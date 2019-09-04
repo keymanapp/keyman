@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
@@ -45,13 +46,13 @@ public final class ModelInfoActivity extends AppCompatActivity {
   private final String titleKey = "title";
   private final String subtitleKey = "subtitle";
   private final String iconKey = "icon";
-  private final String isEnabledKey = "isEnabled";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
+    final String authority = getApplication().getPackageName() + ".fileProvider";
 
     setContentView(R.layout.activity_list_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
@@ -65,14 +66,14 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
     final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
     final String modelID = getIntent().getStringExtra(KMManager.KMKey_LexicalModelID);
+    final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
+    final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
-    final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
     textView.setText(String.format(getString(R.string.model_info_header), modelName));
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
-    final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
 
     infoList = new ArrayList<HashMap<String, String>>();
     // Display model version title
@@ -84,17 +85,18 @@ public final class ModelInfoActivity extends AppCompatActivity {
     infoList.add(hashMap);
 
     // Display model help link
-    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-    String icon = String.valueOf(R.drawable.ic_arrow_forward);
     hashMap = new HashMap<String, String>();
+    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    // Check if app declared FileProvider
+    // Currently, model help only available if custom link exists
+    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    if ( (!customHelpLink.equals("") && !FileProviderUtils.exists(context)) ||
+        customHelpLink.equals("")){
+      icon = noIcon;
+    }
     hashMap.put(titleKey, getString(R.string.help_link));
     hashMap.put(subtitleKey, "");
-    // For now, lexical model help only available when installed via custom packages
-    if(!customHelpLink.equals("")) {
-      hashMap.put(iconKey, icon);
-    } else {
-      hashMap.put(iconKey, noIcon);
-    }
+    hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
     // Display link to uninstall model
@@ -112,12 +114,12 @@ public final class ModelInfoActivity extends AppCompatActivity {
       public boolean isEnabled(int position) {
         HashMap<String, String> hashMap = (HashMap<String, String>)infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
-
+        String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
         if (itemTitle.equals(getString(R.string.model_version))) {
           // No point in 'clicking' on version info.
           return false;
-          // Visibly disables the help option when help isn't available.
-        } else if (itemTitle.equals(getString(R.string.help_link)) && customHelpLink.equals("")) {
+        // Visibly disables the help option when custom help isn't available
+        } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
           return false;
         }
 
@@ -143,7 +145,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
+                  context, authority, customHelp);
                 i.setDataAndType(contentUri, "text/html");
               } catch (NullPointerException e) {
                 String message = "FileProvider undefined in app to load" + customHelp.toString();
@@ -154,7 +156,9 @@ public final class ModelInfoActivity extends AppCompatActivity {
             else {
               i.setData(Uri.parse(customHelpLink));
             }
-            startActivity(i);
+            if (FileProviderUtils.exists(context)) {
+              startActivity(i);
+            }
           } else {
             // We should always have a help file packaged with models.
           }
@@ -169,13 +173,8 @@ public final class ModelInfoActivity extends AppCompatActivity {
         } else {
           return;
         }
-
       }
-
-
     });
-
-
   }
 
   @Override

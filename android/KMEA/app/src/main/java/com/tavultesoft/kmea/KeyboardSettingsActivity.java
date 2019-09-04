@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
@@ -43,13 +44,14 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
   private final String titleKey = "title";
   private final String subtitleKey = "subtitle";
   private final String iconKey = "icon";
-  private final String isEnabledKey = "isEnabled";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
+    final String authority = getApplication().getPackageName() + ".fileProvider";
+
     setContentView(R.layout.activity_list_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
@@ -71,37 +73,35 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
-    final boolean isCustomKeyboard = getIntent().getBooleanExtra(KMManager.KMKey_CustomKeyboard, false);
-
     infoList = new ArrayList<HashMap<String, String>>();
     // Display keyboard version title
-    String icon = "0";
+    final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    hashMap.put(iconKey, icon);
+    hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
     // Display keyboard help link
-    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-    if (isCustomKeyboard && customHelpLink == null) {
-      icon = "0";
-    } else {
-      icon = String.valueOf(R.drawable.ic_arrow_forward);
-    }
     hashMap = new HashMap<String, String>();
+    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    // Check if app declared FileProvider
+    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    if (customHelpLink != null && !FileProviderUtils.exists(context)) {
+      icon = noIcon;
+    }
     hashMap.put(titleKey, getString(R.string.help_link));
     hashMap.put(subtitleKey, "");
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
+    // Display uninstall keyboard
     if (!packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) ||
         !kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
-      icon = "0";
       hashMap = new HashMap<String, String>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");
-      hashMap.put(iconKey, icon);
+      hashMap.put(iconKey, noIcon);
       infoList.add(hashMap);
     }
 
@@ -110,15 +110,15 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
       @Override
-        public boolean isEnabled(int position) {
-        HashMap<String, String> hashMap = (HashMap<String, String>) infoList.get(position);
+      public boolean isEnabled(int position) {
+        HashMap<String, String> hashMap = (HashMap<String, String>)infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
-
+        String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
           // No point in 'clicking' on version info.
           return false;
-          // Visibly disables the help option when help isn't available.
-        } else if (itemTitle.equals(getString(R.string.help_link)) && isCustomKeyboard && customHelpLink == null) {
+        // Visibly disables the help option when custom help isn't available
+        } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
           return false;
         }
 
@@ -144,18 +144,20 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
+                  context, authority, customHelp);
                 i.setDataAndType(contentUri, "text/html");
               } catch (NullPointerException e) {
                 String message = "FileProvider undefined in app to load" + customHelp.toString();
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.e("KeyboardInfoActivity", message);
+                Log.e("KeyboardSettingsActivity", message);
               }
             }
             else {
               i.setData(Uri.parse(customHelpLink));
             }
-            startActivity(i);
+            if (FileProviderUtils.exists(context)) {
+              startActivity(i);
+            }
           } else {
             String helpUrlStr = String.format("http://help.keyman.com/keyboard/%s/%s/", kbID, kbVersion);
             i.setData(Uri.parse(helpUrlStr));
