@@ -22,6 +22,7 @@
 		C05B14221FD8F2B10082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; };
 		C05B14231FD8F2B10082A316 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C07705E41FD8F21500D2F3C7 /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBEFB8C231F9E3E00F8F67C /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8B231F9E3E00F8F67C /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				CEBEFB8C231F9E3E00F8F67C /* Reachability.framework in Embed Frameworks */,
 				C05B14251FD8F2B10082A316 /* Zip.framework in Embed Frameworks */,
 				C05B14211FD8F2B10082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C01AB59C1F8345CB009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
@@ -55,6 +57,8 @@
 		C07705E41FD8F21500D2F3C7 /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
 		C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
+		CEBEFB89231F9CC600F8F67C /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reachability.framework; sourceTree = "<group>"; };
+		CEBEFB8B231F9E3E00F8F67C /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +79,7 @@
 		98ABFCD41AD39165005534F0 = {
 			isa = PBXGroup;
 			children = (
+				CEBEFB8B231F9E3E00F8F67C /* Reachability.framework */,
 				98ABFD171AD391B0005534F0 /* Frameworks */,
 				98ABFD281AD393AD005534F0 /* Keyboards */,
 				98ABFCDF1AD39165005534F0 /* KMSample1 */,
@@ -114,6 +119,7 @@
 		98ABFD171AD391B0005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CEBEFB89231F9CC600F8F67C /* Reachability.framework */,
 				C01AB5991F8345C5009B37D3 /* KeymanEngine.framework */,
 				C07705E51FD8F21500D2F3C7 /* ObjcExceptionBridging.framework */,
 				C07705E61FD8F21500D2F3C7 /* XCGLogger.framework */,
@@ -181,6 +187,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -221,7 +228,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -370,6 +377,7 @@
 					"$(SRCROOT)/../../Carthage/Build/iOS/",
 				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample1;
@@ -392,6 +400,7 @@
 					"$(SRCROOT)/../../Carthage/Build/iOS/",
 				);
 				INFOPLIST_FILE = KMSample1/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample1;
