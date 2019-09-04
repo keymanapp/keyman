@@ -16,7 +16,7 @@ class KeyboardViewController: InputViewController {
     KeymanEngine.log.logAppDetails()
 
     // Replace with your application group id
-    Manager.applicationGroupIdentifier = "group.horton.kmtesting"
+    Manager.applicationGroupIdentifier = "group.KMSample"
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
