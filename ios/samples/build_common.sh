@@ -104,7 +104,7 @@ if [ $DO_UPDATE = true ]; then
         base_dir="$(pwd)"
 
         cd $KMEI_BUILD_DIR
-        ./build.sh -only-framework $KMEI_FLAGS
+        ./kmbuild.sh -only-framework $KMEI_FLAGS
         cd $base_dir
     fi
 
