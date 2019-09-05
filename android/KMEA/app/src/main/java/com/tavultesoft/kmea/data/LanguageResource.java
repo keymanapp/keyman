@@ -9,6 +9,7 @@ public interface LanguageResource {
   String getLanguageName();
   String getVersion();
   String getPackage();
+  String getHelp();
 
   Bundle buildDownloadBundle();
 }

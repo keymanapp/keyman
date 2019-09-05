@@ -79,6 +79,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     // Display keyboard help link
     hashMap = new HashMap<String, String>();
+    final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
@@ -140,7 +141,6 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
               startActivity(i);
             }
           } else {
-            String helpUrlStr = String.format("http://help.keyman.com/keyboard/%s/%s/", kbID, kbVersion);
             i.setData(Uri.parse(helpUrlStr));
             startActivity(i);
           }
