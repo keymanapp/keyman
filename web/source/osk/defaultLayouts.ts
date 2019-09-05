@@ -3,6 +3,8 @@
    Copyright 2017 SIL International
 ***/
 
+///<reference path="../utils/version.ts"/>
+
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
 
@@ -114,7 +116,7 @@ namespace com.keyman.osk {
     * @param   {string}  formFactor
     * @return  {Object}
     */
-    static buildDefaultLayout(PVK, kbdBitmask: number, formFactor: string): LayoutFormFactor {
+    static buildDefaultLayout(PVK, kbdDevVersion: utils.Version, kbdBitmask: number, formFactor: string): LayoutFormFactor {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
@@ -250,7 +252,7 @@ namespace com.keyman.osk {
 
               // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
               // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
-              if(isDefault) {
+              if(isDefault && kbdDevVersion.precedes(utils.Version.NO_DEFAULT_KEYCAPS)) {
                 if(key['id'] != 'K_SPACE' && kx+65 * isShift < Layouts.dfltText.length && key['text'] !== null) {
                   key['text'] = key['text'] || Layouts.dfltText[kx+65*isShift];
                 }

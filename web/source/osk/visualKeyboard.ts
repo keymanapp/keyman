@@ -1,4 +1,5 @@
 /// <reference path="activeLayout.ts" />
+/// <reference path="../utils/version.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -591,7 +592,9 @@ namespace com.keyman.osk {
 
       // Build a layout using the default for the device
       if(typeof layout != 'object' || layout == null) {
-        layout=Layouts.buildDefaultLayout(PVK,kbdBitmask, formFactor);
+        // Using 9.0.0 as a fallback Developer version for keyboards.
+        let kbdDevVersion = utils.Version.parseWithDefault(activeKeyboard['KVER'], "9.0.0");
+        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, formFactor);
       }
 
       // Create the collection of HTML elements from the device-dependent layout object
@@ -2093,7 +2096,9 @@ namespace com.keyman.osk {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
-        layout=Layouts.buildDefaultLayout(PVK,keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
+        // Using 9.0.0 as a fallback Developer version for keyboards.
+        let kbdDevVersion = utils.Version.parseWithDefault(PKbd['KVER'], "9.0.0");
+        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
       }
 
       // Cannot create an OSK if no layout defined, just return empty DIV
