@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018 SIL International. All rights reserved.
+ * Copyright (C) 2018-2019 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -61,6 +61,7 @@ import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
+  private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
+  private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
@@ -239,23 +242,35 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
 
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+
+    // Check if default keyboard should be added
     if (!KMManager.keyboardExists(this, KMManager.KMDefault_UndefinedPackageID,
-      KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
-      HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-      kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-      kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-      kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-      kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-        this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
-      kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-      KMManager.addKeyboard(this, kbInfo);
+        KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
+      boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
+      if (!installDefaultKeyboard) {
+        HashMap<String, String> kbInfo = new HashMap<String, String>();
+        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+        kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
+        kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
+        kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
+        kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
+        kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
+          this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
+        kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+        KMManager.addKeyboard(this, kbInfo);
+      }
+
+      editor.putBoolean(defaultKeyboardInstalled, true);
+      editor.commit();
     }
 
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
+
+    checkAndInstallDefaultDictionary();
 
     Intent intent = getIntent();
     data = intent.getData();
@@ -422,6 +437,29 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onKeyboardDismissed() {
     resizeTextView(false);
+  }
+
+  private void checkAndInstallDefaultDictionary() {
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    // Check if default dictionary model package should be installed
+    // This also depends on a current keyboard being loaded
+    HashMap<String, String> curKbInfo = KMManager.getCurrentKeyboardInfo(this);
+    if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
+        KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID) && curKbInfo != null) {
+      boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
+      if (!installDefaultDictionary) {
+        File defaultDictionaryKMP = new File(
+          new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
+        Uri uri = FileProvider.getUriForFile(
+          context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
+        useLocalKMP(context, uri, true);
+      }
+
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putBoolean(defaultDictionaryInstalled, true);
+      editor.commit();
+    }
   }
 
   private void resizeTextView(boolean isKeyboardVisible) {
@@ -669,6 +707,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   // TODO: Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
+    useLocalKMP(context, data, false);
+  }
+
+  public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
     String filename = "";
     String cacheKMPFilename = "";
     File cacheKMPFile = null;
@@ -721,6 +763,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
     if (cacheKMPFile != null) {
       bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
+      bundle.putBoolean("silentInstall", silentInstall);
 
       Intent packageIntent = new Intent(context, PackageActivity.class);
       packageIntent.putExtras(bundle);
@@ -848,7 +891,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-    String langId = KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID);
+    String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+      KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID) :
+      KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 
     for(int i=0; i<lexicalModelsInstalled.size(); i++) {
