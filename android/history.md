@@ -7,6 +7,9 @@
 * New Feature
   * Include the English (MTNT) dictionary by default for English (#2029)
 
+* Bug Fix:
+  * Fix collision of File Provider (#2053)
+
 ## 2019-09-04 12.0.4084 beta
 * No change to Keyman for Android (updated Keyman Web Engine, #2033, #2037)
 

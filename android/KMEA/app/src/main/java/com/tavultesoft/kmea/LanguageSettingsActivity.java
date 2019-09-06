@@ -208,12 +208,17 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         intent.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
         intent.putExtra(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
         intent.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
-        intent.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID));
+        String keyboardVersion = KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID);
+        intent.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
         boolean isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N").equals("Y") ? true : false;
         intent.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
         String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
-        if (customHelpLink != null)
+        if (customHelpLink != null) {
           intent.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+        } else {
+          intent.putExtra(KMManager.KMKey_HelpLink,
+            String.format("https://help.keyman.com/keyboard/%s/%s/", keyboardID, keyboardVersion));
+        }
         startActivity(intent);
       }
     });
