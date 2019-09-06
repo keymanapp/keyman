@@ -25,14 +25,41 @@ class KeyboardViewController: InputViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
+  override func updateViewConstraints() {
+    super.updateViewConstraints()
+
+    if view.frame.size.width == 0 || self.view.frame.size.height == 0 {
+      return
+    }
+
+    setupTopBarImage(isPortrait: InputViewController.isPortrait)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
+    setupTopBarImage(isPortrait: InputViewController.isPortrait)
+  }
 
-    topBarImageView?.backgroundColor = UIColor(red: 1.0, green: 96.0 / 255.0, blue: 0.0, alpha: 1.0)
-    let label = UILabel(frame: CGRect.zero)
-    label.text = " \(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName")!)"
-    label.sizeToFit()
-    label.textColor = UIColor.white
-    topBarImageView?.addSubview(label)
+  override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    setupTopBarImage(isPortrait: UIDevice.current.orientation.isPortrait)
+  }
+
+  func getTopBarImage(isPortrait: Bool) -> String? {
+    if isPortrait {
+      return Bundle.main.path(forResource: "banner-portrait-text", ofType: "png")
+    } else {
+      return Bundle.main.path(forResource: "banner-landscape-text", ofType: "png")
+    }
+  }
+
+  func setupTopBarImage(isPortrait: Bool) {
+    let imgPath = getTopBarImage(isPortrait: isPortrait)
+    guard let path = imgPath else {
+      log.error("No image specified for the image banner!")
+      return
+    }
+
+    self.setBannerImage(to: path)
   }
 }
