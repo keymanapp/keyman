@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2019 SIL International. All rights reserved.
+ */
 
 package com.tavultesoft.kmea;
 
@@ -88,7 +91,9 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
-    if (customHelpLink != null && !FileProviderUtils.exists(context)) {
+    // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
+    if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
+         (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {
       icon = noIcon;
     }
     hashMap.put(titleKey, getString(R.string.help_link));
@@ -118,7 +123,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
           // No point in 'clicking' on version info.
           return false;
-        // Visibly disables the help option when custom help isn't available
+        // Visibly disables the help option when help isn't available
         } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
           return false;
         }

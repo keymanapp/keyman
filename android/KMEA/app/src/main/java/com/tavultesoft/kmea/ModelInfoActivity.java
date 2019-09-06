@@ -90,8 +90,10 @@ public final class ModelInfoActivity extends AppCompatActivity {
     // Check if app declared FileProvider
     // Currently, model help only available if custom link exists
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    // Don't show help link arrow if both custom help and File Provider don't exist
+	// TODO: Update this when model help available on help.keyman.com
     if ( (!customHelpLink.equals("") && !FileProviderUtils.exists(context)) ||
-        customHelpLink.equals("")){
+        customHelpLink.equals("") ){
       icon = noIcon;
     }
     hashMap.put(titleKey, getString(R.string.help_link));

@@ -57,16 +57,16 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     listView = (ListView) findViewById(R.id.listView);
 
+    final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
     final String kbID = getIntent().getStringExtra(KMManager.KMKey_KeyboardID);
+    String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
+    final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
+    final boolean isCustomKeyboard = getIntent().getBooleanExtra(KMManager.KMKey_CustomKeyboard, false);
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
-    String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
     textView.setText(kbName);
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
-
-    final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
-    final boolean isCustomKeyboard = getIntent().getBooleanExtra(KMManager.KMKey_CustomKeyboard, false);
 
     infoList = new ArrayList<HashMap<String, String>>();
     // Display keyboard version title
@@ -83,7 +83,9 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
-    if (customHelpLink != null && !FileProviderUtils.exists(context)) {
+    // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
+    if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
+         (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {
       icon = noIcon;
     }
     hashMap.put(titleKey, getString(R.string.help_link));
@@ -93,17 +95,17 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
     int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
+
     ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
       @Override
       public boolean isEnabled(int position) {
-
         HashMap<String, String> hashMap = (HashMap<String, String>) infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
           // No point in 'clicking' on version info.
           return false;
-        // Visibly disables the help option when custom help isn't available.
+        // Visibly disables the help option when help isn't available
         } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
           return false;
         }
@@ -146,11 +148,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
           }
         }
       }
-
-
     });
-
-
   }
 
   @Override
