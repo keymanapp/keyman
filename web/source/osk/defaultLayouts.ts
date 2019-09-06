@@ -111,8 +111,9 @@ namespace com.keyman.osk {
     /**
     * Build a default layout for keyboards with no explicit layout
     *
-    * @param   {Object}  PVK         keyboard object (as loaded)
-    * @param   {number}  kbdBitmask  keyboard modifier bitmask
+    * @param   {Object}  PVK             keyboard object (as loaded)
+    * @param   {Object}  kbdDevVersion   object representing the version of Developer that compiled the keyboard
+    * @param   {number}  kbdBitmask      keyboard modifier bitmask
     * @param   {string}  formFactor
     * @return  {Object}
     */
@@ -250,8 +251,8 @@ namespace com.keyman.osk {
                 if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
               }
 
-              // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
-              // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
+              // Legacy (pre 12.0) behavior:  fall back to US English keycap text as default for the base two layers
+              // if a key cap is not otherwise defined. (Any intentional 'ghost' keys must be explicitly defined.)
               if(isDefault && kbdDevVersion.precedes(utils.Version.NO_DEFAULT_KEYCAPS)) {
                 if(key['id'] != 'K_SPACE' && kx+65 * isShift < Layouts.dfltText.length && key['text'] !== null) {
                   key['text'] = key['text'] || Layouts.dfltText[kx+65*isShift];

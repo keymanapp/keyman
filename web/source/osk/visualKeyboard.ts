@@ -592,8 +592,7 @@ namespace com.keyman.osk {
 
       // Build a layout using the default for the device
       if(typeof layout != 'object' || layout == null) {
-        // Using 9.0.0 as a fallback Developer version for keyboards.
-        let kbdDevVersion = utils.Version.parseWithDefault(activeKeyboard['KVER'], "9.0.0");
+        let kbdDevVersion = new utils.Version(activeKeyboard['KVER']);
         layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, formFactor);
       }
 
@@ -2096,8 +2095,7 @@ namespace com.keyman.osk {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
-        // Using 9.0.0 as a fallback Developer version for keyboards.
-        let kbdDevVersion = utils.Version.parseWithDefault(PKbd['KVER'], "9.0.0");
+        let kbdDevVersion = new utils.Version(PKbd['KVER']);
         layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
       }
 
