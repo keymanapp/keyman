@@ -340,7 +340,6 @@ namespace com.keyman {
       var lastElem = this.getLastActiveElement();
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
         this.clearLastActiveElement();
-        this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
         this.keyman.osk._Hide(false);
       }
       
