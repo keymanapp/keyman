@@ -390,8 +390,6 @@ public class CloudRepository {
           hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
           hashMap.put(KMManager.KMKey_Font, kbFont);
-          hashMap.put(KMManager.KMKey_HelpLink,
-            String.format("https://help.keyman.com/keyboard/%s/%s/", kbID, kbVersion));
 
 //          if (keyboardModifiedDates.get(kbID) == null) {
 //            keyboardModifiedDates.put(kbID, keyboardJSON.getString(KMManager.KMKey_KeyboardModified));

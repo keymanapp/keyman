@@ -51,8 +51,6 @@ public class Keyboard implements Serializable, LanguageResource {
     return this.map.get(KMManager.KMKey_PackageID);
   }
 
-  public String getHelp() { return this.map.get(KMManager.KMKey_HelpLink); }
-
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
     bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
