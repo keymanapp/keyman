@@ -3,6 +3,19 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-06 12.0.4085 beta
+* Bug Fix:
+  * Fix collision of File Provider (#2053)
+
+## 2019-09-04 12.0.4084 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2033, #2037)
+
+## 2019-09-03 12.0.4083 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2027)
+
+## 2019-09-02 12.0.4082 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2013)
+
 ## 2019-08-30 12.0.4081 beta
 * New Feature:
   * Allow user to "Add keyboard from local device" from Settings menu (#1992)

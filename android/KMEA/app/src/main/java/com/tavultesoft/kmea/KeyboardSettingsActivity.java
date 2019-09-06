@@ -53,7 +53,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
-    final String authority = getApplication().getPackageName() + ".fileProvider";
+    final String authority = FileProviderUtils.getAuthority(context);
 
     setContentView(R.layout.activity_list_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
