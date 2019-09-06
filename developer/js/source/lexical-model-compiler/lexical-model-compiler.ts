@@ -55,9 +55,6 @@ export default class LexicalModelCompiler {
     function getWordBreakerSpec() {
       if (modelSource.wordBreaker) {
         return modelSource.wordBreaker;
-      } else if (modelSource.wordBreaking) {
-        compiler.logError('`wordBreaking` will be deleted; please use `wordBreaker` instead!');
-        return modelSource.wordBreaking;
       } else {
         return null;
       }
