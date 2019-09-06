@@ -24,6 +24,7 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
 import android.Manifest;
@@ -452,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         File defaultDictionaryKMP = new File(
           new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
         Uri uri = FileProvider.getUriForFile(
-          context, "com.tavultesoft.kmea.fileProvider", defaultDictionaryKMP);
+          context, FileProviderUtils.getAuthority(context), defaultDictionaryKMP);
         useLocalKMP(context, uri, true);
       }
 
