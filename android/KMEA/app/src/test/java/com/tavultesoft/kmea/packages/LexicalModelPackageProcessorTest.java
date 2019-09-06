@@ -22,9 +22,9 @@ public class LexicalModelPackageProcessorTest {
   private static final File TEST_RESOURCE_ROOT = new File("test_resources");
   private static final File TEST_EXTRACTION_ROOT = new File(TEST_RESOURCE_ROOT, "temp");
 
-  private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom.model";
+  private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom";
   private static final File TEST_EN_CUSTOM_MODEL_KMP_FILE = new File(TEST_RESOURCE_ROOT, "packages" +
-    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_NAME + ".kmp");
+    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_NAME + ".model.kmp");
   private static final File TEST_EN_CUSTOM_MODEL_KMP_TARGET = new File(TEST_EXTRACTION_ROOT, "models" +
     File.separator + TEST_EN_CUSTOM_MODEL_NAME);
 
