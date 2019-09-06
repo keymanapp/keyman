@@ -191,10 +191,16 @@ begin
       'the Keyman keyboards repository and includes all basic files '+
       'needed for a keyboard project.';
     kptBlank: lblDescription.Caption :=
-      'Creates a blank, untitled project.';
+      'Creates a blank, untitled keyboard project.';
     kptImportWindowsKeyboard: lblDescription.Caption :=
       'Creates a new keyboard project, importing from a Windows system keyboard '+
       'and generating all the basic files needed for a keyboard project.';
+    kptBlankLexicalModel: lblDescription.Caption :=
+      'Creates a blank, untitled lexical model project.';
+    kptWordlistLexicalModel: lblDescription.Caption :=
+      'Creates a new lexical model project that matches the folder structure used in '+
+      'the Keyman lexical-models repository and includes all basic files '+
+      'needed for a wordlist lexical mdoel.';
   end;
 end;
 

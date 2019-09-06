@@ -28,6 +28,11 @@
 		C05B142E1FD8F45E0082A316 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14281FD8F4510082A316 /* XCGLogger.framework */; };
 		C05B142F1FD8F45E0082A316 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14281FD8F4510082A316 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C05B14311FD8F45E0082A316 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C05B14261FD8F4510082A316 /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEBEFB94231FB4E000F8F67C /* banner-portrait-text.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBEFB92231FB4DF00F8F67C /* banner-portrait-text.png */; };
+		CEBEFB95231FB4E000F8F67C /* banner-landscape-text.png in Resources */ = {isa = PBXBuildFile; fileRef = CEBEFB93231FB4DF00F8F67C /* banner-landscape-text.png */; };
+		CEBEFB98231FB6BD00F8F67C /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */; };
+		CEBEFB99231FB6BE00F8F67C /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */; };
+		CEBEFB9B231FB7DE00F8F67C /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +63,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				CEBEFB9B231FB7DE00F8F67C /* Reachability.framework in Embed Frameworks */,
 				C05B14311FD8F45E0082A316 /* Zip.framework in Embed Frameworks */,
 				C05B142D1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C01AB5A11F834706009B37D3 /* KeymanEngine.framework in Embed Frameworks */,
@@ -87,6 +93,9 @@
 		C05B14261FD8F4510082A316 /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = ../../Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
 		C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
 		C05B14281FD8F4510082A316 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
+		CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
+		CEBEFB92231FB4DF00F8F67C /* banner-portrait-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-portrait-text.png"; sourceTree = "<group>"; };
+		CEBEFB93231FB4DF00F8F67C /* banner-landscape-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-landscape-text.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +105,7 @@
 			files = (
 				C01AB5A01F834706009B37D3 /* KeymanEngine.framework in Frameworks */,
 				C05B142C1FD8F45E0082A316 /* ObjcExceptionBridging.framework in Frameworks */,
+				CEBEFB98231FB6BD00F8F67C /* Reachability.framework in Frameworks */,
 				C05B142E1FD8F45E0082A316 /* XCGLogger.framework in Frameworks */,
 				C059FCB51FD923E900BD1A64 /* Zip.framework in Frameworks */,
 			);
@@ -105,6 +115,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEBEFB99231FB6BE00F8F67C /* Reachability.framework in Frameworks */,
 				C01AB59F1F8346FC009B37D3 /* KeymanEngine.framework in Frameworks */,
 				C059FCB21FD9231D00BD1A64 /* ObjcExceptionBridging.framework in Frameworks */,
 				C059FCB31FD9231D00BD1A64 /* XCGLogger.framework in Frameworks */,
@@ -160,6 +171,7 @@
 		98ABFD601AD3A087005534F0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CEBEFB8D231F9FEE00F8F67C /* Reachability.framework */,
 				C05B14271FD8F4510082A316 /* ObjcExceptionBridging.framework */,
 				C05B14281FD8F4510082A316 /* XCGLogger.framework */,
 				C05B14261FD8F4510082A316 /* Zip.framework */,
@@ -188,6 +200,7 @@
 		98ABFD8D1AD3A232005534F0 /* SWKeyboard */ = {
 			isa = PBXGroup;
 			children = (
+				CEBEFB91231FB49A00F8F67C /* Sample Banner Images */,
 				98ABFDA41AD3A363005534F0 /* SWKeyboard.entitlements */,
 				C045148C1F85E33300D88416 /* KeyboardViewController.swift */,
 				98ABFD8E1AD3A232005534F0 /* Supporting Files */,
@@ -201,6 +214,15 @@
 				98ABFD8F1AD3A232005534F0 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CEBEFB91231FB49A00F8F67C /* Sample Banner Images */ = {
+			isa = PBXGroup;
+			children = (
+				CEBEFB93231FB4DF00F8F67C /* banner-landscape-text.png */,
+				CEBEFB92231FB4DF00F8F67C /* banner-portrait-text.png */,
+			);
+			path = "Sample Banner Images";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -256,7 +278,6 @@
 				TargetAttributes = {
 					98ABFD361AD3A047005534F0 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = N4M8L6CCXN;
 						LastSwiftMigration = 0900;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -266,7 +287,6 @@
 					};
 					98ABFD8B1AD3A232005534F0 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = N4M8L6CCXN;
 						LastSwiftMigration = 0900;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -281,6 +301,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -312,6 +333,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEBEFB95231FB4E000F8F67C /* banner-landscape-text.png in Resources */,
+				CEBEFB94231FB4E000F8F67C /* banner-portrait-text.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -514,6 +537,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = KMSample2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
@@ -535,6 +559,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = KMSample2/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
@@ -558,6 +583,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample2.SystemKeyboard;
@@ -579,6 +605,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman.ios.Sample2.SystemKeyboard;

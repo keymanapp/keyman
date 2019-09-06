@@ -104,7 +104,7 @@ if [ $DO_UPDATE = true ]; then
         base_dir="$(pwd)"
 
         cd $KMEI_BUILD_DIR
-        ./build.sh -only-framework $KMEI_FLAGS
+        ./kmbuild.sh -only-framework $KMEI_FLAGS
         cd $base_dir
     fi
 
@@ -122,7 +122,7 @@ fi
 if [ $CODE_SIGN = true ]; then
   xcodebuild -quiet -target "$TARGET" -config "$CONFIG"
 else
-  xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO -target "$TARGET" -config "$CONFIG"
+  xcodebuild -quiet CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS="" -target "$TARGET" -config "$CONFIG"
 fi
 
 if [ $? = 0 ]; then

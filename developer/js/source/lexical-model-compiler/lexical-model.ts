@@ -39,18 +39,10 @@ interface LexicalModelSource extends LexicalModel {
    *    Boundary Specification, which works well for *most* languages.
    *  - 'ascii' -- a very simple word breaker, for demonstration purposes only.
    *  - word breaking function -- provide your own function that breaks words.
+   *  - class-based word-breaker - may be supported in the future.
    */
-  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
+  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction | ClassBasedWordBreaker;
 
-  /**
-   * ****** TODO: DELETE ME******
-   *
-   * This used to be the way that word breaking was specified, but
-   * this should be deleted once keymanapp/lexical-models#54 is merged.
-   *
-   * https://github.com/keymanapp/lexical-models/pull/54
-   */
-  readonly wordBreaking?: 'default' | 'ascii' | 'placeholder' | WordBreakingFunction | ClassBasedWordBreaker;
   /**
    * How to simplify words, to convert them into simplifired search keys
    * This often involves removing accents, lowercasing, etc.
