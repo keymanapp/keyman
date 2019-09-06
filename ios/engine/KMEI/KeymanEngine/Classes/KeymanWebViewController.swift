@@ -462,7 +462,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   }
 
   private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat, withOffset: Bool = true) -> CGRect {
-    // kmw adds w/2 to x for MOST keys.  Not the touch menu, though!
+    // kmw adds w/2 to x for MOST keys.  Not the picker menu's base key, though!
     return CGRect(x: x - (withOffset ? w / 2.0 : 0), y: y, width: w, height: h)
   }
   
