@@ -28,6 +28,7 @@ type
       const Name: string): Boolean; static;
     class function DoesProjectFilenameFollowLexicalModelConventions(
       const Name: string): Boolean; static;
+    class function CleanLexicalModelIDComponent(const Name: string): string; static;
 
     class function ExtractFileExt(filename: string): string; static;
     class function RemoveFileExt(filename: string): string; static;
@@ -49,10 +50,10 @@ const
 
   // The model ID SHOULD adhere to this pattern (see also developer/js/index.ts):
   //                           author           .bcp47            .uniq
-  MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.js$';
-  MODEL_ID_PATTERN_TS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.ts$';
-  MODEL_ID_PATTERN_PACKAGE = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
-  MODEL_ID_PATTERN_PROJECT = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*\.model\.kpj$';
+  MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.js$';
+  MODEL_ID_PATTERN_TS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.ts$';
+  MODEL_ID_PATTERN_PACKAGE = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
+  MODEL_ID_PATTERN_PROJECT = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$';
 
 class function TLexicalModelUtils.DoesJSFilenameFollowLexicalModelConventions(
   const Name: string): Boolean;
@@ -119,6 +120,20 @@ begin
       SameText(Result, Ext_ProjectSource)) and
      SameText(Second, Ext_Model_Component) then
     Result := Second + Result;
+end;
+
+class function TLexicalModelUtils.CleanLexicalModelIDComponent(const Name: string): string;
+var
+  i: Integer;
+const
+  ValidChars: string = 'abcdefghijklmnopqrstuvwxyz0123456789_';
+begin
+  // Cloned from TKeyboardUtils.CleanKeyboardID
+  Result := LowerCase(Name);
+  if Length(Result) = 0 then Exit;
+  if Pos(Result[1], '0123456789') > 0 then Result := '_'+Result; // Can't have a number as initial
+  for i := 1 to Length(Result) do
+    if Pos(Result[i], ValidChars) = 0 then Result[i] := '_';
 end;
 
 end.

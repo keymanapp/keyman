@@ -12,10 +12,13 @@ uses
   Vcl.CheckLst,
   Vcl.Controls,
   Vcl.Dialogs,
+  Vcl.ExtCtrls,
   Vcl.Forms,
   Vcl.Graphics,
   Vcl.Grids,
   Vcl.StdCtrls,
+
+  Browse4Folder,
 
   kpsfile,
   PackageInfo,
@@ -44,11 +47,14 @@ type
     cmdAddLanguage: TButton;
     cmdEditLanguage: TButton;
     cmdRemoveLanguage: TButton;
-    dlgSave: TSaveDialog;
     lblBCP47: TLabel;
     lblUniq: TLabel;
     editUniq: TEdit;
     cbBCP47: TComboBox;
+    lblModelName: TLabel;
+    editModelName: TEdit;
+    Bevel1: TBevel;
+    dlgBrowse: TBrowse4Folder;
     procedure cmdOKClick(Sender: TObject);
     procedure editModelIDComponentChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -64,7 +70,7 @@ type
     procedure editPathChange(Sender: TObject);
     procedure editModelIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
-    procedure dlgSaveCanClose(Sender: TObject; var CanClose: Boolean);
+    procedure editModelNameChange(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -80,12 +86,23 @@ type
     procedure BCP47_Fill;
     function SelectedLexicalModel: TPackageLexicalModel;
     function GetModelID: string;
+    procedure UpdateAuthorIDFromAuthor;
+    procedure UpdateUniqFromModelName;
+    function GetModelName: string;
+    function GetAuthorID: string;
+    function GetPrimaryBCP47: string;
+    function GetUniq: string;
+    procedure UpdateModelIDFromComponents;
   protected
     function GetHelpTopic: string; override;
+    property AuthorID: string read GetAuthorID;
+    property PrimaryBCP47: string read GetPrimaryBCP47;
+    property Uniq: string read GetUniq;
   public
     property Copyright: string read GetCopyright;
     property Version: string read GetVersion;
     property Author: string read GetAuthor;
+    property ModelName: string read GetModelName;
     property BCP47Tags: string read GetBCP47Tags;
     property BasePath: string read GetBasePath;
 
@@ -127,7 +144,7 @@ begin
 
     pt := TModelProjectTemplate.Create(f.BasePath, f.ModelID);
     try
-      pt.Name := f.ModelID;
+      pt.Name := f.ModelName;
       pt.Copyright := f.Copyright;
       pt.Author := f.Author;
       pt.Version := f.Version;
@@ -174,48 +191,17 @@ begin
   FreeAndNil(pack);
 end;
 
-procedure TfrmNewModelProjectParameters.BCP47_Fill;
-var
-  lm: TPackageLexicalModel;
-  FLastBCP47: string;
-  lang: TPackageKeyboardLanguage;
+function TfrmNewModelProjectParameters.GetHelpTopic: string;
 begin
-  FLastBCP47 := cbBCP47.Text;
-  cbBCP47.Clear;
-  lm := SelectedLexicalModel;
-  if not Assigned(lm) then
-    Exit;
-  for lang in lm.Languages do
-    cbBCP47.Items.Add(lang.ID);
-
-  cbBCP47.ItemIndex := cbBCP47.Items.IndexOf(FLastBCP47);
-  if (cbBCP47.ItemIndex < 0) and (cbBCP47.Items.Count > 0) then
-    cbBCP47.ItemIndex := 0;
-
-  editModelIDComponentChange(cbBCP47);
+  Result := SHelpTopic_Context_NewModelProjectParameters;
 end;
 
 procedure TfrmNewModelProjectParameters.cmdBrowseClick(Sender: TObject);
-var
-  FPathName, FFolderName, FProjectName: string;
 begin
-  inherited;
-  if dlgSave.Execute then
-  begin
-    FPathName := ExtractFilePath(ExtractFileDir(dlgSave.FileName));
-    FFolderName := ExtractFileName(ExtractFileDir(dlgSave.FileName));
-    FProjectName := ChangeFileExt(ExtractFileName(dlgSave.FileName), '');
+  dlgBrowse.InitialDir := editPath.Text;
 
-    if not SameText(FFolderName, FProjectName) then
-    begin
-      if MessageDlg('The project will be saved at "'+FPathName+FFolderName+'\'+FProjectName+'\'+FProjectName+'.kpj". Continue?',
-          mtConfirmation, mbOkCancel, 0) = mrCancel then
-        Exit;
-      FPathName := FPathName+FFolderName;
-    end;
-    editPath.Text := ExcludeTrailingPathDelimiter(FPathName);
-    editModelID.Text := FProjectName;
-  end;
+  if dlgBrowse.Execute and (dlgBrowse.FileName <> '') then
+    editPath.Text := ExcludeTrailingPathDelimiter(dlgBrowse.FileName);
 end;
 
 procedure TfrmNewModelProjectParameters.cmdAddLanguageClick(
@@ -301,19 +287,15 @@ begin
     ModalResult := mrOk;
 end;
 
-procedure TfrmNewModelProjectParameters.dlgSaveCanClose(Sender: TObject; var CanClose: Boolean);
-begin
-  if not TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(dlgSave.FileName) then
-  begin
-    CanClose := False;
-    ShowMessage(Format(TLexicalModelUtils.SProjectFileNameDoesNotFollowLexicalModelConventions_Message, [ExtractFileName(dlgSave.FileName)]));
-  end
-  else
-    CanClose := True;
-end;
-
 procedure TfrmNewModelProjectParameters.editAuthorChange(Sender: TObject);
 begin
+  UpdateAuthorIDFromAuthor;
+  EnableControls;
+end;
+
+procedure TfrmNewModelProjectParameters.editModelNameChange(Sender: TObject);
+begin
+  UpdateUniqFromModelName;
   EnableControls;
 end;
 
@@ -329,7 +311,7 @@ end;
 
 procedure TfrmNewModelProjectParameters.editModelIDComponentChange(Sender: TObject);
 begin
-  editModelID.Text := Format('%s.%s.%s', [editAuthorID.Text, cbBCP47.Text, editUniq.Text]);
+  UpdateModelIDFromComponents;
   EnableControls;
 end;
 
@@ -348,10 +330,12 @@ var
   e: Boolean;
 begin
   e :=
-    (Trim(editAuthorID.Text) <> '') and
-    (Trim(cbBCP47.Text) <> '') and
-    (Trim(editUniq.Text) <> '') and
-    (Trim(editPath.Text) <> '') and
+    not Author.IsEmpty and
+    not ModelName.IsEmpty and
+    not AuthorID.IsEmpty and
+    not PrimaryBCP47.IsEmpty and
+    not Uniq.IsEmpty and
+    not Trim(editPath.Text).IsEmpty and
     TLexicalModelUtils.DoesProjectFilenameFollowLexicalModelConventions(editModelID.Text + Ext_LexicalModelProject) and
     (pack.LexicalModels[0].Languages.Count > 0);
 
@@ -370,6 +354,11 @@ begin
   Result := Trim(editAuthor.Text);
 end;
 
+function TfrmNewModelProjectParameters.GetAuthorID: string;
+begin
+  Result := Trim(editAuthorID.Text);
+end;
+
 function TfrmNewModelProjectParameters.GetBasePath: string;
 begin
   Result := Trim(editPath.Text);
@@ -380,14 +369,24 @@ begin
   Result := Trim(editCopyright.Text);
 end;
 
-function TfrmNewModelProjectParameters.GetHelpTopic: string;
-begin
-  Result := SHelpTopic_Context_NewModelProjectParameters;
-end;
-
 function TfrmNewModelProjectParameters.GetModelID: string;
 begin
   Result := editModelID.Text;
+end;
+
+function TfrmNewModelProjectParameters.GetModelName: string;
+begin
+  Result := Trim(editModelName.Text);
+end;
+
+function TfrmNewModelProjectParameters.GetPrimaryBCP47: string;
+begin
+  Result := Trim(cbBCP47.Text);
+end;
+
+function TfrmNewModelProjectParameters.GetUniq: string;
+begin
+  Result := Trim(editUniq.Text);
 end;
 
 function TfrmNewModelProjectParameters.GetBCP47Tags: string;
@@ -442,6 +441,24 @@ begin
         Exit(False);
     end;
   end;
+end;
+
+{ Dynamically update other fields based on filled details }
+
+procedure TfrmNewModelProjectParameters.UpdateAuthorIDFromAuthor;
+begin
+  editAuthorID.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(Author);
+  editCopyright.Text := '© '+FormatDateTime('yyyy', Now)+' '+Author;
+end;
+
+procedure TfrmNewModelProjectParameters.UpdateUniqFromModelName;
+begin
+  editUniq.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(ModelName);
+end;
+
+procedure TfrmNewModelProjectParameters.UpdateModelIDFromComponents;
+begin
+  editModelID.Text := Format('%s.%s.%s', [AuthorID, PrimaryBCP47.ToLowerInvariant, Uniq]);
 end;
 
 { Languages Grid }
@@ -499,6 +516,27 @@ begin
   finally
     Dec(FSetup);
   end;
+end;
+
+procedure TfrmNewModelProjectParameters.BCP47_Fill;
+var
+  lm: TPackageLexicalModel;
+  FLastBCP47: string;
+  lang: TPackageKeyboardLanguage;
+begin
+  FLastBCP47 := cbBCP47.Text;
+  cbBCP47.Clear;
+  lm := SelectedLexicalModel;
+  if not Assigned(lm) then
+    Exit;
+  for lang in lm.Languages do
+    cbBCP47.Items.Add(lang.ID);
+
+  cbBCP47.ItemIndex := cbBCP47.Items.IndexOf(FLastBCP47);
+  if (cbBCP47.ItemIndex < 0) and (cbBCP47.Items.Count > 0) then
+    cbBCP47.ItemIndex := 0;
+
+  editModelIDComponentChange(cbBCP47);
 end;
 
 end.
