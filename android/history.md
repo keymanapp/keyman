@@ -4,6 +4,9 @@
 * Start version 13.0
 
 ## 2019-09-06 12.0.4085 beta
+* New Feature
+  * Include the English (MTNT) dictionary by default for English (#2029)
+
 * Bug Fix:
   * Fix collision of File Provider (#2053)
 

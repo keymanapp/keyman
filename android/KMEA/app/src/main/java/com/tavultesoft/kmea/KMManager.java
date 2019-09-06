@@ -162,6 +162,11 @@ public final class KMManager {
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
+  // Default Dictionary Info
+  public static final String KMDefault_DictionaryPackageID = "nrc.en.mtnt";
+  public static final String KMDefault_DictionaryModelID = "nrc.en.mtnt";
+  public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
+
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keyman.js";
@@ -394,6 +399,7 @@ public final class KMManager {
     AssetManager assetManager = context.getAssets();
     try {
       // Copy main files
+      copyAsset(context, KMDefault_DictionaryKMP, "", true);
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
       if(KMManager.isDebugMode()) {

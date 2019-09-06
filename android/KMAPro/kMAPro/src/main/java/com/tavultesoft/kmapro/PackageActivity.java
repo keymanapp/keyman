@@ -42,8 +42,6 @@ public class PackageActivity extends AppCompatActivity {
   private AlertDialog alertDialog;
   private File kmpFile;
   private File tempPackagePath;
-  private List<Map<String, String>> installedPackageKeyboards;
-  private List<Map<String, String>> installedLexicalModels;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private PackageProcessor kmpProcessor;
 
@@ -52,11 +50,13 @@ public class PackageActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_package_installer);
+    boolean silentInstall = false;
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       kmpFile = new File(bundle.getString("kmpFile"));
+      silentInstall = bundle.getBoolean("silentInstall", false);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -81,6 +81,12 @@ public class PackageActivity extends AppCompatActivity {
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(tempPackagePath);
     if (pkgInfo == null) {
       showErrorToast(context, getString(R.string.invalid_metadata));
+      return;
+    }
+
+    // Silent installation (skip displaying welcome.htm and user confirmation)
+    if (silentInstall) {
+      installPackage(context, pkgTarget, pkgId);
       return;
     }
 
@@ -179,45 +185,7 @@ public class PackageActivity extends AppCompatActivity {
     installButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        try {
-          if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
-            // processKMP will remove currently installed package and install
-            installedPackageKeyboards = kmpProcessor.processKMP(kmpFile, tempPackagePath,
-              PackageProcessor.PP_KEYBOARDS_KEY);
-            // Do the notifications!
-            boolean success = installedPackageKeyboards.size() != 0;
-            if (success) {
-              notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
-                installedPackageKeyboards, 1);
-              if (installedPackageKeyboards != null) {
-                notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
-                  installedPackageKeyboards, 1);
-              }
-              cleanup();
-            } else {
-              showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
-            }
-          } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-            installedLexicalModels = kmpProcessor.processKMP(kmpFile, tempPackagePath,
-              PackageProcessor.PP_LEXICAL_MODELS_KEY);
-            // Do the notifications
-            boolean success = installedLexicalModels.size() != 0;
-            if (success) {
-              notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-                installedLexicalModels, 1);
-              if (installedLexicalModels != null) {
-                notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
-                  installedLexicalModels, 1);
-              }
-              cleanup();
-            } else {
-              showErrorDialog(context, pkgId, getString(R.string.no_new_predictive_text_to_install));
-            }
-          }
-        } catch (Exception e) {
-          Log.e("PackageActivity", "Error " + e);
-          showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
-        }
+        installPackage(context, pkgTarget, pkgId);
       }
     });
 
@@ -268,6 +236,54 @@ public class PackageActivity extends AppCompatActivity {
     // Setting result to 1 so calling activity will finish too
     setResult(1);
     cleanup();
+  }
+
+  /**
+   * Installs the keyboard or lexical model package, and then notifies the corresponding listeners
+   * @param context Context   The activity context
+   * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
+   * @param pkgId String      The Keyman package ID
+   */
+  private void installPackage(Context context, String pkgTarget, String pkgId) {
+    try {
+      if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+        // processKMP will remove currently installed package and install
+        List<Map<String, String>> installedPackageKeyboards =
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+        // Do the notifications!
+        boolean success = installedPackageKeyboards.size() != 0;
+        if (success) {
+          notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
+            installedPackageKeyboards, 1);
+          if (installedPackageKeyboards != null) {
+            notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
+              installedPackageKeyboards, 1);
+          }
+          cleanup();
+        } else {
+          showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
+        }
+      } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+        List<Map<String, String>> installedLexicalModels =
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+        // Do the notifications
+        boolean success = installedLexicalModels.size() != 0;
+        if (success) {
+          notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+            installedLexicalModels, 1);
+          if (installedLexicalModels != null) {
+            notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+              installedLexicalModels, 1);
+          }
+          cleanup();
+        } else {
+          showErrorDialog(context, pkgId, getString(R.string.no_new_predictive_text_to_install));
+        }
+      }
+    } catch (Exception e) {
+      Log.e("PackageActivity", "Error " + e);
+      showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
+    }
   }
 
   private void showErrorDialog(Context context, String pkgId, String message) {

@@ -4,4 +4,5 @@
     <files-path name="cloud" path="../app_data/cloud/" />
     <files-path name="models" path="../app_data/models/" />
     <files-path name="packages" path="../app_data/packages/" />
+    <files-path name="root" path="../app_data/" />
 </paths>
