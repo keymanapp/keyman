@@ -74,8 +74,7 @@ namespace com.keyman.utils {
     }
 
     compareTo(other: Version): number {
-      // If the version info depth differs, we need a flag to indicate whether or not 'this' instance wins ties.
-      // 12.0 is considered to precede 12.0.0.
+      // If the version info depth differs, we need a flag to indicate which instance is shorter.
       var isShorter: boolean = this.components.length < other.components.length;
       var maxDepth: number = (this.components.length < other.components.length) ? this.components.length : other.components.length;
 

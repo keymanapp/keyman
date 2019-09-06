@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-06 12.0.81 beta
+* For keyboards compiled with Developer 12.0 onward, default key caps will no longer be provided. (#2045)
+
 ## 2019-09-04 12.0.80 beta
 * Fixed issue with 'pt' and unitless font size specifications for keyboard layouts (#2033)
 * Slightly enhanced error logging for internal events (#2037)
