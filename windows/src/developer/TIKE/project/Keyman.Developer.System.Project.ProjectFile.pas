@@ -1293,6 +1293,7 @@ end;
 initialization
   FGlobalProjectStateWnd := TGlobalProjectStateWnd.Create;
 finalization
+  // Deletes temporary session-local project
   if FileExists(TProject.GetUntitledProjectFilename(True)) then
     System.SysUtils.DeleteFile(TProject.GetUntitledProjectFilename(True));
   if FileExists(ChangeFileExt(TProject.GetUntitledProjectFilename(True),Ext_ProjectSourceUser)) then
