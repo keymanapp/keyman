@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-09 12.0.28 beta
+* Character preview was not updating in mobile web touch test (#2061)
+
 ## 2019-09-08 12.0.27 beta
 * Make sure New Project actually starts a new, blank project (#2059)
 * Don't overwrite a BCP 47 code that the user has chosen when writing project templates (#2060)
