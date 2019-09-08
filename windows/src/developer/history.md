@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-08 12.0.27 beta
+* Make sure New Project actually starts a new, blank project (#2059)
+* Don't overwrite a BCP 47 code that the user has chosen when writing project templates (#2060)
+
 ## 2019-09-02 12.0.23 beta
 * Add kmlmc, kmlmi and kmlmp command line tools for building lexical models (#2024)
 
