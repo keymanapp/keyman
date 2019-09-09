@@ -68,7 +68,11 @@ class KeymanWebViewController: UIViewController {
   @objc func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
-    
+  }
+
+  override func viewWillLayoutSubviews() {
+    // This method is called automatically during layout correction by iOS.
+    /// It also has access to correct `view.bounds.size` values, unlike viewDidAppear.
     keyboardSize = view.bounds.size
   }
   
