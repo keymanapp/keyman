@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-09-09 12.0.21 beta
+## 2019-09-09 12.0.32 beta
 * Fixes OSK scaling bug on app re-entry when using keyboards without dictionaries (#2067)
 
 ## 2019-08-29 12.0.20 beta
