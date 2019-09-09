@@ -5,7 +5,7 @@ android {
     buildToolsVersion "28.0.3"
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 28
 
         String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity, so all caps
