@@ -113,7 +113,10 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID);
     i.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
-    boolean isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+    boolean isCustom = false;
+    if (kbInfo.get(KMManager.KMKey_CustomKeyboard) != null || kbInfo.containsKey(KMManager.KMKey_CustomKeyboard)) {
+      isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+    }
     i.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
     String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
     if (customHelpLink != null) {
