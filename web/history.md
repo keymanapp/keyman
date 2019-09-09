@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-09 12.0.82 beta
+* Fixes output of the 102nd key for touch keyboards using desktop layouts (#2063)
+
 ## 2019-09-06 12.0.81 beta
 * For keyboards compiled with Developer 12.0 onward, default key caps will no longer be provided. (#2045)
 
