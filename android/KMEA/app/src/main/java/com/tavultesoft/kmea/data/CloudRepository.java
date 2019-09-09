@@ -398,8 +398,8 @@ public class CloudRepository {
           keyboardsList.add(new Keyboard(hashMap));
         }
       }
-    } catch (JSONException e) {
-      Log.e("JSONParse", "Error: " + e);
+    } catch (JSONException | NullPointerException e) {
+      Log.e(TAG, "JSONParse Error: " + e);
       return new ArrayList<>();  // Is this ideal?
     }
 
@@ -459,8 +459,8 @@ public class CloudRepository {
 
         modelList.add(new LexicalModel(hashMap));
       }
-    } catch (JSONException e) {
-      Log.e("JSONParse", "Error: " + e);
+    } catch (JSONException | NullPointerException e) {
+      Log.e(TAG, "JSONParse Error: " + e);
       return new ArrayList<>();  // Is this ideal?
     }
 
