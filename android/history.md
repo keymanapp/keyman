@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-09 12.0.4086 beta
+* Bug Fix:
+  * Fix exception handling while parsing JSON info from cloud (#2065)
+
 ## 2019-09-06 12.0.4085 beta
 * New Feature
   * Include the English (MTNT) dictionary by default for English (#2029)
