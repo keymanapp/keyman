@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-09 12.0.21 beta
+* Fixes OSK scaling bug on app re-entry when using keyboards without dictionaries (#2067)
+
 ## 2019-08-29 12.0.20 beta
 * Automatically updates old default resources to the new set (#2007)
 * Includes the English (MTNT) dictionary by default for English (#2010)
