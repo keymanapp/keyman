@@ -6,6 +6,7 @@
 ## 2019-09-09 12.0.4086 beta
 * Bug Fix:
   * Fix exception handling while parsing JSON info from cloud (#2065)
+  * Fix crash involving undefined key for custom keyboard (#2066)
 
 ## 2019-09-06 12.0.4085 beta
 * New Feature
