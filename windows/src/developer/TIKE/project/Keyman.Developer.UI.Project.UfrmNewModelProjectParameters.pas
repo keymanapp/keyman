@@ -55,6 +55,8 @@ type
     editModelName: TEdit;
     Bevel1: TBevel;
     dlgBrowse: TBrowse4Folder;
+    lblProjectFilename: TLabel;
+    editProjectFilename: TEdit;
     procedure cmdOKClick(Sender: TObject);
     procedure editModelIDComponentChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -93,6 +95,7 @@ type
     function GetPrimaryBCP47: string;
     function GetUniq: string;
     procedure UpdateModelIDFromComponents;
+    procedure UpdateProjectFilename;
   protected
     function GetHelpTopic: string; override;
     property AuthorID: string read GetAuthorID;
@@ -306,6 +309,7 @@ end;
 
 procedure TfrmNewModelProjectParameters.editModelIDChange(Sender: TObject);
 begin
+  UpdateProjectFilename;
   EnableControls;
 end;
 
@@ -317,6 +321,7 @@ end;
 
 procedure TfrmNewModelProjectParameters.editPathChange(Sender: TObject);
 begin
+  UpdateProjectFilename;
   EnableControls;
 end;
 
@@ -459,6 +464,17 @@ end;
 procedure TfrmNewModelProjectParameters.UpdateModelIDFromComponents;
 begin
   editModelID.Text := Format('%s.%s.%s', [AuthorID, PrimaryBCP47.ToLowerInvariant, Uniq]);
+end;
+
+procedure TfrmNewModelProjectParameters.UpdateProjectFilename;
+begin
+  editProjectFilename.Text :=
+    IncludeTrailingPathDelimiter(BasePath) +
+    ModelID + PathDelim +
+    ModelID + Ext_LexicalModelProject;
+  // Scroll to the end of the control to show the filename
+  editProjectFilename.Perform(EM_SETSEL, Length(editProjectFilename.Text), Length(editProjectFilename.Text));
+  editProjectFilename.Perform(EM_SCROLLCARET, 0, 0);
 end;
 
 { Languages Grid }

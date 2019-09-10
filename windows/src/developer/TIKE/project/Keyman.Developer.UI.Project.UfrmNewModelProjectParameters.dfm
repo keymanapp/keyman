@@ -2,13 +2,13 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Wordlist Lexical Model Project'
-  ClientHeight = 461
+  ClientHeight = 484
   ClientWidth = 412
   OldCreateOrder = True
   Position = poScreenCenter
   OnDestroy = FormDestroy
   ExplicitWidth = 418
-  ExplicitHeight = 490
+  ExplicitHeight = 513
   PixelsPerInch = 96
   TextHeight = 13
   object lblFileName: TLabel
@@ -96,11 +96,20 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     Width = 397
     Height = 2
   end
+  object lblProjectFilename: TLabel
+    Left = 8
+    Top = 422
+    Width = 77
+    Height = 13
+    Caption = 'Project &filename'
+    FocusControl = editProjectFilename
+  end
   object editModelID: TEdit
     Left = 120
     Top = 392
     Width = 205
     Height = 21
+    TabStop = False
     ParentColor = True
     ReadOnly = True
     TabOrder = 13
@@ -158,23 +167,23 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   end
   object cmdOK: TButton
     Left = 252
-    Top = 428
+    Top = 451
     Width = 73
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 14
+    TabOrder = 15
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
     Left = 331
-    Top = 428
+    Top = 451
     Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 15
+    TabOrder = 16
   end
   object gridLanguages: TStringGrid
     Left = 8
@@ -245,9 +254,21 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     TabOrder = 1
     OnChange = editModelNameChange
   end
+  object editProjectFilename: TEdit
+    Left = 120
+    Top = 419
+    Width = 284
+    Height = 21
+    TabStop = False
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 14
+  end
   object dlgBrowse: TBrowse4Folder
+    InitialDir = 'C:\Users\mcdurdin\Desktop\'
     Options = [OnlySelectFileSysAncestors, ShowEditBox, UseNewDialogStyle]
     Root = Desktop
+    Title = 'Select folder to save project to'
     Left = 168
     Top = 168
   end
