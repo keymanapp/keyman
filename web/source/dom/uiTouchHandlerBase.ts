@@ -1,19 +1,31 @@
 namespace com.keyman.dom {
+  /**
+   * This class was added to facilitate scroll handling for overflow-x elements, though it could
+   * be extended in the future to accept overflow-y if needed.
+   * 
+   * This is necessary because of the OSK's need to use `.preventDefault()` for stability; that 
+   * same method blocks native handling of overflow scrolling fomr touch browsers.
+   */
   class TouchState {
-    public readonly x: number;
-    public readonly y: number;
+    // While we don't currently track y-coordinates here, the class is designed
+    // to permit tracking them with minimal extra effort if we ever decide to do so.
+    x: number;
+    totalLength = 0;
 
     constructor(touch: Touch) {
       this.x = touch.pageX;
-      this.y = touch.pageY;
+
+      this.totalLength = 0;
     }
 
-    horizontalDeltaTo(touch: Touch) {
-      return touch.pageX - this.x;
-    }
+    updateTo(touch: Touch): {deltaX: number} {
+      let x = this.x;
+      this.x = touch.pageX;
 
-    verticalDeltaTo(touch: Touch) {
-      return touch.pageY - this.y;
+      let deltas = {deltaX: this.x - x};
+      this.totalLength += Math.abs(deltas.deltaX);
+
+      return deltas;
     }
   }
 
@@ -28,9 +40,7 @@ namespace com.keyman.dom {
 
     private currentTarget: Target;
 
-    private scrollMode: boolean;
     private scrollTouchState: TouchState;
-    private cumulativeScrollLength: number;
     private pendingTarget: Target;
     private popupBaseTarget: Target;
 
@@ -228,9 +238,8 @@ namespace com.keyman.dom {
       }
 
       // Establish scroll tracking.
-      this.scrollMode = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
-      this.scrollTouchState = new TouchState(e.changedTouches[0]);
-      this.cumulativeScrollLength = 0;
+      let scrollMode = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
+      this.scrollTouchState = scrollMode ? new TouchState(e.changedTouches[0]) : null;
 
       // Alright, Target acquired!  Now to use it:
 
@@ -277,7 +286,7 @@ namespace com.keyman.dom {
       var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
 
       // Allow an accidental fudge-factor for overflow element noise, but not much.
-      beyondEdge = beyondEdge || this.cumulativeScrollLength > 10;
+      beyondEdge = beyondEdge || this.scrollTouchState.totalLength > 10;
 
       // Save then decrement current touch count
       var tc=this.touchCount;
@@ -329,13 +338,10 @@ namespace com.keyman.dom {
         return;
       }
 
-      if(this.currentTarget && this.scrollMode) {
-        let deltaX = this.scrollTouchState.horizontalDeltaTo(e.changedTouches[0]);
+      if(this.currentTarget && this.scrollTouchState != null) {
+        let deltaX = this.scrollTouchState.updateTo(e.changedTouches[0]).deltaX;
         this.currentTarget.scrollLeft -= window.devicePixelRatio * deltaX;
-        
-        // Update scroll state info.
-        this.cumulativeScrollLength += deltaX < 0 ? -deltaX : deltaX;
-        this.scrollTouchState = new TouchState(e.changedTouches[0]);
+
         return;
       }
 
