@@ -6,7 +6,7 @@ import os
 import sys
 import struct
 from PIL import Image
-
+Image.LOAD_TRUNCATED_IMAGES = True
 
 def changeblacktowhite(im):
 	data = np.array(im)   # "data" is a height x width x 4 numpy array
@@ -14,20 +14,21 @@ def changeblacktowhite(im):
 
 	# Replace black with white... (leaves alpha values alone...)
 	white_areas = (red == 0) & (blue == 0) & (green == 0)
-	data[..., :-1][white_areas.T] = (255, 255, 255) # Transpose back needed
+	data[..., :-1][white_areas.T] = (255, 255, 255)  # Transpose back needed
 
 	im2 = Image.fromarray(data)
 	return im2
 
+
 def checkandsaveico(icofile):
 	"""
-	Convert keyman ico file to png to work in IBus
-	The ico file may be ico or bmp format
+	Convert keyman icofile to 64x64 png to work in IBus
+	The starting icofile may be ico or bmp format
 
 	Args:
 		icofile (str): path to ico file
 	"""
-	bmpfile = icofile;
+	bmpfile = icofile
 	if icofile.endswith('.ico'):
 		im = Image.open(icofile)
 		im = im.convert('RGBA')
@@ -40,10 +41,18 @@ def checkandsaveico(icofile):
 		bmpfile = icofile + ".bmp"
 		im2.save(bmpfile)
 
-	im3 = Image.open(bmpfile)
-	im4 = im3.resize((64, 64), Image.ANTIALIAS)
-	im4.save(icofile + ".png")
-	os.remove(bmpfile)
+	try:
+		im3 = Image.open(bmpfile)
+		im4 = im3;
+		im4 = im4.resize([64, 64], Image.ANTIALIAS)
+		im4.save(icofile + ".png", "png")
+	except (IOError, OSError) as error:
+		logging.error("Cannot convert %s to png", icofile)
+		pass
+
+	if bmpfile.endswith('.ico.bmp'):
+		os.remove(bmpfile)
+
 
 def extractico(kmxfile):
 	"""
@@ -83,6 +92,7 @@ def extractico(kmxfile):
 
 		return True
 
+
 def main(argv):
 	if len(sys.argv) != 2:
 		logging.error("convertico.py <ico file | kmx file>")
@@ -93,6 +103,7 @@ def main(argv):
 		extractico(sys.argv[1])
 	else:
 		checkandsaveico(sys.argv[1])
+
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
