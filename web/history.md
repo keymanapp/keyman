@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-10 12.0.83 beta
+* Enables scrolling for long suggestions in the mobile-only predictive text banner (#2071)
+
 ## 2019-09-09 12.0.82 beta
 * Fixes output of the 102nd key for touch keyboards using desktop layouts (#2064)
 

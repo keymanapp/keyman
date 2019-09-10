@@ -1,4 +1,22 @@
 namespace com.keyman.dom {
+  class TouchState {
+    public readonly x: number;
+    public readonly y: number;
+
+    constructor(touch: Touch) {
+      this.x = touch.pageX;
+      this.y = touch.pageY;
+    }
+
+    horizontalDeltaTo(touch: Touch) {
+      return touch.pageX - this.x;
+    }
+
+    verticalDeltaTo(touch: Touch) {
+      return touch.pageY - this.y;
+    }
+  }
+
   export abstract class UITouchHandlerBase<Target extends HTMLElement> {
     private rowClassMatch: string;
     private selectedTargetMatch: string;
@@ -9,6 +27,10 @@ namespace com.keyman.dom {
     private touchCount: number;
 
     private currentTarget: Target;
+
+    private scrollMode: boolean;
+    private scrollTouchState: TouchState;
+    private cumulativeScrollLength: number;
     private pendingTarget: Target;
     private popupBaseTarget: Target;
 
@@ -205,6 +227,11 @@ namespace com.keyman.dom {
         return;
       }
 
+      // Establish scroll tracking.
+      this.scrollMode = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
+      this.scrollTouchState = new TouchState(e.changedTouches[0]);
+      this.cumulativeScrollLength = 0;
+
       // Alright, Target acquired!  Now to use it:
 
       // Highlight the touched key
@@ -248,6 +275,9 @@ namespace com.keyman.dom {
       // This is not completely effective and needs some tweaking, especially on Android
       var x = e.changedTouches[0].pageX;
       var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
+
+      // Allow an accidental fudge-factor for overflow element noise, but not much.
+      beyondEdge = beyondEdge || this.cumulativeScrollLength > 10;
 
       // Save then decrement current touch count
       var tc=this.touchCount;
@@ -296,6 +326,16 @@ namespace com.keyman.dom {
 
       // Do not attempt to support reselection of target key for overlapped keystrokes
       if(e.touches.length > 1 || this.touchCount == 0) {
+        return;
+      }
+
+      if(this.currentTarget && this.scrollMode) {
+        let deltaX = this.scrollTouchState.horizontalDeltaTo(e.changedTouches[0]);
+        this.currentTarget.scrollLeft -= window.devicePixelRatio * deltaX;
+        
+        // Update scroll state info.
+        this.cumulativeScrollLength += deltaX < 0 ? -deltaX : deltaX;
+        this.scrollTouchState = new TouchState(e.changedTouches[0]);
         return;
       }
 
