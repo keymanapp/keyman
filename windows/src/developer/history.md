@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-11 12.0.30 beta
+* Clarify the project filename that will be created and simplify how the Browse button works in Project Template dialogs (#2073)
+
 ## 2019-09-09 12.0.28 beta
 * Character preview was not updating in mobile web touch test (#2061)
 
