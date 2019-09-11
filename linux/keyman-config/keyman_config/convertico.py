@@ -28,8 +28,9 @@ def checkandsaveico(icofile):
 	Args:
 		icofile (str): path to ico file
 	"""
-	bmpfile = icofile
-	if icofile.endswith('.ico'):
+	name, ext = os.path.splitext(icofile)
+	bmpfile = name + ".bmp"
+	if ext == '.ico':
 		im = Image.open(icofile)
 		im = im.convert('RGBA')
 		im2 = im
@@ -38,20 +39,15 @@ def checkandsaveico(icofile):
 		if num > 160 and colour == (0, 0, 0, 0):
 			logging.info("checkandsaveico:" + icofile + " mostly black so changing black to white")
 			im2 = changeblacktowhite(im)
-		bmpfile = icofile + ".bmp"
 		im2.save(bmpfile)
 
 	try:
 		im3 = Image.open(bmpfile)
-		im4 = im3;
-		im4 = im4.resize([64, 64], Image.ANTIALIAS)
-		im4.save(icofile + ".png", "png")
-	except (IOError, OSError) as error:
+		im4 = im3.resize([64, 64], Image.ANTIALIAS)
+		im4.save(name + '.png', 'png')
+	except (IOError, OSError) as e:
 		logging.error("Cannot convert %s to png", icofile)
 		pass
-
-	if bmpfile.endswith('.ico.bmp'):
-		os.remove(bmpfile)
 
 
 def extractico(kmxfile):

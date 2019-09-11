@@ -175,19 +175,19 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
 
             if install_area == InstallArea.IA_USER:
                 welcome_file = os.path.join(user_keyboard_dir(kmpdata['packageID']), "welcome.htm")
-                icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['packageID'] + ".ico.png")
+                icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['packageID'] + ".png")
                 if not os.path.isfile(icofile):
-                    icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['keyboardID'] + ".ico.png")
+                    icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['keyboardID'] + ".png")
             elif install_area == InstallArea.IA_SHARED:
                 welcome_file = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], "welcome.htm")
-                icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + ".ico.png")
+                icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + ".png")
                 if not os.path.isfile(icofile):
-                    icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + ".ico.png")
+                    icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + ".png")
             else:
                 welcome_file = os.path.join("/usr/share/keyman", kmpdata['packageID'], "welcome.htm")
-                icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + ".ico.png")
+                icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + ".png")
                 if not os.path.isfile(icofile):
-                    icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + ".ico.png")
+                    icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + ".png")
             if not os.path.isfile(icofile):
                 icofile = find_keyman_image("icon_kmp.png")
 
