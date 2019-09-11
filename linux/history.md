@@ -3,11 +3,13 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 12.0 beta
-* Extract icon from kmx instead of downloading it
+## 2019-09-13 12.0.18 beta
+* Bug Fix:
+  * Extract icon from kmx instead of downloading it
 
-## 12.0 alpha
-* Started work on Keyman for Linux 12
+## 2019-09-11 12.0.17 beta
+* Bug Fix:
+  * Remove code that was downloading keyboard source .kmn files (#2068)
 
 ## 2019-07-29 12.0.12 beta
 * Initial beta release of Keyman for Linux 12
