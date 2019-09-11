@@ -4,13 +4,17 @@ namespace com.keyman.dom {
    * be extended in the future to accept overflow-y if needed.
    * 
    * This is necessary because of the OSK's need to use `.preventDefault()` for stability; that 
-   * same method blocks native handling of overflow scrolling fomr touch browsers.
+   * same method blocks native handling of overflow scrolling for touch browsers.
    */
-  class TouchState {
+  class ScrollState {
     // While we don't currently track y-coordinates here, the class is designed
     // to permit tracking them with minimal extra effort if we ever decide to do so.
     x: number;
     totalLength = 0;
+
+    // The amount of coordinate 'noise' allowed during a scroll-enabled touch allowed
+    // before interpreting the currently-ongoing touch command as having scrolled.
+    static readonly HAS_SCROLLED_FUDGE_FACTOR = 10;
 
     constructor(touch: Touch) {
       this.x = touch.pageX;
@@ -27,6 +31,11 @@ namespace com.keyman.dom {
 
       return deltas;
     }
+
+    public get hasScrolled(): boolean {
+      // Allow an accidental fudge-factor for overflow element noise during a touch, but not much.
+      return this.totalLength > ScrollState.HAS_SCROLLED_FUDGE_FACTOR;
+    }
   }
 
   export abstract class UITouchHandlerBase<Target extends HTMLElement> {
@@ -40,7 +49,7 @@ namespace com.keyman.dom {
 
     private currentTarget: Target;
 
-    private scrollTouchState: TouchState;
+    private scrollTouchState: ScrollState;
     private pendingTarget: Target;
     private popupBaseTarget: Target;
 
@@ -238,8 +247,8 @@ namespace com.keyman.dom {
       }
 
       // Establish scroll tracking.
-      let scrollMode = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
-      this.scrollTouchState = scrollMode ? new TouchState(e.changedTouches[0]) : null;
+      let shouldScroll = (this.currentTarget.clientWidth < this.currentTarget.scrollWidth);
+      this.scrollTouchState = shouldScroll ? new ScrollState(e.changedTouches[0]) : null;
 
       // Alright, Target acquired!  Now to use it:
 
@@ -285,8 +294,9 @@ namespace com.keyman.dom {
       var x = e.changedTouches[0].pageX;
       var beyondEdge = ((x < 2 && this.touchX > 5) || (x > window.innerWidth - 2 && this.touchX < window.innerWidth - 5));
 
-      // Allow an accidental fudge-factor for overflow element noise, but not much.
-      beyondEdge = beyondEdge || this.scrollTouchState.totalLength > 10;
+      if(this.scrollTouchState) {
+        beyondEdge = beyondEdge || this.scrollTouchState.hasScrolled;
+      }
 
       // Save then decrement current touch count
       var tc=this.touchCount;
