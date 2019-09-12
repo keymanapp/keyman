@@ -57,18 +57,8 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let keyboardInfo = Manager.shared.currentKeyboard
-    let currentKeyboardId = keyboardInfo?.id ?? Defaults.keyboard.id
-    let userData = AppDelegate.activeUserDefaults()
-    let keyboards = userData.userKeyboards
-    let keyboardIds = keyboards?.map { $0.id }
-    let installedKeyboards: String
-    if let ids = keyboardIds, !ids.isEmpty {
-      installedKeyboards = Array(Set(ids)).joined(separator: ",")
-    } else {
-      installedKeyboards = currentKeyboardId
-    }
-    let url = "http://keyman.com/iphone-and-ipad/app/?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
+    let appVersion = Version.current
+    let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.string)/?embed=true"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Info page URL: \(url)")
   }
