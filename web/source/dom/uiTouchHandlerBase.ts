@@ -395,7 +395,7 @@ namespace com.keyman.dom {
       this.currentTarget = key1;
 
       // Clear previous key highlighting
-      if(key0 && key1 && key1 != key0) {
+      if(key0 && key1 && key1 !== key0) {
         this.highlight(key0,false);
       }
 
