@@ -282,7 +282,10 @@ uses
   Keyman.Developer.UI.Project.modelTsProjectFileUI in 'project\Keyman.Developer.UI.Project.modelTsProjectFileUI.pas',
   Keyman.Developer.System.ModelProjectTemplate in '..\kmconvert\Keyman.Developer.System.ModelProjectTemplate.pas',
   Keyman.Developer.System.ProjectTemplate in '..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas',
-  Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters};
+  Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters},
+  Keyman.Developer.System.Project.wordlistTsvProjectFile in 'project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
+  Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
+  Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -309,8 +312,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-      ShowStartup;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  ShowStartup;
       Application.Run;
     end;
   finally

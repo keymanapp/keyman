@@ -531,6 +531,12 @@
             <Form>frmNewModelProjectParameters</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmWordlistEditor.pas">
+            <Form>frmWordlistEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
