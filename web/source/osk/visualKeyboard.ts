@@ -1097,7 +1097,7 @@ namespace com.keyman.osk {
       this.currentTarget = key1;
 
       // Clear previous key highlighting
-      if(key0 && key1 && (key1.id != key0.id)) {
+      if(key0 && key1 && key1 !== key0) {
         this.highlightKey(key0,false);
       }
 
