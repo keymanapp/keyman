@@ -285,7 +285,8 @@ uses
   Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters},
   Keyman.Developer.System.Project.wordlistTsvProjectFile in 'project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
   Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
-  Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas';
+  Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
+  Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

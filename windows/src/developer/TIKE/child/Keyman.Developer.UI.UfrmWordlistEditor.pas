@@ -90,7 +90,7 @@ begin
     frameSource := TframeTextEditor.Create(Self);
     frameSource.Parent := pageCode;
     frameSource.Align := alClient;
-    frameSource.EditorFormat := efXML;
+    frameSource.EditorFormat := efWordlistTsv;
     frameSource.Visible := True;
     frameSource.OnChanged := SourceChanged;
     frameSource.TextFileFormat := tffUTF8;
