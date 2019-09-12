@@ -22,8 +22,6 @@ export default class LexicalModelCompiler {
    * @param sourcePath    Where to find auxilary sources files
    */
   generateLexicalModelCode(model_id: string, modelSource: LexicalModelSource, sourcePath: string) {
-    let compiler = this;
-
     // TODO: add metadata in comment
     const filePrefix: string = `(function() {\n'use strict';\n`;
     const fileSuffix: string = `})();`;
@@ -42,13 +40,6 @@ export default class LexicalModelCompiler {
         // Note: the .toString() might just be the property name, but we want a
         // plain function:
           .replace(/^wordBreak(ing|er)\b/, 'function');
-      } else if (wordBreakerSpec.sources) {
-        compiler.logError('class-based word breaker is not officially supported :/');
-        let wordBreakerSources: string[] = wordBreakerSpec.sources.map(function(source) {
-          return fs.readFileSync(path.join(sourcePath, source), 'utf8');
-        });
-
-        wordBreakerSourceCode = this.transpileSources(wordBreakerSources).join('\n');
       }
     }
 
