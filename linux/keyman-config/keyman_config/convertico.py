@@ -8,6 +8,7 @@ import struct
 from PIL import Image
 Image.LOAD_TRUNCATED_IMAGES = True
 
+
 def changeblacktowhite(im):
     data = np.array(im)   # "data" is a height x width x 4 numpy array
     red, green, blue, alpha = data.T # Temporarily unpack the bands for readability
@@ -24,6 +25,8 @@ def checkandsaveico(icofile):
     """
     Convert keyman icofile to 64x64 png to work in IBus
     The starting icofile may be ico or bmp format
+    and follows the progression:
+    .ico -> .bmp -> .bmp.png (png format)
 
     Args:
         icofile (str): path to ico file
@@ -44,15 +47,21 @@ def checkandsaveico(icofile):
     try:
         im3 = Image.open(bmpfile)
         im4 = im3.resize([64, 64], Image.ANTIALIAS)
-        im4.save(name + '.png', 'png')
-    except (IOError, OSError) as e:
+        # Using .bmp.png file extension so it won't conflict if the package already contains .png
+        im4.save(bmpfile + '.png', 'png')
+    except (IOError, OSError):
         logging.error("Cannot convert %s to png", icofile)
         pass
+    finally:
+        # Clean up intermediary .bmp file if it was generated
+        if ext == '.ico':
+            os.remove(bmpfile)
 
 
 def extractico(kmxfile):
     """
     Extract icon file from compiled kmx keyboard
+    The icon file will be converted into .bmp.png
 
     Args:
         kmxfile (str): path to kmx file
