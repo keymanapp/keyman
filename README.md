@@ -35,6 +35,39 @@ Each platform maintains multiple types of releases:
 * Beta: A version that is nearing full "stable" release.
 * Nightly: Contains the very latest code. These versions are published daily whenever the code changes.
 
+# Contributing
+
+npm package maintenance is automated with [Lerna].
+
+## Installing everything for the first time
+
+    npm install
+
+This will install Lerna, and will “bootstrap” all dependencies; i.e.,
+any common dependencies will be installed in the local `node_modules`,
+and any intra-repository dependencies are resolved.
+
+## Incrementing the version number
+
+    npm run bump-alpha-version -- <PRERELEASE>
+    npm run bump-beta-version -- <PRERELEASE>
+    npm run bump-version -- <RELEASE>
+
+Where `<PRERELEASE>` is one of `prepatch`, `preminor`, `premajor` and
+`<RELEASE>` is one of `patch`, `minor`, `release`.
+
+[Lerna]: https://github.com/lerna/lerna#readme
+
+## Publishing all packages
+
+**NOTE**: This must be done _after_ incrementing version number.
+
+**NOTE**: Lerna suggests running this on CI only!
+
+To publish all changed lerna-managed packages, run:
+
+    npm run publish
+
 # License
 
 Copyright (c) 2018-2019 SIL International. All rights reserved.
