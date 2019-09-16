@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/developer-lexical-model-compiler",
-  "version": "0.0.0",
+  "version": "12.0.4087-beta",
   "description": "Keyman Developer lexical model compiler",
   "keywords": [
     "keyboard",
@@ -17,6 +17,9 @@
     "type": "git",
     "url": "https://github.com/keymanapp/keyman"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "contributors": [
     "Eddie Antonio Santos",
@@ -26,11 +29,16 @@
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "homepage": "https://help.keyman.com/developer/12.0/guides/lexical-models/",
+  "main": "dist/index.js",
   "bin": {
     "kmlmc": "dist/kmlmc.js",
     "kmlmp": "dist/kmlmp.js",
     "kmlmi": "dist/kmlmi.js"
+  },
+  "directories": {
+    "lib": "dist",
+    "test": "tests"
   },
   "dependencies": {
     "commander": "^3.0.0",
