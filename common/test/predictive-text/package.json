@@ -19,7 +19,7 @@
     "access": "public"
   },
   "dependencies": {
-    "commander": "^2.20.0",
+    "commander": "^3.0.1",
     "event-iterator": "^1.2.0"
   }
 }
