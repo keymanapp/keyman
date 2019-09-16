@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/lmlayer-cli",
-  "version": "12.0.4092-beta.0",
+  "version": "12.0.4093-beta.0",
   "description": "Command line interface to the predictive text engine.",
   "main": "index.js",
   "bin": {
