@@ -45,9 +45,13 @@ const ANSI = {
 main();
 
 function main() {
+  let programName = require('./package.json').name
+  // remove the scope from the package name, if present
+    .replace(/^@[^/]+[/]/, '');
+  //
   // Command line options:
   program
-    .name(require('./package.json').name)
+    .name(programName)
     .version(require('./package.json').version)
     .usage('[-i <test-file> | -p <phrase> [-p <phrase> ...]] (-f <model-file> | <model-id>)')
     .description('CLI for trying lexical models.')

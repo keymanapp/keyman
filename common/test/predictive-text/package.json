@@ -6,6 +6,9 @@
   "bin": {
     "lmlayer-cli": "index.js"
   },
+  "engines": {
+    "node": ">10.0"
+  },
   "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca> (https://github.com/eddieantonio)",
   "license": "MIT",
   "repository": {

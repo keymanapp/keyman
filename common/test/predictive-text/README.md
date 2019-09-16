@@ -6,7 +6,7 @@ Provides a command line interface to try out predictive text models.
 Install
 -------
 
-**NOTE**: Requires Node >= 10.0
+> **TODO**: extract lmlayer worker into its own lerna package, and depend on that!
 
 First, ensure that Keyman web and the LMLayer are built. You can run the
 build script in `/web/source` to do this for you:
@@ -18,9 +18,9 @@ Then, you can install locally with `npm`:
 
     npm install
 
-Or you can install globally like so:
+Then, you can install globally:
 
-    npm install -g .
+    npm link
 
 When installed globally, you can invoke the CLI using the `lmlayer-cli`
 command.
@@ -42,7 +42,7 @@ language.
  * Press <kbd>Tab</kbd> again to select the next suggestion.
  * Press <kbd>Shift</kbd>+<kbd>Tab</kbd> to select the previous suggestion.
  * Press <kbd>Enter</kbd> to accept the selected suggestion.
- * Press <kbd>Ctrl</kbd>+C or <kbd>Ctrl</kbd>+D to quit.
+ * Press <kbd>Ctrl</kbd>+<kbd>C</kbd> or <kbd>Ctrl</kbd>+<kbd>D</kbd> to quit.
 
 ```
 > He
