@@ -1,6 +1,7 @@
 {
   "packages": [
-    "developer/js"
+    "developer/js",
+    "common/test/predictive-text"
   ],
   "version": "12.0.4090"
 }
