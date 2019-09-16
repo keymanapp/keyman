@@ -6,6 +6,10 @@
   },
   "scripts": {
     "install": "npm run bootstrap",
-    "bootstrap": "lerna bootstrap --hoist"
+    "bootstrap": "lerna bootstrap --hoist",
+    "bump-version": "lerna version --tag-version-prefix=common-",
+    "bump-alpha-version": "lerna version --tag-version-prefix=common- --preid=alpha",
+    "bump-beta-version": "lerna version --tag-version-prefix=common- --preid=beta",
+    "publish": "lerna publish --tag-version-prefix=common- from-git"
   }
 }
