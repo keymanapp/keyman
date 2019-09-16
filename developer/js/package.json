@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "mocha"
+    "test": "mocha",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",

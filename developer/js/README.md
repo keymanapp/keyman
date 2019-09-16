@@ -1,8 +1,11 @@
 Keyman Developer
 ================
 
-This contains the source code of Keyman development tools. This also
-contains `kmlmc`.
+This contains the source code of Keyman lexical model development tools:
+
+ - `kmlmc`
+ - `kmlmp`
+ - `kmlmi`
 
 In order to build [lexical models][], these tools must be built and
 compiled.
@@ -25,21 +28,28 @@ How to run the tests
 How to install
 --------------
 
-This will install both `kmlmc` and will let you install the compiler in
-other node projects on your machine.
+In a different repository, do this:
 
-    ./build.sh
-    npm link
+    npm install @keymanapp/developer-lexical-model-compiler
+
+If you're adding this to a subproject within
+<https://github.com/keymanapp/keyman>, use [lerna][] from the root
+directory:
+
+    # In root directory of the repository
+    npx lerna add @keymanapp/developer-lexical-model-compiler path/to/my-subproject
 
 
-How to use in other Node projects
+[lerna]: https://github.com/lerna/lerna#readme
+
+
+How to get the command line tools
 ---------------------------------
 
-With the package installed with the above instructions, in your new
-project, link this package:
+If you do not have access to the command line tools, run this within
+this directory:
 
-
-    npm link @keymanapp/developer-lexical-model-compiler
+    npm link
 
 
 How to use on the command line
