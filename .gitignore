@@ -248,3 +248,6 @@
 
 # Atom/Nuclide
 compile_flags.txt
+
+# NodeJS stuff
+node_modules/

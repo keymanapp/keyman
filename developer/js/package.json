@@ -41,7 +41,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "commander": "3.0.1",
+    "commander": "^3.0.1",
     "node": "^11.7.0",
     "node-zip": "^1.1.1",
     "typescript": "^3.2.4",

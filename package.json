@@ -3,5 +3,9 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.16.4"
+  },
+  "scripts": {
+    "install": "npm run bootstrap",
+    "bootstrap": "lerna bootstrap --hoist"
   }
 }
