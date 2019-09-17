@@ -157,7 +157,7 @@ extension KeymanWebViewController {
       let y = CGFloat(Float(components[1])!)
       let w = CGFloat(Float(components[2])!)
       let h = CGFloat(Float(components[3])!)
-      completion(KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h, withOffset: false))
+      completion(KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h))
     }
   }
 
@@ -472,9 +472,8 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     }
   }
 
-  private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat, withOffset: Bool = true) -> CGRect {
-    // kmw adds w/2 to x for MOST keys.  Not the picker menu's base key, though!
-    return CGRect(x: x - (withOffset ? w / 2.0 : 0), y: y, width: w, height: h)
+  private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
+    return CGRect(x: x, y: y, width: w, height: h)
   }
   
   public func beep(_ keymanWeb: KeymanWebViewController) {
@@ -852,6 +851,11 @@ extension KeymanWebViewController {
   // Keyman interaction
   func resizeKeyboard() {
     fixLayout()
+
+    // Ensures the height is properly updated.
+    // Note:  System Keyboard init currently requires this for the keyboard to display properly
+    // the first time.
+    setOskHeight(Int(kbSize.height))
   }
   
   func resetKeyboardState() {
@@ -890,7 +894,10 @@ extension KeymanWebViewController {
     }
 
     languageMenuPosition { keyFrame in
-      self.showHelpBubble(at: keyFrame.origin)
+      // We should calculate the center point between the origin and the right-hand coordinate of the key.
+      // keyFrame.origin seems to use the left-hand (minX) edge, which looks ugly.  Y coord's good, though.
+      let tipRootPoint = CGPoint(x: keyFrame.midX, y: keyFrame.origin.y)
+      self.showHelpBubble(at: tipRootPoint)
     }
   }
 
