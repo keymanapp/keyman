@@ -473,7 +473,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   }
 
   private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
-    return CGRect(x: x, y: y, width: w, height: h)
+    return CGRect(x: x - (w/2), y: y, width: w, height: h)
   }
   
   public func beep(_ keymanWeb: KeymanWebViewController) {
