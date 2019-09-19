@@ -85,3 +85,11 @@ The KeymanEngine project contains a demo app that demonstrates usage of the fram
 create a system keyboard.
 
 To build the samples, `cd` into the project directory and run `./build.sh`.
+
+### Compiling the app's offline help
+Extra prerequisite:
+* `wget` (`brew install wget`)
+
+The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
+online version of help on help.keyman.com.  When significant changes to help content have been
+made, it is advisable to manually re-run this script to update the app's offline content.

@@ -3,7 +3,7 @@
 # Uses the open-source `wget` utility to create an embedding-friendly offline mirror
 # equivalent of the online iOS help.
 
-HELP_ROOT=keyman/Keyman/Keyman/WebPages
+HELP_ROOT=keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
 if [ -z $VERSION ]; then
   VERSION="12.0"  # Set manually here because alpha versions usually don't have 
