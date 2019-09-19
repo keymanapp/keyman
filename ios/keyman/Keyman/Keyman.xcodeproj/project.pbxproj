@@ -436,13 +436,6 @@
 			path = SetUpViewController;
 			sourceTree = "<group>";
 		};
-		9845A7D81A439AFB00544E2E /* WebPages */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = WebPages;
-			sourceTree = "<group>";
-		};
 		9845A8BD1A439F1000544E2E /* Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -546,7 +539,6 @@
 			isa = PBXGroup;
 			children = (
 				16A9229D20325253003CC98E /* Keyman-Info.plist */,
-				9845A7D81A439AFB00544E2E /* WebPages */,
 				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
