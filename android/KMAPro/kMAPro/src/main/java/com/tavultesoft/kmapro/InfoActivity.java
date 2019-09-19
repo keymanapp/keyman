@@ -1,11 +1,8 @@
 /**
- * Copyright (C) 2017 SIL International. All rights reserved.
+ * Copyright (C) 2017-2019 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.tavultesoft.kmea.KMManager;
 
@@ -28,7 +25,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 public class InfoActivity extends AppCompatActivity {
 
   private WebView webView;
-  private final String kmBaseUrl = "https://keyman.com/android/app/";
+  private final String kmHelpBaseUrl = "https://help.keyman.com/products/android/";
   private String kmUrl = "";
   private final String htmlPath = "file:///android_asset/info/info.html";
 
@@ -54,41 +51,26 @@ public class InfoActivity extends AppCompatActivity {
     version.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     version.setGravity(Gravity.CENTER);
 
-    String ver = "";
+    // Parse to create a version title
+    String versionStr = "";
     PackageInfo pInfo;
     try {
       pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-      ver = String.format("%s: %s", getString(R.string.title_version), pInfo.versionName);
+      versionStr = pInfo.versionName;
     } catch (NameNotFoundException e) {
-      // Could not get version number
+      // Fallback to a "current" version. This does not need to be maintained
+      versionStr = "12.0.0.0";
     }
-    version.setText(ver);
+
+    String versionTitle = String.format("%s: %s", getString(R.string.title_version), versionStr);
+    version.setText(versionTitle);
     getSupportActionBar().setCustomView(version);
 
+    // Extract the the major minor version from the full version string
+    String[] versionArray = versionStr.split("\\.", 3);
+    String majorMinorVersion = String.format("%s.%s", versionArray[0], versionArray[1]);
 
-    String currentKbID = KMManager.KMDefault_KeyboardID;
-    HashMap<String, String> curKbInfo = KMManager.getCurrentKeyboardInfo(this);
-    if (curKbInfo != null)
-      currentKbID = KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_KeyboardID);
-
-    String installedKbs = "";
-    ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
-    if (kbList != null) {
-      for (HashMap<String, String> kbInfo : kbList) {
-        String kbID = kbInfo.get(KMManager.KMKey_KeyboardID);
-        if (!installedKbs.contains(kbID))
-          installedKbs += kbID + ",";
-      }
-    }
-
-    int lastIndex = installedKbs.length() - 1;
-    if (lastIndex > 0)
-      installedKbs = installedKbs.substring(0, lastIndex);
-
-    if (installedKbs.isEmpty())
-      installedKbs = currentKbID;
-
-    kmUrl = String.format("%s?active=%s&installed=%s", kmBaseUrl, currentKbID, installedKbs);
+    kmUrl = String.format("%s%s/?embed=android", kmHelpBaseUrl, majorMinorVersion);
     webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);
