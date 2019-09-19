@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-19 12.0.4090 beta
+* Use versioned help on the Info page (#2103)
+
 ## 2019-09-09 12.0.4086 beta
 * Bug Fix:
   * Fix exception handling while parsing JSON info from cloud (#2065)
