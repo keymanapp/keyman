@@ -5,14 +5,25 @@
 
 HELP_ROOT=keyman/Keyman/resources/OfflineHelp.bundle/Contents/Resources
 
-if [ -z $VERSION ]; then
-  VERSION="12.0"  # Set manually here because alpha versions usually don't have 
-                  # matching help yet.
+VERSION=`cat ../resources/VERSION.md`
+
+# If TIER is set to "alpha", use the previous version.  Help is usually only updated during
+# the "beta" process.
+if [ -z $TIER ]; then
+  # Prevents an error message on the next check.  Also, manual runs will likely be during beta.
+  TIER=beta
+fi
+
+if [ $TIER = "alpha" ]; then
+  # More readable:  (major).minor
+  [[ "$VERSION" =~ ([0-9]+)\.[0-9]+ ]]
+  # Construct a decremented version string with .minor set to .0
+  $VERSION="$((${BASH_REMATCH[1]}-1)).0"
 fi
 
 # Clear previous help file downloads (if they exist)
 if [ -d "$HELP_ROOT" ]; then
-  rm -r "$HELP_ROOT/*"
+  rm -r "$HELP_ROOT"
 fi
 
 # Create local mirror of the help page subdirectory.
