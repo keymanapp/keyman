@@ -3,9 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-09-13 12.0.18 beta
+## 2019-09-19 12.0.18 beta
 * Bug Fix:
-  * Extract icon from kmx instead of downloading it
+  * Extract icon from kmx instead of downloading it (#2075)
 
 ## 2019-09-11 12.0.17 beta
 * Bug Fix:
