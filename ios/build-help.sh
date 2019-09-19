@@ -3,11 +3,13 @@
 # Uses the open-source `wget` utility to create an embedding-friendly offline mirror
 # equivalent of the online iOS help.
 
-$HELP_ROOT=keyman/Keyman/Keyman/WebPages
+HELP_ROOT=keyman/Keyman/Keyman/WebPages
 
 if [ -z $VERSION ]; then
-  $VERSION="11.0"
+  VERSION="12.0"
 fi
+
+echo $VERSION
 
 # Clear previous help file downloads (if they exist)
 if [ -d "$HELP_ROOT" ]; then
@@ -20,6 +22,7 @@ fi
 wget --mirror \
      --convert-links \
      --wait=2 \
+     --keep-session-cookies \
      --page-requisites \
      --no-parent \
      --restrict-file-names=windows \
@@ -28,7 +31,7 @@ wget --mirror \
      --no-directories \
      --default-page=index.php \
      --adjust-extension \
-     "help.keyman.com/products/iphone-and-ipad/$VERSION/index.php"
+     "help.keyman.com/products/iphone-and-ipad/$VERSION/index.php?embed=ios"
 
 # Results in a flat-structured mirror of the iphone-and-ipad/11.0 folder,
 # together with all needed resources within the 'site' folder.
