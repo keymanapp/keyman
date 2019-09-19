@@ -6,10 +6,9 @@
 HELP_ROOT=keyman/Keyman/Keyman/WebPages
 
 if [ -z $VERSION ]; then
-  VERSION="12.0"
+  VERSION="12.0"  # Set manually here because alpha versions usually don't have 
+                  # matching help yet.
 fi
-
-echo $VERSION
 
 # Clear previous help file downloads (if they exist)
 if [ -d "$HELP_ROOT" ]; then
@@ -33,5 +32,5 @@ wget --mirror \
      --adjust-extension \
      "help.keyman.com/products/iphone-and-ipad/$VERSION/index.php?embed=ios"
 
-# Results in a flat-structured mirror of the iphone-and-ipad/11.0 folder,
+# Results in a flat-structured mirror of the iphone-and-ipad/$VERSION folder,
 # together with all needed resources within the 'site' folder.
