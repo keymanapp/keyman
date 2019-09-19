@@ -18,7 +18,7 @@ import requests
 from keyman_config.get_kmp import get_keyboard_data, get_kmp, user_keyboard_dir, user_keyman_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import parseinfdata, parsemetadata, get_metadata, infmetadata_to_json, KMFileTypes
 from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.convertico import checkandsaveico
+from keyman_config.convertico import extractico, checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 from keyman_config.ibus_util import install_to_ibus, restart_ibus, get_ibus_bus
 
@@ -151,6 +151,8 @@ def install_kmp_shared(inputfile, online=False):
 				for kb in keyboards:
 					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
 						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+						fpath = os.path.join(packageDir, kb['id']+'.kmx')
+				extractico(fpath)
 
 		for kb in keyboards:
 			# install all kmx for first lang not just packageID
@@ -215,6 +217,8 @@ def install_kmp_user(inputfile, online=False):
 				for kb in keyboards:
 					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
 						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+						fpath = os.path.join(packageDir, kb['id']+'.kmx')
+				extractico(fpath)
 
 		install_keyboards_to_ibus(keyboards, packageDir)
 	else:

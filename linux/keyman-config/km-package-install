@@ -5,6 +5,7 @@ import logging
 import sys
 import os
 from keyman_config import __version__
+from keyman_config.uninstall_kmp import uninstall_kmp
 
 import datetime
 import time
