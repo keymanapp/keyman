@@ -18,7 +18,7 @@ if [ $TIER = "alpha" ]; then
   # More readable:  (major).minor
   [[ "$VERSION" =~ ([0-9]+)\.[0-9]+ ]]
   # Construct a decremented version string with .minor set to .0
-  $VERSION="$((${BASH_REMATCH[1]}-1)).0"
+  VERSION="$((${BASH_REMATCH[1]}-1)).0"
 fi
 
 # Clear previous help file downloads (if they exist)
