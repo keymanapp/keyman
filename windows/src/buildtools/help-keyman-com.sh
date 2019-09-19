@@ -58,34 +58,34 @@ echo "Uploading Keyman Desktop documentation to help.keyman.com"
 ## Upload documentation updates to help.keyman.com
 ##
 function upload_keyman_desktop_help {
-    
+
   #
   # Note: release/packages which contain multiple keyboards should also have the keyboards
   # as separate entries in the release/ folder. This means we may have a combined package
-  # help file as well as a per-keyboard help file. It is acceptable in this situation to 
+  # help file as well as a per-keyboard help file. It is acceptable in this situation to
   # make the combined help file link to the per-keyboard help files.
   #
-    
+
   #
-  # Copy all files in that folder, according to the current 
+  # Copy all files in that folder, according to the current
   # version of the keyboard, to help.keyman.com/keyboard/<id>/<version>/
   #
-  
+
   local helppath=$KEYMANROOT/../bin/help/php/desktop
-  
+
   #
   # Look for help source folder.
   #
-  
+
   if [[ ! -d "$helppath" ]]; then
     echo "${t_yel}Warning: The source path $helppath does not exist${t_end}"
     return 0
   fi
-  
+
   local dstpath="$HELP_KEYMAN_COM/products/desktop/$MAJOR_VERSION/docs"
-  
+
   mkdir -p "$dstpath"
-  
+
   rm -rf "$dstpath/*"
   cp -r "$helppath"/* "$dstpath/"
 }
@@ -96,7 +96,7 @@ function upload_keyman_desktop_help {
 
 function commit_and_push {
   echo "Committing and pushing updated Keyman Desktop documentation"
-  
+
   pushd $HELP_KEYMAN_COM
   git config user.name "Keyman Build Server"
   git config user.email "keyman-server@users.noreply.github.com"
@@ -107,14 +107,15 @@ function commit_and_push {
     popd
     return 0
   }
-  
+
   echo "changes added to cache...>>>"
   git commit -m "Keyman Desktop help deployment (automatic)" || return 1
+  git pull origin master || return 1
   git push origin master || return 1
   popd
-  
+
   echo "Push to help.keyman.com complete"
-  
+
   return 0
 }
 
