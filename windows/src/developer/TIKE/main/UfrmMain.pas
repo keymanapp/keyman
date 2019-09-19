@@ -1119,11 +1119,12 @@ begin
               ActiveEditor.Free;
 
         if ext = '.kmn' then Result := OpenKMNEditor(FFileName)
-        else if ext = '.kps' then Result := OpenKPSEditor(FFileName)
-        else if ext = '.kvk' then Result := OpenKVKEditor(FFileName)
-        else if ext = '.bmp' then Result := OpenEditor(FFileName, TfrmBitmapEditor)
-        else if ext = '.tsv' then Result := OpenTSVEditor(FFileName)
-        else                      Result := OpenEditor(FFileName, TfrmEditor);
+        else if ext = '.kps'  then Result := OpenKPSEditor(FFileName)
+        else if ext = '.kvk'  then Result := OpenKVKEditor(FFileName)
+        else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
+        else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
+        else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else                       Result := OpenEditor(FFileName, TfrmEditor);
       end;
 
       if Assigned(Result) then

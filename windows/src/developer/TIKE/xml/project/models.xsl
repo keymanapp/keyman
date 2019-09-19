@@ -25,8 +25,8 @@
           <p>
             Click the New Model button to create a lexical model for predictive text. Lexical model source files are TypeScript files.
             In version 12, the model format supported is "trie-1.0". The model source file will include references to wordlist source
-            files of .tsv format, which can be edited in a compatible spreadsheet program or generated from a number of other tools;
-            check the <a href='help:guides/lexical-models/intro'>online documentation</a> for more details.
+            files of .tsv format, which can be edited in Keyman Developer or in a compatible spreadsheet program or generated from a
+            number of other tools; check the <a href='help:guides/lexical-models/intro'>online documentation</a> for more details.
           </p>
 
           <p>

@@ -97,8 +97,8 @@ begin
 //TODO:    frameSource.UseTabs := True;
     pages.ActivePage := pageDesign;
 
-    gridWordlist.Cells[0, 0] := 'Word';
-    gridWordlist.Cells[1, 0] := 'Frequency';
+    gridWordlist.Cells[0, 0] := 'Word Form';
+    gridWordlist.Cells[1, 0] := 'Count';
     gridWordlist.Cells[2, 0] := 'Comment';
     gridWordlist.ColWidths[0] := ColWidth_Word;
     gridWordlist.ColWidths[1] := ColWidth_Frequency;
