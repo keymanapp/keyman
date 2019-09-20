@@ -15,6 +15,11 @@ class LanguageSettingsViewController: UITableViewController {
   private var settingsArray = [[String: String]]()
   private var keyboardRepository: KeyboardRepository?
 
+  private var doPredictionsSwitch: UISwitch?
+  private var doCorrectionsSwitch: UISwitch?
+  private var doCorrectionsLabel: UILabel?
+  private var correctionsCell: UITableViewCell?
+
   public init(_ keyboardRepository: KeyboardRepository?, _ inLanguage: Language) {
     language = inLanguage
     self.keyboardRepository = keyboardRepository
@@ -85,6 +90,11 @@ class LanguageSettingsViewController: UITableViewController {
     let value = source.isOn;
     let userDefaults = Storage.active.userDefaults
     userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
+
+    // Reactively set the corrections switch interactivity state.
+    self.doCorrectionsSwitch?.isEnabled = value
+    self.doCorrectionsLabel?.isEnabled = value
+    self.correctionsCell?.isUserInteractionEnabled = value
     
     if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
       if Manager.shared.currentKeyboardID?.languageID == self.language.id {
@@ -122,34 +132,39 @@ class LanguageSettingsViewController: UITableViewController {
     if 1 == indexPath.section {
         if 0 == indexPath.row {
           cell.accessoryType = .none
-          let doPredictionsSwitch = UISwitch()
-          doPredictionsSwitch.translatesAutoresizingMaskIntoConstraints = false
+          doPredictionsSwitch = UISwitch()
+          doPredictionsSwitch!.translatesAutoresizingMaskIntoConstraints = false
           
-          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch.frame.size)
-          doPredictionsSwitch.frame = switchFrame
+          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch!.frame.size)
+          doPredictionsSwitch!.frame = switchFrame
           
-          doPredictionsSwitch.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
-          doPredictionsSwitch.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
-          cell.addSubview(doPredictionsSwitch)
+          doPredictionsSwitch!.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+          doPredictionsSwitch!.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
+          cell.addSubview(doPredictionsSwitch!)
           if #available(iOSApplicationExtension 9.0, *) {
-            doPredictionsSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-            doPredictionsSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+            doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+            doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
           }
         } else if 1 == indexPath.row {
+          correctionsCell = cell
           cell.accessoryType = .none
-          let doCorrectionsSwitch = UISwitch()
-          doCorrectionsSwitch.translatesAutoresizingMaskIntoConstraints = false
+          doCorrectionsSwitch = UISwitch()
+          doCorrectionsSwitch!.translatesAutoresizingMaskIntoConstraints = false
           
-          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch.frame.size)
-          doCorrectionsSwitch.frame = switchFrame
+          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch!.frame.size)
+          doCorrectionsSwitch!.frame = switchFrame
           
-          doCorrectionsSwitch.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
-          doCorrectionsSwitch.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
-          cell.addSubview(doCorrectionsSwitch)
+          doCorrectionsSwitch!.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
+          doCorrectionsSwitch!.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
+          cell.addSubview(doCorrectionsSwitch!)
           if #available(iOSApplicationExtension 9.0, *) {
-            doCorrectionsSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-            doCorrectionsSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+            doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+            doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
           }
+
+          // Disable interactivity if the prediction toggle is set to 'off'.
+          doCorrectionsSwitch!.isEnabled = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+          cell.isUserInteractionEnabled = userDefaults.predictSettingForLanguage(languageID: self.language.id)
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
       }
@@ -212,7 +227,9 @@ class LanguageSettingsViewController: UITableViewController {
         case 0:
           cell.textLabel?.text = "Enable predictions"
         case 1:
+          doCorrectionsLabel = cell.textLabel
           cell.textLabel?.text = "Enable corrections"
+          cell.textLabel?.isEnabled = doCorrectionsSwitch?.isEnabled ?? false
         case 2:
           cell.textLabel?.text = "Dictionaries"
           cell.accessoryType = .disclosureIndicator

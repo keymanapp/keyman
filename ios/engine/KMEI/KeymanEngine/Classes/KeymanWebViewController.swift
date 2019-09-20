@@ -68,7 +68,18 @@ class KeymanWebViewController: UIViewController {
   @objc func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
-    
+  }
+
+  override func viewWillLayoutSubviews() {
+    // This method is called automatically during layout correction by iOS.
+    // It also has access to correct `view.bounds.size` values, unlike viewDidAppear.
+    // As a result, it's the correct place to perform OSK size adjustments.
+    //
+    // Problem - this is ALSO called automatically upon any touch-based interaction with the OSK!  (Why!?)
+    // The `keyboardSize` property will filter out any such redundant size-change requests to prevent issues
+    // that would otherwise arise.  (Important event handlers can trigger for the original OSK instance
+    // after it has been replaced by KMW's OSK resizing operation.)
+
     keyboardSize = view.bounds.size
   }
   
@@ -462,8 +473,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
   }
 
   private static func keyFrame(x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat) -> CGRect {
-    // kmw adds w/2 to x.
-    return CGRect(x: x - w / 2.0, y: y, width: w, height: h)
+    return CGRect(x: x - (w/2), y: y, width: w, height: h)
   }
   
   public func beep(_ keymanWeb: KeymanWebViewController) {
@@ -813,9 +823,19 @@ extension KeymanWebViewController {
       return kbSize
     }
     set(size) {
-      kbSize = size
-      setOskWidth(Int(size.width))
-      setOskHeight(Int(size.height))
+      // Only perform set management code if the size values has actually changed.
+      // We tend to get a lot of noise on this, so filtering like this also helps increase
+      // stability and performance.
+      //
+      // Note that since viewWillLayoutSubviews is triggered by touch events (for some reason) as
+      // well as view transitions, this helps to prevent issues that arise from replacing the OSK
+      // on touch events that would otherwise occur - at present, a resize operation in KMW
+      // automatically replaces the OSK.
+      if kbSize != size {
+        kbSize = size
+        setOskWidth(Int(size.width))
+        setOskHeight(Int(size.height))
+      }
     }
   }
 
@@ -831,6 +851,11 @@ extension KeymanWebViewController {
   // Keyman interaction
   func resizeKeyboard() {
     fixLayout()
+
+    // Ensures the height is properly updated.
+    // Note:  System Keyboard init currently requires this for the keyboard to display properly
+    // the first time.
+    setOskHeight(Int(kbSize.height))
   }
   
   func resetKeyboardState() {
@@ -869,7 +894,10 @@ extension KeymanWebViewController {
     }
 
     languageMenuPosition { keyFrame in
-      self.showHelpBubble(at: keyFrame.origin)
+      // We should calculate the center point between the origin and the right-hand coordinate of the key.
+      // keyFrame.origin seems to use the left-hand (minX) edge, which looks ugly.  Y coord's good, though.
+      let tipRootPoint = CGPoint(x: keyFrame.midX, y: keyFrame.origin.y)
+      self.showHelpBubble(at: tipRootPoint)
     }
   }
 

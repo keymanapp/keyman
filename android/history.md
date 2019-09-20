@@ -3,6 +3,30 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-19 12.0.4090 beta
+* Use versioned help on the Info page (#2103)
+
+## 2019-09-09 12.0.4086 beta
+* Bug Fix:
+  * Fix exception handling while parsing JSON info from cloud (#2065)
+  * Fix crash involving undefined key for custom keyboard (#2066)
+
+## 2019-09-06 12.0.4085 beta
+* New Feature
+  * Include the English (MTNT) dictionary by default for English (#2029)
+
+* Bug Fix:
+  * Fix collision of File Provider (#2053)
+
+## 2019-09-04 12.0.4084 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2033, #2037)
+
+## 2019-09-03 12.0.4083 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2027)
+
+## 2019-09-02 12.0.4082 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2013)
+
 ## 2019-08-30 12.0.4081 beta
 * New Feature:
   * Allow user to "Add keyboard from local device" from Settings menu (#1992)

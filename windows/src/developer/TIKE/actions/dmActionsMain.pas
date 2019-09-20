@@ -562,7 +562,7 @@ procedure TmodActionsMain.NewProject(pt: TProjectType);
 begin
   FGlobalProject.Save;
   FreeGlobalProjectUI;
-  LoadGlobalProjectUI(pt, '', False);   // I4687
+  NewGlobalProjectUI(pt);
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;
 end;

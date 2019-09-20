@@ -3,6 +3,23 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-20 12.0.34 beta
+* Add basic wordlist editor to Keyman Developer (#2086)
+
+## 2019-09-19 12.0.33 beta
+* Disable canonicalization of BCP 47 codes when building keyboard and model projects from template because it's inadequate (#2084)
+* Prevent package metadata preprocessor from treating .model.js files as keyboard files when they don't exist (#2085)
+
+## 2019-09-11 12.0.30 beta
+* Clarify the project filename that will be created and simplify how the Browse button works in Project Template dialogs (#2073)
+
+## 2019-09-09 12.0.28 beta
+* Character preview was not updating in mobile web touch test (#2061)
+
+## 2019-09-08 12.0.27 beta
+* Make sure New Project actually starts a new, blank project (#2059)
+* Don't overwrite a BCP 47 code that the user has chosen when writing project templates (#2060)
+
 ## 2019-09-02 12.0.23 beta
 * Add kmlmc, kmlmi and kmlmp command line tools for building lexical models (#2024)
 

@@ -2,182 +2,200 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'New Wordlist Lexical Model Project'
-  ClientHeight = 309
-  ClientWidth = 625
+  ClientHeight = 484
+  ClientWidth = 412
   OldCreateOrder = True
   Position = poScreenCenter
   OnDestroy = FormDestroy
-  ExplicitWidth = 631
-  ExplicitHeight = 338
-  DesignSize = (
-    625
-    309)
+  ExplicitWidth = 418
+  ExplicitHeight = 513
   PixelsPerInch = 96
   TextHeight = 13
   object lblFileName: TLabel
-    Left = 12
-    Top = 275
+    Left = 8
+    Top = 395
     Width = 46
     Height = 13
-    Caption = '&Model ID:'
+    Caption = 'Model &ID:'
     FocusControl = editModelID
   end
   object lblPath: TLabel
-    Left = 12
-    Top = 248
+    Left = 8
+    Top = 259
     Width = 26
     Height = 13
     Caption = '&Path:'
     FocusControl = editPath
   end
   object lblAuthorID: TLabel
-    Left = 12
-    Top = 11
+    Left = 8
+    Top = 314
     Width = 51
     Height = 13
     Caption = 'Aut&hor ID:'
     FocusControl = editAuthorID
   end
   object lblCoypright: TLabel
-    Left = 12
-    Top = 113
+    Left = 8
+    Top = 65
     Width = 51
     Height = 13
     Caption = '&Copyright:'
     FocusControl = editCopyright
   end
   object lblVersion: TLabel
-    Left = 12
-    Top = 140
+    Left = 8
+    Top = 92
     Width = 39
     Height = 13
     Caption = '&Version:'
     FocusControl = editVersion
   end
   object lblAuthor: TLabel
-    Left = 12
-    Top = 167
+    Left = 8
+    Top = 11
     Width = 67
     Height = 13
     Caption = 'A&uthor Name:'
     FocusControl = editAuthor
   end
   object lblLanguages: TLabel
-    Left = 339
-    Top = 11
+    Left = 9
+    Top = 118
     Width = 52
     Height = 13
     Caption = '&Languages'
     FocusControl = gridLanguages
   end
   object lblBCP47: TLabel
-    Left = 12
-    Top = 38
-    Width = 95
+    Left = 8
+    Top = 341
+    Width = 90
     Height = 13
-    Caption = 'Primary BCP47 &Tag:'
+    Caption = '&Primary Language:'
   end
   object lblUniq: TLabel
-    Left = 12
-    Top = 65
+    Left = 8
+    Top = 368
     Width = 67
     Height = 13
     Caption = 'Uni&que Name:'
     FocusControl = editUniq
   end
+  object lblModelName: TLabel
+    Left = 8
+    Top = 38
+    Width = 62
+    Height = 13
+    Caption = '&Model Name:'
+    FocusControl = editModelName
+  end
+  object Bevel1: TBevel
+    Left = 8
+    Top = 289
+    Width = 397
+    Height = 2
+  end
+  object lblProjectFilename: TLabel
+    Left = 8
+    Top = 422
+    Width = 77
+    Height = 13
+    Caption = 'Project &filename'
+    FocusControl = editProjectFilename
+  end
   object editModelID: TEdit
     Left = 120
-    Top = 272
-    Width = 149
+    Top = 392
+    Width = 205
     Height = 21
+    TabStop = False
     ParentColor = True
     ReadOnly = True
-    TabOrder = 11
+    TabOrder = 13
     OnChange = editModelIDChange
   end
   object cmdBrowse: TButton
-    Left = 275
-    Top = 272
-    Width = 78
+    Left = 332
+    Top = 256
+    Width = 73
     Height = 21
     Caption = '&Browse...'
-    TabOrder = 12
+    TabOrder = 9
     OnClick = cmdBrowseClick
   end
   object editPath: TEdit
     Left = 120
-    Top = 245
-    Width = 233
+    Top = 256
+    Width = 205
     Height = 21
-    TabOrder = 10
+    TabOrder = 8
     OnChange = editPathChange
   end
   object editAuthorID: TEdit
     Left = 120
-    Top = 8
+    Top = 311
     Width = 205
     Height = 21
-    TabOrder = 0
+    TabOrder = 10
     OnChange = editModelIDComponentChange
   end
   object editCopyright: TEdit
     Left = 120
-    Top = 110
+    Top = 62
     Width = 205
     Height = 21
-    TabOrder = 3
-    Text = #169
+    TabOrder = 2
     OnChange = editCopyrightChange
   end
   object editVersion: TEdit
     Left = 120
-    Top = 137
+    Top = 89
     Width = 205
     Height = 21
-    TabOrder = 4
+    TabOrder = 3
     Text = '1.0'
     OnChange = editVersionChange
   end
   object editAuthor: TEdit
     Left = 120
-    Top = 164
+    Top = 8
     Width = 205
     Height = 21
-    TabOrder = 5
+    TabOrder = 0
     OnChange = editAuthorChange
   end
   object cmdOK: TButton
-    Left = 463
-    Top = 270
+    Left = 252
+    Top = 451
     Width = 73
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 13
+    TabOrder = 15
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
-    Left = 542
-    Top = 270
+    Left = 331
+    Top = 451
     Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 14
+    TabOrder = 16
   end
   object gridLanguages: TStringGrid
-    Left = 339
-    Top = 32
-    Width = 278
-    Height = 153
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Left = 8
+    Top = 139
+    Width = 317
+    Height = 102
     ColCount = 2
     DefaultRowHeight = 16
     FixedCols = 0
     RowCount = 9
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-    TabOrder = 6
+    TabOrder = 4
     OnClick = gridLanguagesClick
     OnDblClick = gridLanguagesDblClick
     ColWidths = (
@@ -185,59 +203,73 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
       64)
   end
   object cmdAddLanguage: TButton
-    Left = 340
-    Top = 191
+    Left = 332
+    Top = 139
     Width = 73
     Height = 25
-    Anchors = [akLeft, akBottom]
     Caption = '&Add...'
-    TabOrder = 7
+    TabOrder = 5
     OnClick = cmdAddLanguageClick
   end
   object cmdEditLanguage: TButton
-    Left = 419
-    Top = 191
+    Left = 332
+    Top = 170
     Width = 73
     Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = 'Ed&it...'
-    TabOrder = 8
+    Caption = '&Edit...'
+    TabOrder = 6
     OnClick = cmdEditLanguageClick
   end
   object cmdRemoveLanguage: TButton
-    Left = 498
-    Top = 191
-    Width = 72
+    Left = 332
+    Top = 201
+    Width = 73
     Height = 25
-    Anchors = [akLeft, akBottom]
     Caption = '&Remove'
-    TabOrder = 9
+    TabOrder = 7
     OnClick = cmdRemoveLanguageClick
   end
   object editUniq: TEdit
     Left = 120
-    Top = 62
+    Top = 365
     Width = 205
     Height = 21
-    TabOrder = 2
+    TabOrder = 12
     OnChange = editModelIDComponentChange
   end
   object cbBCP47: TComboBox
     Left = 120
-    Top = 35
+    Top = 338
     Width = 205
     Height = 21
     Style = csDropDownList
-    TabOrder = 1
+    TabOrder = 11
     OnClick = editModelIDComponentChange
   end
-  object dlgSave: TSaveDialog
-    DefaultExt = 'kpj'
-    Filter = 'Project files (*.kpj)|*.kpj|All files (*.*)|*.*'
-    FilterIndex = 0
-    Title = 'Create New Project'
-    OnCanClose = dlgSaveCanClose
-    Left = 396
-    Top = 240
+  object editModelName: TEdit
+    Left = 120
+    Top = 35
+    Width = 205
+    Height = 21
+    TabOrder = 1
+    OnChange = editModelNameChange
+  end
+  object editProjectFilename: TEdit
+    Left = 120
+    Top = 419
+    Width = 284
+    Height = 21
+    TabStop = False
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 14
+  end
+  object dlgBrowse: TBrowse4Folder
+    InitialDir = 'C:\Users\mcdurdin\Desktop\'
+    Options = [OnlySelectFileSysAncestors, ShowEditBox, UseNewDialogStyle]
+    Root = Desktop
+    Title = 'Select folder to save project to'
+    Left = 168
+    Top = 168
   end
 end

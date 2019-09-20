@@ -70,6 +70,11 @@ public class PackageProcessor {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
+      // Extract our package ID from .model.kmp file
+      if (filename.lastIndexOf(FileUtils.MODELPACKAGE) != -1) {
+        return filename.substring(0, filename.lastIndexOf(FileUtils.MODELPACKAGE));
+      }
+
       // Extract our best-guess name for the package and construct the temporary package name.
       return filename.substring(0, filename.lastIndexOf(FileUtils.KEYMANPACKAGE));
     } else {

@@ -318,6 +318,7 @@ type
     function OpenKPSEditor(FFileName: string): TfrmTikeEditor;
     procedure SetActiveChild(const Value: TfrmTikeChild);
     function OpenKVKEditor(FFileName: string): TfrmTikeEditor;
+    function OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 
     procedure ShowChild(Window: TfrmTikeChild);
     function GetActiveChild: TfrmTikeChild;
@@ -422,8 +423,11 @@ uses
   OnlineConstants,
   OnlineUpdateCheck,
   GlobalProxySettings,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.UfrmWordlistEditor,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -437,7 +441,7 @@ uses
   UfrmSelectSystemKeyboard,
   UfrmStartup, UfrmOptions,
   UfrmKeyTest, UfrmKeymanWizard,
-  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.System.Project.ProjectFileType,
+  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
   UfrmHelp, dmActionsTextEditor, UfrmDebugStatus,
   UfrmCharacterIdentifier, UfrmCharacterMapNew;
@@ -1115,10 +1119,12 @@ begin
               ActiveEditor.Free;
 
         if ext = '.kmn' then Result := OpenKMNEditor(FFileName)
-        else if ext = '.kps' then Result := OpenKPSEditor(FFileName)
-        else if ext = '.kvk' then Result := OpenKVKEditor(FFileName)
-        else if ext = '.bmp' then Result := OpenEditor(FFileName, TfrmBitmapEditor)
-        else                      Result := OpenEditor(FFileName, TfrmEditor);
+        else if ext = '.kps'  then Result := OpenKPSEditor(FFileName)
+        else if ext = '.kvk'  then Result := OpenKVKEditor(FFileName)
+        else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
+        else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
+        else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else                       Result := OpenEditor(FFileName, TfrmEditor);
       end;
 
       if Assigned(Result) then
@@ -1138,6 +1144,12 @@ end;
 function TfrmKeymanDeveloper.OpenKMNEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmKeymanWizard);
+    //else Result := OpenEditor(FFileName, TfrmEditor);
+end;
+
+function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
+begin
+  Result := OpenEditor(FFileName, TfrmWordlistEditor);
     //else Result := OpenEditor(FFileName, TfrmEditor);
 end;
 

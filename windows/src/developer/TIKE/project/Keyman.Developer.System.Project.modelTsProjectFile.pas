@@ -63,10 +63,6 @@ uses
   System.Variants,
   Winapi.Windows,
 
-  KeyboardParser,
-  kmxfileconsts,
-  KeyboardFonts,
-  Keyman.System.KeyboardUtils,
   utilsystem;
 
 {-------------------------------------------------------------------------------

@@ -1,17 +1,17 @@
 @font-face {
    font-family: "Nunito";
-   src: url("nunito-regular-webfont.eot"); 
+   src: url("nunito-regular-webfont.eot");
    src: url("nunito-regular-webfont.ttf") format("truetype"),
-     url("nunito-regular-webfont.otf") format("opentype"), 
+     url("nunito-regular-webfont.otf") format("opentype"),
      url("nunito-regular-webfont.woff") format("woff"),
      url("nunito-regular-webfont.svg#nunitoregular") format("svg");
 }
 
 @font-face {
    font-family: "Open Sans";
-   src: url("opensans-regular-webfont.eot"); 
+   src: url("opensans-regular-webfont.eot");
    src: url("opensans-regular-webfont.ttf") format("truetype"),
-     url("opensans-regular-webfont.otf") format("opentype"), 
+     url("opensans-regular-webfont.otf") format("opentype"),
      url("opensans-regular-webfont.woff") format("woff"),
      url("opensans-regular-webfont.svg#open_sansregular") format("svg");
 }
@@ -114,10 +114,10 @@ h2{
     width: 30px;
     -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
     filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
-    
+
     -moz-border-radius: 15px;
     border-radius: 15px;
-    
+
     background-color: #A0BC76;
     color: white;
     text-align: center;
@@ -148,7 +148,8 @@ h2{
     text-align: left;
 }
 
-#supporters img{
+#supporters img,
+#fpcf img{
     background-color: white;
     height: 43px;
     width: auto;
@@ -158,29 +159,29 @@ h2{
     filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
 }
 
-#donation{
+#fpcf{
+    border-top: solid 1px #cfcec8;
     padding: 0 30px 10px;
     width: calc(100% - 60px);
     text-align: center;
 }
 
-#donation p{
+#fpcf p{
     color: #ffd988;
     font-size: 0.875em;
     margin: 5px;
-    text-align: left;
 }
 
-#donation a:link{
+#fpcf a:link{
     text-decoration: underline;
     color: white;
-    font-weight: bold;
+    font-weight: normal;
 }
 
-#donation a:visited{
+#fpcf a:visited{
     text-decoration: underline;
     color: white;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 #footer{

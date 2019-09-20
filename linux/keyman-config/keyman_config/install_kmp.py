@@ -18,7 +18,7 @@ import requests
 from keyman_config.get_kmp import get_keyboard_data, get_kmp, user_keyboard_dir, user_keyman_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import parseinfdata, parsemetadata, get_metadata, infmetadata_to_json, KMFileTypes
 from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.convertico import checkandsaveico
+from keyman_config.convertico import extractico, checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 from keyman_config.ibus_util import install_to_ibus, restart_ibus, get_ibus_bus
 
@@ -52,47 +52,11 @@ def extract_kmp(kmpfile, directory):
 	with zipfile.ZipFile(kmpfile,"r") as zip_ref:
 		zip_ref.extractall(directory)
 
-def download_source(keyboardID, packageDir, sourcePath):
-	# just get latest version of kmn unless there turns out to be a way to get the version of a file at a date
-	base_url = "https://raw.github.com/keymanapp/keyboards/master/" + sourcePath
-	kmn_url = base_url + "/source/" + keyboardID + ".kmn"
-	response = requests.get(kmn_url)
-	if response.status_code == 200:
-		kmn_file = os.path.join(packageDir, keyboardID + ".kmn")
-		with open(kmn_file, 'wb') as f:
-			f.write(response.content)
-			logging.info("Installing %s.kmn as keyman file", keyboardID)
-		logging.info("Compiling kmn file")
-		subprocess.run(["kmflcomp", kmn_file], stdout=subprocess.PIPE, stderr= subprocess.STDOUT)
-		# kmfl_file = os.path.join(kbdir, kbid + ".kmfl")
-		# if not os.path.isfile(kmfl_file):
-		# 	message = "Could not compile %s to %s so not installing keyboard." % (kmn_file, kmfl_file)
-		# 	os.remove(kmn_file)
-		# 	rmtree(kbdir)
-		# 	raise InstallError(InstallStatus.Abort, message)
-	# else:
-	# 	message = "install_kmp.py: warning: no kmn source file for %s so not installing keyboard." % (kbid)
-	# 	rmtree(kbdir)
-	# 	raise InstallError(InstallStatus.Abort, message)
-	icodownloadfile = os.path.join(packageDir, keyboardID + ".ico")
-	if not os.path.isfile(icodownloadfile):
-		ico_url = base_url + "/source/" + keyboardID + ".ico"
-		response = requests.get(ico_url)
-		if response.status_code == 200:
-			with open(icodownloadfile, 'wb') as f:
-				f.write(response.content)
-			logging.info("Installing %s.ico as keyman file", keyboardID)
-			checkandsaveico(icodownloadfile)
-		else:
-			logging.warning("install_kmp.py: warning: no ico source file for %s", keyboardID)
-
 def process_keyboard_data(keyboardID, packageDir):
 	kbdata = get_keyboard_data(keyboardID)
 	if kbdata:
 		if not os.path.isdir(packageDir):
 			os.makedirs(packageDir)
-		if 'sourcePath' in kbdata:
-			download_source(keyboardID, packageDir, kbdata['sourcePath'])
 
 		with open(os.path.join(packageDir, keyboardID + '.json'), 'w') as outfile:
 			json.dump(kbdata, outfile)
@@ -125,7 +89,7 @@ def install_kmp_shared(inputfile, online=False):
 
 	Args:
 		inputfile (str): path to kmp file
-		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
+		online(bool, default=False): whether to attempt to get online keyboard data
 	"""
 	check_keyman_dir('/usr/local/share', "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman")
 	check_keyman_dir('/usr/local/share/doc', "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman")
@@ -187,6 +151,8 @@ def install_kmp_shared(inputfile, online=False):
 				for kb in keyboards:
 					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
 						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+						fpath = os.path.join(packageDir, kb['id']+'.kmx')
+				extractico(fpath)
 
 		for kb in keyboards:
 			# install all kmx for first lang not just packageID
@@ -251,6 +217,8 @@ def install_kmp_user(inputfile, online=False):
 				for kb in keyboards:
 					if kmx_id.lower() == kb['id'] and kmx_id != kb['id']:
 						os.rename(os.path.join(packageDir, f['name']), os.path.join(packageDir, kb['id']+'.kmx'))
+						fpath = os.path.join(packageDir, kb['id']+'.kmx')
+				extractico(fpath)
 
 		install_keyboards_to_ibus(keyboards, packageDir)
 	else:
@@ -286,7 +254,7 @@ def install_kmp(inputfile, online=False, sharedarea=False):
 
 	Args:
 		inputfile (str): path to kmp file
-		online(bool, default=False): whether to attempt to get a source kmn and ico for the keyboard
+		online(bool, default=False): whether to attempt to get online keyboard data
 		sharedarea(bool, default=False): whether install kmp to shared area or user directory
 	"""
 	if sharedarea:
