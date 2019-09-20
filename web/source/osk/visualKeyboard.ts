@@ -1054,7 +1054,7 @@ namespace com.keyman.osk {
       }
 
       // Stop repeat if no longer on BKSP key
-      if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('BKSP') < 0)) {
+      if(key1 && (typeof key1.id == 'string') && (key1.id.indexOf('-K_BKSP') < 0)) {
         this.cancelDelete();
       }
 
