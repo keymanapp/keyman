@@ -4,22 +4,6 @@
  */
 /// <reference path="../../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
 
-/**
- * ****** TODO: DELETE ME******
- *
- * This form of specifying word breakers is not implemented.
- *
- */
-interface ClassBasedWordBreaker {
-  allowedCharacters?: { initials?: string, medials?: string, finals?: string } | string,
-  defaultBreakCharacter?: string
-  sources?: Array<string>;
-  /**
-   * The name of the type to instantiate (without parameters) as the base object for a custom word-breaking model.
-   */
-  rootClass?: string
-}
-
 interface LexicalModel {
   readonly format: 'trie-1.0'|'fst-foma-1.0'|'custom-1.0',
   //... metadata ...
@@ -41,7 +25,7 @@ interface LexicalModelSource extends LexicalModel {
    *  - word breaking function -- provide your own function that breaks words.
    *  - class-based word-breaker - may be supported in the future.
    */
-  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction | ClassBasedWordBreaker;
+  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
 
   /**
    * How to simplify words, to convert them into simplifired search keys

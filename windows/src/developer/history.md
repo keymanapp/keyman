@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-19 12.0.33 beta
+* Disable canonicalization of BCP 47 codes when building keyboard and model projects from template because it's inadequate (#2084)
+* Prevent package metadata preprocessor from treating .model.js files as keyboard files when they don't exist (#2085)
+
 ## 2019-09-11 12.0.30 beta
 * Clarify the project filename that will be created and simplify how the Browse button works in Project Template dialogs (#2073)
 

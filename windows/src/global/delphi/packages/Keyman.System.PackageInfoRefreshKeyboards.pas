@@ -25,6 +25,7 @@ type
     function IsKeyboardFileByContent(f: TPackageContentFile): Boolean;
     function CheckKeyboardLanguages: Boolean;
     function CheckKeyboardTargetVersions: Boolean;
+    function IsModelFileByName(f: TPackageContentFile): Boolean;
   public
     type TPackageKeyboardInfo = record
       Name, ID, Version: string;
@@ -222,6 +223,11 @@ begin
   end;
 end;
 
+function TPackageInfoRefreshKeyboards.IsModelFileByName(f: TPackageContentFile): Boolean;
+begin
+  Result := TRegEx.IsMatch(f.FileName, '\.model\.js$', [roIgnoreCase]);
+end;
+
 function TPackageInfoRefreshKeyboards.IsKeyboardFileByName(f: TPackageContentFile): TKMFileType;
 begin
   if f.FileType = ftKeymanFile then
@@ -230,6 +236,12 @@ begin
   end;
 
   if f.FileType <> ftJavascript then
+    Exit(ftOther);
+
+  // A lexical model file will typicaly have the extension .model.js. This prevents the
+  // package editor from treating a lexical model as a keyboard when refreshing the list
+  // of included keyboards
+  if IsModelFileByName(f) then
     Exit(ftOther);
 
   // Need to test if the JS is a valid keyboard file.

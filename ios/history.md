@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-17 12.0.37 beta
+* Multiple bug fixes for the system keyboard (#2094)
+
 ## 2019-09-11 12.0.35 beta
 * Fixes predictive text bug where the last input was always interpreted as the first available key (#2076)
 * Adds support for scrolling long suggestions in the predictive banner (#2071)
