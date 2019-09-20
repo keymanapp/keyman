@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-20 12.0.4091 beta
+* Update offline help content (#2104)
+
 ## 2019-09-19 12.0.4090 beta
 * Use versioned help on the Info page (#2103)
 
