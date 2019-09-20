@@ -1144,10 +1144,10 @@ namespace com.keyman.text {
     }
 
     // Also needed for some legacy CJK keyboards.
-    ['GetLastActiveElement'] = ['getLastActiveElement'];
-    ['FocusLastActiveElement'] = ['focusLastActiveElement'];
-    ['HideHelp'] = self['hideHelp'];
-    ['ShowHelp'] = self['showHelp'];
+    ['GetLastActiveElement'] = this['getLastActiveElement'];
+    ['FocusLastActiveElement'] = this['focusLastActiveElement'];
+    ['HideHelp'] = this['hideHelp'];
+    ['ShowHelp'] = this['showHelp'];
     ['ShowPinnedHelp'] = this['showPinnedHelp'];
 
     resetContext() {
