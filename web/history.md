@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-20 12.0.85 beta
+* Adds failsafe in case of sticky backspace scenarios, making it simpler to cancel. (#2107)
+
 ## 2019-09-10 12.0.83 beta
 * Enables scrolling for long suggestions in the mobile-only predictive text banner (#2071)
 
