@@ -1103,14 +1103,8 @@ namespace com.keyman.text {
     /**
      * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
      */
-    ['getLastActiveElement'](): HTMLElement {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        return keyman.domManager.getLastActiveElement(); 
-      } else {
-        // What are the IMEs looking for with this method?  Would an element interface suffice?
-        return null;
-      }
+    ['getLastActiveElement'](): OutputTarget {
+      return text.Processor.getOutputTarget();
     }
 
     ['focusLastActiveElement'](): void {
