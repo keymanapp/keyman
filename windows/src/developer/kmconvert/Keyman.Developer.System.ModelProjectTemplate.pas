@@ -55,6 +55,7 @@ uses
   KeymanVersion,
   Keyman.Developer.System.Project.modelTsProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.wordlistTsvProjectFile,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFiles,
   PackageInfo,
@@ -133,6 +134,7 @@ begin
 
     // Add model and package to project
     kpj.Files.Add(TmodelTsProjectFile.Create(kpj, GetModelFilename, nil));
+    kpj.Files.Add(TwordlistTsvProjectFile.Create(kpj, GetWordlistFilename, nil));
     kpj.Files.Add(TkpsProjectFile.Create(kpj, GetPackageFilename, nil));
 
     // Add metadata files to project

@@ -136,7 +136,7 @@ begin
 
     bcp47tag := TBCP47Tag.Create(tag);
     try
-      bcp47tag.Canonicalize;
+      //bcp47tag.Canonicalize; #2080
       pkl.ID := bcp47tag.Tag;
 
       if not TLanguageCodeUtils.BCP47Languages.TryGetValue(bcp47tag.Language, pkl.Name) then

@@ -200,7 +200,7 @@ begin
     kptWordlistLexicalModel: lblDescription.Caption :=
       'Creates a new lexical model project that matches the folder structure used in '+
       'the Keyman lexical-models repository and includes all basic files '+
-      'needed for a wordlist lexical mdoel.';
+      'needed for a wordlist lexical model.';
   end;
 end;
 

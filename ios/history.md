@@ -3,9 +3,12 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-09-19 12.0.39 beta
+## 2019-09-20 12.0.39 beta
 * App info / help now points to the equivalent pages on help.keyman.com in a multi-page format (#2088)
 * Offline help now uses a mirrored copy of help.keyman.com and is also multi-page (#2102)
+
+## 2019-09-17 12.0.37 beta
+* Multiple bug fixes for the system keyboard (#2094)
 
 ## 2019-09-11 12.0.35 beta
 * Fixes predictive text bug where the last input was always interpreted as the first available key (#2076)

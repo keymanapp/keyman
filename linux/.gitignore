@@ -32,6 +32,10 @@ keyman-config/make_deb
 tmp/
 dist/
 *~
+# keyboardprocessor build artifacts
+keyboardprocessor/
+# IDE config files
+**/.idea/
 ibus-k*/m4/codeset.m4
 ibus-k*/m4/glibc2.m4
 ibus-k*/m4/glibc21.m4
