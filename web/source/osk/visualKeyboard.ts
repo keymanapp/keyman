@@ -1031,6 +1031,12 @@ namespace com.keyman.osk {
         e.stopPropagation();
       }
 
+      // Shouldn't be possible, but just in case.
+      if(this.touchCount == 0) {
+        this.cancelDelete();
+        return;
+      }
+
       // Get touch position
       var x=typeof e.touches == 'object' ? e.touches[0].clientX : e.clientX,
           y=typeof e.touches == 'object' ? e.touches[0].clientY : e.clientY;
@@ -1054,7 +1060,7 @@ namespace com.keyman.osk {
 
       // Do not attempt to support reselection of target key for overlapped keystrokes.
       // Perform _after_ ensuring possible sticky keys have been cancelled.
-      if(e.touches.length > 1 || this.touchCount == 0) {
+      if(e.touches.length > 1) {
         return;
       }
 
