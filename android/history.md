@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-23 12.0.4092 beta
+* Disable corrections toggle when predictions are disabled (#2119)
+
 ## 2019-09-20 12.0.4091 beta
 * Update offline help content (#2104)
 
