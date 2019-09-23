@@ -49,6 +49,7 @@ if(!window['keyman']['ui']['name']) {
       langKeyboardListNodes: [],
       selectedRegion: 'as',
       listedKeyboards: [],
+      catchAllRegion: 'me',
       keyboardListPriority: 0,
       maxListedKeyboards: 1,
       lastActiveControl: null,
@@ -332,9 +333,17 @@ if(!window['keyman']['ui']['name']) {
         var max = 0, count = 0, languageCode = '';
     
         // Get number of languages for the region         
-        for(var j=0; j<Keyboards.length; j++)
-        {         
-          if(Keyboards[j]['RegionCode'] != i) continue;              // Not this region
+        for(var j=0; j<Keyboards.length; j++) {
+          // REVERT:  ensures that keyboards without visible map region get displayed SOMEWHERE.
+          var kbdRegion = Keyboards[j]['RegionCode'];
+          if(!ui.regions[kbdRegion]) {
+            // For now, we'll display them within the 'middle-east' region.
+            if(i != ui.catchAllRegion) {
+              continue;
+            }
+          } else if(kbdRegion != i) {
+            continue; // Not this region
+          }
 
           // Get JUST the language code for this section.  BCP-47 codes can include more!
           var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
@@ -347,9 +356,17 @@ if(!window['keyman']['ui']['name']) {
   
         // Add language list to columns for the region
         languageCode='';
-        for(var j=0; j<Keyboards.length; j++)
-        {           
-          if(Keyboards[j]['RegionCode'] != i) continue;      // Not this region
+        for(var j=0; j<Keyboards.length; j++) {           
+          // REVERT:  ensures that keyboards without visible map region get displayed SOMEWHERE.
+          var kbdRegion = Keyboards[j]['RegionCode'];
+          if(!ui.regions[kbdRegion]) {
+            // For now, we'll display them within the 'middle-east' region.
+            if(i != ui.catchAllRegion) {
+              continue;
+            }
+          } else if(kbdRegion != i) {
+            continue; // Not this region
+          }
 
           var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
           if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
