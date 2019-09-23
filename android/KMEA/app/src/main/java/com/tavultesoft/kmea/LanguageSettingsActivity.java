@@ -73,15 +73,10 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
       SharedPreferences.Editor prefEditor = prefs.edit();
 
-      // predictionToggle overrides whether correction toggle and text are enabled
+      // predictionsToggle overrides correctionToggle and correctionsTextView
       if (prefsKey.endsWith(predictionPrefSuffix)) {
         boolean override = toggle.isChecked();
-        if (correctionsTextView != null) {
-          correctionsTextView.setEnabled(override);
-        }
-        if (correctionsToggle != null) {
-          correctionsToggle.setEnabled(override);
-        }
+        overrideCorrectionsToggle(override);
       }
 
       // This will allow preemptively making settings for languages without models.
@@ -167,9 +162,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     prefsKey = getLanguagePredictionPreferenceKey(lgCode);
     predictionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
-    // Corrections toggle and text are enabled only when predictions toggle is also enabled
-    correctionsTextView.setEnabled(mayPredict);
-    correctionsToggle.setEnabled(mayPredict);
+    overrideCorrectionsToggle(mayPredict);
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
@@ -322,6 +315,25 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
   public static String getLanguageCorrectionPreferenceKey(String langID) {
     return langID + correctionPrefSuffix;
+  }
+
+  /**
+   * Overrides the enable and visibility of corrections toggle,
+   * and overrides the enable of the corrections text view.
+   * Does not change the corrections toggle value.
+   * @param override boolean - Value from predictions toggle
+   *     When true, enables corrections toggle and text field, and makes corrections toggle visible
+   *     When false, disables corrections toggle and text field, and makes corrections toggle invisible
+   */
+  private void overrideCorrectionsToggle(boolean override) {
+    if (correctionsTextView != null) {
+      correctionsTextView.setEnabled(override);
+    }
+    if (correctionsToggle != null) {
+      correctionsToggle.setEnabled(override);
+      int visibility = override ? View.VISIBLE : View.INVISIBLE;
+      correctionsToggle.setVisibility(visibility);
+    }
   }
 
   // Fully details the building of this Activity's list view items.
