@@ -654,8 +654,8 @@ if(!window['keyman']['ui']['name']) {
       ui.selectedKeyboard = kbd;
 
       // In 12.0, this UI class has only been partially converted to BCP-47.
-      // `lang` refers to the base language identifier and will NOT include any subtags.
-      // We want the FULL language identifier here.
+      // `lang.id` refers to the base language identifier and will NOT include 
+      // any subtags.  We want the FULL language identifier here, with subtags.
       ui.SelectedLanguage = kbd.LanguageCode;
 
       // Return focus to input area and activate the selected keyboard 
