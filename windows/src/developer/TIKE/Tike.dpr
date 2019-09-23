@@ -306,6 +306,7 @@ begin
     begin
       InitThemeLibrary;
       SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+      Application.MainFormOnTaskBar := True;
       Application.Initialize;
     //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
       Application.Title := 'Keyman Developer';
@@ -313,8 +314,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  ShowStartup;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+      ShowStartup;
       Application.Run;
     end;
   finally
