@@ -641,21 +641,27 @@ if(!window['keyman']['ui']['name']) {
      * @param       {Object}  kbd    
      * @return      {boolean} 
      **/  
-    ui.selectKeyboard = function(event,lang,kbd)
-    {
-      if(ui.selectedLanguage)
-      {
+    ui.selectKeyboard = function(event,lang,kbd) {
+      if(ui.selectedLanguage) {
         var found = ui.findListedKeyboard(ui.selectedLanguage);
-        if(found != null) ui.listedKeyboards[found].buttonNode.className = 'kmw_button';
+        if(found != null) {
+          ui.listedKeyboards[found].buttonNode.className = 'kmw_button';
+        }
       }
+
       ui.offButtonNode.className = 'kmw_button';
       ui.selectedLanguage = lang;
       ui.selectedKeyboard = kbd;
-      ui.SelectedLanguage = lang.id; 
+
+      // In 12.0, this UI class has only been partially converted to BCP-47.
+      // `lang.id` refers to the base language identifier and will NOT include 
+      // any subtags.  We want the FULL language identifier here, with subtags.
+      ui.SelectedLanguage = kbd.LanguageCode;
+
       // Return focus to input area and activate the selected keyboard 
       ui.setLastFocus(); //*****this seems out of sequence???
-      ui.addKeyboardToList(lang,kbd);
-      keymanweb['setActiveKeyboard'](kbd['InternalName'],lang.id);
+      ui.addKeyboardToList(lang, kbd);
+      keymanweb['setActiveKeyboard'](kbd['InternalName'], kbd['LanguageCode']);
       ui.listedKeyboards[ui.findListedKeyboard(lang)].buttonNode.className = 'kmw_button_selected';
     
       // Always save current state when selecting a keyboard
