@@ -92,7 +92,7 @@ class LanguageSettingsViewController: UITableViewController {
     userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
 
     // Reactively set the corrections switch interactivity state.
-    self.doCorrectionsSwitch?.isEnabled = value
+    self.doCorrectionsSwitch?.isHidden = !value
     self.doCorrectionsLabel?.isEnabled = value
     self.correctionsCell?.isUserInteractionEnabled = value
     
@@ -163,7 +163,7 @@ class LanguageSettingsViewController: UITableViewController {
           }
 
           // Disable interactivity if the prediction toggle is set to 'off'.
-          doCorrectionsSwitch!.isEnabled = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+          doCorrectionsSwitch!.isHidden = !userDefaults.predictSettingForLanguage(languageID: self.language.id)
           cell.isUserInteractionEnabled = userDefaults.predictSettingForLanguage(languageID: self.language.id)
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
@@ -229,7 +229,7 @@ class LanguageSettingsViewController: UITableViewController {
         case 1:
           doCorrectionsLabel = cell.textLabel
           cell.textLabel?.text = "Enable corrections"
-          cell.textLabel?.isEnabled = doCorrectionsSwitch?.isEnabled ?? false
+          cell.textLabel?.isEnabled = !(doCorrectionsSwitch?.isHidden ?? false)
         case 2:
           cell.textLabel?.text = "Dictionaries"
           cell.accessoryType = .disclosureIndicator
