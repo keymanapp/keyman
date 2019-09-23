@@ -3,6 +3,12 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-24 12.0.36 beta
+* General: File type icons were mismatched (#2112)
+* Project: Shift layer in basic touch layout template had incorrect modifier for period (.) on shift layer (#2113)
+* Touch layout editor: Adding or deleting a playform or layer and making no other changes would not stick (#2114)
+* General: On Windows 7 and 8, in some circumstances dialog boxes could appear behind the main form (#2115)
+
 ## 2019-09-20 12.0.34 beta
 * Add basic wordlist editor to Keyman Developer (#2086)
 
