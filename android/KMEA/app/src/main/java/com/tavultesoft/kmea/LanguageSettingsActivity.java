@@ -43,6 +43,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static TextView lexicalModelTextView = null;
+  private static TextView correctionsTextView = null;
+  private static SwitchCompat correctionsToggle = null;
   private ImageButton addButton = null;
   private String associatedLexicalModel = "";
   private String lgCode;
@@ -66,12 +68,25 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     @Override
     public void onClick(View v) {
-      SwitchCompat correctToggle = (SwitchCompat) v;
+      // For predictions/corrections toggle
+      SwitchCompat toggle = (SwitchCompat) v;
+
+      SharedPreferences.Editor prefEditor = prefs.edit();
+
+      // predictionToggle overrides whether correction toggle and text are enabled
+      if (prefsKey.endsWith(predictionPrefSuffix)) {
+        boolean override = toggle.isChecked();
+        if (correctionsTextView != null) {
+          correctionsTextView.setEnabled(override);
+        }
+        if (correctionsToggle != null) {
+          correctionsToggle.setEnabled(override);
+        }
+      }
 
       // This will allow preemptively making settings for languages without models.
       // Seems more trouble than it's worth to block this.
-      SharedPreferences.Editor prefEditor = prefs.edit();
-      prefEditor.putBoolean(prefsKey, correctToggle.isChecked());
+      prefEditor.putBoolean(prefsKey, toggle.isChecked());
       prefEditor.apply();
 
       // Don't use/apply language modeling settings for languages without models.
@@ -136,21 +151,25 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
 
-    textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.enable_corrections));
-    SwitchCompat toggle = layout.findViewById(R.id.toggle);
-    toggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
+    correctionsTextView = (TextView) layout.findViewById(R.id.text1);
+    correctionsTextView.setText(getString(R.string.enable_corrections));
+    correctionsToggle = layout.findViewById(R.id.toggle);
+    correctionsToggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
     String prefsKey = getLanguageCorrectionPreferenceKey(lgCode);
-    toggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+    correctionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
     layout = (RelativeLayout)findViewById(R.id.predictions_toggle);
 
     textView = (TextView) layout.findViewById(R.id.text1);
     textView.setText(getString(R.string.enable_predictions));
-    toggle = layout.findViewById(R.id.toggle);
-    toggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
+    SwitchCompat predictionsToggle = layout.findViewById(R.id.toggle);
+    predictionsToggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
     prefsKey = getLanguagePredictionPreferenceKey(lgCode);
-    toggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+    predictionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+
+    // Corrections toggle and text are enabled only when predictions toggle is also enabled
+    correctionsTextView.setEnabled(mayPredict);
+    correctionsToggle.setEnabled(mayPredict);
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
