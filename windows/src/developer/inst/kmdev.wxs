@@ -121,8 +121,6 @@
 
         <RegistryValue Root="HKCR" Key=".kmn" Type="string" Value="KeymanDeveloper.File.Keyboard" />
         <RegistryValue Root="HKCR" Key=".kps" Type="string" Value="KeymanDeveloper.File.Package" />
-        <RegistryValue Root="HKCR" Key=".kct" Type="string" Value="KeymanDeveloper.File.Branding" />
-        <RegistryValue Root="HKCR" Key=".kpp" Type="string" Value="KeymanDeveloper.File.Distribution" />
 
         <RegistryValue Root="HKCR" Key=".kvks" Type="string" Value="KeymanDeveloper.File.OnScreenKeyboard" />
         <RegistryValue Root="HKCR" Key=".kpj" Type="string" Value="KeymanDeveloper.File.Project" />
@@ -131,50 +129,38 @@
         <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
         <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
 
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard" Type="string" Value="Keyman Developer Keyboard Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard" Type="string" Value="Keyman Keyboard Source File" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],1" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Keyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
 
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package" Type="string" Value="Keyman Developer Package Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package" Type="string" Value="Keyman Package Source File" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],2" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Package\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
 
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding" Type="string" Value="Keyman Developer Branding Source File" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\DefaultIcon" Type="string" Value="[#tike.exe],3" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\Shell" Type="string" Value="edit" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\Shell\edit" Type="string" Value="&amp;Edit" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Branding\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
-
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution" Type="string" Value="Keyman Developer Distribution Source File" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\DefaultIcon" Type="string" Value="[#tike.exe],4" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell" Type="string" Value="edit" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell\edit" Type="string" Value="&amp;Edit" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Distribution\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
-
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project" Type="string" Value="Keyman Developer Project Source File" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\DefaultIcon" Type="string" Value="[#tike.exe],5" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\DefaultIcon" Type="string" Value="[#tike.exe],3" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell" Type="string" Value="open" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell\open" Type="string" Value="&amp;Open" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.Project\Shell\open\Command" Type="string" Value='"[#tike.exe]" "%1"' />
 
         <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard" Type="string" Value="Keyman Keyboard File" />
-        <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],6" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#tike.exe],4" />
 
         <RegistryValue Root="HKCR" Key="Keyman.File.Package" Type="string" Value="Keyman Package File" />
-        <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],7" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#tike.exe],5" />
 
-        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard" Type="string" Value="Keyman Keyboard File" />
-        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],10" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard" Type="string" Value="Keyman On Screen Keyboard File" />
+        <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],6" />
         <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
 
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard" Type="string" Value="Keyman Developer On Screen Keyboard File" />
-        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],11" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard" Type="string" Value="Keyman On Screen Keyboard Source File" />
+        <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#tike.exe],7" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell" Type="string" Value="edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit" Type="string" Value="&amp;Edit" />
         <RegistryValue Root="HKCR" Key="KeymanDeveloper.File.OnScreenKeyboard\Shell\edit\Command" Type="string" Value='"[#tike.exe]" "%1"' />
