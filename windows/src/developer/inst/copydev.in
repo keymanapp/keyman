@@ -1,5 +1,10 @@
 !include ..\..\Defines.mak
 
+!ifndef TIER
+    # In dev environments, we'll hack the tier to stable; CI sets this for us.
+TIER=alpha
+!endif
+
 # We use different directories so that heat generates
 # different identifiers for the various folders
 KEYMAN_WIX_TEMP_XML=$(TEMP)\keyman_wix_build\xml
@@ -58,11 +63,6 @@ heat-cef:
 heat-model-compiler:
     # Build kmlmc
     cd $(KEYMAN_MODELCOMPILER_ROOT)
-
-!ifndef TIER
-    # In dev environments, we'll hack the tier to stable; CI sets this for us.
-    TIER=alpha
-!endif
 
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh -version "$(VERSION)" -tier "$(TIER)"
