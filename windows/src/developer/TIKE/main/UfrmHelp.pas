@@ -220,8 +220,6 @@ end;
 
 procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 var
-  frm: TTIKEForm;
-  s: string;
   elems: TArray<string>;
 begin
   AssertVclThread;
