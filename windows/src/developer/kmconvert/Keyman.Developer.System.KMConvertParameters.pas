@@ -87,7 +87,7 @@ begin
   writeln('  Creates a basic keyboard project in the repository template format');
   writeln;
   writeln('kmconvert lexical-model -id-author <id-author> -id-language <id-language> -id-uniq <id-uniq> [additional-options]');
-  writeln('  Creates a basic keyboard project in the repository template format');
+  writeln('  Creates a wordlist lexical model project in the repository template format');
   writeln;
   writeln('Parameters:');
   writeln('  -nologo              Don''t show the program description and copyright banner');
