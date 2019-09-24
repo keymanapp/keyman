@@ -19,24 +19,24 @@ test-releaseexists:
     if exist $(ROOT)\release\$VERSION\keymandeveloper*.msi echo. & echo Release $VERSION already exists. Delete it or update src\version.txt and try again & exit 1
 
 candle: heat-cef heat-xml heat-templates heat-model-compiler
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE kmdev.wxs 
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE kmdev.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dModelCompilerSourceDir=$(KEYMAN_MODELCOMPILER_ROOT) kmlmc.wxs
-    
+
 heat-xml:
     # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
     -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
     mkdir $(KEYMAN_WIX_TEMP_XML)
     xcopy $(ROOT)\src\developer\TIKE\xml\* $(KEYMAN_WIX_TEMP_XML)\ /s
     -del /f /s /q $(KEYMAN_WIX_TEMP_XML)\Thumbs.db
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)\app\node_modules 
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)\app\node_modules
     -for /f %i in ('dir /a:d /s /b $(KEYMAN_WIX_TEMP_XML)\.vs') do rd /s /q %i
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_XML) -o xml.wxs -ag -cg XML -dr INSTALLDIR -var var.XmlSourceDir -wx -nologo
     # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
     -rmdir /s/q $(KEYMAN_WIX_TEMP_XML)
-    
+
 heat-templates:
     # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
     -rmdir /s/q $(KEYMAN_WIX_TEMP_TEMPLATES)
@@ -60,10 +60,10 @@ heat-model-compiler:
     cd $(KEYMAN_MODELCOMPILER_ROOT)
 
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh
+    $(GIT_BASH_FOR_KEYMAN) build.sh -version "$(VERSION)" -tier "$(TIER)"
 !else
-    start /wait .\build.sh
-!endif    
+    start /wait .\build.sh -version "$(VERSION)" -tier "$(TIER)"
+!endif
     # While we could use npm-bundle or similar, this gives us more control on the set of
     # files  we want to distribute with the Keyman Developer installer. For users on other
     # operating systems, node.js is a dependency and the compiler can be installed with
@@ -73,7 +73,7 @@ heat-model-compiler:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     mkdir $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_WIX_TEMP_MODELCOMPILER)\ /s
-    
+
     # Remove files we don't want to harvest; build a product node_modules folder
     cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\node_modules
@@ -82,10 +82,10 @@ heat-model-compiler:
     # We don't need source for the compiler or the unit tests
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\source
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\tests
-    
+
     # We don't need another binary copy of node
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\node_modules\node
-    
+
     # We don't need the build script
     -del $(KEYMAN_WIX_TEMP_MODELCOMPILER)\build.sh
 
