@@ -1,33 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <?xml-stylesheet type="text/xsl" href="help.xsl" ?>
 <ContextHelp>
-  <Form Name="context/keyboard-editor#toc-on-screen-tab">
-    <Control Name="chkVKDisplayUnderlyingChars" Title="Display Underlying Character Layouts">
-      <p>If selected, then the visual keyboard will only be used if the current underlying layout is active. </p>
-    </Control>
-    <Control Name="chkVKInclude102key" Title="">
-      <p>Display 102nd Key</p>
-      <p>On European Keyboards a 102nd key is added.  This allows you to map a character on the 102nd key.</p>
-    </Control>
-    <Control Name="chkVKSplitCtrlAlt" Title="Right Ctrl/Alt">
-      <p>Allows for more combinations and also leaves the left Ctrl and Alt keys for general keyboard shortcuts, for example Ctrl C for Copy and Ctrl V for Paste.</p>
-    </Control>
-    <Control Name="cmdBrowseKeyBitmap" Title="Browse button">
-      <p>This allows for a bitmap/picture to be displayed on the selected key. Click on the Browse button to select the bitmap.</p>
-    </Control>
-    <Control Name="cmdExportOnScreenKeyboard" Title="XML">
-      <p>Export the keyboard to other file formats (HTML, BMP, or PNG), for use in documentation. Export the structure of the keyboard to XML format for automated processing. </p>
-    </Control>
-    <Control Name="cmdImportOnScreenKeyboard" Title="Import">
-      <p>Import an existing on screen keyboard layout.</p>
-    </Control>
-    <Control Name="cmdVKImportKMX" Title="Layout">
-      <p>Use the same layout as the new keyboard, assigning the same characters to the same keyboard letters.</p>
-    </Control>
-    <Control Name="editVKKeyText" Title="Text">
-      <p>Allows the user to enter text to be displayed on the selected key.</p>
-    </Control>
-  </Form>
 
   <Form Name="context/character-map">
     <Control Name="editFilter" Title="Character Map Filter">
@@ -99,24 +72,6 @@
       </ul>
     </Control>
 
-    <!-- Layout tab -->
-    <!-- Icon tab -->
-    <Control Name="cmdbitmapChange" Title="Change">
-      <p>The Change option allows the editing of the icon filename.</p>
-    </Control>
-    <Control Name="cmdExport" Title="Export">
-      <p>The Export option allows the exporting of the new image to a selected location.</p>
-    </Control>
-    <Control Name="cmdImport" Title="Import">
-      <p>The import option allows for the loading of an existing icon from a selected location.</p>
-    </Control>
-    <Control Name="panEdit" Title="Icon Editor">
-      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the button and also a preview of the button is displayed.</p>
-    </Control>
-
-    <!-- On-Screen tab -->
-    <!-- KeymanWeb tab -->
-
     <Control Name="chkKMWRTL" Title="Keyboard is right-to-left">
       <p>Select this option to tell KeymanWeb to flag text entered by this keyboard as right-to-left (e.g. Arabic, Hebrew)</p>
     </Control>
@@ -142,6 +97,23 @@
       <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
     </Control>
 
+    <!-- Layout tab -->
+    <!-- Icon tab -->
+    <Control Name="cmdbitmapChange" Title="Change">
+      <p>The Change option allows the editing of the icon filename.</p>
+    </Control>
+    <Control Name="cmdExport" Title="Export">
+      <p>The Export option allows the exporting of the new image to a selected location.</p>
+    </Control>
+    <Control Name="cmdImport" Title="Import">
+      <p>The import option allows for the loading of an existing icon from a selected location.</p>
+    </Control>
+    <Control Name="panEdit" Title="Icon Editor">
+      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the button and also a preview of the button is displayed.</p>
+    </Control>
+
+    <!-- On-Screen tab: see context/keyboard-editor#toc-on-screen-tab -->
+    <!-- Touch Layout tab: see context/keyboard-editor#toc-touch-layout-tab -->
     <!-- Source tab -->
     <!-- Compile tab -->
 
@@ -226,6 +198,43 @@
     <Control Name="editVKFileName" Title="">
       <p>KVK Filename</p>
       <p>Displays the file path and file name of the Keyman Visual Keyboard (KVK). Press the END key on your keyboard to view the filename or click on the Change button to change the filename and location.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/keyboard-editor#toc-on-screen-tab">
+    <Control Name="chkVKDisplayUnderlyingChars" Title="Display Underlying Character Layouts">
+      <p>If selected, then the visual keyboard will only be used if the current underlying layout is active. </p>
+    </Control>
+    <Control Name="chkVKInclude102key" Title="">
+      <p>Display 102nd Key</p>
+      <p>On European Keyboards a 102nd key is added.  This allows you to map a character on the 102nd key.</p>
+    </Control>
+    <Control Name="chkVKSplitCtrlAlt" Title="Right Ctrl/Alt">
+      <p>Allows for more combinations and also leaves the left Ctrl and Alt keys for general keyboard shortcuts, for example Ctrl C for Copy and Ctrl V for Paste.</p>
+    </Control>
+    <Control Name="cmdBrowseKeyBitmap" Title="Browse button">
+      <p>This allows for a bitmap/picture to be displayed on the selected key. Click on the Browse button to select the bitmap.</p>
+    </Control>
+    <Control Name="cmdExportOnScreenKeyboard" Title="XML">
+      <p>Export the keyboard to other file formats (HTML, BMP, or PNG), for use in documentation. Export the structure of the keyboard to XML format for automated processing. </p>
+    </Control>
+    <Control Name="cmdImportOnScreenKeyboard" Title="Import">
+      <p>Import an existing on screen keyboard layout.</p>
+    </Control>
+    <Control Name="cmdVKImportKMX" Title="Layout">
+      <p>Use the same layout as the new keyboard, assigning the same characters to the same keyboard letters.</p>
+    </Control>
+    <Control Name="editVKKeyText" Title="Text">
+      <p>Allows the user to enter text to be displayed on the selected key.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/keyboard-editor#toc-touch-layout-tab">
+    <Control Name="cefwp" Title="Touch Layout Editor">
+      <p>The Touch Layout tab is used to create the visible representation of the keyboard layout for touch devices. It works similarly to the On Screen Keyboard Editor conceptually, but has a number of additional features specific to touch. Keys on the touch layout trigger rules within the normal Keyman keyboard; if no rule is defined for a given key, it will be given output if it has a standard code beginning with <code>K_</code>, or if it is a Unicode value code, starting with <code>U_</code>.</p>
+      <ul>
+        <li><a href="help:guides/develop/touch-keyboard-tutorial">Read the guide on developing touch layouts</a></li>
+      </ul>
     </Control>
   </Form>
 

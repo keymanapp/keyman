@@ -37,7 +37,7 @@
               }
               if(!elem) {
                 elem = document.getElementById('nohelp_name');
-                elem.innerHTML = id;
+                elem.innerHTML = frm + ' - ' + ctrl;
                 elem = document.getElementById('nohelp');
                 var e = document.getElementById('nohelp_link');
                 e.href='help:'+frm;
