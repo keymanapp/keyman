@@ -187,6 +187,8 @@
 
 #define CINFO_NonUnicodeFile            0x000020A6
 
+#define CWARN_TooManyErrorsOrWarnings   0x000020A7
+
 #define CERR_BufferOverflow							0x000080C0
 #define CERR_Break									0x000080C1
 
