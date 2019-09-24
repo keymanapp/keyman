@@ -59,6 +59,11 @@ heat-model-compiler:
     # Build kmlmc
     cd $(KEYMAN_MODELCOMPILER_ROOT)
 
+!ifndef TIER
+    # In dev environments, we'll hack the tier to stable; CI sets this for us.
+    TIER=alpha
+!endif
+
 !ifdef GIT_BASH_FOR_KEYMAN
     $(GIT_BASH_FOR_KEYMAN) build.sh -version "$(VERSION)" -tier "$(TIER)"
 !else
