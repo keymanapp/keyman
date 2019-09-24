@@ -18,6 +18,11 @@ build () {
 
 set_version () {
   local version=$1
+  # We use --no-git-tag-version because our CI system controls version numbering and
+  # already tags releases. We also want to have the version of this match the
+  # release of Keyman Developer -- these two versions should be in sync. Because this
+  # is a large repo with multiple projects and build systems, it's better for us that
+  # individual build systems don't take too much ownership of git tagging. :)
   npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
 }
 
@@ -100,6 +105,7 @@ if [ ! -z "$publish_tier" ]; then
       publish_tier=-beta
       ;;
     stable)
+      # Stable releases intentionally have a blank publish tier:
       publish_tier=
       ;;
     *)

@@ -1,7 +1,12 @@
 !include ..\..\Defines.mak
 
+##
+## In this file, $VERSION and $RELEASE will be replaced by mkver. These are not
+## Make variables, but mkver variables.
+##
+
+# In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
 !ifndef TIER
-    # In dev environments, we'll hack the tier to stable; CI sets this for us.
 TIER=alpha
 !endif
 
@@ -65,12 +70,12 @@ heat-model-compiler:
     cd $(KEYMAN_MODELCOMPILER_ROOT)
 
 !ifdef GIT_BASH_FOR_KEYMAN
-    $(GIT_BASH_FOR_KEYMAN) build.sh -version "$(VERSION)" -tier "$(TIER)"
+    $(GIT_BASH_FOR_KEYMAN) build.sh -version "$VERSION" -tier "$(TIER)"
 !else
-    start /wait .\build.sh -version "$(VERSION)" -tier "$(TIER)"
+    start /wait .\build.sh -version "$VERSION" -tier "$(TIER)"
 !endif
     # While we could use npm-bundle or similar, this gives us more control on the set of
-    # files  we want to distribute with the Keyman Developer installer. For users on other
+    # files we want to distribute with the Keyman Developer installer. For users on other
     # operating systems, node.js is a dependency and the compiler can be installed with
     # `npm install @keymanapp/lexical-model-compiler`.
 
