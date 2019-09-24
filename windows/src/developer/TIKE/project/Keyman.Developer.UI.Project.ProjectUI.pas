@@ -28,6 +28,7 @@ function GetGlobalProjectUI: TProjectUI;
 function LoadGlobalProjectUI(pt: TProjectType; AFilename: string; ALoadPersistedUntitledProject: Boolean = False): TProjectUI;
 function NewGlobalProjectUI(pt: TProjectType): TProjectUI;
 procedure FreeGlobalProjectUI;
+function IsGlobalProjectUIReady: Boolean;
 
 implementation
 
@@ -39,6 +40,11 @@ uses
 function GetGlobalProjectUI: TProjectUI;
 begin
   Result := FGlobalProject as TProjectUI;
+end;
+
+function IsGlobalProjectUIReady: Boolean;
+begin
+  Result := Assigned(FGlobalProject);
 end;
 
 procedure FreeGlobalProjectUI;

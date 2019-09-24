@@ -87,6 +87,8 @@ type
     function DoNavigate(URL: string): Boolean;
     procedure ClearMessages;
     function ShouldHandleNavigation(URL: string): Boolean;
+    procedure WebCommandProject(Command: WideString; Params: TStringList);
+    procedure WebCommandWelcome(Command: WideString; Params: TStringList);
   protected
     function GetHelpTopic: string; override;
   public
@@ -175,8 +177,12 @@ begin
   inherited;
 
   FNextCommandParams := TStringList.Create;
-  GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
-  GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
+
+  if IsGlobalProjectUIReady then
+  begin
+    GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
+    GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
+  end;
 
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
@@ -189,12 +195,17 @@ end;
 
 procedure TfrmProject.RefreshHTML;
 begin
-  if GetGlobalProjectUI.Refreshing then   // I4687
-    tmrRefresh.Enabled := True
-  else
+  if IsGlobalProjectUIReady then
   begin
-    cef.Navigate(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
-  end;
+    if GetGlobalProjectUI.Refreshing then   // I4687
+      tmrRefresh.Enabled := True
+    else
+    begin
+      cef.Navigate(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
+    end;
+  end
+  else
+    cef.Navigate(modWebHttpServer.GetAppURL('project/welcome'));
   RefreshCaption;
 end;
 
@@ -214,8 +225,16 @@ procedure TfrmProject.RefreshCaption;
 var
   s: string;
 begin
-  Hint := FGlobalProject.FileName;
-  s := GetGlobalProjectUI.DisplayFileName;   // I4687
+  if IsGlobalProjectUIReady then
+  begin
+    Hint := FGlobalProject.FileName;
+    s := GetGlobalProjectUI.DisplayFileName;   // I4687
+  end
+  else
+  begin
+    Hint := 'Welcome';
+    s := 'Welcome';
+  end;
   Caption := s;
 end;
 
@@ -227,7 +246,9 @@ end;
 
 procedure TfrmProject.SetGlobalProject;
 begin
-  if not Assigned(GetGlobalProjectUI.OnRefresh) then   // I4687
+  if not IsGlobalProjectUIReady then
+    ProjectRefresh(nil)
+  else if not Assigned(GetGlobalProjectUI.OnRefresh) then   // I4687
   begin
     GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
     GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
@@ -240,7 +261,7 @@ end;
 procedure TfrmProject.FormDestroy(Sender: TObject);
 begin
   inherited;
-  if GetGlobalProjectUI <> nil then
+  if IsGlobalProjectUIReady then
   begin
     GetGlobalProjectUI.OnRefresh := nil;   // I4687
     GetGlobalProjectUI.OnRefreshCaption := nil;   // I4687
@@ -327,6 +348,18 @@ begin
 end;
 
 procedure TfrmProject.WebCommand(Command: WideString; Params: TStringList);
+begin
+  if not IsGlobalProjectUIReady
+    then WebCommandWelcome(Command, Params)
+    else WebCommandProject(Command, Params);
+end;
+
+procedure TfrmProject.WebCommandWelcome(Command: WideString; Params: TStringList);
+begin
+  // TODO
+end;
+
+procedure TfrmProject.WebCommandProject(Command: WideString; Params: TStringList);
     function FileTypeFromParamType: TKMFileType;
     begin
       if Params.Values['type'] = 'keyboard' then Result := ftKeymanSource
@@ -364,6 +397,7 @@ var
   i: Integer;
 begin
   pf := nil;
+
 
   if Command = 'fileaddnew' then
   begin

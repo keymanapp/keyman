@@ -268,6 +268,7 @@ type
     ReloadasUTF161: TMenuItem;
     DebugTests1: TMenuItem;
     CrashTest1: TMenuItem;
+    CloseProject1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -580,7 +581,7 @@ begin
     FChildWindows[i].Release;   // I2595, probably not necessary
   end;
 
-  if Assigned(FGlobalProject) then
+  if IsGlobalProjectUIReady then
     with TRegistryErrorControlled.Create do  // I2890
     try
       if FGlobalProject.Untitled
@@ -1178,6 +1179,12 @@ function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEdi
 var
   i, n: Integer;
 begin
+  if not IsGlobalProjectUIReady then
+  begin
+    // This can happen if we get a file opened via Explorer.
+    NewGlobalProjectUI(ptKeyboard);
+  end;
+
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
@@ -1236,7 +1243,7 @@ procedure TfrmKeymanDeveloper.AddMRU(FileName: string);
 begin
   // Add the filename to the top of the MRU.
 
-  if FileName = '' then Exit;
+  if (FileName = '') or not IsGlobalProjectUIReady then Exit;
 
   if LowerCase(ExtractFileExt(FileName)) <> '.kpj' then
     // Don't add project files to project MRU
@@ -1251,13 +1258,16 @@ begin
   for i := 0 to mnuFileRecent.Count - 1 do
     mnuFileRecent.Items[0].Free;
 
-  for i := 0 to FGlobalProject.MRU.FileCount - 1 do
+  if IsGlobalProjectUIReady then
   begin
-    m := TMenuItem.Create(Self);
-    m.Caption := '&'+IntToStr(i+1)+' '+FGlobalProject.MRU.EllipsisFile(i);
-    m.Hint := FGlobalProject.MRU.Files[i];
-    m.OnClick := mnuFileRecentFileClick;
-    mnuFileRecent.Add(m);
+    for i := 0 to FGlobalProject.MRU.FileCount - 1 do
+    begin
+      m := TMenuItem.Create(Self);
+      m.Caption := '&'+IntToStr(i+1)+' '+FGlobalProject.MRU.EllipsisFile(i);
+      m.Hint := FGlobalProject.MRU.Files[i];
+      m.OnClick := mnuFileRecentFileClick;
+      mnuFileRecent.Add(m);
+    end;
   end;
 end;
 
@@ -1439,7 +1449,9 @@ end;
 
 procedure TfrmKeymanDeveloper.UpdateCaption;
 begin
-  if FGlobalProject.Untitled
+  if not IsGlobalProjectUIReady then
+    Caption := 'Keyman Developer'
+  else if FGlobalProject.Untitled
     then Caption := '(Untitled project) - Keyman Developer'
     else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
 

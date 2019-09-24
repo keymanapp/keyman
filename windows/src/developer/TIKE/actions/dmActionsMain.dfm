@@ -22,6 +22,7 @@ object modActionsMain: TmodActionsMain
       ImageIndex = 0
       ShortCut = 16462
       OnExecute = actFileNewExecute
+      OnUpdate = actFileNewUpdate
     end
     object actViewCharacterIdentifier: TAction
       Category = 'View'
@@ -39,6 +40,7 @@ object modActionsMain: TmodActionsMain
       ImageIndex = 1
       ShortCut = 16463
       OnAccept = actFileOpenAccept
+      OnUpdate = actFileOpenUpdate
     end
     object actFileSave: TAction
       Category = 'File'
@@ -260,6 +262,7 @@ object modActionsMain: TmodActionsMain
       Hint = 'Save Project As|Saves the current project with a new name'
       BeforeExecute = actProjectSaveAsBeforeExecute
       OnAccept = actProjectSaveAsAccept
+      OnUpdate = actProjectSaveAsUpdate
     end
     object actProjectAddCurrentEditorFile: TAction
       Category = 'Project'
@@ -278,6 +281,7 @@ object modActionsMain: TmodActionsMain
       ImageIndex = 30
       ShortCut = 16463
       OnAccept = actProjectAddFilesAccept
+      OnUpdate = actProjectAddFilesUpdate
     end
     object actProjectSettings: TAction
       Category = 'Project'
@@ -285,6 +289,7 @@ object modActionsMain: TmodActionsMain
       Hint = 'Project Settings|Edit settings for this project'
       ImageIndex = 31
       OnExecute = actProjectSettingsExecute
+      OnUpdate = actProjectSettingsUpdate
     end
     object actToolsCustomise: TAction
       Category = 'Tools'
@@ -466,6 +471,12 @@ object modActionsMain: TmodActionsMain
       OnExecute = actViewCodeExecute
       OnUpdate = actViewCodeUpdate
     end
+    object actProjectClose: TAction
+      Category = 'Project'
+      Caption = '&Close Project'
+      OnExecute = actProjectCloseExecute
+      OnUpdate = actProjectCloseUpdate
+    end
   end
   object ActionManager1: TActionManager
     ActionBars = <
@@ -484,7 +495,7 @@ object modActionsMain: TmodActionsMain
     Left = 304
     Top = 236
     Bitmap = {
-      494C01010A000E00840010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010A000E00880010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -893,7 +904,7 @@ object modActionsMain: TmodActionsMain
     Left = 124
     Top = 116
     Bitmap = {
-      494C010112004801B00020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010112004801B40020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000080000000A000000001002000000000000040
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000A8CAFF00A8CA
