@@ -51,7 +51,7 @@ uses
 
   Keyman.Developer.System.Project.ProjectLog,
   UfrmTikeDock,
-  UfrmTike;
+  UfrmTike, Vcl.ComCtrls;
 
 type
   TMessageItem = class
@@ -62,7 +62,7 @@ type
 
   TfrmMessages = class(TTikeDockForm)
     dlgSave: TSaveDialog;
-    memoMessage: TMemo;
+    memoMessage: TRichEdit;
     mnuPopup: TPopupMenu;
     cmdmClear: TMenuItem;
     cmdmSaveToFile: TMenuItem;
@@ -125,6 +125,7 @@ uses
 procedure TfrmMessages.Add(state: TProjectLogState; filename, msg: WideString; MsgCode, line: Integer);
 var
   mi: TMessageItem;
+  FColor: TColor;
 begin
   mi := TMessageItem.Create;
   mi.FileName := filename;
@@ -132,7 +133,22 @@ begin
   mi.MsgCode := MsgCode;
   mi.Line := line;
 
+  case state of
+    plsInfo: FColor := clBlack;
+    plsWarning: FColor := clOlive;
+    plsError: FColor := clRed;
+    plsFatal: FColor := clRed;
+    plsSuccess: FColor := clGreen;
+    plsFailure: FColor := clRed;
+  else
+    FColor := clBlack;
+  end;
+
+  memoMessage.SelStart := Length(memoMessage.Text);
+  memoMessage.SelLength := 0;
+  memoMessage.SelAttributes.Color := FColor;
   memoMessage.Lines.Add(TProjectLog.FormatMessage(state, filename, msg, msgcode, line));
+  memoMessage.SelAttributes.Color := clBlack;
 
   FMessageItems.Add(mi);
   if not memoMessage.Focused then SelLine := memoMessage.Lines.Count - 1;
@@ -257,7 +273,7 @@ begin
   n := memoMessage.SelStart;
   for I := 0 to memoMessage.Lines.Count - 1 do
   begin
-    x := x + Length(memoMessage.Lines[i]) + 2;
+    x := x + Length(memoMessage.Lines[i]) + 1;
     if x > n then
     begin
       Result := i;
@@ -288,7 +304,7 @@ begin
   end;
   for i := 0 to Value - 1 do
   begin
-    x := x + Length(memoMessage.Lines[i]) + 2;
+    x := x + Length(memoMessage.Lines[i]) + 1;
   end;
   memoMessage.SelStart := x;
   memoMessage.SelLength := Length(memoMessage.Lines[Value]);

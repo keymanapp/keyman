@@ -699,6 +699,8 @@ begin
   UpdateReadme;
   UpdateImageFiles;
   UpdateStartMenuPrograms;
+
+  frmMessages.Clear;
   RefreshKeyboardList;
   RefreshLexicalModelList;
 ////  UpdateCustomisationFile;
@@ -742,6 +744,8 @@ begin
     UpdateReadme;
     UpdateImageFiles;
     UpdateStartMenuPrograms;
+
+    frmMessages.Clear;
     RefreshKeyboardList;
     RefreshLexicalModelList;
     Modified := True;
@@ -1369,8 +1373,6 @@ procedure TfrmPackageEditor.RefreshKeyboardList;
 var
   n, i: Integer;
 begin
-  frmMessages.Clear;
-
   n := lbKeyboards.ItemIndex;
 
   with TPackageInfoRefreshKeyboards.Create(pack) do
@@ -1773,8 +1775,6 @@ var
   n: Integer;
   lm: TPackageLexicalModel;
 begin
-  frmMessages.Clear;
-
   n := lbLexicalModels.ItemIndex;
 
   with TPackageInfoRefreshLexicalModels.Create(pack) do
