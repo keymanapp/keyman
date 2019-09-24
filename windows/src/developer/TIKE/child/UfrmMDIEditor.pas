@@ -98,7 +98,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure FindError(const Filename: string; s: string); virtual; abstract;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); virtual; abstract;   // I4081
 
     function HasSubfilename(const Filename: string): Boolean; virtual;
 

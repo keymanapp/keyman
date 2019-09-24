@@ -49,7 +49,7 @@ begin
   if not TLexicalModelUtils.DoesTSFilenameFollowLexicalModelConventions(FileName) then
   begin
     HasCompileWarning := True;
-    Log(plsWarning, Format(TLexicalModelUtils.SModelFileNameDoesNotFollowConventions_Message, [ExtractFileName(FileName)]));
+    Log(plsWarning, Format(TLexicalModelUtils.SModelFileNameDoesNotFollowConventions_Message, [ExtractFileName(FileName)]), CERR_WARNING, 0);
   end;
 end;
 
@@ -61,7 +61,7 @@ begin
   try
     CheckFilenameConventions;
 
-    Log(plsInfo, Format('Compiling ''%s''%s...', [Filename, IfThen(IsDebug, ' with debug symbols ', '')]));
+    Log(plsInfo, Format('Compiling ''%s''%s...', [Filename, IfThen(IsDebug, ' with debug symbols ', '')]), 0, 0);
 
     //compile the model
     ForceDirectories(ExtractFileDir(TargetFileName));
@@ -70,8 +70,8 @@ begin
     if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
     if Result
-      then Log(plsInfo, Format('''%s'' was compiled successfully  to ''%s''.', [FileName, TargetFileName]))   // I4504
-      else Log(plsError, Format('''%s'' was not compiled successfully.', [FileName]));   // I4504
+      then Log(plsSuccess, Format('''%s'' was compiled successfully  to ''%s''.', [FileName, TargetFileName]), 0, 0)   // I4504
+      else Log(plsFailure, Format('''%s'' was not compiled successfully.', [FileName]), 0, 0);   // I4504
   finally
     TProject.CompilerMessageFile := nil;
   end;
