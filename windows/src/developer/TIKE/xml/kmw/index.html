@@ -14,14 +14,7 @@
     <title>Keyman Developer Keyboard Test Site</title>
 
     <style type='text/css'>
-      body {
-          padding-left: 10px;
-          margin-left: 12px;
-      }
-
-      h2 {
-          font-family: sans-serif
-      }
+      @import url('test.css');
 
       .test {
         font-size: 1.5em;
@@ -55,12 +48,12 @@
 
       /** Mobile, Tablet **/
 
-      #install-link {
-        font-weight: bold;
-      }
-
       .install-link .ios,
       .install-link .android {
+        display: none;
+      }
+
+      .touch-device #top-toolbar {
         display: none;
       }
 
@@ -161,19 +154,17 @@
   </head>
 
   <body class='osk-always-visible'>
-    <h2>Keyboard Test Host</h2>
+    <div class='header'>
+      <div><h2>Keyboard Test</h2></div>
+      <div class='float-right'><a href='/packages.html' class='install-link' id='install-link-packages'>Install packages</a></div>
+      <div class='clear'></div>
+    </div>
 
-    <div>
+    <div id='content'>
       <!-- The following DIV is only needed as a UI placeholder for the Button and Toolbar User Interfaces -->
       <div id='top-toolbar'>
         <div class='control' id='keymanweb-control-host'>
           <div id='KeymanWebControl'></div>
-        </div>
-        <div class='control' id='controls'>
-          <a href='https://keyman.com/go/developer/10.0/ios-app' target='_blank' class='install-link' id='install-link-ios'>Install Keyman for iOS</a>
-          <a href='https://keyman.com/go/developer/10.0/android-app' target='_blank' class='install-link' id='install-link-android'>Install Keyman for Android</a>
-          <a href='' class='install-link' id='install-link'>Add keyboard to Keyman for <span class='android'>Android</span><span class='ios'>iOS</span></a>
-          <a href='packages.html' class='install-link' id='install-link-packages'>Install packages</a>
         </div>
         <div style='clear:left'></div>
       </div>
@@ -193,13 +184,6 @@
         fonts:'/font/',
         attachType:'auto'
       });
-
-      keyman.addEventListener('keyboardchange',
-        function (p) {
-          //alert(p.internalName);
-          var nm = p.internalName.substr('Keyboard_'.length);
-          document.getElementById('install-link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
-        });
 
       var ta1 = document.getElementById('ta1');
       var charGrid = document.getElementById('character-grid');
