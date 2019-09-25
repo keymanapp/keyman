@@ -6,10 +6,14 @@
 # Set to .local to run against a locally-hosted version.
 # Leave empty for live runs.
 LOCAL=.local
+WAIT=
+
+# When running against live servers, it's best to have a small wait between loads.
+#WAIT="--wait=2"
 
 DEVICE=android
 HELP_SITE_SECTION=products/android
-HELP_ROOT=temp
+HELP_ROOT=KMAPro/kMAPro/src/main/assets/info
 
 VERSION=`cat ../resources/VERSION.md`
 
@@ -37,17 +41,45 @@ fi
 # One of the .css files auto-includes them otherwise.
 wget --mirror \
      --convert-links \
-     --wait=2 \
+     $WAIT \
      --keep-session-cookies \
      --page-requisites \
      --no-parent \
+     --no-host-directories \
      --restrict-file-names=windows \
      --exclude-directories /font/deploy \
      --directory-prefix="$HELP_ROOT" \
-     --no-directories \
      --default-page=index.php \
      --adjust-extension \
      "help.keyman.com$LOCAL/$HELP_SITE_SECTION/$VERSION/index.php?embed=$DEVICE"
 
 # Results in a flat-structured mirror of the iphone-and-ipad/$VERSION folder,
 # together with all needed resources within the 'site' folder.
+
+# Now for some magic... we rename the -page- folder and redownload with the other setting.
+
+mv ./$HELP_ROOT/$HELP_SITE_SECTION/$VERSION ./$HELP_ROOT/$HELP_SITE_SECTION/phone
+
+# Create local mirror of the help page subdirectory.
+# We don't need /font/deploy folder resources, so they're excluded here.
+# One of the .css files auto-includes them otherwise.
+wget --mirror \
+     --convert-links \
+     $WAIT \
+     --keep-session-cookies \
+     --page-requisites \
+     --no-parent \
+     --no-host-directories \
+     --restrict-file-names=windows \
+     --exclude-directories /font/deploy \
+     --directory-prefix="$HELP_ROOT" \
+     --default-page=index.php \
+     --adjust-extension \
+     "help.keyman.com$LOCAL/$HELP_SITE_SECTION/$VERSION/index.php?embed=$DEVICE"
+
+# Results in a flat-structured mirror of the iphone-and-ipad/$VERSION folder,
+# together with all needed resources within the 'site' folder.
+
+# Now for some magic... we rename the -page- folder and redownload with the other setting.
+
+mv ./$HELP_ROOT/$HELP_SITE_SECTION/$VERSION ./$HELP_ROOT/$HELP_SITE_SECTION/tablet
