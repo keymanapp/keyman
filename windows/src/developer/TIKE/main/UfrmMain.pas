@@ -311,6 +311,7 @@ type
     procedure WMUserInputLangChange(var Message: TMessage); message WM_USER_INPUTLANGCHANGE;
 
     procedure UpdateFileMRU;
+    procedure ProjectMRUChange(Sender: TObject);
 
     procedure AppOnActivate(Sender: TObject);
     function GetActiveEditor: TfrmTikeEditor;
@@ -426,6 +427,7 @@ uses
   GlobalProxySettings,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.Project.WelcomeRenderer,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmWordlistEditor,
@@ -478,6 +480,8 @@ begin
   modActionsMain := TmodActionsMain.Create(Self);
 
   FProjectMRU := TMRUList.Create('Project');
+  FProjectMRU.OnChange := ProjectMRUChange;
+
   FChildWindows := TChildWindowList.Create;
 
   ShowDebug(False);
@@ -522,7 +526,8 @@ begin
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
     FActiveProject := '';
 
-  LoadGlobalProjectUI(ptUnknown, FActiveProject, True);
+  if FActiveProject <> '' then
+    LoadGlobalProjectUI(ptUnknown, FActiveProject, True);
 
   InitDock;
 
@@ -581,21 +586,28 @@ begin
     FChildWindows[i].Release;   // I2595, probably not necessary
   end;
 
-  if IsGlobalProjectUIReady then
-    with TRegistryErrorControlled.Create do  // I2890
-    try
-      if FGlobalProject.Untitled
-        then FGlobalProject.PersistUntitledProject  // I1010: Persist untitled project
-        else FGlobalProject.Save;   // I4691
-        
-      RootKey := HKEY_CURRENT_USER;
-      if OpenKey(SRegKey_IDEOptions_CU, True) then
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_CURRENT_USER;
+    if OpenKey(SRegKey_IDEOptions_CU, True) then
+    begin
+      if IsGlobalProjectUIReady then
       begin
+        if FGlobalProject.Untitled
+          then FGlobalProject.PersistUntitledProject  // I1010: Persist untitled project
+          else FGlobalProject.Save;   // I4691
+
         WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
+      end
+      else
+      begin
+        if ValueExists(SRegValue_ActiveProject) then
+          DeleteValue(SRegValue_ActiveProject);
       end;
-    finally
-      Free;
     end;
+  finally
+    Free;
+  end;
 
   Action := caFree;
 
@@ -1101,6 +1113,12 @@ function TfrmKeymanDeveloper.OpenFile(FFileName: string; FCloseNewFile: Boolean)
 var
   ext: string;
 begin
+  if not IsGlobalProjectUIReady then
+  begin
+    // This can happen if we get a file opened via Explorer.
+    modActionsMain.NewProject(ptKeyboard);
+  end;
+
   Result := nil;
   Screen.Cursor := crHourglass;
   try
@@ -1179,12 +1197,6 @@ function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEdi
 var
   i, n: Integer;
 begin
-  if not IsGlobalProjectUIReady then
-  begin
-    // This can happen if we get a file opened via Explorer.
-    NewGlobalProjectUI(ptKeyboard);
-  end;
-
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
@@ -1501,6 +1513,13 @@ begin
     end;
 
   Result := nil;
+end;
+
+procedure TfrmKeymanDeveloper.ProjectMRUChange(Sender: TObject);
+begin
+  FProjectMRU.SaveListToXML(TWelcomeRenderer.ProjectMRUFilename);
+
+  // Tell project window to refresh!
 end;
 
 procedure InitClasses;  // I3350

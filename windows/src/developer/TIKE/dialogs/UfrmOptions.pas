@@ -51,8 +51,6 @@ type
     cmdOK: TButton;
     dlgFonts: TFontDialog;
     tabGeneral: TTabSheet;
-    gbStartup: TGroupBox;
-    chkShowStartupDialog: TCheckBox;
     tabDebugger: TTabSheet;
     tabCharMap: TTabSheet;
     gbCharMapCharacterLookups: TGroupBox;
@@ -66,7 +64,6 @@ type
     chkDebuggerSingleStepAfterBreak: TCheckBox;
     chkDebuggerShowStoreOffset: TCheckBox;
     chkDebuggerAutoRecompile: TCheckBox;
-    chkAllowMultipleInstances: TCheckBox;
     cmdProxySettings: TButton;
     gbExternalEditor: TGroupBox;
     editExternalEditorPath: TEdit;
@@ -96,6 +93,7 @@ type
     cbEditorTheme: TComboBox;
     lblEditorCustomTheme: TLabel;
     lblEditorTheme: TLabel;
+    chkAllowMultipleInstances: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);

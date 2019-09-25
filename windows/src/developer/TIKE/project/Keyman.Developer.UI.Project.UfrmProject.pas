@@ -56,17 +56,15 @@ uses
   System.Types,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile,
+  StdCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile,
   KeymanDeveloperUtils, UserMessages,
   Keyman.Developer.UI.UframeCEFHost;
 
 type
   TfrmProject = class(TfrmTikeChild)  // I2721
     dlgOpenFile: TOpenDialog;
-    tmrRefresh: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure tmrRefreshTimer(Sender: TObject);
     procedure FormActivate(Sender: TObject);
   private
     FShouldRefresh: Boolean;
@@ -178,11 +176,8 @@ begin
 
   FNextCommandParams := TStringList.Create;
 
-  if IsGlobalProjectUIReady then
-  begin
-    GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
-    GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
-  end;
+  FGlobalProjectRefresh := ProjectRefresh;
+  FGlobalProjectRefreshCaption := ProjectRefreshCaption;
 
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
@@ -197,12 +192,7 @@ procedure TfrmProject.RefreshHTML;
 begin
   if IsGlobalProjectUIReady then
   begin
-    if GetGlobalProjectUI.Refreshing then   // I4687
-      tmrRefresh.Enabled := True
-    else
-    begin
-      cef.Navigate(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
-    end;
+    cef.Navigate(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
   end
   else
     cef.Navigate(modWebHttpServer.GetAppURL('project/welcome'));
@@ -246,26 +236,16 @@ end;
 
 procedure TfrmProject.SetGlobalProject;
 begin
-  if not IsGlobalProjectUIReady then
-    ProjectRefresh(nil)
-  else if not Assigned(GetGlobalProjectUI.OnRefresh) then   // I4687
-  begin
-    GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
-    GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
-    ProjectRefresh(nil);
-  end
-  else if not GetGlobalProjectUI.Refreshing then   // I4687
-    ProjectRefresh(nil);
+  ProjectRefresh(nil);
 end;
 
 procedure TfrmProject.FormDestroy(Sender: TObject);
 begin
   inherited;
-  if IsGlobalProjectUIReady then
-  begin
-    GetGlobalProjectUI.OnRefresh := nil;   // I4687
-    GetGlobalProjectUI.OnRefreshCaption := nil;   // I4687
-  end;
+
+  FGlobalProjectRefresh := nil;
+  FGlobalProjectRefreshCaption := nil;
+
   FreeAndNil(FNextCommandParams);
 end;
 
@@ -355,8 +335,37 @@ begin
 end;
 
 procedure TfrmProject.WebCommandWelcome(Command: WideString; Params: TStringList);
+    function SelectedMRUFileName: WideString;
+    var
+      n: Integer;
+    begin
+      Result := '';
+      if Params.Values['id'].StartsWith('id_MRU') then
+      begin
+        if TryStrToInt(Params.Values['id'].Substring(6), n) and
+            (n >= 0) and
+            (n < frmKeymanDeveloper.ProjectMRU.FileCount) then
+          Result := frmKeymanDeveloper.ProjectMRU.Files[n];
+      end
+    end;
 begin
-  // TODO
+  if Command = 'newproject' then
+    modActionsMain.actProjectNew.Execute
+  else if Command = 'openproject' then
+    modActionsMain.actProjectOpen.Execute
+  else if Command = 'editfile' then // MRU
+  begin
+    if SelectedMRUFileName <> '' then
+      modActionsMain.OpenProject(SelectedMRUFileName);
+  end
+  else if Command = 'removefrommru' then
+  begin
+    if SelectedMRUFileName <> '' then
+    begin
+      frmKeymanDeveloper.ProjectMRU.Delete(SelectedMRUFileName);
+      RefreshHTML;
+    end;
+  end
 end;
 
 procedure TfrmProject.WebCommandProject(Command: WideString; Params: TStringList);
@@ -596,17 +605,11 @@ begin
   ProjectRefresh(nil);
 end;}
 
-procedure TfrmProject.tmrRefreshTimer(Sender: TObject);
-begin
-  tmrRefresh.Enabled := False;
-  ProjectRefresh(nil);
-end;
-
 procedure TfrmProject.cefLoadEnd(Sender: TObject);
 begin
   if csDestroying in ComponentState then
     Exit;
-  if Assigned(FGlobalProject) then GetGlobalProjectUI.Refreshing := False;   // I4687
+
   if (frmKeymanDeveloper.ActiveChild = Self) and (Screen.ActiveForm = frmKeymanDeveloper) then
   begin
     cef.SetFocus;

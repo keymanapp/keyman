@@ -44,6 +44,7 @@ type
     procedure Add(FileName: WideString);
     procedure Append(FileName: WideString);
     procedure Open(FileName: WideString);
+    procedure SaveListToXML(FileName: string);
     property FileCount: Integer read GetFileCount;
     property Files[Index: Integer]: WideString read GetFile;
     function EllipsisFile(Index: Integer): WideString;
@@ -56,6 +57,8 @@ uses
   System.SysUtils,
   Winapi.ShlWapi,
   Winapi.Windows,
+  Xml.XMLDoc,
+  Xml.XMLIntf,
 
   ErrorControlledRegistry,
   RegistryKeys;
@@ -193,6 +196,38 @@ begin
     FMRU.Move(n, 0);
     Change;
   end;
+end;
+
+procedure TMRUList.SaveListToXML(FileName: string);
+var
+  i: Integer;
+  doc: IXMLDocument;
+  node: IXMLNode;
+begin
+  // Save MRU to an XML file, used by global welcome page
+  // This is a mostly a duplicate of part of ProjectSaver and
+  // could be refactored, but there is not much gain in doing
+  // so.
+
+  doc := NewXMLDocument();
+  doc.Options := doc.Options + [doNodeAutoIndent];
+  doc.Encoding := 'utf-8';
+
+  node := doc.CreateElement('MRU', '');
+  doc.DocumentElement := node;
+
+  for i := 0 to FileCount - 1 do
+  begin
+    with node.AddChild('File') do
+    begin
+      AddChild('ID').NodeValue := 'id_MRU'+IntToStr(i);
+      AddChild('Filename').NodeValue := ExtractFileName(Files[i]);
+      AddChild('FileType').NodeValue := ExtractFileExt(Files[i]);
+      AddChild('FullPath').NodeValue := Files[i];
+    end;
+  end;
+
+  doc.SaveToFile(FileName);
 end;
 
 end.

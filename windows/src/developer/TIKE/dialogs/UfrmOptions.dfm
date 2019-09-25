@@ -19,51 +19,27 @@ inherited frmOptions: TfrmOptions
     Top = 8
     Width = 425
     Height = 392
-    ActivePage = tabEditor
+    ActivePage = tabGeneral
     TabOrder = 0
     object tabGeneral: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      object gbStartup: TGroupBox
-        Left = 8
-        Top = 8
-        Width = 237
-        Height = 73
-        Caption = 'Startup'
-        TabOrder = 0
-        object chkShowStartupDialog: TCheckBox
-          Left = 8
-          Top = 20
-          Width = 125
-          Height = 17
-          Caption = '&Show splash screen'
-          TabOrder = 0
-        end
-        object chkAllowMultipleInstances: TCheckBox
-          Left = 8
-          Top = 44
-          Width = 221
-          Height = 17
-          Caption = '&Allow multiple instances of TIKE'
-          TabOrder = 1
-        end
-      end
       object cmdProxySettings: TButton
-        Left = 3
-        Top = 232
+        Left = 8
+        Top = 160
         Width = 125
         Height = 25
         Caption = '&Proxy Settings...'
-        TabOrder = 5
+        TabOrder = 4
         OnClick = cmdProxySettingsClick
       end
       object gbExternalEditor: TGroupBox
-        Left = 3
-        Top = 143
+        Left = 8
+        Top = 71
         Width = 237
         Height = 45
         Caption = '&External Editor Path'
-        TabOrder = 2
+        TabOrder = 1
         object editExternalEditorPath: TEdit
           Left = 8
           Top = 16
@@ -81,36 +57,42 @@ inherited frmOptions: TfrmOptions
         end
       end
       object cmdSMTPSettings: TButton
-        Left = 134
-        Top = 232
+        Left = 139
+        Top = 160
         Width = 125
         Height = 25
         Caption = 'S&MTP Settings...'
-        TabOrder = 4
+        TabOrder = 3
         OnClick = cmdSMTPSettingsClick
       end
       object chkOpenKeyboardFilesInSourceView: TCheckBox
         Left = 8
-        Top = 88
+        Top = 36
         Width = 221
         Height = 17
         Caption = 'Open &keyboard files in source view'
-        TabOrder = 1
+        TabOrder = 0
       end
       object cmdResetToolWindows: TButton
-        Left = 3
-        Top = 201
+        Left = 8
+        Top = 129
         Width = 125
         Height = 25
         Caption = '&Reset tool windows'
-        TabOrder = 3
+        TabOrder = 2
         OnClick = cmdResetToolWindowsClick
+      end
+      object chkAllowMultipleInstances: TCheckBox
+        Left = 8
+        Top = 12
+        Width = 289
+        Height = 17
+        Caption = '&Allow multiple instances of Keyman Developer'
+        TabOrder = 5
       end
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
-      ExplicitLeft = -44
-      ExplicitTop = 0
       object gbEditorSpaces: TGroupBox
         Left = 11
         Top = 16

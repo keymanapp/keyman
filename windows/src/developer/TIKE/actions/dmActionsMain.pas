@@ -283,7 +283,6 @@ uses
   UfrmPackageEditor,
   Keyman.Developer.UI.Project.UfrmProject,
   Keyman.Developer.UI.Project.UfrmProjectSettings,
-  UfrmStartup,
   Upload_Settings,
   UfrmMDIChild;
 
@@ -479,16 +478,10 @@ begin
     actFileSave.Enabled := IsGlobalProjectUIReady and Assigned(ActiveEditor) and ActiveEditor.Modified;
 end;
 
-procedure TmodActionsMain.AboutShowStartup(Sender: TObject);
-begin
-  ForceShowStartup(Sender as TForm);
-end;
-
 procedure TmodActionsMain.actHelpAboutExecute(Sender: TObject);
 begin
   with TfrmAboutTike.Create(frmKeymanDeveloper) do
   try
-    OnIconClick := AboutShowStartup;
     ShowModal;
   finally
     Free;
@@ -587,8 +580,11 @@ begin
     Exit;
   end;
 
-  if not SaveAndCloseAllFiles then Exit;
-  FreeGlobalProjectUI;
+  if IsGlobalProjectUIReady then
+  begin
+    if not SaveAndCloseAllFiles then Exit;
+    FreeGlobalProjectUI;
+  end;
   LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
   frmKeymanDeveloper.ProjectMRU.Add(FGlobalProject.FileName);
   frmKeymanDeveloper.ShowProject;
@@ -597,8 +593,11 @@ end;
 
 procedure TmodActionsMain.NewProject(pt: TProjectType);
 begin
-  if not SaveAndCloseAllFiles then Exit;
-  FreeGlobalProjectUI;
+  if IsGlobalProjectUIReady then
+  begin
+    if not SaveAndCloseAllFiles then Exit;
+    FreeGlobalProjectUI;
+  end;
   NewGlobalProjectUI(pt);
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;
@@ -606,7 +605,10 @@ end;
 
 procedure TmodActionsMain.CloseProject;
 begin
-  if not SaveAndCloseAllFiles then Exit;
+  if IsGlobalProjectUIReady then
+  begin
+    if not SaveAndCloseAllFiles then Exit;
+  end;
   FreeGlobalProjectUI;
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;

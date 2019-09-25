@@ -21,7 +21,7 @@
         </xsl:choose>
       </xsl:attribute>
       <xsl:call-template name="head" />
-      <body onload="pageload()">
+      <body onload="pageload();loadstate();">
         <div id="state"><xsl:copy-of select="/KeymanDeveloperProject/ViewState" /></div>
         <div id="menubackground" onmousedown="HideMenu()"></div>
         <div id="pageheader">
@@ -42,7 +42,7 @@
             <img alt="Welcome" src='res/tab_welcome.gif' />
             Welcome
           </div>
-          
+
           <div id="tabb1" class="tabb" onmousedown="javascript:selecttabb(1);">
             <img alt="Keyboards" src='res/tab_keyboard.png' />
             Keyboards
