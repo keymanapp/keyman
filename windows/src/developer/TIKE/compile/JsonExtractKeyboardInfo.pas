@@ -3,11 +3,11 @@ unit JsonExtractKeyboardInfo;
 interface
 
 uses
-  compile;
+  Keyman.Developer.System.Project.ProjectLog;
 
 type
   TJsonExtractKeyboardInfo = class
-    class function Execute(JsonFile, Fields: string; FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+    class function Execute(JsonFile, Fields: string; FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
   end;
 
 implementation
@@ -22,7 +22,7 @@ uses
 { TJsonExtractKeyboardInfo }
 
 class function TJsonExtractKeyboardInfo.Execute(JsonFile, Fields: string;
-  FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+  FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
 var
   json: TJSONObject;
   s: string;
@@ -35,7 +35,7 @@ begin
       json := TJSONObject.ParseJsonValue(DataString) as TJSONObject;
       if not Assigned(json) then
       begin
-        FCallback(-1, 0, 'Could not parse keyboard_info');
+        FCallback(plsError, JsonFile, 'Could not parse keyboard_info', 0, 0);
         Exit(False);
       end;
 
@@ -58,7 +58,7 @@ begin
   except
     on E:Exception do
     begin
-      FCallback(-1, 0, PAnsiChar(AnsiString(E.Message)));
+      FCallback(plsError, JsonFile, E.Message, 0, 0);
       Exit(False);
     end;
   end;

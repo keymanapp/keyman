@@ -321,7 +321,7 @@ type
 
     procedure NotifyStartedWebDebug;
 
-    procedure FindError(const Filename: string; s: string); override;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
 
     function CanChangeTab(FForward: Boolean): Boolean; override;
     procedure ChangeTab(FForward: Boolean); override;
@@ -554,7 +554,7 @@ begin
   Result := True;
 end;
 
-procedure TfrmPackageEditor.FindError(const Filename: string; s: string);   // I4081
+procedure TfrmPackageEditor.FindError(const Filename: string; s: string; line: Integer);   // I4081
 begin
   SetFocus;
 end;
@@ -699,6 +699,8 @@ begin
   UpdateReadme;
   UpdateImageFiles;
   UpdateStartMenuPrograms;
+
+  frmMessages.Clear;
   RefreshKeyboardList;
   RefreshLexicalModelList;
 ////  UpdateCustomisationFile;
@@ -742,6 +744,8 @@ begin
     UpdateReadme;
     UpdateImageFiles;
     UpdateStartMenuPrograms;
+
+    frmMessages.Clear;
     RefreshKeyboardList;
     RefreshLexicalModelList;
     Modified := True;
@@ -1362,15 +1366,13 @@ end;
 procedure TfrmPackageEditor.HandlePackageRefreshError(Sender: TObject; msg: string; State: TProjectLogState);
 begin
   if Assigned(Self.ProjectFile.Project) then
-    Self.ProjectFile.Project.Log(State, Filename, Msg);
+    Self.ProjectFile.Project.Log(State, Filename, Msg, 0, 0);
 end;
 
 procedure TfrmPackageEditor.RefreshKeyboardList;
 var
   n, i: Integer;
 begin
-  frmMessages.Clear;
-
   n := lbKeyboards.ItemIndex;
 
   with TPackageInfoRefreshKeyboards.Create(pack) do
@@ -1773,8 +1775,6 @@ var
   n: Integer;
   lm: TPackageLexicalModel;
 begin
-  frmMessages.Clear;
-
   n := lbLexicalModels.ItemIndex;
 
   with TPackageInfoRefreshLexicalModels.Create(pack) do
