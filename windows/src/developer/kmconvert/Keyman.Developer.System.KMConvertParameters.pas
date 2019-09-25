@@ -6,7 +6,7 @@ uses
   UKeymanTargets;
 
 type
-  TKMConvertMode = (cmImportWindows, cmTemplate);
+  TKMConvertMode = (cmImportWindows, cmTemplate, cmLexicalModel);
 
   TKMConvertParameters = record
     KLID: string;
@@ -20,6 +20,8 @@ type
     Targets: TKeymanTargets;
     Mode: TKMConvertMode;
     NoLogo: Boolean;
+
+    ModelIdAuthor, ModelIdLanguage, ModelIdUniq: string;
   private
     function CheckParam(name, value: string): Boolean;
   public
@@ -49,6 +51,8 @@ begin
     Mode := cmImportWindows
   else if ModeString = 'template' then
     Mode := cmTemplate
+  else if ModeString = 'lexical-model' then
+    Mode := cmLexicalModel
   else
     Exit(False);
 
@@ -80,20 +84,28 @@ begin
   writeln('  Imports a Windows keyboard into a new Keyman keyboard project');
   writeln;
   writeln('kmconvert template -id <keyboard_id> [additional-options]');
-  writeln('  Creates a blank keyboard project in the repository template format');
+  writeln('  Creates a basic keyboard project in the repository template format');
+  writeln;
+  writeln('kmconvert lexical-model -id-author <id-author> -id-language <id-language> -id-uniq <id-uniq> [additional-options]');
+  writeln('  Creates a wordlist lexical model project in the repository template format');
   writeln;
   writeln('Parameters:');
   writeln('  -nologo              Don''t show the program description and copyright banner');
   writeln('  -klid <source-klid>  The KLID of the keyboard to import, per LoadKeyboardLayout');
-  writeln('  -o <destination>     The target folder to write the keyboard project into, defaults to "."');
   writeln('  -id <keyboard_id>    The id of the keyboard to create');
   writeln('                       (in `import-windows` mode, can be a format string)');
-  writeln('  -name <data>         Name of the keyboard, e.g. "My First Keyboard", "%s Basic" ');
+  writeln('  -o <destination>     The target folder to write the project into, defaults to "."');
+  writeln('  -author <data>       Name of author of the keyboard/model, no default');
+  writeln('  -name <data>         Name of the keyboard/model, e.g. "My First Keyboard", "%s Basic" ');
   writeln('                       (format strings are only valid in `import-windows` mode)');
-  writeln('  -copyright <data>    Copyright string for the keyboard, defaults to "Copyright (C)"');
-  writeln('  -version <data>      Version number of the keyboard, defaults to "1.0"');
+  writeln('  -copyright <data>    Copyright string for the keyboard/model, defaults to "Copyright (C)"');
+  writeln('  -version <data>      Version number of the keyboard/model, defaults to "1.0"');
   writeln('  -languages <data>    space-separated list of BCP 47 tags, e.g. "en-US tpi-PG"');
-  writeln('  -author <data>       Name of author of the keyboard, no default');
+  // Model parameters
+  writeln('Note: model identifiers are constructed from params: <id-author>.<id-language>.<id-uniq>');
+  writeln('  -id-author <data>    Identifier for author of model');
+  writeln('  -id-language <data>  Single BCP 47 tag identifying primary language of model');
+  writeln('  -id-uniq <data>      Unique name for the model');
 end;
 
 { TKMConvertParameters }
@@ -108,6 +120,11 @@ begin
   else if name = '-version' then Version := value
   else if name = '-languages' then BCP47Tags := value
   else if name = '-author' then Author := value
+
+  else if name = '-id-author' then ModelIdAuthor := value
+  else if name = '-id-language' then ModelIdLanguage := value
+  else if name = '-id-uniq' then ModelIdUniq := value
+
   else Exit(False);
   Result := True;
 end;
