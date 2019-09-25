@@ -320,7 +320,7 @@ namespace com.keyman.text {
       let kbdInterface = keyman.interface;
       let keyMapManager = keyman.keyMapManager;
 
-      if(!keyman.isEmbedded && !fromOSK && !window.event) {
+      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
@@ -411,8 +411,7 @@ namespace com.keyman.text {
         return true;
       }
 
-
-      if(!keyman.isEmbedded && !fromOSK && !window.event) {
+      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
