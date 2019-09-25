@@ -9,9 +9,6 @@ namespace com.keyman.utils {
     // as it results in unexpected, bug-like behavior for keyboard designers when it is unwanted.
     public static readonly NO_DEFAULT_KEYCAPS = new Version([12, 0]);
 
-    // Corresponds to the most recent known version of KMW and Keyman Developer.
-    public static readonly CURRENT = new Version([12, 0]);
-
     private readonly components: number[]
 
     /**

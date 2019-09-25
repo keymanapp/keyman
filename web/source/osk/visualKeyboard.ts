@@ -600,7 +600,7 @@ namespace com.keyman.osk {
         if(activeKeyboard) {
           kbdDevVersion = new utils.Version(activeKeyboard['KVER']);
         } else {
-          kbdDevVersion = utils.Version.CURRENT;
+          kbdDevVersion = new utils.Version(keyman['version']);
         }
         layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, formFactor);
       }
