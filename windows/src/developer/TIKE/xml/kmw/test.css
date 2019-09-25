@@ -1,0 +1,55 @@
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+        font-family: sans-serif
+    }
+
+    .install-link {
+      background: none repeat scroll 0 0 #CCCCCC;
+      border: 1px solid #444444;
+      border-radius: 4px;
+      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+      display: inline-block;
+      color: #444444;
+      font-family: Sans-serif;
+      font-size: 10pt;
+      padding: 6px;
+      margin: 12px 2px 0 2px;
+      text-decoration: none;
+    }
+
+    .header {
+      padding: 4px 8px;
+      background: #424248;
+      color: #f0f0ff;
+    }
+
+    .header div {
+      display: inline-block;
+    }
+
+    .header div h2 {
+      margin: 4px;
+    }
+
+    .header div.float-right {
+      display: block;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    .float-right a.install-link {
+      margin: 8px 8px 0 0 ;
+    }
+
+    .clear {
+      clear: both;
+    }
+
+    #content {
+      margin: 8px 16px;
+    }
