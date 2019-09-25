@@ -207,7 +207,9 @@ final class KMKeyboard extends WebView {
     if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardLoaded) ||
       (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardLoaded)) {
 
-      if(this.javascriptAfterLoad.size() == 1)
+      // If !this.keyboardSet, then pageLoaded hasn't fired yet.
+      // When pageLoaded fires, it'll call `callJavascriptAfterLoad` safely.
+      if(this.javascriptAfterLoad.size() == 1 && this.keyboardSet)
         callJavascriptAfterLoad();
     }
   }
