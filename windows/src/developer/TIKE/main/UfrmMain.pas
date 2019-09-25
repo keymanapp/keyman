@@ -1513,6 +1513,8 @@ begin
   FProjectMRU.SaveListToXML(TWelcomeRenderer.ProjectMRUFilename);
 
   // Tell project window to refresh!
+  if ProjectForm <> nil then
+    ProjectForm.SetGlobalProject;
 end;
 
 procedure InitClasses;  // I3350
