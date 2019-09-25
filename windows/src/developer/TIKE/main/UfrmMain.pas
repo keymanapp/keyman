@@ -442,7 +442,7 @@ uses
   UfrmAboutTike,
   UfrmOSKEditor,
   UfrmSelectSystemKeyboard,
-  UfrmStartup, UfrmOptions,
+  UfrmOptions,
   UfrmKeyTest, UfrmKeymanWizard,
   UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
@@ -700,22 +700,15 @@ procedure TfrmKeymanDeveloper.WMUserFormShown(var Message: TMessage);
 var
   i: Integer;
 begin
-  try
-    if ParamCount = 0 then
-    begin
-      ShowProject;
-      ShowStartupModal(Self);
-    end
-    else
-    begin
-      for i := 1 to ParamCount do
-        if FileExists(ParamStr(i)) then
-          OpenFile(ParamStr(i), False);
-      ShowStartupModal(Self);
-    end;
-  except
-    CloseStartup;
-    raise;
+  if ParamCount = 0 then
+  begin
+    ShowProject;
+  end
+  else
+  begin
+    for i := 1 to ParamCount do
+      if FileExists(ParamStr(i)) then
+        OpenFile(ParamStr(i), False);
   end;
 
   if True then //FKeymanDeveloperOptions.AutoCheckForUpdates then

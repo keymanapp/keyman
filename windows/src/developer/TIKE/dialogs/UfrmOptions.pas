@@ -172,8 +172,6 @@ begin
     chkDebuggerShowStoreOffset.Checked :=      DebuggerShowStoreOffset;
     chkDebuggerAutoRecompile.Checked :=        DebuggerAutoRecompileWithDebugInfo;
 
-    chkShowStartupDialog.Checked := ShowStartupDialog;
-
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
 
@@ -255,8 +253,6 @@ begin
     DebuggerAutoRecompileWithDebugInfo := chkDebuggerAutoRecompile.Checked;
 
     WebHostDefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
-
-    ShowStartupDialog := chkShowStartupDialog.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;

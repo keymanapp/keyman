@@ -230,7 +230,6 @@ type
     procedure actFileNewUpdate(Sender: TObject);
     procedure actFileOpenUpdate(Sender: TObject);
   private
-    procedure AboutShowStartup(Sender: TObject);
     function CheckFilenameConventions(FileName: string): Boolean;
     function SaveAndCloseAllFiles: Boolean;
     procedure CloseProject;

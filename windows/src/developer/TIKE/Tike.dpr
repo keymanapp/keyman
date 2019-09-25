@@ -9,7 +9,6 @@ uses
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   UfrmMDIChild in 'child\UfrmMDIChild.pas' {frmTikeChild},
   UfrmNew in 'dialogs\UfrmNew.pas' {frmNew},
-  UfrmStartup in 'main\UfrmStartup.pas' {frmStartup},
   UfrmAboutTike in 'dialogs\UfrmAboutTike.pas' {frmAboutTike},
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
@@ -315,8 +314,7 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  ShowStartup;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
       Application.Run;
     end;
   finally
