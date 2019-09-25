@@ -65,12 +65,14 @@ body.tab-4 .page#page-4 {
   display: block;
 }
 
-html.type-lexical-model .tabb#tabb1 {
+html.type-lexical-model .tabb#tabb1,
+html.type-lexical-model .keyboard-specific {
   /* Hide keyboards tab for lexical model projects */
   display: none;
 }
 
-html.type-keyboard .tabb#tabb2 {
+html.type-keyboard .tabb#tabb2,
+html.type-keyboard .lexical-model-specific {
   /* Hide lexical-models tab for keyboard projects */
   display: none;
 }

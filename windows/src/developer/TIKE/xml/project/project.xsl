@@ -26,7 +26,7 @@
         <div id="menubackground" onmousedown="HideMenu()"></div>
         <div id="pageheader">
           <div id="upperexpand" class="checkbox checked" onmousedown="javascript:showhideupper();">Show help</div>
-          <div id="currentpage">Project - Welcome </div>
+          <div id="currentpage">Project - Information</div>
         </div>
         <div id="pages" class="pages">
           <xsl:call-template name="page_welcome" />
@@ -39,8 +39,8 @@
           <div class="tabbspacer"></div>
 
           <div id="tabb0" class="tabb" onmousedown="javascript:selecttabb(0);">
-            <img alt="Welcome" src='res/tab_welcome.gif' />
-            Welcome
+            <img alt="Information" src='res/tab_welcome.gif' />
+            Information
           </div>
 
           <div id="tabb1" class="tabb" onmousedown="javascript:selecttabb(1);">

@@ -17,7 +17,7 @@ function selecttabb(n) {
 
   var title='';
   switch (n) {
-    case 0: title = 'Welcome'; break;
+    case 0: title = 'Information'; break;
     case 1: title = 'Keyboards'; break;
     case 2: title = 'Models'; break;
     case 3: title = 'Packaging'; break;
