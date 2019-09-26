@@ -607,8 +607,8 @@ begin
   if IsGlobalProjectUIReady then
   begin
     if not SaveAndCloseAllFiles then Exit;
+    FreeGlobalProjectUI;
   end;
-  FreeGlobalProjectUI;
   frmKeymanDeveloper.ShowProject;
   frmKeymanDeveloper.UpdateCaption;
 end;
