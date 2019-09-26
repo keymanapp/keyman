@@ -117,8 +117,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           int offsetY = (v == null) ? 0 : v.getTop();
           i.putExtra("offsetY", offsetY);
           startActivityForResult(i, 1);
-        } else {
-          // language.keyboards.size() == 1
+        } else if (language.keyboards.size() == 1) {
           Keyboard kbd = language.keyboards.iterator().next();
           String kbName = kbd.map.get(KMManager.KMKey_KeyboardName);
 
@@ -148,6 +147,10 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             i.putExtras(bundle);
             startActivity(i);
           }
+        } else {
+          // language.keyboards.size() == 0
+          // No language.keyboards entries exist because of previous failure in downloading keyboard catalog
+          Toast.makeText(context, "One or more resources failed to update!", Toast.LENGTH_SHORT).show();
         }
       }
     });
