@@ -90,7 +90,7 @@ adb shell setprop debug.firebase.analytics.app .none.
 
 ### Compiling the app's offline help
 Extra prerequisite:
-* `wget` (`brew install wget`)
+* `wget`
 
 The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
 online version of help on help.keyman.com.  When significant changes to help content have been
