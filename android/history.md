@@ -3,6 +3,13 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-09-26 12.0.4094 beta
+* Bug Fix:
+  * Fix crashes involving dismissing keyboard and selecting the last keyboard (#2135)
+
+## 2019-09-26 12.0.4093 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2126)
+
 ## 2019-09-23 12.0.4092 beta
 * Disable corrections toggle when predictions are disabled (#2119)
 

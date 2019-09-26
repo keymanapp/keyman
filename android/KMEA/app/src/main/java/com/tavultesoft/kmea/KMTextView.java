@@ -286,15 +286,11 @@ public final class KMTextView extends AppCompatEditText {
   }
 
   public void dismissKeyboard() {
-    AppCompatActivity activity;
-    if (context instanceof ContextThemeWrapper) {
-      activity = (AppCompatActivity)(((ContextThemeWrapper)context).getBaseContext());
-    } else {
-      activity = (AppCompatActivity)context;
-    }
+    AppCompatActivity activity = (AppCompatActivity) context;
 
     Window mainWindow = activity.getWindow();
     FrameLayout mainLayout = (FrameLayout) mainWindow.getDecorView().findViewById(android.R.id.content);
+
     //mainWindow.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     ((InputMethodManager) activity.getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mainLayout.getWindowToken(), 0);
     //keyboardLayout.setAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_out));
