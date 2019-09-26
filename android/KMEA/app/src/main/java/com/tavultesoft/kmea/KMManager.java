@@ -94,6 +94,11 @@ public final class KMManager {
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
+  public enum FormFactor {
+    PHONE,
+    TABLET;
+  }
+
   private static InputMethodService IMService;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
@@ -1234,6 +1239,12 @@ public final class KMManager {
     }
 
     return result;
+  }
+
+  public static FormFactor getFormFactor() {
+    String device_type = appContext.getResources().getString(R.string.device_type);
+
+    return device_type.equals("AndroidMobile") ? FormFactor.PHONE : FormFactor.TABLET;
   }
 
   public static boolean isHelpBubbleEnabled() {
