@@ -53,7 +53,7 @@ type
     constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); override;
     destructor Destroy; override;
 
-    procedure Log(AState: TProjectLogState; Filename, Msg: string); override;   // I4706
+    procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); override;   // I4706
 
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean;
 
@@ -116,7 +116,7 @@ begin
     if not (Files[i].UI as TProjectFileUI).DoAction(action, FSilent) then Exit;
 
   case action of
-    pfaCompile: Log(plsInfo, FileName, 'All files compiled successfully.');   // I4706
+    pfaCompile: Log(plsSuccess, FileName, 'All files compiled successfully.', 0, 0);   // I4706
   end;
 
   Result := True;
@@ -173,15 +173,9 @@ begin
   end;
 end;
 
-procedure TProjectUI.Log(AState: TProjectLogState; Filename, Msg: string);   // I4706
+procedure TProjectUI.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);   // I4706
 begin
-  case AState of
-    plsInfo: ;
-    plsWarning: Msg := 'Warning: '+Msg;
-    plsError:   Msg := 'Error: '+Msg;
-    plsFatal:   Msg := 'Error: '+Msg;
-  end;
-  frmMessages.Add(Filename, Msg);
+  frmMessages.Add(AState, Filename, Msg, MsgCode, line);
 end;
 
 procedure TProjectUI.Refresh;

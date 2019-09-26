@@ -496,7 +496,7 @@ type
 
     function HasSubfilename(const Filename: string): Boolean; override;   // I4081
 
-    procedure FindError(const Filename: string; s1: string); override;   // I4081
+    procedure FindError(const Filename: string; s1: string; line: Integer); override;   // I4081
     procedure RefreshOptions; override;
     procedure TextFileFormatClick; override;
     function CanTextFileFormatClick: Boolean; override;
@@ -567,6 +567,7 @@ uses
   kmxfile,
   OnlineConstants,
   Keyman.Developer.System.Project.Project,
+  Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.UI.Project.ProjectFileUI,
   RegExpr,
@@ -2087,32 +2088,14 @@ begin
   EnableControls;
 end;
 
-procedure TfrmKeymanWizard.FindError(const Filename: string; s1: string);   // I4081
+procedure TfrmKeymanWizard.FindError(const Filename: string; s1: string; line: Integer);   // I4081
 var
-  s: string;
   ln: Integer;
   f: TframeTextEditor;
 
   procedure Activate(tab: TTabSheet; control: TWinControl);
   begin
     pages.ActivePage := tab; control.SetFocus;
-  end;
-
-  procedure ParseError;
-  var
-    n: Integer;
-  begin
-    s := s1;
-    if Copy(s, 1, 7) = 'Error: ' then Delete(s, 1, 7)   // I4765
-    else if Copy(s, 1, 9) = 'Warning: ' then Delete(s, 1, 9);   // I4765
-
-    if Copy(s, 1, 5) = 'line ' then
-    begin
-      Delete(s, 1, 5);
-      n := Pos(' ', s);
-      if n > 0 then Delete(s, n, Length(s)) else Exit;
-      ln := StrToIntDef(s, 0) - 1;
-    end;
   end;
 
   procedure FindKmnError;
@@ -2209,8 +2192,10 @@ var
   kf: TKeyboardParser_FeatureID;
   c: TTabSheet;
 begin
-  ln := 0;   // I4765
-  ParseError;
+  ln := line - 1;
+  if ln < 0 then
+    ln := 0;
+
   if SameText(Filename, Self.Filename) then
     FindKmnError
   else
@@ -3165,10 +3150,12 @@ begin
       AllowChange := False;
       if frameTouchLayout.LastErrorOffset >= 0 then   // I4083
       begin
-        frmMessages.Add(FFeature[kfTouchLayout].Filename,
-          Format('line %d  %s', [
-            frameTouchLayoutSource.OffsetToLine(frameTouchLayout.LastErrorOffset),
-            frameTouchLayout.LastError]));
+        frmMessages.Add(
+          plsError,
+          FFeature[kfTouchLayout].Filename,
+          frameTouchLayout.LastError,
+          CERR_ERROR,
+          0);
         frameTouchLayoutSource.FindErrorByOffset(frameTouchLayout.LastErrorOffset);
       end;
     end;

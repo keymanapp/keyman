@@ -61,7 +61,7 @@ type
     function GetDefaultExt: string; override;
 
   public
-    procedure FindError(const Filename: string; s: string); override;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
   end;
 
 implementation
@@ -162,7 +162,7 @@ begin
   cmdSortByFrequency.Enabled := e;
 end;
 
-procedure TfrmWordlistEditor.FindError(const Filename: string; s: string);
+procedure TfrmWordlistEditor.FindError(const Filename: string; s: string; line: Integer);
 begin
   //
 end;

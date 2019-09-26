@@ -40,7 +40,7 @@ type
     function DoSaveFile: Boolean; override;
     function DoOpenFile: Boolean; override;
   public
-    procedure FindError(const Filename: string; s: string); override;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
   end;
 
 implementation
@@ -66,8 +66,9 @@ begin
   Result := True;
 end;
 
-procedure TfrmOSKEditor.FindError(const Filename: string; s: string);   // I4081
+procedure TfrmOSKEditor.FindError(const Filename: string; s: string; line: Integer);   // I4081
 begin
+
 end;
 
 procedure TfrmOSKEditor.FormCreate(Sender: TObject);

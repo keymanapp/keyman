@@ -291,6 +291,7 @@ uses
   dmActionsMain,
   Glossary,
   keyman32_int,
+  Keyman.Developer.System.Project.ProjectLog,
   KeyNames,
   kmxfile,
   kmxfileconsts,
@@ -981,7 +982,7 @@ end;
 procedure TfrmDebug.AddDebug(s: WideString);
 begin
   if TikeDebugMode then
-    frmMessages.Add('Debugger', s);
+    frmMessages.Add(plsInfo, 'Debugger', s, 0, 0);
   // Do NOTHING AT PRESENT
 end;
 
