@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-9-27 12.0.39 beta
+* General: Introduces a Welcome screen and improves workflow for starting use of Keyman Developer (#2134)
+* General: Fix version numbers for kmlmc, kmlmp and kmlmi (#2129)
+
 ## 2019-09-24 12.0.36 beta
 * General: File type icons were mismatched (#2112)
 * Project: Shift layer in basic touch layout template had incorrect modifier for period (.) on shift layer (#2113)
