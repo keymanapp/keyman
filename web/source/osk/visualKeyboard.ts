@@ -592,7 +592,16 @@ namespace com.keyman.osk {
 
       // Build a layout using the default for the device
       if(typeof layout != 'object' || layout == null) {
-        let kbdDevVersion = new utils.Version(activeKeyboard['KVER']);
+        var kbdDevVersion: utils.Version;
+
+        // This CAN be called with no backing keyboard; KMW will try to force-show
+        // the OSK even without a backing keyboard on mobile, using the default
+        // layout as the OSK's base.
+        if(activeKeyboard) {
+          kbdDevVersion = new utils.Version(activeKeyboard['KVER']);
+        } else {
+          kbdDevVersion = new utils.Version(keyman['version']);
+        }
         layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, formFactor);
       }
 

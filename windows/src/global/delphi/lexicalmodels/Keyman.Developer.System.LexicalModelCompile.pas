@@ -13,6 +13,7 @@ implementation
 uses
   System.Classes,
   System.SysUtils,
+  compile,
   utilexecute;
 
 function CompileModelFile(ProjectFile: TProjectFile; infile, outfile: string; debug: Boolean): Boolean;
@@ -30,7 +31,7 @@ begin
   if not Result then
   begin
     ProjectFile.Project.Log(plsError, infile,
-      Format('Compiler failed to start with error %d: %s', [GetLastError, SysErrorMessage(GetLastError)]));
+      Format('Compiler failed to start with error %d: %s', [GetLastError, SysErrorMessage(GetLastError)]), CERR_ERROR, 0);
   end;
 
   Result := Result and (ec = 0);
@@ -41,7 +42,7 @@ begin
     for line in s do
     begin
       // TODO: for errors and warnings
-      ProjectFile.Project.Log(plsInfo, infile, line);
+      ProjectFile.Project.Log(plsInfo, infile, line, 0, 0);
     end;
   finally
     s.Free;
