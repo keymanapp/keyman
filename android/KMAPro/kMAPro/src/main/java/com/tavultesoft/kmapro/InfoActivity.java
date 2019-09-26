@@ -85,7 +85,7 @@ public class InfoActivity extends AppCompatActivity {
 
     kmUrl = String.format("%s/%s/%s?embed=android&formfactor=%s", kmHelpBaseUrl, majorMinorVersion, htmlPage, formFactor);
     // The offline mirroring process (currently) adds .html to the end of the whole string.
-    kmOfflineUrl = String.format("%s/%s/%s@embed=android&formfactor=%s.html", htmlPath, formFactor, htmlPage, formFactor);
+    kmOfflineUrl = String.format("%s/%s/%s.html", htmlPath, formFactor, htmlPage);
     webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);
