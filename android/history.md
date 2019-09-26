@@ -3,10 +3,14 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-09-26 12.0.4094 beta
-* Bug Fix:
-  * Fix crashes involving dismissing keyboard and selecting the last keyboard (#2135)
+## 2019-09-27 12.0.4095 beta
 * Splits help into multiple pages for better usability (#2139)
+
+## 2019-09-26 12.0.4094 beta
+* Bug Fixes:
+  * Fix crash when Language picker doesn't contain keyboard catalog info (#2138)
+  * Fix crashes involving dismissing keyboard and selecting the last keyboard (#2135)
+  * Improve keyboard swap stability (#2136)
 
 ## 2019-09-26 12.0.4093 beta
 * No change to Keyman for Android (updated Keyman Web Engine, #2126)
