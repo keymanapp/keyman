@@ -59,7 +59,6 @@ do_offline_mirror() {
        --restrict-file-names=windows \
        --exclude-directories /font/deploy \
        --directory-prefix="$HELP_ROOT" \
-       --default-page=index.php \
        --adjust-extension \
        "help.keyman.com$LOCAL/$HELP_SITE_SECTION/$VERSION/index.php?embed=$DEVICE&formfactor=$1"
 
