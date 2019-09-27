@@ -6,6 +6,7 @@
 ## 2019-9-27 12.0.39 beta
 * General: Introduces a Welcome screen and improves workflow for starting use of Keyman Developer (#2134)
 * General: Fix version numbers for kmlmc, kmlmp and kmlmi (#2129)
+* General: .js files now open in Keyman Developer for editing (#2140)
 
 ## 2019-09-25 12.0.37 beta
 * Compiler: Add -lexical-model command line option for building lexical model template projects to kmconvert. (#2120)
