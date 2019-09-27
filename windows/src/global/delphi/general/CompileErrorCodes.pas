@@ -59,6 +59,7 @@ const
 
   CWARN_DontMixChiralAndNonChiralModifiers = $20A3;
 
+  CWARN_TooManyErrorsOrWarnings = $20A7;
 
 implementation
 

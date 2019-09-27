@@ -2,81 +2,51 @@
 <html>
 <head>
   <meta charset='utf-8'>
-  
-  <!-- Set the viewport width to match iOS device widths                         
+
+  <!-- Set the viewport width to match iOS device widths
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />   -->
-  <meta name="viewport" content="width=device-width,user-scalable=no" /> 
+  <meta name="viewport" content="width=device-width,user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  
+
   <!-- Enable IE9 Standards mode -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
-    
-  <title>Keyman Developer Keyboard Package Installation Site</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <style type='text/css'>   
-    body {
-        padding-left: 10px;
-        margin-left: 12px;
-    }
+  <title>Keyman Developer Package Installation</title>
 
-    h2 { 
-        font-family: sans-serif 
-    }
+  <style type='text/css'>
+    @import url('test.css');
 
-    .install-link { 
-      background: none repeat scroll 0 0 #CCCCCC;
-      border: 1px solid #444444;
-      border-radius: 4px;
-      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
-      color: #444444;
-      display: none;
-      font-family: Sans-serif;
-      font-size: 10pt;
-      margin: 0;
-      padding: 6px;
-      margin: 2px;
-      text-decoration: none;
-    }
-    
-    /** Mobile, Tablet **/
-    
-    #install-link {
-      font-weight: bold;
-    }
-    
-    .install-link .ios,
-    .install-link .android {
-      display: none;
-    }
-
-    .touch-device #install-link,
-    .touch-device-ios #install-link-ios,
-    .touch-device-android #install-link-android {
-      display: inline-block;
-    }
-
-    .touch-device-android .install-link .android,
-    .touch-device-ios .install-link .ios {
-      display: inline;
-    }
-  </style> 
+  </style>
 </head>
-  
+
 <body>
-  <h2>Available Packages for Installation</h2>
+  <div class='header'>
+    <div><h2>Install Packages</h2></div>
+    <div class='float-right'><a href='/' class='install-link'>Test keyboards online</a></div>
+    <div class='clear'></div>
+  </div>
 
-  <p>Clicking the package links below will download and install the package into the Keyman app on this device.</p>
-  
-  <ul id='packages'>
-  </ul>
-  
-  <p>You can add more packages to this list by opening the package source in the Package Editor and clicking
-  [Test Online].</p>
+  <div id='content'>
+    <div id='top-toolbar'>
+      <div class='control' id='controls'>
+        <a href='https://keyman.com/go/developer/10.0/ios-app' target='_blank' class='install-link'>Install Keyman for iOS</a>
+        <a href='https://keyman.com/go/developer/10.0/android-app' target='_blank' class='install-link'>Install Keyman for Android</a>
+      </div>
+    </div>
 
+    <p>Clicking the package links below will download and install the package into the Keyman app on this device.</p>
+
+    <ul id='packages'>
+    </ul>
+
+    <p>You can add more packages to this list by opening the package source in the Package Editor and clicking
+    [Test Online].</p>
+
+  </div>
   <!-- The following dynamic script will register each of the additional packages -->
 <script>
   var packages = null, packagesJSON = '';
-  
+
   function ajaxRequest(){
     var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
     if (window.ActiveXObject) { //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
@@ -92,7 +62,7 @@
     }
    return false;
   }
-  
+
   function updatePackages(data) {
     var dataJSON = JSON.stringify(data);
     if(packagesJSON !== dataJSON) {
@@ -101,7 +71,7 @@
       if(!data.packages) {
         return false;
       }
-      
+
       var ul = document.getElementById('packages');
       ul.innerHTML = '';
       if(data.packages.length == 0) {
@@ -110,7 +80,7 @@
         ul.appendChild(li);
         return true;
       }
-      
+
       for(var i = 0; i < data.packages.length; i++) {
         var li = document.createElement('li');
         var a = document.createElement('a');
@@ -134,9 +104,9 @@
     req.open("GET", "/inc/packages.json", true);
     req.send(null);
   }
-  
+
   checkPackages();
-  
+
   window.setInterval(checkPackages, 2000);
 </script>
 </body>

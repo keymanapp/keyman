@@ -428,6 +428,7 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.WelcomeRenderer,
+  Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmWordlistEditor,
@@ -833,8 +834,8 @@ end;
 procedure TfrmKeymanDeveloper.mnuDebugI374Click(Sender: TObject);
 begin
   if Assigned(ActiveEditor)
-    then frmMessages.Add(ActiveEditor.FileName, '1: bug with multi-line messages'#13#10'Double-click on the second line of this message')
-    else frmMessages.Add('test.txt', '1: bug with multi-line messages'#13#10'Double-click on the second line of this message');
+    then frmMessages.Add(plsError, ActiveEditor.FileName, '1: bug with multi-line messages'#13#10'Double-click on the second line of this message', 0, 0)
+    else frmMessages.Add(plsError, 'test.txt', '1: bug with multi-line messages'#13#10'Double-click on the second line of this message', 0, 0);
 end;
 
 procedure TfrmKeymanDeveloper.mnuDebugSetWindowSizeForScreenshotsClick(Sender: TObject);

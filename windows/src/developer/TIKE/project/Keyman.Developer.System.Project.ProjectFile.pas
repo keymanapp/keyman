@@ -134,7 +134,7 @@ type
     property SavedUserFileName: string read GetSavedUserFileName;
 
   public
-    procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual;
+    procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); virtual;
 
     constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
     destructor Destroy; override;
@@ -203,7 +203,7 @@ type
     function GetOwnerProject: TProject;
     procedure UpdateID;
   protected
-    procedure Log(AState: TProjectLogState; Msg: string);   // I4694   // I4706
+    procedure Log(AState: TProjectLogState; Msg: string; MsgCode, Line: Integer);   // I4694   // I4706
 
     procedure SetFileVersion(const AVersion: string);   // I4688
     //FFiles: TProjectFileList;
@@ -327,13 +327,13 @@ uses
   System.StrUtils,
   System.Variants,
 
+  CompileErrorCodes,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles,
   RegistryKeys,
-
   UMD5Hash,
   Unicode,
   utildir,
@@ -573,9 +573,9 @@ begin
   end;
 end;
 
-procedure TProjectFile.Log(AState: TProjectLogState; Msg: string);   // I4694   // I4706
+procedure TProjectFile.Log(AState: TProjectLogState; Msg: string; MsgCode, Line: Integer);   // I4694   // I4706
 begin
-  OwnerProject.Log(AState, Filename, Msg);   // I4702   // I4706
+  OwnerProject.Log(AState, Filename, Msg, MsgCode, Line);   // I4702   // I4706
 end;
 
 procedure TProjectFile.RemoveFreeNotification(
@@ -820,7 +820,7 @@ begin
   end;
 end;
 
-procedure TProject.Log(AState: TProjectLogState; Filename, Msg: string);
+procedure TProject.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);
 begin
   // Do nothing
 end;
@@ -1174,33 +1174,36 @@ const // from compile.pas
   CERR_MEMORY  = $00001000;
   CWARN_Info =   $0000208A;
 var
-  errtype: string;
   FLogState: TProjectLogState;
 begin
-  FLogState := plsInfo; errtype := 'info';   // I4706
+  FLogState := plsInfo;
 
   if msgcode <> CWARN_Info then
     case msgcode and $F000 of
-      CERR_MEMORY: begin errtype := 'fatal';   FLogState := plsFatal; end;
-      CERR_WARNING: begin errtype := 'warning'; FLogState := plsWarning; end;
-      CERR_ERROR: begin errtype := 'error';   FLogState := plsError; end;
-      CERR_FATAL: begin errtype := 'fatal';   FLogState := plsFatal; end;
+      CERR_MEMORY:  FLogState := plsFatal;
+      CERR_WARNING: FLogState := plsWarning;
+      CERR_ERROR:   FLogState := plsError;
+      CERR_FATAL:   FLogState := plsFatal;
     end;
 
   if FLogState = plsWarning then   // I4706
     TProject.CompilerMessageFile.FHasWarning := True;
 
-  if(FLogState <> plsInfo) then
+  if FLogState in [plsWarning, plsError, plsFatal] then
   begin
     Inc(MessageCount);
     if MessageCount > MAX_MESSAGES then
       Exit(1);
   end;
 
-  TProject.CompilerMessageFile.Log(FLogState, Format('line %d  %s %x: %s', [line, errtype, msgcode, text]));   // I4706
+  TProject.CompilerMessageFile.Log(FLogState, String_AtoU(text), msgcode, line);   // I4706
 
   if (FLogState <> plsInfo) and (MessageCount = MAX_MESSAGES) then
-      TProject.CompilerMessageFile.Log(plsInfo, Format('Warning: line %d  warning 0000: More than %d warnings or errors received; suppressing further messages', [line, MAX_MESSAGES]));
+    TProject.CompilerMessageFile.Log(
+      plsWarning,
+      Format('More than %d warnings or errors received; suppressing further messages', [MAX_MESSAGES]),
+      CWARN_TooManyErrorsOrWarnings,
+      line);
 
   Result := 1;
 end;

@@ -7,6 +7,12 @@
 * General: Introduces a Welcome screen and improves workflow for starting use of Keyman Developer (#2134)
 * General: Fix version numbers for kmlmc, kmlmp and kmlmi (#2129)
 
+## 2019-09-25 12.0.37 beta
+* Compiler: Add -lexical-model command line option for building lexical model template projects to kmconvert. (#2120)
+* Debugger: Remove legacy 'Install keyboard' link in web test and cleanup look somewhat. (#2122)
+* Compiler: Support colour log messages and cleanup logging. (#2128)
+* Help: Fix some of the issues with Context Help, and address one specific topic - touch layout editor. (#2132)
+
 ## 2019-09-24 12.0.36 beta
 * General: File type icons were mismatched (#2112)
 * Project: Shift layer in basic touch layout template had incorrect modifier for period (.) on shift layer (#2113)

@@ -302,7 +302,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
   private static void switchKeyboard(int position) {
     setSelection(position);
-    HashMap<String, String> kbInfo = keyboardsList.get(position);
+    int listPosition = (position >= keyboardsList.size()) ? keyboardsList.size()-1 : position;
+    HashMap<String, String> kbInfo = keyboardsList.get(listPosition);
     String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
     if (pkgId == null || pkgId.isEmpty()) {
       pkgId = KMManager.KMDefault_UndefinedPackageID;
