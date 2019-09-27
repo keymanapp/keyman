@@ -38,9 +38,6 @@ type
 
   TProjectUI = class(TProject)
   private
-    FOnRefresh: TNotifyEvent;
-    FOnRefreshCaption: TNotifyEvent;
-    FRefreshing: Boolean;
     FRenderFileName: TTempFile;
     function GetRenderFileName: string;
     procedure Refresh;
@@ -64,10 +61,6 @@ type
     function Load: Boolean; override;   // I4694
 
     property RenderFileName: string read GetRenderFileName;   // I4181
-
-    property OnRefresh: TNotifyEvent read FOnRefresh write FOnRefresh;
-    property OnRefreshCaption: TNotifyEvent read FOnRefreshCaption write FOnRefreshCaption;
-    property Refreshing: Boolean read FRefreshing write FRefreshing;
   end;
 
   TProjectFileUI = class
@@ -102,6 +95,7 @@ uses
 
   utilhttp,
 
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLoader,
   UfrmMessages;
 
@@ -129,8 +123,8 @@ end;
 
 procedure TProjectUI.DoRefreshCaption;
 begin
-  if Assigned(FOnRefreshCaption) then
-    FOnRefreshCaption(Self);
+  if Assigned(FGlobalProjectRefreshCaption) then
+    FGlobalProjectRefreshCaption(Self);
 end;
 
 { TProjectUI }
@@ -181,7 +175,7 @@ end;
 procedure TProjectUI.Refresh;
 begin
   if State = psReady then
-    if Assigned(FOnRefresh) then FOnRefresh(Self);
+    if Assigned(FGlobalProjectRefresh) then FGlobalProjectRefresh(Self);
 end;
 
 function TProjectUI.Render: WideString;

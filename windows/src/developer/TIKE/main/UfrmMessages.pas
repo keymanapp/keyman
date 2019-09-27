@@ -113,7 +113,8 @@ uses
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
-  Keyman.Developer.UI.Project.ProjectFileUI;
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUI;
 
 {$R *.DFM}
 
@@ -172,6 +173,9 @@ var
   FFilename: string;
   line: Integer;
 begin
+  if not IsGlobalProjectUIReady then
+    Exit;
+
   line := SelLine; if line < 0 then Exit;
 
   SelLine := line;

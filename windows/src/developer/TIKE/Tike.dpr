@@ -9,7 +9,6 @@ uses
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   UfrmMDIChild in 'child\UfrmMDIChild.pas' {frmTikeChild},
   UfrmNew in 'dialogs\UfrmNew.pas' {frmNew},
-  UfrmStartup in 'main\UfrmStartup.pas' {frmStartup},
   UfrmAboutTike in 'dialogs\UfrmAboutTike.pas' {frmAboutTike},
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
@@ -286,7 +285,8 @@ uses
   Keyman.Developer.System.Project.wordlistTsvProjectFile in 'project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
   Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
   Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
-  Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas';
+  Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
+  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -315,7 +315,6 @@ begin
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
       Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-      ShowStartup;
       Application.Run;
     end;
   finally

@@ -51,8 +51,6 @@ type
     cmdOK: TButton;
     dlgFonts: TFontDialog;
     tabGeneral: TTabSheet;
-    gbStartup: TGroupBox;
-    chkShowStartupDialog: TCheckBox;
     tabDebugger: TTabSheet;
     tabCharMap: TTabSheet;
     gbCharMapCharacterLookups: TGroupBox;
@@ -66,7 +64,6 @@ type
     chkDebuggerSingleStepAfterBreak: TCheckBox;
     chkDebuggerShowStoreOffset: TCheckBox;
     chkDebuggerAutoRecompile: TCheckBox;
-    chkAllowMultipleInstances: TCheckBox;
     cmdProxySettings: TButton;
     gbExternalEditor: TGroupBox;
     editExternalEditorPath: TEdit;
@@ -96,6 +93,7 @@ type
     cbEditorTheme: TComboBox;
     lblEditorCustomTheme: TLabel;
     lblEditorTheme: TLabel;
+    chkAllowMultipleInstances: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -173,8 +171,6 @@ begin
     chkDebuggerSingleStepAfterBreak.Checked := DebuggerSingleStepAfterBreak;
     chkDebuggerShowStoreOffset.Checked :=      DebuggerShowStoreOffset;
     chkDebuggerAutoRecompile.Checked :=        DebuggerAutoRecompileWithDebugInfo;
-
-    chkShowStartupDialog.Checked := ShowStartupDialog;
 
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
@@ -257,8 +253,6 @@ begin
     DebuggerAutoRecompileWithDebugInfo := chkDebuggerAutoRecompile.Checked;
 
     WebHostDefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
-
-    ShowStartupDialog := chkShowStartupDialog.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;
