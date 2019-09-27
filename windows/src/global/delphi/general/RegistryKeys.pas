@@ -372,9 +372,6 @@ const
   SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
   SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
 
-  SRegValue_IDEOptShowStartupDialog       = 'show startup dialog';                 // CU
-  //SRegValue_IDEOptShowStartupHelperDialog = 'show startup helper dialog';          // CU
-
   SRegValue_IDEOptDebuggerBreakWhenExitingLine = 'debugger break when exiting line';    // CU
   SRegValue_IDEOptDebuggerSingleStepAfterBreak = 'debugger single step after break';    // CU
   SRegValue_IDEOptDebuggerShowStoreOffset      = 'debugger show store offset';          // CU

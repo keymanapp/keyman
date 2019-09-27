@@ -46,8 +46,6 @@ type
     FDebuggerBreakWhenExitingLine: Boolean;
     FDebuggerSingleStepAfterBreak: Boolean;
     FDebuggerShowStoreOffset: Boolean;
-    FShowStartupDialog: Boolean;
-    //FShowStartupHelperDialog: Boolean;
     FCharMapAutoLookup: Boolean;
     FCharMapDisableDatabaseLookups: Boolean;
     FDebuggerAutoRecompileWithDebugInfo: Boolean;
@@ -91,8 +89,6 @@ type
     property DebuggerAutoRecompileWithDebugInfo: Boolean read FDebuggerAutoRecompileWithDebugInfo write FDebuggerAutoRecompileWithDebugInfo;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
-    property ShowStartupDialog: Boolean read FShowStartupDialog write FShowStartupDialog;
-    //property ShowStartupHelperDialog: Boolean read FShowStartupHelperDialog write FShowStartupHelperDialog;
 
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
@@ -180,7 +176,6 @@ begin
     FDebuggerAutoRecompileWithDebugInfo := regReadBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, False);
 
     FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
-    FShowStartupDialog             := regReadBool(SRegValue_IDEOptShowStartupDialog,            True);
 
     FCharMapDisableDatabaseLookups := regReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
     FCharMapAutoLookup             := regReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
@@ -221,9 +216,6 @@ begin
     regWriteBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, FDebuggerAutoRecompileWithDebugInfo);
 
     regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
-
-    regWriteBool(SRegValue_IDEOptShowStartupDialog,            FShowStartupDialog);
-    //regWriteBool(SRegValue_IDEOptShowStartupHelperDialog,      FShowStartupHelperDialog);
 
     regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
     regWriteBool(SRegValue_IDEOptCharMapAutoLookup,             FCharMapAutoLookup);
