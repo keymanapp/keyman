@@ -22,7 +22,6 @@ type
     procedure actHelpContextRefreshUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormShow(Sender: TObject);
   private
     FRefreshQueued: Boolean;
     FHelpControl: TWinControl;
@@ -39,6 +38,7 @@ type
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
   protected
     function GetHelpTopic: string; override;
+    procedure FormShown; override;
   public
     procedure LoadHelp(ControlName, FormName: string);
     procedure QueueRefresh;
@@ -201,7 +201,7 @@ begin
   FreeAndNil(FTempFile);
 end;
 
-procedure TfrmHelp.FormShow(Sender: TObject);
+procedure TfrmHelp.FormShown;
 begin
   inherited;
   cef := TframeCEFHost.Create(Self);
