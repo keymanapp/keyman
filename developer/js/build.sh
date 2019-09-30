@@ -16,16 +16,6 @@ build () {
   npm run build || fail "Could not build top-level JavaScript file."
 }
 
-set_version () {
-  local version=$1
-  # We use --no-git-tag-version because our CI system controls version numbering and
-  # already tags releases. We also want to have the version of this match the
-  # release of Keyman Developer -- these two versions should be in sync. Because this
-  # is a large repo with multiple projects and build systems, it's better for us that
-  # individual build systems don't take too much ownership of git tagging. :)
-  npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
-}
-
 display_usage ( ) {
   echo "Usage: $0 [-test] [-version version] [-tier tier]"
   echo "       $0 -help"
@@ -122,8 +112,8 @@ if (( install_dependencies )) ; then
   npm install || fail "Could not download dependencies."
 fi
 
-if [ ! -z "$publish_version" ]; then
-  set_version "$publish_version" || fail "Setting version failed."
+if [ -n "$publish_version" ]; then
+  set_npm_version "$publish_version" || fail "Setting version failed."
 fi
 
 build || fail "Compilation failed."
