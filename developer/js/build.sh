@@ -21,9 +21,10 @@ display_usage ( ) {
   echo "       $0 -help"
   echo
   echo "  -help               displays this screen and exits"
-  echo "  -test               runs unit tests after building"
   echo "  -version version    sets the package version before building"
-  echo "  -tier tier          also sets the package version tier (alpha, beta, stable) before building"
+  echo "  -test               runs unit tests after building"
+  echo "  -publish-to-npm     publishes the current version to the npm package index"
+  echo "  -tier tier          also sets the package version tier and npm tag (alpha, beta, stable) before building or publishing"
   echo "                      If version has 4 components, only first three are used."
 }
 
@@ -34,6 +35,7 @@ install_dependencies=1
 publish_version=
 publish_tier=
 lastkey=
+should_publish=0
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
@@ -53,6 +55,9 @@ while [[ $# -gt 0 ]] ; do
         ;;
       -tier)
         lastkey=$key
+        ;;
+      -publish-to-npm)
+        should_publish=1
         ;;
       *)
         echo "$0: invalid option: $key"
@@ -121,4 +126,18 @@ echo "Typescript compilation successful."
 
 if (( run_tests )); then
   npm test || fail "Tests failed"
+fi
+
+if (( should_publish )); then
+  # Note: In either case, npm publish MUST be given --access public to publish
+  # a package in the @keymanapp scope on the public npm package index.
+  #
+  # See `npm help publish` for more details.
+  if [ -z "$publish_tier" ] ; then
+    # Publish a stable release (npm tag: latest)
+    npm publish --access public || fail "Could not publish stable release."
+  else
+    # Publish a pre-release (npm tag: alpha or beta)
+    npm publish --access public --tag "$publish_tier" || fail "Could not publish $publish_tier release."
+  fi
 fi

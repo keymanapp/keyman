@@ -4,22 +4,32 @@ npm packages
 This is a guide for how the various Keyman `npm` packages are developed
 and published.
 
+`npm` packages are published on the CI (continuous integration) server.
+Currently, we're using TeamCity for this.
+
+Packages are **never** published from a developer's machine.
+
 
 For CI developers
 -----------------
 
 ### In general
 
-Before publishing, a package must be **built** and **tested**.
+Before publishing, a package must be **built** and **tested** on the CI
+server.
 
 This is typically done with:
 
     ./build.sh -test
 
-Once the build succeeds and tests pass, the version is set in
+Once the build succeeds and the tests pass, the version is set in
 `package.json`:
 
     ./build.sh -version 12.0.${BUILD_NUMBER} -tier ${tier}
+
+Now you can publish! Use the following script for this (again, **only on the CI server**!)
+
+    ./build.sh -publish-to-npm -tier ${tier}
 
 It is then uploaded to the npm package directory. **Ensure that the
 compiled sources are included in the tarball**. For example,
