@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-07-30 12.0.41 beta
+* General: Keyman Desktop 11 would crash if installed together with Keyman Developer 12. (#2148)
+
 ## 2019-09-29 12.0.40 beta
 * General: Context help was not showing correctly on startup. (#2145)
 
