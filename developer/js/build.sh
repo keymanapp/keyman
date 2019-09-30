@@ -36,6 +36,7 @@ publish_version=
 publish_tier=
 lastkey=
 should_publish=0
+npm_dist_tag=
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
@@ -90,18 +91,25 @@ if [ ! -z "$publish_version" ]; then
   [[ $publish_version =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || fail "-version must be dotted numeric string, e.g. 1.2.3."
 fi
 
-if [ ! -z "$publish_tier" ]; then
-  [ -z "$publish_version" ] && fail "-tier cannot be specified without -version"
+if [ -n "$publish_tier" ]; then
+  # Make sure we're either setting the version or publishing:
+  if [ -z "$publish_version" ] && (( !should_publish )) ; then
+    fail "-tier cannot be specified without -version or -publish-to-npm"
+  fi
+
   case "$publish_tier" in
     alpha)
       publish_tier=-alpha
+      npm_dist_tag=alpha
       ;;
     beta)
       publish_tier=-beta
+      npm_dist_tag=beta
       ;;
     stable)
       # Stable releases intentionally have a blank publish tier:
       publish_tier=
+      npm_dist_tag=latest
       ;;
     *)
       fail "-tier must be one of alpha, beta or stable"
@@ -133,11 +141,5 @@ if (( should_publish )); then
   # a package in the @keymanapp scope on the public npm package index.
   #
   # See `npm help publish` for more details.
-  if [ -z "$publish_tier" ] ; then
-    # Publish a stable release (npm tag: latest)
-    npm publish --access public || fail "Could not publish stable release."
-  else
-    # Publish a pre-release (npm tag: alpha or beta)
-    npm publish --access public --tag "$publish_tier" || fail "Could not publish $publish_tier release."
-  fi
+  npm publish --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
 fi
