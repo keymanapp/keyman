@@ -1,8 +1,17 @@
 Keyman Developer
 ================
 
-This contains the source code of Keyman development tools. This also
-contains `kmlmc`.
+This contains the source code of Keyman development tools:
+
+ - `kmlmc` — takes **lexical model sources** and compiles them in to
+   a **.js** file.
+ - `kmlmp` — uses a `.model.kmp` file to generate a redistributable
+   **lexical model package**.
+ - `kmlmi` — merges Keyman lexical model `.model_info` files.
+
+`kmlmc` is intended to be used standalone, or as part of a build system.
+`kmlmp` is used only by command line tools. `kmlmi` is used only in the
+[lexical-models repository](https://github.com/keymanapp/lexical-models).
 
 In order to build [lexical models][], these tools must be built and
 compiled.
@@ -20,6 +29,14 @@ How to run the tests
 --------------------
 
     ./build.sh -test
+
+
+How to update the package version
+---------------------------------
+
+**NOTE**: this step should only be performed on the CI server:
+
+    ./build.sh -version MAJOR.MINOR.${BUILD_NUMBER} [-tier (alpha|beta)]
 
 
 How to install

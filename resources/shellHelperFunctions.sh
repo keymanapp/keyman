@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 _shf_base_dir=$(dirname "$BASH_SOURCE")/..
 
@@ -239,3 +239,21 @@ set_version ( ) {
   fi
 }
 
+
+# Uses npm to set the current package version (package.json).
+#
+# NOTE: this must be invoked exclusively on the CI system!
+#
+# Usage:
+#
+#   set_npm_version VERSION_WITH_TIER
+#
+set_npm_version () {
+  local version=$1
+  # We use --no-git-tag-version because our CI system controls version numbering and
+  # already tags releases. We also want to have the version of this match the
+  # release of Keyman Developer -- these two versions should be in sync. Because this
+  # is a large repo with multiple projects and build systems, it's better for us that
+  # individual build systems don't take too much ownership of git tagging. :)
+  npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
+}

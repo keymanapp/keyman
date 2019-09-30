@@ -16,24 +16,15 @@ build () {
   npm run build || fail "Could not build top-level JavaScript file."
 }
 
-set_version () {
-  local version=$1
-  # We use --no-git-tag-version because our CI system controls version numbering and
-  # already tags releases. We also want to have the version of this match the
-  # release of Keyman Developer -- these two versions should be in sync. Because this
-  # is a large repo with multiple projects and build systems, it's better for us that
-  # individual build systems don't take too much ownership of git tagging. :)
-  npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
-}
-
 display_usage ( ) {
   echo "Usage: $0 [-test] [-version version] [-tier tier]"
   echo "       $0 -help"
   echo
   echo "  -help               displays this screen and exits"
-  echo "  -test               runs unit tests after building"
   echo "  -version version    sets the package version before building"
-  echo "  -tier tier          also sets the package version tier (alpha, beta, stable) before building"
+  echo "  -test               runs unit tests after building"
+  echo "  -publish-to-npm     publishes the current version to the npm package index"
+  echo "  -tier tier          also sets the package version tier and npm tag (alpha, beta, stable) before building or publishing"
   echo "                      If version has 4 components, only first three are used."
 }
 
@@ -44,6 +35,8 @@ install_dependencies=1
 publish_version=
 publish_tier=
 lastkey=
+should_publish=0
+npm_dist_tag=
 
 # Process command-line arguments
 while [[ $# -gt 0 ]] ; do
@@ -63,6 +56,9 @@ while [[ $# -gt 0 ]] ; do
         ;;
       -tier)
         lastkey=$key
+        ;;
+      -publish-to-npm)
+        should_publish=1
         ;;
       *)
         echo "$0: invalid option: $key"
@@ -95,18 +91,25 @@ if [ ! -z "$publish_version" ]; then
   [[ $publish_version =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || fail "-version must be dotted numeric string, e.g. 1.2.3."
 fi
 
-if [ ! -z "$publish_tier" ]; then
-  [ -z "$publish_version" ] && fail "-tier cannot be specified without -version"
+if [ -n "$publish_tier" ]; then
+  # Make sure we're either setting the version or publishing:
+  if [ -z "$publish_version" ] && (( !should_publish )) ; then
+    fail "-tier cannot be specified without -version or -publish-to-npm"
+  fi
+
   case "$publish_tier" in
     alpha)
       publish_tier=-alpha
+      npm_dist_tag=alpha
       ;;
     beta)
       publish_tier=-beta
+      npm_dist_tag=beta
       ;;
     stable)
       # Stable releases intentionally have a blank publish tier:
       publish_tier=
+      npm_dist_tag=latest
       ;;
     *)
       fail "-tier must be one of alpha, beta or stable"
@@ -122,8 +125,8 @@ if (( install_dependencies )) ; then
   npm install || fail "Could not download dependencies."
 fi
 
-if [ ! -z "$publish_version" ]; then
-  set_version "$publish_version" || fail "Setting version failed."
+if [ -n "$publish_version" ]; then
+  set_npm_version "$publish_version" || fail "Setting version failed."
 fi
 
 build || fail "Compilation failed."
@@ -131,4 +134,12 @@ echo "Typescript compilation successful."
 
 if (( run_tests )); then
   npm test || fail "Tests failed"
+fi
+
+if (( should_publish )); then
+  # Note: In either case, npm publish MUST be given --access public to publish
+  # a package in the @keymanapp scope on the public npm package index.
+  #
+  # See `npm help publish` for more details.
+  npm publish --access public --tag "${npm_dist_tag:=latest}" || fail "Could not publish ${npm_dist_tag} release."
 fi
