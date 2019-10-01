@@ -1179,7 +1179,7 @@ namespace com.keyman {
         this.keyman.touchAliasing._FocusKeyboardSettings(false);
       }
 
-      // Allow external focusing KMEW-123ß
+      // Allow external focusing KMEW-123
       if(arguments.length > 1 && setFocus) {
         if(this.keyman.util.device.touchable) {
           var tEvent = {
