@@ -1,49 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <?xml-stylesheet type="text/xsl" href="help.xsl" ?>
 <ContextHelp>
-  <Form Name="context/keyboard-editor">
-    <Control Name="cmdbitmapChange" Title="Change">
-      <p>The Change option allows the editing of the icon filename.</p>
-    </Control>
-    <Control Name="cmdExport" Title="Export">
-      <p>The Export option allows the exporting of the new image to a selected location.</p>
-    </Control>
-    <Control Name="cmdImport" Title="Import">
-      <p>The import option allows for the loading of an existing icon from a selected location.</p>
-    </Control>
-    <Control Name="panEdit" Title="Colours">
-      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the button and also a preview of the button is displayed.</p>
-    </Control>
-  </Form>
-  
-  <Form Name="context/keyboard-editor#toc-on-screen-tab">
-    <Control Name="chkVKDisplayUnderlyingChars" Title="Display Underlying Character Layouts">
-      <p>If selected, then the visual keyboard will only be used if the current underlying layout is active. </p>
-    </Control>
-    <Control Name="chkVKInclude102key" Title="">
-      <p>Display 102nd Key</p>
-      <p>On European Keyboards a 102nd key is added.  This allows you to map a character on the 102nd key.</p>
-    </Control>
-    <Control Name="chkVKSplitCtrlAlt" Title="Right Ctrl/Alt">
-      <p>Allows for more combinations and also leaves the left Ctrl and Alt keys for general keyboard shortcuts, for example Ctrl C for Copy and Ctrl V for Paste.</p>
-    </Control>
-    <Control Name="cmdBrowseKeyBitmap" Title="Browse button">
-      <p>This allows for a bitmap/picture to be displayed on the selected key. Click on the Browse button to select the bitmap.</p>
-    </Control>
-    <Control Name="cmdExportOnScreenKeyboard" Title="XML">
-      <p>Export the keyboard to other file formats (HTML, BMP, or PNG), for use in documentation. Export the structure of the keyboard to XML format for automated processing. </p>
-    </Control>
-    <Control Name="cmdImportOnScreenKeyboard" Title="Import">
-      <p>Import an existing on screen keyboard layout.</p>
-    </Control>
-    <Control Name="cmdVKImportKMX" Title="Layout">
-      <p>Use the same layout as the new keyboard, assigning the same characters to the same keyboard letters.</p>
-    </Control>
-    <Control Name="editVKKeyText" Title="Text">
-      <p>Allows the user to enter text to be displayed on the selected key.</p>
-    </Control>
-  </Form>
-  
+
   <Form Name="context/character-map">
     <Control Name="editFilter" Title="Character Map Filter">
       <p>The Filter allows a user to reduce the number of characters displayed in the character map.  The standard filter options used are by font name or block name.</p>
@@ -52,21 +10,26 @@
       <p>The Character Map Grid displays each character in a square, with a visual representation of the character and the Unicode value displayed at the bottom of the square. Each font group is divided into a block headed by the font name.</p>
     </Control>
   </Form>
-  
+
   <!-- ========================================================================
        Keyboard Editor
        ======================================================================== -->
 
   <Form Name="context/keyboard-editor">
-  
+
     <!-- Details tab -->
     <Control Name="editName" Title="Keyboard Name">
-      <p>The name of the keyboard is displayed in Keyman Configuration, in the tray menu and in many other places.  It should be a descriptive 
-      name, in any language, but remember that some applications may use a font that does not include the language you are writing the 
+      <p>The name of the keyboard is displayed in Keyman Configuration, in the tray menu and in many other places.  It should be a descriptive
+      name, in any language, but remember that some applications may use a font that does not include the language you are writing the
       keyboard name in.  Don't include a version number, help information or hotkey in the name.</p>
 
       <p>This corresponds to the following source line:</p>
       <div class="code">store(&amp;name) 'My Keyboard'</div>
+    </Control>
+    <Control Name="clbTargets" Title="Targets">
+      <p>Specifies the platforms for which this keyboard is designed. Where possible, use more generic targets, for example, use
+      <div class="code">mobile</div> instead of both <div class="code">androidphone</div> and <div class="code">iphone</div>.
+      preference, use <div class="code">any</div>.</p>
     </Control>
     <Control Name="cbType" Title="Character Set">
       <p>Your keyboard should be either Unicode or Codepage based.  Most keyboards today will be Unicode.  If you are designing in the source editor,
@@ -91,7 +54,7 @@
       <div class="code">store(&amp;message) 'Here is a message about a keyboard'</div>
     </Control>
     <Control Name="memoComments" Title="Comments">
-      <p>In this field, enter information about the keyboard for your own reference.  These comments will only be visible in the 
+      <p>In this field, enter information about the keyboard for your own reference.  These comments will only be visible in the
       source file, and not to users of your keyboard.</p>
 
       <p>The comments are placed at the top of the source file, e.g.:</p>
@@ -109,11 +72,6 @@
       </ul>
     </Control>
 
-    <!-- Layout tab -->
-    <!-- Icon tab -->
-    <!-- On-Screen tab -->
-    <!-- KeymanWeb tab -->
-    
     <Control Name="chkKMWRTL" Title="Keyboard is right-to-left">
       <p>Select this option to tell KeymanWeb to flag text entered by this keyboard as right-to-left (e.g. Arabic, Hebrew)</p>
     </Control>
@@ -138,10 +96,27 @@
     <Control Name="cmdTestKeymanWeb" Title="Test KeymanWeb Keyboard">
       <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
     </Control>
-    
+
+    <!-- Layout tab -->
+    <!-- Icon tab -->
+    <Control Name="cmdbitmapChange" Title="Change">
+      <p>The Change option allows the editing of the icon filename.</p>
+    </Control>
+    <Control Name="cmdExport" Title="Export">
+      <p>The Export option allows the exporting of the new image to a selected location.</p>
+    </Control>
+    <Control Name="cmdImport" Title="Import">
+      <p>The import option allows for the loading of an existing icon from a selected location.</p>
+    </Control>
+    <Control Name="panEdit" Title="Icon Editor">
+      <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the button and also a preview of the button is displayed.</p>
+    </Control>
+
+    <!-- On-Screen tab: see context/keyboard-editor#toc-on-screen-tab -->
+    <!-- Touch Layout tab: see context/keyboard-editor#toc-touch-layout-tab -->
     <!-- Source tab -->
     <!-- Compile tab -->
-  
+
     <Control Name="chkCustomOnScreenKeyboard" Title="Include">
       <p>A custom on screen (visual) keyboard can be included with your new keyboard. Check this option to display the on screen keyboard and options available.</p>
     </Control>
@@ -226,6 +201,43 @@
     </Control>
   </Form>
 
+  <Form Name="context/keyboard-editor#toc-on-screen-tab">
+    <Control Name="chkVKDisplayUnderlyingChars" Title="Display Underlying Character Layouts">
+      <p>If selected, then the visual keyboard will only be used if the current underlying layout is active. </p>
+    </Control>
+    <Control Name="chkVKInclude102key" Title="">
+      <p>Display 102nd Key</p>
+      <p>On European Keyboards a 102nd key is added.  This allows you to map a character on the 102nd key.</p>
+    </Control>
+    <Control Name="chkVKSplitCtrlAlt" Title="Right Ctrl/Alt">
+      <p>Allows for more combinations and also leaves the left Ctrl and Alt keys for general keyboard shortcuts, for example Ctrl C for Copy and Ctrl V for Paste.</p>
+    </Control>
+    <Control Name="cmdBrowseKeyBitmap" Title="Browse button">
+      <p>This allows for a bitmap/picture to be displayed on the selected key. Click on the Browse button to select the bitmap.</p>
+    </Control>
+    <Control Name="cmdExportOnScreenKeyboard" Title="XML">
+      <p>Export the keyboard to other file formats (HTML, BMP, or PNG), for use in documentation. Export the structure of the keyboard to XML format for automated processing. </p>
+    </Control>
+    <Control Name="cmdImportOnScreenKeyboard" Title="Import">
+      <p>Import an existing on screen keyboard layout.</p>
+    </Control>
+    <Control Name="cmdVKImportKMX" Title="Layout">
+      <p>Use the same layout as the new keyboard, assigning the same characters to the same keyboard letters.</p>
+    </Control>
+    <Control Name="editVKKeyText" Title="Text">
+      <p>Allows the user to enter text to be displayed on the selected key.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/keyboard-editor#toc-touch-layout-tab">
+    <Control Name="cefwp" Title="Touch Layout Editor">
+      <p>The Touch Layout tab is used to create the visible representation of the keyboard layout for touch devices. It works similarly to the On Screen Keyboard Editor conceptually, but has a number of additional features specific to touch. Keys on the touch layout trigger rules within the normal Keyman keyboard; if no rule is defined for a given key, it will be given output if it has a standard code beginning with <code>K_</code>, or if it is a Unicode value code, starting with <code>U_</code>.</p>
+      <ul>
+        <li><a href="help:guides/develop/touch-keyboard-tutorial">Read the guide on developing touch layouts</a></li>
+      </ul>
+    </Control>
+  </Form>
+
   <Form Name="context/must-include-debug">
     <Control Name="*" Title="TIKE Debugger 'Include Debug Information' Confirmation Screen">
       <p>TIKE Debugger</p>
@@ -233,7 +245,7 @@
       <p>The debugger can be used without the debug information by clicking on Test without debugger.</p>
     </Control>
   </Form>
-  
+
   <Form Name="context/new-file-details">
     <Control Name="*" Title="New File">
       <p>Enter the name for your new keyboard. Click on the Browse button to change the location of the new keyboard.</p>
@@ -265,20 +277,20 @@
     </Control>
 
     <Control Name="cbReadMe" Title="Read Me Details">
-      <p>A readme file can be a text file (ANSI, UTF-8, or UTF-16), or an HTML file (recommended).  Other file types are also acceptable, 
+      <p>A readme file can be a text file (ANSI, UTF-8, or UTF-16), or an HTML file (recommended).  Other file types are also acceptable,
       but the package installer will load the file in a separate program.</p>
     </Control>
     <Control Name="cbKMPImageFile" Title="Package Image">
-      <p>You can include an image file that will be displayed to the left of the install details when the package is 
+      <p>You can include an image file that will be displayed to the left of the install details when the package is
         installed.  This image should be 140 pixels wide and 250 pixels high.</p>
     </Control>
     <Control Name="cmdTestPackage" Title="Test Package">
-      <p>You should try installing your package on your system before distributing it, to ensure that all files are 
+      <p>You should try installing your package on your system before distributing it, to ensure that all files are
       installed correctly.  If you can, try installing your package on several different machines.</p>
     </Control>
-    
+
     <!-- Compile Page -->
-    
+
     <Control Name="editOutPath" Title="Compile">
       <p>Displays the output path and filename of the file when the package is compiled.</p>
     </Control>
@@ -294,7 +306,7 @@
     <Control Name="cmdInstallWith" Title="Select Product Installer">
       <p>Chooses a product installer, such as the Keyman Desktop installation source.  You can download Keyman Desktop installers from tavultesoft.com.</p>
     </Control>
-    
+
     <Control Name="cmdAddToProject" Title="Add to Project">
       <p>This option  allows the user to add the compile package to the project, keeping all files together in the one location.</p>
     </Control>
@@ -368,7 +380,7 @@
       <p>This option allows the user to enter details and other additional information about the selected file.</p>
     </Control>
   </Form>
-  
+
   <Form Name="context/project">
     <Control Name="*" Title="Project Manager">
       <p>The Project Manager allows you to manage all the files related to a keyboard layout in a single location.</p>

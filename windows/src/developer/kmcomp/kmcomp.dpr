@@ -109,7 +109,8 @@ uses
   Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
   Keyman.Developer.System.Project.modelTsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas',
   Keyman.Developer.System.LexicalModelCompile in '..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas',
-  Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas';
+  Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
+  Keyman.Developer.System.Project.ProjectLogConsole in 'Keyman.Developer.System.Project.ProjectLogConsole.pas';
 
 {$R icons.RES}
 {$R version.res}

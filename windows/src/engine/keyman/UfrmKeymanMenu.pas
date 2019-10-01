@@ -515,9 +515,13 @@ begin
 end;
 
 procedure TfrmKeymanMenu.TntFormCreate(Sender: TObject);
+var
+  FImagePath: string;
 begin
   SetWindowLong(Handle, GWL_EXSTYLE, GetWindowLong(Handle, GWL_EXSTYLE) or WS_EX_LAYERED);
-  imgTitle.Picture.LoadFromFile(TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KeymanMenuTitleImage));
+  FImagePath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KeymanMenuTitleImage);
+  if FileExists(FImagePath) then
+    imgTitle.Picture.LoadFromFile(TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KeymanMenuTitleImage));
   imgTitle.AutoSize := True;
   //SetLayeredWindowAttributes(Handle, 0, 255, LWA_ALPHA);
   //UpdateLayeredWindow(Handle, 0, nil, nil, 0,

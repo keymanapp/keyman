@@ -22,7 +22,6 @@ type
     procedure actHelpContextRefreshUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormShow(Sender: TObject);
   private
     FRefreshQueued: Boolean;
     FHelpControl: TWinControl;
@@ -32,13 +31,14 @@ type
     FHMFRoot: IXMLNode;
     FTempFile: TTempFile;
     cef: TframeCEFHost;
-//    procedure AddUnmatchedContext(FormName, ControlName: string);
-//    procedure DeleteMatchedContext(FormName, ControlName: string);
+    procedure AddUnmatchedContext(FormName, ControlName: string);
+    procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure cefLoadEnd(Sender: TObject);
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
   protected
     function GetHelpTopic: string; override;
+    procedure FormShown; override;
   public
     procedure LoadHelp(ControlName, FormName: string);
     procedure QueueRefresh;
@@ -65,7 +65,7 @@ uses
   UmodWebHTTPServer,
   utilsystem;
 
-(*procedure TfrmHelp.AddUnmatchedContext(FormName, ControlName: string);
+procedure TfrmHelp.AddUnmatchedContext(FormName, ControlName: string);
 var
   i: Integer;
   n: IXMLNode;
@@ -101,7 +101,7 @@ begin
       FHMFRoot.ChildNodes.Delete(i);
       Exit;
     end;
-end;*)
+end;
 
 procedure TfrmHelp.actHelpContextRefreshUpdate(Sender: TObject);
 var
@@ -155,7 +155,8 @@ end;
 
 procedure TfrmHelp.LoadHelp(ControlName, FormName: string);
 begin
-  if FormName = 'TfrmHelp' then
+  // We don't want to show help on this form itself -- that's kinda circular
+  if FormName = 'context/help' then
     Exit; // I2823
 
   if not FDocumentLoaded then
@@ -163,16 +164,8 @@ begin
 
   // Call into the web browser control.
   try
-    // TODO: record unmatched context
-    // Check that the page is correct
-    cef.cef.ExecuteJavaScript('ActivatePage("' + FormName + '", "' +
-      ControlName + '")', '');
-    {
-      elem := doc3.getElementById(FormName+'-'+ControlName);
-      if elem = nil
-      then AddUnmatchedContext(FormName, ControlName)
-      else DeleteMatchedContext(FormName, ControlName);
-    }
+    // TODO: we do no validation of ControlName and FormName. Probably should.
+    cef.cef.ExecuteJavaScript('ActivatePage("' + FormName + '", "' + ControlName + '")', '');
   except
     ;
   end;
@@ -208,7 +201,7 @@ begin
   FreeAndNil(FTempFile);
 end;
 
-procedure TfrmHelp.FormShow(Sender: TObject);
+procedure TfrmHelp.FormShown;
 begin
   inherited;
   cef := TframeCEFHost.Create(Self);
@@ -218,7 +211,6 @@ begin
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnLoadEnd := cefLoadEnd;
-//  cef.Navigate(modWebHttpServer.GetAppURL('help/'));
 end;
 
 function TfrmHelp.GetHelpTopic: string;
@@ -228,29 +220,37 @@ end;
 
 procedure TfrmHelp.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
 var
-  frm: TTIKEForm;
+  elems: TArray<string>;
 begin
   AssertVclThread;
-  if Copy(Url, 1, 5) = 'help:' then
+  if Url.StartsWith('help:') then
   begin
-    if FHelpControl is TTIKEForm then
-      frm := FHelpControl as TTIKEForm
-    else if FHelpControl.Owner is TTIKEForm then
-      frm := FHelpControl.Owner as TTIKEForm
-    else
-      frm := nil;
-
-    if frm <> nil then
-      frmKeymanDeveloper.HelpTopic(frm.HelpTopic)
-    else
-      frmKeymanDeveloper.HelpTopic('index')
+    frmKeymanDeveloper.HelpTopic(Url.SubString('help:'.Length));
+  end
+  else if Url.StartsWith('missing:') then
+  begin
+    elems := Url.Split([':']);
+    // expecting to see ['missing', form, control]
+    if Length(elems) > 1 then
+      if Length(elems) = 2
+        then AddUnmatchedContext(elems[1], '')
+        else AddUnmatchedContext(elems[1], elems[2]);
+  end
+  else if Url.StartsWith('found:') then
+  begin
+    elems := Url.Split([':']);
+    // expecting to see ['found', form, control]
+    if Length(elems) > 1 then
+      if Length(elems) = 2
+        then DeleteMatchedContext(elems[1], '')
+        else DeleteMatchedContext(elems[1], elems[2]);
   end;
 end;
 
 procedure TfrmHelp.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
 begin
   AssertCefThread;
-  Handled := Copy(Url, 1, 5) = 'help:';
+  Handled := Url.StartsWith('help:') or Url.StartsWith('missing:') or Url.StartsWith('found:');
 end;
 
 procedure TfrmHelp.cefLoadEnd(Sender: TObject);

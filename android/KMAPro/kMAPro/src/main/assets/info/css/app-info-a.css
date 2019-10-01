@@ -1,3 +1,4 @@
+
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
@@ -152,7 +153,6 @@ th{
 	}
 }
 
-
 /***********************
 	Wrapper CSS
 ***********************/
@@ -193,7 +193,7 @@ h2{
 	color: #BA2034;
 }
 
-p img, img{
+p img{
 	margin-top: 10px !important;
 	display: block !important;
 	margin-left: auto !important;
@@ -243,13 +243,11 @@ th{
 #section2 img{
 	min-width: 40px;
 }
-a{
-	color: #BA2034;
+
+/**
+	Removes existing max-width property settings from images in tables.
+	They overly shrink the images on the main Android symbol glossary.
+ */
+#section2 td img {
+	max-width: unset;
 }
-
-
-
-
-
-
-

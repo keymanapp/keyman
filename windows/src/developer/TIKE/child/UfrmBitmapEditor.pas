@@ -43,7 +43,7 @@ type
     function GetDefaultExt: string; override;
 
   public
-    procedure FindError(const Filename: string; s: string); override;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
   end;
 
 implementation
@@ -102,7 +102,7 @@ begin
   Modified := frame.Modified;
 end;
 
-procedure TfrmBitmapEditor.FindError(const Filename: string; s: string);   // I4081
+procedure TfrmBitmapEditor.FindError(const Filename: string; s: string; line: Integer);   // I4081
 begin
   //
 end;

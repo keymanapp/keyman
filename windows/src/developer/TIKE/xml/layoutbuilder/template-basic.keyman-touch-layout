@@ -115,7 +115,7 @@
               {"id": "K_B","text":"B"},
               {"id": "K_N","text":"N"},
               {"id": "K_M","text":"M"},
-              {"id": "K_PERIOD","text": ".","sk": [
+              {"id": "K_PERIOD","text": ".", "layer": "default", "sk": [
                   {"text": ",","id": "K_COMMA", "layer": "default"},
                   {"text": "!","id": "K_1", "layer": "shift"},
                   {"text": "?","id": "K_SLASH", "layer": "shift"},
@@ -131,7 +131,7 @@
           },
           {
             "id": 4,
-            "key": [            
+            "key": [
               {"id": "K_NUMLOCK","text": "*123*","width":"140","sp": "1","nextlayer": "numeric"},
               {"id": "K_LOPT","text": "*Menu*","width": "120","sp": "1"},
               {"id": "K_SPACE","text": "","width": "630","sp": "0"},
@@ -244,7 +244,7 @@
               {"id": "K_J","text":"j"},
               {"id": "K_K","text":"k"},
               {"id": "K_L","text":"l"},
-              {"text": "","width": "10","sp": "10"}                            
+              {"text": "","width": "10","sp": "10"}
             ]
           },
           {
@@ -313,7 +313,7 @@
               {"id": "K_J","text":"J"},
               {"id": "K_K","text":"K"},
               {"id": "K_L","text":"L"},
-              {"text": "","width": "10","sp": "10"}                            
+              {"text": "","width": "10","sp": "10"}
             ]
           },
           {
@@ -327,7 +327,7 @@
               {"id": "K_B","text":"B"},
               {"id": "K_N","text":"N"},
               {"id": "K_M","text":"M"},
-              {"id": "K_PERIOD","text": ".","sk": [
+              {"id": "K_PERIOD","text": ".", "layer": "default", "sk": [
                   {"text": ",","id": "K_COMMA", "layer": "default"},
                   {"text": "!","id": "K_1", "layer": "shift"},
                   {"text": "?","id": "K_SLASH", "layer": "shift"},

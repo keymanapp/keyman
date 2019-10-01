@@ -1,5 +1,5 @@
 {
-  "name": "@keymanapp/developer-lexical-model-compiler",
+  "name": "@keymanapp/lexical-model-compiler",
   "version": "0.0.0",
   "description": "Keyman Developer lexical model compiler",
   "keywords": [
@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "mocha"
+    "test": "mocha",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -19,14 +20,14 @@
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "contributors": [
-    "Eddie Antonio Santos",
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
     "Joshua Horton"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "homepage": "https://github.com/keymanapp/keyman/tree/master/common/predictive-text#readme",
   "bin": {
     "kmlmc": "dist/kmlmc.js",
     "kmlmp": "dist/kmlmp.js",

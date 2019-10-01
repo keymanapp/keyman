@@ -13,7 +13,7 @@ inherited frmMessages: TfrmMessages
   ExplicitHeight = 123
   PixelsPerInch = 96
   TextHeight = 13
-  object memoMessage: TMemo [0]
+  object memoMessage: TRichEdit [0]
     Left = 0
     Top = 0
     Width = 312
@@ -31,6 +31,7 @@ inherited frmMessages: TfrmMessages
     ScrollBars = ssBoth
     TabOrder = 0
     WordWrap = False
+    Zoom = 100
     OnClick = memoMessageClick
     OnDblClick = memoMessageDblClick
     OnKeyDown = memoMessageKeyDown

@@ -3,6 +3,29 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-07-30 12.0.41 beta
+* General: Keyman Desktop 11 would crash if installed together with Keyman Developer 12. (#2148)
+
+## 2019-09-29 12.0.40 beta
+* General: Context help was not showing correctly on startup. (#2145)
+
+## 2019-09-27 12.0.39 beta
+* General: Introduces a Welcome screen and improves workflow for starting use of Keyman Developer. (#2134)
+* General: Fix version numbers for kmlmc, kmlmp and kmlmi. (#2129)
+* General: .js files now open in Keyman Developer for editing. (#2140)
+
+## 2019-09-25 12.0.37 beta
+* Compiler: Add -lexical-model command line option for building lexical model template projects to kmconvert. (#2120)
+* Debugger: Remove legacy 'Install keyboard' link in web test and cleanup look somewhat. (#2122)
+* Compiler: Support colour log messages and cleanup logging. (#2128)
+* Help: Fix some of the issues with Context Help, and address one specific topic - touch layout editor. (#2132)
+
+## 2019-09-24 12.0.36 beta
+* General: File type icons were mismatched (#2112)
+* Project: Shift layer in basic touch layout template had incorrect modifier for period (.) on shift layer (#2113)
+* Touch layout editor: Adding or deleting a playform or layer and making no other changes would not stick (#2114)
+* General: On Windows 7 and 8, in some circumstances dialog boxes could appear behind the main form (#2115)
+
 ## 2019-09-20 12.0.34 beta
 * Add basic wordlist editor to Keyman Developer (#2086)
 
