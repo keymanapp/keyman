@@ -103,7 +103,12 @@ begin
   if ShouldDebug then
   begin
     if not Assigned(FDebugManager) then
+    try
       FDebugManager := TDebugLogManager.Create(AOwner);
+    except
+      FDebugManager := nil;
+      raise;
+    end;
     Result := FDebugManager;
   end
   else
