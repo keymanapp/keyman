@@ -48,10 +48,17 @@ type
 implementation
 
 uses
-  ErrorControlledRegistry, RegistryKeys, shellapi, SysUtils, keymanerrorcodes, Variants, GetOsVersion,
-  utilkeymanoption,
+  System.SysUtils,
+  System.Variants,
+
+  ErrorControlledRegistry,
+  RegistryKeys,
+  keymanerrorcodes,
+  GetOsVersion,
+  KeymanOptionNames,
   keymanpaths,
-  utilexecute, keyman_implementation;
+  utilexecute,
+  keyman_implementation;
 
 { TKeymanController }
 
@@ -73,7 +80,7 @@ end;
 
 procedure TKeymanController.ControlKeyman(const code: string);
 var
-  path: string;
+  verb, path: string;
   hwnd: THandle;
 begin
   path := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
@@ -88,7 +95,19 @@ begin
   if hwnd = 0 then
     hwnd := GetDesktopWindow;
 
-  if not TUtilExecute.Shell(hwnd, path, ExtractFileDir(path), '-kmc '+code) then  // I3349
+  if ((FKeyman as TKeyman).Options as IKeymanOptions).Items[koDebugging].Value = True then
+  begin
+    // We run Keyman elevated when Debugging mode is switched on. This is because starting a
+    // trace requires certain permissions which a normal user doesn't have (refer StartTrace
+    // documentation). This is also a good visual reminder to the user that Debugging is
+    // active and as it is slightly annoying to be prompted to elevate, will over time encourage
+    // them to switch it off again, which is good ;-)
+    verb := 'runas';
+  end
+  else
+    verb := 'open';
+
+  if not TUtilExecute.Shell(hwnd, path, ExtractFileDir(path), '-kmc '+code, SW_SHOWNORMAL, verb) then  // I3349
     (FKeyman as TKeyman).Errors.AddFmt(KMN_E_KeymanControl_CannotStartProduct, VarArrayOf([path + ' (error='+IntToStr(GetLastError)+','+SysErrorMessage(GetLastError)+')', 'Keyman']), kesFatal);
 end;
 
