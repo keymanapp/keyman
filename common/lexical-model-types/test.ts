@@ -1,3 +1,4 @@
-import { Suggestion } from './';
+/// <reference path="./index.d.ts" />
 
-export let l: Suggestion;
+export let u: USVString;
+export let l: Transform
