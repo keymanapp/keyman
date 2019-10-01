@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-09-27 12.0.4095 beta
+## 2019-10-01 12.0.4095 beta
 * Splits help into multiple pages for better usability (#2139)
 
 ## 2019-09-26 12.0.4094 beta
