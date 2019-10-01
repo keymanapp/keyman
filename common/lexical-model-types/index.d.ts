@@ -147,9 +147,24 @@ declare interface Suggestion {
    * A single metalabel data describing the relation of the suggestion
    * to the input text.  Ex:  'keep', 'emoji', 'correction', etc.
    */
-  // TODO: declare a concrete set of tags
-  tag?: string;
+  tag?: SuggestionTag;
 }
+
+/**
+ * A tag indicating the nature of the current suggestion.
+ * 
+ * Tags include:
+ *  * 'keep' -- suggest the word as what was typed in the first place.
+ *     This tends to be presented as the leftmost suggestion.
+ *     @see LexicalModelPunctuation.quotesForKeepSuggestion
+ *  * 'correction' -- this suggests a correction to the current phrase
+ *  * 'emoji' -- replaces whatever is typed in with an appropriate emoji.
+ *    This tends to be presented as the rightmost suggestion.
+ *  
+ * If left undefined, the consumers will assume this is a prediction.
+ */
+type SuggestionTag = undefined | 'keep' | 'correction' | 'emoji';
+
 
 /**
  * The text and environment surrounding the insertion point (text cursor).

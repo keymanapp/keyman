@@ -3,13 +3,14 @@
 /**
  * This file "tests" the exports from the main module.
  * 
- * Since the exporters all types, the "test" here is that the type can be
+ * Since the exports are all types, the "test" here is that the type can be
  * imported and compiled without any compiler errors.
  */
 
 export let u: USVString;
 export let l: Transform
 export let s: Suggestion;
+export let st: SuggestionTag;
 export let c: Context;
 export let cap: Capabilities;
 export let conf: Configuration;
