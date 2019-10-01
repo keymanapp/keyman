@@ -160,7 +160,7 @@ class LMLayerWorker {
    * @param desc         Type of the model to instantiate and its parameters.
    * @param capabilities Capabilities on offer from the keyboard.
    */
-  public loadModel(model: WorkerInternalModel) {
+  public loadModel(model: LexicalModel) {
     // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
     // returning a Configuration.
     let configuration = model.configure(this._platformCapabilities);
@@ -240,7 +240,7 @@ class LMLayerWorker {
    *
    * @param model The loaded language model.
    */
-  private transitionToReadyState(model: WorkerInternalModel) {
+  private transitionToReadyState(model: LexicalModel) {
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {

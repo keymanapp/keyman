@@ -137,8 +137,8 @@ interface LMLayerWorkerState {
  */
 interface WorkerInternalModelConstructor {
   /**
-   * WorkerInternalModel instances are all given the keyboard's
+   * LexicalModel instances are all given the keyboard's
    * capabilities, plus any parameters they require.
    */
-  new(...modelParameters: any[]): WorkerInternalModel;
+  new(...modelParameters: any[]): LexicalModel;
 }

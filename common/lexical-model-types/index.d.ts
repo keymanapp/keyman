@@ -20,7 +20,7 @@ declare type USVString = string;
 /**
  * The model implementation, within the Worker.
  */
-declare interface WorkerInternalModel {
+declare interface LexicalModel {
   /**
    * Processes `config` messages, configuring the newly-loaded model based on the host
    * platform's capability restrictions.
