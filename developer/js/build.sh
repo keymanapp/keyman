@@ -10,9 +10,15 @@ set -eu
 . ../../resources/shellHelperFunctions.sh
 EX_USAGE=64
 
+# Where to find lexical model types.
+LEXICAL_MODELS_TYPES=../../common/lexical-model-types
+
 
 # Build the main script.
 build () {
+  # Ensure that the local npm package can be require()'d.
+  (cd $LEXICAL_MODELS_TYPES && npm link .)
+
   npm run build || fail "Could not build top-level JavaScript file."
 }
 

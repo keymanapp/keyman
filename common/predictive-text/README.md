@@ -14,11 +14,7 @@ You will need Bash and Node.js >= 10.0.
 Build
 -----
 
-Before anything, you will need to link `@keymanapp/lexical-model-types`:
-
-    (cd ../lexical-model-types && npm link .)
-
-Then, you can run `build.sh`. This will also automatically install dependencies with `npm`.
+Run `build.sh`. This will also automatically install dependencies with `npm`.
 
 ```sh
 ./build.sh

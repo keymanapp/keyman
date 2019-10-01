@@ -10,13 +10,12 @@ Look at [index.d.ts](./index.d.ts) for documentation on each type.
 Usage within keymanapp/keyman repo
 ----------------------------------
 
-**Important**! `npm link` this module before building any other package with
-*keymanapp/keyman that
-depends on it:
+To use it in other subprojects within keymanapp/keyman, ensure that this
+package is linked using:
 
     npm link .
 
-Now you can build:
+The following subprojects already perform `npm link .` as part of their `build.sh`:
 
     common/predictive-text/
     developer/js/

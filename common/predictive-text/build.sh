@@ -12,10 +12,15 @@ WORKER_OUTPUT=build/intermediate
 INCLUDES_OUTPUT=build/includes
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
+LEXICAL_MODELS_TYPES=../lexical-model-types
+
 
 
 # Build the worker and the main script.
 build ( ) {
+  # Ensure that the local npm package we need can be require()'d.
+  (cd $LEXICAL_MODELS_TYPES && npm link .)
+
   # Ensure that the build-product destination for any generated include .d.ts files exists.
   if ! [ -d $INCLUDES_OUTPUT ]; then
     mkdir -p "$INCLUDES_OUTPUT"

@@ -22,11 +22,7 @@ compiled.
 How to build
 ------------
 
-First, link `@keymanapp/lexical-model-types`:
-
-    (cd ../../common/lexical-model-types; npm link .)
-
-Then run `build.sh`:
+Run `build.sh`:
 
     ./build.sh
 
