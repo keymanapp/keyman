@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-01 12.0.87 beta
+* Fixes the `setLastActiveElement` API function for touch form factors
+
 ## 2019-09-23 12.0.86 beta
 * Fixes issue in Toolbar UI for some keyboards with language ids that include subtags (#2116)
 * Fixes issue with '=' key use on certain platforms in Firefox (#2118)
