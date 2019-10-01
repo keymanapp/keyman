@@ -9,12 +9,16 @@ semi-formal specification on how the Worker and the main thread communicate.
 System dependencies
 -------------------
 
-You will need Bash and Node.js >= 6.0.
+You will need Bash and Node.js >= 10.0.
 
 Build
 -----
 
-Run `build.sh`. This will also automatically install dependencies with `npm`.
+Before anything, you will need to link `@keymanapp/lexical-model-types`:
+
+    (cd ../lexical-model-types && npm link .)
+
+Then, you can run `build.sh`. This will also automatically install dependencies with `npm`.
 
 ```sh
 ./build.sh
