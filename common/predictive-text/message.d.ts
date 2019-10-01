@@ -95,24 +95,3 @@ interface WordListModelDescription {
    */
   wordlist: string[];
 }
-
-
-/**
- * Represents members of a probability distribution over potential outputs
- * from ambiguous text sequences.  Designed for use with fat-finger correction
- * and similar typing ambiguities.
- */
-interface ProbabilityMass<T> {
-  /**
-   * An individual sample from a Distribution over the same type.
-   */
-  sample: T;
-
-  /**
-   * The probability mass for this member of the distribution,
-   * calculated devoid of any language-modeling influences.
-   */
-  p: number;
-}
-
-type Distribution<T> = ProbabilityMass<T>[];
