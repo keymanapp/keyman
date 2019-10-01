@@ -2,7 +2,7 @@
  * Interfaces and constants used by the lexical model compiler. These target
  * the LMLayer's internal worker code, so we provide those definitions too.
  */
-/// <reference path="../../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
+/// <reference path="../../node_modules/@keymanapp/lexical-model-types/index.d.ts" />
 
 interface LexicalModel {
   readonly format: 'trie-1.0'|'fst-foma-1.0'|'custom-1.0',
