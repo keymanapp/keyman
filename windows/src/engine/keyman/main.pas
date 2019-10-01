@@ -115,6 +115,9 @@ begin
           Application.CreateForm(TfrmKeyman7Main, frmKeyman7Main);
           if not Application.Terminated then
             Application.Run;
+
+          FreeAndNil(frmKeyman7Main);
+
           Finished := True;
         finally
           if hMutex <> 0 then CloseHandle(hMutex);
