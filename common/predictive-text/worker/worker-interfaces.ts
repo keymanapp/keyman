@@ -27,7 +27,6 @@
  */
 
 /// <reference path="../message.d.ts" />
-/// <reference path="./worker-compiler-interfaces.d.ts" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
