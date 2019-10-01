@@ -150,7 +150,7 @@ begin
   pSessionProperties.Wnode.ClientContext := 1; //QPC clock resolution
   pSessionProperties.Wnode.Guid := SessionGuid;
   pSessionProperties.LogFileMode := EVENT_TRACE_FILE_MODE_SEQUENTIAL;
-  pSessionProperties.MaximumFileSize := 1;  // 1 MB
+  pSessionProperties.MaximumFileSize := 256;  // 256 MB
   pSessionProperties.LoggerNameOffset := sizeof(EVENT_TRACE_PROPERTIES);
   pSessionProperties.LogFileNameOffset := sizeof(EVENT_TRACE_PROPERTIES) + sizeof(LOGSESSION_NAME);
   StrPCopy(PWideChar(PByte(pSessionProperties) + pSessionProperties.LogFileNameOffset), FDebugLogFileName);
