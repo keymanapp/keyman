@@ -132,7 +132,7 @@ declare interface Suggestion {
    * The suggested update to the buffer. Note that this transform should
    * be applied AFTER the instigating transform, if any.
    */
-  transform: Transform;
+  readonly transform: Transform;
 
   /**
    * A string to display the suggestion to the typist.
@@ -176,7 +176,7 @@ declare interface Context {
    * buffer. If there is nothing to the left of the buffer, this is
    * an empty string.
    */
-  left: USVString;
+  readonly left: USVString;
 
   /**
    * Up to maxRightContextCodeUnits code units of Unicode scalar value
@@ -186,17 +186,17 @@ declare interface Context {
    * 
    * This property may be missing entirely.
    */
-  right?: USVString;
+  readonly right?: USVString;
 
   /**
    * Whether the insertion point is at the start of the buffer.
    */
-  startOfBuffer: boolean;
+  readonly startOfBuffer: boolean;
 
   /**
    * Whether the insertion point is at the end of the buffer.
    */
-  endOfBuffer: boolean;
+  readonly endOfBuffer: boolean;
 }
 
 /**
@@ -208,7 +208,7 @@ interface ProbabilityMass<T> {
   /**
    * An individual sample from a Distribution over the same type.
    */
-  sample: T;
+  readonly sample: T;
 
   /**
    * The probability mass for this member of the distribution,
@@ -233,20 +233,20 @@ declare interface Capabilities {
    * The maximum amount of UTF-16 code units that the keyboard will provide to
    * the left of the cursor, as an integer.
    */
-  maxLeftContextCodeUnits: number,
+  readonly maxLeftContextCodeUnits: number,
 
   /**
    * The maximum amount of code units that the keyboard will provide to the
    * right of the cursor, as an integer. The value 0 or the absence of this
    * rule implies that the right contexts are not supported.
    */
-  maxRightContextCodeUnits?: number,
+  readonly maxRightContextCodeUnits?: number,
 
   /**
    * Whether the platform supports deleting to the right. The absence of this
    * rule implies false.
    */
-  supportsDeleteRight?: false,
+  readonly supportsDeleteRight?: false,
 }
 
 /**
