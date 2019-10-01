@@ -5,6 +5,7 @@
 package com.tavultesoft.kmapro;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMManager.FormFactor;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -25,9 +26,11 @@ import android.content.pm.PackageManager.NameNotFoundException;
 public class InfoActivity extends AppCompatActivity {
 
   private WebView webView;
-  private final String kmHelpBaseUrl = "https://help.keyman.com/products/android/";
+  private final String kmHelpBaseUrl = "https://help.keyman.com/products/android";
   private String kmUrl = "";
-  private final String htmlPath = "file:///android_asset/info/info.html";
+  private final String htmlPath = "file:///android_asset/info/products/android";
+  private final String htmlPage = "index.php";
+  private String kmOfflineUrl = "";
 
   @SuppressLint("SetJavaScriptEnabled")
   @Override
@@ -70,7 +73,19 @@ public class InfoActivity extends AppCompatActivity {
     String[] versionArray = versionStr.split("\\.", 3);
     String majorMinorVersion = String.format("%s.%s", versionArray[0], versionArray[1]);
 
-    kmUrl = String.format("%s%s/?embed=android", kmHelpBaseUrl, majorMinorVersion);
+    // Determine the appropriate form factor
+    FormFactor ff = KMManager.getFormFactor();
+    String formFactor;
+
+    if(ff == FormFactor.PHONE) {
+      formFactor = "phone";
+    } else {
+      formFactor = "tablet";
+    }
+
+    kmUrl = String.format("%s/%s/%s?embed=android&formfactor=%s", kmHelpBaseUrl, majorMinorVersion, htmlPage, formFactor);
+    // The offline mirroring process (currently) adds .html to the end of the whole string.
+    kmOfflineUrl = String.format("%s/%s/%s.html", htmlPath, formFactor, htmlPage);
     webView = (WebView) findViewById(R.id.infoWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
     webView.getSettings().setJavaScriptEnabled(true);
@@ -108,7 +123,7 @@ public class InfoActivity extends AppCompatActivity {
       webView.loadUrl(kmUrl);
     } else {
       // Load app info page from assets
-      webView.loadUrl(htmlPath);
+      webView.loadUrl(kmOfflineUrl);
     }
   }
 
