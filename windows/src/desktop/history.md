@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-10-01 12.0.41 beta
+## 2019-10-02 12.0.42 beta
 * Fix issues starting debug logging for non-administrative users (#2153)
 * Fix shutdown issue on some systems (#2153)
 
