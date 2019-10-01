@@ -9,6 +9,11 @@ Currently, we're using TeamCity for this.
 
 Packages are **never** published from a developer's machine.
 
+List of current npm packages
+----------------------------
+
+ * `@keymanapp/lexical-model-types` -- located at `common/lexical-model-types`
+ * `@keymanapp/lexical-model-compiler` -- located at `developer/js`
 
 For CI developers
 -----------------

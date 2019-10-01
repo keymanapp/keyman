@@ -6,6 +6,10 @@
   "scripts": {
     "test": "tsc test.ts"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keymanapp/keyman"
+  },
   "keywords": [
     "lmlayer",
     "keyman",
@@ -27,5 +31,9 @@
   "homepage": "https://github.com/keymanapp/keyman/tree/master/common/lexical-model-types#readme",
   "devDependencies": {
     "typescript": "^3.6.3"
-  }
+  },
+  "files": [
+    "README.md",
+    "index.d.ts"
+  ]
 }
