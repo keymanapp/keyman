@@ -2148,6 +2148,7 @@ $(function () {
 
     target.focus();
     target.val(target.val() + o.text);
+    target.change();
   };
 
   builder.loadingState = true;
