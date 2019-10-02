@@ -10,7 +10,7 @@ set -eu
 # Include some helper functions from resources
 . ../../resources/shellHelperFunctions.sh
 
-# Exit status on invalid usage. 
+# Exit status on invalid usage.
 EX_USAGE=64
 
 LMLAYER_OUTPUT=build
