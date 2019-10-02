@@ -3,9 +3,12 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-01 12.0.42 beta
+* Bug Fix: Additional shutdown issues that sporadically occurred (#2157)
+
 ## 2019-10-01 12.0.41 beta
-* Fix issues starting debug logging for non-administrative users (#2153)
-* Fix shutdown issue on some systems (#2153)
+* Bug Fix: Issues starting debug logging for non-administrative users (#2153)
+* Bug Fix: Shutdown issue on some systems (#2153)
 
 ## 2019-07-29 12.0.9 beta
 * Initial beta release of Keyman Desktop 12
