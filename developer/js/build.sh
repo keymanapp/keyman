@@ -26,6 +26,7 @@ display_usage ( ) {
   echo "  -help               displays this screen and exits"
   echo "  -version version    sets the package version before building"
   echo "  -test               runs unit tests after building"
+  echo "  -tdd                runs unit tests WITHOUT building"
   echo "  -publish-to-npm     publishes the current version to the npm package index"
   echo "  -tier tier          also sets the package version tier and npm tag (alpha, beta, stable) before building or publishing"
   echo "                      If version has 4 components, only first three are used."
@@ -51,6 +52,10 @@ while [[ $# -gt 0 ]] ; do
         exit
         ;;
       -test)
+        run_tests=1
+        install_dependencies=1
+        ;;
+      -tdd)
         run_tests=1
         install_dependencies=0
         ;;
