@@ -2,14 +2,14 @@
  * Interfaces and constants used by the lexical model compiler. These target
  * the LMLayer's internal worker code, so we provide those definitions too.
  */
-/// <reference path="../../../../common/predictive-text/worker/worker-compiler-interfaces.d.ts" />
+/// <reference path="../../node_modules/@keymanapp/lexical-model-types/index.d.ts" />
 
-interface LexicalModel {
+interface LexicalModelDeclaration {
   readonly format: 'trie-1.0'|'fst-foma-1.0'|'custom-1.0',
   //... metadata ...
 }
 
-interface LexicalModelSource extends LexicalModel {
+interface LexicalModelSource extends LexicalModelDeclaration {
   readonly sources: Array<string>;
   /**
    * The name of the type to instantiate (without parameters) as the base object for a custom predictive model.
@@ -41,6 +41,6 @@ interface LexicalModelSource extends LexicalModel {
   readonly punctuation?: LexicalModelPunctuation;
 }
 
-interface LexicalModelCompiled extends LexicalModel {
+interface LexicalModelCompiled extends LexicalModelDeclaration {
   readonly id: string;
 }

@@ -12,6 +12,7 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha",
+    "install": "npm link @keymanapp/lexical-model-types",
     "prepublishOnly": "npm run build"
   },
   "repository": {

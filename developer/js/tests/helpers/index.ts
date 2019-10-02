@@ -29,7 +29,7 @@ export function makePathToFixture(...components: string[]): string {
  *
  * That way, you can determine if the source code was syntactically-valid,
  * whether it raise an exception during construction, and you can even inspect
- * the resultant WorkerInternalModel for yourself!
+ * the resultant LexicalModel for yourself!
  *
  * @param code
  */

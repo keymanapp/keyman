@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Compiles the developer tools, including the language model compilers.
+# Packages the lexical-model-types package.
 #
 
 # Exit on command failure and when using unset variables:
@@ -10,17 +10,6 @@ set -eu
 . ../../resources/shellHelperFunctions.sh
 EX_USAGE=64
 
-# Where to find lexical model types.
-LEXICAL_MODELS_TYPES=../../common/lexical-model-types
-
-
-# Build the main script.
-build () {
-  # Ensure that the local npm package can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
-
-  npm run build || fail "Could not build top-level JavaScript file."
-}
 
 display_usage ( ) {
   echo "Usage: $0 [-test] [-version version] [-tier tier]"
@@ -28,7 +17,7 @@ display_usage ( ) {
   echo
   echo "  -help               displays this screen and exits"
   echo "  -version version    sets the package version before building"
-  echo "  -test               runs unit tests after building"
+  echo "  -test               runs tests"
   echo "  -publish-to-npm     publishes the current version to the npm package index"
   echo "  -tier tier          also sets the package version tier and npm tag (alpha, beta, stable) before building or publishing"
   echo "                      If version has 4 components, only first three are used."
@@ -123,6 +112,13 @@ if [ -n "$publish_tier" ]; then
   publish_version=$publish_version$publish_tier
 fi
 
+# Check that we're doing any task at all!
+if (( !run_tests )) && (( !should_publish )) && [ -z "$publish_version" ]; then
+  echo "$0: Must do at least one of: -test, -version, -publish-npm" >&2
+  display_usage
+  exit $EX_USAGE
+fi
+
 # Check if Node.JS/npm is installed.
 type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
@@ -134,9 +130,6 @@ fi
 if [ -n "$publish_version" ]; then
   set_npm_version "$publish_version" || fail "Setting version failed."
 fi
-
-build || fail "Compilation failed."
-echo "Typescript compilation successful."
 
 if (( run_tests )); then
   npm test || fail "Tests failed"
