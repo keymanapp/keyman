@@ -188,11 +188,9 @@ type
     lblLexicalModelsSubtitle: TLabel;
     lblLexicalModelFilename: TLabel;
     lblLexicalModelDescription: TLabel;
-    lblLexicalModelVersion: TLabel;
     lblLexicalModelLanguages: TLabel;
     lbLexicalModels: TListBox;
     editLexicalModelDescription: TEdit;
-    editLexicalModelVersion: TEdit;
     gridLexicalModelLanguages: TStringGrid;
     cmdLexicalModelLanguageAdd: TButton;
     cmdLexicalModelLanguageRemove: TButton;
@@ -256,7 +254,6 @@ type
     procedure cmdLexicalModelLanguageRemoveClick(Sender: TObject);
     procedure chkLexicalModelRTLClick(Sender: TObject);
     procedure editLexicalModelDescriptionChange(Sender: TObject);
-    procedure editLexicalModelVersionChange(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -1837,7 +1834,6 @@ begin
     if not Assigned(lm) then
     begin
       editLexicalModelDescription.Text := '';
-      editLexicalModelVersion.Text := '';
       editLexicalModelFilename.Text := '';
       chkLexicalModelRTL.Checked := False;
       gridLexicalModelLanguages.RowCount := 1;
@@ -1848,7 +1844,6 @@ begin
     // Details
 
     editLexicalModelDescription.Text := lm.Name;
-    editLexicalModelVersion.Text := lm.Version;
     chkLexicalModelRTL.Checked := lm.RTL;
 
     for i := 0 to pack.Files.Count - 1 do
@@ -1876,8 +1871,6 @@ begin
   editLexicalModelDescription.Enabled := e;
   lblLexicalModelFilename.Enabled := e;
   editLexicalModelFilename.Enabled := e;
-  lblLexicalModelVersion.Enabled := e;
-  editLexicalModelVersion.Enabled := e;
   lblLexicalModelLanguages.Enabled := e;
   cmdLexicalModelLanguageAdd.Enabled := e;
   chkLexicalModelRTL.Enabled := e;
@@ -1950,18 +1943,6 @@ begin
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
   lm.Name := editLexicalModelDescription.Text;
-  Modified := True;
-end;
-
-procedure TfrmPackageEditor.editLexicalModelVersionChange(Sender: TObject);
-var
-  lm: TPackageLexicalModel;
-begin
-  if FSetup > 0 then
-    Exit;
-  lm := SelectedLexicalModel;
-  Assert(Assigned(lm));
-  lm.Version := editLexicalModelVersion.Text;
   Modified := True;
 end;
 
