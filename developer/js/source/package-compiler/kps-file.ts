@@ -1,5 +1,5 @@
 //
-// The interfaces in this file are designed with reference to the 
+// The interfaces in this file are designed with reference to the
 // mapped structures produced by xml2js when passed a .kps file.
 //
 // A few notes:
@@ -8,7 +8,7 @@
 //   mixed up beastie).
 // * Arrays are buried a layer too deep (e.g. <Files><File/><File/></Files>
 //   leads to KpsFiles.KpsFile[]
-// * Properties such as used in Info Items use `_` and `$` and must be 
+// * Properties such as used in Info Items use `_` and `$` and must be
 //   extracted.
 // * Strings element is not yet checked to be correct
 //
@@ -65,7 +65,6 @@ interface KpsFileContentFile {
 interface KpsFileLexicalModel {
   name: string;
   iD: string;
-  version: string;
   languages: KpsFileLanguages;
 }
 
@@ -99,7 +98,7 @@ interface KpsFileKeyboards {
 interface KpsFileStartMenu {
   folder?: string;
   addUninstallEntry?: string;
-  items?: KpsFileStartMenuItems; 
+  items?: KpsFileStartMenuItems;
 }
 
 interface KpsFileStartMenuItem {

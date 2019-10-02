@@ -91,7 +91,7 @@ export default class KmpCompiler {
 
     if(kps.lexicalModels && kps.lexicalModels.lexicalModel) {
       kmp.lexicalModels = arrayWrap(kps.lexicalModels.lexicalModel).map((model: KpsFileLexicalModel) => {
-        return { name:model.name, id:model.iD, version:model.version, languages: kpsLanguagesToKmpLanguages(arrayWrap(model.languages.language) as KpsFileLanguage[]) }
+        return { name:model.name, id:model.iD, languages: kpsLanguagesToKmpLanguages(arrayWrap(model.languages.language) as KpsFileLanguage[]) }
       });
     }
 
