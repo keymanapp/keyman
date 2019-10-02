@@ -4,6 +4,9 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
 # Include some helper functions from resources
 . ../../resources/shellHelperFunctions.sh
 
@@ -19,7 +22,7 @@ LEXICAL_MODELS_TYPES=../lexical-model-types
 # Build the worker and the main script.
 build ( ) {
   # Ensure that the local npm package we need can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .)
+  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
 
   # Ensure that the build-product destination for any generated include .d.ts files exists.
   if ! [ -d $INCLUDES_OUTPUT ]; then

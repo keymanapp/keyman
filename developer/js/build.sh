@@ -17,7 +17,7 @@ LEXICAL_MODELS_TYPES=../../common/lexical-model-types
 # Build the main script.
 build () {
   # Ensure that the local npm package can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .)
+  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
 
   npm run build || fail "Could not build top-level JavaScript file."
 }
