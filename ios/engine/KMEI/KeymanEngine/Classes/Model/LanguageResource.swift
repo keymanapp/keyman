@@ -8,6 +8,10 @@
 
 import Foundation
 
+public enum LanguageResourceType {
+  case keyboard, lexicalModel
+}
+
 public protocol LanguageResource {
   var id: String { get }
   var languageID: String { get }
