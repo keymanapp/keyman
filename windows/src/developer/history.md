@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-05 12.0.45 beta
+* Touch Layout Editor: Make default padding in touch layout editor match default padding in KeymanWeb. (#2170)
+
 ## 2019-10-04 12.0.44 beta
 * Package Editor: Lexical models do not have embedded version numbers, so remove this from the user interface. (#2164)
 * Touch Layout Editor: Dropping character from Character Map onto Touch Layout Editor now saves the change. (#2163)
