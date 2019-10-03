@@ -8,7 +8,7 @@ namespace com.keyman.osk {
     ['key']: OSKKey;
     ['keyId']: string;
     ['subKeys']?: OSKKeySpec[];
-    
+
     constructor(keyData: OSKKey, keyId: string) {
       this['key'] = keyData;
       this['keyId'] = keyId;
@@ -20,7 +20,7 @@ namespace com.keyman.osk {
   // Many thanks to https://www.typescriptlang.org/docs/handbook/advanced-types.html for this.
   function link(elem: HTMLDivElement, data: KeyData): KeyElement {
     let e = <KeyElement> elem;
-    
+
     // Merges all properties and methods of KeyData onto the underlying HTMLDivElement, creating a merged class.
     for(let id in data) {
       if(!e.hasOwnProperty(id)) {
@@ -70,8 +70,8 @@ namespace com.keyman.osk {
   export abstract class OSKKey {
     spec: OSKKeySpec;
 
-    /** 
-     * The layer of the OSK on which the key is displayed. 
+    /**
+     * The layer of the OSK on which the key is displayed.
      */
     readonly layer: string;
 
@@ -84,10 +84,10 @@ namespace com.keyman.osk {
 
     /**
      * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
-     * 
+     *
      * @param {String} text The text to be rendered.
      * @param {String} style The CSSStyleDeclaration for an element to measure against, without modification.
-     * 
+     *
      * @see https://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
      * This version has been substantially modified to work for this particular application.
      */
@@ -160,7 +160,7 @@ namespace com.keyman.osk {
     protected renameSpecialKey(oldText: string): string {
       let keyman = (<KeymanBase>window['keyman'])
       // If a 'special key' mapping exists for the text, replace it with its corresponding special OSK character.
-      return VisualKeyboard.specialCharacters[oldText] ? 
+      return VisualKeyboard.specialCharacters[oldText] ?
         String.fromCharCode(0XE000 + VisualKeyboard.specialCharacters[oldText]) :
         oldText;
     }
@@ -230,7 +230,7 @@ namespace com.keyman.osk {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
-        
+
         // Recompute the new width for use in autoscaling calculations below, just in case.
         width = OSKKey.getTextWidth(osk, keyText, styleSpec);
       }
@@ -333,7 +333,7 @@ namespace com.keyman.osk {
       ks.width=this.objectGeometry(spec['widthpc']);
 
       let originalPercent = totalPercent;
-      
+
       let btnEle=util._CreateElement('div');
       let btn = link(btnEle, new KeyData(this, spec['id']));
 
@@ -389,13 +389,13 @@ namespace com.keyman.osk {
       } else {
         btn['subKeys']=null;
       }
-      
+
       // Add text to button and button to placeholder div
       kDiv.appendChild(btn);
 
       // Prevent user selection of key captions
       //t.style.webkitUserSelect='none';
-      
+
       // The 'return value' of this process.
       return {element: kDiv, percent: totalPercent - originalPercent};
     }
@@ -405,7 +405,7 @@ namespace com.keyman.osk {
       if(unit == '%') {
         return v + unit;
       } else { // unit == 'px'
-        return Math.round(v)+unit;
+        return (Math.round(v*100)/100)+unit;
       }
     }
   }
@@ -513,7 +513,7 @@ namespace com.keyman.osk {
 
     /**
      * Contains layout properties corresponding to the OSK's layout.  Needs to be public
-     * so that its geometry may be updated on rotations and keyboard resize events, as 
+     * so that its geometry may be updated on rotations and keyboard resize events, as
      * said geometry needs to be accurate for fat-finger probability calculations.
      */
     layout: ActiveLayout;
@@ -576,7 +576,7 @@ namespace com.keyman.osk {
     /**
      * @param       {Object}      PVK         Visual keyboard name
      * @param       {Object}      Lhelp       true if OSK defined for this keyboard
-     * @param       {Object}      layout0 
+     * @param       {Object}      layout0
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
@@ -611,7 +611,7 @@ namespace com.keyman.osk {
 
       // Override font if specified by keyboard
       if('font' in layout) {
-        this.fontFamily=layout['font']; 
+        this.fontFamily=layout['font'];
       } else {
         this.fontFamily='';
       }
@@ -737,7 +737,7 @@ namespace com.keyman.osk {
                                                                         // Not to mention, it's rather redundant.
         lDiv.addEventListener('touchstart', this.touch, true);
         // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
-        lDiv.addEventListener('touchend', this.release,true); 
+        lDiv.addEventListener('touchend', this.release,true);
         lDiv.addEventListener('touchmove', this.moveOver,false);
         //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
       }
@@ -786,9 +786,9 @@ namespace com.keyman.osk {
           // All key widths and paddings are rounded for uniformity
           var keyPercent: number, padPercent: number, totalPercent=0;
           for(j=0; j<keys.length-1; j++) {
-            keyPercent = Math.round(keys[j]['widthpc'] * objectWidth); //Math.round(parseInt(keys[j]['width'],10)*objectWidth/totalWidth);
+            keyPercent = keys[j]['widthpc'] * objectWidth;
             keys[j]['widthpc']=keyPercent;
-            padPercent = Math.round(keys[j]['padpc'] * objectWidth); // Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
+            padPercent = keys[j]['padpc'] * objectWidth;
             keys[j]['padpc']=padPercent;
 
             // Recompute center's x-coord with exact, in-browser values.
@@ -799,12 +799,12 @@ namespace com.keyman.osk {
           }
 
           // Allow for right OSK margin (15 layout units)
-          let rightMargin = Math.round(15*objectWidth/layer.totalWidth);
+          let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
           totalPercent += rightMargin;
 
           // If a single key, and padding is negative, add padding to right align the key
           if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
-            keyPercent = Math.round(keys[0]['widthpc'] * objectWidth); //Math.round(parseInt(keys[0]['width'],10)*objectWidth/totalWidth);
+            keyPercent = keys[0]['widthpc'] * objectWidth;
             keys[0]['widthpc']=keyPercent;
             totalPercent += keyPercent;
             keys[0]['padpc']=(objectWidth-totalPercent);
@@ -814,7 +814,7 @@ namespace com.keyman.osk {
             (<ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
           } else if(keys.length > 0) {
             j=keys.length-1;
-            padPercent = Math.round(keys[j]['padpc'] * objectWidth); //Math.round(parseInt(keys[j]['pad'],10)*objectWidth/totalWidth);
+            padPercent = keys[j]['padpc'] * objectWidth;
             keys[j]['padpc']=padPercent;
             totalPercent += padPercent;
             keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
@@ -828,7 +828,7 @@ namespace com.keyman.osk {
           totalPercent=0;
           for(j=0; j<keys.length; j++) {
             key=keys[j];
-            
+
             var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
             var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
 
@@ -848,7 +848,7 @@ namespace com.keyman.osk {
     //#region OSK touch handlers
     getTouchCoordinatesOnKeyboard(touch: Touch) {
       let keyman = com.keyman.singleton;
-      
+
       // We need to compute the 'local', keyboard-based coordinates for the touch.
       let kbdCoords = keyman.util.getAbsolute(this.kbdDiv.firstChild as HTMLElement);
       let offsetCoords = {x: touch.pageX - kbdCoords.x, y: touch.pageY - kbdCoords.y};
@@ -865,7 +865,7 @@ namespace com.keyman.osk {
       if(!keyman.modelManager.mayCorrect) {
         return null;
       }
-      
+
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
       return this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
@@ -1326,7 +1326,7 @@ namespace com.keyman.osk {
       }
 
       layer=this.layers[n];
-      
+
       // Set the on/off state of any visible state keys.
       var states = ['K_CAPS',      'K_NUMLOCK',  'K_SCROLL'];
       var keys   = [layer.capsKey, layer.numKey, layer.scrollKey];
@@ -1354,13 +1354,13 @@ namespace com.keyman.osk {
     setButtonClass(key, btn, layout?) {
       let keyman = com.keyman.singleton;
       var n=0, keyTypes=['default','shift','shift-on','special','special-on','','','','deadkey','blank','hidden'];
-      if(typeof key['dk'] == 'string' && key['dk'] == '1') { 
+      if(typeof key['dk'] == 'string' && key['dk'] == '1') {
         n=8;
       }
 
       if(typeof key['sp'] == 'string') {
         n=parseInt(key['sp'],10);
-      } 
+      }
 
       if(n < 0 || n > 10) {
         n=0;
@@ -1399,7 +1399,7 @@ namespace com.keyman.osk {
       }
       this.popupBaseKey = null;
     }
-    
+
     //#region 'native'-mode subkey handling
     /**
      * Display touch-hold array of 'sub-keys' above the currently touched key
@@ -1414,7 +1414,7 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
       let device = util.device;
-      
+
       // A tag we directly set on a key element during its construction.
       let subKeySpec: OSKKeySpec[] = e['subKeys'];
 
@@ -1465,7 +1465,7 @@ namespace com.keyman.osk {
 
         let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer);
         let kDiv = keyGenerator.construct(this, <HTMLDivElement> e, needsTopMargin);
-        
+
         subKeys.appendChild(kDiv);
       }
 
@@ -1519,8 +1519,8 @@ namespace com.keyman.osk {
 
       if(e && typeof(e.id) != 'undefined') {
         //TODO: refactor this, it's pretty messy...
-        var i, 
-          idx = e.id.split('-'), 
+        var i,
+          idx = e.id.split('-'),
           baseId = e['keyId'],
           layer = e['key'].spec['layer'],
           sp = e['key'].spec['sp'],
@@ -1805,7 +1805,7 @@ namespace com.keyman.osk {
           }
         }
       }
-      
+
       return false;
     }
 
@@ -1886,15 +1886,15 @@ namespace com.keyman.osk {
         (<HTMLElement> layers[nLayer]).style.height=(oskHeight)+'px';
 
         let rowHeight = Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows));
-        
+
         if(device.OS == 'Android' && 'devicePixelRatio' in window) {
           layer.style.height = layer.style.maxHeight = oskHeight + 'px';
           rowHeight /= window.devicePixelRatio;
         }
 
-        // Sets the layers to the correct height 
+        // Sets the layers to the correct height
         let rowPad = Math.round(0.15*rowHeight);
-  
+
         for(let nRow=0; nRow<nRows; nRow++) {
           let rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
           let bottom = (nRows-nRow-1)*rowHeight+1;
