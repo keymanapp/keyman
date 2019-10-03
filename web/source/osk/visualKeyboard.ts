@@ -405,7 +405,7 @@ namespace com.keyman.osk {
       if(unit == '%') {
         return v + unit;
       } else { // unit == 'px'
-        return (Math.round(v*100)/100)+unit;
+        return (Math.round(v*100)/100)+unit; // round to 2 decimal places, making css more readable
       }
     }
   }

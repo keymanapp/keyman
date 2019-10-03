@@ -214,10 +214,8 @@ namespace com.keyman.osk {
 
       // Add default right margin
       if(formFactor == 'desktop') {
-        totalWidth += ActiveKey.DEFAULT_RIGHT_MARGIN;  // KMEW-117
+        totalWidth += 5; // TODO: resolve difference between touch and desktop; why don't we use ActiveKey.DEFAULT_RIGHT_MARGIN?
       } else {
-        // TODO: Not entirely clear why this needs to be 15 instead of 5 on touch layouts.  We probably have
-        // a miscalculation somewhere
         totalWidth += ActiveKey.DEFAULT_RIGHT_MARGIN;
       }
 
