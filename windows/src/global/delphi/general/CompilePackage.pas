@@ -262,36 +262,21 @@ begin
 
     if pack.KPSOptions.FollowKeyboardVersion then
     begin
-      if (kmpinf.Keyboards.Count = 0) and (kmpinf.LexicalModels.Count = 0) then
+      if kmpinf.Keyboards.Count = 0 then
       begin
-        FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards (or lexical models) in the package.');
+        FatalMessage('The option "Follow Keyboard Version" is set but there are no keyboards in the package.');
         Exit;
       end;
 
-      if kmpinf.Keyboards.Count > 0 then
-      begin
-        FPackageVersion := kmpinf.Keyboards[0].Version;
-        for i := 1 to kmpinf.Keyboards.Count - 1 do
-          if kmpinf.Keyboards[i].Version <> FPackageVersion then
-          begin
-            FatalMessage(
-              'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
-              'and the keyboards have mismatching versions.');
-            Exit;
-          end;
-      end
-      else
-      begin
-        FPackageVersion := kmpinf.LexicalModels[0].Version;
-        for i := 1 to kmpinf.LexicalModels.Count - 1 do
-          if kmpinf.LexicalModels[i].Version <> FPackageVersion then
-          begin
-            FatalMessage(
-              'The option "Follow Keyboard Version" is set but the package contains more than one lexical model, '+
-              'and the models have mismatching versions.');
-            Exit;
-          end;
-      end;
+      FPackageVersion := kmpinf.Keyboards[0].Version;
+      for i := 1 to kmpinf.Keyboards.Count - 1 do
+        if kmpinf.Keyboards[i].Version <> FPackageVersion then
+        begin
+          FatalMessage(
+            'The option "Follow Keyboard Version" is set but the package contains more than one keyboard, '+
+            'and the keyboards have mismatching versions.');
+          Exit;
+        end;
 
       kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;
     end;

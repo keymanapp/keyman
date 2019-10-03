@@ -618,13 +618,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 13
           Caption = 'Description:'
         end
-        object lblLexicalModelVersion: TLabel
-          Left = 261
-          Top = 129
-          Width = 41
-          Height = 13
-          Caption = 'Version:'
-        end
         object lblLexicalModelLanguages: TLabel
           Left = 260
           Top = 181
@@ -651,15 +644,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 1
           OnChange = editLexicalModelDescriptionChange
         end
-        object editLexicalModelVersion: TEdit
-          Left = 342
-          Top = 126
-          Width = 148
-          Height = 21
-          TabStop = False
-          TabOrder = 2
-          OnChange = editLexicalModelVersionChange
-        end
         object gridLexicalModelLanguages: TStringGrid
           Left = 260
           Top = 200
@@ -671,7 +655,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-          TabOrder = 3
+          TabOrder = 2
           OnClick = gridLexicalModelLanguagesClick
           OnDblClick = gridLexicalModelLanguagesDblClick
           ColWidths = (
@@ -685,7 +669,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Add...'
-          TabOrder = 4
+          TabOrder = 3
           OnClick = cmdLexicalModelLanguageAddClick
         end
         object cmdLexicalModelLanguageRemove: TButton
@@ -695,7 +679,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 5
+          TabOrder = 4
           OnClick = cmdLexicalModelLanguageRemoveClick
         end
         object cmdLexicalModelLanguageEdit: TButton
@@ -705,16 +689,16 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Ed&it...'
-          TabOrder = 6
+          TabOrder = 5
           OnClick = cmdLexicalModelLanguageEditClick
         end
         object chkLexicalModelRTL: TCheckBox
           Left = 342
-          Top = 153
+          Top = 126
           Width = 97
           Height = 17
           Caption = 'Is Right-to-left'
-          TabOrder = 7
+          TabOrder = 6
           OnClick = chkLexicalModelRTLClick
         end
         object editLexicalModelFilename: TEdit
@@ -725,7 +709,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabStop = False
           ParentColor = True
           ReadOnly = True
-          TabOrder = 8
+          TabOrder = 7
         end
       end
     end

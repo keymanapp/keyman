@@ -17,7 +17,6 @@ type
 
     procedure DoError(msg: string; State: TProjectLogState);
     function CheckLexicalModelLanguages: Boolean;
-    function CheckLexicalModelVersions: Boolean;
     function DoesFileMatchLexicalModelID(f: TPackageContentFile;
       const id: string): Boolean;
     function FindLexicalModelByFileName(const name: string): TPackageLexicalModel;
@@ -94,25 +93,7 @@ begin
     end;
   end;
 
-  Result := CheckLexicalModelVersions;
-  Result := CheckLexicalModelLanguages and Result; // Always check all for comprehensive error messagess
-end;
-
-function TPackageInfoRefreshLexicalModels.CheckLexicalModelVersions: Boolean;
-var
-  lm: TPackageLexicalModel;
-begin
-  // Test that each model has a version string
-  for lm in pack.LexicalModels do
-  begin
-    if lm.Version = '' then
-    begin
-      DoError(Format(SError_LexicalModelMustHaveAVersion, [lm.ID]), plsError);
-      Exit(False);
-    end;
-  end;
-
-  Result := True;
+  Result := CheckLexicalModelLanguages; // Always check all for comprehensive error messagess
 end;
 
 function TPackageInfoRefreshLexicalModels.CheckLexicalModelLanguages: Boolean;
