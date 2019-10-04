@@ -1,18 +1,18 @@
 (*
   Name:             KeymanDeveloperUtils
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
                     23 Aug 2006 - mcdurdin - Add WM_USER_WEBCOMMAND and WM_USER_INPUTLANGCHANGE
@@ -60,11 +60,7 @@ const
   MAXMRU = 4;
   MAX_REG_FONT_ENTRIES = 16;
 
-<<<<<<< HEAD
-function ShouldShowStartup: Boolean;
-=======
 function GetFolderPath(csidl: Integer): string;
->>>>>>> master
 function TikeActive: Boolean;
 function CreateLink(const ObjPath, LinkPath, Desc: string): Boolean;
 procedure SetFontFromString(f: TFont; s: string);
@@ -175,26 +171,6 @@ begin
     Result := SUCCEEDED(hres);
 end;
 
-
-<<<<<<< HEAD
-function ShouldShowStartup: Boolean;
-begin
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then  // I2890
-    try
-      if not ValueExists(SRegValue_IDEOptShowStartupDialog) then Result := True
-      else Result := ReadString(SRegValue_IDEOptShowStartupDialog) = '1';
-    except
-      Result := True;
-    end
-    else
-      Result := True;
-  finally
-    Free;
-  end;
-=======
 function GetFolderPath(csidl: Integer): string;
 var
     buf: array[0..260] of Char;
@@ -215,7 +191,6 @@ begin
             mm.Free(idl);
         end;
     end;
->>>>>>> master
 end;
 
 function TikeActive: Boolean;
