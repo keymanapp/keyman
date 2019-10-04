@@ -1,14 +1,19 @@
 namespace com.keyman.osk {
   type KeyDistribution = text.KeyDistribution;
 
+
   export class ActiveKey implements LayoutKey {
+
+    static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
+    static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
+    static readonly DEFAULT_KEY_WIDTH=100;   // Width of a key, if not specified, in virtual units
 
     // Defines key defaults
     static readonly DEFAULT_KEY = {
       text: '',
-      width: '100',
+      width: ActiveKey.DEFAULT_KEY_WIDTH.toString(),
       sp: '0',
-      pad: '15'
+      pad: ActiveKey.DEFAULT_PAD.toString()
     };
 
     id?: string;
@@ -17,7 +22,7 @@ namespace com.keyman.osk {
     layer: string;
     displayLayer: string;
     nextlayer: "string";
-    
+
     proportionalX: number;
     proportionalWidth: number;
 
@@ -51,7 +56,7 @@ namespace com.keyman.osk {
     private constructor() {
 
     }
-    
+
     static polyfill(row: LayoutRow, displayLayer: string, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
@@ -106,7 +111,7 @@ namespace com.keyman.osk {
       }
 
       // Allow for right OSK margin (15 layout units)
-      let rightMargin = 15/totalWidth;
+      let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN/totalWidth;
       totalPercent += rightMargin;
 
       // If a single key, and padding is negative, add padding to right align the key
@@ -191,14 +196,14 @@ namespace com.keyman.osk {
             keys.length = keys.length-1;
           } else {
             var kw, kp;
-            kw = (typeof key['width'] == 'string' && key['width'] != '') ? parseInt(key['width'],10) : 100;
-            if(isNaN(kw) || kw == 0) kw = 100;
+            kw = (typeof key['width'] == 'string' && key['width'] != '') ? parseInt(key['width'],10) : ActiveKey.DEFAULT_KEY_WIDTH;
+            if(isNaN(kw) || kw == 0) kw = ActiveKey.DEFAULT_KEY_WIDTH;
             key['width'] = kw.toString();
-            kp = (typeof key['pad'] == 'string' && key['pad'] != '') ? parseInt(key['pad'],10) : 15;
-            if(isNaN(kp) || kp == 0) kp = 15;  // KMEW-119
+            kp = (typeof key['pad'] == 'string' && key['pad'] != '') ? parseInt(key['pad'],10) : ActiveKey.DEFAULT_PAD;
+            if(isNaN(kp) || kp == 0) kp = ActiveKey.DEFAULT_PAD;  // KMEW-119
             key['pad'] = kp.toString();
             width += kw + kp;
-            //if(typeof key['width'] == 'string' && key['width'] != '') width += parseInt(key['width'],10); else width += 100;
+            //if(typeof key['width'] == 'string' && key['width'] != '') width += parseInt(key['width'],10); else width += DEFAULT_KEY_WIDTH;
             //if(typeof key['pad'] == 'string' && key['pad'] != '') width += parseInt(key['pad'],10); else width += 5;
           }
         }
@@ -209,11 +214,9 @@ namespace com.keyman.osk {
 
       // Add default right margin
       if(formFactor == 'desktop') {
-        totalWidth += 5;  // KMEW-117
+        totalWidth += 5; // TODO: resolve difference between touch and desktop; why don't we use ActiveKey.DEFAULT_RIGHT_MARGIN?
       } else {
-        // TODO: Not entirely clear why this needs to be 15 instead of 5 on touch layouts.  We probably have
-        // a miscalculation somewhere
-        totalWidth += 15;
+        totalWidth += ActiveKey.DEFAULT_RIGHT_MARGIN;
       }
 
       let rowCount = layer.row.length;
@@ -281,7 +284,7 @@ namespace com.keyman.osk {
 
       let totalMass = 0;
 
-      // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place 
+      // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
       // of the formula in the loop below.
       for(let key in keyDists) {
         totalMass += keyProbs[key] = 1 / (keyDists[key] + 1e-6); // Prevent div-by-0 errors.
@@ -389,9 +392,9 @@ namespace com.keyman.osk {
     }
 
     /**
-     * 
+     *
      * @param layout
-     * @param formFactor 
+     * @param formFactor
      */
     static polyfill(layout: LayoutFormFactor, formFactor: string): ActiveLayout {
       if(layout == null) {
