@@ -53,6 +53,7 @@ import android.widget.RelativeLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
@@ -198,6 +199,10 @@ public final class KMManager {
 
   public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
+  }
+
+  public static String getVersion() {
+    return com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
   }
 
   // Check if a keyboard namespace is reserved
@@ -1046,9 +1051,17 @@ public final class KMManager {
     return kbFileVersion;
   }
 
+  public static void addKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(listener);
+  }
+
   public static void addKeyboardEventListener(OnKeyboardEventListener listener) {
     KMTextView.addOnKeyboardEventListener(listener);
     KMKeyboard.addOnKeyboardEventListener(listener);
+  }
+
+  public static void removeKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
+    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(listener);
   }
 
   public static void removeKeyboardEventListener(OnKeyboardEventListener listener) {
