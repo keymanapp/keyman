@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-04 12.0.90 beta
+* Fixes next-layer management complications with predictive correction data computation (#2172)
+
 ## 2019-10-01 12.0.87 beta
 * Fixes the `setLastActiveElement` API function for touch form factors (#2151)
 
