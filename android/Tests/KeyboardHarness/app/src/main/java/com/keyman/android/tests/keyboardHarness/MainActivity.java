@@ -148,4 +148,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardInfo) {
   }
+
+  @Override
+  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
+  }
 }

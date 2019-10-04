@@ -3,6 +3,8 @@
    Copyright 2017 SIL International
 ***/
 
+///<reference path="../utils/version.ts"/>
+
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
 
@@ -16,6 +18,7 @@ namespace com.keyman.osk {
     "text"?: string,
     "sp"?: ButtonClass,
     "width"?: string,
+    "layer"?: string, // Key derives any modifiers from the value set here if specified, not the actual display layer.
     "nextlayer"?: string,
     "pad"?: string,
     "sk"?: LayoutKey[]
@@ -108,12 +111,13 @@ namespace com.keyman.osk {
     /**
     * Build a default layout for keyboards with no explicit layout
     *
-    * @param   {Object}  PVK         keyboard object (as loaded)
-    * @param   {number}  kbdBitmask  keyboard modifier bitmask
+    * @param   {Object}  PVK             keyboard object (as loaded)
+    * @param   {Object}  kbdDevVersion   object representing the version of Developer that compiled the keyboard
+    * @param   {number}  kbdBitmask      keyboard modifier bitmask
     * @param   {string}  formFactor
     * @return  {Object}
     */
-    static buildDefaultLayout(PVK, kbdBitmask: number, formFactor: string): LayoutFormFactor {
+    static buildDefaultLayout(PVK, kbdDevVersion: utils.Version, kbdBitmask: number, formFactor: string): LayoutFormFactor {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
@@ -247,9 +251,9 @@ namespace com.keyman.osk {
                 if(kx >= 0 && kx < layerSpec.length) key['text']=layerSpec[kx];
               }
 
-              // Fall back to US English keycap text as default for the base two layers if not otherwise defined.
-              // (Any 'ghost' keys must be explicitly defined in layout for these layers.)
-              if(isDefault) {
+              // Legacy (pre 12.0) behavior:  fall back to US English keycap text as default for the base two layers
+              // if a key cap is not otherwise defined. (Any intentional 'ghost' keys must be explicitly defined.)
+              if(isDefault && kbdDevVersion.precedes(utils.Version.NO_DEFAULT_KEYCAPS)) {
                 if(key['id'] != 'K_SPACE' && kx+65 * isShift < Layouts.dfltText.length && key['text'] !== null) {
                   key['text'] = key['text'] || Layouts.dfltText[kx+65*isShift];
                 }

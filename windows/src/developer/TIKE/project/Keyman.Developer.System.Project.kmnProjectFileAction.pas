@@ -44,7 +44,7 @@ begin
     except
       on E:Exception do
       begin
-        OwnerProject.Log(plsError, AKVKSourceFile, 'Invalid visual keyboard: '+E.Message);
+        OwnerProject.Log(plsError, AKVKSourceFile, 'Invalid visual keyboard: '+E.Message, CERR_ERROR, 0);
         Exit(False);
       end;
     end;
@@ -55,7 +55,7 @@ begin
       except
         on E:Exception do
         begin
-          OwnerProject.Log(plsError, AKVKSourceFile, 'Could not save visual keyboard '+AKVKSourceFile+' to '+AKVKTargetFile+': '+E.ClassName+','+E.Message);
+          OwnerProject.Log(plsError, AKVKSourceFile, 'Could not save visual keyboard '+AKVKSourceFile+' to '+AKVKTargetFile+': '+E.ClassName+','+E.Message, CERR_ERROR, 0);
           Exit(False);
         end;
       end;
@@ -93,7 +93,7 @@ begin
   if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(FileName) then
   begin
     HasCompileWarning := True;
-    Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(FileName)]));
+    Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(FileName)]), CERR_WARNING, 0);
   end;
 
   if KVKFileName <> '' then
@@ -101,7 +101,7 @@ begin
     if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(KVKFileName) then
     begin
       HasCompileWarning := True;
-      Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(KVKFileName)]));
+      Log(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(KVKFileName)]), CERR_WARNING, 0);
     end;
   end;
 end;
@@ -127,7 +127,7 @@ begin
     if Targets * KMXKeymanTargets <> [] then
     begin
       TargetNames := KeymanTargetsToNames(Targets * KMXKeymanTargets);
-      Log(plsInfo, Format('Compiling ''%s'' %sfor %s...', [Filename, IfThen(Debug, 'with debug symbols ', ''), TargetNames]));
+      Log(plsInfo, Format('Compiling ''%s'' %sfor %s...', [Filename, IfThen(Debug, 'with debug symbols ', ''), TargetNames]), 0, 0);
 
       //compile the keyboard
       KMXFileName := TargetFileName;
@@ -146,8 +146,8 @@ begin
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
       if Result
-        then Log(plsInfo, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, KMXFileName]))   // I4504
-        else Log(plsError, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]));   // I4504
+        then Log(plsSuccess, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, KMXFileName]), 0, 0)   // I4504
+        else Log(plsFailure, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]), 0, 0);   // I4504
     end
     else
       Result := True;   // I4564
@@ -156,7 +156,7 @@ begin
     if Result and (Targets * KMWKeymanTargets <> []) then
     begin
       TargetNames := KeymanTargetsToNames(Targets * KMWKeymanTargets);
-      Log(plsInfo, Format('Compiling ''%s'' %sfor %s...', [Filename, IfThen(Debug, 'with debug symbols ', ''), TargetNames]));
+      Log(plsInfo, Format('Compiling ''%s'' %sfor %s...', [Filename, IfThen(Debug, 'with debug symbols ', ''), TargetNames]), 0, 0);
 
       ckw := TCompileKeymanWeb.Create;
       try
@@ -172,8 +172,8 @@ begin
         if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then Result := False;   // I4706
 
       if Result
-        then Log(plsInfo, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, FOutFileName]))   // I4504
-        else Log(plsError, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]));   // I4504
+        then Log(plsSuccess, Format('''%s'' was compiled successfully for %s to ''%s''.', [FileName, TargetNames, FOutFileName]), 0, 0)   // I4504
+        else Log(plsFailure, Format('''%s'' was not compiled successfully for %s.', [FileName, TargetNames]), 0, 0);   // I4504
       finally
         ckw.Free;
       end;

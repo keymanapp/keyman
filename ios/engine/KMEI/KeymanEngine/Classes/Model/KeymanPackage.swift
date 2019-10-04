@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Zip
 
 public enum KMPError : String, Error {
   case invalidPackage = "Invalid Keyman Package."
@@ -18,33 +19,24 @@ public class KeymanPackage
 {
   static private let kmpFile = "kmp.json"
   public var sourceFolder: URL
-  private var keyboards: [KMPKeyboard]!
 
   init(folder: URL) {
     sourceFolder = folder
   }
-  
-  public func parse(json: [String:AnyObject]) {
-    self.keyboards = []
     
-    if let packagedKeyboards = json["keyboards"] as? [[String:AnyObject]] {
-      for keyboardJson in packagedKeyboards {
-        let keyboard = KMPKeyboard.init(kmp: self)
-        keyboard.parse(json: keyboardJson)
-        
-        if(keyboard.isValid) {
-          keyboards.append(keyboard)
-        }
-      }
-    }
+  // to be overridden by subclasses
+  public func isKeyboard() -> Bool {
+    return false
+  }
+
+  // to be overridden by subclasses
+  public func parse(json: [String:AnyObject]) {
+    return
   }
   
+  // to be overridden by subclasses
   public func defaultInfoHtml() -> String {
-    var str = "Found Packages:<br/>"
-    for keyboard in keyboards {
-      str += keyboard.keyboardId! + "<br/>"
-    }
-    return str
+    return "base class!"
   }
   
   public func infoHtml() -> String {
@@ -67,9 +59,21 @@ public class KeymanPackage
         let data = try Data(contentsOf: path, options: .mappedIfSafe)
         let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
         if let jsonResult = jsonResult as? [String:AnyObject] {
-          let kmp = KeymanPackage.init(folder: folder)
-          kmp.parse(json: jsonResult)
-          return kmp
+          if let _ = jsonResult["keyboards"] as? [[String:AnyObject]] {
+            if let _ = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+                //TODO: rrb show error to user, for now, just log
+              log.error("error parsing keyman package: packages  MUST NOT have both keyboards and lexical models")
+              return nil
+            }
+            let kmp = KeyboardKeymanPackage.init(folder: folder)
+            kmp.parse(json: jsonResult)
+            return kmp
+          }
+          else if let _ = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
+            let kmm = LexicalModelKeymanPackage.init(folder: folder)
+            kmm.parse(json: jsonResult)
+            return kmm
+          }
         }
       }
     } catch {
@@ -79,10 +83,24 @@ public class KeymanPackage
     return nil
   }
   
-  static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void)
-  {
-    Manager.shared.unzipFile(fileUrl: fileUrl, destination: destination) {
+  static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) {
+    unzipFile(fileUrl: fileUrl, destination: destination) {
       complete(KeymanPackage.parse(destination))
+    }
+  }
+
+  static public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void) {
+    do {
+      try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
+                        password: nil,
+                        progress: { (progress) -> () in
+                          //TODO: add timeout
+                          if(progress == 1.0) {
+                            complete()
+                          }
+                        })
+    } catch {
+      log.error("error unzipping archive: \(error)")
     }
   }
 }

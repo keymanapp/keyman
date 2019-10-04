@@ -46,8 +46,6 @@ type
     FDebuggerBreakWhenExitingLine: Boolean;
     FDebuggerSingleStepAfterBreak: Boolean;
     FDebuggerShowStoreOffset: Boolean;
-    FShowStartupDialog: Boolean;
-    //FShowStartupHelperDialog: Boolean;
     FCharMapAutoLookup: Boolean;
     FCharMapDisableDatabaseLookups: Boolean;
     FDebuggerAutoRecompileWithDebugInfo: Boolean;
@@ -59,6 +57,7 @@ type
     FOpenKeyboardFilesInSourceView: Boolean;   // I4751
     FDisplayTheme: string;
     FEditorTheme: string;
+    FFix183_LadderLength: Integer;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -83,14 +82,13 @@ type
     property CharMapAutoLookup: Boolean read FCharMapAutoLookup write FCharMapAutoLookup;
     property CharMapDisableDatabaseLookups: Boolean read FCharMapDisableDatabaseLookups write FCharMapDisableDatabaseLookups;
 
+    property Fix183_LadderLength: Integer read FFix183_LadderLength write FFix183_LadderLength;
     property DebuggerBreakWhenExitingLine: Boolean read FDebuggerBreakWhenExitingLine write FDebuggerBreakWhenExitingLine;
     property DebuggerSingleStepAfterBreak: Boolean read FDebuggerSingleStepAfterBreak write FDebuggerSingleStepAfterBreak;
     property DebuggerShowStoreOffset: Boolean read FDebuggerShowStoreOffset write FDebuggerShowStoreOffset;
     property DebuggerAutoRecompileWithDebugInfo: Boolean read FDebuggerAutoRecompileWithDebugInfo write FDebuggerAutoRecompileWithDebugInfo;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
-    property ShowStartupDialog: Boolean read FShowStartupDialog write FShowStartupDialog;
-    //property ShowStartupHelperDialog: Boolean read FShowStartupHelperDialog write FShowStartupHelperDialog;
 
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
@@ -178,7 +176,6 @@ begin
     FDebuggerAutoRecompileWithDebugInfo := regReadBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, False);
 
     FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
-    FShowStartupDialog             := regReadBool(SRegValue_IDEOptShowStartupDialog,            True);
 
     FCharMapDisableDatabaseLookups := regReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
     FCharMapAutoLookup             := regReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
@@ -196,6 +193,8 @@ begin
     FExternalEditorPath := regReadString(SRegValue_IDEOptExternalEditorPath, '');
     FSMTPServer := regReadString(SRegValue_IDEOptSMTPServer, '');   // I4506
     FTestEmailAddresses := regReadString(SRegValue_IDEOptTestEmailAddresses, '');   // I4506
+
+    FFix183_LadderLength := regReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
   finally
     CloseRegistry;
   end;
@@ -218,9 +217,6 @@ begin
 
     regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
 
-    regWriteBool(SRegValue_IDEOptShowStartupDialog,            FShowStartupDialog);
-    //regWriteBool(SRegValue_IDEOptShowStartupHelperDialog,      FShowStartupHelperDialog);
-
     regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
     regWriteBool(SRegValue_IDEOptCharMapAutoLookup,             FCharMapAutoLookup);
 
@@ -233,6 +229,8 @@ begin
     regWriteString(SRegValue_IDEOptExternalEditorPath,          FExternalEditorPath);
     regWriteString(SRegValue_IDEOptSMTPServer,                  FSMTPServer);   // I4506
     regWriteString(SRegValue_IDEOptTestEmailAddresses,          FTestEmailAddresses);   // I4506
+
+    regWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
   finally
     CloseRegistry;
   end;

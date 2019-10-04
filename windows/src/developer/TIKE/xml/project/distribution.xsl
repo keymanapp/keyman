@@ -3,13 +3,13 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
   <xsl:template name="page_distribution">
-    <div class="page" id="page-3">
-      <div class="help-container" id="uppertext3">
+    <div class="page" id="page-4">
+      <div class="help-container" id="uppertext4">
         <div class="headerimage">
           <p><img alt="Distribution" src='res/header_distrib.png' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
-          
+
             <ul>
               <li><a href="https://keyman.com/go/developer/10.0/help-keyboards">Share source and add to Keyman keyboard repositories</a></li>
               <li><a href="https://keyman.com/go/developer/10.0/help-packages">Windows and macOS distribution</a></li>
@@ -23,11 +23,11 @@
         <div class="pagetext">
 
           <h2>Distribute Your Keyboard Layouts</h2>
-          
+
           <p>After completing your keyboards and packages, share them with the world.</p>
 
           <p>Keyman keyboards can be shared in several different ways:</p>
-          
+
           <ul>
             <li>Add your keyboard to the Keyman Keyboard Repositories. In order to do this, you must share the source code of your keyboard.
                 <b>Recommended option!</b> &#160; <a href='https://keyman.com/go/developer/10.0/help-keyboards'>Learn more</a></li>
@@ -38,12 +38,12 @@
             <li>Add your keyboard to a website using KeymanWeb
                 <a href='https://keyman.com/go/developer/10.0/keymanweb'>Learn more</a></li>
           </ul>
-          
+
           <p>You can also create your own custom keyboarding product based on Keyman: <a href='https://keyman.com/go/developer/10.0/keyman-engine-home'>Learn more</a></p>
-          
+
         </div>
       </div>
-   
+
       <div class='filelist' id="distributionlist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New file...</xsl:with-param>
@@ -58,23 +58,23 @@
           <xsl:with-param name="caption">Build all</xsl:with-param>
           <xsl:with-param name="command">keyman:compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.ts' or FileType='.tsv') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Clean all</xsl:with-param>
           <xsl:with-param name="command">keyman:cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.ts' or FileType='.tsv') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
-        
+
         <br />
         <br />
 
         <div>
-          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and not(ParentFileID)]">
+          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and FileType!='.ts' and FileType!='.tsv' and not(ParentFileID)]">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description"></xsl:with-param>
@@ -86,7 +86,7 @@
     </div>
   </xsl:template>
 
-  <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn']" >
+  <xsl:template mode="options_menu" match="/KeymanDeveloperProject/Files/File[FileType!='.kps' and FileType!='.kmn' and FileType!='.ts' and FileType!='.tsv']" >
     <div class="menu">
       <xsl:attribute name="id">menu_options_<xsl:value-of select="ID"/></xsl:attribute>
       <xsl:call-template name="menuitem">
@@ -97,12 +97,10 @@
         <xsl:with-param name="caption">Build</xsl:with-param>
         <xsl:with-param name="command">keyman:compilefile?id=<xsl:value-of select="ID" /></xsl:with-param>
       </xsl:call-template>
-      <xsl:if test="/KeymanDeveloperProject/Modules/Module[ID='BrandingPack']">
-        <xsl:call-template name="menuitem">
-          <xsl:with-param name="caption">Build installer</xsl:with-param>
-          <xsl:with-param name="command">keyman:package_compileinstaller?id=<xsl:value-of select="ID" /></xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
+      <xsl:call-template name="menuitem">
+        <xsl:with-param name="caption">Build installer</xsl:with-param>
+        <xsl:with-param name="command">keyman:package_compileinstaller?id=<xsl:value-of select="ID" /></xsl:with-param>
+      </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Clean</xsl:with-param>
         <xsl:with-param name="command">keyman:cleanfile?id=<xsl:value-of select="ID" /></xsl:with-param>
@@ -125,5 +123,5 @@
       </xsl:call-template>
     </div>
   </xsl:template>
-  
-</xsl:stylesheet>  
+
+</xsl:stylesheet>

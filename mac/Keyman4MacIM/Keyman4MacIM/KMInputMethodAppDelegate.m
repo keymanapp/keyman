@@ -24,6 +24,7 @@
 
 NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
+NSString *const kKMSavedStoresKey = @"KMSavedStoresKey";
 NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
@@ -80,20 +81,28 @@ id _lastServerWithOSKShowing = nil;
                                                            andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                          forEventClass:kInternetEventClass
                                                             andEventID:kAEGetURL];
-        
-        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGHeadInsertEventTap, kCGEventTapOptionListenOnly, NSFlagsChangedMask | NSLeftMouseDown | NSLeftMouseUp, (CGEventTapCallBack)eventTapFunction, nil);
-        
+
+        self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
+                                                 kCGHeadInsertEventTap,
+                                                 kCGEventTapOptionListenOnly,
+                                                 CGEventMaskBit(kCGEventFlagsChanged) |
+                                                 CGEventMaskBit(kCGEventLeftMouseDown) |
+                                                 CGEventMaskBit(kCGEventLeftMouseUp) |
+                                                 CGEventMaskBit(kCGEventKeyDown),
+                                                 (CGEventTapCallBack)eventTapFunction,
+                                                 nil);
+
         if (!self.lowLevelEventTap) {
             NSLog(@"Can't tap into low level events!");
         }
         else {
             CFRelease(self.lowLevelEventTap);
         }
-        
+
         self.runLoopEventSrc = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, self.lowLevelEventTap, 0);
-        
+
         CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-        
+
         if (self.runLoopEventSrc && runLoop) {
             CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
         }
@@ -118,7 +127,7 @@ id _lastServerWithOSKShowing = nil;
 #endif
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
-    
+
     [self processURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
 }
 
@@ -128,14 +137,14 @@ id _lastServerWithOSKShowing = nil;
     NSURL *url = [NSURL URLWithString:urlStr];
     if (self.debugMode)
         NSLog(@"url = %@", url);
-    
+
     if ([url.lastPathComponent isEqualToString:@"download"]) {
         if (_connection != nil) {
             if (self.debugMode)
                 NSLog(@"Already downloading a keyboard.");
             return;
         }
-        
+
         NSURL *downloadUrl;
         NSArray *params = [[url query] componentsSeparatedByString:@"&"];
         for (NSString *value in params) {
@@ -153,11 +162,11 @@ id _lastServerWithOSKShowing = nil;
                 downloadUrl = [NSURL URLWithString:urlString];
             }
         }
-        
+
         if (downloadUrl && _downloadFilename) {
             if (_infoWindow.window != nil)
                 [_infoWindow close];
-            
+
             [self.downloadInfoView setInformativeText:self.downloadFilename];
             if (self.configWindow.window != nil) {
                 [self.configWindow.window makeKeyAndOrderFront:nil];
@@ -250,13 +259,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             }
             return event;
         }
-        
+
         NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
         // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
         // un-commented when needed.
         //if (appDelegate.debugMode)
         //    NSLog(@"System Event: %@", sysEvent);
-        
+
         switch (type) {
             case kCGEventFlagsChanged:
                 appDelegate.currentModifierFlags = sysEvent.modifierFlags;
@@ -264,13 +273,24 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                     appDelegate.contextChangingEventDetected = YES;
                 }
                 break;
-                
+
             case kCGEventLeftMouseUp:
             case kCGEventLeftMouseDown:
             case kCGEventOtherMouseUp:
             case kCGEventOtherMouseDown:
                 appDelegate.contextChangingEventDetected = YES;
                 break;
+
+            case kCGEventKeyDown:
+                // Pass back delete events through to the input method event handler
+                // because some 'legacy' apps don't allow us to see back delete events
+                // that we have synthesized (and we need to see them, for serialization
+                // of events)
+                if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
+                    [appDelegate.inputController handleDeleteBackLowLevel:sysEvent];
+                }
+                break;
+
             default:
                 break;
         }
@@ -287,7 +307,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         _kme = [[KMEngine alloc] initWithKMX:nil contextBuffer:self.contextBuffer];
         [_kme setDebugMode:self.debugMode];
     }
-    
+
     return _kme;
 }
 
@@ -306,6 +326,53 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     _keyboardName = keyboardName;
     if (_oskWindow != nil)
         [_oskWindow.window setTitle:self.oskWindowTitle];
+}
+
+- (void)loadSavedStores {
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
+    if (!allSavedStores) return;
+    NSDictionary *savedStores = [allSavedStores objectForKey:_selectedKeyboard];
+    if (!savedStores) return;
+
+    NSNumberFormatter *fmt = [[NSNumberFormatter alloc] init];
+    fmt.numberStyle = NSNumberFormatterDecimalStyle;
+
+    for (NSString *key in savedStores) {
+        NSString *value = [savedStores objectForKey:key];
+        NSUInteger storeID = [[fmt numberFromString:key] unsignedIntegerValue];
+        [self.kme setStore:(DWORD)storeID withValue:value];
+    }
+}
+
+- (void)saveStore:(NSNumber *)storeKey withValue:(NSString* )value {
+    NSString *storeKeyStr = [storeKey stringValue];
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    NSDictionary *allSavedStores = [userData dictionaryForKey:kKMSavedStoresKey];
+    NSDictionary *savedStores;
+
+    if (allSavedStores) {
+        savedStores = [allSavedStores objectForKey:_selectedKeyboard];
+    }
+
+    if (savedStores) {
+        NSMutableDictionary *newSavedStores = [savedStores mutableCopy];
+        [newSavedStores setObject:value forKey:storeKeyStr];
+        savedStores = newSavedStores;
+    } else {
+        savedStores = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKeyStr, nil];
+    }
+
+    if (allSavedStores) {
+        NSMutableDictionary *newAllSavedStores = [allSavedStores mutableCopy];
+        [newAllSavedStores setObject:savedStores forKey:_selectedKeyboard];
+        allSavedStores = newAllSavedStores;
+    } else {
+        allSavedStores = [[NSDictionary alloc] initWithObjectsAndKeys:savedStores, _selectedKeyboard, nil];
+    }
+
+    [userData setObject:allSavedStores forKey:kKMSavedStoresKey];
+    [userData synchronize];
 }
 
 - (NSString *)oskWindowTitle {
@@ -352,7 +419,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [fm createDirectoryAtPath:_keyboardsPath withIntermediateDirectories:YES attributes:nil error:nil];
         }
     }
-    
+
     return _keyboardsPath;
 }
 
@@ -379,11 +446,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 }
             }
         }
-        
+
         if (others != nil)
             [_kmxFileList addObject:others];
     }
-    
+
     return _kmxFileList;
 }
 
@@ -399,7 +466,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             x++;
         }
     }
-    
+
     return nil;
 }
 
@@ -414,15 +481,15 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             x++;
             continue;
         }
-        
+
         if (index >= x && index <= (x+pArray.count)) {
             packagePath = [[pArray objectAtIndex:0] stringByDeletingLastPathComponent];
             break;
         }
-        
+
         x += (pArray.count+1);
     }
-    
+
     return packagePath;
 }
 
@@ -439,7 +506,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             }
         }
     }
-    
+
     return index;
 }
 
@@ -449,12 +516,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSString *mPath = [NSString stringWithString:[path stringByDeletingLastPathComponent]];
     if ([mPath isEqualToString:sourcePath])
         return @"Others";
-    
+
     while (![mPath isEqualToString:sourcePath]) {
         packageFolder = [mPath lastPathComponent];
         mPath = [mPath stringByDeletingLastPathComponent];
     }
-    
+
     return packageFolder;
 }
 
@@ -469,17 +536,17 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             hasInfo = YES;
             continue;
         }
-        
+
         if (hasInfo && [line startsWith:@"Name="]) {
             NSString *value = [[[line substringFromIndex:5] componentsSeparatedByString:@","] objectAtIndex:0];
             packageName = [NSString stringWithString:[value stringByReplacingOccurrencesOfString:@"\"" withString:@""]];
             break;
         }
     }
-    
+
     if (packageName == nil)
         packageName = packageFolder;
-    
+
     return packageName;
 }
 
@@ -504,7 +571,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
     NSMutableArray *fonts = [NSMutableArray arrayWithCapacity:0];
     NSMutableArray *kbs = [NSMutableArray arrayWithCapacity:0];
-    
+
     @try {
         NSString *fileContents = [[NSString stringWithContentsOfFile:infoFile encoding:NSUTF8StringEncoding error:NULL] stringByReplacingOccurrencesOfString:@"\r" withString:@""];
         NSArray *lines = [fileContents componentsSeparatedByString:@"\n"];
@@ -512,7 +579,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         for (NSString *line in lines) {
             if (!line.length)
                 continue;
-            
+
             if ([line startsWith:kPackage]) {
                 contentType = ctPackage;
                 continue;
@@ -537,14 +604,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 contentType = ctFiles;
                 continue;
             }
-            
+
             switch (contentType) {
                 case ctPackage: {
                     if ([line startsWith:kReadMeFile])
                         [infoDict setObject:[line substringFromIndex:kReadMeFile.length+1] forKey:kReadMeFile];
                     else if ([line startsWith:kGraphicFile])
                         [infoDict setObject:[line substringFromIndex:kGraphicFile.length+1] forKey:kGraphicFile];
-                    
+
                     break;
                 }
                 case ctButtons:
@@ -559,7 +626,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [infoDict setObject:@[v1, v2] forKey:kWelcome];
                     }
-                    
+
                     break;
                 }
                 case ctInfo: {
@@ -598,14 +665,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [infoDict setObject:@[v1, v2] forKey:kWebSite];
                     }
-                    
+
                     break;
                 }
                 case ctFiles: {
                     NSUInteger x = [line rangeOfString:@"="].location;
                     if (x == NSNotFound)
                         continue;
-                    
+
                     NSString *s = [line substringFromIndex:x+2];
                     if ([s startsWith:kFile]) {
                         NSArray *vs = [s componentsSeparatedByString:@"\","];
@@ -625,7 +692,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                         NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                         [kbs addObject:@[v1, v2]];
                     }
-                    
+
                     break;
                 }
                 default:
@@ -637,14 +704,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         NSLog(@"Error = %@", e.description);
         return nil;
     }
-    
+
     if (files.count)
         [infoDict setValue:files forKey:kFile];
     if (fonts.count)
         [infoDict setValue:fonts forKey:kFont];
     if (kbs.count)
         [infoDict setValue:kbs forKey:kKeyboard];
-    
+
     return infoDict.count?[NSDictionary dictionaryWithDictionary:infoDict]:nil;
 }
 
@@ -653,7 +720,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
         _selectedKeyboard = [userData objectForKey:kKMSelectedKeyboardKey];
     }
-    
+
     return _selectedKeyboard;
 }
 
@@ -671,7 +738,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if (!_activeKeyboards)
             _activeKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
     }
-    
+
     return _activeKeyboards;
 }
 
@@ -696,7 +763,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if (![[NSFileManager defaultManager] fileExistsAtPath:path])
             [pathsToRemove addObject:path];
     }
-    
+
     if (pathsToRemove.count > 0) {
         [self.activeKeyboards removeObjectsInArray:pathsToRemove];
         NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
@@ -709,7 +776,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (_contextBuffer == nil) {
         _contextBuffer = [[NSMutableString alloc] initWithString:@""];
     }
-    
+
     return _contextBuffer;
 }
 
@@ -722,15 +789,15 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)awakeFromNib {
     [self setKeyboardsSubMenu];
-    
+
     NSMenuItem *config = [self.menu itemWithTag:2];
     if (config)
         [config setAction:@selector(menuAction:)];
-    
+
     NSMenuItem *osk = [self.menu itemWithTag:3];
     if (osk)
         [osk setAction:@selector(menuAction:)];
-    
+
     NSMenuItem *about = [self.menu itemWithTag:4];
     if (about)
         [about setAction:@selector(menuAction:)];
@@ -765,6 +832,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 [self setKvk:kvk];
                 [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
                 [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
+                [self loadSavedStores];
 
                 didSetKeyboard = YES;
             }
@@ -773,7 +841,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
             [keyboards.submenu addItem:item];
         }
-        
+
         if (keyboards.submenu.numberOfItems == 0) {
             NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"(None)" action:NULL keyEquivalent:@""];
             [keyboards.submenu addItem:item];
@@ -800,6 +868,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
             [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
             [self setContextBuffer:nil];
+            [self loadSavedStores];
             [self setSelectedKeyboard:path];
         }
     }
@@ -818,7 +887,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if ([extension isEqualToString:@"kmx"])
             [kmxFiles addObject:[path stringByAppendingPathComponent:filePath]];
     }
-    
+
     return kmxFiles;
 }
 
@@ -831,7 +900,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if ([extension isEqualToString:@"kvk"])
             [kvkFiles addObject:[self.keyboardsPath stringByAppendingPathComponent:filePath]];
     }
-    
+
     return kvkFiles;
 }
 
@@ -844,14 +913,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             break;
         }
     }
-    
+
     return kvkFilePath;
 }
 
 - (NSWindowController *)oskWindow {
     if (!_oskWindow)
         _oskWindow = [[OSKWindowController alloc] initWithWindowNibName:@"OSKWindowController"];
-    
+
     return _oskWindow;
 }
 
@@ -893,7 +962,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (_aboutWindow.window == nil) {
         _aboutWindow = [[KMAboutWindowController alloc] initWithWindowNibName:@"KMAboutWindowController"];
     }
-    
+
     return _aboutWindow;
 }
 
@@ -905,7 +974,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (_infoWindow.window == nil) {
         _infoWindow = [[KMInfoWindowController alloc] initWithWindowNibName:@"KMInfoWindowController"];
     }
-    
+
     return _infoWindow;
 }
 
@@ -917,7 +986,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (_kbHelpWindow.window == nil) {
         _kbHelpWindow = [[KMKeyboardHelpWindowController alloc] initWithWindowNibName:@"KMKeyboardHelpWindowController"];
     }
-    
+
     return _kbHelpWindow;
 }
 
@@ -929,7 +998,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (_downloadKBWindow.window == nil) {
         _downloadKBWindow = [[KMDownloadKBWindowController alloc] initWithWindowNibName:@"KMDownloadKBWindowController"];
     }
-    
+
     return _downloadKBWindow;
 }
 
@@ -953,11 +1022,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [self.infoWindow.window makeKeyAndOrderFront:nil];
             [self.infoWindow.window setLevel:NSFloatingWindowLevel];
         }
-        
+
         NSString *packagePath = [self.keyboardsPath stringByAppendingPathComponent:[self.downloadFilename stringByDeletingPathExtension]];
         [self.infoWindow setPackagePath:packagePath];
     }
-    
+
     _downloadInfoView = nil;
     _connection = nil;
     _downloadFilename = nil;
@@ -974,7 +1043,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_downloadInfoView setAlertStyle:NSInformationalAlertStyle];
         [_downloadInfoView setAccessoryView:self.progressIndicator];
     }
-    
+
     return _downloadInfoView;
 }
 
@@ -986,7 +1055,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_progressIndicator setMaxValue:100];
         [_progressIndicator setDoubleValue:0];
     }
-    
+
     return _progressIndicator;
 }
 
@@ -1045,7 +1114,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)handleKeyEvent:(NSEvent *)event {
     if (_oskWindow == nil)
         return;
-    
+
     [_oskWindow.oskView handleKeyEvent:event];
 }
 
@@ -1055,12 +1124,12 @@ extern const CGKeyCode kProcessPendingBuffer;
 // allows us to override the norma behavior for unit testing, where there is no
 // active event loop to post to.
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
-    
+
     CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
     if (postEvent)
         postEvent(ev);
     CFRelease(ev);
-    if (virtualKey != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed 
+    if (virtualKey != kProcessPendingBuffer) { // special 0xFF code is not a real key-press, so no "up" is needed
         ev = CGEventCreateKeyboardEvent (source, virtualKey, false); //up
         if (postEvent)
             postEvent(ev);
@@ -1083,7 +1152,7 @@ extern const CGKeyCode kProcessPendingBuffer;
         didUnzip = [za UnzipFileTo:destFolder overWrite:YES];
         [za UnzipCloseFile];
     }
-    
+
     if (didUnzip) {
         if (self.debugMode)
             NSLog(@"Unzipped file: %@", filePath);
@@ -1101,7 +1170,7 @@ extern const CGKeyCode kProcessPendingBuffer;
             NSLog(@"Failed to unzip file: %@", filePath);
         }
     }
-    
+
     return didUnzip;
 }
 
@@ -1109,14 +1178,14 @@ extern const CGKeyCode kProcessPendingBuffer;
     if (_fontsPath == nil) {
         BOOL isDir;
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-        
+
         if (paths.count == 1) {
             NSString *path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Fonts"];
             if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir] && isDir)
                 _fontsPath = [NSString stringWithString:path];
         }
     }
-    
+
     return _fontsPath;
 }
 
@@ -1124,17 +1193,17 @@ extern const CGKeyCode kProcessPendingBuffer;
     NSString *fontsPath = self.fontsPath;
     if (fontsPath == nil)
         return;
-    
+
     NSArray *fonts = [self FontFilesAtPath:path];
     for (NSString *srcPath in fonts) {
         NSString *destPath = [fontsPath stringByAppendingPathComponent:[srcPath lastPathComponent]];
         NSError *error;
         if ([[NSFileManager defaultManager] fileExistsAtPath:destPath])
             [[NSFileManager defaultManager] removeItemAtPath:destPath error:&error];
-        
+
         if (error == nil)
             [[NSFileManager defaultManager] copyItemAtPath:srcPath toPath:destPath error:&error];
-        
+
         if (error != nil)
             NSLog(@"Error = %@", error);
     }
@@ -1149,7 +1218,7 @@ extern const CGKeyCode kProcessPendingBuffer;
         if ([extension isEqualToString:@"ttf"] || [extension isEqualToString:@"otf"])
             [fontFiles addObject:[path stringByAppendingPathComponent:filePath]];
     }
-    
+
     return fontFiles;
 }
 

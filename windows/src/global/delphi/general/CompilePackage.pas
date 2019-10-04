@@ -49,10 +49,13 @@ uses
   RegistryKeys,
   kmxfile,
   KeymanDeveloperOptions,
+  KeymanVersion,
 
   Keyman.System.KeyboardUtils,
+  Keyman.System.LexicalModelUtils,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.PackageInfoRefreshKeyboards,
+  Keyman.System.PackageInfoRefreshLexicalModels,
 
   RedistFiles,
   TempFileManager;
@@ -82,6 +85,7 @@ type
     procedure CheckKeyboardVersions;
     procedure CheckKeyboardLanguages;
     procedure CheckFilenameConventions;
+    function CheckLexicalModels: Boolean;
   end;
 
 function DoCompilePackage(pack: TKPSFile; AMessageEvent: TCompilePackageMessageEvent; ASilent, ACheckFilenameConventions: Boolean; const AOutputFileName: string): Boolean;   // I4688
@@ -119,14 +123,36 @@ begin
   if not FCheckFilenameConventions then
     Exit;
 
-  if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(pack.FileName) then
-    WriteMessage(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(pack.FileName)]));
+  if pack.LexicalModels.Count > 0 then
+  begin
+    if not TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventions(pack.FileName) then
+      WriteMessage(plsWarning, Format(TKeyboardUtils.SPackageNameDoesNotFollowLexicalModelConventions_Message, [ExtractFileName(pack.FileName)]));
+  end
+  else
+  begin
+    if not TKeyboardUtils.DoesKeyboardFilenameFollowConventions(pack.FileName) then
+      WriteMessage(plsWarning, Format(TKeyboardUtils.SKeyboardNameDoesNotFollowConventions_Message, [ExtractFileName(pack.FileName)]));
+  end;
 
   for i := 0 to pack.Files.Count - 1 do
   begin
     if not TKeyboardUtils.DoesFilenameFollowConventions(pack.Files[i].FileName) then
       WriteMessage(plsWarning, Format(TKeyboardUtils.SFilenameDoesNotFollowConventions_Message, [ExtractFileName(pack.Files[i].FileName)]));
   end;
+end;
+
+function TCompilePackage.CheckLexicalModels: Boolean;
+begin
+  if pack.LexicalModels.Count > 0 then
+  begin
+    if pack.Keyboards.Count > 0 then
+    begin
+      FatalMessage('The package contains both lexical models and keyboards, which is not permitted.');
+      Exit(False);
+    end;
+  end;
+
+  Exit(True);
 end;
 
 function TCompilePackage.Compile: Boolean;
@@ -155,6 +181,7 @@ begin
   CheckForDangerousFiles;
   CheckKeyboardVersions;
   CheckKeyboardLanguages;
+  if not CheckLexicalModels then Exit;
 
   GetTempPath(260, buf);
   FTempPath := buf;
@@ -216,6 +243,18 @@ begin
       Free;
     end;
 
+    with TPackageInfoRefreshLexicalModels.Create(kmpinf) do
+    try
+      OnError := Self.FOnMessage;
+      if not Execute then
+      begin
+        WriteMessage(plsError, 'The package build was not successful.');
+        Exit;
+      end;
+    finally
+      Free;
+    end;
+
     //
     // Update the package version to the current compiled
     // keyboard version.
@@ -230,7 +269,6 @@ begin
       end;
 
       FPackageVersion := kmpinf.Keyboards[0].Version;
-
       for i := 1 to kmpinf.Keyboards.Count - 1 do
         if kmpinf.Keyboards[i].Version <> FPackageVersion then
         begin
@@ -239,17 +277,25 @@ begin
             'and the keyboards have mismatching versions.');
           Exit;
         end;
-      kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;;
+
+      kmpinf.Info.Desc[PackageInfo_Version] := FPackageVersion;
     end;
 
     kmpinf.RemoveFilePaths;
 
-    psf := TPackageContentFile.Create(kmpinf);
-    psf.FileName := 'kmp.inf';
-    psf.Description := 'Package information';
-    psf.CopyLocation := pfclPackage;
+    if kmpinf.LexicalModels.Count = 0
+      then kmpinf.Options.FileVersion := SKeymanVersion70
+      else kmpinf.Options.FileVersion := SKeymanVersion120;
 
-    kmpinf.Files.Add(psf);
+    if kmpinf.Options.FileVersion = SKeymanVersion70 then
+    begin
+      psf := TPackageContentFile.Create(kmpinf);
+      psf.FileName := 'kmp.inf';
+      psf.Description := 'Package information';
+      psf.CopyLocation := pfclPackage;
+
+      kmpinf.Files.Add(psf);
+    end;
 
     psf := TPackageContentFile.Create(kmpinf);
     psf.FileName := 'kmp.json';

@@ -647,6 +647,11 @@ namespace com.keyman.text {
     beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
+      // Do not trigger a 'beep' when operating on alternates - the use case of Mocks.
+      if(outputTarget instanceof Mock) {
+        return;
+      }
+
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();
@@ -844,7 +849,7 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       
       // KeymanTouch for Android uses direct insertion of the character string
-      if('oninserttext' in keyman) {
+      if('oninserttext' in keyman && !(outputTarget instanceof Mock)) {
         keyman['oninserttext'](dn,s);
       }
 
@@ -980,6 +985,11 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
+        // Do not trigger a layer change when operating on alternates - the use case of Mocks.
+        if(outputTarget instanceof Mock) {
+          return;
+        }
+
         // How would this be handled in an eventual headless mode?
         return keyman.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
@@ -1098,14 +1108,8 @@ namespace com.keyman.text {
     /**
      * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
      */
-    ['getLastActiveElement'](): HTMLElement {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        return keyman.domManager.getLastActiveElement(); 
-      } else {
-        // What are the IMEs looking for with this method?  Would an element interface suffice?
-        return null;
-      }
+    ['getLastActiveElement'](): OutputTarget {
+      return text.Processor.getOutputTarget();
     }
 
     ['focusLastActiveElement'](): void {
@@ -1138,6 +1142,13 @@ namespace com.keyman.text {
       }
     }
 
+    // Also needed for some legacy CJK keyboards.
+    ['GetLastActiveElement'] = this['getLastActiveElement'];
+    ['FocusLastActiveElement'] = this['focusLastActiveElement'];
+    ['HideHelp'] = this['hideHelp'];
+    ['ShowHelp'] = this['showHelp'];
+    ['ShowPinnedHelp'] = this['showPinnedHelp'];
+
     resetContext() {
       let keyman = com.keyman.singleton;
       if(!keyman.isHeadless && keyman.osk.vkbd) {
@@ -1151,6 +1162,10 @@ namespace com.keyman.text {
       }
       this.resetContextCache();
       this.resetVKShift();
+      
+      if(keyman.modelManager) {
+        keyman.modelManager.invalidateContext();
+      }
 
       if(!keyman.isHeadless) {
         keyman.osk._Show();

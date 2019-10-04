@@ -1,9 +1,97 @@
 # Keyman for Android
 
-## 12.0 alpha
-* Update compile and target Android SDK version to 28 (#1654)
-* Add feature to install lexical model packages (#1641, 1653)
-* Started work on Keyman for Android 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-10-04 12.0.4096 beta
+* Bug Fix:
+  * Add wrappers for missing API methods (#2167)
+* Add in-app help on uninstalling dictionary (#2171)
+
+## 2019-10-01 12.0.4095 beta
+* Splits help into multiple pages for better usability (#2139)
+
+## 2019-09-26 12.0.4094 beta
+* Bug Fixes:
+  * Fix crash when Language picker doesn't contain keyboard catalog info (#2138)
+  * Fix crashes involving dismissing keyboard and selecting the last keyboard (#2135)
+  * Improve keyboard swap stability (#2136)
+
+## 2019-09-26 12.0.4093 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2126)
+
+## 2019-09-23 12.0.4092 beta
+* Disable corrections toggle when predictions are disabled (#2119)
+
+## 2019-09-20 12.0.4091 beta
+* Update offline help content (#2104)
+
+## 2019-09-19 12.0.4090 beta
+* Use versioned help on the Info page (#2103)
+
+## 2019-09-09 12.0.4086 beta
+* Bug Fix:
+  * Fix exception handling while parsing JSON info from cloud (#2065)
+  * Fix crash involving undefined key for custom keyboard (#2066)
+
+## 2019-09-06 12.0.4085 beta
+* New Feature
+  * Include the English (MTNT) dictionary by default for English (#2029)
+
+* Bug Fix:
+  * Fix collision of File Provider (#2053)
+
+## 2019-09-04 12.0.4084 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2033, #2037)
+
+## 2019-09-03 12.0.4083 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2027)
+
+## 2019-09-02 12.0.4082 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2013)
+
+## 2019-08-30 12.0.4081 beta
+* New Feature:
+  * Allow user to "Add keyboard from local device" from Settings menu (#1992)
+
+* Bug Fix:
+  * Fix keyboard and dictionary info pages (#2020)
+
+## 2019-08-27 12.0.4080 beta
+* Fix menu icon and text alignment (#1999)
+
+## 2019-08-23 12.0.4079 beta
+* Disable version and copyright text on splash screen (#1989)
+
+## 2019-08-16 12.0.4078 beta
+* No changes to Keyman for Android
+
+## 2019-08-12 12.0.4077 beta
+* No changes to Keyman for Android
+
+## 2019-08-06 12.0.4076 beta
+* Adjustments to Settings UI (#1931)
+
+## 2019-08-05 12.0.4075 beta
+* Fixes issue with suggestion text misalignment (#1932)
+
+## 2019-07-29 12.0.4074 beta
+* Initial beta release of Keyman for Android 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Aandroid+base%3Amaster)
+
+* New Features:
+  * Add new "Settings" menu (#1751)
+  * Add predictive text support (#1641, #1653)
+
+* Changes:
+  * Minimum supported Android version is now 4.4 (KitKat) (#1905)
+
+* Bug Fixes:
+  * Improve stability of keyboard loading and app startup (#1907)
+
+## 2019-06-28 11.0.2108 stable
+* Changes:
+  * Allow user to change keyboard from lock screen (#1709)
 
 ## 2019-02-27 11.0.2102 stable
 * Bug fix:

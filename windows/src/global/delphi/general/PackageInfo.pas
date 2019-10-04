@@ -328,7 +328,38 @@ type
     Name: string;
   end;
 
-  TPackageKeyboardLanguageList = class(TPackageObjectList<TPackageKeyboardLanguage>);
+  TPackageKeyboardLanguageList = class(TPackageObjectList<TPackageKeyboardLanguage>)
+  public
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+  end;
+
+  TPackageLexicalModel = class(TPackageBaseObject)
+  private
+    FName: string;
+    FID: string;
+    FLanguages: TPackageKeyboardLanguageList;
+    FRTL: Boolean;
+  public
+    constructor Create(APackage: TPackage); override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPackageLexicalModel); virtual;
+    property Name: string read FName write FName;
+    property ID: string read FID write FID;
+    property RTL: Boolean read FRTL write FRTL;
+    property Languages: TPackageKeyboardLanguageList read FLanguages;
+  end;
+
+  TPackageLexicalModelList = class(TPackageObjectList<TPackageLexicalModel>)
+    procedure Assign(Source: TPackageLexicalModelList); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+    function ItemByID(id: string): TPackageLexicalModel;
+  end;
 
   { TPackage }
 
@@ -352,6 +383,7 @@ type
     Files: TPackageContentFileList;
     Info: TPackageInfoEntryList;
     Keyboards: TPackageKeyboardList;
+    LexicalModels: TPackageLexicalModelList;
 
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
@@ -403,6 +435,7 @@ const
 
 const
   SXML_PackageKeyboards = 'Keyboards';
+  SXML_PackageKeyboard = 'Keyboard';
   SXML_PackageKeyboard_Name = 'Name';
   SXML_PackageKeyboard_ID = 'ID';
   SXML_PackageKeyboard_Version = 'Version';
@@ -414,6 +447,14 @@ const
   SXML_PackageKeyboard_Language = 'Language';
   SXML_PackageKeyboard_Language_ID = 'ID';
   SXML_PackageKeyboard_Language_Name = 'Name';
+
+  SXML_PackageLexicalModels = 'LexicalModels';
+  SXML_PackageLexicalModel = 'LexicalModel';
+  SXML_PackageLexicalModel_Name = 'Name';
+  SXML_PackageLexicalModel_ID = 'ID';
+  SXML_PackageLexicalModel_Version = 'Version';
+  SXML_PackageLexicalModel_RTL = 'RTL';
+  SXML_PackageLexicalModel_Languages = 'Languages';
 
 const
   SJSON_System = 'system';
@@ -471,6 +512,12 @@ const
   SJSON_Keyboard_Languages = 'languages';
   SJSON_Keyboard_Language_ID = 'id';
   SJSON_Keyboard_Language_Name = 'name';
+
+  SJSON_LexicalModels = 'lexicalModels';
+  SJSON_LexicalModel_Name = 'name';
+  SJSON_LexicalModel_ID = 'id';
+  SJSON_LexicalModel_RTL = 'rtl';
+  SJSON_LexicalModel_Languages = 'languages';
 
 function XmlVarToStr(v: OleVariant): string;
 begin
@@ -1366,17 +1413,19 @@ begin
   StartMenu.Assign(Source.StartMenu);
   Info.Assign(Source.Info);
   Keyboards.Assign(Source.Keyboards);
+  LexicalModels.Assign(Source.LexicalModels);
 end;
 
 constructor TPackage.Create;
 begin
   inherited Create;
+  // A subclass of this may have already created (subclasses of) these, so only create if not already done
   if not Assigned(Files)     then Files     := TPackageContentFileList.Create(Self);
   if not Assigned(Options)   then Options   := TPackageOptions.Create(Self);
   if not Assigned(StartMenu) then StartMenu := TPackageStartMenu.Create(Self);
   if not Assigned(Info)      then Info      := TPackageInfoEntryList.Create(Self);
   if not Assigned(Keyboards) then Keyboards := TPackageKeyboardList.Create(Self);
-
+  if not Assigned(LexicalModels) then LexicalModels := TPackageLexicalModelList.Create(Self);
 end;
 
 destructor TPackage.Destroy;
@@ -1386,6 +1435,7 @@ begin
   StartMenu.Free;
   Info.Free;
   Keyboards.Free;
+  LexicalModels.Free;
   inherited Destroy;
 end;
 
@@ -1418,6 +1468,7 @@ begin
   Options.LoadLegacy := FLoadLegacy;
   Options.LoadIni(ini);
   Keyboards.LoadIni(ini);
+  //LexicalModels not supported in ini
 end;
 
 procedure TPackage.LoadJSON;
@@ -1521,6 +1572,8 @@ begin
   Files.LoadJSON(ARoot);
   Options.LoadJSON(ARoot);
   Keyboards.LoadJSON(ARoot);
+  if Options.FileVersion = SKeymanVersion120 then
+    LexicalModels.LoadJSON(ARoot);
 end;
 
 procedure TPackage.DoLoadXML(ARoot: IXMLNode);
@@ -1528,7 +1581,7 @@ var
   FVersion: WideString;
 begin
   FVersion := XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
-  if FVersion <> SKeymanVersion70 then
+  if (FVersion <> SKeymanVersion70) and (FVersion <> SKeymanVersion120) then
     PackageLoadError('Package file version '+FVersion+' is not recognised.');
 
   StartMenu.LoadXML(ARoot);
@@ -1536,6 +1589,8 @@ begin
   Files.LoadXML(ARoot);
   Options.LoadXML(ARoot);
   Keyboards.LoadXML(ARoot);
+  if FVersion = SKeymanVersion120 then
+    LexicalModels.LoadXML(ARoot);
 end;
 
 procedure TPackage.DoSaveIni(ini: TIniFile);
@@ -1545,25 +1600,38 @@ begin
   Info.SaveIni(ini);
   Files.SaveIni(ini);
   Keyboards.SaveIni(ini);
+  // Lexical models not supported in ini
 end;
 
 procedure TPackage.DoSaveJSON(ARoot: TJSONObject);
 begin
+  if LexicalModels.Count > 0
+    then Options.FileVersion := SKeymanVersion120
+    else Options.FileVersion := SKeymanVersion70;
+
   Options.SaveJSON(ARoot);
   StartMenu.SaveJSON(ARoot);
   Info.SaveJSON(ARoot);
   Files.SaveJSON(ARoot);
   Keyboards.SaveJSON(ARoot);
+  if Options.FileVersion = SKeymanVersion120 then
+    LexicalModels.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
 begin
+  if LexicalModels.Count > 0
+    then Options.FileVersion := SKeymanVersion120
+    else Options.FileVersion := SKeymanVersion70;
+
   ARoot.ChildNodes['System'].ChildNodes['KeymanDeveloperVersion'].NodeValue := GetVersionString;
   Options.SaveXML(ARoot);
   StartMenu.SaveXML(ARoot);
   Info.SaveXML(ARoot);
   Files.SaveXML(ARoot);
   Keyboards.SaveXML(ARoot);
+  if Options.FileVersion = SKeymanVersion120 then
+    LexicalModels.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
@@ -1871,10 +1939,9 @@ end;
 procedure TPackageKeyboardList.LoadJSON(ARoot: TJSONObject);
 var
   keyboard: TPackageKeyboard;
-  i, j: Integer;
-  ALanguages, ANode: TJSONArray;
-  AKeyboard, ALanguage: TJSONObject;
-  FLanguage: TPackageKeyboardLanguage;
+  i: Integer;
+  ANode: TJSONArray;
+  AKeyboard: TJSONObject;
 begin
   Clear;
 
@@ -1893,21 +1960,7 @@ begin
     keyboard.RTL := GetJsonValueBool(AKeyboard, SJSON_Keyboard_RTL);
     keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
     keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
-
-    ALanguages := AKeyboard.Values[SJSON_Keyboard_Languages] as TJSONArray;
-    if Assigned(ALanguages) then
-    begin
-      for j := 0 to ALanguages.Count - 1 do
-      begin
-        ALanguage := ALanguages.Items[j] as TJSONObject;
-
-        FLanguage := TPackageKeyboardLanguage.Create(Package);
-        FLanguage.ID := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_ID);
-        FLanguage.Name := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_Name);
-        keyboard.Languages.Add(FLanguage);
-      end;
-    end;
-
+    keyboard.Languages.LoadJSON(AKeyboard);
     Add(keyboard);
   end;
 end;
@@ -1915,9 +1968,8 @@ end;
 procedure TPackageKeyboardList.LoadXML(ARoot: IXMLNode);
 var
   keyboard: TPackageKeyboard;
-  i, j: Integer;
-  AKeyboard, ALanguage, ALanguages, ANode: IXMLNode;
-  FLanguage: TPackageKeyboardLanguage;
+  i: Integer;
+  AKeyboard, ANode: IXMLNode;
 begin
   Clear;
 
@@ -1934,20 +1986,7 @@ begin
     keyboard.OSKFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_OSKFont]));
     keyboard.DisplayFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
 
-    ALanguages := AKeyboard.ChildNodes['Languages'];
-    if Assigned(ALanguages) then
-    begin
-      for j := 0 to ALanguages.ChildNodes.Count - 1 do
-      begin
-        ALanguage := ALanguages.ChildNodes[j];
-
-        FLanguage := TPackageKeyboardLanguage.Create(Package);
-        FLanguage.ID := VarToStr(ALanguage.Attributes[SXML_PackageKeyboard_Language_ID]);
-        FLanguage.Name := VarToStr(ALanguage.NodeValue);
-        keyboard.Languages.Add(FLanguage);
-      end;
-    end;
-
+    keyboard.Languages.LoadXML(AKeyboard);
     Add(keyboard);
   end;
 end;
@@ -1978,9 +2017,9 @@ end;
 
 procedure TPackageKeyboardList.SaveJSON(ARoot: TJSONObject);
 var
-  i, j: Integer;
-  AKeyboard, ALanguage: TJSONObject;
-  AKeyboards, ALanguages: TJSONArray;
+  i: Integer;
+  AKeyboard: TJSONObject;
+  AKeyboards: TJSONArray;
 begin
   if Count = 0 then
     Exit;
@@ -2002,28 +2041,19 @@ begin
     if Assigned(Items[i].DisplayFont) then
       AKeyboard.AddPair(SJSON_Keyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
 
-    ALanguages := TJSONArray.Create;
-    AKeyboard.AddPair(SJSON_Keyboard_Languages, ALanguages);
-    for j := 0 to Items[i].Languages.Count - 1 do
-    begin
-      ALanguage := TJSONObject.Create;
-      ALanguages.Add(ALanguage);
-      ALanguage.AddPair(SJSON_Keyboard_Language_Name, Items[i].Languages[j].Name);
-      ALanguage.AddPair(SJSON_Keyboard_Language_ID, Items[i].Languages[j].ID);
-    end;
+    Items[i].Languages.SaveJSON(AKeyboard);
   end;
 end;
 
 procedure TPackageKeyboardList.SaveXML(ARoot: IXMLNode);
 var
-  i, j: Integer;
+  i: Integer;
   AKeyboard, ANode: IXMLNode;
-  ALanguage, ALanguages: IXMLNode;
 begin
-  ANode := ARoot.AddChild('Keyboards');
+  ANode := ARoot.AddChild(SXML_PackageKeyboards);
   for i := 0 to Count - 1 do
   begin
-    AKeyboard := ANode.AddChild('Keyboard');
+    AKeyboard := ANode.AddChild(SXML_PackageKeyboard);
 
     AKeyboard.ChildNodes[SXML_PackageKeyboard_Name].NodeValue := Items[i].Name;
     AKeyboard.ChildNodes[SXML_PackageKeyboard_ID].NodeValue := Items[i].ID;
@@ -2034,13 +2064,8 @@ begin
       AKeyboard.ChildNodes[SXML_PackageKeyboard_OSKFont].NodeValue := Items[i].OSKFont.RelativeFileName;
     if Assigned(Items[i].DisplayFont) then
       AKeyboard.ChildNodes[SXML_PackageKeyboard_DisplayFont].NodeValue := Items[i].DisplayFont.RelativeFileName;
-    ALanguages := AKeyboard.AddChild('Languages');
-    for j := 0 to Items[i].Languages.Count - 1 do
-    begin
-      ALanguage := ALanguages.AddChild('Language');
-      ALanguage.NodeValue := Items[i].Languages[j].Name;
-      ALanguage.Attributes[SXML_PackageKeyboard_Language_ID] := Items[i].Languages[j].ID;
-    end;
+
+    Items[i].Languages.SaveXML(AKeyboard);
   end;
 end;
 
@@ -2057,6 +2082,231 @@ end;
 function GetJsonValueBool(o: TJSONObject; const n: string): Boolean;
 begin
   Result := Assigned(o.Values[n]) and (o.Values[n] is TJSONTrue);
+end;
+
+{ TPackageLexicalModel }
+
+procedure TPackageLexicalModel.Assign(Source: TPackageLexicalModel);
+var
+  i: Integer;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  FName := Source.Name;
+  FID := Source.ID;
+  FRTL := Source.RTL;
+  FLanguages.Clear;
+  for i := 0 to Source.Languages.Count - 1 do
+  begin
+    FLanguage := TPackageKeyboardLanguage.Create(Package);
+    FLanguage.ID := Source.Languages[i].ID;
+    FLanguage.Name := Source.Languages[i].Name;
+    FLanguages.Add(FLanguage);
+  end;
+end;
+
+constructor TPackageLexicalModel.Create(APackage: TPackage);
+begin
+  inherited Create(APackage);
+  FLanguages := TPackageKeyboardLanguageList.Create(APackage);
+end;
+
+destructor TPackageLexicalModel.Destroy;
+begin
+  FreeAndNil(FLanguages);
+  inherited Destroy;
+end;
+
+{ TPackageLexicalModelList }
+
+procedure TPackageLexicalModelList.Assign(Source: TPackageLexicalModelList);
+var
+  i: Integer;
+  plm: TPackageLexicalModel;
+begin
+  Clear;
+  for i := 0 to Source.Count - 1 do
+  begin
+    plm := TPackageLexicalModel.Create(Package);
+    plm.Assign(Source[i]);
+    Add(plm);
+  end;
+end;
+
+function TPackageLexicalModelList.ItemByID(id: string): TPackageLexicalModel;
+begin
+  for Result in Self do
+    if SameText(id, Result.ID) then
+      Exit;
+  Result := nil;
+end;
+
+procedure TPackageLexicalModelList.LoadJSON(ARoot: TJSONObject);
+var
+  lexicalModel: TPackageLexicalModel;
+  i: Integer;
+  ANode: TJSONArray;
+  ALexicalModel: TJSONObject;
+begin
+  Clear;
+
+  ANode := ARoot.Values[SJSON_LexicalModels] as TJSONArray;
+  if not Assigned(ANode) then
+    Exit;
+
+  for i := 0 to ANode.Count - 1 do
+  begin
+    ALexicalModel := ANode.Items[i] as TJSONObject;
+
+    lexicalModel := TPackageLexicalModel.Create(Package);
+    lexicalModel.Name := GetJsonValueString(ALexicalModel, SJSON_LexicalModel_Name);
+    lexicalModel.ID := GetJsonValueString(ALexicalModel,SJSON_LexicalModel_ID);
+    lexicalModel.RTL := GetJsonValueBool(ALexicalModel, SJSON_LexicalModel_RTL);
+    lexicalModel.Languages.LoadJSON(ALexicalModel);
+
+    Add(lexicalModel);
+  end;
+end;
+
+procedure TPackageLexicalModelList.LoadXML(ARoot: IXMLNode);
+var
+  lexicalModel: TPackageLexicalModel;
+  i: Integer;
+  ALexicalModel, ANode: IXMLNode;
+begin
+  Clear;
+
+  ANode := ARoot.ChildNodes[SXML_PackageLexicalModels];
+  for i := 0 to ANode.ChildNodes.Count - 1 do
+  begin
+    ALexicalModel := ANode.ChildNodes[i];
+
+    lexicalModel := TPackageLexicalModel.Create(Package);
+    lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
+    lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
+    lexicalModel.RTL := ANode.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
+    lexicalModel.Languages.LoadXML(ALexicalModel);
+    Add(lexicalModel);
+  end;
+end;
+
+procedure TPackageLexicalModelList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  ALexicalModel: TJSONObject;
+  ALexicalModels: TJSONArray;
+begin
+  if Count = 0 then
+    Exit;
+
+  ALexicalModels := TJSONArray.Create;
+  ARoot.AddPair(SJSON_LexicalModels, ALexicalModels);
+
+  for i := 0 to Count - 1 do
+  begin
+    ALexicalModel := TJSONObject.Create;
+    ALexicalModels.Add(ALexicalModel);
+
+    ALexicalModel.AddPair(SJSON_LexicalModel_Name, Items[i].Name);
+    ALexicalModel.AddPair(SJSON_LexicalModel_ID, Items[i].ID);
+    if Items[i].RTL then ALexicalModel.AddPair(SJSON_LexicalModel_RTL, TJSONTrue.Create);
+    Items[i].Languages.SaveJSON(ALexicalModel);
+  end;
+end;
+
+procedure TPackageLexicalModelList.SaveXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ALexicalModel, ANode: IXMLNode;
+begin
+  ANode := ARoot.AddChild(SXML_PackageLexicalModels);
+  for i := 0 to Count - 1 do
+  begin
+    ALexicalModel := ANode.AddChild(SXML_PackageLexicalModel);
+
+    ALexicalModel.ChildNodes[SXML_PackageLexicalModel_Name].NodeValue := Items[i].Name;
+    ALexicalModel.ChildNodes[SXML_PackageLexicalModel_ID].NodeValue := Items[i].ID;
+    if Items[i].RTL then
+      ALexicalModel.ChildNodes[SXML_PackageLexicalModel_RTL].NodeValue := True;
+
+    Items[i].Languages.SaveXML(ALexicalModel);
+  end;
+end;
+
+{ TPackageKeyboardLanguageList }
+
+procedure TPackageKeyboardLanguageList.LoadJSON(ARoot: TJSONObject);
+var
+  j: Integer;
+  ALanguage: TJSONObject;
+  FLanguage: TPackageKeyboardLanguage;
+  ALanguages: TJSONArray;
+begin
+  ALanguages := ARoot.Values[SJSON_Keyboard_Languages] as TJSONArray;
+  if not Assigned(ALanguages) then
+    Exit;
+
+  for j := 0 to ALanguages.Count - 1 do
+  begin
+    ALanguage := ALanguages.Items[j] as TJSONObject;
+
+    FLanguage := TPackageKeyboardLanguage.Create(Package);
+    FLanguage.ID := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_ID);
+    FLanguage.Name := GetJsonValueString(ALanguage, SJSON_Keyboard_Language_Name);
+    Self.Add(FLanguage);
+  end;
+end;
+
+procedure TPackageKeyboardLanguageList.LoadXML(ARoot: IXMLNode);
+var
+  j: Integer;
+  ALanguages, ALanguage: IXMLNode;
+  FLanguage: TPackageKeyboardLanguage;
+begin
+  ALanguages := ARoot.ChildNodes[SXML_PackageKeyboard_Languages];
+  if not Assigned(ALanguages) then
+    Exit;
+
+  for j := 0 to ALanguages.ChildNodes.Count - 1 do
+  begin
+    ALanguage := ALanguages.ChildNodes[j];
+
+    FLanguage := TPackageKeyboardLanguage.Create(Package);
+    FLanguage.ID := VarToStr(ALanguage.Attributes[SXML_PackageKeyboard_Language_ID]);
+    FLanguage.Name := VarToStr(ALanguage.NodeValue);
+    Self.Add(FLanguage);
+  end;
+end;
+
+procedure TPackageKeyboardLanguageList.SaveJSON(ARoot: TJSONObject);
+var
+  ALanguages: TJSONArray;
+  j: Integer;
+  ALanguage: TJSONObject;
+begin
+  ALanguages := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Keyboard_Languages, ALanguages);
+  for j := 0 to Count - 1 do
+  begin
+    ALanguage := TJSONObject.Create;
+    ALanguages.Add(ALanguage);
+    ALanguage.AddPair(SJSON_Keyboard_Language_Name, Items[j].Name);
+    ALanguage.AddPair(SJSON_Keyboard_Language_ID, Items[j].ID);
+  end;
+end;
+
+procedure TPackageKeyboardLanguageList.SaveXML(ARoot: IXMLNode);
+var
+  ALanguages: IXMLNode;
+  j: Integer;
+  ALanguage: IXMLNode;
+begin
+  ALanguages := ARoot.AddChild(SXML_PackageKeyboard_Languages);
+  for j := 0 to Count - 1 do
+  begin
+    ALanguage := ALanguages.AddChild(SXML_PackageKeyboard_Language);
+    ALanguage.NodeValue := Items[j].Name;
+    ALanguage.Attributes[SXML_PackageKeyboard_Language_ID] := Items[j].ID;
+  end;
 end;
 
 end.

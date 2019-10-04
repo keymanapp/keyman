@@ -9,5 +9,6 @@ digraph LMLayerFSM {
   unconfigured -> modelless [label="config"];
   modelless -> ready [label="load"];
   ready -> ready [label="predict"];
+  ready -> ready [label="wordbreak"];
   ready -> modelless [label="unload"];
 }

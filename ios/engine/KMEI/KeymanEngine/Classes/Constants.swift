@@ -6,19 +6,37 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import Foundation
+
 public enum Key {
   public static let keyboardInfo = "keyboardInfo"
+  public static let lexicalModelInfo = "lexicalModelInfo"
 
   /// Array of user keyboards info list in UserDefaults
   static let userKeyboardsList = "UserKeyboardsList"
 
+  /// Array of user lexical models info list in UserDefaults
+  static let userLexicalModelsList = "UserLexicalModelsList"
+
   /// Currently/last selected keyboard info in UserDefaults
   static let userCurrentKeyboard = "UserCurrentKeyboard"
+
+  /// Currently/last selected lexical model info in UserDefaults
+  static let userCurrentLexicalModel = "UserCurrentLexicalModel"
+  
+  /// Dictionary of lexical model ids keyed by language id in UserDefaults
+  static let userPreferredLexicalModels = "UserPreferredLexicalModels"
+  
+  /// Dictionary of prediction/correction toggle settings keyed by language id in UserDefaults
+  static let userPredictSettings = "UserPredictionEnablementSettings"
+  static let userCorrectSettings = "UserCorrectionEnablementSettings"
 
   // Internal user defaults keys
   static let engineVersion = "KeymanEngineVersion"
   static let keyboardPickerDisplayed = "KeyboardPickerDisplayed"
   static let synchronizeSWKeyboard = "KeymanSynchronizeSWKeyboard"
+  static let synchronizeSWLexicalModel = "KeymanSynchronizeSWLexicalModel"
+
   static let migrationLevel = "KeymanEngineMigrationLevel"
 
   // JSON keys for language REST calls
@@ -27,10 +45,16 @@ public enum Key {
 
   // TODO: Check if it matches with the key in Keyman Cloud API
   static let keyboardCopyright = "copyright"
+  static let lexicalModelCopyright = "lexicalmodelcopyright"
   static let languages = "languages"
 
   // Other keys
   static let update = "update"
+  
+  // ResourceDownloadQueue keys
+  static let downloadTask = "downloadTask"
+  static let downloadBatch = "downloadBatch"
+  static let downloadQueueFrame = "queueFrame"
 }
 
 public enum Defaults {
@@ -43,6 +67,11 @@ public enum Defaults {
                                                    isRTL: false,
                                                    font: font,
                                                    oskFont: nil,
+                                                   isCustom: false)
+  public static let lexicalModel = InstallableLexicalModel(id: "nrc.en.mtnt",
+                                                   name: "English dictionary (MTNT)",
+                                                   languageID: "en",
+                                                   version: "0.1.2",
                                                    isCustom: false)
 }
 

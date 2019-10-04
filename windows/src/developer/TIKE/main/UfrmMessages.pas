@@ -32,19 +32,37 @@ unit UfrmMessages;  // I3306   // I4796
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, CaptionPanel, Menus, Contnrs, UfrmTikeDock, UfrmTike,
-  JvComponentBase, JvDockControlForm;
+  System.Classes,
+  System.Contnrs,
+  System.SysUtils,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.StdCtrls,
+  Vcl.Menus,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  CaptionPanel,
+  JvComponentBase,
+  JvDockControlForm,
+
+  Keyman.Developer.System.Project.ProjectLog,
+  UfrmTikeDock,
+  UfrmTike, Vcl.ComCtrls;
 
 type
   TMessageItem = class
     FileName: string;
     Msg: string;
+    MsgCode, Line: Integer;
   end;
 
   TfrmMessages = class(TTikeDockForm)
     dlgSave: TSaveDialog;
-    memoMessage: TMemo;
+    memoMessage: TRichEdit;
     mnuPopup: TPopupMenu;
     cmdmClear: TMenuItem;
     cmdmSaveToFile: TMenuItem;
@@ -74,7 +92,7 @@ type
     property SelLine: Integer read GetSelLine write SetSelLine;
   public
     procedure RefreshOptions;
-    procedure Add(filename, msg: WideString);
+    procedure Add(state: TProjectLogState; filename, msg: WideString; MsgCode, line: Integer);
     procedure Clear;
     procedure NextMessage;
     procedure PrevMessage;
@@ -86,47 +104,53 @@ type
 var
   frmMessages: TfrmMessages;
 
-  FCompilingFile: string;
-
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
-
 implementation
 
 uses
-  Keyman.Developer.System.HelpTopics,
-
   UfrmMain,
   UfrmMDIEditor,
   dmActionsMain,
+  Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
-  Keyman.Developer.UI.Project.ProjectFileUI;
+  Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.ProjectUI;
 
 {$R *.DFM}
 
 
 {-------------------------------------------------------------------------------
- - Docking functions                                                           -
- -------------------------------------------------------------------------------}
-
-{procedure TfrmMessages.UpdateDockStatus(FDocked: Boolean);
-begin
-  inherited UpdateDockStatus(FDocked);
-  ResizeMessages;
-end;}
-
-{-------------------------------------------------------------------------------
  - Message functions                                                           -
  -------------------------------------------------------------------------------}
 
-procedure TfrmMessages.Add(filename, msg: WideString);
+procedure TfrmMessages.Add(state: TProjectLogState; filename, msg: WideString; MsgCode, line: Integer);
 var
   mi: TMessageItem;
+  FColor: TColor;
 begin
   mi := TMessageItem.Create;
   mi.FileName := filename;
   mi.Msg := msg;
-  memoMessage.Lines.Add(ExtractFileName(filename) + ': ' + StringReplace(msg, #13#10, '   ', [rfReplaceAll]));
+  mi.MsgCode := MsgCode;
+  mi.Line := line;
+
+  case state of
+    plsInfo: FColor := clBlack;
+    plsWarning: FColor := clOlive;
+    plsError: FColor := clRed;
+    plsFatal: FColor := clRed;
+    plsSuccess: FColor := clGreen;
+    plsFailure: FColor := clRed;
+  else
+    FColor := clBlack;
+  end;
+
+  memoMessage.SelStart := Length(memoMessage.Text);
+  memoMessage.SelLength := 0;
+  memoMessage.SelAttributes.Color := FColor;
+  memoMessage.Lines.Add(TProjectLog.FormatMessage(state, filename, msg, msgcode, line));
+  memoMessage.SelAttributes.Color := clBlack;
+
   FMessageItems.Add(mi);
   if not memoMessage.Focused then SelLine := memoMessage.Lines.Count - 1;
   modActionsMain.actViewMessages.Update;
@@ -138,6 +162,7 @@ procedure TfrmMessages.Clear;
 begin
   FMessageItems.Clear;
   memoMessage.Clear;
+  ProjectCompilerMessageClear;
 end;
 
 procedure TfrmMessages.memoMessageDblClick(Sender: TObject);
@@ -148,6 +173,9 @@ var
   FFilename: string;
   line: Integer;
 begin
+  if not IsGlobalProjectUIReady then
+    Exit;
+
   line := SelLine; if line < 0 then Exit;
 
   SelLine := line;
@@ -169,7 +197,7 @@ begin
     end;
   end;
 
-  if frm is TfrmTikeEditor then (frm as TfrmTikeEditor).FindError(mi.FileName, mi.Msg);   // I4081
+  if frm is TfrmTikeEditor then (frm as TfrmTikeEditor).FindError(mi.FileName, mi.Msg, mi.Line);   // I4081
 end;
 
 procedure TfrmMessages.memoMessageKeyDown(Sender: TObject; var Key: Word;
@@ -205,31 +233,6 @@ end;
 procedure TfrmMessages.cmdmPreviousMessageClick(Sender: TObject);
 begin
   PrevMessage;
-end;
-
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
-var
-  errtype: string;
-begin
-  (*subtext := text;
-  n := Pos('chr:', subtext);
-  if n > 0 then
-  begin
-    if TryStrToInt(Trim(Copy(subtext, n+4, MAXINT)), v) then
-    begin
-      Delete(subtext, n, MAXINT);
-    end;
-  end;*)
-
-  case msgcode and $F000 of
-    $1000: errtype := 'fatal';
-    $2000: errtype := 'warning';
-    $4000: errtype := 'error';
-    $8000: errtype := 'fatal';
-  end;
-
-  frmMessages.Add(FCompilingFile, Format('line %d  %s %x: %s', [line, errtype, msgcode, text]));
-  Result := 1;
 end;
 
 procedure TfrmMessages.NextMessage;
@@ -274,7 +277,7 @@ begin
   n := memoMessage.SelStart;
   for I := 0 to memoMessage.Lines.Count - 1 do
   begin
-    x := x + Length(memoMessage.Lines[i]) + 2;
+    x := x + Length(memoMessage.Lines[i]) + 1;
     if x > n then
     begin
       Result := i;
@@ -305,7 +308,7 @@ begin
   end;
   for i := 0 to Value - 1 do
   begin
-    x := x + Length(memoMessage.Lines[i]) + 2;
+    x := x + Length(memoMessage.Lines[i]) + 1;
   end;
   memoMessage.SelStart := x;
   memoMessage.SelLength := Length(memoMessage.Lines[Value]);

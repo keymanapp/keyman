@@ -14,7 +14,7 @@
         app:showAsAction="always"
         android:title="@string/action_web"
         android:icon="@drawable/ic_light_action_web" />
-    
+
     <item
         android:id="@+id/action_text_size"
         app:showAsAction="always"
@@ -38,5 +38,11 @@
         app:showAsAction="always"
         android:title="@string/get_started"
         android:icon="@drawable/ic_action_get_started" />
-        
+
+    <item
+        android:id="@+id/action_settings"
+        app:showAsAction="always"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_settings" />
+
 </menu>

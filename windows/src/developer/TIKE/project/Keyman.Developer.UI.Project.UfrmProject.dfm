@@ -15,10 +15,4 @@ inherited frmProject: TfrmProject
     Left = 536
     Top = 40
   end
-  object tmrRefresh: TTimer
-    Enabled = False
-    OnTimer = tmrRefreshTimer
-    Left = 604
-    Top = 48
-  end
 end

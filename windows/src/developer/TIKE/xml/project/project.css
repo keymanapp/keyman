@@ -1,68 +1,82 @@
-#pageheader { font: 16pt Tahoma; padding:	8px 8px 8px 8px; border-bottom: 2px solid #CC3846; margin: 0px 0px 0px 0px; }
-#upperexpand {float: right; height: 24px; background-position: 6px 7px; background-repeat: no-repeat; font: bold 8pt Tahoma; padding: 5px 0px 0px 20px;}
+#pageheader { font: 16pt "Segoe UI"; padding:	8px 8px 8px 8px; border-bottom: 2px solid #CC3846; margin: 0px 0px 0px 0px; }
+#upperexpand {float: right; height: 24px; background-position: 6px 7px; background-repeat: no-repeat; font: bold 8pt "Segoe UI"; padding: 5px 0px 0px 20px;}
 #state { display: none; }
 
 .pagetext a { text-decoration: none; }
 .pagetext a:hover { text-decoration: underline; }
 
-.page { 
+.page {
   display: none;
   max-height: calc(100% - 153px);  /* tabs height + pageheader height */
   overflow-y: auto;
 }
 
-.tabbackground { 
-  position: absolute; 
-  bottom: 0px; 
-  background: linear-gradient(#dedee2, #ffffff); 
-  width: 100%; 
-  padding-bottom: 2px; 
+.tabbackground {
+  position: absolute;
+  bottom: 0px;
+  background: linear-gradient(#dedee2, #ffffff);
+  width: 100%;
+  padding-bottom: 2px;
   border-top: 2px solid #CC3846;
 }
 
-.tabbspacer { 
-  float: left; 
-  width: 30px; 
+.tabbspacer {
+  float: left;
+  width: 30px;
 }
 
-.tabb { 
-  top: -2px; 
-  position: relative; 
-  float: left; 
-  height: 90px; 
-  width: 90px; 
+.tabb {
+  top: -2px;
+  position: relative;
+  float: left;
+  height: 90px;
+  width: 90px;
   margin-left: 2px;
   margin-right: 2px;
-  text-align: center; 
-  font: bold 10pt Tahoma; 
-  border-top: 2px solid #CC3846; 
-  background:none; 
+  text-align: center;
+  font: bold 10pt "Segoe UI";
+  border-top: 2px solid #CC3846;
+  background:none;
   color: #888888;
 }
 
 body.tab-0 .tabb#tabb0,
 body.tab-1 .tabb#tabb1,
 body.tab-2 .tabb#tabb2,
-body.tab-3 .tabb#tabb3 {
-  border-top: none; 
-  width: 90px; 
-  border-left: 2px solid #CC3846; 
-  border-right: 2px solid #CC3846; 
-  border-bottom: 2px solid #CC3846; 
+body.tab-3 .tabb#tabb3,
+body.tab-4 .tabb#tabb4 {
+  border-top: none;
+  width: 90px;
+  border-left: 2px solid #CC3846;
+  border-right: 2px solid #CC3846;
+  border-bottom: 2px solid #CC3846;
   margin-left: 0;
   margin-right: 0;
-  padding-top: 2px; 
-  background: #FFFFFF; 
-  color: #000000; 
+  padding-top: 2px;
+  background: #FFFFFF;
+  color: #000000;
 }
 
 body.tab-0 .page#page-0,
 body.tab-1 .page#page-1,
 body.tab-2 .page#page-2,
-body.tab-3 .page#page-3 {
+body.tab-3 .page#page-3,
+body.tab-4 .page#page-4 {
   display: block;
 }
-  
+
+html.type-lexical-model .tabb#tabb1,
+html.type-lexical-model .keyboard-specific {
+  /* Hide keyboards tab for lexical model projects */
+  display: none;
+}
+
+html.type-keyboard .tabb#tabb2,
+html.type-keyboard .lexical-model-specific {
+  /* Hide lexical-models tab for keyboard projects */
+  display: none;
+}
+
 
 .help-container {
   display: none;
@@ -84,13 +98,13 @@ table.io {
 table.io td {
   text-align: center;
   padding: 5px;
-  font: bold 8pt Tahoma;
+  font: bold 8pt "Segoe UI";
 }
 table.io td.arrow {
   padding: 5px 20px 5px 20px;
 }
 table.io th {
-  font: bold 8pt Tahoma 
+  font: bold 8pt "Segoe UI"
 }
 
 .pages { overflow-y: auto; padding-top: 12px; width: 100%; height: 100% }
@@ -98,24 +112,24 @@ table.io th {
 .checkbox { background-image: url("chk_checkbox.gif");}
 .checked { background-image: url("chk_checked.gif"); }
 
-.headerimage { 
+.headerimage {
   vertical-align: top;
-  display: table-cell; 
-  width: 140px; 
-  margin: 5px 20px 0px 10px; 
+  display: table-cell;
+  width: 140px;
+  margin: 5px 20px 0px 10px;
   text-align: center;
 }
 
 .quicklinks { margin-top: 16px; }
 .quicklinks h3 { text-align: center }
-.quicklinks ul { margin-left: 16px; padding-left: 0px; font: 8pt Tahoma; margin-top: 4px; text-align: left }
+.quicklinks ul { margin-left: 16px; padding-left: 12px; font: 8pt "Segoe UI"; margin-top: 4px; text-align: left }
 
-.pagetext { 
+.pagetext {
   vertical-align: top;
-  display: table-cell; 
-  padding: 0px 20px 20px 0px; 
-  font: 10pt Tahoma; 
-  text-align: justify; 
+  display: table-cell;
+  padding: 20px;
+  font: 10pt "Segoe UI";
+  text-align: justify;
 }
 
 .pagetext ul { margin: 0px 10px 10px 16px; }
@@ -124,11 +138,11 @@ table.io th {
 
 .filelist { padding: 0 10px 10px 10px; clear: all; }
 
-.file { 
-  margin-top: 5px; 
-  min-height: 24px; 
-  border: 2px solid #CEEDFB; 
-  padding: 2px 0px 2px 2px; 
+.file {
+  margin-top: 5px;
+  min-height: 24px;
+  border: 2px solid #CEEDFB;
+  padding: 2px 0px 2px 2px;
   display: block;
 }
 
@@ -136,32 +150,32 @@ table.io th {
 .fileexpand_empty { float: left; width: 20px; height: 24px; background-image: url("btn_expand_empty.gif"); background-position: 45% 50%; background-repeat: no-repeat; }
 .filecontract { background-image: url("btn_contract.gif"); }
 .fileicon { float: left; margin: 4px 2px 0px 0px; }
-.filename { float: left; margin: 2px 0px 2px 2px; font: bold 12pt Tahoma; }
-.filedescription { float: left; margin: 5px 0px 0px 10px; font: 10pt Tahoma; }
+.filename { float: left; margin: 2px 0px 2px 2px; font: bold 12pt "Segoe UI"; }
+.filedescription { float: left; margin: 5px 0px 0px 10px; font: 10pt "Segoe UI"; }
 
-.filedetails { 
-  clear: both; 
-  display: none; 
-  padding-left: 20px; 
+.filedetails {
+  clear: both;
+  display: none;
+  padding-left: 20px;
   margin-bottom: 2px;
 }
 
-.filedetailtext { vertical-align: top;  font: 9pt Tahoma; }
+.filedetailtext { vertical-align: top;  font: 9pt "Segoe UI"; }
 table.filedetailtext tr th { white-space: nowrap; vertical-align: top; text-align: left; padding-left: 0px; padding-right: 8px; }
 
-.fileoptions { 
-  float: right; 
+.fileoptions {
+  float: right;
   margin-right: 2px;
 }
 
 body { padding: 0px; margin: 0px; height: 100%; cursor: default}
 html { height: 100%; overflow: hidden }
 
-p { font: 10pt Tahoma; margin: 4px 0 }
+p { font: 10pt "Segoe UI"; margin: 4px 0 }
 p.follow { color: #ad4a28; }
 p.upgrade { font-weight: bold }
-h2 { font: bold 12pt Tahoma; margin: 4px 0 8px 0 }
-h3 { font: bold 10pt Tahoma; margin: 4px 0 }
+h2 { font: bold 12pt "Segoe UI"; margin: 4px 0 8px 0 }
+h3 { font: bold 10pt "Segoe UI"; margin: 4px 0 }
 
 
 /* Popup menu styles */
@@ -181,35 +195,78 @@ h3 { font: bold 10pt Tahoma; margin: 4px 0 }
   z-index: 99;
 }
 
-.menu { 
-  position: absolute; 
-  display: block; 
-  background: white; 
-  visibility: hidden; 
-  border: solid 1px #ACA899; 
-  font: 8pt Tahoma; 
-  padding: 0px; 
-  background-image: url("menugrey.gif"); 
-  background-repeat: repeat-y; 
+.menu {
+  position: absolute;
+  display: block;
+  background: white;
+  visibility: hidden;
+  border: solid 1px #ACA899;
+  font: 8pt "Segoe UI";
+  padding: 0px;
+  background-image: url("menugrey.gif");
+  background-repeat: repeat-y;
   background-position: 0 0;
   z-index: 100;
 }
 
-k\:menuitem { 
-  width: calc(100%-2px); 
-  padding: 4px 4px 4px 28px; 
-  margin: 1px; 
+k\:menuitem {
+  width: calc(100%-2px);
+  padding: 4px 4px 4px 28px;
+  margin: 1px;
   display: block;
   box-sizing: border-box;
 }
 
-k\:menuitem:hover { 
-  color: #000000; 
-  background: #FFE3DB; 
-  border: solid 1px #DB704F; 
-  padding: 3 3 3 27; 
+k\:menuitem:hover {
+  color: #000000;
+  background: #FFE3DB;
+  border: solid 1px #DB704F;
+  padding: 3 3 3 27;
 }
 
-k\:menuitem.down { 
-  background: #DB704F; 
+k\:menuitem.down {
+  background: #DB704F;
+}
+
+/* Global Welcome elements */
+
+#globalwelcome #pageheader {
+  padding-left: 140px;
+  background: #6D6C6F;
+  border: none;
+  color: #dadddc;
+}
+
+#globalwelcome #pageheader a {
+  color: #dadddc;
+}
+
+#globalwelcome #pageheader .pagetext {
+  display: inline-block;
+  padding: 20px 20px 10px 20px;
+}
+
+#header-version,
+#header-link {
+  text-align: right;
+}
+
+#header-version {
+  margin-bottom: 0;
+}
+
+#header-sil img {
+  vertical-align: top;
+  margin-left: 4px;
+}
+
+#header-sil > div {
+  margin-top: 16px;
+  display: inline-block;
+  padding-left: 16px;
+  font-size: 16pt;
+}
+
+#header-copyright {
+  font-size: 8pt;
 }

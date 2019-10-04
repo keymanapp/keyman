@@ -102,7 +102,7 @@ type
     procedure ReloadAsTextFileFormatClick(TextFileFormat: TTextFileFormat);  // I3082   // I3502
       override;
 
-    procedure FindError(const Filename: string; s: string); override;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
 
     procedure SetEditorText(s: WideString);
 
@@ -128,7 +128,6 @@ uses
   kwhelp,
   OnlineConstants,
   Keyman.Developer.System.Project.Project,
-  ResourceStrings,
   KeymanDeveloperOptions,
   KMDevResourceStrings,
   KeymanDeveloperUtils,
@@ -364,7 +363,7 @@ begin
   TextFileFormat := TTextFileFormat(frmKeymanDeveloper.cbTextFileFormat.ItemIndex);
 end;
 
-procedure TfrmEditor.FindError(const Filename: string; s: string);   // I4081
+procedure TfrmEditor.FindError(const Filename: string; s: string; line: Integer);   // I4081
 begin
 end;
 

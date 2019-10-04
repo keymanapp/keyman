@@ -1,6 +1,7 @@
 **/DerivedData
 **/project.xcworkspace
 **/xcuserdata
+**/*.xcscheme
 Keyman4MacIM/output/*
 Keyman4MacIM/Keyman4MacIM/Frameworks/**
 Keyman4MacIM/Pods/**

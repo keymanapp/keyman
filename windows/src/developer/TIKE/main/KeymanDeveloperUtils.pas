@@ -60,7 +60,11 @@ const
   MAXMRU = 4;
   MAX_REG_FONT_ENTRIES = 16;
 
+<<<<<<< HEAD
 function ShouldShowStartup: Boolean;
+=======
+function GetFolderPath(csidl: Integer): string;
+>>>>>>> master
 function TikeActive: Boolean;
 function CreateLink(const ObjPath, LinkPath, Desc: string): Boolean;
 procedure SetFontFromString(f: TFont; s: string);
@@ -94,7 +98,7 @@ uses
   Classes, SysUtils,
   ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
-     ResourceStrings, CRC32, VisualKeyboard, Controls;
+     KeymanVersion, CRC32, VisualKeyboard, Controls;
 
 var
   hMutex: THandle;
@@ -172,6 +176,7 @@ begin
 end;
 
 
+<<<<<<< HEAD
 function ShouldShowStartup: Boolean;
 begin
   with TRegistryErrorControlled.Create do  // I2890
@@ -189,6 +194,28 @@ begin
   finally
     Free;
   end;
+=======
+function GetFolderPath(csidl: Integer): string;
+var
+    buf: array[0..260] of Char;
+    idl: PItemIDList;
+    mm: IMalloc;
+begin
+    Result := '';
+    if SHGetMalloc(mm) = NOERROR then
+    begin
+        if SHGetSpecialFolderLocation(0, csidl, idl) = NOERROR then
+        begin
+            if SHGetPathFromIDList(idl, buf) then
+            begin
+                Result := Buf;
+                if Result <> '' then
+                    if Result[Length(Result)] <> '\' then Result := Result + '\';
+            end;
+            mm.Free(idl);
+        end;
+    end;
+>>>>>>> master
 end;
 
 function TikeActive: Boolean;
@@ -424,7 +451,7 @@ begin
   Result := IncludeTrailingPathDelimiter(RootPath);
 
   if not FileExists(Result + 'keyman32.dll') then
-    ShowMessage('The executable keyman32.dll could not be found.  You should reinstall '+DistApplicationTitle+'.');
+    ShowMessage('The executable keyman32.dll could not be found.  You should reinstall '+SKeymanDesktopName+'.');
 end;
 
 

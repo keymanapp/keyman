@@ -179,7 +179,10 @@
         <DCCReference Include="..\..\global\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilicon.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ResourceStrings.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
+        <DCCReference Include="Keyman.Developer.System.ModelProjectTemplate.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

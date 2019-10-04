@@ -59,9 +59,9 @@
     // Keyboard rule "q" + "q" > nul
     [client handleEventIfNotHandledBy:im event:event];
     [self helperVerifyAndProcessPendingDelete:client inputMethodEventHandler:im];
-    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
+    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"d" keyCode:kVK_ANSI_B]];
     assert([client length] == 2);
-    assert([[client getResult] isEqualToString:@"ab"]);
+    assert([[client getResult] isEqualToString:@"ad"]);
 }
 
 - (void)testHandleEvent_Actions1QBack2Nul_Legacy_followingCharacter_ExistingContextCharacterDeleted {
@@ -76,6 +76,30 @@
     assert([client length] == 1);
     assert([[client getResult] isEqualToString:@"b"]);
 }
+
+// This test added to verify https://github.com/keymanapp/keyman/issues/1877; seems to fail only on macOS Mojave 10.14.5
+/* Sadly, the test suite infrastructure isn't complete enough to allow us to run this test automatically at present.
+-(void)testHandleEvent_Actions1A1B2C_Legacy_precedingCharacterInEngineContext_ExistingContextCharacterReplaced {
+  KMInputMethodEventHandler * im =  [[KMInputMethodEventHandler alloc] initWithLegacyMode:YES clientSelectionCanChangeUnexpectedly:YES];
+  id client = [[LegacyTestClient alloc] init];
+  // Initial input "z"
+  [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"z" keyCode:kVK_ANSI_Z]];
+  NSLog(@"client result 0 = '%@'", [client getResult]);
+  // Input "a" (no matching rule)
+  NSEvent *event1 = [_delegate keyStrokeEventForCharacter: @"a" keyCode:kVK_ANSI_A];
+  [client handleEventIfNotHandledBy:im event:event1];
+  NSLog(@"client result 1 = '%@'", [client getResult]);
+
+  // Input "b", Keyboard rule "a" + "b" > "c"
+  NSEvent *event2 = [_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B];
+  [client handleEventIfNotHandledBy:im event:event2];
+  NSLog(@"client result 2 = '%@'", [client getResult]);
+  [self helperVerifyAndProcessPendingDelete:client inputMethodEventHandler:im];
+  assert([client length] == 2);
+  NSString *result = [client getResult];
+  NSLog(@"client result = '%@'", result);
+  assert([result isEqualToString:@"zc"]);
+}*/
 
 // ***** NoContext: Client implements insertText; implementation of attributedSubstringFromRange returns nil *****
 -(void)testHandleEvent_Actions1QBack2Nul_NoContext_precedingCharacterInEngineContext_ExistingContextCharacterDeleted {
@@ -98,9 +122,9 @@
     [client handleEventIfNotHandledBy:im event:event];
     // Keyboard rule "q" + "q" > nul
     [client handleEventIfNotHandledBy:im event:event];
-    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
+    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"d" keyCode:kVK_ANSI_B]];
     assert([client length] == 2);
-    assert([[client getResult] isEqualToString:@"ab"]);
+    assert([[client getResult] isEqualToString:@"ad"]);
 }
 
 - (void)testHandleEvent_Actions1QBack2Nul_NoContext_followingCharacter_ExistingContextCharacterDeleted {
@@ -138,9 +162,9 @@
     [client handleEventIfNotHandledBy:im event:event];
     // Keyboard rule "q" + "q" > nul
     [client handleEventIfNotHandledBy:im event:event];
-    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"b" keyCode:kVK_ANSI_B]];
+    [client handleEventIfNotHandledBy:im event:[_delegate keyStrokeEventForCharacter: @"d" keyCode:kVK_ANSI_B]];
     assert([client length] == 2);
-    assert([[client getResult] isEqualToString:@"ab"]);
+    assert([[client getResult] isEqualToString:@"ad"]);
 }
 
 - (void)testHandleEvent_Actions1QBack2Nul_AppleCompliant_followingCharacter_ExistingContextCharacterDeleted {

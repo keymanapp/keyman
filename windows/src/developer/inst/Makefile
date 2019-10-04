@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DEVELOPER_FILES=kmdev.wixobj xml.wixobj templates.wixobj
+DEVELOPER_FILES=kmdev.wixobj xml.wixobj cef.wixobj templates.wixobj kmlmc.wixobj
 
 setup:
 
@@ -16,11 +16,11 @@ setup:
 
     cd $(ROOT)\src\developer\inst
     $(PROGRAM)\buildtools\mkver -v -u copydev.in copydev.mak $(ROOT)\src\developer\version.txt
-    
+
     #
     # Build the installation archive
     #
-    
+
     $(MAKE) -fcopydev.mak candle
     $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
 
@@ -39,13 +39,13 @@ setup:
 
 build:
     @rem
-	
+
 signcode:
     @rem
 
 backup:
     @rem
-	
+
 clean:
     cd $(ROOT)\src\developer\inst
     -del /Q copydev.mak
@@ -60,6 +60,7 @@ clean:
     -del /Q *.wixpdb
     -del /Q xml.wxs
     -del /Q templates.wxs
+    -del /Q kmlmc.wxs
 
 test-releaseexists:
     cd $(ROOT)\src\developer\inst
@@ -69,6 +70,7 @@ test-releaseexists:
 
 install:
     @rem
+
 # ----------------------------------------------------------------------
 
 !include ..\..\Target.mak

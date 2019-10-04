@@ -22,7 +22,7 @@
 
 /**
  * @file worker-interfaces.ts
- * 
+ *
  * Interfaces and types required internally in the worker code.
  */
 
@@ -38,8 +38,8 @@ type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
 /**
  * The valid incoming message kinds.
  */
-type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload';
-type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage;
+type IncomingMessageKind = 'config' | 'load' | 'predict' | 'unload' | 'wordbreak';
+type IncomingMessage = ConfigMessage | LoadMessage | PredictMessage | UnloadMessage | WordbreakMessage;
 
 /**
  * The structure of a config message.  It should include the platform's supported
@@ -83,10 +83,10 @@ interface PredictMessage {
    * If this is not provided, then the prediction is not
    * assumed to be associated with an input event (for example,
    * when a user starts typing on an empty text field).
-   * 
+   *
    * TODO: test for absent transform!
    */
-  transform?: Transform;
+  transform?: Transform | Distribution<Transform>;
 
   /**
    * The context (text to the left and text to right) at the
@@ -98,6 +98,24 @@ interface PredictMessage {
 
 interface UnloadMessage {
   message: 'unload'
+}
+
+/**
+ * Message used to request the last pre-cursor word in the context.
+ */
+interface WordbreakMessage {
+  message: 'wordbreak';
+
+  /**
+   * Opaque, unique token that pairs this wordbreak message with its return message.
+   */
+  token: Token;
+
+  /**
+   * The context (text to the left and text to right) at the
+   * insertion point/text cursor.
+   */
+  context: Context;
 }
 
 
@@ -113,25 +131,14 @@ interface LMLayerWorkerState {
   handleMessage(payload: IncomingMessage): void;
 }
 
-/**
- * The model implementation, within the Worker.
- */
-interface WorkerInternalModel {
-  configure(capabilities: Capabilities): Configuration;
-  predict(transform: Transform, context: Context): Suggestion[];
-}
 
 /**
  * Constructors that return worker internal models.
  */
 interface WorkerInternalModelConstructor {
   /**
-   * WorkerInternalModel instances are all given the keyboard's
+   * LexicalModel instances are all given the keyboard's
    * capabilities, plus any parameters they require.
    */
-  new(...modelParameters: any[]): WorkerInternalModel;
-}
-
-interface WorkerInternalWordBreaker {
-  break(text: string): string[]; // 
+  new(...modelParameters: any[]): LexicalModel;
 }

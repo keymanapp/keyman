@@ -53,6 +53,18 @@
 /windows/src/**/*.suo
 /windows/src/**/.idea
 
+# Temp files generated during release build
+/windows/src/buildtools/inst/copydebug.mak
+/windows/src/desktop/inst/desktop_resources.res
+/windows/src/desktop/inst/desktopui.wxs
+/windows/src/developer/inst/cef.wxs
+/windows/src/developer/inst/keymandeveloper.msi
+/windows/src/developer/inst/setup.inf
+/windows/src/developer/inst/setup.zip
+/windows/src/developer/inst/templates.wxs
+/windows/src/developer/inst/xml.wxs
+/windows/src/developer/inst/kmlmc.wxs
+
 # local defines for build, usually used for certificates and passwords
 /windows/src/UserDefines.mak
 

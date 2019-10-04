@@ -26,12 +26,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.widget.TextView;
 
 public class GetStartedActivity extends AppCompatActivity {
 
   private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> list = null;
   private static KMListAdapter listAdapter = null;
+  protected static final String showGetStartedKey = "ShowGetStarted";
   private final String iconKey = "icon";
   private final String textKey = "text";
   private final String isEnabledKey = "isEnabled";
@@ -53,16 +55,24 @@ public class GetStartedActivity extends AppCompatActivity {
     });
 
     final SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean dontShowGetStarted = prefs.getBoolean(MainActivity.dontShowGetStartedKey, false);
+    boolean showGetStarted = prefs.getBoolean(showGetStartedKey, true);
 
     final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-    checkBox.setChecked(dontShowGetStarted);
+    checkBox.setChecked(showGetStarted);
     checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(MainActivity.dontShowGetStartedKey, isChecked);
+        editor.putBoolean(showGetStartedKey, isChecked);
         editor.commit();
+      }
+    });
+
+    final TextView getStartedText = findViewById(R.id.getStartedText);
+    getStartedText.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        checkBox.setChecked(!checkBox.isChecked());
       }
     });
 
@@ -145,7 +155,7 @@ public class GetStartedActivity extends AppCompatActivity {
         list.get(0).put(iconKey, one);
       }
 
-      if (isEnabledAsSystemKB(this)) {
+      if (SystemIMESettings.isEnabledAsSystemKB(this)) {
         list.get(1).put(iconKey, checkbox_on);
         list.get(2).put(isEnabledKey, "true");
       } else {
@@ -153,7 +163,7 @@ public class GetStartedActivity extends AppCompatActivity {
         list.get(2).put(isEnabledKey, "false");
       }
 
-      if (isDefaultKB(this)) {
+      if (SystemIMESettings.isDefaultKB(this)) {
         list.get(2).put(iconKey, checkbox_on);
       } else {
         list.get(2).put(iconKey, three);
@@ -166,25 +176,5 @@ public class GetStartedActivity extends AppCompatActivity {
       listAdapter = new KMListAdapter(this, list, R.layout.get_started_row_layout, from, to);
       listView.setAdapter(listAdapter);
     }
-  }
-
-  protected static boolean isEnabledAsSystemKB(Context context) {
-    InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-    List<InputMethodInfo> imList = imManager.getEnabledInputMethodList();
-    boolean isEnabled = false;
-    int size = imList.size();
-    for (int i = 0; i < size; i++) {
-      if (imList.get(i).getServiceName().equals("com.keyman.android.SystemKeyboard")) {
-        isEnabled = true;
-        break;
-      }
-    }
-
-    return isEnabled;
-  }
-
-  protected static boolean isDefaultKB(Context context) {
-    String inputMethod = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
-    return inputMethod.equals(context.getPackageName() + "/com.keyman.android.SystemKeyboard");
   }
 }

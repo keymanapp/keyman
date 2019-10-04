@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "sourceMap": true
+    },
+    "include": [
+        "**/test-*.ts"
+    ]
+}

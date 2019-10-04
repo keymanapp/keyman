@@ -26,7 +26,7 @@ uses
 
 type
   TTextFileFormat = (tffANSI, tffUTF8, tffUTF16);
-  TEditorFormat = (efKMN, efXML, efText, efHTML, efJSON, efJS, efCSS);
+  TEditorFormat = (efKMN, efXML, efText, efHTML, efJSON, efJS, efCSS, efWordlistTsv);
 
 function TextFileFormatToEncoding(AFormat: TTextFileFormat): TEncoding;   // I3502   // I3637
 

@@ -88,6 +88,14 @@ adb shell setprop debug.firebase.analytics.app .none.
     * If multiple devices are connected you may need `$ANDROID_HOME/platform-tools/adb.exe install -r -s SERIAL path/to/apk.apk`. Replace `SERIAL` with
        the device serial number listed in step 2.
 
+### Compiling the app's offline help
+Extra prerequisite:
+* `wget`
+
+The script `build-help.sh` uses the `wget` tool to construct an offline bundle from the current
+online version of help on help.keyman.com.  When significant changes to help content have been
+made, it is advisable to manually re-run this script to update the app's offline content.
+
 ### Sample Projects
 
 There are two included sample projects that can be modified to test a keyboard.

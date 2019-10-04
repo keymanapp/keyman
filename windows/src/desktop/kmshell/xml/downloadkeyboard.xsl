@@ -15,7 +15,7 @@
         
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <style type="text/css">
-            * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; }
+            * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; }
             
             body { 
               padding: 0px; margin: 0px; overflow: hidden; 

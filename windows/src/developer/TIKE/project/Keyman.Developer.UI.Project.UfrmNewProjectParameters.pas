@@ -20,16 +20,16 @@ uses
   kpsfile,
   PackageInfo,
   UfrmTike,
-  UKeymanTargets;
+  UKeymanTargets,
+  utilfiletypes, Browse4Folder;
 
 type
   TfrmNewProjectParameters = class(TTikeForm)
     lblFileName: TLabel;
     lblPath: TLabel;
-    editFileName: TEdit;
+    editKeyboardID: TEdit;
     cmdBrowse: TButton;
     editPath: TEdit;
-    dlgSave: TSaveDialog;
     lblKeyboardName: TLabel;
     editKeyboardName: TEdit;
     lblCoypright: TLabel;
@@ -47,6 +47,9 @@ type
     cmdKeyboardEditLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
     lblKeyboardLanguages: TLabel;
+    dlgBrowse: TBrowse4Folder;
+    lblProjectFilename: TLabel;
+    editProjectFilename: TEdit;
     procedure cmdOKClick(Sender: TObject);
     procedure editKeyboardNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -61,11 +64,11 @@ type
     procedure editAuthorChange(Sender: TObject);
     procedure clbTargetsClickCheck(Sender: TObject);
     procedure editPathChange(Sender: TObject);
-    procedure editFileNameChange(Sender: TObject);
+    procedure editKeyboardIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
   private
-    pack: TKPSFile;
-    FSetup: Integer; // Used temporarily for storing language list
+    pack: TKPSFile; // Used temporarily for storing language list
+    FSetup: Integer;
     function GetAuthor: string;
     function GetBasePath: string;
     function GetCopyright: string;
@@ -82,16 +85,18 @@ type
     procedure SetBCP47Tags(const Value: string);
     procedure SetKeyboardID(const Value: string);
     procedure SetKeyboardName(const Value: string);
+    procedure UpdateProjectFilename;
   protected
     function GetHelpTopic: string; override;
   public
-    property KeyboardName: string read GetKeyboardName write SetKeyboardName;
     property Copyright: string read GetCopyright;
     property Version: string read GetVersion;
     property Author: string read GetAuthor;
     property Targets: TKeymanTargets read GetTargets;
     property BCP47Tags: string read GetBCP47Tags write SetBCP47Tags;
     property BasePath: string read GetBasePath;
+
+    property KeyboardName: string read GetKeyboardName write SetKeyboardName;
     property KeyboardID: string read GetKeyboardID write SetKeyboardID;
   end;
 
@@ -111,6 +116,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.KeyboardProjectTemplate,
+  Keyman.Developer.System.ProjectTemplate,
   Keyman.Developer.UI.UfrmSelectBCP47Language,
   Keyman.System.KeyboardUtils;
 
@@ -128,7 +134,7 @@ uses
 function ShowNewProjectParameters(Owner: TComponent): Boolean;
 var
   f: TfrmNewProjectParameters;
-  kpt: TKeyboardProjectTemplate;
+  pt: TProjectTemplate;
 begin
   f := TfrmNewProjectParameters.Create(Owner);
   try
@@ -136,16 +142,16 @@ begin
     if not Result then
       Exit;
 
-    kpt := TKeyboardProjectTemplate.Create(f.BasePath, f.KeyboardID, f.Targets);
+    pt := TKeyboardProjectTemplate.Create(f.BasePath, f.KeyboardID, f.Targets);
     try
-      kpt.Name := f.KeyboardName;
-      kpt.Copyright := f.Copyright;
-      kpt.Author := f.Author;
-      kpt.Version := f.Version;
-      kpt.BCP47Tags := f.BCP47Tags;
+      pt.Name := f.KeyboardName;
+      pt.Copyright := f.Copyright;
+      pt.Author := f.Author;
+      pt.Version := f.Version;
+      pt.BCP47Tags := f.BCP47Tags;
 
       try
-        kpt.Generate;
+        pt.Generate;
       except
         on E:EFOpenError do
         begin
@@ -154,11 +160,11 @@ begin
         end;
       end;
 
-      modActionsMain.OpenProject(kpt.ProjectFilename);
+      modActionsMain.OpenProject(pt.ProjectFilename);
       Result := True;
 
     finally
-      kpt.Free;
+      pt.Free;
     end;
   finally
     f.Free;
@@ -198,25 +204,11 @@ begin
 end;
 
 procedure TfrmNewProjectParameters.cmdBrowseClick(Sender: TObject);
-var
-  FPathName, FFolderName, FProjectName: string;
 begin
-  inherited;
-  if dlgSave.Execute then
-  begin
-    FPathName := ExtractFilePath(ExtractFileDir(dlgSave.FileName));
-    FFolderName := ExtractFileName(ExtractFileDir(dlgSave.FileName));
-    FProjectName := ChangeFileExt(ExtractFileName(dlgSave.FileName), '');
-    if not SameText(FFolderName, FProjectName) then
-    begin
-      if MessageDlg('The project will be saved at "'+FPathName+FFolderName+'\'+FProjectName+'\'+FProjectName+'.kpj". Continue?',
-          mtConfirmation, mbOkCancel, 0) = mrCancel then
-        Exit;
-      FPathName := FPathName+FFolderName;
-    end;
-    editPath.Text := ExcludeTrailingPathDelimiter(FPathName);
-    editFileName.Text := FProjectName;
-  end;
+  dlgBrowse.InitialDir := editPath.Text;
+
+  if dlgBrowse.Execute and (dlgBrowse.FileName <> '') then
+    editPath.Text := ExcludeTrailingPathDelimiter(dlgBrowse.FileName);
 end;
 
 procedure TfrmNewProjectParameters.cmdKeyboardAddLanguageClick(
@@ -308,20 +300,22 @@ begin
   EnableControls;
 end;
 
-procedure TfrmNewProjectParameters.editFileNameChange(Sender: TObject);
+procedure TfrmNewProjectParameters.editKeyboardIDChange(Sender: TObject);
 begin
+  UpdateProjectFilename;
   EnableControls;
 end;
 
 procedure TfrmNewProjectParameters.editKeyboardNameChange(Sender: TObject);
 begin
-  if not editFileName.Modified then
-    editFileName.Text := TKeyboardUtils.CleanKeyboardID(Trim(editKeyboardName.Text));
+  if not editKeyboardID.Modified then
+    editKeyboardID.Text := TKeyboardUtils.CleanKeyboardID(Trim(editKeyboardName.Text));
   EnableControls;
 end;
 
 procedure TfrmNewProjectParameters.editPathChange(Sender: TObject);
 begin
+  UpdateProjectFilename;
   EnableControls;
 end;
 
@@ -336,8 +330,9 @@ var
 begin
   e := (Trim(editKeyboardName.Text) <> '') and
     (Trim(editPath.Text) <> '') and
-    TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text), True) and
+    TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) and
     (GetTargets <> []);
+
   cmdOK.Enabled := e;
 
   e := gridKeyboardLanguages.RowCount > 1;
@@ -370,7 +365,7 @@ end;
 
 function TfrmNewProjectParameters.GetKeyboardID: string;
 begin
-  Result := Trim(LowerCase(editFileName.Text));
+  Result := Trim(LowerCase(editKeyboardID.Text));
 end;
 
 function TfrmNewProjectParameters.GetKeyboardName: string;
@@ -422,7 +417,7 @@ function TfrmNewProjectParameters.Validate: Boolean;
 var
   ProjectFolder: string;
 begin
-  Result := TKeyboardUtils.IsValidKeyboardID(Trim(editFileName.Text), True);
+  Result := TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
 
   if Result then
   begin
@@ -432,7 +427,7 @@ begin
         Exit(False);
     end;
 
-    ProjectFolder := IncludeTrailingPathDelimiter(editPath.Text) + editFileName.Text;
+    ProjectFolder := IncludeTrailingPathDelimiter(editPath.Text) + editKeyboardID.Text;
     if DirectoryExists(ProjectFolder) then
     begin
       if MessageDlg('The project folder '+ProjectFolder+' already exists. Are you sure you want to overwrite it?', mtWarning,
@@ -495,7 +490,7 @@ end;
 
 procedure TfrmNewProjectParameters.SetKeyboardID(const Value: string);
 begin
-  editFileName.Text := Value;
+  editKeyboardID.Text := Value;
   EnableControls;
 end;
 
@@ -541,5 +536,15 @@ begin
   end;
 end;
 
+procedure TfrmNewProjectParameters.UpdateProjectFilename;
+begin
+  editProjectFilename.Text :=
+    IncludeTrailingPathDelimiter(BasePath) +
+    KeyboardID + PathDelim +
+    KeyboardID + Ext_ProjectSource;
+  // Scroll to the end of the control to show the filename
+  editProjectFilename.Perform(EM_SETSEL, Length(editProjectFilename.Text), Length(editProjectFilename.Text));
+  editProjectFilename.Perform(EM_SCROLLCARET, 0, 0);
+end;
 
 end.

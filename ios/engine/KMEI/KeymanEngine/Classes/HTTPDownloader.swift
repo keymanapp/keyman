@@ -6,11 +6,14 @@
 //  Copyright © 2017 SIL International. All rights reserved.
 //
 
+import Foundation
+
 protocol HTTPDownloadDelegate: class {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
   func downloadRequestFailed(_ request: HTTPDownloadRequest)
   func downloadQueueFinished(_ queue: HTTPDownloader)
+  func downloadQueueCancelled(_ queue: HTTPDownloader)
 }
 
 class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate,
@@ -130,6 +133,8 @@ URLSessionDataDelegate {
     if let currentRequest = currentRequest {
       currentRequest.task?.cancel()
     }
+    
+    self.handler?.downloadQueueCancelled(self)
   }
 
   var requestsCount: Int {

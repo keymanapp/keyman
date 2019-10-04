@@ -8,7 +8,7 @@
 ///<reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
-  class TextTransform implements Transform {
+  export class TextTransform implements Transform {
     readonly insert: string;
     readonly deleteLeft: number;
     readonly deleteRight?: number;
@@ -18,33 +18,39 @@ namespace com.keyman.text {
       this.deleteLeft = deleteLeft;
       this.deleteRight = deleteRight || 0;
     }
+
+    public static readonly nil = new TextTransform('', 0, 0);
   }
 
   export class Transcription {
     readonly token: number;
     readonly keystroke: KeyEvent;
     readonly transform: Transform;
+    readonly alternates: Alternate[];
     readonly preInput: Mock;
-
-    // While not presently needed, there's a chance we'll want to have this information tracked
-    // for developments later down the line.  May as well resolve the logic now.
-    readonly removedDks: Deadkey[];
-    readonly insertedDks: Deadkey[];
 
     private static tokenSeed: number = 0;
 
-    constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, removedDks: Deadkey[], insertedDks: Deadkey[]) {
-      this.token = Transcription.tokenSeed++;
+    constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
+      let token = this.token = Transcription.tokenSeed++;
 
       this.keystroke = keystroke;
       this.transform = transform;
+      this.alternates = alternates;
       this.preInput = preInput;
-      this.removedDks = removedDks;
-      this.insertedDks = insertedDks;
 
       this.transform.id = this.token;
+
+      // Assign the ID to each alternate, as well.
+      if(alternates) {
+        alternates.forEach(function(alt) {
+          alt.sample.id = token;
+        });
+      }
     }
   }
+
+  export type Alternate = ProbabilityMass<Transform>;
 
   export abstract class OutputTarget {
     private _dks: text.DeadkeyTracker;
@@ -92,7 +98,7 @@ namespace com.keyman.text {
      * As such, it assumes that the caret is immediately after any inserted text.
      * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
      */
-    private buildTransformFrom(original: Mock): Transform {
+    buildTransformFrom(original: OutputTarget): Transform {
       let to = this.getText();
       let from = original.getText();
 
@@ -120,47 +126,62 @@ namespace com.keyman.text {
       return new TextTransform(delta, deletedLeft, originalRight - undeletedRight);
     }
 
-    buildTranscriptionFrom(original: Mock, keyEvent: KeyEvent): Transcription {
+    buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, alternates?: Alternate[]): Transcription {
       let transform = this.buildTransformFrom(original);
 
-      // While not presently needed, there's a chance we'll want to have Deadkey mutation tracked
-      // for developments later down the line.  May as well resolve the logic now.
+      // If we ever decide to re-add deadkey tracking, this is the place for it.
 
-      // Determine what deadkeys were removed and added.
-      let fromDks = original.deadkeys().toSortedArray();
-      let toDks = this.deadkeys().toSortedArray();
-      
-      let commonDks: Deadkey[] = [];
-      let removedDks: Deadkey[] = [];
-      let insertedDks: Deadkey[] = [];
-      
-      // Since the ordinals of any original deadkey are preserved, we can check for the (id, ordinal).
-      fromDks.forEach(function(dk: Deadkey){
-        for(var i=0; i < toDks.length; i++) {
-          if(toDks[i].d == dk.d && toDks[i].o == dk.o) {
-            commonDks.push(dk);
-            return;
-          }
-        }
-
-        // Wasn't found to be in common?  Must have been removed.
-        removedDks.push(dk);
-      });
-
-      toDks.forEach(function(dk: Deadkey) {
-        for(var i=0; i < commonDks.length; i++) {
-          if(commonDks[i].d == dk.d && commonDks[i].o == dk.o) {
-            // It's a common one.
-            return;
-          }
-        }
-
-        // Wasn't found to be in common?  Must have been inserted.
-        insertedDks.push(dk);
-      });
-
-      return new Transcription(keyEvent, transform, Mock.from(original), removedDks, insertedDks);
+      return new Transcription(keyEvent, transform, Mock.from(original), alternates);
     }
+
+    /**
+     * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
+     * @param original An `OutputTarget` (usually a `Mock`).
+     */
+    restoreTo(original: OutputTarget) {
+      //
+      this.setTextBeforeCaret(original.getTextBeforeCaret());
+      this.setTextAfterCaret(original.getTextAfterCaret());
+
+      // Also, restore the deadkeys!
+      this._dks = original._dks.clone();
+    }
+
+    apply(transform: Transform) {
+      if(transform.deleteRight) {
+        this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
+      }
+
+      if(transform.deleteLeft) {
+        this.deleteCharsBeforeCaret(transform.deleteLeft);
+      }
+
+      if(transform.insert) {
+        this.insertTextBeforeCaret(transform.insert);
+      }
+
+      // We assume that all deadkeys are invalidated after applying a Transform, since
+      // prediction implies we'll be completing a word, post-deadkeys.
+      this._dks.clear();
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'before' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected setTextBeforeCaret(s: string): void {
+      // This one's easy enough to provide a default implementation for.
+      this.deleteCharsBeforeCaret(this.getTextBeforeCaret()._kmwLength());
+      this.insertTextBeforeCaret(s);
+    }
+
+    /**
+     * Helper to `restoreTo` - allows directly setting the 'after' context to that of another
+     * `OutputTarget`.
+     * @param s 
+     */
+    protected abstract setTextAfterCaret(s: string): void;
 
     /**
      * Returns the underlying element / document modeled by the wrapper.
@@ -316,6 +337,10 @@ namespace com.keyman.text {
     insertTextBeforeCaret(s: string): void {
       this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
       this.caretIndex += s.kmwLength();
+    }
+
+    protected setTextAfterCaret(s: string): void {
+      this.text = this.getTextBeforeCaret() + s;
     }
   }
 }

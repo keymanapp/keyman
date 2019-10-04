@@ -31,7 +31,8 @@
 
 /// <reference path="../message.d.ts" />
 /// <reference path="models/dummy-model.ts" />
-/// <reference path="models/wordlist-model.ts" />
+/// <reference path="word_breaking/ascii-word-breaker.ts" />
+/// <reference path="./model-compositor.ts" />
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.
@@ -83,6 +84,8 @@ class LMLayerWorker {
 
   private _hostURL: string;
 
+  private _currentModelSource: string;
+
   constructor(options = {
     importScripts: null,
     postMessage: null
@@ -114,8 +117,23 @@ class LMLayerWorker {
       throw new Error(`Missing required 'message' property: ${event.data}`)
     }
 
+    // If last load was for this exact model file, squash the message.
+    // (Though not if we've had an unload since.)
+    let im = event.data as IncomingMessage;
+    if(im.message == 'load') {
+      let data = im as LoadMessage;
+      if(data.model == this._currentModelSource) {
+        console.warn("Duplicate model load message detected - squashing!");
+        return;
+      } else {
+        this._currentModelSource = data.model;
+      }
+    } else if(im.message == 'unload') {
+      this._currentModelSource = null;
+    }
+
     // We got a message! Delegate to the current state.
-    this.state.handleMessage(event.data as IncomingMessage);
+    this.state.handleMessage(im);
   }
 
   /**
@@ -142,7 +160,7 @@ class LMLayerWorker {
    * @param desc         Type of the model to instantiate and its parameters.
    * @param capabilities Capabilities on offer from the keyboard.
    */
-  public loadModel(model: WorkerInternalModel) {
+  public loadModel(model: LexicalModel) {
     // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
     // returning a Configuration.
     let configuration = model.configure(this._platformCapabilities);
@@ -194,10 +212,6 @@ class LMLayerWorker {
     }
   }
   
-  public loadWordBreaker(breaker: WorkerInternalWordBreaker) {
-    // TODO:  Actually store it somewhere for future use.  Make sure we can forget it with `unloadModel` as well.
-  }
-
   /**
    * Sets the model-loading state, i.e., `modelless`.
    * This state only handles `load` messages, and will
@@ -226,16 +240,29 @@ class LMLayerWorker {
    *
    * @param model The loaded language model.
    */
-  private transitionToReadyState(model: WorkerInternalModel) {
+  private transitionToReadyState(model: LexicalModel) {
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {
           case 'predict':
             let {transform, context} = payload;
+            let compositor = new ModelCompositor(model); // Yeah, should probably use a persistent one eventually.
+
+            let suggestions = compositor.predict(transform, context);
+
+            // Now that the suggestions are ready, send them out!
             this.cast('suggestions', {
               token: payload.token,
-              suggestions: model.predict(transform, context)
+              suggestions: suggestions
+            });
+            break;
+          case 'wordbreak':
+            let brokenWord = model.wordbreak(payload.context);
+
+            this.cast('currentword', {
+              token: payload.token,
+              word: brokenWord
             });
             break;
           case 'unload':
@@ -274,6 +301,7 @@ class LMLayerWorker {
     // Assists unit-testing.
     scope['LMLayerWorker'] = worker;
     scope['models'] = models;
+    scope['wordBreakers'] = wordBreakers;
 
     return worker;
   }
@@ -283,6 +311,9 @@ class LMLayerWorker {
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = LMLayerWorker;
   module.exports['models'] = models;
+  module.exports['wordBreakers'] = wordBreakers;
+  /// XXX: export the ModelCompositor for testing.
+  module.exports['ModelCompositor'] = ModelCompositor;
 } else if (typeof self !== 'undefined' && 'postMessage' in self) {
   // Automatically install if we're in a Web Worker.
   LMLayerWorker.install(self as DedicatedWorkerGlobalScope);

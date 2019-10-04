@@ -53,16 +53,15 @@ uses
 type
   TfrmRunDesktop = class(TForm)
     imgTitle: TImage;
-    cmdInstall: TButton;
+    panContent: TPanel;
     lblLicense: TLabel;
     lblOptions: TLabel;
+    lblStatus: TLabel;
+    lblFree: TLabel;
+    cmdInstall: TButton;
     cmdExit: TButton;
     progress: TProgressBar;
     memoPackages: TMemo;
-    lblStatus: TLabel;
-    Image1: TImage;
-    Label1: TLabel;
-    Image2: TImage;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -141,10 +140,9 @@ end;
 
 procedure TfrmRunDesktop.cmdExitClick(Sender: TObject);
 begin
-  if cmdExit.Caption = 'Cancel' then // I2644
+  if cmdExit.Caption = FInstallInfo.Text(ssCancelButton) then // I2644
   begin
-    if MessageDlg('Are you sure you want to cancel the '+
-      'installation of Keyman Desktop?', mtConfirmation, mbOkCancel, 0) = mrCancel then Exit;
+    if MessageDlg(FInstallInfo.Text(ssCancelQuery), mtConfirmation, mbOkCancel, 0) = mrCancel then Exit;
     g_bCancelInstall := True;
   end
   else
@@ -481,7 +479,7 @@ begin
   SetCursor(LoadCursor(0, IDC_WAIT));
   try
     memoPackages.Enabled := False;
-    cmdExit.Caption := 'Cancel'; // I2644
+    cmdExit.Caption := FInstallInfo.Text(ssCancelButton); // I2644
     cmdInstall.Enabled := False;
     lblOptions.Enabled := False;
     lblLicense.Enabled := False;
@@ -495,15 +493,16 @@ begin
 
     SetupMSI; // I2644
 
-    if GetRunTools.DoInstall(Handle, PackagesOnly, FCheckForUpdatesInstall, FStartAfterInstall, FStartWithWindows, FCheckForUpdates) then
+    if GetRunTools.DoInstall(Handle, PackagesOnly, FCheckForUpdatesInstall, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
+      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
-        ShowMessage('Keyman Desktop '+SKeymanVersion+' has been installed successfully.');
+        ShowMessage(FInstallInfo.Text(ssInstallSuccess));
       ModalResult := mrOk;
     end;
   finally
     memoPackages.Enabled := True;
-    cmdExit.Caption := 'E&xit'; // I2644
+    cmdExit.Caption := FInstallInfo.Text(ssExitButton); // I2644
     cmdExit.Visible := True;
     cmdInstall.Enabled := True;
     lblOptions.Enabled := True;
@@ -517,11 +516,25 @@ end;
 procedure TfrmRunDesktop.FormCreate(Sender: TObject);
 var
   i: Integer;
+  oldHeight: Integer;
 begin
-  Application.Title := 'Keyman Desktop '+SKeymanVersion+' Setup';  // I2617
-  Caption := 'Install Keyman Desktop '+SKeymanVersion;
-  cmdInstall.Caption := '&Install Keyman Desktop '+SKeymanVersion;
-  memoPackages.Text := 'This install includes:'#13#10+'• Keyman Desktop '+SKeymanVersion+#13#10;
+
+  Application.Title := FInstallInfo.Text(ssApplicationTitle);
+  Caption := FInstallInfo.Text(ssTitle);
+  cmdInstall.Caption := FInstallInfo.Text(ssInstallButton);
+  cmdExit.Caption := FInstallInfo.Text(ssExitButton);
+  memoPackages.Text := FInstallInfo.Text(ssWelcome_Keyboards);
+  lblLicense.Caption := FInstallInfo.Text(ssLicenseLink);
+  lblOptions.Caption := FInstallInfo.Text(ssInstallOptionsLink);
+  lblFree.Caption := FInstallInfo.Text(ssFreeCaption);
+
+  if FInstallInfo.TitleImageFilename <> '' then
+  begin
+    oldHeight := imgTitle.Height;
+    imgTitle.Picture.LoadFromFile(ExtPath + FInstallInfo.TitleImageFilename);
+    ClientHeight := ClientHeight - oldHeight + imgTitle.Height;
+  end;
+
   if FInstallInfo.Packages.Count > 0 then
   begin
     for i := 0 to FInstallInfo.Packages.Count - 1 do

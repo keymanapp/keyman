@@ -1,13 +1,13 @@
 inherited frmNewProjectParameters: TfrmNewProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'New Project'
-  ClientHeight = 309
+  Caption = 'New Basic Keyboard Project'
+  ClientHeight = 330
   ClientWidth = 625
   Position = poScreenCenter
   OnDestroy = FormDestroy
   ExplicitWidth = 631
-  ExplicitHeight = 338
+  ExplicitHeight = 359
   PixelsPerInch = 96
   TextHeight = 13
   object lblFileName: TLabel
@@ -16,7 +16,7 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Width = 64
     Height = 13
     Caption = '&Keyboard ID:'
-    FocusControl = editFileName
+    FocusControl = editKeyboardID
   end
   object lblPath: TLabel
     Left = 12
@@ -74,27 +74,35 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Caption = '&Languages'
     FocusControl = gridKeyboardLanguages
   end
-  object editFileName: TEdit
+  object lblProjectFilename: TLabel
+    Left = 12
+    Top = 302
+    Width = 77
+    Height = 13
+    Caption = 'Project &filename'
+    FocusControl = editProjectFilename
+  end
+  object editKeyboardID: TEdit
     Left = 120
     Top = 272
-    Width = 149
+    Width = 205
     Height = 21
-    TabOrder = 10
-    OnChange = editFileNameChange
+    TabOrder = 11
+    OnChange = editKeyboardIDChange
   end
   object cmdBrowse: TButton
-    Left = 275
-    Top = 272
-    Width = 78
+    Left = 340
+    Top = 245
+    Width = 73
     Height = 21
     Caption = '&Browse...'
-    TabOrder = 11
+    TabOrder = 10
     OnClick = cmdBrowseClick
   end
   object editPath: TEdit
     Left = 120
     Top = 245
-    Width = 233
+    Width = 205
     Height = 21
     TabOrder = 9
     OnChange = editPathChange
@@ -135,23 +143,23 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
   end
   object cmdOK: TButton
     Left = 463
-    Top = 270
+    Top = 297
     Width = 73
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 12
+    TabOrder = 13
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
     Left = 542
-    Top = 270
+    Top = 297
     Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 13
+    TabOrder = 14
   end
   object clbTargets: TCheckListBox
     Left = 120
@@ -167,7 +175,6 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 32
     Width = 278
     Height = 153
-    Anchors = [akLeft, akTop, akRight, akBottom]
     ColCount = 2
     DefaultRowHeight = 16
     FixedCols = 0
@@ -185,7 +192,6 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 191
     Width = 73
     Height = 25
-    Anchors = [akLeft, akBottom]
     Caption = '&Add...'
     TabOrder = 6
     OnClick = cmdKeyboardAddLanguageClick
@@ -195,7 +201,6 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 191
     Width = 73
     Height = 25
-    Anchors = [akLeft, akBottom]
     Caption = 'Ed&it...'
     TabOrder = 7
     OnClick = cmdKeyboardEditLanguageClick
@@ -205,17 +210,26 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     Top = 191
     Width = 72
     Height = 25
-    Anchors = [akLeft, akBottom]
     Caption = '&Remove'
     TabOrder = 8
     OnClick = cmdKeyboardRemoveLanguageClick
   end
-  object dlgSave: TSaveDialog
-    DefaultExt = 'kpj'
-    Filter = 'Project files (*.kpj)|*.kpj|All files (*.*)|*.*'
-    FilterIndex = 0
-    Title = 'Create New Project'
-    Left = 188
-    Top = 152
+  object editProjectFilename: TEdit
+    Left = 120
+    Top = 299
+    Width = 293
+    Height = 21
+    TabStop = False
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 12
+    OnChange = editKeyboardIDChange
+  end
+  object dlgBrowse: TBrowse4Folder
+    Options = [OnlySelectFileSysDir, ShowEditBox, UseNewDialogStyle]
+    Root = Desktop
+    Title = 'Select folder to save project to'
+    Left = 56
+    Top = 168
   end
 end

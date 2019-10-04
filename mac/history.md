@@ -1,7 +1,25 @@
 # Keyman for macOS Version History
 
-## 12.0 alpha
-* Started work on Keyman for macOS 12.
+## 13.0 alpha
+* Start version 13.0
+
+## 2019-08-12 12.0.7 beta
+* Fix compatibility issues with macOS 10.14.5 (#1889)
+
+## 2019-08-09 12.0.6 beta
+* Fix crash when working with keyboards that contain if() statements (e.g sil_ipa) (#1956)
+
+## 2019-07-29 12.0.5 beta
+* Initial beta release of Keyman for Mac 12
+* [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Amac+base%3Amaster)
+
+* Bug Fixes:
+  * Fix keyboard download passed wrong version string (#1814)
+
+## 2019-02-26 11.0.221 stable
+* Add support for option stores (if/set/reset/save statements) (#1838)
+* Fix bug where keyboards with more than nine deadkeys did not operate correctly (#1839)
+* Fix out of date context buffer when using command keys (#1840)
 
 ## 2019-02-25 11.0.220 stable
 * 11.0 Stable release
@@ -18,12 +36,12 @@
 * Changes:
   * Code refactoring and cleanup (#1050, #1053)
   * Added SIL logo and copyright information to About box and DMG image (#1163)
-  
+
 * Bug Fixes:
   * In some situations, Keyman for Mac would use the wrong rule in a keyboard (#1091, #1099)
   * Various crashes (#1424, #1066, #1080)
 
-## 2018-08-14 10.0.111 stable 
+## 2018-08-14 10.0.111 stable
 * CORRECLTY fixed bug in engine that caused incorrect rules to be used (#1095, #1099)
 
 ## 2018-08-10 10.0.110 stable
@@ -44,7 +62,7 @@
 ## 2018-06-28 10.0.53 beta
 * Made key-press on OSK work instead of crash (#1038)
 * Reverted fix for issue #872: resetting font in Pages and Keynote (#1039)
- 
+
 ## 2018-06-27 10.0.52 beta
 * Prevented permanently hiding OSK when a menu is dropped down (#1031)
 

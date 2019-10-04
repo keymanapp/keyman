@@ -2922,6 +2922,9 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object SaveProjectAs1: TMenuItem
         Action = modActionsMain.actProjectSaveAs
       end
+      object CloseProject1: TMenuItem
+        Action = modActionsMain.actProjectClose
+      end
       object N25: TMenuItem
         Caption = '-'
       end

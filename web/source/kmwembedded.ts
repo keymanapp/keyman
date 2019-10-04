@@ -20,18 +20,19 @@ namespace com.keyman.osk {
    * 
    * @param {Object}  key   base key element
    */            
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) { 
-    let util = com.keyman.singleton.util;       
+  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
+    let util = com.keyman.singleton.util;
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv);      
+      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv)*/ /*+ bannerHeight*/;
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
       }
 
       this.popupBaseKey = key;
-      this.popupPending=true;      
+      this.popupPending=true;
       window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
     }
   };
@@ -76,8 +77,10 @@ namespace com.keyman.osk {
     }
 
     if(on && (typeof showPreview == 'function')) {
-      var xBase=dom.Utils.getAbsoluteX(key)-dom.Utils.getAbsoluteX(this.kbdDiv)+key.offsetWidth/2,
-          yBase=dom.Utils.getAbsoluteY(key)-dom.Utils.getAbsoluteY(this.kbdDiv), kc;
+      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
+          kc;
 
       // Find key text element
       for(var i=0; i<key.childNodes.length; i++) {
@@ -88,7 +91,7 @@ namespace com.keyman.osk {
       }
         
       if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
-        showPreview(xBase,yBase,key.offsetWidth,key.offsetHeight,kc.innerHTML);
+        showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
       }
     } else if(!on && (typeof clearPreview == 'function')) {
       if(this.touchCount == 0 || key == null) {
@@ -107,80 +110,24 @@ namespace com.keyman.osk {
     }
   };
 
-  /**
-   * Adjust the absolute height of each keyboard element after a rotation - modified for KMEI, 13/11/14
-   *    
-   **/      
-  VisualKeyboard.prototype.adjustHeights = function(this: VisualKeyboard): boolean {
-    let keyman = com.keyman.singleton;
-    let oskManager = keyman.osk;
-    let _Box = oskManager._Box;
-    let util = keyman.util;
-    let device = util.device;
+  SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
+    // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
+    let suggestionEle = suggestionObj.div;
 
-    if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
-      return false;
-    }
+    // Need to know if it's a <keep> option or not!
 
-    var layers=this.kbdDiv.firstChild.childNodes,
-        nRows=layers[0].childNodes.length,
-        rowHeight=Math.floor(oskManager.getKeyboardHeight()/(nRows == 0 ? 1 : nRows)),
-        nLayer,nRow,rs,keys,nKeys,nKey,key,ks,j,pad=4,fs=1.0;
+    var xBase = dom.Utils.getAbsoluteX(suggestionEle) - dom.Utils.getAbsoluteX(suggestionEle.parentElement) + suggestionEle.offsetWidth/2,
+        yBase = dom.Utils.getAbsoluteY(suggestionEle) - dom.Utils.getAbsoluteY(suggestionEle.parentElement);
 
-    if(device.OS == 'Android' && 'devicePixelRatio' in window) {
-      rowHeight = rowHeight/window.devicePixelRatio;
-    }
-    let oskHeight : number = nRows*rowHeight;
-
-    var b: HTMLElement = _Box, bs=b.style;
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    b = <HTMLElement> b.childNodes.item(1).firstChild;
-    bs=b.style;
-    bs.height=bs.maxHeight=(oskHeight+3)+'px';
-    pad = Math.round(0.15*rowHeight);
-
-    var resizeLabels=(device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
-
-    for(nLayer=0;nLayer<layers.length; nLayer++) {
-      // Check the heights of each row, in case different layers have different row counts.
-      nRows=layers[nLayer].childNodes.length;
-      (<HTMLElement> layers[nLayer]).style.height=(oskManager.getKeyboardHeight()+3)+'px';
-
-      for(nRow=0; nRow<nRows; nRow++) {
-        rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
-        rs.bottom=(nRows-nRow-1)*rowHeight+'px';
-        rs.maxHeight=rs.height=rowHeight+'px';
-        keys=layers[nLayer].childNodes[nRow].childNodes;
-        nKeys=keys.length;
-        for(nKey=0;nKey<nKeys;nKey++) {
-          key=keys[nKey];
-          // Must set the height of the text DIV, not the label (if any)
-          for(j=0; j<key.childNodes.length; j++) {
-            if(util.hasClass(key.childNodes[j],'kmw-key')) {
-              break;
-            }
-          }
-          ks=key.childNodes[j].style;
-          ks.bottom=rs.bottom;
-          ks.height=ks.minHeight=(rowHeight-pad)+'px';
-
-          // Rescale keycap labels on iPhone (iOS 7)
-          if(resizeLabels && (j > 0)) {
-            key.childNodes[0].style.fontSize='6px';
-          }
-        }
-      }
-    }
-
-    return true;
-  };
+    window['suggestionPopup'](suggestionObj.suggestion, isCustom, xBase, yBase, suggestionEle.offsetWidth, suggestionEle.offsetHeight);
+  }
 }
 
 namespace com.keyman.text {
   let nativeDefaultKeyOutput = Processor.prototype.defaultKeyOutput;
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
     let keyman = com.keyman.singleton;
 
     // Note:  this assumes Lelem is properly attached and has an element interface.
@@ -193,8 +140,12 @@ namespace com.keyman.text {
     if (code == Codes.keyCodes.K_SPACE) {
       return ' ';
     } else if (code == Codes.keyCodes.K_BKSP) {
-      keyman['interface'].defaultBackspace();
-      return '';
+      if(!disableDOM) {
+        keyman['interface'].defaultBackspace();
+        return '';
+      } else {
+        return '\b';
+      }
     } else if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
       if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
@@ -205,7 +156,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, false);
+    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, usingOSK);
   }
 }
 
@@ -346,7 +297,7 @@ namespace com.keyman.text {
    * correctOSKTextSize handles rotation event -- currently rebuilds keyboard and adjusts font sizes
    */
   keymanweb['correctOSKTextSize']=function() {
-    if(osk.vkbd.adjustHeights()) {
+    if(osk && osk.vkbd && osk.vkbd.adjustHeights()) {
       osk._Load();
     }
   };
@@ -358,10 +309,19 @@ namespace com.keyman.text {
    */
   keymanweb['registerModel']=function(model: com.keyman.text.prediction.ModelSpec) {
     keymanweb.modelManager.register(model);
+  };
+
+  keymanweb['showNewSuggestions'] = function() {
+    let keyman = com.keyman.singleton;
+
+    if(keyman['osk'].banner['activeBanner'] instanceof com.keyman.osk.SuggestionBanner) {
+      let banner = keyman['osk'].banner['activeBanner'];
+      banner.rotateSuggestions();
+    }
   }
 
   /**
-   * Function called by iOS when a device-implemented keyboard popup is displayed or hidden
+   * Function called by Android and iOS when a device-implemented keyboard popup is displayed or hidden
    * 
    *  @param  {boolean}  isVisible
    *     
@@ -395,8 +355,10 @@ namespace com.keyman.text {
 
     var w=key.offsetWidth, 
         h=key.offsetHeight,
-        x=dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(osk.vkbd.kbdDiv) + w/2,
-        y=dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(osk.vkbd.kbdDiv);
+        // Since the full OSKManager '_Box' is displayed within the keyboards' WebViews,
+        // these calculations should be performed with respect to that, rather than osk.vkbd.kbdDiv.
+        x=dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(osk._Box) + w/2,
+        y=dom.Utils.getAbsoluteY(key) - dom.Utils.getAbsoluteY(osk._Box);
 
     return x+','+y+','+w+','+h;
   };

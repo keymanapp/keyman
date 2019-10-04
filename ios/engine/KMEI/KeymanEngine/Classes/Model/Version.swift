@@ -11,6 +11,9 @@ import Foundation
 /// Dotted-decimal version.
 public struct Version: Comparable {
   public static let fallback = Version("1.0")!
+  public static let current = Version("12.0")!
+  // The Engine first started tracking the 'last loaded version' in 12.0.
+  public static let firstTracked = Version("12.0")!
 
   private let components: [Int]
   public let string: String

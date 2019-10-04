@@ -22,12 +22,10 @@ public enum MenuBehaviour {
 }
 
 open class InputViewController: UIInputViewController, KeymanWebDelegate {
-  var menuCloseButtonTitle: String?
-  var isInputClickSoundEnabled = true
-  var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
-  var menuBehaviour = MenuBehaviour.showAlways
-
-  open var topBarImageView: UIImageView?
+  public var menuCloseButtonTitle: String?
+  public var isInputClickSoundEnabled = true
+  public var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
+  public var menuBehaviour = MenuBehaviour.showAlways
 
   var _isSystemKeyboard: Bool
   var isSystemKeyboard: Bool {
@@ -40,6 +38,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   var landscapeConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
+  
+  private var swallowBackspaceTextChange: Bool = false
 
   open class var isPortrait: Bool {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
@@ -60,8 +60,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
-  // TODO:  Consider deleting this.
-  private var expandedHeight: CGFloat {
+  var expandedHeight: CGFloat {
     return keymanWeb.keyboardHeight + activeTopBarHeight
   }
   
@@ -102,6 +101,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       portraitConstraint?.isActive = false
       landscapeConstraint?.isActive = true
     }
+    
+    keymanWeb.setBannerHeight(to: InputViewController.topBarHeight)
 
     super.updateViewConstraints()
   }
@@ -115,16 +116,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // TODO: If the following line is enabled, the WKWebView does not respond to touch events
     // Can figure out why one day maybe
     baseView.translatesAutoresizingMaskIntoConstraints = false
-    baseView.autoresizingMask = UIViewAutoresizing.flexibleHeight.union(.flexibleWidth)
+    baseView.autoresizingMask = UIView.AutoresizingMask.flexibleHeight.union(.flexibleWidth)
 
     keymanWeb.delegate = self
-
-    // Fixes debugging issue - views added later are moved to the front.
-    topBarImageView?.removeFromSuperview()
-    topBarImageView = UIImageView()
-    topBarImageView!.translatesAutoresizingMaskIntoConstraints = false
-    topBarImageView!.backgroundColor = UIColor.gray
-    baseView.addSubview(topBarImageView!)
 
     baseView.addSubview(keymanWeb.view)
 
@@ -140,8 +134,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     let activeUserDef = Storage.active.userDefaults
     let standardUserDef = UserDefaults.standard
-    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
-    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[safe: 0]
+    let activeDate = (activeUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[0]
+    let standardDate = (standardUserDef.object(forKey: Key.synchronizeSWKeyboard) as? [Date])?[0]
 
     let shouldSynchronize: Bool
     if let standardDate = standardDate,
@@ -185,11 +179,19 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     // Necessary for existing infrastructure to resend info for the keyboard after reloading
-    // as system keyboard.
-    Manager.shared.shouldReloadKeyboard = true
+    // as system keyboard.  Do NOT perform if in-app, as this unnecessarily resets the WebView.
+    if(Manager.shared.isSystemKeyboard) {
+      Manager.shared.shouldReloadKeyboard = true
+    }
   }
 
   open override func textDidChange(_ textInput: UITextInput?) {
+    // Swallows self-triggered calls from emptying the context due to keyboard rules
+    if self.swallowBackspaceTextChange && textDocumentProxy.documentContextBeforeInput == nil {
+      self.swallowBackspaceTextChange = false
+      return
+    }
+    
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
     let context = "\(contextBeforeInput)\(contextAfterInput)"
@@ -201,10 +203,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       newRange = context.startIndex..<context.startIndex
     }
 
-    setText(context)
-    setSelectionRange(NSRange(newRange, in: context), manually: false)
+    setContextState(text: context, range: NSRange(newRange, in: context))
+    // Within the app, this is triggered after every keyboard input.
+    // We should NOT call .resetContext() here for this reason.
   }
-
+  
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if keymanWeb.isSubKeysMenuVisible {
       return
@@ -235,6 +238,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - 1)
           textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
         }
+      }
+      
+      if textDocumentProxy.documentContextBeforeInput == nil {
+        if(self.swallowBackspaceTextChange) {
+          // A single keyboard processing command should never trigger two of these in a row;
+          // only one output function will perform deletions.
+          
+          // This should allow us to debug any failures of this assumption.
+          // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
+          // so all seems good.
+          log.verbose("Failed to swallow a recent textDidChange call!")
+        }
+        self.swallowBackspaceTextChange = true
+        break
       }
     }
 
@@ -303,37 +320,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private func setInnerConstraints() {
-    let topBar = topBarImageView!
     let container = keymanWeb.view!
-    
-    // Establish a consistent set of constraints for the top bar.
-    if #available(iOSApplicationExtension 11.0, *) {
-      topBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-
-      // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
-      topBarWidthConstraint.priority = .defaultHigh
-      topBarWidthConstraint.isActive = true
-    } else {
-      topBar.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
-      topBar.leftAnchor.constraint(equalTo: view.layoutMarginsGuide.leftAnchor).isActive = true
-      topBar.rightAnchor.constraint(equalTo: view.layoutMarginsGuide.rightAnchor).isActive = true
-      
-      // Allow this one to be broken if/as necessary to resolve layout issues.
-      let topBarWidthConstraint = topBar.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
-      topBarWidthConstraint.priority = .defaultHigh
-      topBarWidthConstraint.isActive = true
-    }
-
-    topBar.heightAnchor.constraint(equalToConstant: activeTopBarHeight).isActive = true
-
-    // Establishes a set of constraints for the keyboard's container, supporting autoresizing of
-    // the keyboard's WebView via its constraints.
-    container.topAnchor.constraint(equalTo:topBar.bottomAnchor).isActive = true
 
     if #available(iOSApplicationExtension 11.0, *) {
+      container.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
       container.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
@@ -344,6 +334,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.isActive = true
     } else {
       // Fallback on earlier versions
+      container.topAnchor.constraint(equalTo:view.layoutMarginsGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.layoutMarginsGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo:view.layoutMarginsGuide.leftAnchor).isActive = true
       container.rightAnchor.constraint(equalTo:view.layoutMarginsGuide.rightAnchor).isActive = true
@@ -403,6 +394,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func setKeyboard(_ kb: InstallableKeyboard) {
     keymanWeb.setKeyboard(kb)
   }
+    
+  func registerLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.registerLexicalModel(lm)
+  }
+  
+  func deregisterLexicalModel(_ lm: InstallableLexicalModel) {
+    keymanWeb.deregisterLexicalModel(lm)
+  }
   
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
@@ -411,24 +410,40 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
   }
-  
-//  func setCursorRange(_ range: NSRange) {
-//    keymanWeb.setCursorRange(range)
-//  }
-  
-  func setText(_ text: String?) {
-    keymanWeb.setText(text)
-  }
-  
+
   func clearText() {
-    setText(nil)
-    setSelectionRange(NSRange(location: 0, length: 0), manually: true)
+    setContextState(text: nil, range: NSRange(location: 0, length: 0))
+    keymanWeb.resetContext()
     log.info("Cleared text.")
   }
   
-  func setSelectionRange(_ range: NSRange, manually: Bool) {
+  func resetContext() {
+    keymanWeb.resetContext()
+  }
+ 
+  func setContextState(text: String?, range: NSRange) {
+    // Check for any LTR or RTL marks at the context's start; if they exist, we should
+    // offset the selection range.
+    let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
+    var offsetPrefix = false;
+    
+    let context = text ?? ""
+    
+    for codepoint in characterOrderingChecks {
+      if(context.hasPrefix(codepoint)) {
+        offsetPrefix = true;
+        break;
+      }
+    }
+    
+    var selRange = range;
+    if(offsetPrefix) { // If we have a character ordering mark, offset range location to hide it.
+      selRange = NSRange(location: selRange.location - 1, length: selRange.length)
+    }
+    
+    keymanWeb.setText(context)
     if range.location != NSNotFound {
-      keymanWeb.setCursorRange(range)
+      keymanWeb.setCursorRange(selRange)
     }
   }
   
@@ -442,5 +457,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   func dismissKeyboardMenu() {
     keymanWeb.dismissKeyboardMenu()
+  }
+  
+  open func setBannerImage(to path: String) {
+    keymanWeb.setBannerImage(to: path)
   }
 }

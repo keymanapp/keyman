@@ -1,0 +1,6 @@
+# Ignore files required only in development.
+build.sh
+source/*
+tests/*
+*.js.map
+tsconfig.json

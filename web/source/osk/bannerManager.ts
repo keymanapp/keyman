@@ -7,8 +7,9 @@ namespace com.keyman.osk {
    * each field.
    */
   export interface BannerOptions {
-    persistentBanner?: boolean;
-    enablePredictions?: boolean;
+    alwaysShow?: boolean;
+    mayPredict?: boolean;
+    mayCorrect?: boolean;
     imagePath?: string;
   }
 
@@ -49,15 +50,17 @@ namespace com.keyman.osk {
    *       rather than as its standalone app.
    */
   export class BannerManager {
+    private _activeType: BannerType;
     private _options: BannerOptions = {};
     private bannerContainer: HTMLDivElement;
     private activeBanner: Banner;
-    private alwaysShows: boolean;
+    private alwaysShow: boolean;
     private imagePath?: string = "";
 
     public static readonly DEFAULT_OPTIONS: BannerOptions = {
-      persistentBanner: false,
-      enablePredictions: true,
+      alwaysShow: false,
+      mayPredict: true,
+      mayCorrect: true,
       imagePath: ""
     }
 
@@ -81,10 +84,9 @@ namespace com.keyman.osk {
     private constructContainer(): HTMLDivElement {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
-
       let d = util._CreateElement('div');
       d.id = "keymanweb_banner_container";
-      d.className = "keymanweb-banner-container";
+      d.className = "kmw-banner-container";
       return this.bannerContainer = d;
     }
 
@@ -136,23 +138,24 @@ namespace com.keyman.osk {
       for(let key in optionSpec) {
         switch(key) {
           // Each defined option may require specialized handling.
-          case 'persistentBanner':
+          case 'alwaysShow':
             // Determines the banner type to activate.
-            this.alwaysShows = optionSpec['persistentBanner'];
+            this.alwaysShow = optionSpec[key];
             break;
-          case 'enablePredictions':
-            // If we're not going to show suggestions, it's best to turn off predictions.
-            keyman.modelManager.enabled = optionSpec['enablePredictions'];
+          case 'mayPredict':
+            keyman.modelManager.mayPredict = optionSpec[key]
+            break;
+          case 'mayCorrect':
+            keyman.modelManager.mayCorrect = optionSpec[key];
             break;
           case 'imagePath':
             // Determines the image file to use for ImageBanners.
-            this.imagePath = optionSpec['imagePath'];
+            this.imagePath = optionSpec[key];
             break;
           default:
             // Invalid option specified!
         }
-
-        this._options[key] = optionSpec['key'];
+        this._options[key] = optionSpec[key];
       }
 
       this.selectBanner();
@@ -173,24 +176,30 @@ namespace com.keyman.osk {
      * 
      * @param type `'blank' | 'image' | 'suggestion'` - A plain-text string 
      *        representing the type of `Banner` to set active.
+     * @param height - Optional banner height in pixels.
      */
-    public setBanner(type: BannerType) {
+    public setBanner(type: BannerType, height?: number) {
+      var banner: Banner;
+
       switch(type) {
         case 'blank':
-          this._setBanner(new BlankBanner());
+          banner = new BlankBanner();
           break;
         case 'image':
-          this._setBanner(new ImageBanner(this.imagePath, ImageBanner.DEFAULT_HEIGHT));
+          banner = new ImageBanner(this.imagePath, Banner.DEFAULT_HEIGHT);
           break;
         case 'suggestion':
-          this._setBanner(new SuggestionBanner());
-          let keyman = com.keyman.singleton;
-          let banner = this.activeBanner as SuggestionBanner;
-          keyman.modelManager['addEventListener']('invalidatesuggestions', banner.invalidateSuggestions);
-          keyman.modelManager['addEventListener']('suggestionsready', banner.updateSuggestions);
+          banner = new SuggestionBanner(height);
           break;
         default:
           throw new Error("Invalid type specified for the banner!");
+      }
+
+      this._activeType = type;
+      
+      if(banner) {
+        this._setBanner(banner);
+        banner.activate();
       }
     }
 
@@ -208,7 +217,7 @@ namespace com.keyman.osk {
       // when predictions are disabled.
       if(keyman.modelManager.activeModel) {
         this.setBanner('suggestion');
-      } else if(this.alwaysShows) {
+      } else if(this.alwaysShow) {
         this.setBanner('image');
       } else {
         this.setBanner('blank');
@@ -226,18 +235,21 @@ namespace com.keyman.osk {
           return;
         } else {
           let prevBanner = this.activeBanner;
+          prevBanner.deactivate();
           this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
-
-          if(prevBanner instanceof SuggestionBanner) {
-            let keyman = com.keyman.singleton;
-            keyman.modelManager['removeEventListener']('invalidatesuggestions', prevBanner.invalidateSuggestions);
-            keyman.modelManager['removeEventListener']('suggestionsready', prevBanner.updateSuggestions);
-          }
         }
       }
 
       this.activeBanner = banner;
       this.bannerContainer.appendChild(banner.getDiv());
+
+      // Don't forget to adjust the OSK in case we're now using a blank Banner!
+      let keyman = com.keyman.singleton;
+      keyman['osk']._Show();
+    }
+
+    public get activeType(): BannerType {
+      return this._activeType;
     }
 
     /**
@@ -248,6 +260,15 @@ namespace com.keyman.osk {
         return this.activeBanner.height;
       } else {
         return 0;
+      }
+    }
+
+    /**
+     * Sets the height (in pixels) of the active 'Banner' instance.
+     */
+    public set height(h: number) {
+      if (this.activeBanner) {
+        this.activeBanner.height = h;
       }
     }
   }

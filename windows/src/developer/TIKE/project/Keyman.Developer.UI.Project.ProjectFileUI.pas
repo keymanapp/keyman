@@ -38,9 +38,6 @@ type
 
   TProjectUI = class(TProject)
   private
-    FOnRefresh: TNotifyEvent;
-    FOnRefreshCaption: TNotifyEvent;
-    FRefreshing: Boolean;
     FRenderFileName: TTempFile;
     function GetRenderFileName: string;
     procedure Refresh;
@@ -50,10 +47,10 @@ type
     procedure DoRefreshCaption; override;
 
   public
-    constructor Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False); override;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); override;
     destructor Destroy; override;
 
-    procedure Log(AState: TProjectLogState; Filename, Msg: string); override;   // I4706
+    procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); override;   // I4706
 
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean;
 
@@ -64,10 +61,6 @@ type
     function Load: Boolean; override;   // I4694
 
     property RenderFileName: string read GetRenderFileName;   // I4181
-
-    property OnRefresh: TNotifyEvent read FOnRefresh write FOnRefresh;
-    property OnRefreshCaption: TNotifyEvent read FOnRefreshCaption write FOnRefreshCaption;
-    property Refreshing: Boolean read FRefreshing write FRefreshing;
   end;
 
   TProjectFileUI = class
@@ -102,6 +95,7 @@ uses
 
   utilhttp,
 
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectLoader,
   UfrmMessages;
 
@@ -116,7 +110,7 @@ begin
     if not (Files[i].UI as TProjectFileUI).DoAction(action, FSilent) then Exit;
 
   case action of
-    pfaCompile: Log(plsInfo, FileName, 'All files compiled successfully.');   // I4706
+    pfaCompile: Log(plsSuccess, FileName, 'All files compiled successfully.', 0, 0);   // I4706
   end;
 
   Result := True;
@@ -129,13 +123,13 @@ end;
 
 procedure TProjectUI.DoRefreshCaption;
 begin
-  if Assigned(FOnRefreshCaption) then
-    FOnRefreshCaption(Self);
+  if Assigned(FGlobalProjectRefreshCaption) then
+    FGlobalProjectRefreshCaption(Self);
 end;
 
 { TProjectUI }
 
-constructor TProjectUI.Create(AFileName: string;
+constructor TProjectUI.Create(AProjectType: TProjectType; AFileName: string;
   ALoadPersistedUntitledProject: Boolean);
 begin
   inherited;
@@ -173,21 +167,15 @@ begin
   end;
 end;
 
-procedure TProjectUI.Log(AState: TProjectLogState; Filename, Msg: string);   // I4706
+procedure TProjectUI.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);   // I4706
 begin
-  case AState of
-    plsInfo: ;
-    plsWarning: Msg := 'Warning: '+Msg;
-    plsError:   Msg := 'Error: '+Msg;
-    plsFatal:   Msg := 'Error: '+Msg;
-  end;
-  frmMessages.Add(Filename, Msg);
+  frmMessages.Add(AState, Filename, Msg, MsgCode, line);
 end;
 
 procedure TProjectUI.Refresh;
 begin
   if State = psReady then
-    if Assigned(FOnRefresh) then FOnRefresh(Self);
+    if Assigned(FGlobalProjectRefresh) then FGlobalProjectRefresh(Self);
 end;
 
 function TProjectUI.Render: WideString;

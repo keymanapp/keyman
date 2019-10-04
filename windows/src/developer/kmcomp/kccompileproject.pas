@@ -1,18 +1,18 @@
 (*
   Name:             kccompileproject
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      5 May 2015
 
   Modified Date:    11 May 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          05 May 2015 - mcdurdin - I4699 - V9.0 - Compile .kpj files from kmcomp
                     11 May 2015 - mcdurdin - I4706 - V9.0 - Update compile logging for silent and warning-as-error cleanness
                     11 May 2015 - mcdurdin - I4709 - V9.0 - Use static hashing for id for project files to avoid unnecessary changes
@@ -21,7 +21,7 @@ unit kccompileproject;   // I4699
 
 interface
 
-function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADebug, AClean, AWarnAsError, ACheckFilenameConventions: Boolean; ATarget: string): Boolean;   // I4706
+function DoKCCompileProject(AProjectFilename: string; ADebug, AClean, AWarnAsError, ACheckFilenameConventions: Boolean; ATarget: string): Boolean;   // I4706
 
 implementation
 
@@ -30,7 +30,9 @@ uses
 
   Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.System.Project.kpsProjectFileAction,
+  Keyman.Developer.System.Project.modelTsProjectFileAction,
   Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectLogConsole,
   Keyman.Developer.System.Project.ProjectFile;
 
 type
@@ -39,19 +41,20 @@ type
     FSilent: Boolean;
     FFullySilent: Boolean;
   public
-    procedure Log(AState: TProjectLogState; Filename: string; Msg: string); override;   // I4706
+    procedure Log(AState: TProjectLogState; Filename: string; Msg: string; MsgCode, Line: Integer); override;   // I4706
     function Save: Boolean; override;   // I4709
 
     property Silent: Boolean read FSilent write FSilent;
     property FullySilent: Boolean read FFullySilent write FFullySilent;
   end;
 
-function DoKCCompileProject(AProjectFilename: string; AFullySilent, ASilent, ADebug, AClean, AWarnAsError, ACheckFilenameConventions: Boolean; ATarget: string): Boolean;   // I4706
+function DoKCCompileProject(AProjectFilename: string; ADebug, AClean, AWarnAsError, ACheckFilenameConventions: Boolean; ATarget: string): Boolean;   // I4706
 var
   i: Integer;
   Found: Boolean;
   kmn: TkmnProjectFileAction;
   kps: TkpsProjectFileAction;
+  modelTs: TmodelTsProjectFileAction;
 
   function Matches(AFile: TProjectFile; AClass: TProjectFileClass): Boolean;
   begin
@@ -64,11 +67,9 @@ var
 begin
   Result := False;
   Found := False;
-  with TProjectConsole.Create(AProjectFilename, False) do
+  with TProjectConsole.Create(ptUnknown, AProjectFilename, False) do
   try
     Options.CheckFilenameConventions := Options.CheckFilenameConventions or ACheckFilenameConventions; // never downgrade this option
-    FullySilent := AFullySilent;
-    Silent := ASilent;
     for i := 0 to Files.Count - 1 do
       if Matches(Files[i], TkmnProjectFileAction) then
       begin
@@ -82,7 +83,21 @@ begin
         else
           if not kmn.CompileKeyboard then Exit;
         Found := True;
+      end
+      else if Matches(Files[i], TmodelTsProjectFileAction) then
+      begin
+        modelTs := Files[i] as TmodelTsProjectFileAction;
+        modelTs.Debug := ADebug;
+        modelTs.WarnAsError := AWarnAsError;
+        if AClean then
+        begin
+          if not modelTs.Clean then Exit;
+        end
+        else
+          if not modelTs.CompileModel then Exit;
+        Found := True;
       end;
+
 
     for i := 0 to Files.Count - 1 do
       if Matches(Files[i], TkpsProjectFileAction) then
@@ -103,27 +118,15 @@ begin
   end;
 
   if not Found then
-    writeln(ExtractFileName(AProjectFilename)+': Fatal: Target not found (or project empty)');
+    TProjectLogConsole.Instance.Log(plsFatal, AProjectFileName, 'Target not found (or project empty)', 0, 0);
   Result := Found;
 end;
 
 { TProjectConsole }
 
-procedure TProjectConsole.Log(AState: TProjectLogState; Filename, Msg: string);   // I4706
+procedure TProjectConsole.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, Line: Integer);   // I4706
 begin
-  case AState of
-    plsInfo:
-      if not FSilent then
-        writeln(ExtractFileName(Filename)+': '+Msg);
-    plsWarning:
-      if not FFullySilent then
-        writeln(ExtractFileName(Filename)+': Warning: '+Msg);
-    plsError:
-      if not FFullySilent then
-        writeln(ExtractFileName(Filename)+': Error: '+Msg);
-    plsFatal:
-      writeln(ExtractFileName(Filename)+': Fatal error: '+Msg);
-  end;
+  TProjectLogConsole.Instance.Log(AState, Filename, Msg, MsgCode, Line);
 end;
 
 function TProjectConsole.Save: Boolean;   // I4709

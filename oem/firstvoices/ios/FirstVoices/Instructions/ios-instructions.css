@@ -1,0 +1,210 @@
+@font-face {
+   font-family: "Nunito";
+   src: url("nunito-regular-webfont.eot");
+   src: url("nunito-regular-webfont.ttf") format("truetype"),
+     url("nunito-regular-webfont.otf") format("opentype"),
+     url("nunito-regular-webfont.woff") format("woff"),
+     url("nunito-regular-webfont.svg#nunitoregular") format("svg");
+}
+
+@font-face {
+   font-family: "Open Sans";
+   src: url("opensans-regular-webfont.eot");
+   src: url("opensans-regular-webfont.ttf") format("truetype"),
+     url("opensans-regular-webfont.otf") format("opentype"),
+     url("opensans-regular-webfont.woff") format("woff"),
+     url("opensans-regular-webfont.svg#open_sansregular") format("svg");
+}
+
+html, body{
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	padding: 0;
+}
+
+html{
+	margin: 0;
+	min-height: 100%;
+	position: relative;
+}
+
+body{
+	background: #f7511e;
+	background: -moz-linear-gradient(25deg,  #f7511e 0%, #aa1225 55%, #9f031f 100%);
+	background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#f7511e), color-stop(55%,#aa1225), color-stop(100%,#9f031f));
+	background: -webkit-linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);
+	background: -o-linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);
+	background: -ms-linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);
+	background: linear-gradient(25deg,  #f7511e 0%,#aa1225 55%,#9f031f 100%);
+	color: #fff;
+	font-family: 'Open Sans';
+	margin: 0 0 200px 0;
+}
+
+#instructions{
+	padding: 0 30px 10px;
+	width: calc(100% - 60px);
+}
+
+#instructions p{
+	font-size: 0.875em;
+	margin: 15px 0;
+}
+
+#logo {
+    display: block;
+    margin: 30px auto;
+    text-align: center;
+}
+
+#logo img{
+	max-width: 400px;
+	width: 100%;
+}
+
+#logo p{
+    color: #FBF8E4;
+    font-family: 'Nunito';
+    font-size: 1.5em;
+    font-weight: bold;
+    text-shadow: 1px 1px 0px #000;
+    margin: 0;
+}
+
+h2{
+	color: #ffd988;
+	font-family: 'Nunito';
+	font-size: 1.25em;
+	font-weight: normal;
+}
+
+.steps{
+	display: table;
+	width: 100%;
+}
+
+.step{
+	display: table-row;
+}
+
+.step-number, .step-instruction{
+	border-bottom: 1px solid #A0BC76;
+	display: table-cell;
+	vertical-align: top;
+}
+
+.step-number{
+	width: 80px;
+}
+
+.step-number img{
+	display: block;
+	height: 30px;
+	margin: 15px auto;
+	width: 30px;
+	-webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+	filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+}
+
+.step-number span {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    margin: 15px auto;
+    width: 30px;
+    -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+
+    background-color: #A0BC76;
+    color: white;
+    text-align: center;
+    font-family: 'Nunito';
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.steps.use .step-number, .steps.use .step-instruction{
+	border-bottom: 0 none;
+}
+
+#globe{
+	height: 40px;
+	width: auto;
+}
+
+#supporters{
+    padding: 0 30px 10px;
+    width: calc(100% - 60px);
+    text-align: center;
+}
+
+#supporters p{
+    color: #ffd988;
+    font-size: 0.875em;
+    margin: 5px;
+    text-align: left;
+}
+
+#supporters img,
+#fpcf img{
+    background-color: white;
+    height: 43px;
+    width: auto;
+    padding: 2px;
+    margin: 5px;
+    -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+}
+
+#fpcf{
+    border-top: solid 1px #cfcec8;
+    padding: 0 30px 10px;
+    width: calc(100% - 60px);
+    text-align: center;
+}
+
+#fpcf p{
+    color: #ffd988;
+    font-size: 0.875em;
+    margin: 5px;
+}
+
+#fpcf a:link{
+    text-decoration: underline;
+    color: white;
+    font-weight: normal;
+}
+
+#fpcf a:visited{
+    text-decoration: underline;
+    color: white;
+    font-weight: normal;
+}
+
+#footer{
+	background-color: #605E4B;
+	color: #CFCEC8;
+	height: 200px;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+#footer h2, #footer a{
+	color: #CFCEC8;
+}
+
+#footer p{
+	font-size: 0.875em;
+	margin: 5px 0;
+}
+
+#footer img{
+	height: auto;
+	width: 50px;
+}

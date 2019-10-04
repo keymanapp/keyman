@@ -4,14 +4,22 @@
 # Designed for optimal compatibility with the Keyman Suite.
 #
 
+# Exit on command failure and when using unset variables:
+set -eu
+
 # Include some helper functions from resources
 . ../../resources/shellHelperFunctions.sh
+
+# Exit status on invalid usage.
+EX_USAGE=64
 
 LMLAYER_OUTPUT=build
 WORKER_OUTPUT=build/intermediate
 INCLUDES_OUTPUT=build/includes
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
+LEXICAL_MODELS_TYPES=../lexical-model-types
+
 
 
 # Build the worker and the main script.
@@ -63,7 +71,7 @@ clean ( ) {
   if [ -d $WORKER_OUTPUT ]; then
     rm -rf "$WORKER_OUTPUT" || fail "Failed to erase the prior build."
   fi
-  
+
   if [ -d $LMLAYER_OUTPUT ]; then
     rm -rf "$LMLAYER_OUTPUT" || fail "Failed to erase the prior build."
   fi
@@ -127,7 +135,7 @@ while [[ $# -gt 0 ]] ; do
     *)
       echo "$0: invalid option: $key"
       display_usage
-      exit -1
+      exit $EX_USAGE
   esac
   shift # past the processed argument
 done
@@ -137,6 +145,9 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( fetch_deps )); then
+  # Before installing, ensure that the local npm package we need can be require()'d.
+  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
+
   echo "Dependencies check"
   npm install --no-optional
 fi

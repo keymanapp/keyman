@@ -80,7 +80,10 @@ uses
   KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   utilicon in '..\..\global\delphi\general\utilicon.pas',
-  ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas';
+  CompileErrorCodes in '..\..\global\delphi\general\CompileErrorCodes.pas',
+  Keyman.Developer.System.ModelProjectTemplate in 'Keyman.Developer.System.ModelProjectTemplate.pas',
+  Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
+  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas';
 
 {$R icons.RES}
 {$R version.res}

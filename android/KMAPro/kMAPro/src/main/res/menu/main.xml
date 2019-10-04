@@ -27,7 +27,7 @@
                 android:id="@+id/action_text_size"
                 android:title="@string/action_text_size"
                 app:showAsAction="never"
-                android:icon="@drawable/ic_light_action_textsize"/>
+                android:icon="@drawable/ic_light_action_textsize" />
 
             <item
                 android:id="@+id/action_clear_text"
@@ -46,6 +46,13 @@
                 android:title="@string/get_started"
                 app:showAsAction="never"
                 android:icon="@drawable/ic_action_get_started" />
+
+            <item
+                android:id="@+id/action_settings"
+                android:title="@string/action_settings"
+                app:showAsAction="never"
+                android:icon="@drawable/ic_settings" />
+
         </menu>
     </item>
 </menu>

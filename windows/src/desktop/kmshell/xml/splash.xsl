@@ -10,6 +10,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
   <title><xsl:value-of select="($locale/String[@Id='S_Splash_Title'])[1]" /></title>
+  <style> * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";} </style>
   <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
   <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>splash.css</xsl:attribute></link>
   <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu.js</xsl:attribute><xsl:text> </xsl:text></script>
