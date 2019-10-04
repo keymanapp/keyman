@@ -64,8 +64,8 @@ body {
   padding-top: 70px;
   padding-right: 108px;
 }
-  
-.key-droppable 
+
+.key-droppable
 {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -86,7 +86,7 @@ body {
   width: 50px;
 }
 
-.key-dragging 
+.key-dragging
 {
   background: #cccccc !important;
 }
@@ -137,7 +137,7 @@ body {
 .key .text {
 
 }
- 
+
 .hasSubKeyArray {
   background-image: url('skflag.png');
   background-position: top right;
@@ -147,21 +147,21 @@ body {
 .hasSubKeyArray.selected {
   background-image: url('skflags.png');
 }
- 
+
 .key.selected {
   border-color: #4040ff !important;
   box-shadow: 0px 0px 20px rgba(100, 100, 255, 0.5);
 }
- 
+
 .row {
   clear:left;
   line-height: 1;
   position: relative;
 }
- 
+
 #sk {
   clear:left;
-  padding: 8px; 
+  padding: 8px;
   margin: 0px 0px 8px;
   min-height: 69px;
   background: #eeeeee;
@@ -180,7 +180,7 @@ body {
   white-space: nowrap;
 }
 
-#sk .key 
+#sk .key
 {
   height: 48px;
   padding-top: 5px;
@@ -227,7 +227,7 @@ button, input, select {
   margin: 1px 2px;
 }
 
-button { 
+button {
   padding: 2px 4px;
 }
 
@@ -243,7 +243,7 @@ button {
   clear: left;
 }
 
-#data { 
+#data {
   display: none;
 }
 
@@ -293,7 +293,7 @@ div.wedge-horz span, div.wedge-vert span {
     font-size: 11px;
 }
 
-div.wedge-vert span {    
+div.wedge-vert span {
     left: -7px;
     top: 2px;
 }
@@ -338,8 +338,8 @@ input#inpKeyCap, input#inpSubKeyCap {
   color: white;
   font: 9pt Calibri;
   left: 100%;
-  margin-left: 12px;
-  margin-top: 8px;
+  margin-left: 16px;
+  margin-top: 16px;
   position: absolute;
   top: 0;
   z-index: 10;
@@ -348,13 +348,14 @@ input#inpKeyCap, input#inpSubKeyCap {
 
 #kbd.phone-iphone5-portrait .key-size {
   color: black;
-  margin-left: 42px;
+  margin-left: 48px;
   font-size: 8pt;
 }
 
 #kbd.phone-iphone5-landscape .key-size {
   font-size: 8pt;
-  margin-top: 4px;
+  margin-left: 16px;
+  margin-top: 8px;
   background: rgba(0,0,0,0.5);
   border-radius: 2px;
 }
