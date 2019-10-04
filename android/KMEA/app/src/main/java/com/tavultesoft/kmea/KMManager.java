@@ -53,6 +53,7 @@ import android.widget.RelativeLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
@@ -92,6 +93,11 @@ public final class KMManager {
     GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
     GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
     GLOBE_KEY_ACTION_DO_NOTHING,
+  }
+
+  public enum FormFactor {
+    PHONE,
+    TABLET;
   }
 
   private static InputMethodService IMService;
@@ -193,6 +199,10 @@ public final class KMManager {
 
   public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
+  }
+
+  public static String getVersion() {
+    return com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
   }
 
   // Check if a keyboard namespace is reserved
@@ -1041,9 +1051,17 @@ public final class KMManager {
     return kbFileVersion;
   }
 
+  public static void addKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(listener);
+  }
+
   public static void addKeyboardEventListener(OnKeyboardEventListener listener) {
     KMTextView.addOnKeyboardEventListener(listener);
     KMKeyboard.addOnKeyboardEventListener(listener);
+  }
+
+  public static void removeKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
+    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(listener);
   }
 
   public static void removeKeyboardEventListener(OnKeyboardEventListener listener) {
@@ -1234,6 +1252,12 @@ public final class KMManager {
     }
 
     return result;
+  }
+
+  public static FormFactor getFormFactor() {
+    String device_type = appContext.getResources().getString(R.string.device_type);
+
+    return device_type.equals("AndroidMobile") ? FormFactor.PHONE : FormFactor.TABLET;
   }
 
   public static boolean isHelpBubbleEnabled() {

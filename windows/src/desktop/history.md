@@ -3,6 +3,11 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-03 12.0.42 beta
+* Bug Fix: Additional shutdown issues that sporadically occurred (#2157)
+* Fix issues starting debug logging for non-administrative users (#2153)
+* Fix shutdown issue on some systems (#2153)
+
 ## 2019-07-29 12.0.9 beta
 * Initial beta release of Keyman Desktop 12
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Awindows+base%3Amaster)
@@ -82,14 +87,14 @@
 * New Features:
   * Introduce support for Metro-style (UWP) applications such as Edge, Skype (#1265, #1377)
   * Added Kannada localization (#1273)
-  
+
 * Changes:
   * Debug logging now uses Event Tracing for Windows (#1261, #1286)
   * Added SIL logo to startup (#1194)
   * Removed hard coded version numbers, versioned paths and registry settings for simpler future upgrades (#1171, #1175)
   * Upgraded to WiX 3.11 to build installers (#1098, #1178)
   * Support for Delphi Community Edition (#1104)
-  
+
 * Bug Fixes:
   * Rework keyboard input to serialize input queue to resolve modifier key stickiness (#1226, #1229, #1236, #1439, #1300)
   * Improved On Screen Keyboard key cap font size for scripts such as Tai Dam (#1434)
@@ -422,7 +427,7 @@
 ## 9.0.469 stable
 * Download Keyboard dialog does not display correctly (I4414)
 * OSK does not show underlying characters if base keyboard is not loaded (I4415)
-    
+
 ## 9.0.467 stable
 * Character Map needs to insert characters using SendInput (I4412)
 * Manual Activate dialog is misformatted (I4408)
@@ -471,7 +476,7 @@
 * Deadkeys are now working with Microsoft Word in TSF-aware mode (I4370)
 * WOW64 is now tested consistently in all locations (I4374)
 * Add registry flag 'deep tsf integration' to allow us to disable enhanced integration with TSF-aware applications (I4375)
-    
+
 ## 9.0.459 beta
 * Deadkeys are now working correctly in all cases in Wordpad and other TSF-aware applications (except Word) (I4278)
 * All .ico formats do not load correctly in icon conversion for keyboard layouts (I4317)
@@ -484,7 +489,7 @@
 * Splash screen buy links now go to correct version of Keyman (I4357)
 * COM registration updated for new interfaces in Keyman 9 (I4358)
 * OSK now shows correct base keyboard and refreshes when switching languages (I4359)
-    
+
 ## 9.0.458 beta
 * Getting Started window gave instructions that were not valid for KM9 (I3674)
 * Script error dialog was appearing behind splash dialog (regression from I3710) (I3730)
@@ -494,7 +499,7 @@
 ## 9.0.457 beta
 * Fixed: Keys that have rules but are not matched due to context did not generate output (I4290)
 * Fixed: Additional minor bug fixes (I4302)
-    
+
 ## 9.0.456 beta
 * Fixed: Crash in Keyman Configuration (I4296)
 * Fixed: Upgrade of keyboards failed to register in local machine context (I4297)
@@ -507,7 +512,7 @@
 ## 9.0.454 beta
 * Fixed: Switch from Keyman to Keyman keyboard caused loop in global language switch (I4277)
 * Fixed: Keyboard switching and legacy support edge case scenarios (I4285, I4286, I4287, I4288)
-    
+
 ## 9.0.453 beta
 * Fixed: Shift states were not being preserved correctly (I3605)
 * Fixed: Opening User Interface Language menu causes crash [CrashID:kmshell.exe_9.0.447.0_script_TfrmMain_0] (I4199)
@@ -516,7 +521,7 @@
 * Fixed: Switch language for all applications is not working (I4271)
 * Fixed: TIP only outputs first 127 characters of a rule result (I4272)
 * Fixed: kmtip does not work if already active before KM starts (I4274)
-    
+
 ## 9.0.452 beta
 * Fixed: Keyman installed keyboards do not seem to appear in Windows Language control panel in Win 8 (I4202)
 * Fixed: Icons do not show background correctly in lang switch window and Win 8 languages controls (also I4316) (I4204)
@@ -569,7 +574,7 @@
 * Mnemonic layouts should be recompiled to positional based on user-selected base keyboard (I4169)
 * Console execute in utilexecute.pas needs a temp copy of buffer to avoid write access violations (I4170)
 * Shift states still not working with unprocessed keys in V9 (I4128)
-    
+
 ## 9.0.444 beta
 * Keyman Desktop installer does not install x64 TIP (I4161)
 
@@ -593,7 +598,7 @@ Here are some of the great things we have added to Keyman Desktop 8.0.
 * Enhanced Character Map — Support for Planes 1-15 of the Unicode Standard has been greatly improved, as has filtering and search. For example, search now with instant feedback by part or all of character code point or name.
 * Support for Unicode 5.2 & 6.0 — Type in everything from Egyptian to Emoji.
 * Improved Application Compatibility — The keystroke processor in Keyman Desktop has been made more compatible with major applications such as OpenOffice, Microsoft Office and popular web browsers.
-* Single Installer — Both Keyman Desktop Light & Keyman Desktop Professional now install from the same file, which there's no longer any need to worry about downloading the wrong edition. 
+* Single Installer — Both Keyman Desktop Light & Keyman Desktop Professional now install from the same file, which there's no longer any need to worry about downloading the wrong edition.
 
 ## 7.0.0 stable
 

@@ -45,7 +45,6 @@ interface KmpJsonFileContentFile {
 interface KmpJsonFileLexicalModel {
   name: string;
   id: string;
-  version: string;
   languages: KmpJsonFileLanguage[];
 }
 
@@ -67,7 +66,7 @@ interface KmpJsonFileKeyboard {
 interface KmpJsonFileStartMenu {
   folder?: string;
   addUninstallEntry?: boolean;
-  items?: KmpJsonFileStartMenuItem[]; 
+  items?: KmpJsonFileStartMenuItem[];
 }
 
 interface KmpJsonFileStartMenuItem {

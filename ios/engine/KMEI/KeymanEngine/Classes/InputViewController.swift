@@ -60,7 +60,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
-  private var expandedHeight: CGFloat {
+  var expandedHeight: CGFloat {
     return keymanWeb.keyboardHeight + activeTopBarHeight
   }
   

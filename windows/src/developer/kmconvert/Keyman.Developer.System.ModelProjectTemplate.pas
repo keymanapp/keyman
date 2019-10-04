@@ -161,7 +161,7 @@ begin
     kps.Info.Desc[PackageInfo_Name] := Name;
     kps.Info.Desc[PackageInfo_Copyright] := Copyright;
     kps.Info.Desc[PackageInfo_Author] := Author;
-    kps.KPSOptions.FollowKeyboardVersion := True;
+    kps.Info.Desc[PackageInfo_Version] := Version;
     kps.FileName := GetPackageFilename;
 
     // Add model.js
@@ -184,7 +184,6 @@ begin
     plm := TPackageLexicalModel.Create(kps);
     plm.Name := Name;
     plm.ID := ID;
-    plm.Version := Version;
     kps.LexicalModels.Add(plm);
 
     SetPackageLanguageMetadata(kps, plm.Languages);

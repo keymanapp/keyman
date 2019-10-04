@@ -31,7 +31,7 @@ namespace models {
   /**
    * The Dummy Model that returns nonsensical, but predictable results. 
    */
-  export class DummyModel implements WorkerInternalModel {
+  export class DummyModel implements LexicalModel {
     configuration: Configuration;
     punctuation?: LexicalModelPunctuation;
     private _futureSuggestions: Suggestion[][];

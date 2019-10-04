@@ -576,7 +576,7 @@ $(function () {
     "phone-iphone5-portrait": { "x": 526, "y": 266, "name": "iPhone 5 (portrait)"}  // 528x936 = iPhone box size; (90,204)-(618,1040)
   };
 
-  this.keyMargin = 5;
+  this.keyMargin = 15;
 
   // from kmwosk.js:
   this.modifierCodes = {
@@ -2148,6 +2148,7 @@ $(function () {
 
     target.focus();
     target.val(target.val() + o.text);
+    target.change();
   };
 
   builder.loadingState = true;

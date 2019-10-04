@@ -22,6 +22,8 @@ compiled.
 How to build
 ------------
 
+Run `build.sh`:
+
     ./build.sh
 
 

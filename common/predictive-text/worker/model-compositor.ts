@@ -1,9 +1,9 @@
 class ModelCompositor {
-  private lexicalModel: WorkerInternalModel;
+  private lexicalModel: LexicalModel;
   private static readonly MAX_SUGGESTIONS = 12;
   private readonly punctuation: LexicalModelPunctuation;
 
-  constructor(lexicalModel: WorkerInternalModel) {
+  constructor(lexicalModel: LexicalModel) {
     this.lexicalModel = lexicalModel;
     this.punctuation = ModelCompositor.determinePunctuationFromModel(lexicalModel);
   }
@@ -158,7 +158,7 @@ class ModelCompositor {
   /**
    * Returns the punctuation used for this model, filling out unspecified fields
    */
-  private static determinePunctuationFromModel(model: WorkerInternalModel): LexicalModelPunctuation {
+  private static determinePunctuationFromModel(model: LexicalModel): LexicalModelPunctuation {
     let defaults = DEFAULT_PUNCTUATION;
 
     // Use the defaults of the model does not provide any punctuation at all.

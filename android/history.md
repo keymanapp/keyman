@@ -3,6 +3,14 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-04 12.0.4096 beta
+* Bug Fix:
+  * Add wrappers for missing API methods (#2167)
+* Add in-app help on uninstalling dictionary (#2171)
+
+## 2019-10-01 12.0.4095 beta
+* Splits help into multiple pages for better usability (#2139)
+
 ## 2019-09-26 12.0.4094 beta
 * Bug Fixes:
   * Fix crash when Language picker doesn't contain keyboard catalog info (#2138)

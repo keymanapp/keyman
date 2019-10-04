@@ -9,7 +9,7 @@ semi-formal specification on how the Worker and the main thread communicate.
 System dependencies
 -------------------
 
-You will need Bash and Node.js >= 6.0.
+You will need Bash and Node.js >= 10.0.
 
 Build
 -----

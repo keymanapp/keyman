@@ -3,7 +3,14 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-07-30 12.0.41 beta
+## 2019-10-05 12.0.45 beta
+* Touch Layout Editor: Make default padding in touch layout editor match default padding in KeymanWeb. (#2170)
+
+## 2019-10-04 12.0.44 beta
+* Package Editor: Lexical models do not have embedded version numbers, so remove this from the user interface. (#2164)
+* Touch Layout Editor: Dropping character from Character Map onto Touch Layout Editor now saves the change. (#2163)
+
+## 2019-09-30 12.0.41 beta
 * General: Keyman Desktop 11 would crash if installed together with Keyman Developer 12. (#2148)
 
 ## 2019-09-29 12.0.40 beta

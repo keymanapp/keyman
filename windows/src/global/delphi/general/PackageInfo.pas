@@ -338,7 +338,6 @@ type
 
   TPackageLexicalModel = class(TPackageBaseObject)
   private
-    FVersion: string;
     FName: string;
     FID: string;
     FLanguages: TPackageKeyboardLanguageList;
@@ -349,7 +348,6 @@ type
     procedure Assign(Source: TPackageLexicalModel); virtual;
     property Name: string read FName write FName;
     property ID: string read FID write FID;
-    property Version: string read FVersion write FVersion;
     property RTL: Boolean read FRTL write FRTL;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
   end;
@@ -518,7 +516,6 @@ const
   SJSON_LexicalModels = 'lexicalModels';
   SJSON_LexicalModel_Name = 'name';
   SJSON_LexicalModel_ID = 'id';
-  SJSON_LexicalModel_Version = 'version';
   SJSON_LexicalModel_RTL = 'rtl';
   SJSON_LexicalModel_Languages = 'languages';
 
@@ -2096,7 +2093,6 @@ var
 begin
   FName := Source.Name;
   FID := Source.ID;
-  FVersion := Source.Version;
   FRTL := Source.RTL;
   FLanguages.Clear;
   for i := 0 to Source.Languages.Count - 1 do
@@ -2164,7 +2160,6 @@ begin
     lexicalModel := TPackageLexicalModel.Create(Package);
     lexicalModel.Name := GetJsonValueString(ALexicalModel, SJSON_LexicalModel_Name);
     lexicalModel.ID := GetJsonValueString(ALexicalModel,SJSON_LexicalModel_ID);
-    lexicalModel.Version := GetJsonValueString(ALexicalModel, SJSON_LexicalModel_Version);
     lexicalModel.RTL := GetJsonValueBool(ALexicalModel, SJSON_LexicalModel_RTL);
     lexicalModel.Languages.LoadJSON(ALexicalModel);
 
@@ -2188,7 +2183,6 @@ begin
     lexicalModel := TPackageLexicalModel.Create(Package);
     lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
     lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
-    lexicalModel.Version := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Version]);
     lexicalModel.RTL := ANode.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
     lexicalModel.Languages.LoadXML(ALexicalModel);
     Add(lexicalModel);
@@ -2214,7 +2208,6 @@ begin
 
     ALexicalModel.AddPair(SJSON_LexicalModel_Name, Items[i].Name);
     ALexicalModel.AddPair(SJSON_LexicalModel_ID, Items[i].ID);
-    ALexicalModel.AddPair(SJSON_LexicalModel_Version, Items[i].Version);
     if Items[i].RTL then ALexicalModel.AddPair(SJSON_LexicalModel_RTL, TJSONTrue.Create);
     Items[i].Languages.SaveJSON(ALexicalModel);
   end;
@@ -2232,7 +2225,6 @@ begin
 
     ALexicalModel.ChildNodes[SXML_PackageLexicalModel_Name].NodeValue := Items[i].Name;
     ALexicalModel.ChildNodes[SXML_PackageLexicalModel_ID].NodeValue := Items[i].ID;
-    ALexicalModel.ChildNodes[SXML_PackageLexicalModel_Version].NodeValue := Items[i].Version;
     if Items[i].RTL then
       ALexicalModel.ChildNodes[SXML_PackageLexicalModel_RTL].NodeValue := True;
 
