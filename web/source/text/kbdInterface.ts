@@ -985,6 +985,11 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
+        // Do not trigger a layer change when operating on alternates - the use case of Mocks.
+        if(outputTarget instanceof Mock) {
+          return;
+        }
+
         // How would this be handled in an eventual headless mode?
         return keyman.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
