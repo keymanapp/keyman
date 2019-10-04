@@ -963,4 +963,64 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     shouldReloadKeyboard = true
     inputViewController.reload()
   }
+
+  /*-----------------------------
+   *    Legacy API endpoints    -
+   *-----------------------------
+   *
+   * Some functionality has been refactored into separate classes for 12.0.
+   * No reason we can't add a couple of helper functions to help forward
+   * the data for apps built on older versions of KMEI, though.
+   */
+
+  public func downloadKeyboard(from url: URL) {
+    ResourceDownloadManager.shared.downloadKeyboard(from: url)
+  }
+
+  public func downloadKeyboard(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
+    ResourceDownloadManager.shared.downloadKeyboard(withID: withID,
+                                                    languageID: languageID,
+                                                    isUpdate: isUpdate,
+                                                    fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
+  }
+
+  // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
+  public func downloadLexicalModel(from url: URL) {
+    ResourceDownloadManager.shared.downloadLexicalModel(from: url)
+  }
+
+  // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
+  public func downloadLexicalModel(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
+    ResourceDownloadManager.shared.downloadLexicalModel(withID: withID,
+                                                        languageID: languageID,
+                                                        isUpdate: isUpdate,
+                                                        fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
+  }
+
+  public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
+    return ResourceDownloadManager.shared.stateForKeyboard(withID: keyboardID)
+  }
+
+  // Technically new, but it does closely parallel an old API point.
+  public func stateForLexicalModel(withID modelID: String) -> KeyboardState {
+    return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
+  }
+
+  public func parseKMP(_ folder: URL, type: LanguageResourceType = .keyboard) throws -> Void {
+    switch type {
+      case .keyboard:
+        try! parseKbdKMP(folder)
+        break
+      case .lexicalModel:
+        // Yep.  Unlike the original, THIS one is static.
+        try! Manager.parseLMKMP(folder)
+        break
+    }
+  }
+
+  // To re-implement the old API (missing from v11!) we need to pick one version of height.
+  // For library users, the total height of the InputViewController should be most useful.
+  public func keyboardHeight() -> CGFloat {
+    return inputViewController?.expandedHeight ?? 0
+  }
 }
