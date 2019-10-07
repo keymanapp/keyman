@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-07 12.0.4200 stable
+* Release 12.0
+
 ## 2019-10-04 12.0.4096 beta
 * Bug Fix:
   * Add wrappers for missing API methods (#2167)
@@ -105,7 +108,7 @@
 
 ## 2019-02-15 11.0.2062 beta
 * No changes.
-  
+
 ## 2019-02-07 11.0.2061 beta
 * Bug fix:
   * Add notifications when keyboard or font fails to download from Keyman cloud (#1570)
@@ -219,7 +222,7 @@
 ## 2018-06-11 10.0.399 beta
 * Consolidate Info view (#972)
 * Platform tests (in keyboards) are now consistent across all platforms (#969)
- 
+
 ## 2018-06-05 10.0.398 beta
 * Fix globe button for system keyboard (#942)
 
@@ -288,7 +291,7 @@
 * Initial beta release of Keyman for Android 10.0
 
 ## 10.0 alpha
-* Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text 
+* Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text
   from being processed as key codes, and fixes the app crash when longpress with K_SPACE.
 * Added support for L/R Alt and Ctrl and Caps Lock modifiers for keyboards if specified by a keyboard designer
 * Add feature to reset keyboard to default layer when new input field focused (#288)
@@ -299,7 +302,7 @@
 * Add feature to install ad-hoc keyboards via .kmp packages
 * Add [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/) for generating crash reports
 * Add Material Design [icons](https://material.io/icons/)
-* Fix path to special OSK font for longpress of special keys (#239) 
+* Fix path to special OSK font for longpress of special keys (#239)
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable
