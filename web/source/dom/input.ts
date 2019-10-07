@@ -78,6 +78,33 @@ namespace com.keyman.dom {
 
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
+
+      this.doScroll();
+    }
+
+    doScroll() {
+      let dummyKey = 32;
+
+      // Non-IE browsers:  create the event this way.  keyCode's bugged on InputEvent in Chrome,
+      // so we bypass that with a base Event instead.
+      if(typeof Event == 'function') {
+        event = new Event('keypress');
+        event['key'] = " ";
+        event['code'] = 0x20;
+        event['keyCode'] = 0x20;
+        event['location'] = 0;
+        event['getModifierState'] = function() {
+          return 0;
+        }
+      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
+        event = document.createEvent('KeyboardEvent');
+        // An override to ensure that IE's method gets called.
+        // Many thanks to https://gist.github.com/termi/4654819, line 142 at the time of writing this.
+        var success = (<any>event).initKeyboardEvent('keypress', false, true, null, dummyKey, 0, 
+          '', 0, 0);
+      }
+
+      this.root.dispatchEvent(event);
     }
 
     getTextBeforeCaret(): string {
