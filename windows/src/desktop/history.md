@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-07 12.0.50 stable
+* Release 12.0
+
 ## 2019-10-03 12.0.42 beta
 * Bug Fix: Additional shutdown issues that sporadically occurred (#2157)
 * Fix issues starting debug logging for non-administrative users (#2153)
