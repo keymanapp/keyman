@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-07 12.0.100 stable
+* Release 12.0
+
 ## 2019-10-04 12.0.90 beta
 * Fixes next-layer management complications with predictive correction data computation (#2172)
 
@@ -115,7 +118,7 @@
 * New Features:
   * Added `setNumericLayer()` for embedded platforms to change OSK to numeric layer. (#1218)
   * Added support for Promises to `init()` and `setActiveKeyboard()`. (#1432)
-  
+
 * Changes:
   * Added OSK bulk rendering script for testing (#1432)
   * Code refactors (#1403)
@@ -325,9 +328,9 @@ when the initialization option `attachType` is set to auto and will attach/detac
 * Correct invalid return values in smpstring.js.
 * Remove debug reference from kmwtoggle.js.
 * kmwbase.js: accept file: as protocol for page or resource references.
-* Expose font checking as *isFontAvailable(name)* to allow site developers to check that a custom font has in fact been installed by the user's browser. 
-(This was added partly to make it possible to know if cross-source font loading was being prevented, 
-as by Firefox unless an override option is set. Not currently used, as use during page loading is 
+* Expose font checking as *isFontAvailable(name)* to allow site developers to check that a custom font has in fact been installed by the user's browser.
+(This was added partly to make it possible to know if cross-source font loading was being prevented,
+as by Firefox unless an override option is set. Not currently used, as use during page loading is
 problematic.)
 
 ## 2014-10-20 2.0.365 stable

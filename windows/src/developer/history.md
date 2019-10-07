@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-07 12.0.50 stable
+* Release 12.0
+
 ## 2019-10-05 12.0.45 beta
 * Touch Layout Editor: Make default padding in touch layout editor match default padding in KeymanWeb. (#2170)
 

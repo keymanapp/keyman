@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-07 12.0.50 stable
+* Release 12.0
+
 ## 2019-08-12 12.0.7 beta
 * Fix compatibility issues with macOS 10.14.5 (#1889)
 
