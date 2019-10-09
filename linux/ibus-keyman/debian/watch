@@ -1,2 +1,2 @@
 version=4
-https://downloads.keyman.com/linux/(?:beta|stable)/(\d\S+)/ibus-keyman-(.+)\.tar\.gz debian uupdate
+https://downloads.keyman.com/linux/(?:stable)/(\d\S+)/ibus-keyman-(.+)\.tar\.gz debian uupdate
