@@ -1514,23 +1514,6 @@ namespace com.keyman {
       return this.keymanweb.util.callEvent('kmw.keyboardchange', p);
     }
 
-        
-    /**
-     * Function     _NotifyKeyboard
-     * Scope        Private
-     * @param       {number}    _PCommand     event code (16,17,18) or 0
-     * @param       {Object}    _PTarget      target element
-     * @param       {number}    _PData        1 or 0    
-     * Description  Notifies keyboard of keystroke or other event
-     */    
-    notifyKeyboard = function(_PCommand: number, _PTarget: HTMLElement|Document, _PData: number) { // I2187
-      var activeKeyboard = this.activeKeyboard;
-
-      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
-        activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
-      }
-    }
-
     shutdown() {
       for(let script of this.linkedScripts) {
         if(script.remove) {
