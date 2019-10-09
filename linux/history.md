@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-10 12.0.52 stable
+* Change Debian watch files to only watch stable (#2188)
+
 ## 2019-10-07 12.0.50 stable
 * Release 12.0
 
