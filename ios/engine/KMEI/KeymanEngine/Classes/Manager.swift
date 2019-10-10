@@ -708,8 +708,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         }
 
         // Version uses a 'conditional initializer'.  If it fails, the version info is invalid.
-        guard let _ = Version(version) else {
-          // Marc's decision - lazy-handle the error and replace version with 1.0.
+        if let _ = Version(version) {
+          // No problem
+        } else {
+          // Lazy-handle the error and replace version with 1.0.  Legacy decision from 2005.
           version = "1.0"
         }
 
