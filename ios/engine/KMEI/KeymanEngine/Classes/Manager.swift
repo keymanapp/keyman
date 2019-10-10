@@ -697,7 +697,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       let data = try Data(contentsOf: path, options: .mappedIfSafe)
       let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
       if let jsonResult = jsonResult as? [String:AnyObject] {
-        var version: String = "error"
+        var version: String = "1.0"
 
         if let info = jsonResult["info"] as? [String:AnyObject] {
           if let versionEntry = info["version"] as? [String:AnyObject] {
@@ -705,10 +705,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
               version = description;
             }
           }
-        }
-
-        if version == "error" {
-          throw KMPError.invalidPackage
         }
 
         if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
