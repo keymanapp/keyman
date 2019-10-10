@@ -63,14 +63,15 @@ public class LexicalModelPackageProcessorTest {
     FileUtils.moveDirectory(tempPkg, TEST_EN_CUSTOM_MODEL_KMP_TARGET);
 
     Assert.assertNotNull(json);
+    String pkgVersion = lmPP.getPackageVersion(json);
 
-    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom");
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion);
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
     en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");
     en_custom.put(KMManager.KMKey_LexicalModelName, "Example (English) Template Custom Model");
     en_custom.put(KMManager.KMKey_LexicalModelID, "example.en.custom");
-    en_custom.put(KMManager.KMKey_LexicalModelVersion, "1.0.0");
+    en_custom.put(KMManager.KMKey_LexicalModelVersion, "1.0");
     en_custom.put(KMManager.KMKey_LanguageID, "en");
     en_custom.put(KMManager.KMKey_LanguageName, "English");
     en_custom.put(KMManager.KMKey_CustomHelpLink, "");
