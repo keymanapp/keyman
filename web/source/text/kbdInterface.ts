@@ -204,6 +204,32 @@ namespace com.keyman.text {
         DOMEventHandlers.states._IgnoreNextSelChange = 1;
       }
     }
+
+            
+    /**
+     * Function     _NotifyKeyboard
+     * Scope        Private
+     * @param       {number}    _PCommand     event code (16,17,18) or 0
+     * @param       {Object}    _PTarget      target element
+     * @param       {number}    _PData        1 or 0    
+     * Description  Notifies keyboard of keystroke or other event
+     */    
+    notifyKeyboard(_PCommand: number, _PTarget: OutputTarget|HTMLElement|Document, _PData: number) { // I2187
+      let keyman = com.keyman.singleton;
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+
+      var target: OutputTarget;
+      if(_PTarget instanceof text.OutputTarget) {
+        target = _PTarget;
+      } else {
+        target = text.Processor.getOutputTarget(_PTarget as HTMLElement);
+      }
+
+      // Good example use case - the Japanese CJK-picker keyboard
+      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
+        activeKeyboard['KNS'](_PCommand, target, _PData);
+      }
+    }
       
     /**
      * Function     KT
