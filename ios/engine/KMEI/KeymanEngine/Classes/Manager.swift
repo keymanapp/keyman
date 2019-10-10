@@ -697,11 +697,28 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       let data = try Data(contentsOf: path, options: .mappedIfSafe)
       let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
       if let jsonResult = jsonResult as? [String:AnyObject] {
+        var version: String = "1.0"
+
+        if let info = jsonResult["info"] as? [String:AnyObject] {
+          if let versionEntry = info["version"] as? [String:AnyObject] {
+            if let description = versionEntry["description"] as? String {
+              version = description;
+            }
+          }
+        }
+
+        // Version uses a 'conditional initializer'.  If it fails, the version info is invalid.
+        if let _ = Version(version) {
+          // No problem
+        } else {
+          // Lazy-handle the error and replace version with 1.0.  Legacy decision from 2005.
+          version = "1.0"
+        }
+
         if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
           for k in lexicalModels {
             let name = k["name"] as! String
             let lexicalModelID = k["id"] as! String
-            let version = k["version"] as! String
             
             //TODO: handle errors if languages do not exist
             //var languageName = ""
