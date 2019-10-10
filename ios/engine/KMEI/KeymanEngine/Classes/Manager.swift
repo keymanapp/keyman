@@ -709,7 +709,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
         // Version uses a 'conditional initializer'.  If it fails, the version info is invalid.
         guard let _ = Version(version) else {
-          throw KMPError.invalidPackage
+          // Marc's decision - lazy-handle the error and replace version with 1.0.
+          version = "1.0"
         }
 
         if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
