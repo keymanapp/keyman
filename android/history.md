@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-10 12.0.4201 stable
+* Bug Fix:
+  * Use lexical model package version for lexical model version (#2195)
+
 ## 2019-10-07 12.0.4200 stable
 * Release 12.0
 
