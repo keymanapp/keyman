@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-08 12.0.52 stable
+* Fixes issue when installing dictionaries (#2193)
+
 ## 2019-10-07 12.0.50 stable
 * Release 12.0
 
