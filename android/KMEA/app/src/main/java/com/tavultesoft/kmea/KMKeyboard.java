@@ -616,7 +616,9 @@ final class KMKeyboard extends WebView {
     params.putString("keyboardName", this.keyboardName);
     params.putString("keyboardVersion", this.keyboardVersion);
 
-    mFirebaseAnalytics.logEvent("kmw_console_error", params);
+    if(mFirebaseAnalytics != null) {
+      mFirebaseAnalytics.logEvent("kmw_console_error", params);
+    }
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
@@ -1300,12 +1302,12 @@ final class KMKeyboard extends WebView {
         popupKeysList = null;
       }
       break;
-    }  
+    }
   }
   */
 
-  /* 
-   * Override onDraw method to render missing characters for Android API 17 & 18 font rendering bug. 
+  /*
+   * Override onDraw method to render missing characters for Android API 17 & 18 font rendering bug.
     private Bitmap keyboardImage;
     private Canvas keyboardCanvas;
     private Paint paint;
