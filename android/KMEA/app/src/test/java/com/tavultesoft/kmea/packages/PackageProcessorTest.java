@@ -131,8 +131,9 @@ public class PackageProcessorTest {
     FileUtils.moveDirectory(tempPkg, TEST_GFF_KMP_TARGET);
 
     Assert.assertNotNull(json);
+    String pkgVersion = PP.getPackageVersion(json);
 
-    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion);
     // Only the first language is installed with the keyboard
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
