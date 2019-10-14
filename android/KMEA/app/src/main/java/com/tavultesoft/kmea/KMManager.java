@@ -323,7 +323,7 @@ public final class KMManager {
     if (parent != null)
       parent.removeView(SystemKeyboard);
     keyboardLayout.addView(SystemKeyboard);
-    
+
     mainLayout.addView(keyboardLayout);
     //mainLayout.addView(overlayLayout);
     return mainLayout;
@@ -812,7 +812,10 @@ public final class KMManager {
     params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
     params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
     params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
-    mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+
+    if(mFirebaseAnalytics != null) {
+      mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+    }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }
