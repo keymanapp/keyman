@@ -31,4 +31,7 @@ gradle_models.ser
 KMEA/app/src/main/assets/
 KMAPro/assets/keyman.js
 
-
+# Eclipse files
+.project
+.settings/
+.classpath
