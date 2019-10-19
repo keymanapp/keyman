@@ -100,7 +100,6 @@ type
     procedure RunVersion8Upgrade(const KMShellPath: WideString);   // I4293
     procedure RunVersion9Upgrade(const KMShellPath: WideString);
     procedure RunVersion10Upgrade(const KMShellPath: WideString);
-    procedure RunVersion11PlusUpgrade(const KMShellPath: WideString);
     procedure CloseKeymanApplications;  // I2740
     procedure DeleteBackupPath; // I2747
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
@@ -686,7 +685,6 @@ begin
     RunVersion8Upgrade(FKMShellPath);  // I4293
     RunVersion9Upgrade(FKMShellPath);
     RunVersion10Upgrade(FKMShellPath);
-    RunVersion11PlusUpgrade(FKMShellPath);
 
     { Install packages for all users }
     s := '-nowelcome -s -i '; //"'+ExtPath+'" ';
@@ -885,17 +883,6 @@ begin
   begin
     s := '"'+KMShellPath+'" -upgradekeyboards='; // I2548
     TUtilExecute.WaitForProcess(s+'10,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
-  end;
-end;
-
-procedure TRunTools.RunVersion11PlusUpgrade(const KMShellPath: WideString);
-var
-  s: WideString;
-begin
-  if FRunUpgrade11Plus then
-  begin
-    s := '"'+KMShellPath+'" -upgradekeyboards='; // I2548
-    TUtilExecute.WaitForProcess(s+'11,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
   end;
 end;
 

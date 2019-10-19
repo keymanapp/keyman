@@ -297,7 +297,8 @@
       <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND Or HIGHERFOUND</Custom>
 
 
-      <!--<RemoveExistingProducts After='InstallFinalize'>VERSION11FOUND</RemoveExistingProducts>-->
+      <!-- Note: we do not remove existing products for 11.0 or later. This ensures that keyboards, settings etc are not removed during upgrade, as we
+           guarantee that we maintain the same identifiers etc. -->
       <RemoveExistingProducts After='InstallValidate'>VERSION9FOUND or VERSION10FOUND or OLDERFOUND70 OR OLDERFOUND80 Or OLDERFOUNDL70</RemoveExistingProducts>
 
       <Custom Action='RollbackPostInstallLM' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>

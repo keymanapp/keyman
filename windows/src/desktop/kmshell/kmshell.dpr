@@ -159,7 +159,6 @@ uses
   Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
   UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
   Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas',
-  Keyman.System.UImportOlderVersionKeyboards11Plus in 'main\Keyman.System.UImportOlderVersionKeyboards11Plus.pas',
   Keyman.System.RegistryTools in '..\..\global\delphi\general\Keyman.System.RegistryTools.pas';
 
 {$R VERSION.RES}

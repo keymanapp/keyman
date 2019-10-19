@@ -82,7 +82,6 @@ type
     FRunUpgrade8: Boolean;   // I4293
     FRunUpgrade9: Boolean;
     FRunUpgrade10: Boolean;
-    FRunUpgrade11Plus: Boolean;
     FCanUpgrade6: Boolean;
     FCanUpgrade7: Boolean;
     FCanUpgrade8: Boolean;   // I4293
@@ -100,13 +99,11 @@ type
     procedure CheckVersion8Upgrade;   // I4293
     procedure CheckVersion9Upgrade;
     procedure CheckVersion10Upgrade;
-    procedure CheckVersion11PlusUpgrade;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure Status(const Text: WideString = '');
     procedure SetupMSI;  // I2644
     procedure BackupKey(Root: HKEY; Path: WideString);  // I2642
     procedure GetDefaultSettings;
-    procedure BackupProfileHotkeys;
     { Private declarations }
   public
     procedure DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
@@ -474,7 +471,6 @@ begin
     FRunUpgrade8 := False;   // I4293
     FRunUpgrade9 := False;
     FRunUpgrade10 := False;
-    // FRunUpgrade11Plus is never disabled; we always do upgrades from 11.0 or later versions
   end;
 
   GetRunTools.PromptForReboot := PromptForReboot;  // I3355   // I3500
@@ -496,7 +492,6 @@ begin
     GetRunTools.RunUpgrade8 := FRunUpgrade8;   // I4293
     GetRunTools.RunUpgrade9 := FRunUpgrade9;
     GetRunTools.RunUpgrade10 := FRunUpgrade10;
-    GetRunTools.RunUpgrade11Plus := FRunUpgrade11Plus;
 
     SetupMSI; // I2644
 
@@ -556,7 +551,6 @@ begin
   CheckVersion8Upgrade;   // I4293
   CheckVersion9Upgrade;
   CheckVersion10Upgrade;
-  CheckVersion11PlusUpgrade;
 
   GetDefaultSettings;  // I2651
 
@@ -867,110 +861,6 @@ begin
     BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine100_InstalledPackages_LM);
     BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine100_CU);
   end;
-end;
-
-procedure TfrmRunDesktop.BackupProfileHotkeys;
-type
-  TProfileInfo = record
-    bcp47: string;
-    id: string;
-  end;
-var
-  rcu, rbcu, rlm: TRegistry;
-  s, s2: TStringList;
-  fprofile: TProfileInfo;
-  fprofiles: TDictionary<string,TProfileInfo>;
-  i: Integer;
-  j: Integer;
-begin
-  rlm := CreateHKLMRegistry;
-  rbcu := CreateHKCURegistry;
-  rcu := CreateHKCURegistry;
-  s := TStringList.Create;
-  s2 := TStringList.Create;
-  fprofiles := TDictionary<string,TProfileInfo>.Create;
-
-  // We don't want to introduce a dependency on keymanapi in Setup. It will not
-  // be available on new installs and we risk adding unreliability to situations
-  // where users are trying to reinstall due to corrupted configuration etc. So
-  // we will enumerate the information we need directly from the registry.
-
-  try
-    if rlm.OpenKeyReadOnly(SRegKey_InstalledKeyboards_LM) then
-    begin
-      rlm.GetKeyNames(s);
-      for i := 0 to s.Count - 1 do
-      begin
-        if rlm.OpenKeyReadOnly('\'+SRegKey_InstalledKeyboards_LM+'\'+s[i]+SRegSubKey_LanguageProfiles) then
-        begin
-          rlm.GetKeyNames(s2);
-          for j := 0 to s2.Count - 1 do
-          begin
-            if rlm.OpenKeyReadOnly('\'+SRegKey_InstalledKeyboards_LM+'\'+s[i]+SRegSubKey_LanguageProfiles+'\'+s2[j]) and
-              rlm.ValueExists(SRegValue_KeymanProfileGUID) then
-            begin
-              fprofile.bcp47 := s2[j];
-              fprofile.id := s[i];
-              fprofiles.Add(rlm.ReadString(SRegValue_KeymanProfileGUID), fprofile);
-            end;
-          end;
-        end;
-      end;
-    end;
-
-    if rbcu.OpenKey(SRegKey_UpgradeBackupPath_CU + '\' + SRegSubKey_LanguageHotkeys_CU, True) and
-      rcu.OpenKeyReadOnly(SRegKey_KeymanEngine110Plus_CU + '\' + SRegSubKey_LanguageHotkeys_CU) then
-    begin
-      rcu.GetValueNames(s);
-      for i := 0 to s.Count - 1 do
-      begin
-        if fprofiles.ContainsKey(s[i]) then
-        begin
-          // Backup the BCP-47 + keyboard id along with its string value
-          fprofile := fprofiles[s[i]];
-          rbcu.WriteString(fprofile.bcp47+';'+fprofile.id, rcu.ReadString(s[i]));
-        end;
-        if Copy(s[i], 1, 1) = '{' then
-        begin
-          // This is a profile guid. Look for the corresponding Keyman keyboard profile guid
-          // OR IS THIS THE RIGHT WAY TO DO IT?
-
-        end;
-      end;
-    end;
-  finally
-    rlm.Free;
-    rcu.Free;
-    rbcu.Free;
-    s2.Free;
-    s.Free;
-    fprofiles.Free;
-  end;
-end;
-
-// For Keyman 11 and later versions, all updates are considered
-// major upgrades. This means we need to backup keys and restore
-// them after the update. But we will not show this in the UI
-// because we will ALWAYS upgrade 11.0+ settings
-procedure TfrmRunDesktop.CheckVersion11PlusUpgrade;
-begin
-  FRunUpgrade11Plus := False;
-{
-  with CreateHKLMRegistry do  // I2749
-  try
-    FRunUpgrade11Plus := OpenKeyReadOnly(SRegKey_KeymanEngine110Plus_InstalledKeyboards_LM);
-  finally
-    Free;
-  end;
-
-  if FRunUpgrade11Plus then
-  begin
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine110Plus_InstalledKeyboards_LM); // I2642
-    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine110Plus_InstalledPackages_LM);
-    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine110Plus_CU);
-    BackupProfileHotkeys;
-  end;
-}
 end;
 
 procedure TfrmRunDesktop.WMUserFormShown(var Message: TMessage);
