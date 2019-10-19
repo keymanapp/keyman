@@ -82,6 +82,7 @@ type
     FRunUpgrade8: Boolean;   // I4293
     FRunUpgrade9: Boolean;
     FRunUpgrade10: Boolean;
+    FRunUpgrade11Plus: Boolean;
     FCanUpgrade6: Boolean;
     FCanUpgrade7: Boolean;
     FCanUpgrade8: Boolean;   // I4293
@@ -99,6 +100,7 @@ type
     procedure CheckVersion8Upgrade;   // I4293
     procedure CheckVersion9Upgrade;
     procedure CheckVersion10Upgrade;
+    procedure CheckVersion11PlusUpgrade;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure Status(const Text: WideString = '');
     procedure SetupMSI;  // I2644
@@ -123,6 +125,7 @@ uses
   OnlineConstants,
   SFX,
   SetupStrings,
+  Keyman.System.RegistryTools,
   Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
   RegistryHelpers,
@@ -469,6 +472,7 @@ begin
     FRunUpgrade8 := False;   // I4293
     FRunUpgrade9 := False;
     FRunUpgrade10 := False;
+    // FRunUpgrade11Plus is never disabled; we always do upgrades from 11.0 or later versions
   end;
 
   GetRunTools.PromptForReboot := PromptForReboot;  // I3355   // I3500
@@ -490,6 +494,7 @@ begin
     GetRunTools.RunUpgrade8 := FRunUpgrade8;   // I4293
     GetRunTools.RunUpgrade9 := FRunUpgrade9;
     GetRunTools.RunUpgrade10 := FRunUpgrade10;
+    GetRunTools.RunUpgrade11Plus := FRunUpgrade11Plus;
 
     SetupMSI; // I2644
 
@@ -549,6 +554,7 @@ begin
   CheckVersion8Upgrade;   // I4293
   CheckVersion9Upgrade;
   CheckVersion10Upgrade;
+  CheckVersion11PlusUpgrade;
 
   GetDefaultSettings;  // I2651
 
@@ -638,43 +644,6 @@ var
   regRead: TRegistryErrorControlled;  // I2890
   regWrite: TRegistryErrorControlled;  // I2890
   FBackupPath: string;
-
-    procedure CopyKey(p: WideString);  // I2890
-    var
-      s: TStringList;
-      i: Integer;
-      sz: Integer;
-      m: Pointer;
-    begin
-      s := TStringList.Create;
-      try
-        if regRead.OpenKeyReadOnly('\'+p) and regWrite.OpenKey(FBackupPath + p, True) then
-        begin
-          regRead.GetValueNames(s);
-          for i := 0 to s.Count - 1 do
-          begin
-            case regRead.GetDataType(s[i]) of
-              rdString: regWrite.WriteString(s[i], regRead.ReadString(s[i]));
-              rdExpandString: regWrite.WriteExpandString(s[i], regRead.ReadString(s[i]));
-              rdInteger: regWrite.WriteInteger(s[i], regRead.ReadInteger(s[i]));
-              rdBinary:
-                begin
-                  sz := regRead.GetDataSize(s[i]);
-                  m := AllocMem(sz);
-                  regRead.ReadBinaryData(s[i], m^, sz);
-                  regWrite.WriteBinaryData(s[i], m^, sz);
-                  FreeMem(m);
-                end;
-            end;
-          end;
-          regRead.GetKeyNames(s);
-          for i := 0 to s.Count - 1 do
-            CopyKey(p + '\' + s[i]);
-        end;
-      finally
-        s.Free;
-      end;
-    end;
 begin
   if Root = HKEY_CURRENT_USER then  // I2749
   begin
@@ -690,7 +659,7 @@ begin
   end;
 
   try
-    CopyKey(Path);
+    TRegistryTools.CopyKey(regRead, regWrite, Path, FBackupPath+Path, True);
   finally
     regRead.Free;
     regWrite.Free;
@@ -898,6 +867,28 @@ begin
   end;
 end;
 
+// For Keyman 11 and later versions, all updates are considered
+// major upgrades. This means we need to backup keys and restore
+// them after the update. But we will not show this in the UI
+// because we will ALWAYS upgrade 11.0+ settings
+procedure TfrmRunDesktop.CheckVersion11PlusUpgrade;
+begin
+  FRunUpgrade11Plus := False;
+
+  with CreateHKLMRegistry do  // I2749
+  try
+    FRunUpgrade11Plus := OpenKeyReadOnly(SRegKey_KeymanEngine110Plus_InstalledKeyboards_LM);
+  finally
+    Free;
+  end;
+
+  if FRunUpgrade11Plus then
+  begin
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine110Plus_InstalledKeyboards_LM); // I2642
+    BackupKey(HKEY_LOCAL_MACHINE, SRegKey_KeymanEngine110Plus_InstalledPackages_LM);
+    BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine110Plus_CU);
+  end;
+end;
 
 procedure TfrmRunDesktop.WMUserFormShown(var Message: TMessage);
 begin

@@ -37,7 +37,8 @@ uses
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   SFX in '..\..\global\delphi\setup\SFX.pas',
   Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',
-  Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas';
+  Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
+  Keyman.System.RegistryTools in '..\..\global\delphi\general\Keyman.System.RegistryTools.pas';
 
 {$R icons.res}
 {$R version.res}

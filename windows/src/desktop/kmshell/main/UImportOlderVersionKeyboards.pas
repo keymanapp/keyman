@@ -39,11 +39,12 @@ type
   TImportKeymanKeyboardBase = class
   private
     FLogFile: TFileStream;
+    FShouldCopyFiles: Boolean;
     function MoveStartMenu(packagename, srcinf, dstinf: string): Boolean;   // I4324
     function CopyAndInstallFonts(dstinf: string): Boolean;   // I4324
 
   public
-    constructor Create(AAdmin: Boolean);  // I2361
+    constructor Create(AAdmin, AShouldCopyFiles: Boolean);  // I2361
     destructor Destroy; override;
 
   protected
@@ -61,6 +62,7 @@ type
     function CopyPackage(const packagename: string): Boolean;
     procedure CopyValue(const name: string);
 
+    property ShouldCopyFiles: Boolean read FShouldCopyFiles;
     //TODO: procedure InstallKeyboardProfile
   end;
 
@@ -227,7 +229,8 @@ begin
         pathWrite := TImportOlderKeyboardUtils.GetPackageInstallPath;   // I4185
 
         { Copy files from old package folder to new package folder }
-        if not CopyFiles(ExtractFileDir(inf), pathWrite + packagename) then Exit;
+        if ShouldCopyFiles and not
+          CopyFiles(ExtractFileDir(inf), pathWrite + packagename) then Exit;
 
         { Don't allow old font references to be removed }
         if FileExists(ExtractFilePath(inf) + 'fonts.inf') then
@@ -299,7 +302,7 @@ begin
       else
       begin
         pathname := TImportOlderKeyboardUtils.GetKeyboardInstallPath + keyboardname;   // I4185   // I4623
-        if not CopyFiles(ExtractFileDir(filename), pathname) then Exit;
+        if ShouldCopyFiles and not CopyFiles(ExtractFileDir(filename), pathname) then Exit;
         pathname := pathname + '\'
       end;
 
@@ -376,12 +379,13 @@ end;
 
 { TImportKeymanKeyboardBase }
 
-constructor TImportKeymanKeyboardBase.Create(AAdmin: Boolean);
+constructor TImportKeymanKeyboardBase.Create(AAdmin, AShouldCopyFiles: Boolean);
 var
   i: Integer;  // I2361
 begin
   inherited Create;
   FAdmin := AAdmin;  // I2361
+  FShouldCopyFiles := AShouldCopyFiles;
   for i := 0 to 5 do
   try
     FLogFile := TFileStream.Create(GetErrLogFileName('keymanimport'), fmCreate);  // I2792

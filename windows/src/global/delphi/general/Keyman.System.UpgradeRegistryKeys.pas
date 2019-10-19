@@ -36,12 +36,14 @@ const
   SRegKey_KeymanEngine80_CU = SRegKey_TavultesoftKeymanEngine_CU + '\'+SKeymanVersion80;
   SRegKey_KeymanEngine90_CU = SRegKey_TavultesoftKeymanEngine_CU + '\'+SKeymanVersion90;
   SRegKey_KeymanEngine100_CU = SRegKey_KeymanEngine_CU + '\'+SKeymanVersion100;
+  SRegKey_KeymanEngine110Plus_CU = SRegKey_KeymanEngine_CU; // No version number in registry keys
 
   SRegKey_TavultesoftKeymanEngine_LM = SRegKey__Tavultesoft_LM + '\Keyman Engine';
   SRegKey_KeymanEngine70_LM = SRegKey_TavultesoftKeymanEngine_LM + '\'+SKeymanVersion70;
   SRegKey_KeymanEngine80_LM = SRegKey_TavultesoftKeymanEngine_LM + '\'+SKeymanVersion80;
   SRegKey_KeymanEngine90_LM = SRegKey_TavultesoftKeymanEngine_LM + '\'+SKeymanVersion90;
   SRegKey_KeymanEngine100_LM = SRegKey_KeymanEngine_LM + '\'+SKeymanVersion100;
+  SRegKey_KeymanEngine110Plus_LM = SRegKey_KeymanEngine_LM; // No version number in registry keys
 
   SRegKey_Keyman60_InstalledPackages_CU = SRegKey_Keyman60_CU + '\Installed Packages';
   SRegKey_Keyman60_InstalledKeyboards_CU = SRegKey_Keyman60_CU + '\Installed Keyboards';
@@ -87,12 +89,23 @@ const
   SRegKey_KeymanEngine100_InstalledPackages_LM = SRegKey_KeymanEngine100_LM+'\Installed Packages';
   SRegKey_KeymanEngine100_InstalledKeyboards_LM = SRegKey_KeymanEngine100_LM+'\Installed Keyboards';
 
+  { For 11.0 or later, we don't embed a version number }
+  SRegKey_KeymanEngine110Plus_ActiveLanguages_CU = SRegKey_KeymanEngine110Plus_CU+'\Active Languages';
+  SRegKey_KeymanEngine110Plus_ActiveKeyboards_CU = SRegKey_KeymanEngine110Plus_CU+'\Active Keyboards';
+  SRegKey_KeymanEngine110Plus_InstalledPackages_CU = SRegKey_KeymanEngine110Plus_CU+'\Installed Packages';
+  SRegKey_KeymanEngine110Plus_InstalledKeyboards_CU = SRegKey_KeymanEngine110Plus_CU+'\Installed Keyboards';
+
+  SRegKey_KeymanEngine110Plus_InstalledPackages_LM = SRegKey_KeymanEngine110Plus_LM+'\Installed Packages';
+  SRegKey_KeymanEngine110Plus_InstalledKeyboards_LM = SRegKey_KeymanEngine110Plus_LM+'\Installed Keyboards';
+
   SRegValue_Legacy_KeymanActiveHotkey = 'keyman active hotkey';
 
   { Upgrade temporary keys }
 
-  SRegKey_UpgradeBackupPath_LM = '\'+SRegKey_KeymanEngine_LM+'\Upgrade Backup\';  // I2642
-  SRegKey_UpgradeBackupPath_CU = '\'+SRegKey_KeymanEngine_CU+'\Upgrade Backup\';  // I2642
+  // Note the upgrade keys are outside the Keyman\Keyman Engine path otherwise we end up
+  // with gnarly nested Upgrade Backup paths with 11.0 and later backups!
+  SRegKey_UpgradeBackupPath_LM = '\'+SRegKey_KeymanEngine_LM+' Upgrade Backup\';  // I2642
+  SRegKey_UpgradeBackupPath_CU = '\'+SRegKey_KeymanEngine_CU+' Upgrade Backup\';  // I2642
 
 const
   SFolderTavultesoft_                = 'Tavultesoft';                              // PF, PFC, AD, CAD

@@ -11,7 +11,7 @@
   Dependencies:     
 
   Bugs:             
-  Todo:             
+  Todo:
   Notes:            
   History:          22 Feb 2011 - mcdurdin - I2651 - Install does not set desired default options
                     22 Feb 2011 - mcdurdin - I2753 - Firstrun crashes because start with windows and auto update check options are set in Engine instead of Desktop
@@ -29,8 +29,11 @@ function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
   System.Win.ComObj,
+  System.Win.Registry,
+  Winapi.Windows,
 
   Hints,
   InterfaceHotkeys,
@@ -38,6 +41,7 @@ uses
   KeymanVersion,
   kmint,
   keymanapi_TLB,
+  Keyman.System.RegistryTools,
   ErrorControlledRegistry,
   RegistryKeys,
   UImportOlderKeyboardUtils;
@@ -81,9 +85,22 @@ begin
     kmcom.Hotkeys.Items[khLanguageSwitch].VirtualKey := 0;
     kmcom.Hotkeys.Items[khLanguageSwitch].Modifiers := HK_ALT or HK_SHIFT;
 
+    kmcom.Apply;
+
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU) then
+      if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine110Plus_CU) then
+      begin
+        // Copy values in and refresh kmcom: this handles new options without needing maintenance.
+        // It does negate all the settings made above, but that's fine.
+        TRegistryTools.CopyKey(HKEY_CURRENT_USER, SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine110Plus_CU,                                   SRegKey_KeymanEngine_CU, False);
+        TRegistryTools.CopyKey(HKEY_CURRENT_USER, SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine110Plus_CU + '\' + SRegSubKey_Hotkeys_CU,         SRegKey_KeymanHotkeys_CU, False);
+        TRegistryTools.CopyKey(HKEY_CURRENT_USER, SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine110Plus_CU + '\' + SRegSubKey_LanguageHotkeys_CU, SRegKey_LanguageHotkeys_CU, False);
+        TRegistryTools.CopyKey(HKEY_CURRENT_USER, SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine110Plus_CU + '\' + SRegSubKey_KeymanOSK_CU,       SRegKey_KeymanOSK_CU, False);
+        kmcom.Refresh;
+      end
+      // TODO 8.0,9.0,10.0
+      else if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU) then
       begin
         kmcom.Options['koKeyboardHotkeysAreToggle'].Value := ValueExists(SRegValue_KeyboardHotKeysAreToggle) and ReadBool(SRegValue_KeyboardHotKeysAreToggle);
         kmcom.Options['koAltGrCtrlAlt'].Value := ValueExists(SRegValue_AltGrCtrlAlt) and ReadBool(SRegValue_AltGrCtrlAlt);
@@ -102,6 +119,9 @@ begin
               kmcom.Hotkeys[I].RawValue := ReadInteger(IntToStr(i));
             end;
         end;
+
+        if kmcom.Options['koShowHints'].Value then
+          ResetAllHints;
       end
       else if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_Keyman60_CU) then
       begin
@@ -118,13 +138,16 @@ begin
 
         if ValueExists('visual keyboard hotkey') then v := StrToIntDef(ReadString('visual keyboard hotkey'), 0) else v := 0;
         if v <> 0 then kmcom.Hotkeys[khVisualKeyboard].RawValue := v;
-      end;
+
+        if kmcom.Options['koShowHints'].Value then
+          ResetAllHints;
+      end
+      else
+        if kmcom.Options['koShowHints'].Value then
+          ResetAllHints;
     finally
       Free;
     end;
-
-    if kmcom.Options['koShowHints'].Value then
-      ResetAllHints;
   end;
 
   if DoStartWithWindows then kmcom.Options['koStartWithWindows'].Value := True; // I2753

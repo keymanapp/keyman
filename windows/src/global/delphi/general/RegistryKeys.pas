@@ -94,7 +94,8 @@ const
   SRegKey_KeymanEngine_CU     = SRegKey_KeymanEngineRoot_CU;     // CU
   SRegKey_KeymanEngineDiag_CU = SRegKey_KeymanEngine_CU + '\Diag';                     // CU
 
-  SregKey_KeymanHotkeys_CU    = SRegKey_KeymanEngine_CU + '\hotkeys';
+  SRegSubKey_Hotkeys_CU       = 'hotkeys';
+  SRegKey_KeymanHotkeys_CU    = SRegKey_KeymanEngine_CU + '\' + SRegSubKey_Hotkeys_CU;
 
   SRegValue_RootKeyboardAdminPath   = 'root keyboard admin path';                   // LM
   SRegValue_RootKeyboardUserPath    = 'root keyboard user path';                    // CU
@@ -113,7 +114,6 @@ const
   SRegValue_DefaultCustomisation    = 'default customisation';                      // LM
 
   SRegValue_ShowStartup             = 'show startup';                        // CU
-  SRegValue_ShowWelcome             = 'show welcome';                        // CU
   //SRegValue_NoCheckAssociations     = 'no check associations';                      // CU
   SRegValue_UseAdvancedInstall      = 'use advanced install';                       // CU
 
@@ -138,7 +138,8 @@ const
 
   { On Screen Keyboard Settings }
 
-  SRegKey_KeymanOSK_CU         = SRegKey_KeymanEngine_CU + '\On Screen Keyboard';
+  SRegSubKey_KeymanOSK_CU      = 'On Screen Keyboard';
+  SRegKey_KeymanOSK_CU         = SRegKey_KeymanEngine_CU + '\' + SRegSubKey_KeymanOSK_CU;
   SRegKey_KeymanOSK_CharMap_CU = SRegKey_KeymanOSK_CU + '\Character Map';
 
   SRegValue_OSK_ShowVisualKeyboard          = 'show visual keyboard';                // CU
@@ -196,8 +197,9 @@ const
 
   { ActiveLanguages }
 
-  SRegKey_ActiveLanguages_CU = SRegKey_KeymanEngine_CU + '\Active Languages';                   // CU
-  SRegKey_LanguageHotkeys_CU = SRegKey_KeymanEngine_CU + '\Language Hotkeys';                   // CU
+  SRegKey_ActiveLanguages_CU    = SRegKey_KeymanEngine_CU + '\Active Languages';                   // CU
+  SRegSubKey_LanguageHotkeys_CU = 'Language Hotkeys';                                              // CU
+  SRegKey_LanguageHotkeys_CU    = SRegKey_KeymanEngine_CU + '\' + SRegSubKey_LanguageHotkeys_CU;   // CU
 
   { InstalledKeyboards }
 

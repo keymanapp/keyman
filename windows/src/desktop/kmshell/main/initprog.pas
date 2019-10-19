@@ -128,6 +128,7 @@ uses
   UImportOlderVersionKeyboards8,
   UImportOlderVersionKeyboards9,
   UImportOlderVersionKeyboards10,
+  Keyman.System.UImportOlderVersionKeyboards11Plus,
   UILanguages,
   uninstall,
   UpgradeMnemonicLayout,
@@ -406,6 +407,7 @@ begin
         ImportOlderVersionKeyboards8(Pos('admin', FQuery) > 0);   // I4185
         ImportOlderVersionKeyboards9(Pos('admin', FQuery) > 0);   // I4185
         ImportOlderVersionKeyboards10(Pos('admin', FQuery) > 0);   // I4185
+        ImportOlderVersionKeyboards11Plus(Pos('admin', FQuery) > 0);   // I4185
         DeleteLegacyKeymanInstalledSystemKeyboards;   // I3613
       end;
 

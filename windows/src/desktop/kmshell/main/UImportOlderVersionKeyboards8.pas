@@ -76,7 +76,7 @@ type
 
 procedure ImportOlderVersionKeyboards8(DoAdmin: Boolean);  // I2361
 begin
-  with TImportKeyman8Keyboard.Create(DoAdmin) do  // I2361
+  with TImportKeyman8Keyboard.Create(DoAdmin, True) do  // I2361
   try
     Import;
   finally

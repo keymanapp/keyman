@@ -41,7 +41,7 @@ uses
 
 procedure ImportOlderVersionKeyboards9(DoAdmin: Boolean);  // I2361
 begin
-  with TImportKeyman9PlusKeyboard.Create(DoAdmin) do  // I2361
+  with TImportKeyman9PlusKeyboard.Create(DoAdmin, True) do  // I2361
   try
     SRegKey_KeymanEngineOld_InstalledPackages_CU := SRegKey_KeymanEngine90_InstalledPackages_CU;
     SRegKey_KeymanEngineOld_InstalledKeyboards_CU := SRegKey_KeymanEngine90_InstalledKeyboards_CU;
