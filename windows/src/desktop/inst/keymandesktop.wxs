@@ -296,7 +296,9 @@
       <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>CURRENTVERSIONFOUND</Custom>
       <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND Or HIGHERFOUND</Custom>
 
-      <RemoveExistingProducts After='InstallValidate'>VERSION9FOUND or VERSION10FOUND or VERSION11FOUND or OLDERFOUND70 OR OLDERFOUND80 Or OLDERFOUNDL70</RemoveExistingProducts>
+
+      <!--<RemoveExistingProducts After='InstallFinalize'>VERSION11FOUND</RemoveExistingProducts>-->
+      <RemoveExistingProducts After='InstallValidate'>VERSION9FOUND or VERSION10FOUND or OLDERFOUND70 OR OLDERFOUND80 Or OLDERFOUNDL70</RemoveExistingProducts>
 
       <Custom Action='RollbackPostInstallLM' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
       <Custom Action='RollbackPostInstallCU' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>

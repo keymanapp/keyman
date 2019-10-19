@@ -955,7 +955,7 @@ end;
 procedure TfrmRunDesktop.CheckVersion11PlusUpgrade;
 begin
   FRunUpgrade11Plus := False;
-
+{
   with CreateHKLMRegistry do  // I2749
   try
     FRunUpgrade11Plus := OpenKeyReadOnly(SRegKey_KeymanEngine110Plus_InstalledKeyboards_LM);
@@ -970,6 +970,7 @@ begin
     BackupKey(HKEY_CURRENT_USER, SRegKey_KeymanEngine110Plus_CU);
     BackupProfileHotkeys;
   end;
+}
 end;
 
 procedure TfrmRunDesktop.WMUserFormShown(var Message: TMessage);
