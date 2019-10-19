@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Module Id="engine" Version="$(var.VERSION)" Language="1033">
-    <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine" 
-             Description="Keyman Engine $(var.RELEASE)" Comments="Contact:  Your local administrator" 
+    <Package Id="{CE38CB16-4448-4432-851B-B3FCE3AF464F}" Keywords="Keyman,Keyboard,Engine"
+             Description="Keyman Engine $(var.RELEASE)" Comments="Contact:  Your local administrator"
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
-    
+
     <ComponentGroupRef Id="KeymanEngineComponents" />
-    
+
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="CommonFilesFolder">
         <Directory Id="KEYMANROOT" Name="Keyman">
@@ -15,8 +15,8 @@
               <Directory Id="xml" Name="xml">
                 <Directory Id="osk" Name="osk" FileSource="..\..\engine\xml\osk\">
                   <Component Id="xml" Guid="{58D31506-F964-47AF-B4A0-51107A74C2FE}">
-                    <!-- while we'd like to use heat to harvest the files in the OSK folder during build, this breaks component 
-                         guid rules with merge modules, as we end up with LGHT0231, as the CommonFilesFolder root folder seems to be 
+                    <!-- while we'd like to use heat to harvest the files in the OSK folder during build, this breaks component
+                         guid rules with merge modules, as we end up with LGHT0231, as the CommonFilesFolder root folder seems to be
                          ignored when building the merge module. Therefore we list these files in a single component for now. -->
                     <File Id="osk.xsl" Name="osk.xsl" />
                     <File Id="keyaltl.gif"         Name="key-altl.gif" />
@@ -80,7 +80,7 @@
         </Directory>
       </Directory>
     </Directory>
-   
+
     <CustomAction Id="PreUninstallA" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="PreUninstall" />
     <CustomAction Id="EnginePostInstall" Execute="deferred" Impersonate="no" BinaryKey="insthelper.dll" DllEntry="EnginePostInstall" />
 

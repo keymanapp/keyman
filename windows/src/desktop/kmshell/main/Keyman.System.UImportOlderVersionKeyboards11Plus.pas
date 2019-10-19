@@ -11,9 +11,18 @@ procedure ImportOlderVersionKeyboards11Plus(DoAdmin: Boolean);
 implementation
 
 uses
+  System.Classes,
+  System.SysUtils,
+  System.Win.Registry,
+
+  kmint,
+  keymanapi_TLB,
   Keyman.System.UpgradeRegistryKeys,
+  RegistryKeys,
   UImportOlderVersionKeyboards9Plus,
   UImportOlderKeyboardUtils;
+
+procedure TransferLanguageHotkeys; forward;
 
 //
 // All Keyman versions from 11.0 onward use the same registry + file layout and
@@ -34,6 +43,61 @@ begin
   finally
     Free;
   end;
+
+  TransferLanguageHotkeys;
+end;
+
+procedure TransferLanguageHotkeys;
+var
+  bcp47: string;
+  id: string;
+  rcu: TRegistry;
+  s: TStringList;
+//  fprofiles: TDictionary<string,TProfileInfo>;
+  n, i: Integer;
+  lang: IKeymanLanguage;
+  value: Integer;
+  j: Integer;
+begin
+  rcu := TRegistry.Create;
+  s := TStringList.Create;
+
+  kmcom.Refresh;
+
+  try
+    if rcu.OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + '\' + SRegSubKey_LanguageHotkeys_CU) then
+    begin
+      rcu.GetValueNames(s);
+      for i := 0 to s.Count - 1 do
+      begin
+        n := Pos(s[i], ';');
+        if n = 0 then
+          Continue;
+        bcp47 := Copy(s[i], 1, n-1);
+        id := Copy(s[i], n+1, MAXINT);
+        if not TryStrToInt(rcu.ReadString(s[i]), value) then
+          Continue;
+
+        for j := 0 to kmcom.Languages.Count - 1 do
+        begin
+          lang := kmcom.Languages[j];
+          if SameText(lang.BCP47Code, bcp47) and
+            (lang.KeymanKeyboardLanguage <> nil) and
+            (lang.KeymanKeyboardLanguage.OwnerKeyboard <> nil) and
+            SameText(lang.KeymanKeyboardLanguage.OwnerKeyboard.ID, id) then
+          begin
+            lang.Hotkey.RawValue := value;
+            Break;
+          end;
+        end;
+      end;
+    end;
+  finally
+    rcu.Free;
+    s.Free;
+  end;
+
+  kmcom.Apply;
 end;
 
 end.
