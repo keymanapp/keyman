@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-20 12.0.52 stable
+* Upgrades from 11.0 and 12.0 were losing installed keyboards and settings (#2214)
+
 ## 2019-10-07 12.0.50 stable
 * Release 12.0
 
