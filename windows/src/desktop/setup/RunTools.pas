@@ -581,6 +581,7 @@ end;
 
 function TRunTools.InstallMSI: Boolean;
 var
+  pcode: array[0..39] of Char;
   res: Cardinal;
   ReinstallMode: WideString;
   FCacheFileName: WideString;
@@ -610,8 +611,26 @@ begin
   if not IsNewerVersionInstalled(FInstallInfo.Version) then // I2560
   begin
     ReinstallMode := 'REBOOTPROMPT=S REBOOT=ReallySuppress'; // I2754 - Auto update is too silent
-    if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode)
-      then ReinstallMode := ReinstallMode + ' REINSTALLMODE=vomus REINSTALL=ALL';
+    if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode) then
+    begin
+      ReinstallMode := ReinstallMode + ' REINSTALLMODE=vomus REINSTALL=ALL';
+    end
+    else
+    begin
+      Status('Removing older versions');
+      // Remove older versions of Keyman now. We'll still get the upgrade desired
+      // because we've backed up the relevant keys for reapplication post-install
+      if (MsiGetProductCode('{35E06B45-17C0-406C-B94F-70EFF1EC9278}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
+         (MsiGetProductCode('{04C8710E-3D29-4A25-80A2-A56853A4267D}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
+         (MsiGetProductCode('{18E9B728-8E4E-48DF-9E9F-6F3086A1FE04}', pcode) = ERROR_SUCCESS) or // Keyman 8.0
+         (MsiGetProductCode('{E6806190-7B09-4A8C-8C95-25982589D919}', pcode) = ERROR_SUCCESS) or // Keyman 9.0
+         (MsiGetProductCode('{A20AFB02-7581-4019-9229-5312308FBA1E}', pcode) = ERROR_SUCCESS) then // Keyman 10.0
+      begin
+        MsiConfigureProduct(pcode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT);
+        // We'll ignore errors ...
+      end;
+    end;
+
 
     { Log the install to the diag folder }
 
