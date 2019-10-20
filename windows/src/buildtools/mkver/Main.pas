@@ -186,7 +186,7 @@ begin
 
   if ResourceFileName = 'manifest.xml' then
   begin
-    xml := LoadXMLDocument(ResourceFileName);
+    xml := LoadXMLDocument(ChangeFileExt(ResourceFileName, '.in'));
     xml.DocumentElement.ChildNodes['assemblyIdentity'].Attributes['version'] := StringProductVersion;
     xml.SaveToFile(ResourceFileName);
     xml := nil;
@@ -196,7 +196,7 @@ begin
     StringProductVersion := '"' + StringProductVersion + '\0"';
     with TStringList.Create do
     try
-      LoadFromFile(ResourceFileName);
+      LoadFromFile(ChangeFileExt(ResourceFileName, '.in'));
 
       for i := 0 to Count - 1 do
         case GetTagValue(Strings[i], 1, PredefTags) of

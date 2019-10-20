@@ -217,13 +217,6 @@ global-versions: mkver-app
     $(MKVER_U) $(ROOT)\src\engine\version.in $(ROOT)\src\engine\version.txt $(ROOT)\src\version.txt
     $(MKVER_U) $(ROOT)\src\support\version.in $(ROOT)\src\support\version.txt $(ROOT)\src\version.txt
 
-
-#    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\buildtools\version.txt $(ROOT)\src\version.txt $(ROOT)\src\buildtools\version.in
- #   $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\developer\version.txt $(ROOT)\src\version.txt $(ROOT)\src\developer\version.in
-  #  $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\desktop\version.txt $(ROOT)\src\version.txt $(ROOT)\src\desktop\version.in
- #   $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\engine\version.txt $(ROOT)\src\version.txt $(ROOT)\src\engine\version.in
-  #  $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\support\version.txt $(ROOT)\src\version.txt $(ROOT)\src\support\version.in
-
 build-tools: global-versions
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)
