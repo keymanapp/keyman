@@ -1,7 +1,7 @@
-PRODUCTVERSION	11,0,1500,0
+PRODUCTVERSION	$VERSIONNUM
 FILEFLAGS		0x0L
 
 VALUE "CompanyName", "SIL International\0"
-VALUE "LegalCopyright", "© SIL International\0"
+VALUE "LegalCopyright", "ï¿½ SIL International\0"
 VALUE "LegalTrademarks", "Keyman is a registered trademark of SIL International\0"
 VALUE "ProductName", "Keyman Desktop\0"
