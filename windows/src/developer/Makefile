@@ -5,6 +5,7 @@
 
 TARGETS=kmcmpdll kmcomp kmanalyze kmconvert tike samples setup inst
 MANIFESTS=kmcomp tike setup
+CLEANS=clean-developer
 
 !include ..\Header.mak
 
@@ -45,6 +46,12 @@ setup:
 inst:
     cd $(ROOT)\src\developer\inst
     $(MAKE) $(TARGET)
+
+# ----------------------------------------------------------------------
+
+clean-developer:
+    cd $(ROOT)\src\developer
+    -del version.txt
 
 !include ..\Target.mak
 
