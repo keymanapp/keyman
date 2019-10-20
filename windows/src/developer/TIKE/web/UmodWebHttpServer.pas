@@ -217,7 +217,7 @@ begin
 
   if sFull <> '' then v.Add('http://'+sFull+port);
   if sHost <> '' then v.Add('http://'+sHost+port);
-  if sNetbios <> '' then v.Add('http://'+sHost+port);
+  if sNetbios <> '' then v.Add('http://'+sNetbios+port);
 
   FIPv4Addresses := TIdStackLocalAddressList.Create;
   try
