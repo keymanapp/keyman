@@ -5,6 +5,7 @@ src/inst/*.msi
 src/inst/*.exe
 src/inst/download.mak
 src/inst/fv_all.kmp
+src/xml/localedef.dtd
 **/Thumbs.db
 
 # Temporary ignores
