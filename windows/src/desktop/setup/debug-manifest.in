@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-	<assemblyIdentity type="win32" name="tavultesoft.keymandesktop.setup" version="12.0.2000.0" processorArchitecture="x86"/>
+	<assemblyIdentity type="win32" name="tavultesoft.keymandesktop.setup" version="$VERSION" processorArchitecture="x86"/>
 	<description>Keyman Desktop Setup</description>
 	<trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
 		<security>
 			<requestedPrivileges>
-				<requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
+				<requestedExecutionLevel level="asInvoker" uiAccess="false"/>
 			</requestedPrivileges>
 		</security>
 	</trustInfo>
