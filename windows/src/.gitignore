@@ -26,6 +26,6 @@ developer/version.txt
 engine/version.txt
 support/version.txt
 
-# TODO
+# These are built from corresponding manifest.in and version.in
 **/manifest.xml
 **/version.rc
