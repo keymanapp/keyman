@@ -42,7 +42,7 @@ install:
     $(COPY) keyman.rsm "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    grep -c "uiAccess=\"true\"" manifest.xml
+    grep -c "uiAccess=\"true\"" manifest.in
 
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true

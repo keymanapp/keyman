@@ -29,7 +29,7 @@ install:
     $(COPY) $(PROGRAM)\engine\keymanx64.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    grep -c "uiAccess=\"true\"" manifest.xml
+    grep -c "uiAccess=\"true\"" manifest.in
 
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
