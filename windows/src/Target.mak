@@ -21,7 +21,7 @@ devtools-app: dirs
     $(MAKE) devtools
     cd $(ROOT)\src
 
-version.res: version.rc
+version.res: version.in
     $(MKVER_V)
     rc version.rc
 
@@ -29,7 +29,7 @@ manifest.res: version.res
     $(MKVER_M)
     rc manifest.rc
 
-dirs: 
+dirs:
     @-mkdir $(ROOT)\build\desktop 2>nul
     @-mkdir $(ROOT)\build\engine 2>nul
     @-mkdir $(ROOT)\build\developer 2>nul
