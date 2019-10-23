@@ -332,7 +332,7 @@ begin
     Free;
   end;
 
-  // Transform the string from 1.2.3.4 to 1,2,3,4 for version.txt/version.rc format
+  // Transform the string from 1.2 to 1,2 to match version.txt/version.rc format
   BuildVersion := StringReplace(BuildVersion, '.', ',', [rfReplaceAll]);
 
   // And add the static 9999 version
