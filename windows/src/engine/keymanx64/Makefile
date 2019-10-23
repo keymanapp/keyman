@@ -6,7 +6,7 @@
 
 PLATFORM=x64
 
-build: version.res dirs
+build: manifest.res version.res dirs
     $(MSBUILD) keymanx64.sln $(MSBUILD_BUILD)
     $(COPY) keymanx64.exe $(PROGRAM)\engine
     $(COPY) keymanx64.pdb $(DEBUGPATH)\engine
