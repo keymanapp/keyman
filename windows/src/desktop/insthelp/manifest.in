@@ -3,7 +3,7 @@
   <assemblyIdentity
     type="win32"
     name="tavultesoft.keymandeveloper.insthelp"
-    version="7.0.220.0"
+    version="$VERSION"
     processorArchitecture="x86"/>
   <description>Keyman Engine Installation Assistant</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
@@ -17,7 +17,7 @@
   </trustInfo>
 
   <!-- Switch on various compatibility values -->
-  
+
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
       <supportedOS Id="{e2011457-1546-43c5-a5fe-008deee3d3f0}"/><!-- Windows Vista and Windows Server 2008 -->

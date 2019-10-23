@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-	<assemblyIdentity type="win32" name="tavultesoft.keymanengine.keymanx64" version="9.0.447.0" processorArchitecture="amd64"/>
+	<assemblyIdentity type="win32" name="tavultesoft.keymanengine.mcompile" version="$VERSION" processorArchitecture="x86"/>
 	<description>Keyman Engine x64</description>
 	<trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
 		<security>
 			<requestedPrivileges>
-				<requestedExecutionLevel level="asInvoker" uiAccess="true"/>
+				<requestedExecutionLevel level="asInvoker" uiAccess="false"/>
 			</requestedPrivileges>
 		</security>
 	</trustInfo>
