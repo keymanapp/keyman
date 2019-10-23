@@ -1,7 +1,7 @@
 CLEAN=@-del /S /Q
 
 def-clean:
-    $(CLEAN) *.err *.stat *.dproj.local *.Build.CppClean.Log *.suo *.jdbg *.dbg *.dcu *.~* *.dsk *.exe *.rsm *.ncb *.opt *.pch *.plg *.aps *.001 *.sbr *.dep *.drc *.bak *.pdb *.lib *.cod *.ilk *.tds vc80.idb *.map *.bsc version.res manifest.res >nul 2>nul
+    $(CLEAN) *.err *.stat *.dproj.local *.Build.CppClean.Log *.suo *.jdbg *.dbg *.dcu *.~* *.dsk *.exe *.rsm *.ncb *.opt *.pch *.plg *.aps *.001 *.sbr *.dep *.drc *.bak *.pdb *.lib *.cod *.ilk *.tds vc80.idb *.map *.bsc version.rc version.res manifest.xml manifest.res >nul 2>nul
     $(CLEAN) ExcMagic.Debug *.wixpdb *.identcache *.embed.manifest *.embed.manifest.res *.intermediate.manifest error.log >nul 2>nul
 
 versionhistory-app: dirs
