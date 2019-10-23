@@ -206,7 +206,7 @@ global-versions: mkver-app
     $(MKVER_APP) -c $(ROOT)\src\version.txt -b $(BUILD_NUMBER)
 !else
     # Otherwise, we use the major version from resources/version.md and build 999 for 'debug'
-    $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\resources\version.md
+    $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\resources\VERSION.md
 !endif
 
     $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h $(ROOT)\src\version.txt
