@@ -205,7 +205,7 @@ global-versions: mkver-app
     # If CI has defined a version for us, then use that.
     $(MKVER_APP) -c $(ROOT)\src\version.txt -b $(BUILD_NUMBER)
 !else
-    # Otherwise, we use the major version from resources/version.md and build 999 for 'debug'
+    # Otherwise, we use the major version from resources/VERSION.md and build 9999 for 'debug'
     $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\resources\VERSION.md
 !endif
 
