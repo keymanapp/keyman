@@ -94,7 +94,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     listView.setFastScrollEnabled(true);
 
     // Establish the list view based on the CloudRepository's Dataset.
-    Dataset repo = CloudRepository.shared.fetchDataset(this,null,null,null,true);
+    Dataset repo = CloudRepository.shared.fetchDataset(this);
 
     listView.setAdapter(new LanguagesAdapter(this, repo));
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

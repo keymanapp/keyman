@@ -1,50 +1,34 @@
 package com.tavultesoft.kmea.data;
 
-import android.app.DownloadManager;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.BuildConfig;
-import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.packages.JSONUtils;
-import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
   static final String TAG = "CloudRepository";
+
+  public static final boolean USE_DOWNLOAD_MANAGER = true;
 
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
@@ -144,19 +128,6 @@ public class CloudRepository {
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   public Dataset fetchDataset(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
-    return fetchDataset(context,updateHandler,onSuccess,onFailure,false);
-  }
-  /**
-   * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
-   * services.  Unless recently cached, this object will be populated asynchronously.
-   * @param context   The current Activity requesting the Dataset.
-   * @param updateHandler  An object that can handle update notification if desired.
-   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
-   * @param onFailure  A callback to be triggered upon failure of a query.
-   * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
-   */
-  public Dataset fetchDataset(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure,
-                              boolean anUseDownloadManager) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, getKeyboardCacheFile(context));
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
 
@@ -267,7 +238,7 @@ public class CloudRepository {
       // We need the array to be exactly the same size as our entry count.
       CloudApiTypes.CloudApiParam[] params = new CloudApiTypes.CloudApiParam[cloudQueryEntries];
       cloudQueries.toArray(params);
-      if(anUseDownloadManager)
+      if(USE_DOWNLOAD_MANAGER)
       {
         // TODO check duplicated downloads
         if(CloudDownloadMgr.getInstance().alreadyDownloadingData(context))
