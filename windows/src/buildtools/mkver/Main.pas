@@ -358,9 +358,11 @@ begin
   if not Init then
   begin
     UpdateFiles.Free;
-    writeln(#13#10+'Usage: kmver -c <root-version.txt> (-b <version> | -r <version.md>)');
+    writeln(#13#10+'Usage: kmver -c <root-version.txt> (-b <version> | -r <VERSION.md>)');
     writeln(' or    kmver -v [-u f.in f.out]* <template> [version.rc]');
     writeln('   -c:         Sets the root template version');
+    writeln('       -r:     Use major.minor version data from VERSION.md and appends .9999.0 to indicate custom built version');
+    writeln('       -b:     For CI, use the specific version number specified');
     writeln('   -v:         Update the version.rc with the template information');
     writeln('   -m:         Update manifest.xml with the template information');
     writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
