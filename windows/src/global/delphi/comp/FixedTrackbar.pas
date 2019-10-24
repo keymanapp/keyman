@@ -63,7 +63,8 @@ end;
   so it should be checked if we upgrade to new version of Delphi.
 }
 
-{$IFNDEF VER320}
+{$IFNDEF VER330}
+// TODO: Actually check this (after Delphi 10.3 code changes are done)
 {$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2' }
 {$ENDIF}
 

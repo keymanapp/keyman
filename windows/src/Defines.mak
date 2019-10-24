@@ -1,6 +1,18 @@
 # DEBUG=1
 
+# TODO: Eliminate this hard coded version; used only in windows/src/desktop/help/Makefile
+#       so convert to .in with mkver transform
 KEYMAN_VERSION=13.0
+
+#
+# Delphi Compiler Configuration - Delphi 10.3.2
+#
+
+DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\20.0\bin
+
+#
+# Paths
+#
 
 !IFNDEF KEYMAN_ROOT
 KEYMAN_ROOT=c:\keyman
@@ -68,7 +80,7 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
   MAKEFLAG_RELEASE_OEM=-DRELEASE_OEM
 !ENDIF
 
-MAKE=$(MAKE) -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
+MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
 
 #
 # Delphi build commands
@@ -88,8 +100,8 @@ DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $
 DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData
 
 !IFDEF NOUI
-DCC32=dcc32.exe $(DELPHIDPRPARAMS)
-DCC32DPK=dcc32.exe $(DELPHIDPKPARAMS)
+DCC32="$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
+DCC32DPK="$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
 !ELSE
 !IFDEF QUIET
 DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS)
@@ -100,7 +112,7 @@ DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS)
 !ENDIF
 !ENDIF
 
-DCC64=dcc64.exe $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
+DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
 #
 # Delphi MSBuild related commands and macros

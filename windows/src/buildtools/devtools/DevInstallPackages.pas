@@ -52,6 +52,14 @@ const
   SKey_Delphi = 'Software\Embarcadero\BDS\19.0';
   SPath_DelphiCommonPackageBPLFiles = '%0:sEmbarcadero\Studio\19.0\bpl\';
   SPath_DelphiCommonPackageDCPFiles = '%0:sEmbarcadero\Studio\19.0\dcp\';
+{$ELSE}
+{$IFDEF VER330}
+  SKey_Delphi = 'Software\Embarcadero\BDS\20.0';
+  SPath_DelphiCommonPackageBPLFiles = '%0:sEmbarcadero\Studio\20.0\bpl\';
+  SPath_DelphiCommonPackageDCPFiles = '%0:sEmbarcadero\Studio\20.0\dcp\';
+{$ELSE}
+  ERROR: New version of compiler needs new defines
+{$ENDIF VER330}
 {$ENDIF VER320}
 {$ENDIF VER310}
 

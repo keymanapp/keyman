@@ -64,6 +64,14 @@ const
   SKey_DelphiLibrary = 'Software\Embarcadero\BDS\19.0\Library\Win32';
   SKey_DelphiLibrary64 = 'Software\Embarcadero\BDS\19.0\Library\Win64';
   SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\19.0\EnvOptions.proj';
+{$ELSE}
+{$IFDEF VER330}
+  SKey_DelphiLibrary = 'Software\Embarcadero\BDS\20.0\Library\Win32';
+  SKey_DelphiLibrary64 = 'Software\Embarcadero\BDS\20.0\Library\Win64';
+  SFile_DelphiEnvironmentProject = '%AppData%\Embarcadero\BDS\20.0\EnvOptions.proj';
+{$ELSE}
+  ERROR: New version of compiler needs new defines
+{$ENDIF VER330}
 {$ENDIF VER320}
 {$ENDIF VER310}
 
