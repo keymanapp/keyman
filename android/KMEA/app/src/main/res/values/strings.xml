@@ -58,7 +58,7 @@
     <string name="checking_model_download" translatable="false">Checking to download dictionary&#8230;</string>
     <string name="downloading_model" translatable="false">Downloading dictionary&#8230;</string>
     <string name="catalog_unavailable" translatable="false">The resource catalog is unavailable\n</string>
-    <string name="catalog_download_start_in_background" translatable="false">Catalog update is running in background. Please, try again later!\n</string>
+    <string name="catalog_download_start_in_background" translatable="false">Catalog update started in background.\n</string>
     <string name="catalog_download_is_running_in_background" translatable="false">The download of catalog is running. Please, try again later!\n</string>
 
     <!-- General Updates -->
