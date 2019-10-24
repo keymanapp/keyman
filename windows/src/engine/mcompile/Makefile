@@ -4,7 +4,7 @@
 
 !include ..\..\Defines.mak
 
-build: version.res dirs
+build: manifest.res version.res dirs
     $(MSBUILD) mcompile.sln $(MSBUILD_BUILD)
     $(COPY) mcompile.exe $(PROGRAM)\engine
     $(COPY) mcompile.pdb $(DEBUGPATH)\engine
