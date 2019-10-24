@@ -5,12 +5,6 @@
 KEYMAN_VERSION=13.0
 
 #
-# Delphi Compiler Configuration - Delphi 10.3.2
-#
-
-DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\20.0\bin
-
-#
 # Paths
 #
 
@@ -79,6 +73,29 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
 !IFDEF RELEASE_OEM
   MAKEFLAG_RELEASE_OEM=-DRELEASE_OEM
 !ENDIF
+
+#
+# USERDEFINES allows the developer to specify overrides for various settings. We need a variable
+# because Makefiles cannot test for file existence
+#
+
+!ifdef USERDEFINES
+!include $(ROOT)\src\UserDefines.mak
+!endif
+
+#
+# Delphi Compiler Configuration - Delphi 10.3.2
+#
+
+!IFDEF DELPHI_VERSION
+DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
+!ELSE
+DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\20.0\bin
+!ENDIF
+
+#
+# Pass local configuration through to sub-instances of MAKE
+#
 
 MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
 
@@ -202,16 +219,23 @@ MAKE=$(MAKE)
 # To get a .pfx from a .spc and .pvk, run pvk2pfx.exe
 #
 
-SC_URL="https://keyman.com/"
-SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+!IFNDEF SC_PFX_SHA1
 SC_PFX_SHA1="$(ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
+!ENDIF
+
+!IFNDEF SC_PFX_SHA256
+SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+!ENDIF
+
+!IFNDEF SC_URL
+SC_URL="https://keyman.com/"
+!ENDIF
+
+!IFNDEF SC_PWD
 SC_PWD=""
+!ENDIF
 
 SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
-
-!ifdef USERDEFINES
-!include $(ROOT)\src\UserDefines.mak
-!endif
 
 #
 # On some computers, the PLATFORM environment variable is set to x86. This can break msbuild

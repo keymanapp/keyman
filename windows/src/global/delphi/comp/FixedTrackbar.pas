@@ -64,8 +64,10 @@ end;
 }
 
 {$IFNDEF VER330}
+{$IFNDEF VER320}
 // TODO: Actually check this (after Delphi 10.3 code changes are done)
 {$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2' }
+{$ENDIF}
 {$ENDIF}
 
 procedure TTntFixedDrawGrid.MouseDown(Button: TMouseButton;
