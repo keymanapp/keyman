@@ -438,11 +438,11 @@ public class CloudRepository {
           langName = languageObj.getString("name");
         }
 
-        String modelID = model.getString("id");
-        String modelName = model.getString("name");
-        String modelVersion = model.getString("version");
+        String modelID = model.getString(KMManager.KMKey_ID);
+        String modelName = model.getString(KMManager.KMKey_Name);
+        String modelVersion = model.getString(KMManager.KMKey_LexicalModelVersion);
 
-        String isCustom = model.optString("CustomModel", "N");
+        String isCustom = model.optString(KMManager.KMKey_CustomModel, "N");
         String icon = "0";
 
         HashMap<String, String> hashMap = new HashMap<String, String>();
