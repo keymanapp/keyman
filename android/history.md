@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-25 12.0.4205 stable
+* Bug fix:
+  * Use lexical model package version for dataset (#2242)
+  
 ## 2019-10-14 12.0.4204 stable
 * Bug Fix:
   * FirstVoices app may crash if analytics is not present (#2204)
