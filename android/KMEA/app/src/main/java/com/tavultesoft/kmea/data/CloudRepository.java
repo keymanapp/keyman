@@ -29,6 +29,7 @@ public class CloudRepository {
   static final String TAG = "CloudRepository";
 
   public static final boolean USE_DOWNLOAD_MANAGER = true;
+  public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
@@ -166,8 +167,8 @@ public class CloudRepository {
       memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray));
     }
 
-     CloudApiDownloadCallback _download_callback = new CloudApiDownloadCallback(
-      context, memCachedDataset, updateHandler, onSuccess, onFailure);
+     CloudCatalogDownloadCallback _download_callback = new CloudCatalogDownloadCallback(
+      context, updateHandler, onSuccess, onFailure);
 
 //    CloudApiParam[] cloudQueries = new CloudApiParam[2];
 //    int cloudQueryEntries = 0;
@@ -241,7 +242,7 @@ public class CloudRepository {
       if(USE_DOWNLOAD_MANAGER)
       {
         // TODO check duplicated downloads
-        if(CloudDownloadMgr.getInstance().alreadyDownloadingData(context))
+        if(CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE))
         {
           String msg = context.getString(R.string.catalog_download_is_running_in_background);
           Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
@@ -250,13 +251,14 @@ public class CloudRepository {
         {
           String msg = context.getString(R.string.catalog_download_start_in_background);
           Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-          CloudDownloadMgr.getInstance().executeAsDownload(context,_download_callback,params);
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, DOWNLOAD_IDENTIFIER_CATALOGUE,memCachedDataset,_download_callback,params);
         }
 
         executeCallbacks = false;
       }
       else {
-        CloudDownloadTask downloadTask = new CloudDownloadTask(context, memCachedDataset, updateHandler, onSuccess, onFailure);
+        CloudCatalogDownloadTask downloadTask = new CloudCatalogDownloadTask(context, memCachedDataset,_download_callback);
 
         // We can pass in multiple URLs; this format is extensible if we need extra catalogs in the future.
         downloadTask.execute(params);
@@ -266,10 +268,10 @@ public class CloudRepository {
 
     // Reuse any valid parts of the cache.
     if(loadKeyboardsFromCache || loadLexicalModelsFromCache) {
-      CloudApiTypes.CloudDownloadReturns jsonData = new CloudApiTypes.CloudDownloadReturns(kbdData, lexData);
+      CloudCatalogDownloadReturns jsonData = new CloudCatalogDownloadReturns(kbdData, lexData);
 
       // Call the processor method directly with the cached API data.
-      _download_callback.processCloudReturns(jsonData, executeCallbacks); // TODO:  Take params for finish, return val for failures
+      _download_callback.processCloudReturns(memCachedDataset,jsonData, executeCallbacks); // TODO:  Take params for finish, return val for failures
     }
 
     return memCachedDataset;

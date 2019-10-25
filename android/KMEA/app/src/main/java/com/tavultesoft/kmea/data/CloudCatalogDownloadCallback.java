@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -15,7 +16,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CloudApiDownloadCallback {
+/**
+ * Callback for cloud catalogue download.
+ * Is used for download with progress and download with Clientdownloadmanager.
+ */
+public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns>{
 
   private static final boolean DEBUG_SIMULATE_UPDATES = false;
 
@@ -26,15 +31,11 @@ public class CloudApiDownloadCallback {
   private final Runnable failure;
   private final CloudRepository.UpdateHandler updateHandler;
 
-  //
 
-  private final Dataset dataset;
-
-  public CloudApiDownloadCallback(Context context, Dataset dataset, CloudRepository.UpdateHandler updateHandler, Runnable success, Runnable failure)
+  public CloudCatalogDownloadCallback(Context context, CloudRepository.UpdateHandler updateHandler, Runnable success, Runnable failure)
   {
     this.context = context;
 
-    this.dataset = dataset;
 
     Runnable dummy = new Runnable() {
       public void run() {
@@ -52,7 +53,7 @@ public class CloudApiDownloadCallback {
       }
     };
   }
-  public Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
+  private Bundle updateCheck(LanguageResource cloudResource, LanguageResource existingMatch) {
     if (DEBUG_SIMULATE_UPDATES) {
       return cloudResource.buildDownloadBundle();
     }
@@ -64,7 +65,7 @@ public class CloudApiDownloadCallback {
     }
   }
 
-  public int compareVersions(LanguageResource addition, LanguageResource original) {
+  private int compareVersions(LanguageResource addition, LanguageResource original) {
     // Get version from newly-downloaded keyboard.
     String addVersion = addition.getVersion();
     String origVersion = original.getVersion();
@@ -84,7 +85,7 @@ public class CloudApiDownloadCallback {
     failure.run();
   }
 
-  void saveDataToCache(CloudApiTypes.CloudDownloadReturns jsonTuple)
+  void saveDataToCache(CloudCatalogDownloadReturns jsonTuple)
   {
     // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
     if (jsonTuple.keyboardJSON != null) {
@@ -96,8 +97,8 @@ public class CloudApiDownloadCallback {
   }
 
 
-    protected JSONArray ensureInit(Context aContext,JSONArray json) {
-    if (json == null && dataset.isEmpty()) {
+    private JSONArray ensureInit(Context aContext,Dataset aDataSet, JSONArray json) {
+    if (json == null && aDataSet.isEmpty()) {
       Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
       handleDownloadError();
       return null;
@@ -106,8 +107,8 @@ public class CloudApiDownloadCallback {
     return (json != null) ? json : new JSONArray();
   }
 
-    protected JSONObject ensureInit(Context aContext,JSONObject json) {
-    if (json == null && dataset.isEmpty()) {
+   private JSONObject ensureInit(Context aContext,Dataset aDataSet, JSONObject json) {
+    if (json == null && aDataSet.isEmpty()) {
       Toast.makeText(context, "Failed to access Keyman server!", Toast.LENGTH_SHORT).show();
       handleDownloadError();
       return null;
@@ -116,13 +117,13 @@ public class CloudApiDownloadCallback {
     return (json != null) ? json : new JSONObject();
   }
 
-  void ensureInitCloudReturn(Context aContext,CloudApiTypes.CloudDownloadReturns jsonTuple)
+  protected void ensureInitCloudReturn(Context aContext, Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple)
   {
-    jsonTuple.keyboardJSON = ensureInit(aContext,jsonTuple.keyboardJSON);
-    jsonTuple.lexicalModelJSON = ensureInit(aContext,jsonTuple.lexicalModelJSON);
+    jsonTuple.keyboardJSON = ensureInit(aContext,aDataSet,jsonTuple.keyboardJSON);
+    jsonTuple.lexicalModelJSON = ensureInit(aContext,aDataSet, jsonTuple.lexicalModelJSON);
   }
 
-  public void processCloudReturns(CloudApiTypes.CloudDownloadReturns jsonTuple, boolean executeCallbacks) {
+  public void processCloudReturns(Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple, boolean executeCallbacks) {
     // Only empty if no queries returned data - we're offline.
     if (jsonTuple.isEmpty()) {
       if (this.updateHandler == null) {
@@ -140,18 +141,18 @@ public class CloudApiDownloadCallback {
     final List<Bundle> updateBundles = new ArrayList<>();
 
     // We're about to do a big batch of edits.
-    this.dataset.setNotifyOnChange(false);
+    aDataSet.setNotifyOnChange(false);
 
     // Filter out any duplicates from KMP keyboards, properly merging the lists.
     for (int i = 0; i < keyboardsArrayList.size(); i++) {
       Keyboard keyboard = keyboardsArrayList.get(i);
 
       // Check for duplicates / possible updates.
-      Keyboard match = dataset.keyboards.findMatch(keyboard);
+      Keyboard match = aDataSet.keyboards.findMatch(keyboard);
 
       if (match != null) {
         if (compareVersions(keyboard, match) == FileUtils.VERSION_GREATER) {
-          dataset.keyboards.remove(match);
+          aDataSet.keyboards.remove(match);
         } else {
           keyboardsArrayList.remove(keyboard);
           i--; // Decrement our index to reflect the removal.
@@ -160,14 +161,14 @@ public class CloudApiDownloadCallback {
     }
 
     // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
-    dataset.keyboards.addAll(keyboardsArrayList);
+    aDataSet.keyboards.addAll(keyboardsArrayList);
 
     // The actual update check.
     for (int i = 0; i < installedData.keyboards.getCount(); i++) {
       Keyboard keyboard = installedData.keyboards.getItem(i);
 
       // Check for duplicates / possible updates.
-      Keyboard match = dataset.keyboards.findMatch(keyboard);
+      Keyboard match = aDataSet.keyboards.findMatch(keyboard);
 
       if (match != null) {
         Bundle bundle = updateCheck(match, keyboard);
@@ -182,11 +183,11 @@ public class CloudApiDownloadCallback {
       LexicalModel model = lexicalModelsArrayList.get(i);
 
       // Check for duplicates / possible updates.
-      LexicalModel match = dataset.lexicalModels.findMatch(model);
+      LexicalModel match = aDataSet.lexicalModels.findMatch(model);
 
       if (match != null) {
         if (compareVersions(model, match) == FileUtils.VERSION_GREATER) {
-          dataset.lexicalModels.remove(match);
+          aDataSet.lexicalModels.remove(match);
         } else {
           lexicalModelsArrayList.remove(model);
           i--; // Decrement our index to reflect the removal.
@@ -195,14 +196,14 @@ public class CloudApiDownloadCallback {
     }
 
     // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
-    dataset.lexicalModels.addAll(lexicalModelsArrayList);
+    aDataSet.lexicalModels.addAll(lexicalModelsArrayList);
 
     // Do the actual update checks.
     for (int i = 0; i < installedData.lexicalModels.getCount(); i++) {
       LexicalModel model = installedData.lexicalModels.getItem(i);
 
       // Check for duplicates / possible updates.
-      LexicalModel match = dataset.lexicalModels.findMatch(model);
+      LexicalModel match = aDataSet.lexicalModels.findMatch(model);
 
       if (match != null) {
         Bundle bundle = updateCheck(match, model);
@@ -220,10 +221,59 @@ public class CloudApiDownloadCallback {
     }
 
     // And finish.
-    this.dataset.notifyDataSetChanged(); // Edits are done - signal that.
+    aDataSet.notifyDataSetChanged(); // Edits are done - signal that.
 
     if (executeCallbacks) {
       querySuccess.run();
     }
+  }
+
+  @Override
+  public void applyCloudDownloadToModel(Context aContext, Dataset aDataSet, CloudCatalogDownloadReturns aCloudResult)
+  {
+    saveDataToCache(aCloudResult);
+
+    ensureInitCloudReturn(aContext,aDataSet,aCloudResult);
+
+    processCloudReturns(aDataSet, aCloudResult,true);
+  }
+
+  @Override
+  public CloudCatalogDownloadReturns extractCloudResultFromDownloadSet(
+    CloudApiTypes.CloudDownloadSet<Dataset, CloudCatalogDownloadReturns> aDownload)
+  {
+    List<CloudApiTypes.CloudApiReturns> retrievedJSON = new ArrayList<>(aDownload.getSingleDownloads().size());
+
+
+    for (CloudApiTypes.SingleCloudDownload _d : aDownload.getSingleDownloads()) {
+      JSONParser jsonParser = new JSONParser();
+      JSONArray dataArray = null;
+      JSONObject dataObject = null;
+
+      if (_d.getDestiniationFile() != null && _d.getDestiniationFile().length() > 0) {
+        try {
+
+          Object _o = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile());
+          if (_d.getType() == CloudApiTypes.JSONType.Array) {
+            dataArray = (JSONArray) _o;
+          } else {
+            dataObject = (JSONObject) _o;
+          }
+        } catch (Exception e) {
+          Log.d(CloudRepository.TAG, e.getMessage());
+        } finally {
+          _d.getDestiniationFile().delete();
+        }
+      } else {
+        // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.
+      }
+
+      if (_d.getType() == CloudApiTypes.JSONType.Array) {
+        retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.getTarget(), dataArray));  // Null if offline.
+      } else {
+        retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.getTarget(), dataObject)); // Null if offline.
+      }
+    }
+    return new CloudCatalogDownloadReturns(retrievedJSON);
   }
 }

@@ -1,8 +1,15 @@
 package com.tavultesoft.kmea.data;
 
+import android.app.DownloadManager;
+
+import androidx.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CloudApiTypes {
@@ -48,53 +55,141 @@ public class CloudApiTypes {
     }
   }
 
-  protected static class CloudDownloadReturns {
-    public JSONObject keyboardJSON;
-    public JSONArray lexicalModelJSON;
+  public static class SingleCloudDownload
+  {
+    private DownloadManager.Request request;
+    private boolean downloadfinished =false;
+    private long downloadId;
+    private File destiniationFile;
+    private CloudApiTypes.JSONType type;
+    private CloudApiTypes.ApiTarget target;
 
-    // Used by the CloudDownloadTask, as it fits well with doInBackground's param structure.
-    public CloudDownloadReturns(List<CloudApiReturns> returns) {
-      JSONObject kbd = null;
-      JSONArray lex = null;
+    public SingleCloudDownload(DownloadManager.Request aRequest,File aDestinationFile)
+    {
+      request = aRequest;
+      destiniationFile=aDestinationFile;
+    }
+    public SingleCloudDownload setDownloadId(long downloadId) {
+      this.downloadId = downloadId;
+      return this;
+    }
 
-      //TODO: Seems to be wrong because only the last result for each type will be processed
-      for(CloudApiTypes.CloudApiReturns ret: returns) {
-        switch(ret.target) {
-          case Keyboards:
-            kbd = ret.jsonObject;
-            break;
-          case LexicalModels:
-            lex = ret.jsonArray;
+    public SingleCloudDownload setJsonType(JSONType type) {
+      this.type = type;
+      return this;
+    }
+
+    public SingleCloudDownload setTarget(ApiTarget target) {
+      this.target = target;
+      return this;
+    }
+
+    public DownloadManager.Request getRequest() {
+      return request;
+    }
+
+    public long getDownloadId() {
+      return downloadId;
+    }
+
+    public File getDestiniationFile() {
+      return destiniationFile;
+    }
+
+    public JSONType getType() {
+      return type;
+    }
+
+    public ApiTarget getTarget() {
+      return target;
+    }
+  }
+
+  /**
+   * Typed Download sets for cloud download.
+   * @param <M> the model objects type
+   * @param <R> the result type of the download
+   */
+  public static class CloudDownloadSet<M,R> {
+    private String downloadIdentifier;
+    private M targetModel;
+    private LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
+
+    private ICloudDownloadCallback<M,R> callback;
+
+    private boolean resultsAreProcessing = false;
+
+    //maybe implement a max lifetime for downloads
+    //private long startingTime = System.currentTimeMillis();
+
+    public CloudDownloadSet(@NonNull String aDownloadIdentifier, M theTargetObject)
+    {
+      targetModel = theTargetObject;
+      downloadIdentifier = aDownloadIdentifier;
+    }
+
+    protected boolean hasOpenDownloads() {
+      synchronized (downloads) {
+        for (SingleCloudDownload _d : downloads) {
+          if (!_d.downloadfinished)
+            return true;
         }
+        return false;
       }
-
-      // Errors are thrown if we try to do this assignment within the loop.
-      this.keyboardJSON = kbd;
-      this.lexicalModelJSON = lex;
     }
 
-    public CloudDownloadReturns(JSONObject keyboardJSON, JSONArray lexicalModelJSON) {
-      this.keyboardJSON = keyboardJSON;
-      this.lexicalModelJSON = lexicalModelJSON;
+    void addDownload(SingleCloudDownload aDownload) {
+      synchronized (downloads) {
+        if (resultsAreProcessing)
+          throw new IllegalStateException("Could not add download to an allready processed download set");
+
+        downloads.add(aDownload);
+      }
     }
 
-    public boolean isEmpty() {
-      boolean emptyKbd = false;
-      boolean emptyLex = false;
+    public ICloudDownloadCallback getCallback() {
+      return callback;
+    }
 
-      if (keyboardJSON == null) {
-        emptyKbd = true;
-      } else if (keyboardJSON.length() == 0) {
-        emptyKbd = true;
+    public void setCallback(ICloudDownloadCallback callback) {
+      this.callback = callback;
+    }
+
+    public boolean isResultsAreProcessing() {
+      return resultsAreProcessing;
+    }
+
+    public void setResultsAreProcessing(boolean resultsAreProcessing) {
+      this.resultsAreProcessing = resultsAreProcessing;
+    }
+
+    public String getDownloadIdentifier() {
+      return downloadIdentifier;
+    }
+
+    public M getTargetModel() {
+      return targetModel;
+    }
+
+    void setDone(long aDownload) {
+      synchronized (downloads) {
+        if (resultsAreProcessing)
+          throw new IllegalStateException("Download is already processed");
+
+        for (SingleCloudDownload _d : downloads) {
+          if (_d.downloadId == aDownload) {
+            _d.downloadfinished = true;
+            return;
+          }
+        }
+        return;
       }
 
-      if(lexicalModelJSON == null) {
-        emptyLex = true;
-      } else if(lexicalModelJSON.length() == 0) {
-        emptyLex = true;
-      }
 
-      return emptyKbd && emptyLex;
+    }
+
+    public List<SingleCloudDownload> getSingleDownloads() {
+      return Collections.unmodifiableList(downloads);
     }
   }
 }

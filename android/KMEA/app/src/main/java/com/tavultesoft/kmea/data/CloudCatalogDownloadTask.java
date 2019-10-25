@@ -1,17 +1,11 @@
 package com.tavultesoft.kmea.data;
 
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,7 +20,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-class CloudDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, CloudApiTypes.CloudDownloadReturns> {
+class CloudCatalogDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, CloudCatalogDownloadReturns> {
 
 
   private final boolean hasConnection;
@@ -36,18 +30,18 @@ class CloudDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, 
 
   private final Dataset dataset;
 
-  private final CloudApiDownloadCallback callback;
+  private final CloudCatalogDownloadCallback callback;
 
 
 
-  public CloudDownloadTask(Context context, Dataset dataset, CloudRepository.UpdateHandler updateHandler, Runnable success, Runnable failure) {
+  public CloudCatalogDownloadTask(Context context, Dataset dataset, CloudCatalogDownloadCallback aCallback) {
     this.context = context;
     this.dataset = dataset;
 
     this.hasConnection = KMManager.hasConnection(context);
 
 
-    callback = new CloudApiDownloadCallback(context,dataset,updateHandler,success,failure);
+    callback = aCallback;
   }
 
   protected void showProgressDialog(final Runnable finishCallback) {
@@ -95,7 +89,7 @@ class CloudDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, 
   }
 
   @Override
-  protected CloudApiTypes.CloudDownloadReturns doInBackground(CloudApiTypes.CloudApiParam... params) {
+  protected CloudCatalogDownloadReturns doInBackground(CloudApiTypes.CloudApiParam... params) {
     if (isCancelled()) {
       return null;
     }
@@ -136,13 +130,13 @@ class CloudDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, 
       }
     }
 
-    return new CloudApiTypes.CloudDownloadReturns(retrievedJSON); // Will report empty arrays/objects if offline.
+    return new CloudCatalogDownloadReturns(retrievedJSON); // Will report empty arrays/objects if offline.
   }
 
 
 
   @Override
-  protected void onPostExecute(CloudApiTypes.CloudDownloadReturns jsonTuple) {
+  protected void onPostExecute(CloudCatalogDownloadReturns jsonTuple) {
 
     callback.saveDataToCache(jsonTuple);
 
@@ -155,9 +149,9 @@ class CloudDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, 
       }
     }
 
-    callback.ensureInitCloudReturn(context,jsonTuple);
+    callback.ensureInitCloudReturn(context,dataset,jsonTuple);
 
-    callback.processCloudReturns(jsonTuple, true);
+    callback.processCloudReturns(dataset,jsonTuple, true);
   }
 
 

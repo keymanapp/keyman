@@ -6,26 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.net.UrlQuerySanitizer;
-import android.util.JsonReader;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.tavultesoft.kmea.JSONParser;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.ObjectInputStream;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Central manager for cloud downloads.
+ */
 public class CloudDownloadMgr{
 
   private static CloudDownloadMgr instance;
@@ -45,117 +33,8 @@ public class CloudDownloadMgr{
 
   boolean isInitialized = false;
 
-  private HashMap<Long,SingleCloudDownload> pendingCloudDownloads = new HashMap<>();
-
-  private class SingleCloudDownload
-  {
-    DownloadManager.Request request;
-    CloudApiTypes.CloudApiReturns api_return;
-    boolean downloadfinished =false;
-    long downloadId;
-    CloudDownloadSet parentSet;
-    File destiniationfile;
-    CloudApiTypes.JSONType type;
-    CloudApiTypes.ApiTarget target;
-
-  }
-
-  private class CloudDownloadSet
-  {
-    private LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
-
-    private CloudApiDownloadCallback callback;
-
-    private boolean resultsAreProcessed = false;
-
-    private long startingTime = System.currentTimeMillis();
-
-    protected boolean hasOpenDownloads()
-    {
-      synchronized (downloads)
-      {
-          for (SingleCloudDownload _d : downloads) {
-            if (!_d.downloadfinished)
-              return true;
-          }
-          return false;
-      }
-    }
-
-    private void addDownload(SingleCloudDownload aDownload)
-    {
-      synchronized (downloads)
-      {
-        if (resultsAreProcessed)
-          throw new IllegalStateException("Could not add download to an allready processed download set");
-
-        downloads.add(aDownload);
-      }
-    }
-
-    private void setDone(long aDownload)
-    {
-      synchronized (downloads)
-      {
-        if (resultsAreProcessed)
-          throw new IllegalStateException("Download is already processed");
-
-        for (SingleCloudDownload _d : downloads) {
-          if (_d.downloadId==aDownload)
-          {
-            _d.downloadfinished=true;
-            return;
-          }
-        }
-        return;
-      }
-    }
-
-    protected CloudApiTypes.CloudDownloadReturns getDownloadReturns() {
-
-
-      List<CloudApiTypes.CloudApiReturns> retrievedJSON = new ArrayList<>(downloads.size());
-
-
-
-      for (SingleCloudDownload _d : downloads) {
-        JSONParser jsonParser = new JSONParser();
-        JSONArray dataArray = null;
-        JSONObject dataObject = null;
-
-        if(_d.destiniationfile!=null&& _d.destiniationfile.length()>0)
-        {
-          try {
-
-            Object _o = jsonParser.getJSONObjectFromFile(_d.destiniationfile);
-            if (_d.type == CloudApiTypes.JSONType.Array) {
-               dataArray = (JSONArray) _o;
-            } else {
-              dataObject = (JSONObject)_o;
-            }
-          } catch (Exception e) {
-            Log.d(CloudRepository.TAG, e.getMessage());
-          }
-          finally
-          {
-            _d.destiniationfile.delete();
-          }
-        } else {
-          // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.
-        }
-
-        if (_d.type == CloudApiTypes.JSONType.Array) {
-          retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.target, dataArray));  // Null if offline.
-        } else {
-          retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.target, dataObject)); // Null if offline.
-        }
-
-      }
-
-      return new CloudApiTypes.CloudDownloadReturns(retrievedJSON); // Will report empty arrays/objects if offline.
-    }
-
-  }
+  private HashMap<Long,String> internalDownloadIdToDownloadIdentifier = new HashMap<>();
+  private HashMap<String, CloudApiTypes.CloudDownloadSet> downloadSetByDownloadIdentifier = new HashMap<>();
 
   private synchronized void initializeReceiver(Context aContext)
   {
@@ -176,70 +55,115 @@ public class CloudDownloadMgr{
     }
   };
 
-
-  public void downloadCompleted(Context aContext,long aDownloadId)
+  private CloudApiTypes.CloudDownloadSet getDownloadSetForInternalDownloadId(long anInternalDownloadId)
   {
-    synchronized (pendingCloudDownloads) {
-      SingleCloudDownload _result = pendingCloudDownloads.remove(aDownloadId);
-      if (_result != null) {
-        CloudDownloadSet _parentSet = _result.parentSet;
-        _parentSet.setDone(aDownloadId);
-        if(!_parentSet.hasOpenDownloads())
-        {
-          processDownloadSet(aContext, _parentSet);
-        }
+    String _downloadset_id = internalDownloadIdToDownloadIdentifier.get(anInternalDownloadId);
+    if(_downloadset_id==null)
+      return null;
+    return downloadSetByDownloadIdentifier.get(_downloadset_id);
+  }
 
+  private void removeDownload(String anIdenitifer)
+  {
+    synchronized (downloadSetByDownloadIdentifier)
+    {
+      CloudApiTypes.CloudDownloadSet _downloadset = downloadSetByDownloadIdentifier.remove(anIdenitifer);
+      if (_downloadset == null)
+        return;
+      List<CloudApiTypes.SingleCloudDownload> _children = _downloadset.getSingleDownloads();
+      for (CloudApiTypes.SingleCloudDownload _d : _children)
+        internalDownloadIdToDownloadIdentifier.remove(_d.getDownloadId());
+    }
+  }
+
+  private void downloadCompleted(Context aContext,long aDownloadId)
+  {
+    synchronized (downloadSetByDownloadIdentifier) {
+
+      CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(aDownloadId);
+      _parentSet.setDone(aDownloadId);
+      if(!_parentSet.hasOpenDownloads())
+      {
+        processDownloadSet(aContext, _parentSet);
+        removeDownload(_parentSet.getDownloadIdentifier());
       }
     }
   }
 
-  private void processDownloadSet(Context aContext, CloudDownloadSet aParentSet) {
-    aParentSet.resultsAreProcessed = true;
-
-    CloudApiTypes.CloudDownloadReturns jsonTuple = aParentSet.getDownloadReturns();
-
-    CloudApiDownloadCallback _callback = aParentSet.callback;
-    _callback.saveDataToCache(jsonTuple);
-
-    _callback.ensureInitCloudReturn(aContext,jsonTuple);
-
-    _callback.processCloudReturns(jsonTuple,true);
-  }
-
-  public boolean alreadyDownloadingData(Context aContext)
+  /**
+   * called after finishing the download.
+   * @param aContext the context
+   * @param aDownloadSet the download set
+   */
+  private void processDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet aDownloadSet)
   {
-    return !pendingCloudDownloads.isEmpty();
+    aDownloadSet.setResultsAreProcessing(true);
+
+    ICloudDownloadCallback _callback = aDownloadSet.getCallback();
+
+    Object jsonTuple = _callback
+      .extractCloudResultFromDownloadSet(aDownloadSet);
+
+    _callback.applyCloudDownloadToModel(aContext,aDownloadSet.getTargetModel(),jsonTuple);
   }
 
-  public void executeAsDownload(Context aContext, CloudApiDownloadCallback aCallback, CloudApiTypes.CloudApiParam... params)
+  /**
+   * check if download is already running
+   * @param anDownloadIdentifier an identifier to prevent duplicate downloading
+   * @return the result
+   */
+  public boolean alreadyDownloadingData(String anDownloadIdentifier)
+  {
+    return downloadSetByDownloadIdentifier.containsKey(anDownloadIdentifier);
+  }
+
+  /**
+   * execute download in background.
+   * @param aContext the context
+   * @param aDownloadIdentifier  an identifier to prevent duplicate downloading
+   * @param aTargetModel the target model
+   * @param aCallback the callback
+   * @param params the cloud api params for download
+   */
+  public <M,R> void executeAsDownload(Context aContext, String aDownloadIdentifier,
+                                M aTargetModel,
+                                ICloudDownloadCallback<M,R> aCallback, CloudApiTypes.CloudApiParam... params)
   {
     if(!isInitialized)
       initializeReceiver(aContext);
 
-    synchronized (pendingCloudDownloads) {
+    synchronized (downloadSetByDownloadIdentifier) {
 
-      if(alreadyDownloadingData(aContext))
+      if(alreadyDownloadingData(aDownloadIdentifier))
         return;
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
-      CloudDownloadSet _downloadSet = new CloudDownloadSet();
-      _downloadSet.callback=aCallback;
+      CloudApiTypes.CloudDownloadSet _downloadSet = new CloudApiTypes.CloudDownloadSet(
+        aDownloadIdentifier,aTargetModel);
+      _downloadSet.setCallback(aCallback);
+
+      downloadSetByDownloadIdentifier.put(aDownloadIdentifier,_downloadSet);
 
       for(int _i=0;_i<params.length;_i++)
       {
-        SingleCloudDownload _download = createRequest(aContext,_i,params[_i]);
-        _download.downloadId = downloadManager.enqueue(_download.request);// enqueue puts the download request in the queue.
-        _download.parentSet = _downloadSet;
-        pendingCloudDownloads.put(_download.downloadId,_download);
+        CloudApiTypes.SingleCloudDownload _download = createRequest(aContext,_i,params[_i]);
+        _download.setDownloadId(downloadManager.enqueue(_download.getRequest()));// enqueue puts the download request in the queue.
+        internalDownloadIdToDownloadIdentifier.put(_download.getDownloadId(),aDownloadIdentifier);
         _downloadSet.addDownload(_download);
       }
-
     }
 
   }
 
-  public SingleCloudDownload createRequest(Context aContext, int aNo,CloudApiTypes.CloudApiParam aParam)
+  /**
+   * create request from api param.
+   * @param aContext the context
+   * @param aNo the number
+   * @param aParam the api parameter
+   * @return the single download
+   */
+  private CloudApiTypes.SingleCloudDownload createRequest(Context aContext, int aNo, CloudApiTypes.CloudApiParam aParam)
   {
 
     File _file=new File(aContext.getExternalFilesDir(null),"download_"+System.currentTimeMillis()+"_"+aNo);
@@ -256,11 +180,8 @@ public class CloudDownloadMgr{
       //.setAllowedOverMetered(true)// Set if download is allowed on Mobile network
       //.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
-    SingleCloudDownload _download= new SingleCloudDownload();
-    _download.request = _request;
-    _download.destiniationfile = _file;
-    _download.type = aParam.type;
-    _download.target = aParam.target;
-    return _download;
+    return new CloudApiTypes.SingleCloudDownload(_request,_file)
+      .setJsonType(aParam.type)
+      .setTarget(aParam.target);
   }
 }
