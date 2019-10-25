@@ -8,7 +8,7 @@
 4. Install [nodejs](https://nodejs.org/en/download/).
 5. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
 6. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
-7. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
+7. Start Delphi IDE once after installation to create default environment files and ensure registration is complete.
 8. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `USERDEFINES`,
    `GIT_BASH_FOR_KEYMAN`.
 9. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
