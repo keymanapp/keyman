@@ -87,11 +87,11 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
 # Delphi Compiler Configuration - Delphi 10.3.2
 #
 
-!IFDEF DELPHI_VERSION
-DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
-!ELSE
-DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\20.0\bin
+!IFNDEF DELPHI_VERSION
+DELPHI_VERSION=20.0
 !ENDIF
+
+DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
 
 #
 # Pass local configuration through to sub-instances of MAKE
@@ -135,7 +135,8 @@ DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 # Delphi MSBuild related commands and macros
 #
 
-DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
+# Warning: whitespace is horribly significant in the following macro -- particularly lack of space before &&
+DELPHI_MSBUILD=set DCC32PATH=$(DCC32PATH)&& $(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF DEBUG
 TARGET_PATH=Debug

@@ -7,6 +7,8 @@ rem
 rem Do not use this for VS builds.
 rem
 
-call rsvars.bat
+if not exist "%DCC32PATH%\rsvars.bat" echo Batch file %DCC32PATH%\rsvars.bat does not exist && exit /b 1
+
+call "%DCC32PATH%\rsvars.bat"
 msbuild.exe %*
 exit /b %errorlevel%
