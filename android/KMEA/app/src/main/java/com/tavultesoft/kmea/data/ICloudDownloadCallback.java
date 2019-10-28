@@ -4,10 +4,10 @@ import android.content.Context;
 
 /**
  * Interface for {@link CloudDownloadMgr} as callback to do use case specific task.
- * @param <M> the model objects type
- * @param <R> the result type of the download
+ * @param <ModelType> the model objects type
+ * @param <ResultType> the result type of the download
  */
-public interface ICloudDownloadCallback<M,R> {
+public interface ICloudDownloadCallback<ModelType,ResultType> {
 
 
   /**
@@ -15,7 +15,13 @@ public interface ICloudDownloadCallback<M,R> {
    * @param aDownload the download
    * @return the result
    */
-  R extractCloudResultFromDownloadSet(CloudApiTypes.CloudDownloadSet<M,R> aDownload);
+  ResultType extractCloudResultFromDownloadSet(CloudApiTypes.CloudDownloadSet<ModelType,ResultType> aDownload);
 
-  void applyCloudDownloadToModel(Context aContext, M aModel, R aCloudResult);
+  /**
+   * Apply download results to target model.
+   * @param aContext the context
+   * @param aModel the model
+   * @param aCloudResult the result
+   */
+  void applyCloudDownloadToModel(Context aContext, ModelType aModel, ResultType aCloudResult);
 }

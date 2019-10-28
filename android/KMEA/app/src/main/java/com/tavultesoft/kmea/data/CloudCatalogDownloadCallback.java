@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns>{
 
+  private static final String TAG = "CloudCatalogDownloadCallback";
   private static final boolean DEBUG_SIMULATE_UPDATES = false;
 
   private final Context context;
@@ -215,7 +216,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
     if (updateBundles.size() > 0) {
       // Time for updates!
-      Log.v(CloudRepository.TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");
+      Log.v(TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");
 
       updateHandler.onUpdateDetection(updateBundles);
     }
@@ -250,19 +251,19 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       JSONArray dataArray = null;
       JSONObject dataObject = null;
 
-      if (_d.getDestiniationFile() != null && _d.getDestiniationFile().length() > 0) {
+      if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0) {
         try {
 
           //Object _o = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile());
           if (_d.getType() == CloudApiTypes.JSONType.Array) {
-            dataArray = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile(),JSONArray.class);//(JSONArray) _o;
+            dataArray = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONArray.class);//(JSONArray) _o;
           } else {
-            dataObject = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile(),JSONObject.class);//(JSONObject) _o;
+            dataObject = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONObject.class);//(JSONObject) _o;
           }
         } catch (Exception e) {
-          Log.d(CloudRepository.TAG, e.getMessage());
+          Log.d(TAG, e.getMessage());
         } finally {
-          _d.getDestiniationFile().delete();
+          _d.getDestinationFile().delete();
         }
       } else {
         // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.

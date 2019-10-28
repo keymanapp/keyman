@@ -58,16 +58,16 @@ public class CloudApiTypes {
   public static class SingleCloudDownload
   {
     private DownloadManager.Request request;
-    private boolean downloadfinished =false;
+    private boolean downloadFinished =false;
     private long downloadId;
-    private File destiniationFile;
+    private File destinationFile;
     private CloudApiTypes.JSONType type;
     private CloudApiTypes.ApiTarget target;
 
     public SingleCloudDownload(DownloadManager.Request aRequest,File aDestinationFile)
     {
       request = aRequest;
-      destiniationFile=aDestinationFile;
+      destinationFile = aDestinationFile;
     }
     public SingleCloudDownload setDownloadId(long downloadId) {
       this.downloadId = downloadId;
@@ -92,8 +92,8 @@ public class CloudApiTypes {
       return downloadId;
     }
 
-    public File getDestiniationFile() {
-      return destiniationFile;
+    public File getDestinationFile() {
+      return destinationFile;
     }
 
     public JSONType getType() {
@@ -107,22 +107,22 @@ public class CloudApiTypes {
 
   /**
    * Typed Download sets for cloud download.
-   * @param <M> the model objects type
-   * @param <R> the result type of the download
+   * @param <ModelType> the model objects type
+   * @param <ResultType> the result type of the download
    */
-  public static class CloudDownloadSet<M,R> {
+  public static class CloudDownloadSet<ModelType,ResultType> {
     private String downloadIdentifier;
-    private M targetModel;
+    private ModelType targetModel;
     private LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
 
-    private ICloudDownloadCallback<M,R> callback;
+    private ICloudDownloadCallback<ModelType,ResultType> callback;
 
-    private boolean resultsAreProcessing = false;
+    private boolean resultsReady = false;
 
-    //maybe implement a max lifetime for downloads
+    //TODO: maybe implement a max lifetime for downloads
     //private long startingTime = System.currentTimeMillis();
 
-    public CloudDownloadSet(@NonNull String aDownloadIdentifier, M theTargetObject)
+    public CloudDownloadSet(@NonNull String aDownloadIdentifier, ModelType theTargetObject)
     {
       targetModel = theTargetObject;
       downloadIdentifier = aDownloadIdentifier;
@@ -131,7 +131,7 @@ public class CloudApiTypes {
     protected boolean hasOpenDownloads() {
       synchronized (downloads) {
         for (SingleCloudDownload _d : downloads) {
-          if (!_d.downloadfinished)
+          if (!_d.downloadFinished)
             return true;
         }
         return false;
@@ -140,7 +140,7 @@ public class CloudApiTypes {
 
     void addDownload(SingleCloudDownload aDownload) {
       synchronized (downloads) {
-        if (resultsAreProcessing)
+        if (resultsReady)
           throw new IllegalStateException("Could not add download to an allready processed download set");
 
         downloads.add(aDownload);
@@ -155,30 +155,30 @@ public class CloudApiTypes {
       this.callback = callback;
     }
 
-    public boolean isResultsAreProcessing() {
-      return resultsAreProcessing;
+    public boolean isResultsReady() {
+      return resultsReady;
     }
 
-    public void setResultsAreProcessing(boolean resultsAreProcessing) {
-      this.resultsAreProcessing = resultsAreProcessing;
+    public void setResultsReady() {
+      this.resultsReady = true;
     }
 
     public String getDownloadIdentifier() {
       return downloadIdentifier;
     }
 
-    public M getTargetModel() {
+    public ModelType getTargetModel() {
       return targetModel;
     }
 
     void setDone(long aDownload) {
       synchronized (downloads) {
-        if (resultsAreProcessing)
-          throw new IllegalStateException("Download is already processed");
+        if (resultsReady)
+          throw new IllegalStateException("Download is already ready");
 
         for (SingleCloudDownload _d : downloads) {
           if (_d.downloadId == aDownload) {
-            _d.downloadfinished = true;
+            _d.downloadFinished = true;
             return;
           }
         }
