@@ -283,7 +283,7 @@ class LanguageSettingsViewController: UITableViewController {
     return false
   }
   
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                           forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
       if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
