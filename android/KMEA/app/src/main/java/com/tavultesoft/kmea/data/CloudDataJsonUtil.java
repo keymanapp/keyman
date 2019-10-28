@@ -1,5 +1,6 @@
 package com.tavultesoft.kmea.data;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -156,7 +157,7 @@ public class CloudDataJsonUtil {
     return lmData;
   }
 
-  protected static JSONObject getCachedJSONObject(File file) {
+  public static JSONObject getCachedJSONObject(File file) {
     JSONObject kbData = null;
     try {
       // Read from cache file
@@ -209,4 +210,13 @@ public class CloudDataJsonUtil {
     }
   }
 
+  public static File getKeyboardCacheFile(Context context) {
+    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
+    return new File(context.getCacheDir(), jsonCacheFilename);
+  }
+
+  public static File getLexicalModelCacheFile(Context context) {
+    final String jsonLexicalCacheFilename = "jsonLexicalModelsCache.dat";
+    return new File(context.getCacheDir(), jsonLexicalCacheFilename);
+  }
 }

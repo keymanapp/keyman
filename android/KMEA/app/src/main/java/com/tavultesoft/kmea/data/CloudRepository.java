@@ -57,8 +57,8 @@ public class CloudRepository {
     if(shouldUseMemCache(context)) {
       return true;
     } else {
-      return shouldUseCache(context, getKeyboardCacheFile(context)) &&
-          shouldUseCache(context, getLexicalModelCacheFile(context));
+      return shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context)) &&
+          shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
     }
   }
 
@@ -88,7 +88,7 @@ public class CloudRepository {
     boolean hasConnection = KMManager.hasConnection(context);
 
     // Forced cache bypass - we need to load more lexical models (signaled by invalidation).
-    if(this.invalidateLexicalCache && cacheFile.equals(this.getLexicalModelCacheFile(context))) {
+    if(this.invalidateLexicalCache && cacheFile.equals(CloudDataJsonUtil.getLexicalModelCacheFile(context))) {
       this.invalidateLexicalCache = false;
       return false;
     }
@@ -111,7 +111,7 @@ public class CloudRepository {
 
     // We should also pre-emptively clear out the old cache file
     // in case of an app close or crash.
-    File file = getLexicalModelCacheFile(context);
+    File file = CloudDataJsonUtil.getLexicalModelCacheFile(context);
     file.delete();
   }
 
@@ -129,8 +129,8 @@ public class CloudRepository {
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   public Dataset fetchDataset(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
-    boolean loadKeyboardsFromCache = this.shouldUseCache(context, getKeyboardCacheFile(context));
-    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, getLexicalModelCacheFile(context));
+    boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
+    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
     boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
 
@@ -178,7 +178,7 @@ public class CloudRepository {
     JSONArray lexData = new JSONArray();
 
     if(loadKeyboardsFromCache) {
-      kbdData = CloudDataJsonUtil.getCachedJSONObject(getKeyboardCacheFile(context));
+      kbdData = CloudDataJsonUtil.getCachedJSONObject(CloudDataJsonUtil.getKeyboardCacheFile(context));
 
       // In case something went wrong with the last cache attempt, which can cause a null return.
       if(kbdData == null) {
@@ -204,7 +204,7 @@ public class CloudRepository {
     }
 
     if(loadLexicalModelsFromCache) {
-      lexData = CloudDataJsonUtil.getCachedJSONArray(getLexicalModelCacheFile(context));
+      lexData = CloudDataJsonUtil.getCachedJSONArray(CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
       if(lexData == null) {
         lexData = new JSONArray();
@@ -277,15 +277,7 @@ public class CloudRepository {
     return memCachedDataset;
   }
 
-  protected static File getKeyboardCacheFile(Context context) {
-    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
-    return new File(context.getCacheDir(), jsonCacheFilename);
-  }
 
-  protected static File getLexicalModelCacheFile(Context context) {
-    final String jsonLexicalCacheFilename = "jsonLexicalModelsCache.dat";
-    return new File(context.getCacheDir(), jsonLexicalCacheFilename);
-  }
 
 
   protected JSONObject wrapKmpKeyboardJSON(JSONArray languagesArray) {

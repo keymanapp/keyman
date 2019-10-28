@@ -55,6 +55,7 @@ import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -648,7 +649,7 @@ public final class KMManager {
       }
 
       if (shouldClearCache) {
-        File cache = LanguageListActivity.getCacheFile(appContext);
+        File cache = CloudDataJsonUtil.getKeyboardCacheFile(appContext);
         if (cache.exists()) {
           cache.delete();
         }
