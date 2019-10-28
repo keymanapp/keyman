@@ -22,6 +22,7 @@ import java.util.List;
 
 class CloudCatalogDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, CloudCatalogDownloadReturns> {
 
+  private static final String TAG = "CloudCatalogDownloadTask";
 
   private final boolean hasConnection;
   private ProgressDialog progressDialog;
@@ -114,7 +115,7 @@ class CloudCatalogDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, In
             dataObject = jsonParser.getJSONObjectFromUrl(remoteUrl, JSONObject.class);
           }
         } catch (Exception e) {
-          Log.d(CloudRepository.TAG, e.getMessage());
+          Log.d(TAG, e.getMessage());
         }
       } else {
         // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.

@@ -23,6 +23,7 @@ import java.util.List;
 
 public class CloudDataJsonUtil {
 
+  private static final String TAG = "CloudDataJsonUtil";
   private CloudDataJsonUtil()
   {
     //no instances
@@ -70,7 +71,7 @@ public class CloudDataJsonUtil {
         }
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(CloudRepository.TAG, "JSONParse Error: " + e);
+      Log.e(TAG, "JSONParse Error: " + e);
       return new ArrayList<>();  // Is this ideal?
     }
 
@@ -131,7 +132,7 @@ public class CloudDataJsonUtil {
         modelList.add(new LexicalModel(hashMap));
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(CloudRepository.TAG, "JSONParse Error: " + e);
+      Log.e(TAG, "JSONParse Error: " + e);
       return new ArrayList<>();  // Is this ideal?
     }
 
@@ -148,7 +149,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(CloudRepository.TAG, "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "Failed to read from cache file. Error: " + e);
       lmData = null;
     }
 
@@ -165,7 +166,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(CloudRepository.TAG, "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "Failed to read from cache file. Error: " + e);
       kbData = null;
     }
 
@@ -186,7 +187,7 @@ public class CloudDataJsonUtil {
       objOutput.writeObject(json.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e(CloudRepository.TAG, "Failed to save to cache file. Error: " + e);
+      Log.e(TAG, "Failed to save to cache file. Error: " + e);
     }
   }
 
@@ -204,7 +205,7 @@ public class CloudDataJsonUtil {
       objOutput.writeObject(json.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e(CloudRepository.TAG, "Failed to save to cache file. Error: " + e);
+      Log.e(TAG, "Failed to save to cache file. Error: " + e);
     }
   }
 

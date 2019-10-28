@@ -97,7 +97,7 @@ public class CloudDownloadMgr{
    */
   private void processDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet aDownloadSet)
   {
-    aDownloadSet.setResultsAreProcessing(true);
+    aDownloadSet.setResultsReady();
 
     ICloudDownloadCallback _callback = aDownloadSet.getCallback();
 
