@@ -338,8 +338,10 @@ public final class KMManager {
     } else if (currentLexicalModel == null) {
       // Check if lm-layer needs to be re-enabled
       HashMap<String, String> kbInfo = getCurrentKeyboardInfo(appContext);
-      String langId = kbInfo.get(KMKey_LanguageID);
-      registerAssociatedLexicalModel(langId);
+      if (kbInfo != null) {
+        String langId = kbInfo.get(KMKey_LanguageID);
+        registerAssociatedLexicalModel(langId);
+      }
     }
 
     if (!restarting) {
