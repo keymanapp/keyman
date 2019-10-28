@@ -26,7 +26,7 @@ import java.util.List;
 
 public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
-  static final String TAG = "CloudRepository";
+  private static final String TAG = "CloudRepository";
 
   public static final boolean USE_DOWNLOAD_MANAGER = true;
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";

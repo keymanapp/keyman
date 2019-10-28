@@ -39,20 +39,8 @@ class CloudCatalogDownloadReturns {
   }
 
   public boolean isEmpty() {
-    boolean emptyKbd = false;
-    boolean emptyLex = false;
-
-    if (keyboardJSON == null) {
-      emptyKbd = true;
-    } else if (keyboardJSON.length() == 0) {
-      emptyKbd = true;
-    }
-
-    if(lexicalModelJSON == null) {
-      emptyLex = true;
-    } else if(lexicalModelJSON.length() == 0) {
-      emptyLex = true;
-    }
+    boolean emptyKbd = keyboardJSON == null || keyboardJSON.length() == 0;
+    boolean emptyLex = lexicalModelJSON == null || lexicalModelJSON.length() == 0;
 
     return emptyKbd && emptyLex;
   }
