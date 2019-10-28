@@ -158,6 +158,14 @@ public class CloudRepository {
     /* do what's possible here, rather than in the Task */
   }
 
+  /**
+   * initialize the data set from cache on startup of the application
+   * (not used until keyboard update is implemented)
+   * @param context the main activity of the application
+   * @param updateHandler An object that can handle update notification if desired.
+   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
+   * @param onFailure A callback to be triggered upon failure of a query.
+   */
   public void initializeDataSet(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure)
   {
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
@@ -167,6 +175,13 @@ public class CloudRepository {
   }
 
 
+  /**
+   * precache dataset and notify callbacks if no update from cloud api services is necessary.
+   * @param context   The current Activity requesting the Dataset.
+   * @param updateHandler  An object that can handle update notification if desired.
+   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
+   * @param onFailure  A callback to be triggered upon failure of a query.
+   */
   private void preCacheDataSet(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure)
   {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
@@ -269,8 +284,8 @@ public class CloudRepository {
   }
 
   /**
-   * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
-   * services.  Unless recently cached, this object will be populated asynchronously.
+   * Downloads keyboards and models available from the Cloud API
+   * services.  This object will be populated asynchronously to the cached dataset.
    * @param context   The current Activity requesting the Dataset.
    * @param updateHandler  An object that can handle update notification if desired.
    * @param onSuccess  A callback to be triggered on completion of all queries and operations.
