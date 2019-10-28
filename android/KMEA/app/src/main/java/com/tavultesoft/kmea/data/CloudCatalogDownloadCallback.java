@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns>{
 
-  private static final String TAG = "CloudCatalogDownloadCallback";
+  private static final String TAG = "CloudCatalogDownloadCb";
   private static final boolean DEBUG_SIMULATE_UPDATES = false;
 
   private final Context context;
@@ -90,10 +90,10 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   {
     // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
     if (jsonTuple.keyboardJSON != null) {
-      CloudDataJsonUtil.saveJSONObjectToCache(CloudRepository.getKeyboardCacheFile(context), jsonTuple.keyboardJSON);
+      CloudDataJsonUtil.saveJSONObjectToCache(CloudDataJsonUtil.getKeyboardCacheFile(context), jsonTuple.keyboardJSON);
     }
     if (jsonTuple.lexicalModelJSON != null) {
-      CloudDataJsonUtil.saveJSONArrayToCache(CloudRepository.getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
+      CloudDataJsonUtil.saveJSONArrayToCache(CloudDataJsonUtil.getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
     }
   }
 
@@ -254,7 +254,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0) {
         try {
 
-          //Object _o = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile());
           if (_d.getType() == CloudApiTypes.JSONType.Array) {
             dataArray = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONArray.class);//(JSONArray) _o;
           } else {

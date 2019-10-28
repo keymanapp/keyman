@@ -141,7 +141,7 @@ public class CloudApiTypes {
     void addDownload(SingleCloudDownload aDownload) {
       synchronized (downloads) {
         if (resultsReady)
-          throw new IllegalStateException("Could not add download to an allready processed download set");
+          throw new IllegalStateException("Could not add download to an already processed download set");
 
         downloads.add(aDownload);
       }
