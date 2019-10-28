@@ -26,7 +26,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     super.viewDidLoad()
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.refreshTable),
-                                           name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+                                           name: UIApplication.didBecomeActiveNotification, object: nil)
 
     tableView.isScrollEnabled = false
 

@@ -83,7 +83,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     
-    addChildViewController(keymanWeb)
+    addChild(keymanWeb)
   }
 
   public required init?(coder aDecoder: NSCoder) {

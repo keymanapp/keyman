@@ -124,12 +124,12 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       
       let alertController = UIAlertController(title: "\(language.name): \(lexicalModel.name)",
         message: "Would you like to download this dictionary?",
-        preferredStyle: UIAlertControllerStyle.alert)
+        preferredStyle: UIAlertController.Style.alert)
       alertController.addAction(UIAlertAction(title: "Cancel",
-                                              style: UIAlertActionStyle.cancel,
+                                              style: UIAlertAction.Style.cancel,
                                               handler: nil))
       alertController.addAction(UIAlertAction(title: "Download",
-                                              style: UIAlertActionStyle.default,
+                                              style: UIAlertAction.Style.default,
                                               handler: {_ in self.downloadHandler(lexicalModelIndex)} ))
       
       self.present(alertController, animated: true, completion: nil)

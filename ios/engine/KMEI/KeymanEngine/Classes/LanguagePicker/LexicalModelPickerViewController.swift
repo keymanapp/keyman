@@ -106,7 +106,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     return true
   }
   
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                           forRowAt indexPath: IndexPath) {
     if editingStyle != .delete {
       return
@@ -216,9 +216,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: { _ in
                                               self.navigationController?.popToRootViewController(animated: true)
                                             }))

@@ -62,7 +62,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
    * Creates the classic spinning-wheel 'activity in progress' indicator.
    */
   private func setupActivityIndicator() -> UIActivityIndicatorView {
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    let indicatorView = UIActivityIndicatorView(style: .gray)
     indicatorView.center = CGPoint(x: frame.width - indicatorView.frame.width,
                                    y: frame.height * 0.5)
     indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
@@ -123,7 +123,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
     
     actionButton = setupActionButton(text, for: target, onClick: callback)
     addSubview(actionButton!)
-    bringSubview(toFront: actionButton!)
+    bringSubviewToFront(actionButton!)
     
     // Automatically display if we're hidden and have access to our owning UINavigationController.
     if navigationController?.isToolbarHidden ?? false {
