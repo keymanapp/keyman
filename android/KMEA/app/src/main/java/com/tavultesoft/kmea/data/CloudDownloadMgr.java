@@ -94,14 +94,16 @@ public class CloudDownloadMgr{
    * called after finishing the download.
    * @param aContext the context
    * @param aDownloadSet the download set
+   * @param <ModelType> the target models type
+   * @param <ResultType> the cloud requests result type
    */
-  private void processDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet aDownloadSet)
+  private <ModelType,ResultType> void processDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet<ModelType,ResultType> aDownloadSet)
   {
     aDownloadSet.setResultsReady();
 
-    ICloudDownloadCallback _callback = aDownloadSet.getCallback();
+    ICloudDownloadCallback<ModelType,ResultType> _callback = aDownloadSet.getCallback();
 
-    Object jsonTuple = _callback
+    ResultType jsonTuple = _callback
       .extractCloudResultFromDownloadSet(aDownloadSet);
 
     _callback.applyCloudDownloadToModel(aContext,aDownloadSet.getTargetModel(),jsonTuple);
@@ -124,10 +126,13 @@ public class CloudDownloadMgr{
    * @param aTargetModel the target model
    * @param aCallback the callback
    * @param params the cloud api params for download
+   * @param <ModelType> the target models type
+   * @param <ResultType> the cloud requests result type
    */
-  public <M,R> void executeAsDownload(Context aContext, String aDownloadIdentifier,
-                                M aTargetModel,
-                                ICloudDownloadCallback<M,R> aCallback, CloudApiTypes.CloudApiParam... params)
+  public <ModelType,ResultType> void executeAsDownload(Context aContext, String aDownloadIdentifier,
+                                ModelType aTargetModel,
+                                ICloudDownloadCallback<ModelType,ResultType> aCallback,
+                                CloudApiTypes.CloudApiParam... params)
   {
     if(!isInitialized)
       initializeReceiver(aContext);
@@ -139,7 +144,8 @@ public class CloudDownloadMgr{
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
-      CloudApiTypes.CloudDownloadSet _downloadSet = new CloudApiTypes.CloudDownloadSet(
+      CloudApiTypes.CloudDownloadSet<ModelType,ResultType> _downloadSet =
+        new CloudApiTypes.CloudDownloadSet<ModelType,ResultType>(
         aDownloadIdentifier,aTargetModel);
       _downloadSet.setCallback(aCallback);
 
