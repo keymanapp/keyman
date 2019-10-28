@@ -38,7 +38,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
   }
   
   public func scroll(toSelectedKeyboard animated: Bool) {
-    let index = userKeyboards.index { kb in
+    let index = userKeyboards.firstIndex { kb in
       return Manager.shared.currentKeyboardID == kb.fullID
     }
     

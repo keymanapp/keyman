@@ -331,7 +331,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
-    if let index = userKeyboards.index(where: { $0.fullID == keyboard.fullID }) {
+    if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
       userKeyboards[index] = keyboard
     } else {
       userKeyboards.append(keyboard)
@@ -396,7 +396,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     var userLexicalModels = userDefaults.userLexicalModels ?? []
     
     // Update lexical model if it exists
-    if let index = userLexicalModels.index(where: { $0.fullID == lexicalModel.fullID }) {
+    if let index = userLexicalModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
       userLexicalModels[index] = lexicalModel
     } else {
       userLexicalModels.append(lexicalModel)
@@ -412,7 +412,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     // Remove keyboard from the list if it exists
-    let index = Storage.active.userDefaults.userKeyboards?.index { $0.fullID == fullID }
+    let index = Storage.active.userDefaults.userKeyboards?.firstIndex { $0.fullID == fullID }
     if let index = index {
       return removeKeyboard(at: index)
     }
@@ -473,7 +473,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: The lexical model exists and was removed
   public func removeLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
     // Remove lexical model from the list if it exists
-    let index = Storage.active.userDefaults.userLexicalModels?.index { $0.fullID == fullID }
+    let index = Storage.active.userDefaults.userLexicalModels?.firstIndex { $0.fullID == fullID }
     if let index = index {
       return removeLexicalModel(at: index)
     }
@@ -555,7 +555,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
-      let index = userKeyboards.index(where: { self.currentKeyboardID == $0.fullID })
+      let index = userKeyboards.firstIndex(where: { self.currentKeyboardID == $0.fullID })
     else {
       return nil
     }
