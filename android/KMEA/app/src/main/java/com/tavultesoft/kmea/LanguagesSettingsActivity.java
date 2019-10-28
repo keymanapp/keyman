@@ -313,7 +313,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
     };
 
     checkingUpdates = true;
-    CloudRepository.shared.fetchDataset(this, this, onSuccess, onFailure);
+    CloudRepository.shared.updateDatasetIfNeeded(this, this, onSuccess, onFailure);
   }
 
   public void onUpdateDetection(final List<Bundle> updatableResources) {

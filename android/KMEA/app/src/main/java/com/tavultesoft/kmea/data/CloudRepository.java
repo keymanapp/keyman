@@ -115,10 +115,6 @@ public class CloudRepository {
     file.delete();
   }
 
-  public Dataset fetchDataset(@NonNull Context context) {
-    return fetchDataset(context, null, null, null);
-  }
-
   private CloudApiTypes.CloudApiParam prepareKeyboardUpdateQuery(Context aContext)
   {
     String deviceType = aContext.getString(R.string.device_type);
@@ -172,6 +168,30 @@ public class CloudRepository {
 
     if(USE_DOWNLOAD_MANAGER)
       downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
+  }
+
+  /**
+   * update the data set from cache on startup of the application
+   * (not used until keyboard update is implemented)
+   * @param context the main activity of the application
+   * @param updateHandler An object that can handle update notification if desired.
+   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
+   * @param onFailure A callback to be triggered upon failure of a query.
+   */
+  public void updateDatasetIfNeeded(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure)
+  {
+    boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
+    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
+
+    boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
+
+    if(cacheValid && shouldUseMemCache(context)) {
+      return; // isn't null - checked by `shouldUseCache`.
+    }
+
+    preCacheDataSet(context,updateHandler,onSuccess,onFailure);
+
+    downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
 
@@ -257,15 +277,11 @@ public class CloudRepository {
     }
   }
   /**
-   * Fetches a Dataset object corresponding to keyboards and models available from the Cloud API
-   * services.  Unless recently cached, this object will be populated asynchronously.
+   * Fetches a Dataset object corresponding to keyboards and models available from cache or file cache.
    * @param context   The current Activity requesting the Dataset.
-   * @param updateHandler  An object that can handle update notification if desired.
-   * @param onSuccess  A callback to be triggered on completion of all queries and operations.
-   * @param onFailure  A callback to be triggered upon failure of a query.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
-  public Dataset fetchDataset(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
+  public Dataset fetchDataset(@NonNull Context context) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
@@ -275,10 +291,12 @@ public class CloudRepository {
       return memCachedDataset; // isn't null - checked by `shouldUseCache`.
     }
 
-    preCacheDataSet(context,updateHandler,onSuccess,onFailure);
-//  if(!USE_DOWNLOAD_MANAGER && (!loadKeyboardsFromCache || !loadLexicalModelsFromCache))
-    if(!loadKeyboardsFromCache || !loadLexicalModelsFromCache)
-      downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
+    preCacheDataSet(context,null,null,null);
+
+    if(USE_DOWNLOAD_MANAGER && CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
+      String msg = context.getString(R.string.catalog_download_is_running_in_background);
+      Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+    }
 
     return memCachedDataset;
   }
