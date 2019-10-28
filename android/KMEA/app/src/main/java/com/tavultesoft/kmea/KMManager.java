@@ -330,9 +330,20 @@ public final class KMManager {
   }
 
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
+    int inputType = attribute.inputType;
+
+    // Temporarily disable lm-layer if entering a hidden password field
+    if (currentLexicalModel != null && isHiddenPasswordInputType(inputType)) {
+      deregisterLexicalModel(currentLexicalModel.get(KMKey_LexicalModelID));
+    } else if (currentLexicalModel == null) {
+      // Check if lm-layer needs to be re-enabled
+      HashMap<String, String> kbInfo = getCurrentKeyboardInfo(appContext);
+      String langId = kbInfo.get(KMKey_LanguageID);
+      registerAssociatedLexicalModel(langId);
+    }
+
     if (!restarting) {
       String packageName = attribute.packageName;
-      int inputType = attribute.inputType;
       if (packageName.equals("android") && inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
         SystemKeyboard.keyboardPickerEnabled = false;
       } else {
@@ -669,6 +680,21 @@ public final class KMManager {
     }
 
     return isCustom;
+  }
+
+  /**
+   * Determine if the InputType field is a hidden password text field
+   * @param inputType android.text.InputType
+   * @return true if inputType is a text field of either
+   * TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+   */
+  private static boolean isHiddenPasswordInputType(int inputType) {
+    boolean isHiddenPassword =
+      ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
+       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+
+    return isHiddenPassword;
   }
 
   /**
