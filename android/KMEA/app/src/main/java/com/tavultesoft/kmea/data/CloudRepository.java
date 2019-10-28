@@ -261,8 +261,8 @@ public class CloudRepository {
     }
 
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
-
-    if(!USE_DOWNLOAD_MANAGER && (!loadKeyboardsFromCache || !loadLexicalModelsFromCache))
+//  if(!USE_DOWNLOAD_MANAGER && (!loadKeyboardsFromCache || !loadLexicalModelsFromCache))
+    if(!loadKeyboardsFromCache || !loadLexicalModelsFromCache)
       downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
 
     return memCachedDataset;

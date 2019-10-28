@@ -240,25 +240,7 @@ public final class KMManager {
 
     JSONUtils.initialize(new File(getPackagesDir()));
 
-    Runnable onSuccess = new Runnable() {
-      public void run() {
-
-
-        Toast.makeText(context, context.getString(R.string.update_check_current), Toast.LENGTH_SHORT).show();
-        Calendar lastUpdateCheck = Calendar.getInstance();
-        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
-        editor.commit();
-      }
-    };
-
-    Runnable onFailure = new Runnable() {
-      public void run() {
-        Toast.makeText(context, context.getString(R.string.update_check_unavailable), Toast.LENGTH_SHORT).show();
-      }
-    };
-    CloudRepository.shared.initializeDataSet(context,null,onSuccess,onFailure);
+    //TODO: Add resource update here
   }
 
   public static void setInputMethodService(InputMethodService service) {
