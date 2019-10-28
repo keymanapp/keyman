@@ -107,22 +107,22 @@ public class CloudApiTypes {
 
   /**
    * Typed Download sets for cloud download.
-   * @param <M> the model objects type
-   * @param <R> the result type of the download
+   * @param <ModelType> the model objects type
+   * @param <ResultType> the result type of the download
    */
-  public static class CloudDownloadSet<M,R> {
+  public static class CloudDownloadSet<ModelType,ResultType> {
     private String downloadIdentifier;
-    private M targetModel;
+    private ModelType targetModel;
     private LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
 
-    private ICloudDownloadCallback<M,R> callback;
+    private ICloudDownloadCallback<ModelType,ResultType> callback;
 
     private boolean resultsReady = false;
 
     //TODO: maybe implement a max lifetime for downloads
     //private long startingTime = System.currentTimeMillis();
 
-    public CloudDownloadSet(@NonNull String aDownloadIdentifier, M theTargetObject)
+    public CloudDownloadSet(@NonNull String aDownloadIdentifier, ModelType theTargetObject)
     {
       targetModel = theTargetObject;
       downloadIdentifier = aDownloadIdentifier;
@@ -167,7 +167,7 @@ public class CloudApiTypes {
       return downloadIdentifier;
     }
 
-    public M getTargetModel() {
+    public ModelType getTargetModel() {
       return targetModel;
     }
 
