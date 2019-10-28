@@ -271,7 +271,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func scroll(toSelectedLexicalModel animated: Bool) {
-    let index = userLexicalModels.index { lm in
+    let index = userLexicalModels.firstIndex { lm in
       return Manager.shared.currentLexicalModelID == lm.fullID
     }
     
