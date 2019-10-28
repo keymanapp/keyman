@@ -253,11 +253,11 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       if (_d.getDestiniationFile() != null && _d.getDestiniationFile().length() > 0) {
         try {
 
-          Object _o = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile());
+          //Object _o = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile());
           if (_d.getType() == CloudApiTypes.JSONType.Array) {
-            dataArray = (JSONArray) _o;
+            dataArray = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile(),JSONArray.class);//(JSONArray) _o;
           } else {
-            dataObject = (JSONObject) _o;
+            dataObject = jsonParser.getJSONObjectFromFile(_d.getDestiniationFile(),JSONObject.class);//(JSONObject) _o;
           }
         } catch (Exception e) {
           Log.d(CloudRepository.TAG, e.getMessage());
