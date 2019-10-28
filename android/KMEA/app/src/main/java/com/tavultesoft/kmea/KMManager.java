@@ -119,6 +119,11 @@ public final class KMManager {
   protected static HashMap<String, String> currentLexicalModel = null;
   protected static String currentBanner = "blank";
 
+  // Special override for when keyboard is entering a password text field.
+  // When shouldOverrideMayProtect is true, the option {'mayProtect' = false} is set in the lm-layer
+  // regardless what the Settings preference is.
+  private static boolean shouldOverrideMayProtect = false;
+
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -330,22 +335,9 @@ public final class KMManager {
   }
 
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
-    int inputType = attribute.inputType;
-
-    // Temporarily disable lm-layer if entering a hidden password field
-    if (currentLexicalModel != null && isHiddenPasswordInputType(inputType)) {
-      deregisterLexicalModel(currentLexicalModel.get(KMKey_LexicalModelID));
-    } else if (currentLexicalModel == null) {
-      // Check if lm-layer needs to be re-enabled
-      HashMap<String, String> kbInfo = getCurrentKeyboardInfo(appContext);
-      if (kbInfo != null) {
-        String langId = kbInfo.get(KMKey_LanguageID);
-        registerAssociatedLexicalModel(langId);
-      }
-    }
-
     if (!restarting) {
       String packageName = attribute.packageName;
+      int inputType = attribute.inputType;
       if (packageName.equals("android") && inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
         SystemKeyboard.keyboardPickerEnabled = false;
       } else {
@@ -691,12 +683,12 @@ public final class KMManager {
    * TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
    */
-  private static boolean isHiddenPasswordInputType(int inputType) {
-    boolean isHiddenPassword =
+  public static boolean isHiddenPasswordInputType(int inputType) {
+    shouldOverrideMayProtect =
       ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
        (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
 
-    return isHiddenPassword;
+    return shouldOverrideMayProtect;
   }
 
   /**
@@ -757,8 +749,10 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayPredict = (shouldOverrideMayProtect) ? false :
+      prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
@@ -785,6 +779,18 @@ public final class KMManager {
     }
 
     if (SystemKeyboard != null) { // && SystemKeyboardLoaded) {
+      SystemKeyboard.loadJavascript(url);
+    }
+    return true;
+  }
+
+  public static boolean setBannerOptions(boolean mayPredict) {
+    String url = String.format("setBannerOptions(%s)", mayPredict);
+    if (InAppKeyboard != null) {
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
     }
     return true;
