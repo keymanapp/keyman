@@ -36,7 +36,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private var getStartedVC: GetStartedViewController!
   private var infoView: InfoViewController!
-  private var popover: UIPopoverController?
+  private var popover: UIViewController?
   private var textSizeController: UISlider!
   private var dropdownItems: [UIBarButtonItem]!
 
@@ -605,9 +605,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if UIDevice.current.userInterfaceIdiom == .phone {
       present(activityVC, animated: true, completion: nil)
     } else {
-      popover = UIPopoverController(contentViewController: activityVC)
-      popover!.present(from: (navigationItem.rightBarButtonItems?[8])!, permittedArrowDirections: .any,
-                      animated: true)
+      activityVC.modalPresentationStyle = UIModalPresentationStyle.popover
+      activityVC.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[12]
+      self.present(activityVC, animated: true)
+
+      popover = activityVC
     }
   }
 
@@ -675,7 +677,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     } else {
       let vc = UIViewController()
       vc.modalPresentationStyle = .popover
-      vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
+      vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[8]
       vc.view = containerView
       vc.preferredContentSize = containerView.frame.size
       present(vc, animated: true, completion: nil)
@@ -713,7 +715,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let cancel = UIAlertAction(title: "Cancel", style: .default, handler: nil)
     alert.addAction(clear)
     alert.addAction(cancel)
-    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[4]
+    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
     present(alert, animated: true, completion: nil)
   }
 
