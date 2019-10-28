@@ -24,10 +24,7 @@
 /* Begin PBXBuildFile section */
 		1645D5952036C6FF0076C51B /* KeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5942036C6FF0076C51B /* KeymanPackage.swift */; };
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
-		165C8B8D1FD8220600D4A78D /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
-		1687ACCE1FD8DE5300926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
-		1687ACCF1FD8DE5300926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
 		988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */; };
@@ -81,7 +78,6 @@
 		9A079E49223F176100581263 /* String+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C075EB051F8EFF870041F4BD /* String+Helpers.swift */; };
 		9A082559227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */; };
 		9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */; };
-		9A0FC9FD22D66D9E00D33F86 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		9A0FCA0422D7C49700D33F86 /* DeviceKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0522D7C49E00D33F86 /* Reachability.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0622D7C4E100D33F86 /* XCGLogger.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -104,11 +100,9 @@
 		9A31E2CE224AE8B100D9A491 /* LexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB083224170F700231FB9 /* LexicalModelRepository.swift */; };
 		9A31E2CF224AE8B800D9A491 /* LexicalModelRepositoryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0852241717C00231FB9 /* LexicalModelRepositoryDelegate.swift */; };
 		9A31E2D0224AE8BF00D9A491 /* APILexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */; };
-		9A3B14BB228F592F0052A11F /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */; };
 		9A3B14BC228F59380052A11F /* LanguageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */; };
 		9A3B14BD228F593C0052A11F /* LexicalModelPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */; };
 		9A3B14BE228F59420052A11F /* LexicalModelInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */; };
-		9A3B14BF228F59450052A11F /* KeyboardInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62141F67C8D500268D03 /* KeyboardInfoViewController.swift */; };
 		9A3B14C0228F59490052A11F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A60764322893A4E003BCFBA /* SettingsViewController.swift */; };
 		9A3B14C1228F595A0052A11F /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
 		9A3B14C3228F59C10052A11F /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
@@ -128,8 +122,6 @@
 		9A5091B322B418CA0094B99C /* KeyboardInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62141F67C8D500268D03 /* KeyboardInfoViewController.swift */; };
 		9A5091B422B419B10094B99C /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */; };
 		9A60764422893A4E003BCFBA /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A60764322893A4E003BCFBA /* SettingsViewController.swift */; };
-		9A862D2822B429FB005FE26D /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
-		9A862D2922B42A0C005FE26D /* LanguageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */; };
 		9A9CB08022416E5400231FB9 /* LexicalModelPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */; };
 		9A9CB0822241704800231FB9 /* APILexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */; };
 		9A9CB084224170F700231FB9 /* LexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB083224170F700231FB9 /* LexicalModelRepository.swift */; };
@@ -214,11 +206,15 @@
 		CE24ECF021B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
 		CE24ECF121B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
 		CE24ECF221B763740052D291 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
-		CE2B1E4621B60E7C007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4721B60E89007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4821B60E8A007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4A21B60FB1007D092E /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
+		CE808A48236697BE00713E6B /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
+		CE808A4B236697D400713E6B /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; };
+		CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
+		CE808A4F236697D800713E6B /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
+		CE808A532366980A00713E6B /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -455,11 +451,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A0FC9FD22D66D9E00D33F86 /* Reachability.framework in Frameworks */,
-				1687ACCE1FD8DE5300926D69 /* XCGLogger.framework in Frameworks */,
-				1687ACCF1FD8DE5300926D69 /* ObjcExceptionBridging.framework in Frameworks */,
-				165C8B8D1FD8220600D4A78D /* Zip.framework in Frameworks */,
-				CE2B1E4621B60E7C007D092E /* DeviceKit.framework in Frameworks */,
+				CE808A532366980A00713E6B /* Zip.framework in Frameworks */,
+				CE808A4F236697D800713E6B /* XCGLogger.framework in Frameworks */,
+				CE808A48236697BE00713E6B /* DeviceKit.framework in Frameworks */,
+				CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */,
+				CE808A4B236697D400713E6B /* ObjcExceptionBridging.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -976,7 +972,7 @@
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Original;
 				LastSwiftUpdateCheck = 1010;
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
 					98F9D6961954112F0087AA43 = {
@@ -1112,7 +1108,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1169,7 +1165,6 @@
 				9A079E41223B602B00581263 /* LexicalModel.swift in Sources */,
 				9A3E832622EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
 				9A3B14C0228F59490052A11F /* SettingsViewController.swift in Sources */,
-				9A3B14BB228F592F0052A11F /* LanguageViewController.swift in Sources */,
 				9A31E2CE224AE8B100D9A491 /* LexicalModelRepository.swift in Sources */,
 				9A079E2E22361B8100581263 /* KeymanResponder+Types.swift in Sources */,
 				9A079DE12231A14D00581263 /* Storage.swift in Sources */,
@@ -1182,7 +1177,6 @@
 				9A31E2C9224AE88600D9A491 /* LanguagesAPICall.swift in Sources */,
 				9A3B14C1228F595A0052A11F /* KeyboardError.swift in Sources */,
 				9A079E2B22361A3200581263 /* KeymanWebViewController.swift in Sources */,
-				9A862D2822B429FB005FE26D /* KeyboardNameTableViewCell.swift in Sources */,
 				9A31E2CD224AE8A700D9A491 /* NotificationObserver.swift in Sources */,
 				9A079E382238680700581263 /* KMPLexicalModel.swift in Sources */,
 				9A3B14BC228F59380052A11F /* LanguageDetailViewController.swift in Sources */,
@@ -1194,10 +1188,8 @@
 				9A3B14D3229370B20052A11F /* InstalledLanguagesViewController.swift in Sources */,
 				9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */,
 				9A079E2A223619FC00581263 /* KeymanWebDelegate.swift in Sources */,
-				9A3B14BF228F59450052A11F /* KeyboardInfoViewController.swift in Sources */,
 				9A31E2C3224AADBB00D9A491 /* NotificationName.swift in Sources */,
 				9A3B14C8228F59EE0052A11F /* TextView.swift in Sources */,
-				9A862D2922B42A0C005FE26D /* LanguageDetailViewController.swift in Sources */,
 				9A079DDA2231A0B900581263 /* KeymanPackage.swift in Sources */,
 				9A079DE22231A15900581263 /* Manager.swift in Sources */,
 				9A079E47223DBF0100581263 /* SubKeysView.swift in Sources */,
