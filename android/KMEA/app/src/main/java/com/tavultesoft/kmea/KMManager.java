@@ -120,9 +120,9 @@ public final class KMManager {
   protected static String currentBanner = "blank";
 
   // Special override for when keyboard is entering a password text field.
-  // When shouldOverrideMayProtect is true, the option {'mayProtect' = false} is set in the lm-layer
+  // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
-  private static boolean shouldOverrideMayProtect = false;
+  private static boolean mayPredictOverride = false;
 
   // Keyman public keys
   public static final String KMKey_ID = "id";
@@ -677,18 +677,23 @@ public final class KMManager {
   }
 
   /**
-   * Determine if the InputType field is a hidden password text field
+   * Sets mayPredictOverride true if the InputType field is a hidden password text field
+   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
    * @param inputType android.text.InputType
-   * @return true if inputType is a text field of either
-   * TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
-   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
    */
-  public static boolean isHiddenPasswordInputType(int inputType) {
-    shouldOverrideMayProtect =
+  public static void setMayPredictOverride(int inputType) {
+    mayPredictOverride =
       ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
        (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+  }
 
-    return shouldOverrideMayProtect;
+  /**
+   * Get the value of mayPredictOverride
+   * @return boolean
+   */
+  public static boolean getMayPredictOverride() {
+    return mayPredictOverride;
   }
 
   /**
@@ -751,7 +756,7 @@ public final class KMManager {
 
     // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = (shouldOverrideMayProtect) ? false :
+    boolean mayPredict = (mayPredictOverride) ? false :
       prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 

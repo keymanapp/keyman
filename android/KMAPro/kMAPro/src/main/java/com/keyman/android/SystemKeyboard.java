@@ -118,7 +118,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     }
 
     // Temporarily disable predictions if entering a hidden password field
-    if (KMManager.isHiddenPasswordInputType(inputType)) {
+    KMManager.setMayPredictOverride(inputType);
+    if (KMManager.getMayPredictOverride()) {
       KMManager.setBannerOptions(false);
     } else {
       // Check if predictions needs to be re-enabled per Settings preference
