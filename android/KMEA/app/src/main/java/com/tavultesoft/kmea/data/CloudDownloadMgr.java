@@ -18,12 +18,20 @@ public class CloudDownloadMgr{
 
   private static CloudDownloadMgr instance;
 
+  /**
+   *
+   * @return get or create shared instance.
+   */
   public static CloudDownloadMgr getInstance()
   {
     if(instance==null)
       createInstance();
     return instance;
   }
+
+  /**
+   * create singleton instance.
+   */
   private synchronized static void createInstance()
   {
     if(instance!=null)
@@ -31,11 +39,18 @@ public class CloudDownloadMgr{
     instance = new CloudDownloadMgr();
   }
 
+  /**
+   * Marks that the download receiver is already appended to the main context.
+   */
   boolean isInitialized = false;
 
   private HashMap<Long,String> internalDownloadIdToDownloadIdentifier = new HashMap<>();
   private HashMap<String, CloudApiTypes.CloudDownloadSet> downloadSetByDownloadIdentifier = new HashMap<>();
 
+  /**
+   * Append downloadreceiver to the main context.
+   * @param aContext the context
+   */
   private synchronized void initializeReceiver(Context aContext)
   {
     if(isInitialized)
@@ -44,6 +59,9 @@ public class CloudDownloadMgr{
     isInitialized = true;
   }
 
+  /**
+   * callback for finished downloads.
+   */
   BroadcastReceiver completeListener = new BroadcastReceiver() {
 
     @Override
@@ -55,6 +73,11 @@ public class CloudDownloadMgr{
     }
   };
 
+  /**
+   * find download set by the android internal download id.
+   * @param anInternalDownloadId the internal download id
+   * @return the result
+   */
   private CloudApiTypes.CloudDownloadSet getDownloadSetForInternalDownloadId(long anInternalDownloadId)
   {
     String _downloadset_id = internalDownloadIdToDownloadIdentifier.get(anInternalDownloadId);
@@ -63,6 +86,10 @@ public class CloudDownloadMgr{
     return downloadSetByDownloadIdentifier.get(_downloadset_id);
   }
 
+  /**
+   * clean up a download.
+   * @param anIdenitifer the identifier
+   */
   private void removeDownload(String anIdenitifer)
   {
     synchronized (downloadSetByDownloadIdentifier)
@@ -76,12 +103,18 @@ public class CloudDownloadMgr{
     }
   }
 
-  private void downloadCompleted(Context aContext,long aDownloadId)
+  /**
+   *  Executed when a single download is completed.
+   *  If the whole download set is completed the download results will be processed.
+   * @param aContext the context
+   * @param anInternalDownloadId an internal id
+   */
+  private void downloadCompleted(Context aContext,long anInternalDownloadId)
   {
     synchronized (downloadSetByDownloadIdentifier) {
 
-      CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(aDownloadId);
-      _parentSet.setDone(aDownloadId);
+      CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
+      _parentSet.setDone(anInternalDownloadId);
       if(!_parentSet.hasOpenDownloads())
       {
         processDownloadSet(aContext, _parentSet);
