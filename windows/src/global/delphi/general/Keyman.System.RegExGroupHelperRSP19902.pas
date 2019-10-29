@@ -16,6 +16,7 @@ interface
 // the library, then this workaround will fail. See the corresponding unit test
 // to make sure that we pick up when this happens.
 //
+// Fixed in VER330 (Delphi 10.3 Rio, 20.0)
 
 uses
   System.Character,
@@ -26,8 +27,10 @@ uses
 type
   TGroupHelperRSP19902 = record
   private
+{$IFDEF VER320}
     FInput: string;
     FSourceGroup: TGroup;
+{$ENDIF}
     FFixedIndex, FFixedLength: Integer;
     FFixedValue: string;
   public
@@ -42,6 +45,7 @@ implementation
 { TGroupHelperRSP19902 }
 
 constructor TGroupHelperRSP19902.Create(SourceGroup: TGroup; const Input: string);
+{$IFDEF VER320}
 var
   i: Integer;
 begin
@@ -65,6 +69,13 @@ begin
   end;
 
   FFixedValue := Copy(input, FFixedIndex, FFixedLength);
+{$ELSE}
+begin
+  // This was fixed in VER320 so
+  FFixedIndex := SourceGroup.Index;
+  FFixedLength := SourceGroup.Length;
+  FFixedValue := SourceGroup.Value;
+{$ENDIF}
 end;
 
 end.

@@ -3,17 +3,17 @@
 ## Build Prerequisites
 
 1. Install [VS2017 Community Edition](#visual-studio-2017-community-edition-setup-requirements).
-2. Install [Delphi 10.2](#delphi-setup-requirements).
+2. Install [Delphi 10.2 or Delphi 10.3](#delphi-setup-requirements).
 3. Install [git](https://git-scm.com/download/win).
 4. Install [nodejs](https://nodejs.org/en/download/).
 5. Follow steps in /web/README.md to install prerequisites for building KeymanWeb (included in Keyman Developer)
 6. Add the Keyman root folder to antivirus exclusions for performance and file lock reasons (optional - but highly recommended).
-7. Start Delphi 10.2 IDE once after installation to create default environment files and ensure registration is complete.
-8. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `USERDEFINES`, 
+7. Start Delphi IDE once after installation to create default environment files and ensure registration is complete.
+8. Set environment variables per [notes below](#environment-variables): `KEYMAN_ROOT`, `USERDEFINES`,
    `GIT_BASH_FOR_KEYMAN`.
 9. Add the **windows/lib** folder in the Keyman repository to your `PATH` environment variable (required for packages in Delphi).
-10. In order to run Keyman Developer in the development build, you need to specify where the 
-   https://github.com/keymanapp/CEF4Delphi_binary repo is on your system, with the registry setting `HKCU\Software\Keyman\Debug`, 
+10. In order to run Keyman Developer in the development build, you need to specify where the
+   https://github.com/keymanapp/CEF4Delphi_binary repo is on your system, with the registry setting `HKCU\Software\Keyman\Debug`,
    `Debug_CEFPath`.
 
 ### Release build prerequisites
@@ -31,7 +31,7 @@ For local development you do not need to perform a release build so these are op
 2. Run `make build` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/bin** folder.
 
-*Note*: running `make build` will currently reset the packages and path settings in your Delphi environment. If you use Delphi for other projects, 
+*Note*: running `make build` will currently reset the packages and path settings in your Delphi environment. If you use Delphi for other projects,
 you should consider building Keyman under a login user dedicated to it, or in a VM.
 
 Type `make` to see build targets. Common build targets are:
@@ -52,11 +52,11 @@ environment.
 2. Run `make release` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/release** folder.
 4. **buildtools/help-keyman-com.sh** will push updated documentation to help.keyman.com.
-   Environment variable `HELP_KEYMAN_COM` needs to be set to the root of the local 
+   Environment variable `HELP_KEYMAN_COM` needs to be set to the root of the local
    help.keyman.com git repository.
 
-Note: by default, the version number generated may vary from the current release version. 
-You will not be able to install it over a later version of Keyman, and will need to 
+Note: by default, the version number generated may vary from the current release version.
+You will not be able to install it over a later version of Keyman, and will need to
 uninstall and reinstall.
 
 ## Installing Keyman
@@ -108,6 +108,9 @@ Install Delphi using the following options:
 * No other 3rd party components required
 * No Interbase components required
 
+Delphi 10.3 is supported by default. For Delphi 10.2, set the environment variable
+`DELPHI_VERSION=19.0`. This variable can also be added to your `UserDefines.mak`.
+
 ## Environment Variables
 
 To check whether these variables are set, run `SET NAME_OF_VAR` in command prompt.
@@ -125,7 +128,7 @@ SET KEYMAN_ROOT=c:\projects\keyman
 ### GIT_BASH_FOR_KEYMAN
 
 This environment variable is optional: the build will run bash in a separate window
-in order to build KeymanWeb if it isn't present, but you'll lose logging and have 
+in order to build KeymanWeb if it isn't present, but you'll lose logging and have
 the annoyance of a window popping up halfway through the build. To resolve both of
 those issues, set the environment variable to:
 
@@ -138,7 +141,7 @@ You should verify the install location of Git on your computer as it may vary.
 ### USERDEFINES - User Defines
 
 You can specify defines that will not be added to the git repository and will be used in
-the build in the UserDefines.mak file in the root folder. This is used mostly for 
+the build in the UserDefines.mak file in the root folder. This is used mostly for
 code signing certificates. If not specified, a test certificate will be used to sign
 executables when you build a release.
 

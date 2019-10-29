@@ -22,7 +22,8 @@ interface
 
 uses
   System.JSON,
-  System.Classes;
+  System.Classes,
+  System.Generics.Collections;
 
 function JSONToString(obj: TJSONAncestor; ReplaceSlashes: Boolean = False): string;
 

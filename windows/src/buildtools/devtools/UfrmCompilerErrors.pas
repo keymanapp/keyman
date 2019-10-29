@@ -113,6 +113,12 @@ const BDSPath = 'C:\Program Files (x86)\Embarcadero\Studio\18.0\bin\bds.EXE';
 {$ELSE}
 {$IFDEF VER320}
 const BDSPath = 'C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\bds.EXE';
+{$ELSE}
+{$IFDEF VER330}
+const BDSPath = 'C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\bds.EXE';
+{$ELSE}
+ERROR: BDSPath is not defined
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 
@@ -290,7 +296,12 @@ begin
   e := gridErrors.Objects[0, gridErrors.Row] as TCompilerError;
   if e.FileName = '' then Exit;
 
-  CommandLine := ' -np -ns -ni -pDelphi "'+FProjectFileName+'"'; // "'+e.FileName+'"';
+{$IFDEF VER320}
+  CommandLine := ' -np -ns -ni -pDelphi "'+FProjectFileName+'"';
+{$ELSE}
+  // Assume this works for Delphi compiler version 330 (10.3.2 Rio / 20.0) and above
+  CommandLine := ' -np -ns -p Delphi "'+FProjectFileName+'"';
+{$ENDIF}
 
   with TRegistry.Create do
   try
