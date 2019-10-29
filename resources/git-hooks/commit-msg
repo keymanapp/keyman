@@ -41,13 +41,13 @@ fi
 
 if ! (git remote -v | grep -E "origin|upstream" | grep -q "//github.com/keymanapp"); then
   # Not a Keyman repository. We have no opinion.
-  echo "Not a Keyman repository. We don't care"
+  # echo "Not a Keyman repository. We don't care"
   exit 0
 fi
 
 if (git remote -v | grep -E "origin|upstream" | grep -Eq "keyboards|lexical-models"); then
   # We don't enforce commit messages on keyboards or lexical-models repositories
-  echo "Keyboards or Lexical-Models. We still don't care."
+  # echo "Keyboards or Lexical-Models. We still don't care."
   exit 0
 fi
 
