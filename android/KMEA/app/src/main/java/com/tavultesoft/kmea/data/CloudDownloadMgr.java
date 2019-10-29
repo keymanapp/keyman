@@ -51,12 +51,24 @@ public class CloudDownloadMgr{
    * Append downloadreceiver to the main context.
    * @param aContext the context
    */
-  private synchronized void initializeReceiver(Context aContext)
+  public synchronized void initialize(Context aContext)
   {
     if(isInitialized)
       return;
-    aContext.getApplicationContext().registerReceiver(completeListener,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    aContext.registerReceiver(completeListener,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     isInitialized = true;
+  }
+
+  /**
+   * Append downloadreceiver to the main context.
+   * @param aContext the context
+   */
+  public synchronized void shutdown(Context aContext)
+  {
+    if(!isInitialized)
+      return;
+    aContext.unregisterReceiver(completeListener);
+    isInitialized = false;
   }
 
   /**
@@ -168,7 +180,7 @@ public class CloudDownloadMgr{
                                 CloudApiTypes.CloudApiParam... params)
   {
     if(!isInitialized)
-      initializeReceiver(aContext);
+      throw new IllegalStateException("Downloadmanager is not initialize. Call KMManger.initialize before");
 
     synchronized (downloadSetByDownloadIdentifier) {
 
