@@ -39,7 +39,7 @@ fi
 # Test the repository upstream/origin: ignore if not keymanapp/keyman
 #
 
-if ! (git remote -v | grep -E "origin|upstream" | grep -q "//github.com/keymanapp"); then
+if ! (git remote -v | grep -E "origin|upstream" | grep -q "keymanapp/"); then
   # Not a Keyman repository. We have no opinion.
   # echo "Not a Keyman repository. We don't care"
   exit 0
