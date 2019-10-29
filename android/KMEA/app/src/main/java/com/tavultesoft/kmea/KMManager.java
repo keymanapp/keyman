@@ -59,6 +59,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.data.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
@@ -240,6 +241,7 @@ public final class KMManager {
 
     JSONUtils.initialize(new File(getPackagesDir()));
 
+    CloudDownloadMgr.getInstance().initialize(appContext);
     //TODO: Add resource update here
   }
 
@@ -375,6 +377,7 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
     }
+    CloudDownloadMgr.getInstance().shutdown(appContext);
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {

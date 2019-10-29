@@ -18,12 +18,20 @@ public class CloudDownloadMgr{
 
   private static CloudDownloadMgr instance;
 
+  /**
+   *
+   * @return get or create shared instance.
+   */
   public static CloudDownloadMgr getInstance()
   {
     if(instance==null)
       createInstance();
     return instance;
   }
+
+  /**
+   * create singleton instance.
+   */
   private synchronized static void createInstance()
   {
     if(instance!=null)
@@ -31,19 +39,41 @@ public class CloudDownloadMgr{
     instance = new CloudDownloadMgr();
   }
 
+  /**
+   * Marks that the download receiver is already appended to the main context.
+   */
   boolean isInitialized = false;
 
   private HashMap<Long,String> internalDownloadIdToDownloadIdentifier = new HashMap<>();
   private HashMap<String, CloudApiTypes.CloudDownloadSet> downloadSetByDownloadIdentifier = new HashMap<>();
 
-  private synchronized void initializeReceiver(Context aContext)
+  /**
+   * Append downloadreceiver to the main context.
+   * @param aContext the context
+   */
+  public synchronized void initialize(Context aContext)
   {
     if(isInitialized)
       return;
-    aContext.getApplicationContext().registerReceiver(completeListener,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    aContext.registerReceiver(completeListener,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     isInitialized = true;
   }
 
+  /**
+   * Append downloadreceiver to the main context.
+   * @param aContext the context
+   */
+  public synchronized void shutdown(Context aContext)
+  {
+    if(!isInitialized)
+      return;
+    aContext.unregisterReceiver(completeListener);
+    isInitialized = false;
+  }
+
+  /**
+   * callback for finished downloads.
+   */
   BroadcastReceiver completeListener = new BroadcastReceiver() {
 
     @Override
@@ -55,6 +85,11 @@ public class CloudDownloadMgr{
     }
   };
 
+  /**
+   * find download set by the android internal download id.
+   * @param anInternalDownloadId the internal download id
+   * @return the result
+   */
   private CloudApiTypes.CloudDownloadSet getDownloadSetForInternalDownloadId(long anInternalDownloadId)
   {
     String _downloadset_id = internalDownloadIdToDownloadIdentifier.get(anInternalDownloadId);
@@ -63,6 +98,10 @@ public class CloudDownloadMgr{
     return downloadSetByDownloadIdentifier.get(_downloadset_id);
   }
 
+  /**
+   * clean up a download.
+   * @param anIdenitifer the identifier
+   */
   private void removeDownload(String anIdenitifer)
   {
     synchronized (downloadSetByDownloadIdentifier)
@@ -76,12 +115,18 @@ public class CloudDownloadMgr{
     }
   }
 
-  private void downloadCompleted(Context aContext,long aDownloadId)
+  /**
+   *  Executed when a single download is completed.
+   *  If the whole download set is completed the download results will be processed.
+   * @param aContext the context
+   * @param anInternalDownloadId an internal id
+   */
+  private void downloadCompleted(Context aContext,long anInternalDownloadId)
   {
     synchronized (downloadSetByDownloadIdentifier) {
 
-      CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(aDownloadId);
-      _parentSet.setDone(aDownloadId);
+      CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
+      _parentSet.setDone(anInternalDownloadId);
       if(!_parentSet.hasOpenDownloads())
       {
         processDownloadSet(aContext, _parentSet);
@@ -94,14 +139,16 @@ public class CloudDownloadMgr{
    * called after finishing the download.
    * @param aContext the context
    * @param aDownloadSet the download set
+   * @param <ModelType> the target models type
+   * @param <ResultType> the cloud requests result type
    */
-  private void processDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet aDownloadSet)
+  private <ModelType,ResultType> void processDownloadSet(Context aContext, CloudApiTypes.CloudDownloadSet<ModelType,ResultType> aDownloadSet)
   {
     aDownloadSet.setResultsReady();
 
-    ICloudDownloadCallback _callback = aDownloadSet.getCallback();
+    ICloudDownloadCallback<ModelType,ResultType> _callback = aDownloadSet.getCallback();
 
-    Object jsonTuple = _callback
+    ResultType jsonTuple = _callback
       .extractCloudResultFromDownloadSet(aDownloadSet);
 
     _callback.applyCloudDownloadToModel(aContext,aDownloadSet.getTargetModel(),jsonTuple);
@@ -124,13 +171,16 @@ public class CloudDownloadMgr{
    * @param aTargetModel the target model
    * @param aCallback the callback
    * @param params the cloud api params for download
+   * @param <ModelType> the target models type
+   * @param <ResultType> the cloud requests result type
    */
-  public <M,R> void executeAsDownload(Context aContext, String aDownloadIdentifier,
-                                M aTargetModel,
-                                ICloudDownloadCallback<M,R> aCallback, CloudApiTypes.CloudApiParam... params)
+  public <ModelType,ResultType> void executeAsDownload(Context aContext, String aDownloadIdentifier,
+                                ModelType aTargetModel,
+                                ICloudDownloadCallback<ModelType,ResultType> aCallback,
+                                CloudApiTypes.CloudApiParam... params)
   {
     if(!isInitialized)
-      initializeReceiver(aContext);
+      throw new IllegalStateException("Downloadmanager is not initialize. Call KMManger.initialize before");
 
     synchronized (downloadSetByDownloadIdentifier) {
 
@@ -139,7 +189,8 @@ public class CloudDownloadMgr{
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
-      CloudApiTypes.CloudDownloadSet _downloadSet = new CloudApiTypes.CloudDownloadSet(
+      CloudApiTypes.CloudDownloadSet<ModelType,ResultType> _downloadSet =
+        new CloudApiTypes.CloudDownloadSet<ModelType,ResultType>(
         aDownloadIdentifier,aTargetModel);
       _downloadSet.setCallback(aCallback);
 

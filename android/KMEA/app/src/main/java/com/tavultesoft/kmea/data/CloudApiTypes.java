@@ -151,7 +151,7 @@ public class CloudApiTypes {
       return callback;
     }
 
-    public void setCallback(ICloudDownloadCallback callback) {
+    public void setCallback(ICloudDownloadCallback<ModelType,ResultType> callback) {
       this.callback = callback;
     }
 
