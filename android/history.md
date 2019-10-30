@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-30 12.0.4206 stable
+* Bug fix:
+  * Disable suggestions when system keyboard entering password field (#2255)
+
 ## 2019-10-25 12.0.4205 stable
 * Bug fix:
   * Use lexical model package version for dataset (#2242)
