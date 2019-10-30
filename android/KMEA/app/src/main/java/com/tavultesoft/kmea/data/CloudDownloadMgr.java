@@ -189,6 +189,9 @@ public class CloudDownloadMgr{
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
+
+      aCallback.initializeContext(aContext);
+
       CloudApiTypes.CloudDownloadSet<ModelType,ResultType> _downloadSet =
         new CloudApiTypes.CloudDownloadSet<ModelType,ResultType>(
         aDownloadIdentifier,aTargetModel);

@@ -9,6 +9,7 @@ import android.content.Context;
  */
 public interface ICloudDownloadCallback<ModelType,ResultType> {
 
+  void initializeContext(Context context);
 
   /**
    * extract download result object from download set

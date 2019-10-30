@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -552,6 +553,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   }
 
   private static void downloadKeyboardUsingDownloadManager(Context context) {
+
+
+
     if (pkgID == null || pkgID.trim().isEmpty() ||
       (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
       throw new IllegalStateException("Invalid keyboard");
@@ -585,25 +589,61 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         .setType(CloudApiTypes.JSONType.Array));
     }
 
-    CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
-    _callback.setDownloadEventListeners(kbDownloadEventListeners);
+    String _downloadid= "metadata_" + langID + "_" + kbID;
 
-    CloudDownloadMgr.getInstance().executeAsDownload(
-      context, "metadata_" + langID + "_" + kbID, null, _callback,
-      cloudQueries.toArray(new CloudApiTypes.CloudApiParam[0]));
+    if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)
+       ||  CloudDownloadMgr.getInstance().alreadyDownloadingData(
+         CloudKeyboardDataDownloadCallback.createDownloadId(kbID)))
+    {
+      Toast.makeText(context,
+        context.getString(R.string.keyboard_download_is_running_in_background),
+        Toast.LENGTH_SHORT).show();
+    }
+    else
+    {
+      CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
+      _callback.setDownloadEventListeners(kbDownloadEventListeners);
 
+      Toast.makeText(context,
+        context.getString(R.string.keyboard_download_start_in_background),
+        Toast.LENGTH_SHORT).show();
+
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback,
+        cloudQueries.toArray(new CloudApiTypes.CloudApiParam[0]));
+    }
+
+    ((AppCompatActivity) context).finish();
   }
 
   private static void downloadLexicalModelUsingDownloadManager(Context context) {
-    CloudLexicalPackageDownloadCallback _callback =new CloudLexicalPackageDownloadCallback();
-    _callback.initializeContext(context);
-    _callback.setDownloadEventListeners(kbDownloadEventListeners);
 
-    CloudApiTypes.CloudApiParam _param = new CloudApiTypes.CloudApiParam(
-      CloudApiTypes.ApiTarget.LexicalModelPackage, url);
 
-    CloudDownloadMgr.getInstance().executeAsDownload(
-      context, "dictionary_" + modelID, null, _callback, _param);
+    String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(modelID);
+
+    if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid))
+    {
+      Toast.makeText(context,
+        context.getString(R.string.dictionary_download_is_running_in_background),
+        Toast.LENGTH_SHORT).show();
+    }
+    else
+    {
+      CloudLexicalPackageDownloadCallback _callback = new CloudLexicalPackageDownloadCallback();
+      _callback.setDownloadEventListeners(kbDownloadEventListeners);
+
+      CloudApiTypes.CloudApiParam _param = new CloudApiTypes.CloudApiParam(
+        CloudApiTypes.ApiTarget.LexicalModelPackage, url);
+
+      Toast.makeText(context,
+        context.getString(R.string.dictionary_download_start_in_background),
+        Toast.LENGTH_SHORT).show();
+
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback, _param);
+    }
+
+    ((AppCompatActivity) context).finish();
   }
 
 

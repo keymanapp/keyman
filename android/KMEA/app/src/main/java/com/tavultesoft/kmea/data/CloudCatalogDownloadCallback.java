@@ -230,6 +230,11 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   }
 
   @Override
+  public void initializeContext(Context context) {
+
+  }
+
+  @Override
   public void applyCloudDownloadToModel(Context aContext, Dataset aDataSet, CloudCatalogDownloadReturns aCloudResult)
   {
     saveDataToCache(aCloudResult);

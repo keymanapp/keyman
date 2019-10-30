@@ -2,10 +2,12 @@ package com.tavultesoft.kmea.data;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -33,13 +35,13 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
 
   private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
 
-
   public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners)
   {
     downloadEventListeners.clear();
     downloadEventListeners.addAll(aDownloadEventListeners);
   }
 
+  @Override
   public void initializeContext(Context context)
   {
     resourceRoot = new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -94,11 +96,21 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   @Override
   public void applyCloudDownloadToModel(Context aContext, Void aModel, CloudKeyboardDownloadReturns aCloudResult)
   {
+    Toast.makeText(aContext,
+      aContext.getString(R.string.dictionary_download_finished),
+      Toast.LENGTH_SHORT).show();
+
     if(aCloudResult.installedLexicalModels != null)
     {
       KeyboardEventHandler.notifyListeners(downloadEventListeners, KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
         aCloudResult.installedLexicalModels, aCloudResult.kbdResult);
     }
 
+
+  }
+
+  public static String createDownloadId(String aModelID)
+  {
+    return "dictionary_" + aModelID;
   }
 }

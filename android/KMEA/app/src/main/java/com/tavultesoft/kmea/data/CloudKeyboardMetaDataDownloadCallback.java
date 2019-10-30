@@ -17,7 +17,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCallback<Void,
   List<CloudKeyboardMetaDataDownloadCallback.MetaDataResult>>
@@ -27,7 +26,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
     CloudApiTypes.CloudApiReturns returnjson;
     CloudApiTypes.CloudApiParam params;
     HashMap<String,String> keyboardInfo;
-    String keyboardId;
+    String additionalDownloadid;
     List<CloudApiTypes.CloudApiParam> additionalDownloads;
   }
 
@@ -44,6 +43,11 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
   public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners) {
     downloadEventListeners.clear();
     downloadEventListeners.addAll(aDownloadEventListeners);
+  }
+
+  @Override
+  public void initializeContext(Context context) {
+
   }
 
   @Override
@@ -81,42 +85,51 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
     processCloudResults(aCloudResult);
 
+    startDownloads(aContext, aCloudResult);
+  }
+
+  private void startDownloads(Context aContext, List<MetaDataResult> aCloudResult) {
     for(MetaDataResult _r:aCloudResult)
     {
       if(_r.additionalDownloads!=null)
       {
-       ;
-
-
-
         if(_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard)
         {
           CloudKeyboardDataDownloadCallback _callback = new CloudKeyboardDataDownloadCallback();
           _callback.setDownloadEventListeners(downloadEventListeners);
           _callback.setKeyboardInfo(_r.keyboardInfo);
-          _callback.initializeContext(aContext);
+
+          if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_r.additionalDownloadid))
+          {
+            continue;
+          }
 
           KeyboardEventHandler.notifyListeners(downloadEventListeners,
             KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_STARTED, _r.keyboardInfo, 0);
 
-          CloudDownloadMgr.getInstance().executeAsDownload(aContext,
-            "keyboarddata_" + _r.keyboardId, null, _callback,
+          CloudDownloadMgr.getInstance().executeAsDownload(aContext, _r.additionalDownloadid, null, _callback,
             _r.additionalDownloads.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
         else if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyBoardLexicalModels) {
+
+          if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_r.additionalDownloadid))
+          {
+            Toast.makeText(aContext,
+              aContext.getString(R.string.dictionary_download_is_running_in_background),
+              Toast.LENGTH_SHORT).show();
+            continue;
+          }
           CloudLexicalPackageDownloadCallback _callback = new CloudLexicalPackageDownloadCallback();
           _callback.setDownloadEventListeners(downloadEventListeners);
-          _callback.initializeContext(aContext);
+
+          Toast.makeText(aContext,
+            aContext.getString(R.string.dictionary_download_start_in_background),
+            Toast.LENGTH_SHORT).show();
 
           CloudDownloadMgr.getInstance().executeAsDownload(aContext,
-            "lexicalpackage_" + _r.keyboardId, null, _callback,
+            _r.additionalDownloadid, null, _callback,
             _r.additionalDownloads.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
-        else
-          continue;
-
-
-
       }
     }
   }
@@ -135,12 +148,15 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
           try
           {
             JSONObject modelInfo = lmData.getJSONObject(0);
-            if (modelInfo.has("packageFilename"))
+
+            if (modelInfo.has("packageFilename") && modelInfo.has("id"))
             {
+              String _modelID = modelInfo.getString("id");
               ArrayList<CloudApiTypes.CloudApiParam> urls = new ArrayList<>();
               urls.add(new CloudApiTypes.CloudApiParam(
                 CloudApiTypes.ApiTarget.KeyBoardLexicalModels,
                 modelInfo.getString("packageFilename")));
+              _r.additionalDownloadid = CloudLexicalPackageDownloadCallback.createDownloadId(_modelID);
               _r.additionalDownloads= urls;
             }
           } catch (JSONException e) {
@@ -170,14 +186,9 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       if (options == null) {
         throw new IllegalStateException("JSON file does not contain a valid \"options\" object");
       }
-      String kbBaseUri = options.optString(KMKeyboardDownloaderActivity.KMKey_KeyboardBaseURI, "");
-      if (kbBaseUri.isEmpty()) {
-        throw new IllegalStateException("JSON file does not contain a valid \"keyboardBaseUri\" object");
-      }
 
-      String fontBaseUri = options.optString(KMKeyboardDownloaderActivity.KMKey_FontBaseURI, "");
 
-      // Keyman cloud keyboard distribution via JSON
+      // Keyman cloud _keyboard distribution via JSON
       JSONObject language = _kb_data.optJSONObject(
         KMKeyboardDownloaderActivity.KMKey_Language);
       if (language == null) {
@@ -188,42 +199,23 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
       JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
 
-      JSONObject keyboard = CloudDataJsonUtil.findMatchingKeyBoardByID(keyboards, _key_id);
+      JSONObject _keyboard = CloudDataJsonUtil.findMatchingKeyBoardByID(keyboards, _key_id);
 
-      _key_id = keyboard.getString(KMManager.KMKey_ID);
-      String _pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      _key_id = _keyboard.getString(KMManager.KMKey_ID);
+      String _pkgID = _keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
 
-      String _kbName = keyboard.optString(KMManager.KMKey_Name, "");
-      String _kbVersion = keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-      String _kbFilename = keyboard.optString(KMKeyboardDownloaderActivity.KMKey_Filename, "");
-      if (_kbName.isEmpty() || _langName.isEmpty() || _kbFilename.isEmpty())
-        throw new IllegalStateException("JSON file does not contain a valid base values for keyboard object");
+      String _kbName = _keyboard.optString(KMManager.KMKey_Name, "");
+      String _kbVersion = _keyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
 
-      String _js_filename = _kbFilename;
-      if (FileUtils.hasJavaScriptExtension(_kbFilename)) {
+      if (_kbName.isEmpty() || _langName.isEmpty())
+        throw new IllegalStateException("JSON file does not contain a valid base values for _keyboard object");
 
-        int start = _kbFilename.lastIndexOf("/");
-        if (start < 0) {
-          start = 0;
-        } else {
-          start++;
-        }
-        if (!_kbFilename.contains("-")) {
-          _js_filename = _kbFilename.substring(start, _kbFilename.length() - 3) + "-" + _kbVersion + ".js";
-        } else {
-          _js_filename = _kbFilename.substring(start);
-        }
-      }
-      String kbUrl = kbBaseUri + _kbFilename;
       ArrayList<CloudApiTypes.CloudApiParam> urls = new ArrayList<>();
 
-      urls.add(
-        new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, kbUrl)
-          .setAdditionalProperty(
-            CloudKeyboardDataDownloadCallback.PARAM_DESTINATION_FILE_NAME, _js_filename));
+      urls.add(prepareKeyboardPackageDownload(options, _keyboard));
 
-      JSONObject jsonFont = keyboard.optJSONObject(KMManager.KMKey_Font);
-      JSONObject jsonOskFont = keyboard.optJSONObject(KMManager.KMKey_OskFont);
+      JSONObject jsonFont = _keyboard.optJSONObject(KMManager.KMKey_Font);
+      JSONObject jsonOskFont = _keyboard.optJSONObject(KMManager.KMKey_OskFont);
 
       if (jsonFont != null) {
         CloudDataJsonUtil.updateFontSourceToTTFFont(jsonFont);
@@ -231,6 +223,8 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       if (jsonOskFont != null) {
         CloudDataJsonUtil.updateFontSourceToTTFFont(jsonOskFont);
       }
+      String fontBaseUri = options.optString(KMKeyboardDownloaderActivity.KMKey_FontBaseURI, "");
+
       ArrayList<String> fontUrls = CloudDataJsonUtil.fontUrls(jsonFont, fontBaseUri, true);
       ArrayList<String> oskFontUrls = CloudDataJsonUtil.fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null) {
@@ -246,10 +240,11 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
         }
       }
 
-      String _font = keyboard.optString(KMManager.KMKey_Font);
-      String _oskFont = keyboard.optString(KMManager.KMKey_OskFont);
+      String _font = _keyboard.optString(KMManager.KMKey_Font);
+      String _oskFont = _keyboard.optString(KMManager.KMKey_OskFont);
 
-      theKbData.keyboardId = _key_id;
+
+      theKbData.additionalDownloadid = CloudKeyboardDataDownloadCallback.createDownloadId(_key_id);
       theKbData.keyboardInfo = CloudDataJsonUtil
         .createKeyBoardInfoMap(
           _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _kbIsCustom, _font, _oskFont);
@@ -260,6 +255,43 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       Log.e(TAG,_e.getLocalizedMessage(),_e);
     }
   }
+
+  private CloudApiTypes.CloudApiParam prepareKeyboardPackageDownload(JSONObject aOptions, JSONObject aKeyboard) {
+
+
+    String kbBaseUri = aOptions.optString(KMKeyboardDownloaderActivity.KMKey_KeyboardBaseURI, "");
+    if (kbBaseUri.isEmpty()) {
+      throw new IllegalStateException("JSON file does not contain a valid \"keyboardBaseUri\" object");
+    }
+
+    String _kbVersion = aKeyboard.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+    String _kbFilename = aKeyboard.optString(KMKeyboardDownloaderActivity.KMKey_Filename, "");
+
+    if (_kbFilename.isEmpty())
+      throw new IllegalStateException("JSON file does not contain a valid \"filename\" object");
+
+    String _js_filename = _kbFilename;
+    if (FileUtils.hasJavaScriptExtension(_kbFilename)) {
+
+      int start = _kbFilename.lastIndexOf("/");
+      if (start < 0) {
+        start = 0;
+      } else {
+        start++;
+      }
+      if (!_kbFilename.contains("-")) {
+        _js_filename = _kbFilename.substring(start, _kbFilename.length() - 3) + "-" + _kbVersion + ".js";
+      } else {
+        _js_filename = _kbFilename.substring(start);
+      }
+    }
+    String kbUrl = kbBaseUri + _kbFilename;
+
+    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, kbUrl)
+      .setAdditionalProperty(
+        CloudKeyboardDataDownloadCallback.PARAM_DESTINATION_FILE_NAME, _js_filename);
+  }
+
 
 
 }
