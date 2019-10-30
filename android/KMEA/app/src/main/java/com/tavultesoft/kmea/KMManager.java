@@ -2038,11 +2038,16 @@ public final class KMManager {
             CharSequence chars = ic.getTextBeforeCursor(1, 0);
             if (chars != null && chars.length() > 0) {
               char c = chars.charAt(0);
+              int codePoint = ((String)chars).codePointAt(0);
               SystemKeyboardShouldIgnoreSelectionChange = true;
               if (Character.isLowSurrogate(c)) {
                 ic.deleteSurroundingText(2, 0);
               } else {
                 ic.deleteSurroundingText(1, 0);
+                // TODO: Investigate why base character + combining diacritic gets deleted
+                if (Character.getType(codePoint) == Character.NON_SPACING_MARK){
+                  i++;
+                }
               }
             }
           }
