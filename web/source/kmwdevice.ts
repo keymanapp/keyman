@@ -70,7 +70,54 @@ namespace com.keyman {
         } else if(agent.indexOf('Linux') >= 0) {
           this.OS='Linux';
         } else if(agent.indexOf('Macintosh') >= 0) {
-          this.OS='MacOSX';
+          // Starting with 13.1, "Macintosh" can reflect iPads (by default) or iPhones 
+          // (by user setting); a new "Request Desktop Website" setting for Safari will
+          // change the user agent string to match a desktop Mac.
+          let regex = /Intel Mac OS X (10(?:_\d+)+)/i;
+          let results = regex.exec(agent);
+          
+          // Match result:  a version string with components separated by underscores.
+          if(results.length > 1 && results[1]) {
+            // Converts version string to array of numbers in major.minor.build order.
+            // Example:  10_14_6 => [10, 14, 6]
+            let versionComponentStrings = results[1].split('_');
+            let versionComponents: number[] = [];
+
+            // Can't use for...of loop b/c IE.
+            for(let i = 0; i < versionComponentStrings.length; i++) {
+              versionComponents.push(parseInt(versionComponentStrings[i]));
+            }
+
+            let version = new utils.Version(versionComponents);
+
+            if(utils.Version.MAC_POSSIBLE_IPAD_ALIAS.compareTo(version) <= 0) {
+              // Indistinguishable user agent string!  We need a different test; fortunately, true macOS
+              // doesn't support TouchEvents.
+              if(window['TouchEvent']) {
+                this.OS='iOS';
+                this.formFactor='tablet';
+                this.dyPortrait=this.dyLandscape=0;
+
+                // It's currently impossible to differentiate between iPhone and iPad here
+                // except for by screen dimensions.
+                let aspectRatio = screen.height / screen.width;
+                if(aspectRatio < 1) {
+                  aspectRatio = 1 / aspectRatio;
+                }
+
+                // iPhones usually have a ratio of 16:9 (or 1.778) or higher, while iPads use 4:3 (or 1.333)
+                if(aspectRatio > 1.6) {
+                  // Override - we'll treat this device as an iPhone.
+                  this.formFactor = 'phone';
+                  this.dyPortrait=this.dyLandscape=25;
+                }
+              } else {
+                this.OS='MacOSX';
+              }
+            } else {
+              this.OS='MacOSX';
+            }
+          }
         } else if(agent.indexOf('Windows NT') >= 0) {
           this.OS='Windows';
           if(agent.indexOf('Touch') >= 0) {
