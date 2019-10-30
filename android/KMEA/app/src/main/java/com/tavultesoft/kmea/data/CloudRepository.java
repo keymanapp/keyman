@@ -117,19 +117,15 @@ public class CloudRepository {
 
   private CloudApiTypes.CloudApiParam prepareKeyboardUpdateQuery(Context aContext)
   {
-    String deviceType = aContext.getString(R.string.device_type);
-    if (deviceType.equals("AndroidTablet")) {
-      deviceType = "androidtablet";
-    } else {
-      deviceType = "androidphone";
-    }
+    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(aContext);
 
     // Retrieves the cloud-based keyboard catalog in Android's preferred format.
     String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
       KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
 
     //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object);
-   return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.Keyboards, keyboardURL, CloudApiTypes.JSONType.Object);
+   return new CloudApiTypes.CloudApiParam(
+     CloudApiTypes.ApiTarget.Keyboards, keyboardURL).setType(CloudApiTypes.JSONType.Object);
   }
 
   private CloudApiTypes.CloudApiParam prepareLexicalModellUpdateQuery(Context aContext)
@@ -139,7 +135,8 @@ public class CloudRepository {
     //        query is ready!
     String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
-    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL, CloudApiTypes.JSONType.Array);
+    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL)
+      .setType(CloudApiTypes.JSONType.Array);
 
 
     // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)

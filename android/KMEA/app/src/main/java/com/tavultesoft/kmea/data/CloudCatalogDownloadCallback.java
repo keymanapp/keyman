@@ -245,35 +245,14 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   {
     List<CloudApiTypes.CloudApiReturns> retrievedJSON = new ArrayList<>(aDownload.getSingleDownloads().size());
 
-
     for (CloudApiTypes.SingleCloudDownload _d : aDownload.getSingleDownloads()) {
-      JSONParser jsonParser = new JSONParser();
-      JSONArray dataArray = null;
-      JSONObject dataObject = null;
 
-      if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0) {
-        try {
+      CloudApiTypes.CloudApiReturns _json_result = CloudDataJsonUtil.retrieveJsonFromDownload(_d);
 
-          if (_d.getType() == CloudApiTypes.JSONType.Array) {
-            dataArray = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONArray.class);//(JSONArray) _o;
-          } else {
-            dataObject = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONObject.class);//(JSONObject) _o;
-          }
-        } catch (Exception e) {
-          Log.d(TAG, e.getMessage());
-        } finally {
-          _d.getDestinationFile().delete();
-        }
-      } else {
-        // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.
-      }
-
-      if (_d.getType() == CloudApiTypes.JSONType.Array) {
-        retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.getTarget(), dataArray));  // Null if offline.
-      } else {
-        retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.getTarget(), dataObject)); // Null if offline.
-      }
+      if (_json_result!=null)
+        retrievedJSON.add(_json_result);  // Null if offline.
     }
+
     return new CloudCatalogDownloadReturns(retrievedJSON);
   }
 }

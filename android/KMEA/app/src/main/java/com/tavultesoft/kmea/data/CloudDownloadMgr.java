@@ -232,7 +232,6 @@ public class CloudDownloadMgr{
       //.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
     return new CloudApiTypes.SingleCloudDownload(_request,_file)
-      .setJsonType(aParam.type)
-      .setTarget(aParam.target);
+      .setCloudParams(aParam);
   }
 }

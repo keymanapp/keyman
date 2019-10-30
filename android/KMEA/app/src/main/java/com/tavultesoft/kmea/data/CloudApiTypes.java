@@ -9,8 +9,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class CloudApiTypes {
   protected static class CloudApiReturns {
@@ -33,25 +35,44 @@ public class CloudApiTypes {
 
   }
 
-  protected enum ApiTarget {
+  public enum ApiTarget {
     Keyboards,
-    LexicalModels
+    LexicalModels,
+    Keyboard,
+    KeyBoardLexicalModels,
+    KeyboardData,
+    LexicalModelPackage,
   }
 
-  protected enum JSONType {
+  public enum JSONType {
     Array,
     Object
   }
 
-  protected static class CloudApiParam {
+  public static class CloudApiParam {
     public final ApiTarget target;
     public final String url;
-    public final JSONType type;
+    public JSONType type;
+    private Map<String,Object> additionalProperties = new HashMap<>();
 
-    CloudApiParam(ApiTarget target, String url, JSONType type) {
+    public CloudApiParam(ApiTarget target, String url) {
       this.target = target;
       this.url = url;
+    }
+
+    public CloudApiParam setType(JSONType type) {
       this.type = type;
+      return this;
+    }
+    public CloudApiParam setAdditionalProperty(String aProperty, Object aValue)
+    {
+      additionalProperties.put(aProperty,aValue);
+      return this;
+    }
+
+    public <T> T getAdditionalProperty(String aProperty,Class<T> aType)
+    {
+      return (T)additionalProperties.get(aProperty);
     }
   }
 
@@ -61,8 +82,7 @@ public class CloudApiTypes {
     private boolean downloadFinished =false;
     private long downloadId;
     private File destinationFile;
-    private CloudApiTypes.JSONType type;
-    private CloudApiTypes.ApiTarget target;
+    private CloudApiParam cloudParams;
 
     public SingleCloudDownload(DownloadManager.Request aRequest,File aDestinationFile)
     {
@@ -74,13 +94,8 @@ public class CloudApiTypes {
       return this;
     }
 
-    public SingleCloudDownload setJsonType(JSONType type) {
-      this.type = type;
-      return this;
-    }
-
-    public SingleCloudDownload setTarget(ApiTarget target) {
-      this.target = target;
+    public SingleCloudDownload setCloudParams(CloudApiParam params) {
+      this.cloudParams = params;
       return this;
     }
 
@@ -96,12 +111,8 @@ public class CloudApiTypes {
       return destinationFile;
     }
 
-    public JSONType getType() {
-      return type;
-    }
-
-    public ApiTarget getTarget() {
-      return target;
+    public CloudApiParam getCloudParams() {
+      return cloudParams;
     }
   }
 
