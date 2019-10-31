@@ -247,9 +247,9 @@ public class CloudDataJsonUtil {
         try {
 
           if (aDownload.getCloudParams().type == CloudApiTypes.JSONType.Array) {
-            dataArray = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONArray.class);//(JSONArray) _o;
+            dataArray = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONArray.class);
           } else {
-            dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);//(JSONObject) _o;
+            dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
           }
         } catch (Exception e) {
           Log.d(TAG, e.getMessage());
