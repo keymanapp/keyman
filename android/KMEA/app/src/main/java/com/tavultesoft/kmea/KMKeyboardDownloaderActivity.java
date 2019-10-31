@@ -402,7 +402,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       if (jsonOskFont != null) {
         CloudDataJsonUtil.updateFontSourceToTTFFont(jsonOskFont);
       }
-      ArrayList<String> fontUrls = CloudDataJsonUtil.fontUrls(jsonFont, fontBaseUri, true);
+      ArrayList<String> fontUrls = CloudDataJsonUtil.fontUrls(jsonFont, fontBaseUri, false);
       ArrayList<String> oskFontUrls = CloudDataJsonUtil.fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null)
         urls.addAll(fontUrls);

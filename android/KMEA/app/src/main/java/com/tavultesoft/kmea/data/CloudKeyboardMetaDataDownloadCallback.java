@@ -255,7 +255,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       }
       String fontBaseUri = options.optString(KMKeyboardDownloaderActivity.KMKey_FontBaseURI, "");
 
-      ArrayList<String> fontUrls = CloudDataJsonUtil.fontUrls(jsonFont, fontBaseUri, true);
+      ArrayList<String> fontUrls = CloudDataJsonUtil.fontUrls(jsonFont, fontBaseUri, false);
       ArrayList<String> oskFontUrls = CloudDataJsonUtil.fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null) {
         for (String url : fontUrls) {
