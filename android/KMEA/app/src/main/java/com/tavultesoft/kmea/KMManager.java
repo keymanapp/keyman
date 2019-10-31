@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.IntStream;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -2038,10 +2039,12 @@ public final class KMManager {
             CharSequence chars = ic.getTextBeforeCursor(1, 0);
             if (chars != null && chars.length() > 0) {
               char c = chars.charAt(0);
+              IntStream codePoints = chars.codePoints();
               int codePoint = ((String)chars).codePointAt(0);
               SystemKeyboardShouldIgnoreSelectionChange = true;
               if (Character.isLowSurrogate(c)) {
                 ic.deleteSurroundingText(2, 0);
+                i++;
               } else {
                 ic.deleteSurroundingText(1, 0);
                 // TODO: Investigate why base character + combining diacritic gets deleted
