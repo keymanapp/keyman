@@ -18,9 +18,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Start the keyboard download when keyboard metadata is downloaded.
+ */
 public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCallback<Void,
   List<CloudKeyboardMetaDataDownloadCallback.MetaDataResult>>
 {
+  /**
+   * the metadata result and all necessary downloads which should be started.
+   */
   public static class MetaDataResult
   {
     CloudApiTypes.CloudApiReturns returnjson;
@@ -32,14 +38,25 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
   private static final String TAG = "CloudKeyboardMetaDldCb";
 
-  private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
+  private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
 
-
+  /**
+   * Additional Cloud API parameter: Is custom keyboard.
+   */
   public static final String PARAM_IS_CUSTOM = "is_custom";
+  /**
+   * Additional Cloud API parameter: language id.
+   */
   public static final String PARAM_LANG_ID = "lang_id";
+  /**
+   * Additional Cloud API parameter: keyboard id.
+   */
   public static final String PARAM_KB_ID = "kb_id";
 
-
+  /**
+   * Listeners to notify about starting the data download.
+   * @param aDownloadEventListeners
+   */
   public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners) {
     downloadEventListeners.clear();
     downloadEventListeners.addAll(aDownloadEventListeners);
@@ -88,8 +105,13 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
     startDownloads(aContext, aCloudResult);
   }
 
-  private void startDownloads(Context aContext, List<MetaDataResult> aCloudResult) {
-    for(MetaDataResult _r:aCloudResult)
+  /**
+   * Start the keyboard data and lexical model download.
+   * @param aContext the context
+   * @param aMetaDataResult the meta data result
+   */
+  private void startDownloads(Context aContext, List<MetaDataResult> aMetaDataResult) {
+    for(MetaDataResult _r:aMetaDataResult)
     {
       if(_r.additionalDownloads!=null)
       {
@@ -134,8 +156,12 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
     }
   }
 
-  private void processCloudResults(List<MetaDataResult> aCloudResult) {
-    for(MetaDataResult _r:aCloudResult)
+  /**
+   * process the meta data result and prepare the additional downloads.
+   * @param aMetaDataResult the meta data results
+   */
+  private void processCloudResults(List<MetaDataResult> aMetaDataResult) {
+    for(MetaDataResult _r:aMetaDataResult)
     {
       if(_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard)
       {
@@ -229,13 +255,17 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       ArrayList<String> oskFontUrls = CloudDataJsonUtil.fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null) {
         for (String url : fontUrls) {
-          urls.add(new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, url));
+          urls.add(new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, url)
+            .setAdditionalProperty(
+              CloudKeyboardDataDownloadCallback.PARAM_PACKAGE, _pkgID));
         }
       }
       if (oskFontUrls != null) {
         for (String url : oskFontUrls) {
           if (!urls.contains(url))
-            urls.add(new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, url));
+            urls.add(new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, url)
+              .setAdditionalProperty(
+                CloudKeyboardDataDownloadCallback.PARAM_PACKAGE, _pkgID));
           ;
         }
       }
@@ -285,13 +315,26 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
         _js_filename = _kbFilename.substring(start);
       }
     }
+
+    String _pkgID = aKeyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
     String kbUrl = kbBaseUri + _kbFilename;
 
     return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, kbUrl)
       .setAdditionalProperty(
+        CloudKeyboardDataDownloadCallback.PARAM_PACKAGE, _pkgID)
+      .setAdditionalProperty(
         CloudKeyboardDataDownloadCallback.PARAM_DESTINATION_FILE_NAME, _js_filename);
   }
 
-
+  /**
+   * create a download id for the keyboard metadata.
+   * @param  aLanguageId the language id
+   * @param aKeyboardId the keyboard id
+   * @return the result
+   */
+  public static String createDownloadId(String aLanguageId, String aKeyboardId)
+  {
+    return "metadata_" + aLanguageId + "_" + aKeyboardId;
+  }
 
 }

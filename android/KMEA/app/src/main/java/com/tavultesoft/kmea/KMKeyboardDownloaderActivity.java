@@ -169,6 +169,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * Used by the <code>download</code> method to handle asynchronous downloading and evaluation of
    * packages and keyboards.
    */
+  @Deprecated
   static class DownloadTask extends AsyncTask<Void, Integer, DownloadTask.Result> {
     static class Result {
       public final Integer kbdResult;
@@ -539,7 +540,12 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       new DownloadTask(context, showProgressDialog, aDownloadOnlyLexicalModel).execute();
   }
 
-  public static void downloadUsingDownloadManager(final Context context,
+  /**
+   * Download in keyboards and lexical model using download manager.
+   * @param context the context
+   * @param aDownloadOnlyLexicalModel is lexical model download
+   */
+  private static void downloadUsingDownloadManager(final Context context,
                               final boolean aDownloadOnlyLexicalModel)
   {
     if(aDownloadOnlyLexicalModel)
@@ -552,18 +558,58 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
   }
 
-  private static void downloadKeyboardUsingDownloadManager(Context context) {
-
-
-
+  /**
+   * prepare and execute keyboard download using downloadmanager.
+   * @param context the context
+   */
+  private static void downloadKeyboardUsingDownloadManager(Context context)
+  {
     if (pkgID == null || pkgID.trim().isEmpty() ||
       (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
       throw new IllegalStateException("Invalid keyboard");
     }
 
-    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(context);
 
+
+    List<CloudApiTypes.CloudApiParam> cloudQueries = getPrepareCloudQueriesForKeyboardDownload(context);
+
+    String _downloadid= CloudKeyboardMetaDataDownloadCallback.createDownloadId(langID , kbID);
+
+    if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)
+       ||  CloudDownloadMgr.getInstance().alreadyDownloadingData(
+              CloudKeyboardDataDownloadCallback.createDownloadId(kbID)))
+    {
+      Toast.makeText(context,
+        context.getString(R.string.keyboard_download_is_running_in_background),
+        Toast.LENGTH_SHORT).show();
+    }
+    else
+    {
+      CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
+      _callback.setDownloadEventListeners(kbDownloadEventListeners);
+
+      Toast.makeText(context,
+        context.getString(R.string.keyboard_download_start_in_background),
+        Toast.LENGTH_SHORT).show();
+
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback,
+        cloudQueries.toArray(new CloudApiTypes.CloudApiParam[0]));
+    }
+
+    ((AppCompatActivity) context).finish();
+  }
+
+  /**
+   * Prepare the cloud queries for keyboard metadata download.
+   * @param context the context
+   * @return the result
+   */
+  private static List<CloudApiTypes.CloudApiParam> getPrepareCloudQueriesForKeyboardDownload(Context context)
+  {
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
+
+    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(context);
 
     if (isCustom) {
       //TODO: will end up in an exception during download???
@@ -588,34 +634,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         CloudApiTypes.ApiTarget.KeyBoardLexicalModels, _remoteLexicalModelUrl)
         .setType(CloudApiTypes.JSONType.Array));
     }
-
-    String _downloadid= "metadata_" + langID + "_" + kbID;
-
-    if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)
-       ||  CloudDownloadMgr.getInstance().alreadyDownloadingData(
-         CloudKeyboardDataDownloadCallback.createDownloadId(kbID)))
-    {
-      Toast.makeText(context,
-        context.getString(R.string.keyboard_download_is_running_in_background),
-        Toast.LENGTH_SHORT).show();
-    }
-    else
-    {
-      CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
-      _callback.setDownloadEventListeners(kbDownloadEventListeners);
-
-      Toast.makeText(context,
-        context.getString(R.string.keyboard_download_start_in_background),
-        Toast.LENGTH_SHORT).show();
-
-      CloudDownloadMgr.getInstance().executeAsDownload(
-        context, _downloadid, null, _callback,
-        cloudQueries.toArray(new CloudApiTypes.CloudApiParam[0]));
-    }
-
-    ((AppCompatActivity) context).finish();
+    return cloudQueries;
   }
 
+  /**
+   * prepare and execute lexical model download using downloadmanager.
+   * @param context the context
+   */
   private static void downloadLexicalModelUsingDownloadManager(Context context) {
 
 

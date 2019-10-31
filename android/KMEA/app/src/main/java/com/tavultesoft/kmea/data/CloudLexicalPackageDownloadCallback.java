@@ -24,6 +24,9 @@ import java.util.Map;
 
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
+/**
+ * Install lexical model.
+ */
 public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallback<
   Void, CloudKeyboardDownloadReturns>
 {
@@ -35,6 +38,10 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
 
   private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
 
+  /**
+   * listeners to inform after installation is completed.
+   * @param aDownloadEventListeners the listeners
+   */
   public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners)
   {
     downloadEventListeners.clear();
@@ -52,7 +59,6 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
     CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
-
     LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
     List<Map<String, String>> installedLexicalModels = null;
 
@@ -105,12 +111,15 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
       KeyboardEventHandler.notifyListeners(downloadEventListeners, KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
         aCloudResult.installedLexicalModels, aCloudResult.kbdResult);
     }
-
-
   }
 
-  public static String createDownloadId(String aModelID)
+  /**
+   * create a download id for the model.
+   * @param aModelId the lexical model id
+   * @return the result
+   */
+  public static String createDownloadId(String aModelId)
   {
-    return "dictionary_" + aModelID;
+    return "dictionary_" + aModelId;
   }
 }

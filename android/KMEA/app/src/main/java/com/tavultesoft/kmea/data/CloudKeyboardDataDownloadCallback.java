@@ -15,6 +15,10 @@ import java.util.HashMap;
 
 import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
+/**
+ * Install keyboard data, when download is finished.
+ * Could be keyboard packages or fonts.
+ */
 public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback<
   Void, CloudKeyboardDownloadReturns>
 {
@@ -26,14 +30,34 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
   private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
   private HashMap<String,String> keyboardInfo;
 
+  /**
+   * Additional Cloud API parameter:
+   * Parameter to force a special destination file name during installation.
+   * Default name is the file name of the url.
+   */
   public static final String PARAM_DESTINATION_FILE_NAME = "destination_file_name";
 
+  /**
+   * Additional Cloud API parameter:
+   * Parameter to force a special destination file name during installation.
+   * Default name is the file name of the url.
+   */
+  public static final String PARAM_PACKAGE = "package";
+
+  /**
+   * listeners to inform after installation is completed.
+   * @param aDownloadEventListeners the listeners
+   */
   public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners)
   {
     downloadEventListeners.clear();
     downloadEventListeners.addAll(aDownloadEventListeners);
   }
 
+  /**
+   * Keyboard meta data.
+   * @param aKeyboardInfo the keyboard
+   */
   public void setKeyboardInfo(HashMap<String, String> aKeyboardInfo) {
     this.keyboardInfo = aKeyboardInfo;
   }
@@ -56,8 +80,9 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
 
         try {
 
+          String _pkg = _d.getCloudParams().getAdditionalProperty(PARAM_PACKAGE,String.class);
             String destination = dataDir.toString() +
-               File.separator + KMDefault_UndefinedPackageID + File.separator;
+               File.separator + _pkg + File.separator;
 
             String _filename = _d.getCloudParams().getAdditionalProperty(PARAM_DESTINATION_FILE_NAME,String.class);
             if (_filename==null) {
@@ -99,11 +124,13 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
       KeyboardEventHandler.notifyListeners(downloadEventListeners, KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED,
        keyboardInfo, aCloudResult.kbdResult);
     }
-
-
-
   }
 
+  /**
+   * create a download id for the keyboard data.
+   * @param aKeyboardId the keyboard id
+   * @return the result
+   */
   public static String createDownloadId(String aKeyboardId)
   {
     return "keyboarddata_" + aKeyboardId;

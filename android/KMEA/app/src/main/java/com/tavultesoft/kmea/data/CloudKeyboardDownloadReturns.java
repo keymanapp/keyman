@@ -3,6 +3,9 @@ package com.tavultesoft.kmea.data;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * key board and lexical model download result.
+ */
 public class CloudKeyboardDownloadReturns {
   public final Integer kbdResult;
   public final List<Map<String, String>> installedLexicalModels;

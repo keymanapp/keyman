@@ -237,6 +237,11 @@ public class CloudDataJsonUtil {
     return new File(context.getCacheDir(), jsonLexicalCacheFilename);
   }
 
+  /**
+   * retrieve a json object from a downloaded file.
+   * @param aDownload the download
+   * @return the result
+   */
   public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload( CloudApiTypes.SingleCloudDownload aDownload)
   {
       JSONParser jsonParser = new JSONParser();
@@ -397,6 +402,12 @@ public class CloudDataJsonUtil {
 
     return keyboard;
   }
+
+  /**
+   * select device type for api queries.
+   * @param aContext a context
+   * @return the result
+   */
   public static String getDeviceTypeForCloudQuery(Context aContext)
   {
     String deviceType = aContext.getString(R.string.device_type);
