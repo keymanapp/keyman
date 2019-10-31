@@ -329,6 +329,9 @@ namespace com.keyman.text {
 
     deleteCharsBeforeCaret(dn: number): void {
       if(dn >= 0) {
+        if(dn > this.caretIndex) {
+          dn = this.caretIndex;
+        }
         this.text = this.text.kmwSubstr(0, this.caretIndex - dn) + this.getTextAfterCaret();
         this.caretIndex -= dn;
       }
