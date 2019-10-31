@@ -193,6 +193,10 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
     }
   }
 
+  /**
+   * handle meta data result.
+   * @param theKbData the data
+   */
   private void handleKeyBoardMetaData(MetaDataResult theKbData)
   {
     if (theKbData.params.getAdditionalProperty(PARAM_IS_CUSTOM,Boolean.class)) {
@@ -286,9 +290,14 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
     }
   }
 
-  private CloudApiTypes.CloudApiParam prepareKeyboardPackageDownload(JSONObject aOptions, JSONObject aKeyboard) {
-
-
+  /**
+   * prepare keyboard package download.
+   * @param aOptions the options from json
+   * @param aKeyboard the keyboard
+   * @return the result
+   */
+  private CloudApiTypes.CloudApiParam prepareKeyboardPackageDownload(JSONObject aOptions, JSONObject aKeyboard)
+  {
     String kbBaseUri = aOptions.optString(KMKeyboardDownloaderActivity.KMKey_KeyboardBaseURI, "");
     if (kbBaseUri.isEmpty()) {
       throw new IllegalStateException("JSON file does not contain a valid \"keyboardBaseUri\" object");
