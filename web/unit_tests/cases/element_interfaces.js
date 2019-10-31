@@ -31,6 +31,7 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.Input.resetWithText = function(pair, string) {
       pair.elem.value = string;
+      pair.wrapper.invalidateSelection();
       pair.elem.setSelectionRange(0, 0);
     }
 
@@ -76,6 +77,7 @@ if(typeof InterfaceTests == 'undefined') {
 
     InterfaceTests.TextArea.resetWithText = function(pair, string) {
       pair.elem.value = string;
+      pair.wrapper.invalidateSelection();
       pair.elem.setSelectionRange(0, 0);
     }
 
@@ -803,6 +805,14 @@ if(typeof InterfaceTests == 'undefined') {
       pair.wrapper.deleteCharsBeforeCaret(2);
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 1) + Apple.mixed.substr(4), "Error deleting context chars from a mixed SMP string");
       String.kmwEnableSupplementaryPlane(false);
+
+      String.kmwEnableSupplementaryPlane(false);
+      testObj.resetWithText(pair, Apple.normal);
+      testObj.setCaret(pair, 4);
+      pair.wrapper.deleteCharsBeforeCaret(7);
+      assert.equal(pair.wrapper.getText(), "e", "Bounds-check on deletion range failed; context improperly deleted.");
+      String.kmwEnableSupplementaryPlane(false);
+      pair.wrapper.invalidateSelection();
     }
 
     InterfaceTests.Tests.deleteCharsBeforeCaretWithSelection = function(testObj) {
