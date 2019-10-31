@@ -46,6 +46,7 @@ namespace com.keyman {
 
     detect() : void {
       var IEVersion = Device._GetIEVersion();
+      var possMacSpoof = false;
       
       if(navigator && navigator.userAgent) {
         var agent=navigator.userAgent;
@@ -78,45 +79,12 @@ namespace com.keyman {
           
           // Match result:  a version string with components separated by underscores.
           if(results.length > 1 && results[1]) {
-            // Converts version string to array of numbers in major.minor.build order.
-            // Example:  10_14_6 => [10, 14, 6]
-            let versionComponentStrings = results[1].split('_');
-            let versionComponents: number[] = [];
+            // Convert version string into a usable form.
+            let versionString = results[1].replace('_', '.');
+            let version = new utils.Version(versionString);
 
-            // Can't use for...of loop b/c IE.
-            for(let i = 0; i < versionComponentStrings.length; i++) {
-              versionComponents.push(parseInt(versionComponentStrings[i]));
-            }
-
-            let version = new utils.Version(versionComponents);
-
-            if(utils.Version.MAC_POSSIBLE_IPAD_ALIAS.compareTo(version) <= 0) {
-              // Indistinguishable user agent string!  We need a different test; fortunately, true macOS
-              // doesn't support TouchEvents.
-              if(window['TouchEvent']) {
-                this.OS='iOS';
-                this.formFactor='tablet';
-                this.dyPortrait=this.dyLandscape=0;
-
-                // It's currently impossible to differentiate between iPhone and iPad here
-                // except for by screen dimensions.
-                let aspectRatio = screen.height / screen.width;
-                if(aspectRatio < 1) {
-                  aspectRatio = 1 / aspectRatio;
-                }
-
-                // iPhones usually have a ratio of 16:9 (or 1.778) or higher, while iPads use 4:3 (or 1.333)
-                if(aspectRatio > 1.6) {
-                  // Override - we'll treat this device as an iPhone.
-                  this.formFactor = 'phone';
-                  this.dyPortrait=this.dyLandscape=25;
-                }
-              } else {
-                this.OS='MacOSX';
-              }
-            } else {
-              this.OS='MacOSX';
-            }
+            possMacSpoof = utils.Version.MAC_POSSIBLE_IPAD_ALIAS.compareTo(version) <= 0;
+            this.OS='MacOSX';
           }
         } else if(agent.indexOf('Windows NT') >= 0) {
           this.OS='Windows';
@@ -179,6 +147,30 @@ namespace com.keyman {
             this.browser='safari';
           }
         } 
+      }
+
+      if(possMacSpoof && this.browser == 'safari') {
+        // Indistinguishable user agent string!  We need a different test; fortunately, true macOS
+        // Safari doesn't support TouchEvents.  (Chrome does, though!  Hence the filter above.)
+        if(window['TouchEvent']) {
+          this.OS='iOS';
+          this.formFactor='tablet';
+          this.dyPortrait=this.dyLandscape=0;
+
+          // It's currently impossible to differentiate between iPhone and iPad here
+          // except for by screen dimensions.
+          let aspectRatio = screen.height / screen.width;
+          if(aspectRatio < 1) {
+            aspectRatio = 1 / aspectRatio;
+          }
+
+          // iPhones usually have a ratio of 16:9 (or 1.778) or higher, while iPads use 4:3 (or 1.333)
+          if(aspectRatio > 1.6) {
+            // Override - we'll treat this device as an iPhone.
+            this.formFactor = 'phone';
+            this.dyPortrait=this.dyLandscape=25;
+          }
+        }
       }
     }
 
