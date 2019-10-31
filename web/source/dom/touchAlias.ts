@@ -50,6 +50,9 @@ namespace com.keyman.dom {
     deleteCharsBeforeCaret(dn: number): void {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
+        if(this.getDeadkeyCaret() < dn) {
+          dn = this.getDeadkeyCaret();
+        }
         this.adjustDeadkeys(-dn);
         this.root.setTextBeforeCaret(curText.kmwSubstring(0, this.root.getTextCaret() - dn));
       }
