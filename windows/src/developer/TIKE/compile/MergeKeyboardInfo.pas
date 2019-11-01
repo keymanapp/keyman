@@ -108,6 +108,7 @@ uses
   Soap.XsBuiltIns,
 
   System.Classes,
+  System.Generics.Collections,
   System.RegularExpressions,
   System.SysUtils,
   System.Zip,

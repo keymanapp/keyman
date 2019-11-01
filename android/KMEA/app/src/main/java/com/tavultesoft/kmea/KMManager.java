@@ -119,6 +119,11 @@ public final class KMManager {
   protected static HashMap<String, String> currentLexicalModel = null;
   protected static String currentBanner = "blank";
 
+  // Special override for when keyboard is entering a password text field.
+  // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
+  // regardless what the Settings preference is.
+  private static boolean mayPredictOverride = false;
+
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -672,6 +677,26 @@ public final class KMManager {
   }
 
   /**
+   * Sets mayPredictOverride true if the InputType field is a hidden password text field
+   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * @param inputType android.text.InputType
+   */
+  public static void setMayPredictOverride(int inputType) {
+    mayPredictOverride =
+      ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
+       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+  }
+
+  /**
+   * Get the value of mayPredictOverride
+   * @return boolean
+   */
+  public static boolean getMayPredictOverride() {
+    return mayPredictOverride;
+  }
+
+  /**
    * Get the font typeface from a fully pathed font name
    * @param context
    * @param fontFilename String - full path to the font file
@@ -729,8 +754,10 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayPredict = (mayPredictOverride) ? false :
+      prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
@@ -757,6 +784,18 @@ public final class KMManager {
     }
 
     if (SystemKeyboard != null) { // && SystemKeyboardLoaded) {
+      SystemKeyboard.loadJavascript(url);
+    }
+    return true;
+  }
+
+  public static boolean setBannerOptions(boolean mayPredict) {
+    String url = String.format("setBannerOptions(%s)", mayPredict);
+    if (InAppKeyboard != null) {
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
     }
     return true;
