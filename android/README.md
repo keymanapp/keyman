@@ -2,8 +2,12 @@
 
 ## Prerequisites
 * Android Studio 3.3.2+
-* Java SE Development Kit 8
+* Java SE Development Kit 11 (Java 9 or newer)
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+
+Recommended to use openJDK because of license issues.
+Tested with latest release for openJDK 11 
+https://github.com/ojdkbuild/ojdkbuild
 
 ## Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)
