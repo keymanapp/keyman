@@ -9,14 +9,10 @@
 It is recommended to use openJDK because of oracle license issues.
 Tested with latest release for openJDK 11 from
 https://github.com/ojdkbuild/ojdkbuild
-Download the zip archive, and unpack to c:\Program Files\Java.
 
-### Issue on windows:
-When extracting the zip file an error message: Error 0x80010135 “Path Too Long” appears.
-
-Fix: Use default java directory to extract the zip archive C:\Program Files\Java 
-
-Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-11.0.5.10-1
+1. Download and unpack the zip archive
+2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
+3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-11.0.5.10-1
 
 ## Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)
