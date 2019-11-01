@@ -2035,25 +2035,52 @@ public final class KMManager {
           }
 
           // Perform left-deletions
+          // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
+          // instead of one code-point.
+          // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
+          // for surrogate pairs + a long grapheme cluster.
+          // This buffer will be used to put back characters as-needed
+          CharSequence charsBackup = ic.getTextBeforeCursor(dn*2 + 16, 0);
+          IntStream codePoints = charsBackup.codePoints();
+
+          // Count the number of surrogate pairs in this buffer, backwards from the end
+          // until we reach dn codepoints.
+          // Unfortunately, can't foreach charSequence in reverse
+          int numPairs = 0;
+          int lastIndex = charsBackup.length()-1;
+          int counter=0;
+          if (dn > 1) {
+            do {
+              if ((lastIndex - counter > 0) && Character.isLowSurrogate(charsBackup.charAt(lastIndex - counter))) {
+                numPairs++;
+              }
+              counter++;
+            } while (counter < dn && numPairs < dn);
+          }
+          // Delete dn+numPairs code points from right of charsBackup
+          charsBackup = charsBackup.subSequence(0, (charsBackup.length()-1) - (dn + 2*numPairs));
+
+          ic.deleteSurroundingText(dn+numPairs, 0);
+
+          // Now see if we need to re-insert characters
+          CharSequence newChars = ic.getTextBeforeCursor((dn*2+16) - (dn+numPairs), 0);
+
+          /*
+          // Perform left-deletions (legacy)
           for (int i = 0; i < dn; i++) {
+            int codePoint = codePoints
             CharSequence chars = ic.getTextBeforeCursor(1, 0);
             if (chars != null && chars.length() > 0) {
               char c = chars.charAt(0);
-              IntStream codePoints = chars.codePoints();
-              int codePoint = ((String)chars).codePointAt(0);
               SystemKeyboardShouldIgnoreSelectionChange = true;
               if (Character.isLowSurrogate(c)) {
                 ic.deleteSurroundingText(2, 0);
-                i++;
               } else {
                 ic.deleteSurroundingText(1, 0);
-                // TODO: Investigate why base character + combining diacritic gets deleted
-                if (Character.getType(codePoint) == Character.NON_SPACING_MARK){
-                  i++;
-                }
               }
             }
           }
+          */
 
           // Perform right-deletions
           for (int i = 0; i < dr; i++) {
