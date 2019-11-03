@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.stream.IntStream;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -320,9 +319,7 @@ public final class KMManager {
   */
   public static void performLeftDeletions(InputConnection ic, int dn) {
     int originalBufferLength = dn*2 + 16; // characters
-    //CharSequence desired = ic.getTextBeforeCursor(dn, 0);
     CharSequence charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
-    IntStream codePoints = charsBackup.codePoints();
 
     // Count the number of surrogate pairs in this buffer, backwards from the end
     // until we reach dn codepoints.
