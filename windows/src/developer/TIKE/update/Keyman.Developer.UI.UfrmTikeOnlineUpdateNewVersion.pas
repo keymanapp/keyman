@@ -66,9 +66,9 @@ implementation
 uses
   UtilExecute;
 
-function OnlineUpdateNewVersion(AOwner: TComponent): TfrmOnlineUpdateNewVersion;
+function OnlineUpdateNewVersion(AOwner: TComponent): TfrmTikeOnlineUpdateNewVersion;
 begin
-  Result := TfrmOnlineUpdateNewVersion.Create(AOwner);
+  Result := TfrmTikeOnlineUpdateNewVersion.Create(AOwner);
 end;
 
 {$R *.DFM}

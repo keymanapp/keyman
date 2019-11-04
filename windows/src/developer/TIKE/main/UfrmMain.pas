@@ -423,7 +423,7 @@ uses
   keymanapi_TLB,
   KeymanVersion,
   OnlineConstants,
-  OnlineUpdateCheck,
+  Keyman.Developer.UI.TikeOnlineUpdateCheck,
   GlobalProxySettings,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
