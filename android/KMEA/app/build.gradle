@@ -42,11 +42,15 @@ android {
                 //showStandardStreams = true // If we want test console log output to show during builds.
             }
             workingDir = "../" // Defaults to the `app` subdirectory, which is different from Android Studio's default.
+
             //Avoid Warning: an illegal reflective access operation has occurred
             //Change argument jdk.module.illegalAccess=warn for detailed information which module needs to be opened
-            jvmArgs ('-Djdk.module.illegalAccess=permit')
-            jvmArgs('--add-opens', 'java.base/java.lang=ALL-UNNAMED')
-            jvmArgs('--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED')
+            if(JavaVersion.current().isJava9Compatible()){
+                jvmArgs ('-Djdk.module.illegalAccess=permit')
+                jvmArgs('--add-opens', 'java.base/java.lang=ALL-UNNAMED')
+                jvmArgs('--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED')
+            }
+
         }
     }
 }
