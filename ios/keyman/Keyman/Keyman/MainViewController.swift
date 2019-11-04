@@ -143,8 +143,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.apiKeyboardRepository.fetch()
     Manager.shared.apiLexicalModelRepository.fetch()
 
-    // TODO:  For dark mode implementation, we'll need to change the color here.
-    let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
+    // Implement a default color...
+    var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
+    // And if the iOS version is current enough, override it from the palette.
+    if #available(iOS 11.0, *) {
+      bgColor = UIColor(named: "InputBackground")!
+    }
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
@@ -198,7 +202,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.isScrollEnabled = true
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
-    textView.textColor = UIColor.black // Dark mode will use white otherwise
     view?.addSubview(textView!)
 
     // Setup Info View
