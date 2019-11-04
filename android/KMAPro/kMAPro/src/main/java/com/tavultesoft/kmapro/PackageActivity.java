@@ -154,7 +154,7 @@ public class PackageActivity extends AppCompatActivity {
       }
     });
 
-    // Determine if ad-hoc distributed KMP contains welcome.htm (case-insensitive) to display
+     // Determine if ad-hoc distributed KMP contains readme.htm (case-insensitive) to display
     FileFilter _readmeFilter = new FileFilter() {
       @Override
       public boolean accept(File pathname) {
