@@ -27,7 +27,7 @@
                     08 Jun 2012 - mcdurdin - I3309 - V9.0 - Migrate to Delphi XE2, VS2010, svn 1.7
                     08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute
 *)
-unit OnlineUpdateCheck;  // I3306
+unit Keyman.Developer.UI.TikeOnlineUpdateCheck;  // I3306
 
 interface
 
