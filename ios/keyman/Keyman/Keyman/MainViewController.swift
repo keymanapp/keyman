@@ -647,14 +647,17 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let eframe = CGRect(x: sframe.origin.x, y: sframe.origin.y - h - 8, width: w, height: h)
     let containerView = UIView(frame: sframe)
     containerView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleRightMargin]
+    if #available(iOS 13.0, *) {
+      containerView.backgroundColor = UIColor.systemBackground
+    } else {
+      containerView.backgroundColor = UIColor.white
+    }
     containerView.tag = 1
-    containerView.backgroundColor = UIColor.white
     containerView.layer.cornerRadius = 4.0
 
     let doneButton = UIButton(type: .roundedRect)
     doneButton.addTarget(self, action: #selector(self.dismissTextSizeVC), for: .touchUpInside)
 
-    doneButton.backgroundColor = UIColor.white
     doneButton.setTitle("Done", for: .normal)
     doneButton.titleLabel?.font = doneButton.titleLabel?.font?.withSize(21.0)
     doneButton.setTitleColor(UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0), for: .normal)
@@ -665,8 +668,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     let lframe = CGRect(x: 0, y: bframe.origin.y - 1, width: sframe.size.width, height: 1)
     let borderLine = UIView(frame: lframe)
-    let c: CGFloat = 230.0 / 255.0
-    borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
+    if #available(iOS 13.0, *) {
+      borderLine.backgroundColor = UIColor.separator
+    } else {
+      let c: CGFloat = 230.0 / 255.0
+      borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
+    }
     containerView.addSubview(borderLine)
 
     let tframe = CGRect(x: 0, y: 0, width: bframe.size.width, height: 40)
@@ -675,7 +682,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textSizeTitle.backgroundColor = UIColor.clear
     textSizeTitle.text = "Text size: \(Int(textSize))"
     textSizeTitle.textAlignment = .center
-    textSizeTitle.textColor = UIColor.gray
+    if #available(iOS 13.0, *) {
+      textSizeTitle.textColor = UIColor.secondaryLabel
+    } else {
+      textSizeTitle.textColor = UIColor.gray
+    }
     textSizeTitle.font = textSizeTitle.font.withSize(14.0)
     containerView.addSubview(textSizeTitle)
 
