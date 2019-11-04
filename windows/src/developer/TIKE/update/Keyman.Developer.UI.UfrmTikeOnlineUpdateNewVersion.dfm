@@ -3,7 +3,7 @@ object frmTikeOnlineUpdateNewVersion: TfrmTikeOnlineUpdateNewVersion
   Top = 410
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Keyman Desktop'
+  Caption = 'Keyman Developer'
   ClientHeight = 173
   ClientWidth = 469
   Color = clBtnFace
@@ -20,9 +20,9 @@ object frmTikeOnlineUpdateNewVersion: TfrmTikeOnlineUpdateNewVersion
   object lblNewVersion: TLabel
     Left = 16
     Top = 16
-    Width = 305
+    Width = 316
     Height = 13
-    Caption = 'A newer version of Keyman Desktop is now available.'
+    Caption = 'A newer version of Keyman Developer is now available.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11

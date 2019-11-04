@@ -86,13 +86,11 @@ end;
 
 procedure TfrmTikeOnlineUpdateNewVersion.FormShow(Sender: TObject);
 begin
-  Caption := Forms.Application.Title;
-  lblNewVersion.Caption := 'A newer version of '+Application.Title+' is now available.';
   lblVersionInfo.Caption := 'The new version is '+FNewVersion+' (you are currently running version '+FCurrentVersion+')';
   if FInstallURL <> '' then  // I2849
   begin
     panDownload.Visible := False;
-    lblInstallDetail.Caption := 'A '+Format('%d', [FInstallSize div 1024])+'KB upgrade can be automatically downloaded and installed.';  // I2849
+    lblInstallDetail.Caption := 'A '+Format('%d', [FInstallSize div 1024 div 1024])+'MB upgrade can be automatically downloaded and installed.';  // I2849
   end;
 end;
 
