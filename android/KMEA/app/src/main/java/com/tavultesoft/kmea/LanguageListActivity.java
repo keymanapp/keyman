@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -241,7 +242,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       return keyboardsInfo;
     } else {
       try {
-        JSONObject jsonObj = getCachedJSONObject(context);
+        JSONObject jsonObj = CloudDataJsonUtil.getCachedJSONObject(
+          CloudDataJsonUtil.getKeyboardCacheFile(context));
         if (jsonObj == null) {
           return null;
         }
@@ -320,31 +322,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         return null;
       }
     }
-  }
-
-  // Still used by KMManager and/or KMKeyboard.
-  protected static File getCacheFile(Context context) {
-    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
-    return new File(context.getCacheDir(), jsonCacheFilename);
-  }
-
-  // Still used by KMManager and/or KMKeyboard.
-  protected static JSONObject getCachedJSONObject(Context context) {
-    JSONObject jsonObj = null;
-    try {
-      // Read from cache file
-      File file = getCacheFile(context);
-      if (file.exists()) {
-        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
-        jsonObj = new JSONObject(objInput.readObject().toString());
-        objInput.close();
-      }
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
-      jsonObj = null;
-    }
-
-    return jsonObj;
   }
 
   private static void showErrorDialog(Context context, String title, String message) {

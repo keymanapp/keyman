@@ -9,7 +9,9 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -49,12 +51,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.data.CloudDownloadMgr;
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -218,7 +224,7 @@ public final class KMManager {
     return false;
   }
 
-  public static void initialize(Context context, KeyboardType keyboardType) {
+  public static void initialize(final Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
@@ -239,6 +245,9 @@ public final class KMManager {
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
+
+    CloudDownloadMgr.getInstance().initialize(appContext);
+    //TODO: Add resource update here
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -373,6 +382,7 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
     }
+    CloudDownloadMgr.getInstance().shutdown(appContext);
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {
@@ -653,7 +663,7 @@ public final class KMManager {
       }
 
       if (shouldClearCache) {
-        File cache = LanguageListActivity.getCacheFile(appContext);
+        File cache = CloudDataJsonUtil.getKeyboardCacheFile(appContext);
         if (cache.exists()) {
           cache.delete();
         }
