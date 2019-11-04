@@ -854,7 +854,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
           if (i == 0) {
             if (KMManager.addKeyboard(this, kbInfo)) {
-              KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
+              if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
+                KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
             }
           } else {
             KMManager.addKeyboard(this, kbInfo);
@@ -862,7 +863,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         }
       } else {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
+            KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
         }
       }
     } else {

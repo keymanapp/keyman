@@ -4,6 +4,34 @@
 
 package com.tavultesoft.kmea;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.util.MapCompat;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,41 +42,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.MapCompat;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.PopupMenu;
-import android.widget.TextView;
-import android.widget.Toast;
-
 public final class KeyboardPickerActivity extends AppCompatActivity {
 
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
+
+  public static final String  KMKEY_INTERNAL_NEW_KEYBOARD = "_internal_new_keyboard_";
 
   // Lists of installed keyboards and installed lexical models
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
@@ -176,6 +177,39 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
+
+    KMKeyboard.addOnKeyboardEventListener(new KeyboardEventHandler.OnKeyboardEventListener() {
+      @Override
+      public void onKeyboardLoaded(KMManager.KeyboardType keyboardType) {
+
+      }
+
+      @Override
+      public void onKeyboardChanged(String newKeyboard) {
+          int _index = getKeyboardIndex(context,newKeyboard);
+          if(_index>=0)
+          {
+            Map<String,String> _keyboard = keyboardsList.get(_index);
+            if(_keyboard==null)
+              return;
+            if(_keyboard.get(KMKEY_INTERNAL_NEW_KEYBOARD)==null)
+              return;
+            _keyboard.remove(KMKEY_INTERNAL_NEW_KEYBOARD);
+            saveList(context, KMManager.KMFilename_KeyboardsList);
+            notifyKeyboardsUpdate(context);
+          }
+      }
+
+      @Override
+      public void onKeyboardShown() {
+
+      }
+
+      @Override
+      public void onKeyboardDismissed() {
+
+      }
+    });
   }
 
   @Override
@@ -343,9 +377,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         if (kbKey.length() >= 3) {
           int x = getKeyboardIndex(context, kbKey);
           if (x >= 0) {
+            if(keyboardsList.get(x).get(KMKEY_INTERNAL_NEW_KEYBOARD)!=null)
+              keyboardInfo.put(KMKEY_INTERNAL_NEW_KEYBOARD,KMKEY_INTERNAL_NEW_KEYBOARD);
             keyboardsList.set(x, keyboardInfo);
             result = saveList(context, KMManager.KMFilename_KeyboardsList);
           } else {
+            keyboardInfo.put(KMKEY_INTERNAL_NEW_KEYBOARD,KMKEY_INTERNAL_NEW_KEYBOARD);
             keyboardsList.add(keyboardInfo);
             result = saveList(context, KMManager.KMFilename_KeyboardsList);
             if (!result) {
