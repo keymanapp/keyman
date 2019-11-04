@@ -143,14 +143,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.apiKeyboardRepository.fetch()
     Manager.shared.apiLexicalModelRepository.fetch()
 
-    var bgColor: UIColor
-//    // Select an appropriate background color for the theme.
-//    if #available(iOS 13.0, *) {
-//      bgColor = UIColor.secondarySystemBackground
-//    } else {
-//      // Fallback on earlier versions
-      bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
-    //}
+    // TODO:  For dark mode implementation, we'll need to change the color here.
+    let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
