@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -153,17 +155,17 @@ public class PackageActivity extends AppCompatActivity {
     });
 
     // Determine if ad-hoc distributed KMP contains welcome.htm (case-insensitive) to display
-    FileFilter welcomeFilter = new FileFilter() {
+    FileFilter _readmeFilter = new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        if (pathname.isFile() && FileUtils.isWelcomeFile(pathname.getName())) {
+        if (pathname.isFile() && FileUtils.isReadmeFile(pathname.getName())) {
           return true;
         }
         return false;
       }
     };
 
-    File[] files = tempPackagePath.listFiles(welcomeFilter);
+    File[] files = tempPackagePath.listFiles(_readmeFilter);
     if (files.length > 0 && files[0].exists() && files[0].length() > 0) {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
@@ -238,6 +240,28 @@ public class PackageActivity extends AppCompatActivity {
     cleanup();
   }
 
+  private boolean loadWelcomePage(List<Map<String, String>> theInstalledKeyboards)
+  {
+    boolean _found=false;
+     for(Map<String,String> _keyboard:theInstalledKeyboards) {
+       String _customlink = _keyboard.get(KMManager.KMKey_CustomHelpLink);
+       if (_customlink != null) {
+         webView.loadUrl("file:///" + _customlink);
+         _found=true;
+         break;
+       }
+     }
+     if(!_found)
+       return false;
+
+      final Button installButton = (Button) findViewById(R.id.installButton);
+      final Button cancelButton = (Button) findViewById(R.id.cancelButton);
+      installButton.setVisibility(View.GONE);
+      cancelButton.setText("OK");
+      findViewById(R.id.buttonBar).requestLayout();
+      return true;
+
+  }
   /**
    * Installs the keyboard or lexical model package, and then notifies the corresponding listeners
    * @param context Context   The activity context
@@ -252,14 +276,17 @@ public class PackageActivity extends AppCompatActivity {
           kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
         // Do the notifications!
         boolean success = installedPackageKeyboards.size() != 0;
+        boolean _cleanup = true;
         if (success) {
+          _cleanup = !loadWelcomePage(installedPackageKeyboards);
           notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
             installedPackageKeyboards, 1);
           if (installedPackageKeyboards != null) {
             notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
               installedPackageKeyboards, 1);
           }
-          cleanup();
+          if(_cleanup)
+            cleanup();
         } else {
           showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
         }
@@ -268,14 +295,17 @@ public class PackageActivity extends AppCompatActivity {
           kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
         // Do the notifications
         boolean success = installedLexicalModels.size() != 0;
+        boolean _cleanup = true;
         if (success) {
+          _cleanup = !loadWelcomePage(installedLexicalModels);
           notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
             installedLexicalModels, 1);
           if (installedLexicalModels != null) {
             notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
               installedLexicalModels, 1);
           }
-          cleanup();
+          if(_cleanup)
+            cleanup();
         } else {
           showErrorDialog(context, pkgId, getString(R.string.no_new_predictive_text_to_install));
         }
