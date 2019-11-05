@@ -115,9 +115,6 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
-    final Button installButton = (Button) findViewById(R.id.installButton);
-    final Button cancelButton = (Button) findViewById(R.id.cancelButton);
-
     webView = (WebView) findViewById(R.id.packageWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
     webView.getSettings().setJavaScriptEnabled(true);
@@ -184,6 +181,20 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
+    initializeButtons(context, pkgId, pkgTarget);
+  }
+
+  /**
+   * Initialize buttons of package installer.
+   * @param context the context
+   * @param pkgId the keyman package id
+   * @param pkgTarget  String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
+   */
+  private void initializeButtons(final Context context, final String pkgId, final String pkgTarget) {
+    final Button installButton = (Button) findViewById(R.id.installButton);
+    final Button cancelButton = (Button) findViewById(R.id.cancelButton);
+    final Button finishButton = (Button) findViewById(R.id.finishButton);
+
     installButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -191,12 +202,16 @@ public class PackageActivity extends AppCompatActivity {
       }
     });
 
-    cancelButton.setOnClickListener(new OnClickListener() {
+    OnClickListener _cleanup_action = new OnClickListener() {
       @Override
       public void onClick(View v) {
         cleanup();
       }
-    });
+    };
+    cancelButton.setOnClickListener(_cleanup_action);
+    finishButton.setOnClickListener(_cleanup_action);
+
+    updateButtonState(true);
   }
 
   @Override
@@ -240,10 +255,41 @@ public class PackageActivity extends AppCompatActivity {
     cleanup();
   }
 
-  private boolean loadWelcomePage(List<Map<String, String>> theInstalledKeyboards)
+  /**
+   * switch button visibility for package installer.
+   * before installation show Install and Cancel
+   * after installation show OK button
+   * @param anIsStartInstaller if true - before installation, false - after installation
+   */
+  private void updateButtonState(boolean anIsStartInstaller)
+  {
+    final Button installButton = (Button) findViewById(R.id.installButton);
+    final Button cancelButton = (Button) findViewById(R.id.cancelButton);
+    final Button closeButton = (Button) findViewById(R.id.finishButton);
+    if(anIsStartInstaller)
+    {
+      installButton.setVisibility(View.VISIBLE);
+      cancelButton.setVisibility(View.VISIBLE);
+      closeButton.setVisibility(View.GONE);
+    }
+    else
+    {
+      installButton.setVisibility(View.GONE);
+      cancelButton.setVisibility(View.GONE);
+      closeButton.setVisibility(View.VISIBLE);
+    }
+    findViewById(R.id.buttonBar).requestLayout();
+  }
+
+  /**
+   * show welcome page from installed keyboard.
+   * @param theInstalledPackages the installed keyboards or lexical models
+   * @return true if a welcomepage is available
+   */
+  private boolean loadWelcomePage(List<Map<String, String>> theInstalledPackages)
   {
     boolean _found=false;
-     for(Map<String,String> _keyboard:theInstalledKeyboards) {
+     for(Map<String,String> _keyboard:theInstalledPackages) {
        String _customlink = _keyboard.get(KMManager.KMKey_CustomHelpLink);
        if (_customlink != null) {
          webView.loadUrl("file:///" + _customlink);
@@ -254,11 +300,8 @@ public class PackageActivity extends AppCompatActivity {
      if(!_found)
        return false;
 
-      final Button installButton = (Button) findViewById(R.id.installButton);
-      final Button cancelButton = (Button) findViewById(R.id.cancelButton);
-      installButton.setVisibility(View.GONE);
-      cancelButton.setText("OK");
-      findViewById(R.id.buttonBar).requestLayout();
+     updateButtonState(false);
+
       return true;
 
   }
