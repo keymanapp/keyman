@@ -180,7 +180,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
               String _modelID = modelInfo.getString("id");
               ArrayList<CloudApiTypes.CloudApiParam> urls = new ArrayList<>();
               urls.add(new CloudApiTypes.CloudApiParam(
-                CloudApiTypes.ApiTarget.KeyBoardLexicalModels,
+                CloudApiTypes.ApiTarget.LexicalModelPackage,
                 modelInfo.getString("packageFilename")));
               _r.additionalDownloadid = CloudLexicalPackageDownloadCallback.createDownloadId(_modelID);
               _r.additionalDownloads= urls;
