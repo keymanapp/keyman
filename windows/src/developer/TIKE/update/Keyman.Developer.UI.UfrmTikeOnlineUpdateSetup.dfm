@@ -1,4 +1,4 @@
-object frmOnlineUpdateSetup: TfrmOnlineUpdateSetup
+object frmTikeOnlineUpdateSetup: TfrmTikeOnlineUpdateSetup
   Left = 192
   Top = 110
   BorderIcons = [biSystemMenu]

@@ -18,7 +18,7 @@
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute
 *)
-unit UfrmOnlineUpdateNewVersion;  // I3306
+unit Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion;  // I3306
 
 interface
 
@@ -27,7 +27,7 @@ uses
   StdCtrls, ShellAPI, ExtCtrls;
 
 type
-  TfrmOnlineUpdateNewVersion = class(TForm)
+  TfrmTikeOnlineUpdateNewVersion = class(TForm)
     lblNewVersion: TLabel;
     lblVersionInfo: TLabel;
     panDownload: TPanel;
@@ -59,44 +59,42 @@ type
     property AppTitle: string read FAppTitle write FAppTitle;
   end;
 
-function OnlineUpdateNewVersion(AOwner: TComponent): TfrmOnlineUpdateNewVersion;
+function OnlineUpdateNewVersion(AOwner: TComponent): TfrmTikeOnlineUpdateNewVersion;
 
 implementation
 
 uses
   UtilExecute;
 
-function OnlineUpdateNewVersion(AOwner: TComponent): TfrmOnlineUpdateNewVersion;
+function OnlineUpdateNewVersion(AOwner: TComponent): TfrmTikeOnlineUpdateNewVersion;
 begin
-  Result := TfrmOnlineUpdateNewVersion.Create(AOwner);
+  Result := TfrmTikeOnlineUpdateNewVersion.Create(AOwner);
 end;
 
 {$R *.DFM}
 
-procedure TfrmOnlineUpdateNewVersion.lblURLClick(Sender: TObject);
+procedure TfrmTikeOnlineUpdateNewVersion.lblURLClick(Sender: TObject);
 begin
   OpenURL(lblURL.Caption);
 end;
 
-procedure TfrmOnlineUpdateNewVersion.cmdVisitNowClick(Sender: TObject);
+procedure TfrmTikeOnlineUpdateNewVersion.cmdVisitNowClick(Sender: TObject);
 begin
   OpenURL(lblURL.Caption);
   ModalResult := mrOk;
 end;
 
-procedure TfrmOnlineUpdateNewVersion.FormShow(Sender: TObject);
+procedure TfrmTikeOnlineUpdateNewVersion.FormShow(Sender: TObject);
 begin
-  Caption := Forms.Application.Title;
-  lblNewVersion.Caption := 'A newer version of '+Application.Title+' is now available.';
   lblVersionInfo.Caption := 'The new version is '+FNewVersion+' (you are currently running version '+FCurrentVersion+')';
   if FInstallURL <> '' then  // I2849
   begin
     panDownload.Visible := False;
-    lblInstallDetail.Caption := 'A '+Format('%d', [FInstallSize div 1024])+'KB upgrade can be automatically downloaded and installed.';  // I2849
+    lblInstallDetail.Caption := 'A '+Format('%d', [FInstallSize div 1024 div 1024])+'MB upgrade can be automatically downloaded and installed.';  // I2849
   end;
 end;
 
-procedure TfrmOnlineUpdateNewVersion.OpenURL(url: string);
+procedure TfrmTikeOnlineUpdateNewVersion.OpenURL(url: string);
 begin
   if not TUtilExecute.URL(url) then  // I3349
     ShowMessage(SysErrorMessage(GetLastError));
