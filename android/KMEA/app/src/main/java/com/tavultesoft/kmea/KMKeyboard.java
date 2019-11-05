@@ -360,7 +360,7 @@ final class KMKeyboard extends WebView {
   /**
    * Return the full path to the special OSK font,
    * which is with all the keyboard assets at the root app_data folder
-   * @param String filename
+   * @param filename
    * @return String
    */
   public String specialOSKFontFilename(String filename) {
@@ -456,6 +456,51 @@ final class KMKeyboard extends WebView {
     }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
+    return retVal;
+  }
+
+  /**
+   * preapre keyboard switch. The switch is executed in next reload.
+   * @param packageID the package id
+   * @param keyboardID the keyman keyboard id
+   * @param languageID the langauge id
+   * @param keyboardName the keyboard name
+   * @param languageName the language name
+   * @return the result
+   */
+  public boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID,  String keyboardName, String languageName)
+  {
+    if (packageID == null || keyboardID == null || languageID == null)
+      return false;
+
+    boolean retVal = true;
+    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
+    if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      keyboardID = KMManager.KMDefault_KeyboardID;
+      languageID = KMManager.KMDefault_LanguageID;
+      retVal = false;
+    }
+    String kbKey = String.format("%s_%s", languageID, keyboardID);
+
+    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
+
+    setKeyboardRoot(packageID);
+
+    //TODO: check fonts?
+
+    // Escape single-quoted names for javascript call
+    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+    languageName = languageName.replaceAll("\'", "\\\\'");
+
+    this.packageID = packageID;
+    this.keyboardID = keyboardID;
+    this.keyboardName = keyboardName;
+    this.keyboardVersion = keyboardVersion;
+    currentKeyboard = kbKey;
+    saveCurrentKeyboardIndex();
+
     return retVal;
   }
 

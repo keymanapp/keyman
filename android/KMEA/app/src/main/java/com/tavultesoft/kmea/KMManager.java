@@ -9,9 +9,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -26,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
-import android.inputmethodservice.Keyboard;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -51,21 +48,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.data.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudDownloadMgr;
-import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.KMScanCodeMap;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -123,7 +115,22 @@ public final class KMManager {
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
   protected static HashMap<String, String> currentLexicalModel = null;
-  protected static String currentBanner = "blank";
+
+  /**
+   * Banner state value: "blank" - no banner available.
+   */
+  protected static final String KM_BANNER_STATE_BLANK = "blank";
+  /**
+   * Banner state value: "suggestion" - dictionary suggestions are shown.
+   */
+  protected static final String BANNER_STATE_SUGGESTION = "suggestion";
+
+  //TODO: should be part of kmkeyboard
+  /**
+   * Current banner state.
+   */
+  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+
 
   // Special override for when keyboard is entering a password text field.
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
@@ -886,6 +893,42 @@ public final class KMManager {
     return (result1 || result2);
   }
 
+  /**
+   * Prepare keyboard switch for inapp keyboard and systemkeyboard
+   * @param packageID the package id
+   * @param keyboardID the keyboard id
+   * @param languageID the language id
+   * @param keyboardName keyboard name
+   * @param languageName language name
+   * @return the success result
+   */
+  public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName, String languageName) {
+
+    //reset banner and layout params
+    currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+
+    boolean result1 = false;
+    boolean result2 = false;
+
+    if (InAppKeyboard != null && InAppKeyboardLoaded)
+    {
+      result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName,languageName);
+      if(result1)
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
+
+    if (SystemKeyboard != null && SystemKeyboardLoaded)
+    {
+      result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName,languageName);
+      if(result2)
+        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
+
+    registerAssociatedLexicalModel(languageID);
+
+    return (result1 || result2);
+  }
+
   public static boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
     boolean result1 = false;
     boolean result2 = false;
@@ -1558,7 +1601,8 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        currentBanner = (change.equals("loaded")) ?
+          BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
