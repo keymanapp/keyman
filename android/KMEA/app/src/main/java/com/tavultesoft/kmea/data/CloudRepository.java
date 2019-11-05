@@ -28,7 +28,9 @@ public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
   private static final String TAG = "CloudRepository";
 
+  //TODO: Should be removed with the old implementation when downloadmanager impl works
   public static final boolean USE_DOWNLOAD_MANAGER = true;
+
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
   private Dataset memCachedDataset;

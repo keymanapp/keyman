@@ -53,6 +53,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
 
   // ********* ONLY USED BY UPDATE CODE ***********
 
+  //TODO: Refactoring to separate update logic from view
   private static boolean updateCheckFailed = false;
   private static boolean updateFailed = false;
   private static Calendar lastUpdateCheck = null;

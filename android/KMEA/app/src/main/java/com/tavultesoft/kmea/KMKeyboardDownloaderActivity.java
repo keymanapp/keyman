@@ -36,7 +36,9 @@ import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
 public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   // Bundle Keys
+
   // Cloud
+  //TODO: Should be removed with the old implementation when downloadmanager impl works
   public static boolean USE_DOWNLOAD_MANAGER = true;
 
   public static final String ARG_PKG_ID = "KMKeyboardActivity.pkgID";
@@ -75,6 +77,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
   public static final String KMKey_FontBaseURI = "fontBaseUri";
 
+  //TODO: use keyboard model class, should not be static
   private static String pkgID;
   private static String kbID;
   private static String langID;

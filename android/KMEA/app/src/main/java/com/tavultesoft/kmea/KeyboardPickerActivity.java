@@ -44,6 +44,7 @@ import java.util.Map;
 
 public final class KeyboardPickerActivity extends AppCompatActivity {
 
+  //TODO: view instances should not be static
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static Button closeButton = null;
@@ -51,6 +52,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
   public static final String  KMKEY_INTERNAL_NEW_KEYBOARD = "_internal_new_keyboard_";
 
+  // TODO: Refactoring to remove keyboard selection into own keyboard manager class (MVC)
   // Lists of installed keyboards and installed lexical models
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
