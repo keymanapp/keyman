@@ -287,8 +287,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                            orientation: orientation)
     browserButton.title = "Browser"
 
-    let actionButton = createNavBarButton(with: #imageLiteral(resourceName: "702-share.png"),
-                                          highlightedImage: #imageLiteral(resourceName: "702-share-selected.png"),
+    let actionButton = createNavBarButton(with: UIImage(named: "IconShare")!,
+                                          highlightedImage: UIImage(named: "IconShareSelected")!,
                                           imageScale: imageScaleF,
                                           action: #selector(self.actionButtonClick),
                                           orientation: orientation)
