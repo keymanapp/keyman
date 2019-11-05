@@ -88,7 +88,7 @@ public class PackageActivity extends AppCompatActivity {
 
     // Silent installation (skip displaying welcome.htm and user confirmation)
     if (silentInstall) {
-      installPackage(context, pkgTarget, pkgId);
+      installPackage(context, pkgTarget, pkgId,true);
       return;
     }
 
@@ -198,7 +198,7 @@ public class PackageActivity extends AppCompatActivity {
     installButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        installPackage(context, pkgTarget, pkgId);
+        installPackage(context, pkgTarget, pkgId,false);
       }
     });
 
@@ -311,7 +311,7 @@ public class PackageActivity extends AppCompatActivity {
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param pkgId String      The Keyman package ID
    */
-  private void installPackage(Context context, String pkgTarget, String pkgId) {
+  private void installPackage(Context context, String pkgTarget, String pkgId, boolean anSilentInstall) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
@@ -321,7 +321,8 @@ public class PackageActivity extends AppCompatActivity {
         boolean success = installedPackageKeyboards.size() != 0;
         boolean _cleanup = true;
         if (success) {
-          _cleanup = !loadWelcomePage(installedPackageKeyboards);
+          if(!anSilentInstall)
+            _cleanup = !loadWelcomePage(installedPackageKeyboards);
           notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
             installedPackageKeyboards, 1);
           if (installedPackageKeyboards != null) {
@@ -340,7 +341,8 @@ public class PackageActivity extends AppCompatActivity {
         boolean success = installedLexicalModels.size() != 0;
         boolean _cleanup = true;
         if (success) {
-          _cleanup = !loadWelcomePage(installedLexicalModels);
+          if(!anSilentInstall)
+            _cleanup = !loadWelcomePage(installedLexicalModels);
           notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
             installedLexicalModels, 1);
           if (installedLexicalModels != null) {
