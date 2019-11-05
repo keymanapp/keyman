@@ -208,6 +208,7 @@ public class JSONUtils {
           try {
             String packageID = pkg.getName();
             JSONObject kmp = parser.getJSONObjectFromFile(file);
+            String packageVersion = PackageProcessor.getPackageVersion(kmp);
             JSONArray kmpModels = kmp.getJSONArray("lexicalModels");
 
             // Determine if kmp contains welcome.htm help file
@@ -218,7 +219,6 @@ public class JSONUtils {
               JSONObject kmpModelObj = kmpModels.getJSONObject(i);
               String modelName = kmpModelObj.getString(KMManager.KMKey_Name);
               String modelID = kmpModelObj.getString(KMManager.KMKey_ID);
-              String modelVersion = kmpModelObj.getString("version");
               String modelFilename = pkg.getName() + "/" + modelID + FileUtils.LEXICALMODEL;
 
               // Merge languages
@@ -230,10 +230,10 @@ public class JSONUtils {
 
                 JSONObject modelObj = new JSONObject();
                 modelObj.put(KMManager.KMKey_PackageID, packageID);
-                modelObj.put("id", modelID);
+                modelObj.put(KMManager.KMKey_ID, modelID);
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
-                modelObj.put(KMManager.KMKey_KeyboardVersion, modelVersion);
+                modelObj.put(KMManager.KMKey_LexicalModelVersion, packageVersion);
                 modelObj.put(KMManager.KMKey_CustomModel, "Y");
                 if (containsHelp) {
                   File welcomeFile = new File(pkg, "welcome.htm");

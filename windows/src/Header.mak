@@ -17,10 +17,10 @@ ROOT=c:\keyman\windows
 !include $(ROOT)\src\Defines.mak
 
 #
-# These three targets are the standard targets for all 
+# These three targets are the standard targets for all
 #
 
-build:
+build: $(BUILDPREREQ)
     $(MAKE) -DTARGET=build $(TARGETS)
 
 !IFNDEF NOTARGET_SIGNCODE

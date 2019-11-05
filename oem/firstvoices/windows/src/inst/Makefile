@@ -20,13 +20,14 @@ manual-setup: check setup
 # During an automated build, `make setup` is called, so `check` target is never used
 setup: desktop
 
-prereq: 
+prereq:
     #
     # Prepare make file to copy versioned filenames to release folder
     #
 
     cd $(FVROOT)\src\inst
     $(PROGRAM)\buildtools\mkver -v -u download.in download.mak $(ROOT)\src\desktop\version.txt
+    $(PROGRAM)\buildtools\mkver -v -u ..\localedef.dtd.in ..\xml\localedef.dtd $(ROOT)\src\desktop\version.txt
 
     #
     # Build FirstVoices keyboards fv_all.kmp
@@ -47,7 +48,7 @@ prereq:
 
 desktop: prereq
     $(MAKE) -fdownload.mak candle-desktop
-    $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out $(MSI) -ext WixUIExtension $(DESKTOP_FILES) 
+    $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out $(MSI) -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d $(APPTITLE) $(MSI)
     $(ROOT)\bin\buildtools\buildpkg -m $(MSI) -s $(ROOT)\bin\desktop -l license.html -a $(APPTITLE) -i $(TITLEIMAGE) -n "FirstVoices Keyboards" -startDisabled -startWithConfiguration $(KMP)
     if exist $(EXE) del $(EXE)
@@ -89,4 +90,3 @@ check-unicodedata:
 # ----------------------------------------------------------------------
 # EOF
 # ----------------------------------------------------------------------
-	

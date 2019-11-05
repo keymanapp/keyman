@@ -24,6 +24,7 @@ implementation
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.SysUtils,
   Winapi.Windows,
 

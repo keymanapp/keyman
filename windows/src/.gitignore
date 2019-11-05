@@ -1,6 +1,6 @@
 **/*.aps
 
-# Delphi target folders -- by including Debug/ and Release/ we avoid accidentally matching folders that we might create otherwise 
+# Delphi target folders -- by including Debug/ and Release/ we avoid accidentally matching folders that we might create otherwise
 **/Win64/Debug/
 **/Win64/Release/
 **/Win32/Debug/
@@ -17,3 +17,15 @@ engine/keyman32/KEYMAN32.res
 engine/keyman64/Keyman64.res
 engine/keymanx64/keymanx64.res
 engine/mcompile/Release/
+
+# Version metadata
+version.txt
+buildtools/version.txt
+desktop/version.txt
+developer/version.txt
+engine/version.txt
+support/version.txt
+
+# These are built from corresponding manifest.in and version.in
+**/manifest.xml
+**/version.rc

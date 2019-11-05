@@ -215,7 +215,7 @@ public class PackageProcessor {
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
    */
-  public String getPackageVersion(JSONObject json) {
+  public static String getPackageVersion(JSONObject json) {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
     } catch (Exception e) {

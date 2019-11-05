@@ -31,6 +31,10 @@ const dcc32 = 'C:\Program Files (x86)\Embarcadero\Studio\18.0\bin\DCC32.EXE';
 {$ELSE}
 {$IFDEF VER320}
 const dcc32 = 'C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\DCC32.EXE';
+{$ELSE}
+{$IFDEF VER330}
+const dcc32 = 'C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\DCC32.EXE';
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 
