@@ -33,7 +33,7 @@ public class CloudDataJsonUtil {
   }
 
   public static HashMap<String,String> createKeyboardInfoMap(String aPackageId,String aLanguageId, String aLanguageName, String aKeyboardId,
-                                                   String aKeyboardName, String aKeyboardVersion, String anIsCustomKeyBoard,
+                                                   String aKeyboardName, String aKeyboardVersion, String anIsCustomKeyboard,
                                                    String aFont, String aOskFont)
   {
     HashMap<String, String> keyboardInfo = new HashMap<String, String>();
@@ -44,7 +44,7 @@ public class CloudDataJsonUtil {
     keyboardInfo.put(KMManager.KMKey_KeyboardName, aKeyboardName);
     keyboardInfo.put(KMManager.KMKey_LanguageName, aLanguageName);
     keyboardInfo.put(KMManager.KMKey_KeyboardVersion, aKeyboardVersion);
-    keyboardInfo.put(KMManager.KMKey_CustomKeyboard, anIsCustomKeyBoard);
+    keyboardInfo.put(KMManager.KMKey_CustomKeyboard, anIsCustomKeyboard);
     keyboardInfo.put(KMManager.KMKey_Font, aFont);
     if (aOskFont != null)
       keyboardInfo.put(KMManager.KMKey_OskFont, aOskFont);

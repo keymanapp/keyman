@@ -634,7 +634,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
       String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
       cloudQueries.add(new CloudApiTypes.CloudApiParam(
-        CloudApiTypes.ApiTarget.KeyBoardLexicalModels, _remoteLexicalModelUrl)
+        CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
         .setType(CloudApiTypes.JSONType.Array));
     }
     return cloudQueries;

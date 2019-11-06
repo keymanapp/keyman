@@ -51,7 +51,7 @@ public class CloudApiTypes {
     /**
      * Keyboard download: lexical models meta data for the language of the selected keyboard.
      */
-    KeyBoardLexicalModels,
+    KeyboardLexicalModels,
     /**
      *  Keyboard download: download keyboard data package and fonts.
      */

@@ -132,7 +132,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
           CloudDownloadMgr.getInstance().executeAsDownload(aContext, _r.additionalDownloadid, null, _callback,
             _r.additionalDownloads.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
-        else if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyBoardLexicalModels) {
+        else if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels) {
 
           if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_r.additionalDownloadid))
           {
@@ -165,9 +165,9 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
     {
       if(_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard)
       {
-        handleKeyBoardMetaData(_r);
+        handleKeyboardMetaData(_r);
       }
-      if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyBoardLexicalModels)
+      if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels)
       {
         JSONArray lmData = _r.returnjson.jsonArray;
         if (lmData != null && lmData.length() > 0) {
@@ -197,7 +197,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
    * handle meta data result.
    * @param theKbData the data
    */
-  private void handleKeyBoardMetaData(MetaDataResult theKbData)
+  private void handleKeyboardMetaData(MetaDataResult theKbData)
   {
     if (theKbData.params.getAdditionalProperty(PARAM_IS_CUSTOM,Boolean.class)) {
       throw new IllegalStateException("Cannot download custom non-KMP keyboard");
