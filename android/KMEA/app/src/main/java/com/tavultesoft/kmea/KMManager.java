@@ -318,12 +318,17 @@ public final class KMManager {
   private static void performLeftDeletions(InputConnection ic, int dn) {
     int originalBufferLength = dn*2 + 16; // characters
     CharSequence charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
+    int lastIndex = charsBackup.length()-1;
+
+    // Exit if there's no context to delete
+    if (lastIndex < 0) {
+      return;
+    }
 
     // Count the number of surrogate pairs in this buffer, backwards from the end
     // until we reach dn codepoints.
     // Unfortunately, can't foreach charSequence in reverse
     int numPairs = 0;
-    int lastIndex = charsBackup.length()-1;
     int counter=0;
     try {
       do {
