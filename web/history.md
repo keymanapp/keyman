@@ -2,6 +2,10 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Testing for upcoming patch to stable:
+  * Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2288)
+  * Fix for iOS Safari's "Request Desktop Website" option disabling touch interactivity (#2283)
+  * Fix for keyboards using rules with the `nul` statement that replace the full context (#2284)
 
 ## 2019-10-04 12.0.90 beta
 * Fixes next-layer management complications with predictive correction data computation (#2172)
