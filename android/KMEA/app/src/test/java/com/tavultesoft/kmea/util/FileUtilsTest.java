@@ -1,5 +1,7 @@
 package com.tavultesoft.kmea.util;
 
+import androidx.test.core.app.ApplicationProvider;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,8 +9,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowLog;
 
 import java.util.List;
-
-import androidx.test.core.app.ApplicationProvider;
 
 @RunWith(RobolectricTestRunner.class)
 public class FileUtilsTest {
@@ -248,5 +248,15 @@ public class FileUtilsTest {
     filename = "test/abc.svg";
     Assert.assertEquals("", FileUtils.getSVGFilename(filename));
 
+  }
+
+  @Test
+  public void test_isReadmeFile() {
+
+    Assert.assertTrue(FileUtils.isReadmeFile("test/readme.htm"));
+
+    Assert.assertTrue(FileUtils.isReadmeFile("test/README.HTM"));
+
+    Assert.assertFalse(FileUtils.isReadmeFile("test/WELCOME.HTM"));
   }
 }

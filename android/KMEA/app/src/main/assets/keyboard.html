@@ -189,6 +189,12 @@
       registerModel(model);
     }
 
+    function setBannerOptions(mayPredict) {
+      keyman.osk.banner.setOptions({
+        'mayPredict': mayPredict
+      });
+    }
+
     function registerModel(model) {
       var kmw=window['keyman'];
       //window.console.log('registerModel: ' + model);

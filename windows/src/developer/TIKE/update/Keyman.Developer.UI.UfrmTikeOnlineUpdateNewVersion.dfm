@@ -1,9 +1,9 @@
-object frmOnlineUpdateNewVersion: TfrmOnlineUpdateNewVersion
+object frmTikeOnlineUpdateNewVersion: TfrmTikeOnlineUpdateNewVersion
   Left = 385
   Top = 410
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  Caption = 'Keyman Desktop'
+  Caption = 'Keyman Developer'
   ClientHeight = 173
   ClientWidth = 469
   Color = clBtnFace
@@ -20,9 +20,9 @@ object frmOnlineUpdateNewVersion: TfrmOnlineUpdateNewVersion
   object lblNewVersion: TLabel
     Left = 16
     Top = 16
-    Width = 322
+    Width = 316
     Height = 13
-    Caption = 'A newer version of Keyman Desktop is now available.'
+    Caption = 'A newer version of Keyman Developer is now available.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -65,7 +65,7 @@ object frmOnlineUpdateNewVersion: TfrmOnlineUpdateNewVersion
     object lblURL: TLabel
       Left = 40
       Top = 24
-      Width = 254
+      Width = 267
       Height = 13
       Cursor = crHandPoint
       Caption = 'https://secure.tavultesoft.com/keymandev/downloads/'

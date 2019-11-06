@@ -24,6 +24,10 @@ inherited frmOptions: TfrmOptions
     object tabGeneral: TTabSheet
       Caption = 'General'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object cmdProxySettings: TButton
         Left = 8
         Top = 160
@@ -93,6 +97,10 @@ inherited frmOptions: TfrmOptions
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbEditorSpaces: TGroupBox
         Left = 11
         Top = 16
@@ -212,6 +220,10 @@ inherited frmOptions: TfrmOptions
     object tabDebugger: TTabSheet
       Caption = 'Debugger'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbDebuggerSettings: TGroupBox
         Left = 8
         Top = 8
@@ -288,6 +300,10 @@ inherited frmOptions: TfrmOptions
     object tabCharMap: TTabSheet
       Caption = 'Character Map'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbCharMapCharacterLookups: TGroupBox
         Left = 8
         Top = 8
