@@ -23,6 +23,7 @@ const
   SHelpTopic_Context_New = 'context/new';
   SHelpTopic_Context_NewProject = 'context/new-project';
   SHelpTopic_Context_NewProjectParameters = 'context/new-project-parameters';
+  SHelpTopic_Context_NewModelProjectParameters = 'context/new-model-project-parameters';
   SHelpTopic_Context_NewFileDetails = 'context/new-file-details';
   SHelpTopic_Context_OnScreenKeyboardEditor = 'context/keyboard-editor#toc-on-screen-tab';
   SHelpTopic_Context_Options = 'context/options';
@@ -44,6 +45,7 @@ const
   SHelpTopic_Context_KeyboardEditor = 'context/keyboard-editor';
   SHelpTopic_Context_TouchLayoutBuilder = 'context/keyboard-editor#toc-touch-layout-tab';
   SHelpTopic_Context_TestKeyboard = 'context/debug#toc-test-mode';
+  SHelpTopic_Context_WordlistEditor = 'context/wordlist-editor';
 
   // For all .kmn language reference topics, prefix with this path:
   SHelpTopic_LanguageReference_Prefix = 'language/reference/';

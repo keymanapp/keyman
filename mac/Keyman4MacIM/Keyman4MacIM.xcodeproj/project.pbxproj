@@ -127,6 +127,7 @@
 
 /* Begin PBXFileReference section */
 		2B51C9B443060BB3B4A1AE8E /* Pods-Keyman.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Keyman.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Keyman/Pods-Keyman.debug.xcconfig"; sourceTree = "<group>"; };
+		37589AD422E52DA20097D39D /* Keyman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keyman.entitlements; sourceTree = "<group>"; };
 		750C7C7BCA2917BAF99E6B69 /* Pods-Keyman.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Keyman.release.xcconfig"; path = "Pods/Target Support Files/Pods-Keyman/Pods-Keyman.release.xcconfig"; sourceTree = "<group>"; };
 		8577C0C788461AFE564DDF4F /* Pods-KeymanTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeymanTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KeymanTests/Pods-KeymanTests.debug.xcconfig"; sourceTree = "<group>"; };
 		97064F9FBF9E0D09264AF6C5 /* libPods-Keyman.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Keyman.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -351,6 +352,7 @@
 		989C9BFF1A7876DE00A20425 = {
 			isa = PBXGroup;
 			children = (
+				37589AD422E52DA20097D39D /* Keyman.entitlements */,
 				E2C92D4720B46CEA00742A7D /* KeymanEngine4Mac.framework.dSYM */,
 				E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */,
 				E28914D82028A78C0048E71E /* OCMock.framework */,
@@ -388,9 +390,9 @@
 				98A778C21A8C53BF00CF809D /* KMInputMethodAppDelegate.h */,
 				98A778C31A8C53BF00CF809D /* KMInputMethodAppDelegate.m */,
 				E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */,
+				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
 				E24C79EC1FFFEA6B00D8E46F /* KMInputMethodEventHandlerProtected.h */,
 				E22020F920050D6300B74FAC /* KMInputMethodBrowserClientEventHandlerProtected.h */,
-				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
 				E24C79EB1FFFCE3000D8E46F /* KMInputMethodBrowserClientEventHandler.h */,
 				E22020F3200505EF00B74FAC /* KMInputMethodSafariClientEventHandler.h */,
 				E24C79E91FFFCC7500D8E46F /* KMInputMethodBrowserClientEventHandler.m */,
@@ -574,6 +576,9 @@
 						DevelopmentTeam = 3YE4W86L3G;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
 							com.apple.Sandbox = {
 								enabled = 0;
 							};
@@ -591,6 +596,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -678,6 +684,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# check that our PRODUCT_VERSION matches this git branch's KM_VERSION from ../../resources/VERSION.md\n(cd .. ; ./is_same_version.sh Keyman4MacIM || exit 1 ; cd -)\n";
+			showEnvVarsInLog = 0;
 		};
 		D2FF67BB6C749BA6861F5E25 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -889,7 +896,9 @@
 			baseConfigurationReference = 2B51C9B443060BB3B4A1AE8E /* Pods-Keyman.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
@@ -897,6 +906,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
+				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -912,9 +922,10 @@
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = "keyman.inputmethod.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 12.0;
+				PRODUCT_VERSION = 13.0;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -926,13 +937,16 @@
 			baseConfigurationReference = 750C7C7BCA2917BAF99E6B69 /* Pods-Keyman.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
 				COPYRIGHT_YEARS = "2017-2019";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
+				ENABLE_HARDENED_RUNTIME = YES;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -948,9 +962,10 @@
 				INFOPLIST_FILE = Keyman4MacIM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = "keyman.inputmethod.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 12.0;
+				PRODUCT_VERSION = 13.0;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_INSTALLED_PRODUCT = YES;

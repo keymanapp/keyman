@@ -1,12 +1,13 @@
-import LexicalModelCompiler from '../';
+import LexicalModelCompiler from '../dist/lexical-model-compiler/lexical-model-compiler';
 import {assert} from 'chai';
 import 'mocha';
 
 import path = require('path');
+import { compileModelSourceCode } from './helpers';
 
 
 describe('LexicalModelCompiler', function () {
-  describe('spefifying punctuation', function () {
+  describe('specifying punctuation', function () {
     const MODEL_ID = 'example.qaa.trivial';
     const PATH = path.join(__dirname, 'fixtures', MODEL_ID)
 
@@ -26,7 +27,11 @@ describe('LexicalModelCompiler', function () {
       assert.match(code, /»/);
       // Ensure we inserted that OGHAM SPACE MARK!
       assert.match(code, /\u1680/);
-      // TODO: more robust assertions?
+
+      // Make sure it compiles!
+      let compilation = compileModelSourceCode(code);
+      assert.isFalse(compilation.hasSyntaxError);
+      assert.isNotNull(compilation.exportedModel);
     });
   })
 });

@@ -56,17 +56,15 @@ uses
   System.Types,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile,
+  StdCtrls, Menus, UfrmMDIEditor, UfrmMDIChild, Keyman.Developer.System.Project.ProjectFile,
   KeymanDeveloperUtils, UserMessages,
   Keyman.Developer.UI.UframeCEFHost;
 
 type
   TfrmProject = class(TfrmTikeChild)  // I2721
     dlgOpenFile: TOpenDialog;
-    tmrRefresh: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure tmrRefreshTimer(Sender: TObject);
     procedure FormActivate(Sender: TObject);
   private
     FShouldRefresh: Boolean;
@@ -87,6 +85,8 @@ type
     function DoNavigate(URL: string): Boolean;
     procedure ClearMessages;
     function ShouldHandleNavigation(URL: string): Boolean;
+    procedure WebCommandProject(Command: WideString; Params: TStringList);
+    procedure WebCommandWelcome(Command: WideString; Params: TStringList);
   protected
     function GetHelpTopic: string; override;
   public
@@ -107,6 +107,7 @@ uses
   KeymanDeveloperOptions,
   Keyman.Developer.System.Project.kmnProjectFile,
   Keyman.Developer.System.Project.kpsProjectFile,
+  Keyman.Developer.System.Project.modelTsProjectFile,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.Project.ProjectFileUI,
@@ -174,8 +175,9 @@ begin
   inherited;
 
   FNextCommandParams := TStringList.Create;
-  GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
-  GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
+
+  FGlobalProjectRefresh := ProjectRefresh;
+  FGlobalProjectRefreshCaption := ProjectRefreshCaption;
 
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
@@ -188,12 +190,12 @@ end;
 
 procedure TfrmProject.RefreshHTML;
 begin
-  if GetGlobalProjectUI.Refreshing then   // I4687
-    tmrRefresh.Enabled := True
-  else
+  if IsGlobalProjectUIReady then
   begin
     cef.Navigate(modWebHttpServer.GetAppURL('project/?path='+URLEncode(GetGlobalProjectUI.FileName)));
-  end;
+  end
+  else
+    cef.Navigate(modWebHttpServer.GetAppURL('project/welcome'));
   RefreshCaption;
 end;
 
@@ -213,8 +215,16 @@ procedure TfrmProject.RefreshCaption;
 var
   s: string;
 begin
-  Hint := FGlobalProject.FileName;
-  s := GetGlobalProjectUI.DisplayFileName;   // I4687
+  if IsGlobalProjectUIReady then
+  begin
+    Hint := FGlobalProject.FileName;
+    s := GetGlobalProjectUI.DisplayFileName;   // I4687
+  end
+  else
+  begin
+    Hint := 'Welcome';
+    s := 'Welcome';
+  end;
   Caption := s;
 end;
 
@@ -226,24 +236,16 @@ end;
 
 procedure TfrmProject.SetGlobalProject;
 begin
-  if not Assigned(GetGlobalProjectUI.OnRefresh) then   // I4687
-  begin
-    GetGlobalProjectUI.OnRefresh := ProjectRefresh;   // I4687
-    GetGlobalProjectUI.OnRefreshCaption := ProjectRefreshCaption;   // I4687
-    ProjectRefresh(nil);
-  end
-  else if not GetGlobalProjectUI.Refreshing then   // I4687
-    ProjectRefresh(nil);
+  ProjectRefresh(nil);
 end;
 
 procedure TfrmProject.FormDestroy(Sender: TObject);
 begin
   inherited;
-  if GetGlobalProjectUI <> nil then
-  begin
-    GetGlobalProjectUI.OnRefresh := nil;   // I4687
-    GetGlobalProjectUI.OnRefreshCaption := nil;   // I4687
-  end;
+
+  FGlobalProjectRefresh := nil;
+  FGlobalProjectRefreshCaption := nil;
+
   FreeAndNil(FNextCommandParams);
 end;
 
@@ -326,10 +328,52 @@ begin
 end;
 
 procedure TfrmProject.WebCommand(Command: WideString; Params: TStringList);
+begin
+  if not IsGlobalProjectUIReady
+    then WebCommandWelcome(Command, Params)
+    else WebCommandProject(Command, Params);
+end;
+
+procedure TfrmProject.WebCommandWelcome(Command: WideString; Params: TStringList);
+    function SelectedMRUFileName: WideString;
+    var
+      n: Integer;
+    begin
+      Result := '';
+      if Params.Values['id'].StartsWith('id_MRU') then
+      begin
+        if TryStrToInt(Params.Values['id'].Substring(6), n) and
+            (n >= 0) and
+            (n < frmKeymanDeveloper.ProjectMRU.FileCount) then
+          Result := frmKeymanDeveloper.ProjectMRU.Files[n];
+      end
+    end;
+begin
+  if Command = 'newproject' then
+    modActionsMain.actProjectNew.Execute
+  else if Command = 'openproject' then
+    modActionsMain.actProjectOpen.Execute
+  else if Command = 'editfile' then // MRU
+  begin
+    if SelectedMRUFileName <> '' then
+      modActionsMain.OpenProject(SelectedMRUFileName);
+  end
+  else if Command = 'removefrommru' then
+  begin
+    if SelectedMRUFileName <> '' then
+    begin
+      frmKeymanDeveloper.ProjectMRU.Delete(SelectedMRUFileName);
+      RefreshHTML;
+    end;
+  end
+end;
+
+procedure TfrmProject.WebCommandProject(Command: WideString; Params: TStringList);
     function FileTypeFromParamType: TKMFileType;
     begin
       if Params.Values['type'] = 'keyboard' then Result := ftKeymanSource
       else if Params.Values['type'] = 'package' then Result := ftPackageSource
+      else if Params.Values['type'] = 'model' then Result := ftModelSource
       else Result := ftOther;
     end;
 
@@ -362,6 +406,7 @@ var
   i: Integer;
 begin
   pf := nil;
+
 
   if Command = 'fileaddnew' then
   begin
@@ -447,8 +492,11 @@ begin
     ClearMessages;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
-      if FGlobalProject.Files[i] is TkmnProjectFile then
+      if (FGlobalProject.Files[i] is TkmnProjectFile) or
+        (FGlobalProject.Files[i] is TmodelTsProjectFile) then
+      begin
         if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
+      end;
     end;
     for i := 0 to FGlobalProject.Files.Count - 1 do
     begin
@@ -482,6 +530,25 @@ begin
         (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
     end;
   end
+  else if Command = 'model_compileall' then
+  begin
+    ClearMessages;
+    for i := 0 to FGlobalProject.Files.Count - 1 do
+    begin
+      if FGlobalProject.Files[i] is TmodelTsProjectFile then
+        (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False);   // I4687
+    end;
+  end
+  else if Command = 'model_cleanall' then   // I4692
+  begin
+    ClearMessages;
+    for i := 0 to FGlobalProject.Files.Count - 1 do
+    begin
+      if FGlobalProject.Files[i] is TmodelTsProjectFile then
+        (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaClean, False);
+    end;
+  end
+
   else if Command = 'package_compileall' then
   begin
     ClearMessages;
@@ -538,17 +605,11 @@ begin
   ProjectRefresh(nil);
 end;}
 
-procedure TfrmProject.tmrRefreshTimer(Sender: TObject);
-begin
-  tmrRefresh.Enabled := False;
-  ProjectRefresh(nil);
-end;
-
 procedure TfrmProject.cefLoadEnd(Sender: TObject);
 begin
   if csDestroying in ComponentState then
     Exit;
-  if Assigned(FGlobalProject) then GetGlobalProjectUI.Refreshing := False;   // I4687
+
   if (frmKeymanDeveloper.ActiveChild = Self) and (Screen.ActiveForm = frmKeymanDeveloper) then
   begin
     cef.SetFocus;

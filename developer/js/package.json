@@ -1,23 +1,45 @@
 {
-  "name": "@keymanapp/developer-lexical-model-compiler",
-  "version": "1.0.0",
+  "name": "@keymanapp/lexical-model-compiler",
+  "version": "0.0.0",
   "description": "Keyman Developer lexical model compiler",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "keywords": [
+    "keyboard",
+    "predictive-text",
+    "keyman",
+    "lexical-model",
+    "unicode"
+  ],
   "scripts": {
-    "build": "npx tsc -p .",
-    "test": "mocha -r ts-node/register tests/**/test-*.ts"
+    "build": "tsc",
+    "test": "mocha",
+    "install": "npm link @keymanapp/lexical-model-types",
+    "prepublishOnly": "npm run build"
   },
-  "author": "Marc Durdin (SIL)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keymanapp/keyman"
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "contributors": [
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
+    "Joshua Horton"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "homepage": "https://github.com/keymanapp/keyman/tree/master/common/predictive-text#readme",
+  "bin": {
+    "kmlmc": "dist/kmlmc.js",
+    "kmlmp": "dist/kmlmp.js",
+    "kmlmi": "dist/kmlmi.js"
+  },
   "dependencies": {
+    "commander": "^3.0.0",
     "node": "^11.7.0",
     "node-zip": "^1.1.1",
-    "typescript": "^3.2.4"
+    "typescript": "^3.2.4",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -26,7 +48,10 @@
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
     "mocha": "^6.1.4",
-    "ts-node": "^8.3.0",
-    "xml2js": "^0.4.19"
+    "ts-node": "^8.3.0"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "spec": "tests/**/test-*.ts"
   }
 }

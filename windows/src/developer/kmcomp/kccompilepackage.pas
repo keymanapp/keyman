@@ -32,33 +32,27 @@ uses
   PackageInfo,
   kpsfile;
 
-function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
+function DoKCCompilePackage(FileName: string; AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean;
+  const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
 
 implementation
 
 uses
-  Keyman.Developer.System.Project.ProjectLog;
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectLogConsole;
 
 type
   TKCCompilePackage = class
-    FSilent: Boolean;
-    FFullySilent: Boolean;
-    FHasWarning: Boolean;
     pack: TKPSFile;
     procedure SelfMessage(Sender: TObject; msg: string; State: TProjectLogState);
   end;
 
 procedure TKCCompilePackage.SelfMessage(Sender: TObject; msg: string; State: TProjectLogState);   // I4706
 begin
-  case State of
-    plsInfo: if not FSilent then writeln(ExtractFileName(pack.FileName) + ': ' + msg);
-    plsWarning: begin FHasWarning := True; if not FFullySilent then writeln(ExtractFileName(pack.FileName) + ': warning: ' + msg); end;
-    plsError: if not FFullySilent then writeln(ExtractFileName(pack.FileName) + ': error: ' + msg);
-    plsFatal: if not FFullySilent then writeln(ExtractFileName(pack.FileName) + ': fatal: ' + msg);
-  end;
+  TProjectLogConsole.Instance.Log(State, pack.Filename, Msg, 0, 0);
 end;
 
-function DoKCCompilePackage(FileName: string; AFullySilent, ASilent, AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
+function DoKCCompilePackage(FileName: string; AWarnAsError, ACheckFilenameConventions, AInstaller: Boolean; const AInstallerMSI: string; AUpdateInstaller: Boolean): Boolean;   // I4706
 var
   tcp: TKCCompilePackage;
   pack: TKPSFile;
@@ -71,7 +65,7 @@ begin
     GetFullPathName(PChar(FileName), 260, buf, pbuf); FileName := buf;
     if not FileExists(FileName) then
     begin
-      writeln(ExtractFileName(FileName) + ': fatal: Package file does not exist.');
+      TProjectLogConsole.Instance.Log(plsFatal, FileName, 'Package file does not exist', 0, 0);
       Exit;
     end;
     pack.FileName := FileName;
@@ -79,18 +73,20 @@ begin
 
     tcp := TKCCompilePackage.Create;
     try
-      tcp.FFullySilent := AFullySilent;
-      tcp.FSilent := ASilent;
       tcp.pack := pack;
-      Result := DoCompilePackage(pack, tcp.SelfMessage, ASilent, ACheckFilenameConventions, ChangeFileExt(pack.FileName, '.kmp'));   // I4694
-      if AWarnAsError and tcp.FHasWarning then Result := False;
+      Result := DoCompilePackage(pack, tcp.SelfMessage, False, ACheckFilenameConventions, ChangeFileExt(pack.FileName, '.kmp'));   // I4694
+      if AWarnAsError and TProjectLogConsole.Instance.HasWarning then Result := False;
 
       if AInstaller and Result then
       begin
-        Result := DoCompilePackageInstaller(pack, tcp.SelfMessage, ASilent, AInstallerMSI,   // I4694
-          ChangeFileExt(pack.FileName, '.exe'), AUpdateInstaller);
-        if AWarnAsError and tcp.FHasWarning then Result := False;
+        Result := DoCompilePackageInstaller(pack, tcp.SelfMessage, False, AInstallerMSI,   // I4694
+          ChangeFileExt(pack.FileName, '.exe'), '', AUpdateInstaller, True, '', '', '', False, False);
+        if AWarnAsError and TProjectLogConsole.Instance.HasWarning then Result := False;
       end;
+
+      if Result
+        then TProjectLogConsole.Instance.Log(plsSuccess, FileName, 'Package '+FileName+' compiled successfully.', 0, 0)
+        else TProjectLogConsole.Instance.Log(plsFailure, FileName, 'Package '+FileName+' could not be compiled.', 0, 0);
     finally
       tcp.Free;
     end;

@@ -3,6 +3,39 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-04 12.0.90 beta
+* Fixes next-layer management complications with predictive correction data computation (#2172)
+
+## 2019-10-01 12.0.87 beta
+* Fixes the `setLastActiveElement` API function for touch form factors (#2151)
+
+## 2019-09-23 12.0.86 beta
+* Fixes issue in Toolbar UI for some keyboards with language ids that include subtags (#2116)
+* Fixes issue with '=' key use on certain platforms in Firefox (#2118)
+
+## 2019-09-20 12.0.85 beta
+* Adds failsafe in case of sticky backspace scenarios, making it simpler to cancel. (#2107)
+
+## 2019-09-10 12.0.83 beta
+* Enables scrolling for long suggestions in the mobile-only predictive text banner (#2071)
+
+## 2019-09-09 12.0.82 beta
+* Fixes output of the 102nd key for touch keyboards using desktop layouts (#2064)
+
+## 2019-09-06 12.0.81 beta
+* For keyboards compiled with Developer 12.0 onward, default key caps will no longer be provided. (#2045)
+
+## 2019-09-04 12.0.80 beta
+* Fixed issue with 'pt' and unitless font size specifications for keyboard layouts (#2033)
+* Slightly enhanced error logging for internal events (#2037)
+
+## 2019-09-03 12.0.79 beta
+* Tweaks suggestion banner behavior after multiple backspaces. (#2027)
+
+## 2019-09-02 12.0.78 beta
+* Fixes erroneous 'beep' feedback on mobile form-factors (#2013)
+* Longpress menu disappears properly after selecting a subkey (#2013)
+
 ## 2019-08-09 12.0.76 beta
 * The suggestion banner will no longer activate if predictions are not enabled, regardless of correction state.  (#1960)
 

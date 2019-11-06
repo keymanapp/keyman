@@ -1,0 +1,127 @@
+html, body { 
+  overflow: hidden;
+}
+
+div {
+  position: absolute;
+}
+
+#background { 
+  background: #79C3DA; z-index: 1; left: 0; top: 0; 
+}
+
+#foreground { 
+  z-index: 2; left: 0; top: 0; 
+}
+
+#frame {
+  top: 0; left: 0; 
+  height: 244px; 
+  padding: 10px; 
+}
+
+#image {
+  top: 0; 
+  left: 0; 
+  height: 250px; 
+  width: 140px; 
+  padding: 5px
+}
+
+.content {
+  left: 150px; top: 0px; 
+  width: 438px; 
+  padding: 4px;
+  background: white;
+  border-left: 2px solid #888888;
+  border-top: 2px solid #888888;
+  border-right: 2px solid #888888;
+  overflow-y: auto;
+  height: 244px;
+  border-bottom: solid 2px #888888;
+}
+
+.has_readme .content {
+  height: 226px; 
+  visibility: hidden;
+}
+
+.content_selected {
+  left: 150px; top: 0px; 
+  width: 438px; 
+  padding: 4px;
+  background: white;
+  border-left: 2px solid #888888;
+  border-top: 2px solid #888888;
+  border-right: 2px solid #888888;
+  overflow-y: auto;
+  height: 226px; 
+  visibility: visible
+}
+
+.content_selected#readme {
+  padding: 0px; width: 446px; height: 234px; overflow: hidden;
+}
+
+#tabs {
+  cursor: default;
+  left: 150px; top: 236px;
+  width: 448px; background: none;
+  border-top: 2px solid #888888;
+  padding-left: 2px;
+}
+#tabs div {
+  float: left;
+  position: relative;
+  font-weight: bold;
+  font-size: 13.3px;
+  padding: 2px;
+  width: 76px; background: #cccccc; text-align: center;
+  top: -2px; margin-left: -2px;
+  border-left: solid 2px #888888;
+  border-right: solid 2px #888888;
+  border-bottom: solid 2px #888888;
+  }
+#tabs div.selected {
+  top: -2px;
+  background: white;
+  border-left: solid 2px #888888;
+  border-right: solid 2px #888888;
+  border-bottom: solid 2px #888888;
+  }
+}
+
+#details {
+}
+
+#readme {
+}
+
+#footer {
+  top: 260px; 
+  left: 0;
+  height: 26px;
+  vertical-align: middle;
+  padding: 8px;
+  text-align: right;
+}
+
+.keyboardname {
+  font-weight: bold;
+  font-size: 14.7px;
+  padding: 4px;
+  color: white;
+  background: #CC3846;
+}
+.detailheader {
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 13.3px;
+  padding-right: 10px;
+  margin: 1px;
+  vertical-align: top;
+}
+.otherdetails {
+  font-size: 13.3px;
+  vertical-align: top;
+}

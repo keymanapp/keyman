@@ -24,8 +24,11 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.FileProviderUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardInfoActivity extends AppCompatActivity {
@@ -43,6 +46,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
+    final String authority = FileProviderUtils.getAuthority(context);
 
     setContentView(R.layout.activity_list_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
@@ -53,38 +57,62 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     listView = (ListView) findViewById(R.id.listView);
 
+    final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
     final String kbID = getIntent().getStringExtra(KMManager.KMKey_KeyboardID);
+    String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
+    final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
+    final boolean isCustomKeyboard = getIntent().getBooleanExtra(KMManager.KMKey_CustomKeyboard, false);
 
     final TextView textView = (TextView) findViewById(R.id.bar_title);
-    String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
     textView.setText(kbName);
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
-    final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
-    boolean isCustomKeyboard = getIntent().getBooleanExtra(KMManager.KMKey_CustomKeyboard, false);
-
     infoList = new ArrayList<HashMap<String, String>>();
-    String icon = "0";
+    // Display keyboard version title
+    final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<String, String>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
+    hashMap.put(iconKey, noIcon);
+    infoList.add(hashMap);
+
+    // Display keyboard help link
+    hashMap = new HashMap<String, String>();
+    final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
+    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    // Check if app declared FileProvider
+    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
+    if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
+         (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {
+      icon = noIcon;
+    }
+    hashMap.put(titleKey, getString(R.string.help_link));
+    hashMap.put(subtitleKey, "");
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
-    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
-    if (!isCustomKeyboard || customHelpLink != null) {
-      icon = String.valueOf(R.drawable.ic_arrow_forward);
-      hashMap = new HashMap<String, String>();
-      hashMap.put(titleKey, getString(R.string.help_link));
-      hashMap.put(subtitleKey, "");
-      hashMap.put(iconKey, icon);
-      infoList.add(hashMap);
-    }
-
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
     int[] to = new int[]{R.id.text1, R.id.text2, R.id.image1};
-    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to);
+
+    ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
+      @Override
+      public boolean isEnabled(int position) {
+        HashMap<String, String> hashMap = (HashMap<String, String>) infoList.get(position);
+        String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
+        String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
+        if (itemTitle.equals(getString(R.string.keyboard_version))) {
+          // No point in 'clicking' on version info.
+          return false;
+        // Visibly disables the help option when help isn't available
+        } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
+          return false;
+        }
+
+        return super.isEnabled(position);
+      }
+    };
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -100,28 +128,27 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
                 Uri contentUri = FileProvider.getUriForFile(
-                  context, getApplication().getPackageName() + ".fileProvider", customHelp);
+                  context, authority, customHelp);
                 i.setDataAndType(contentUri, "text/html");
-              } catch (Exception e) {
-                Log.e("KeyboardInfoActivity", "Failed to access " + customHelp.toString());
+              } catch (NullPointerException e) {
+                String message = "FileProvider undefined in app to load" + customHelp.toString();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.e("KeyboardInfoActivity", message);
               }
             }
             else {
               i.setData(Uri.parse(customHelpLink));
             }
-            startActivity(i);
+            if (FileProviderUtils.exists(context)) {
+              startActivity(i);
+            }
           } else {
-            String helpUrlStr = String.format("http://help.keyman.com/keyboard/%s/%s/", kbID, kbVersion);
             i.setData(Uri.parse(helpUrlStr));
             startActivity(i);
           }
         }
       }
-
-
     });
-
-
   }
 
   @Override

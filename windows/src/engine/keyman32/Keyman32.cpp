@@ -512,10 +512,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
     return FALSE;
   }
 
-#ifndef _WIN64
-  ISerialKeyEventServer::Shutdown();
-#endif
-
   *Globals::InitialisingThread() = 0;
 
   BOOL RetVal = TRUE;
@@ -538,6 +534,10 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
   RetVal = RetVal && UninitHooks();
 
 	UninitDebugging();
+
+#ifndef _WIN64
+  ISerialKeyEventServer::Shutdown();
+#endif
 
   //if(RetVal) ;
 

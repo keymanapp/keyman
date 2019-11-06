@@ -111,12 +111,20 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
     i.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
     i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
-    i.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID));
-    boolean isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID);
+    i.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
+    boolean isCustom = false;
+    if (kbInfo.get(KMManager.KMKey_CustomKeyboard) != null || kbInfo.containsKey(KMManager.KMKey_CustomKeyboard)) {
+      isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
+    }
     i.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
     String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
-    if (customHelpLink != null)
+    if (customHelpLink != null) {
       i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+    } else {
+      i.putExtra(KMManager.KMKey_HelpLink,
+        String.format("https://help.keyman.com/keyboard/%s/%s/", keyboardID, keyboardVersion));
+    }
     KeyboardInfoActivity.titleFont = listFont;
     this.getContext().startActivity(i);
   }

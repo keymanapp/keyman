@@ -1,6 +1,6 @@
 $(function () {
   window.builder = this;
-  
+
   (function(search) {
     var q = search.match(/Filename=(.+)(&|$)/);
     if(q) {
@@ -351,7 +351,7 @@ $(function () {
   ['',''], // 'K_?3E',      // &H3E
   ['',''], // 'K_?3F',      // &H3F
   ['',''], // 'K_?40',      // &H40
-  
+
   ['a','A'], // 'K_A',        // &H41
   ['b','B'], // 'K_B',        // &H42
   ['c','C'], // 'K_C',        // &H43
@@ -555,8 +555,8 @@ $(function () {
   ['',''], // 'K_?FE',      // &HFE
   ['',''], // 'K_?FF'       // &HFF
   ];
-  
-  
+
+
   this.lookupKeyNames = [];
 
   for (var i = 0; i < this.standardKeyNames.length; i++) {
@@ -576,7 +576,7 @@ $(function () {
     "phone-iphone5-portrait": { "x": 526, "y": 266, "name": "iPhone 5 (portrait)"}  // 528x936 = iPhone box size; (90,204)-(618,1040)
   };
 
-  this.keyMargin = 5;
+  this.keyMargin = 15;
 
   // from kmwosk.js:
   this.modifierCodes = {
@@ -595,49 +595,49 @@ $(function () {
     "NO_SCROLL_LOCK":0x2000,
     "VIRTUAL_KEY":0x4000*/
   };
-     
+
   // Lists the combinations that we allow users to use. Some are mutually exclusive,
   // such as Left+Right modifiers, or chiral and non-chiral modifiers (excl. Shift)
   this.validModifierCombinations = [
     0,
-    
+
     this.modifierCodes.LCTRL,
     this.modifierCodes.RCTRL,
-    
+
     this.modifierCodes.LALT,
     this.modifierCodes.LCTRL | this.modifierCodes.LALT,
-    
+
     this.modifierCodes.RALT,
     this.modifierCodes.RCTRL | this.modifierCodes.RALT,
-    
+
     this.modifierCodes.SHIFT,
-    
+
     this.modifierCodes.LCTRL | this.modifierCodes.SHIFT,
     this.modifierCodes.LALT | this.modifierCodes.SHIFT,
     this.modifierCodes.LCTRL | this.modifierCodes.LALT | this.modifierCodes.SHIFT,
-    
+
     this.modifierCodes.RCTRL | this.modifierCodes.SHIFT,
     this.modifierCodes.RALT | this.modifierCodes.SHIFT,
     this.modifierCodes.RCTRL | this.modifierCodes.RALT | this.modifierCodes.SHIFT,
-    
+
     this.modifierCodes.CTRL,
     this.modifierCodes.CTRL | this.modifierCodes.SHIFT,
-    
+
     this.modifierCodes.ALT,
     this.modifierCodes.CTRL | this.modifierCodes.ALT,
     this.modifierCodes.SHIFT | this.modifierCodes.ALT,
     this.modifierCodes.SHIFT | this.modifierCodes.CTRL | this.modifierCodes.ALT
   ];
-  
+
   this.minimalModifierCombinations = [
     0,
     this.modifierCodes.RALT,
     this.modifierCodes.SHIFT,
     this.modifierCodes.RALT | this.modifierCodes.SHIFT
   ];
-  
+
   this.showAllModifierCombinations = false;
-  
+
   // Add CAPS and NO_CAPS variants for all of the above
   (function(c, codes) {
     var i, n = c.length;
@@ -646,7 +646,7 @@ $(function () {
     for(i = 0; i < n; i++)
       c.push(c[i] | codes.NO_CAPS);
   })(this.validModifierCombinations, this.modifierCodes);
-  
+
   this.modifierNames = [
     'leftctrl',   // 0x001
     'rightctrl',  // 0x002
@@ -659,7 +659,7 @@ $(function () {
     'caps',       // 0x100
     'nocaps'      // 0x200
   ];
-  
+
   /**
   *  Get kebab-cased full name of a modifier combination given a bitmask
   *
@@ -688,7 +688,7 @@ $(function () {
     builder.prepareLayer();
     builder.saveState();
   });
-  
+
   $('#chkShowAllModifierOptions').click(function () {
     builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
     builder.fillModifierSelect();
@@ -731,8 +731,8 @@ $(function () {
   /**
   * Replace default key names by special font codes for modifier keys (copied from kmwosk.js)
   *
-  *  @param    {string}  oldText    
-  *  @return {string}      
+  *  @param    {string}  oldText
+  *  @return {string}
   **/
 
   this.renameSpecialKey = function (oldText) {
@@ -752,12 +752,12 @@ $(function () {
     this.fillLayerSelect();
     this.fillModifierSelect();
   };
-  
+
   this.fillLayerSelect = function() {
     $('#selLayer option').remove();
     $('#selKeyNextLayer option').remove();
     $('#selSubKeyNextLayer option').remove();
-    
+
     opt = document.createElement('option');
     $(opt).attr('value', '').text('(none)');
     $('#selKeyNextLayer').append(opt);
@@ -781,15 +781,15 @@ $(function () {
       $('#selSubKeyNextLayer').append(opt);
     }
   };
-  
+
   this.fillModifierSelect = function() {
     var modifiers = this.showAllModifierCombinations ? this.validModifierCombinations : this.minimalModifierCombinations;
-    
+
     var
       $selKeyLayerOverride = $('#selKeyLayerOverride'),
       $selSubKeyLayerOverride = $('#selSubKeyLayerOverride'),
       $addLayerList = $('#addLayerList');
-      
+
     var add = function(e, val, text) {
       var opt = document.createElement('option');
       if(typeof text != 'undefined') {
@@ -800,7 +800,7 @@ $(function () {
       }
       e.append(opt);
     };
-    
+
     $('#selKeyLayerOverride option').remove();
     $('#selSubKeyLayerOverride option').remove();
     $('#addLayerList option').remove();
@@ -808,24 +808,24 @@ $(function () {
     add($selKeyLayerOverride, '', '(current layer)');
     add($selSubKeyLayerOverride, '', '(current layer)');
     add($addLayerList, '', '(custom)');
-    
-        
+
+
     for (var modifier = 0; modifier < modifiers.length; modifier++) {
       var name = this.getModifierCombinationName(modifiers[modifier]);
-      
+
       add($selKeyLayerOverride, name);
       add($selSubKeyLayerOverride, name);
       add($addLayerList, name);
     }
-    
+
     var alreadyAdded = function(modifier) {
       return builder.minimalModifierCombinations.indexOf(modifier) >= 0;
     };
 
-    
+
     // check all keys for modifier usage
     var modifierNames = [];
-    
+
     for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
       var layer = KVKL[builder.lastPlatform].layer[i];
       for(var j = 0; j < layer.row.length; j++) {
@@ -844,11 +844,11 @@ $(function () {
         }
       }
     }
-    
+
     var isUsed = function(modifierName) {
       return modifierNames.indexOf(modifierName) >= 0;
     };
-    
+
     if(!this.showAllModifierCombinations) {
       // Add any layer names that are already referenced
       for(modifier = 0; modifier < this.validModifierCombinations.length; modifier++) {
@@ -869,15 +869,15 @@ $(function () {
     }
     return 0;
   };
-  
+
   this.isLayerIdShifted = function(id) {
     return (builder.getModifierCombinationFromLayerId(id) & this.modifierCodes.SHIFT) != 0;
   };
-  
+
   this.prepareLayer = function () {
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
-    
-    var isLayerShifted = builder.isLayerIdShifted(layer.id); 
+
+    var isLayerShifted = builder.isLayerIdShifted(layer.id);
 
     var width = 0;  // calculate the widest and rescale
     for (var i = 0; i < layer.row.length; i++) {
@@ -967,7 +967,7 @@ $(function () {
     $(div).css('clear', 'both');
     $('#kbd').append(div);
   };
-  
+
   this.getStandardKeyCap = function (id, shifted) {
     id = id ? id.toUpperCase() : '';
     var i = this.standardKeyNames.findIndex(function(x) { return x.toUpperCase() == id });
@@ -994,7 +994,7 @@ $(function () {
     }
 
     $('#chkDisplayUnderlying')[0].checked = KVKL[builder.lastPlatform].displayUnderlying;
-    
+
     builder.prepareLayers();
     builder.selectLayer(0);
   }
@@ -1050,7 +1050,7 @@ $(function () {
     if (!saveToRedo) {
       builder.redoStack = [];
     }
-    builder.generate(true);
+    builder.generate(true,false);
     var s = {
       KVKL: JSON.stringify(KVKL),
       platform: builder.lastPlatform,
@@ -1070,7 +1070,7 @@ $(function () {
     builder.enableUndoControls();
     builder.command('modified');
   }
-  
+
   this.commands = [];
 
   this.command = function (cmd) {
@@ -1127,7 +1127,7 @@ $(function () {
 
     return row;
   };
-  
+
   this.addKey = function (position, isSubKey, sp) {
     var key = document.createElement('div');
     var ktext = document.createElement('div');
@@ -1354,12 +1354,12 @@ $(function () {
   this.selectedKey = function () {
     return $('#kbd .selected');
   }
-  
+
   this.wrapChange = function(f, opt) {
     return function() {
       if(typeof opt == 'object' && opt.saveOnce) {
-        if (!builder.hasSavedKeyUndo) { 
-          builder.saveUndo(); 
+        if (!builder.hasSavedKeyUndo) {
+          builder.saveUndo();
           builder.hasSavedKeyUndo = true;
         } else {
       builder.command('modified');
@@ -1385,7 +1385,7 @@ $(function () {
     builder.selectedKey().data('width', $(this).val())
                          .css('width', parseInt($(this).val(), 10) * this.xscale + 'px');
   }, {rescale: true}));
-  
+
   $('#inpKeyName').change(builder.wrapChange(function () {
     builder.selectedKey().data('id', $(this).val());
     builder.updateKeyId(builder.selectedKey());
@@ -1727,14 +1727,14 @@ $(function () {
     builder.generateSubKeys();
   }));
 
-  this.generate = function (display) {
+  this.generate = function (display, force) {
     var json = JSON.stringify(KVKL, null, '  ');
-    
+
     if(!display) {
       // Save changed settings -- only when not saving undo
       KVKL[builder.lastPlatform].displayUnderlying = $('#chkDisplayUnderlying')[0].checked;
     }
-    
+
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
     layer.row = [];
 
@@ -1758,7 +1758,9 @@ $(function () {
     });
 
     var newJson = JSON.stringify(KVKL, null, '  ');
-    if(newJson != json) {
+    if(force || newJson != json) {
+      // When adding or deleting layers and platforms, we need to force because
+      // that will not result in changes to the rows.
       $.ajax('/app/source/file', {
         'type': 'POST',
         'data': {
@@ -1771,7 +1773,7 @@ $(function () {
   };
 
   this.post = this.generate;
-  
+
   $('#wedgeAddRowAbove').click(builder.wrapChange(function () {
     var row = builder.addRow('above'); builder.selectKey(builder.addKey(row, false));
   }, {rescale: true}));
@@ -1804,16 +1806,16 @@ $(function () {
     builder.enableKeyControls();
   }));
 
-  $('#btnGenerate').click(function () { builder.generate(); });
+  $('#btnGenerate').click(function () { builder.generate(false,false); });
 
   $('#selPlatform').change(function () {
-    if (builder.lastPlatform) builder.generate();
+    if (builder.lastPlatform) builder.generate(false,false);
     builder.selectPlatform();
     builder.saveState();
   });
 
   $('#selLayer').change(function () {
-    if (builder.lastPlatform) builder.generate();
+    if (builder.lastPlatform) builder.generate(false,false);
     builder.selectLayer();
     builder.saveState();
   });
@@ -1830,7 +1832,6 @@ $(function () {
     buttons: {
       "OK": function () {
         builder.saveUndo();
-        builder.generate();
 
         var platform = $('#selAddPlatform').val();
         KVKL[platform] = $.extend(true, {}, KVKL[builder.lastPlatform]);  // copy existing platform
@@ -1838,6 +1839,8 @@ $(function () {
         builder.preparePlatforms();
         $('#selPlatform').val(platform);
         builder.selectPlatform();
+
+        builder.generate(false,true);
 
         $(this).dialog('close');
       },
@@ -1870,9 +1873,9 @@ $(function () {
     delete KVKL[platform];
     builder.lastPlatform = null;
     builder.preparePlatforms();
-    builder.post();
+    builder.generate(false,true);
   });
-  
+
   $('#chkDisplayUnderlying').click(function () {
     builder.saveUndo();
     var platform = $('#selPlatform').val();
@@ -1959,8 +1962,8 @@ $(function () {
       }
     }
   });
-  
-  
+
+
   $('#addLayerName').on('input', function() {
     var layerName = $(this).val();
     $('#addLayerList').val(layerName);
@@ -1971,7 +1974,7 @@ $(function () {
       $('#addLayerNote').text(layerName+' is a recognised modifier-aware layer name.');
     }
   });
-  
+
   $('#addLayerList').change(function() {
     var v = $(this).val();
     if(v == '(custom)') {
@@ -2002,14 +2005,13 @@ $(function () {
           }
         }
         builder.saveUndo();
-        builder.generate();
         var layer = $.extend(true, {}, KVKL[builder.lastPlatform].layer[builder.lastLayerIndex]);
         layer.id = id;
         var n = KVKL[builder.lastPlatform].layer.push(layer) - 1;
         builder.selectPlatform();
         $('#selLayer').val(n);
         builder.selectLayer();
-        builder.post();
+        builder.generate(false,true);
         $(this).dialog('close');
       },
       "Cancel": function () {
@@ -2027,7 +2029,7 @@ $(function () {
     builder.saveUndo();
     KVKL[builder.lastPlatform].layer.splice(builder.lastLayerIndex, 1);
     builder.selectPlatform();
-    builder.post();
+    builder.generate(false,true);
   });
 
   $('#btnEditLayer').click(function () {
@@ -2102,23 +2104,23 @@ $(function () {
   //
   // Character map drag+drop and double-click insertion
   //
-  
+
   builder.charmapDragOver = function(o) {
-    
+
     // Convert X, Y to document coordinates
-    
+
     let target = document.elementFromPoint(o.x, o.y);
     if(target === null || (target.nodeName != 'INPUT' && target.className != 'text')) {
       return false;
     }
-    
-    return true;    
+
+    return true;
   };
-  
+
   builder.charmapDragDrop = function(o) {
 
     // Convert X, Y to document coordinates
-    
+
     if(o.x >= 0 && o.y >= 0) {
       var target = document.elementFromPoint(o.x, o.y);
       if(target === null) {
@@ -2141,42 +2143,43 @@ $(function () {
       // Double-click insertion, so use last focused control
       var target = $(document.lastFocus);
     }
-    
+
     // Focus the control and add the text
 
     target.focus();
     target.val(target.val() + o.text);
+    target.change();
   };
-  
+
   builder.loadingState = true;
-  
+
   builder.saveState = function() {
     if(builder.loadingState) return;
-    
+
     var state = {
       platform: builder.lastPlatform,
       layer: builder.lastLayerIndex,
       presentation: $('#selPlatformPresentation').val()
     };
-    
+
     var key = builder.selectedKey();
     if(key.length > 0) {
       state.key = key.data('id');
     }
-    
+
     var subkey = builder.selectedSubKey();
     if (subkey.length > 0) {
       state.subkey = $(subkey).data('id');
     }
-    
+
     $.post('/app/source/toucheditor/state', {
       'Filename': builder.filename,
       'State': JSON.stringify(state)
     });
   };
-  
+
   builder.loadState = function() {
-    $.get('/app/source/toucheditor/state', 
+    $.get('/app/source/toucheditor/state',
       {
         'Filename': builder.filename
       },
@@ -2197,7 +2200,7 @@ $(function () {
           }
           if(data.key) {
             builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === data.key; }).first());
-          }         
+          }
           if(data.subkey) {
             builder.selectSubKey($('#sk .key').filter(function (index) { return $(this).data('id') === data.subkey; }).first());
           }
@@ -2205,10 +2208,9 @@ $(function () {
       }
     );
   };
-  
+
   builder.preparePlatforms();
   builder.enableUndoControls();
-    
+
   builder.loadState();
 });
-  

@@ -235,8 +235,8 @@
   <String Type="PlainText" Id="S_Usage_Config">&Name; ಸಂರಚನೆ (ಕಾನ್ಫಿಗರೇಷನ್)</String>
   <String Type="HTML" Id="S_Usage_KeyboardNoDocumentation">ಈ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವು ಪ್ರಾರಂಭಿಸುವಿಕೆ ಅಥವಾ ಬಳಕೆ ದಸ್ತಾವೇಜನ್ನು ಹೊಂದಿಲ್ಲ. ಈ ಕೀಲಿಮಣೆ ಲೇಔಟ್ ಅನ್ನು ಹೇಗೆ ಬಳಸುವುದು ಎಂಬುದರ ಕುರಿತು ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ ಸ್ಟಾರ್ಟ್ ಮೆನುವನ್ನು ಪರಿಶೀಲಿಸಿ ಅಥವಾ ಕೀಲಿಮಣೆ ಅಭಿವೃದ್ಧಿಪಡಿಸಿದವರನ್ನು ಸಂಪರ್ಕಿಸಿ.</String>
   <String Type="HTML" Id="S_Usage_KeyboardDocumentation">ಹೆಚ್ಚುವರಿ ದಸ್ತಾವೇಜನ್ನು ಮತ್ತು/ಅಥವಾ "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ವೀಕ್ಷಿಸಲು ಕೆಳಗಿನ ಗುಂಡಿಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
-  <String Type="HTML" Id="S_Usage_KeymanOff">ಪ್ರಸ್ತುತ &amp;Name; ರಲ್ಲಿ ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಮೇಲಿನ ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್)ನಲ್ಲಿನ ಯಾವುದೇ ಕೀಲಿಮಣೆ ಚಿತ್ರ(ಐಕಾನ್)ಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
-  <String Type="HTML" Id="S_Usage_NoKeyboardsInstalled">ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸಗಳನ್ನು ಪ್ರಸ್ತುತ ಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು &amp;Name; ಸಂರಚನೆಯನ್ನು(ಕಾನ್ಫಿಗರೇಷನ್) ಬಳಸಿ.</String>
+  <String Type="HTML" Id="S_Usage_KeymanOff">ಪ್ರಸ್ತುತ &Name; ರಲ್ಲಿ ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಮೇಲಿನ ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್)ನಲ್ಲಿನ ಯಾವುದೇ ಕೀಲಿಮಣೆ ಚಿತ್ರ(ಐಕಾನ್)ಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
+  <String Type="HTML" Id="S_Usage_NoKeyboardsInstalled">ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸಗಳನ್ನು ಪ್ರಸ್ತುತ ಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು &Name; ಸಂರಚನೆಯನ್ನು(ಕಾನ್ಫಿಗರೇಷನ್) ಬಳಸಿ.</String>
   <String Type="FormatString" Id="SKApplicationTitle">&Name_CN;</String>
   <String Type="FormatString" Id="SKSplashVersion">ಆವೃತ್ತಿ %0:s</String>
   <String Type="FormatString" Id="SKButtonHelp">ಸಹಾಯ</String>
@@ -278,7 +278,7 @@
   <String Type="FormatString" Id="SKLangCheck_WindowsLanguage_Link">ಭಾಷೆ %0:s ಅನ್ನು ಕೀಮನ್ ಕೀಲಿಮಣೆ %1:s ಗೆ ಸೇರಿಸು</String>
   <String Type="FormatString" Id="SKLangCheck_WindowsLanguage_Install">ಭಾಷೆ %0:s ಅನ್ನು ಸ್ಥಾಪಿಸಿ ಮತ್ತು ಕೀಮನ್ ಕೀಲಿಮಣೆ %1:s ಗೆ ಸೇರಿಸು</String>
   <String Type="HTML" Id="S_OSK_FontHelper_PleaseWait1">ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ, ನಿಮ್ಮ </String>
-  <String Type="HTML" Id="S_OSK_FontHelper_PleaseWait2"> ಕೀಲಿಮಣೆ ಜೊತೆ ಕೆಲಸ ಕಾರ್ಯನಿರ್ವಹಿಸುವ ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳುನ್ನು &amp;Name; ಹುಡುಕುತ್ತಿದೆ.</String>
+  <String Type="HTML" Id="S_OSK_FontHelper_PleaseWait2"> ಕೀಲಿಮಣೆ ಜೊತೆ ಕೆಲಸ ಕಾರ್ಯನಿರ್ವಹಿಸುವ ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳುನ್ನು &Name; ಹುಡುಕುತ್ತಿದೆ.</String>
   <String Type="HTML" Id="S_OSK_FontHelper_NonUnicode2">ಯುನಿಕೋಡ್ ಕೀಲಿಮಣೆ ಅಲ್ಲ. ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸ್ಥಾಪಿಸಲಾಗುವುದಿಲ್ಲ. ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳ ಮಾಹಿತಿಗಾಗಿ ದಯವಿಟ್ಟು ಕೀಲಿಮಣೆ ದಸ್ತಾವೇಜನ್ನು(documentation) ಪರಿಶೀಲಿಸಿ.</String>
   <String Type="HTML" Id="S_OSK_FontHelper_MatchedFonts1">ಕೆಳಗಿನ ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳು ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತವೆ </String>
   <String Type="HTML" Id="S_OSK_FontHelper_MatchedFonts2">ಕೀಲಿಮಣೆ:</String>
@@ -287,8 +287,8 @@
   <String Type="HTML" Id="S_OSK_FontHelper_PossibleFontsOnly2"> ಕೀಲಿಮಣೆಯ ಜೊತೆ ಮಾಡಬಹುದು</String>
   <String Type="HTML" Id="S_OSK_FontHelper_NoFonts1a">ನಿಮ್ಮ ಸಿಸ್ಟಂನಲ್ಲಿ ಯಾವುದೇ ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳು </String>
   <String Type="HTML" Id="S_OSK_FontHelper_NoFonts1b"> ಕೀಲಿಮಣೆಯ ಜೊತೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆಯೆಂದು ಕಂಡುಬಂದಿಲ್ಲ. ಈ ಕೀಲಿಮಣೆಗಾಗಿ ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳುನ್ನು ಹುಡುಕಲು, ದಯವಿಟ್ಟು <a href='keyman:welcome'>ದಾಖಲೆಯನ್ನು</a> ಪರಿಶೀಲಿಸಿ.</String>
-  <String Type="HTML" Id="S_OSK_FontHelper_NoKeyboards">ನೀವು ಯಾವುದೇ ಕೀಲಿಮಣೆಯನ್ನು ಅನುಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು &amp;Name; "ಸಂರಚನೆ"(ಕಾನ್ಫಿಗರೇಷನ್)ನಲ್ಲಿ "ಡೌನ್ಲೋಡ್ ಕೀಲಿಮಣೆ" ಗುಂಡಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
-  <String Type="HTML" Id="S_OSK_FontHelper_ChooseKeyboard">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳನ್ನು ಹುಡುಕಲು, ದಯವಿಟ್ಟು ಒಂದು &amp;Name; ಕೀಲಿಮಣೆ ಆಯ್ಕೆಮಾಡಿ ಆಯ್ಕೆಮಾಡಿ.</String>
+  <String Type="HTML" Id="S_OSK_FontHelper_NoKeyboards">ನೀವು ಯಾವುದೇ ಕೀಲಿಮಣೆಯನ್ನು ಅನುಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು &Name; "ಸಂರಚನೆ"(ಕಾನ್ಫಿಗರೇಷನ್)ನಲ್ಲಿ "ಡೌನ್ಲೋಡ್ ಕೀಲಿಮಣೆ" ಗುಂಡಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
+  <String Type="HTML" Id="S_OSK_FontHelper_ChooseKeyboard">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳನ್ನು ಹುಡುಕಲು, ದಯವಿಟ್ಟು ಒಂದು &Name; ಕೀಲಿಮಣೆ ಆಯ್ಕೆಮಾಡಿ ಆಯ್ಕೆಮಾಡಿ.</String>
   <String Type="Plain Text" Id="S_OSK_Hint_Title">ಸುಳಿವು:</String>
   <String Type="Plain Text" Id="S_OSK_Hint1">ವಿಂಡೋ ಅಂಚಿನಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು ಎಳೆಯುವುದರ ಮೂಲಕ "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ಗಾತ್ರ ಬದಲಾಯಿಸಿ</String>
   <String Type="Plain Text" Id="S_OSK_Hint2">"&Name;" ಶೀರ್ಷಿಕೆ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು ಎಳೆಯುವ ಮೂಲಕ "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ಅನ್ನು ಸರಿಸಿ.</String>

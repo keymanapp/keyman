@@ -16,6 +16,7 @@ type
     const S_KeymanExe = 'keyman.exe';
     const S_CfgIcon = 'cfgicon.ico';
     const S_AppIcon = 'appicon.ico';
+    const S_KeymanMenuTitleImage = 'menutitle.png';
     const S_FallbackKeyboardPath = 'Keyboards\';
     const S__Package = '_Package\';
     const S_MCompileExe = 'mcompile.exe';
@@ -33,6 +34,7 @@ uses
   Winapi.Windows,
   Winapi.ActiveX,
   Winapi.ShlObj,
+  System.Classes,
   System.Win.Registry,
 
   DebugPaths,
@@ -80,15 +82,97 @@ begin
   Result := ExtractFileDir(KeymanDesktopInstallPath);
 end;
 
-class function TKeymanPaths.KeymanDesktopInstallPath(const filename: string = ''): string;
+type
+  TRegSzHelper = class helper for TRegistry
+    function ReadMultiSz(const name: string; strings: TStrings): Boolean;
+  end;
+
+function TRegSzHelper.ReadMultiSz(const name: string; Strings: TStrings): boolean;
+var
+  iSizeInWChar, iSizeInByte: integer;
+  Buffer: array of WChar;
+  p, EndBuffer: PWChar;
 begin
-  with TRegistry.Create do  // I2890
-  try
-    RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop_LM) and ValueExists(SRegValue_RootPath) then
-      Result := ReadString(SRegValue_RootPath);
-  finally
-    Free;
+  iSizeInByte := GetDataSize(name);
+  iSizeInWChar := iSizeInByte div SizeOf(WChar);
+  if iSizeInByte > 0 then
+  begin
+    SetLength(Buffer, iSizeInWChar);
+    iSizeInWChar := ReadBinaryData(name, Buffer[0], iSizeInByte) div sizeof(WChar);
+    p := @Buffer[0];
+    EndBuffer := p;
+    Inc(EndBuffer, iSizeInWChar);
+    while p < EndBuffer do
+    begin
+      Strings.Append(p);
+      p := StrScan(p, #0);
+      Inc(p);
+    end;
+    Result := True;
+  end
+  else
+    Result := False;
+end;
+
+class function TKeymanPaths.KeymanDesktopInstallPath(const filename: string = ''): string;
+var
+  s: TStrings;
+begin
+  //
+  // If the current executable is kmshell.exe, then return the folder it is in (unless
+  // a debug path overrides it).
+  //
+  // Otherwise, Keyman Desktop takes precedence if installed. If it is not installed,
+  // check the installed OEM product registry and the first installed OEM product is
+  // used. Currently, I assess that the likelihood of two OEM products being installed
+  // without Keyman being installed is low, and we can live with the first one taking
+  // precedence.
+  //
+  // Finally, if no OEM product can be found, then abort.
+  //
+
+  Result := '';
+
+  if SameText(ExtractFileName(ParamStr(0)), TKeymanPaths.S_KMShell) then
+  begin
+    // Just for kmshell.exe, use the current folder
+    Result := ExtractFilePath(ParamStr(0));
+  end;
+
+  if Result = '' then
+  begin
+    // If Keyman Desktop is installed, then use its install path.
+    with TRegistry.Create do  // I2890
+    try
+      RootKey := HKEY_LOCAL_MACHINE;
+      if OpenKeyReadOnly(SRegKey_KeymanDesktop_LM) and ValueExists(SRegValue_RootPath) then
+        Result := ReadString(SRegValue_RootPath);
+    finally
+      Free;
+    end;
+  end;
+
+  if Result = '' then
+  begin
+    // Look in the registry for any installed OEM product; this is a multistring,
+    // but we only want the first value
+    with TRegistry.Create do
+    try
+      RootKey := HKEY_LOCAL_MACHINE;
+      if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Engine_OEMProductPath) then
+      begin
+        s := TStringList.Create;
+        try
+          ReadMultiSz(SRegValue_Engine_OEMProductPath, s);
+          if s.Count > 0 then
+            Result := s[0];
+        finally
+          s.Free;
+        end;
+      end;
+    finally
+      Free;
+    end;
   end;
 
   Result := GetDebugPath('KeymanDesktop', Result);

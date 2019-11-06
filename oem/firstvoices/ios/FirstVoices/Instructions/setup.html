@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+	    <title>FirstVoices Keyboards installation</title>
+	    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" name="viewport">
+	    <link rel="stylesheet" type="text/css" href="ios-instructions.css" />
+        <script language="JavaScript">
+            var fragmentToggle = 0;
+            function showKeyboards() {
+                fragmentToggle = (fragmentToggle + 1) % 100;
+                window.location.hash = 'showKeyboards-'+fragmentToggle;
+            }
+        </script>
+	</head>
+
+	<body>
+		<div id="instructions">
+			<div id="logo">
+				<img src="firstvoices-logo.gif" alt="FirstVoices" />
+                <p>Keyboards</p>
+			</div>
+			<h2>Installation instructions</h2>
+			<div class="steps">
+                <div class="step">
+                    <div class="step-number"><span>1</span></div>
+                    <div class="step-instruction">
+                        <p>Press <input type="button" value="here" onclick="showKeyboards()" id="button" /> to select your keyboards</p>
+                    </div>
+                </div>
+				<div class="step">
+					<div class="step-number"><span>2</span></div>
+					<div class="step-instruction">
+						<p>Open the 'Settings' app and go to 'General' > 'Keyboard'</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number"><span>3</span></div>
+					<div class="step-instruction">
+						<p>Press 'Keyboards'</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number"><span>4</span></div>
+					<div class="step-instruction">
+						<p>Press 'Add New Keyboard...'</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number"><span>5</span></div>
+					<div class="step-instruction">
+						<p>Press 'FirstVoices' listed under 'Third Party Keyboards'</p>
+					</div>
+				</div>
+			</div>
+			<h2>To use FirstVoices Keyboards</h2>
+			<div class="steps use">
+				<div class="step">
+					<div class="step-number"><img src="globe.svg" alt="Globe icon" id="globe" /></div>
+					<div class="step-instruction">
+						<p>After completing these steps above, selected FirstVoices keyboards will be available on your iPhone or iPad by pressing the "Globe" button.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <div id="supporters">
+            <p>FirstVoices gratefully acknowledges the following supporters of this project:</p>
+            <a href="https://www.newrelationshiptrust.ca/"><img src="nrt.svg" alt="" /></a>
+            <a href="http://www.fpcc.ca/"><img src="fpcc.svg" alt="" /></a>
+            <a href="http://www.languagegeek.com/"><img src="languagegeek.png" alt="" /></a>
+        </div>
+
+        <div id="fpcf">
+					<h2>Created by</h2>
+					<a href="http://www.fpcf.ca/"><img src="FPCF_Logo.jpeg" alt="First Peoples' Cultural Foundation" /></a>
+          <p><a href="http://www.fpcf.ca/">First Peoples' Cultural Foundation</a></p>
+        </div>
+
+		<div id="footer">
+			<h2>Developed by</h2>
+			<img src="keyman.svg" alt="" />
+			<p>Keyman | SIL International</p>
+			<p><a href="https://keyman.com/">www.keyman.com</a></p>
+		</div>
+
+	</body>
+</html>

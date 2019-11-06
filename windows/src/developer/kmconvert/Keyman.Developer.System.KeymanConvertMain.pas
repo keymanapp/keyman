@@ -13,7 +13,8 @@ uses
   Keyman.Developer.System.KMConvertParameters,
   Keyman.Developer.System.ImportWindowsKeyboard,
   Keyman.Developer.System.KeyboardProjectTemplate,
-  ResourceStrings,
+  Keyman.Developer.System.ModelProjectTemplate,
+  KeymanVersion,
   VersionInfo;
 
 function DoRun: Boolean; forward;
@@ -102,9 +103,46 @@ begin
   end;
 end;
 
+function DoCreateModelTemplate(FParameters: TKMConvertParameters): Boolean;
+var
+  mpt: TModelProjectTemplate;
+  FTargetFolder: string;
+  ModelID: string;
+begin
+  ModelID := FParameters.ModelIdAuthor + '.' + FParameters.ModelIdLanguage + '.' + FParameters.ModelIdUniq;
+  mpt := TModelProjectTemplate.Create(FParameters.Destination, ModelID);
+  try
+    mpt.Name := FParameters.Name;
+    mpt.Copyright := FParameters.Copyright;
+    mpt.Version := FParameters.Version;
+    mpt.BCP47Tags := FParameters.BCP47Tags;
+    mpt.Author := FParameters.Author;
+
+    FTargetFolder := ExtractFileDir(mpt.ProjectFilename);
+    if DirectoryExists(FTargetFolder) then
+    begin
+      writeln('ERROR: The directory "'+FTargetFolder+'" already exists.');
+      Exit(False);
+    end;
+
+    try
+      mpt.Generate;
+    except
+      on E:EModelProjectTemplate do
+      begin
+        writeln(E.Message);
+        Exit(False);
+      end;
+    end;
+    Result := True;
+  finally
+    mpt.Free;
+  end;
+end;
+
 procedure WriteBanner;
 begin
-  writeln(DevApplicationTitle + ' Conversion Utility');
+  writeln(SKeymanDeveloperName + ' Conversion Utility');
   writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
   writeln;
 end;
@@ -133,6 +171,8 @@ begin
       Result := DoImportWindowsKeyboard(FParameters);
     cmTemplate:
       Result := DoCreateKeyboardTemplate(FParameters);
+    cmLexicalModel:
+      Result := DoCreateModelTemplate(FParameters);
   end;
 end;
 

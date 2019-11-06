@@ -5,6 +5,7 @@
 
   <string name="action_share" translatable="false">Share</string>
   <string name="action_web" translatable="false">Web Browser</string>
+  <string name="action_file_browser" translatable="false">File Browser</string>
   <string name="action_text_size" translatable="false">Text Size</string>
   <string name="action_overflow" translatable="false">More</string>
   <string name="action_clear_text" translatable="false">Clear Text</string>
@@ -15,6 +16,7 @@
   <string name="textview_hint" translatable="false">Start typing here&#8230;</string>
 
   <!-- Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false"></string>
   <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
 
   <!-- Text Size dialog -->

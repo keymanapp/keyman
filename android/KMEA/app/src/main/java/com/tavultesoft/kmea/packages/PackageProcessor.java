@@ -70,6 +70,11 @@ public class PackageProcessor {
         throw new IllegalArgumentException("Invalid file passed to the KMP unpacker!");
       }
 
+      // Extract our package ID from .model.kmp file
+      if (filename.lastIndexOf(FileUtils.MODELPACKAGE) != -1) {
+        return filename.substring(0, filename.lastIndexOf(FileUtils.MODELPACKAGE));
+      }
+
       // Extract our best-guess name for the package and construct the temporary package name.
       return filename.substring(0, filename.lastIndexOf(FileUtils.KEYMANPACKAGE));
     } else {
@@ -134,10 +139,12 @@ public class PackageProcessor {
    * Generates a list of keyboard data maps designed to mirror the `download` method output of
    * KMKeyboardDownloader as closely as practical.
    * @param jsonEntry  One entry of the master JSONArray of the top-level "keyboards" property.
+   * @param packageId  Package ID
+   * @param packageVersion Package version (used for lexical model version)
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
 
     String keyboardId = jsonEntry.getString("id");
@@ -208,7 +215,7 @@ public class PackageProcessor {
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
    */
-  public String getPackageVersion(JSONObject json) {
+  public static String getPackageVersion(JSONObject json) {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
     } catch (Exception e) {
@@ -415,6 +422,10 @@ public class PackageProcessor {
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
     String packageId = getPackageID(path);
 
+    // For lexical model packages, lexical model version is determined by the package version
+    // (Default to "1.0")
+    String packageVersion = getPackageVersion(newInfoJSON);
+
     File permPath = constructPath(path, false);
     if (permPath.exists()) {
       // Out with the old.  "In with the new" is identical to a new package installation.
@@ -435,7 +446,7 @@ public class PackageProcessor {
       JSONArray entries = newInfoJSON.getJSONArray(key);
 
       for (int i = 0; i < entries.length(); i++) {
-        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId);
+        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion);
         if (maps != null) {
           specs.addAll(Arrays.asList(maps));
         }

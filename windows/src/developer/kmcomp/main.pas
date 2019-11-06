@@ -38,7 +38,6 @@ unit main;  // I3306
 interface
 
 procedure Run;
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;   // I3310
 
 implementation
 
@@ -48,65 +47,26 @@ uses
   Winapi.ActiveX,
   Winapi.Windows,
 
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectLogConsole,
   OnlineConstants,
   VersionInfo,
   compile,
   KCCompilePackage,
-  ResourceStrings,
   KCCompileProject,
   KCCompileKVK,
+  KeymanVersion,
   CompileKeymanWeb,
   JsonExtractKeyboardInfo,
   ValidateKeyboardInfo,
   MergeKeyboardInfo;
 
-var
-  hOutfile: THandle;
-  HasWarning: Boolean = False;
-  MessageCount: Integer = 0;
-
-const
-  MAX_MESSAGES = 100;
-
-function CompileKeyboard(FInFile, FOutFile: string; FDebug, FSilent, FWarnAsError: Boolean): Boolean; forward;   // I4706
-
-function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;   // I3310
-var
-  p, str: ansistring;   // I3310
-	dw: DWord;
-const
-	nlstr: array[0..2] of ansichar = (#$D, #$A, #$0);   // I3310
-begin
-  if (msgcode = CWARN_Info) then p := 'Info'
-  else if (msgcode and CERR_ERROR) <> 0   then p := 'Error'
-  else if (msgcode and CERR_WARNING) <> 0 then begin p := 'Warning'; HasWarning := True; end   // I4706
-  else if (msgcode and CERR_FATAL) <> 0   then p := 'Fatal'
-  else p := 'Memory';
-
-  if(msgcode <> CWARN_Info) then
-  begin
-    Inc(MessageCount);
-    if MessageCount > MAX_MESSAGES then
-      Exit(1);
-
-    if MessageCount = MAX_MESSAGES
-      then str := System.AnsiStrings.Format('%s %d: 00000000 More than %d warnings or errors received; suppressing further messages', [p, line, MAX_MESSAGES])
-      else str := System.AnsiStrings.Format('%s %d: %8.8X %s', [p, line, msgcode, text]);   // I3310
-  end;
-
-	if hOutfile <> 0 then
-  begin
-		WriteFile(hOutfile, str, Length(str), dw, nil);
-		WriteFile(hOutfile, nlstr, 2, dw, nil);
-	end
-	else
-		writeln(str);
-
-  Result := 1;
-end;
+function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean; forward;   // I4706
+//function CompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall; forward;
 
 procedure Run;
 var
+  hOutfile: THandle;
   FNologo, FDebug, FSilent, FError: Boolean;
   s, FParamTarget, FParamInfile, FParamOutfile, FParamDebugfile: string;
   i: Integer;
@@ -127,6 +87,7 @@ var
   FJsonSchemaPath: string;
   FParamSourcePath: string;
   FParamHelpLink: string;
+  FColorMode: TProjectLogConsole.TColorMode;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -144,6 +105,7 @@ begin
   FMergingValidateIds := False;
   FParamDistribution := False;
   FInstallerMSI := '';
+  FColorMode := cmDefault;
 
   FParamInfile := '';
   FParamOutfile := '';
@@ -211,6 +173,10 @@ begin
       Inc(i);
       FParamJsonFields := ParamStr(i);
     end
+    else if s = '-color' then
+      FColorMode := cmForceColor
+    else if s = '-no-color' then
+      FColorMode := cmForceNoColor
     else if FParamInfile = '' then FParamInfile := ParamStr(i)
     else if FParamOutfile = '' then FParamOutfile := ParamStr(i)
     else if FParamDebugfile = '' then FParamDebugfile := ParamStr(i)
@@ -226,7 +192,7 @@ begin
 
   if (not FSilent and not FNologo) or FError then   // I4706
   begin
-    writeln(DevApplicationTitle + ' Compiler');
+    writeln(SKeymanDeveloperName + ' Compiler');
     writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
   end;
 
@@ -235,7 +201,7 @@ begin
     writeln('');
     writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
     writeln('              [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
-    writeln('              [-add-help-link path]');
+    writeln('              [-add-help-link path] [-color|-no-color]');
     writeln('              [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
@@ -243,15 +209,19 @@ begin
     writeln('          outfile.js    write a KeymanWeb file');
     writeln('          error.log     write to an error log; outfile must be specified');   // I4825
     writeln('');
-    writeln('          -s       silent; don''t print information-level messages');
-    writeln('          -ss      fully silent; don''t print anything (except fatal errors)');
-    writeln('          -nologo  don''t print the compiler description');
-    writeln('          -c       clean target (only for .kpj)');
-    writeln('          -d       include debug information');
-    writeln('          -w       treat warnings as errors');
-    writeln('          -cfc     check filename conventions');
-    writeln('          -t       build only the target file from the project (only for .kpj)');   // I4699
+    writeln('          -s             silent; don''t print information-level messages');
+    writeln('          -ss            fully silent; don''t print anything (except fatal errors)');
+    writeln('          -nologo        don''t print the compiler description');
+    writeln('          -c             clean target (only for .kpj)');
+    writeln('          -d             include debug information');
+    writeln('          -w             treat warnings as errors');
+    writeln('          -cfc           check filename conventions');
+    writeln('          -t             build only the target file from the project (only for .kpj)');   // I4699
     writeln('          -add-help-link path to help file on https://help.keyman.com/keyboards');
+    writeln;
+    writeln('          -color         If specified, forces color log messages on');
+    writeln('          -no-color      If specified, forces color log messages off. If neither specified,');
+    writeln('                         uses console mode to determine whether color should be used.');
     writeln;
     writeln(' JSON .keyboard_info compile targets:');
     writeln('          -v[s]    validate infile against source schema');
@@ -278,18 +248,20 @@ begin
     else
       hOutfile := 0;
 
+    TProjectLogConsole.Create(FSilent, FFullySilent, hOutfile, FColorMode);
+
     if FMerging then
-      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpLink, FMergingValidateIds, FSilent, @CompilerMessage)
+      FError := not TMergeKeyboardInfo.Execute(FParamSourcePath, FParamInfile, FParamInfile2, FParamOutfile, FParamHelpLink, FMergingValidateIds, FSilent, TProjectLogConsole.Instance.Log)
     else if FValidating then
-      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, @CompilerMessage)
+      FError := not TValidateKeyboardInfo.Execute(FParamInfile, FJsonSchemaPath, FParamDistribution, FSilent, TProjectLogConsole.Instance.Log)
     else if FJsonExtract then
-      FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, @CompilerMessage)
+      FError := not TJsonExtractKeyboardInfo.Execute(FParamInfile, FParamJsonFields, FSilent, TProjectLogConsole.Instance.Log)
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kpj' then   // I4699
-      Ferror := not DoKCCompileProject(FParamInfile, FFullySilent, FSilent, FDebug, FClean, FWarnAsError, FCheckFilenameConventions, FParamTarget)   // I4706   // I4707
+      Ferror := not DoKCCompileProject(FParamInfile, FDebug, FClean, FWarnAsError, FCheckFilenameConventions, FParamTarget)   // I4706   // I4707
     else if LowerCase(ExtractFileExt(FParamInfile)) = '.kps' then
-      FError := not DoKCCompilePackage(FParamInfile, FFullySilent, FSilent, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller)   // I4706
+      FError := not DoKCCompilePackage(FParamInfile, FWarnAsError, FInstaller, FCheckFilenameConventions, FInstallerMSI, FUpdateInstaller)   // I4706
     else
-      FError := not CompileKeyboard(FParamInfile, FParamOutfile, FDebug, FSilent, FWarnAsError);   // I4706
+      FError := not CompileKeyboard(FParamInfile, FParamOutfile, FDebug, FWarnAsError);   // I4706
 
     if hOutfile <> 0 then CloseHandle(hOutfile);
   finally
@@ -299,8 +271,10 @@ begin
   if FError then Halt(1);
 end;
 
-function CompileKeyboard(FInFile, FOutFile: string; FDebug, FSilent, FWarnAsError: Boolean): Boolean;   // I4706
+function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean;   // I4706
 begin
+  TProjectLogConsole.Instance.Filename := FInFile;
+
   if SameText(ExtractFileExt(FOutFile), '.js') then
   begin
     with TCompileKeymanWeb.Create do
@@ -314,22 +288,17 @@ begin
   begin
     if FOutFile = '' then FOutFile := ChangeFileExt(FInFile, '.kmx');
   	Result := CompileKeyboardFile(PChar(FInFile), PChar(FOutFile), FDebug, FWarnAsError, True, @CompilerMessage) <> 0;   // I4865   // I4866
-    Result := Result and CompileVisualKeyboardFromKMX(FInFile, FOutFile, FSilent);
+    Result := Result and CompileVisualKeyboardFromKMX(FInFile, FOutFile);
   end;
 
-  if HasWarning and FWarnAsError then Result := False;   // I4706
+  if TProjectLogConsole.Instance.HasWarning and FWarnAsError then Result := False;   // I4706
 
-  if Result then
-  begin
-    if not FSilent then
-			writeln('Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.');
-	end
-	else
-  begin
-    if not FSilent then
-      writeln('Keyboard '+FInFile+' could not be compiled.');
-  end;
+  if Result 
+    then TProjectLogConsole.Instance.Log(plsSuccess, FInFile, 'Keyboard '+FInFile+' compiled, output saved as '+FOutFile+'.', 0, 0)
+  	else TProjectLogConsole.Instance.Log(plsFailure, FInFile, 'Keyboard '+FInFile+' could not be compiled.', 0, 0);
 end;
+
+
 
 end.
 

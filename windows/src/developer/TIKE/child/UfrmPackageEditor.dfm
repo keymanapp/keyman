@@ -183,7 +183,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageCompile
+    ActivePage = pageLexicalModels
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -196,9 +196,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageFiles: TTabSheet
       Caption = 'Files'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitWidth = 588
-      ExplicitHeight = 447
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -209,8 +206,6 @@ inherited frmPackageEditor: TfrmPackageEditor
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 588
-        ExplicitHeight = 447
         DesignSize = (
           872
           622)
@@ -265,7 +260,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblFileType: TLabel
           Left = 256
           Top = 107
-          Width = 46
+          Width = 47
           Height = 13
           Caption = 'File Type:'
           FocusControl = editFilePath
@@ -289,7 +284,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Add...'
           TabOrder = 1
           OnClick = cmdAddFileClick
-          ExplicitTop = 407
         end
         object cmdRemoveFile: TButton
           Left = 103
@@ -301,7 +295,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Enabled = False
           TabOrder = 2
           OnClick = cmdRemoveFileClick
-          ExplicitTop = 407
         end
         object editFileType: TEdit
           Left = 352
@@ -313,7 +306,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 4
-          ExplicitWidth = 227
         end
         object editFilePath: TEdit
           Left = 328
@@ -325,7 +317,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 6
-          ExplicitWidth = 251
         end
         object memoFileDetails: TMemo
           Left = 328
@@ -337,7 +328,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Color = clBtnFace
           ReadOnly = True
           TabOrder = 3
-          ExplicitWidth = 251
         end
         object cmdOpenFile: TButton
           Left = 328
@@ -362,9 +352,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageKeyboards: TTabSheet
       Caption = 'Keyboards'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitWidth = 588
-      ExplicitHeight = 447
       object Panel5: TPanel
         Left = 0
         Top = 0
@@ -375,8 +362,6 @@ inherited frmPackageEditor: TfrmPackageEditor
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 588
-        ExplicitHeight = 447
         DesignSize = (
           872
           622)
@@ -479,7 +464,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentColor = True
           ReadOnly = True
           TabOrder = 1
-          ExplicitTop = 311
         end
         object memoKeyboardFiles: TMemo
           Left = 96
@@ -491,7 +475,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentColor = True
           ReadOnly = True
           TabOrder = 2
-          ExplicitTop = 338
         end
         object editKeyboardVersion: TEdit
           Left = 96
@@ -503,7 +486,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentColor = True
           ReadOnly = True
           TabOrder = 3
-          ExplicitTop = 390
         end
         object cbKeyboardOSKFont: TComboBox
           Left = 339
@@ -550,7 +532,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Add...'
           TabOrder = 8
           OnClick = cmdKeyboardAddLanguageClick
-          ExplicitTop = 412
         end
         object cmdKeyboardRemoveLanguage: TButton
           Left = 418
@@ -561,7 +542,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Remove'
           TabOrder = 9
           OnClick = cmdKeyboardRemoveLanguageClick
-          ExplicitTop = 412
         end
         object editKeyboardRTL: TEdit
           Left = 96
@@ -573,7 +553,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           ParentColor = True
           ReadOnly = True
           TabOrder = 4
-          ExplicitTop = 417
         end
         object cmdKeyboardEditLanguage: TButton
           Left = 339
@@ -584,16 +563,159 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = 'Ed&it...'
           TabOrder = 10
           OnClick = cmdKeyboardEditLanguageClick
-          ExplicitTop = 412
+        end
+      end
+    end
+    object pageLexicalModels: TTabSheet
+      Caption = 'Lexical Models'
+      ImageIndex = 17
+      object panLexicalModels: TPanel
+        Left = 0
+        Top = 0
+        Width = 872
+        Height = 622
+        Align = alClient
+        BevelOuter = bvNone
+        Color = 14211288
+        ParentBackground = False
+        TabOrder = 0
+        DesignSize = (
+          872
+          622)
+        object lblLexlicalModels: TLabel
+          Left = 15
+          Top = 10
+          Width = 140
+          Height = 23
+          Caption = 'Lexical Models'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -19
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object lblLexicalModelsSubtitle: TLabel
+          Left = 15
+          Top = 37
+          Width = 546
+          Height = 32
+          AutoSize = False
+          Caption = 'Configure language assignments for each lexical model'
+          WordWrap = True
+        end
+        object lblLexicalModelFilename: TLabel
+          Left = 261
+          Top = 75
+          Width = 49
+          Height = 13
+          Caption = 'Filename:'
+        end
+        object lblLexicalModelDescription: TLabel
+          Left = 261
+          Top = 102
+          Width = 62
+          Height = 13
+          Caption = 'Description:'
+        end
+        object lblLexicalModelLanguages: TLabel
+          Left = 260
+          Top = 181
+          Width = 59
+          Height = 13
+          Caption = 'Languages:'
+        end
+        object lbLexicalModels: TListBox
+          Left = 15
+          Top = 72
+          Width = 229
+          Height = 504
+          Anchors = [akLeft, akTop, akBottom]
+          ItemHeight = 13
+          TabOrder = 0
+          OnClick = lbLexicalModelsClick
+        end
+        object editLexicalModelDescription: TEdit
+          Left = 342
+          Top = 99
+          Width = 275
+          Height = 21
+          TabStop = False
+          TabOrder = 1
+          OnChange = editLexicalModelDescriptionChange
+        end
+        object gridLexicalModelLanguages: TStringGrid
+          Left = 260
+          Top = 200
+          Width = 593
+          Height = 376
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ColCount = 2
+          DefaultRowHeight = 16
+          FixedCols = 0
+          RowCount = 9
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+          TabOrder = 2
+          OnClick = gridLexicalModelLanguagesClick
+          OnDblClick = gridLexicalModelLanguagesDblClick
+          ColWidths = (
+            78
+            64)
+        end
+        object cmdLexicalModelLanguageAdd: TButton
+          Left = 260
+          Top = 587
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Add...'
+          TabOrder = 3
+          OnClick = cmdLexicalModelLanguageAddClick
+        end
+        object cmdLexicalModelLanguageRemove: TButton
+          Left = 418
+          Top = 587
+          Width = 72
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = '&Remove'
+          TabOrder = 4
+          OnClick = cmdLexicalModelLanguageRemoveClick
+        end
+        object cmdLexicalModelLanguageEdit: TButton
+          Left = 339
+          Top = 587
+          Width = 73
+          Height = 25
+          Anchors = [akLeft, akBottom]
+          Caption = 'Ed&it...'
+          TabOrder = 5
+          OnClick = cmdLexicalModelLanguageEditClick
+        end
+        object chkLexicalModelRTL: TCheckBox
+          Left = 342
+          Top = 126
+          Width = 97
+          Height = 17
+          Caption = 'Is Right-to-left'
+          TabOrder = 6
+          OnClick = chkLexicalModelRTLClick
+        end
+        object editLexicalModelFilename: TEdit
+          Left = 342
+          Top = 72
+          Width = 275
+          Height = 21
+          TabStop = False
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 7
         end
       end
     end
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 588
-      ExplicitHeight = 447
       object Panel2: TPanel
         Left = 0
         Top = 0
@@ -604,8 +726,6 @@ inherited frmPackageEditor: TfrmPackageEditor
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 588
-        ExplicitHeight = 447
         DesignSize = (
           872
           622)
@@ -740,7 +860,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           OnChange = editInfoNameChange
-          ExplicitWidth = 215
         end
         object editInfoVersion: TEdit
           Left = 108
@@ -750,7 +869,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
           OnChange = editInfoVersionChange
-          ExplicitWidth = 215
         end
         object editInfoCopyright: TEdit
           Left = 108
@@ -761,7 +879,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 4
           Text = #169
           OnChange = editInfoCopyrightChange
-          ExplicitWidth = 215
         end
         object editInfoAuthor: TEdit
           Left = 108
@@ -771,7 +888,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 5
           OnChange = editInfoAuthorChange
-          ExplicitWidth = 215
         end
         object editInfoEmail: TEdit
           Left = 108
@@ -781,7 +897,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 6
           OnChange = editInfoEmailChange
-          ExplicitWidth = 215
         end
         object editInfoWebSite: TEdit
           Left = 108
@@ -791,7 +906,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 7
           OnChange = editInfoWebSiteChange
-          ExplicitWidth = 215
         end
         object cmdInsertCopyright: TButton
           Left = 614
@@ -802,7 +916,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Insert '#169
           TabOrder = 8
           OnClick = cmdInsertCopyrightClick
-          ExplicitLeft = 330
         end
         object cbKMPImageFile: TComboBox
           Left = 108
@@ -822,7 +935,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Anchors = [akTop, akRight]
           BevelOuter = bvLowered
           TabOrder = 10
-          ExplicitLeft = 410
           object imgKMPSample: TImage
             Left = 1
             Top = 0
@@ -844,9 +956,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitWidth = 588
-      ExplicitHeight = 447
       object Panel3: TPanel
         Left = 0
         Top = 0
@@ -857,8 +966,6 @@ inherited frmPackageEditor: TfrmPackageEditor
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 588
-        ExplicitHeight = 447
         DesignSize = (
           872
           622)
@@ -972,7 +1079,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Default = True
           TabOrder = 4
           OnClick = cmdNewStartMenuEntryClick
-          ExplicitTop = 397
         end
         object cmdDeleteStartMenuEntry: TButton
           Left = 106
@@ -983,7 +1089,6 @@ inherited frmPackageEditor: TfrmPackageEditor
           Caption = '&Delete'
           TabOrder = 5
           OnClick = cmdDeleteStartMenuEntryClick
-          ExplicitTop = 397
         end
         object editStartMenuDescription: TEdit
           Left = 271
@@ -1014,16 +1119,10 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 588
-      ExplicitHeight = 447
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 588
-      ExplicitHeight = 447
       object Panel4: TPanel
         Left = 0
         Top = 0
@@ -1034,8 +1133,6 @@ inherited frmPackageEditor: TfrmPackageEditor
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitWidth = 588
-        ExplicitHeight = 447
         object Label13: TLabel
           Left = 15
           Top = 48
@@ -1061,7 +1158,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object Label5: TLabel
           Left = 24
           Top = 121
-          Width = 81
+          Width = 82
           Height = 13
           Caption = 'Target filename:'
         end
@@ -1249,7 +1346,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           object lblInstallerOutputFilename: TLabel
             Left = 9
             Top = 37
-            Width = 81
+            Width = 82
             Height = 13
             Caption = 'Target filename:'
             FocusControl = editInstallerOutputFilename

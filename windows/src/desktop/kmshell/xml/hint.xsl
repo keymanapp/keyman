@@ -19,7 +19,7 @@
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>hint.css</xsl:attribute></link>
 				<style type="text/css">
 					* { 
-            font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />;
+            font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
           }
 					#container {
   					width: <xsl:value-of select="$locale_hint/@Width" />px;

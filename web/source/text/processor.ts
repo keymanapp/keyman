@@ -320,7 +320,7 @@ namespace com.keyman.text {
       let kbdInterface = keyman.interface;
       let keyMapManager = keyman.keyMapManager;
 
-      if(!keyman.isEmbedded && !fromOSK && !window.event) {
+      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
@@ -411,8 +411,7 @@ namespace com.keyman.text {
         return true;
       }
 
-
-      if(!keyman.isEmbedded && !fromOSK && !window.event) {
+      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
@@ -462,7 +461,8 @@ namespace com.keyman.text {
       if(LeventMatched) {
         let alternates: Alternate[];
 
-        if(keyEvent.keyDistribution) {
+        // Note - we don't yet do fat-fingering with longpress keys.
+        if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
           let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
           alternates = [];
   
@@ -955,7 +955,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          keyman.keyboardManager.notifyKeyboard(Levent.Lcode, Levent.Ltarg, 1); 
+          keyman['interface'].notifyKeyboard(Levent.Lcode, Levent.Ltarg, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -964,7 +964,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        keyman.keyboardManager.notifyKeyboard(0, Levent.Ltarg, 1); 
+        keyman['interface'].notifyKeyboard(0, Levent.Ltarg, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 

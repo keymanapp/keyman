@@ -73,7 +73,7 @@
    * prefix searches within words, however they are not very good
    * at predicting the next word.
    */
-  export class TrieModel implements WorkerInternalModel {
+  export class TrieModel implements LexicalModel {
     configuration: Configuration;
     private _trie: Trie;
     readonly breakWords: WordBreakingFunction;

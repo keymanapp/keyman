@@ -9,7 +9,6 @@ uses
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   UfrmMDIChild in 'child\UfrmMDIChild.pas' {frmTikeChild},
   UfrmNew in 'dialogs\UfrmNew.pas' {frmNew},
-  UfrmStartup in 'main\UfrmStartup.pas' {frmStartup},
   UfrmAboutTike in 'dialogs\UfrmAboutTike.pas' {frmAboutTike},
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
@@ -21,7 +20,6 @@ uses
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
-  ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas',
   UfrmEditor in 'child\UfrmEditor.pas' {frmEditor},
   MenuImgList in '..\..\global\delphi\comp\MenuImgList.pas',
   UfrmSelectKey in 'dialogs\UfrmSelectKey.pas' {frmSelectKey},
@@ -37,7 +35,7 @@ uses
   Keyman.Developer.System.Project.ProjectFiles in 'project\Keyman.Developer.System.Project.ProjectFiles.pas',
   Keyman.Developer.System.Project.kpsProjectFile in 'project\Keyman.Developer.System.Project.kpsProjectFile.pas',
   Keyman.Developer.System.Project.kmxProjectFile in 'project\Keyman.Developer.System.Project.kmxProjectFile.pas',
-  Keyman.Developer.System.Project.kmnProjectFile in 'project\Keyman.Developer.System.Project.kmnProjectFile.pas',
+  Keyman.Developer.System.Project.modelTsProjectFile in 'project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
   Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
   Keyman.Developer.UI.Project.ProjectFileUI in 'project\Keyman.Developer.UI.Project.ProjectFileUI.pas',
   Keyman.Developer.UI.Project.ProjectUI in 'project\Keyman.Developer.UI.Project.ProjectUI.pas',
@@ -274,7 +272,21 @@ uses
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager in 'main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas',
   Keyman.Developer.System.ImportWindowsKeyboard in '..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas',
   Keyman.Developer.System.ImportKeyboardDLL in '..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas',
-  Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas';
+  Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
+  Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
+  Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
+  Keyman.Developer.System.Project.kmnProjectFile in 'project\Keyman.Developer.System.Project.kmnProjectFile.pas',
+  Keyman.Developer.System.Project.modelTsProjectFileAction in 'project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas',
+  Keyman.Developer.System.LexicalModelCompile in '..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas',
+  Keyman.Developer.UI.Project.modelTsProjectFileUI in 'project\Keyman.Developer.UI.Project.modelTsProjectFileUI.pas',
+  Keyman.Developer.System.ModelProjectTemplate in '..\kmconvert\Keyman.Developer.System.ModelProjectTemplate.pas',
+  Keyman.Developer.System.ProjectTemplate in '..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas',
+  Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters},
+  Keyman.Developer.System.Project.wordlistTsvProjectFile in 'project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
+  Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
+  Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
+  Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
+  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -294,6 +306,7 @@ begin
     begin
       InitThemeLibrary;
       SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+      Application.MainFormOnTaskBar := True;
       Application.Initialize;
     //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
       Application.Title := 'Keyman Developer';
@@ -302,7 +315,6 @@ begin
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
       Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-      ShowStartup;
       Application.Run;
     end;
   finally

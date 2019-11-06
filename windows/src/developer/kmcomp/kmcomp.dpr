@@ -8,7 +8,6 @@ uses
   kccompilepackage in 'kccompilepackage.pas',
   CompilePackage in '..\..\global\delphi\general\CompilePackage.pas',
   CRC32 in '..\..\global\delphi\general\CRC32.pas',
-  ResourceStrings in '..\..\global\delphi\general\ResourceStrings.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
   PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
@@ -105,7 +104,13 @@ uses
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
   TextFileFormat in '..\TIKE\main\TextFileFormat.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
-  Keyman.Developer.System.Project.kpsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas';
+  Keyman.Developer.System.Project.kpsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
+  Keyman.System.PackageInfoRefreshLexicalModels in '..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas',
+  Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
+  Keyman.Developer.System.Project.modelTsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas',
+  Keyman.Developer.System.LexicalModelCompile in '..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas',
+  Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
+  Keyman.Developer.System.Project.ProjectLogConsole in 'Keyman.Developer.System.Project.ProjectLogConsole.pas';
 
 {$R icons.RES}
 {$R version.res}

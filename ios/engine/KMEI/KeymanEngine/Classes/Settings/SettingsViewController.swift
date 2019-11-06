@@ -48,7 +48,7 @@ open class SettingsViewController: UITableViewController {
 //    self.init(style: UITableViewStyle.grouped)
 //  }
   
-  init(/*storage: Storage*/) {
+  public init(/*storage: Storage*/) {
 //    self.storage = storage
     super.init(nibName: nil, bundle: nil)
     
@@ -134,20 +134,20 @@ open class SettingsViewController: UITableViewController {
         }
       case "showgetstarted":
         cell.accessoryType = .none
-        let dontShowAgainSwitch = UISwitch()
-        dontShowAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
+        let showAgainSwitch = UISwitch()
+        showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
         
-        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: dontShowAgainSwitch.frame.size)
-        dontShowAgainSwitch.frame = switchFrame
+        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showAgainSwitch.frame.size)
+        showAgainSwitch.frame = switchFrame
         
-        dontShowAgainSwitch.isOn = dontShowGetStarted
-        dontShowAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
+        showAgainSwitch.isOn = showGetStarted
+        showAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
                                       for: .valueChanged)
-        cell.addSubview(dontShowAgainSwitch)
+        cell.addSubview(showAgainSwitch)
         
         if #available(iOSApplicationExtension 9.0, *) {
-          dontShowAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          dontShowAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+          showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+          showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
@@ -174,9 +174,9 @@ open class SettingsViewController: UITableViewController {
     }
   }
   
-  private var dontShowGetStarted: Bool {
+  private var showGetStarted: Bool {
     let userData = Storage.active.userDefaults
-    return !userData.bool(forKey: "ShouldShowGetStarted")
+    return userData.bool(forKey: "ShouldShowGetStarted")
   }
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -313,6 +313,7 @@ open class SettingsViewController: UITableViewController {
     } else {
       itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
     }
+    tableView.reloadData()
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {

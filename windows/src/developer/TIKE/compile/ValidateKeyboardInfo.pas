@@ -4,7 +4,7 @@ interface
 
 uses
   System.JSON,
-  compile;
+  Keyman.Developer.System.Project.ProjectLog;
 
 type
   TValidateKeyboardInfo = class
@@ -17,17 +17,19 @@ type
     constructor Create(AJsonFile: string; ASilent: Boolean);
     function Failed(message: string): Boolean;
   public
-    class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+    class function Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
   end;
 
 implementation
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.SysUtils,
   Winapi.Windows,
 
   BCP47Tag,
+//  Keyman.Developer.System.Project.ProjectLogConsole,
   Keyman.System.KeyboardInfoFile,
   Keyman.System.KMXFileLanguages;
 
@@ -38,7 +40,8 @@ const
   SKeyboardInfoDistSchemaJson = 'keyboard_info.distribution.json';
 
 var
-  GCallback: TCompilerCallback = nil;
+  GCallback: TProjectLogObjectEvent = nil;
+  GFilename: string;
 
 type TValidateJsonMessageProc = function (offset: Int64; message: PAnsiChar): BOOL; stdcall;
 
@@ -47,7 +50,7 @@ function ValidateJsonFile(pwszSchemaFile, pwszJsonFile: PWideChar; MessageProc: 
 
 function ValidateMessageProc(offset: Int64; message: PAnsiChar): BOOL; stdcall;
 begin
-  GCallback(-1, 0, message);
+  GCallback(plsInfo, GFilename, string(AnsiString(message)), 0, 0);
   Result := TRUE;
 end;
 
@@ -110,7 +113,7 @@ end;
 
 function TValidateKeyboardInfo.Failed(message: string): Boolean;
 begin
-  writeln(message);
+  GCallback(plsError, FJsonFile, Message, 0, 0);
   Result := False;
 end;
 
@@ -132,12 +135,14 @@ begin
   Result := Assigned(json);
 end;
 
-class function TValidateKeyboardInfo.Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TCompilerCallback): Boolean;
+class function TValidateKeyboardInfo.Execute(JsonFile, JsonSchemaPath: string; FDistribution, FSilent: Boolean; FCallback: TProjectLogObjectEvent): Boolean;
 var
   SchemaFile: string;
   t: TValidateKeyboardInfo;
 begin
   GCallback := FCallback;
+  GFilename := JsonFile;
+
   if FDistribution
     then SchemaFile := JsonSchemaPath + SKeyboardInfoDistSchemaJson
     else SchemaFile := JsonSchemaPath + SKeyboardInfoSourceSchemaJson;
@@ -152,12 +157,10 @@ begin
       t.Free;
     end;
   end;
-  if not FSilent then
-  begin
-    if Result
-      then writeln('File '+JsonFile+' validated successfully.')
-      else writeln('File '+JsonFile+' had errors.');
-  end;
+
+  if Result
+    then GCallback(plsSuccess, JsonFile, 'File '+JsonFile+' validated successfully.', 0, 0)
+    else GCallback(plsFailure, JsonFile, 'File '+JsonFile+' has errors.', 0, 0);
 end;
 
 end.

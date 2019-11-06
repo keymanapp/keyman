@@ -16,9 +16,7 @@ private let toolbarActivityIndicatorTag = 102
 class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelegate {
   private var userLexicalModels: [InstallableLexicalModel] = [InstallableLexicalModel]()
   public var language: Language!
-  private var updateQueue: [InstallableLexicalModel]?
   private var _isDoneButtonEnabled = false
-  private var isDidUpdateCheck = false
   
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
   private var lexicalModelDownloadCompletedObserver: NotificationObserver?
@@ -37,8 +35,6 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     super.viewDidLoad()
     
     title = "\(language.name) Dictionaries"
-    isDidUpdateCheck = false
-    updateQueue = nil
     if Manager.shared.canAddNewLexicalModels {
       let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
                                       action: #selector(self.addClicked))
@@ -74,26 +70,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     log.info("didAppear: LexicalModelPickerViewController")
-    if isDidUpdateCheck || !checkUpdates() {
-      return
-    }
     
-    let toolbarFrame = navigationController!.toolbar!.frame
-    let button = UIButton(type: .roundedRect)
-    button.addTarget(self, action: #selector(self.updateClicked), for: .touchUpInside)
-    
-    button.frame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
-                          width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7)
-    button.center = CGPoint(x: toolbarFrame.width / 2, y: toolbarFrame.height / 2)
-    button.tintColor = UIColor(red: 0.75, green: 1.0, blue: 0.5, alpha: 1.0)
-    button.setTitleColor(UIColor.white, for: .normal)
-    button.setTitle("Update available", for: .normal)
-    button.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                               .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    button.tag = toolbarButtonTag
-    navigationController?.toolbar?.addSubview(button)
-    
-    navigationController?.setToolbarHidden(false, animated: true)
     scroll(toSelectedLexicalModel: false)
 }
   
@@ -209,59 +186,23 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
     log.info("lexicalModelDownloadCompleted LexicalModelPicker")
-    if view == navigationController?.topViewController?.view {
-      if updateQueue == nil {
-        return
-      }
-      Manager.shared.shouldReloadLexicalModel = true
-      
-      // Update lexicalModel version
-      for lexicalModel in lexicalModels {
-        Manager.shared.updateUserLexicalModels(with: lexicalModel)
-      }
-      
-      updateQueue!.remove(at: 0)
-      if !updateQueue!.isEmpty {
-        let langID = updateQueue![0].languageID
-        let lmID = updateQueue![0].id
-        Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
-      } else {
-        loadUserLexicalModels()
-        view.isUserInteractionEnabled = true
-        navigationItem.leftBarButtonItem?.isEnabled = true
-        if navigationItem.rightBarButtonItem != nil {
-          navigationItem.rightBarButtonItem?.isEnabled = true
-        }
-        updateQueue = nil
-        let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-        label?.text = "Dictionaries successfully updated!"
-        navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-        Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
-                             userInfo: nil, repeats: false)
-      }
-    } else {
-      let label = navigationController?.toolbar?.viewWithTag(toolbarLabelTag) as? UILabel
-      label?.text = "Dictionary successfully downloaded!"
-      navigationController?.toolbar?.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-      Timer.scheduledTimer(timeInterval: 3.0, target: self, selector: #selector(self.hideToolbarDelayed),
-                           userInfo: nil, repeats: false)
-      
-      view.isUserInteractionEnabled = true
-      navigationItem.leftBarButtonItem?.isEnabled = true
-      if navigationItem.rightBarButtonItem != nil {
-        navigationItem.rightBarButtonItem?.isEnabled = true
-      }
-      
-      // Add lexicalModel.
-      for lexicalModel in lexicalModels {
-        if lexicalModel.languageID == language?.id {
-          Manager.shared.addLexicalModel(lexicalModel)
-          switchLexicalModel(lexicalModel)
-        }
-      }
-      
-      navigationController?.popToRootViewController(animated: true)
+    
+    // Actually used now.
+    view.isUserInteractionEnabled = true
+    navigationItem.leftBarButtonItem?.isEnabled = true
+    if navigationItem.rightBarButtonItem != nil {
+      navigationItem.rightBarButtonItem?.isEnabled = true
     }
+    
+    // Add lexicalModel.
+    for lexicalModel in lexicalModels {
+      if lexicalModel.languageID == language?.id {
+        Manager.addLexicalModel(lexicalModel)
+        switchLexicalModel(lexicalModel)
+      }
+    }
+    
+    navigationController?.popToRootViewController(animated: true)
   }
   
   private func lexicalModelDownloadFailed(_ notification: LexicalModelDownloadFailedNotification) {
@@ -271,20 +212,16 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       item.isEnabled = true
     }
     
-    let title: String
-    if view == navigationController?.topViewController?.view {
-      updateQueue = nil
-      title = "Dictionary Update Error"
-    } else {
-      title = "Dictionary Download Error"
-    }
+    let title: String = "Dictionary Download Error"
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
                                             preferredStyle: UIAlertControllerStyle.alert)
     alertController.addAction(UIAlertAction(title: "OK",
                                             style: UIAlertActionStyle.cancel,
-                                            handler: nil))
+                                            handler: { _ in
+                                              self.navigationController?.popToRootViewController(animated: true)
+                                            }))
     
     self.present(alertController, animated: true, completion: nil)
   }
@@ -333,67 +270,6 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     showAddLexicalModel()
   }
   
-  @objc func updateClicked(_ sender: Any) {
-    navigationController?.toolbar?.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    let toolbarFrame = navigationController!.toolbar!.frame
-    let width = toolbarFrame.width * 0.95
-    let height = toolbarFrame.height * 0.7
-    let labelFrame = CGRect(x: toolbarFrame.origin.x, y: toolbarFrame.origin.y,
-                            width: width, height: height)
-    
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: width * 0.5, y: height * 0.5)
-    label.text = "Updating\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-    
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: width - indicatorView.frame.width, y: height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-    navigationController?.toolbar?.addSubview(label)
-    navigationController?.toolbar?.addSubview(indicatorView)
-    setIsDoneButtonEnabled(true)
-    updateLexicalModels()
-  }
-  
-  private func checkUpdates() -> Bool {
-    if Manager.shared.apiLexicalModelRepository.lexicalModels == nil {
-      return false
-    }
-    
-    isDidUpdateCheck = true
-    return userLexicalModels.contains { lexicalModel in
-      let lmID = lexicalModel.id
-      return Manager.shared.stateForLexicalModel(withID: lmID) == .needsUpdate
-    }
-  }
-  
-  private func updateLexicalModels() {
-    updateQueue = []
-    var lmIDs = Set<String>()
-    for lm in userLexicalModels {
-      let lmState = Manager.shared.stateForLexicalModel(withID: lm.id)
-      if lmState == .needsUpdate {
-        if !lmIDs.contains(lm.id) {
-          lmIDs.insert(lm.id)
-          updateQueue!.append(lm)
-        }
-      }
-    }
-    
-    if !updateQueue!.isEmpty {
-      let langID = updateQueue![0].languageID
-      let lmID = updateQueue![0].id
-      Manager.shared.downloadLexicalModel(withID: lmID, languageID: langID, isUpdate: true)
-    }
-  }
-  
   private func scroll(toSelectedLexicalModel animated: Bool) {
     let index = userLexicalModels.index { lm in
       return Manager.shared.currentLexicalModelID == lm.fullID
@@ -427,7 +303,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     //get list of lexical models for this languageID and show it
     func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
       if let error = error {
-        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error as! String))
+        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error.localizedDescription))
         DispatchQueue.main.async {
           self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
         }

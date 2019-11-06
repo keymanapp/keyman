@@ -43,10 +43,13 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static TextView lexicalModelTextView = null;
+  private static TextView correctionsTextView = null;
+  private static SwitchCompat correctionsToggle = null;
   private ImageButton addButton = null;
   private String associatedLexicalModel = "";
   private String lgCode;
   private String lgName;
+  private String customHelpLink;
   private SharedPreferences prefs;
 
   private final static String TAG = "LanguageSettingsAct";
@@ -65,12 +68,20 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     @Override
     public void onClick(View v) {
-      SwitchCompat correctToggle = (SwitchCompat) v;
+      // For predictions/corrections toggle
+      SwitchCompat toggle = (SwitchCompat) v;
+
+      SharedPreferences.Editor prefEditor = prefs.edit();
+
+      // predictionsToggle overrides correctionToggle and correctionsTextView
+      if (prefsKey.endsWith(predictionPrefSuffix)) {
+        boolean override = toggle.isChecked();
+        overrideCorrectionsToggle(override);
+      }
 
       // This will allow preemptively making settings for languages without models.
       // Seems more trouble than it's worth to block this.
-      SharedPreferences.Editor prefEditor = prefs.edit();
-      prefEditor.putBoolean(prefsKey, correctToggle.isChecked());
+      prefEditor.putBoolean(prefsKey, toggle.isChecked());
       prefEditor.apply();
 
       // Don't use/apply language modeling settings for languages without models.
@@ -119,6 +130,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     lgCode = bundle.getString(KMManager.KMKey_LanguageID);
     lgName = bundle.getString(KMManager.KMKey_LanguageName);
+    customHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
 
     // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
     String title = String.format(getString(R.string.title_language_settings), lgName);
@@ -134,21 +146,23 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
 
-    textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.enable_corrections));
-    SwitchCompat toggle = layout.findViewById(R.id.toggle);
-    toggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
+    correctionsTextView = (TextView) layout.findViewById(R.id.text1);
+    correctionsTextView.setText(getString(R.string.enable_corrections));
+    correctionsToggle = layout.findViewById(R.id.toggle);
+    correctionsToggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
     String prefsKey = getLanguageCorrectionPreferenceKey(lgCode);
-    toggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+    correctionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
 
     layout = (RelativeLayout)findViewById(R.id.predictions_toggle);
 
     textView = (TextView) layout.findViewById(R.id.text1);
     textView.setText(getString(R.string.enable_predictions));
-    toggle = layout.findViewById(R.id.toggle);
-    toggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
+    SwitchCompat predictionsToggle = layout.findViewById(R.id.toggle);
+    predictionsToggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
     prefsKey = getLanguagePredictionPreferenceKey(lgCode);
-    toggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+    predictionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+
+    overrideCorrectionsToggle(mayPredict);
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
@@ -168,6 +182,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString(KMManager.KMKey_LanguageID, lgCode);
         bundle.putString(KMManager.KMKey_LanguageName, lgName);
+        bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
         Intent i = new Intent(context, ModelPickerActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.putExtras(bundle);
@@ -205,12 +220,17 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         intent.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
         intent.putExtra(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
         intent.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
-        intent.putExtra(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID));
+        String keyboardVersion = KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID);
+        intent.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
         boolean isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N").equals("Y") ? true : false;
         intent.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
         String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
-        if (customHelpLink != null)
+        if (customHelpLink != null) {
           intent.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+        } else {
+          intent.putExtra(KMManager.KMKey_HelpLink,
+            String.format("https://help.keyman.com/keyboard/%s/%s/", keyboardID, keyboardVersion));
+        }
         startActivity(intent);
       }
     });
@@ -295,6 +315,25 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
   public static String getLanguageCorrectionPreferenceKey(String langID) {
     return langID + correctionPrefSuffix;
+  }
+
+  /**
+   * Overrides the enable and visibility of corrections toggle,
+   * and overrides the enable of the corrections text view.
+   * Does not change the corrections toggle value.
+   * @param override boolean - Value from predictions toggle
+   *     When true, enables corrections toggle and text field, and makes corrections toggle visible
+   *     When false, disables corrections toggle and text field, and makes corrections toggle invisible
+   */
+  private void overrideCorrectionsToggle(boolean override) {
+    if (correctionsTextView != null) {
+      correctionsTextView.setEnabled(override);
+    }
+    if (correctionsToggle != null) {
+      correctionsToggle.setEnabled(override);
+      int visibility = override ? View.VISIBLE : View.INVISIBLE;
+      correctionsToggle.setVisibility(visibility);
+    }
   }
 
   // Fully details the building of this Activity's list view items.

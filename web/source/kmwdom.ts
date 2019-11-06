@@ -340,7 +340,6 @@ namespace com.keyman {
       var lastElem = this.getLastActiveElement();
       if(lastElem == Pelem || lastElem == Pelem['kmw_ip']) {
         this.clearLastActiveElement();
-        this.keyman.keyboardManager.setActiveKeyboard(this.keyman.globalKeyboard, this.keyman.globalLanguageCode);
         this.keyman.osk._Hide(false);
       }
       
@@ -1183,7 +1182,14 @@ namespace com.keyman {
       // Allow external focusing KMEW-123
       if(arguments.length > 1 && setFocus) {
         if(this.keyman.util.device.touchable) {
-          this.keyman.touchAliasing.setFocus();
+          var tEvent = {
+            clientX: 0,
+            clientY: 0,
+            target: e as HTMLElement
+          };
+          
+          // Kinda hacky, but gets the job done.
+          (this.keyman.touchAliasing as DOMTouchHandlers).setFocusWithTouch(tEvent);
         } else {
           this.focusLastActiveElement();
         }

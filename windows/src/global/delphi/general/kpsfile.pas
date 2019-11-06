@@ -28,6 +28,7 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.IniFiles,
   System.JSON,
   System.SysUtils,

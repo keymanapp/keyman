@@ -204,6 +204,32 @@ namespace com.keyman.text {
         DOMEventHandlers.states._IgnoreNextSelChange = 1;
       }
     }
+
+            
+    /**
+     * Function     _NotifyKeyboard
+     * Scope        Private
+     * @param       {number}    _PCommand     event code (16,17,18) or 0
+     * @param       {Object}    _PTarget      target element
+     * @param       {number}    _PData        1 or 0    
+     * Description  Notifies keyboard of keystroke or other event
+     */    
+    notifyKeyboard(_PCommand: number, _PTarget: OutputTarget|HTMLElement|Document, _PData: number) { // I2187
+      let keyman = com.keyman.singleton;
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+
+      var target: OutputTarget;
+      if(_PTarget instanceof text.OutputTarget) {
+        target = _PTarget;
+      } else {
+        target = text.Processor.getOutputTarget(_PTarget as HTMLElement);
+      }
+
+      // Good example use case - the Japanese CJK-picker keyboard
+      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
+        activeKeyboard['KNS'](_PCommand, target, _PData);
+      }
+    }
       
     /**
      * Function     KT
@@ -647,6 +673,11 @@ namespace com.keyman.text {
     beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
+      // Do not trigger a 'beep' when operating on alternates - the use case of Mocks.
+      if(outputTarget instanceof Mock) {
+        return;
+      }
+
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();
@@ -980,6 +1011,11 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
+        // Do not trigger a layer change when operating on alternates - the use case of Mocks.
+        if(outputTarget instanceof Mock) {
+          return;
+        }
+
         // How would this be handled in an eventual headless mode?
         return keyman.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
@@ -1098,14 +1134,8 @@ namespace com.keyman.text {
     /**
      * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
      */
-    ['getLastActiveElement'](): HTMLElement {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        return keyman.domManager.getLastActiveElement(); 
-      } else {
-        // What are the IMEs looking for with this method?  Would an element interface suffice?
-        return null;
-      }
+    ['getLastActiveElement'](): OutputTarget {
+      return text.Processor.getOutputTarget();
     }
 
     ['focusLastActiveElement'](): void {
@@ -1138,7 +1168,11 @@ namespace com.keyman.text {
       }
     }
 
-    // Needed for some legacy CJK keyboards.
+    // Also needed for some legacy CJK keyboards.
+    ['GetLastActiveElement'] = this['getLastActiveElement'];
+    ['FocusLastActiveElement'] = this['focusLastActiveElement'];
+    ['HideHelp'] = this['hideHelp'];
+    ['ShowHelp'] = this['showHelp'];
     ['ShowPinnedHelp'] = this['showPinnedHelp'];
 
     resetContext() {

@@ -1,9 +1,9 @@
 /*
  * Editor using monaco
- * 
+ *
  * Helpful references:
  * https://microsoft.github.io/monaco-editor/api/index.html
- * https://blog.expo.io/building-a-code-editor-with-monaco-f84b3a06deaf 
+ * https://blog.expo.io/building-a-code-editor-with-monaco-f84b3a06deaf
  */
 
 window.editorGlobalContext = {
@@ -23,7 +23,7 @@ async function loadSettings() {
   let params = (new URL(location)).searchParams;
   let filename = params.get('filename');
   let mode = params.get('mode');
-  
+
   if(!mode) {
     mode = 'keyman';
   }
@@ -32,7 +32,7 @@ async function loadSettings() {
     Initialize the editor
   */
 
-  require.config({ paths: { 
+  require.config({ paths: {
     'vs': '../lib/monaco/min/vs'
   } });
 
@@ -42,13 +42,18 @@ async function loadSettings() {
     // Register Keyman .kmn tokens provider and language formatter
     // https://github.com/Microsoft/monaco-editor/blob/master/test/playground.generated/extending-language-services-custom-languages.html
     //
-    
+
     monaco.languages.register({ id: 'keyman' });
     monaco.languages.setMonarchTokensProvider('keyman', _language.language);
-    
+
     //
     // Create editor and load source file
     //
+
+    let isWordlistTsv = (mode == 'wordlisttsv');
+    if(isWordlistTsv) {
+      mode = 'text';
+    }
 
     editor = monaco.editor.create(document.getElementById('editor'), {
       language: mode,
@@ -72,16 +77,16 @@ async function loadSettings() {
       },
       "text"
     );
-    
+
     //
     // Set initial fonts
     //
-    
+
     context.setFonts({
       codeFont: { name: params.get('codeFontName'), size: params.get('codeFontSize') },
       charFont: { name: params.get('charFontName'), size: params.get('charFontSize') }
     });
-    
+
     //
     // Setup callbacks
     //
@@ -91,6 +96,10 @@ async function loadSettings() {
     });
 
     const model = editor.getModel();
+
+    if(isWordlistTsv) {
+      model.updateOptions({insertSpaces: false});
+    }
 
     context.reloadSettings();
 
@@ -119,21 +128,21 @@ async function loadSettings() {
   });
 
   //
-  // Search and replace interfaces 
+  // Search and replace interfaces
   //
-  
+
   context.searchFind = function () {
     editor.trigger('', 'actions.find');
   };
 
-  context.searchFindNext = function() {  
+  context.searchFindNext = function() {
     editor.trigger('', 'editor.action.nextMatchFindAction');
   };
 
-  context.searchReplace = function() {  
+  context.searchReplace = function() {
     editor.trigger('', 'editor.action.startFindReplaceAction');
   };
-  
+
   //
   // Edit command interfaces
   //
@@ -145,7 +154,7 @@ async function loadSettings() {
   context.editRedo = function() {
     editor.model.redo();
   };
-  
+
   context.editSelectAll = function() {
     editor.setSelection(editor.model.getFullModelRange());
   };
@@ -158,11 +167,11 @@ async function loadSettings() {
     editor.setPosition({ column: o.column + 1, lineNumber: o.row + 1 });
     editor.revealPositionInCenterIfOutsideViewport(editor.getPosition(), monaco.editor.ScrollType.Smooth);
   };
-  
+
   //
   // Debug interactions
   //
-  
+
   context.setBreakpoint = function (row) {
     if (!breakpoints[row]) {
       breakpoints[row] = editor.deltaDecorations(
@@ -171,7 +180,7 @@ async function loadSettings() {
       );
     }
   };
-  
+
   context.clearBreakpoint = function (row) {
     if (breakpoints[row]) {
       editor.deltaDecorations(breakpoints[row], []);
@@ -186,46 +195,46 @@ async function loadSettings() {
     );
     context.moveCursor({ row: row, column: 0 });
   };
-  
+
   //
   // Character map drag+drop and double-click insertion
   //
-  
+
   context.charmapDragOver = function(o) {
-    
+
     // Convert X, Y to document coordinates
-    
+
     let target = editor.getTargetAtClientPoint(o.x, o.y);
-    
+
     if(target === null || target.type !== monaco.editor.MouseTargetType.CONTENT_TEXT) {
       return false;
     }
-    
+
     // Move insertion point accordingly
-    
+
     let position = editor.getPosition();
-    
+
     if(!position.equals(target.position)) {
       editor.setPosition(target.position);
     }
 
-    return true;    
+    return true;
   };
-  
+
   context.charmapDragDrop = function(o) {
 
     // Convert X, Y to document coordinates
-    
+
     if(o.x >= 0 && o.y >= 0) {
       let target = editor.getTargetAtClientPoint(o.x, o.y);
-      
+
       if(target === null || target.type !== monaco.editor.MouseTargetType.CONTENT_TEXT) {
         return false;
       }
-      
+
       editor.setPosition(target.position);
     }
-    
+
     editor.trigger('keyboard', 'type', {text: o.text});
   };
 
@@ -250,7 +259,7 @@ async function loadSettings() {
       { range: r, text: o.newText }
     ]);
   };
-  
+
   context.setText = function (text) {
     let range = editor.getSelection();
     context.loading = true;
@@ -274,9 +283,9 @@ async function loadSettings() {
     }
 
     fontCss.innerHTML = ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
-      
+
     // Calculate the appropriate line height based on the maximum from the two fonts set
-      
+
     var eChar = document.createElement('div');
     eChar.innerHTML = '?';
     eChar.style = "position:absolute; top: -50000px; left: 0; font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\";";
@@ -285,9 +294,9 @@ async function loadSettings() {
 
     eChar.style = "position:absolute; top: -50000px; left: 0; font-size: " + fonts.codeFont.size + "px; font-family: \"" + fonts.codeFont.name + "\";";
     lineHeight = Math.max(lineHeight, eChar.offsetHeight);
-    
+
     document.body.removeChild(eChar);
-      
+
     editor.updateOptions({
       fontFamily: fonts.codeFont.name,
       fontSize: fonts.codeFont.size,
@@ -361,12 +370,12 @@ async function loadSettings() {
       document.body.appendChild(iframe);
     });*/
   };
-      
+
   /**
     Notifies the host application of an event or command from the
     text editor. Commands are cached until idle to allow for batches
     of commands to be sent together.
-    
+
     Copy of this is in builder.js (ready for refactor!)
   */
   var commands = [];
@@ -389,11 +398,11 @@ async function loadSettings() {
     }
     commands.push(cmd);
   };
-  
+
   //
-  // Updates the state of the host application 
+  // Updates the state of the host application
   //
-  
+
   var updateState = function () {
     let s = editor.getSelection();
     command(s.isEmpty() ? 'no-selection' : 'has-selection');
@@ -412,7 +421,7 @@ async function loadSettings() {
   var getTokenAtCursor = function () {
     var txt = editor.model.getValueInRange(editor.getSelection());
     if (txt != '') {
-      // We'll always return the first 100 characters of the selection and not 
+      // We'll always return the first 100 characters of the selection and not
       // do any manipulation here.
       return { column: null, text: txt.substr(0, 99) };
     }

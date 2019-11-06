@@ -91,7 +91,7 @@ type
       InstallSuccess: Boolean);
     procedure CheckInstalledVersion;
     function InstallMSI: Boolean;
-    procedure InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates: Boolean);
+    procedure InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration: Boolean);
     procedure PrepareForReboot(res: Cardinal);
     function RestartWindows: Boolean;
     procedure RunVersion6Upgrade(const kmshellpath: WideString);
@@ -106,7 +106,7 @@ type
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
     function DownloadFile(ADownloadURL, ADownloadFilename: WideString): Boolean;
-    function DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates: Boolean): Boolean;
+    function DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled, StartWithConfiguration: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
     property Silent: Boolean read FSilent write FSilent;
     property PromptForReboot: Boolean read FPromptForReboot write FPromptForReboot;  // I3355   // I3500
@@ -184,7 +184,7 @@ begin
   inherited;
 end;
 
-function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates: Boolean): Boolean;
+function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled, StartWithConfiguration: Boolean): Boolean;
 begin
   Result := False;
 
@@ -212,14 +212,14 @@ begin
 
     if InstallMSI then
     begin
-      InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates);
+      InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration);
       Result := True;
     end
   end
   else
   begin
     CheckInstalledVersion;
-    InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates);
+    InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration);
     Result := True;
   end;
 end;
@@ -581,6 +581,7 @@ end;
 
 function TRunTools.InstallMSI: Boolean;
 var
+  pcode: array[0..39] of Char;
   res: Cardinal;
   ReinstallMode: WideString;
   FCacheFileName: WideString;
@@ -610,8 +611,28 @@ begin
   if not IsNewerVersionInstalled(FInstallInfo.Version) then // I2560
   begin
     ReinstallMode := 'REBOOTPROMPT=S REBOOT=ReallySuppress'; // I2754 - Auto update is too silent
-    if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode)
-      then ReinstallMode := ReinstallMode + ' REINSTALLMODE=vomus REINSTALL=ALL';
+    if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode) then
+    begin
+      ReinstallMode := ReinstallMode + ' REINSTALLMODE=vomus REINSTALL=ALL';
+    end
+    else
+    begin
+      Status('Removing older versions');
+      // Remove older versions of Keyman now. We'll still get the upgrade desired
+      // because we've backed up the relevant keys for reapplication post-install
+      // Version 11 and later do not need this treatment as they are upgraded in-place
+      // with the file and registry locations remaining static
+      if (MsiGetProductCode('{35E06B45-17C0-406C-B94F-70EFF1EC9278}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
+         (MsiGetProductCode('{04C8710E-3D29-4A25-80A2-A56853A4267D}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
+         (MsiGetProductCode('{18E9B728-8E4E-48DF-9E9F-6F3086A1FE04}', pcode) = ERROR_SUCCESS) or // Keyman 8.0
+         (MsiGetProductCode('{E6806190-7B09-4A8C-8C95-25982589D919}', pcode) = ERROR_SUCCESS) or // Keyman 9.0
+         (MsiGetProductCode('{A20AFB02-7581-4019-9229-5312308FBA1E}', pcode) = ERROR_SUCCESS) then // Keyman 10.0
+      begin
+        MsiConfigureProduct(pcode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT);
+        // We'll ignore errors ...
+      end;
+    end;
+
 
     { Log the install to the diag folder }
 
@@ -666,7 +687,7 @@ begin
   end;
 end;
 
-procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates: Boolean);
+procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration: Boolean);
 var
   i: Integer;
   s: WideString;
@@ -695,7 +716,18 @@ begin
 
     if StartWithWindows then s := s + 'StartWithWindows,';
     if CheckForUpdates then s := s + 'CheckForUpdates,';
+
     if (FInstalledVersion.Version = '') or (FInstalledVersion.ProductCode <> FInstallerVersion.ProductCode) then s := s + 'InstallDefaults,';  // I2651
+
+    if StartDisabled then
+    begin
+      s := s + ' -disablePackages=';
+      for i := 0 to FInstallInfo.Packages.Count - 1 do
+      begin
+        if i > 0 then s := s + ',';
+        s := s + '"'+ExtractFileName(ChangeFileExt(FInstallInfo.Packages.Names[i], ''))+'"';
+      end;
+    end;
 
     TUtilExecute.WaitForProcess('"'+FKMShellPath+'" '+s, ExtractFilePath(FKMShellPath), SW_SHOWNORMAL, WaitFor); // I2605 - for admin-installed packages  // I3349
 
@@ -713,8 +745,13 @@ begin
   if StartKeyman then  // I2738
   begin
     if SysUtils.FileExists(FKMShellPath) then
-      if not CreateProcessAsShellUser(FKMShellPath, '"'+FKMShellPath+'"', False) then  // I2741
+    begin
+      s := '"'+FKMShellPath+'"';
+      if StartWithConfiguration then
+        s := s + ' -startWithConfiguration';
+      if not CreateProcessAsShellUser(FKMShellPath, s, False) then  // I2741
         LogError('Failed to start Keyman Desktop: '+SysErrorMessage(GetLastError), False); // I2756
+    end;
     //if not VarIsNull(ole_product) then
     //  ole_product.OpenProduct;
     //ModalResult := mrOk;

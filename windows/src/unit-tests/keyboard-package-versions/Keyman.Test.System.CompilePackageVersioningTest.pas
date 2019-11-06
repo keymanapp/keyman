@@ -48,7 +48,7 @@ type
     FSilent: Boolean;
     FFullySilent: Boolean;
   public
-    procedure Log(AState: TProjectLogState; Filename: string; Msg: string); override;   // I4706
+    procedure Log(AState: TProjectLogState; Filename: string; Msg: string; MsgCode, line: Integer); override;   // I4706
     function Save: Boolean; override;   // I4709
 
     property Silent: Boolean read FSilent write FSilent;
@@ -68,7 +68,7 @@ begin
   //
   FUnitTestKMCmpDllPath := FRoot + '\..\..\developer\kmcmpdll\';
 
-  p := TProjectConsole.Create(FRoot+'\test-1.0\test-1.0.kpj', False);
+  p := TProjectConsole.Create(ptUnknown, FRoot+'\test-1.0\test-1.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
       if p.Files[i] is TkmnProjectFileAction then
@@ -77,7 +77,7 @@ begin
     p.Free;
   end;
 
-  p := TProjectConsole.Create(FRoot+'\test-2.0\test-2.0.kpj', False);
+  p := TProjectConsole.Create(ptUnknown, FRoot+'\test-2.0\test-2.0.kpj', False);
   try
     for i := 0 to p.Files.Count - 1 do
       if p.Files[i] is TkmnProjectFileAction then
@@ -93,7 +93,8 @@ end;
 
 procedure TCompilePackageVersioningTest.PackageMessage(Sender: TObject; msg: string; State: TProjectLogState);
 const
-  Map: array[TProjectLogState] of TLogLevel = (TLogLevel.Information, TLogLevel.Warning, TLogLevel.Error, TLogLevel.Error);
+  Map: array[TProjectLogState] of TLogLevel = (TLogLevel.Information, TLogLevel.Warning, TLogLevel.Error, TLogLevel.Error,
+    TLogLevel.Information, TLogLevel.Error);
 begin
   Log(Map[State], msg);
 end;
@@ -114,11 +115,13 @@ begin
   end;
 end;
 
-procedure TProjectConsole.Log(AState: TProjectLogState; Filename, Msg: string);   // I4706
+procedure TProjectConsole.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);   // I4706
 begin
 {$IFDEF DEBUG_PROJECT}
   case AState of
-    plsInfo:
+    plsInfo,
+    plsSuccess,
+    plsFailure:
       if not FSilent then
         writeln(ExtractFileName(Filename)+': '+Msg);
     plsWarning:

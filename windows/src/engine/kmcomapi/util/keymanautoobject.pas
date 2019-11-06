@@ -168,10 +168,10 @@ end;
 function TKeymanAutoObject.SafeCallException(ExceptObject: TObject;
   ExceptAddr: Pointer): HResult;
 begin
-{$IFDEF KLOG}
+{.$IFDEF KLOG}
   if (ExceptObject is Exception) then //and not (ExceptObject is EOleException) { for some reason, we lose the class name EKeyman? } then
     LogException(ClassName, ExceptObject as Exception, ExceptAddr);
-{$ENDIF}
+{.$ENDIF}
   Result := inherited SafeCallException(ExceptObject, ExceptAddr);
 end;
 

@@ -58,7 +58,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     return false;
   }
 
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
 
     String modelId = jsonEntry.getString("id");
@@ -70,7 +70,8 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
         models[i].put(KMManager.KMKey_PackageID, packageId);
         models[i].put(KMManager.KMKey_LexicalModelName, jsonEntry.getString("name"));
         models[i].put(KMManager.KMKey_LexicalModelID, jsonEntry.getString("id"));
-        models[i].put(KMManager.KMKey_LexicalModelVersion, jsonEntry.getString("version"));
+        // Use package version for the lexical model version
+        models[i].put(KMManager.KMKey_LexicalModelVersion, packageVersion);
         models[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
         models[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
 
@@ -80,6 +81,8 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
           File welcomeFile = new File(packageDir, "welcome.htm");
           // Only storing relative instead of absolute paths as a convenience for unit tests.
           models[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+        } else {
+          models[i].put(KMManager.KMKey_CustomHelpLink, "");
         }
       }
       return models;

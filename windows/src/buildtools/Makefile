@@ -6,7 +6,7 @@ NOTARGET_SIGNCODE=yes
 
 TARGETS=devtools makejcldbg tds2dbg genkmnp getfilelocks isadmin mkver stockeditor \
   xslt buildunidata build_standards_data buildpkg test-klog delphiprojectmanager #help
-CLEANS=inst
+CLEANS=inst clean-buildtools
 
 !include ..\Header.mak
 
@@ -15,11 +15,11 @@ CLEANS=inst
 help:
     cd $(ROOT)\src\buildtools\help
     $(MAKE) $(TARGET)
-    
+
 build_standards_data:
     cd $(ROOT)\src\buildtools\build_standards_data
     $(MAKE) $(TARGET)
-    
+
 makejcldbg:
     cd $(ROOT)\src\ext\jedi
     $(MAKE) $(TARGET)
@@ -76,6 +76,11 @@ tds2dbg:
     cd $(ROOT)\src\buildtools\tds2dbg
     $(MAKE) $(TARGET)
 
+# ----------------------------------------------------------------------
+
+clean-buildtools:
+    cd $(ROOT)\src\buildtools
+    -del version.txt
 
 !include ..\Target.mak
 

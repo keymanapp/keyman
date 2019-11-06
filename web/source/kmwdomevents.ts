@@ -220,7 +220,7 @@ namespace com.keyman {
       
       var isActivating = this.keyman.uiManager.isActivating;
       if(!isActivating) {
-        this.keyman.keyboardManager.notifyKeyboard(0, Ltarg, 0);  // I2187
+        this.keyman['interface'].notifyKeyboard(0, Ltarg, 0);  // I2187
       }
 
       //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
@@ -328,7 +328,7 @@ namespace com.keyman {
         if(target && text.Processor.getOutputTarget(target)) {
           text.Processor.getOutputTarget(target).deadkeys().clear();
         }
-        this.keyman.keyboardManager.notifyKeyboard(0, target, 1);  // I2187
+        this.keyman['interface'].notifyKeyboard(0, target, 1);  // I2187
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
@@ -488,8 +488,6 @@ namespace com.keyman {
      *      
      */       
     setFocus: (e?: TouchEvent|MSPointerEvent) => void = function(this: DOMTouchHandlers, e?: TouchEvent|MSPointerEvent): void {
-      var osk = this.keyman.osk;
-
       DOMEventHandlers.states.setFocusTimer();
 
       var tEvent: {
@@ -498,8 +496,8 @@ namespace com.keyman {
         target?: EventTarget;
       };
 
-      if(dom.Utils.instanceof(e, "TouchEvent")) {
-          tEvent=(e as TouchEvent).touches[0];
+      if(e && dom.Utils.instanceof(e, "TouchEvent")) {
+        tEvent=(e as TouchEvent).touches[0];
       } else { // Allow external code to set focus and thus display the OSK on touch devices if required (KMEW-123)
         tEvent={clientX:0, clientY:0}
         // Will usually be called from setActiveElement, which should define DOMEventHandlers.states.lastActiveElement
@@ -509,16 +507,22 @@ namespace com.keyman {
         } else {
           tEvent.target = this.keyman.domManager.sortedInputs[0]['kmw_ip'];
         }
-      }    
+      }
+
+      this.setFocusWithTouch(tEvent);
+    }.bind(this);
       
+    setFocusWithTouch(tEvent: {clientX: number, clientY: number, target?: EventTarget}) {
+      var osk = this.keyman.osk;
+
       var touchX=tEvent.clientX,touchY=tEvent.clientY;
       var tTarg=tEvent.target as HTMLElement;
       var scroller: HTMLElement;
 
       // Identify the scroller element
-      if(dom.Utils.instanceof(tTarg, "HTMLSpanElement")) {
+      if(tTarg && dom.Utils.instanceof(tTarg, "HTMLSpanElement")) {
         scroller=tTarg.parentNode as HTMLElement;
-      } else if(tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0) {
+      } else if(tTarg && (tTarg.className != null && tTarg.className.indexOf('keymanweb-input') >= 0)) {
         scroller=tTarg.firstChild as HTMLElement;
       } else {
         scroller=tTarg;
@@ -553,7 +557,7 @@ namespace com.keyman {
       }
       
       // If clicked on DIV, set caret to end of text
-      if(dom.Utils.instanceof(tTarg, "TouchAliasElement")) {
+      if(tTarg && dom.Utils.instanceof(tTarg, "TouchAliasElement")) {
         var x,cp;
         x=dom.Utils.getAbsoluteX(scroller.firstChild as HTMLElement);        
         if(target.dir == 'rtl') { 
@@ -655,7 +659,7 @@ namespace com.keyman {
       if(this._CommonFocusHelper(target)) {
         return;
       }
-    }.bind(this);
+    }
 
     /**
      * Close OSK and remove simulated caret on losing focus

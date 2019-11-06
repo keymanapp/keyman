@@ -6,7 +6,7 @@
 
 PLATFORM=x64
 
-build: version.res dirs
+build: manifest.res version.res dirs
     $(MSBUILD) keymanx64.sln $(MSBUILD_BUILD)
     $(COPY) keymanx64.exe $(PROGRAM)\engine
     $(COPY) keymanx64.pdb $(DEBUGPATH)\engine
@@ -29,7 +29,7 @@ install:
     $(COPY) $(PROGRAM)\engine\keymanx64.exe "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    grep -c "uiAccess=\"true\"" manifest.xml
+    grep -c "uiAccess=\"true\"" manifest.in
 
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true

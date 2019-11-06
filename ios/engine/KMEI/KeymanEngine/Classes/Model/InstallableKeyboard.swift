@@ -9,10 +9,10 @@
 import Foundation
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
-public struct InstallableKeyboard: Codable {
-  public var id: String
+public struct InstallableKeyboard: Codable, LanguageResource {
+  public private(set) var id: String
   public var name: String
-  public var languageID: String
+  public private(set) var languageID: String
   public var languageName: String
   public var version: String
   public var isRTL: Bool

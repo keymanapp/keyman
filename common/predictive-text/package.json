@@ -1,13 +1,14 @@
 {
   "name": "keyman-lmlayer-prototype",
-  "version": "0.20181001.0",
+  "version": "0.0.0",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
   "scripts": {
     "karma": "karma",
     "mocha": "mocha",
     "test": "bash ./unit_tests/test.sh",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "install": "npm link @keymanapp/lexical-model-types"
   },
   "repository": {
     "type": "git",

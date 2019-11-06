@@ -182,6 +182,21 @@ type
     editBootstrapMSI: TEdit;
     editInstallerOutputFilename: TEdit;
     cmdInstallWith: TButton;
+    pageLexicalModels: TTabSheet;
+    panLexicalModels: TPanel;
+    lblLexlicalModels: TLabel;
+    lblLexicalModelsSubtitle: TLabel;
+    lblLexicalModelFilename: TLabel;
+    lblLexicalModelDescription: TLabel;
+    lblLexicalModelLanguages: TLabel;
+    lbLexicalModels: TListBox;
+    editLexicalModelDescription: TEdit;
+    gridLexicalModelLanguages: TStringGrid;
+    cmdLexicalModelLanguageAdd: TButton;
+    cmdLexicalModelLanguageRemove: TButton;
+    cmdLexicalModelLanguageEdit: TButton;
+    chkLexicalModelRTL: TCheckBox;
+    editLexicalModelFilename: TEdit;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -231,6 +246,14 @@ type
     procedure cmdKeyboardEditLanguageClick(Sender: TObject);
     procedure cmdStartTestOnlineClick(Sender: TObject);
     procedure cmdOpenDebugHostClick(Sender: TObject);
+    procedure lbLexicalModelsClick(Sender: TObject);
+    procedure gridLexicalModelLanguagesClick(Sender: TObject);
+    procedure gridLexicalModelLanguagesDblClick(Sender: TObject);
+    procedure cmdLexicalModelLanguageAddClick(Sender: TObject);
+    procedure cmdLexicalModelLanguageEditClick(Sender: TObject);
+    procedure cmdLexicalModelLanguageRemoveClick(Sender: TObject);
+    procedure chkLexicalModelRTLClick(Sender: TObject);
+    procedure editLexicalModelDescriptionChange(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -267,6 +290,16 @@ type
     procedure RefreshTargetPanels;
     procedure EnableControls;
     function CheckFilenameConventions(FileName: string): Boolean;
+    function SelectedLexicalModel: TPackageLexicalModel;
+    function SelectedLexicalModelLanguage: TPackageKeyboardLanguage;
+    procedure RefreshLanguageList(grid: TStringGrid;
+      langs: TPackageKeyboardLanguageList);
+    procedure EnableLexicalModelTabControls;
+    procedure ShowEditLanguageForm(grid: TStringGrid;
+      langs: TPackageKeyboardLanguageList; lang: TPackageKeyboardLanguage);
+    function ShowAddLanguageForm(grid: TStringGrid;
+      langs: TPackageKeyboardLanguageList): Boolean;
+    procedure RefreshLexicalModelList;
 
   protected
     function GetHelpTopic: string; override;
@@ -285,7 +318,7 @@ type
 
     procedure NotifyStartedWebDebug;
 
-    procedure FindError(const Filename: string; s: string); override;   // I4081
+    procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
 
     function CanChangeTab(FForward: Boolean): Boolean; override;
     procedure ChangeTab(FForward: Boolean); override;
@@ -304,7 +337,9 @@ uses
   OnlineConstants,
   KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
+  Keyman.System.PackageInfoRefreshLexicalModels,
   Keyman.System.KeyboardUtils,
+  Keyman.System.LexicalModelUtils,
   kmxfileconsts,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
@@ -357,6 +392,7 @@ begin
     UpdateImageFiles;
     UpdateImagePreviews;
     RefreshKeyboardList;
+    RefreshLexicalModelList;
 
     frameSource := TframeTextEditor.Create(Self);
     frameSource.Parent := pageSource;
@@ -515,7 +551,7 @@ begin
   Result := True;
 end;
 
-procedure TfrmPackageEditor.FindError(const Filename: string; s: string);   // I4081
+procedure TfrmPackageEditor.FindError(const Filename: string; s: string; line: Integer);   // I4081
 begin
   SetFocus;
 end;
@@ -660,7 +696,10 @@ begin
   UpdateReadme;
   UpdateImageFiles;
   UpdateStartMenuPrograms;
+
+  frmMessages.Clear;
   RefreshKeyboardList;
+  RefreshLexicalModelList;
 ////  UpdateCustomisationFile;
   Modified := True;
 end;
@@ -702,7 +741,10 @@ begin
     UpdateReadme;
     UpdateImageFiles;
     UpdateStartMenuPrograms;
+
+    frmMessages.Clear;
     RefreshKeyboardList;
+    RefreshLexicalModelList;
     Modified := True;
   end;
 end;
@@ -1168,6 +1210,7 @@ begin
     UpdateImagePreviews;   // I4814
 
     RefreshKeyboardList;
+    RefreshLexicalModelList;
   finally
     Dec(FSetup);
   end;
@@ -1320,15 +1363,13 @@ end;
 procedure TfrmPackageEditor.HandlePackageRefreshError(Sender: TObject; msg: string; State: TProjectLogState);
 begin
   if Assigned(Self.ProjectFile.Project) then
-    Self.ProjectFile.Project.Log(State, Filename, Msg);
+    Self.ProjectFile.Project.Log(State, Filename, Msg, 0, 0);
 end;
 
 procedure TfrmPackageEditor.RefreshKeyboardList;
 var
   n, i: Integer;
 begin
-  frmMessages.Clear;
-
   n := lbKeyboards.ItemIndex;
 
   with TPackageInfoRefreshKeyboards.Create(pack) do
@@ -1638,6 +1679,283 @@ begin
   panBuildDesktop.Visible := FHasDesktopTarget;
   panBuildWindowsInstaller.Visible := FHasDesktopTarget;
   panBuildMobile.Visible := FHasMobileTarget;
+end;
+
+{-------------------------------------------------------------------------------
+ - Lexical Models and Keyboards - language list shared functions
+ -------------------------------------------------------------------------------}
+
+procedure TfrmPackageEditor.RefreshLanguageList(grid: TStringGrid; langs: TPackageKeyboardLanguageList);
+var
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
+    grid.RowCount := langs.Count + 1;
+    grid.ColWidths[1] := grid.ClientWidth - 120 - 1;
+
+    if langs.Count > 0 then
+    begin
+      grid.FixedRows := 1;
+    end
+    else
+      grid.Enabled := False;
+
+    for i := 0 to langs.Count - 1 do
+    begin
+      grid.Objects[0, i+1] := langs[i];
+      grid.Cells[0, i+1] := langs[i].ID;
+      grid.Cells[1, i+1] := langs[i].Name;
+    end;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+function TfrmPackageEditor.ShowAddLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList): Boolean;
+var
+  lang: TPackageKeyboardLanguage;
+  frm: TfrmSelectBCP47Language;
+begin
+  Result := False;
+  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
+  try
+    if frm.ShowModal = mrOk then
+    begin
+      lang := TPackageKeyboardLanguage.Create(pack);
+      lang.ID := frm.LanguageID;
+      lang.Name := frm.LanguageName;
+      langs.Add(lang);
+      RefreshLanguageList(grid, langs);
+      grid.Row := grid.RowCount - 1;
+      Modified := True;
+      Result := True;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+procedure TfrmPackageEditor.ShowEditLanguageForm(grid: TStringGrid; langs: TPackageKeyboardLanguageList; lang: TPackageKeyboardLanguage);
+var
+  frm: TfrmSelectBCP47Language;
+begin
+  frm := TfrmSelectBCP47Language.Create(Application.MainForm);
+  try
+    frm.LanguageID := lang.ID;
+    frm.LanguageName := lang.Name;
+    if frm.ShowModal = mrOk then
+    begin
+      lang.ID := frm.LanguageID;
+      lang.Name := frm.LanguageName;
+      RefreshLanguageList(grid, langs);
+      Modified := True;
+    end;
+  finally
+    frm.Free;
+  end;
+end;
+
+{-------------------------------------------------------------------------------
+ - Lexical Models tab
+ -------------------------------------------------------------------------------}
+
+(**
+  Adds new lexical models to the LexicalModels object in the kmp.json and
+  removes any that are no longer in the list.
+
+  Finally, updates the LexicalModels tab
+*)
+
+procedure TfrmPackageEditor.RefreshLexicalModelList;
+var
+  n: Integer;
+  lm: TPackageLexicalModel;
+begin
+  n := lbLexicalModels.ItemIndex;
+
+  with TPackageInfoRefreshLexicalModels.Create(pack) do
+  try
+    OnError := Self.HandlePackageRefreshError;
+    if not Execute then
+      frmMessages.DoShowForm;
+  finally
+    Free;
+  end;
+
+  lbLexicalModels.Clear;
+  for lm in pack.LexicalModels do
+    lbLexicalModels.Items.AddObject(lm.ID, lm);
+
+  if lbLexicalModels.Count = 0 then
+    n := -1
+  else if n >= lbLexicalModels.Count then
+    n := lbLexicalModels.Count - 1
+  else if (n < 0) and (lbLexicalModels.Count > 0) then
+    n := 0;
+  lbLexicalModels.ItemIndex := n;
+  lbLexicalModelsClick(lbLexicalModels);
+end;
+
+function TfrmPackageEditor.SelectedLexicalModel: TPackageLexicalModel;
+begin
+  if lbLexicalModels.ItemIndex < 0
+    then Result := nil
+    else Result := lbLexicalModels.Items.Objects[lbLexicalModels.ItemIndex] as TPackageLexicalModel;
+end;
+
+function TfrmPackageEditor.SelectedLexicalModelLanguage: TPackageKeyboardLanguage;
+var
+  lm: TPackageLexicalModel;
+begin
+  lm := SelectedLexicalModel;
+  if not Assigned(lm) then
+    Exit(nil);
+
+  if gridLexicalModelLanguages.Row = 0 then
+    Exit(nil);
+
+  Result := gridLexicalModelLanguages.Objects[0, gridLexicalModelLanguages.Row] as TPackageKeyboardLanguage;
+end;
+
+procedure TfrmPackageEditor.lbLexicalModelsClick(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+  i: Integer;
+begin
+  Inc(FSetup);
+  try
+    gridLexicalModelLanguages.Cells[0, 0] := 'BCP 47 tag';
+    gridLexicalModelLanguages.Cells[1, 0] := 'Language name';
+    gridLexicalModelLanguages.ColWidths[0] := 120;
+    gridLexicalModelLanguages.ColWidths[1] := 10;
+
+    lm := SelectedLexicalModel;
+    if not Assigned(lm) then
+    begin
+      editLexicalModelDescription.Text := '';
+      editLexicalModelFilename.Text := '';
+      chkLexicalModelRTL.Checked := False;
+      gridLexicalModelLanguages.RowCount := 1;
+      EnableLexicalModelTabControls;
+      Exit;
+    end;
+
+    // Details
+
+    editLexicalModelDescription.Text := lm.Name;
+    chkLexicalModelRTL.Checked := lm.RTL;
+
+    for i := 0 to pack.Files.Count - 1 do
+      if TLexicalModelUtils.LexicalModelFileNameToID(pack.Files[i].FileName) = lm.ID then
+      begin
+        editLexicalModelFilename.Text := pack.Files[i].FileName;
+        Break;
+      end;
+
+    // Languages
+
+    RefreshLanguageList(gridLexicalModelLanguages, lm.Languages);
+    EnableLexicalModelTabControls;
+  finally
+    Dec(FSetup);
+  end;
+end;
+
+procedure TfrmPackageEditor.EnableLexicalModelTabControls;
+var
+  e: Boolean;
+begin
+  e := lbLexicalModels.ItemIndex >= 0;
+  lblLexicalModelDescription.Enabled := e;
+  editLexicalModelDescription.Enabled := e;
+  lblLexicalModelFilename.Enabled := e;
+  editLexicalModelFilename.Enabled := e;
+  lblLexicalModelLanguages.Enabled := e;
+  cmdLexicalModelLanguageAdd.Enabled := e;
+  chkLexicalModelRTL.Enabled := e;
+
+  e := e and (gridLexicalModelLanguages.Row > 0);
+  gridLexicalModelLanguages.Enabled := e;
+  cmdLexicalModelLanguageRemove.Enabled := e;
+  cmdLexicalModelLanguageEdit.Enabled := e;
+end;
+
+procedure TfrmPackageEditor.gridLexicalModelLanguagesClick(Sender: TObject);
+begin
+  EnableLexicalModelTabControls;
+end;
+
+procedure TfrmPackageEditor.gridLexicalModelLanguagesDblClick(Sender: TObject);
+begin
+  if SelectedLexicalModelLanguage <> nil then
+    cmdLexicalModelLanguageEdit.Click;
+end;
+
+procedure TfrmPackageEditor.cmdLexicalModelLanguageAddClick(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+begin
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+
+  if ShowAddLanguageForm(gridLexicalModelLanguages, lm.Languages) then
+    gridLexicalModelLanguagesClick(gridLexicalModelLanguages);
+  EnableLexicalModelTabControls;
+end;
+
+procedure TfrmPackageEditor.cmdLexicalModelLanguageEditClick(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+  lang: TPackageKeyboardLanguage;
+begin
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lang := SelectedLexicalModelLanguage;
+  Assert(Assigned(lang));
+
+  ShowEditLanguageForm(gridLexicalModelLanguages, lm.Languages, lang);
+end;
+
+procedure TfrmPackageEditor.cmdLexicalModelLanguageRemoveClick(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+  lang: TPackageKeyboardLanguage;
+begin
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lang := SelectedLexicalModelLanguage;
+  Assert(Assigned(lang));
+
+  lm.Languages.Remove(lang);
+  RefreshLanguageList(gridLexicalModelLanguages, lm.Languages);
+  EnableLexicalModelTabControls;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.editLexicalModelDescriptionChange(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+begin
+  if FSetup > 0 then
+    Exit;
+
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lm.Name := editLexicalModelDescription.Text;
+  Modified := True;
+end;
+
+procedure TfrmPackageEditor.chkLexicalModelRTLClick(Sender: TObject);
+var
+  lm: TPackageLexicalModel;
+begin
+  if FSetup > 0 then
+    Exit;
+  lm := SelectedLexicalModel;
+  Assert(Assigned(lm));
+  lm.RTL := chkLexicalModelRTL.Checked;
+  Modified := True;
 end;
 
 end.

@@ -1,0 +1,14 @@
+src/inst/*.wixobj
+src/inst/desktopui.*
+src/inst/*.wixpdb
+src/inst/*.msi
+src/inst/*.exe
+src/inst/download.mak
+src/inst/fv_all.kmp
+src/xml/localedef.dtd
+**/Thumbs.db
+
+# Temporary ignores
+
+FV Keyman License_revised040608.rtf
+extra/

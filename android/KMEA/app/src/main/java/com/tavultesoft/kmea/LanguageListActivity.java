@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -117,8 +118,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
           int offsetY = (v == null) ? 0 : v.getTop();
           i.putExtra("offsetY", offsetY);
           startActivityForResult(i, 1);
-        } else {
-          // language.keyboards.size() == 1
+        } else if (language.keyboards.size() == 1) {
           Keyboard kbd = language.keyboards.iterator().next();
           String kbName = kbd.map.get(KMManager.KMKey_KeyboardName);
 
@@ -148,6 +148,10 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             i.putExtras(bundle);
             startActivity(i);
           }
+        } else {
+          // language.keyboards.size() == 0
+          // No language.keyboards entries exist because of previous failure in downloading keyboard catalog
+          Toast.makeText(context, "One or more resources failed to update!", Toast.LENGTH_SHORT).show();
         }
       }
     });
@@ -238,7 +242,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       return keyboardsInfo;
     } else {
       try {
-        JSONObject jsonObj = getCachedJSONObject(context);
+        JSONObject jsonObj = CloudDataJsonUtil.getCachedJSONObject(
+          CloudDataJsonUtil.getKeyboardCacheFile(context));
         if (jsonObj == null) {
           return null;
         }
@@ -317,31 +322,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
         return null;
       }
     }
-  }
-
-  // Still used by KMManager and/or KMKeyboard.
-  protected static File getCacheFile(Context context) {
-    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
-    return new File(context.getCacheDir(), jsonCacheFilename);
-  }
-
-  // Still used by KMManager and/or KMKeyboard.
-  protected static JSONObject getCachedJSONObject(Context context) {
-    JSONObject jsonObj = null;
-    try {
-      // Read from cache file
-      File file = getCacheFile(context);
-      if (file.exists()) {
-        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
-        jsonObj = new JSONObject(objInput.readObject().toString());
-        objInput.close();
-      }
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
-      jsonObj = null;
-    }
-
-    return jsonObj;
   }
 
   private static void showErrorDialog(Context context, String title, String message) {

@@ -52,23 +52,17 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromLocal() {
-    let filePath = Bundle.main.path(forResource: "info", ofType: "html", inDirectory: nil)
+    let offlineHelpBundle = Bundle(path: Bundle.main.path(forResource: "OfflineHelp", ofType: "bundle")!)!
+
+    // Yes, .php.html.  That's how `wget` is set to retrieve it, since Safari won't recognize the contents
+    // without the .html ending, it seems.
+    let filePath = offlineHelpBundle.path(forResource: "index.php", ofType: "html", inDirectory: nil)
     webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 
   private func loadFromServer() {
-    let keyboardInfo = Manager.shared.currentKeyboard
-    let currentKeyboardId = keyboardInfo?.id ?? Defaults.keyboard.id
-    let userData = AppDelegate.activeUserDefaults()
-    let keyboards = userData.userKeyboards
-    let keyboardIds = keyboards?.map { $0.id }
-    let installedKeyboards: String
-    if let ids = keyboardIds, !ids.isEmpty {
-      installedKeyboards = Array(Set(ids)).joined(separator: ",")
-    } else {
-      installedKeyboards = currentKeyboardId
-    }
-    let url = "http://keyman.com/iphone-and-ipad/app/?active=\(currentKeyboardId)&installed=\(installedKeyboards)"
+    let appVersion = Version.current
+    let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.string)/?embed=ios"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Info page URL: \(url)")
   }

@@ -22,10 +22,10 @@ public enum MenuBehaviour {
 }
 
 open class InputViewController: UIInputViewController, KeymanWebDelegate {
-  var menuCloseButtonTitle: String?
-  var isInputClickSoundEnabled = true
-  var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
-  var menuBehaviour = MenuBehaviour.showAlways
+  public var menuCloseButtonTitle: String?
+  public var isInputClickSoundEnabled = true
+  public var globeKeyTapBehaviour = GlobeKeyTapBehaviour.switchToNextKeyboard
+  public var menuBehaviour = MenuBehaviour.showAlways
 
   var _isSystemKeyboard: Bool
   var isSystemKeyboard: Bool {
@@ -60,7 +60,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return Storage.active.userDefaults.userKeyboards?.count ?? 0
   }
 
-  private var expandedHeight: CGFloat {
+  var expandedHeight: CGFloat {
     return keymanWeb.keyboardHeight + activeTopBarHeight
   }
   

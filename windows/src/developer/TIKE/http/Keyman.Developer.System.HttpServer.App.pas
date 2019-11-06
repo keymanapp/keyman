@@ -44,6 +44,7 @@ uses
   JsonUtil,
   KeymanDeveloperOptions,
   Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.WelcomeRenderer,
   RedistFiles;
 
 { TAppHttpServer }
@@ -97,6 +98,12 @@ end;
 procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 
+  procedure RespondWelcome;
+  begin
+    AResponseInfo.ContentType := 'text/html; charset=UTF-8';
+    AResponseInfo.ContentText := TWelcomeRenderer.Render;
+  end;
+
   procedure RespondProjectFile;
   var
     path: string;
@@ -118,7 +125,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
     end;
 
     // Transform the .kpj
-    with TProject.Create(path) do
+    with TProject.Create(ptUnknown, path) do
     try
       AResponseInfo.ContentType := 'text/html; charset=UTF-8';
       AResponseInfo.ContentText := Render;
@@ -222,6 +229,8 @@ begin
   Delete(doc, 1, 8);
   if (doc = '') or (doc = 'index') then
     RespondProjectFile
+  else if doc = 'welcome' then
+    RespondWelcome
   else if doc = 'ico' then
     RespondIco
   else if Copy(doc, 1, 4) = 'res/' then

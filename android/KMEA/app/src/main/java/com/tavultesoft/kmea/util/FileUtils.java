@@ -40,6 +40,7 @@ public final class FileUtils {
   public static final String SVGVIEWBOX = ".svg#";
   public static final String WOFFFONT = ".woff";
 
+  public static final String MODELPACKAGE = ".model.kmp";
   public static final String KEYMANPACKAGE = ".kmp";
   public static final String WELCOME_HTM = "welcome.htm";
 

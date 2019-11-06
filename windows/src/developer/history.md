@@ -3,6 +3,59 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-10-05 12.0.45 beta
+* Touch Layout Editor: Make default padding in touch layout editor match default padding in KeymanWeb. (#2170)
+
+## 2019-10-04 12.0.44 beta
+* Package Editor: Lexical models do not have embedded version numbers, so remove this from the user interface. (#2164)
+* Touch Layout Editor: Dropping character from Character Map onto Touch Layout Editor now saves the change. (#2163)
+
+## 2019-09-30 12.0.41 beta
+* General: Keyman Desktop 11 would crash if installed together with Keyman Developer 12. (#2148)
+
+## 2019-09-29 12.0.40 beta
+* General: Context help was not showing correctly on startup. (#2145)
+
+## 2019-09-27 12.0.39 beta
+* General: Introduces a Welcome screen and improves workflow for starting use of Keyman Developer. (#2134)
+* General: Fix version numbers for kmlmc, kmlmp and kmlmi. (#2129)
+* General: .js files now open in Keyman Developer for editing. (#2140)
+
+## 2019-09-25 12.0.37 beta
+* Compiler: Add -lexical-model command line option for building lexical model template projects to kmconvert. (#2120)
+* Debugger: Remove legacy 'Install keyboard' link in web test and cleanup look somewhat. (#2122)
+* Compiler: Support colour log messages and cleanup logging. (#2128)
+* Help: Fix some of the issues with Context Help, and address one specific topic - touch layout editor. (#2132)
+
+## 2019-09-24 12.0.36 beta
+* General: File type icons were mismatched (#2112)
+* Project: Shift layer in basic touch layout template had incorrect modifier for period (.) on shift layer (#2113)
+* Touch layout editor: Adding or deleting a playform or layer and making no other changes would not stick (#2114)
+* General: On Windows 7 and 8, in some circumstances dialog boxes could appear behind the main form (#2115)
+
+## 2019-09-20 12.0.34 beta
+* Add basic wordlist editor to Keyman Developer (#2086)
+
+## 2019-09-19 12.0.33 beta
+* Disable canonicalization of BCP 47 codes when building keyboard and model projects from template because it's inadequate (#2084)
+* Prevent package metadata preprocessor from treating .model.js files as keyboard files when they don't exist (#2085)
+
+## 2019-09-11 12.0.30 beta
+* Clarify the project filename that will be created and simplify how the Browse button works in Project Template dialogs (#2073)
+
+## 2019-09-09 12.0.28 beta
+* Character preview was not updating in mobile web touch test (#2061)
+
+## 2019-09-08 12.0.27 beta
+* Make sure New Project actually starts a new, blank project (#2059)
+* Don't overwrite a BCP 47 code that the user has chosen when writing project templates (#2060)
+
+## 2019-09-02 12.0.23 beta
+* Add kmlmc, kmlmi and kmlmp command line tools for building lexical models (#2024)
+
+## 2019-08-16 12.0.15 beta
+* Add support for lexical models in packages for development tools (#1977)
+
 ## 2019-07-29 12.0.9 beta
 * Initial beta release of Keyman Desktop 12
 * [Pull Requests](https://github.com/keymanapp/keyman/pulls?utf8=%E2%9C%93&q=is%3Apr+merged%3A2019-02-25..2019-08-04+label%3Adeveloper+base%3Amaster)
@@ -106,7 +159,7 @@
   * Improved performance of web server (#1433)
   * Current project is now shown in title bar (#1369)
   * Tweaked setup user interface and structure (#1098, #1175, #1178, #1245, #1238)
-  
+
 * Bug Fixes:
   * Support for display (avoiding crash) when loading large icons (#1416)
   * Importing .kvks into .keyman-touch-layout no longer uses incorrect layer names for some rare modifiers (#1415)
@@ -156,7 +209,7 @@
 
 ## 2018-06-12 10.0.1106.0 beta
 * No changes to Keyman Developer
- 
+
 ## 2018-06-11 10.0.1105.0 beta
 * No changes to Keyman Developer
 
@@ -289,7 +342,7 @@
 * No changes in Keyman Developer
 
 ## 2018-03-22 10.0.1054.0 beta
-* Initial beta release of Keyman Developer 10 
+* Initial beta release of Keyman Developer 10
 
 ## 10.0 alpha
 * Keyman Developer moved to open source (#121)
@@ -297,7 +350,7 @@
 * KeymanWeb is now continuously integrated with Developer, ensuring that each update uses the most current version possible (#122)
   - Additional KeymanWeb compatibility fixes (#349)
 * Keyman Developer now connects only to *api.keyman.com* and *keyman.com* for online tools (#653)
-  
+
 ### Compilers
 * Keyman Developer compiler now generates keyboards that distinguish left and right ctrl/alt for web (#313)
 * Packages can now include .js files for deployment to iOS and Android (#461)
@@ -380,7 +433,7 @@
 * Fixed: Character Map and Character Identifier don't match tokens at start of line (I4842)
 * Fixed: Delete key doesn't work in the keyboard debugger (I4845)
 * Fixed: Code editor does not get focus automatically when file is loaded (I4847)
-  
+
 ## 9.0.511 stable
 * Added: Refresh Keyman Developer look and feel for release (I4796)
 * Added: Split Path and Name boxes in New File dialogs (I4798)
@@ -734,7 +787,7 @@
 ### KeymanWeb Pack
 * KeymanWeb compiler and design tools integrated into Keyboard Editor
 * KeymanWeb keyboard test window
-  
+
 ### Branding Pack
 * Create your own product using the Branding Pack and the Keyman Engine
 * Fully customisable user interface for your product with Branding Editor
@@ -750,4 +803,4 @@
 * Modern Windows Installer for straightforward deployment
 * Windows Vista support
 * Unicode support throughout Keyman Developer
-* Automated online updates 
+* Automated online updates

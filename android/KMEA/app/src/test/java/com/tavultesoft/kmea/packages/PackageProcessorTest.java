@@ -41,9 +41,9 @@ public class PackageProcessorTest {
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
 
-  private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom.model";
+  private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom";
   private static final File TEST_EN_CUSTOM_MODEL_KMP_FILE = new File(TEST_RESOURCE_ROOT, "packages" +
-    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_NAME + ".kmp");
+    File.separator + "en.custom" + File.separator + TEST_EN_CUSTOM_MODEL_NAME + ".model.kmp");
 
   private static File tempPkg;
   private static File tempPkgAlt;
@@ -131,8 +131,9 @@ public class PackageProcessorTest {
     FileUtils.moveDirectory(tempPkg, TEST_GFF_KMP_TARGET);
 
     Assert.assertNotNull(json);
+    String pkgVersion = PP.getPackageVersion(json);
 
-    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json");
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion);
     // Only the first language is installed with the keyboard
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 

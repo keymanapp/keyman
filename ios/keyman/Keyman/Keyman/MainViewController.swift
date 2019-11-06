@@ -138,7 +138,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup Keyman Manager & fetch keyboards list
     Manager.shared.canRemoveDefaultKeyboard = true
+
+    // Pre-load for use in update checks.
     Manager.shared.apiKeyboardRepository.fetch()
+    Manager.shared.apiLexicalModelRepository.fetch()
 
     let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
@@ -550,6 +553,29 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.showKeymanEngineSettings(inVC: self)
   }
 
+  func showInstalledLanguages() {
+    Manager.shared.hideKeyboard()
+
+    // Allows us to set a custom UIToolbar for download/update status displays.
+    let nc = UINavigationController(navigationBarClass: nil, toolbarClass: ResourceDownloadStatusToolbar.self)
+
+    // Grab our newly-generated toolbar instance and inform it of its parent NavigationController.
+    // This will help streamline use of the 'toolbar' as a status/update bar.
+    let toolbar = nc.toolbar as? ResourceDownloadStatusToolbar
+    toolbar?.navigationController = nc
+
+    // As it's the first added view controller, settingsVC will function as root automatically.
+    let settingsVC = SettingsViewController()
+    nc.pushViewController(settingsVC, animated: false)
+    nc.modalTransitionStyle = .coverVertical
+    nc.modalPresentationStyle = .pageSheet
+
+    let installedLanguagesVC = InstalledLanguagesViewController()
+    nc.pushViewController(installedLanguagesVC, animated: true)
+
+    self.present(nc, animated: true)
+  }
+
   @objc func actionButtonClick(_ sender: Any) {
     _ = dismissDropDownMenu()
     popover?.dismiss(animated: false)
@@ -803,7 +829,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         return
       }
 
-      if Manager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
+      if ResourceDownloadManager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
         keyboardToDownload = keyboard
         confirmInstall(withTitle: "\(keyboard.languageName): \(keyboard.name)",
           message: "Would you like to install this keyboard?",
@@ -889,7 +915,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
     if let keyboard = keyboardToDownload {
-      Manager.shared.downloadKeyboard(withID: keyboard.id, languageID: keyboard.languageID, isUpdate: false)
+      ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id,
+                                                      languageID: keyboard.languageID,
+                                                      isUpdate: false)
     }
   }
 
@@ -909,7 +937,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
     if let url = customKeyboardToDownload {
-      Manager.shared.downloadKeyboard(from: url)
+      ResourceDownloadManager.shared.downloadKeyboard(from: url)
     }
     showGetStartedIfNeeded(withAction: action)
   }
@@ -996,7 +1024,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if userData.bool(forKey: dontShowGetStartedKey) {
       return false
     }
-    if !userData.bool(forKey: shouldShowGetStartedKey) {
+
+    // Needs a nil check to ensure Get Started displays for the initial install - userData.bool defaults to false.
+    if !userData.bool(forKey: shouldShowGetStartedKey) && userData.object(forKey: shouldShowGetStartedKey) != nil {
       return false
     }
 

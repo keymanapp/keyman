@@ -3,11 +3,30 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-08-11 12.0.13 beta
-* Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
+## 2019-09-20 12.0.39 beta
+* App info / help now points to the equivalent pages on help.keyman.com in a multi-page format (#2088)
+* Offline help now uses a mirrored copy of help.keyman.com and is also multi-page (#2102)
 
-## 2019-08-08 12.0.12 beta
+## 2019-09-17 12.0.37 beta
+* Multiple bug fixes for the system keyboard (#2094)
+
+## 2019-09-11 12.0.35 beta
+* Fixes predictive text bug where the last input was always interpreted as the first available key (#2076)
+* Adds support for scrolling long suggestions in the predictive banner (#2071)
+
+## 2019-09-09 12.0.32 beta
+* Fixes OSK scaling bug on app re-entry when using keyboards without dictionaries (#2067)
+
+## 2019-08-29 12.0.20 beta
+* Automatically updates old default resources to the new set (#2007)
+* Includes the English (MTNT) dictionary by default for English (#2010)
+
+## 2019-08-26 12.0.14 beta
+* Fixes Get Started display logic (#1988)
+* Enables swipe-deletion of installed keyboards in the language settings menu. (#1969)
 * Fixes toggle alignment issues in the Settings UI (#1947)
+* Polishes loading of specific-language keyboard downloading menu.  (#1944)
+* Moves update functionality to the Installed Language menu and added dictionary updates. (#1979)
 
 ## 2019-07-29 12.0.11 beta
 * Initial beta release of Keyman for iPhone and iPad 12

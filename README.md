@@ -1,8 +1,12 @@
-![Keyman](https://keyman.com/cdn/dev/img/logo2.png) 
+![Keyman](https://keyman.com/cdn/dev/img/logo2.png)
 
 Open Source
 
+[Keyman](https://keyman.com) makes it possible for you to type in over 1,000 languages on Windows, iPhone, iPad, Android tablets and phones, and even instantly in your web browser.
+
 [comment]: # (CI Build statuses)
+
+Development Status on [status.keyman.com](https://status.keyman.com)
 
 | Platform  | Master | Nightly | Beta | Stable |
 | --------  | :----: | :-----: | :--: | :----: |
@@ -13,19 +17,17 @@ Open Source
 | iOS   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Master)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Beta)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Stable),branch:(default:false)/statusIcon) |
 | Linux   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Master)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Beta)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Stable),branch:(default:false)/statusIcon) |
 
-[Keyman](https://keyman.com) makes it possible for you to type in over 1,000 languages on Windows, iPhone, iPad, Android tablets and phones, and even instantly in your web browser.
-
 # Getting Started
 
 ## Desktop Platforms ##
-[Windows](./windows/src/README.md)
-[macOS](./mac/README.md)
-[Linux](./linux/README.md)
+* [Windows](./windows/src/README.md)
+* [macOS](./mac/README.md)
+* [Linux](./linux/README.md)
 
 ## Web & Mobile Platforms ##
-[Web](./web/README.md)
-[Android](./android/README.md)
-[iOS](./ios/README.md)
+* [Web](./web/README.md)
+* [Android](./android/README.md)
+* [iOS](./ios/README.md)
 
 # Release Types
 

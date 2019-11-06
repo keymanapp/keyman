@@ -61,7 +61,6 @@ const
   MAX_REG_FONT_ENTRIES = 16;
 
 function GetFolderPath(csidl: Integer): string;
-function ShouldShowStartup: Boolean;
 function TikeActive: Boolean;
 function CreateLink(const ObjPath, LinkPath, Desc: string): Boolean;
 procedure SetFontFromString(f: TFont; s: string);
@@ -94,7 +93,7 @@ uses
   Winapi.ShellApi,
   Classes, SysUtils, ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
-     ResourceStrings, CRC32, VisualKeyboard, Controls;
+     KeymanVersion, CRC32, VisualKeyboard, Controls;
 
 var
   hMutex: THandle;
@@ -192,25 +191,6 @@ begin
             mm.Free(idl);
         end;
     end;
-end;
-
-function ShouldShowStartup: Boolean;
-begin
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) then  // I2890
-    try
-      if not ValueExists(SRegValue_IDEOptShowStartupDialog) then Result := True
-      else Result := ReadString(SRegValue_IDEOptShowStartupDialog) = '1';
-    except
-      Result := True;
-    end
-    else
-      Result := True;
-  finally
-    Free;
-  end;
 end;
 
 function TikeActive: Boolean;
@@ -446,7 +426,7 @@ begin
   Result := IncludeTrailingPathDelimiter(RootPath);
 
   if not FileExists(Result + 'keyman32.dll') then
-    ShowMessage('The executable keyman32.dll could not be found.  You should reinstall '+DistApplicationTitle+'.');
+    ShowMessage('The executable keyman32.dll could not be found.  You should reinstall '+SKeymanDesktopName+'.');
 end;
 
 

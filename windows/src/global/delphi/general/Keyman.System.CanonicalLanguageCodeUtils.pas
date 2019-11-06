@@ -23,6 +23,11 @@ uses
 // 3. finally, if no appropriate script is given, return '', because we'll need user
 //    to figure out the script themselves
 //
+// TODO: This code is not really 100% correct. We need to revisit how language tags
+//       are constructed and the point at which we do canonicalization. There are
+//       also competing requirements; for instance, Windows requires a script in
+//       some language tags where other operating systems might now.
+//
 class function TCanonicalLanguageCodeUtils.FindBestTag(const Tag: string): string;
 var
   t: TBCP47Tag;
@@ -34,6 +39,12 @@ var
   var
     i: Integer;
   begin
+    // If the tag is in the list of valid tags, use it. #2046.
+    for i := 0 to High(a) do
+      if SameText(a[i], Tag) then
+        Exit(a[i]);
+
+    // Otherwise, use the most complete tag
     for i := High(a) downto 0 do
     begin
       with TBCP47Tag.Create(a[i]) do

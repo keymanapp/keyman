@@ -9,7 +9,9 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -49,11 +51,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
+import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.data.CloudDownloadMgr;
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -94,6 +101,11 @@ public final class KMManager {
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
+  public enum FormFactor {
+    PHONE,
+    TABLET;
+  }
+
   private static InputMethodService IMService;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
@@ -113,6 +125,11 @@ public final class KMManager {
   protected static HashMap<String, String> currentLexicalModel = null;
   protected static String currentBanner = "blank";
 
+  // Special override for when keyboard is entering a password text field.
+  // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
+  // regardless what the Settings preference is.
+  private static boolean mayPredictOverride = false;
+
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -120,6 +137,7 @@ public final class KMManager {
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
   public static final String KMKey_KeyboardCount = "kbCount";
+  public static final String KMKey_HelpLink = "helpLink";
   public static final String KMKey_Icon = "icon";
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
@@ -161,6 +179,11 @@ public final class KMManager {
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
 
+  // Default Dictionary Info
+  public static final String KMDefault_DictionaryPackageID = "nrc.en.mtnt";
+  public static final String KMDefault_DictionaryModelID = "nrc.en.mtnt";
+  public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
+
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keyman.js";
@@ -189,6 +212,10 @@ public final class KMManager {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
+  public static String getVersion() {
+    return com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+  }
+
   // Check if a keyboard namespace is reserved
   public static boolean isReservedNamespace(String packageID) {
     if (packageID.equals(KMDefault_UndefinedPackageID)) {
@@ -197,7 +224,7 @@ public final class KMManager {
     return false;
   }
 
-  public static void initialize(Context context, KeyboardType keyboardType) {
+  public static void initialize(final Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
@@ -218,6 +245,9 @@ public final class KMManager {
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
+
+    CloudDownloadMgr.getInstance().initialize(appContext);
+    //TODO: Add resource update here
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -307,7 +337,7 @@ public final class KMManager {
     if (parent != null)
       parent.removeView(SystemKeyboard);
     keyboardLayout.addView(SystemKeyboard);
-    
+
     mainLayout.addView(keyboardLayout);
     //mainLayout.addView(overlayLayout);
     return mainLayout;
@@ -352,6 +382,7 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
     }
+    CloudDownloadMgr.getInstance().shutdown(appContext);
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {
@@ -393,6 +424,7 @@ public final class KMManager {
     AssetManager assetManager = context.getAssets();
     try {
       // Copy main files
+      copyAsset(context, KMDefault_DictionaryKMP, "", true);
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
       if(KMManager.isDebugMode()) {
@@ -631,7 +663,7 @@ public final class KMManager {
       }
 
       if (shouldClearCache) {
-        File cache = LanguageListActivity.getCacheFile(appContext);
+        File cache = CloudDataJsonUtil.getKeyboardCacheFile(appContext);
         if (cache.exists()) {
           cache.delete();
         }
@@ -652,6 +684,26 @@ public final class KMManager {
     }
 
     return isCustom;
+  }
+
+  /**
+   * Sets mayPredictOverride true if the InputType field is a hidden password text field
+   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * @param inputType android.text.InputType
+   */
+  public static void setMayPredictOverride(int inputType) {
+    mayPredictOverride =
+      ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
+       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+  }
+
+  /**
+   * Get the value of mayPredictOverride
+   * @return boolean
+   */
+  public static boolean getMayPredictOverride() {
+    return mayPredictOverride;
   }
 
   /**
@@ -701,6 +753,7 @@ public final class KMManager {
       languageJSONArray.put(languageID);
       modelObj.put("languages", languageJSONArray);
       modelObj.put("path", path);
+      modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
       Log.e(TAG, "Invalid lexical model to register");
       return false;
@@ -711,8 +764,10 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayPredict = (mayPredictOverride) ? false :
+      prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
@@ -744,6 +799,18 @@ public final class KMManager {
     return true;
   }
 
+  public static boolean setBannerOptions(boolean mayPredict) {
+    String url = String.format("setBannerOptions(%s)", mayPredict);
+    if (InAppKeyboard != null) {
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(url);
+    }
+    return true;
+  }
+
   public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     return KeyboardPickerActivity.addLexicalModel(context, lexicalModelInfo);
   }
@@ -770,7 +837,7 @@ public final class KMManager {
    * Search the installed lexical models list and see if there's an
    * associated model for a given language ID
    * @param langId - String of the language ID
-   * @return HashMap<String, String> Keyboard information if it exists. Otherwise null
+   * @return HashMap<String, String> Model information if it exists. Otherwise null
    */
   public static HashMap<String, String> getAssociatedLexicalModel(String langId) {
     ArrayList<HashMap<String, String>> lexicalModelsList = getLexicalModelsList(appContext);
@@ -794,7 +861,10 @@ public final class KMManager {
     params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
     params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
     params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
-    mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+
+    if(mFirebaseAnalytics != null) {
+      mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+    }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }
@@ -1033,9 +1103,17 @@ public final class KMManager {
     return kbFileVersion;
   }
 
+  public static void addKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
+    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(listener);
+  }
+
   public static void addKeyboardEventListener(OnKeyboardEventListener listener) {
     KMTextView.addOnKeyboardEventListener(listener);
     KMKeyboard.addOnKeyboardEventListener(listener);
+  }
+
+  public static void removeKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
+    KMKeyboardDownloaderActivity.removeKeyboardDownloadEventListener(listener);
   }
 
   public static void removeKeyboardEventListener(OnKeyboardEventListener listener) {
@@ -1226,6 +1304,12 @@ public final class KMManager {
     }
 
     return result;
+  }
+
+  public static FormFactor getFormFactor() {
+    String device_type = appContext.getResources().getString(R.string.device_type);
+
+    return device_type.equals("AndroidMobile") ? FormFactor.PHONE : FormFactor.TABLET;
   }
 
   public static boolean isHelpBubbleEnabled() {

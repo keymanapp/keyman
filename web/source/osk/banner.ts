@@ -652,11 +652,15 @@ namespace com.keyman.osk {
      * Otherwise, return true.
      */
     tryRevert: () => boolean = function(this: SuggestionManager): boolean {
-      if(this.recentAccept) {
+      // Has the revert keystroke (BKSP) already been sent once since the last accept?
+      if(this.doRevert) {
+        // If so, clear the 'revert' option and start doing normal predictions again.
+        this.doRevert = false;
+        this.recentAccept = false;
+        // Otherwise, did we just accept something before the revert signal was received?
+      } else if(this.recentAccept) {
         this.showRevert();
         this.swallowPrediction = true;
-      } else if(this.doRevert) {
-        this.doRevert = false;
       }
 
       return true;

@@ -8,16 +8,16 @@
 
     <!-- ALLOW Upgrade from 7.0 Light -->
     <Upgrade Id="5D7A2C7D-4CF3-4425-A1B1-411533CA006F">
-      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes"
                       Maximum="8.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDERFOUNDL70" />
     </Upgrade>
 
     <!-- ALLOW Upgrade from 7.0 Pro -->
     <Upgrade Id="76CACC8E-7024-40ba-BA60-4E2F9FF95C2B">
-      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="7.0.213.0" IncludeMinimum="yes"
                       Maximum="8.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDERFOUND70" />
     </Upgrade>
-    
+
     <!-- PREVENT Upgrade from Corporate -->
     <Upgrade Id="63299AFB-F396-43bb-86F2-B8EB0C167E87">
       <UpgradeVersion OnlyDetect="yes" Minimum="7.0.213.0" Property="HIGHERFOUND" />
@@ -25,27 +25,27 @@
 
     <!-- ALLOW Upgrade from 8.0 -->
     <Upgrade Id="E756C3BC-A261-427f-91BE-37955544A126">
-      <UpgradeVersion OnlyDetect="no" Minimum="8.0.300.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="8.0.300.0" IncludeMinimum="yes"
                       Maximum="9.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="OLDERFOUND80" />
     </Upgrade>
 
     <!-- ALLOW Upgrade from 9.0 -->
     <Upgrade Id="593EA657-7DF2-4799-B90E-B9E95A8E66D3">
-      <UpgradeVersion OnlyDetect="no" Minimum="9.0.454.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="9.0.454.0" IncludeMinimum="yes"
                       Maximum="10.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION9FOUND" />
     </Upgrade>
 
     <!-- ALLOW Upgrade from 10.0 -->
     <Upgrade Id="1211D5B5-AAF5-4AE5-8D3D-67E3C19E3C13">
-      <UpgradeVersion OnlyDetect="no" Minimum="10.0.0.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="10.0.0.0" IncludeMinimum="yes"
                       Maximum="11.0.0.0" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION10FOUND" />
     </Upgrade>
-    
+
     <!-- PREVENT or ALLOW Upgrade from 11.0 or later versions -->
     <Upgrade Id="c70af17c-8b9e-47a1-a099-b65aee3dc8b4">
-      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes"
                       Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
-      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes" 
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes"
                       Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
@@ -53,13 +53,13 @@
     <Property Id='OLDINSTALLDIR'>
       <RegistrySearch Id='oldinstalldir_search' Key='Software\Keyman\Keyman Desktop' Root='HKLM' Name='root path' Type='raw' />
     </Property>
-    
+
     <Property Id='OnlineProductID' Value='30' />
-    
+
     <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
 
       <Merge Id="keymanengine" Language='1033' SourceFile='..\..\engine\inst\keymanengine.msm' />
-      
+
       <Directory Id="ProgramFilesFolder" Name=".">
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN" Name="Keyman Desktop">
@@ -75,7 +75,7 @@
                 <RegistryValue Root="HKCR" Key=".kmp" Type="string" Value="Keyman.File.Package" />
                 <RegistryValue Root="HKCR" Key=".kmx" Type="string" Value="Keyman.File.Keyboard" />
                 <RegistryValue Root="HKCR" Key=".kvk" Type="string" Value="Keyman.File.OnScreenKeyboard" />
-                
+
                 <RegistryValue Root="HKCR" Key="Keyman.File.Package" Type="string" Value="Keyman Package File" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell" Type="string" Value="install" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Package\Shell\install" Type="string" Value="&amp;Install" />
@@ -90,47 +90,51 @@
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell" Type="string" Value="install" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install" Type="string" Value="&amp;Install" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
-                
+
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
               </Component>
-              
+
               <Component>
                 <File Name="desktop_resources.dll" Source="..\..\desktop\inst\desktop_resources.dll" KeyPath="yes" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Package\DefaultIcon" Type="string" Value="[#desktop_resources.dll],0" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.Keyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],1" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\DefaultIcon" Type="string" Value="[#desktop_resources.dll],2" />
               </Component>
-              
+
               <Component>
                 <File Name="menu.txt" Source="..\..\desktop\branding\menu.txt" KeyPath="yes" />
               </Component>
-              
+
               <Component>
                 <File Name="messages.txt" Source="..\..\desktop\branding\messages.txt" KeyPath="yes" />
               </Component>
-              
+
+              <Component>
+                <File Name="menutitle.png" Source="..\..\desktop\branding\menutitle.png" KeyPath="yes" />
+              </Component>
+
               <Component>
                 <File Id="trayicon.ico" Name="trayicon.ico" Source="..\..\desktop\branding\trayicon.ico" KeyPath="yes" />
               </Component>
-                            
-              <Component>
-                <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" KeyPath="yes" />
-              </Component>
-              
+
               <Component>
                 <File Id="appicon.ico" Name="appicon.ico" Source="..\..\global\res\90\desktop\appicon.ico" KeyPath="yes" />
               </Component>
-              
+
               <Component>
                 <File Id="cfgicon.ico" Name="cfgicon.ico" Source="..\..\global\res\90\desktop\cfgicon.ico" KeyPath="yes" />
               </Component>
-              
+
+              <Component>
+                <File Id="KeymanDesktop.chm" Name="KeymanDesktop.chm" KeyPath="yes" />
+              </Component>
+
               <Component>
                 <File Name="unicodedata.mdb" Source="..\..\global\inst\data\unicodedata.mdb" />
               </Component>
-              
+
               <Component Id="Reg_RootPath" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="root path" Type="string" Value="[INSTALLDIR]" />
                 <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="version" Type="string" Value="$(var.VERSION)" />
@@ -138,12 +142,12 @@
                 <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="charmap source data" Type="string" Value="[INSTALLDIR]" />
                 <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\Keyman\Keyman Desktop" />
               </Component>
-              
+
               <Component Id="removeCU" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop" Name="Install" Type="string" Value="1" />
                 <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Desktop" />
                 <RemoveFolder Id="ProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
-      
+
                 <RemoveFile Id="Version70ShortcutKeyman"   Name="Keyman Desktop Light 7.0.lnk"  Directory="ProgramMenuDirLight70" On="both" />
                 <RemoveFile Id="Version71ShortcutKeyman"   Name="Keyman Desktop Light 7.1.lnk"  Directory="ProgramMenuDirLight71" On="both" />
                 <RemoveFile Id="Version70ShortcutKeymanD"  Name="Keyman Desktop Light 7.0.lnk"  Directory="DesktopFolder" On="both" />
@@ -166,7 +170,7 @@
                 <RemoveFile Id="Version80ShortcutKeyman"   Name="Keyman Desktop 8.0.lnk"  Directory="ProgramMenuDir80" On="both" />
                 <RemoveFile Id="Version80ShortcutKeymanD"  Name="Keyman Desktop 8.0.lnk"  Directory="DesktopFolder" On="both" />
                 <RemoveFile Id="Version80ShortcutConfig"   Name="Keyman Configuration.lnk"  Directory="ProgramMenuDir80" On="both" />
-                
+
                 <RemoveFolder Id="Version80Shortcuts" Directory="ProgramMenuDir80" On="both" />
 
                 <RemoveFile Id="Version90ShortcutKeyman"   Name="Keyman Desktop 9.0.lnk"  Directory="ProgramMenuDir90" On="both" />
@@ -223,7 +227,7 @@
           </Directory>
         </Directory>
       </Directory>
-      
+
       <Directory Id="ProgramMenuFolder" Name="Programs">
         <Directory Id="ProgramMenuDir" Name="Keyman Desktop" />
         <Directory Id="ProgramMenuDirLight70" Name="Tavultesoft Keyman Desktop Light 7.0" />
@@ -248,13 +252,14 @@
       <ComponentRef Id="KeymanDesktop.chm" />
       <ComponentRef Id="appicon.ico" />
       <ComponentRef Id="cfgicon.ico" />
+      <ComponentRef Id="menutitle.png" />
       <ComponentRef Id="unicodedata.mdb" />
-      
+
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="removeCU" />
       <ComponentGroupRef Id="DesktopUI" />
 
-      <ComponentRef Id="locale_de" />  
+      <ComponentRef Id="locale_de" />
       <ComponentRef Id="locale_fr" />
       <ComponentRef Id="locale_my" />
       <ComponentRef Id="locale_pt_br" />
@@ -265,9 +270,9 @@
 
       <MergeRef Id='keymanengine' />
     </Feature>
-    
+
     <!-- Actions -->
-    
+
     <CustomAction Id="RollbackPostInstallCU" Execute="rollback" Impersonate="yes" ExeCommand='-rcu' BinaryKey='insthelp.exe' />
     <CustomAction Id="RollbackPostInstallLM" Execute="rollback" Impersonate="no" ExeCommand='-rlm' BinaryKey='insthelp.exe' />
     <CustomAction Id="PreUninstallUser" Execute="deferred" Impersonate="yes" ExeCommand='-uu' BinaryKey="insthelp.exe" />
@@ -291,7 +296,10 @@
       <Custom Action='AlreadyUpdated' After='FindRelatedProducts'>CURRENTVERSIONFOUND</Custom>
       <Custom Action='NoDowngrade' After='AlreadyUpdated'>NEWERFOUND Or HIGHERFOUND</Custom>
 
-      <RemoveExistingProducts After='InstallValidate'>VERSION9FOUND or VERSION10FOUND or VERSION11FOUND or OLDERFOUND70 OR OLDERFOUND80 Or OLDERFOUNDL70</RemoveExistingProducts>
+      <!-- Note: we do not remove existing products for 10.0 or earlier, but rely on setup to
+           do this for us, because we actually need the uninstall to happen before InstallValidate.
+           But we cannot have RemoveExistingProducts in two places in the installer! -->
+      <RemoveExistingProducts After='InstallFinalize'>VERSION11FOUND</RemoveExistingProducts>
 
       <Custom Action='RollbackPostInstallLM' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>
       <Custom Action='RollbackPostInstallCU' After='InstallInitialize'><![CDATA[Not Installed Or REINSTALL]]></Custom>

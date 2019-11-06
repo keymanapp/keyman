@@ -14,7 +14,7 @@
         app:showAsAction="always"
         android:title="@string/action_web"
         android:icon="@drawable/ic_light_action_web" />
-    
+
     <item
         android:id="@+id/action_text_size"
         app:showAsAction="always"

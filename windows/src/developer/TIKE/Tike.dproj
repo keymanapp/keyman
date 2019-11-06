@@ -122,9 +122,6 @@
             <Form>frmNew</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="main\UfrmStartup.pas">
-            <Form>frmStartup</Form>
-        </DCCReference>
         <DCCReference Include="dialogs\UfrmAboutTike.pas">
             <Form>frmAboutTike</Form>
         </DCCReference>
@@ -140,7 +137,6 @@
         <DCCReference Include="..\..\global\delphi\general\CompilePackage.pas"/>
         <DCCReference Include="main\KeymanDeveloperUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ResourceStrings.pas"/>
         <DCCReference Include="child\UfrmEditor.pas">
             <Form>frmEditor</Form>
         </DCCReference>
@@ -164,7 +160,7 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.ProjectFiles.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmxProjectFile.pas"/>
-        <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas">
             <Form>frmProjectSettings</Form>
         </DCCReference>
@@ -520,6 +516,26 @@
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas"/>
         <DCCReference Include="..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
+        <DCCReference Include="..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
+        <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFile.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas"/>
+        <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.modelTsProjectFileUI.pas"/>
+        <DCCReference Include="..\kmconvert\Keyman.Developer.System.ModelProjectTemplate.pas"/>
+        <DCCReference Include="..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas">
+            <Form>frmNewModelProjectParameters</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmWordlistEditor.pas">
+            <Form>frmWordlistEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.WelcomeRenderer.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

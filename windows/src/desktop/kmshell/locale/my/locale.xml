@@ -321,8 +321,8 @@
   <String Type="PlainText" Id="S_Yes">လုပ်မည်</String>
   <String Type="Caption" Caption="Save as Web Page...">ဝက်ဘ်စာမျက်နှာအဖြစ်သိမ်းပါ</String>
   <String Type="Caption" Caption="Show Toolbar">Toolbar ကိုပြပါ</String>
-  <String Type="PlainText" Id="SK_UIFontName">Tahoma</String>
-  <String Type="PlainText" Id="SK_UIFontSize">8</String>
+  <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
+  <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
   
   

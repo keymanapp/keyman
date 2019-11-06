@@ -42,6 +42,7 @@ uses
   TempFileManager,
   kmxfile,
   kmxfileconsts,
+  Keyman.Developer.System.Project.ProjectLog,
   UKeymanTargets;
 
 type
@@ -60,7 +61,7 @@ type
   private
     json: TJSONObject;
     FSilent: Boolean;
-    FCallback: TCompilerCallback;
+    FCallback: TProjectLogObjectEvent;
     FBaseName, FJsFile, FKmpFile, FJsonFile: string;
     FMergingValidateIds: Boolean;
     FKMPInfFile: TKMPInfFile;
@@ -75,7 +76,7 @@ type
     function LoadJsonFile: Boolean;
     function LoadKMPFile: Boolean;
     function LoadJSFile: Boolean;
-    constructor Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
+    constructor Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string; AMergingValidateIds, ASilent: Boolean; ACallback: TProjectLogObjectEvent);
     procedure AddAuthor;
     procedure AddAuthorEmail;
     procedure CheckOrAddEncodings;
@@ -98,7 +99,7 @@ type
     procedure AddSourcePath;
   public
     destructor Destroy; override;
-    class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string; AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean; overload;
+    class function Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string; AMergingValidateIds, ASilent: Boolean; ACallback: TProjectLogObjectEvent): Boolean; overload;
   end;
 
 implementation
@@ -107,6 +108,7 @@ uses
   Soap.XsBuiltIns,
 
   System.Classes,
+  System.Generics.Collections,
   System.RegularExpressions,
   System.SysUtils,
   System.Zip,
@@ -127,7 +129,7 @@ type
 { TMergeKeyboardInfo }
 
 class function TMergeKeyboardInfo.Execute(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string;
-  AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback): Boolean;
+  AMergingValidateIds, ASilent: Boolean; ACallback: TProjectLogObjectEvent): Boolean;
 begin
   with TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink, AMergingValidateIds, ASilent, ACallback) do
   try
@@ -138,7 +140,7 @@ begin
 end;
 
 constructor TMergeKeyboardInfo.Create(ASourcePath, AJsFile, AKmpFile, AJsonFile, AHelpLink: string;
-  AMergingValidateIds, ASilent: Boolean; ACallback: TCompilerCallback);
+  AMergingValidateIds, ASilent: Boolean; ACallback: TProjectLogObjectEvent);
 begin
   inherited Create;
 
@@ -403,7 +405,7 @@ end;
 
 function TMergeKeyboardInfo.Failed(message: string): Boolean;
 begin
-  FCallback(0, 0, PAnsiChar(AnsiString(Message)));
+  FCallback(plsError, FJsonFile, message, 0, 0);
   Result := False;
 end;
 

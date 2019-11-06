@@ -1,0 +1,742 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		37150F72231637EA00C73C6A /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6D231637E900C73C6A /* DeviceKit.framework */; };
+		37150F73231637EA00C73C6A /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */; };
+		37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6F231637EA00C73C6A /* Reachability.framework */; };
+		37150F75231637EA00C73C6A /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F70231637EA00C73C6A /* Zip.framework */; };
+		37150F76231637EA00C73C6A /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F71231637EA00C73C6A /* XCGLogger.framework */; };
+		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
+		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
+		37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; };
+		37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F22228A1F57003E710C /* FVInputViewController.swift */; };
+		37EA1F26228B5D6E003E710C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F25228B5D6E003E710C /* AppDelegate.swift */; };
+		37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F27228B5E2B003E710C /* ViewController.swift */; };
+		37EA1F2A228B69AF003E710C /* KeyboardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */; };
+		37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F2E228B7458003E710C /* CheckBox.swift */; };
+		37EA1F31228B7661003E710C /* FVShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F30228B7661003E710C /* FVShared.swift */; };
+		37EA1F32228BCDA7003E710C /* FVShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F30228B7661003E710C /* FVShared.swift */; };
+		37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F4522921BAD003E710C /* KeyboardInfo.swift */; };
+		37EA1F482292238F003E710C /* Keyboards in Resources */ = {isa = PBXBuildFile; fileRef = 37EA1F472292238E003E710C /* Keyboards */; };
+		9800EC5C1C029F2200BF0FB5 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9800EC5B1C029F2200BF0FB5 /* Settings.bundle */; };
+		98395E331C1E61AF007CD675 /* 739-question-selected.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2D1C1E61AF007CD675 /* 739-question-selected.png */; };
+		98395E341C1E61AF007CD675 /* 739-question-selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */; };
+		98395E351C1E61AF007CD675 /* 739-question-selected@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E2F1C1E61AF007CD675 /* 739-question-selected@3x.png */; };
+		98395E361C1E61AF007CD675 /* 739-question.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E301C1E61AF007CD675 /* 739-question.png */; };
+		98395E371C1E61AF007CD675 /* 739-question@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E311C1E61AF007CD675 /* 739-question@2x.png */; };
+		98395E381C1E61AF007CD675 /* 739-question@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98395E321C1E61AF007CD675 /* 739-question@3x.png */; };
+		9889E8C41BFA9CEC00019560 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C21BFA9CEC00019560 /* Main.storyboard */; };
+		9889E8C61BFA9CEC00019560 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C51BFA9CEC00019560 /* Assets.xcassets */; };
+		9889E8C91BFA9CEC00019560 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */; };
+		98C9A8C41BFBF23C009E9A4F /* SWKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98C9A8BC1BFBF23C009E9A4F /* SWKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		98C9A8E81BFBF6C1009E9A4F /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8DD1BFBF6C1009E9A4F /* banner-Landscape-568h@2x.png */; };
+		98C9A8E91BFBF6C1009E9A4F /* banner-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8DE1BFBF6C1009E9A4F /* banner-Landscape-568h@3x.png */; };
+		98C9A8EA1BFBF6C1009E9A4F /* banner-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8DF1BFBF6C1009E9A4F /* banner-Landscape.png */; };
+		98C9A8EB1BFBF6C1009E9A4F /* banner-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E01BFBF6C1009E9A4F /* banner-Landscape@2x.png */; };
+		98C9A8EC1BFBF6C1009E9A4F /* banner-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E11BFBF6C1009E9A4F /* banner-Landscape@2x~ipad.png */; };
+		98C9A8ED1BFBF6C1009E9A4F /* banner-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E21BFBF6C1009E9A4F /* banner-Landscape~ipad.png */; };
+		98C9A8EE1BFBF6C1009E9A4F /* banner-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E31BFBF6C1009E9A4F /* banner-Portrait.png */; };
+		98C9A8EF1BFBF6C1009E9A4F /* banner-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E41BFBF6C1009E9A4F /* banner-Portrait@2x.png */; };
+		98C9A8F01BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */; };
+		98C9A8F11BFBF6C1009E9A4F /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */; };
+		98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		371C855D2288F3A50076612A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		98C9A8C81BFBF23C009E9A4F /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				98C9A8C41BFBF23C009E9A4F /* SWKeyboard.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		37150F6D231637E900C73C6A /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
+		37150F6F231637EA00C73C6A /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
+		37150F70231637EA00C73C6A /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
+		37150F71231637EA00C73C6A /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
+		37C183B822932AD2009F9EFD /* FVKeyboardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardList.swift; sourceTree = "<group>"; };
+		37C183BC2293321C009F9EFD /* Instructions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Instructions; path = FirstVoices/Instructions; sourceTree = "<group>"; };
+		37EA1F1D228A1809003E710C /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
+		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
+		37EA1F25228B5D6E003E710C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		37EA1F27228B5E2B003E710C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardsViewController.swift; sourceTree = "<group>"; };
+		37EA1F2E228B7458003E710C /* CheckBox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CheckBox.swift; path = Checkbox/CheckBox.swift; sourceTree = "<group>"; };
+		37EA1F30228B7661003E710C /* FVShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FVShared.swift; path = FVShared/FVShared.swift; sourceTree = "<group>"; };
+		37EA1F4522921BAD003E710C /* KeyboardInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardInfo.swift; sourceTree = "<group>"; };
+		37EA1F472292238E003E710C /* Keyboards */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Keyboards; path = FirstVoices/Keyboards; sourceTree = "<group>"; };
+		9800EC5B1C029F2200BF0FB5 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		98395E2D1C1E61AF007CD675 /* 739-question-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected.png"; sourceTree = "<group>"; };
+		98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected@2x.png"; sourceTree = "<group>"; };
+		98395E2F1C1E61AF007CD675 /* 739-question-selected@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question-selected@3x.png"; sourceTree = "<group>"; };
+		98395E301C1E61AF007CD675 /* 739-question.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question.png"; sourceTree = "<group>"; };
+		98395E311C1E61AF007CD675 /* 739-question@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question@2x.png"; sourceTree = "<group>"; };
+		98395E321C1E61AF007CD675 /* 739-question@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "739-question@3x.png"; sourceTree = "<group>"; };
+		9889E8B61BFA9CEC00019560 /* FirstVoices.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FirstVoices.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9889E8C31BFA9CEC00019560 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9889E8C51BFA9CEC00019560 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9889E8C81BFA9CEC00019560 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9889E8CA1BFA9CEC00019560 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98C9A8BC1BFBF23C009E9A4F /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		98C9A8C11BFBF23C009E9A4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98C9A8DD1BFBF6C1009E9A4F /* banner-Landscape-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@2x.png"; sourceTree = "<group>"; };
+		98C9A8DE1BFBF6C1009E9A4F /* banner-Landscape-568h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape-568h@3x.png"; sourceTree = "<group>"; };
+		98C9A8DF1BFBF6C1009E9A4F /* banner-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape.png"; sourceTree = "<group>"; };
+		98C9A8E01BFBF6C1009E9A4F /* banner-Landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape@2x.png"; sourceTree = "<group>"; };
+		98C9A8E11BFBF6C1009E9A4F /* banner-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
+		98C9A8E21BFBF6C1009E9A4F /* banner-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Landscape~ipad.png"; sourceTree = "<group>"; };
+		98C9A8E31BFBF6C1009E9A4F /* banner-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait.png"; sourceTree = "<group>"; };
+		98C9A8E41BFBF6C1009E9A4F /* banner-Portrait@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait@2x.png"; sourceTree = "<group>"; };
+		98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait@2x~ipad.png"; sourceTree = "<group>"; };
+		98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait@3x.png"; sourceTree = "<group>"; };
+		98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner-Portrait~ipad.png"; sourceTree = "<group>"; };
+		98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FirstVoices.entitlements; sourceTree = "<group>"; };
+		98C9A9FA1BFC1111009E9A4F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9889E8B31BFA9CEC00019560 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37150F72231637EA00C73C6A /* DeviceKit.framework in Frameworks */,
+				37150F73231637EA00C73C6A /* ObjcExceptionBridging.framework in Frameworks */,
+				37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */,
+				37150F75231637EA00C73C6A /* Zip.framework in Frameworks */,
+				37150F76231637EA00C73C6A /* XCGLogger.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		98C9A8B91BFBF23C009E9A4F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		98395E2C1C1E61AF007CD675 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				98395E2D1C1E61AF007CD675 /* 739-question-selected.png */,
+				98395E2E1C1E61AF007CD675 /* 739-question-selected@2x.png */,
+				98395E2F1C1E61AF007CD675 /* 739-question-selected@3x.png */,
+				98395E301C1E61AF007CD675 /* 739-question.png */,
+				98395E311C1E61AF007CD675 /* 739-question@2x.png */,
+				98395E321C1E61AF007CD675 /* 739-question@3x.png */,
+			);
+			path = Icons;
+			sourceTree = "<group>";
+		};
+		9889E8AD1BFA9CEC00019560 = {
+			isa = PBXGroup;
+			children = (
+				37C183BC2293321C009F9EFD /* Instructions */,
+				37EA1F472292238E003E710C /* Keyboards */,
+				9889E8B81BFA9CEC00019560 /* FirstVoices */,
+				98C9A9FB1BFC19ED009E9A4F /* Frameworks */,
+				98C7F7EE1BFD422E007F17B7 /* FVShared */,
+				9889E8B71BFA9CEC00019560 /* Products */,
+				9800EC5B1C029F2200BF0FB5 /* Settings.bundle */,
+				98C9A8BD1BFBF23C009E9A4F /* SWKeyboard */,
+			);
+			sourceTree = "<group>";
+		};
+		9889E8B71BFA9CEC00019560 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9889E8B61BFA9CEC00019560 /* FirstVoices.app */,
+				98C9A8BC1BFBF23C009E9A4F /* SWKeyboard.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9889E8B81BFA9CEC00019560 /* FirstVoices */ = {
+			isa = PBXGroup;
+			children = (
+				98C9A9F91BFC10D2009E9A4F /* FirstVoices.entitlements */,
+				9889E8CA1BFA9CEC00019560 /* Info.plist */,
+				37EA1F25228B5D6E003E710C /* AppDelegate.swift */,
+				37EA1F2E228B7458003E710C /* CheckBox.swift */,
+				37C183B822932AD2009F9EFD /* FVKeyboardList.swift */,
+				37EA1F4522921BAD003E710C /* KeyboardInfo.swift */,
+				37EA1F29228B69AF003E710C /* KeyboardsViewController.swift */,
+				37EA1F27228B5E2B003E710C /* ViewController.swift */,
+				9889E8C51BFA9CEC00019560 /* Assets.xcassets */,
+				98395E2C1C1E61AF007CD675 /* Icons */,
+				9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */,
+				9889E8C21BFA9CEC00019560 /* Main.storyboard */,
+				9889E8B91BFA9CEC00019560 /* Supporting Files */,
+			);
+			path = FirstVoices;
+			sourceTree = "<group>";
+		};
+		9889E8B91BFA9CEC00019560 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		98C7F7EE1BFD422E007F17B7 /* FVShared */ = {
+			isa = PBXGroup;
+			children = (
+				37EA1F30228B7661003E710C /* FVShared.swift */,
+			);
+			name = FVShared;
+			sourceTree = "<group>";
+		};
+		98C9A8BD1BFBF23C009E9A4F /* SWKeyboard */ = {
+			isa = PBXGroup;
+			children = (
+				98C9A9FA1BFC1111009E9A4F /* SWKeyboard.entitlements */,
+				98C9A8DC1BFBF6C1009E9A4F /* Images */,
+				37EA1F22228A1F57003E710C /* FVInputViewController.swift */,
+				98C9A8C11BFBF23C009E9A4F /* Info.plist */,
+			);
+			path = SWKeyboard;
+			sourceTree = "<group>";
+		};
+		98C9A8DC1BFBF6C1009E9A4F /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				98C9A8DD1BFBF6C1009E9A4F /* banner-Landscape-568h@2x.png */,
+				98C9A8DE1BFBF6C1009E9A4F /* banner-Landscape-568h@3x.png */,
+				98C9A8DF1BFBF6C1009E9A4F /* banner-Landscape.png */,
+				98C9A8E01BFBF6C1009E9A4F /* banner-Landscape@2x.png */,
+				98C9A8E11BFBF6C1009E9A4F /* banner-Landscape@2x~ipad.png */,
+				98C9A8E21BFBF6C1009E9A4F /* banner-Landscape~ipad.png */,
+				98C9A8E31BFBF6C1009E9A4F /* banner-Portrait.png */,
+				98C9A8E41BFBF6C1009E9A4F /* banner-Portrait@2x.png */,
+				98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */,
+				98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */,
+				98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				37150F6D231637E900C73C6A /* DeviceKit.framework */,
+				37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */,
+				37150F6F231637EA00C73C6A /* Reachability.framework */,
+				37150F71231637EA00C73C6A /* XCGLogger.framework */,
+				37150F70231637EA00C73C6A /* Zip.framework */,
+				37EA1F1D228A1809003E710C /* KeymanEngine.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9889E8B51BFA9CEC00019560 /* FirstVoices */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9889E8CD1BFA9CEC00019560 /* Build configuration list for PBXNativeTarget "FirstVoices" */;
+			buildPhases = (
+				9889E8B21BFA9CEC00019560 /* Sources */,
+				9889E8B31BFA9CEC00019560 /* Frameworks */,
+				9889E8B41BFA9CEC00019560 /* Resources */,
+				98C9A8C81BFBF23C009E9A4F /* Embed App Extensions */,
+				9800EC5D1C029FCD00BF0FB5 /* ShellScript */,
+				371C855D2288F3A50076612A /* Embed Frameworks */,
+				37150F6C2315E4BF00C73C6A /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FirstVoices;
+			productName = FirstVoices;
+			productReference = 9889E8B61BFA9CEC00019560 /* FirstVoices.app */;
+			productType = "com.apple.product-type.application";
+		};
+		98C9A8BB1BFBF23C009E9A4F /* SWKeyboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 98C9A8C71BFBF23C009E9A4F /* Build configuration list for PBXNativeTarget "SWKeyboard" */;
+			buildPhases = (
+				98C9A8B81BFBF23C009E9A4F /* Sources */,
+				98C9A8B91BFBF23C009E9A4F /* Frameworks */,
+				98C9A8BA1BFBF23C009E9A4F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SWKeyboard;
+			productName = SWKeyboard;
+			productReference = 98C9A8BC1BFBF23C009E9A4F /* SWKeyboard.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9889E8AE1BFA9CEC00019560 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = FirstVoices;
+				TargetAttributes = {
+					9889E8B51BFA9CEC00019560 = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = D7TR486TEH;
+						LastSwiftMigration = 1020;
+						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					98C9A8BB1BFBF23C009E9A4F = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = D7TR486TEH;
+						LastSwiftMigration = 1020;
+						ProvisioningStyle = Manual;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 9889E8B11BFA9CEC00019560 /* Build configuration list for PBXProject "FirstVoices" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9889E8AD1BFA9CEC00019560;
+			productRefGroup = 9889E8B71BFA9CEC00019560 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9889E8B51BFA9CEC00019560 /* FirstVoices */,
+				98C9A8BB1BFBF23C009E9A4F /* SWKeyboard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9889E8B41BFA9CEC00019560 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9889E8C91BFA9CEC00019560 /* LaunchScreen.storyboard in Resources */,
+				37C183BD2293321C009F9EFD /* Instructions in Resources */,
+				9800EC5C1C029F2200BF0FB5 /* Settings.bundle in Resources */,
+				9889E8C61BFA9CEC00019560 /* Assets.xcassets in Resources */,
+				98395E331C1E61AF007CD675 /* 739-question-selected.png in Resources */,
+				37EA1F482292238F003E710C /* Keyboards in Resources */,
+				98395E371C1E61AF007CD675 /* 739-question@2x.png in Resources */,
+				9889E8C41BFA9CEC00019560 /* Main.storyboard in Resources */,
+				98395E341C1E61AF007CD675 /* 739-question-selected@2x.png in Resources */,
+				98395E361C1E61AF007CD675 /* 739-question.png in Resources */,
+				98395E381C1E61AF007CD675 /* 739-question@3x.png in Resources */,
+				98395E351C1E61AF007CD675 /* 739-question-selected@3x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		98C9A8BA1BFBF23C009E9A4F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				98C9A8E91BFBF6C1009E9A4F /* banner-Landscape-568h@3x.png in Resources */,
+				98C9A8EB1BFBF6C1009E9A4F /* banner-Landscape@2x.png in Resources */,
+				98C9A8ED1BFBF6C1009E9A4F /* banner-Landscape~ipad.png in Resources */,
+				98C9A8EA1BFBF6C1009E9A4F /* banner-Landscape.png in Resources */,
+				98C9A8F11BFBF6C1009E9A4F /* banner-Portrait@3x.png in Resources */,
+				98C9A8F01BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png in Resources */,
+				98C9A8EF1BFBF6C1009E9A4F /* banner-Portrait@2x.png in Resources */,
+				98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */,
+				98C9A8EC1BFBF6C1009E9A4F /* banner-Landscape@2x~ipad.png in Resources */,
+				98C9A8EE1BFBF6C1009E9A4F /* banner-Portrait.png in Resources */,
+				98C9A8E81BFBF6C1009E9A4F /* banner-Landscape-568h@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		37150F6C2315E4BF00C73C6A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Zip.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/ObjcExceptionBridging.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/XCGLogger.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/DeviceKit.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Reachability.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Zip.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/XCGLogger.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/DeviceKit.framework",
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Reachability.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"-- Copying Frameworks --\"\n/usr/local/bin/carthage copy-frameworks\n\n\n";
+			showEnvVarsInLog = 0;
+		};
+		9800EC5D1C029FCD00BF0FB5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/FirstVoices/Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/FirstVoices/Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9889E8B21BFA9CEC00019560 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37EA1F26228B5D6E003E710C /* AppDelegate.swift in Sources */,
+				37EA1F2A228B69AF003E710C /* KeyboardsViewController.swift in Sources */,
+				37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */,
+				37EA1F2F228B7458003E710C /* CheckBox.swift in Sources */,
+				37EA1F31228B7661003E710C /* FVShared.swift in Sources */,
+				37EA1F28228B5E2B003E710C /* ViewController.swift in Sources */,
+				37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		98C9A8B81BFBF23C009E9A4F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37EA1F32228BCDA7003E710C /* FVShared.swift in Sources */,
+				37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		9889E8C21BFA9CEC00019560 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9889E8C31BFA9CEC00019560 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9889E8C81BFA9CEC00019560 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		9889E8CB1BFA9CEC00019560 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../../ios/Carthage/Build/iOS/",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9889E8CC1BFA9CEC00019560 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../../../ios/Carthage/Build/iOS/",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9889E8CE1BFA9CEC00019560 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FirstVoices/FirstVoices.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = D7TR486TEH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = FirstVoices/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		9889E8CF1BFA9CEC00019560 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FirstVoices/FirstVoices.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = D7TR486TEH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = FirstVoices/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+		98C9A8C51BFBF23C009E9A4F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = D7TR486TEH;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = SWKeyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "";
+				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards.swkeyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards_SWKeyboard;
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		98C9A8C61BFBF23C009E9A4F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = D7TR486TEH;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = SWKeyboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_LDFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards.swkeyboard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards_SWKeyboard;
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9889E8B11BFA9CEC00019560 /* Build configuration list for PBXProject "FirstVoices" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9889E8CB1BFA9CEC00019560 /* Debug */,
+				9889E8CC1BFA9CEC00019560 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9889E8CD1BFA9CEC00019560 /* Build configuration list for PBXNativeTarget "FirstVoices" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9889E8CE1BFA9CEC00019560 /* Debug */,
+				9889E8CF1BFA9CEC00019560 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		98C9A8C71BFBF23C009E9A4F /* Build configuration list for PBXNativeTarget "SWKeyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				98C9A8C51BFBF23C009E9A4F /* Debug */,
+				98C9A8C61BFBF23C009E9A4F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9889E8AE1BFA9CEC00019560 /* Project object */;
+}

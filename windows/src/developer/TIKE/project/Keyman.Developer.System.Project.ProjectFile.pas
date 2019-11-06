@@ -79,7 +79,8 @@ uses
 
   mrulist,
   Keyman.Developer.System.Project.ProjectLog,
-  TempFileManager;
+  TempFileManager,
+  utilfiletypes;
 
 type
   { Forward declarations }
@@ -92,6 +93,7 @@ type
   TProjectOptions = class;
 
   TProjectState = (psCreating, psReady, psLoading, psSaving, psDestroying);
+  TProjectType = (ptUnknown, ptKeyboard, ptLexicalModel); // distinct from utilfiletypes.TKeymanProjectType
 
   { TProject }
 
@@ -132,9 +134,9 @@ type
     property SavedUserFileName: string read GetSavedUserFileName;
 
   public
-    procedure Log(AState: TProjectLogState; Filename, Msg: string); virtual;
+    procedure Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer); virtual;
 
-    constructor Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
+    constructor Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False); virtual;
     destructor Destroy; override;
 
     procedure Refresh;
@@ -201,7 +203,7 @@ type
     function GetOwnerProject: TProject;
     procedure UpdateID;
   protected
-    procedure Log(AState: TProjectLogState; Msg: string);   // I4694   // I4706
+    procedure Log(AState: TProjectLogState; Msg: string; MsgCode, Line: Integer);   // I4694   // I4706
 
     procedure SetFileVersion(const AVersion: string);   // I4688
     //FFiles: TProjectFileList;
@@ -295,12 +297,14 @@ type
     FWarnDeprecatedCode: Boolean;   // I4866
     FCompilerWarningsAsErrors: Boolean;   // I4865
     FCheckFilenameConventions: Boolean;
+    FProjectType: TProjectType;
   public
     constructor Create;
     property BuildPath: string read FBuildPath write FBuildPath;
     property WarnDeprecatedCode: Boolean read FWarnDeprecatedCode write FWarnDeprecatedCode;   // I4866
     property CompilerWarningsAsErrors: Boolean read FCompilerWarningsAsErrors write FCompilerWarningsAsErrors;   // I4865
     property CheckFilenameConventions: Boolean read FCheckFilenameConventions write FCheckFilenameConventions;
+    property ProjectType: TProjectType read FProjectType write FProjectType;
   end;
 
 const
@@ -309,6 +313,9 @@ const
 function GlobalProjectStateWndHandle: THandle;
 function ProjectCompilerMessage(line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310   // I4694
 procedure ProjectCompilerMessageClear;
+
+function ProjectTypeFromString(s: string): TProjectType;
+function ProjectTypeToString(pt: TProjectType): string;
 
 implementation
 
@@ -320,17 +327,16 @@ uses
   System.StrUtils,
   System.Variants,
 
+  CompileErrorCodes,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFileType,
   Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.Project.ProjectSaver,
   RedistFiles,
   RegistryKeys,
-
   UMD5Hash,
   Unicode,
   utildir,
-  utilfiletypes,
   utilsystem;
 
 { TProjectFileList }
@@ -567,9 +573,9 @@ begin
   end;
 end;
 
-procedure TProjectFile.Log(AState: TProjectLogState; Msg: string);   // I4694   // I4706
+procedure TProjectFile.Log(AState: TProjectLogState; Msg: string; MsgCode, Line: Integer);   // I4694   // I4706
 begin
-  OwnerProject.Log(AState, Filename, Msg);   // I4702   // I4706
+  OwnerProject.Log(AState, Filename, Msg, MsgCode, Line);   // I4702   // I4706
 end;
 
 procedure TProjectFile.RemoveFreeNotification(
@@ -679,11 +685,16 @@ begin
   end;
 end;
 
-constructor TProject.Create(AFileName: string; ALoadPersistedUntitledProject: Boolean = False);
+constructor TProject.Create(AProjectType: TProjectType; AFileName: string; ALoadPersistedUntitledProject: Boolean = False);
 var
   i: Integer;
 begin
   FOptions := TProjectOptions.Create;   // I4688
+
+  if AProjectType = ptUnknown
+    then FOptions.ProjectType := ptKeyboard
+    else FOptions.ProjectType := AProjectType;
+
   FState := psCreating;
   inherited Create;
   FMRU := TMRUList.Create('');
@@ -809,7 +820,7 @@ begin
   end;
 end;
 
-procedure TProject.Log(AState: TProjectLogState; Filename, Msg: string);
+procedure TProject.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);
 begin
   // Do nothing
 end;
@@ -1163,33 +1174,36 @@ const // from compile.pas
   CERR_MEMORY  = $00001000;
   CWARN_Info =   $0000208A;
 var
-  errtype: string;
   FLogState: TProjectLogState;
 begin
-  FLogState := plsInfo; errtype := 'info';   // I4706
+  FLogState := plsInfo;
 
   if msgcode <> CWARN_Info then
     case msgcode and $F000 of
-      CERR_MEMORY: begin errtype := 'fatal';   FLogState := plsFatal; end;
-      CERR_WARNING: begin errtype := 'warning'; FLogState := plsWarning; end;
-      CERR_ERROR: begin errtype := 'error';   FLogState := plsError; end;
-      CERR_FATAL: begin errtype := 'fatal';   FLogState := plsFatal; end;
+      CERR_MEMORY:  FLogState := plsFatal;
+      CERR_WARNING: FLogState := plsWarning;
+      CERR_ERROR:   FLogState := plsError;
+      CERR_FATAL:   FLogState := plsFatal;
     end;
 
   if FLogState = plsWarning then   // I4706
     TProject.CompilerMessageFile.FHasWarning := True;
 
-  if(FLogState <> plsInfo) then
+  if FLogState in [plsWarning, plsError, plsFatal] then
   begin
     Inc(MessageCount);
     if MessageCount > MAX_MESSAGES then
       Exit(1);
   end;
 
-  TProject.CompilerMessageFile.Log(FLogState, Format('line %d  %s %x: %s', [line, errtype, msgcode, text]));   // I4706
+  TProject.CompilerMessageFile.Log(FLogState, String_AtoU(text), msgcode, line);   // I4706
 
   if (FLogState <> plsInfo) and (MessageCount = MAX_MESSAGES) then
-      TProject.CompilerMessageFile.Log(plsInfo, Format('Warning: line %d  warning 0000: More than %d warnings or errors received; suppressing further messages', [line, MAX_MESSAGES]));
+    TProject.CompilerMessageFile.Log(
+      plsWarning,
+      Format('More than %d warnings or errors received; suppressing further messages', [MAX_MESSAGES]),
+      CWARN_TooManyErrorsOrWarnings,
+      line);
 
   Result := 1;
 end;
@@ -1201,6 +1215,7 @@ begin
   WarnDeprecatedCode := True;   // I4866
   CompilerWarningsAsErrors := False;   // I4865
   CheckFilenameConventions := True; // default to TRUE for new projects
+  ProjectType := ptKeyboard;
 end;
 
 type
@@ -1262,9 +1277,26 @@ begin
   Result := FGlobalProjectStateWndHandle;
 end;
 
+function ProjectTypeFromString(s: string): TProjectType;
+begin
+  if SameText(s, 'keyboard') then Result := ptKeyboard
+  else if SameText(s, 'lexicalmodel') then Result := ptLexicalModel
+  else Result := ptUnknown;
+end;
+
+function ProjectTypeToString(pt: TProjectType): string;
+begin
+  case pt of
+    ptUnknown: Result := '';
+    ptKeyboard: Result := 'keyboard';
+    ptLexicalModel: Result := 'lexicalmodel';
+  end;
+end;
+
 initialization
   FGlobalProjectStateWnd := TGlobalProjectStateWnd.Create;
 finalization
+  // Deletes temporary session-local project
   if FileExists(TProject.GetUntitledProjectFilename(True)) then
     System.SysUtils.DeleteFile(TProject.GetUntitledProjectFilename(True));
   if FileExists(ChangeFileExt(TProject.GetUntitledProjectFilename(True),Ext_ProjectSourceUser)) then

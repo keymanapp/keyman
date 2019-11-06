@@ -26,6 +26,7 @@ type
 implementation
 
 uses
+  compile,
   CompilePackage,
   CompilePackageInstaller,
   PackageInfo,
@@ -52,17 +53,18 @@ begin
         Result := False;
 
       if Result then
-        Log(plsInfo, '''' + FileName + ''' compiled successfully to '''+TargetFileName+'''.')
+        Log(plsSuccess, '''' + FileName + ''' compiled successfully to '''+TargetFileName+'''.', 0, 0)
       else
       begin
         if FileExists(TargetFilename) then
           System.SysUtils.DeleteFile(TargetFilename);
-        Log(plsError, '''' + FileName + ''' was not compiled successfully.');
+        Log(plsFailure, '''' + FileName + ''' was not compiled successfully.', 0, 0);
       end;
     except
       on E:Exception do
       begin
-        Log(plsError, E.Message);
+        Log(plsError, E.Message, CERR_Error, 0);
+        Log(plsFailure, '''' + FileName + ''' was not compiled successfully.', 0, 0);
         Result := False;
       end;
     end;
@@ -90,17 +92,18 @@ begin
 
   try
     try
-      Result := DoCompilePackageInstaller(pack, SelfMessage, FSilent, '', TargetInstallerFilename, False);
+      Result := DoCompilePackageInstaller(pack, SelfMessage, FSilent, '', TargetInstallerFilename, '', False, True, '', '', '', False, False);
       if HasCompileWarning and (WarnAsError or OwnerProject.Options.CompilerWarningsAsErrors) then   // I4706
         Result := False;
 
       if Result
-        then Log(plsInfo, '''' + FileName + ''' compiled successfully.')
-        else Log(plsError, '''' + FileName + ''' was not compiled successfully.');
+        then Log(plsSuccess, '''' + FileName + ''' compiled successfully.', 0, 0)
+        else Log(plsFailure, '''' + FileName + ''' was not compiled successfully.', 0, 0);
     except
       on E:Exception do
       begin
-        Log(plsError, E.Message);
+        Log(plsError, E.Message, CERR_ERROR, 0);
+        Log(plsFailure, '''' + FileName + ''' was not compiled successfully.', 0, 0);
         Result := False;
       end;
     end;
@@ -122,7 +125,7 @@ procedure TkpsProjectFileAction.SelfMessage(Sender: TObject; msg: string; State:
 begin
   if State = plsWarning then
     HasCompileWarning := True;
-  Log(State, msg);
+  Log(State, msg, 0, 0);
 end;
 
 initialization

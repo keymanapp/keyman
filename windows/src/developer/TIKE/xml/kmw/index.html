@@ -2,43 +2,36 @@
 <html>
   <head>
     <meta charset='utf-8'>
-    
-    <!-- Set the viewport width to match iOS device widths                         
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />   -->
-    <meta name="viewport" content="width=device-width,user-scalable=no" /> 
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    
-    <!-- Enable IE9 Standards mode -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
-      
-    <title>Keyman Developer Keyboard Test Site</title>
- 
-    <style type='text/css'>   
-      body {
-          padding-left: 10px;
-          margin-left: 12px;
-      }
 
-      h2 { 
-          font-family: sans-serif 
-      }
+    <!-- Set the viewport width to match iOS device widths
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no" />   -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Keyman Developer Keyboard Test Site</title>
+
+    <style type='text/css'>
+      @import url('test.css');
 
       .test {
-        font-size: 1.5em; 
-        background-color: #ffffee; 
+        font-size: 1.5em;
+        background-color: #ffffee;
         height:100px;
-        width:92%; 
-        min-height:30px; 
+        width:92%;
+        min-height:30px;
       }
-      
+
       .desktop-device .test {
         box-sizing: border-box;
         padding: 4px;
         margin: 0;
-        width:100%; 
+        width:100%;
       }
-      
-      .install-link { 
+
+      .install-link {
         background: none repeat scroll 0 0 #CCCCCC;
         border: 1px solid #444444;
         border-radius: 4px;
@@ -52,15 +45,15 @@
         margin: 2px;
         text-decoration: none;
       }
-      
+
       /** Mobile, Tablet **/
-      
-      #install-link {
-        font-weight: bold;
-      }
-      
+
       .install-link .ios,
       .install-link .android {
+        display: none;
+      }
+
+      .touch-device #top-toolbar {
         display: none;
       }
 
@@ -75,32 +68,32 @@
       .touch-device-ios .install-link .ios {
         display: inline;
       }
-      
+
       #top-toolbar {
         background: #eeeeee;
         min-height: 23px;
         padding: 4px;
       }
-      
+
       .control {
-        float: left; 
+        float: left;
       }
 
       .touch-device #character-grid {
         white-space: nowrap;
         overflow-x: scroll;
       }
-      
+
       #character-grid {
         min-height: 49px;
         margin: 8px 0;
         border: solid 1px #cccccc;
       }
-      
+
       #character-grid > div {
         display: inline-block;
       }
-      
+
       .char-char,
       .char-code {
         border-right: solid 1px #eeeeee;
@@ -110,70 +103,68 @@
       .char-char {
         border-bottom: solid 1px #eeeeee;
       }
-      
+
       .cursor > .char-char,
       .cursor > .char-code {
         border-right: solid 3px blue;
         margin-right: 0;
       }
-      
+
       .cursor#character-grid {
         border-left: solid 3px blue;
       }
-      
+
       .cursor-selected {
         background: #e0e0ff;
       }
-      
+
       .char-char {
         font-size: 14pt;
         text-align: center;
       }
-      
+
       .char-code {
         font: 8pt Consolas,Courier;
         padding: 4px;
       }
-    </style> 
+    </style>
 
-  <script src="resource/keymanweb.js"></script>   
+  <script src="resource/keymanweb.js"></script>
   <script src="resource/kmwuibutton.js"></script>
-    
+
   <!-- The following dynamic script will register each of the additional keyboards -->
-    
+
   <script src="/inc/keyboards.js" type="text/javascript"></script>
 
   <!-- This script loads the dynamic keyboard fonts -->
 
   <link href="/inc/keyboards.css" type="text/css" rel="stylesheet" />
-       
-  <!-- 
+
+  <!--
     KeymanWeb initialization script, to initialize KeymanWeb and specify parameters for its use:
       'key':  license key (required parameter).
       'ui':   the type of user interface to be installed, either downloaded automatically from the
               KeymanWeb server, or else inserted as a separate script (above) if a custom user interface.
-              If omitted, 'ui' will default to 'float' and install the 'Floating User Interface'. 
+              If omitted, 'ui' will default to 'float' and install the 'Floating User Interface'.
       'resources': the absolute or page-relative url from which to download the ui, css and image files
-      'keyboards': the absolute or page-relative url from which to download keyboard objects 
-      'fonts': the absolute or page-relative url from which to download embedded fonts. 
-  -->  
+      'keyboards': the absolute or page-relative url from which to download keyboard objects
+      'fonts': the absolute or page-relative url from which to download embedded fonts.
+  -->
 
   </head>
-  
-  <body class='osk-always-visible'>
-    <h2>Keyboard Test Host</h2>
 
-    <div>
+  <body class='osk-always-visible'>
+    <div class='header'>
+      <div><h2>Keyboard Test</h2></div>
+      <div class='float-right'><a href='/packages.html' class='install-link' id='install-link-packages'>Install packages</a></div>
+      <div class='clear'></div>
+    </div>
+
+    <div id='content'>
       <!-- The following DIV is only needed as a UI placeholder for the Button and Toolbar User Interfaces -->
       <div id='top-toolbar'>
         <div class='control' id='keymanweb-control-host'>
           <div id='KeymanWebControl'></div>
-        </div>
-        <div class='control' id='controls'>
-          <a href='https://keyman.com/go/developer/10.0/ios-app' target='_blank' class='install-link' id='install-link-ios'>Install Keyman for iOS</a>
-          <a href='https://keyman.com/go/developer/10.0/android-app' target='_blank' class='install-link' id='install-link-android'>Install Keyman for Android</a>
-          <a href='' class='install-link' id='install-link'>Add keyboard to Keyman for <span class='android'>Android</span><span class='ios'>iOS</span></a>
-          <a href='packages.html' class='install-link' id='install-link-packages'>Install packages</a>
         </div>
         <div style='clear:left'></div>
       </div>
@@ -183,9 +174,9 @@
       <div id='input-area'>
         <textarea id='ta1' class='test'></textarea><br/>
       </div>
-      
+
     </div>
-    <script> 
+    <script>
       keyman.init({
         ui:'button',
         resources:'/resource/',
@@ -194,17 +185,10 @@
         attachType:'auto'
       });
 
-      keyman.addEventListener('keyboardchange',
-        function (p) {
-          //alert(p.internalName);
-          var nm = p.internalName.substr('Keyboard_'.length);
-          document.getElementById('install-link').href='keyman://localhost/open?direct=true&url='+location.protocol+'//'+location.host+'/kbinstall/'+nm+'-'+debugKeyboards[nm].version+'.json';
-        });
-        
       var ta1 = document.getElementById('ta1');
       var charGrid = document.getElementById('character-grid');
       var lastContent = null;
-      
+
       if(keyman.util.isTouchDevice()) {
         document.body.className += ' touch-device';
         if(keyman.util.device.OS == 'iOS') {
@@ -215,13 +199,13 @@
       } else {
         document.body.className += ' desktop-device';
       }
-      
+
       function removeChildNodes(node) {
         while (node.lastChild) {
           node.removeChild(node.lastChild);
         }
       }
-      
+
       function addCharElements(text, code) {
         var ebox = document.createElement('div'), echar = document.createElement('div'), ecode = document.createElement('div');
         echar.textContent = text;
@@ -232,7 +216,7 @@
         ebox.appendChild(ecode);
         charGrid.appendChild(ebox);
       }
-      
+
       function logContent() {
         if(lastContent === ta1.value) {
           updateLogCursor();
@@ -265,13 +249,13 @@
         updateLogCursor();
         lastContent = ta1.value;
       }
-      
+
       var lastSelStart = -1;
-      
+
       function calculateLengthByCodepoint(text, base, x)  {
         var stop = base + x;
         while(base < stop - 1) {
-          if(text.charCodeAt(base) >= 0xD800 && text.charCodeAt(base) < 0xDC00 && 
+          if(text.charCodeAt(base) >= 0xD800 && text.charCodeAt(base) < 0xDC00 &&
              text.charCodeAt(base+1) >= 0xDC00 && text.charCodeAt(base+1) < 0xE000) {
             // Decrement position by one for each surrogate pair
             x--;
@@ -280,13 +264,13 @@
         }
         return x;
       }
-      
+
       function updateLogCursor() {
         var i, selStart, selLength, selDirection;
-        
+
         if(keyman.isPositionSynthesized()) { // this is an internal function
           // For touch devices, we need to ask KMW
-          selStart = keyman.touchAliasing.getTextBeforeCaret(ta1.kmw_ip).length;
+          selStart = ta1.kmw_ip ? ta1.kmw_ip.getTextBeforeCaret().length : 0;
           selLength = 0;
           selDirection = 'forward';
         } else {
@@ -295,16 +279,16 @@
           selLength = ta1.selectionEnd - ta1.selectionStart;
           selDirection = ta1.selectionDirection;
         }
-        
+
         selLength = calculateLengthByCodepoint(ta1.value, selStart, selLength);
         selStart = calculateLengthByCodepoint(ta1.value, 0, selStart);
-        
+
         //console.log('selStart='+selStart+', selLength='+selLength);
         if(lastSelStart != selStart || lastSelLength != selLength) {
           for(i = 0; i < charGrid.childNodes.length; i++) {
             charGrid.childNodes[i].className = '';
           }
-          
+
           var x = selDirection == 'backward' ? selStart-1 : selStart+selLength - 1;
 
           if(x < 0) {
@@ -327,11 +311,11 @@
 
       logContent();
       window.setInterval(logContent, 100);
-        
+
       /* TODO: once KeymanWeb supports oninput signalling
       document.getElementById('ta1').addEventListener('input', logContent, false);
       */
-      
+
       window.onload = function() {
         window.setTimeout(
           function () {

@@ -2,7 +2,7 @@ unit kccompilekvk;
 
 interface
 
-function CompileVisualKeyboardFromKMX(FInFile, FOutFile: string; FSilent: Boolean): Boolean;
+function CompileVisualKeyboardFromKMX(FInFile, FOutFile: string): Boolean;
 
 implementation
 
@@ -10,6 +10,8 @@ uses
   System.Classes,
   System.SysUtils,
 
+  Keyman.Developer.System.Project.ProjectLog,
+  Keyman.Developer.System.Project.ProjectLogConsole,
   KeyboardParser,
   kmxfile,
   kmxfileconsts,
@@ -36,7 +38,7 @@ const
   was a small window of time in May/June 2017 where .kvk files could be either XML or
   binary).
 *)
-function CompileVisualKeyboardFromKMX(FInFile, FOutFile: string; FSilent: Boolean): Boolean;
+function CompileVisualKeyboardFromKMX(FInFile, FOutFile: string): Boolean;
 var
   FKVKInputFileName, FKVKOutputFileName: string;
 begin
@@ -62,15 +64,14 @@ begin
         begin
           // Source and destination files are different
           SaveToFile(FKVKOutputFileName, kvksfBinary);
-          if not FSilent then
-            writeln('Visual keyboard '+FKVKInputFileName+' successfully compiled to '+FKVKOutputFileName);
+          TProjectLogConsole.Instance.Log(plsSuccess, FKVKInputFileName, 'Visual keyboard '+FKVKInputFileName+' successfully compiled to '+FKVKOutputFileName, 0, 0);
         end
         else
         begin
           if LoadedFileFormat = kvksfXML then
-            CompilerMessage(0, CWARN_KVKFileIsInSourceFormat, '.kvk file should be binary but is an XML file')
-          else if not FSilent then
-            writeln('Visual keyboard '+FKVKInputFileName+' is valid');
+            TProjectLogConsole.Instance.Log(plsWarning, FKVKInputFileName, '.kvk file should be binary but is an XML file', CWARN_KVKFileIsInSourceFormat, 0)
+          else
+            TProjectLogConsole.Instance.Log(plsInfo, FKVKInputFileName, 'Visual keyboard '+FKVKInputFileName+' is valid', 0, 0);
         end;
       finally
         Free;
@@ -82,12 +83,12 @@ begin
   except
     on E:EFCreateError do
     begin
-      writeln(E.Message);
+      TProjectLogConsole.Instance.Log(plsFatal, FKVKInputFileName, E.Message, 0, 0);
       Exit(False);
     end;
     on E:EVisualKeyboardLoader do
     begin
-      writeln(E.Message);
+      TProjectLogConsole.Instance.Log(plsFatal, FKVKInputFileName, E.Message, 0, 0);
       Exit(False);
     end;
   end;

@@ -190,6 +190,7 @@ final class KMKeyboard extends WebView {
 
   public void loadKeyboard() {
     keyboardSet = false;
+    this.javascriptAfterLoad.clear();
 
     if(keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP)
       KMManager.InAppKeyboardLoaded = false;
@@ -207,7 +208,9 @@ final class KMKeyboard extends WebView {
     if((keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && KMManager.InAppKeyboardLoaded) ||
       (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && KMManager.SystemKeyboardLoaded)) {
 
-      if(this.javascriptAfterLoad.size() == 1)
+      // If !this.keyboardSet, then pageLoaded hasn't fired yet.
+      // When pageLoaded fires, it'll call `callJavascriptAfterLoad` safely.
+      if(this.javascriptAfterLoad.size() == 1 && keyboardSet)
         callJavascriptAfterLoad();
     }
   }
@@ -221,8 +224,11 @@ final class KMKeyboard extends WebView {
           if(javascriptAfterLoad.size() > 0) {
             loadUrl("javascript:" + javascriptAfterLoad.get(0));
             javascriptAfterLoad.remove(0);
-            if (javascriptAfterLoad.size() > 0) {
-              callJavascriptAfterLoad();
+            // Make sure we didn't reset the page in the middle of the queue!
+            if(keyboardSet) {
+              if (javascriptAfterLoad.size() > 0) {
+                callJavascriptAfterLoad();
+              }
             }
           }
         }
@@ -610,7 +616,9 @@ final class KMKeyboard extends WebView {
     params.putString("keyboardName", this.keyboardName);
     params.putString("keyboardVersion", this.keyboardVersion);
 
-    mFirebaseAnalytics.logEvent("kmw_console_error", params);
+    if(mFirebaseAnalytics != null) {
+      mFirebaseAnalytics.logEvent("kmw_console_error", params);
+    }
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
@@ -1294,12 +1302,12 @@ final class KMKeyboard extends WebView {
         popupKeysList = null;
       }
       break;
-    }  
+    }
   }
   */
 
-  /* 
-   * Override onDraw method to render missing characters for Android API 17 & 18 font rendering bug. 
+  /*
+   * Override onDraw method to render missing characters for Android API 17 & 18 font rendering bug.
     private Bitmap keyboardImage;
     private Canvas keyboardCanvas;
     private Paint paint;

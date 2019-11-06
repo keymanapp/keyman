@@ -1,0 +1,8 @@
+DerivedData
+.DS_Store
+project.xcworkspace
+xcuserdata
+build
+KeymanEngine.framework
+FirstVoices/Keyboards
+Carthage

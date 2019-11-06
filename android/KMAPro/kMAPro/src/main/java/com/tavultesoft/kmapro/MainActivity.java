@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018 SIL International. All rights reserved.
+ * Copyright (C) 2018-2019 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -23,7 +23,9 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 
 import android.Manifest;
@@ -61,6 +63,7 @@ import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -75,10 +78,12 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
-  ActivityCompat.OnRequestPermissionsResultCallback {
+    ActivityCompat.OnRequestPermissionsResultCallback {
+  public static Context context;
 
   // Fields used for installing kmp packages
   private static final int PERMISSION_REQUEST_STORAGE = 0;
+  public static final int READ_REQUEST_CODE = 42;
   Uri data;
 
   private static final String TAG = "MainActivity";
@@ -88,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
+  private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
+  private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
@@ -132,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
+    context = this;
     resultReceiver = new DownloadResultReceiver(new Handler());
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -236,23 +244,35 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
 
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+
+    // Check if default keyboard should be added
     if (!KMManager.keyboardExists(this, KMManager.KMDefault_UndefinedPackageID,
-      KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
-      HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-      kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-      kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-      kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-      kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-      kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-        this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
-      kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-      KMManager.addKeyboard(this, kbInfo);
+        KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID)) {
+      boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
+      if (!installDefaultKeyboard) {
+        HashMap<String, String> kbInfo = new HashMap<String, String>();
+        kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+        kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
+        kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
+        kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
+        kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
+        kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
+          this, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
+        kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+        KMManager.addKeyboard(this, kbInfo);
+      }
+
+      editor.putBoolean(defaultKeyboardInstalled, true);
+      editor.commit();
     }
 
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
+
+    checkAndInstallDefaultDictionary();
 
     Intent intent = getIntent();
     data = intent.getData();
@@ -419,6 +439,29 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onKeyboardDismissed() {
     resizeTextView(false);
+  }
+
+  private void checkAndInstallDefaultDictionary() {
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    // Check if default dictionary model package should be installed
+    // This also depends on a current keyboard being loaded
+    HashMap<String, String> curKbInfo = KMManager.getCurrentKeyboardInfo(this);
+    if (!KMManager.lexicalModelExists(this, KMManager.KMDefault_DictionaryPackageID,
+        KMManager.KMDefault_LanguageID, KMManager.KMDefault_DictionaryModelID) && curKbInfo != null) {
+      boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
+      if (!installDefaultDictionary) {
+        File defaultDictionaryKMP = new File(
+          new File(KMManager.getResourceRoot(), KMManager.KMDefault_DictionaryKMP).getAbsolutePath());
+        Uri uri = FileProvider.getUriForFile(
+          context, FileProviderUtils.getAuthority(context), defaultDictionaryKMP);
+        useLocalKMP(context, uri, true);
+      }
+
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putBoolean(defaultDictionaryInstalled, true);
+      editor.commit();
+    }
   }
 
   private void resizeTextView(boolean isKeyboardVisible) {
@@ -619,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       // Request for storage permission
       if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
-        useLocalKMP(data);
+        useLocalKMP(context, data);
       } else {
         // Permission request denied
         String message = "Storage permission request was denied. Unable to install keyboard package";
@@ -634,14 +677,14 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
         PackageManager.PERMISSION_GRANTED) {
-        useLocalKMP(data);
+        useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
         requestStoragePermission();
       }
     } else {
       // Permission automatically granted on older Android versions
-      useLocalKMP(data);
+      useLocalKMP(context, data);
     }
   }
 
@@ -664,7 +707,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
-  private void useLocalKMP(Uri data) {
+  // TODO: Move this to KMEA during Keyman 13.0 refactoring
+  public static void useLocalKMP(Context context, Uri data) {
+    useLocalKMP(context, data, false);
+  }
+
+  public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
     String filename = "";
     String cacheKMPFilename = "";
     File cacheKMPFile = null;
@@ -675,13 +723,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       switch (data.getScheme().toLowerCase()) {
         case "content":
           // DownloadManager passes a path "/document/number" so we need to extract the .kmp filename
-          Cursor cursor = getContentResolver().query(data, null, null, null, null);
+          Cursor cursor = context.getContentResolver().query(data, null, null, null, null);
           cursor.moveToFirst();
           int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
           filename = cursor.getString(nameIndex);
           isKMP = FileUtils.hasKeymanPackageExtension(filename);
           cacheKMPFilename = filename;
-          inputFile = getContentResolver().openInputStream(data);
+          inputFile = context.getContentResolver().openInputStream(data);
           break;
 
         case "file":
@@ -695,31 +743,33 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
       if (isKMP) {
         // Copy KMP to app cache
-        cacheKMPFile = new File(MainActivity.this.getCacheDir().toString(), cacheKMPFilename);
+        cacheKMPFile = new File(context.getCacheDir().toString(), cacheKMPFilename);
         if (cacheKMPFile.exists()) {
           cacheKMPFile.delete();
         }
 
         FileUtils.copy(inputFile, new FileOutputStream(cacheKMPFile));
       } else {
-        String noKeyboardsInstalledMessage = " is not a valid keyboard package file.\nNo keyboards were installed.";
-        Toast.makeText(getApplicationContext(),
+        String noKeyboardsInstalledMessage = " is not a valid Keyman package file.\n" +
+          "No keyboards/dictionaries were installed.";
+        Toast.makeText(context,
           filename + noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
       }
     } catch (Exception e) {
       String message = "Access denied to " + filename +
         ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
-      Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+      Toast.makeText(context, message, Toast.LENGTH_LONG).show();
       Log.e(TAG, "Unable to copy " + filename + " to app cache");
       return;
     }
 
     if (cacheKMPFile != null) {
       bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
+      bundle.putBoolean("silentInstall", silentInstall);
 
-      Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
+      Intent packageIntent = new Intent(context, PackageActivity.class);
       packageIntent.putExtras(bundle);
-      startActivity(packageIntent);
+      context.startActivity(packageIntent);
     }
   }
 
@@ -843,7 +893,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-    String langId = KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID);
+    String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+      KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID) :
+      KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 
     for(int i=0; i<lexicalModelsInstalled.size(); i++) {

@@ -89,42 +89,6 @@
 		9845A7D21A439A9200544E2E /* InfoViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */; };
 		9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */; };
 		9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9845A7CA1A439A9200544E2E /* SetUpViewController.xib */; };
-		9845A8581A439B8F00544E2E /* app-info.css in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8341A439B8F00544E2E /* app-info.css */; };
-		9845A85A1A439B8F00544E2E /* backspace.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8351A439B8F00544E2E /* backspace.png */; };
-		9845A85C1A439B8F00544E2E /* bookmarklet.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8361A439B8F00544E2E /* bookmarklet.png */; };
-		9845A85E1A439B8F00544E2E /* confirm-dl-a.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8371A439B8F00544E2E /* confirm-dl-a.png */; };
-		9845A8601A439B8F00544E2E /* confirm-dl.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8381A439B8F00544E2E /* confirm-dl.png */; };
-		9845A8621A439B8F00544E2E /* delete-a.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8391A439B8F00544E2E /* delete-a.png */; };
-		9845A8641A439B8F00544E2E /* delete.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A83A1A439B8F00544E2E /* delete.png */; };
-		9845A8661A439B8F00544E2E /* dl-success-a.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A83B1A439B8F00544E2E /* dl-success-a.png */; };
-		9845A8681A439B8F00544E2E /* dl-success.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A83C1A439B8F00544E2E /* dl-success.png */; };
-		9845A86A1A439B8F00544E2E /* font-dl1.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A83D1A439B8F00544E2E /* font-dl1.png */; };
-		9845A86C1A439B8F00544E2E /* font-dl2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A83E1A439B8F00544E2E /* font-dl2.png */; };
-		9845A86E1A439B8F00544E2E /* font-dl3.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A83F1A439B8F00544E2E /* font-dl3.png */; };
-		9845A8701A439B8F00544E2E /* font-dl4.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8401A439B8F00544E2E /* font-dl4.png */; };
-		9845A8721A439B8F00544E2E /* font-dl5.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8411A439B8F00544E2E /* font-dl5.png */; };
-		9845A8741A439B8F00544E2E /* font-size-a.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8421A439B8F00544E2E /* font-size-a.png */; };
-		9845A8761A439B8F00544E2E /* font-size.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8431A439B8F00544E2E /* font-size.png */; };
-		9845A8781A439B8F00544E2E /* globe.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8441A439B8F00544E2E /* globe.png */; };
-		9845A87A1A439B8F00544E2E /* hide-keyboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8451A439B8F00544E2E /* hide-keyboard.png */; };
-		9845A87C1A439B8F00544E2E /* info-ap.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8461A439B8F00544E2E /* info-ap.png */; };
-		9845A87E1A439B8F00544E2E /* info.html in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8471A439B8F00544E2E /* info.html */; };
-		9845A8801A439B8F00544E2E /* install1i.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8481A439B8F00544E2E /* install1i.png */; };
-		9845A8821A439B8F00544E2E /* install2i.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8491A439B8F00544E2E /* install2i.png */; };
-		9845A8841A439B8F00544E2E /* keyman-settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A84A1A439B8F00544E2E /* keyman-settings.png */; };
-		9845A8861A439B8F00544E2E /* keyman-settings2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A84B1A439B8F00544E2E /* keyman-settings2.png */; };
-		9845A8881A439B8F00544E2E /* keyman-settings3.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A84C1A439B8F00544E2E /* keyman-settings3.png */; };
-		9845A88A1A439B8F00544E2E /* keyman-settings4.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A84D1A439B8F00544E2E /* keyman-settings4.png */; };
-		9845A88C1A439B8F00544E2E /* keyman-settings5.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A84E1A439B8F00544E2E /* keyman-settings5.png */; };
-		9845A88E1A439B8F00544E2E /* keyman-settings6.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A84F1A439B8F00544E2E /* keyman-settings6.png */; };
-		9845A8901A439B8F00544E2E /* lang-list.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8501A439B8F00544E2E /* lang-list.png */; };
-		9845A8921A439B8F00544E2E /* return.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8511A439B8F00544E2E /* return.png */; };
-		9845A8941A439B8F00544E2E /* share.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8521A439B8F00544E2E /* share.png */; };
-		9845A8961A439B8F00544E2E /* shift.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8531A439B8F00544E2E /* shift.png */; };
-		9845A8981A439B8F00544E2E /* touch-hold.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8541A439B8F00544E2E /* touch-hold.png */; };
-		9845A89A1A439B8F00544E2E /* url-screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8551A439B8F00544E2E /* url-screen.png */; };
-		9845A89C1A439B8F00544E2E /* url-screeni.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8561A439B8F00544E2E /* url-screeni.png */; };
-		9845A8A01A439BB500544E2E /* setup.html in Resources */ = {isa = PBXBuildFile; fileRef = 9845A89E1A439BB500544E2E /* setup.html */; };
 		9845A8B51A439D3000544E2E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 98C893F119F0811A000B9AC8 /* Images.xcassets */; };
 		9845A8CC1A439F1000544E2E /* 715-globe-toolbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8BE1A439F1000544E2E /* 715-globe-toolbar.png */; };
 		9845A8CD1A439F1000544E2E /* 715-globe-toolbar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9845A8BF1A439F1000544E2E /* 715-globe-toolbar@2x.png */; };
@@ -153,10 +117,6 @@
 		985EA9E819E64A580006C017 /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
 		985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		98CF00B81B461EDE00627DC6 /* browser-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B41B461EDE00627DC6 /* browser-icon.png */; };
-		98CF00B91B461EDE00627DC6 /* get-started.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B51B461EDE00627DC6 /* get-started.png */; };
-		98CF00BA1B461EDE00627DC6 /* info.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B61B461EDE00627DC6 /* info.png */; };
-		98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 98CF00B71B461EDE00627DC6 /* menu-icon.png */; };
 		9A0FCA0022D7C22000D33F86 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
@@ -174,10 +134,10 @@
 		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
+		CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */; };
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
-		E213601C2141C5FB00A043B7 /* sil-small.png in Resources */ = {isa = PBXBuildFile; fileRef = E213601B2141C5FB00A043B7 /* sil-small.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -280,42 +240,6 @@
 		9845A7C51A439A9200544E2E /* InfoViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPad.xib; sourceTree = "<group>"; };
 		9845A7C61A439A9200544E2E /* InfoViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoViewController_iPhone.xib; sourceTree = "<group>"; };
 		9845A7CA1A439A9200544E2E /* SetUpViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetUpViewController.xib; sourceTree = "<group>"; };
-		9845A8341A439B8F00544E2E /* app-info.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = "app-info.css"; sourceTree = "<group>"; };
-		9845A8351A439B8F00544E2E /* backspace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backspace.png; sourceTree = "<group>"; };
-		9845A8361A439B8F00544E2E /* bookmarklet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bookmarklet.png; sourceTree = "<group>"; };
-		9845A8371A439B8F00544E2E /* confirm-dl-a.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "confirm-dl-a.png"; sourceTree = "<group>"; };
-		9845A8381A439B8F00544E2E /* confirm-dl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "confirm-dl.png"; sourceTree = "<group>"; };
-		9845A8391A439B8F00544E2E /* delete-a.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "delete-a.png"; sourceTree = "<group>"; };
-		9845A83A1A439B8F00544E2E /* delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delete.png; sourceTree = "<group>"; };
-		9845A83B1A439B8F00544E2E /* dl-success-a.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dl-success-a.png"; sourceTree = "<group>"; };
-		9845A83C1A439B8F00544E2E /* dl-success.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dl-success.png"; sourceTree = "<group>"; };
-		9845A83D1A439B8F00544E2E /* font-dl1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-dl1.png"; sourceTree = "<group>"; };
-		9845A83E1A439B8F00544E2E /* font-dl2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-dl2.png"; sourceTree = "<group>"; };
-		9845A83F1A439B8F00544E2E /* font-dl3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-dl3.png"; sourceTree = "<group>"; };
-		9845A8401A439B8F00544E2E /* font-dl4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-dl4.png"; sourceTree = "<group>"; };
-		9845A8411A439B8F00544E2E /* font-dl5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-dl5.png"; sourceTree = "<group>"; };
-		9845A8421A439B8F00544E2E /* font-size-a.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-size-a.png"; sourceTree = "<group>"; };
-		9845A8431A439B8F00544E2E /* font-size.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "font-size.png"; sourceTree = "<group>"; };
-		9845A8441A439B8F00544E2E /* globe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = globe.png; sourceTree = "<group>"; };
-		9845A8451A439B8F00544E2E /* hide-keyboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "hide-keyboard.png"; sourceTree = "<group>"; };
-		9845A8461A439B8F00544E2E /* info-ap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "info-ap.png"; sourceTree = "<group>"; };
-		9845A8471A439B8F00544E2E /* info.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = info.html; sourceTree = "<group>"; };
-		9845A8481A439B8F00544E2E /* install1i.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = install1i.png; sourceTree = "<group>"; };
-		9845A8491A439B8F00544E2E /* install2i.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = install2i.png; sourceTree = "<group>"; };
-		9845A84A1A439B8F00544E2E /* keyman-settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-settings.png"; sourceTree = "<group>"; };
-		9845A84B1A439B8F00544E2E /* keyman-settings2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-settings2.png"; sourceTree = "<group>"; };
-		9845A84C1A439B8F00544E2E /* keyman-settings3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-settings3.png"; sourceTree = "<group>"; };
-		9845A84D1A439B8F00544E2E /* keyman-settings4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-settings4.png"; sourceTree = "<group>"; };
-		9845A84E1A439B8F00544E2E /* keyman-settings5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-settings5.png"; sourceTree = "<group>"; };
-		9845A84F1A439B8F00544E2E /* keyman-settings6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "keyman-settings6.png"; sourceTree = "<group>"; };
-		9845A8501A439B8F00544E2E /* lang-list.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lang-list.png"; sourceTree = "<group>"; };
-		9845A8511A439B8F00544E2E /* return.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = return.png; sourceTree = "<group>"; };
-		9845A8521A439B8F00544E2E /* share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = share.png; sourceTree = "<group>"; };
-		9845A8531A439B8F00544E2E /* shift.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shift.png; sourceTree = "<group>"; };
-		9845A8541A439B8F00544E2E /* touch-hold.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "touch-hold.png"; sourceTree = "<group>"; };
-		9845A8551A439B8F00544E2E /* url-screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "url-screen.png"; sourceTree = "<group>"; };
-		9845A8561A439B8F00544E2E /* url-screeni.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "url-screeni.png"; sourceTree = "<group>"; };
-		9845A89E1A439BB500544E2E /* setup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = setup.html; sourceTree = "<group>"; };
 		9845A8BE1A439F1000544E2E /* 715-globe-toolbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar.png"; sourceTree = "<group>"; };
 		9845A8BF1A439F1000544E2E /* 715-globe-toolbar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar@2x.png"; sourceTree = "<group>"; };
 		9845A8C01A439F1000544E2E /* 715-globe-toolbar@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "715-globe-toolbar@3x.png"; sourceTree = "<group>"; };
@@ -357,10 +281,6 @@
 		98CD125C19CA85710089385F /* SWKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SWKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98CD125F19CA85710089385F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98CD127619CA866B0089385F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
-		98CF00B41B461EDE00627DC6 /* browser-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "browser-icon.png"; sourceTree = "<group>"; };
-		98CF00B51B461EDE00627DC6 /* get-started.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "get-started.png"; sourceTree = "<group>"; };
-		98CF00B61B461EDE00627DC6 /* info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = info.png; sourceTree = "<group>"; };
-		98CF00B71B461EDE00627DC6 /* menu-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-icon.png"; sourceTree = "<group>"; };
 		98D55ED618480B6800104956 /* textsize_down.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_down.png; path = "Keyman Icons/textsize_down.png"; sourceTree = "<group>"; };
 		98D55ED718480B6800104956 /* textsize_down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_down@2x.png"; path = "Keyman Icons/textsize_down@2x.png"; sourceTree = "<group>"; };
 		98D55EDC18480B6800104956 /* textsize_up.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_up.png; path = "Keyman Icons/textsize_up.png"; sourceTree = "<group>"; };
@@ -380,10 +300,10 @@
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
+		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
 		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E213601B2141C5FB00A043B7 /* sil-small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sil-small.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -516,70 +436,6 @@
 			path = SetUpViewController;
 			sourceTree = "<group>";
 		};
-		9845A7D81A439AFB00544E2E /* WebPages */ = {
-			isa = PBXGroup;
-			children = (
-				9845A89D1A439BB500544E2E /* SetupSWK */,
-				9845A8331A439B8F00544E2E /* Info */,
-			);
-			path = WebPages;
-			sourceTree = "<group>";
-		};
-		9845A8331A439B8F00544E2E /* Info */ = {
-			isa = PBXGroup;
-			children = (
-				E213601B2141C5FB00A043B7 /* sil-small.png */,
-				98CF00B41B461EDE00627DC6 /* browser-icon.png */,
-				98CF00B51B461EDE00627DC6 /* get-started.png */,
-				98CF00B61B461EDE00627DC6 /* info.png */,
-				98CF00B71B461EDE00627DC6 /* menu-icon.png */,
-				9845A8341A439B8F00544E2E /* app-info.css */,
-				9845A8351A439B8F00544E2E /* backspace.png */,
-				9845A8361A439B8F00544E2E /* bookmarklet.png */,
-				9845A8371A439B8F00544E2E /* confirm-dl-a.png */,
-				9845A8381A439B8F00544E2E /* confirm-dl.png */,
-				9845A8391A439B8F00544E2E /* delete-a.png */,
-				9845A83A1A439B8F00544E2E /* delete.png */,
-				9845A83B1A439B8F00544E2E /* dl-success-a.png */,
-				9845A83C1A439B8F00544E2E /* dl-success.png */,
-				9845A83D1A439B8F00544E2E /* font-dl1.png */,
-				9845A83E1A439B8F00544E2E /* font-dl2.png */,
-				9845A83F1A439B8F00544E2E /* font-dl3.png */,
-				9845A8401A439B8F00544E2E /* font-dl4.png */,
-				9845A8411A439B8F00544E2E /* font-dl5.png */,
-				9845A8421A439B8F00544E2E /* font-size-a.png */,
-				9845A8431A439B8F00544E2E /* font-size.png */,
-				9845A8441A439B8F00544E2E /* globe.png */,
-				9845A8451A439B8F00544E2E /* hide-keyboard.png */,
-				9845A8461A439B8F00544E2E /* info-ap.png */,
-				9845A8471A439B8F00544E2E /* info.html */,
-				9845A8481A439B8F00544E2E /* install1i.png */,
-				9845A8491A439B8F00544E2E /* install2i.png */,
-				9845A84A1A439B8F00544E2E /* keyman-settings.png */,
-				9845A84B1A439B8F00544E2E /* keyman-settings2.png */,
-				9845A84C1A439B8F00544E2E /* keyman-settings3.png */,
-				9845A84D1A439B8F00544E2E /* keyman-settings4.png */,
-				9845A84E1A439B8F00544E2E /* keyman-settings5.png */,
-				9845A84F1A439B8F00544E2E /* keyman-settings6.png */,
-				9845A8501A439B8F00544E2E /* lang-list.png */,
-				9845A8511A439B8F00544E2E /* return.png */,
-				9845A8521A439B8F00544E2E /* share.png */,
-				9845A8531A439B8F00544E2E /* shift.png */,
-				9845A8541A439B8F00544E2E /* touch-hold.png */,
-				9845A8551A439B8F00544E2E /* url-screen.png */,
-				9845A8561A439B8F00544E2E /* url-screeni.png */,
-			);
-			path = Info;
-			sourceTree = "<group>";
-		};
-		9845A89D1A439BB500544E2E /* SetupSWK */ = {
-			isa = PBXGroup;
-			children = (
-				9845A89E1A439BB500544E2E /* setup.html */,
-			);
-			path = SetupSWK;
-			sourceTree = "<group>";
-		};
 		9845A8BD1A439F1000544E2E /* Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -626,6 +482,7 @@
 				CE2B1E4B21B6112B007D092E /* DeviceKit.framework */,
 				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
 				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
+				CE1F5ECC23331C1C00141F3E /* resources */,
 				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB9176935E400B62590 /* Keyman */,
 				98ABADB1176935E400B62590 /* Products */,
@@ -682,7 +539,6 @@
 			isa = PBXGroup;
 			children = (
 				16A9229D20325253003CC98E /* Keyman-Info.plist */,
-				9845A7D81A439AFB00544E2E /* WebPages */,
 				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
@@ -773,6 +629,14 @@
 				98CD125F19CA85710089385F /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CE1F5ECC23331C1C00141F3E /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */,
+			);
+			path = resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -888,25 +752,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				9845A8DE1A439FB200544E2E /* BookmarksViewController.xib in Resources */,
-				9845A8601A439B8F00544E2E /* confirm-dl.png in Resources */,
 				981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */,
 				9845A8D41A439F1000544E2E /* 786-browser@3x.png in Resources */,
-				9845A8921A439B8F00544E2E /* return.png in Resources */,
 				9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */,
 				9845A8B51A439D3000544E2E /* Images.xcassets in Resources */,
 				981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */,
 				9845A8D71A439F1000544E2E /* UIButtonBarArrowRight@2x.png in Resources */,
-				9845A8941A439B8F00544E2E /* share.png in Resources */,
 				981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */,
 				981AFA9819EF44DE006706BF /* 724-info.png in Resources */,
-				9845A85E1A439B8F00544E2E /* confirm-dl-a.png in Resources */,
-				9845A87A1A439B8F00544E2E /* hide-keyboard.png in Resources */,
-				E213601C2141C5FB00A043B7 /* sil-small.png in Resources */,
 				981AFA9919EF44DE006706BF /* MainViewController_iPad.xib in Resources */,
 				982D149319FF462A007D4629 /* 724-info-selected@3x.png in Resources */,
 				982D149519FF462A007D4629 /* 724-info@3x.png in Resources */,
 				981AFA9E19EF44DE006706BF /* textsize.png in Resources */,
-				9845A8881A439B8F00544E2E /* keyman-settings3.png in Resources */,
 				9845A8D11A439F1000544E2E /* 786-browser-selected@3x.png in Resources */,
 				9845A8CE1A439F1000544E2E /* 715-globe-toolbar@3x.png in Resources */,
 				9845A7B11A43983300544E2E /* kmwb-navbar-Landscape~ipad.png in Resources */,
@@ -914,29 +771,17 @@
 				981AFAA219EF44DE006706BF /* navbar-Portrait@2x.png in Resources */,
 				9845A8D01A439F1000544E2E /* 786-browser-selected@2x.png in Resources */,
 				9822CB6D1A3A8E3200D73CAA /* more-selected@2x.png in Resources */,
-				9845A8A01A439BB500544E2E /* setup.html in Resources */,
 				9845A7B01A43983300544E2E /* kmwb-navbar-Landscape@2x~ipad.png in Resources */,
-				98CF00BA1B461EDE00627DC6 /* info.png in Resources */,
-				98CF00B81B461EDE00627DC6 /* browser-icon.png in Resources */,
-				9845A8901A439B8F00544E2E /* lang-list.png in Resources */,
-				98CF00BB1B461EDE00627DC6 /* menu-icon.png in Resources */,
 				9845A7AD1A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png in Resources */,
-				9845A86A1A439B8F00544E2E /* font-dl1.png in Resources */,
 				9845A7B61A43983300544E2E /* kmwb-navbar-Portrait~ipad.png in Resources */,
 				9845A7AF1A43983300544E2E /* kmwb-navbar-Landscape@2x.png in Resources */,
 				9845A7AE1A43983300544E2E /* kmwb-navbar-Landscape.png in Resources */,
-				9845A8681A439B8F00544E2E /* dl-success.png in Resources */,
-				9845A87C1A439B8F00544E2E /* info-ap.png in Resources */,
-				9845A8581A439B8F00544E2E /* app-info.css in Resources */,
 				981AFAA519EF44DE006706BF /* 724-info-selected@2x.png in Resources */,
-				9845A85C1A439B8F00544E2E /* bookmarklet.png in Resources */,
 				981AFAA919EF44DE006706BF /* 702-share-selected@2x.png in Resources */,
 				982D14A119FF462A007D4629 /* textsize@3x.png in Resources */,
 				9845A8CD1A439F1000544E2E /* 715-globe-toolbar@2x.png in Resources */,
 				982D149B19FF462A007D4629 /* textsize_down@3x.png in Resources */,
-				9845A8721A439B8F00544E2E /* font-dl5.png in Resources */,
 				9845A8D81A439F1000544E2E /* UIButtonBarRefresh@2x.png in Resources */,
-				9845A8861A439B8F00544E2E /* keyman-settings2.png in Resources */,
 				981AFAAA19EF44DE006706BF /* navbar-Landscape~ipad.png in Resources */,
 				982D149D19FF462A007D4629 /* textsize_selected@3x.png in Resources */,
 				981AFAB019EF44DE006706BF /* textsize_selected.png in Resources */,
@@ -947,51 +792,35 @@
 				981AFAB219EF44DE006706BF /* navbar-Portrait~ipad.png in Resources */,
 				989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */,
 				9822CB6F1A3A8E3200D73CAA /* more@2x.png in Resources */,
-				9845A88E1A439B8F00544E2E /* keyman-settings6.png in Resources */,
-				98CF00B91B461EDE00627DC6 /* get-started.png in Resources */,
 				9820CE531A144F0400EA909A /* navbar-Portrait@3x.png in Resources */,
 				981AFAB519EF44DE006706BF /* 711-trash-selected.png in Resources */,
 				9845A7B51A43983300544E2E /* kmwb-navbar-Portrait@3x.png in Resources */,
 				981AFAB619EF44DE006706BF /* navbar-Landscape@2x.png in Resources */,
-				9845A8641A439B8F00544E2E /* delete.png in Resources */,
 				9820CE521A144F0400EA909A /* navbar-Landscape-568h@3x.png in Resources */,
 				162E2C9020924EEE00F40769 /* keyman_logo@3x.png in Resources */,
-				9845A87E1A439B8F00544E2E /* info.html in Resources */,
 				981AFAB719EF44DE006706BF /* navbar-Portrait@2x~ipad.png in Resources */,
 				981AFAB819EF44DE006706BF /* textsize_down.png in Resources */,
-				9845A8701A439B8F00544E2E /* font-dl4.png in Resources */,
 				981AFAB919EF44DE006706BF /* 887-notepad-selected@2x.png in Resources */,
 				9845A8CF1A439F1000544E2E /* 786-browser-selected.png in Resources */,
 				981AFABA19EF44DE006706BF /* textsize_down@2x.png in Resources */,
-				9845A8801A439B8F00544E2E /* install1i.png in Resources */,
 				982D148B19FF462A007D4629 /* 702-share-selected@3x.png in Resources */,
 				9845A7B21A43983300544E2E /* kmwb-navbar-Portrait.png in Resources */,
 				981AFABB19EF44DE006706BF /* 887-notepad-selected.png in Resources */,
-				9845A8661A439B8F00544E2E /* dl-success-a.png in Resources */,
 				981AFABC19EF44DE006706BF /* 887-notepad@2x.png in Resources */,
-				9845A88A1A439B8F00544E2E /* keyman-settings4.png in Resources */,
 				981AFABE19EF44DE006706BF /* textsize_up.png in Resources */,
-				9845A8961A439B8F00544E2E /* shift.png in Resources */,
 				982D148F19FF462A007D4629 /* 711-trash-selected@3x.png in Resources */,
 				981AFABF19EF44DE006706BF /* textsize_up@2x.png in Resources */,
-				9845A8841A439B8F00544E2E /* keyman-settings.png in Resources */,
-				9845A8781A439B8F00544E2E /* globe.png in Resources */,
 				9845A7D01A439A9200544E2E /* GetStartedViewController.xib in Resources */,
-				9845A8761A439B8F00544E2E /* font-size.png in Resources */,
 				981AFAC019EF44DE006706BF /* textsize@2x.png in Resources */,
 				981AFAC419EF44DE006706BF /* navbar-Landscape.png in Resources */,
 				981AFAC519EF44DE006706BF /* 724-info-selected.png in Resources */,
 				981AFAC619EF44DE006706BF /* 711-trash-selected@2x.png in Resources */,
 				981AFAC719EF44DE006706BF /* navbar-Landscape@2x~ipad.png in Resources */,
 				981AFAC819EF44DE006706BF /* navbar-Portrait.png in Resources */,
-				9845A8821A439B8F00544E2E /* install2i.png in Resources */,
 				981AFAC919EF44DE006706BF /* 711-trash.png in Resources */,
 				9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */,
 				9845A8D51A439F1000544E2E /* UIAccessoryButtonX@2x.png in Resources */,
-				9845A85A1A439B8F00544E2E /* backspace.png in Resources */,
-				9845A8621A439B8F00544E2E /* delete-a.png in Resources */,
 				982D149919FF462A007D4629 /* 887-notepad@3x.png in Resources */,
-				9845A86E1A439B8F00544E2E /* font-dl3.png in Resources */,
 				982D149719FF462A007D4629 /* 887-notepad-selected@3x.png in Resources */,
 				9845A7B41A43983300544E2E /* kmwb-navbar-Portrait@2x~ipad.png in Resources */,
 				981AFACD19EF44DE006706BF /* 711-trash@2x.png in Resources */,
@@ -1000,13 +829,9 @@
 				9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */,
 				9845A8D31A439F1000544E2E /* 786-browser@2x.png in Resources */,
 				981AFACF19EF44DE006706BF /* textsize_selected@2x.png in Resources */,
-				9845A89C1A439B8F00544E2E /* url-screeni.png in Resources */,
+				CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */,
 				981AFAD319EF44DE006706BF /* navbar-Landscape-568h@2x.png in Resources */,
 				9845A8CC1A439F1000544E2E /* 715-globe-toolbar.png in Resources */,
-				9845A8981A439B8F00544E2E /* touch-hold.png in Resources */,
-				9845A88C1A439B8F00544E2E /* keyman-settings5.png in Resources */,
-				9845A86C1A439B8F00544E2E /* font-dl2.png in Resources */,
-				9845A89A1A439B8F00544E2E /* url-screen.png in Resources */,
 				981AFAD419EF44DE006706BF /* 887-notepad.png in Resources */,
 				981AFAD619EF44DE006706BF /* 702-share-selected.png in Resources */,
 				982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */,
@@ -1014,7 +839,6 @@
 				982D148D19FF462A007D4629 /* 702-share@3x.png in Resources */,
 				9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */,
 				9822CB691A3A77D200D73CAA /* MainViewController_.xib in Resources */,
-				9845A8741A439B8F00544E2E /* font-size-a.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1075,6 +899,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			showEnvVarsInLog = 0;
 		};
 		CE06AA671F161422006D91C3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

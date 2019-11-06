@@ -27,6 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
@@ -107,6 +108,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
 
         if(associatedLexicalModel != null) {
           args.putString(KMManager.KMKey_LexicalModelName, associatedLexicalModel.get(KMManager.KMKey_LexicalModelName));
+          args.putString(KMManager.KMKey_CustomHelpLink, associatedLexicalModel.get(KMManager.KMKey_CustomHelpLink));
         }
 
         Intent intent = new Intent(context, LanguageSettingsActivity.class);
@@ -125,7 +127,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
         // 1. connection to cloud catalog
         // 2. cached file
         // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists() ||
+        if (KMManager.hasConnection(context) || CloudDataJsonUtil.getKeyboardCacheFile(context).exists() ||
           KeyboardPickerActivity.hasKeyboardFromPackage()){
           dismissOnSelect = false;
           Intent i = new Intent(context, LanguageListActivity.class);
@@ -311,7 +313,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
     };
 
     checkingUpdates = true;
-    CloudRepository.shared.fetchDataset(this, this, onSuccess, onFailure);
+    CloudRepository.shared.updateDatasetIfNeeded(this, this, onSuccess, onFailure);
   }
 
   public void onUpdateDetection(final List<Bundle> updatableResources) {

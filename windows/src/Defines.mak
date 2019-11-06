@@ -1,12 +1,18 @@
 # DEBUG=1
 
-KEYMAN_VERSION=12.0
+# TODO: Eliminate this hard coded version; used only in windows/src/desktop/help/Makefile
+#       so convert to .in with mkver transform
+KEYMAN_VERSION=13.0
 
-!IFDEF KEYMAN_ROOT
-ROOT=$(KEYMAN_ROOT)\windows
-!ELSE
-ROOT=c:\keyman\windows
+#
+# Paths
+#
+
+!IFNDEF KEYMAN_ROOT
+KEYMAN_ROOT=c:\keyman
 !ENDIF
+
+ROOT=$(KEYMAN_ROOT)\windows
 
 EXT=$(ROOT)\src\ext
 
@@ -64,7 +70,34 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
 !ENDIF
 !ENDIF
 
-MAKE=$(MAKE) -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET)
+!IFDEF RELEASE_OEM
+  MAKEFLAG_RELEASE_OEM=-DRELEASE_OEM
+!ENDIF
+
+#
+# USERDEFINES allows the developer to specify overrides for various settings. We need a variable
+# because Makefiles cannot test for file existence
+#
+
+!ifdef USERDEFINES
+!include $(ROOT)\src\UserDefines.mak
+!endif
+
+#
+# Delphi Compiler Configuration - Delphi 10.3.2
+#
+
+!IFNDEF DELPHI_VERSION
+DELPHI_VERSION=20.0
+!ENDIF
+
+DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
+
+#
+# Pass local configuration through to sub-instances of MAKE
+#
+
+MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
 
 #
 # Delphi build commands
@@ -74,7 +107,7 @@ MAKE=$(MAKE) -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) 
 DEVTOOLS=$(PROGRAM)\buildtools\devtools.exe
 
 !IFDEF LINT
-DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_CAST_LOSS -W+EXPLICIT_STRING_CAST -W+EXPLICIT_STRING_CAST_LOSS -W+CVT_WCHAR_TO_ACHAR -W+CVT_NARROWING_STRING_LOST -W+CVT_ACHAR_TO_WCHAR -W+CVT_WIDENING_STRING_LOST -W+UNICODE_TO_LOCALE -W+LOCALE_TO_UNICODE -W+IMPLICIT_VARIANTS 
+DELPHIWARNINGS=-W+MESSAGE_DIRECTIVE -W+IMPLICIT_STRING_CAST -W+IMPLICIT_STRING_CAST_LOSS -W+EXPLICIT_STRING_CAST -W+EXPLICIT_STRING_CAST_LOSS -W+CVT_WCHAR_TO_ACHAR -W+CVT_NARROWING_STRING_LOST -W+CVT_ACHAR_TO_WCHAR -W+CVT_WIDENING_STRING_LOST -W+UNICODE_TO_LOCALE -W+LOCALE_TO_UNICODE -W+IMPLICIT_VARIANTS
 !ELSE
 DELPHIWARNINGS=-W-MESSAGE_DIRECTIVE -W-IMPLICIT_STRING_CAST -W-IMPLICIT_STRING_CAST_LOSS -W-EXPLICIT_STRING_CAST -W-EXPLICIT_STRING_CAST_LOSS -W-CVT_WCHAR_TO_ACHAR -W-CVT_NARROWING_STRING_LOST -W-CVT_ACHAR_TO_WCHAR -W-CVT_WIDENING_STRING_LOST -W-UNICODE_TO_LOCALE -W-LOCALE_TO_UNICODE -W-IMPLICIT_VARIANTS -W-IMPLICIT_INTEGER_CAST_LOSS -W-IMPLICIT_CONVERSION_LOSS -W-COMBINING_SIGNED_UNSIGNED64 -W-COMBINING_SIGNED_UNSIGNED64
 !ENDIF
@@ -84,8 +117,8 @@ DELPHIDPRPARAMS64=-Q -B -GD -H -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $
 DELPHIDPKPARAMS=-Q -B -GD -VT -$C+ -$D+ -$L+ -$O+ -$Q- -$R- -$W+ -$Y+ -E. $(DELPHIWARNINGS) -I$(DELPHIINCLUDES) -U$(DELPHIINCLUDES) -R$(DELPHIINCLUDES) -NSVcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Web;Soap;Winapi;System.Win -LE$(OUTLIB) -LN$(OUTLIB) -NSData
 
 !IFDEF NOUI
-DCC32=dcc32.exe $(DELPHIDPRPARAMS)
-DCC32DPK=dcc32.exe $(DELPHIDPKPARAMS)
+DCC32="$(DCC32PATH)\dcc32.exe" $(DELPHIDPRPARAMS)
+DCC32DPK="$(DCC32PATH)\dcc32.exe" $(DELPHIDPKPARAMS)
 !ELSE
 !IFDEF QUIET
 DCC32=@$(DEVTOOLS) -dccq  $(DELPHIDPRPARAMS)
@@ -96,13 +129,14 @@ DCC32DPK=@$(DEVTOOLS) -dcc $(DELPHIDPKPARAMS)
 !ENDIF
 !ENDIF
 
-DCC64=dcc64.exe $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
+DCC64="$(DCC32PATH)\dcc64.exe" $(DELPHIDPRPARAMS64) -N0x64\ -Ex64\
 
 #
 # Delphi MSBuild related commands and macros
 #
 
-DELPHI_MSBUILD=$(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
+# Warning: whitespace is horribly significant in the following macro -- particularly lack of space before &&
+DELPHI_MSBUILD=set DCC32PATH=$(DCC32PATH)&& $(ROOT)\src\buildtools\msbuild-wrapper.bat $(DELPHI_MSBUILD_FLAG_DEBUG)
 
 !IFDEF DEBUG
 TARGET_PATH=Debug
@@ -124,7 +158,7 @@ BRCC32=rc.exe
 
 HHC=\progra~1\htmlhe~1\hhc
 NMAKE=nmake.exe
-CL=cl.exe 
+CL=cl.exe
 MSBUILD=msbuild.exe /maxcpucount
 MT="C:\Program Files (x86)\Windows Kits\8.1\bin\x86\mt.exe"
 VCBUILD=error
@@ -186,16 +220,23 @@ MAKE=$(MAKE)
 # To get a .pfx from a .spc and .pvk, run pvk2pfx.exe
 #
 
-SC_URL="https://keyman.com/"
-SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+!IFNDEF SC_PFX_SHA1
 SC_PFX_SHA1="$(ROOT)\src\buildtools\certificates\keymantest-sha1.pfx"
+!ENDIF
+
+!IFNDEF SC_PFX_SHA256
+SC_PFX_SHA256="$(ROOT)\src\buildtools\certificates\keymantest-sha256.pfx"
+!ENDIF
+
+!IFNDEF SC_URL
+SC_URL="https://keyman.com/"
+!ENDIF
+
+!IFNDEF SC_PWD
 SC_PWD=""
+!ENDIF
 
 SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_PFX_SHA256) $(SC_URL) $(SC_PWD)
-
-!ifdef USERDEFINES
-!include $(ROOT)\src\UserDefines.mak
-!endif
 
 #
 # On some computers, the PLATFORM environment variable is set to x86. This can break msbuild
@@ -222,4 +263,4 @@ MKVER_V=$(MKVER_APP) -v $(MKVER_VERSION_TXT)
 # Update a manifest.xml file
 MKVER_M=$(MKVER_APP) -m $(MKVER_VERSION_TXT)
 # Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out> $(MKVER_VERSION_TXT)
-MKVER_U=$(MKVER_APP) -v -u 
+MKVER_U=$(MKVER_APP) -v -u

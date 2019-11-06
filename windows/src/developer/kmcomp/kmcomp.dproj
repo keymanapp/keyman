@@ -88,8 +88,8 @@
         <DCC_Optimize>false</DCC_Optimize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>-v balochi_phonetic.keyboard_info</Debugger_RunParams>
-        <Debugger_CWD>c:\projects\keyman\keyboards\release\b\balochi_phonetic</Debugger_CWD>
+        <Debugger_RunParams>enga.kpj</Debugger_RunParams>
+        <Debugger_CWD>c:\users\mcdurdin\documents\enga</Debugger_CWD>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
@@ -107,7 +107,6 @@
         <DCCReference Include="kccompilepackage.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CompilePackage.pas"/>
         <DCCReference Include="..\..\global\delphi\general\CRC32.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ResourceStrings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kpsfile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\PackageFileFormats.pas"/>
@@ -208,6 +207,12 @@
         <DCCReference Include="..\TIKE\main\TextFileFormat.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kmnProjectFileAction.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
+        <DCCReference Include="..\..\global\delphi\packages\Keyman.System.PackageInfoRefreshLexicalModels.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas"/>
+        <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas"/>
+        <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
+        <DCCReference Include="Keyman.Developer.System.Project.ProjectLogConsole.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

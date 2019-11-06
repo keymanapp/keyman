@@ -27,7 +27,6 @@
  */
 
 /// <reference path="../message.d.ts" />
-/// <reference path="./worker-compiler-interfaces.d.ts" />
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
@@ -211,8 +210,8 @@ interface WorkerInternalModel {
  */
 interface WorkerInternalModelConstructor {
   /**
-   * WorkerInternalModel instances are all given the keyboard's
+   * LexicalModel instances are all given the keyboard's
    * capabilities, plus any parameters they require.
    */
-  new(...modelParameters: any[]): WorkerInternalModel;
+  new(...modelParameters: any[]): LexicalModel;
 }

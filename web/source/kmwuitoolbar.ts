@@ -49,6 +49,7 @@ if(!window['keyman']['ui']['name']) {
       langKeyboardListNodes: [],
       selectedRegion: 'as',
       listedKeyboards: [],
+      catchAllRegion: 'un',
       keyboardListPriority: 0,
       maxListedKeyboards: 1,
       lastActiveControl: null,
@@ -81,10 +82,10 @@ if(!window['keyman']['ui']['name']) {
     
     ui.ToolBar_Text['ca']='Central America';
     ui.ToolBar_Text['sa']='South America';
-    ui.ToolBar_Text['na']='North America';
+    ui.ToolBar_Text['na']='Americas';
     ui.ToolBar_Text['eu']='Europe';
     ui.ToolBar_Text['af']='Africa';
-    ui.ToolBar_Text['me']='Middle east';
+    ui.ToolBar_Text['un']='Undetermined';
     ui.ToolBar_Text['as']='Asia';
     ui.ToolBar_Text['oc']='Oceania';
 
@@ -147,14 +148,14 @@ if(!window['keyman']['ui']['name']) {
       util['linkStyleSheet'](util['getOption']('resources')+'ui/toolbar/kmwuitoolbar.css');
         
       ui.regions = {};
-      ui.regions['ca'] = {t: ui.ToolBar_Text['ca'], m: '49,52,65,54,68,57,71,56,73,59,75,60,93,61,94,58,97,58,101,59,107,60,114,64,115,68,114,77,104,74,98,75,96,78,95,82,90,81,85,80,82,76,78,74,74,73,65,68,57,61' },
-      ui.regions['sa'] = {t: ui.ToolBar_Text['sa'], m: '82,82,95,82,96,78,98,75,104,74,114,77,120,79,124,83,126,87,141,90,142,97,138,103,135,113,127,116,123,124,115,131,112,132,109,138,117,139,140,141,141,146,134,148,114,145,109,148,100,148,91,143,91,130,96,111,89,102,83,95,77,89' },
-      ui.regions['na'] = {t: ui.ToolBar_Text['na'], m: '0,3,0,37,24,32,35,37,43,47,49,52,65,54,68,57,71,56,73,59,75,60,93,61,93,57,103,49,118,41,126,41,136,23,148,17,156,14,164,5,164,0,57,0,35,5,25,9,5,8' },
+      //ui.regions['ca'] = {t: ui.ToolBar_Text['ca'], m: '49,52,65,54,68,57,71,56,73,59,75,60,93,61,94,58,97,58,101,59,107,60,114,64,115,68,114,77,104,74,98,75,96,78,95,82,90,81,85,80,82,76,78,74,74,73,65,68,57,61' },
+      //ui.regions['sa'] = {t: ui.ToolBar_Text['sa'], m: '82,82,95,82,96,78,98,75,104,74,114,77,120,79,124,83,126,87,141,90,142,97,138,103,135,113,127,116,123,124,115,131,112,132,109,138,117,139,140,141,141,146,134,148,114,145,109,148,100,148,91,143,91,130,96,111,89,102,83,95,77,89' },
+      ui.regions['na'] = {t: ui.ToolBar_Text['na'], m: '0,3,0,37,24,32,35,37,43,47,49,52,65,54,68,57,71,56,73,59,75,60,93,61,93,57,103,49,118,41,126,41,136,23,148,17,156,14,164,5,164,0,57,0,35,5,25,9,5,8,49,52,65,54,68,57,71,56,73,59,75,60,93,61,94,58,97,58,101,59,107,60,114,64,115,68,114,77,104,74,98,75,96,78,95,82,90,81,85,80,82,76,78,74,74,73,65,68,57,61,82,82,95,82,96,78,98,75,104,74,114,77,120,79,124,83,126,87,141,90,142,97,138,103,135,113,127,116,123,124,115,131,112,132,109,138,117,139,140,141,141,146,134,148,114,145,109,148,100,148,91,143,91,130,96,111,89,102,83,95,77,89' },
       ui.regions['eu'] = {t: ui.ToolBar_Text['eu'], m: '145,29,146,19,158,14,171,6,187,2,206,1,217,4,227,11,231,16,231,33,227,34,225,35,225,37,227,39,228,44,228,47,227,48,223,46,218,44,215,43,208,43,203,45,202,48,205,52,201,52,195,49,189,50,187,48,177,48,175,49,166,50,147,33' },
       ui.regions['af'] = {t: ui.ToolBar_Text['af'], m: '150,58,158,50,166,50,175,49,177,48,187,48,189,50,195,49,201,52,205,52,207,53,221,75,229,75,231,77,231,85,227,92,232,101,237,106,237,112,227,115,222,118,206,125,199,127,193,127,185,111,183,104,180,87,168,89,153,85,143,71,147,60' },
-      ui.regions['me'] = {t: ui.ToolBar_Text['me'], m: '205,52,202,48,203,45,208,43,215,43,218,44,223,46,227,48,232,48,239,48,240,49,239,53,242,60,243,65,237,76,231,77,229,75,221,75,207,53' },
       ui.regions['as'] = {t: ui.ToolBar_Text['as'], m: '219,1,221,6,228,12,231,16,231,33,227,34,225,35,225,37,227,39,229,45,232,48,239,48,240,49,239,53,242,60,243,65,249,70,252,81,259,87,271,87,278,95,289,100,303,101,311,98,320,98,323,98,323,84,311,81,308,73,307,65,317,57,330,50,334,44,348,36,364,38,375,34,375,8,355,8,336,5,292,1,285,0,219,0' },
       ui.regions['oc'] = {t: ui.ToolBar_Text['oc'], m: '288,117,289,107,303,101,311,98,323,98,323,84,333,77,344,73,362,80,369,88,375,96,375,141,352,143,323,142,316,136,310,130,291,130' }
+      ui.regions['un'] = {t: ui.ToolBar_Text['un'], m: '205,52,202,48,203,45,208,43,215,43,218,44,223,46,227,48,232,48,239,48,240,49,239,53,242,60,243,65,237,76,231,77,229,75,221,75,207,53' },
       
       ui.toolbarNode = ui.createNode('div', 'kmw_controls');
       ui.toolbarNode.style.display='block';
@@ -332,9 +333,17 @@ if(!window['keyman']['ui']['name']) {
         var max = 0, count = 0, languageCode = '';
     
         // Get number of languages for the region         
-        for(var j=0; j<Keyboards.length; j++)
-        {         
-          if(Keyboards[j]['RegionCode'] != i) continue;              // Not this region
+        for(var j=0; j<Keyboards.length; j++) {
+          // REVERT:  ensures that keyboards without visible map region get displayed SOMEWHERE.
+          var kbdRegion = Keyboards[j]['RegionCode'];
+          if(!ui.regions[kbdRegion]) {
+            // For now, we'll display them within the 'middle-east' region.
+            if(i != ui.catchAllRegion) {
+              continue;
+            }
+          } else if(kbdRegion != i) {
+            continue; // Not this region
+          }
 
           // Get JUST the language code for this section.  BCP-47 codes can include more!
           var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
@@ -347,9 +356,17 @@ if(!window['keyman']['ui']['name']) {
   
         // Add language list to columns for the region
         languageCode='';
-        for(var j=0; j<Keyboards.length; j++)
-        {           
-          if(Keyboards[j]['RegionCode'] != i) continue;      // Not this region
+        for(var j=0; j<Keyboards.length; j++) {           
+          // REVERT:  ensures that keyboards without visible map region get displayed SOMEWHERE.
+          var kbdRegion = Keyboards[j]['RegionCode'];
+          if(!ui.regions[kbdRegion]) {
+            // For now, we'll display them within the 'middle-east' region.
+            if(i != ui.catchAllRegion) {
+              continue;
+            }
+          } else if(kbdRegion != i) {
+            continue; // Not this region
+          }
 
           var bcpSubtags: string[] = keymanweb['util']['getLanguageCodes'](Keyboards[j]['LanguageCode']);
           if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
@@ -641,21 +658,27 @@ if(!window['keyman']['ui']['name']) {
      * @param       {Object}  kbd    
      * @return      {boolean} 
      **/  
-    ui.selectKeyboard = function(event,lang,kbd)
-    {
-      if(ui.selectedLanguage)
-      {
+    ui.selectKeyboard = function(event,lang,kbd) {
+      if(ui.selectedLanguage) {
         var found = ui.findListedKeyboard(ui.selectedLanguage);
-        if(found != null) ui.listedKeyboards[found].buttonNode.className = 'kmw_button';
+        if(found != null) {
+          ui.listedKeyboards[found].buttonNode.className = 'kmw_button';
+        }
       }
+
       ui.offButtonNode.className = 'kmw_button';
       ui.selectedLanguage = lang;
       ui.selectedKeyboard = kbd;
-      ui.SelectedLanguage = lang.id; 
+
+      // In 12.0, this UI class has only been partially converted to BCP-47.
+      // `lang.id` refers to the base language identifier and will NOT include 
+      // any subtags.  We want the FULL language identifier here, with subtags.
+      ui.SelectedLanguage = kbd.LanguageCode;
+
       // Return focus to input area and activate the selected keyboard 
       ui.setLastFocus(); //*****this seems out of sequence???
-      ui.addKeyboardToList(lang,kbd);
-      keymanweb['setActiveKeyboard'](kbd['InternalName'],lang.id);
+      ui.addKeyboardToList(lang, kbd);
+      keymanweb['setActiveKeyboard'](kbd['InternalName'], kbd['LanguageCode']);
       ui.listedKeyboards[ui.findListedKeyboard(lang)].buttonNode.className = 'kmw_button_selected';
     
       // Always save current state when selecting a keyboard

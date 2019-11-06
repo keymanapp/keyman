@@ -142,7 +142,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     switch indexPath.section {
     case 0:
       mainViewController.dismissGetStartedView(nil)
-      Manager.shared.showKeyboardPicker(in: mainViewController, shouldAddKeyboard: true)
+      mainViewController.showInstalledLanguages()
     case 1:
       mainViewController.dismissGetStartedView(nil)
       let setUpVC = SetUpViewController()
@@ -179,7 +179,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
   @objc func switchValueChanged(_ sender: Any) {
     let userData = AppDelegate.activeUserDefaults()
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: dontShowGetStartedKey)
+      userData.set(!toggle.isOn, forKey: shouldShowGetStartedKey)
       userData.synchronize()
     }
   }

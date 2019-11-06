@@ -268,6 +268,7 @@ type
     ReloadasUTF161: TMenuItem;
     DebugTests1: TMenuItem;
     CrashTest1: TMenuItem;
+    CloseProject1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -310,6 +311,7 @@ type
     procedure WMUserInputLangChange(var Message: TMessage); message WM_USER_INPUTLANGCHANGE;
 
     procedure UpdateFileMRU;
+    procedure ProjectMRUChange(Sender: TObject);
 
     procedure AppOnActivate(Sender: TObject);
     function GetActiveEditor: TfrmTikeEditor;
@@ -318,6 +320,7 @@ type
     function OpenKPSEditor(FFileName: string): TfrmTikeEditor;
     procedure SetActiveChild(const Value: TfrmTikeChild);
     function OpenKVKEditor(FFileName: string): TfrmTikeEditor;
+    function OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 
     procedure ShowChild(Window: TfrmTikeChild);
     function GetActiveChild: TfrmTikeChild;
@@ -422,8 +425,13 @@ uses
   OnlineConstants,
   OnlineUpdateCheck,
   GlobalProxySettings,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectFileType,
+  Keyman.Developer.System.Project.WelcomeRenderer,
+  Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.UfrmWordlistEditor,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -435,9 +443,9 @@ uses
   UfrmAboutTike,
   UfrmOSKEditor,
   UfrmSelectSystemKeyboard,
-  UfrmStartup, UfrmOptions,
+  UfrmOptions,
   UfrmKeyTest, UfrmKeymanWizard,
-  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor, Keyman.Developer.System.Project.ProjectFile, Keyman.Developer.System.Project.ProjectFileType,
+  UfrmPackageEditor, UfrmEditor, UfrmBitmapEditor,
   UfrmDebug, KeymanDeveloperOptions, utilfiletypes,
   UfrmHelp, dmActionsTextEditor, UfrmDebugStatus,
   UfrmCharacterIdentifier, UfrmCharacterMapNew;
@@ -473,6 +481,8 @@ begin
   modActionsMain := TmodActionsMain.Create(Self);
 
   FProjectMRU := TMRUList.Create('Project');
+  FProjectMRU.OnChange := ProjectMRUChange;
+
   FChildWindows := TChildWindowList.Create;
 
   ShowDebug(False);
@@ -517,7 +527,8 @@ begin
   if (FActiveProject <> '') and not FileExists(FActiveProject) then
     FActiveProject := '';
 
-  LoadGlobalProjectUI(FActiveProject, True);
+  if FActiveProject <> '' then
+    LoadGlobalProjectUI(ptUnknown, FActiveProject, True);
 
   InitDock;
 
@@ -576,21 +587,28 @@ begin
     FChildWindows[i].Release;   // I2595, probably not necessary
   end;
 
-  if Assigned(FGlobalProject) then
-    with TRegistryErrorControlled.Create do  // I2890
-    try
-      if FGlobalProject.Untitled
-        then FGlobalProject.PersistUntitledProject  // I1010: Persist untitled project
-        else FGlobalProject.Save;   // I4691
-        
-      RootKey := HKEY_CURRENT_USER;
-      if OpenKey(SRegKey_IDEOptions_CU, True) then
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    RootKey := HKEY_CURRENT_USER;
+    if OpenKey(SRegKey_IDEOptions_CU, True) then
+    begin
+      if IsGlobalProjectUIReady then
       begin
+        if FGlobalProject.Untitled
+          then FGlobalProject.PersistUntitledProject  // I1010: Persist untitled project
+          else FGlobalProject.Save;   // I4691
+
         WriteString(SRegValue_ActiveProject, FGlobalProject.FileName);
+      end
+      else
+      begin
+        if ValueExists(SRegValue_ActiveProject) then
+          DeleteValue(SRegValue_ActiveProject);
       end;
-    finally
-      Free;
     end;
+  finally
+    Free;
+  end;
 
   Action := caFree;
 
@@ -683,22 +701,15 @@ procedure TfrmKeymanDeveloper.WMUserFormShown(var Message: TMessage);
 var
   i: Integer;
 begin
-  try
-    if ParamCount = 0 then
-    begin
-      ShowProject;
-      ShowStartupModal(Self);
-    end
-    else
-    begin
-      for i := 1 to ParamCount do
-        if FileExists(ParamStr(i)) then
-          OpenFile(ParamStr(i), False);
-      ShowStartupModal(Self);
-    end;
-  except
-    CloseStartup;
-    raise;
+  if ParamCount = 0 then
+  begin
+    ShowProject;
+  end
+  else
+  begin
+    for i := 1 to ParamCount do
+      if FileExists(ParamStr(i)) then
+        OpenFile(ParamStr(i), False);
   end;
 
   if True then //FKeymanDeveloperOptions.AutoCheckForUpdates then
@@ -823,8 +834,8 @@ end;
 procedure TfrmKeymanDeveloper.mnuDebugI374Click(Sender: TObject);
 begin
   if Assigned(ActiveEditor)
-    then frmMessages.Add(ActiveEditor.FileName, '1: bug with multi-line messages'#13#10'Double-click on the second line of this message')
-    else frmMessages.Add('test.txt', '1: bug with multi-line messages'#13#10'Double-click on the second line of this message');
+    then frmMessages.Add(plsError, ActiveEditor.FileName, '1: bug with multi-line messages'#13#10'Double-click on the second line of this message', 0, 0)
+    else frmMessages.Add(plsError, 'test.txt', '1: bug with multi-line messages'#13#10'Double-click on the second line of this message', 0, 0);
 end;
 
 procedure TfrmKeymanDeveloper.mnuDebugSetWindowSizeForScreenshotsClick(Sender: TObject);
@@ -1096,6 +1107,12 @@ function TfrmKeymanDeveloper.OpenFile(FFileName: string; FCloseNewFile: Boolean)
 var
   ext: string;
 begin
+  if not IsGlobalProjectUIReady then
+  begin
+    // This can happen if we get a file opened via Explorer.
+    modActionsMain.NewProject(ptKeyboard);
+  end;
+
   Result := nil;
   Screen.Cursor := crHourglass;
   try
@@ -1115,10 +1132,12 @@ begin
               ActiveEditor.Free;
 
         if ext = '.kmn' then Result := OpenKMNEditor(FFileName)
-        else if ext = '.kps' then Result := OpenKPSEditor(FFileName)
-        else if ext = '.kvk' then Result := OpenKVKEditor(FFileName)
-        else if ext = '.bmp' then Result := OpenEditor(FFileName, TfrmBitmapEditor)
-        else                      Result := OpenEditor(FFileName, TfrmEditor);
+        else if ext = '.kps'  then Result := OpenKPSEditor(FFileName)
+        else if ext = '.kvk'  then Result := OpenKVKEditor(FFileName)
+        else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
+        else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
+        else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else                       Result := OpenEditor(FFileName, TfrmEditor);
       end;
 
       if Assigned(Result) then
@@ -1138,6 +1157,12 @@ end;
 function TfrmKeymanDeveloper.OpenKMNEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmKeymanWizard);
+    //else Result := OpenEditor(FFileName, TfrmEditor);
+end;
+
+function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
+begin
+  Result := OpenEditor(FFileName, TfrmWordlistEditor);
     //else Result := OpenEditor(FFileName, TfrmEditor);
 end;
 
@@ -1224,7 +1249,7 @@ procedure TfrmKeymanDeveloper.AddMRU(FileName: string);
 begin
   // Add the filename to the top of the MRU.
 
-  if FileName = '' then Exit;
+  if (FileName = '') or not IsGlobalProjectUIReady then Exit;
 
   if LowerCase(ExtractFileExt(FileName)) <> '.kpj' then
     // Don't add project files to project MRU
@@ -1239,13 +1264,16 @@ begin
   for i := 0 to mnuFileRecent.Count - 1 do
     mnuFileRecent.Items[0].Free;
 
-  for i := 0 to FGlobalProject.MRU.FileCount - 1 do
+  if IsGlobalProjectUIReady then
   begin
-    m := TMenuItem.Create(Self);
-    m.Caption := '&'+IntToStr(i+1)+' '+FGlobalProject.MRU.EllipsisFile(i);
-    m.Hint := FGlobalProject.MRU.Files[i];
-    m.OnClick := mnuFileRecentFileClick;
-    mnuFileRecent.Add(m);
+    for i := 0 to FGlobalProject.MRU.FileCount - 1 do
+    begin
+      m := TMenuItem.Create(Self);
+      m.Caption := '&'+IntToStr(i+1)+' '+FGlobalProject.MRU.EllipsisFile(i);
+      m.Hint := FGlobalProject.MRU.Files[i];
+      m.OnClick := mnuFileRecentFileClick;
+      mnuFileRecent.Add(m);
+    end;
   end;
 end;
 
@@ -1427,7 +1455,9 @@ end;
 
 procedure TfrmKeymanDeveloper.UpdateCaption;
 begin
-  if FGlobalProject.Untitled
+  if not IsGlobalProjectUIReady then
+    Caption := 'Keyman Developer'
+  else if FGlobalProject.Untitled
     then Caption := '(Untitled project) - Keyman Developer'
     else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
 
@@ -1477,6 +1507,15 @@ begin
     end;
 
   Result := nil;
+end;
+
+procedure TfrmKeymanDeveloper.ProjectMRUChange(Sender: TObject);
+begin
+  FProjectMRU.SaveListToXML(TWelcomeRenderer.ProjectMRUFilename);
+
+  // Tell project window to refresh!
+  if ProjectForm <> nil then
+    ProjectForm.SetGlobalProject;
 end;
 
 procedure InitClasses;  // I3350

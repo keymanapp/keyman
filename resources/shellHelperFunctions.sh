@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 _shf_base_dir=$(dirname "$BASH_SOURCE")/..
 
@@ -66,7 +66,7 @@ verify_platform() {
 # Sets $platform_folder accordingly.
 get_platform_folder() {
   verify_platform $1
-  
+
   if [[ $1 = "desktop" || $1 = "developer" ]]; then
     platform_folder="$_shf_base_dir/windows/src/$1"
   elif [[ $1 = "lmlayer" ]]; then
@@ -82,7 +82,17 @@ if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]]; then
     ERROR_RED=$(tput setaf 1)
     WARNING_YELLOW=$(tput setaf 3)
     NORMAL=$(tput sgr0)
+    TERM_HEADING=$(tput setaf 4)
+else
+    ERROR_RED=
+    WARNING_YELLOW=
+    NORMAL=
+    TERM_HEADING=
 fi
+
+echo_heading() {
+  echo "${TERM_HEADING}$*${NORMAL}"
+}
 
 fail() {
     FAILURE_MSG="$1"
@@ -214,4 +224,36 @@ write_download_info() {
   echo "  \"build\": \"${KM_BLD_COUNTER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
   echo "  \"size\": \"${FILE_SIZE}\"" >> "$DOWNLOAD_INFO_FILEPATH"
   echo } >> "$DOWNLOAD_INFO_FILEPATH"
+}
+
+# set_version sets the file version on mac/ios projects
+set_version ( ) {
+  PRODUCT_PATH=$1
+
+  if [ $BUILD_NUMBER ]; then
+    if [ $2 ]; then  # $2 = product name.
+      echo "Setting version numbers in $2 to $BUILD_NUMBER."
+    fi
+    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $BUILD_NUMBER" "$PRODUCT_PATH/Info.plist"
+  fi
+}
+
+
+# Uses npm to set the current package version (package.json).
+#
+# NOTE: this must be invoked exclusively on the CI system!
+#
+# Usage:
+#
+#   set_npm_version VERSION_WITH_TIER
+#
+set_npm_version () {
+  local version=$1
+  # We use --no-git-tag-version because our CI system controls version numbering and
+  # already tags releases. We also want to have the version of this match the
+  # release of Keyman Developer -- these two versions should be in sync. Because this
+  # is a large repo with multiple projects and build systems, it's better for us that
+  # individual build systems don't take too much ownership of git tagging. :)
+  npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
 }

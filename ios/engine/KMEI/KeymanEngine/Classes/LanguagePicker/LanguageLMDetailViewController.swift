@@ -105,7 +105,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       cell.detailTextLabel?.isEnabled = true
     }
     
-    let kbState = Manager.shared.stateForLexicalModel(withID: lexicalModel.id)
+    let kbState = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
     cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
   }
   
@@ -114,7 +114,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
     let lexicalModelIndex = indexPath.section
     let lexicalModel = lexicalModels![lexicalModelIndex]
     
-    let state = Manager.shared.stateForLexicalModel(withID: lexicalModel.id)
+    let state = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
     if state != .downloading {
       if state == .needsDownload {
         isUpdate = false
@@ -137,39 +137,15 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   func downloadHandler(_ lexicalModelIndex: Int) {
-    Manager.shared.downloadLexicalModelPackage(string: (lexicalModels?[lexicalModelIndex].packageFilename)!)
+    let lexicalModel = lexicalModels![lexicalModelIndex]
+    ResourceDownloadManager.shared.downloadLexicalModel(withID: lexicalModel.id, languageID: language.id, isUpdate: false)
   }
   
   private func lexicalModelDownloadStarted() {
     log.info("lexicalModelDownloadStarted: LanguageLMDetailViewController")
     view.isUserInteractionEnabled = false
+    
     navigationItem.setHidesBackButton(true, animated: true)
-    
-    let toolbarFrame = navigationController!.toolbar.frame
-    let labelFrame = CGRect(origin: toolbarFrame.origin,
-                            size: CGSize(width: toolbarFrame.width * 0.95, height: toolbarFrame.height * 0.7))
-    let label = UILabel(frame: labelFrame)
-    label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.white
-    label.textAlignment = .center
-    label.center = CGPoint(x: toolbarFrame.width * 0.5, y: toolbarFrame.height * 0.5)
-    label.text = "Downloading\u{2026}"
-    label.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                              .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-    label.tag = toolbarLabelTag
-    
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    indicatorView.center = CGPoint(x: toolbarFrame.width - indicatorView.frame.width,
-                                   y: toolbarFrame.height * 0.5)
-    indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
-    indicatorView.tag = toolbarActivityIndicatorTag
-    indicatorView.startAnimating()
-    
-    navigationController?.toolbar.viewWithTag(toolbarButtonTag)?.removeFromSuperview()
-    navigationController?.toolbar.viewWithTag(toolbarLabelTag)?.removeFromSuperview()
-    navigationController?.toolbar.viewWithTag(toolbarActivityIndicatorTag)?.removeFromSuperview()
-    navigationController?.toolbar.addSubview(label)
-    navigationController?.toolbar.addSubview(indicatorView)
     navigationController?.setToolbarHidden(false, animated: true)
   }
   

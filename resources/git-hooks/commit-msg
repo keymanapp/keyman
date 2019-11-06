@@ -1,0 +1,102 @@
+#!/bin/bash
+
+#
+# This commit-msg hook validates commit messages
+# to ensure that they meet our conventional commit standard.
+#
+#
+#   "type: message"
+#   "type(scope): message"
+#   Optionally, append ". Fixes #1234"
+#
+# Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
+#
+
+#
+# Configurable options for types, scopes and message length.
+#
+
+types=(fix feat chore change docs style refactor test)
+scopes=(android ci common developer ios linux mac web windows)
+min_length=4
+max_length=72
+
+#
+# Define terminal colours.
+#
+
+if [ -t 2 ]; then
+  t_red=$'\e[1;31m'
+  t_grn=$'\e[1;32m'
+  t_yel=$'\e[1;33m'
+  t_blu=$'\e[1;34m'
+  t_mag=$'\e[1;35m'
+  t_cyn=$'\e[1;36m'
+  t_end=$'\e[0m'
+fi
+
+#
+# Test the repository upstream/origin: ignore if not keymanapp/keyman
+#
+
+if ! (git remote -v | grep -E "origin|upstream" | grep -q "keymanapp/"); then
+  # Not a Keyman repository. We have no opinion.
+  # echo "Not a Keyman repository. We don't care"
+  exit 0
+fi
+
+if (git remote -v | grep -E "origin|upstream" | grep -Eq "keyboards|lexical-models"); then
+  # We don't enforce commit messages on keyboards or lexical-models repositories
+  # echo "Keyboards or Lexical-Models. We still don't care."
+  exit 0
+fi
+
+# build the regex pattern based on the config file
+function build_regex() {
+  retypes=
+  for type in "${types[@]}"
+  do
+    retypes="${retypes}$type|"
+  done
+  retypes="(${retypes%?})"
+
+  rescope=
+  for scope in "${scopes[@]}"
+  do
+    rescope="${rescope}$scope|"
+  done
+  # %? removes last |
+  rescope="(\((${rescope%?})\))?"
+
+  remessage=".{$min_length,$max_length}[^.]"
+  refixes="( \. Fixes #\d+)?"
+
+  regexp="^${retypes}${rescope}: ${remessage}${refixes}\s*$"
+}
+
+# Print out a standard error message which explains
+# how the commit message should be structured
+function print_error() {
+  echo -e "\n${t_red}ERROR: Commit message is not in Conventional Commit format"
+  echo -e "----------------------------------------------------------${t_end}"
+  echo -e "Valid types: ${t_grn}${types[@]}${t_end}"
+  echo -e "Valid scopes: ${t_grn}${scopes[@]}${t_end}"
+  echo -e "Max length (first line): ${t_grn}$max_length${t_end}"
+  echo -e "Min length (first line): ${t_grn}$min_length${t_end}"
+  echo -e "Optionally, append ${t_grn}Fixes #1234${t_end}\n"
+  echo -e "${t_cyn}Example:${t_end} fix(windows): Re-attaches the widget plug which had fallen out. Fixes #1111"
+  echo -e "${t_cyn}Reference${t_end}: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes"
+  echo -e ""
+  echo -e "This script: $0"
+}
+
+# get the first line of the commit message
+msg=$(head -1 $1)
+
+build_regex
+
+if [[ ! $msg =~ $regexp ]]; then
+  # commit message is invalid according to config - block commit
+  print_error
+  exit 1
+fi

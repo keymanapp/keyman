@@ -217,7 +217,7 @@ begin
 
   if sFull <> '' then v.Add('http://'+sFull+port);
   if sHost <> '' then v.Add('http://'+sHost+port);
-  if sNetbios <> '' then v.Add('http://'+sHost+port);
+  if sNetbios <> '' then v.Add('http://'+sNetbios+port);
 
   FIPv4Addresses := TIdStackLocalAddressList.Create;
   try
@@ -260,7 +260,8 @@ begin
       Exit;
     end;
 
-    FDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
+    if Assigned(FDebugger) then
+      FDebugger.ProcessRequest(AContext, ARequestInfo, AResponseInfo);
   finally
     CoUninitialize;
   end;

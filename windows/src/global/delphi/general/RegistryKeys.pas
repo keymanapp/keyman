@@ -101,6 +101,8 @@ const
 
   SRegValue_MnemonicLayoutVersion = 'mnemonic layout version';                      // LM DWord   // I4553
 
+  SRegValue_Engine_OEMProductPath = 'oem product path';
+
   SRegValue_Transparency = 'transparency';                                          // CU, 0 or missing = heuristic, 1 = force enable, 2 = force disable, I2555
 
 //  SRegValue_UnknownLayoutID         = 'unknown layout id';                          // LM
@@ -369,9 +371,6 @@ const
   SRegValue_IDEOptToolbarVisible   = 'toolbar visible';                            // CU
   SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
   SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
-
-  SRegValue_IDEOptShowStartupDialog       = 'show startup dialog';                 // CU
-  //SRegValue_IDEOptShowStartupHelperDialog = 'show startup helper dialog';          // CU
 
   SRegValue_IDEOptDebuggerBreakWhenExitingLine = 'debugger break when exiting line';    // CU
   SRegValue_IDEOptDebuggerSingleStepAfterBreak = 'debugger single step after break';    // CU
