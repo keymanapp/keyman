@@ -314,10 +314,8 @@ public final class KMManager {
   // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
   // for surrogate pairs + a long grapheme cluster.
   // This buffer will be used to put back characters as-needed
-  //
-  // Visibility public so we can run a unit test
   */
-  public static void performLeftDeletions(InputConnection ic, int dn) {
+  private static void performLeftDeletions(InputConnection ic, int dn) {
     int originalBufferLength = dn*2 + 16; // characters
     CharSequence charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
 
@@ -327,31 +325,34 @@ public final class KMManager {
     int numPairs = 0;
     int lastIndex = charsBackup.length()-1;
     int counter=0;
-    do {
-      if ((lastIndex - counter > 0) && Character.isLowSurrogate(charsBackup.charAt(lastIndex - counter))) {
-        numPairs++;
-      }
-      counter++;
-    } while (counter < dn && numPairs < dn);
+    try {
+      do {
+        if ((lastIndex - counter > 0) && Character.isLowSurrogate(charsBackup.charAt(lastIndex - counter))) {
+          numPairs++;
+        }
+        counter++;
+      } while (counter < dn && numPairs < dn);
 
-    // Chop dn+numPairs code points from the end of charsBackup
-    // subSequence indices are start(inclusive) to end(exclusive)
-    CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
-    ic.deleteSurroundingText(dn+numPairs, 0);
-    CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength-dn, 0);
+      // Chop dn+numPairs code points from the end of charsBackup
+      // subSequence indices are start(inclusive) to end(exclusive)
+      CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+      ic.deleteSurroundingText(dn + numPairs, 0);
+      CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
 
-    // Now see if we need to re-insert characters
-    if (expectedChars.length() != newContext.length()) {
-      String newCharsString = expectedChars.toString();
-      String newContextString = newContext.toString();
-      int index = newCharsString.indexOf(newContextString);
-      if (index > -1) {
-        // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
-        expectedChars = expectedChars.subSequence(index+newContextString.length(), expectedChars.length());
-        ic.commitText(expectedChars, expectedChars.length());
+      // Now see if we need to re-insert characters
+      if (expectedChars.length() != newContext.length()) {
+        String newCharsString = expectedChars.toString();
+        String newContextString = newContext.toString();
+        int index = newCharsString.indexOf(newContextString);
+        if (index > -1) {
+          // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
+          expectedChars = expectedChars.subSequence(index + newContextString.length(), expectedChars.length());
+          ic.commitText(expectedChars, expectedChars.length());
+        }
       }
+    } catch (Exception e) {
+      Log.e(TAG, "Error in performLeftDeletions: " + e);
     }
-    Log.d(TAG, "composing");
   }
 
   public static void hideSystemKeyboard() {
