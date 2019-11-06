@@ -1,5 +1,7 @@
-apply plugin: 'name.remal.default-plugins'
-apply plugin: 'com.android.library'
+plugins {
+    id 'name.remal.default-plugins'
+    id 'com.android.library'
+}
 
 android {
     compileSdkVersion 29
@@ -76,7 +78,7 @@ dependencies {
     }
 
     // Assign the annotation processor for tests.
-    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc6'
+    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
 }
 //Show deprecation compiler warnings
 /*
