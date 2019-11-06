@@ -348,7 +348,7 @@ public final class KMManager {
       if (index > -1) {
         // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
         expectedChars = expectedChars.subSequence(index+newContextString.length(), expectedChars.length());
-        ic.setComposingText(expectedChars, expectedChars.length());
+        ic.commitText(expectedChars, expectedChars.length());
       }
     }
     Log.d(TAG, "composing");
