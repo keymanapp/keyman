@@ -36,11 +36,31 @@ public class CloudApiTypes {
   }
 
   public enum ApiTarget {
+    /**
+     * Catalog download: available keyboards including meta data.
+     */
     Keyboards,
+    /**
+     * Catalog download: available lexical models including meta data.
+     */
     LexicalModels,
+    /**
+     * Keyboard download: keyboard meta data for the selected keyboard.
+     */
     Keyboard,
+    /**
+     * Keyboard download: lexical models meta data for the language of the selected keyboard.
+     */
     KeyBoardLexicalModels,
+    /**
+     *  Keyboard download: download keyboard data package and fonts.
+     */
     KeyboardData,
+    /**
+     *  Lexical download: download lexical model package
+     *  Used for single lexical model download and
+     *  automatic lexical model download during keyboard download
+     */
     LexicalModelPackage,
   }
 

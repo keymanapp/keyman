@@ -32,7 +32,7 @@ public class CloudDataJsonUtil {
     //no instances
   }
 
-  public static HashMap<String,String> createKeyBoardInfoMap(String aPackageId,String aLanguageId, String aLanguageName, String aKeyboardId,
+  public static HashMap<String,String> createKeyboardInfoMap(String aPackageId,String aLanguageId, String aLanguageName, String aKeyboardId,
                                                    String aKeyboardName, String aKeyboardVersion, String anIsCustomKeyBoard,
                                                    String aFont, String aOskFont)
   {
@@ -78,7 +78,7 @@ public class CloudDataJsonUtil {
           String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
 
           //String kbKey = String.format("%s_%s", langID, kbID);
-          HashMap<String, String> hashMap = createKeyBoardInfoMap(null,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null);
+          HashMap<String, String> hashMap = createKeyboardInfoMap(null,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null);
 
 
 //          if (keyboardModifiedDates.get(kbID) == null) {
@@ -382,7 +382,7 @@ public class CloudDataJsonUtil {
     return urls;
   }
 
-  public static JSONObject findMatchingKeyBoardByID(JSONArray aKeyboards, String aKbId)
+  public static JSONObject findMatchingKeyboardByID(JSONArray aKeyboards, String aKbId)
       throws  IllegalStateException, JSONException
   {
     if (aKeyboards == null) {

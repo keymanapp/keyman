@@ -381,7 +381,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
       JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
 
-      JSONObject keyboard = CloudDataJsonUtil.findMatchingKeyBoardByID(keyboards,kbID);
+      JSONObject keyboard = CloudDataJsonUtil.findMatchingKeyboardByID(keyboards,kbID);
 
       kbID = keyboard.getString(KMManager.KMKey_ID);
       pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -503,7 +503,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     protected void notifyListeners(KeyboardEventHandler.EventType eventType, int result) {
       if (kbDownloadEventListeners != null) {
         HashMap<String, String> keyboardInfo =
-          CloudDataJsonUtil.createKeyBoardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,kbIsCustom,font,oskFont);
+          CloudDataJsonUtil.createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,kbIsCustom,font,oskFont);
 
         KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboardInfo, result);
       }

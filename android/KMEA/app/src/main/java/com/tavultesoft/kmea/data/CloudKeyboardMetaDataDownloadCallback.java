@@ -229,7 +229,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
       JSONArray keyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
 
-      JSONObject _keyboard = CloudDataJsonUtil.findMatchingKeyBoardByID(keyboards, _key_id);
+      JSONObject _keyboard = CloudDataJsonUtil.findMatchingKeyboardByID(keyboards, _key_id);
 
       _key_id = _keyboard.getString(KMManager.KMKey_ID);
       String _pkgID = _keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -280,7 +280,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
       theKbData.additionalDownloadid = CloudKeyboardDataDownloadCallback.createDownloadId(_key_id);
       theKbData.keyboardInfo = CloudDataJsonUtil
-        .createKeyBoardInfoMap(
+        .createKeyboardInfoMap(
           _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _kbIsCustom, _font, _oskFont);
       theKbData.additionalDownloads = urls;
     }
