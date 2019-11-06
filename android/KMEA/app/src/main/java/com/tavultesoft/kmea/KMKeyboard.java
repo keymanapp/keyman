@@ -468,7 +468,7 @@ final class KMKeyboard extends WebView {
    * @param languageName the language name
    * @return the result
    */
-  public boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID,  String keyboardName, String languageName)
+  public boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID,  String keyboardName)
   {
     if (packageID == null || keyboardID == null || languageID == null)
       return false;
@@ -492,7 +492,6 @@ final class KMKeyboard extends WebView {
 
     // Escape single-quoted names for javascript call
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
-    languageName = languageName.replaceAll("\'", "\\\\'");
 
     this.packageID = packageID;
     this.keyboardID = keyboardID;

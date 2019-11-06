@@ -899,10 +899,9 @@ public final class KMManager {
    * @param keyboardID the keyboard id
    * @param languageID the language id
    * @param keyboardName keyboard name
-   * @param languageName language name
    * @return the success result
    */
-  public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName, String languageName) {
+  public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName) {
 
     //reset banner and layout params
     currentBanner = KMManager.KM_BANNER_STATE_BLANK;
@@ -912,14 +911,14 @@ public final class KMManager {
 
     if (InAppKeyboard != null && InAppKeyboardLoaded)
     {
-      result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName,languageName);
+      result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
       if(result1)
         InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
     {
-      result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName,languageName);
+      result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
       if(result2)
         SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }

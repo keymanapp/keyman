@@ -321,7 +321,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
     if(aPrepareOnly)
-      KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName, langName);
+      KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
     else
       KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
