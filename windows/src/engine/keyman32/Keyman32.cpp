@@ -157,11 +157,13 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 	case DLL_PROCESS_ATTACH:
     //if(!TestDebugProcess()) return FALSE;
     //if(!ShouldAttachToProcess()) return FALSE;
+    OutputThreadDebugString("DLL_PROCESS_ATTACH");
     if(!Globals_InitProcess()) return FALSE;
 		break;
 	case DLL_PROCESS_DETACH:
     //if(!TestDebugProcess()) return FALSE;
     if (reserved == NULL) {
+      OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       // If reserved == NULL, that means the library is being unloaded, but
       // the process is not terminating.
       //
@@ -181,14 +183,19 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
       UninitialiseProcess(FALSE);
       Globals_UninitProcess();
     }
+    else {
+      OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
+    }
 		break;
 	case DLL_THREAD_ATTACH:
     //if(!TestDebugProcess()) return FALSE;
+    OutputThreadDebugString("DLL_THREAD_ATTACH");
     Globals_InitThread();
 		break;
 	case DLL_THREAD_DETACH:
     //if(!TestDebugProcess()) return FALSE;
-		UninitialiseProcess(FALSE);
+    OutputThreadDebugString("DLL_THREAD_DETACH");
+    UninitialiseProcess(FALSE);
     Globals_UninitThread();
 		break;
 	}
@@ -214,8 +221,13 @@ BOOL UninitialiseProcess(BOOL Lock)
 
 	  if(_td->IndexStack) delete _td->IndexStack;
 	  _td->IndexStack = NULL;
-  }
 
+    if (_td->miniContext) delete _td->miniContext;
+    _td->miniContext = NULL;
+
+    if (_td->msgbuf) delete _td->msgbuf;
+    _td->msgbuf = NULL;
+  }
 	return TRUE;
 }
 
@@ -512,6 +524,10 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
     return FALSE;
   }
 
+#ifndef WIN64
+  Hotkeys::Unload();
+#endif
+
   *Globals::InitialisingThread() = 0;
 
   BOOL RetVal = TRUE;
@@ -801,6 +817,7 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 
 void RefreshKeyboards(BOOL Initialising)
 {
+  OutputThreadDebugString("RefreshKeyboards");
 	char sz[_MAX_FNAME];
 	char oldname[_MAX_FNAME];
 	RegistryReadOnly *reg2;
@@ -828,7 +845,7 @@ void RefreshKeyboards(BOOL Initialising)
 		_td->ActiveKeymanID = KEYMANID_NONKEYMAN;
   }
 
-	ReleaseKeyboards(TRUE);
+  ReleaseKeyboards(TRUE);
 
 	/* Read the "keyboard off hotkey", simulate Alt+Gr, Hotkeys-Toggle flags */ 
 
@@ -938,13 +955,14 @@ void RefreshKeyboards(BOOL Initialising)
 
   _td->FInRefreshKeyboards = FALSE;
 }
-
 void ReleaseKeyboards(BOOL Lock)
 {
+  OutputThreadDebugString("ReleaseKeyboards");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-	if(!_td || _td->lpKeyboards) return;
+	if(!_td || !_td->lpKeyboards) return;
 
-	if(Lock) if(_td->lpActiveKeyboard && !_td->ForceFileName[0]) DeactivateDLLs(_td->lpActiveKeyboard);
+
+  if(Lock) if(_td->lpActiveKeyboard && !_td->ForceFileName[0]) DeactivateDLLs(_td->lpActiveKeyboard);
 
 	for(int i = 0; i < _td->nKeyboards; i++) 
 	{
