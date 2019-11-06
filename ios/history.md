@@ -2,6 +2,8 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Testing for upcoming patch to stable:
+  * Fixes for deprecated code, improving maintainability (#2282)
 
 ## 2019-09-20 12.0.39 beta
 * App info / help now points to the equivalent pages on help.keyman.com in a multi-page format (#2088)
