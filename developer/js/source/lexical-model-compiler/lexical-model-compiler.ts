@@ -8,7 +8,7 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure } from "./build-trie";
+import { createTrieDataStructure, parseWordList, compileWordListCharacterSet } from "./build-trie";
 
 export default class LexicalModelCompiler {
 
@@ -83,6 +83,9 @@ export default class LexicalModelCompiler {
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;
         }
+        let wordlist = parseWordList(modelSource.sources.join('\n'));
+        let charSet = compileWordListCharacterSet(wordlist, modelSource.searchTermToKey);
+        func += `  characterSet: ${charSet},\n`;
         func += `}));\n`;
         break;
       default:
