@@ -2,8 +2,17 @@
 
 ## Prerequisites
 * Android Studio 3.3.2+
-* Java SE Development Kit 8
+* Java SE Development Kit 8 
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+
+## Install Java
+It is recommended to use openJDK because of oracle license issues.
+Tested with latest release for openJDK 8 from
+https://github.com/ojdkbuild/ojdkbuild
+
+1. Download and unpack the zip archive
+2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
+3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
 
 ## Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)

@@ -12,7 +12,7 @@ import UIKit
 extension UIView {
 
     func constrainEqually(to parent: UIView,
-                          attribute: NSLayoutAttribute,
+                          attribute: NSLayoutConstraint.Attribute,
                           constant: CGFloat = 0) -> NSLayoutConstraint {
 
         let constraint = NSLayoutConstraint(item: self,
@@ -25,7 +25,7 @@ extension UIView {
         return constraint
     }
 
-    func constrainEqually(to constant: CGFloat, attribute: NSLayoutAttribute) -> NSLayoutConstraint {
+  func constrainEqually(to constant: CGFloat, attribute: NSLayoutConstraint.Attribute) -> NSLayoutConstraint {
         let constraint = NSLayoutConstraint(
             item: self,
             attribute: attribute,

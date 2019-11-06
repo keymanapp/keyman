@@ -133,7 +133,7 @@ uses
   KeymanDeveloperUtils,
   UfrmCharacterMapNew,
   UfrmMain,
-  UfrmOnlineUpdateSetup,
+  Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup,
   UfrmSMTPSetup,
   UnicodeData,
   utilstr;
@@ -284,7 +284,7 @@ end;
 
 procedure TfrmOptions.cmdProxySettingsClick(Sender: TObject);
 begin
-  with TfrmOnlineUpdateSetup.Create(Self) do
+  with TfrmTikeOnlineUpdateSetup.Create(Self) do
   try
     ShowModal;
   finally

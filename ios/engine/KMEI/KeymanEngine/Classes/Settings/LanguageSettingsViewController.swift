@@ -283,7 +283,7 @@ class LanguageSettingsViewController: UITableViewController {
     return false
   }
   
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                           forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
       if let globalIndex = getKeyboardIndex(kb: (language.keyboards?[safe: indexPath.row])!) {
@@ -336,7 +336,7 @@ class LanguageSettingsViewController: UITableViewController {
       return nil
     }
 
-    if let index = globalUserKeyboards.index(where: { $0.fullID == matchingFullID }) {
+    if let index = globalUserKeyboards.firstIndex(where: { $0.fullID == matchingFullID }) {
       guard index < globalUserKeyboards.count else {
         return nil
       }
@@ -354,7 +354,7 @@ class LanguageSettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
 
     // If user defaults for keyboards list does not exist, do nothing.
-    guard var globalUserKeyboards = userData.userKeyboards else {
+    guard let globalUserKeyboards = userData.userKeyboards else {
       log.error("no keyboards in the global keyboards list!")
       return
     }
@@ -395,7 +395,7 @@ class LanguageSettingsViewController: UITableViewController {
       let userData = Storage.active.userDefaults
       
       if let globalUserLexicalModels = userData.userLexicalModels {
-        if let index = globalUserLexicalModels.index(where: { $0.fullID == matchingFullID }) {
+        if let index = globalUserLexicalModels.firstIndex(where: { $0.fullID == matchingFullID }) {
           guard index < globalUserLexicalModels.count else {
             return
           }

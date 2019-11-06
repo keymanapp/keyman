@@ -15,7 +15,7 @@
   Notes:            
   History:          15 Jan 2007 - mcdurdin - Initial version
 *)
-unit OnlineUpdateCheckMessages;
+unit Keyman.Developer.System.TikeOnlineUpdateCheckMessages;
 
 interface
 

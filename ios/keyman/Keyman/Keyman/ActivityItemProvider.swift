@@ -31,11 +31,11 @@ class ActivityItemProvider: UIActivityItemProvider {
 
   override var item: Any {
     switch activityType {
-    case UIActivityType.mail?:
+    case UIActivity.ActivityType.mail?:
       return htmlMail(withText: text, font: font)
-    case UIActivityType.postToFacebook?:
+    case UIActivity.ActivityType.postToFacebook?:
       return "\(text)\n\n\(fbText)"
-    case UIActivityType.postToTwitter?:
+    case UIActivity.ActivityType.postToTwitter?:
       return text.prefix(140)
     default:
       return text

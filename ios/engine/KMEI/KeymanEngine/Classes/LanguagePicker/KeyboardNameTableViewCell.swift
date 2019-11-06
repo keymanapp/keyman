@@ -13,7 +13,7 @@ private let cellSelectedTag = 4576 // arbitrary number
 class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
   var indexPath: IndexPath?
 
-  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     indentationLevel = 0
   }
@@ -23,7 +23,7 @@ class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
   }
 
   func setKeyboardState(_ kbState: KeyboardState, selected isSelected: Bool,
-                        defaultAccessoryType accessoryType: UITableViewCellAccessoryType) {
+                        defaultAccessoryType accessoryType: UITableViewCell.AccessoryType) {
     if kbState != .downloading {
       accessoryView = nil
     }
@@ -35,7 +35,7 @@ class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height))
         view.tag = cellSelectedTag
         view.backgroundColor = UIColor.green
-        view.autoresizingMask = UIViewAutoresizing.flexibleWidth.union(.flexibleHeight)
+        view.autoresizingMask = UIView.AutoresizingMask.flexibleWidth.union(.flexibleHeight)
         addSubview(view)
       }
     } else {
