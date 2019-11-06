@@ -143,8 +143,8 @@ uses
   UfrmDebugStatus in 'child\UfrmDebugStatus.pas' {frmDebugStatus},
   UfrmDebugStatus_Key in 'debug\UfrmDebugStatus_Key.pas' {frmDebugStatus_Key},
   UfrmDebugStatus_Child in 'debug\UfrmDebugStatus_Child.pas' {frmDebugStatus_Child},
-  OnlineUpdateCheck in '..\..\global\delphi\online\OnlineUpdateCheck.pas',
-  UfrmOnlineUpdateNewVersion in '..\..\global\delphi\online\UfrmOnlineUpdateNewVersion.pas' {frmOnlineUpdateNewVersion},
+  Keyman.Developer.UI.TikeOnlineUpdateCheck in 'update\Keyman.Developer.UI.TikeOnlineUpdateCheck.pas',
+  Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion in 'update\Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion.pas' {frmTikeOnlineUpdateNewVersion},
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   MessageDefaults in 'kct\MessageDefaults.pas',
   UfrmDownloadProgress in 'main\UfrmDownloadProgress.pas' {frmDownloadProgress},
@@ -152,8 +152,8 @@ uses
   UfrmOSKEditor in 'child\UfrmOSKEditor.pas' {frmOSKEditor},
   utilxml in '..\..\global\delphi\general\utilxml.pas',
   UfrmTike in 'main\UfrmTike.pas' {TikeForm},
-  UfrmOnlineUpdateSetup in '..\..\global\delphi\online\UfrmOnlineUpdateSetup.pas' {frmOnlineUpdateSetup},
-  OnlineUpdateCheckMessages in 'main\OnlineUpdateCheckMessages.pas',
+  Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup in 'update\Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup.pas' {frmTikeOnlineUpdateSetup},
+  Keyman.Developer.System.TikeOnlineUpdateCheckMessages in 'update\Keyman.Developer.System.TikeOnlineUpdateCheckMessages.pas',
   VisualKeyboardExportBMP in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportBMP.pas',
   VisualKeyboardExportPNG in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportPNG.pas',
   MSXML2_TLB in '..\..\global\delphi\tlb\MSXML2_TLB.pas',
@@ -314,8 +314,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-      Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
     end;
   finally
     FInitializeCEF.Free;

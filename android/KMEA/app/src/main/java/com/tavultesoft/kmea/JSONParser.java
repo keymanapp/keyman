@@ -30,7 +30,7 @@ public final class JSONParser {
   public JSONParser() {
   }
 
-  private <T extends Object> T getJSONObjectFromReader(BufferedReader reader, Class<T> type) {
+  public <T extends Object> T getJSONObjectFromReader(BufferedReader reader, Class<T> type) {
     String jsonStr = "";
     T obj = null;
     String logTag = "JSONObjectFromReader";
@@ -77,12 +77,16 @@ public final class JSONParser {
   }
 
   public JSONObject getJSONObjectFromFile(File path) {
+    return getJSONObjectFromFile(path,JSONObject.class);
+  }
+
+  public <T extends Object> T getJSONObjectFromFile(File path, Class<T> type) {
     BufferedReader reader = null;
-    JSONObject jsonObj = null;
+    T jsonObj = null;
 
     try {
       reader = new BufferedReader(new FileReader(path));
-      jsonObj = getJSONObjectFromReader(reader, JSONObject.class);
+      jsonObj = getJSONObjectFromReader(reader, type);
     } catch (FileNotFoundException e) {
       Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
       jsonObj = null;

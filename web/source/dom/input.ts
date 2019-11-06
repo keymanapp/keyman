@@ -113,6 +113,10 @@ namespace com.keyman.dom {
         let curText = this.getTextBeforeCaret();
         let caret = this.getCaret();
 
+        if(dn > caret) {
+          dn = caret;
+        }
+
         this.adjustDeadkeys(-dn);
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
         this.setCaret(caret - dn);

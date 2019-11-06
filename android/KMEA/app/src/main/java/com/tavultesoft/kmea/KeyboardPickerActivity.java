@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -776,7 +777,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   }
 
   protected static void showLanguageList(Context context) {
-    if (KMManager.hasConnection(context) || LanguageListActivity.getCacheFile(context).exists()) {
+    if (KMManager.hasConnection(context) || CloudDataJsonUtil.getKeyboardCacheFile(context).exists()) {
       Intent i = new Intent(context, LanguageListActivity.class);
       i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
       context.startActivity(i);

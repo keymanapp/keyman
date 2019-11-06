@@ -842,7 +842,9 @@ namespace com.keyman.text {
       // We want to control exactly which deadkeys get removed.
       if(dn > 0) {
         context = this._BuildExtendedContext(dn, dn, outputTarget);
-        for(var i=0; i < context.deadContext.length; i++) {
+        let nulCount = 0;
+
+        for(var i=0; i < context.valContext.length; i++) {
           var dk = context.deadContext[i];
 
           if(dk) {
@@ -851,7 +853,17 @@ namespace com.keyman.text {
 
             // Reduce our reported context size.
             dn--;
+          } else if(context.valContext[i] == "\uFFFE") {
+            // Count any `nul` sentinels that would contribute to our deletion count.
+            nulCount++;
           }
+        }
+
+        // Prevent attempts to delete nul sentinels, as they don't exist in the actual context.
+        // (Addresses regression from KMW v 12.0 paired with Developer bug through same version)
+        let contextLength = context.valContext.length - nulCount;
+        if(dn > contextLength) {
+          dn = contextLength;
         }
       }
 

@@ -16,7 +16,7 @@
   History:          04 Jan 2007 - mcdurdin - Rework to use GetProxySettings
                     30 May 2007 - mcdurdin - I825 - Added proxy username and password
 *)
-unit UfrmOnlineUpdateSetup;
+unit Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup;
 
 interface
 
@@ -25,7 +25,7 @@ uses
   StdCtrls;
 
 type
-  TfrmOnlineUpdateSetup = class(TForm)
+  TfrmTikeOnlineUpdateSetup = class(TForm)
     lblHTTPProxy: TLabel;
     lblPort: TLabel;
     editProxy: TEdit;
@@ -47,13 +47,13 @@ uses
 
 {$R *.DFM}
 
-procedure TfrmOnlineUpdateSetup.cmdOKClick(Sender: TObject);
+procedure TfrmTikeOnlineUpdateSetup.cmdOKClick(Sender: TObject);
 begin
   GetProxySettings.Save(editProxy.Text, StrToIntDef(editPort.Text, 0), editUsername.Text, editPassword.Text);
   ModalResult := mrOk;
 end;
 
-procedure TfrmOnlineUpdateSetup.FormCreate(Sender: TObject);
+procedure TfrmTikeOnlineUpdateSetup.FormCreate(Sender: TObject);
 begin
   inherited;
   editProxy.Text := GetProxySettings.Server;

@@ -9,8 +9,11 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.LanguageSettingsActivity;
+import com.tavultesoft.kmea.R;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.inputmethodservice.InputMethodService;
@@ -23,6 +26,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
+
+import java.util.HashMap;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
@@ -110,6 +115,22 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
         ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE)) {
       KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    }
+
+    // Temporarily disable predictions if entering a hidden password field
+    KMManager.setMayPredictOverride(inputType);
+    if (KMManager.getMayPredictOverride()) {
+      KMManager.setBannerOptions(false);
+    } else {
+      // Check if predictions needs to be re-enabled per Settings preference
+      Context appContext = getApplicationContext();
+      HashMap<String, String> kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
+      if (kbInfo != null) {
+        String langId = kbInfo.get(KMManager.KMKey_LanguageID);
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(langId), true);
+        KMManager.setBannerOptions(mayPredict);
+      }
     }
 
     InputConnection ic = getCurrentInputConnection();
