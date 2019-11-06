@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var navigationController: UINavigationController?
 
   func application(_ app: UIApplication, open url: URL,
-                   options: [UIApplicationOpenURLOptionsKey: Any] = [:]) -> Bool {
+                   options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
     // .kmp package install, Keyman 10 onwards
     var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       log.outputLevel = .debug
@@ -98,7 +98,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       _overlayWindow!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       _overlayWindow!.autoresizesSubviews = true
       _overlayWindow!.backgroundColor = UIColor(white: 0.0, alpha: 0.75)
-      _overlayWindow!.windowLevel = UIWindowLevelStatusBar + 1
+      _overlayWindow!.windowLevel = UIWindow.Level.statusBar + 1
       _overlayWindow!.isUserInteractionEnabled = true
       _overlayWindow!.isHidden = true
     }
@@ -133,9 +133,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   public func showSimpleAlert(title: String, message: String) {
     let alertController = UIAlertController(title: title, message: message,
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.default,
+                                            style: UIAlertAction.Style.default,
                                             handler: nil))
 
     self.window?.rootViewController?.present(alertController, animated: true, completion: nil)

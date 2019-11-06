@@ -36,7 +36,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private var getStartedVC: GetStartedViewController!
   private var infoView: InfoViewController!
-  private var popover: UIPopoverController?
+  private var popover: UIViewController?
   private var textSizeController: UISlider!
   private var dropdownItems: [UIBarButtonItem]!
 
@@ -88,11 +88,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup Notifications
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-        name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        name: UIResponder.keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow),
-        name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        name: UIResponder.keyboardDidShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-        name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        name: UIResponder.keyboardWillHideNotification, object: nil)
     keyboardLoadedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardLoaded,
       observer: self,
@@ -307,7 +307,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
     let vAdjLscpe: CGFloat = -1.6
 
-    let vAdj = UIInterfaceOrientationIsPortrait(orientation) ? vAdjPort : vAdjLscpe
+    let vAdj = orientation.isPortrait ? vAdjPort : vAdjLscpe
     let navBarHeight = self.navBarHeight()
     let y = (navBarHeight - icon.size.height) / 2.0 + vAdj
 
@@ -593,9 +593,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     printText.font = textView.font
 
     let activityVC = UIActivityViewController(activityItems: [activityProvider, printText], applicationActivities: nil)
-    activityVC.excludedActivityTypes = [UIActivityType.assignToContact, UIActivityType.postToWeibo,
-                                        UIActivityType.saveToCameraRoll]
-    activityVC.completionWithItemsHandler = {(_ activityType: UIActivityType?, _ completed: Bool,
+    activityVC.excludedActivityTypes = [UIActivity.ActivityType.assignToContact,
+                                        UIActivity.ActivityType.postToWeibo,
+                                        UIActivity.ActivityType.saveToCameraRoll]
+    activityVC.completionWithItemsHandler = {(_ activityType: UIActivity.ActivityType?, _ completed: Bool,
       _ returnedItems: [Any]?, _ activityError: Error?) -> Void in
       self.textView.isUserInteractionEnabled = true
     }
@@ -604,9 +605,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if UIDevice.current.userInterfaceIdiom == .phone {
       present(activityVC, animated: true, completion: nil)
     } else {
-      popover = UIPopoverController(contentViewController: activityVC)
-      popover!.present(from: (navigationItem.rightBarButtonItems?[8])!, permittedArrowDirections: .any,
-                      animated: true)
+      activityVC.modalPresentationStyle = UIModalPresentationStyle.popover
+      activityVC.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[12]
+      self.present(activityVC, animated: true)
+
+      popover = activityVC
     }
   }
 
@@ -674,7 +677,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     } else {
       let vc = UIViewController()
       vc.modalPresentationStyle = .popover
-      vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
+      vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[8]
       vc.view = containerView
       vc.preferredContentSize = containerView.frame.size
       present(vc, animated: true, completion: nil)
@@ -712,7 +715,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let cancel = UIAlertAction(title: "Cancel", style: .default, handler: nil)
     alert.addAction(clear)
     alert.addAction(cancel)
-    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[4]
+    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
     present(alert, animated: true, completion: nil)
   }
 
@@ -723,7 +726,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     dismissGetStartedView(nil)
     overlayWindow.isHidden = false
-    let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let activityView = UIActivityIndicatorView(style: .whiteLarge)
     let containerView = UIView(frame: activityView.bounds.insetBy(dx: -10.0, dy: -10.0))
     containerView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
     containerView.layer.cornerRadius = 6.0
@@ -902,12 +905,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     dismissGetStartedView(nil)
 
     let alertController = UIAlertController(title: title, message: msg,
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "Cancel",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: cbHandler))
     alertController.addAction(UIAlertAction(title: "Install",
-                                              style: UIAlertActionStyle.default,
+                                              style: UIAlertAction.Style.default,
                                               handler: installHandler))
 
     self.present(alertController, animated: true, completion: nil)

@@ -128,9 +128,9 @@ class KeymanWebViewController: UIViewController {
     view.addGestureRecognizer(hold)
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-                                           name: .UIKeyboardWillShow, object: nil)
+                                           name: UIResponder.keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-                                           name: .UIKeyboardWillHide, object: nil)
+                                           name: UIResponder.keyboardWillHideNotification, object: nil)
 
     reloadKeyboard()
   }
@@ -735,7 +735,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       button.addTarget(self, action: #selector(subKeyButtonClick), for: .touchUpInside)
 
       // Detect the text width for subkeys.  The 'as Any' silences an inappropriate warning from Swift.
-      let textSize = subKeyText.size(withAttributes: [NSAttributedStringKey.font: button.titleLabel?.font! as Any])
+      let textSize = subKeyText.size(withAttributes: [NSAttributedString.Key.font: button.titleLabel?.font! as Any])
       var displayText = subKeyText
       
       if textSize.width <= 0 && subKeyText.count > 0 {

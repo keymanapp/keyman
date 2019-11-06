@@ -113,12 +113,12 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   
   private func showDeleteLexicalModel() {
     let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this dictionary?",
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "Cancel",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: nil))
     alertController.addAction(UIAlertAction(title: "Delete",
-                                            style: UIAlertActionStyle.default,
+                                            style: UIAlertAction.Style.default,
                                             handler: deleteHandler))
   
     self.present(alertController, animated: true, completion: nil)
