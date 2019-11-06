@@ -2,6 +2,9 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* New Features:
+ * Adding a download manager to execute downloads in background (#2247)
+ * Improve custom package installation: Show readme.htm before starting installation process
 
 ## 2019-10-10 12.0.4201 stable
 * Bug Fix:
