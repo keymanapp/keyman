@@ -28,9 +28,6 @@ public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
   private static final String TAG = "CloudRepository";
 
-  //TODO: Should be removed with the old implementation when downloadmanager impl works
-  public static final boolean USE_DOWNLOAD_MANAGER = true;
-
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
   private Dataset memCachedDataset;
@@ -165,8 +162,7 @@ public class CloudRepository {
   {
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
 
-    if(USE_DOWNLOAD_MANAGER)
-      downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
+    downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
   /**
@@ -292,7 +288,7 @@ public class CloudRepository {
 
     preCacheDataSet(context,null,null,null);
 
-    if(USE_DOWNLOAD_MANAGER && CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
+    if(CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
       String msg = context.getString(R.string.catalog_download_is_running_in_background);
       Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
@@ -355,23 +351,15 @@ public class CloudRepository {
       // We need the array to be exactly the same size as our entry count.
       CloudApiTypes.CloudApiParam[] params = new CloudApiTypes.CloudApiParam[cloudQueryEntries];
       cloudQueries.toArray(params);
-      if (USE_DOWNLOAD_MANAGER) {
-        if (CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
-          String msg = context.getString(R.string.catalog_download_is_running_in_background);
-          Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        } else {
-          String msg = context.getString(R.string.catalog_download_start_in_background);
-          Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-          CloudDownloadMgr.getInstance().executeAsDownload(
-            context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
-        }
 
-
+      if (CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
+        String msg = context.getString(R.string.catalog_download_is_running_in_background);
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
       } else {
-        CloudCatalogDownloadTask downloadTask = new CloudCatalogDownloadTask(context, memCachedDataset, _download_callback);
-
-        // We can pass in multiple URLs; this format is extensible if we need extra catalogs in the future.
-        downloadTask.execute(params);
+        String msg = context.getString(R.string.catalog_download_start_in_background);
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        CloudDownloadMgr.getInstance().executeAsDownload(
+          context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
       }
     }
   }
