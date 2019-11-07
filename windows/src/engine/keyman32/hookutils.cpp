@@ -75,15 +75,15 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep) {
     if (er->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
       OutputThreadDebugString("EXCEPTION_ACCESS_VIOLATION in ");
       OutputThreadDebugString(Proc);
-      SendDebugMessageFormat(0, sdmGlobal, 0, "CAUGHT EXCEPTION %d (ACCESS VIOLATION) IN %s AT %x; attempted to %s %x",
+      /*SendDebugMessageFormat(0, sdmGlobal, 0, "CAUGHT EXCEPTION %d (ACCESS VIOLATION) IN %s AT %x; attempted to %s %x",
         er->ExceptionCode, Proc, er->ExceptionAddress,
         er->ExceptionInformation[0] == 0 ? "read from" : "write to",
-        er->ExceptionInformation[1]);
+        er->ExceptionInformation[1]);*/
     }
     else {
       OutputThreadDebugString("CAUGHT EXCEPTION");
-      SendDebugMessageFormat(0, sdmGlobal, 0, "CAUGHT EXCEPTION %d IN %s AT %x",
-        er->ExceptionCode, Proc, er->ExceptionAddress);
+      /*SendDebugMessageFormat(0, sdmGlobal, 0, "CAUGHT EXCEPTION %d IN %s AT %x",
+        er->ExceptionCode, Proc, er->ExceptionAddress);*/
     }
     er = er->ExceptionRecord;
   }

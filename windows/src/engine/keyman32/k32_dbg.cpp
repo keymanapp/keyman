@@ -309,7 +309,7 @@ char *Debug_UnicodeString(PWSTR s, int x) {
 #ifdef _DEBUG
 void _OutputThreadDebugString(char *s) {
   char buf[256];
-  wsprintf(buf, "[%d]: %s\n", GetCurrentThreadId(), s);
+  sprintf_s(buf, "[%d]: %s\n", GetCurrentThreadId(), s);
   OutputDebugString(buf);
 }
 #endif
