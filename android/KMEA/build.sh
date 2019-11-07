@@ -126,8 +126,7 @@ fi
 
 echo "Gradle Build of KMEA"
 cd $KMA_ROOT/KMEA
-./gradlew $DAEMON_FLAG clean
-./gradlew $DAEMON_FLAG aR
+./gradlew $DAEMON_FLAG clean aR lint
 if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
 fi

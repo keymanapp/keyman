@@ -192,6 +192,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
     if (resultCode == 1) {
       finish();
     }

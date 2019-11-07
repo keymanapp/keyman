@@ -38,7 +38,8 @@ import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
-
+  private static final String TAG = "KbSettingsActivity";
+  
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private DialogFragment dialog;
@@ -155,7 +156,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
               } catch (NullPointerException e) {
                 String message = "FileProvider undefined in app to load" + customHelp.toString();
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.e("KeyboardSettingsActivity", message);
+                Log.e("TAG", message);
               }
             }
             else {
