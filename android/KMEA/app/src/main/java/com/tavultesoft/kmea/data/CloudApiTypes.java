@@ -8,11 +8,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class CloudApiTypes {
   protected static class CloudApiReturns {
@@ -69,11 +69,14 @@ public class CloudApiTypes {
     Object
   }
 
-  public static class CloudApiParam {
+  public static class CloudApiParam implements Serializable {
+
+    static final long serialVersionUID = 1L;
+
     public final ApiTarget target;
     public final String url;
     public JSONType type;
-    private Map<String,Object> additionalProperties = new HashMap<>();
+    private final HashMap<String,Serializable> additionalProperties = new HashMap<>();
 
     public CloudApiParam(ApiTarget target, String url) {
       this.target = target;
@@ -84,24 +87,24 @@ public class CloudApiTypes {
       this.type = type;
       return this;
     }
-    public CloudApiParam setAdditionalProperty(String aProperty, Object aValue)
+    public CloudApiParam setAdditionalProperty(String aProperty, Serializable aValue)
     {
       additionalProperties.put(aProperty,aValue);
       return this;
     }
 
-    public <T> T getAdditionalProperty(String aProperty,Class<T> aType)
+    public <T extends  Serializable> T getAdditionalProperty(String aProperty,Class<T> aType)
     {
-      return (T)additionalProperties.get(aProperty);
+      return aType.cast(additionalProperties.get(aProperty));
     }
   }
 
   public static class SingleCloudDownload
   {
-    private DownloadManager.Request request;
+    private final DownloadManager.Request request;
     private boolean downloadFinished =false;
     private long downloadId;
-    private File destinationFile;
+    private final File destinationFile;
     private CloudApiParam cloudParams;
 
     public SingleCloudDownload(DownloadManager.Request aRequest,File aDestinationFile)
@@ -142,9 +145,9 @@ public class CloudApiTypes {
    * @param <ResultType> the result type of the download
    */
   public static class CloudDownloadSet<ModelType,ResultType> {
-    private String downloadIdentifier;
-    private ModelType targetModel;
-    private LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
+    private final String downloadIdentifier;
+    private final ModelType targetModel;
+    private final LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
 
     private ICloudDownloadCallback<ModelType,ResultType> callback;
 
@@ -213,7 +216,6 @@ public class CloudApiTypes {
             return;
           }
         }
-        return;
       }
 
 

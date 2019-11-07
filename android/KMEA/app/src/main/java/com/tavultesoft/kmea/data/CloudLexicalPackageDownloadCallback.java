@@ -4,8 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -16,13 +15,9 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
 /**
  * Install lexical model.
@@ -35,18 +30,6 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
 
   private File resourceRoot;
   private File cacheDir;
-
-  private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
-
-  /**
-   * listeners to inform after installation is completed.
-   * @param aDownloadEventListeners the listeners
-   */
-  public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners)
-  {
-    downloadEventListeners.clear();
-    downloadEventListeners.addAll(aDownloadEventListeners);
-  }
 
   @Override
   public void initializeContext(Context context)
@@ -108,7 +91,8 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
 
     if(aCloudResult.installedLexicalModels != null)
     {
-      KeyboardEventHandler.notifyListeners(downloadEventListeners, KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+      KeyboardEventHandler.notifyListeners(KMKeyboardDownloaderActivity.getKbDownloadEventListeners(),
+        KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
         aCloudResult.installedLexicalModels, aCloudResult.kbdResult);
     }
   }

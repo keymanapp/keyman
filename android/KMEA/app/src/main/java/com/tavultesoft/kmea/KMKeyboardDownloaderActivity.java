@@ -60,23 +60,24 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
   public static final String KMKey_FontBaseURI = "fontBaseUri";
 
-  //TODO: use keyboard model class, should not be static
-  private static String pkgID;
-  private static String kbID;
-  private static String langID;
-  private static String modelID;
-  private static String modelName;
-  private static String kbName;
-  private static String langName;
-  private static Boolean isCustom;
-  private static Boolean downloadOnlyLexicalModel;
+  //TODO: use keyboard model class
+  private String pkgID;
+  private String kbID;
+  private String langID;
+  private String modelID;
+  private String modelName;
+  private String kbName;
+  private String langName;
+  private Boolean isCustom;
+  private Boolean downloadOnlyLexicalModel;
 
-  private static String customKeyboard;
-  private static String customLanguage;
-  private static Boolean isDirect;
-  private static String url;
-  private static String filename;
+  private String customKeyboard;
+  private String customLanguage;
+  private Boolean isDirect;
+  private String url;
+  private String filename;
 
+  //TODO: move to keyboard manager class
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   
   @Override
@@ -119,7 +120,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       }
     }
 
-    String title = "";
+    String title;
     if (url != null) {
       title = String.format("%s: %s", getString(R.string.custom_keyboard), filename);
     } else if (customKeyboard != null && customLanguage != null &&
@@ -141,52 +142,47 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     DialogFragment dialog;
     if (downloadOnlyLexicalModel) {
       title = String.format("%s: %s", langName, modelName);
-      dialog = ConfirmDialogFragment.newInstance(
-        DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model));
+      dialog = ConfirmDialogFragment.newInstanceForLexicalModel(
+        DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model),
+        modelID,
+        prepareCloudApiParamsForLexicalModelDownload());
     } else {
-      dialog = ConfirmDialogFragment.newInstance(
-        DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard));
+      dialog = ConfirmDialogFragment.newInstanceForKeyboard(
+        DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard),
+        langID, kbID,
+        prepareCloudApiParamsForKeyboardDownload());
     }
 
     dialog.show(getFragmentManager(), "dialog");
   }
 
   /**
-   * Download in keyboards and lexical model using download manager.
-   * @param context the context
-   * @param aDownloadOnlyLexicalModel is lexical model download
+   * prepare cloud api params for lexical models download.
+   * @return the result
    */
-  public static void downloadUsingDownloadManager(final Context context,
-                              final boolean aDownloadOnlyLexicalModel)
-  {
-    if(aDownloadOnlyLexicalModel)
-    {
-      downloadLexicalModelUsingDownloadManager(context);
-    }
-    else
-    {
-      downloadKeyboardUsingDownloadManager(context);
-    }
+  private ArrayList<CloudApiTypes.CloudApiParam> prepareCloudApiParamsForLexicalModelDownload() {
+    ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
+    _params.add(new CloudApiTypes.CloudApiParam(
+      CloudApiTypes.ApiTarget.LexicalModelPackage, url));
+    return _params;
   }
 
   /**
    * prepare and execute keyboard download using downloadmanager.
    * @param context the context
+   * @param aLangId the language id
+   * @param aKbId the keyman keyboard id
+   * @param aPreparedCloudApiParams the prepared api params
    */
-  private static void downloadKeyboardUsingDownloadManager(Context context)
+  public static void downloadKeyboardUsingDownloadManager(Context context,
+                                                           String aLangId, String aKbId,
+                                                           List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams)
   {
-    if (pkgID == null || pkgID.trim().isEmpty() ||
-      (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
-      throw new IllegalStateException("Invalid keyboard");
-    }
-
-    List<CloudApiTypes.CloudApiParam> cloudQueries = getPrepareCloudQueriesForKeyboardDownload(context);
-
-    String _downloadid= CloudKeyboardMetaDataDownloadCallback.createDownloadId(langID , kbID);
+    String _downloadid= CloudKeyboardMetaDataDownloadCallback.createDownloadId(aLangId , aKbId);
 
     if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)
        ||  CloudDownloadMgr.getInstance().alreadyDownloadingData(
-              CloudKeyboardDataDownloadCallback.createDownloadId(kbID)))
+              CloudKeyboardDataDownloadCallback.createDownloadId(aKbId)))
     {
       Toast.makeText(context,
         context.getString(R.string.keyboard_download_is_running_in_background),
@@ -195,7 +191,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     else
     {
       CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
-      _callback.setDownloadEventListeners(kbDownloadEventListeners);
 
       Toast.makeText(context,
         context.getString(R.string.keyboard_download_start_in_background),
@@ -203,22 +198,26 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
       CloudDownloadMgr.getInstance().executeAsDownload(
         context, _downloadid, null, _callback,
-        cloudQueries.toArray(new CloudApiTypes.CloudApiParam[0]));
+        aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
     }
 
     ((AppCompatActivity) context).finish();
   }
 
   /**
-   * Prepare the cloud queries for keyboard metadata download.
-   * @param context the context
+   * Prepare the cloud api params for keyboard metadata download.
    * @return the result
    */
-  private static List<CloudApiTypes.CloudApiParam> getPrepareCloudQueriesForKeyboardDownload(Context context)
+  private ArrayList<CloudApiTypes.CloudApiParam> prepareCloudApiParamsForKeyboardDownload()
   {
-    List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
+    if (pkgID == null || pkgID.trim().isEmpty() ||
+      (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
+      throw new IllegalStateException("Invalid keyboard");
+    }
 
-    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(context);
+    ArrayList<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
+
+    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(this);
 
     if (isCustom) {
       //TODO: will end up in an exception during download???
@@ -249,11 +248,15 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   /**
    * prepare and execute lexical model download using downloadmanager.
    * @param context the context
+   * @param aModelId the lexical model id
+   * @param aPreparedCloudApiParams the prepared api params
    */
-  private static void downloadLexicalModelUsingDownloadManager(Context context) {
+  public static void downloadLexicalModelUsingDownloadManager(Context context,
+                                                               String aModelId,
+                                                               List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams) {
 
 
-    String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(modelID);
+    String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(aModelId);
 
     if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid))
     {
@@ -264,17 +267,14 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     else
     {
       CloudLexicalPackageDownloadCallback _callback = new CloudLexicalPackageDownloadCallback();
-      _callback.setDownloadEventListeners(kbDownloadEventListeners);
-
-      CloudApiTypes.CloudApiParam _param = new CloudApiTypes.CloudApiParam(
-        CloudApiTypes.ApiTarget.LexicalModelPackage, url);
 
       Toast.makeText(context,
         context.getString(R.string.dictionary_download_start_in_background),
         Toast.LENGTH_SHORT).show();
 
       CloudDownloadMgr.getInstance().executeAsDownload(
-        context, _downloadid, null, _callback, _param);
+        context, _downloadid, null, _callback,
+        aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
     }
 
     ((AppCompatActivity) context).finish();
@@ -294,7 +294,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
   public static void addKeyboardDownloadEventListener(KeyboardEventHandler.OnKeyboardDownloadEventListener listener) {
     if (kbDownloadEventListeners == null) {
-      kbDownloadEventListeners = new ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener>();
+      kbDownloadEventListeners = new ArrayList<>();
     }
 
     if (listener != null && !kbDownloadEventListeners.contains(listener)) {
@@ -306,5 +306,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     if (kbDownloadEventListeners != null) {
       kbDownloadEventListeners.remove(listener);
     }
+  }
+
+  public static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> getKbDownloadEventListeners() {
+    return kbDownloadEventListeners;
   }
 }

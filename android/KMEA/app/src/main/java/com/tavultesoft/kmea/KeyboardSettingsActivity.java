@@ -1,20 +1,17 @@
-/**
+/*
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
-
 package com.tavultesoft.kmea;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -39,14 +36,11 @@ import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
 
-  private static Toolbar toolbar = null;
-  private static ListView listView = null;
-  private DialogFragment dialog;
   private static ArrayList<HashMap<String, String>> infoList = null;
-  protected static Typeface titleFont = null;
-  private final String titleKey = "title";
-  private final String subtitleKey = "subtitle";
-  private final String iconKey = "icon";
+  private static Typeface titleFont = null;
+  private static final String titleKey = "title";
+  private static final String subtitleKey = "subtitle";
+  private static final String iconKey = "icon";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -56,13 +50,13 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String authority = FileProviderUtils.getAuthority(context);
 
     setContentView(R.layout.activity_list_layout);
-    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    listView = (ListView) findViewById(R.id.listView);
+    final ListView listView = findViewById(R.id.listView);
 
     final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
     final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
@@ -71,22 +65,22 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
     final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
 
-    final TextView textView = (TextView) findViewById(R.id.bar_title);
+    final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
-    infoList = new ArrayList<HashMap<String, String>>();
+    infoList = new ArrayList<>();
     // Display keyboard version title
     final String noIcon = "0";
-    HashMap<String, String> hashMap = new HashMap<String, String>();
+    HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
     // Display keyboard help link
-    hashMap = new HashMap<String, String>();
+    hashMap = new HashMap<>();
     final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
@@ -104,7 +98,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     // Display uninstall keyboard
     if (!packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) ||
         !kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
-      hashMap = new HashMap<String, String>();
+      hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");
       hashMap.put(iconKey, noIcon);
@@ -117,7 +111,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
       @Override
       public boolean isEnabled(int position) {
-        HashMap<String, String> hashMap = (HashMap<String, String>)infoList.get(position);
+        HashMap<String, String> hashMap = infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
@@ -173,7 +167,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
           // Uninstall selected keyboard
           String title = String.format("%s: %s", languageName, kbName);
           String keyboardKey = String.format("%s_%s", languageID, kbID);
-          DialogFragment dialog = ConfirmDialogFragment.newInstance(
+          DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
             DIALOG_TYPE_DELETE_KEYBOARD, title, getString(R.string.confirm_delete_keyboard), keyboardKey);
           dialog.show(getFragmentManager(), "dialog");
         }
@@ -190,9 +184,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
   @Override
   public void onDestroy(){
     super.onDestroy();
-    if ( dialog !=null ){
-      dialog.dismiss();
-    }
+
   }
 
 }

@@ -1,6 +1,5 @@
 package com.tavultesoft.kmea;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -8,14 +7,23 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.data.CloudApiTypes;
+
+import java.util.ArrayList;
+
+
 /**
  * Confirmation dialog for downloading or deleting a Keyman keyboard/model
  */
 public class ConfirmDialogFragment extends DialogFragment {
-  public static final String ARG_DIALOG_TYPE = "ConfirmDialogFragment.dialogType";
-  public static final String ARG_TITLE = "ConfirmDialogFragment.title";
-  public static final String ARG_MESSAGE = "ConfirmDialogFragment.message";
-  public static final String ARG_ITEM_KEY = "confirmDialogFragment.itemKey";
+  private static final String ARG_DIALOG_TYPE = "ConfirmDialogFragment.dialogType";
+  private static final String ARG_TITLE = "ConfirmDialogFragment.title";
+  private static final String ARG_MESSAGE = "ConfirmDialogFragment.message";
+  private static final String ARG_ITEM_KEY = "confirmDialogFragment.itemKey";
+  private static final String ARG_DOWNLOAD_QUERIES_KEY = "confirmDialogFragment.downloadQueries";
+  private static final String ARG_MODEL_ID_KEY = "confirmDialogFragment.modelId";
+  private static final String ARG_LANG_ID_KEY = "confirmDialogFragment.langId";
+  private static final String ARG_KB_ID_KEY = "confirmDialogFragment.kbId";
   private boolean dismissOnSelect = false;
 
   public enum DialogType {
@@ -25,17 +33,36 @@ public class ConfirmDialogFragment extends DialogFragment {
     DIALOG_TYPE_DELETE_MODEL
   }
 
-  public static ConfirmDialogFragment newInstance(DialogType dialogType, String title, String message) {
+  public static ConfirmDialogFragment newInstanceForKeyboard(DialogType dialogType, String title, String message,
+                                                  String aLangId, String aKbId,
+                                                  ArrayList<CloudApiTypes.CloudApiParam> aQueries) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
     Bundle args = new Bundle();
     args.putSerializable(ARG_DIALOG_TYPE, dialogType);
     args.putString(ARG_TITLE, title);
     args.putString(ARG_MESSAGE, message);
+    args.putString(ARG_LANG_ID_KEY, aLangId);
+    args.putString(ARG_KB_ID_KEY, aKbId);
+    args.putSerializable(ARG_DOWNLOAD_QUERIES_KEY,aQueries);
     frag.setArguments(args);
     return frag;
   }
 
-  public static ConfirmDialogFragment newInstance(DialogType dialogType, String title, String message, String itemKey) {
+  public static ConfirmDialogFragment newInstanceForLexicalModel(DialogType dialogType, String title, String message,
+                                                             String aModelId,
+                                                             ArrayList<CloudApiTypes.CloudApiParam> aQueries) {
+    ConfirmDialogFragment frag = new ConfirmDialogFragment();
+    Bundle args = new Bundle();
+    args.putSerializable(ARG_DIALOG_TYPE, dialogType);
+    args.putString(ARG_TITLE, title);
+    args.putString(ARG_MESSAGE, message);
+    args.putString(ARG_MODEL_ID_KEY, aModelId);
+    args.putSerializable(ARG_DOWNLOAD_QUERIES_KEY,aQueries);
+    frag.setArguments(args);
+    return frag;
+  }
+
+  public static ConfirmDialogFragment newInstanceForItemKeyBasedAction(DialogType dialogType, String title, String message, String itemKey) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
     Bundle args = new Bundle();
     args.putSerializable(ARG_DIALOG_TYPE, dialogType);
@@ -48,12 +75,17 @@ public class ConfirmDialogFragment extends DialogFragment {
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    Dialog dialog = super.onCreateDialog(savedInstanceState);
+     super.onCreateDialog(savedInstanceState);
 
     final DialogType dialogType = (DialogType)getArguments().getSerializable(ARG_DIALOG_TYPE);
     final String title = getArguments().getString(ARG_TITLE);
     final String message = getArguments().getString(ARG_MESSAGE);
     final String itemKey = getArguments().getString(ARG_ITEM_KEY);
+    final String _langId = getArguments().getString(ARG_LANG_ID_KEY);
+    final String _kbId = getArguments().getString(ARG_KB_ID_KEY);
+    final String _modelId = getArguments().getString(ARG_MODEL_ID_KEY);
+    final ArrayList<CloudApiTypes.CloudApiParam> _preparedCloudApiParams =
+      (ArrayList)getArguments().getSerializable(ARG_DOWNLOAD_QUERIES_KEY);
     String positiveLabel = (dialogType == DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD ||
       dialogType == DialogType.DIALOG_TYPE_DOWNLOAD_MODEL) ?
       getString(R.string.label_download) : getString(R.string.label_delete);
@@ -66,9 +98,11 @@ public class ConfirmDialogFragment extends DialogFragment {
         public void onClick(DialogInterface dialog, int which) {
           switch (dialogType) {
             case DIALOG_TYPE_DOWNLOAD_KEYBOARD :
+
               // Confirmation to download keyboard
               if (KMManager.hasConnection(getActivity())) {
-                KMKeyboardDownloaderActivity.downloadUsingDownloadManager(getActivity(), false);
+                KMKeyboardDownloaderActivity.downloadKeyboardUsingDownloadManager(
+                  getActivity(), _langId, _kbId,_preparedCloudApiParams);
               } else {
                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
               }
@@ -82,7 +116,8 @@ public class ConfirmDialogFragment extends DialogFragment {
             case DIALOG_TYPE_DOWNLOAD_MODEL :
               // Confirmation to download lexical model
               if (KMManager.hasConnection(getActivity())) {
-                KMKeyboardDownloaderActivity.downloadUsingDownloadManager(getActivity(), true);
+                KMKeyboardDownloaderActivity.downloadLexicalModelUsingDownloadManager(getActivity(),
+                  _modelId, _preparedCloudApiParams);
               } else {
                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
               }
