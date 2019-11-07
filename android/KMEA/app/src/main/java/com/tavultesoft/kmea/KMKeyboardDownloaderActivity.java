@@ -7,12 +7,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tavultesoft.kmea.data.CloudApiTypes;
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
-import com.tavultesoft.kmea.data.CloudDownloadMgr;
-import com.tavultesoft.kmea.data.CloudKeyboardDataDownloadCallback;
-import com.tavultesoft.kmea.data.CloudKeyboardMetaDataDownloadCallback;
-import com.tavultesoft.kmea.data.CloudLexicalPackageDownloadCallback;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudKeyboardDataDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudKeyboardMetaDataDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
 
 import java.util.ArrayList;
 import java.util.List;

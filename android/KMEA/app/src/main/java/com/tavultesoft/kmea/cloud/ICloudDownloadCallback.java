@@ -2,6 +2,8 @@ package com.tavultesoft.kmea.data;
 
 import android.content.Context;
 
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+
 /**
  * Interface for {@link CloudDownloadMgr} as callback to do use case specific task.
  * @param <ModelType> the model objects type

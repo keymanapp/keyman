@@ -1,8 +1,10 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.app.DownloadManager;
 
 import androidx.annotation.NonNull;
+
+import com.tavultesoft.kmea.data.ICloudDownloadCallback;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

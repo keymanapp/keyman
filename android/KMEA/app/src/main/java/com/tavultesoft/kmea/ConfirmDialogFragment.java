@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.data.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
 
 import java.util.ArrayList;
 

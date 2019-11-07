@@ -8,6 +8,7 @@ import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -243,7 +244,7 @@ public class CloudDataJsonUtil {
    * @param aDownload the download
    * @return the result
    */
-  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload( CloudApiTypes.SingleCloudDownload aDownload)
+  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload(CloudApiTypes.SingleCloudDownload aDownload)
   {
       JSONParser jsonParser = new JSONParser();
       JSONArray dataArray = null;

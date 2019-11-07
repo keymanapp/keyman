@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;

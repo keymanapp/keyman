@@ -12,6 +12,7 @@ import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.packages.JSONUtils;
 
 import org.json.JSONArray;
