@@ -4,8 +4,6 @@ import android.app.DownloadManager;
 
 import androidx.annotation.NonNull;
 
-import com.tavultesoft.kmea.data.ICloudDownloadCallback;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CloudApiTypes {
-  protected static class CloudApiReturns {
+  public static class CloudApiReturns {
 
     public final ApiTarget target;
     public final JSONArray jsonArray;

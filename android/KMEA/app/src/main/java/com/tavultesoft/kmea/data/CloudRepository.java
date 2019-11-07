@@ -13,6 +13,10 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
 
 import org.json.JSONArray;

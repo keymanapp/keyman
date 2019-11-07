@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.cloud;
+package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.widget.Toast;
 
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;

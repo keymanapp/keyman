@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.cloud;
+package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,6 +7,8 @@ import android.widget.Toast;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;

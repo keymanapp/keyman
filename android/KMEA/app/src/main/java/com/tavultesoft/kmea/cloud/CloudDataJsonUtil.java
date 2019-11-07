@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
 import android.os.Build;
@@ -9,6 +9,8 @@ import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;

@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.cloud;
+package com.tavultesoft.kmea.cloud.impl;
 
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 

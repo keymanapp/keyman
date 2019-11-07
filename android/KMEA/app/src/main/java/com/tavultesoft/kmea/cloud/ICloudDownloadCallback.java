@@ -1,8 +1,9 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
 
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 
 /**
  * Interface for {@link CloudDownloadMgr} as callback to do use case specific task.
