@@ -16,6 +16,10 @@ typedef BOOL
     );
 
 DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep) {
+#ifndef _DEBUG
+  UNREFERENCED_PARAMETER(Proc);
+#endif
+
   MINIDUMP_EXCEPTION_INFORMATION mei;
   char filename[MAX_PATH], temppath[MAX_PATH];
   if (GetTempPath(MAX_PATH, temppath) == 0 ||
