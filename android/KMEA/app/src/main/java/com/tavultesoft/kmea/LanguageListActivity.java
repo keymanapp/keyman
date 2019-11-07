@@ -138,8 +138,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
             // Custom keyboard already exists in packages/ so just add the language association
             KeyboardPickerActivity.addKeyboard(context, kbInfo);
 
-            if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-              KMManager.setKeyboard(pkgID, kbID, langID, kbName, language.name, kFont, kOskFont);
             Toast.makeText(context, "Keyboard installed", Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             ((AppCompatActivity) context).finish();
@@ -216,8 +214,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
 
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-        KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
       if (result == 2) {
         Toast.makeText(context, context.getString(R.string.font_failed_to_download), Toast.LENGTH_LONG).show();
