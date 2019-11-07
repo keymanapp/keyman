@@ -1165,7 +1165,7 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (currentBanner.equals("suggestion")) {
+    if (currentBanner.equals(BANNER_STATE_SUGGESTION)) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;
@@ -1836,7 +1836,7 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        currentBanner = (change.equals("loaded")) ? BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {

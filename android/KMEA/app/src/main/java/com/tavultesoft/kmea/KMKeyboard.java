@@ -483,8 +483,6 @@ final class KMKeyboard extends WebView {
 
     setKeyboardRoot(packageID);
 
-    //TODO: check fonts?
-
     // Escape single-quoted names for javascript call
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
 
