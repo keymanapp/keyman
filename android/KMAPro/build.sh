@@ -49,10 +49,12 @@ else
 fi
 
 if [ "$ONLY_DEBUG" = true ]; then
-  BUILD_FLAG=assembleDebug
+  BUILD_FLAGS="assembleDebug lintDebug"
 else
-  BUILD_FLAG=build
+  # build = assemble + check; check = test + lint
+  BUILD_FLAGS=build
 fi
 
-./gradlew $DAEMON_FLAG clean $BUILD_FLAG
+echo "BUILD_FLAGS $BUILD_FLAGS"
+./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
