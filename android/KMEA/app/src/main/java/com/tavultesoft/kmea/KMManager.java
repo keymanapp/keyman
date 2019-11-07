@@ -2106,10 +2106,35 @@ public final class KMManager {
 
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
+
             ic.commitText(s, s.length());
+
+            adjustCursorPosition(ic, s);
           }
 
           ic.endBatchEdit();
+        }
+
+        /**
+         * Adjust cursor position after insert the new text.
+         * @param ic the inputconnection
+         * @param s the inserted text
+         */
+        private void adjustCursorPosition(InputConnection ic, String s) {
+          CharSequence _charbefore = ic.getTextBeforeCursor(s.length()*2,0);
+
+          int _expected_start_index = _charbefore.length() - s.length();
+          int _move = 0;
+          while (_move < _expected_start_index) {
+
+            CharSequence _check = _charbefore.subSequence(
+              _expected_start_index - _move,_charbefore.length()-_move);
+            if(_check.equals(s))
+              break;
+            _move++;
+          }
+          if(_move>0)
+            ic.commitText("", -_move);
         }
       });
     }
@@ -2119,4 +2144,6 @@ public final class KMManager {
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     }
   }
+
+
 }
