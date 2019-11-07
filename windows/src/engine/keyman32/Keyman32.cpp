@@ -524,7 +524,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
     return FALSE;
   }
 
-#ifndef WIN64
+#ifndef _WIN64
   Hotkeys::Unload();
 #endif
 
