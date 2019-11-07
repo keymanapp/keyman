@@ -203,15 +203,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
     finish();
   }
 
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-
-    if (resultCode == 1) {
-      finish();
-    }
-  }
-
   // Uses the repo dataset's master lexical model list to create a filtered adapter for use here.
   // As this one is specific to this class, we can implement Activity-specific functionality within it.
   static private class FilteredLexicalModelAdapter extends NestedAdapter<LexicalModel, Dataset.LexicalModels, String> {
