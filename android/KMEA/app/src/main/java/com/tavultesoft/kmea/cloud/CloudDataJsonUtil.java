@@ -55,7 +55,7 @@ public class CloudDataJsonUtil {
     return keyboardInfo;
   }
 
-  static List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
+  public static List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
     List<Keyboard> keyboardsList = new ArrayList<>();
     //keyboardModifiedDates = new HashMap<String, String>();
 
@@ -99,7 +99,7 @@ public class CloudDataJsonUtil {
     return keyboardsList;
   }
 
-  static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
+  public static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
@@ -161,7 +161,7 @@ public class CloudDataJsonUtil {
     return modelList;
   }
 
-   static JSONArray getCachedJSONArray(File file) {
+   public static JSONArray getCachedJSONArray(File file) {
     JSONArray lmData = null;
     try {
       // Read from cache file
@@ -201,7 +201,7 @@ public class CloudDataJsonUtil {
    * be used for each API call, such as for keyboards vs lexical models.
    * @param json - Array of JSON objects containing API return info
    */
-  protected static void saveJSONArrayToCache(File file, JSONArray json) {
+  public static void saveJSONArrayToCache(File file, JSONArray json) {
     ObjectOutput objOutput;
     try {
       // Save to cache file
@@ -219,7 +219,7 @@ public class CloudDataJsonUtil {
    * be used for each API call, such as for keyboards vs lexical models.
    * @param json - JSON object containing API return info
    */
-  protected static void saveJSONObjectToCache(File file, JSONObject json) {
+  public static void saveJSONObjectToCache(File file, JSONObject json) {
     ObjectOutput objOutput;
     try {
       // Save to cache file
