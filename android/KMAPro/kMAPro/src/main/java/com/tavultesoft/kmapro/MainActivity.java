@@ -852,20 +852,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           kbInfo.put(KMManager.KMKey_Font, kFont);
           kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-          if (i == 0) {
-            if (KMManager.addKeyboard(this, kbInfo)) {
-              if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-                KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
-            }
-          } else {
-            KMManager.addKeyboard(this, kbInfo);
-          }
+
+          KMManager.addKeyboard(this, kbInfo);
+
         }
       } else {
-        if (KMManager.addKeyboard(this, keyboardInfo)) {
-          if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-            KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-        }
+        KMManager.addKeyboard(this, keyboardInfo);
       }
     } else {
       // Error notifications handled in LanguageListActivity
