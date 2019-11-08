@@ -20,22 +20,36 @@ public class CountSurrogatePairsTest {
   public void test_invalid_input() {
 
     // Test invalid input doesn't throw exception
+
+    // null sequence
     CharSequence sequence = null;
     int numPairs = KMManager.countSurrogatePairs(sequence, 1);
     Assert.assertEquals(0, numPairs);
 
-    sequence = "test";
+    // negative dn
+    sequence = SMILEY + " Day";
     numPairs = KMManager.countSurrogatePairs(sequence, -1);
     Assert.assertEquals(0, numPairs);
 
+    // dn longer than the sequence length
     numPairs = KMManager.countSurrogatePairs(sequence, sequence.length()+5);
-    Assert.assertEquals(0, numPairs);
+    Assert.assertEquals(1, numPairs);
   }
 
   @Test
-  public void test_zero_pair() {
+  public void test_zero_pairs() {
+
+    // Test for scenarios that expect 0 surrogate pairs
     CharSequence sequence = "Zero emojis";
     int numPairs = KMManager.countSurrogatePairs(sequence, sequence.length());
+    Assert.assertEquals(0, numPairs);
+
+    // dn doesn't reach the surrogate pair
+    sequence = "Zero emojis" + SMILEY + "!";
+    numPairs = KMManager.countSurrogatePairs(sequence, 0);
+    Assert.assertEquals(0, numPairs);
+
+    numPairs = KMManager.countSurrogatePairs(sequence, 1);
     Assert.assertEquals(0, numPairs);
   }
 
@@ -43,15 +57,21 @@ public class CountSurrogatePairsTest {
   public void test_one_pair() {
 
     // Test for scenarios that expect 1 surrogate pair
-    CharSequence sequence = "HaveA" + SMILEY + "Day";
-    int numPairs = KMManager.countSurrogatePairs(sequence, 4);
-    Assert.assertEquals(1, numPairs);
-
-    sequence = "HaveA" + SMILEY + WINK;
-    numPairs = KMManager.countSurrogatePairs(sequence, 1);
+    CharSequence sequence = "Have A " + SMILEY;
+    int numPairs = KMManager.countSurrogatePairs(sequence, 1);
     Assert.assertEquals(1, numPairs);
 
     numPairs = KMManager.countSurrogatePairs(sequence, 2);
+    Assert.assertEquals(1, numPairs);
+
+    numPairs = KMManager.countSurrogatePairs(sequence, 6);
+    Assert.assertEquals(1, numPairs);
+
+    sequence = "Have A " + SMILEY + WINK + " Day";
+    numPairs = KMManager.countSurrogatePairs(sequence, 5);
+    Assert.assertEquals(1, numPairs);
+
+    numPairs = KMManager.countSurrogatePairs(sequence, 6);
     Assert.assertEquals(1, numPairs);
   }
 
@@ -59,11 +79,11 @@ public class CountSurrogatePairsTest {
   public void test_two_pairs() {
 
     // Test for scenarios that expect 2 surrogate pairs
-    CharSequence sequence = "HaveA" + SMILEY + WINK;
-    int numPairs = KMManager.countSurrogatePairs(sequence, 3);
+    CharSequence sequence = "Have A " + SMILEY + WINK + " Day";
+    int numPairs = KMManager.countSurrogatePairs(sequence, 7);
     Assert.assertEquals(2, numPairs);
 
-    numPairs = KMManager.countSurrogatePairs(sequence, 4);
+    numPairs = KMManager.countSurrogatePairs(sequence, 8);
     Assert.assertEquals(2, numPairs);
   }
 }

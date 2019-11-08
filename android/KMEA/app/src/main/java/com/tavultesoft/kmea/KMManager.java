@@ -310,7 +310,7 @@ public final class KMManager {
 
   /**
    * Count the number of surrogate pairs starting from the end of a character sequence
-   * until we reach dn codepoints.
+   * until we reach dn codepoints or searched the entire sequence.
    * Doing this the hard way because we can't foreach charSequence in reverse.
    * @param sequence - the character sequence to analyze
    * @param dn - the number of code points to count up to
@@ -325,19 +325,43 @@ public final class KMManager {
     int lastIndex = sequence.length()-1;
     try {
       do {
-        if ((lastIndex - counter > 0) && Character.isLowSurrogate(sequence.charAt(lastIndex - counter))) {
+        if (Character.isLowSurrogate(sequence.charAt(lastIndex - counter))) {
           numPairs++;
         }
         counter++;
-      } while (counter < dn && numPairs < dn);
-
+      } while ((lastIndex - counter >= 0) && (counter < dn) && (numPairs < dn));
       return numPairs;
     } catch (Exception e) {
       Log.e(TAG, "Error in countSurrogatePairs: " + e);
-      if (counter >= dn) {
-        return numPairs;
+      return numPairs;
+    }
+  }
+
+  /**
+   * Determine if a character sequence needs to be re-inserted. If newContext is a
+   * subSequence of expectedChars, returns the character sequence that needs to be restored.
+   * @param expectedChars - expected character sequence
+   * @param newContext - current character sequence
+   * @return CharSequence. If length is 0, no characters need to be restored
+   */
+  public static CharSequence restoreChars(CharSequence expectedChars, CharSequence newContext) {
+    CharSequence charsToRestore = "";
+
+    try {
+      // Now see if we need to re-insert characters
+      if (expectedChars.length() != newContext.length()) {
+        String newCharsString = expectedChars.toString();
+        String newContextString = newContext.toString();
+        int index = newCharsString.indexOf(newContextString);
+        if (index > -1) {
+          charsToRestore = expectedChars.subSequence(index + newContextString.length(), expectedChars.length());
+        }
       }
-      return 0;
+
+      return charsToRestore;
+    } catch (Exception e) {
+      Log.e(TAG, "Error in restoreChars: " + e);
+      return charsToRestore;
     }
   }
 
@@ -358,28 +382,18 @@ public final class KMManager {
       return;
     }
 
-    try {
-      int numPairs = countSurrogatePairs(charsBackup, dn);
+    int numPairs = countSurrogatePairs(charsBackup, dn);
 
-      // Chop dn+numPairs code points from the end of charsBackup
-      // subSequence indices are start(inclusive) to end(exclusive)
-      CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
-      ic.deleteSurroundingText(dn + numPairs, 0);
-      CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
+    // Chop dn+numPairs code points from the end of charsBackup
+    // subSequence indices are start(inclusive) to end(exclusive)
+    CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+    ic.deleteSurroundingText(dn + numPairs, 0);
+    CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
 
-      // Now see if we need to re-insert characters
-      if (expectedChars.length() != newContext.length()) {
-        String newCharsString = expectedChars.toString();
-        String newContextString = newContext.toString();
-        int index = newCharsString.indexOf(newContextString);
-        if (index > -1) {
-          // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
-          expectedChars = expectedChars.subSequence(index + newContextString.length(), expectedChars.length());
-          ic.commitText(expectedChars, expectedChars.length());
-        }
-      }
-    } catch (Exception e) {
-      Log.e(TAG, "Error in performLeftDeletions: " + e);
+    CharSequence charsToRestore = restoreChars(expectedChars, newContext);
+    if (charsToRestore.length() > 0) {
+      // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
+      ic.commitText(charsToRestore, charsToRestore.length());
     }
   }
 
