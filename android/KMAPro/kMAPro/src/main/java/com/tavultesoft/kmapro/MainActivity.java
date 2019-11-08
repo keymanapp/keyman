@@ -186,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
+    super.onActivityResult(requestCode, resultCode, returnIntent);
+
     if (resultCode != RESULT_OK) {
       checkGetStarted();
       return;

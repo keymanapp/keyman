@@ -22,7 +22,7 @@ import java.util.List;
 
 class CloudCatalogDownloadTask extends AsyncTask<CloudApiTypes.CloudApiParam, Integer, CloudCatalogDownloadReturns> {
 
-  private static final String TAG = "CloudCatalogDownloadTask";
+  private static final String TAG = "CloudCatDownloadTask";
 
   private final boolean hasConnection;
   private ProgressDialog progressDialog;
