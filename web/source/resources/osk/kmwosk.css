@@ -64,6 +64,16 @@
 .phone.ios .kmw-key.kmw-key-special-on {color:#000;background-color:#fdfdfe;}
 .phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
 
+@media (prefers-color-scheme: dark) {
+  .phone.ios .kmw-key-layer-group {background-color: #0f1319}
+  .phone.ios .kmw-key.kmw-key-default {color:#fff;background-color:#3d3d3e}
+  .phone.ios .kmw-key.kmw-key-shift,
+  .phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
+  .phone.ios .kmw-key.kmw-key-shift-on,
+  .phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#3d3d3e;}
+  .phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
+}
+
 .ios .kmw-banner-bar {
   background-color: #cfd3d9; 
   position: absolute;
@@ -268,19 +278,19 @@ body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;f
 #kmw-popup-callout {
   position:fixed; display:block; background-color: #fdfdfe; 
   border-radius: 0 0 6px 6px; z-index:10001; pointer-events:none;
-  }
+}
 
 /* Key preview styles */
 div.ios div.kmw-keytip {
   position:fixed; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
-  }
+}
 
 div.android div.kmw-keytip {
   position:fixed; left:0; top:0; width:3em; height:3em; 
   color:#fff;
   background-color: rgb(0,0,0,0);
   overflow:visible;
-  }
+}
 
 div.android #keytip {background-color:#f00;}
 
@@ -357,6 +367,10 @@ div.android #keytip {background-color:#f00;}
 .kmw-alert-text{margin:10px;white-space:default;font-family:Arial,sans-serif;}
 
 .kmw-spacebar-caption{font:0.6em Arial !important;color:rgba(0,0,0,0.15);}
+
+@media (prefers-color-scheme: dark) {
+  .kmw-spacebar-caption{color:rgba(255, 255, 255, 0.15);}
+}
 
 /* Static styles */
 
