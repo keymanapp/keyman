@@ -4,6 +4,25 @@
 
 package com.tavultesoft.kmea;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.util.MapCompat;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -21,26 +40,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.MapCompat;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class KeyboardPickerActivity extends AppCompatActivity {
 
@@ -147,7 +147,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switchKeyboard(position);
+        switchKeyboard(position,dismissOnSelect);
         if (dismissOnSelect)
           finish();
       }
@@ -337,7 +337,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     selectedIndex = position;
   }
 
-  private static void switchKeyboard(int position) {
+  /**
+   * switch to the given keyboard.
+   * @param position the keyboard index in list
+   * @param aPrepareOnly prepare switch, it is executed on keyboard reload
+   */
+  private static void switchKeyboard(int position, boolean aPrepareOnly) {
     setSelection(position);
     int listPosition = (position >= keyboardsList.size()) ? keyboardsList.size()-1 : position;
     HashMap<String, String> kbInfo = keyboardsList.get(listPosition);
@@ -351,7 +356,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+    if(aPrepareOnly)
+      KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
+    else
+      KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -467,7 +475,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
       }
       if (position == curKbPos && listView != null) {
-        switchKeyboard(0);
+        switchKeyboard(0,false);
       } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = getCurrentKeyboardIndex();
         setSelection(curKbPos);
