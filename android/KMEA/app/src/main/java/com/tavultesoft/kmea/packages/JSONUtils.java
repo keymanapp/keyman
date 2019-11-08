@@ -171,7 +171,7 @@ public class JSONUtils {
 
   /**
    * Mirror options information that comes from keyboard cloud catalog
-   * @param String deviceType
+   * @param deviceType
    * @return JSONObject
    */
   public static JSONObject defaultOptions(String deviceType) {
