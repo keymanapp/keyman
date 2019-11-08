@@ -77,21 +77,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
   private static AlertDialog alertDialog;
 
-  private void updateProgressBar()
-  {
-    RelativeLayout _progress = findViewById(R.id.progress);
-    boolean _updaterunning= CloudRepository.shared.updateIsRunning();
-    ListView _list = findViewById(R.id.listView);
-    if(_updaterunning)
-    {
-      _progress.setVisibility(View.VISIBLE);
-      _list.setVisibility(View.GONE);
-    }
-    else {
-      _progress.setVisibility(View.GONE);
-      _list.setVisibility(View.VISIBLE);
-    }
-  }
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -113,14 +98,17 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     // Establish the list view based on the CloudRepository's Dataset.
     repo = CloudRepository.shared.fetchDataset(this);
 
+    // add listener to dataset to get event for catalog update.
     repoObserver = new DataSetObserver() {
       @Override
       public void onChanged() {
         updateProgressBar();
       }
     };
+
     repo.registerDataSetObserver(repoObserver);
 
+    // init progress bar state
     updateProgressBar();
 
     listView.setAdapter(new LanguagesAdapter(this, repo));
@@ -184,6 +172,25 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
     Intent i = getIntent();
     listView.setSelectionFromTop(i.getIntExtra("listPosition", 0), i.getIntExtra("offsetY", 0));
+  }
+
+  /**
+   * switch between progress and listview.
+   */
+  private void updateProgressBar()
+  {
+    RelativeLayout _progress = findViewById(R.id.progress);
+    boolean _updaterunning= CloudRepository.shared.updateIsRunning();
+    ListView _list = findViewById(R.id.listView);
+    if(_updaterunning)
+    {
+      _progress.setVisibility(View.VISIBLE);
+      _list.setVisibility(View.GONE);
+    }
+    else {
+      _progress.setVisibility(View.GONE);
+      _list.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override
@@ -446,6 +453,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    // remove listener from dataset.
     repo.unregisterDataSetObserver(repoObserver);
   }
 }
