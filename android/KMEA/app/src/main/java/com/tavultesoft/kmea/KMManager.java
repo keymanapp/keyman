@@ -308,6 +308,39 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Count the number of surrogate pairs starting from the end of a character sequence
+   * until we reach dn codepoints.
+   * Doing this the hard way because we can't foreach charSequence in reverse.
+   * @param sequence - the character sequence to analyze
+   * @param dn - the number of code points to count up to
+   * @return int
+   */
+  public static int countSurrogatePairs(CharSequence sequence, int dn) {
+    if ((sequence == null) || (sequence.length() == 0) || (dn <= 0)) {
+      return 0;
+    }
+
+    int numPairs = 0, counter = 0;
+    int lastIndex = sequence.length()-1;
+    try {
+      do {
+        if ((lastIndex - counter > 0) && Character.isLowSurrogate(sequence.charAt(lastIndex - counter))) {
+          numPairs++;
+        }
+        counter++;
+      } while (counter < dn && numPairs < dn);
+
+      return numPairs;
+    } catch (Exception e) {
+      Log.e(TAG, "Error in countSurrogatePairs: " + e);
+      if (counter >= dn) {
+        return numPairs;
+      }
+      return 0;
+    }
+  }
+
   /*
   // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
   // instead of one code-point.
@@ -325,18 +358,8 @@ public final class KMManager {
       return;
     }
 
-    // Count the number of surrogate pairs in this buffer, backwards from the end
-    // until we reach dn codepoints.
-    // Unfortunately, can't foreach charSequence in reverse
-    int numPairs = 0;
-    int counter=0;
     try {
-      do {
-        if ((lastIndex - counter > 0) && Character.isLowSurrogate(charsBackup.charAt(lastIndex - counter))) {
-          numPairs++;
-        }
-        counter++;
-      } while (counter < dn && numPairs < dn);
+      int numPairs = countSurrogatePairs(charsBackup, dn);
 
       // Chop dn+numPairs code points from the end of charsBackup
       // subSequence indices are start(inclusive) to end(exclusive)
