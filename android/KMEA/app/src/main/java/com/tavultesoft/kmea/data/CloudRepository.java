@@ -399,7 +399,7 @@ public class CloudRepository {
     updateIsRunning=false;
   }
 
-  public boolean isUpdateRunning() {
+  public boolean updateIsRunning() {
     return updateIsRunning;
   }
 }

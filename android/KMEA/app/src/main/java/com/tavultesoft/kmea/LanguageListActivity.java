@@ -80,7 +80,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   private void updateProgressBar()
   {
     RelativeLayout _progress = findViewById(R.id.progress);
-    boolean _updaterunning= CloudRepository.shared.isUpdateRunning();
+    boolean _updaterunning= CloudRepository.shared.updateIsRunning();
     ListView _list = findViewById(R.id.listView);
     if(_updaterunning)
     {
