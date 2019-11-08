@@ -134,10 +134,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   public void processCloudReturns(Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple, boolean executeCallbacks) {
     // Only empty if no queries returned data - we're offline.
     if (jsonTuple.isEmpty()) {
-      if (this.updateHandler == null) {
-        String msg = context.getString(R.string.catalog_unavailable);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-      }
       this.failure.run(); // Signal failure to download to our failure callback.
       return;
     }

@@ -261,7 +261,7 @@ public class CloudDataJsonUtil {
             dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
           }
         } catch (Exception e) {
-          Log.d(TAG, e.getMessage());
+          Log.d(TAG, e.getMessage(),e);
         } finally {
           aDownload.getDestinationFile().delete();
         }

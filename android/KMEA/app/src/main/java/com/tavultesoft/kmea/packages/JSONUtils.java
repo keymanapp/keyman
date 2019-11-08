@@ -121,8 +121,8 @@ public class JSONUtils {
 
   /**
    * Iterate through a JSONArray to determine if a language/keyboard/model ID exists.
-   * @param {a} JSONArray to search
-   * @param {id} String of the language/keyboard ID
+   * @param a JSONArray to search
+   * @param id String of the language/keyboard ID
    * @return int - Index if the ID is found (starting with 0). -1 if the ID doesn't exist
    */
   public static int findID(JSONArray a, String id) {

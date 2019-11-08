@@ -308,7 +308,6 @@ public class CloudRepository {
    * @param updateHandler  An object that can handle update notification if desired.
    * @param onSuccess  A callback to be triggered on completion of all queries and operations.
    * @param onFailure  A callback to be triggered upon failure of a query.
-   * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
   private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
