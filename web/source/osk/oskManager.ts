@@ -467,7 +467,7 @@ namespace com.keyman.osk {
           this.showBuild();
         }
         return false;
-      },false);
+      }.bind(this),false);
 
       // Prevent selection of caption (IE - set by class for other browsers)
       if('onselectstart' in Ltitle) Ltitle.onselectstart= util.selectStartHandler; //IE (Build 360)

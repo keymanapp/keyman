@@ -188,13 +188,6 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
   }
 
   @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (resultCode == 1) {
-      finish();
-    }
-  }
-
-  @Override
   public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
     // Do nothing
   }

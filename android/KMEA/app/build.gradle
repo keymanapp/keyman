@@ -32,6 +32,11 @@ android {
         }
     }
 
+    // TODO: Remove this when SDK > 17
+    lintOptions {
+        disable 'ResourceType'
+    }
+
     testOptions {
         unitTests {
             // Allows use of a simulated Android API for tests.  (Thanks, roboelectric!)
@@ -63,7 +68,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'commons-io:commons-io:2.6'
-    implementation 'org.apache.commons:commons-text:1.8'
 
     // Robolectric
     testImplementation 'androidx.test:core:1.2.0'
