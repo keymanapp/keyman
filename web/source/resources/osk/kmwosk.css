@@ -64,6 +64,7 @@
 .phone.ios .kmw-key.kmw-key-special-on {color:#000;background-color:#fdfdfe;}
 .phone.ios .kmw-key.kmw-key-touched {background-color:#88f;}
 
+/* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
   .phone.ios .kmw-key-layer-group {background-color: #0f1319}
   .phone.ios .kmw-key.kmw-key-default {color:#fff;background-color:#3d3d3e}
@@ -368,6 +369,7 @@ div.android #keytip {background-color:#f00;}
 
 .kmw-spacebar-caption{font:0.6em Arial !important;color:rgba(0,0,0,0.15);}
 
+/* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
   .kmw-spacebar-caption{color:rgba(255, 255, 255, 0.15);}
 }
