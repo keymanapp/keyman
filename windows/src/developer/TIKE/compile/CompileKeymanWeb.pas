@@ -974,15 +974,14 @@ begin
       n := len;
       pwszContext := fkp.dpContext;
 
-      //CODE_IFOPT:    // I3429
-      //CODE_IFSYSTEMSTORE:     // I3430
       for i := 1 to n do
       begin
         rec := ExpandSentinel(pwszContext);
-        if rec.IsSentinel and (rec.Code in [CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
+        if rec.IsSentinel and (rec.Code in [CODE_NUL, CODE_IFOPT, CODE_IFSYSTEMSTORE]) then
           Dec(len);
         pwszContext := incxstr(pwszContext);
       end;
+
     end
     // KMW < 10.0 exclude all sentinel-based characters, including deadkeys, from direct context deletion.
     // Deadkeys have alternative special handling.
@@ -992,10 +991,10 @@ begin
     len := -1;
 
   if IsKeyboardVersion10OrLater() and (pwsz^ <> #0) then
-    begin
-      Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
-      len := -1;
-    end;
+  begin
+    Result := Result + nlt+Format('k.KDC(%d,t);', [ len ] );   // I3681
+    len := -1;
+  end;
 
 	while pwsz^ <> #0 do
   begin
