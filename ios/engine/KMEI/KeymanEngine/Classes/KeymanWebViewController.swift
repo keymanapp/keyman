@@ -856,7 +856,7 @@ extension KeymanWebViewController {
   func resizeKeyboard() {
     fixLayout()
 
-    // Ensures the height is properly updated.
+     // Ensures the width and height are properly updated.
     // Note:  System Keyboard init currently requires this for the keyboard to display properly
     // the first time.
     setOskWidth(Int(kbSize.width))
