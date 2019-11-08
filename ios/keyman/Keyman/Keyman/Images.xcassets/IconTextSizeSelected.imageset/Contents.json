@@ -3,6 +3,16 @@
     {
       "idiom" : "universal",
       "filename" : "textsize_selected.png"
+    },
+    {
+      "idiom" : "universal",
+      "filename" : "textsize_selected-dark.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ]
     }
   ],
   "info" : {

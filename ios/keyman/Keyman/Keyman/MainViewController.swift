@@ -245,43 +245,43 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
 
     let imageScaleF: CGFloat = 0.9
-    let moreButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"),
-                                        highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
+    let moreButton = createNavBarButton(with: UIImage(named: "IconMore")!,
+                                        highlightedImage: UIImage(named: "IconMoreSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.showDropDownMenu),
                                         orientation: orientation)
     moreButton.title = "More"
 
-    let infoButton = createNavBarButton(with: #imageLiteral(resourceName: "724-info.png"),
-                                        highlightedImage: #imageLiteral(resourceName: "724-info-selected.png"),
+    let infoButton = createNavBarButton(with: UIImage(named: "IconInfo")!,
+                                        highlightedImage: UIImage(named: "IconInfoSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.infoButtonClick),
                                         orientation: orientation)
     infoButton.title = "Info"
 
-    let getStartedButton = createNavBarButton(with: #imageLiteral(resourceName: "887-notepad.png"),
-                                              highlightedImage: #imageLiteral(resourceName: "887-notepad-selected.png"),
+    let getStartedButton = createNavBarButton(with: UIImage(named: "IconNotepad")!,
+                                              highlightedImage: UIImage(named: "IconNotepadSelected")!,
                                               imageScale: imageScaleF,
                                               action: #selector(self.showGetStartedView),
                                               orientation: orientation)
     getStartedButton.title = "Get Started"
 
-    let trashButton = createNavBarButton(with: #imageLiteral(resourceName: "711-trash.png"),
-                                         highlightedImage: #imageLiteral(resourceName: "711-trash-selected.png"),
+    let trashButton = createNavBarButton(with: UIImage(named: "IconTrash")!,
+                                         highlightedImage: UIImage(named: "IconTrashSelected")!,
                                          imageScale: imageScaleF,
                                          action: #selector(self.trashButtonClick),
                                          orientation: orientation)
     trashButton.title = "Clear Text"
 
-    let textSizeButton = createNavBarButton(with: #imageLiteral(resourceName: "textsize.png"),
-                                            highlightedImage: #imageLiteral(resourceName: "textsize_selected.png"),
+    let textSizeButton = createNavBarButton(with: UIImage(named: "IconTextSize")!,
+                                            highlightedImage: UIImage(named: "IconTextSizeSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.textSizeButtonClick),
                                             orientation: orientation)
     textSizeButton.title = "Text Size"
 
-    let browserButton = createNavBarButton(with: #imageLiteral(resourceName: "786-browser.png"),
-                                           highlightedImage: #imageLiteral(resourceName: "786-browser-selected.png"),
+    let browserButton = createNavBarButton(with: UIImage(named: "IconBrowser")!,
+                                           highlightedImage: UIImage(named: "IconBrowserSelected")!,
                                            imageScale: 1.0,
                                            action: #selector(self.showKMWebBrowserView),
                                            orientation: orientation)
@@ -294,11 +294,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                           orientation: orientation)
     actionButton.title = "Share"
 
-    let settingsButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"), // should find a gear image and use that instead of re-using 'more'
-                                          highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
-                                          imageScale: imageScaleF,
-                                          action: #selector(self.settingsButtonClick),
-                                          orientation: orientation)
+    let settingsButton = createNavBarButton(with: UIImage(named: "IconMore")!,
+                                            highlightedImage: UIImage(named: "IconMoreSelected")!,
+                                            imageScale: imageScaleF,
+                                            action: #selector(self.settingsButtonClick),
+                                            orientation: orientation)
     settingsButton.title = "Settings"
 
     dropdownItems = [textSizeButton, trashButton, infoButton, getStartedButton, settingsButton]

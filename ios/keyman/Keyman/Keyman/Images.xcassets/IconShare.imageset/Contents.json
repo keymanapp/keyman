@@ -3,6 +3,16 @@
     {
       "idiom" : "universal",
       "filename" : "702-share.png"
+    },
+    {
+      "idiom" : "universal",
+      "filename" : "702-share-dark.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ]
     }
   ],
   "info" : {

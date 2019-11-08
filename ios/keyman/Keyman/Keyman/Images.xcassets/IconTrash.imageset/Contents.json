@@ -3,6 +3,16 @@
     {
       "idiom" : "universal",
       "filename" : "711-trash.png"
+    },
+    {
+      "idiom" : "universal",
+      "filename" : "711-trash-dark.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ]
     }
   ],
   "info" : {
