@@ -30,7 +30,7 @@ import org.json.JSONObject;
  * KMEA engine.  This is primarily for installing keyboard packages.
  */
 public class PackageProcessor {
-  protected static File resourceRoot = null;
+  protected File resourceRoot = null;
 
   public static final String PP_DEFAULT_VERSION = "1.0";
   public static final String PP_DEFAULT_METADATA = "kmp.json";

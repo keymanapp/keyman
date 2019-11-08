@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.tavultesoft.kmea.data.CloudApiTypes;
+import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.data.CloudDownloadMgr;
+import com.tavultesoft.kmea.data.CloudKeyboardDataDownloadCallback;
+import com.tavultesoft.kmea.data.CloudKeyboardMetaDataDownloadCallback;
+import com.tavultesoft.kmea.data.CloudLexicalPackageDownloadCallback;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -29,7 +36,11 @@ import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
 public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   // Bundle Keys
+
   // Cloud
+  //TODO: Should be removed with the old implementation when downloadmanager impl works
+  public static boolean USE_DOWNLOAD_MANAGER = true;
+
   public static final String ARG_PKG_ID = "KMKeyboardActivity.pkgID";
   public static final String ARG_KB_ID = "KMKeyboardActivity.kbID";
   public static final String ARG_LANG_ID = "KMKeyboardActivity.langID";
@@ -66,6 +77,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";
   public static final String KMKey_FontBaseURI = "fontBaseUri";
 
+  //TODO: use keyboard model class, should not be static
   private static String pkgID;
   private static String kbID;
   private static String langID;
@@ -89,43 +101,41 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
 
     Bundle bundle = getIntent().getExtras();
-    if (bundle != null) {
-      pkgID = bundle.getString(ARG_PKG_ID);
-      if (pkgID == null || pkgID.isEmpty()) {
-        pkgID = KMManager.KMDefault_UndefinedPackageID;
-      }
-      langID = bundle.getString(ARG_LANG_ID);
-      langName = bundle.getString(ARG_LANG_NAME);
-
-      downloadOnlyLexicalModel = bundle.containsKey(ARG_MODEL_URL) &&
-        bundle.getString(ARG_MODEL_URL) != null &&
-        !bundle.getString(ARG_MODEL_URL).isEmpty();
-
-      if (downloadOnlyLexicalModel) {
-        modelID = bundle.getString(ARG_MODEL_ID);
-        modelName = bundle.getString(ARG_MODEL_NAME);
-        isCustom = false;
-        url = bundle.getString(ARG_MODEL_URL);
-      } else {
-
-        kbID = bundle.getString(ARG_KB_ID);
-        kbName = bundle.getString(ARG_KB_NAME);
-        isCustom = bundle.getBoolean(ARG_IS_CUSTOM);
-
-        // URL parameters for custom keyboard (if they exist)
-        customKeyboard = bundle.getString(ARG_KEYBOARD);
-        customLanguage = bundle.getString(ARG_LANGUAGE);
-        url = bundle.getString(ARG_URL);
-        filename = bundle.getString(ARG_FILENAME);
-        if (filename == null || filename.isEmpty()) {
-          filename = "unknown";
-        }
-      }
-    } else {
+    if (bundle == null)
       return;
+
+    pkgID = bundle.getString(ARG_PKG_ID);
+    if (pkgID == null || pkgID.isEmpty()) {
+      pkgID = KMManager.KMDefault_UndefinedPackageID;
+    }
+    langID = bundle.getString(ARG_LANG_ID);
+    langName = bundle.getString(ARG_LANG_NAME);
+
+    downloadOnlyLexicalModel = bundle.containsKey(ARG_MODEL_URL) &&
+      bundle.getString(ARG_MODEL_URL) != null &&
+      !bundle.getString(ARG_MODEL_URL).isEmpty();
+
+    if (downloadOnlyLexicalModel) {
+      modelID = bundle.getString(ARG_MODEL_ID);
+      modelName = bundle.getString(ARG_MODEL_NAME);
+      isCustom = false;
+      url = bundle.getString(ARG_MODEL_URL);
+    } else {
+
+      kbID = bundle.getString(ARG_KB_ID);
+      kbName = bundle.getString(ARG_KB_NAME);
+      isCustom = bundle.getBoolean(ARG_IS_CUSTOM);
+
+      // URL parameters for custom keyboard (if they exist)
+      customKeyboard = bundle.getString(ARG_KEYBOARD);
+      customLanguage = bundle.getString(ARG_LANGUAGE);
+      url = bundle.getString(ARG_URL);
+      filename = bundle.getString(ARG_FILENAME);
+      if (filename == null || filename.isEmpty()) {
+        filename = "unknown";
+      }
     }
 
-    Bundle args = new Bundle();
     String title = "";
     if (url != null) {
       title = String.format("%s: %s", getString(R.string.custom_keyboard), filename);
@@ -162,6 +172,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * Used by the <code>download</code> method to handle asynchronous downloading and evaluation of
    * packages and keyboards.
    */
+  @Deprecated
   static class DownloadTask extends AsyncTask<Void, Integer, DownloadTask.Result> {
     static class Result {
       public final Integer kbdResult;
@@ -247,6 +258,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
         String remoteUrl = "",remoteLexicalModelUrl = "";
         if (isCustom) {
+          //TODO: Doesn't work, because this case will end up in an exception during download???
+          // See downloadNonKMPKeyboard
           remoteUrl = url;
         } else {
           // Keyman cloud
@@ -357,10 +370,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       }
 
       String fontBaseUri = options.optString(KMKey_FontBaseURI, "");
-      JSONObject language, keyboard = null;
 
       // Keyman cloud keyboard distribution via JSON
-      language = kbData.optJSONObject(KMKey_Language);
+      JSONObject language = kbData.optJSONObject(KMKey_Language);
       if (language == null) {
         throw new Exception(exceptionStr);
       }
@@ -368,20 +380,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       langName = language.optString(KMManager.KMKey_Name, "");
 
       JSONArray keyboards = language.getJSONArray(KMKey_LanguageKeyboards);
-      if (keyboards == null) {
-        throw new Exception(exceptionStr);
-      }
 
-      // In case keyboards array contains multiple keyboards, get the one with matching keyboard ID
-      for (int index = 0; index < keyboards.length(); index++) {
-        keyboard = keyboards.getJSONObject(index);
-        if (keyboard != null && (kbID.equals(keyboard.getString(KMManager.KMKey_ID)))) {
-          break;
-        }
-      }
-      if (keyboard == null) {
-        throw new Exception(exceptionStr);
-      }
+      JSONObject keyboard = CloudDataJsonUtil.findMatchingKeyboardByID(keyboards,kbID);
 
       kbID = keyboard.getString(KMManager.KMKey_ID);
       pkgID = keyboard.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -400,13 +400,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       JSONObject jsonOskFont = keyboard.optJSONObject(KMManager.KMKey_OskFont);
 
       if (jsonFont != null) {
-        findTTF(jsonFont);
+        CloudDataJsonUtil.updateFontSourceToTTFFont(jsonFont);
       }
       if (jsonOskFont != null) {
-        findTTF(jsonOskFont);
+        CloudDataJsonUtil.updateFontSourceToTTFFont(jsonOskFont);
       }
-      ArrayList<String> fontUrls = fontUrls(jsonFont, fontBaseUri, true);
-      ArrayList<String> oskFontUrls = fontUrls(jsonOskFont, fontBaseUri, true);
+      ArrayList<String> fontUrls = CloudDataJsonUtil.fontUrls(jsonFont, fontBaseUri, false);
+      ArrayList<String> oskFontUrls = CloudDataJsonUtil.fontUrls(jsonOskFont, fontBaseUri, true);
       if (fontUrls != null)
         urls.addAll(fontUrls);
       if (oskFontUrls != null) {
@@ -502,17 +502,9 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
      */
     protected void notifyListeners(KeyboardEventHandler.EventType eventType, int result) {
       if (kbDownloadEventListeners != null) {
-        HashMap<String, String> keyboardInfo = new HashMap<String, String>();
-        keyboardInfo.put(KMManager.KMKey_PackageID, pkgID);
-        keyboardInfo.put(KMManager.KMKey_KeyboardID, kbID);
-        keyboardInfo.put(KMManager.KMKey_LanguageID, langID);
-        keyboardInfo.put(KMManager.KMKey_KeyboardName, kbName);
-        keyboardInfo.put(KMManager.KMKey_LanguageName, langName);
-        keyboardInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-        keyboardInfo.put(KMManager.KMKey_CustomKeyboard, kbIsCustom);
-        keyboardInfo.put(KMManager.KMKey_Font, font);
-        if (oskFont != null)
-          keyboardInfo.put(KMManager.KMKey_OskFont, oskFont);
+        HashMap<String, String> keyboardInfo =
+          CloudDataJsonUtil.createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,kbIsCustom,font,oskFont);
+
         KeyboardEventHandler.notifyListeners(kbDownloadEventListeners, eventType, keyboardInfo, result);
       }
     }
@@ -537,13 +529,151 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param showProgressDialog
    */
   public static void download(final Context context, final boolean showProgressDialog) {
-    new DownloadTask(context, showProgressDialog).execute();
+    if(USE_DOWNLOAD_MANAGER)
+      downloadKeyboardUsingDownloadManager(context);
+    else
+      new DownloadTask(context, showProgressDialog).execute();
   }
 
   public static void download(final Context context, final boolean showProgressDialog,
-                              final boolean donwloadOnlyLexicalModel) {
-    new DownloadTask(context, showProgressDialog, downloadOnlyLexicalModel).execute();
+                              final boolean aDownloadOnlyLexicalModel) {
+    if(USE_DOWNLOAD_MANAGER)
+      downloadUsingDownloadManager(context,aDownloadOnlyLexicalModel);
+    else
+      new DownloadTask(context, showProgressDialog, aDownloadOnlyLexicalModel).execute();
   }
+
+  /**
+   * Download in keyboards and lexical model using download manager.
+   * @param context the context
+   * @param aDownloadOnlyLexicalModel is lexical model download
+   */
+  private static void downloadUsingDownloadManager(final Context context,
+                              final boolean aDownloadOnlyLexicalModel)
+  {
+    if(aDownloadOnlyLexicalModel)
+    {
+      downloadLexicalModelUsingDownloadManager(context);
+    }
+    else
+    {
+      downloadKeyboardUsingDownloadManager(context);
+    }
+  }
+
+  /**
+   * prepare and execute keyboard download using downloadmanager.
+   * @param context the context
+   */
+  private static void downloadKeyboardUsingDownloadManager(Context context)
+  {
+    if (pkgID == null || pkgID.trim().isEmpty() ||
+      (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
+      throw new IllegalStateException("Invalid keyboard");
+    }
+
+
+
+    List<CloudApiTypes.CloudApiParam> cloudQueries = getPrepareCloudQueriesForKeyboardDownload(context);
+
+    String _downloadid= CloudKeyboardMetaDataDownloadCallback.createDownloadId(langID , kbID);
+
+    if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid)
+       ||  CloudDownloadMgr.getInstance().alreadyDownloadingData(
+              CloudKeyboardDataDownloadCallback.createDownloadId(kbID)))
+    {
+      Toast.makeText(context,
+        context.getString(R.string.keyboard_download_is_running_in_background),
+        Toast.LENGTH_SHORT).show();
+    }
+    else
+    {
+      CloudKeyboardMetaDataDownloadCallback _callback = new CloudKeyboardMetaDataDownloadCallback();
+      _callback.setDownloadEventListeners(kbDownloadEventListeners);
+
+      Toast.makeText(context,
+        context.getString(R.string.keyboard_download_start_in_background),
+        Toast.LENGTH_SHORT).show();
+
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback,
+        cloudQueries.toArray(new CloudApiTypes.CloudApiParam[0]));
+    }
+
+    ((AppCompatActivity) context).finish();
+  }
+
+  /**
+   * Prepare the cloud queries for keyboard metadata download.
+   * @param context the context
+   * @return the result
+   */
+  private static List<CloudApiTypes.CloudApiParam> getPrepareCloudQueriesForKeyboardDownload(Context context)
+  {
+    List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
+
+    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(context);
+
+    if (isCustom) {
+      //TODO: will end up in an exception during download???
+      cloudQueries.add(new CloudApiTypes.CloudApiParam(
+        CloudApiTypes.ApiTarget.KeyboardData, url));
+    }
+    else
+    {
+      // Keyman cloud
+      String _remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
+        kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
+      cloudQueries.add(
+        new CloudApiTypes.CloudApiParam(
+          CloudApiTypes.ApiTarget.Keyboard, _remoteUrl)
+          .setType(CloudApiTypes.JSONType.Object)
+          .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_IS_CUSTOM,isCustom)
+          .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_LANG_ID,langID)
+           .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_KB_ID,kbID));
+
+      String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
+      cloudQueries.add(new CloudApiTypes.CloudApiParam(
+        CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
+        .setType(CloudApiTypes.JSONType.Array));
+    }
+    return cloudQueries;
+  }
+
+  /**
+   * prepare and execute lexical model download using downloadmanager.
+   * @param context the context
+   */
+  private static void downloadLexicalModelUsingDownloadManager(Context context) {
+
+
+    String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(modelID);
+
+    if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_downloadid))
+    {
+      Toast.makeText(context,
+        context.getString(R.string.dictionary_download_is_running_in_background),
+        Toast.LENGTH_SHORT).show();
+    }
+    else
+    {
+      CloudLexicalPackageDownloadCallback _callback = new CloudLexicalPackageDownloadCallback();
+      _callback.setDownloadEventListeners(kbDownloadEventListeners);
+
+      CloudApiTypes.CloudApiParam _param = new CloudApiTypes.CloudApiParam(
+        CloudApiTypes.ApiTarget.LexicalModelPackage, url);
+
+      Toast.makeText(context,
+        context.getString(R.string.dictionary_download_start_in_background),
+        Toast.LENGTH_SHORT).show();
+
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback, _param);
+    }
+
+    ((AppCompatActivity) context).finish();
+  }
+
 
   public static boolean isCustom(String u) {
     boolean ret = false;
@@ -554,108 +684,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     return ret;
   }
 
-  // If a font JSONObject contains multiple font font files, only keep the .ttf source
-  private static void findTTF(JSONObject jsonFont) {
-    boolean updateJsonFont = false;
-    try {
-      JSONArray fontSource = jsonFont.optJSONArray(KMManager.KMKey_FontSource);
-      if ((fontSource != null) && hasTTFFont(fontSource)) {
-        for (int i = fontSource.length() - 1; i >= 0; i--) {
-          String s = fontSource.getString(i);
-          if (!FileUtils.isTTFFont(s)) {
-            updateJsonFont = true;
-            // remove() was added in API 19
-            // https://developer.android.com/reference/org/json/JSONArray#remove(int)
-            if (Build.VERSION.SDK_INT > 19) {
-              fontSource.remove(i);
-            } else {
-              fontSource = removeJsonObjectAtIndex(fontSource, i);
-            }
-          }
-        }
 
-        if (updateJsonFont) {
-          JSONArray copy = fontSource;
-          jsonFont.remove(KMManager.KMKey_FontSource);
-          jsonFont.put(KMManager.KMKey_FontSource, copy);
-        }
-      }
-    } catch (JSONException e) {
-      Log.e(TAG, "findTTF exception" + e);
-    }
-  }
-
-  // Parse the fontSource JSONArray to see if it contains a .ttf font
-  private static boolean hasTTFFont(JSONArray fontSource) {
-    try {
-      for (int i = 0; i < fontSource.length(); i++) {
-        String s = fontSource.getString(i);
-        if (FileUtils.isTTFFont(s)) {
-          return true;
-        }
-      }
-      return false;
-    } catch (JSONException e) {
-      Log.e(TAG, "hasTTFFont exception" + e);
-      return false;
-    }
-  }
-
-  // From https://stackoverflow.com/questions/27427999/remove-jsonobeject-before-android-api-lvl-19
-  private static JSONArray removeJsonObjectAtIndex(JSONArray source, int index) throws JSONException {
-    if (index < 0 || index > source.length() - 1) {
-      throw new IndexOutOfBoundsException();
-    }
-
-    final JSONArray copy = new JSONArray();
-    for (int i=0, count = source.length(); i<count; i++) {
-      if (i != index) {
-        copy.put(source.get(i));
-      }
-    }
-    return copy;
-  }
-
-  private static ArrayList<String> fontUrls(JSONObject jsonFont, String baseUri, boolean isOskFont) {
-    if (jsonFont == null)
-      return null;
-
-    ArrayList<String> urls = new ArrayList<String>();
-    JSONArray fontSource = jsonFont.optJSONArray(KMManager.KMKey_FontSource);
-    if (fontSource != null) {
-      int fcCount = fontSource.length();
-      for (int i = 0; i < fcCount; i++) {
-        String fontSourceString;
-        try {
-          fontSourceString = fontSource.getString(i);
-
-          if (FileUtils.hasFontExtension(fontSourceString)) {
-            urls.add(baseUri + fontSourceString);
-          } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
-            String fontFilename = FileUtils.getSVGFilename(fontSourceString);
-            urls.add(baseUri + fontFilename);
-          }
-        } catch (JSONException e) {
-          return null;
-        }
-      }
-    } else {
-      String fontSourceString;
-      try {
-        fontSourceString = jsonFont.getString(KMManager.KMKey_FontSource);
-        if (FileUtils.hasFontExtension(fontSourceString)) {
-          urls.add(baseUri + fontSourceString);
-        } else if (isOskFont && FileUtils.hasSVGViewBox(fontSourceString)) {
-          String fontFilename = FileUtils.getSVGFilename(fontSourceString);
-          urls.add(baseUri + fontFilename);
-        }
-      } catch (JSONException e) {
-        return null;
-      }
-    }
-
-    return urls;
-  }
 
   public static void addKeyboardDownloadEventListener(KeyboardEventHandler.OnKeyboardDownloadEventListener listener) {
     if (kbDownloadEventListeners == null) {

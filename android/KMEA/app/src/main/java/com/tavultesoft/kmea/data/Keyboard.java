@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -24,6 +25,12 @@ public class Keyboard implements Serializable, LanguageResource {
 
   public Keyboard(Map<String, String> kbdData) {
     this.map = kbdData;
+  }
+
+
+
+  public boolean isNewKeyboard() {
+    return map.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD)!=null;
   }
 
   public String getResourceId() {

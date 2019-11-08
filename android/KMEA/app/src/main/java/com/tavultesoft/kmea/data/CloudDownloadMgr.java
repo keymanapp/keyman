@@ -189,6 +189,9 @@ public class CloudDownloadMgr{
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
+
+      aCallback.initializeContext(aContext);
+
       CloudApiTypes.CloudDownloadSet<ModelType,ResultType> _downloadSet =
         new CloudApiTypes.CloudDownloadSet<ModelType,ResultType>(
         aDownloadIdentifier,aTargetModel);
@@ -232,7 +235,6 @@ public class CloudDownloadMgr{
       //.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
     return new CloudApiTypes.SingleCloudDownload(_request,_file)
-      .setJsonType(aParam.type)
-      .setTarget(aParam.target);
+      .setCloudParams(aParam);
   }
 }

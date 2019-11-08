@@ -28,7 +28,9 @@ public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
   private static final String TAG = "CloudRepository";
 
+  //TODO: Should be removed with the old implementation when downloadmanager impl works
   public static final boolean USE_DOWNLOAD_MANAGER = true;
+
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
   private Dataset memCachedDataset;
@@ -117,19 +119,15 @@ public class CloudRepository {
 
   private CloudApiTypes.CloudApiParam prepareKeyboardUpdateQuery(Context aContext)
   {
-    String deviceType = aContext.getString(R.string.device_type);
-    if (deviceType.equals("AndroidTablet")) {
-      deviceType = "androidtablet";
-    } else {
-      deviceType = "androidphone";
-    }
+    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(aContext);
 
     // Retrieves the cloud-based keyboard catalog in Android's preferred format.
     String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
       KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
 
     //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object);
-   return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.Keyboards, keyboardURL, CloudApiTypes.JSONType.Object);
+   return new CloudApiTypes.CloudApiParam(
+     CloudApiTypes.ApiTarget.Keyboards, keyboardURL).setType(CloudApiTypes.JSONType.Object);
   }
 
   private CloudApiTypes.CloudApiParam prepareLexicalModellUpdateQuery(Context aContext)
@@ -139,7 +137,8 @@ public class CloudRepository {
     //        query is ready!
     String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
-    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL, CloudApiTypes.JSONType.Array);
+    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL)
+      .setType(CloudApiTypes.JSONType.Array);
 
 
     // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)
@@ -167,7 +166,7 @@ public class CloudRepository {
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
 
     if(USE_DOWNLOAD_MANAGER)
-      downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
+      downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
   /**
@@ -191,7 +190,7 @@ public class CloudRepository {
 
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
 
-    downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
+    downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
 
@@ -310,7 +309,7 @@ public class CloudRepository {
    * @param onFailure  A callback to be triggered upon failure of a query.
    * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
-  private void downloadCatalogFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
+  private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
