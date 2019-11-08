@@ -123,7 +123,7 @@ public final class KMManager {
   /**
    * Banner state value: "suggestion" - dictionary suggestions are shown.
    */
-  protected static final String BANNER_STATE_SUGGESTION = "suggestion";
+  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
 
   //TODO: should be part of kmkeyboard
   /**
@@ -903,8 +903,6 @@ public final class KMManager {
    */
   public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName) {
 
-    //reset banner and layout params
-    currentBanner = KMManager.KM_BANNER_STATE_BLANK;
 
     boolean result1 = false;
     boolean result2 = false;
@@ -912,13 +910,21 @@ public final class KMManager {
     if (InAppKeyboard != null && InAppKeyboardLoaded)
     {
       result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
-      if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
-
     if (SystemKeyboard != null && SystemKeyboardLoaded)
     {
       result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
+    }
+
+    if(result1 || result2)
+    {
+      //reset banner state if new language has no lexical model
+      if(currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
+        && getAssociatedLexicalModel(languageID)==null)
+        currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+
+      if(result1)
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
       if(result2)
         SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
     }
@@ -1165,7 +1171,7 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (currentBanner.equals(BANNER_STATE_SUGGESTION)) {
+    if (currentBanner.equals(KM_BANNER_STATE_SUGGESTION)) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;
@@ -1601,7 +1607,7 @@ public final class KMManager {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
         currentBanner = (change.equals("loaded")) ?
-          BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
+          KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
@@ -1836,7 +1842,7 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
+        currentBanner = (change.equals("loaded")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
