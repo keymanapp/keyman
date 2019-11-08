@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
@@ -123,9 +125,18 @@ public class CloudRepository {
   {
     String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(aContext);
 
+    // Sanitize appVersion to #.#.# to match the API spec
+    // Regex needs to match the entire string
+    String appVersion = BuildConfig.VERSION_NAME;
+    Pattern pattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+).*");
+    Matcher matcher = pattern.matcher(appVersion);
+    if (matcher.matches() && matcher.groupCount() >= 1) {
+      appVersion = matcher.group(1);
+    }
+
     // Retrieves the cloud-based keyboard catalog in Android's preferred format.
     String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
-      KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
+      KMKeyboardDownloaderActivity.kKeymanApiBaseURL, appVersion, deviceType);
 
     //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object);
    return new CloudApiTypes.CloudApiParam(
