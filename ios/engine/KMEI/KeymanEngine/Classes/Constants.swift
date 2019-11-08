@@ -115,3 +115,32 @@ public enum FileExtensions {
   public static let openTypeFont = "otf"
   public static let configurationProfile = "mobileconfig"
 }
+
+// Used to facilitate constant colors with legacy (pre iOS-11.0) devices,
+// as they can't use "Color Assets".
+public enum Colors {
+
+  public static var systemBackground: UIColor {
+    get {
+      if #available(iOS 13.0, *) {
+        return UIColor.systemBackground
+      } else {
+        return UIColor.white
+      }
+    }
+  }
+
+  // The primary color used for selected UI elements in the settings menu.
+  public static var selectionPrimary: UIColor {
+    get {
+      if #available(iOSApplicationExtension 11.0, *) {
+        return UIColor(named: "SelectionPrimary")!
+      } else {
+        return UIColor(red: 204.0 / 255.0,
+                       green: 136.0 / 255.0,
+                       blue: 34.0 / 255.0,
+                       alpha: 1.0)
+      }
+    }
+  }
+}

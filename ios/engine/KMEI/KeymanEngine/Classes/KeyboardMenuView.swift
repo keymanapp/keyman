@@ -9,6 +9,7 @@
 import  Foundation
 import  UIKit
 
+// Used by the system keyboard as its globe key menu.
 class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
   private let bgColor = UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
   private let bgColor2 = UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)

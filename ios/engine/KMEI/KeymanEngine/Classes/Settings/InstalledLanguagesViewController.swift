@@ -204,8 +204,13 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       cell = reusedCell
     } else {
       let selectionColor = UIView()
-      selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0,
-                                               blue: 34.0 / 255.0, alpha: 1.0)
+
+      if #available(iOSApplicationExtension 11.0, *) {
+        selectionColor.backgroundColor = UIColor(named: "SelectionPrimary")
+      } else {
+        selectionColor.backgroundColor = Colors.selectionPrimary
+      }
+
       if keyboards.count < 2 {
         cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
       } else {

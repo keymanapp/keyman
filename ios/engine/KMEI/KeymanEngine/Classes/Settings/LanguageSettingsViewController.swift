@@ -170,7 +170,7 @@ class LanguageSettingsViewController: UITableViewController {
       }
     }
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     cell.textLabel?.font = cell.textLabel?.font?.withSize(16.0)
     return cell

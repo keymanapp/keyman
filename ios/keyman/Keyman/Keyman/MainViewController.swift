@@ -649,11 +649,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let eframe = CGRect(x: sframe.origin.x, y: sframe.origin.y - h - 8, width: w, height: h)
     let containerView = UIView(frame: sframe)
     containerView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleRightMargin]
-    if #available(iOS 13.0, *) {
-      containerView.backgroundColor = UIColor.systemBackground
-    } else {
-      containerView.backgroundColor = UIColor.white
-    }
+    containerView.backgroundColor = Colors.systemBackground
     containerView.tag = 1
     containerView.layer.cornerRadius = 4.0
 
