@@ -27,8 +27,7 @@ open class SettingsViewController: UITableViewController {
                                      action: #selector(self.doneClicked))
     navigationItem.leftBarButtonItem = doneButton
 
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
-                                                          blue: 0.25, alpha: 0.9)
+    navigationController?.toolbar?.barTintColor = Colors.statusToolbar
   }
   
   @objc func doneClicked(_ sender: Any) {

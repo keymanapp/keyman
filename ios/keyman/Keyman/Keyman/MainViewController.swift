@@ -341,6 +341,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: icon.size.width, height: navBarHeight))
     containerView.backgroundColor = UIColor.clear
     containerView.addSubview(customButton)
+
     return UIBarButtonItem(customView: containerView)
   }
 
@@ -756,7 +757,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     overlayWindow.isHidden = false
     let activityView = UIActivityIndicatorView(style: .whiteLarge)
     let containerView = UIView(frame: activityView.bounds.insetBy(dx: -10.0, dy: -10.0))
-    containerView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
+    containerView.backgroundColor = Colors.spinnerBackground
     containerView.layer.cornerRadius = 6.0
     containerView.center = overlayWindow.center
     containerView.tag = activityIndicatorViewTag

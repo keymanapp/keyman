@@ -18,9 +18,9 @@ class SubKeysView: UIView {
   private var rows: Int = 0
 
   private let scale = UIScreen.main.scale
-  private let bgColor = UIColor.white
-  private let bgColor2 = UIColor.white
-  private let borderColor = UIColor(red: 145.0 / 255.0, green: 148.0 / 255.0, blue: 152.0 / 255.0, alpha: 1.0)
+  private let bgColor = Colors.systemBackground
+  private let bgColor2 = Colors.systemBackground
+  private let borderColor = Colors.popupBorder
 
   let containerView: UIView
 

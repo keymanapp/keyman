@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import KeymanEngine
 
 class DropDownListView: UIView {
   init(listItems items: [UIBarButtonItem], itemSize size: CGSize, position pos: CGPoint) {
@@ -30,8 +31,8 @@ class DropDownListView: UIView {
 
     for (index, item) in items.enumerated() {
       let button = UIButton(type: .custom)
-      button.setTitleColor(UIColor.lightGray, for: .normal)
-      button.setTitleColor(UIColor.darkGray, for: .highlighted)
+      button.setTitleColor(Colors.labelNormal, for: .normal)
+      button.setTitleColor(Colors.labelHighlighted, for: .highlighted)
       button.frame = CGRect(x: x, y: y, width: w, height: h)
       button.setTitle(item.title, for: .normal)
       addSubview(button)
@@ -56,7 +57,7 @@ class DropDownListView: UIView {
 
       if index < count - 1 {
         let seperator = UIView(frame: CGRect(x: x + 1, y: y + h, width: w - 2, height: 1))
-        seperator.backgroundColor = UIColor.lightGray
+        seperator.backgroundColor = Colors.listSeparator
         addSubview(seperator)
       }
       y += h + 1

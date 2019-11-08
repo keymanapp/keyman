@@ -15,7 +15,7 @@ class KeyPreviewView: UIView {
   private let adjX: CGFloat
   private let adjY: CGFloat
 
-  private let borderColor = UIColor(red: 145.0 / 255.0, green: 148.0 / 255.0, blue: 152.0 / 255.0, alpha: 1.0)
+  private let borderColor = Colors.popupBorder
   private var bgColor = UIColor.white
   private let bgColor2 = UIColor.white
   private let label: UILabel
