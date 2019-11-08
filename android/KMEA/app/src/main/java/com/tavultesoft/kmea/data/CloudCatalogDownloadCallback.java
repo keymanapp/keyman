@@ -131,6 +131,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
         String msg = context.getString(R.string.catalog_unavailable);
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
       }
+      CloudRepository.shared.updateFinished();
       this.failure.run(); // Signal failure to download to our failure callback.
       return;
     }
@@ -237,6 +238,9 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     ensureInitCloudReturn(aContext,aDataSet,aCloudResult);
 
     processCloudReturns(aDataSet, aCloudResult,true);
+
+    CloudRepository.shared.updateFinished();
+    aDataSet.notifyDataSetChanged();
   }
 
   @Override

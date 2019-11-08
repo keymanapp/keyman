@@ -38,6 +38,9 @@ public class CloudRepository {
   // DEBUG:  Never allow these to be `true` in production.
   private static final boolean DEBUG_DISABLE_CACHE = false;
 
+  private boolean updateIsRunning = false;
+
+
 
   private CloudRepository() {
     // Tracks the time of the most recent cache.  We start at null to indicate that we haven't
@@ -361,6 +364,7 @@ public class CloudRepository {
           String msg = context.getString(R.string.catalog_download_is_running_in_background);
           Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
         } else {
+          updateIsRunning = true;
           String msg = context.getString(R.string.catalog_download_start_in_background);
           Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
           CloudDownloadMgr.getInstance().executeAsDownload(
@@ -390,11 +394,12 @@ public class CloudRepository {
   }
 
 
+  public void updateFinished()
+  {
+    updateIsRunning=false;
+  }
 
-
-
-
-
-
-
+  public boolean isUpdateRunning() {
+    return updateIsRunning;
+  }
 }
