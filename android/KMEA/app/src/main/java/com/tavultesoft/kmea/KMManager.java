@@ -341,20 +341,20 @@ public final class KMManager {
    * Determine if a character sequence needs to be re-inserted. If newContext is a
    * subSequence of expectedChars, returns the character sequence that needs to be restored.
    * @param expectedChars - expected character sequence
-   * @param newContext - current character sequence
+   * @param currentContext - current character sequence
    * @return CharSequence. If length is 0, no characters need to be restored
    */
-  public static CharSequence restoreChars(CharSequence expectedChars, CharSequence newContext) {
+  public static CharSequence restoreChars(CharSequence expectedChars, CharSequence currentContext) {
     CharSequence charsToRestore = "";
 
     try {
       // Now see if we need to re-insert characters
-      if (expectedChars.length() != newContext.length()) {
-        String newCharsString = expectedChars.toString();
-        String newContextString = newContext.toString();
-        int index = newCharsString.indexOf(newContextString);
+      if (expectedChars.length() != currentContext.length()) {
+        String expectedCharsString = expectedChars.toString();
+        String currentContextString = currentContext.toString();
+        int index = expectedCharsString.indexOf(currentContextString);
         if (index > -1) {
-          charsToRestore = expectedChars.subSequence(index + newContextString.length(), expectedChars.length());
+          charsToRestore = expectedChars.subSequence(index + currentContextString.length(), expectedChars.length());
         }
       }
 
