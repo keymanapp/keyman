@@ -32,15 +32,20 @@ if [ "$1" != "" ]; then
     fi
 fi
 
-JENKINS=${JENKINS:="no"}
-oldvers=`cat VERSION`
+if [ -n $SKIPVERSION ]; then
+    oldvers=$(cat OLDVERSION)
+    newvers=$(cat VERSION)
+else
+    JENKINS=${JENKINS:="no"}
+    oldvers=`cat VERSION`
 
-. $(dirname "$0")/version.sh
+    . $(dirname "$0")/version.sh
 
-version
+    version
 
-echo "version: ${newvers}"
-echo "${newvers}" > VERSION
+    echo "version: ${newvers}"
+    echo "${newvers}" > VERSION
+fi
 
 # autoreconf the projects
 for proj in ${autotool_projects}; do
