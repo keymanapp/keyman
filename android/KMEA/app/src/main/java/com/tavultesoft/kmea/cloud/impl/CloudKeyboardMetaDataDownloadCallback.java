@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +8,10 @@ import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -27,7 +31,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
   /**
    * the metadata result and all necessary downloads which should be started.
    */
-  public static class MetaDataResult
+  static class MetaDataResult
   {
     CloudApiTypes.CloudApiReturns returnjson;
     CloudApiTypes.CloudApiParam params;
@@ -37,8 +41,6 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
   }
 
   private static final String TAG = "CloudKeyboardMetaDldCb";
-
-  private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
 
   /**
    * Additional Cloud API parameter: Is custom keyboard.
@@ -53,14 +55,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
    */
   public static final String PARAM_KB_ID = "kb_id";
 
-  /**
-   * Listeners to notify about starting the data download.
-   * @param aDownloadEventListeners
-   */
-  public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners) {
-    downloadEventListeners.clear();
-    downloadEventListeners.addAll(aDownloadEventListeners);
-  }
+
 
   @Override
   public void initializeContext(Context context) {
@@ -118,7 +113,6 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
         if(_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard)
         {
           CloudKeyboardDataDownloadCallback _callback = new CloudKeyboardDataDownloadCallback();
-          _callback.setDownloadEventListeners(downloadEventListeners);
           _callback.setKeyboardInfo(_r.keyboardInfo);
 
           if(  CloudDownloadMgr.getInstance().alreadyDownloadingData(_r.additionalDownloadid))
@@ -126,7 +120,8 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
             continue;
           }
 
-          KeyboardEventHandler.notifyListeners(downloadEventListeners,
+          KeyboardEventHandler.notifyListeners(
+            KMKeyboardDownloaderActivity.getKbDownloadEventListeners(),
             KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_STARTED, _r.keyboardInfo, 0);
 
           CloudDownloadMgr.getInstance().executeAsDownload(aContext, _r.additionalDownloadid, null, _callback,
@@ -142,7 +137,6 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
             continue;
           }
           CloudLexicalPackageDownloadCallback _callback = new CloudLexicalPackageDownloadCallback();
-          _callback.setDownloadEventListeners(downloadEventListeners);
 
           Toast.makeText(aContext,
             aContext.getString(R.string.dictionary_download_start_in_background),
@@ -266,11 +260,12 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       }
       if (oskFontUrls != null) {
         for (String url : oskFontUrls) {
-          if (!urls.contains(url))
+          if (fontUrls==null || ! fontUrls.contains(url)) {
             urls.add(new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, url)
               .setAdditionalProperty(
                 CloudKeyboardDataDownloadCallback.PARAM_PACKAGE, _pkgID));
-          ;
+          }
+
         }
       }
 

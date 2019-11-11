@@ -1,13 +1,20 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LanguageResource;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -20,7 +27,7 @@ import java.util.List;
  * Callback for cloud catalogue download.
  * Is used for download with progress and download with Clientdownloadmanager.
  */
-public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns>{
+public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns> {
 
   private static final String TAG = "CloudCatalogDownloadCb";
   private static final boolean DEBUG_SIMULATE_UPDATES = false;
@@ -127,10 +134,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   public void processCloudReturns(Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple, boolean executeCallbacks) {
     // Only empty if no queries returned data - we're offline.
     if (jsonTuple.isEmpty()) {
-      if (this.updateHandler == null) {
-        String msg = context.getString(R.string.catalog_unavailable);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-      }
       this.failure.run(); // Signal failure to download to our failure callback.
       return;
     }

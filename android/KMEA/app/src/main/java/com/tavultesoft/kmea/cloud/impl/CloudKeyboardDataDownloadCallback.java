@@ -1,19 +1,19 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import static com.tavultesoft.kmea.KMManager.KMDefault_UndefinedPackageID;
 
 /**
  * Install keyboard data, when download is finished.
@@ -27,7 +27,6 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
 
   private File dataDir;
 
-  private ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> downloadEventListeners = new ArrayList<>();
   private HashMap<String,String> keyboardInfo;
 
   /**
@@ -43,16 +42,6 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
    * Default name is the file name of the url.
    */
   public static final String PARAM_PACKAGE = "package";
-
-  /**
-   * listeners to inform after installation is completed.
-   * @param aDownloadEventListeners the listeners
-   */
-  public void setDownloadEventListeners(ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> aDownloadEventListeners)
-  {
-    downloadEventListeners.clear();
-    downloadEventListeners.addAll(aDownloadEventListeners);
-  }
 
   /**
    * Keyboard meta data.
@@ -121,7 +110,8 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
 
     if(keyboardInfo!=null)
     {
-      KeyboardEventHandler.notifyListeners(downloadEventListeners, KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED,
+      KeyboardEventHandler.notifyListeners(KMKeyboardDownloaderActivity.getKbDownloadEventListeners(),
+        KeyboardEventHandler.EventType.KEYBOARD_DOWNLOAD_FINISHED,
        keyboardInfo, aCloudResult.kbdResult);
     }
   }

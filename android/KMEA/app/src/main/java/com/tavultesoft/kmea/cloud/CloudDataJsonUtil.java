@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
 import android.os.Build;
@@ -8,6 +8,9 @@ import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -52,7 +55,7 @@ public class CloudDataJsonUtil {
     return keyboardInfo;
   }
 
-  static List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
+  public static List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
     List<Keyboard> keyboardsList = new ArrayList<>();
     //keyboardModifiedDates = new HashMap<String, String>();
 
@@ -96,7 +99,7 @@ public class CloudDataJsonUtil {
     return keyboardsList;
   }
 
-  static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
+  public static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
@@ -158,7 +161,7 @@ public class CloudDataJsonUtil {
     return modelList;
   }
 
-   static JSONArray getCachedJSONArray(File file) {
+   public static JSONArray getCachedJSONArray(File file) {
     JSONArray lmData = null;
     try {
       // Read from cache file
@@ -198,7 +201,7 @@ public class CloudDataJsonUtil {
    * be used for each API call, such as for keyboards vs lexical models.
    * @param json - Array of JSON objects containing API return info
    */
-  protected static void saveJSONArrayToCache(File file, JSONArray json) {
+  public static void saveJSONArrayToCache(File file, JSONArray json) {
     ObjectOutput objOutput;
     try {
       // Save to cache file
@@ -216,7 +219,7 @@ public class CloudDataJsonUtil {
    * be used for each API call, such as for keyboards vs lexical models.
    * @param json - JSON object containing API return info
    */
-  protected static void saveJSONObjectToCache(File file, JSONObject json) {
+  public static void saveJSONObjectToCache(File file, JSONObject json) {
     ObjectOutput objOutput;
     try {
       // Save to cache file
@@ -243,7 +246,7 @@ public class CloudDataJsonUtil {
    * @param aDownload the download
    * @return the result
    */
-  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload( CloudApiTypes.SingleCloudDownload aDownload)
+  public static CloudApiTypes.CloudApiReturns retrieveJsonFromDownload(CloudApiTypes.SingleCloudDownload aDownload)
   {
       JSONParser jsonParser = new JSONParser();
       JSONArray dataArray = null;
@@ -258,7 +261,7 @@ public class CloudDataJsonUtil {
             dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
           }
         } catch (Exception e) {
-          Log.d(TAG, e.getMessage());
+          Log.d(TAG, e.getMessage(),e);
         } finally {
           aDownload.getDestinationFile().delete();
         }

@@ -145,8 +145,6 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
 
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-        KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
     }
     finish();
   }

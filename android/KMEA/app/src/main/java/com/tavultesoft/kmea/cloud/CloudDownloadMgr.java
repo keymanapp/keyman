@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -126,6 +126,8 @@ public class CloudDownloadMgr{
     synchronized (downloadSetByDownloadIdentifier) {
 
       CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
+      if(_parentSet==null)
+        throw new IllegalStateException("Download with ID " + anInternalDownloadId + " is not available");
       _parentSet.setDone(anInternalDownloadId);
       if(!_parentSet.hasOpenDownloads())
       {
@@ -188,7 +190,8 @@ public class CloudDownloadMgr{
         return;
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
-
+      if(downloadManager==null)
+        throw new IllegalStateException("Downloadmanager is not available");
 
       aCallback.initializeContext(aContext);
 
