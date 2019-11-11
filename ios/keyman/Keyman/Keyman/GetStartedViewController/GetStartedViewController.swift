@@ -68,7 +68,15 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     footer.addSubview(label)
     footer.addSubview(dontShowAgainSwitch)
     footer.addSubview(line)
-    footer.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
+
+    if #available(iOS 13.0, *) {
+      // Allows "dark mode" adjustment
+      footer.backgroundColor = UIColor.systemBackground
+    } else {
+      // Default "light mode" styling.
+      footer.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
+    }
+
     tableView.tableHeaderView = header
     tableView.tableFooterView = footer
   }

@@ -143,6 +143,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.apiKeyboardRepository.fetch()
     Manager.shared.apiLexicalModelRepository.fetch()
 
+    // TODO:  For dark mode implementation, we'll need to change the color here.
     let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
     view?.backgroundColor = bgColor
 
@@ -169,6 +170,20 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup NavigationBar
     if let navbar = navigationController?.navigationBar {
+      if #available(iOS 13.0, *) {
+        // Dark mode settings must be applied through this new property,
+        // its class, and others like it.
+        navbar.standardAppearance.configureWithOpaqueBackground()
+
+        // The various options we offer at the top level need significant
+        // image work to be properly dark-mode ready.
+        //
+        // This simply overrides it to have a "light mode" appearance,
+        // even in dark mode.  It's a small bar, so there should be little issue.
+        navbar.standardAppearance.backgroundColor = UIColor.white
+      } else {
+        // Fallback on earlier versions
+      }
       navbarBackground = KMNavigationBarBackgroundView()
       navbarBackground.addToNavbar(navbar)
       navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
@@ -183,6 +198,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.isScrollEnabled = true
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
+    textView.textColor = UIColor.black // Dark mode will use white otherwise
     view?.addSubview(textView!)
 
     // Setup Info View
