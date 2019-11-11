@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]] ; do
             DO_KEYMANAPP=false
             ;;
         -no-codesign)
-            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM"
+            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
             DO_ARCHIVE=false
             ;;
         -no-archive)
