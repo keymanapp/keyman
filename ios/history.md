@@ -3,6 +3,13 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-14 12.0.54 stable
+* Confine system keyboard popup-key positioning (#2317)
+* Fix initialization of system keyboard width (#2318)
+
+## 2019-10-10 12.0.53 stable
+* No actual code changes affecting iOS (KeymanWeb #2194)
+
 ## 2019-10-08 12.0.52 stable
 * Fixes issue when installing dictionaries (#2193)
 
