@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
+    KMManager.executeResourceUpdate(this);
     setContentView(R.layout.activity_main);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);

@@ -56,6 +56,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -69,6 +70,7 @@ public final class KMManager {
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
+  private static ResourcesUpdateTool updateTool;
 
   // Keyboard types
   public enum KeyboardType {
@@ -254,7 +256,19 @@ public final class KMManager {
     JSONUtils.initialize(new File(getPackagesDir()));
 
     CloudDownloadMgr.getInstance().initialize(appContext);
-    //TODO: Add resource update here
+  }
+
+  public static void executeResourceUpdate(Context aContext)
+  {
+    getUpdateTool().checkForResourceUpdates(aContext,true);
+  }
+
+  static ResourcesUpdateTool getUpdateTool() {
+    if(updateTool==null) {
+      updateTool = new ResourcesUpdateTool();
+      KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(updateTool);
+    }
+    return updateTool;
   }
 
   public static void setInputMethodService(InputMethodService service) {
