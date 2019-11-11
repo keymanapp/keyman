@@ -101,7 +101,7 @@ public class ConfirmDialogFragment extends DialogFragment {
 
               // Confirmation to download keyboard
               if (KMManager.hasConnection(getActivity())) {
-                KMKeyboardDownloaderActivity.downloadKeyboardUsingDownloadManager(
+                KMKeyboardDownloaderActivity.downloadKeyboard(
                   getActivity(), _langId, _kbId,_preparedCloudApiParams);
               } else {
                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();
@@ -116,7 +116,7 @@ public class ConfirmDialogFragment extends DialogFragment {
             case DIALOG_TYPE_DOWNLOAD_MODEL :
               // Confirmation to download lexical model
               if (KMManager.hasConnection(getActivity())) {
-                KMKeyboardDownloaderActivity.downloadLexicalModelUsingDownloadManager(getActivity(),
+                KMKeyboardDownloaderActivity.downloadLexicalModel(getActivity(),
                   _modelId, _preparedCloudApiParams);
               } else {
                 Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_SHORT).show();

@@ -174,7 +174,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param aKbId the keyman keyboard id
    * @param aPreparedCloudApiParams the prepared api params
    */
-  public static void downloadKeyboardUsingDownloadManager(Context context,
+  public static void downloadKeyboard(Context context,
                                                            String aLangId, String aKbId,
                                                            List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams)
   {
@@ -251,7 +251,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param aModelId the lexical model id
    * @param aPreparedCloudApiParams the prepared api params
    */
-  public static void downloadLexicalModelUsingDownloadManager(Context context,
+  public static void downloadLexicalModel(Context context,
                                                                String aModelId,
                                                                List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams) {
 

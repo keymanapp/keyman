@@ -260,10 +260,11 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
       }
       if (oskFontUrls != null) {
         for (String url : oskFontUrls) {
-          if (fontUrls==null || ! fontUrls.contains(url))
+          if (fontUrls==null || ! fontUrls.contains(url)) {
             urls.add(new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.KeyboardData, url)
               .setAdditionalProperty(
                 CloudKeyboardDataDownloadCallback.PARAM_PACKAGE, _pkgID));
+          }
 
         }
       }
