@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 * New Features:
-  * Adding a download manager to execute downloads in background (#2247,#2275)
+  * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308)
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
   * Update target Android SDK version to 29 (#2279)
   * Add linting to Debug builds and resolve lint errors (#2305)
