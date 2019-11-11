@@ -308,6 +308,8 @@ public final class KMManager {
     }
   }
 
+  // These aren't public for KMManager API. Just for unit testing:
+
   /**
    * Count the number of surrogate pairs starting from the end of a character sequence
    * until we reach dn codepoints or searched the entire sequence.
@@ -338,11 +340,12 @@ public final class KMManager {
   }
 
   /**
-   * Determine if a character sequence needs to be re-inserted. If newContext is a
+   * Determine a character sequence that needs to be re-inserted. If currentContext is a
    * subSequence of expectedChars, returns the character sequence that needs to be restored.
    * @param expectedChars - expected character sequence
    * @param currentContext - current character sequence
-   * @return CharSequence. If length is 0, no characters need to be restored
+   * @return CharSequence - Character sequence that will need to be appended to currentContext.
+   *                        Empty string if no characters need to be restored.
    */
   public static CharSequence restoreChars(CharSequence expectedChars, CharSequence currentContext) {
     CharSequence charsToRestore = "";
@@ -354,6 +357,7 @@ public final class KMManager {
         String currentContextString = currentContext.toString();
         int index = expectedCharsString.indexOf(currentContextString);
         if (index > -1) {
+          // subSequence indices are start(inclusive) to end(exclusive)
           charsToRestore = expectedChars.subSequence(index + currentContextString.length(), expectedChars.length());
         }
       }
@@ -364,6 +368,29 @@ public final class KMManager {
       return charsToRestore;
     }
   }
+
+  /**
+   * Adjust cursor position after insert the new text.
+   * @param charsBefore the character sequence of the inputconnection (2*s.length)
+   * @param s the inserted text
+   * @return int - number of characters to adjust the cursor
+   */
+  public static int adjustCursorPosition(CharSequence charsBefore, String s) {
+    int _expected_start_index = charsBefore.length() - s.length();
+    int _move = 0;
+    while (_move < _expected_start_index) {
+
+      CharSequence _check = charsBefore.subSequence(
+        _expected_start_index - _move,charsBefore.length()-_move);
+      if(_check.equals(s)) {
+        break;
+      }
+      _move++;
+    }
+    return _move;
+  }
+
+  // End of public methods for unit testing
 
   /*
   // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
@@ -2145,33 +2172,14 @@ public final class KMManager {
             SystemKeyboardShouldIgnoreSelectionChange = true;
 
             ic.commitText(s, s.length());
-
-            adjustCursorPosition(ic, s);
+            CharSequence charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
+            int move = adjustCursorPosition(charsBefore, s);
+            if (move > 0) {
+              ic.commitText("", -move);
+            }
           }
 
           ic.endBatchEdit();
-        }
-
-        /**
-         * Adjust cursor position after insert the new text.
-         * @param ic the inputconnection
-         * @param s the inserted text
-         */
-        private void adjustCursorPosition(InputConnection ic, String s) {
-          CharSequence _charbefore = ic.getTextBeforeCursor(s.length()*2,0);
-
-          int _expected_start_index = _charbefore.length() - s.length();
-          int _move = 0;
-          while (_move < _expected_start_index) {
-
-            CharSequence _check = _charbefore.subSequence(
-              _expected_start_index - _move,_charbefore.length()-_move);
-            if(_check.equals(s))
-              break;
-            _move++;
-          }
-          if(_move>0)
-            ic.commitText("", -_move);
         }
       });
     }
@@ -2181,6 +2189,5 @@ public final class KMManager {
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     }
   }
-
 
 }
