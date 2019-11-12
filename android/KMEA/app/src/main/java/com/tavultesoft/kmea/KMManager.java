@@ -9,6 +9,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -376,6 +377,10 @@ public final class KMManager {
    * @return int - number of characters to adjust the cursor
    */
   public static int adjustCursorPosition(CharSequence charsBefore, String s) {
+    if (charsBefore == null || s == null) {
+      return 0;
+    }
+
     int _expected_start_index = charsBefore.length() - s.length();
     int _move = 0;
     while (_move < _expected_start_index) {
@@ -402,6 +407,14 @@ public final class KMManager {
   private static void performLeftDeletions(InputConnection ic, int dn) {
     int originalBufferLength = dn*2 + 16; // characters
     CharSequence charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
+
+
+    if (Character.isHighSurrogate(charsBackup.charAt(charsBackup.length()-1))) {
+      // Firefox sometimes splits a surrogate pair so move the cursor back
+      ic.commitText("", -1);
+      charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
+    }
+
     int lastIndex = charsBackup.length()-1;
 
     // Exit if there's no context to delete
@@ -2170,11 +2183,31 @@ public final class KMManager {
 
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
-
             ic.commitText(s, s.length());
+
+            CharSequence check = ic.getTextBeforeCursor(1, 0);
+            if (check != null && Character.isHighSurrogate(check.charAt(0))) {
+              ic.commitText("", -1);
+            }
+            // Compensate for surrogate pairs and combining marks
+            /*
+            int adjustedLength = s.length();
+            for(char c: s.toCharArray()) {
+              if (Character.isLowSurrogate(c)) {
+                adjustedLength--;
+              } else if (Character.getType(c) == Character.NON_SPACING_MARK ||
+                Character.getType(c) == Character.COMBINING_SPACING_MARK) {
+                adjustedLength -= 2;
+              }
+            }
+            ic.commitText(s, adjustedLength);
+            */
+
+            //String userAgent = System.getProperty("http.agent");
             CharSequence charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
             int move = adjustCursorPosition(charsBefore, s);
             if (move > 0) {
+              Log.d(TAG, "charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
               ic.commitText("", -move);
             }
           }
