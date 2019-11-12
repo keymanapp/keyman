@@ -128,7 +128,7 @@ public class CloudRepository {
     // Sanitize appVersion to #.#.# to match the API spec
     // Regex needs to match the entire string
     String appVersion = BuildConfig.VERSION_NAME;
-    Pattern pattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+).*");
+    Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+).*");
     Matcher matcher = pattern.matcher(appVersion);
     if (matcher.matches() && matcher.groupCount() >= 1) {
       appVersion = matcher.group(1);
