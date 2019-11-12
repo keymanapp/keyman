@@ -23,7 +23,7 @@ import org.robolectric.android.controller.ActivityController;
 @RunWith(RobolectricTestRunner.class)
 public class KeyboardPickerTest {
   @Test
-  public void openKeyboardPickerAndSelectLanguage() {
+  public void openKeyboardPickerAndOpenKeyboardInfo() {
 
     KMManager.initialize(
       ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
