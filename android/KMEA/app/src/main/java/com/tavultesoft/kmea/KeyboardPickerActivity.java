@@ -104,6 +104,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     });
 
     listView = (ListView) findViewById(R.id.listView);
+
+    //TODO: put into a logic class
     keyboardsList = getKeyboardsList(context);
     if (keyboardsList == null) {
       keyboardsList = new ArrayList<HashMap<String, String>>();
@@ -147,7 +149,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switchKeyboard(position,dismissOnSelect);
+        switchKeyboard(position,dismissOnSelect && ! KMManager.isTestMode());
         if (dismissOnSelect)
           finish();
       }

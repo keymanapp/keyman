@@ -102,6 +102,7 @@ public final class KMManager {
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
+  private static boolean testmode = false;
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static int sysKbIndexOnLockScreen = -1;
@@ -236,7 +237,7 @@ public final class KMManager {
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
-    if (!didCopyAssets) {
+    if (!didCopyAssets || testmode) {
       copyAssets(appContext);
       migrateOldKeyboardFiles(appContext);
       updateOldKeyboardsList(appContext);
@@ -385,9 +386,11 @@ public final class KMManager {
   public static void onDestroy() {
     if (InAppKeyboard != null) {
       InAppKeyboard.onDestroy();
+      InAppKeyboard = null;
     }
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
+      SystemKeyboard = null;
     }
     CloudDownloadMgr.getInstance().shutdown(appContext);
   }
@@ -938,7 +941,7 @@ public final class KMManager {
     boolean result1 = false;
     boolean result2 = false;
 
-    if (InAppKeyboard != null && InAppKeyboardLoaded)
+    if (InAppKeyboard != null && (InAppKeyboardLoaded || testmode))
       result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
@@ -1187,6 +1190,14 @@ public final class KMManager {
 
   public static boolean isDebugMode() {
     return debugMode;
+  }
+
+  public static void setTestMode(boolean value) {
+    testmode = value;
+  }
+
+  public static boolean isTestMode() {
+    return testmode;
   }
 
   public static void setShouldAllowSetKeyboard(boolean value) {
