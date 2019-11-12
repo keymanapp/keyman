@@ -133,7 +133,7 @@ begin
   end;
   writeln(FLogFile, Format('%12.12d ', [GetTickCount()])+FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now) + ': ' + StringOfChar(' ', FMethodStack.Count*2) + msg);
   flush(FLogFile);
-  OutputDebugString(PChar(msg));
+  OutputDebugString(PChar('KLog:' + msg + #13#10));
 {$ENDIF}
 end;
 

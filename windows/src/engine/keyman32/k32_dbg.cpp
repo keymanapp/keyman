@@ -305,3 +305,11 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   //WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
   return bufout[x];
 }
+
+#ifdef _DEBUG
+void _OutputThreadDebugString(char *s) {
+  char buf[256];
+  sprintf_s(buf, "[%d]: %s\n", GetCurrentThreadId(), s);
+  OutputDebugString(buf);
+}
+#endif

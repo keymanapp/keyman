@@ -3,6 +3,10 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-12 12.0.53 stable
+* Bug Fix: Address instability when exiting Keyman on some systems (#2324)
+* Bug Fix: Keyman was not working with Skype, Windows Search on some systems (#2324)
+
 ## 2019-10-20 12.0.52 stable
 * Upgrades from 11.0 and 12.0 were losing installed keyboards and settings (#2214)
 

@@ -43,4 +43,5 @@ public:
 	Hotkey *GetHotkey(DWORD hotkey);
   static void Reload();   // I4326
   static Hotkeys *Instance();   // I4326
-};
+  static void Unload();
+ };
