@@ -63,6 +63,7 @@
   <!-- Background download messages-->
     <string name="catalog_download_start_in_background" translatable="false">Catalog update started in background.\n</string>
     <string name="catalog_download_is_running_in_background" translatable="false">The catalog is still downloading; please try again in a moment!\n</string>
+    <string name="progress_message_catalog_download_is_running" translatable="false">The catalog is still downloading!\n</string>
     <string name="keyboard_download_start_in_background" translatable="false">Downloading keyboard started in Background</string>
     <string name="keyboard_download_is_running_in_background" translatable="false">The selected keyboard is already downloading; please try again in a moment!</string>
     <string name="keyboard_download_finished" translatable="false">Keyboard download is finished!</string>
