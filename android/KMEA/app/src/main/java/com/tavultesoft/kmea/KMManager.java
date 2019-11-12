@@ -1192,10 +1192,16 @@ public final class KMManager {
     return debugMode;
   }
 
-  public static void setTestMode(boolean value) {
-    testmode = value;
+  /**
+   * set testmode (only used for unit test)
+   */
+  public static void setTestMode() {
+    testmode = true;
   }
 
+  /**
+   * @return check for unit test.
+   */
   public static boolean isTestMode() {
     return testmode;
   }

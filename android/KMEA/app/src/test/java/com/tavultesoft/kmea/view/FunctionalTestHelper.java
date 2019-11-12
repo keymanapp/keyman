@@ -21,15 +21,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Helper methods for functional tests.
+ */
 class FunctionalTestHelper {
 
+  /**
+   * initialize keyman for tests.
+   */
   static void initializeKeyman()
   {
-    KMManager.setTestMode(true);
+    KMManager.setTestMode();
     KMManager.initialize(
       ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
   }
 
+  /**
+   * set initial keyboard English.
+   */
   static void setInitialKeyboard()
   {
     HashMap<String, String> keyboardInfo = KMManager.getKeyboardInfo(
@@ -46,6 +55,12 @@ class FunctionalTestHelper {
     }
   }
 
+  /**
+   * install a keyboard.
+   * @param aKPMFile the file
+   * @throws IOException
+   * @throws JSONException
+   */
   static void installCustomKeyboard(File aKPMFile) throws IOException, JSONException {
     PackageProcessor kmpProcessor =  new PackageProcessor(new File(KMManager.getResourceRoot()));
 

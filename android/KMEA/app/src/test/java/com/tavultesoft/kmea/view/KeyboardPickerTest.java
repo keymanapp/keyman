@@ -40,24 +40,32 @@ public class KeyboardPickerTest {
 
     FunctionalTestHelper.initializeKeyman();
 
-    //initializes the keyboard list
-    activity = Robolectric.buildActivity(KeyboardPickerActivity.class).setup().get();
+    try {
+      //initializes the keyboard picker (and keyboard list in background)
+      activity = Robolectric.buildActivity(KeyboardPickerActivity.class).setup().get();
 
-    FunctionalTestHelper.setInitialKeyboard();
+      //Initial keyboard load (normally done by webview)
+      // should be done directly in  FunctionalTestHelper.initializeKeyman();
+      // but we need to initialize the keyboardpicker first, because auf initialization process
+      FunctionalTestHelper.setInitialKeyboard();
 
-    ListView _view = activity.findViewById(R.id.listView);
-    Assert.assertNotNull(_view);
+      //find the list view
+      ListView _view = activity.findViewById(R.id.listView);
+      Assert.assertNotNull(_view);
 
-    View _itemview = _view.getAdapter().getView(0, null, null);
-    Assert.assertNotNull(_itemview);
-    _itemview.findViewById(R.id.imageButton1).performClick();
+      // click the info button to open keyboard info activity
+      View _itemview = _view.getAdapter().getView(0, null, null);
+      Assert.assertNotNull(_itemview);
+      _itemview.findViewById(R.id.imageButton1).performClick();
 
-    Intent actual = Shadows.shadowOf(activity).getNextStartedActivity();
-    Intent expectedIntent = new Intent(activity, KeyboardInfoActivity.class);
-    Assert.assertEquals(expectedIntent.getComponent(), actual.getComponent());
-
-    KMManager.onDestroy();
-
+      // check if expected intent was sent
+      Intent actual = Shadows.shadowOf(activity).getNextStartedActivity();
+      Intent expectedIntent = new Intent(activity, KeyboardInfoActivity.class);
+      Assert.assertEquals(expectedIntent.getComponent(), actual.getComponent());
+    }
+    finally {
+      KMManager.onDestroy();
+    }
   }
 
   private static final File TEST_RESOURCE_ROOT = new File("test_resources");
@@ -73,32 +81,46 @@ public class KeyboardPickerTest {
 
     FunctionalTestHelper.initializeKeyman();
 
-    //initializes the keyboard list
-    ActivityController<KeyboardPickerActivity> controller = Robolectric.buildActivity(KeyboardPickerActivity.class);
-    activity = controller.setup().get();
+    try
+    {
+      //initializes the keyboard list
+      ActivityController<KeyboardPickerActivity> controller = Robolectric.buildActivity(KeyboardPickerActivity.class);
+      activity = controller.setup().get();
 
-    FunctionalTestHelper.setInitialKeyboard();
+      //Initial keyboard load (normally done by webview)
+      // should be done directly in  FunctionalTestHelper.initializeKeyman();
+      // but we need to initialize the keyboardpicker first, because auf initialization process
+      FunctionalTestHelper.setInitialKeyboard();
 
-    Map<String,String> _old = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
-    Assert.assertNotNull(_old);
+      // get current keyboard
+      Map<String,String> _old = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
+      Assert.assertNotNull(_old);
 
-    FunctionalTestHelper.installCustomKeyboard(TEST_GFF_KMP_FILE);
+      // install new custom keyboard programmatically
+      FunctionalTestHelper.installCustomKeyboard(TEST_GFF_KMP_FILE);
 
-    ListView _view = activity.findViewById(R.id.listView);
-    Assert.assertNotNull(_view);
+      // get keyboard picker list
+      ListView _view = activity.findViewById(R.id.listView);
+      Assert.assertNotNull(_view);
 
-    View _itemview = _view.getAdapter().getView(1, null, null);
-    Assert.assertNotNull(_itemview);
-    _view.performItemClick(_itemview,1,_view.getAdapter().getItemId(1));
+      // click the new installed keyboard, to select it.
+      View _itemview = _view.getAdapter().getView(1, null, null);
+      Assert.assertNotNull(_itemview);
+      _view.performItemClick(_itemview,1,_view.getAdapter().getItemId(1));
 
-    Assert.assertTrue(activity.isFinishing());
+      // check keyboard picker is closing
+      Assert.assertTrue(activity.isFinishing());
 
-    Map<String,String> _current = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
-    Assert.assertNotNull(_current);
+      // check if keyboardswitch is done
+      Map<String,String> _current = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
+      Assert.assertNotNull(_current);
 
-    Assert.assertNotEquals(_old.get(KMManager.KMKey_KeyboardID),_current.get(KMManager.KMKey_KeyboardID));
+      Assert.assertNotEquals(_old.get(KMManager.KMKey_KeyboardID),_current.get(KMManager.KMKey_KeyboardID));
 
-    KMManager.onDestroy();
+    }
+    finally {
+      KMManager.onDestroy();
+    }
   }
 
 
