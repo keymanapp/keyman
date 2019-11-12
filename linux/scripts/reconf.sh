@@ -32,7 +32,7 @@ if [ "$1" != "" ]; then
     fi
 fi
 
-if [ -n $SKIPVERSION ]; then
+if [ -n "$SKIPVERSION" -a -f OLDVERSION ]; then
     oldvers=$(cat OLDVERSION)
     newvers=$(cat VERSION)
 else
