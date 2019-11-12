@@ -352,6 +352,8 @@ public class WebBrowserActivity extends AppCompatActivity {
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
     if (webView != null) {
       if (resultCode == RESULT_OK && data != null) {
         String url = data.getStringExtra("url");

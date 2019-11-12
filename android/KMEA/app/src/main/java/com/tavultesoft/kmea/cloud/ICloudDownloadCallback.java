@@ -1,6 +1,9 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
+
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 
 /**
  * Interface for {@link CloudDownloadMgr} as callback to do use case specific task.
@@ -9,6 +12,11 @@ import android.content.Context;
  */
 public interface ICloudDownloadCallback<ModelType,ResultType> {
 
+  /**
+   * Initialize callback using context.
+   * @param context the context
+   */
+  void initializeContext(Context context);
 
   /**
    * extract download result object from download set

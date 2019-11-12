@@ -12,6 +12,11 @@ import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
 
 import org.json.JSONArray;
@@ -28,7 +33,6 @@ public class CloudRepository {
   static public final CloudRepository shared = new CloudRepository();
   private static final String TAG = "CloudRepository";
 
-  public static final boolean USE_DOWNLOAD_MANAGER = true;
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
   private Dataset memCachedDataset;
@@ -120,19 +124,15 @@ public class CloudRepository {
 
   private CloudApiTypes.CloudApiParam prepareKeyboardUpdateQuery(Context aContext)
   {
-    String deviceType = aContext.getString(R.string.device_type);
-    if (deviceType.equals("AndroidTablet")) {
-      deviceType = "androidtablet";
-    } else {
-      deviceType = "androidphone";
-    }
+    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(aContext);
 
     // Retrieves the cloud-based keyboard catalog in Android's preferred format.
     String keyboardURL = String.format("%s?version=%s&device=%s&languageidtype=bcp47",
       KMKeyboardDownloaderActivity.kKeymanApiBaseURL, BuildConfig.VERSION_NAME, deviceType);
 
     //cloudQueries[cloudQueryEntries++] = new CloudApiParam(ApiTarget.Keyboards, keyboardURL, JSONType.Object);
-   return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.Keyboards, keyboardURL, CloudApiTypes.JSONType.Object);
+   return new CloudApiTypes.CloudApiParam(
+     CloudApiTypes.ApiTarget.Keyboards, keyboardURL).setType(CloudApiTypes.JSONType.Object);
   }
 
   private CloudApiTypes.CloudApiParam prepareLexicalModellUpdateQuery(Context aContext)
@@ -142,7 +142,8 @@ public class CloudRepository {
     //        query is ready!
     String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
 
-    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL, CloudApiTypes.JSONType.Array);
+    return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL)
+      .setType(CloudApiTypes.JSONType.Array);
 
 
     // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)
@@ -169,8 +170,7 @@ public class CloudRepository {
   {
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
 
-    if(USE_DOWNLOAD_MANAGER)
-      downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
+    downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
   /**
@@ -194,7 +194,7 @@ public class CloudRepository {
 
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
 
-    downloadCatalogFromServer(context,updateHandler,onSuccess,onFailure);
+    downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
 
@@ -296,7 +296,7 @@ public class CloudRepository {
 
     preCacheDataSet(context,null,null,null);
 
-    if(USE_DOWNLOAD_MANAGER && CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
+    if(CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
       String msg = context.getString(R.string.catalog_download_is_running_in_background);
       Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
@@ -311,9 +311,8 @@ public class CloudRepository {
    * @param updateHandler  An object that can handle update notification if desired.
    * @param onSuccess  A callback to be triggered on completion of all queries and operations.
    * @param onFailure  A callback to be triggered upon failure of a query.
-   * @return  A Dataset object implementing the Adapter interface to be asynchronously filled.
    */
-  private void downloadCatalogFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
+  private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
     boolean loadKeyboardsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getKeyboardCacheFile(context));
     boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
@@ -359,24 +358,16 @@ public class CloudRepository {
       // We need the array to be exactly the same size as our entry count.
       CloudApiTypes.CloudApiParam[] params = new CloudApiTypes.CloudApiParam[cloudQueryEntries];
       cloudQueries.toArray(params);
-      if (USE_DOWNLOAD_MANAGER) {
-        if (CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
-          String msg = context.getString(R.string.catalog_download_is_running_in_background);
-          Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        } else {
-          updateIsRunning = true;
-          String msg = context.getString(R.string.catalog_download_start_in_background);
-          Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-          CloudDownloadMgr.getInstance().executeAsDownload(
-            context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
-        }
 
-
+      if (CloudDownloadMgr.getInstance().alreadyDownloadingData(DOWNLOAD_IDENTIFIER_CATALOGUE)) {
+        String msg = context.getString(R.string.catalog_download_is_running_in_background);
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
       } else {
-        CloudCatalogDownloadTask downloadTask = new CloudCatalogDownloadTask(context, memCachedDataset, _download_callback);
-
-        // We can pass in multiple URLs; this format is extensible if we need extra catalogs in the future.
-        downloadTask.execute(params);
+        updateIsRunning = true;
+        String msg = context.getString(R.string.catalog_download_start_in_background);
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        CloudDownloadMgr.getInstance().executeAsDownload(
+          context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
       }
     }
   }

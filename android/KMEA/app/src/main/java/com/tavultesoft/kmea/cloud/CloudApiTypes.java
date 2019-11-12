@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.app.DownloadManager;
 
@@ -8,12 +8,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class CloudApiTypes {
-  protected static class CloudApiReturns {
+  public static class CloudApiReturns {
 
     public final ApiTarget target;
     public final JSONArray jsonArray;
@@ -33,36 +35,77 @@ public class CloudApiTypes {
 
   }
 
-  protected enum ApiTarget {
+  public enum ApiTarget {
+    /**
+     * Catalog download: available keyboards including meta data.
+     */
     Keyboards,
-    LexicalModels
+    /**
+     * Catalog download: available lexical models including meta data.
+     */
+    LexicalModels,
+    /**
+     * Keyboard download: keyboard meta data for the selected keyboard.
+     */
+    Keyboard,
+    /**
+     * Keyboard download: lexical models meta data for the language of the selected keyboard.
+     */
+    KeyboardLexicalModels,
+    /**
+     *  Keyboard download: download keyboard data package and fonts.
+     */
+    KeyboardData,
+    /**
+     *  Lexical download: download lexical model package
+     *  Used for single lexical model download and
+     *  automatic lexical model download during keyboard download
+     */
+    LexicalModelPackage,
   }
 
-  protected enum JSONType {
+  public enum JSONType {
     Array,
     Object
   }
 
-  protected static class CloudApiParam {
+  public static class CloudApiParam implements Serializable {
+
+    static final long serialVersionUID = 1L;
+
     public final ApiTarget target;
     public final String url;
-    public final JSONType type;
+    public JSONType type;
+    private final HashMap<String,Serializable> additionalProperties = new HashMap<>();
 
-    CloudApiParam(ApiTarget target, String url, JSONType type) {
+    public CloudApiParam(ApiTarget target, String url) {
       this.target = target;
       this.url = url;
+    }
+
+    public CloudApiParam setType(JSONType type) {
       this.type = type;
+      return this;
+    }
+    public CloudApiParam setAdditionalProperty(String aProperty, Serializable aValue)
+    {
+      additionalProperties.put(aProperty,aValue);
+      return this;
+    }
+
+    public <T extends  Serializable> T getAdditionalProperty(String aProperty,Class<T> aType)
+    {
+      return aType.cast(additionalProperties.get(aProperty));
     }
   }
 
   public static class SingleCloudDownload
   {
-    private DownloadManager.Request request;
+    private final DownloadManager.Request request;
     private boolean downloadFinished =false;
     private long downloadId;
-    private File destinationFile;
-    private CloudApiTypes.JSONType type;
-    private CloudApiTypes.ApiTarget target;
+    private final File destinationFile;
+    private CloudApiParam cloudParams;
 
     public SingleCloudDownload(DownloadManager.Request aRequest,File aDestinationFile)
     {
@@ -74,13 +117,8 @@ public class CloudApiTypes {
       return this;
     }
 
-    public SingleCloudDownload setJsonType(JSONType type) {
-      this.type = type;
-      return this;
-    }
-
-    public SingleCloudDownload setTarget(ApiTarget target) {
-      this.target = target;
+    public SingleCloudDownload setCloudParams(CloudApiParam params) {
+      this.cloudParams = params;
       return this;
     }
 
@@ -96,12 +134,8 @@ public class CloudApiTypes {
       return destinationFile;
     }
 
-    public JSONType getType() {
-      return type;
-    }
-
-    public ApiTarget getTarget() {
-      return target;
+    public CloudApiParam getCloudParams() {
+      return cloudParams;
     }
   }
 
@@ -111,9 +145,9 @@ public class CloudApiTypes {
    * @param <ResultType> the result type of the download
    */
   public static class CloudDownloadSet<ModelType,ResultType> {
-    private String downloadIdentifier;
-    private ModelType targetModel;
-    private LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
+    private final String downloadIdentifier;
+    private final ModelType targetModel;
+    private final LinkedList<SingleCloudDownload> downloads = new LinkedList<>();
 
     private ICloudDownloadCallback<ModelType,ResultType> callback;
 
@@ -182,7 +216,6 @@ public class CloudApiTypes {
             return;
           }
         }
-        return;
       }
 
 

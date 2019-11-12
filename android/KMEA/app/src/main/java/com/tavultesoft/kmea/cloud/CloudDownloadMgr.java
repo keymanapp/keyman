@@ -1,4 +1,4 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -126,6 +126,8 @@ public class CloudDownloadMgr{
     synchronized (downloadSetByDownloadIdentifier) {
 
       CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
+      if(_parentSet==null)
+        throw new IllegalStateException("Download with ID " + anInternalDownloadId + " is not available");
       _parentSet.setDone(anInternalDownloadId);
       if(!_parentSet.hasOpenDownloads())
       {
@@ -188,6 +190,10 @@ public class CloudDownloadMgr{
         return;
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
+      if(downloadManager==null)
+        throw new IllegalStateException("Downloadmanager is not available");
+
+      aCallback.initializeContext(aContext);
 
       CloudApiTypes.CloudDownloadSet<ModelType,ResultType> _downloadSet =
         new CloudApiTypes.CloudDownloadSet<ModelType,ResultType>(
@@ -232,7 +238,6 @@ public class CloudDownloadMgr{
       //.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
     return new CloudApiTypes.SingleCloudDownload(_request,_file)
-      .setJsonType(aParam.type)
-      .setTarget(aParam.target);
+      .setCloudParams(aParam);
   }
 }

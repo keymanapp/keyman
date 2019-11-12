@@ -1,13 +1,20 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LanguageResource;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -20,7 +27,7 @@ import java.util.List;
  * Callback for cloud catalogue download.
  * Is used for download with progress and download with Clientdownloadmanager.
  */
-public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns>{
+public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns> {
 
   private static final String TAG = "CloudCatalogDownloadCb";
   private static final boolean DEBUG_SIMULATE_UPDATES = false;
@@ -127,12 +134,8 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   public void processCloudReturns(Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple, boolean executeCallbacks) {
     // Only empty if no queries returned data - we're offline.
     if (jsonTuple.isEmpty()) {
-      if (this.updateHandler == null) {
-        String msg = context.getString(R.string.catalog_unavailable);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-      }
-      CloudRepository.shared.updateFinished();
       this.failure.run(); // Signal failure to download to our failure callback.
+      CloudRepository.shared.updateFinished();
       return;
     }
 
@@ -231,6 +234,11 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   }
 
   @Override
+  public void initializeContext(Context context) {
+
+  }
+
+  @Override
   public void applyCloudDownloadToModel(Context aContext, Dataset aDataSet, CloudCatalogDownloadReturns aCloudResult)
   {
     saveDataToCache(aCloudResult);
@@ -249,35 +257,14 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   {
     List<CloudApiTypes.CloudApiReturns> retrievedJSON = new ArrayList<>(aDownload.getSingleDownloads().size());
 
-
     for (CloudApiTypes.SingleCloudDownload _d : aDownload.getSingleDownloads()) {
-      JSONParser jsonParser = new JSONParser();
-      JSONArray dataArray = null;
-      JSONObject dataObject = null;
 
-      if (_d.getDestinationFile() != null && _d.getDestinationFile().length() > 0) {
-        try {
+      CloudApiTypes.CloudApiReturns _json_result = CloudDataJsonUtil.retrieveJsonFromDownload(_d);
 
-          if (_d.getType() == CloudApiTypes.JSONType.Array) {
-            dataArray = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONArray.class);
-          } else {
-            dataObject = jsonParser.getJSONObjectFromFile(_d.getDestinationFile(),JSONObject.class);
-          }
-        } catch (Exception e) {
-          Log.d(TAG, e.getMessage());
-        } finally {
-          _d.getDestinationFile().delete();
-        }
-      } else {
-        // Offline trouble!  That said, we can't get anything, so we simply shouldn't add anything.
-      }
-
-      if (_d.getType() == CloudApiTypes.JSONType.Array) {
-        retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.getTarget(), dataArray));  // Null if offline.
-      } else {
-        retrievedJSON.add(new CloudApiTypes.CloudApiReturns(_d.getTarget(), dataObject)); // Null if offline.
-      }
+      if (_json_result!=null)
+        retrievedJSON.add(_json_result);  // Null if offline.
     }
+
     return new CloudCatalogDownloadReturns(retrievedJSON);
   }
 }

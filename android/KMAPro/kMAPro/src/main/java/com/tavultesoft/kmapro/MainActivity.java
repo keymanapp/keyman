@@ -186,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
+    super.onActivityResult(requestCode, resultCode, returnIntent);
+
     if (resultCode != RESULT_OK) {
       checkGetStarted();
       return;
@@ -852,18 +854,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           kbInfo.put(KMManager.KMKey_Font, kFont);
           kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-          if (i == 0) {
-            if (KMManager.addKeyboard(this, kbInfo)) {
-              KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
-            }
-          } else {
-            KMManager.addKeyboard(this, kbInfo);
-          }
+
+          KMManager.addKeyboard(this, kbInfo);
+
         }
       } else {
-        if (KMManager.addKeyboard(this, keyboardInfo)) {
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-        }
+        KMManager.addKeyboard(this, keyboardInfo);
       }
     } else {
       // Error notifications handled in LanguageListActivity

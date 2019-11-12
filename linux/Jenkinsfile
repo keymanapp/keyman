@@ -4,4 +4,7 @@
 
 @Library('lsdev-pipeline-library') _
 
-keymanPackaging
+keymanPackaging {
+	distributionsToPackage = 'xenial bionic'
+	arches = 'amd64 i386'
+}

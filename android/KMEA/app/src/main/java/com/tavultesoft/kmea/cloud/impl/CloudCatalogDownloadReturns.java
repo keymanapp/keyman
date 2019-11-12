@@ -1,4 +1,6 @@
-package com.tavultesoft.kmea.data;
+package com.tavultesoft.kmea.cloud.impl;
+
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -8,7 +10,7 @@ import java.util.List;
 /**
  * Result type for catalogue download.
  */
-class CloudCatalogDownloadReturns {
+public class CloudCatalogDownloadReturns {
   public JSONObject keyboardJSON;
   public JSONArray lexicalModelJSON;
 

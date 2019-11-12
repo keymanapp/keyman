@@ -27,7 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
@@ -53,6 +53,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
 
   // ********* ONLY USED BY UPDATE CODE ***********
 
+  //TODO: Refactoring to separate update logic from view
   private static boolean updateCheckFailed = false;
   private static boolean updateFailed = false;
   private static Calendar lastUpdateCheck = null;
