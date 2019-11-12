@@ -656,7 +656,6 @@ end;
 
 procedure TframeTextEditor.SetFocus;
 begin
-  inherited;
   cef.SetFocus;
 end;
 
