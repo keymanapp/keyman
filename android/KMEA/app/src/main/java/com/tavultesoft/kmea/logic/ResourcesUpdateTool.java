@@ -28,6 +28,12 @@ import java.util.Map;
 
 public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler{
 
+  /**
+   * Force resource update.
+   * Only for testing, should be false for merging
+   */
+  public static final boolean FORCE_RESOURCE_UPDATE = false;
+
   private Context currentContext;
 
   private boolean updateCheckFailed = false;
@@ -151,7 +157,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     }, 1000);
   }
 
-  private boolean shouldCheckUpdate(Context aContext) {
+  public boolean shouldCheckUpdate(Context aContext) {
     boolean shouldCheckUpdate = false;
     if (lastUpdateCheck == null) {
       SharedPreferences prefs = aContext.getSharedPreferences(aContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
@@ -178,8 +184,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     } else {
       shouldCheckUpdate = true;
     }
-    // TODO:  Extremely temporary code for testing - remove before merging!
-    shouldCheckUpdate = true;
+
+    if(FORCE_RESOURCE_UPDATE)
+      shouldCheckUpdate = true;
 
     return shouldCheckUpdate;
   }
