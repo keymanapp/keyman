@@ -8,6 +8,7 @@
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
   * Update target Android SDK version to 29 (#2279)
   * Add linting to Debug builds and resolve lint errors (#2305)
+  * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
 
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:
