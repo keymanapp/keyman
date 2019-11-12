@@ -35,6 +35,9 @@ public class KeyboardPickerTest {
 
   private com.tavultesoft.kmea.KeyboardPickerActivity activity;
 
+  /**
+   * Test show keyboard info.
+   */
   @Test
   public void openKeyboardPickerAndOpenKeyboardInfo() {
 
@@ -74,6 +77,11 @@ public class KeyboardPickerTest {
   private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + TEST_GFF_KMP_NAME + ".kmp");
 
 
+  /**
+   * Test keyboard switch using keyboard picker.
+   * @throws IOException
+   * @throws JSONException
+   */
   @Test
   public void openKeyboardPickerAndSwitchKeyboardInfo()
   throws IOException, JSONException
