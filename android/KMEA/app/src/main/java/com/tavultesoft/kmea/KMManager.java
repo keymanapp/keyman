@@ -412,6 +412,7 @@ public final class KMManager {
     if (Character.isHighSurrogate(charsBackup.charAt(charsBackup.length()-1))) {
       // Firefox sometimes splits a surrogate pair so move the cursor back
       ic.commitText("", -1);
+      Log.d(TAG, "adjust trimming high surrogate pair from charsBackup: " + charsBackup.toString());
       charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
     }
 
@@ -2207,7 +2208,7 @@ public final class KMManager {
             CharSequence charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
             int move = adjustCursorPosition(charsBefore, s);
             if (move > 0) {
-              Log.d(TAG, "charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
+              Log.d(TAG, "adjusting cursor charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
               ic.commitText("", -move);
             }
           }

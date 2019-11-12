@@ -17,6 +17,7 @@ public class RestoreCharsTest {
 
   private final String COMPOSING_DOT_ABOVE = "\u0307";
   private final String COMPOSING_CIRCUMFLEX_ACCENT = "\u0302";
+  private final String P_COMPOSING_CIRCUMFLEX_ACCENT = "p" + COMPOSING_CIRCUMFLEX_ACCENT;
 
   @Test
   public void test_invalid_input() {
@@ -33,10 +34,18 @@ public class RestoreCharsTest {
     charsToRestore = KMManager.restoreChars(expectedChars, currentContext);
     Assert.assertEquals("", charsToRestore);
 
-    expectedChars = "qwerty";
+    expectedChars = WINK;
     currentContext = "notamatch";
     charsToRestore = KMManager.restoreChars(expectedChars, currentContext);
     Assert.assertEquals("", charsToRestore);
+  }
+
+  @Test
+  public void test_split_surrogate_pair() {
+    CharSequence expectedChars = "o" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + WINK + "p";
+    CharSequence currentContext = P_COMPOSING_CIRCUMFLEX_ACCENT + "\uD800";
+    CharSequence charsToRestore = KMManager.restoreChars(expectedChars, currentContext);
+    Assert.assertEquals("\uDC3C" + "p", charsToRestore);
   }
 
   @Test
@@ -47,14 +56,14 @@ public class RestoreCharsTest {
     CharSequence charsToRestore = KMManager.restoreChars(expectedChars, currentContext);
     Assert.assertEquals(SMILEY + COMPOSING_DOT_ABOVE, charsToRestore);
 
-    expectedChars = "qwertyp" + COMPOSING_CIRCUMFLEX_ACCENT + "p" + COMPOSING_CIRCUMFLEX_ACCENT;
+    expectedChars = "qwerty" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
     currentContext = "qwertyp";
     charsToRestore = KMManager.restoreChars(expectedChars, currentContext);
-    Assert.assertEquals(COMPOSING_CIRCUMFLEX_ACCENT + "p" + COMPOSING_CIRCUMFLEX_ACCENT, charsToRestore);
+    Assert.assertEquals(COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT, charsToRestore);
 
-    expectedChars = "qwertyp" + COMPOSING_CIRCUMFLEX_ACCENT + "p" + COMPOSING_CIRCUMFLEX_ACCENT;
+    expectedChars = "qwerty" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
     currentContext = "qwerty";
     charsToRestore = KMManager.restoreChars(expectedChars, currentContext);
-    Assert.assertEquals("p" + COMPOSING_CIRCUMFLEX_ACCENT + "p" + COMPOSING_CIRCUMFLEX_ACCENT, charsToRestore);
+    Assert.assertEquals(P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT, charsToRestore);
   }
 }
