@@ -1,7 +1,5 @@
 ﻿program keyman;
 
-
-
 uses
   Forms,
   Dialogs,
@@ -147,6 +145,11 @@ uses
 {$R ICONS.RES}
 {$R VERSION.RES}
 {$R MANIFEST.RES}
+
+//
+// PEOPTFLAGS $140 turns on Data Execution Prevention
+//
+{$SETPEOPTFLAGS $140}
 
 begin
   //InitTntEnvironment;

@@ -347,6 +347,13 @@ BOOL ShouldDebug_1(); // TSDMState state);
 
 #endif
 
+#ifdef _DEBUG
+#define OutputThreadDebugString(s) _OutputThreadDebugString(s)
+void _OutputThreadDebugString(char *s);
+#else
+#define OutputThreadDebugString(s) 
+#endif
+
 /* Keyboard selection functions */ 
 
 void HandleRefresh(int code, LONG tag);
