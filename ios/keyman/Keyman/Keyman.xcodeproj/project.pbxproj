@@ -14,11 +14,8 @@
 		162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */; };
 		165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3992097165B00040A69 /* UIColor+Extensions.swift */; };
 		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
-		1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8F1FD8221800D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
-		1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
-		1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
@@ -117,7 +114,6 @@
 		985EA9E819E64A580006C017 /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
 		985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		9A0FCA0022D7C22000D33F86 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
@@ -138,6 +134,7 @@
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
+		CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -158,11 +155,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9A0FCA0022D7C22000D33F86 /* Reachability.framework in Embed Frameworks */,
-				1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */,
-				1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */,
 				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
-				1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -304,6 +297,7 @@
 		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -478,6 +472,7 @@
 		98ABADA7176935E400B62590 = {
 			isa = PBXGroup;
 			children = (
+				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
 				9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */,
 				CE2B1E4B21B6112B007D092E /* DeviceKit.framework */,
 				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
@@ -664,13 +659,13 @@
 			buildConfigurationList = 981AFADE19EF44DE006706BF /* Build configuration list for PBXNativeTarget "Keyman" */;
 			buildPhases = (
 				981AFA7A19EF44DE006706BF /* Sources */,
+				1687ACCB1FD826D000926D69 /* Run Script */,
 				981AFA8319EF44DE006706BF /* Frameworks */,
 				981AFA8E19EF44DE006706BF /* Resources */,
+				989E4DB91B1EB5C200A345FB /* Run Script */,
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
-				989E4DB91B1EB5C200A345FB /* ShellScript */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
 				C01AB5981F8343F7009B37D3 /* Embed Frameworks */,
-				1687ACCB1FD826D000926D69 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -685,7 +680,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 98CD126819CA85710089385F /* Build configuration list for PBXNativeTarget "SWKeyboard" */;
 			buildPhases = (
-				CE06AA671F161422006D91C3 /* ShellScript */,
+				CE06AA671F161422006D91C3 /* Run Script */,
 				98CD125819CA85710089385F /* Sources */,
 				98CD125919CA85710089385F /* Frameworks */,
 				98CD125A19CA85710089385F /* Resources */,
@@ -806,6 +801,7 @@
 				982D148B19FF462A007D4629 /* 702-share-selected@3x.png in Resources */,
 				9845A7B21A43983300544E2E /* kmwb-navbar-Portrait.png in Resources */,
 				981AFABB19EF44DE006706BF /* 887-notepad-selected.png in Resources */,
+				CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */,
 				981AFABC19EF44DE006706BF /* 887-notepad@2x.png in Resources */,
 				981AFABE19EF44DE006706BF /* textsize_up.png in Resources */,
 				982D148F19FF462A007D4629 /* 711-trash-selected@3x.png in Resources */,
@@ -863,7 +859,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1687ACCB1FD826D000926D69 /* ShellScript */ = {
+		1687ACCB1FD826D000926D69 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -875,6 +871,7 @@
 				"$(SRCROOT)/../../Carthage/Build/iOS/DeviceKit.framework",
 				"$(SRCROOT)/../../Carthage/Build/iOS/Reachability.framework",
 			);
+			name = "Run Script";
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Zip.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
@@ -887,13 +884,14 @@
 			shellScript = "echo \"-- Copying Frameworks --\"\n/usr/local/bin/carthage copy-frameworks\n\n\n";
 			showEnvVarsInLog = 0;
 		};
-		989E4DB91B1EB5C200A345FB /* ShellScript */ = {
+		989E4DB91B1EB5C200A345FB /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -901,13 +899,14 @@
 			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		CE06AA671F161422006D91C3 /* ShellScript */ = {
+		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -985,7 +984,6 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_STYLE = Manual;
@@ -1007,7 +1005,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1018,7 +1016,6 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_STYLE = Manual;
@@ -1039,7 +1036,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Tavultesoft.Keyman";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1193,7 +1190,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1231,7 +1228,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

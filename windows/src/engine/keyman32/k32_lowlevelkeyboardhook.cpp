@@ -53,7 +53,7 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(
   __except(ExceptionMessage("kmnLowLevelKeyboardProc", GetExceptionInformation())) {
 	}
 #endif
-	return res;
+  return res;
 }
 
 BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD ShiftState);

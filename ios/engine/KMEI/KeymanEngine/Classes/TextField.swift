@@ -54,7 +54,7 @@ public class TextField: UITextField, KeymanResponder {
     self.inputView = Manager.shared.inputViewController.view
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.textFieldTextDidChange),
-                                           name: .UITextFieldTextDidChange, object: self)
+                                           name: UITextField.textDidChangeNotification, object: self)
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
                                                                      function: TextField.keyboardChanged)

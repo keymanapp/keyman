@@ -51,12 +51,12 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
 
   @IBAction func addBookmark(_ sender: Any) {
     let alertController = UIAlertController(title: "Add Bookmark", message: "",
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addTextField(configurationHandler: { (textField) in
       //listen for changes
       NotificationCenter.default.addObserver(self,
         selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
-        name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
+        name: UITextField.textDidChangeNotification, object: textField)
       textField.placeholder = "Title"
       textField.text = self.webBrowser?.webView?.stringByEvaluatingJavaScript(from: "document.title")
       textField.autocapitalizationType = .sentences
@@ -69,7 +69,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       //listen for changes
       NotificationCenter.default.addObserver(self,
           selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
-          name: NSNotification.Name.UITextFieldTextDidChange, object: textField)
+          name: UITextField.textDidChangeNotification, object: textField)
       textField.placeholder = "URL"
       textField.text = self.webBrowser?.webView?.request?.mainDocumentURL?.absoluteString
       textField.autocapitalizationType = .none
@@ -79,11 +79,11 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       self.inputUrlField = textField
     })
     alertController.addAction(UIAlertAction(title: "Cancel",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: nil))
 
     let addAlertAction = UIAlertAction(title: "Add",
-                                  style: UIAlertActionStyle.default,
+                                  style: UIAlertAction.Style.default,
                                   handler: {_ in self.addBookmarkHandler()
     })
     alertController.addAction(addAlertAction)
@@ -152,7 +152,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     let bookmark = bookmarks[indexPath.section]
     cell.textLabel?.text = bookmark[bookmarkTitleKey]
     cell.detailTextLabel?.text = bookmark[bookmarkUrlKey]
-    cell.accessoryType = UITableViewCellAccessoryType.none
+    cell.accessoryType = UITableViewCell.AccessoryType.none
   }
 
   func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -160,7 +160,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   }
 
   func tableView(_ tableView: UITableView,
-                 commit editingStyle: UITableViewCellEditingStyle,
+                 commit editingStyle: UITableViewCell.EditingStyle,
                  forRowAt indexPath: IndexPath) {
     if editingStyle == .delete {
       bookmarks.remove(at: indexPath.section)

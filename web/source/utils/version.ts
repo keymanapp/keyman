@@ -9,6 +9,8 @@ namespace com.keyman.utils {
     // as it results in unexpected, bug-like behavior for keyboard designers when it is unwanted.
     public static readonly NO_DEFAULT_KEYCAPS = new Version([12, 0]);
 
+    public static readonly MAC_POSSIBLE_IPAD_ALIAS = new Version([10, 15]);
+
     private readonly components: number[]
 
     /**

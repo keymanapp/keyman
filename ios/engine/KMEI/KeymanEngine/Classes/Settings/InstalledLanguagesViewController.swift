@@ -361,9 +361,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: "",
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: nil))
     
     self.present(alertController, animated: true, completion: nil)
@@ -391,7 +391,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   
   func showActivityView() {
     view.isUserInteractionEnabled = false
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let indicatorView = UIActivityIndicatorView(style: .whiteLarge)
     let activityView = UIView(frame: indicatorView.bounds.insetBy(dx: -10.0, dy: -10.0))
     activityView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
     activityView.layer.cornerRadius = 6.0
@@ -442,9 +442,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     dismissActivityView()
     let alertController = UIAlertController(title: "Connection Error",
                                             message: "Could not reach Keyman server. Please try again later.",
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.default,
+                                            style: UIAlertAction.Style.default,
                                             handler: errorAcknowledgmentHandler))
     
     self.present(alertController, animated: true, completion: nil)
