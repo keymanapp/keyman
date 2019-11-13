@@ -59,6 +59,9 @@ public final class CharSequenceUtil {
         }
       }
 
+      Log.d(TAG, "adjusting expectedChars: " + expectedChars.toString() +
+        ", currentContext: " + currentContext.toString() +
+        ", charsToRestore: " + charsToRestore.toString());
       return charsToRestore;
     } catch (Exception e) {
       Log.e(TAG, "Error in restoreChars: " + e);
@@ -77,6 +80,7 @@ public final class CharSequenceUtil {
       return 0;
     }
 
+    int numPairs = countSurrogatePairs(charsBefore, s.length());
     int _expected_start_index = charsBefore.length() - s.length();
     int _move = 0;
     while (_move < _expected_start_index) {

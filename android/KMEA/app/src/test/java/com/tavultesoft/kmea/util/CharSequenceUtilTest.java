@@ -10,7 +10,9 @@ import com.tavultesoft.kmea.util.CharSequenceUtil;
 @RunWith(RobolectricTestRunner.class)
 public class CharSequenceUtilTest {
   // Smiley emoji U+1F600 = D800 DC3D
-  private final String SMILEY = "\uD800\uDC3D";
+  private final String SMILEY_HIGH_SURROGATE_PAIR = "\uD800";
+  private final String SMILEY_LOW_SURROGATE_PAIR = "\uDC3D";
+  private final String SMILEY = SMILEY_HIGH_SURROGATE_PAIR + SMILEY_LOW_SURROGATE_PAIR;
 
   // Winking emoji U+1F609 = D800 DC3C
   private final String WINK = "\uD800\uDC3C";
@@ -21,7 +23,7 @@ public class CharSequenceUtilTest {
   private final String P_COMPOSING_DOT_ABOVE = "p" + COMPOSING_DOT_ABOVE;
   private final String P_COMPOSING_CIRCUMFLEX_ACCENT = "p" + COMPOSING_CIRCUMFLEX_ACCENT;
 
-  // Section countSurrogaetPairs Tests
+  //region countSurrogatePairs tests
 
   @Test
   public void test_countSurrogatePairs_invalid_input() {
@@ -64,8 +66,12 @@ public class CharSequenceUtilTest {
   public void test_countSurrogatePairs_one_pair() {
 
     // Test for scenarios that expect 1 surrogate pair
-    CharSequence sequence = "Have A " + SMILEY;
+    CharSequence sequence = SMILEY_LOW_SURROGATE_PAIR;
     int numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 1);
+    Assert.assertEquals(1, numPairs);
+
+    sequence = "Have A " + SMILEY;
+    numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 1);
     Assert.assertEquals(1, numPairs);
 
     numPairs = CharSequenceUtil.countSurrogatePairs(sequence, 2);
@@ -94,6 +100,9 @@ public class CharSequenceUtilTest {
     Assert.assertEquals(2, numPairs);
   }
 
+  //endregion
+
+  // region restoreChars tests
 
   @Test
   public void test_restoreChars_invalid_input() {
@@ -118,7 +127,7 @@ public class CharSequenceUtilTest {
   @Test
   public void test_restoreChars_split_surrogate_pair() {
     CharSequence expectedChars = "o" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + WINK + "p";
-    CharSequence currentContext = P_COMPOSING_CIRCUMFLEX_ACCENT + "\uD800";
+    CharSequence currentContext = P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY_HIGH_SURROGATE_PAIR;
     CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, currentContext);
     Assert.assertEquals("\uDC3C" + "p", charsToRestore);
   }
@@ -141,6 +150,10 @@ public class CharSequenceUtilTest {
     Assert.assertEquals("p" + COMPOSING_CIRCUMFLEX_ACCENT + "p" + COMPOSING_CIRCUMFLEX_ACCENT, charsToRestore);
   }
 
+  //endregion
+
+  // region adjustCursorPosition tests
+
   @Test
   public void test_adjustCursorPosition_invalid_input() {
     CharSequence sequence = null;
@@ -155,17 +168,37 @@ public class CharSequenceUtilTest {
   }
 
   @Test
-  public void test_adjustCursorPosition_move_3() {
-    CharSequence charsBefore = "o" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT +
-      SMILEY + P_COMPOSING_DOT_ABOVE;
-    String s = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
+  public void test_adjustCursorPosition_split_surrogate_pair() {
+    CharSequence sequence = SMILEY_LOW_SURROGATE_PAIR + P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY_HIGH_SURROGATE_PAIR;
+    String s = P_COMPOSING_CIRCUMFLEX_ACCENT;
+    int move = CharSequenceUtil.adjustCursorPosition(sequence, s);
+    Assert.assertEquals(1, move);
+  }
 
+  @Test
+  public void test_adjustCursorPosition_move() {
+    CharSequence charsBefore = P_COMPOSING_DOT_ABOVE + SMILEY;
+    String s = P_COMPOSING_DOT_ABOVE;
     int move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
+    Assert.assertEquals(2, move);
+
+    charsBefore = P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY;
+    s = P_COMPOSING_CIRCUMFLEX_ACCENT;
+    move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
+    Assert.assertEquals(2, move);
+
+    charsBefore = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY + P_COMPOSING_DOT_ABOVE;
+    s = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
+    move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
     Assert.assertEquals(4, move);
 
-    charsBefore = "g" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + "lyf";
+    // Firefox behavior
+    charsBefore = "o" + P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT + SMILEY + "p";
+    s = P_COMPOSING_CIRCUMFLEX_ACCENT + P_COMPOSING_CIRCUMFLEX_ACCENT;
     move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
     Assert.assertEquals(3, move);
-
   }
+
+  //endregion
+
 }

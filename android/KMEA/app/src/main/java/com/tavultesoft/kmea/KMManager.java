@@ -321,12 +321,15 @@ public final class KMManager {
     int originalBufferLength = dn*2 + 16; // characters
     CharSequence charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
 
-
     if (Character.isHighSurrogate(charsBackup.charAt(charsBackup.length()-1))) {
       // Firefox sometimes splits a surrogate pair so move the cursor back
+      String origChars = charsBackup.toString();
+
       ic.commitText("", -1);
-      Log.d(TAG, "adjust trimming high surrogate pair from charsBackup: " + charsBackup.toString());
       charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
+      Log.d(TAG, "adjusting high surrogate pair from charsBackup was: " + origChars +
+        ", now: " + charsBackup.toString());
+
     }
 
     int lastIndex = charsBackup.length()-1;
@@ -348,6 +351,7 @@ public final class KMManager {
     if (charsToRestore.length() > 0) {
       // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
       ic.commitText(charsToRestore, charsToRestore.length());
+      Log.d(TAG, "performLeftDeletions commitText(" + charsToRestore.toString() + ")");
     }
   }
 
@@ -2098,31 +2102,33 @@ public final class KMManager {
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
             ic.commitText(s, s.length());
+            Log.d(TAG, "adjusting commitText s:" + s.toString());
 
             CharSequence check = ic.getTextBeforeCursor(1, 0);
-            if (check != null && Character.isHighSurrogate(check.charAt(0))) {
-              ic.commitText("", -1);
-            }
-            // Compensate for surrogate pairs and combining marks
-            /*
-            int adjustedLength = s.length();
-            for(char c: s.toCharArray()) {
-              if (Character.isLowSurrogate(c)) {
-                adjustedLength--;
-              } else if (Character.getType(c) == Character.NON_SPACING_MARK ||
-                Character.getType(c) == Character.COMBINING_SPACING_MARK) {
-                adjustedLength -= 2;
-              }
-            }
-            ic.commitText(s, adjustedLength);
-            */
 
-            //String userAgent = System.getProperty("http.agent");
+            if (check != null && Character.isHighSurrogate(check.charAt(0))) {
+              // Firefox sometimes splits a surrogate pair so move the cursor back
+              String origChars = check.toString();
+
+              ic.commitText("", -1);
+              check = ic.getTextBeforeCursor(1, 0);
+              Log.d(TAG, "adjusting high surrogate pair from check was: " + origChars +
+                ", now: " + check.toString());
+            }
+
             CharSequence charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
             int move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
             if (move > 0) {
               Log.d(TAG, "adjusting cursor charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
               ic.commitText("", -move);
+
+              // Do another check for Firefox?
+              charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
+              move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
+              if (move > 0) {
+                Log.d(TAG, "adjusting cursor 2 charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
+                ic.commitText("", -move);
+              }
             }
           }
 
@@ -2136,5 +2142,4 @@ public final class KMManager {
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
     }
   }
-
 }
