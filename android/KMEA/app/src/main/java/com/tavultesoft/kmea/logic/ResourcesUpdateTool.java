@@ -122,48 +122,8 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     updateCount = updatableResources.size();
 
     if(SEND_UPDATE_NOTIFICATIONS) {
-      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
       for (Bundle resourceBundle : updatableResources) {
-        String langID = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
-        String langName = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_NAME);
-        boolean downloadOnlyLexicalModel = resourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
-          resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
-          !resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
-        String message;
-        int notification_id;
-        if(downloadOnlyLexicalModel) {
-          String modelID = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
-          String modelName = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
-          message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
-          notification_id = this.notificationid.incrementAndGet();
-        }
-        else {
-          String kbID = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
-          String kbName = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
-          message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
-          notification_id = this.notificationid.incrementAndGet();
-        }
-
-        Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
-        intent.putExtras(resourceBundle);
-        intent.putExtra(KMKeyboardDownloaderActivity.ARG_NOTIFICATION_ID,notification_id);
-
-        // Create the TaskStackBuilder and add the intent, which inflates the back stack
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(currentContext);
-        stackBuilder.addNextIntentWithParentStack(intent);
-        // Get the PendingIntent containing the entire back stack
-        PendingIntent startUpdateIntent =
-          stackBuilder.getPendingIntent(notification_id, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Builder builder = new Builder(currentContext, getClass().getName())
-          .setSmallIcon(R.drawable.ic_launcher)
-          .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
-          .setContentText(message)
-          .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-          .setContentIntent(startUpdateIntent);
-
-
-        notificationManager.notify(notification_id,builder.build());
+        sendNotification( resourceBundle);
       }
       checkingUpdates = false;
     }
@@ -213,12 +173,63 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     }
   }
 
+  /**
+   * send update notification.
+   * @param theResourceBundle the bundle
+   */
+  private void sendNotification(Bundle theResourceBundle) {
+    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
+
+    String langName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_NAME);
+    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
+      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
+      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+
+    String message;
+
+    if(downloadOnlyLexicalModel) {
+      String modelName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
+      message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
+    }
+    else {
+      String kbName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
+      message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
+
+    }
+
+    int  notification_id = this.notificationid.incrementAndGet();
+    Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
+    intent.putExtras(theResourceBundle);
+    intent.putExtra(KMKeyboardDownloaderActivity.ARG_NOTIFICATION_ID,notification_id);
+
+    // Create the TaskStackBuilder and add the intent, which inflates the back stack
+    TaskStackBuilder stackBuilder = TaskStackBuilder.create(currentContext);
+    stackBuilder.addNextIntentWithParentStack(intent);
+    // Get the PendingIntent containing the entire back stack
+    PendingIntent startUpdateIntent =
+      stackBuilder.getPendingIntent(notification_id, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    Builder builder = new Builder(currentContext, getClass().getName())
+      .setSmallIcon(R.drawable.ic_launcher)
+      .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
+      .setContentText(message)
+      .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+      .setContentIntent(startUpdateIntent);
+
+    notificationManager.notify(notification_id,builder.build());
+  }
+
   private boolean isContextAvailable() {
     if(currentContext instanceof AppCompatActivity)
       return !((AppCompatActivity) currentContext).isFinishing();
     return true;
   }
 
+  /**
+   * check for updates.
+   * @param aContext the context
+   * @param anIsInitialize check for update on startup.
+   */
   public void checkForResourceUpdates(final Context aContext, final boolean anIsInitialize) {
 
     currentContext = aContext;
