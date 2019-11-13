@@ -31,6 +31,7 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -56,7 +57,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   private Calendar lastUpdateCheck = null;
   private boolean checkingUpdates = false;
 
-  private int updateCount = 0;
+  private HashSet<String> openUpdates = new HashSet<>();
   private int failedUpdateCount = 0;
 
   private AtomicInteger notificationid = new AtomicInteger(1);
@@ -65,7 +66,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
     Runnable onSuccess = new Runnable() {
       public void run() {
-        if(updateCount > 0) {
+        if(! openUpdates.isEmpty()) {
           return;
         }
 
@@ -81,7 +82,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
     Runnable onFailure = new Runnable() {
       public void run() {
-        if(updateCount > 0) {
+        if(! openUpdates.isEmpty()) {
           return;
         }
 
@@ -92,7 +93,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       }
     };
 
-    updateCount = 0;
     checkingUpdates = true;
     if(anInitialize)
       CloudRepository.shared.initializeDataSet(currentContext, this, onSuccess, onFailure);
@@ -119,13 +119,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   public void onUpdateDetection(final List<Bundle> updatableResources) {
     failedUpdateCount = 0;
-    updateCount = updatableResources.size();
 
     if(SEND_UPDATE_NOTIFICATIONS) {
       for (Bundle resourceBundle : updatableResources) {
         sendNotification( resourceBundle);
       }
-      checkingUpdates = false;
     }
     else {
       AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(currentContext);
@@ -139,6 +137,22 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
             // TODO:  May need a reework to better handle large amounts of updates -
             //        these calls will stack within the Android subsystem and may have issues accordingly.
             for (Bundle resourceBundle : updatableResources) {
+
+              String langid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
+
+              boolean downloadOnlyLexicalModel = resourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
+                resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
+                !resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+
+              if(downloadOnlyLexicalModel) {
+                String modelid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
+                openUpdates.add(createLexicalModelId(langid,modelid));
+              }
+              else {
+                String kbid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
+                openUpdates.add(createKeyboardId(langid,kbid));
+              }
+
               Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
               intent.putExtras(resourceBundle);
               currentContext.startActivity(intent);
@@ -180,6 +194,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   private void sendNotification(Bundle theResourceBundle) {
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
 
+    String langid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
     String langName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_NAME);
     boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
       theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
@@ -188,12 +203,16 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     String message;
 
     if(downloadOnlyLexicalModel) {
+      String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
       String modelName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
       message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
+      openUpdates.add(createLexicalModelId(langid,modelid));
     }
     else {
+      String kbid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
       String kbName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
       message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
+      openUpdates.add(createKeyboardId(langid,kbid));
 
     }
 
@@ -296,8 +315,10 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       failedUpdateCount++;
     }
 
-    if (updateCount > 0) {
-      updateCount--;
+    if (! openUpdates.isEmpty()) {
+      String _langid = keyboardInfo.get(KMManager.KMKey_LanguageID);
+      String _kbid = keyboardInfo.get(KMManager.KMKey_KeyboardID);
+      openUpdates.remove(createKeyboardId(_langid,_kbid));
     }
 
     tryFinalizeUpdate();
@@ -310,15 +331,27 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-    if (updateCount > 0) {
-      updateCount -= lexicalModelsInstalled.size();
+    if (! openUpdates.isEmpty()) {
+      for(Map<String,String> _lm:lexicalModelsInstalled) {
+        String _langid = _lm.get(KMManager.KMKey_LanguageID);
+        String _modelid = _lm.get(KMManager.KMKey_LexicalModelID);
+        openUpdates.remove(createLexicalModelId(_langid, _modelid));
+      }
     }
 
     tryFinalizeUpdate();
   }
 
+  private String createKeyboardId(String theLanguageId, String theKbId) {
+    return "kb_" + theLanguageId + "_" + theKbId;
+  }
+
+  private String createLexicalModelId(String theLanguageId, String theModelId) {
+    return "model_" + theLanguageId + "_" + theModelId;
+  }
+
   void tryFinalizeUpdate() {
-    if (updateCount == 0) {
+    if (openUpdates.isEmpty()) {
 
 
       if (failedUpdateCount > 0) {
@@ -327,8 +360,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
         updateFailed = true;
         checkingUpdates = false;
       } else {
-        if(! SEND_UPDATE_NOTIFICATIONS)
-          Toast.makeText(currentContext, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(currentContext, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
