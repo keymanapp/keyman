@@ -1,17 +1,25 @@
 package com.tavultesoft.kmea.logic;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationCompat.Builder;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
@@ -25,6 +33,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler{
 
@@ -32,7 +42,12 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * Force resource update.
    * Only for testing, should be false for merging
    */
-  public static final boolean FORCE_RESOURCE_UPDATE = false;
+  public static final boolean FORCE_RESOURCE_UPDATE = true;
+
+  /**
+   * Send update notifications.
+   */
+  public static final boolean SEND_UPDATE_NOTIFICATIONS = true;
 
   private Context currentContext;
 
@@ -44,6 +59,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   private int updateCount = 0;
   private int failedUpdateCount = 0;
 
+  private AtomicInteger notificationid = new AtomicInteger(1);
 
   private void checkResourceUpdatesInternal(boolean anInitialize) {
 
@@ -85,50 +101,115 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   }
 
+  public static void createNotificationChannel(Context aContext) {
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && SEND_UPDATE_NOTIFICATIONS) {
+      CharSequence name = aContext.getString(R.string.keyboard_updates_channel);
+      String description = aContext.getString(R.string.keyboard_updates_available);
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel(ResourcesUpdateTool.class.getName(), name, importance);
+      channel.setDescription(description);
+      // Register the channel with the system; you can't change the importance
+      // or other notification behaviors after this
+      NotificationManager notificationManager = aContext.getSystemService(NotificationManager.class);
+      notificationManager.createNotificationChannel(channel);
+    }
+  }
+
   public void onUpdateDetection(final List<Bundle> updatableResources) {
     failedUpdateCount = 0;
     updateCount = updatableResources.size();
-    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(currentContext);
-    dialogBuilder.setTitle(currentContext.getString(R.string.keyboard_updates_available));
-    dialogBuilder.setMessage(currentContext.getString(R.string.confirm_update));
-    dialogBuilder.setPositiveButton(currentContext.getString(R.string.label_update), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        // Update keyboards
-        if (KMManager.hasConnection(currentContext)) {
-          // For each updatable keyboard, one at a time, do the update.
-          // TODO:  May need a reework to better handle large amounts of updates -
-          //        these calls will stack within the Android subsystem and may have issues accordingly.
-          for (Bundle resourceBundle: updatableResources) {
-            Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
-            intent.putExtras(resourceBundle);
-            currentContext.startActivity(intent);
-          }
-        } else {
-          Toast.makeText(currentContext, "No internet connection", Toast.LENGTH_SHORT).show();
-          checkingUpdates = false;
+
+    if(SEND_UPDATE_NOTIFICATIONS) {
+      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
+      for (Bundle resourceBundle : updatableResources) {
+        String langID = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
+        String langName = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_NAME);
+        boolean downloadOnlyLexicalModel = resourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
+          resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
+          !resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+        String message;
+        int notification_id;
+        if(downloadOnlyLexicalModel) {
+          String modelID = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
+          String modelName = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
+          message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
+          notification_id = this.notificationid.incrementAndGet();
         }
-      }
-    });
+        else {
+          String kbID = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
+          String kbName = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
+          message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
+          notification_id = this.notificationid.incrementAndGet();
+        }
 
-    dialogBuilder.setNegativeButton(currentContext.getString(R.string.label_later), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        lastUpdateCheck = Calendar.getInstance();
-        checkingUpdates = false;
-      }
-    });
+        Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
+        intent.putExtras(resourceBundle);
+        intent.putExtra(KMKeyboardDownloaderActivity.ARG_NOTIFICATION_ID,notification_id);
 
-    AlertDialog dialog = dialogBuilder.create();
-    if (isContextAvailable()) {
-      dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-        @Override
-        public void onCancel(DialogInterface dialog) {
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(currentContext);
+        stackBuilder.addNextIntentWithParentStack(intent);
+        // Get the PendingIntent containing the entire back stack
+        PendingIntent startUpdateIntent =
+          stackBuilder.getPendingIntent(notification_id, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Builder builder = new Builder(currentContext, getClass().getName())
+          .setSmallIcon(R.drawable.ic_launcher)
+          .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
+          .setContentText(message)
+          .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+          .setContentIntent(startUpdateIntent);
+
+
+        notificationManager.notify(notification_id,builder.build());
+      }
+      checkingUpdates = false;
+    }
+    else {
+      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(currentContext);
+      dialogBuilder.setTitle(currentContext.getString(R.string.keyboard_updates_available));
+      dialogBuilder.setMessage(currentContext.getString(R.string.confirm_update));
+      dialogBuilder.setPositiveButton(currentContext.getString(R.string.label_update), new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
+          // Update keyboards
+          if (KMManager.hasConnection(currentContext)) {
+            // For each updatable keyboard, one at a time, do the update.
+            // TODO:  May need a reework to better handle large amounts of updates -
+            //        these calls will stack within the Android subsystem and may have issues accordingly.
+            for (Bundle resourceBundle : updatableResources) {
+              Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
+              intent.putExtras(resourceBundle);
+              currentContext.startActivity(intent);
+            }
+          } else {
+            Toast.makeText(currentContext, "No internet connection", Toast.LENGTH_SHORT).show();
+            checkingUpdates = false;
+          }
+        }
+      });
+
+      dialogBuilder.setNegativeButton(currentContext.getString(R.string.label_later), new DialogInterface.OnClickListener() {
+        public void onClick(DialogInterface dialog, int which) {
           lastUpdateCheck = Calendar.getInstance();
           checkingUpdates = false;
         }
       });
-      dialog.show();
-    } else {
-      checkingUpdates = false;
+
+      AlertDialog dialog = dialogBuilder.create();
+      if (isContextAvailable()) {
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+          @Override
+          public void onCancel(DialogInterface dialog) {
+            lastUpdateCheck = Calendar.getInstance();
+            checkingUpdates = false;
+          }
+        });
+        dialog.show();
+      } else {
+        checkingUpdates = false;
+      }
     }
   }
 
@@ -235,7 +316,8 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
         updateFailed = true;
         checkingUpdates = false;
       } else {
-        Toast.makeText(currentContext, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
+        if(! SEND_UPDATE_NOTIFICATIONS)
+          Toast.makeText(currentContext, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

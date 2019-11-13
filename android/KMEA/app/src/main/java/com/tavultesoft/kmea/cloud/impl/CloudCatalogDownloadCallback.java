@@ -217,7 +217,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       } // else no match == no special handling.
     }
 
-    if (updateBundles.size() > 0) {
+    if (updateBundles.size() > 0 && !(DEBUG_SIMULATE_UPDATES && !executeCallbacks)) {
       // Time for updates!
       Log.v(TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");
 

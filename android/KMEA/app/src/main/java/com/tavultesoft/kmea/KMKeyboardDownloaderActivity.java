@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
@@ -34,6 +35,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_MODEL_NAME = "KMKeyboardActivity.modelName";
   public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
   public static final String ARG_MODEL_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
+  public static final String ARG_NOTIFICATION_ID = "KMKeyboardActivity.notificiationid";
 
   // custom keyboard
   public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";
@@ -87,6 +89,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     Bundle bundle = getIntent().getExtras();
     if (bundle == null)
       return;
+
+    int _notification_id = bundle.getInt(ARG_NOTIFICATION_ID,0);
+    if(_notification_id!=0)
+    {
+      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+      notificationManager.cancel(_notification_id);
+    }
 
     pkgID = bundle.getString(ARG_PKG_ID);
     if (pkgID == null || pkgID.isEmpty()) {

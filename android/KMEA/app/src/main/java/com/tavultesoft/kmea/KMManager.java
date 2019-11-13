@@ -266,7 +266,10 @@ public final class KMManager {
   static ResourcesUpdateTool getUpdateTool() {
     if(updateTool==null) {
       updateTool = new ResourcesUpdateTool();
+      updateTool.createNotificationChannel(appContext);
+
       KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(updateTool);
+
     }
     return updateTool;
   }
