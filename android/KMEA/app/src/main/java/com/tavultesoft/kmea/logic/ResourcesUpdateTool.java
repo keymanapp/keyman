@@ -43,7 +43,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * Force resource update.
    * Only for testing, should be false for merging
    */
-  public static final boolean FORCE_RESOURCE_UPDATE = true;
+  public static final boolean FORCE_RESOURCE_UPDATE = false;
 
   /**
    * Send update notifications.

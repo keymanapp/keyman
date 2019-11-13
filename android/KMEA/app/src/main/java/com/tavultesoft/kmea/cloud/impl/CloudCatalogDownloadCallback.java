@@ -30,7 +30,7 @@ import java.util.List;
 public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns> {
 
   private static final String TAG = "CloudCatalogDownloadCb";
-  private static final boolean DEBUG_SIMULATE_UPDATES = true;
+  private static final boolean DEBUG_SIMULATE_UPDATES = false;
 
   private final Context context;
 
