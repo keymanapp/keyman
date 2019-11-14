@@ -310,50 +310,6 @@ public final class KMManager {
     }
   }
 
-  /*
-  // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
-  // instead of one code-point.
-  // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
-  // for surrogate pairs + a long grapheme cluster.
-  // This buffer will be used to put back characters as-needed
-  */
-  private static void performLeftDeletions(InputConnection ic, int dn) {
-    int originalBufferLength = dn*2 + 16; // characters
-    CharSequence charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
-
-    if (Character.isHighSurrogate(charsBackup.charAt(charsBackup.length()-1))) {
-      // Firefox sometimes splits a surrogate pair so move the cursor back
-      String origChars = charsBackup.toString();
-
-      ic.commitText("", -1);
-      charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
-      Log.d(TAG, "adjusting high surrogate pair from charsBackup was: " + origChars +
-        ", now: " + charsBackup.toString());
-    }
-
-    int lastIndex = charsBackup.length()-1;
-
-    // Exit if there's no context to delete
-    if (lastIndex < 0) {
-      return;
-    }
-
-    int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
-
-    // Chop dn+numPairs code points from the end of charsBackup
-    // subSequence indices are start(inclusive) to end(exclusive)
-    CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
-    ic.deleteSurroundingText(dn + numPairs, 0);
-    CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
-
-    CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
-    if (charsToRestore.length() > 0) {
-      // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
-      ic.commitText(charsToRestore, charsToRestore.length());
-      Log.d(TAG, "performLeftDeletions commitText(" + charsToRestore.toString() + ")");
-    }
-  }
-
   public static void hideSystemKeyboard() {
     if (SystemKeyboard != null) {
       SystemKeyboard.hideKeyboard();
@@ -2116,15 +2072,7 @@ public final class KMManager {
             // After inserting the string s and adjusting the cursor count clusters,
             // Chrome and Firefox sometimes have the cursor too far, so
             // check if we need to adjust the cursor position
-            CharSequence charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
-            if (charsBefore != null && Character.isHighSurrogate(charsBefore.charAt(charsBefore.length()-1))) {
-              // Firefox sometimes splits a surrogate pair so move the cursor back
-              String origChars = charsBefore.toString();
-              ic.commitText("", -1);
-              charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
-              Log.d(TAG, "adjusting high surrogate pair from check was: " + origChars +
-                ", now: " + charsBefore.toString());
-            }
+            CharSequence charsBefore = getCharacterSequence(ic, s.length()*2);
 
             // Adjust the cursor by "move" codepoints
             int move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
@@ -2142,6 +2090,66 @@ public final class KMManager {
     private void keyDownUp(int keyEventCode) {
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+    }
+
+    /*
+    // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
+    // instead of one code-point.
+    // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
+    // for surrogate pairs + a long grapheme cluster.
+    // This buffer will be used to put back characters as-needed
+    */
+    private static void performLeftDeletions(InputConnection ic, int dn) {
+      int originalBufferLength = dn*2 + 16; // characters
+      CharSequence charsBackup = getCharacterSequence(ic, originalBufferLength);
+
+      int lastIndex = charsBackup.length()-1;
+
+      // Exit if there's no context to delete
+      if (lastIndex < 0) {
+        return;
+      }
+
+      int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
+
+      // Chop dn+numPairs code points from the end of charsBackup
+      // subSequence indices are start(inclusive) to end(exclusive)
+      CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+      ic.deleteSurroundingText(dn + numPairs, 0);
+      CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
+
+      CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
+      if (charsToRestore.length() > 0) {
+        // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
+        ic.commitText(charsToRestore, charsToRestore.length());
+        Log.d(TAG, "performLeftDeletions commitText(" + charsToRestore.toString() + ")");
+      }
+    }
+
+    /**
+     * Get a character sequence from the InputConnection.
+     * Sometimes Firefox will split a surrogate pair, so chop that and update the cursor
+     * @param ic - the InputConnection
+     * @param length - number of characters to get
+     * @return CharSequence
+     */
+    private static CharSequence getCharacterSequence(InputConnection ic, int length) {
+      if (ic == null || length <= 0) {
+        return "";
+      }
+
+      CharSequence sequence = ic.getTextBeforeCursor(length, 0);
+
+      // Move the cursor back if there's a split surrogate pair
+      if (Character.isHighSurrogate(sequence.charAt(sequence.length()-1))) {
+        String origChars = sequence.toString();
+        ic.commitText("", -1);
+        sequence = ic.getTextBeforeCursor(length, 0);
+        Log.d(TAG, "getCharacterSequence adjusting high surrogate pair from " + origChars +
+          ", now " + sequence.toString());
+      }
+
+      return sequence;
     }
   }
 }
