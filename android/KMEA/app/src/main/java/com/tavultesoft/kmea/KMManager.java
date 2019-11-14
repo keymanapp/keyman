@@ -9,7 +9,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.Normalizer;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -329,7 +329,6 @@ public final class KMManager {
       charsBackup = ic.getTextBeforeCursor(originalBufferLength, 0);
       Log.d(TAG, "adjusting high surrogate pair from charsBackup was: " + origChars +
         ", now: " + charsBackup.toString());
-
     }
 
     int lastIndex = charsBackup.length()-1;
@@ -2101,34 +2100,37 @@ public final class KMManager {
 
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
-            ic.commitText(s, s.length());
-            Log.d(TAG, "adjusting commitText s:" + s.toString());
 
-            CharSequence check = ic.getTextBeforeCursor(1, 0);
-
-            if (check != null && Character.isHighSurrogate(check.charAt(0))) {
-              // Firefox sometimes splits a surrogate pair so move the cursor back
-              String origChars = check.toString();
-
-              ic.commitText("", -1);
-              check = ic.getTextBeforeCursor(1, 0);
-              Log.d(TAG, "adjusting high surrogate pair from check was: " + origChars +
-                ", now: " + check.toString());
+            // Using BreakIterator to count grapheme clusters
+            BreakIterator boundary = BreakIterator.getCharacterInstance();
+            boundary.setText(s);
+            int count = 0;
+            while (boundary.next() != BreakIterator.DONE) {
+              count++;
             }
 
+            // Commit the string s and adjust the cursor by the number of grapheme clusters
+            ic.commitText(s, count);
+            Log.d(TAG, "adjusting commitText s:" + s.toString() + ", count: " + count + ", s.length: " + s.length());
+
+            // After inserting the string s and adjusting the cursor count clusters,
+            // Chrome and Firefox sometimes have the cursor too far, so
+            // check if we need to adjust the cursor position
             CharSequence charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
+            if (charsBefore != null && Character.isHighSurrogate(charsBefore.charAt(charsBefore.length()-1))) {
+              // Firefox sometimes splits a surrogate pair so move the cursor back
+              String origChars = charsBefore.toString();
+              ic.commitText("", -1);
+              charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
+              Log.d(TAG, "adjusting high surrogate pair from check was: " + origChars +
+                ", now: " + charsBefore.toString());
+            }
+
+            // Adjust the cursor by "move" codepoints
             int move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
             if (move > 0) {
               Log.d(TAG, "adjusting cursor charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
               ic.commitText("", -move);
-
-              // Do another check for Firefox?
-              charsBefore = ic.getTextBeforeCursor(s.length()*2, 0);
-              move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
-              if (move > 0) {
-                Log.d(TAG, "adjusting cursor 2 charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
-                ic.commitText("", -move);
-              }
             }
           }
 
