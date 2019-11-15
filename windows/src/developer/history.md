@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-15 12.0.54 stable
+* Bug Fix: Text editor and other controls did not receive focus correctly (#2331)
+
 ## 2019-10-07 12.0.50 stable
 * Release 12.0
 
