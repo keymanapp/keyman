@@ -34,7 +34,7 @@ class FunctionalTestHelper {
    */
   static void initializeKeyman()
   {
-    KMManager.setTestMode();
+
     KMManager.initialize(
       ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
     Shadows.shadowOf((Application) ApplicationProvider.getApplicationContext()).grantPermissions(

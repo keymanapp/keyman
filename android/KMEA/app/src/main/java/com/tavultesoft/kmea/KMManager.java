@@ -102,7 +102,7 @@ public final class KMManager {
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
-  private static boolean testmode = false;
+
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static int sysKbIndexOnLockScreen = -1;
@@ -237,7 +237,7 @@ public final class KMManager {
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
-    if (!didCopyAssets || testmode) {
+    if (!didCopyAssets || isTestMode()) {
       copyAssets(appContext);
       migrateOldKeyboardFiles(appContext);
       updateOldKeyboardsList(appContext);
@@ -941,7 +941,7 @@ public final class KMManager {
     boolean result1 = false;
     boolean result2 = false;
 
-    if (InAppKeyboard != null && (InAppKeyboardLoaded || testmode))
+    if (InAppKeyboard != null && (InAppKeyboardLoaded || isTestMode()))
       result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
@@ -1193,17 +1193,10 @@ public final class KMManager {
   }
 
   /**
-   * set testmode (only used for unit test)
-   */
-  public static void setTestMode() {
-    testmode = true;
-  }
-
-  /**
    * @return check for unit test.
    */
   public static boolean isTestMode() {
-    return testmode;
+    return Boolean.parseBoolean(System.getProperty("kmeaTestMode"));
   }
 
   public static void setShouldAllowSetKeyboard(boolean value) {
