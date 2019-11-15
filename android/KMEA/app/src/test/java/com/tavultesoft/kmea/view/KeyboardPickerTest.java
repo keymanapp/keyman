@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
@@ -47,7 +48,7 @@ public class KeyboardPickerTest {
   private static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
   private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + TEST_GFF_KMP_NAME + ".kmp");
 
-  private com.tavultesoft.kmea.KeyboardPickerActivity activity;
+
 
   /**
    * Test show keyboard info.
@@ -61,7 +62,7 @@ public class KeyboardPickerTest {
     try {
        _controller = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
       //initializes the keyboard picker (and keyboard list in background)
-      activity = _controller.get();
+      KeyboardPickerActivity activity = _controller.get();
 
       //Initial keyboard load (normally done by webview)
       // should be done directly in  FunctionalTestHelper.initializeKeyman();
@@ -106,7 +107,7 @@ public class KeyboardPickerTest {
     try {
       _controller = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
       //initializes the keyboard picker (and keyboard list in background)
-      activity = _controller.get();
+      KeyboardPickerActivity activity = _controller.get();
 
       //Initial keyboard load (normally done by webview)
       // should be done directly in  FunctionalTestHelper.initializeKeyman();
@@ -158,9 +159,10 @@ public class KeyboardPickerTest {
     ActivityController<KeyboardPickerActivity> _controller = null;
     ActivityController<KeyboardInfoActivity> _controller2 = null;
     try {
+
       _controller = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
       //initializes the keyboard picker (and keyboard list in background)
-      activity = _controller.get();
+      KeyboardPickerActivity activity = _controller.get();
 
       //Initial keyboard load (normally done by webview)
       // should be done directly in  FunctionalTestHelper.initializeKeyman();
@@ -169,8 +171,6 @@ public class KeyboardPickerTest {
 
       // install new custom keyboard programmatically
       FunctionalTestHelper.installCustomKeyboard(TEST_GFF_KMP_FILE);
-
-
 
       //find the list view
       ListView _view = activity.findViewById(R.id.listView);
