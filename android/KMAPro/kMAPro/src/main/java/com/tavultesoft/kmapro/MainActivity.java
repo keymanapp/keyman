@@ -41,6 +41,8 @@ import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.ListMenuItemView;
+import androidx.appcompat.view.menu.MenuView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
@@ -64,6 +66,8 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.internal.view.SupportMenu;
+
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -73,7 +77,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -377,10 +385,41 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   @Override
+  public boolean onPrepareOptionsMenu(final Menu menu) {
+    final MenuItem overflowMenuItem = menu.findItem(R.id.action_overflow);
+    final ViewGroup rootView = (ViewGroup) overflowMenuItem.getActionView();
+
+    updateUpdateCountIndicator();
+    rootView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        PopupMenu popup = new PopupMenu(context, rootView);
+        getMenuInflater().inflate(R.menu.overflow_menu,popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+          public boolean onMenuItemClick(MenuItem item) {
+            return onOptionsItemSelected(item);
+          }
+        });
+        popup.show();
+      }
+    });
+
+    return super.onPrepareOptionsMenu(menu);
+  }
+
+  private void updateUpdateCountIndicator()
+  {
+    final MenuItem overflowMenuItem = menu.findItem(R.id.action_overflow);
+    final ViewGroup rootView = (ViewGroup) overflowMenuItem.getActionView();
+
+    rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
+  }
+  @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     this.menu = menu;
+
     return true;
   }
 

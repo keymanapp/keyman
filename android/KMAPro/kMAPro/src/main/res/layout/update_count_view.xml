@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.view.menu.ListMenuItemView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+
+  android:layout_height="32dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="32dp"
+  android:layout_gravity="right"
+  >
+   <ImageView
+      android:id="@+id/counterBackground"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@drawable/ic_light_action_overflow" />
+
+  <TextView
+    android:id="@+id/update_count_indicator"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignRight="@+id/counterBackground"
+    android:background="@drawable/shape_update_count"
+    android:text="12"
+    android:textColor="#FFFFFF"
+    android:textSize="8sp" />
+
+
+</RelativeLayout>
+</androidx.appcompat.view.menu.ListMenuItemView>

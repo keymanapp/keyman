@@ -28,6 +28,8 @@ import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.data.CloudRepository;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +61,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   private HashSet<String> openUpdates = new HashSet<>();
   private int failedUpdateCount = 0;
+
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
 
   private AtomicInteger notificationid = new AtomicInteger(1);
 
@@ -370,4 +375,14 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       }
     }
   }
+
+
+  public void addPropertyChangeListener (PropertyChangeListener listener){
+    this.propertyChangeSupport.addPropertyChangeListener(listener);
+  }
+
+  public void removePropertyChangeListener (PropertyChangeListener listener){
+    this.propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
 }
