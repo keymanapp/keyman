@@ -148,7 +148,7 @@ public class KeyboardPickerTest {
   /**
    * Test show keyboard info.
    */
-  //@Test
+  @Test
   public void openKeyboardPickerAndOpenKeyboardHelplink()
     throws IOException, JSONException
   {

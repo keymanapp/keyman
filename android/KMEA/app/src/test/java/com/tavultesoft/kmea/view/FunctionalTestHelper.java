@@ -35,6 +35,8 @@ class FunctionalTestHelper {
   static void initializeKeyman()
   {
 
+    if(!KMManager.isTestMode())
+      throw new IllegalStateException("Set system property kmeaTestmode=true");
     KMManager.initialize(
       ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
     Shadows.shadowOf((Application) ApplicationProvider.getApplicationContext()).grantPermissions(
