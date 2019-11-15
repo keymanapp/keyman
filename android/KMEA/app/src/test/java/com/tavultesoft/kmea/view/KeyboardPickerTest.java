@@ -185,6 +185,11 @@ public class KeyboardPickerTest {
       Intent actual = Shadows.shadowOf(activity).getNextStartedActivity();
       Assert.assertNotNull(actual);
 
+      if(_controller!=null) {
+        _controller.pause().stop().destroy();
+        _controller = null;
+      }
+
       _controller2 = Robolectric.buildActivity(KeyboardInfoActivity.class,actual).setup();
       KeyboardInfoActivity _info = _controller2.get();
       Assert.assertNotNull(_info);
