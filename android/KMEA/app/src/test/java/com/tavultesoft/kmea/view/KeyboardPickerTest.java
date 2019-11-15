@@ -148,7 +148,7 @@ public class KeyboardPickerTest {
   /**
    * Test show keyboard info.
    */
-  @Test
+  //@Test
   public void openKeyboardPickerAndOpenKeyboardHelplink()
     throws IOException, JSONException
   {
@@ -203,8 +203,10 @@ public class KeyboardPickerTest {
     }
     finally {
       KMManager.onDestroy();
-      _controller.pause().stop().destroy();
-      _controller2.pause().stop().destroy();
+      if(_controller!=null)
+        _controller.pause().stop().destroy();
+      if(_controller2!=null)
+        _controller2.pause().stop().destroy();
     }
   }
 
