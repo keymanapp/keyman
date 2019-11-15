@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-15 12.0.54 stable
+* Bug Fix: On Screen Keyboard restored to wrong screen and position when reloading (#2330)
+
 ## 2019-11-12 12.0.53 stable
 * Bug Fix: Address instability when exiting Keyman on some systems (#2324)
 * Bug Fix: Keyman was not working with Skype, Windows Search on some systems (#2324)
