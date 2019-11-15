@@ -1,5 +1,7 @@
 package com.tavultesoft.kmea.view;
 
+import android.Manifest;
+import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
@@ -12,6 +14,7 @@ import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONException;
 import org.junit.Assert;
+import org.robolectric.Shadows;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,6 +37,8 @@ class FunctionalTestHelper {
     KMManager.setTestMode();
     KMManager.initialize(
       ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
+    Shadows.shadowOf((Application) ApplicationProvider.getApplicationContext()).grantPermissions(
+      Manifest.permission.READ_EXTERNAL_STORAGE);
   }
 
   /**
@@ -41,18 +46,12 @@ class FunctionalTestHelper {
    */
   static void setInitialKeyboard()
   {
-    HashMap<String, String> keyboardInfo = KMManager.getKeyboardInfo(
-      ApplicationProvider.getApplicationContext(), 0);
-    if (keyboardInfo != null) {
-      String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
-      String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-      String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
-      String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-      String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-      String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-      String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-      KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
-    }
+    KMManager.setKeyboard(KMManager.KMDefault_UndefinedPackageID,
+      KMManager.KMDefault_KeyboardID,
+      KMManager.KMDefault_LanguageID,
+      KMManager.KMDefault_KeyboardName,
+      KMManager.KMDefault_LanguageName,
+      KMManager.KMDefault_KeyboardFont, null);
   }
 
   /**

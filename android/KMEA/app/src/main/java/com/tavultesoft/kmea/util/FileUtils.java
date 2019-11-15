@@ -219,7 +219,10 @@ public final class FileUtils {
   public static String getFilename(String urlStr) {
     String filename = "unknown";
     if (urlStr != null && !urlStr.isEmpty()) {
-      filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
+      if(urlStr.indexOf(File.separator)>=0)
+        filename = urlStr.substring(urlStr.lastIndexOf(File.separator) + 1);
+      else
+        filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
   }
