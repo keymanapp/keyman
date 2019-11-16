@@ -6,6 +6,10 @@
 **/Win32/Debug/
 **/Win32/Release/
 
+# These are intermediate and output folders for VC++
+**/obj
+**/x64
+
 # KeymanWeb is copied from /web/src during Developer build
 developer/TIKE/xml/kmw/resource
 
