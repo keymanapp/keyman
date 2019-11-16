@@ -6,20 +6,27 @@
 
 
 build: version.res dirs
-    $(MSBUILD) kmcmpdll.sln $(MSBUILD_BUILD)
-    $(COPY) kmcmpdll.dll $(PROGRAM)\developer
-    $(COPY) kmcmpdll.lib $(OUTLIB)
-    $(COPY) kmcmpdll.pdb $(DEBUGPATH)\developer
+    $(MSBUILD) kmcmpdll.sln $(MSBUILD_BUILD) /p:Platform=Win32
+    $(COPY) $(WIN32_TARGET_PATH)\kmcmpdll.dll $(PROGRAM)\developer
+    $(COPY) $(WIN32_TARGET_PATH)\kmcmpdll.lib $(OUTLIB)
+    $(COPY) $(WIN32_TARGET_PATH)\kmcmpdll.pdb $(DEBUGPATH)\developer
     # for debugging purposes, it's useful to have a copy
     # of kmcmpdll.dll in the TIKE project folder; it is
     # .gitignored
-    $(COPY) kmcmpdll.dll ..\tike\kmcmpdll.dll
+    $(COPY) $(WIN32_TARGET_PATH)\kmcmpdll.dll ..\tike\kmcmpdll.dll
+	
+    $(MSBUILD) kmcmpdll.sln $(MSBUILD_BUILD) /p:Platform=x64
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.dll $(PROGRAM)\developer\kmcmpdll.x64.dll
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.lib $(OUTLIB)\kmcmpdll.x64.lib
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.pdb $(DEBUGPATH)\developer\kmcmpdll.x64.pdb
+	
 
 clean: def-clean
     $(MSBUILD) kmcmpdll.sln $(MSBUILD_CLEAN)
 
 signcode:
     $(SIGNCODE) /d "Keyman Developer Compiler" $(PROGRAM)\developer\kmcmpdll.dll
+    $(SIGNCODE) /d "Keyman Developer Compiler" $(PROGRAM)\developer\kmcmpdll.x64.dll
 
 backup:
     $(WZZIP) $(BUILD)\developer\kmcmpdll.zip  $(BACKUPDEFAULTS) kmcmpdll.dll
@@ -29,5 +36,6 @@ test-manifest:
 
 install:
     $(COPY) $(PROGRAM)\developer\kmcmpdll.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmcmpdll.dll"
+    $(COPY) $(PROGRAM)\developer\kmcmpdll.x64.dll "$(INSTALLPATH_KEYMANDEVELOPER)\kmcmpdll.x64.dll"
     
 !include ..\..\Target.mak
