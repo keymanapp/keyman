@@ -3,9 +3,11 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-18 12.0.55 stable
+* Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
+
 ## 2019-11-15 12.0.54 stable
 * Bug Fix: Text editor and other controls did not receive focus correctly (#2331)
-* Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
 
 ## 2019-10-07 12.0.50 stable
 * Release 12.0
