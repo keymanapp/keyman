@@ -388,6 +388,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+    if(_overflowMenuItem==null)
+      return super.onPrepareOptionsMenu(menu);
     final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
 
     _rootView.setOnClickListener(new View.OnClickListener() {
@@ -422,6 +424,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if(menu==null)
       return;
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+    if( _overflowMenuItem==null)
+      return;
+
     final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
 
     if(anUpdateCount==0)
