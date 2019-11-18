@@ -20,7 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="node_modules/promise-polyfill/lib/polyfill.js" />
+/// <reference path="node_modules/es6-shim/es6-shim.min.js" />
 /// <reference path="promise-store.ts" />
 
 /**
