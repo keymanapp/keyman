@@ -58,10 +58,6 @@ public final class CharSequenceUtil {
           charsToRestore = expectedChars.subSequence(index + currentContextString.length(), expectedChars.length());
         }
       }
-
-      Log.d(TAG, "adjusting expectedChars: " + expectedChars.toString() +
-        ", currentContext: " + currentContext.toString() +
-        ", charsToRestore: " + charsToRestore.toString());
       return charsToRestore;
     } catch (Exception e) {
       Log.e(TAG, "Error in restoreChars: " + e);

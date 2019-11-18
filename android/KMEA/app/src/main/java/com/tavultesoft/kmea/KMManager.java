@@ -2058,7 +2058,6 @@ public final class KMManager {
 
             // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
             ic.commitText(s, 1);
-            Log.d(TAG, "adjusting commitText s:" + s.toString());
           }
 
           ic.endBatchEdit();
@@ -2073,7 +2072,9 @@ public final class KMManager {
 
     /*
     // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
-    // instead of one code-point.
+    // instead of one code-point. See Chromium issue #1024738
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
+    //
     // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
     // for surrogate pairs + a long grapheme cluster.
     // This buffer will be used to put back characters as-needed
@@ -2099,9 +2100,9 @@ public final class KMManager {
 
       CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
       if (charsToRestore.length() > 0) {
-        // Restore expectedChars that Chromium deleted, and advance the cursor by expectedChars.length()
-        ic.commitText(charsToRestore, charsToRestore.length());
-        Log.d(TAG, "performLeftDeletions commitText(" + charsToRestore.toString() + ")");
+        // Restore expectedChars that Chromium deleted.
+        // Use newCusorPosition 1 so cursor will be after the inserted string
+        ic.commitText(charsToRestore, 1);
       }
     }
 
@@ -2124,8 +2125,6 @@ public final class KMManager {
         String origChars = sequence.toString();
         ic.commitText("", -1);
         sequence = ic.getTextBeforeCursor(length, 0);
-        Log.d(TAG, "getCharacterSequence adjusting high surrogate pair from " + origChars +
-          ", now " + sequence.toString());
       }
 
       return sequence;
