@@ -44,6 +44,6 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
-    "promise-polyfill": "8.1.0"
+    "es6-shim": "^0.35.5"
   }
 }

@@ -26,8 +26,8 @@ namespace com.keyman.dom {
         }
 
         // On mobile devices, the OSK uses 'fixed' - this requires some extra offset work to handle.
-        if(Lobj.style.position == 'fixed') {
-          let Ldoc = Lobj.ownerDocument;
+        let Ldoc = Lobj.ownerDocument;
+        if(Lobj.style.position == 'fixed' && Ldoc && Ldoc.scrollingElement) {
           Lcurleft += Ldoc.scrollingElement.scrollLeft;
         }
       }
