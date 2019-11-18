@@ -1,10 +1,10 @@
 package com.tavultesoft.kmea.logic;
 
-import android.app.Application;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
+
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +21,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationCompat.Builder;
 import androidx.core.app.NotificationManagerCompat;
 
+
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.KMManager;
@@ -33,11 +34,11 @@ import java.beans.PropertyChangeSupport;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+
 
 public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler{
 
@@ -52,6 +53,13 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    */
   public static final boolean SEND_UPDATE_NOTIFICATIONS = true;
 
+  private static final class OngoingUpdate
+  {
+    Integer notificationid;
+    String updateid;
+    Bundle bundle;
+  }
+
   private Context currentContext;
 
   private boolean updateCheckFailed = false;
@@ -59,7 +67,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   private Calendar lastUpdateCheck = null;
   private boolean checkingUpdates = false;
 
-  private HashSet<String> openUpdates = new HashSet<>();
+  private LinkedHashMap<String, OngoingUpdate> openUpdates = new LinkedHashMap<>();
   private int failedUpdateCount = 0;
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -151,11 +159,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
               if(downloadOnlyLexicalModel) {
                 String modelid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
-                addOpenUpdate(createLexicalModelId(langid,modelid));
+                addOpenUpdate(createLexicalModelId(langid,modelid),null,resourceBundle);
               }
               else {
                 String kbid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
-                addOpenUpdate(createKeyboardId(langid,kbid));
+                addOpenUpdate(createKeyboardId(langid,kbid),null, resourceBundle);
               }
 
               Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
@@ -192,17 +200,37 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     }
   }
 
-  private void addOpenUpdate(String anId)
+  /**
+   * Add open update.
+   * @param anUpdateId the update id
+   * @param aNotificationId the system notification id
+   * @param aBundle the bundle
+   */
+  private void addOpenUpdate(String anUpdateId,Integer aNotificationId, Bundle aBundle)
   {
     int _old= openUpdates.size();
-    openUpdates.add(anId);
+    OngoingUpdate _update = new OngoingUpdate();
+    _update.updateid = anUpdateId;
+    _update.notificationid = aNotificationId;
+    _update.bundle = aBundle;
+    openUpdates.put(anUpdateId, _update);
     propertyChangeSupport.firePropertyChange("updateCount",_old,openUpdates.size());
   }
 
-  private void removeOpenUpdate(String anId)
+  /**
+   * remove the open update package.
+   * cancels the system notification.
+   * @param anUpdateId the update id
+   */
+  private void removeOpenUpdate(String anUpdateId)
   {
     int _old= openUpdates.size();
-    openUpdates.remove(anId);
+    OngoingUpdate _update = openUpdates.remove(anUpdateId);
+
+    if(_update.notificationid!=null) {
+      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
+      notificationManager.cancel(_update.notificationid);
+    }
     propertyChangeSupport.firePropertyChange("updateCount",_old,openUpdates.size());
   }
 
@@ -227,26 +255,26 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
       !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
 
+    int  notification_id = this.notificationid.incrementAndGet();
+
     String message;
 
     if(downloadOnlyLexicalModel) {
       String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
       String modelName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
       message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
-      addOpenUpdate(createLexicalModelId(langid,modelid));
+      addOpenUpdate(createLexicalModelId(langid,modelid),notification_id, theResourceBundle);
     }
     else {
       String kbid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
       String kbName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
       message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
-     addOpenUpdate(createKeyboardId(langid,kbid));
+     addOpenUpdate(createKeyboardId(langid,kbid),notification_id, theResourceBundle);
 
     }
 
-    int  notification_id = this.notificationid.incrementAndGet();
     Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
     intent.putExtras(theResourceBundle);
-    intent.putExtra(KMKeyboardDownloaderActivity.ARG_NOTIFICATION_ID,notification_id);
 
     // Create the TaskStackBuilder and add the intent, which inflates the back stack
     TaskStackBuilder stackBuilder = TaskStackBuilder.create(currentContext);
@@ -260,7 +288,8 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-      .setContentIntent(startUpdateIntent);
+      .setContentIntent(startUpdateIntent)
+      .setOngoing(true);
 
     notificationManager.notify(notification_id,builder.build());
   }
@@ -405,6 +434,32 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   public void removePropertyChangeListener (PropertyChangeListener listener){
     this.propertyChangeSupport.removePropertyChangeListener(listener);
-    }
+  }
 
+  public void cancelKeyboardUpdate(String aLangId, String aKbId)
+  {
+    removeOpenUpdate(createKeyboardId(aLangId,aKbId));
+    if(openUpdates.isEmpty())
+      checkingUpdates = false;
+  }
+
+  public void cancelLexicalModelUpdate(String aLangId, String aModelId)
+  {
+    removeOpenUpdate(createLexicalModelId(aLangId,aModelId));
+    if(openUpdates.isEmpty())
+      checkingUpdates = false;
+  }
+
+  /**
+   * Install available open Updates.
+   */
+  public void executeOpenUpdates()
+  {
+    for(OngoingUpdate _up:openUpdates.values())
+    {
+      Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
+      intent.putExtras(_up.bundle);
+      currentContext.startActivity(intent);
+    }
+  }
 }

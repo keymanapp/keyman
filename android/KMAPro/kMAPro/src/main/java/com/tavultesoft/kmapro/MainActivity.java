@@ -43,8 +43,8 @@ import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.ListMenuItemView;
-import androidx.appcompat.view.menu.MenuView;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
@@ -68,7 +68,7 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
-import androidx.core.internal.view.SupportMenu;
+import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Html;
 import android.util.Log;
@@ -81,9 +81,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
+
 
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
@@ -389,20 +387,30 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
-    final MenuItem overflowMenuItem = menu.findItem(R.id.action_overflow);
-    final ViewGroup rootView = (ViewGroup) overflowMenuItem.getActionView();
+    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+    final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
 
-    rootView.setOnClickListener(new View.OnClickListener() {
+    _rootView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        PopupMenu popup = new PopupMenu(context, rootView);
-        getMenuInflater().inflate(R.menu.overflow_menu,popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-          public boolean onMenuItemClick(MenuItem item) {
-            return onOptionsItemSelected(item);
+        PopupMenu _popup = new PopupMenu(context, _rootView);
+        getMenuInflater().inflate(R.menu.overflow_menu,_popup.getMenu());
+
+        if(KMManager.getUpdateTool().getOpenUpdateCount()==0)
+          _popup.getMenu().findItem(R.id.action_update_keyboards).setVisible(false);
+        else
+          _popup.getMenu().findItem(R.id.action_update_keyboards).setVisible(true);
+
+
+        _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+          public boolean onMenuItemClick(MenuItem theItem) {
+            return onOptionsItemSelected(theItem);
           }
         });
-        popup.show();
+
+        MenuPopupHelper _menuHelper = new MenuPopupHelper(context, (MenuBuilder) _popup.getMenu(), _rootView);
+        _menuHelper.setForceShowIcon(true);
+        _menuHelper.show();
       }
     });
 
@@ -413,15 +421,18 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   {
     if(menu==null)
       return;
-    final MenuItem overflowMenuItem = menu.findItem(R.id.action_overflow);
-    final ViewGroup rootView = (ViewGroup) overflowMenuItem.getActionView();
+    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+    final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
 
     if(anUpdateCount==0)
-      rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
-    else
-      rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+    {
+      _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
+    }
+    else {
+      _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+    }
 
-    TextView _t = rootView.findViewById(R.id.update_count_indicator);
+    TextView _t = _rootView.findViewById(R.id.update_count_indicator);
     _t.setText(String.valueOf(anUpdateCount));
   }
 
@@ -469,6 +480,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         return true;
       case R.id.action_settings:
         showSettings();
+        return true;
+      case R.id.action_update_keyboards:
+        KMManager.getUpdateTool().executeOpenUpdates();
         return true;
       default:
         return super.onOptionsItemSelected(item);

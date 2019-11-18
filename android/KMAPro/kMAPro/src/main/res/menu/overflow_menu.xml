@@ -34,5 +34,10 @@
         app:showAsAction="never"
         android:icon="@drawable/ic_settings" />
 
+      <item
+        android:id="@+id/action_update_keyboards"
+        android:title="@string/action_install_updates"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_cloud_download"/>
 
 </menu>
