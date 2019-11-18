@@ -151,11 +151,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
               if(downloadOnlyLexicalModel) {
                 String modelid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
-                openUpdates.add(createLexicalModelId(langid,modelid));
+                addOpenUpdate(createLexicalModelId(langid,modelid));
               }
               else {
                 String kbid = resourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
-                openUpdates.add(createKeyboardId(langid,kbid));
+                addOpenUpdate(createKeyboardId(langid,kbid));
               }
 
               Intent intent = new Intent(currentContext, KMKeyboardDownloaderActivity.class);
@@ -192,6 +192,28 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     }
   }
 
+  private void addOpenUpdate(String anId)
+  {
+    int _old= openUpdates.size();
+    openUpdates.add(anId);
+    propertyChangeSupport.firePropertyChange("updateCount",_old,openUpdates.size());
+  }
+
+  private void removeOpenUpdate(String anId)
+  {
+    int _old= openUpdates.size();
+    openUpdates.remove(anId);
+    propertyChangeSupport.firePropertyChange("updateCount",_old,openUpdates.size());
+  }
+
+  /**
+   * get open update count.
+   * @return the count
+   */
+  public int getOpenUpdateCount()
+  {
+    return openUpdates.size();
+  }
   /**
    * send update notification.
    * @param theResourceBundle the bundle
@@ -211,13 +233,13 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
       String modelName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
       message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
-      openUpdates.add(createLexicalModelId(langid,modelid));
+      addOpenUpdate(createLexicalModelId(langid,modelid));
     }
     else {
       String kbid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
       String kbName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
       message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
-      openUpdates.add(createKeyboardId(langid,kbid));
+     addOpenUpdate(createKeyboardId(langid,kbid));
 
     }
 
@@ -323,7 +345,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     if (! openUpdates.isEmpty()) {
       String _langid = keyboardInfo.get(KMManager.KMKey_LanguageID);
       String _kbid = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-      openUpdates.remove(createKeyboardId(_langid,_kbid));
+      removeOpenUpdate(createKeyboardId(_langid,_kbid));
     }
 
     tryFinalizeUpdate();
@@ -340,7 +362,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       for(Map<String,String> _lm:lexicalModelsInstalled) {
         String _langid = _lm.get(KMManager.KMKey_LanguageID);
         String _modelid = _lm.get(KMManager.KMKey_LexicalModelID);
-        openUpdates.remove(createLexicalModelId(_langid, _modelid));
+        removeOpenUpdate(createLexicalModelId(_langid, _modelid));
       }
     }
 

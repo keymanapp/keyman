@@ -263,7 +263,7 @@ public final class KMManager {
     getUpdateTool().checkForResourceUpdates(aContext,true);
   }
 
-  static ResourcesUpdateTool getUpdateTool() {
+  public static ResourcesUpdateTool getUpdateTool() {
     if(updateTool==null) {
       updateTool = new ResourcesUpdateTool();
       updateTool.createNotificationChannel(appContext);

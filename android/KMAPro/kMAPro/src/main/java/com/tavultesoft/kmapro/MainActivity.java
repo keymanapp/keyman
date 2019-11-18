@@ -4,6 +4,8 @@
 
 package com.tavultesoft.kmapro;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -83,6 +85,7 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
@@ -389,7 +392,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     final MenuItem overflowMenuItem = menu.findItem(R.id.action_overflow);
     final ViewGroup rootView = (ViewGroup) overflowMenuItem.getActionView();
 
-    updateUpdateCountIndicator();
     rootView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -407,19 +409,40 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     return super.onPrepareOptionsMenu(menu);
   }
 
-  private void updateUpdateCountIndicator()
+  private void updateUpdateCountIndicator(int anUpdateCount)
   {
+    if(menu==null)
+      return;
     final MenuItem overflowMenuItem = menu.findItem(R.id.action_overflow);
     final ViewGroup rootView = (ViewGroup) overflowMenuItem.getActionView();
 
-    rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
+    if(anUpdateCount==0)
+      rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
+    else
+      rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+
+    TextView _t = rootView.findViewById(R.id.update_count_indicator);
+    _t.setText(String.valueOf(anUpdateCount));
   }
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     this.menu = menu;
 
+    KMManager.getUpdateTool().addPropertyChangeListener(new PropertyChangeListener()
+      {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if(!evt.getPropertyName().equals("updateCount"))
+            return;
+          updateUpdateCountIndicator(
+            evt.getNewValue()==null?0:(Integer) evt.getNewValue());
+        }
+      }
+    );
+    updateUpdateCountIndicator(KMManager.getUpdateTool().getOpenUpdateCount());
     return true;
   }
 
