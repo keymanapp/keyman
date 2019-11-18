@@ -326,9 +326,11 @@ begin
                 SetLength(FPackageJSFileInfos, Length(FPackageJSFileInfos)+1);
                 FPackageJSFileInfos[High(FPackageJSFileInfos)].Filename := Zip.FileNames[j];
 
-                // For now, apply JS keyboard to all web and mobile targets
+                // Apply JS keyboard only to mobile targets, because web is not supported
+                // in a package. If a package does not support mobile, it should not include
+                // the .js.
                 // Not using GetKeyboardInfo because that only handles kmx files
-                FPackageJSFileInfos[High(FPackageJSFileInfos)].Info.Targets := 'web mobile';
+                FPackageJSFileInfos[High(FPackageJSFileInfos)].Info.Targets := 'mobile';
               end;
             end;
           end;
@@ -975,8 +977,6 @@ begin
       AddNewPair('windows', 'full');
       AddNewPair('macos', 'full');
       AddNewPair('linux', 'full');
-      AddNewPair('desktopWeb', 'full');
-      AddNewPair('mobileWeb', 'full');
       AddNewPair('android', 'full');
       AddNewPair('ios', 'full');
     end
@@ -1007,11 +1007,6 @@ begin
 
         // FPackageKMXFileInfos can contain target information for web/mobile targets.
         // This is a current limitation of FPackageJSFileInfos if there's no kmx files
-        if target = ktWeb then
-        begin
-          AddNewPair('desktopWeb', 'full');
-          AddNewPair('mobileWeb', 'full');
-        end;
         if (target = ktMobile) then
         begin
           AddNewPair('android', 'full');
@@ -1034,11 +1029,6 @@ begin
     targets := StringToKeymanTargets(keyboardFile.Info.Targets);
     for target in targets do
     begin
-      if (target = ktWeb) then
-      begin
-        AddNewPair('desktopWeb', 'full');
-        AddNewPair('mobileWeb', 'full');
-      end;
       if (target = ktMobile) then
       begin
         AddNewPair('android', 'full');
@@ -1055,16 +1045,17 @@ begin
     end;
   end;
 
-  // Handle JS file not in kmp
-  if FJsFile <> '' then
+  // Handle JS file not in kmp. Because it is isolated, we cannot detect
+  // whether it supports mobile vs desktop web because that is not included
+  // in the .js. So, for now we assume both.
+  //
+  // We no longer assume that the presence of a .js means support for
+  // native mobile apps. These apps now work on the basis of having a
+  // .kmp file available
+  if (FJsFile <> '') then
   begin
     AddNewPair('desktopWeb', 'full');
     AddNewPair('mobileWeb', 'full');
-
-    // TODO: Don't add Android and iOS when we complete the addition of all .js keyboards
-    // to packages in the repository (including legacy keyboards)
-    AddNewPair('android', 'full');
-    AddNewPair('ios', 'full');
   end;
 
   json.AddPair('platformSupport', v);
