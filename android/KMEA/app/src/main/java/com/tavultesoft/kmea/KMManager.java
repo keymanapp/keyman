@@ -9,7 +9,6 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -2057,29 +2056,9 @@ public final class KMManager {
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
 
-            // Using BreakIterator to count grapheme clusters
-            BreakIterator boundary = BreakIterator.getCharacterInstance();
-            boundary.setText(s);
-            int count = 0;
-            while (boundary.next() != BreakIterator.DONE) {
-              count++;
-            }
-
-            // Commit the string s and adjust the cursor by the number of grapheme clusters
-            ic.commitText(s, count);
-            Log.d(TAG, "adjusting commitText s:" + s.toString() + ", count: " + count + ", s.length: " + s.length());
-
-            // After inserting the string s and adjusting the cursor count clusters,
-            // Chrome and Firefox sometimes have the cursor too far, so
-            // check if we need to adjust the cursor position
-            CharSequence charsBefore = getCharacterSequence(ic, s.length()*2);
-
-            // Adjust the cursor by "move" codepoints
-            int move = CharSequenceUtil.adjustCursorPosition(charsBefore, s);
-            if (move > 0) {
-              Log.d(TAG, "adjusting cursor charsBefore: " + charsBefore.toString() + ", s: " + s + ", move: " + move);
-              ic.commitText("", -move);
-            }
+            // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
+            ic.commitText(s, 1);
+            Log.d(TAG, "adjusting commitText s:" + s.toString());
           }
 
           ic.endBatchEdit();
