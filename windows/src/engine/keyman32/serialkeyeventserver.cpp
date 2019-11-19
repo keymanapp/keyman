@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "serialkeyeventserver.h"
 #include "security.h"
+#include "kbd.h"
 
 #ifndef _WIN64
 
@@ -523,7 +524,7 @@ private:
       break;
     case VK_SHIFT:
       // Left and right shift are distinguished by scan code alone
-      bVk = bScan == 0x36 ? VK_RSHIFT : VK_LSHIFT;
+      bVk = bScan == SCANCODE_RSHIFT ? VK_RSHIFT : VK_LSHIFT;
       break;
     case VK_LCONTROL:
     case VK_RCONTROL:

@@ -1911,7 +1911,7 @@ var
   language: IKeymanLanguage;
   id: Integer;
 begin
-  if not Reg_GetDebugFlag(SRegValue_Flag_UseRegisterHotkeys) then Exit;
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseRegisterHotkey) then Exit;
 
   TDebugLogClient.Instance.WriteMessage('Enter RegisterHotkeys', []);
 
@@ -1965,7 +1965,7 @@ procedure TfrmKeyman7Main.UnregisterHotkeys;
 var
   i, hk: Integer;
 begin
-  if not Reg_GetDebugFlag(SRegValue_Flag_UseRegisterHotkeys) then Exit;
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseRegisterHotkey) then Exit;
 
   TDebugLogClient.Instance.WriteMessage('Enter UnregisterHotkeys', []);
 
