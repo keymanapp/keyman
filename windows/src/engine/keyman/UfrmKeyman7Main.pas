@@ -1284,6 +1284,22 @@ begin
 end;
 
 procedure TfrmKeyman7Main.ProcessProfileChange(CommandAndAtom: DWORD);   // I3933   // I3949
+
+  procedure ProcessHotkeyChange(hkl: DWORD; guidProfile: TGUID);
+  var
+    kbd: TLangSwitchKeyboard;
+  begin
+    kbd := FLangSwitchManager.FindKeyboard(hkl, guidProfile);
+    if Assigned(kbd) then
+    begin
+      // Handle toggle hotkey
+      if (kbd = FLangSwitchManager.ActiveKeyboard) and (kmcom.Options['koKeyboardHotkeysAreToggle'].Value) then
+          kbd := FLangSwitchManager.Languages[0].Keyboards[0];
+
+      ActivateKeyboard(kbd);
+    end;
+  end;
+
 var
   val, FLangID: Integer;
   param2, param3: string;
@@ -1293,7 +1309,6 @@ var
   FActiveKeyboard: TLangSwitchKeyboard;
   i: Integer;
   wCommand: Word;
-  kbd: TLangSwitchKeyboard;
 begin
   if GlobalGetAtomName(HiWord(CommandAndAtom), buftext, 128) = 0 then   // I3949
     Exit;   // I4286
@@ -1329,15 +1344,7 @@ begin
     end
     else if wCommand = PC_HOTKEYCHANGE then
     begin
-      kbd := FLangSwitchManager.FindKeyboard(val, GUID_NULL);
-      if Assigned(kbd) then
-      begin
-        // Handle toggle hotkey
-        if (kbd = FLangSwitchManager.ActiveKeyboard) and (kmcom.Options['koKeyboardHotkeysAreToggle'].Value) then
-            kbd := FLangSwitchManager.Languages[0].Keyboards[0];
-
-        ActivateKeyboard(kbd);
-      end;
+      ProcessHotkeyChange(val, GUID_NULL);
       Exit;
     end;
   end
@@ -1367,15 +1374,7 @@ begin
     end
     else if wCommand = PC_HOTKEYCHANGE then
     begin
-      kbd := FLangSwitchManager.FindKeyboard(0, FProfileGuid);
-      if Assigned(kbd) then
-      begin
-        // Handle toggle hotkey
-        if (kbd = FLangSwitchManager.ActiveKeyboard) and (kmcom.Options['koKeyboardHotkeysAreToggle'].Value) then
-            kbd := FLangSwitchManager.Languages[0].Keyboards[0];
-
-        ActivateKeyboard(kbd);
-      end;
+      ProcessHotkeyChange(0, FProfileGuid);
       Exit;
     end;
   end;
