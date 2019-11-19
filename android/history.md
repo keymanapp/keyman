@@ -5,7 +5,7 @@
 
 ## 2019-11-17 12.0.4208 stable
 * Bug fix:
-  * Fix context manipulation to work around Chromium issue (2281)
+  * Fix context manipulation to work around Chromium issue (#2281)
 
 ## 2019-11-13 12.0.4207 stable
 * No change to Keyman for Android (updated Keyman Web Engine, #2288)
