@@ -29,6 +29,8 @@
 #error k32_lowlevelkeyboardhook.cpp is not required for win64.
 #endif
 
+BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState);
+
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode,
   _In_  WPARAM wParam,
@@ -119,15 +121,15 @@ LRESULT _kmnLowLevelKeyboardProc(
   // Track shift state
   DWORD Flag = 0;
   switch(hs->vkCode) {
-    case VK_LCONTROL: 
-    case VK_RCONTROL: 
-    case VK_CONTROL:  Flag = HK_CTRL; break;
-    case VK_LMENU:    
-    case VK_RMENU:    
-    case VK_MENU:     Flag = HK_ALT; break;
-    case VK_LSHIFT:
-    case VK_RSHIFT:
-    case VK_SHIFT:    Flag = HK_SHIFT; break;
+    case VK_LCONTROL: Flag = HK_CTRL; break;
+    case VK_RCONTROL: Flag = 0; break;
+    case VK_CONTROL:  Flag = extended ? HK_CTRL : 0; break;
+    case VK_LMENU:    Flag = HK_ALT; break;
+    case VK_RMENU:    Flag = 0; break;
+    case VK_MENU:     Flag = extended ? HK_ALT : 0; break;
+    case VK_LSHIFT:   Flag = HK_SHIFT; break;
+    case VK_RSHIFT:   Flag = 0; break;
+    case VK_SHIFT:    Flag = hs->scanCode == 0x36 /*SCAN_RIGHT_SHIFT*/ ? 0 : HK_SHIFT; break;
   }
 
   if(Flag != 0) {
@@ -144,9 +146,13 @@ LRESULT _kmnLowLevelKeyboardProc(
     if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
   }
 
+  if (ProcessHotkey(hs->vkCode, isUp, FHotkeyShiftState)) {
+    return 1;
+  }
+
   /*
     
-    Not the language switch hotkey, so we will use the serialized input model
+    Not a registered hotkey, so we will use the serialized input model
   
   */
 
@@ -172,3 +178,36 @@ LRESULT _kmnLowLevelKeyboardProc(
   return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
 }
 
+BOOL SendKeyboardSelectionToHost(HKL hkl, GUID profileGUID);
+
+BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
+  if (Reg_GetDebugFlag(REGSZ_Flag_UseRegisterHotkey, FALSE)) {
+    return FALSE;
+  }
+
+  Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
+  if (!hotkeys) {
+    return FALSE;
+  }
+
+  Hotkey *hotkey = hotkeys->GetHotkey(ShiftState | vkCode);   // I4641
+  if (!hotkey) {
+    return FALSE;
+  }
+
+  if (isUp) {
+    return TRUE;
+  }
+
+  if (hotkey->HotkeyType == hktInterface) {
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
+  }
+  else {
+    SendKeyboardSelectionToHost(hotkey->hkl, hotkey->profileGUID);
+  }
+  
+  /* Generate a dummy keystroke to block menu activations, etc but let the shift key through */
+  PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   // I4844
+
+  return TRUE;
+}

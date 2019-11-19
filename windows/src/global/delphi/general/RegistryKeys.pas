@@ -424,7 +424,11 @@ const
   SRegKey_Keyman_Exception_CU = SRegKey_KeymanRoot_CU + '\Exception';
   SRegValue_SymbolPath = 'SymbolPath';
 
+  { Debug Flags - Reg_GetDebugFlag in DebugPaths.pas }
 
+  SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
+
+  SRegValue_Flag_UseRegisterHotkeys = 'Flag_UseRegisterHotkey';
 // Fixed path names
 const
   // PF = CSIDL_PROGRAM_FILES

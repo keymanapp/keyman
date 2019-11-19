@@ -179,23 +179,88 @@ void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground) {   
     }
 }
 
+void PrepareLanguageSwitchString(UINT langid, HKL hkl, char *str) {
+  wsprintf(str, "%d|%d|%d", GetCurrentThreadId(), langid, hkl);   // I4285
+}
+
+void PrepareLanguageSwitchString(UINT langid, GUID clsid, GUID guidProfile, char *str) {
+  WCHAR clsidstr[40], profilestr[40];
+  StringFromGUID2(clsid, clsidstr, _countof(clsidstr));
+  StringFromGUID2(guidProfile, profilestr, _countof(profilestr));
+  wsprintf(str, "%d|%d|%ws|%ws", GetCurrentThreadId(), langid, clsidstr, profilestr);   // I4285
+}
+
+BOOL ReportKeyboardChanged(WORD wCommand, TF_INPUTPROCESSORPROFILE *pprofile);
+
 void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand) {   // I3933   // I3949
+  //OutputDebugString("ReportActiveKeyboard\n");
   if(OpenTSF(_td) && IsFocusedThread()) {   // I4277
     TF_INPUTPROCESSORPROFILE profile;
     if(SUCCEEDED(_td->pInputProcessorProfileMgr->GetActiveProfile(GUID_TFCAT_TIP_KEYBOARD, &profile))) {
-      char str[128];
-      WCHAR clsidstr[40], profilestr[40];
-      if(profile.dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT) {
-        wsprintf(str, "%d|%d|%d", GetCurrentThreadId(), profile.langid, profile.hkl);   // I4285
-      } else if(profile.dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR) {
-        StringFromGUID2(profile.clsid, clsidstr, _countof(clsidstr));
-        StringFromGUID2(profile.guidProfile, profilestr, _countof(profilestr));
-        wsprintf(str, "%d|%d|%ws|%ws", GetCurrentThreadId(), profile.langid, clsidstr, profilestr);   // I4285
-      } else {
-        return;
-      }
-      WORD wAtom = GlobalAddAtom(str);
-      Globals::PostMasterController(wm_keyman_control, KMC_PROFILECHANGED, MAKELONG(wCommand, wAtom));
+      ReportKeyboardChanged(wCommand, &profile);
     }
   }
+}
+
+BOOL ReportKeyboardChanged(WORD wCommand, TF_INPUTPROCESSORPROFILE *pprofile) {
+  char str[128];
+  //OutputDebugString("  ReportKeyboardChanged: ");
+  if (pprofile->dwProfileType == TF_PROFILETYPE_KEYBOARDLAYOUT) {
+    PrepareLanguageSwitchString(pprofile->langid, pprofile->hkl, str);
+  }
+  else if (pprofile->dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR) {
+    PrepareLanguageSwitchString(pprofile->langid, pprofile->clsid, pprofile->guidProfile, str);
+  }
+  else {
+    return FALSE;
+  }
+  //OutputDebugStringA(str);
+  //OutputDebugString("\n");
+  WORD wAtom = GlobalAddAtom(str);  // TODO: stop abusing atoms and use a rolling shared memory buffer with index
+  Globals::PostMasterController(wm_keyman_control, KMC_PROFILECHANGED, MAKELONG(wCommand, wAtom));
+  return TRUE;
+}
+
+BOOL SendKeyboardSelectionToHost(HKL hkl, GUID profileGUID) {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) return FALSE;
+
+  //OutputDebugString("SendKeyboardSelectionToHost: ENTER\n");
+
+  if (!OpenTSF(_td)) {
+    return FALSE;
+  }
+
+  ULONG nLanguages = 0;
+  LANGID *pLanguages = NULL;
+  if (!SUCCEEDED(_td->pInputProcessorProfiles->GetLanguageList(&pLanguages, &nLanguages))) {
+    return FALSE;
+  }
+
+  if (!pLanguages) {
+    return FALSE;
+  }
+
+  for (UINT i = 0; i < nLanguages; i++) {
+    IEnumTfInputProcessorProfiles *pEnum;
+    if (!SUCCEEDED(_td->pInputProcessorProfileMgr->EnumProfiles(pLanguages[i], &pEnum))) {
+      CoTaskMemFree(pLanguages);
+      return FALSE;
+    }
+
+    TF_INPUTPROCESSORPROFILE profile;
+    while (pEnum->Next(1, &profile, NULL) == S_OK) {
+      if ((hkl != 0 && profile.hkl == hkl) || (hkl == 0 && IsEqualGUID(profileGUID, profile.guidProfile))) {
+        ReportKeyboardChanged(PC_HOTKEYCHANGE, &profile);
+        pEnum->Release();
+        CoTaskMemFree(pLanguages);
+        return TRUE;
+      }
+    }
+
+    pEnum->Release();
+  }
+
+  CoTaskMemFree(pLanguages);
+  return FALSE;
 }
