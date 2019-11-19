@@ -11,7 +11,7 @@
   <string name="action_clear_text" translatable="false">Clear Text</string>
   <string name="action_info" translatable="false">Info</string>
   <string name="action_settings" translatable="false">Settings</string>
-  <string name="action_install_updates" translatable="false">Install updates</string>
+  <string name="action_install_updates" translatable="false">Install Updates</string>
   <string name="title_version" translatable="false">Version</string>
   <!-- &#8230; is the ellipsis character "..." -->
   <string name="textview_hint" translatable="false">Start typing here&#8230;</string>
