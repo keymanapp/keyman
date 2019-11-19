@@ -34,7 +34,6 @@ inherited frameCEFHost: TframeCEFHost
     Top = 208
   end
   object cef: TChromium
-    OnWidgetCompMsg = cefWidgetCompMsg
     OnLoadEnd = cefLoadEnd
     OnSetFocus = cefSetFocus
     OnRunContextMenu = cefRunContextMenu

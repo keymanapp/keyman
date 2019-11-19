@@ -1,3 +1,6 @@
+// Includes version-related functionality
+///<reference path="utils/version.ts"/>
+
 // The Device object definition -------------------------------------------------
 
 namespace com.keyman {

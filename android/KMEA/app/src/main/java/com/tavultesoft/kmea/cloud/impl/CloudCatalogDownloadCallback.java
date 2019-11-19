@@ -135,6 +135,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     // Only empty if no queries returned data - we're offline.
     if (jsonTuple.isEmpty()) {
       this.failure.run(); // Signal failure to download to our failure callback.
+      CloudRepository.shared.updateFinished();
       return;
     }
 
@@ -245,6 +246,9 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     ensureInitCloudReturn(aContext,aDataSet,aCloudResult);
 
     processCloudReturns(aDataSet, aCloudResult,true);
+
+    CloudRepository.shared.updateFinished();
+    aDataSet.notifyDataSetChanged();
   }
 
   @Override

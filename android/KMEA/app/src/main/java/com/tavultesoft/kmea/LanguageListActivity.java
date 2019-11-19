@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
@@ -36,6 +37,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +58,8 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
   // These two JSON objects and their getters are still used by legacy metadata functions.
   private static JSONArray languages = null;
+  private DataSetObserver repoObserver;
+  private Dataset repo;
 
   protected static JSONArray languages() {
     return languages;
@@ -78,7 +82,7 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
-    setContentView(R.layout.activity_list_layout);
+    setContentView(R.layout.activity_list_with_progress_layout);
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
@@ -88,11 +92,24 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
     TextView textView = (TextView) findViewById(R.id.bar_title);
     textView.setText(getString(R.string.title_add_language));
 
-    listView = (ListView) findViewById(R.id.listView);
+    listView = findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
 
     // Establish the list view based on the CloudRepository's Dataset.
-    Dataset repo = CloudRepository.shared.fetchDataset(this);
+    repo = CloudRepository.shared.fetchDataset(this);
+
+    // add listener to dataset to get event for catalog update.
+    repoObserver = new DataSetObserver() {
+      @Override
+      public void onChanged() {
+        updateProgressBar();
+      }
+    };
+
+    repo.registerDataSetObserver(repoObserver);
+
+    // init progress bar state
+    updateProgressBar();
 
     listView.setAdapter(new LanguagesAdapter(this, repo));
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -155,6 +172,25 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
 
     Intent i = getIntent();
     listView.setSelectionFromTop(i.getIntExtra("listPosition", 0), i.getIntExtra("offsetY", 0));
+  }
+
+  /**
+   * switch between progress and listview.
+   */
+  private void updateProgressBar()
+  {
+    RelativeLayout _progress = findViewById(R.id.progress);
+    boolean _updaterunning= CloudRepository.shared.updateIsRunning();
+    ListView _list = findViewById(R.id.listView);
+    if(_updaterunning)
+    {
+      _progress.setVisibility(View.VISIBLE);
+      _list.setVisibility(View.GONE);
+    }
+    else {
+      _progress.setVisibility(View.GONE);
+      _list.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override
@@ -404,5 +440,12 @@ public final class LanguageListActivity extends AppCompatActivity implements OnK
       String kbKey = String.format("%s_%s", langID, kbID);
       return !KeyboardPickerActivity.containsKeyboard(context, kbKey);
     }
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    // remove listener from dataset.
+    repo.unregisterDataSetObserver(repoObserver);
   }
 }
