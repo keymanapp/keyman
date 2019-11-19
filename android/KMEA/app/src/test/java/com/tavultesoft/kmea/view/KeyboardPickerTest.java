@@ -31,6 +31,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.android.controller.ActivityController;
+import org.robolectric.annotation.LooperMode;
 import org.robolectric.shadows.ShadowContentProvider;
 import org.robolectric.shadows.ShadowContentResolver;
 
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(RobolectricTestRunner.class)
+@LooperMode(LooperMode.Mode.PAUSED)
 public class KeyboardPickerTest {
 
   private static final File TEST_RESOURCE_ROOT = new File("test_resources");
