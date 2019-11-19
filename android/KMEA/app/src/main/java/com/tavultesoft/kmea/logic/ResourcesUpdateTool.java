@@ -52,6 +52,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * Send update notifications.
    */
   public static final boolean SEND_UPDATE_NOTIFICATIONS = true;
+  public static final String PREF_KEY_LAST_UPDATE_CHECK = "lastUpdateCheck";
 
   private static final class OngoingUpdate
   {
@@ -87,7 +88,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
+        editor.putLong(PREF_KEY_LAST_UPDATE_CHECK, lastUpdateCheck.getTime().getTime());
         editor.commit();
         checkingUpdates = false;
       }
@@ -328,7 +329,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     boolean shouldCheckUpdate = false;
     if (lastUpdateCheck == null) {
       SharedPreferences prefs = aContext.getSharedPreferences(aContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-      Long lastUpdateCheckTime = prefs.getLong("lastUpdateCheck", 0);
+      Long lastUpdateCheckTime = prefs.getLong(PREF_KEY_LAST_UPDATE_CHECK, 0);
       if (lastUpdateCheckTime > 0) {
         lastUpdateCheck = Calendar.getInstance();
         lastUpdateCheck.setTime(new Date(lastUpdateCheckTime));
@@ -420,7 +421,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
+        editor.putLong(PREF_KEY_LAST_UPDATE_CHECK, lastUpdateCheck.getTime().getTime());
         editor.commit();
         checkingUpdates = false;
       }

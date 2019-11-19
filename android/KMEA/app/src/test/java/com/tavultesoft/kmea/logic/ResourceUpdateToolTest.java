@@ -66,7 +66,7 @@ public class ResourceUpdateToolTest {
       ApplicationProvider.getApplicationContext().getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
     SharedPreferences.Editor editor = prefs.edit();
-    editor.putLong("lastUpdateCheck", theLastUpdate.getTimeInMillis());
+    editor.putLong(ResourcesUpdateTool.PREF_KEY_LAST_UPDATE_CHECK, theLastUpdate.getTimeInMillis());
     editor.commit();
   }
 }
