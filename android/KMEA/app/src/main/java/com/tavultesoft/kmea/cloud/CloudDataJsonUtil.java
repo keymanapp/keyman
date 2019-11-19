@@ -134,9 +134,9 @@ public class CloudDataJsonUtil {
         String modelID = model.getString(KMManager.KMKey_ID);
         String modelName = model.getString(KMManager.KMKey_Name);
 
-        // Cloud data may not contain lexical model version, so fallback to keyboard (package) version
-        String keyboardVersion = model.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-        String modelVersion = model.getString(KMManager.KMKey_LexicalModelVersion);
+        // Cloud data may not contain lexical model version, so fallback to (package) version
+        String version = model.optString(KMManager.KMKey_Version, "1.0");
+        String modelVersion = model.optString(KMManager.KMKey_LexicalModelVersion, version);
 
         String isCustom = model.optString(KMManager.KMKey_CustomModel, "N");
         
