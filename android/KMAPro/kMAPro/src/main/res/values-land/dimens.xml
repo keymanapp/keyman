@@ -1,0 +1,9 @@
+<resources>
+
+    <!--
+         Customize dimensions originally defined in res/values/dimens.xml (such as
+         screen margins) for landscape here.
+    -->
+
+    <dimen name="update_indicator_bg_margin">10dp</dimen>
+</resources>

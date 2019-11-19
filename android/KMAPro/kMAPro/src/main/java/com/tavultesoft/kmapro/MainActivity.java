@@ -33,6 +33,7 @@ import com.tavultesoft.kmea.util.DownloadIntentService;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -385,57 +386,92 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     invalidateOptionsMenu();
   }
 
+
   @Override
   public boolean onPrepareOptionsMenu(final Menu menu) {
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    if(_overflowMenuItem==null)
+
+    if(_overflowMenuItem!=null) {
+      final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
+
+      _rootView.findViewById(R.id.counterBackground).setBackground(
+        this.getResources().getDrawable(R.drawable.ic_light_action_overflow));
+
+      _rootView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          PopupMenu _popup = new PopupMenu(context, _rootView);
+          getMenuInflater().inflate(R.menu.overflow_menu, _popup.getMenu());
+
+          updateUpdateCountIndicator(
+            _popup.getMenu().findItem(R.id.action_update_keyboards),
+            KMManager.getUpdateTool().getOpenUpdateCount(),true);
+
+          _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem theItem) {
+              return onOptionsItemSelected(theItem);
+            }
+          });
+
+          MenuPopupHelper _menuHelper = new MenuPopupHelper(context, (MenuBuilder) _popup.getMenu(), _rootView);
+          _menuHelper.setForceShowIcon(true);
+          _menuHelper.show();
+        }
+      });
       return super.onPrepareOptionsMenu(menu);
-    final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
+    }
+
+    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+    if(_keyboardupdate==null)
+      return super.onPrepareOptionsMenu(menu);
+
+    final ViewGroup _rootView = (ViewGroup) _keyboardupdate.getActionView();
+
+    _rootView.findViewById(R.id.counterBackground).setBackground(
+      this.getResources().getDrawable(R.drawable.ic_cloud_download));
 
     _rootView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        PopupMenu _popup = new PopupMenu(context, _rootView);
-        getMenuInflater().inflate(R.menu.overflow_menu,_popup.getMenu());
-
-        if(KMManager.getUpdateTool().getOpenUpdateCount()==0)
-          _popup.getMenu().findItem(R.id.action_update_keyboards).setVisible(false);
-        else
-          _popup.getMenu().findItem(R.id.action_update_keyboards).setVisible(true);
-
-
-        _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-          public boolean onMenuItemClick(MenuItem theItem) {
-            return onOptionsItemSelected(theItem);
-          }
-        });
-
-        MenuPopupHelper _menuHelper = new MenuPopupHelper(context, (MenuBuilder) _popup.getMenu(), _rootView);
-        _menuHelper.setForceShowIcon(true);
-        _menuHelper.show();
+        onOptionsItemSelected(_keyboardupdate);
       }
     });
-
     return super.onPrepareOptionsMenu(menu);
   }
 
-  private void updateUpdateCountIndicator(int anUpdateCount)
-  {
-    if(menu==null)
+  private void updateUpdateCountIndicator(int anUpdateCount) {
+    if (menu == null)
       return;
     final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
-    if( _overflowMenuItem==null)
-      return;
+    if (_overflowMenuItem != null)
+      updateUpdateCountIndicator(_overflowMenuItem,anUpdateCount,false);
 
-    final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
+    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+    if (_keyboardupdate != null)
+      updateUpdateCountIndicator(_keyboardupdate,anUpdateCount,true);
+
+  }
+
+  private void updateUpdateCountIndicator(MenuItem theItem, int anUpdateCount, boolean aHideMenuitem)
+  {
+    final ViewGroup _rootView = (ViewGroup) theItem.getActionView();
 
     if(anUpdateCount==0)
     {
-      _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
+      if(aHideMenuitem)
+        theItem.setVisible(false);
+      else if(_rootView!=null)
+        _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
     }
     else {
+      if(aHideMenuitem)
+        theItem.setVisible(true);
+      else if(_rootView!=null)
       _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
     }
+
+    if(_rootView==null)
+      return;
 
     TextView _t = _rootView.findViewById(R.id.update_count_indicator);
     _t.setText(String.valueOf(anUpdateCount));
@@ -459,6 +495,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       }
     );
     updateUpdateCountIndicator(KMManager.getUpdateTool().getOpenUpdateCount());
+    updateUpdateCountIndicator(1);
     return true;
   }
 

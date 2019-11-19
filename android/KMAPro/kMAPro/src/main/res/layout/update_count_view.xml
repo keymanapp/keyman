@@ -2,22 +2,28 @@
 <RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="wrap_content"
-  android:layout_height="32dp"
+  android:layout_height="wrap_content"
   android:layout_gravity="right"
   >
+  <RelativeLayout
+    android:id="@+id/update_count_indicator_icon_bg"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
    <ImageView
       android:id="@+id/counterBackground"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:background="@drawable/ic_light_action_overflow" />
-
+     android:layout_marginRight="@dimen/update_indicator_bg_margin"
+     android:background="@drawable/ic_cloud_download"/>
+  </RelativeLayout>
   <TextView
     android:id="@+id/update_count_indicator"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignRight="@+id/counterBackground"
-    android:width="16dp"
-    android:height="16dp"
+    android:layout_alignRight="@+id/update_count_indicator_icon_bg"
+    android:width="@dimen/update_indicator_size"
+    android:height="@dimen/update_indicator_size"
     android:background="@drawable/shape_update_count"
     android:text=""
     android:gravity="center"
