@@ -142,6 +142,7 @@ public final class KMManager {
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
+  public static final String KMKey_Version = "version";
   public static final String KMKey_PackageID = "packageId";
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";

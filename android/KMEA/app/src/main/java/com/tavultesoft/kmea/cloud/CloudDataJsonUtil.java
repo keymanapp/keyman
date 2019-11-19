@@ -133,7 +133,7 @@ public class CloudDataJsonUtil {
 
         String modelID = model.getString(KMManager.KMKey_ID);
         String modelName = model.getString(KMManager.KMKey_Name);
-        String modelVersion = model.getString(KMManager.KMKey_LexicalModelVersion);
+        String modelVersion = model.optString(KMManager.KMKey_Version,"1.0");
 
         String isCustom = model.optString(KMManager.KMKey_CustomModel, "N");
         
