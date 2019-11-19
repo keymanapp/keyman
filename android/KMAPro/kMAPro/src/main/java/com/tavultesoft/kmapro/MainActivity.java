@@ -495,7 +495,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       }
     );
     updateUpdateCountIndicator(KMManager.getUpdateTool().getOpenUpdateCount());
-    updateUpdateCountIndicator(1);
     return true;
   }
 
