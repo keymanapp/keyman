@@ -1,25 +1,16 @@
 package com.tavultesoft.kmea.view;
 
-import android.Manifest;
-import android.app.Application;
-import android.content.Context;
+
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
-import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 
-import androidx.core.content.FileProvider;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardInfoActivity;
-import com.tavultesoft.kmea.KeyboardListActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.ModelInfoActivity;
 import com.tavultesoft.kmea.R;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.FileProviderUtils;
 
 import org.json.JSONException;
 import org.junit.After;
@@ -32,13 +23,9 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.LooperMode;
-import org.robolectric.shadows.ShadowContentProvider;
-import org.robolectric.shadows.ShadowContentResolver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RunWith(RobolectricTestRunner.class)
@@ -50,26 +37,44 @@ public class KeyboardPickerTest {
   private static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
   private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + TEST_GFF_KMP_NAME + ".kmp");
 
+  private ActivityController<KeyboardPickerActivity> keyboardPickerActivityActivityController;
 
 
+  /**
+   * initialize tests.
+   */
+  @Before
+  public void startTest()
+  {
+    FunctionalTestHelper.initializeKeyman();
+    //initializes the keyboard picker (and keyboard list in background)
+    keyboardPickerActivityActivityController = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
+
+    //Initial keyboard load (normally done by webview)
+    // should be done directly in  FunctionalTestHelper.initializeKeyman();
+    // but we need to initialize the keyboardpicker first, because auf initialization process
+    FunctionalTestHelper.setInitialKeyboard();
+
+  }
+
+  /**
+   * clean up tests.
+   */
+  @After
+  public void endTest()
+  {
+    KMManager.onDestroy();
+    if(keyboardPickerActivityActivityController!=null)
+      keyboardPickerActivityActivityController.pause().stop().destroy();
+    keyboardPickerActivityActivityController=null;
+  }
   /**
    * Test show keyboard info.
    */
   @Test
-  public void openKeyboardPickerAndOpenKeyboardInfo() {
-
-    FunctionalTestHelper.initializeKeyman();
-
-    ActivityController<KeyboardPickerActivity> _controller = null;
-    try {
-       _controller = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
-      //initializes the keyboard picker (and keyboard list in background)
-      KeyboardPickerActivity activity = _controller.get();
-
-      //Initial keyboard load (normally done by webview)
-      // should be done directly in  FunctionalTestHelper.initializeKeyman();
-      // but we need to initialize the keyboardpicker first, because auf initialization process
-      FunctionalTestHelper.setInitialKeyboard();
+  public void openKeyboardPickerAndOpenKeyboardInfo()
+  {
+      KeyboardPickerActivity activity = keyboardPickerActivityActivityController.get();
 
       //find the list view
       ListView _view = activity.findViewById(R.id.listView);
@@ -84,14 +89,7 @@ public class KeyboardPickerTest {
       Intent actual = Shadows.shadowOf(activity).getNextStartedActivity();
       Intent expectedIntent = new Intent(activity, KeyboardInfoActivity.class);
       Assert.assertEquals(expectedIntent.getComponent(), actual.getComponent());
-    }
-    finally {
-      KMManager.onDestroy();
-      _controller.pause().stop().destroy();
-    }
   }
-
-
 
   /**
    * Test keyboard switch using keyboard picker.
@@ -102,19 +100,7 @@ public class KeyboardPickerTest {
   public void openKeyboardPickerAndSwitchKeyboardInfo()
   throws IOException, JSONException
   {
-
-    FunctionalTestHelper.initializeKeyman();
-
-    ActivityController<KeyboardPickerActivity> _controller = null;
-    try {
-      _controller = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
-      //initializes the keyboard picker (and keyboard list in background)
-      KeyboardPickerActivity activity = _controller.get();
-
-      //Initial keyboard load (normally done by webview)
-      // should be done directly in  FunctionalTestHelper.initializeKeyman();
-      // but we need to initialize the keyboardpicker first, because auf initialization process
-      FunctionalTestHelper.setInitialKeyboard();
+      KeyboardPickerActivity activity = keyboardPickerActivityActivityController.get();
 
       // get current keyboard
       Map<String,String> _old = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
@@ -140,16 +126,10 @@ public class KeyboardPickerTest {
       Assert.assertNotNull(_current);
 
       Assert.assertNotEquals(_old.get(KMManager.KMKey_KeyboardID),_current.get(KMManager.KMKey_KeyboardID));
-
-    }
-    finally {
-      KMManager.onDestroy();
-      _controller.pause().stop().destroy();
-    }
   }
 
   /**
-   * Test show keyboard info.
+   * Test show keyboard info and help.
    */
   @Test
   public void openKeyboardPickerAndOpenKeyboardHelplink()
@@ -158,18 +138,10 @@ public class KeyboardPickerTest {
 
     FunctionalTestHelper.initializeKeyman();
 
-    ActivityController<KeyboardPickerActivity> _controller = null;
     ActivityController<KeyboardInfoActivity> _controller2 = null;
     try {
 
-      _controller = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
-      //initializes the keyboard picker (and keyboard list in background)
-      KeyboardPickerActivity activity = _controller.get();
-
-      //Initial keyboard load (normally done by webview)
-      // should be done directly in  FunctionalTestHelper.initializeKeyman();
-      // but we need to initialize the keyboardpicker first, because auf initialization process
-      FunctionalTestHelper.setInitialKeyboard();
+      KeyboardPickerActivity activity = keyboardPickerActivityActivityController.get();
 
       // install new custom keyboard programmatically
       FunctionalTestHelper.installCustomKeyboard(TEST_GFF_KMP_FILE);
@@ -186,11 +158,6 @@ public class KeyboardPickerTest {
       // check if expected intent was sent
       Intent actual = Shadows.shadowOf(activity).getNextStartedActivity();
       Assert.assertNotNull(actual);
-
-      if(_controller!=null) {
-        _controller.pause().stop().destroy();
-        _controller = null;
-      }
 
       _controller2 = Robolectric.buildActivity(KeyboardInfoActivity.class,actual).setup();
       KeyboardInfoActivity _info = _controller2.get();
@@ -209,9 +176,6 @@ public class KeyboardPickerTest {
       Assert.assertEquals(actual2.getAction(),Intent.ACTION_VIEW);
     }
     finally {
-      KMManager.onDestroy();
-      if(_controller!=null)
-        _controller.pause().stop().destroy();
       if(_controller2!=null)
         _controller2.pause().stop().destroy();
     }
