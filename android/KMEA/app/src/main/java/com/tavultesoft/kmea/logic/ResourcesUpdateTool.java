@@ -230,6 +230,10 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
     int _old= openUpdates.size();
     OngoingUpdate _update = openUpdates.remove(anUpdateId);
 
+    if(_update==null) {
+      return;
+    }
+
     if(_update.notificationid!=null) {
       NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
       notificationManager.cancel(_update.notificationid);
