@@ -138,7 +138,7 @@ BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD Shift
       if(isUp)
       {
         InLanguageSwitchKeySequence = FALSE;
-        //ReportActiveKeyboard(_td, 0);
+        //ReportActiveKeyboard(_td, PC_UPDATE);
         Globals::PostControllers(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
         PostDummyKeyEvent();   // I4124   // I4844
         keybd_event(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);    // I4203

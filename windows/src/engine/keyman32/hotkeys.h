@@ -20,6 +20,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 
+// TODO fix this yuk: dynamic alloc plz
 #define MAX_HOTKEYS 1000
 
 typedef enum { hktInterface, hktLanguage } HotkeyType;
