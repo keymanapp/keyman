@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 @RunWith(RobolectricTestRunner.class)
-public class ResourceUpdateToolTest {
+public class ResourcesUpdateToolTest {
 
   @Test
   public void shouldUpdateFirstCallTest() {
