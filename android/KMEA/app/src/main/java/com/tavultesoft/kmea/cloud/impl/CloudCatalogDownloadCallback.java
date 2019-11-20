@@ -30,6 +30,11 @@ import java.util.List;
 public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Dataset, CloudCatalogDownloadReturns> {
 
   private static final String TAG = "CloudCatalogDownloadCb";
+
+  /**
+   * Forces update process for all installed keyboard bundles.
+   * Only for testing, should be false for merging
+   */
   private static final boolean DEBUG_SIMULATE_UPDATES = false;
 
   private final Context context;
@@ -218,7 +223,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       } // else no match == no special handling.
     }
 
-    if (updateBundles.size() > 0) {
+    if (updateBundles.size() > 0 && !(DEBUG_SIMULATE_UPDATES && !executeCallbacks)) {
       // Time for updates!
       Log.v(TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");
 

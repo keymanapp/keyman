@@ -200,6 +200,7 @@ public class CloudRepository {
     boolean cacheValid = loadKeyboardsFromCache && loadLexicalModelsFromCache;
 
     if(cacheValid && shouldUseMemCache(context)) {
+      onSuccess.run();
       return; // isn't null - checked by `shouldUseCache`.
     }
 

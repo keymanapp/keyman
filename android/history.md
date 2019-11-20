@@ -7,6 +7,9 @@
   * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
   * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
+  * Check for keyboard updates during keyman startup (#2335)
+  * Show available keyboard updates as android system notifications (#2335)
+  * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
 * Changes:
   * Update target Android SDK version to 29 (#2279)
   * Add linting to Debug builds and resolve lint errors (#2305)
