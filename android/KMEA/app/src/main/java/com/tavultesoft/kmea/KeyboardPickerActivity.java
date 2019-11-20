@@ -840,7 +840,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     }
   }
 
-  static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+  public static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
     String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
     String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
     String kbKey = String.format("%s_%s", languageID, keyboardID);

@@ -142,6 +142,16 @@ public class ConfirmDialogFragment extends DialogFragment {
       })
       .setNegativeButton(getString(R.string.label_cancel),  new DialogInterface.OnClickListener() {
        public void onClick(DialogInterface dialog, int which) {
+         switch (dialogType) {
+           case DIALOG_TYPE_DOWNLOAD_KEYBOARD :
+             KMManager.getUpdateTool().cancelKeyboardUpdate(_langId,_kbId);
+             break;
+           case DIALOG_TYPE_DOWNLOAD_MODEL :
+             KMManager.getUpdateTool().cancelLexicalModelUpdate(_langId,_modelId);
+             break;
+           default :
+             break;
+         }
          // Cancel
          if (dialog != null) {
            dialog.dismiss();

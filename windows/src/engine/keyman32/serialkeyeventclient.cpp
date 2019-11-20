@@ -149,6 +149,7 @@ public:
 };
 
 void ISerialKeyEventClient::Startup() {
+  OutputThreadDebugString("ISerialKeyEventClient::Startup");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td) {
     _td->pSerialKeyEventClient = new SerialKeyEventClient();
@@ -156,6 +157,7 @@ void ISerialKeyEventClient::Startup() {
 }
 
 void ISerialKeyEventClient::Shutdown() {
+  OutputThreadDebugString("ISerialKeyEventClient::Shutdown");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (_td && _td->pSerialKeyEventClient) {
     delete _td->pSerialKeyEventClient;

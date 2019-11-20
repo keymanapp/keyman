@@ -49,6 +49,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.setInputMethodService(this); // for HW interface
+    KMManager.executeResourceUpdate(this);
   }
 
   @Override

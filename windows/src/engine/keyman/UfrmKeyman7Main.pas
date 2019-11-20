@@ -442,6 +442,10 @@ begin
   begin
     olestrm := TOLEStream.Create(istrm);
     try
+      // In some situations, launching the app multiple times rapidly can
+      // cause the icon to be loaded multiple times. Make sure we reset the
+      // stream position before we try and read.
+      olestrm.Position := 0;
       Application.Icon.LoadFromStream(olestrm);
     finally
       olestrm.Free;
