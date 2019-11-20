@@ -55,10 +55,6 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
   private boolean dismissOnSelect = false;
   protected static boolean canAddNewKeyboard = true;
 
-  private ResourcesUpdateTool resourceupdater = new ResourcesUpdateTool();
-
-  private static String TAG = "LanguagesSettingsActivity";
-
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
