@@ -122,7 +122,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
           Intent i = new Intent(Intent.ACTION_VIEW);
 
           if (customHelpLink != null) {
-            if (FileUtils.isWelcomeFile(customHelpLink)) {
+            if (FileUtils.isWelcomeFile(customHelpLink) && ! KMManager.isTestMode()) {
               File customHelp = new File(new File(customHelpLink).getAbsolutePath());
               i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
@@ -139,7 +139,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
             else {
               i.setData(Uri.parse(customHelpLink));
             }
-            if (FileProviderUtils.exists(context)) {
+            if (FileProviderUtils.exists(context)|| KMManager.isTestMode()) {
               startActivity(i);
             }
           } else {
