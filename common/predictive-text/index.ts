@@ -143,8 +143,15 @@ namespace com.keyman.text.prediction {
 
     private onMessage(event: MessageEvent): void {
       let payload: OutgoingMessage = event.data;
-      if (payload.message === 'ready') {
+      if (payload.message === 'error') {
+        console.error(payload.log);
+        if(payload.error) {
+          console.error(payload.error);
+        }
+      }
+      else if (payload.message === 'ready') {
         this._declareLMLayerReady(event.data.configuration);
+        console.log("LMLayer ready!");
       } else if (payload.message === 'suggestions') {
         this._predictPromises.keep(payload.token, payload.suggestions);
       } else if (payload.message === 'currentword') {
