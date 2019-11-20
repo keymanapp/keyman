@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 * New Features:
-  * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308)
+  * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308, #2365)
   * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
   * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
