@@ -159,19 +159,22 @@ public class KeyboardPickerTest {
       Intent actual = Shadows.shadowOf(activity).getNextStartedActivity();
       Assert.assertNotNull(actual);
 
+      //execute next activity -> opens Keyboardinfo
       _controller2 = Robolectric.buildActivity(KeyboardInfoActivity.class,actual).setup();
       KeyboardInfoActivity _info = _controller2.get();
       Assert.assertNotNull(_info);
 
+      //get info list
       ListView _infolistview = _info.findViewById(R.id.listView);
       Assert.assertNotNull(_infolistview);
 
+      //find helplink and click
       View _helplink = _view.getAdapter().getView(1, null, null);
       Assert.assertNotNull(_helplink);
       _infolistview.performItemClick(_helplink,1,_infolistview.getAdapter().getItemId(1));
 
+      // check result intent to be a weblink to open
       Intent actual2 = Shadows.shadowOf(_info).getNextStartedActivity();
-
       Assert.assertNotNull(actual2);
       Assert.assertEquals(actual2.getAction(),Intent.ACTION_VIEW);
     }
