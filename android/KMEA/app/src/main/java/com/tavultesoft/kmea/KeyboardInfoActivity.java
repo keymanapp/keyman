@@ -102,6 +102,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
+        //TODO: change to a language independent property. Add an id for each line to the map.
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
           // No point in 'clicking' on version info.
           return false;
