@@ -311,7 +311,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       stackBuilder.getPendingIntent(notification_id, PendingIntent.FLAG_UPDATE_CURRENT);
 
     Builder builder = new Builder(currentContext, getClass().getName())
-      .setSmallIcon(R.drawable.ic_launcher)
+      .setSmallIcon(R.drawable.ic_keyboard)
       .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
