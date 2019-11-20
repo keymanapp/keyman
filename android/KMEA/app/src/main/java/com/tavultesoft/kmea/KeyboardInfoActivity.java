@@ -84,7 +84,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
-    if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
+    if ( (customHelpLink != null && !FileProviderUtils.exists(context) && ! KMManager.isTestMode()) ||
          (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {
       icon = noIcon;
     }
