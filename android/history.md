@@ -6,9 +6,11 @@
   * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308)
   * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
+  * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
+* Changes:
   * Update target Android SDK version to 29 (#2279)
   * Add linting to Debug builds and resolve lint errors (#2305)
-  * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
+  * Fix memory issues during build process (#2361)
 
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:
