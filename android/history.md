@@ -14,7 +14,7 @@
   * Update target Android SDK version to 29 (#2279)
   * Add linting to Debug builds and resolve lint errors (#2305)
   * Fix memory issues during build process (#2361)
-  * Add ui test for keyboard picker and keyboard info screen (#2326)
+  * Add ui tests for keyboard picker and keyboard info screens (#2326)
 
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:
