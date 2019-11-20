@@ -84,7 +84,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     // Check if app declared FileProvider
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
-    if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
+    if ( (customHelpLink != null && !FileProviderUtils.exists(context) && ! KMManager.isTestMode()) ||
          (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {
       icon = noIcon;
     }
@@ -102,6 +102,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
+        //TODO: change to a language independent property. Add an id for each line to the map.
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
           // No point in 'clicking' on version info.
           return false;
@@ -122,7 +123,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
           Intent i = new Intent(Intent.ACTION_VIEW);
 
           if (customHelpLink != null) {
-            if (FileUtils.isWelcomeFile(customHelpLink)) {
+            if (FileUtils.isWelcomeFile(customHelpLink) && ! KMManager.isTestMode()) {
               File customHelp = new File(new File(customHelpLink).getAbsolutePath());
               i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
@@ -139,7 +140,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
             else {
               i.setData(Uri.parse(customHelpLink));
             }
-            if (FileProviderUtils.exists(context)) {
+            if (FileProviderUtils.exists(context)|| KMManager.isTestMode()) {
               startActivity(i);
             }
           } else {
