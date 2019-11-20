@@ -7,6 +7,7 @@
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
   * Update target Android SDK version to 29 (#2279)
   * Add linting to Debug builds and resolve lint errors (#2305)
+  * First simple ui test for keyboard picker and keybaord info screen (#2326)
 
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:
