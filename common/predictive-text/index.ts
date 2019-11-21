@@ -151,7 +151,6 @@ namespace com.keyman.text.prediction {
       }
       else if (payload.message === 'ready') {
         this._declareLMLayerReady(event.data.configuration);
-        console.log("LMLayer ready!");
       } else if (payload.message === 'suggestions') {
         this._predictPromises.keep(payload.token, payload.suggestions);
       } else if (payload.message === 'currentword') {

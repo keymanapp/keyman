@@ -131,9 +131,10 @@ class LMLayerWorker {
     if(im.message == 'load') {
       let data = im as LoadMessage;
       if(data.model == this._currentModelSource) {
-        // if(console) {
-        //   console.warn("Duplicate model load message detected - squashing!");
-        // }
+        // Some JS implementations don't allow web workers access to the console.
+        if(console) {
+          console.warn("Duplicate model load message detected - squashing!");
+        }
         return;
       } else {
         this._currentModelSource = data.model;
