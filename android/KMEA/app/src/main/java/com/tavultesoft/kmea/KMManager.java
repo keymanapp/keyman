@@ -2119,6 +2119,9 @@ public final class KMManager {
       }
 
       CharSequence sequence = ic.getTextBeforeCursor(length, 0);
+      if (sequence.length() <= 0) {
+        return "";
+      }
 
       // Move the cursor back if there's a split surrogate pair
       if (Character.isHighSurrogate(sequence.charAt(sequence.length()-1))) {

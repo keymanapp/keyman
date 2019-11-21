@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 
-## 2019-11-17 12.0.4208 stable
+## 2019-11-21 12.0.4208 stable
 * Bug fix:
   * Fix context manipulation to work around Chromium issue (#2281)
 
