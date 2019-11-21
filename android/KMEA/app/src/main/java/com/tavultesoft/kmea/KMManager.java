@@ -2096,7 +2096,6 @@ public final class KMManager {
       // subSequence indices are start(inclusive) to end(exclusive)
       CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
       ic.deleteSurroundingText(dn + numPairs, 0);
-      //CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
       CharSequence newContext = getCharacterSequence(ic, originalBufferLength - dn);
 
       CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
