@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.util.Connection;
 import android.util.Log;
 
 public final class JSONParser {
+  private final String TAG = "JSONParser";
 
   public JSONParser() {
   }
@@ -88,7 +89,8 @@ public final class JSONParser {
       reader = new BufferedReader(new FileReader(path));
       jsonObj = getJSONObjectFromReader(reader, type);
     } catch (FileNotFoundException e) {
-      Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
+      String errorString = (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage();
+      Log.e(TAG, "JSONObjectFromFile error " + errorString);
       jsonObj = null;
       System.err.println(e);
     } finally {
@@ -96,6 +98,7 @@ public final class JSONParser {
         try {
           reader.close();
         } catch (IOException e) {
+          Log.e(TAG, "getJSONObjectFromFile error: " + e);
           // Ignore.
         }
       }

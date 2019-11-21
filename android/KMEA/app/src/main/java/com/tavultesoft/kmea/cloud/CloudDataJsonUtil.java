@@ -56,7 +56,7 @@ public class CloudDataJsonUtil {
 
   public static List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
     List<Keyboard> keyboardsList = new ArrayList<>();
-    if (query.length() == 0) {
+    if (query == null || query.length() == 0) {
       return keyboardsList;
     }
 
