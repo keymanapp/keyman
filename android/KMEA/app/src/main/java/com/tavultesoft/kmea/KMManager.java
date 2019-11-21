@@ -2096,7 +2096,8 @@ public final class KMManager {
       // subSequence indices are start(inclusive) to end(exclusive)
       CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
       ic.deleteSurroundingText(dn + numPairs, 0);
-      CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
+      //CharSequence newContext = ic.getTextBeforeCursor(originalBufferLength - dn, 0);
+      CharSequence newContext = getCharacterSequence(ic, originalBufferLength - dn);
 
       CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
       if (charsToRestore.length() > 0) {
@@ -2108,7 +2109,8 @@ public final class KMManager {
 
     /**
      * Get a character sequence from the InputConnection.
-     * Sometimes Firefox will split a surrogate pair, so chop that and update the cursor
+     * Sometimes the WebView can split a surrogate pair at either end,
+     * so chop that and update the cursor
      * @param ic - the InputConnection
      * @param length - number of characters to get
      * @return CharSequence
@@ -2128,6 +2130,12 @@ public final class KMManager {
         String origChars = sequence.toString();
         ic.commitText("", -1);
         sequence = ic.getTextBeforeCursor(length, 0);
+      }
+
+      if (Character.isLowSurrogate(sequence.charAt(0))) {
+        // Adjust if the first char is also a split surrogate pair
+        // subSequence indices are start(inclusive) to end(exclusive)
+        sequence = sequence.subSequence(1, sequence.length());
       }
 
       return sequence;
