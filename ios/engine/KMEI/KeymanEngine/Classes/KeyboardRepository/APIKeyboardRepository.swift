@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 public enum APIKeyboardFetchError: Error {
+  case duplicateLanguageCodes
   case networkError(Error)
   case noData
   case parsingError(Error)
@@ -75,7 +76,32 @@ public class APIKeyboardRepository: KeyboardRepository {
     }
 
     options = result.options
-    languages = Dictionary(uniqueKeysWithValues: result.languages.map { ($0.id, $0) })
+
+    // Detect duplicate ids - this scenario indicates an infrastructure problem.
+    var dictionary = Dictionary<String, Language>()
+    var duplicateDetected = false
+    result.languages.forEach { language in
+      // Does an entry for this ID already exist?  Trouble if so.
+      if let _ = dictionary[language.id] {
+        duplicateDetected = true
+        return
+      }
+
+      dictionary.updateValue(language, forKey: language.id)
+    }
+
+    guard !duplicateDetected else {
+      // This indicates an issue in our keyboard API infrastructure.
+      // Don't let it crash the app, but definitely make note of it
+      // as something to be fixed.
+      log.error("Corrupt data detected in API returns: duplicate language codes")
+      errorHandler(APIKeyboardFetchError.duplicateLanguageCodes)
+      return
+    }
+
+    // Now that we've successfully processed the API returns, assign
+    // the results to the proper field.
+    languages = dictionary
 
     let keyboardsWithID = result.languages.flatMap { language in
       language.keyboards?.map { kb in (kb.id, kb) } ?? []
