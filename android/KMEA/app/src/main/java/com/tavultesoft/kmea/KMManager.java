@@ -468,12 +468,6 @@ public final class KMManager {
         packagesDir.mkdir();
       }
 
-      // Lexical models directory
-      File lexicalModelsDir = new File(getLexicalModelsDir());
-      if (!lexicalModelsDir.exists()) {
-        lexicalModelsDir.mkdir();
-      }
-
       // Copy default cloud keyboard
       File cloudDir = new File(getCloudDir());
       if (!cloudDir.exists()) {
@@ -482,6 +476,23 @@ public final class KMManager {
       String[] keyboardFiles = assetManager.list(KMDefault_UndefinedPackageID);
       for (String keyboardFile : keyboardFiles) {
         copyAsset(context, keyboardFile, KMDefault_UndefinedPackageID, true);
+      }
+
+      // Copy lexical model directory and subfolders
+      File lexicalModelsDir = new File(getLexicalModelsDir());
+      if (!lexicalModelsDir.exists()) {
+        lexicalModelsDir.mkdir();
+      }
+      String[] modelNames = assetManager.list(KMDefault_LexicalModelPackages);
+      for (String modelName : modelNames) {
+        File lexicalModelDir = new File(lexicalModelsDir, modelName);
+        if (!lexicalModelDir.exists()) {
+          lexicalModelDir.mkdir();
+        }
+        String[] modelFiles = assetManager.list(KMDefault_LexicalModelPackages + File.separator + modelName);
+        for (String modelFile : modelFiles) {
+          copyAsset(context, modelFile, KMDefault_LexicalModelPackages + File.separator + modelName, true);
+        }
       }
     } catch (Exception e) {
       Log.e(TAG, "Failed to copy assets. Error: " + e);
