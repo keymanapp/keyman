@@ -15,6 +15,7 @@
   * Add linting to Debug builds and resolve lint errors (#2305)
   * Fix memory issues during build process (#2361)
   * Add simple UI tests for keyboard picker and keyboard info screens (#2326)
+  * Add example dictionary to KMSample1 project (#2369)
 
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:
