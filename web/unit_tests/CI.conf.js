@@ -43,12 +43,12 @@ module.exports = function(config) {
    * Definition of browser sets possibly relevant for testing.
    */
   var CURRENT_MAC_LAUNCHERS = {
-    bs_firefox_mac: {
-      browser: 'firefox',
-      browser_version: '62',
-      os: 'OS X',
-      os_version: 'Mojave'
-    },
+    // bs_firefox_mac: {
+    //   browser: 'firefox',
+    //   browser_version: '62',
+    //   os: 'OS X',
+    //   os_version: 'Mojave'
+    // },
     // Unfortunately, BrowserStack's Safari test clients have been quite unstable recently,
     // failing to even start running their tests.  We're disabling them until the issue goes away.
 
@@ -58,12 +58,12 @@ module.exports = function(config) {
     //   os: 'OS X',
     //   os_version: 'High Sierra'
     // },
-    // bs_safari_mac_m: {
-    //   browser: 'safari',
-    //   browser_version: '12',
-    //   os: 'OS X',
-    //   os_version: 'Mojave'
-    // },
+    bs_safari_mac_m: {
+      browser: 'safari',
+      browser_version: '13',
+      os: 'OS X',
+      os_version: 'Catalina'
+    },
     bs_chrome_mac: {
       browser: 'chrome',
       browser_version: '70.0',
@@ -117,13 +117,6 @@ module.exports = function(config) {
   }
 
   var CURRENT_ANDROID_LAUNCHERS = {
-    bs_native_android: {
-      os: 'android',
-      os_version: '7.1',
-      browser: 'firefox',
-      real_mobile: true,
-      device: 'Samsung Galaxy Note 8'
-    },
     bs_chrome_android: {
       os: 'android',
       os_version: '7.1',
