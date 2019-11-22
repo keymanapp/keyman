@@ -24,6 +24,32 @@ public class APIKeyboardRepository: KeyboardRepository {
   public private(set) var keyboards: [String: Keyboard]?
   private(set) var options: Options?
 
+  private func resultsToDictionary(for result: LanguagesAPICall, handler: (_ error: Error) -> Void) -> Dictionary<String, Language>? {
+    // Detect duplicate ids - this scenario indicates an infrastructure problem.
+    var dictionary = Dictionary<String, Language>()
+    var duplicateDetected = false
+    result.languages.forEach { language in
+      // Does an entry for this ID already exist?  Trouble if so.
+      if let _ = dictionary[language.id] {
+        duplicateDetected = true
+        return
+      }
+
+      dictionary.updateValue(language, forKey: language.id)
+    }
+
+    guard !duplicateDetected else {
+      // This indicates an issue in our keyboard API infrastructure.
+      // Don't let it crash the app, but definitely make note of it
+      // as something to be fixed.
+      log.error("Corrupt data detected in API returns: duplicate language codes")
+      handler(APIKeyboardFetchError.duplicateLanguageCodes)
+      return nil
+    }
+
+    return dictionary
+  }
+
   public func fetch(completionHandler: CompletionHandler?) {
     let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
     let keymanVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
@@ -78,24 +104,8 @@ public class APIKeyboardRepository: KeyboardRepository {
     options = result.options
 
     // Detect duplicate ids - this scenario indicates an infrastructure problem.
-    var dictionary = Dictionary<String, Language>()
-    var duplicateDetected = false
-    result.languages.forEach { language in
-      // Does an entry for this ID already exist?  Trouble if so.
-      if let _ = dictionary[language.id] {
-        duplicateDetected = true
-        return
-      }
-
-      dictionary.updateValue(language, forKey: language.id)
-    }
-
-    guard !duplicateDetected else {
-      // This indicates an issue in our keyboard API infrastructure.
-      // Don't let it crash the app, but definitely make note of it
-      // as something to be fixed.
-      log.error("Corrupt data detected in API returns: duplicate language codes")
-      errorHandler(APIKeyboardFetchError.duplicateLanguageCodes)
+    guard let dictionary = resultsToDictionary(for: result, handler: errorHandler) else {
+      // The helper performs any relevant error handling on our behalf.
       return
     }
 
