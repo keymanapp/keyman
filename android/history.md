@@ -3,6 +3,13 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-22 12.0.4208 stable
+* Bug fix:
+  * Fix context manipulation to work around Chromium issue (#2281)
+
+## 2019-11-13 12.0.4207 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2288)
+
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:
   * Disable suggestions when system keyboard entering password field (#2255)
