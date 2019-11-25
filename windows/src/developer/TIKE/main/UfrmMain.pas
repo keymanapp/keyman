@@ -341,6 +341,7 @@ type
     procedure SaveDockLayout;
     procedure CEFShutdownComplete(Sender: TObject);
     procedure ActivateActiveChild;
+    function OpenModelEditor(FFileName: string): TfrmTikeEditor;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -432,6 +433,7 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmWordlistEditor,
+  Keyman.Developer.UI.UfrmModelEditor,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -1104,6 +1106,11 @@ begin
 end;
 
 function TfrmKeymanDeveloper.OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
+  function FileHasModelTsExt(Filename: string): Boolean;
+  begin
+    // We cannot use ExtractFileExt because of the two-part extension
+    Result := Filename.ToLower.EndsWith('.model.ts');
+  end;
 var
   ext: string;
 begin
@@ -1137,6 +1144,7 @@ begin
         else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
       end;
 
@@ -1164,6 +1172,11 @@ function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmWordlistEditor);
     //else Result := OpenEditor(FFileName, TfrmEditor);
+end;
+
+function TfrmKeymanDeveloper.OpenModelEditor(FFileName: string): TfrmTikeEditor;
+begin
+  Result := OpenEditor(FFileName, TfrmModelEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenKPSEditor(FFileName: string): TfrmTikeEditor;
