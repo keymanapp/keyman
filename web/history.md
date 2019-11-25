@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-18 12.0.103 stable
+* Fix for 'display underlying' flag not working (#2353)
+
 ## 2019-10-10 12.0.101 stable
 * Fixes issue with keyboards requiring special state notifications, such as the CJK picker keyboards (#2194)
 

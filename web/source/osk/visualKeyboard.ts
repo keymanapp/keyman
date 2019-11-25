@@ -617,7 +617,12 @@ namespace com.keyman.osk {
       }
 
       // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      if(typeof layout['displayUnderlying'] != 'undefined') {
+        layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+      } else {
+        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      }
+
       let divLayerContainer = this.deviceDependentLayout(layout, util.device.formFactor);
 
       this.ddOSK = true;
@@ -2126,7 +2131,11 @@ namespace com.keyman.osk {
 
       // Cannot create an OSK if no layout defined, just return empty DIV
       if(layout != null) {
-        layout.keyLabels=((typeof(PKbd['KDU']) != 'undefined') && PKbd['KDU']);
+        if(typeof layout['displayUnderlying'] != 'undefined') {
+          layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+        } else {
+          layout.keyLabels = typeof(PKbd['KDU']) != 'undefined' && PKbd['KDU'];
+        }        
       }
 
       // TODO:  Fix this method's link!
