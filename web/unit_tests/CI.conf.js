@@ -43,20 +43,13 @@ module.exports = function(config) {
    * Definition of browser sets possibly relevant for testing.
    */
   var CURRENT_MAC_LAUNCHERS = {
+    // Disabled due to a long period BrowserStack failing to actually run the tests on
+    // the browser/platform combo.
     // bs_firefox_mac: {
     //   browser: 'firefox',
     //   browser_version: '62',
     //   os: 'OS X',
     //   os_version: 'Mojave'
-    // },
-    // Unfortunately, BrowserStack's Safari test clients have been quite unstable recently,
-    // failing to even start running their tests.  We're disabling them until the issue goes away.
-
-    // bs_safari_mac_hs: {
-    //   browser: 'safari',
-    //   browser_version: '11.1',
-    //   os: 'OS X',
-    //   os_version: 'High Sierra'
     // },
     bs_safari_mac_m: {
       browser: 'safari',
