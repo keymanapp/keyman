@@ -2120,7 +2120,7 @@ public final class KMManager {
       }
 
       CharSequence sequence = ic.getTextBeforeCursor(length, 0);
-      if (sequence.length() <= 0) {
+      if (sequence == null || sequence.length() <= 0) {
         return "";
       }
 
@@ -2131,7 +2131,7 @@ public final class KMManager {
         sequence = ic.getTextBeforeCursor(length, 0);
       }
 
-      if (Character.isLowSurrogate(sequence.charAt(0))) {
+      if (sequence != null && Character.isLowSurrogate(sequence.charAt(0))) {
         // Adjust if the first char is also a split surrogate pair
         // subSequence indices are start(inclusive) to end(exclusive)
         sequence = sequence.subSequence(1, sequence.length());
