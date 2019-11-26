@@ -27,22 +27,24 @@ public class APIKeyboardRepository: KeyboardRepository {
   private func resultsToDictionary(for result: LanguagesAPICall, handler: (_ error: Error) -> Void) -> Dictionary<String, Language>? {
     // Detect duplicate ids - this scenario indicates an infrastructure problem.
     var dictionary = Dictionary<String, Language>()
-    var duplicateDetected = false
+    var duplicates: [String] = []
+
     result.languages.forEach { language in
       // Does an entry for this ID already exist?  Trouble if so.
       if let _ = dictionary[language.id] {
-        duplicateDetected = true
-        return
+        if duplicates.firstIndex(of: language.id) != -1 {
+          duplicates.append(language.id)
+        }
       }
 
       dictionary.updateValue(language, forKey: language.id)
     }
 
-    guard !duplicateDetected else {
+    guard duplicates.count == 0 else {
       // This indicates an issue in our keyboard API infrastructure.
       // Don't let it crash the app, but definitely make note of it
       // as something to be fixed.
-      log.error("Corrupt data detected in API returns: duplicate language codes")
+      log.error("Corrupt data detected in API returns - duplicate language codes: \(duplicates)")
       handler(APIKeyboardFetchError.duplicateLanguageCodes)
       return nil
     }
