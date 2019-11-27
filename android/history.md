@@ -3,6 +3,16 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-11-27 12.0.4211 stable
+* Bug fix:
+  * Fix crashes involving context manipulation of invalid context (#2377)
+
+## 2019-11-26 12.0.4210 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2322)
+
+## 2019-11-25 12.0.4209 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2372)
+
 ## 2019-11-22 12.0.4208 stable
 * Bug fix:
   * Fix context manipulation to work around Chromium issue (#2281)
