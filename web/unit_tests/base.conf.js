@@ -2,7 +2,6 @@
 // Generated on Mon Jan 29 2018 11:58:53 GMT+0700 (SE Asia Standard Time)
 
 // Super-useful!  http://www.bradoncode.com/blog/2015/02/27/karma-tutorial/#handling-html-fixtures
-let karma = require("karma");
 
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
