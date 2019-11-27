@@ -3,6 +3,11 @@ var assert = chai.assert;
 describe('Basic KeymanWeb', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
+  before(function() {
+    // These tests require use of KMW's device-detection functionality.
+    assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+  })
+
   beforeEach(function(done) {
     this.timeout(kmwconfig.timeouts.scriptLoad);
 
