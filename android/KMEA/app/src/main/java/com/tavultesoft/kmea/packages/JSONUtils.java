@@ -33,6 +33,9 @@ public class JSONUtils {
    * Will need to swap kmp.json (keyboards : languages) to cloud order (languages : keyboards)
    */
   public static JSONArray getLanguages() {
+    if (resourceRoot == null) {
+      return new JSONArray();
+    }
     File[] packages = resourceRoot.listFiles();
     JSONArray languagesArray = new JSONArray();
     JSONParser parser = new JSONParser();
