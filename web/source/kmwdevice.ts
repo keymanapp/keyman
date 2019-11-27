@@ -77,7 +77,10 @@ namespace com.keyman {
           // Starting with 13.1, "Macintosh" can reflect iPads (by default) or iPhones 
           // (by user setting); a new "Request Desktop Website" setting for Safari will
           // change the user agent string to match a desktop Mac.
-          let regex = /Intel Mac OS X (10(?:_\d+)+)/i;
+          //
+          // Firefox uses '.' between version components, while Chrome and Safari use
+          // '_' instead.  So, we have to check for both.  Yay.
+          let regex = /Intel Mac OS X (10(?:[_\.]\d+)+)/i;
           let results = regex.exec(agent);
           
           // Match result:  a version string with components separated by underscores.

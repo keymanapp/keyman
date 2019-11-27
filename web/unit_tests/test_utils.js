@@ -1,9 +1,23 @@
 // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
+com = com || {};
+com.keyman = com.keyman || {};
+com.keyman.karma = com.keyman.karma || {};
+com.keyman.karma.DEVICE_DETECT_FAILURE = false;
+
 (function() {
-  var device = new com.keyman.Device();
-  device.detect();
-  var mobile = (device.formFactor != 'desktop');
+  // Default value in case of device-detection failure.
+  var mobile = false;
+
+  try {
+    var device = new com.keyman.Device();
+    device.detect();
+
+    mobile = (device.formFactor != 'desktop');
+  } catch (err) {
+    // Sets a warning flag that unit-test files can use to disable themselves.
+    com.keyman.karma.DEVICE_DETECT_FAILURE = true;
+  }
 
   var kmwconfig = window['kmwconfig'] = {mobile: mobile};
 
