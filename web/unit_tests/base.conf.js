@@ -2,10 +2,14 @@
 // Generated on Mon Jan 29 2018 11:58:53 GMT+0700 (SE Asia Standard Time)
 
 // Super-useful!  http://www.bradoncode.com/blog/2015/02/27/karma-tutorial/#handling-html-fixtures
+let karma = require("karma");
 
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude)
   basePath: '..',
+
+  // Safeguards against disconnecting after starting tests.
+  browserNoActivityTimeout: 60000,
 
   client: {
     /* `client.args` here is passed to the test runner page as `__karma__.config.args`.  
@@ -37,6 +41,7 @@ module.exports = {
     'unit_tests/recorder_InputEvents.js', // The object definitions used to generate/replicate key events for engine tests.
                                           // Includes KMW's Device class, which is used by test_utils below.
     'unit_tests/dev_resources.js',  // Defines com.keyman.dom objects separate from KMW for unit testing.
+    'unit_tests/test_init_check.js', // Ensures that tests will initialize properly
     'unit_tests/test_utils.js', // A basic utility script useful for constructing tests
     'unit_tests/cases/**/*.js', // Where the tests actually reside.
     'unit_tests/json/**/*.json', // Where pre-loaded JSON resides.

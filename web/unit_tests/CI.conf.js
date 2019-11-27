@@ -43,14 +43,12 @@ module.exports = function(config) {
    * Definition of browser sets possibly relevant for testing.
    */
   var CURRENT_MAC_LAUNCHERS = {
-    // Disabled due to a long period BrowserStack failing to actually run the tests on
-    // the browser/platform combo.
-    // bs_firefox_mac: {
-    //   browser: 'firefox',
-    //   browser_version: '62',
-    //   os: 'OS X',
-    //   os_version: 'Mojave'
-    // },
+    bs_firefox_mac: {
+      browser: 'firefox',
+      browser_version: '62',
+      os: 'OS X',
+      os_version: 'Mojave'
+    },
     bs_safari_mac_m: {
       browser: 'safari',
       browser_version: '13',
@@ -162,7 +160,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DEBUG,
 
     // Concurrency level
     // For CI, it really helps to keep a nice, clean set of output logs.
