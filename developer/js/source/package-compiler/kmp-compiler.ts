@@ -2,9 +2,9 @@
 /// <reference path="kps-file.ts" />
 /// <reference path="kmp-json-file.ts" />
 
-let fs = require('fs');
-let path = require('path');
-let xml2js = require('xml2js');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as xml2js from 'xml2js';
 let zip = require('node-zip')();
 
 export default class KmpCompiler {

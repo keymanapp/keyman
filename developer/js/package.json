@@ -35,6 +35,7 @@
     "kmlmi": "dist/kmlmi.js"
   },
   "dependencies": {
+    "@types/xml2js": "^0.4.5",
     "commander": "^3.0.0",
     "node": "^11.7.0",
     "node-zip": "^1.1.1",
