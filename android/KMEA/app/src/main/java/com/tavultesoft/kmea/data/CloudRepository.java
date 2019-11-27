@@ -358,8 +358,9 @@ public class CloudRepository {
 
   protected List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
     List<Keyboard> keyboardsList = new ArrayList<>();
-    //keyboardModifiedDates = new HashMap<String, String>();
-
+    if (query.length() == 0) {
+      return keyboardsList;
+    }
     String isCustom = fromKMP ? "Y" : "N";
 
     try {
@@ -376,6 +377,7 @@ public class CloudRepository {
         int kbLength = langKeyboards.length();
         for (int j = 0; j < kbLength; j++) {
           JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
+          String pkgID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
           String kbID = keyboardJSON.getString(KMManager.KMKey_ID);
           String kbName = keyboardJSON.getString(KMManager.KMKey_Name);
           String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
@@ -384,6 +386,7 @@ public class CloudRepository {
           //String kbKey = String.format("%s_%s", langID, kbID);
           HashMap<String, String> hashMap = new HashMap<String, String>();
           hashMap.put(KMManager.KMKey_KeyboardName, kbName);
+          hashMap.put(KMManager.KMKey_PackageID, pkgID);
           hashMap.put(KMManager.KMKey_KeyboardID, kbID);
           hashMap.put(KMManager.KMKey_LanguageName, langName);
           hashMap.put(KMManager.KMKey_LanguageID, langID);
@@ -440,7 +443,8 @@ public class CloudRepository {
 
         String modelID = model.getString(KMManager.KMKey_ID);
         String modelName = model.getString(KMManager.KMKey_Name);
-        String modelVersion = model.getString(KMManager.KMKey_LexicalModelVersion);
+        String version = model.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+        String modelVersion = model.optString(KMManager.KMKey_LexicalModelVersion, version);
 
         String isCustom = model.optString(KMManager.KMKey_CustomModel, "N");
         String icon = "0";
