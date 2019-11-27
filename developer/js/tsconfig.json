@@ -7,8 +7,10 @@
     "outDir": "dist",
     "declaration": true,
     "alwaysStrict": true,
-    "noImplicitReturns": true,
     "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
     "noUnusedLocals": true
   },
   "include": [
