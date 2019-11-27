@@ -2096,7 +2096,7 @@ public final class KMManager {
       // subSequence indices are start(inclusive) to end(exclusive)
       CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
       ic.deleteSurroundingText(dn + numPairs, 0);
-      CharSequence newContext = getCharacterSequence(ic, originalBufferLength - dn);
+      CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
 
       CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
       if (charsToRestore.length() > 0) {
@@ -2120,7 +2120,7 @@ public final class KMManager {
       }
 
       CharSequence sequence = ic.getTextBeforeCursor(length, 0);
-      if (sequence.length() <= 0) {
+      if (sequence == null || sequence.length() <= 0) {
         return "";
       }
 
@@ -2131,7 +2131,7 @@ public final class KMManager {
         sequence = ic.getTextBeforeCursor(length, 0);
       }
 
-      if (Character.isLowSurrogate(sequence.charAt(0))) {
+      if (sequence != null && Character.isLowSurrogate(sequence.charAt(0))) {
         // Adjust if the first char is also a split surrogate pair
         // subSequence indices are start(inclusive) to end(exclusive)
         sequence = sequence.subSequence(1, sequence.length());
