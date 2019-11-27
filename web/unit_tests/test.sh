@@ -4,7 +4,7 @@
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
 display_usage ( ) {
-    echo "test.sh [-CI | -debug | -? | -h | -help] [-reporter <reporter>]"
+    echo "test.sh [-CI | -debug | -? | -h | -help] | [-log-level <level>] | [-reporter <reporter>]"
     echo
     echo "  -CI               to run unit tests in CI mode on BrowserStack."
     echo "                    This script requires your credentials to be set in environment variables - see "
@@ -12,6 +12,9 @@ display_usage ( ) {
     echo ""
     echo "  -debug            to establish a Karma server that facilitates unit test debugging"
     echo "                    Not compatible with -CI."
+    echo ""
+    echo "  -log-level        to set the logging level used by Karma."
+    echo "                    Valid options: 'debug', 'info', 'warn', 'error', 'disable'"
     echo ""
     echo "  -reporter         sets the test engine to utilize the specified <reporter>."
     echo "                    Valid options:  BrowserStack, teamcity, dots, progress, mocha"
@@ -65,6 +68,10 @@ while [[ $# -gt 0 ]] ; do
         -CI)
             CONFIG=CI.conf.js
             ;;
+        -log-level)
+            shift
+            FLAGS="--log-level=$1 $FLAGS"
+            ;;
         -debug)
             # Disables the default 'run once, then done' configuration needed for CI.
             DEBUG=true
@@ -103,7 +110,7 @@ cd $BASE_PATH/../source
 ./build_dev_resources.sh
 
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
-npm --no-color run karma -- start --log-level=debug $FLAGS $BROWSERS unit_tests/$CONFIG
+npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 
 CODE=$?
 
