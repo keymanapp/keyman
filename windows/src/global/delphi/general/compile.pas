@@ -35,8 +35,19 @@ uses
 
   kmxfileconsts;
 
+const
+{$IFDEF WIN64}
+  kmcmpdll_lib = 'kmcmpdll.x64.dll';
+{$ELSE}
+  kmcmpdll_lib = 'kmcmpdll.dll';
+{$ENDIF}
+
+{$IFDEF WIN64}
+{$A16}
+{$ENDIF}
+
 type
-  FILE_STORE = packed record
+  FILE_STORE = record
   	dwSystemID: DWORD;
   	szName: array[0..SZMAX_STORENAME-1] of WCHAR;	// the name of the store
 	  dpString: PWideChar;	    				// from start of store structure
@@ -50,7 +61,7 @@ type
 
   PFILE_STORE = ^FILE_STORE;
 
-  FILE_KEY = packed record
+  FILE_KEY = record
     Key: WCHAR;            // WCHAR -- actually a WORD
     packing: WORD;
     Line: DWORD;
@@ -61,7 +72,7 @@ type
 
   PFILE_KEY = ^FILE_KEY;
 
-  FILE_GROUP  = packed record
+  FILE_GROUP  = record
     szName: array[0..SZMAX_GROUPNAME-1] of WCHAR;
     dpKeyArray: PFILE_KEY;         // address of first item in key array, from start of group structure
     dpMatch: PWideChar;                // from start of group structure
@@ -72,19 +83,19 @@ type
 
   PFILE_GROUP = ^FILE_GROUP;
 
-  FILE_DEADKEY = packed record
+  FILE_DEADKEY = record
 	  szName: array[0..SZMAX_DEADKEYNAME-1] of WCHAR;
   end;
 
   PFILE_DEADKEY  = ^FILE_DEADKEY;
 
-  FILE_VKDICTIONARY = packed record  // I3438
+  FILE_VKDICTIONARY = record  // I3438
 	  szName: array[0..SZMAX_VKDICTIONARYNAME-1] of WCHAR;
   end;
 
   PFILE_VKDICTIONARY = ^FILE_VKDICTIONARY;
 
-  FILE_KEYBOARD = packed record
+  FILE_KEYBOARD = record
     KeyboardID: DWORD;			// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 
     version: DWORD;				// keyboard file version with VERSION keyword
@@ -115,6 +126,10 @@ type
 	end;
 
   PFILE_KEYBOARD = ^FILE_KEYBOARD;
+
+{$IFDEF WIN64}
+{$A8}
+{$ENDIF}
 
 type
   TCompilerCallback = function( line: Integer; msgcode: LongWord; text: PAnsiChar): Integer; stdcall;  // I3310
@@ -171,7 +186,7 @@ begin
     if s = '' then
     begin
       s := GetDebugKMCmpDllPath;
-      if (s <> '') and not FileExists(s +'kmcmpdll.dll') then   // I4770
+      if (s <> '') and not FileExists(s + kmcmpdll_lib) then   // I4770
         s := '';
       if s = '' then
       begin
@@ -184,11 +199,11 @@ begin
       end;
     end;
 
-    HKMCmpDll := LoadLibrary(PChar(s+'kmcmpdll.dll'));
+    HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
     if HKMCmpDll = 0 then
     begin
-      Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+'kmcmpdll.dll.  '+   // I4706
-        'Check that kmcmpdll.dll is in the program directory '+
+      Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+kmcmpdll_lib+'.  '+   // I4706
+        'Check that '+kmcmpdll_lib+' is in the program directory '+
         'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
       Result := -1;
       Exit;
@@ -198,7 +213,7 @@ begin
   @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFile');
   if not Assigned(@ckf) then
   begin
-    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that kmcmpdll.dll is in the program directory '+   // I4706
+    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
       'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
     Result := -1;
     Exit;
@@ -227,11 +242,11 @@ begin
       if s = '' then s := ExtractFilePath(ParamStr(0));
     end;
 
-    HKMCmpDll := LoadLibrary(PChar(s+'kmcmpdll.dll'));
+    HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
     if HKMCmpDll = 0 then
     begin
-      Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+'kmcmpdll.dll.  '+   // I4706
-        'Check that kmcmpdll.dll is in the program directory '+
+      Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+kmcmpdll_lib+'.  '+   // I4706
+        'Check that '+kmcmpdll_lib+' is in the program directory '+
         'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
       Result := -1;
       Exit;
@@ -241,7 +256,7 @@ begin
   @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFileToBuffer');
   if not Assigned(@ckf) then
   begin
-    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that kmcmpdll.dll is in the program directory '+   // I4706
+    Callback(0, $8000, PAnsiChar(AnsiString('Could not access the compiler.  Check that '+kmcmpdll_lib+' is in the program directory '+   // I4706
       'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
     Result := -1;
     Exit;
