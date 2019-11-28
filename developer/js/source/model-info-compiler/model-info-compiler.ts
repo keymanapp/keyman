@@ -69,12 +69,15 @@ export function writeMergedModelMetadataFile(
   // https://help.keyman.com/developer/cloud/model_info/1.0
   //
 
-  function setModelMetadata(field: string, expected: any, warn: boolean = true) {
-    if(model_info[field] && model_info[field] !== expected) {
-      if(warn || typeof warn === 'undefined')
+  function setModelMetadata(field: keyof ModelInfoFile, expected: unknown, warn: boolean = true) {
+    if (model_info[field] && model_info[field] !== expected) {
+      if (warn || typeof warn === 'undefined')
         console.warn(`Warning: source ${sourceModelInfoFileName} field ${field} value "${model_info[field]}" does not match "${expected}" found in source file metadata.`);
     }
-    model_info[field] = model_info[field] || expected;
+    // TypeScript gets upset with this assignment, because it cannot deduce
+    // the exact type of model_info[field] -- there are many possibilities!
+    // So we assert that it's unknown so that TypeScript can chill.
+    (<unknown> model_info[field]) = model_info[field] || expected;
   }
 
   //
