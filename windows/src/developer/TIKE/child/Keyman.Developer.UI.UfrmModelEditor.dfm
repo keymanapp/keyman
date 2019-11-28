@@ -105,35 +105,25 @@ inherited frmModelEditor: TfrmModelEditor
               24
               24)
           end
-          object cmdNewWordlist: TButton
+          object cmdAddWordlist: TButton
             Left = 503
             Top = 27
             Width = 101
             Height = 25
             Anchors = [akTop, akRight]
-            Caption = '&New...'
+            Caption = '&Add...'
             TabOrder = 1
-            OnClick = cmdNewWordlistClick
+            OnClick = cmdAddWordlistClick
           end
           object cmdRemoveWordlist: TButton
-            Left = 503
-            Top = 89
-            Width = 100
-            Height = 25
-            Anchors = [akTop, akRight]
-            Caption = 'Remove'
-            TabOrder = 3
-            OnClick = cmdRemoveWordlistClick
-          end
-          object cmdAddExistingWordlist: TButton
             Left = 503
             Top = 58
             Width = 100
             Height = 25
             Anchors = [akTop, akRight]
-            Caption = '&Add existing...'
+            Caption = 'Remove'
             TabOrder = 2
-            OnClick = cmdAddExistingWordlistClick
+            OnClick = cmdRemoveWordlistClick
           end
         end
         object panBasicInformation: TPanel
@@ -236,10 +226,16 @@ inherited frmModelEditor: TfrmModelEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -387,6 +383,7 @@ inherited frmModelEditor: TfrmModelEditor
   end
   object dlgAddWordlist: TOpenDialog
     Options = [ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Title = 'Create or Add Wordlist'
     Left = 344
     Top = 344
   end

@@ -29,6 +29,7 @@ type
     function ReplaceWordBreaker(const m: TMatch): string;
     function ReplaceSources(const m: TMatch): string;
     function ReplaceComment(const m: TMatch): string;
+    procedure WordlistsChange(Sender: TObject);
   public
     constructor Create(Source: string);
     destructor Destroy; override;
@@ -58,10 +59,11 @@ constructor TLexicalModelParser.Create(Source: string);
 begin
   inherited Create;
   FWordlists := TStringList.Create;
+  (FWordlists as TStringList).OnChange := WordlistsChange;
   FText := TStringList.Create;
   FText.Text := Source;
-  FModified := False;
   Parse;
+  FModified := False;
 end;
 
 destructor TLexicalModelParser.Destroy;
@@ -222,6 +224,11 @@ begin
     FWordBreaker := Value;
     Modify;
   end;
+end;
+
+procedure TLexicalModelParser.WordlistsChange(Sender: TObject);
+begin
+  Modify;
 end;
 
 end.

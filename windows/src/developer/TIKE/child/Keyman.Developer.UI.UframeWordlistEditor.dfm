@@ -24,6 +24,8 @@ inherited frameWordlistEditor: TframeWordlistEditor
     object pageDesign: TTabSheet
       Caption = 'Design'
       ImageIndex = -1
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 627
       ExplicitHeight = 273
       object gridWordlist: TStringGridEditControlled

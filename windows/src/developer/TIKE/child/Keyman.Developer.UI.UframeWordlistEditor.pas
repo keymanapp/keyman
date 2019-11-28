@@ -146,8 +146,8 @@ begin
   if FileExists(FileName) then
   begin
     FWordlist.LoadFromFile(FileName);
-    UpdateData;
   end;
+  UpdateData;
   Result := True;
 end;
 

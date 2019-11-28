@@ -1,3 +1,4 @@
+//TODO: CEF destruction is incorrect in this unit
 unit Keyman.Developer.UI.UfrmModelEditor;
 
 interface
@@ -21,6 +22,10 @@ uses
   LeftTabbedPageControl,
   UfrmMDIEditor,
   UframeTextEditor,
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.modeltsProjectFile,
+  Keyman.Developer.UI.Project.modeltsProjectFileUI,
+
   Keyman.Developer.UI.UframeWordlistEditor,
   Keyman.Developer.System.LexicalModelParser,
   Keyman.Developer.System.LexicalModelParserTypes;
@@ -33,7 +38,7 @@ type
     panWordlists: TPanel;
     lblWordlists: TLabel;
     gridWordlists: TStringGrid;
-    cmdNewWordlist: TButton;
+    cmdAddWordlist: TButton;
     cmdRemoveWordlist: TButton;
     panBasicInformation: TPanel;
     lblFormat: TLabel;
@@ -63,10 +68,8 @@ type
     Label2: TLabel;
     lblReadOnly: TLabel;
     dlgAddWordlist: TOpenDialog;
-    cmdAddExistingWordlist: TButton;
     procedure FormDestroy(Sender: TObject);
-    procedure cmdNewWordlistClick(Sender: TObject);
-    procedure cmdAddExistingWordlistClick(Sender: TObject);
+    procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
     procedure gridWordlistsDblClick(Sender: TObject);
     procedure pagesChanging(Sender: TObject; var AllowChange: Boolean);
@@ -99,6 +102,9 @@ type
       const WordlistFilename: string): TfrmModelEditor.TWordlist;
     function MoveDesignToSource: Boolean;
     function MoveSourceToDesign: Boolean;
+    procedure SourceChanged(Sender: TObject);
+    function CheckModifiedWordlistsForRemoval(
+      newParser: TLexicalModelParser): Boolean;
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -107,6 +113,8 @@ type
     function GetFileNameFilter: string; override;
     function GetDefaultExt: string; override;
 
+    function GetProjectFile: TProjectFile; override;
+
   public
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
   end;
@@ -114,6 +122,8 @@ type
 implementation
 
 uses
+  System.UITypes,
+  Keyman.Developer.System.Project.modeltsProjectFileAction,
   TextFileFormat;
 
 {$R *.dfm}
@@ -159,8 +169,17 @@ begin
 end;
 
 function TfrmModelEditor.DoSaveFile: Boolean;
+var
+  wordlist: TWordlist;
 begin
-  // TODO
+  for wordlist in wordlists do
+  begin
+    wordlist.Frame.SaveToFile(wordlist.Frame.Filename);
+  end;
+
+  model.Text := parser.Text;
+  model.SaveToFile(FileName);
+
   Result := True;
 end;
 
@@ -175,7 +194,7 @@ begin
   cbWordBreaker.Enabled := e;
   lblComments.Enabled := e;
   memoComments.Enabled := e;
-  cmdAddExistingWordlist.Enabled := e;
+  cmdAddWordlist.Enabled := e;
   gridWordlists.Enabled := e and (parser.Wordlists.Count > 0);
   cmdRemoveWordlist.Enabled := e and (parser.Wordlists.Count > 0);
   lblReadOnly.Visible := not e;
@@ -199,7 +218,7 @@ begin
     frameSource.Align := alClient;
     frameSource.EditorFormat := efJS;
     frameSource.Visible := True;
-//    frameSource.OnChanged := SourceChanged;
+    frameSource.OnChanged := SourceChanged;
     frameSource.TextFileFormat := tffUTF8;
 
     pages.ActivePage := pageDetails;
@@ -231,6 +250,16 @@ begin
   Result := ''; //SHelpTopic_Context_WordlistEditor;  // TODO: use a better topic
 end;
 
+function TfrmModelEditor.GetProjectFile: TProjectFile;
+begin
+  Result := inherited GetProjectFile;
+  if not Assigned(Result) then
+  begin
+    FStandaloneProjectFile := TmodelTsProjectFileAction.Create(nil, FileName, nil);
+    Result := FStandaloneProjectFile;
+  end;
+end;
+
 procedure TfrmModelEditor.gridWordlistsDblClick(Sender: TObject);
 begin
   pages.ActivePageIndex := gridWordlists.Row + 1;
@@ -244,12 +273,48 @@ begin
   Modified := True;
 end;
 
+procedure TfrmModelEditor.SourceChanged(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  Modified := True;
+end;
+
+function TfrmModelEditor.CheckModifiedWordlistsForRemoval(newParser: TLexicalModelParser): Boolean;
+var
+  wordlist: TWordlist;
+begin
+  for wordlist in wordlists do
+  begin
+    if (newParser.Wordlists.IndexOf(wordlist.Filename) < 0) and
+      wordlist.Frame.Modified then
+    begin
+      case MessageDlg(Format('The wordlist %s has been removed but has been modified. Save changes before removal?',
+          [ExtractFileName(wordlist.Filename)]), mtConfirmation, mbYesNoCancel, 0) of
+        mrYes: wordlist.Frame.SaveToFile(wordlist.Frame.Filename);
+        mrNo: ;
+        mrCancel: Exit(False);
+      end;
+    end;
+  end;
+
+  Result := True;
+end;
+
 function TfrmModelEditor.MoveSourceToDesign: Boolean;
+var
+  newParser: TLexicalModelParser;
 begin
   Inc(FSetup);
   try
+    newParser := TLexicalModelParser.Create(frameSource.EditorText);
+    if not CheckModifiedWordlistsForRemoval(newParser) then
+    begin
+      FreeAndNil(newParser);
+      Exit(False);
+    end;
     FreeAndNil(parser);
-    parser := TLexicalModelParser.Create(frameSource.EditorText);
+    parser := newParser;
     FillDetails;
     UpdateWordlistTabs;
   finally
@@ -378,23 +443,7 @@ begin
   Modified := True;
 end;
 
-procedure TfrmModelEditor.cmdAddExistingWordlistClick(Sender: TObject);
-begin
-  if dlgAddWordlist.Execute then
-  begin
-    parser.Wordlists.Add(ExtractRelativePath(Filename, dlgAddWordlist.FileName));
-    Inc(FSetup);
-    try
-      FillDetails;
-      UpdateWordlistTabs;
-    finally
-      Dec(FSetup);
-    end;
-    Modified := True;
-  end;
-end;
-
-procedure TfrmModelEditor.cmdNewWordlistClick(Sender: TObject);
+procedure TfrmModelEditor.cmdAddWordlistClick(Sender: TObject);
 begin
   if dlgAddWordlist.Execute then
   begin
@@ -411,7 +460,21 @@ begin
 end;
 
 procedure TfrmModelEditor.cmdRemoveWordlistClick(Sender: TObject);
+var
+  wordlist: TWordlist;
 begin
+  wordlist := wordlists[gridWordlists.Row];
+  if wordlist.Frame.Modified then
+  begin
+    case MessageDlg(Format('Save changes to wordlist %s before removing it?',
+        [ExtractFileName(wordlist.Filename)]),
+        mtConfirmation, mbYesNoCancel, 0) of
+      mrYes: wordlist.Frame.SaveToFile(wordlist.Frame.Filename);
+      mrNo: ;
+      mrCancel: Exit;
+    end;
+  end;
+
   parser.Wordlists.Delete(gridWordlists.Row);
   Inc(FSetup);
   try
