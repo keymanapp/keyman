@@ -5,7 +5,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
-let zip = require('node-zip')();
+import * as JSZip from 'jszip';
+
+let zip = JSZip();
 
 export default class KmpCompiler {
 
