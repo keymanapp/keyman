@@ -20,6 +20,8 @@
 ## 2019-11-27 12.0.4211 stable
 * Bug fix:
   * Fix crashes involving context manipulation of invalid context (#2377)
+  * Fix Package ID so other languages from a keyboard .kmp package can be installed (#2378)
+  * Fix crashes when accessing the Cloud for downloading keyboards (#2378)
 
 ## 2019-11-26 12.0.4210 stable
 * No change to Keyman for Android (updated Keyman Web Engine, #2322)
