@@ -1,4 +1,3 @@
-// <reference path="lexical-model.ts" />
 /// <reference path="kps-file.ts" />
 /// <reference path="kmp-json-file.ts" />
 
