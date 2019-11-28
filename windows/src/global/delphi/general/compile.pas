@@ -111,8 +111,8 @@ type
 
     szName: array[0..SZMAX_KEYBOARDNAME-1] of WCHAR;			// Keyboard layout name
     szLanguageName: array[0..SZMAX_LANGUAGENAME-1] of WCHAR;	// Language name
-    szCopyright: array[0..SZMAX_COPYRIGHT] of WCHAR;			// Copyright information
-    szMessage: array[0..SZMAX_MESSAGE] of WCHAR;				// General information about the keyboard
+    szCopyright: array[0..SZMAX_COPYRIGHT-1] of WCHAR;			// Copyright information
+    szMessage: array[0..SZMAX_MESSAGE-1] of WCHAR;				// General information about the keyboard
     lpBitmap: PBYTE;
     dwBitmapSize: DWORD;
     dwFlags: DWORD;					// Flags for the keyboard file
