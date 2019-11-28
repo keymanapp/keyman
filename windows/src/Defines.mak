@@ -160,7 +160,8 @@ BRCC32=rc.exe
 HHC=\progra~1\htmlhe~1\hhc
 NMAKE=nmake.exe
 CL=cl.exe
-MSBUILD=msbuild.exe /maxcpucount
+MSBUILD=msbuild.exe
+# /maxcpucount see https://devblogs.microsoft.com/cppblog/precompiled-header-pch-issues-and-recommendations/
 MT="C:\Program Files (x86)\Windows Kits\8.1\bin\x86\mt.exe"
 VCBUILD=error
 
