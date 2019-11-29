@@ -42,7 +42,7 @@ public class CloudDataJsonUtil {
     HashMap<String, String> keyboardInfo = new HashMap<String, String>();
     keyboardInfo.put(KMManager.KMKey_PackageID, aPackageId);
     keyboardInfo.put(KMManager.KMKey_KeyboardID, aKeyboardId);
-    keyboardInfo.put(KMManager.KMKey_LanguageID, aLanguageId);
+    keyboardInfo.put(KMManager.KMKey_LanguageID, aLanguageId.toLowerCase());
     keyboardInfo.put(KMManager.KMKey_KeyboardName, aKeyboardName);
     keyboardInfo.put(KMManager.KMKey_LanguageName, aLanguageName);
     keyboardInfo.put(KMManager.KMKey_KeyboardVersion, aKeyboardVersion);
@@ -146,7 +146,7 @@ public class CloudDataJsonUtil {
 
         HashMap<String, String> hashMap = new HashMap<String, String>();
         hashMap.put(KMManager.KMKey_PackageID, packageID);
-        hashMap.put(KMManager.KMKey_LanguageID, languageID);
+        hashMap.put(KMManager.KMKey_LanguageID, languageID.toLowerCase());
         hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
         hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
         hashMap.put(KMManager.KMKey_LanguageName, langName);
