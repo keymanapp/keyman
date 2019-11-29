@@ -76,10 +76,10 @@ export default class KmpCompiler {
     let keys: (keyof KpsFileOptions & keyof KmpJsonFileOptions)[] = ['executeProgram', 'graphicFile', 'msiFilename', 'msiOptions', 'readmeFile'];
     for (let element of keys) {
       if (kps.options[element]) {
-        if (element === "followKeyboardVersion") {
-          throw new Error('Should never get here')
-        }
-        kmp.options[element] = kps.options[element];
+        // TypeScript thinks it's possible to assign to followKeyboardVersion (a
+        // boolean), but in reality, all of the other keys are strings.
+        // Politely inform TypeScript that it's okay to do this assignment:
+        (<string> kmp.options[element]) = kps.options[element];
       }
     }
 
