@@ -18,11 +18,11 @@ build: version.res dirs
     $(COPY) $(WIN32_TARGET_PATH)\kmcmpdll.dll ..\kmcomp\$(WIN32_TARGET_PATH)\kmcmpdll.dll
 	
     $(MSBUILD) kmcmpdll.sln $(MSBUILD_BUILD) /p:Platform=x64
-    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.dll $(PROGRAM)\developer\kmcmpdll.x64.dll
-    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.lib $(OUTLIB)\kmcmpdll.x64.lib
-    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.pdb $(DEBUGPATH)\developer\kmcmpdll.x64.pdb
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.x64.dll $(PROGRAM)\developer\kmcmpdll.x64.dll
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.x64.lib $(OUTLIB)\kmcmpdll.x64.lib
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.x64.pdb $(DEBUGPATH)\developer\kmcmpdll.x64.pdb
     -mkdir ..\kmcomp\$(WIN64_TARGET_PATH)
-    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.dll ..\kmcomp\$(WIN64_TARGET_PATH)\kmcmpdll.x64.dll
+    $(COPY) $(X64_TARGET_PATH)\kmcmpdll.x64.dll ..\kmcomp\$(WIN64_TARGET_PATH)\kmcmpdll.x64.dll
 	
 
 clean: def-clean
