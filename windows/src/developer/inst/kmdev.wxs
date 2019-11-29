@@ -179,6 +179,14 @@
       </Component>
 
       <Component>
+        <File Name="kmcmpdll.x64.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="kmcomp.x64.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
         <File Name="debughost.kmx" KeyPath="yes" Source="..\..\developer\tike\redist\debughost.kmx" />
       </Component>
 
