@@ -546,6 +546,15 @@
             <Form>frmWordlistEditor</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmWebTest.pas">
+            <Form>frmWebTest</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="actions\Keyman.Developer.UI.dmActionsModelEditor.pas">
+            <Form>modActionsModelEditor</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

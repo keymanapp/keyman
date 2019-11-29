@@ -14,7 +14,7 @@ inherited frmModelEditor: TfrmModelEditor
     Top = 0
     Width = 712
     Height = 708
-    ActivePage = pageDetails
+    ActivePage = pageCompile
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -226,16 +226,10 @@ inherited frmModelEditor: TfrmModelEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -260,8 +254,7 @@ inherited frmModelEditor: TfrmModelEditor
           Top = 40
           Width = 137
           Height = 25
-          Caption = '&Compile Lexical Model'
-          ImageIndex = 37
+          Action = modActionsModelEditor.actModelCompile
           TabOrder = 0
         end
         object cmdAddToProject: TButton
@@ -269,10 +262,7 @@ inherited frmModelEditor: TfrmModelEditor
           Top = 40
           Width = 137
           Height = 25
-          Hint = 
-            'Add Current Editor File|Adds the current editor file to the proj' +
-            'ect'
-          Caption = '&Current Editor File'
+          Action = modActionsMain.actProjectAddCurrentEditorFile
           TabOrder = 1
         end
         object cmdOpenContainingFolder2: TButton
@@ -282,6 +272,7 @@ inherited frmModelEditor: TfrmModelEditor
           Height = 25
           Caption = '&Open Containing Folder'
           TabOrder = 2
+          OnClick = cmdOpenContainingFolder2Click
         end
         object panBuildLexicalModel: TPanel
           Left = 10
@@ -335,7 +326,7 @@ inherited frmModelEditor: TfrmModelEditor
             Top = 122
             Width = 150
             Height = 25
-            Caption = 'Test Lexical &Model'
+            Action = modActionsModelEditor.actModelTest
             TabOrder = 2
           end
           object cmdOpenDebugHost: TButton
@@ -345,6 +336,7 @@ inherited frmModelEditor: TfrmModelEditor
             Height = 25
             Caption = 'Open &debugger in local browser'
             TabOrder = 3
+            OnClick = cmdOpenDebugHostClick
           end
           object lbDebugHosts: TListBox
             Left = 12
@@ -361,6 +353,7 @@ inherited frmModelEditor: TfrmModelEditor
             Height = 25
             Caption = 'Send addresses to &email...'
             TabOrder = 5
+            OnClick = cmdSendURLsToEmailClick
           end
           object editTestKeyboard: TEdit
             Left = 123
@@ -386,5 +379,13 @@ inherited frmModelEditor: TfrmModelEditor
     Title = 'Create or Add Wordlist'
     Left = 344
     Top = 344
+  end
+  object dlgBrowseTestKeyboard: TOpenDialog
+    DefaultExt = 'js'
+    Filter = 'Compiled keyboard files (*.js)|*.js|All files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Title = 'Select compiled keyboard to test with'
+    Left = 488
+    Top = 120
   end
 end

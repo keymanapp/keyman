@@ -19,6 +19,8 @@ uses
   Winapi.Messages,
   Winapi.Windows,
 
+  Keyman.Developer.UI.dmActionsModelEditor,
+  dmActionsMain,
   LeftTabbedPageControl,
   UfrmMDIEditor,
   UframeTextEditor,
@@ -68,6 +70,7 @@ type
     Label2: TLabel;
     lblReadOnly: TLabel;
     dlgAddWordlist: TOpenDialog;
+    dlgBrowseTestKeyboard: TOpenDialog;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -77,6 +80,9 @@ type
     procedure cbFormatClick(Sender: TObject);
     procedure cbWordBreakerClick(Sender: TObject);
     procedure memoCommentsChange(Sender: TObject);
+    procedure cmdOpenContainingFolder2Click(Sender: TObject);
+    procedure cmdOpenDebugHostClick(Sender: TObject);
+    procedure cmdSendURLsToEmailClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -117,6 +123,7 @@ type
 
   public
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
+    procedure NotifyStartedWebDebug;
   end;
 
 implementation
@@ -124,7 +131,11 @@ implementation
 uses
   System.UITypes,
   Keyman.Developer.System.Project.modeltsProjectFileAction,
-  TextFileFormat;
+  TextFileFormat,
+  UmodWebHttpServer,
+  UfrmSendURLsToEmail,
+  utilexecute,
+  utilsystem;
 
 {$R *.dfm}
 
@@ -188,6 +199,9 @@ var
   e: Boolean;
 begin
   e := parser.IsEditable;
+
+  { Details tab }
+
   lblFormat.Enabled := e;
   cbFormat.Enabled := e;
   lblWordBreaker.Enabled := e;
@@ -198,6 +212,19 @@ begin
   gridWordlists.Enabled := e and (parser.Wordlists.Count > 0);
   cmdRemoveWordlist.Enabled := e and (parser.Wordlists.Count > 0);
   lblReadOnly.Visible := not e;
+
+  { Build tab }
+  cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
+  cmdSendURLsToEmail.Enabled := lbDebugHosts.Items.Count > 0;   // I4506
+end;
+
+procedure TfrmModelEditor.NotifyStartedWebDebug;
+begin
+  lbDebugHosts.Clear;
+  modWebHttpServer.GetURLs(lbDebugHosts.Items);
+  if lbDebugHosts.Items.Count > 0 then
+    lbDebugHosts.ItemIndex := 0;
+  EnableControls;
 end;
 
 procedure TfrmModelEditor.FindError(const Filename: string; s: string;
@@ -459,6 +486,16 @@ begin
   end;
 end;
 
+procedure TfrmModelEditor.cmdOpenContainingFolder2Click(Sender: TObject);
+begin
+  OpenContainingFolder(FileName);
+end;
+
+procedure TfrmModelEditor.cmdOpenDebugHostClick(Sender: TObject);
+begin
+  TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
+end;
+
 procedure TfrmModelEditor.cmdRemoveWordlistClick(Sender: TObject);
 var
   wordlist: TWordlist;
@@ -484,6 +521,18 @@ begin
     Dec(FSetup);
   end;
   Modified := True;
+end;
+
+procedure TfrmModelEditor.cmdSendURLsToEmailClick(Sender: TObject);
+begin
+  with TfrmSendURLsToEmail.Create(Application.MainForm) do
+  try
+    //TODO: KeyboardName := Self.FKeyboardParser.GetSystemStoreValue(ssName);
+    Hosts.Assign(lbDebugHosts.Items);
+    ShowModal;
+  finally
+    Free;
+  end;
 end;
 
 { TfrmModelEditor.TWordlist }

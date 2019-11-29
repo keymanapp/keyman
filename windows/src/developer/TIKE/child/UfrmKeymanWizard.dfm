@@ -177,7 +177,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     Top = 0
     Width = 1043
     Height = 645
-    ActivePage = pageDetails
+    ActivePage = pageCompile
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -198,9 +198,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageDetails: TTabSheet
       Caption = 'Details'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sbDetails: TScrollBox
         Left = 0
         Top = 0
@@ -253,7 +250,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           BevelOuter = bvNone
           ParentColor = True
           TabOrder = 2
-          ExplicitTop = 189
           object lblWinLangTitle: TLabel
             Left = 12
             Top = 5
@@ -318,7 +314,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 5
-          ExplicitTop = 569
           object lblComments: TLabel
             Left = 12
             Top = 3
@@ -350,7 +345,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 6
-          ExplicitTop = 656
           object Label9: TLabel
             AlignWithMargins = True
             Left = 12
@@ -424,7 +418,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 4
-          ExplicitTop = 442
           object panMessage: TPanel
             Left = 0
             Top = 42
@@ -598,7 +591,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 3
-          ExplicitTop = 378
           object lblISOLangTitle: TLabel
             Left = 12
             Top = 3
@@ -729,9 +721,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageLayout: TTabSheet
       Caption = 'Layout'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pagesLayout: TPageControl
         Left = 0
         Top = 0
@@ -746,10 +735,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object panLayoutSimple: TPanel
             Left = 0
             Top = 0
@@ -973,10 +958,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
       end
     end
@@ -1023,16 +1004,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageOnScreenKeyboard: TTabSheet
       Caption = 'On-Screen'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1047,55 +1022,32 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -1233,7 +1185,7 @@ inherited frmKeymanWizard: TfrmKeymanWizard
           end
           object cmdTestKeymanWeb: TButton
             Left = 12
-            Top = 34
+            Top = 29
             Width = 150
             Height = 25
             Action = modActionsKeyboardEditor.actKeyboardTestKeymanWeb

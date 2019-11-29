@@ -3085,6 +3085,10 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Caption = 'Crash Test'
           OnClick = crash1Click
         end
+        object CreateWebTestWindow1: TMenuItem
+          Caption = 'Create Web Test Window'
+          OnClick = CreateWebTestWindow1Click
+        end
       end
     end
     object Help1: TMenuItem
