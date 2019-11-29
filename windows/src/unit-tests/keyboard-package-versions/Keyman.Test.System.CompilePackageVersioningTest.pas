@@ -67,6 +67,8 @@ begin
   // Assumes it has already been built, of course...
   //
   FUnitTestKMCmpDllPath := FRoot + '\..\..\..\bin\developer\';
+  Assert.IsTrue(FileExists(FUnitTestKMCmpDllPath + 'kmcmpdll.dll'),
+    'kmcmpdll.dll does not exist at ' + FUnitTestKMCmpDllPath + 'kmcmpdll.dll');
 
   p := TProjectConsole.Create(ptUnknown, FRoot+'\test-1.0\test-1.0.kpj', False);
   try
