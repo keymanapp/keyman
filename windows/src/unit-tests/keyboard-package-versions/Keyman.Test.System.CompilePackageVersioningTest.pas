@@ -66,7 +66,7 @@ begin
   // Force load development version of kmcmpdll
   // Assumes it has already been built, of course...
   //
-  FUnitTestKMCmpDllPath := FRoot + '\..\..\developer\kmcmpdll\';
+  FUnitTestKMCmpDllPath := FRoot + '\..\..\..\bin\developer\';
 
   p := TProjectConsole.Create(ptUnknown, FRoot+'\test-1.0\test-1.0.kpj', False);
   try
