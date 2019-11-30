@@ -34,7 +34,7 @@ uses
 type
   TEditorBreakpointClickedEvent = procedure(Sender: TObject; ALine: Integer) of object;
 
-  TframeTextEditor = class(TTikeForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
+  TframeTextEditor = class(TTIKEForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
     dlgPrintSetup: TPrinterSetupDialog;
