@@ -6,16 +6,18 @@
   * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308, #2365)
   * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
-  * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
   * Check for keyboard updates during keyman startup (#2335)
   * Show available keyboard updates as android system notifications (#2335)
   * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
 * Changes:
   * Update target Android SDK version to 29 (#2279)
-  * Add linting to Debug builds and resolve lint errors (#2305)
-  * Fix memory issues during build process (#2361)
   * Add simple UI tests for keyboard picker and keyboard info screens (#2326)
   * Add example dictionary to KMSample1 project (#2369)
+* Bug fix:
+  * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
+  * Add linting to Debug builds and resolve lint errors (#2305)
+  * Fix memory issues during build process (#2361)
+  * Fix crashes when parsing JSON data from Cloud (#2393)
 
 ## 2019-11-27 12.0.4211 stable
 * Bug fix:
