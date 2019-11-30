@@ -546,10 +546,6 @@
             <Form>frmWordlistEditor</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="child\Keyman.Developer.UI.UfrmWebTest.pas">
-            <Form>frmWebTest</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="actions\Keyman.Developer.UI.dmActionsModelEditor.pas">
             <Form>modActionsModelEditor</Form>
             <FormType>dfm</FormType>

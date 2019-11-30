@@ -249,6 +249,13 @@ inherited frmModelEditor: TfrmModelEditor
             'The keyboard must be compiled in order to distribute or install ' +
             'it'
         end
+        object Label5: TLabel
+          Left = 10
+          Top = 79
+          Width = 82
+          Height = 13
+          Caption = 'Target filename:'
+        end
         object cmdCompile: TButton
           Left = 10
           Top = 40
@@ -276,7 +283,7 @@ inherited frmModelEditor: TfrmModelEditor
         end
         object panBuildLexicalModel: TPanel
           Left = 10
-          Top = 96
+          Top = 112
           Width = 424
           Height = 353
           BevelOuter = bvNone
@@ -361,6 +368,7 @@ inherited frmModelEditor: TfrmModelEditor
             Width = 158
             Height = 21
             TabOrder = 0
+            OnChange = editTestKeyboardChange
           end
           object cmdBrowseTestKeyboard: TButton
             Left = 287
@@ -369,7 +377,18 @@ inherited frmModelEditor: TfrmModelEditor
             Height = 25
             Caption = '&Browse...'
             TabOrder = 1
+            OnClick = cmdBrowseTestKeyboardClick
           end
+        end
+        object editOutPath: TEdit
+          Left = 98
+          Top = 76
+          Width = 383
+          Height = 21
+          TabStop = False
+          ParentColor = True
+          ReadOnly = True
+          TabOrder = 4
         end
       end
     end

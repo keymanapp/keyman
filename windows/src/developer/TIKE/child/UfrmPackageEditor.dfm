@@ -183,7 +183,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageFiles
+    ActivePage = pageCompile
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -1119,9 +1119,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'

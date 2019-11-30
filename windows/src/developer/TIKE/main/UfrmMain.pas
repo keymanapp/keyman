@@ -270,7 +270,6 @@ type
     DebugTests1: TMenuItem;
     CrashTest1: TMenuItem;
     CloseProject1: TMenuItem;
-    CreateWebTestWindow1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -290,7 +289,6 @@ type
     procedure pagesChange(Sender: TObject);
     procedure pagesCloseTab(Sender: TObject; Index: Integer);
     procedure ools1Click(Sender: TObject);
-    procedure CreateWebTestWindow1Click(Sender: TObject);
 
   private
     AppStorage: TJvAppRegistryStorage;
@@ -437,7 +435,6 @@ uses
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmWordlistEditor,
   Keyman.Developer.UI.UfrmModelEditor,
-  Keyman.Developer.UI.UfrmWebTest,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -554,12 +551,6 @@ begin
   Invalidate;
 
   UpdateCaption;
-end;
-
-procedure TfrmKeymanDeveloper.CreateWebTestWindow1Click(Sender: TObject);
-begin
-  inherited;
-  ShowChild(TfrmWebTest.Create(Self));
 end;
 
 procedure TfrmKeymanDeveloper.CreateWnd;

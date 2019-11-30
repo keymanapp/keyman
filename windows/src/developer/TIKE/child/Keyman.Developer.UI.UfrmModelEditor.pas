@@ -71,6 +71,8 @@ type
     lblReadOnly: TLabel;
     dlgAddWordlist: TOpenDialog;
     dlgBrowseTestKeyboard: TOpenDialog;
+    Label5: TLabel;
+    editOutPath: TEdit;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -83,6 +85,8 @@ type
     procedure cmdOpenContainingFolder2Click(Sender: TObject);
     procedure cmdOpenDebugHostClick(Sender: TObject);
     procedure cmdSendURLsToEmailClick(Sender: TObject);
+    procedure cmdBrowseTestKeyboardClick(Sender: TObject);
+    procedure editTestKeyboardChange(Sender: TObject);
   private
     type
       TWordlist = class
@@ -191,7 +195,16 @@ begin
   model.Text := parser.Text;
   model.SaveToFile(FileName);
 
+  editOutPath.Text := (ProjectFile as TmodelTsProjectFile).TargetFilename;   // I4688
+
   Result := True;
+end;
+
+procedure TfrmModelEditor.editTestKeyboardChange(Sender: TObject);
+begin
+  if FSetup > 0 then
+    Exit;
+  (ProjectFile as TmodelTsProjectFile).TestKeyboard := editTestKeyboard.Text;
 end;
 
 procedure TfrmModelEditor.EnableControls;
@@ -391,6 +404,9 @@ begin
     end;
   end;
 
+  editOutPath.Text := (ProjectFile as TmodelTsProjectFile).TargetFilename;   // I4688
+  editTestKeyboard.Text := (ProjectFile as TmodelTsProjectFile).TestKeyboard;
+
   EnableControls;
 end;
 
@@ -484,6 +500,12 @@ begin
     end;
     Modified := True;
   end;
+end;
+
+procedure TfrmModelEditor.cmdBrowseTestKeyboardClick(Sender: TObject);
+begin
+  if dlgBrowseTestKeyboard.Execute then
+    editTestKeyboard.Text := dlgBrowseTestKeyboard.FileName;
 end;
 
 procedure TfrmModelEditor.cmdOpenContainingFolder2Click(Sender: TObject);
