@@ -250,13 +250,17 @@ public class CloudRepository {
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
 
-    if (kmpLanguagesArray.length() == 0 && kmpLexicalModelsArray.length() == 0) {
-      // May need to note this for handling a 'failure' check.
-    } else {
-      memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
-      memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray));
+    try {
+      if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
+        getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages).length() >  0) {
+        memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
+      }
+      if (kmpLexicalModelsArray.length() > 0) {
+        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray));
+      }
+    } catch (Exception e) {
+      Log.e(TAG, "preCacheDataSet error " + e);
     }
-
     CloudCatalogDownloadCallback _download_callback = new CloudCatalogDownloadCallback(
       context, updateHandler, onSuccess, onFailure);
 

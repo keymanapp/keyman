@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.File;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.List;
  * Central manager for cloud downloads.
  */
 public class CloudDownloadMgr{
-
+  private static final String TAG = "CloudDownloadMgr";
   private static CloudDownloadMgr instance;
 
   /**
@@ -126,8 +127,10 @@ public class CloudDownloadMgr{
     synchronized (downloadSetByDownloadIdentifier) {
 
       CloudApiTypes.CloudDownloadSet _parentSet = getDownloadSetForInternalDownloadId(anInternalDownloadId);
-      if(_parentSet==null)
-        throw new IllegalStateException("Download with ID " + anInternalDownloadId + " is not available");
+      if(_parentSet==null) {
+        Log.e(TAG, "Download with ID " + anInternalDownloadId + " is not available");
+        return;
+      }
       _parentSet.setDone(anInternalDownloadId);
       if(!_parentSet.hasOpenDownloads())
       {
@@ -186,8 +189,9 @@ public class CloudDownloadMgr{
 
     synchronized (downloadSetByDownloadIdentifier) {
 
-      if(alreadyDownloadingData(aDownloadIdentifier))
+      if (alreadyDownloadingData(aDownloadIdentifier) || params == null) {
         return;
+      }
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
       if(downloadManager==null)
