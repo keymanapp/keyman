@@ -183,7 +183,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageCompile
+    ActivePage = pageLexicalModels
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
