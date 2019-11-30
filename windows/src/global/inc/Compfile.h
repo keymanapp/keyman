@@ -156,8 +156,7 @@ typedef FILE_KEYBOARD *PFILE_KEYBOARD;
   that the structure sizes correspond precisely across
   compilers (pas and c++).
 */
-// TODO: make a unit test to validate that these are same size as
-// in the pascal for same bitness
+
 const DWORD sz_FILE_STORE = sizeof(FILE_STORE);
 const DWORD sz_FILE_KEY = sizeof(FILE_KEY);
 const DWORD sz_FILE_GROUP = sizeof(FILE_GROUP);
