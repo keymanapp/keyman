@@ -37,7 +37,6 @@
   "dependencies": {
     "commander": "^3.0.0",
     "node": "^11.7.0",
-    "node-zip": "^1.1.1",
     "typescript": "^3.2.4",
     "xml2js": "^0.4.19"
   },
@@ -45,8 +44,10 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",
+    "@types/xml2js": "^0.4.5",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
+    "jszip": "^2.5.0",
     "mocha": "^6.1.4",
     "ts-node": "^8.3.0"
   },
