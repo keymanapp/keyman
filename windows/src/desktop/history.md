@@ -2,6 +2,7 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Add 64-bit version of kmcomp and kmcmpdll for cross-platform support (#2352)
 
 ## 2019-12-01 12.0.59 stable
 * Bug Fix: Using supplementary plane characters could cause rules to fail to match (#2398) 

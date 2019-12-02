@@ -280,11 +280,30 @@
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
+/*
+  These sanity checks help ensure we don't
+  break on-disk struct sizes when we cross
+  compilers, bitness and platforms. They must
+  correspond to the equivalent constants in
+  kmxfile.pas. For historical reasons, these
+  structures have the prefix COMP_ while
+  the pas versions are TKeyboardFile_, names
+  which correspond more closely to what the
+  structures are for.
+*/
+
+#define KEYBOARDFILEHEADER_SIZE 64
+#define KEYBOARDFILESTORE_SIZE  12
+#define KEYBOARDFILEGROUP_SIZE  24
+#define KEYBOARDFILEKEY_SIZE    20
+
 struct COMP_STORE {
 	DWORD dwSystemID;
 	DWORD dpName;	
 	DWORD dpString;
 	};
+
+static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be KEYBOARDFILESTORE_SIZE bytes");
 
 struct COMP_KEY {
 	WORD Key;
@@ -294,6 +313,8 @@ struct COMP_KEY {
 	DWORD dpContext;
 	};
 
+static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOARDFILEKEY_SIZE bytes");
+
 struct COMP_GROUP {
 	DWORD dpName;
 	DWORD dpKeyArray;		// [LPKEY] address of first item in key array
@@ -302,6 +323,8 @@ struct COMP_GROUP {
 	DWORD cxKeyArray;		// in array entries
 	BOOL  fUsingKeys;		// group(xx) [using keys] <-- specified or not
 	};
+
+static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
 
 struct COMP_KEYBOARD {
 	DWORD dwIdentifier;		// 0000 Keyman compiled keyboard id
@@ -334,6 +357,8 @@ struct COMP_KEYBOARD {
 	DWORD dpBitmapOffset;	// 0038 offset of the bitmaps in the file
 	DWORD dwBitmapSize;		// 003C size in bytes of the bitmaps
 	};
+
+static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;

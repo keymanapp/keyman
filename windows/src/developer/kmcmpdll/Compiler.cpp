@@ -1796,7 +1796,8 @@ LinePrefixType GetLinePrefixType(PWSTR *p)
 
 int LineTokenType(PWSTR *str)
 {
-	int i, l;
+  int i;
+  size_t l;
 	PWSTR p = *str;
 
   LinePrefixType lpt = GetLinePrefixType(&p);
@@ -2894,7 +2895,8 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 	PCOMP_STORE sp;
 	PCOMP_KEY kp;
 	PBYTE buf;
-	DWORD size, offset;
+	size_t offset;
+  size_t size;
 	DWORD i, j;
 
 	// Calculate how much memory to allocate
@@ -2965,27 +2967,27 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 	wcscpy((PWSTR)(buf + offset), fk->szMessage);
 	offset += wcslen(fk->szMessage)*2 + 2;*/
 
-	ck->dpStoreArray = offset;
+	ck->dpStoreArray = (DWORD) offset;
 	sp = (PCOMP_STORE)(buf+offset);
 	fsp = fk->dpStoreArray;
 	offset += sizeof(COMP_STORE) * ck->cxStoreArray;
 	for( i = 0; i < ck->cxStoreArray; i++, sp++, fsp++ )
     {
 		sp->dwSystemID = fsp->dwSystemID;
-		sp->dpString = offset;
+		sp->dpString = (DWORD) offset;
 		wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fsp->dpString);  // I3481   // I3641
 		offset += wcslen(fsp->dpString)*2 + 2;
 
     if(FSaveDebug || fsp->fIsOption)
 		{
-			sp->dpName = offset;
+			sp->dpName = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fsp->szName);  // I3481   // I3641
 			offset += wcslen(fsp->szName)*2 + 2;
 		}
 		else sp->dpName = 0;
 	}
 
-	ck->dpGroupArray = offset;
+	ck->dpGroupArray = (DWORD) offset;
 	gp = (PCOMP_GROUP)(buf+offset);
 	fgp = fk->dpGroupArray;
 
@@ -3000,26 +3002,26 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 
 		if(fgp->dpMatch)
         {
-			gp->dpMatch = offset;
+			gp->dpMatch = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fgp->dpMatch);  // I3481   // I3641
 			offset += wcslen(fgp->dpMatch)*2 + 2;
 			}
 		if(fgp->dpNoMatch)
         {
-			gp->dpNoMatch = offset;
+			gp->dpNoMatch = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fgp->dpNoMatch);  // I3481   // I3641
 			offset += wcslen(fgp->dpNoMatch)*2 + 2;
 		}
 
 		if(FSaveDebug)
 		{
-			gp->dpName = offset;
+			gp->dpName = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fgp->szName);  // I3481   // I3641
 			offset += wcslen(fgp->szName)*2 + 2;
 		}
 		else gp->dpName = 0;
 
-		gp->dpKeyArray = offset;
+		gp->dpKeyArray = (DWORD) offset;
 		kp = (PCOMP_KEY) (buf + offset);
 		fkp = fgp->dpKeyArray;
 		offset += gp->cxKeyArray * sizeof(COMP_KEY);
@@ -3028,27 +3030,28 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 			kp->Key = fkp->Key;
 			if(FSaveDebug) kp->Line = fkp->Line; else kp->Line = 0;
 			kp->ShiftFlags = fkp->ShiftFlags;
-			kp->dpOutput = offset;
+			kp->dpOutput = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fkp->dpOutput);  // I3481   // I3641
 			offset += wcslen(fkp->dpOutput)*2 + 2;
-			kp->dpContext = offset;
+			kp->dpContext = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fkp->dpContext);  // I3481   // I3641
 			offset += wcslen(fkp->dpContext)*2 + 2;
 		}
 	}
 
 	ck->dwBitmapSize = fk->dwBitmapSize;
-	ck->dpBitmapOffset = offset;
+	ck->dpBitmapOffset = (DWORD) offset;
 	memcpy(buf + offset, fk->lpBitmap, fk->dwBitmapSize);
 	offset += fk->dwBitmapSize;
 
 	if(offset != size) return CERR_SomewhereIGotItWrong;
 
-	SetChecksum(buf, &ck->dwCheckSum, size);
+	SetChecksum(buf, &ck->dwCheckSum, (DWORD) size);
 
-	WriteFile(hOutfile, buf, size, &offset, NULL);
+  DWORD dwBytesWritten = 0;
+	WriteFile(hOutfile, buf, (DWORD) size, &dwBytesWritten, NULL);
 
-	if(offset != size) return CERR_UnableToWriteFully;
+	if(dwBytesWritten != size) return CERR_UnableToWriteFully;
 
 	delete buf;
 
@@ -3306,7 +3309,8 @@ int UTF32ToUTF16(int n, int *n1, int *n2)
 
 DWORD BuildVKDictionary(PFILE_KEYBOARD fk)  // I3438
 {
-  DWORD i, len = 0;
+  DWORD i;
+  size_t len = 0;
   if(fk->cxVKDictionary == 0) return CERR_None;
   for(i = 0; i < fk->cxVKDictionary; i++)
   {
@@ -3454,7 +3458,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
         // because we don't support HINT/INFO messages yet and we don't want
         // this to cause a blocking compile at this stage
         poutbuf = strtowstr((PSTR)buf);
-        WriteFile(hOutfile, poutbuf, wcslen(poutbuf) * 2, &len2, NULL);
+        WriteFile(hOutfile, poutbuf, (DWORD) wcslen(poutbuf) * 2, &len2, NULL);
         delete poutbuf;
       }
       else {
