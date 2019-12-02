@@ -267,7 +267,6 @@ BOOL AIWin2000Unicode::PostKeys()
 		  break;
 	  case QIT_BACK:
 		  if(Queue[n].dwData == BK_DEADKEY) break;
-      if(Queue[n].dwData == BK_SUPP2) break;  // I1389 - supp chars on vista default to single backspace //TODO: eliminate BK_SUPP2
 		  if(Addin_ProcessBackspace(hwnd)) break;
 
       pInputs[i].type = INPUT_KEYBOARD;
