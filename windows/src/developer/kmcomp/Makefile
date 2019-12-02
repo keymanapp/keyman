@@ -36,11 +36,12 @@ signcode:
     $(SIGNCODE) /d "Keyman Developer Command-Line Compiler" $(PROGRAM)\developer\kmcomp.x64.exe
 
 backup:
-    $(WZZIP) $(BUILD)\developer\kmcomp.zip  $(BACKUPDEFAULTS) kmcomp.exe
+    $(WZZIP) $(BUILD)\developer\kmcomp.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmcomp.exe $(PROGRAM)\developer\kmcomp.x64.exe
 
 test-manifest:
-    # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
+    # test that (a) linked manifest exists and correct
     $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmcomp.exe -validate_manifest
+    $(MT) -nologo -inputresource:$(PROGRAM)\developer\kmcomp.x64.exe -validate_manifest
 
 install:
     $(COPY) $(PROGRAM)\developer\kmcomp.exe "$(INSTALLPATH_KEYMANDEVELOPER)\kmcomp.exe"

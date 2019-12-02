@@ -2,6 +2,7 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Add 64-bit version of kmcomp and kmcmpdll for cross-platform support (#2352)
 
 ## 2019-11-15 12.0.54 stable
 * Bug Fix: On Screen Keyboard restored to wrong screen and position when reloading (#2330)

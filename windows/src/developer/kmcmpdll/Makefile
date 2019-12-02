@@ -33,8 +33,8 @@ signcode:
     $(SIGNCODE) /d "Keyman Developer Compiler" $(PROGRAM)\developer\kmcmpdll.x64.dll
 
 backup:
-    $(WZZIP) $(BUILD)\developer\kmcmpdll.zip  $(BACKUPDEFAULTS) kmcmpdll.dll
-
+    $(WZZIP) $(BUILD)\developer\kmcmpdll.zip  $(BACKUPDEFAULTS) $(PROGRAM)\developer\kmcmpdll.dll $(PROGRAM)\developer\kmcmpdll.x64.dll
+ 
 test-manifest:
     @rem This target needed as dependency for TIKE and KMCMPDLL
 
