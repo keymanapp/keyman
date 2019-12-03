@@ -30,8 +30,14 @@ type Token = number;
 /**
  * The valid outgoing message kinds.
  */
-type OutgoingMessageKind = 'ready' | 'suggestions' | 'currentword';
-type OutgoingMessage = ReadyMessage | SuggestionMessage | CurrentWordMessage;
+type OutgoingMessageKind = 'error' | 'ready' | 'suggestions' | 'currentword';
+type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | CurrentWordMessage;
+
+interface ErrorMessage {
+  message: 'error';
+  error?: any;
+  log: string;
+}
 
 /**
  * Tells the keyboard that the LMLayer is ready. Provides
