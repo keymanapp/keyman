@@ -1,0 +1,22 @@
+
+    {
+        "id": "nrc.str.sencoten",
+        "name": "SEN\u0106O\u0166EN (Saanich Dialect) Lexical Model",
+        "license": "mit",
+        "version": "1.0.4",
+        "languages": [
+            "str-Latn"
+        ],
+        "authorName": "Eddie Antonio Santos",
+        "jsFileSize": 2116107,
+        "jsFilename": "https://downloads.keyman.com/models/nrc.str.sencoten/1.0.4/nrc.str.sencoten.model.js",
+        "sourcePath": "release/nrc/nrc.str.sencoten",
+        "authorEmail": "Eddie.Santos@nrc-cnrc.gc.ca",
+        "description": "SEN\u0106O\u0166EN (Saanich Dialect)",
+        "packageFileSize": 257025,
+        "packageFilename": "https://downloads.keyman.com/models/nrc.str.sencoten/1.0.4/nrc.str.sencoten.model.kmp",
+        "packageIncludes": [],
+        "lastModifiedDate": "2019-11-28T00:41:52.076Z",
+        "minKeymanVersion": "12.0"
+    }
+

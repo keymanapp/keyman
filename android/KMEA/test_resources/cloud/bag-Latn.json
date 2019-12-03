@@ -1,0 +1,39 @@
+{
+  "options": {
+    "context": "language",
+    "dateFormat": "standard",
+    "device": "androidphone",
+    "keyboardBaseUri": "https://s.keyman.com/keyboard/",
+    "fontBaseUri": "https://s.keyman.com/font/deploy/",
+    "keyboardVersion": "current"
+  },
+  "languages": {
+    "languages": [
+      {
+        "name": "Tuki (Latin)",
+        "id": "bag-latn",
+        "region": 2,
+        "keyboards": [
+          {
+            "id": "sil_cameroon_azerty",
+            "name": "Cameroon AZERTY",
+            "filename": "sil_cameroon_azerty/6.0/sil_cameroon_azerty-6.0.js",
+            "version": "6.0",
+            "source": "https://github.com/keymanapp/keyboards/tree/master/release/sil/sil_cameroon_azerty",
+            "lastModified": "2019-11-28",
+            "fileSize": 55534
+          },
+          {
+            "id": "sil_cameroon_qwerty",
+            "name": "Cameroon QWERTY",
+            "filename": "sil_cameroon_qwerty/6.0.1/sil_cameroon_qwerty-6.0.1.js",
+            "version": "6.0.1",
+            "source": "https://github.com/keymanapp/keyboards/tree/master/release/sil/sil_cameroon_qwerty",
+            "lastModified": "2019-11-28",
+            "fileSize": 55348
+          }
+        ]
+      }
+    ]
+  }
+}
