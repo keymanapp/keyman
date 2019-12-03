@@ -244,7 +244,7 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
     key: string;
     response: string;
     value: TWebDebugKeyboardInfo;
-    src: string;
+    id, src: string;
     n: Integer;
     srcVersion: string;
     model: string;
@@ -298,14 +298,8 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
     try
       for model in FModels.Keys do
       begin
-        src := ChangeFileExt(model, '');
-        response := response + Format(
-          '  keyman.modelManager.register({'#13#10+
-          '    "id": "%s", '#13#10+
-          '    "languages": ["en"],'#13#10+
-          '    "path": "http://"+location.host+"/model/%s"'#13#10+
-          '  });'#13#10,
-          [src, model]);
+        id := ChangeFileExt(model, '');
+        response := response + Format('registerModel("%s", "%s");', [id, model]);
       end;
     finally
       FModelsCS.Leave;
