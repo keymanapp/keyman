@@ -63,6 +63,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    */
   public static final String PREF_KEY_LAST_UPDATE_CHECK = "lastUpdateCheck";
 
+  /**
+   * Months to ignore update notification
+   */
+  public static final int MONTHS_TO_IGNORE_NOTIFICATION = 3;
+
   private static final class OngoingUpdate
   {
     Integer notificationid;
@@ -269,6 +274,31 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       addOpenUpdate(createKeyboardId(langid, kbid), null, theResourceBundle);
     }
   }
+
+  /**
+   * Check shared preference to see if an update notification should be ignored.
+   * The window is MONTHS_TO_IGNORE_NOTIFICATION from the last time the notification was ignored.
+   * @param id keyboard or lexical model ID
+   * @return true if the notification should be ignored
+   */
+  private boolean checkIfNotificationShouldBeIgnored(String id) {
+    // Check preference if notification is to be ignored
+    SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    Long lastIgnoredTime = prefs.getLong(id, 0);
+    if (lastIgnoredTime > 0) {
+      Calendar now = Calendar.getInstance();
+      Calendar ignoreUntilTime = Calendar.getInstance();
+      ignoreUntilTime.setTime(new Date(lastIgnoredTime));
+      ignoreUntilTime.add(Calendar.MONTH, MONTHS_TO_IGNORE_NOTIFICATION);
+      if (now.compareTo(ignoreUntilTime) > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /**
    * send update notification.
    * @param theResourceBundle the bundle
@@ -290,13 +320,23 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
       String modelName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
       message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
-      addOpenUpdate(createLexicalModelId(langid,modelid),notification_id, theResourceBundle);
+      if (!checkIfNotificationShouldBeIgnored(modelid)) {
+        addOpenUpdate(createLexicalModelId(langid, modelid), notification_id, theResourceBundle);
+      } else {
+        // Update notification should be ignored
+        return;
+      }
     }
     else {
       String kbid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
       String kbName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
       message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
-     addOpenUpdate(createKeyboardId(langid,kbid),notification_id, theResourceBundle);
+      if (!checkIfNotificationShouldBeIgnored(kbid)) {
+        addOpenUpdate(createKeyboardId(langid, kbid), notification_id, theResourceBundle);
+      } else {
+        // Update notification should be ignored
+        return;
+      }
 
     }
 
