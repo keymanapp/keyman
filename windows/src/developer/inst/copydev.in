@@ -33,7 +33,10 @@ candle: heat-cef heat-xml heat-templates heat-model-compiler
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dXmlSourceDir=$(ROOT)\src\developer\TIKE\xml xml.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
     $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dTemplatesSourceDir=$(KEYMAN_DEVELOPER_TEMPLATES_ROOT) templates.wxs
-    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dModelCompilerSourceDir=$(KEYMAN_MODELCOMPILER_ROOT) kmlmc.wxs
+    $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dModelCompilerSourceDir=$(KEYMAN_WIX_TEMP_MODELCOMPILER) kmlmc.wxs
+    $(MAKE) -fcopydev.mak clean-heat
+
+clean-heat: clean-heat-model-compiler
 
 heat-xml:
     # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
@@ -103,6 +106,8 @@ heat-model-compiler:
     cd $(ROOT)\src\developer\inst
     $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_MODELCOMPILER) -o kmlmc.wxs -ag -cg ModelCompiler -dr INSTALLDIR -var var.ModelCompilerSourceDir -wx -nologo
 
+clean-heat-model-compiler:
+    # the production build generates files that are not in source, e.g. .ps1 scripts
     # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
 
