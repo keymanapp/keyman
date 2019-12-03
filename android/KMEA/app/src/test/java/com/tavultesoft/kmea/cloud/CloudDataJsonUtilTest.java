@@ -38,7 +38,7 @@ public class CloudDataJsonUtilTest {
 
   @Test
   public void shouldLowercaseLanguageID() {
-    // Test createKeyboardInfoMap
+    // Test createKeyboardInfoMap() used by processKeyboardJSON()
     HashMap<String, String> kbInfo = CloudDataJsonUtil.createKeyboardInfoMap(
       pkgID, langID, langName, keyboardID, keyboardName, keyboardVersion, customKeyboard, aFont, oskFont);
     Assert.assertEquals(langID.toLowerCase(), kbInfo.get(KMManager.KMKey_LanguageID));
