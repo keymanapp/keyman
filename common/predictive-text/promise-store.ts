@@ -1,3 +1,5 @@
+/// <reference path="node_modules/es6-shim/es6-shim.min.js" />
+
 /*
  * Copyright (c) 2018 National Research Council Canada (author: Eddie A. Santos)
  * Copyright (c) 2018 SIL International
