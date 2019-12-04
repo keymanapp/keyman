@@ -330,7 +330,8 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * @param id : keyboard or lexical model ID to ignore for MONTHS_TO_IGNORE_NOTIFICATION months
    */
   private void setPrefKeyIgnoreNotifications(String id) {
-    SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = currentContext.getSharedPreferences(
+      currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     String ignoredNotificationsStr = prefs.getString(PREF_KEY_IGNORE_NOTIFICATIONS, null);
 
