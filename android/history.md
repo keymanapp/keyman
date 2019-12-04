@@ -9,10 +9,12 @@
   * Check for keyboard updates during keyman startup (#2335)
   * Show available keyboard updates as android system notifications (#2335)
   * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
+  * Add preference so update notifications can be ignored 3 months (#2412)
 * Changes:
   * Update target Android SDK version to 29 (#2279)
   * Add simple UI tests for keyboard picker and keyboard info screens (#2326)
   * Add example dictionary to KMSample1 project (#2369)
+  * Prevent lower-cased API returns from causing mismatches (#2404)
 * Bug fix:
   * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
   * Add linting to Debug builds and resolve lint errors (#2305)
