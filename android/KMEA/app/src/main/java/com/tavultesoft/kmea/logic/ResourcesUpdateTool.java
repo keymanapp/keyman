@@ -313,7 +313,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           Calendar ignoreUntilTime = Calendar.getInstance();
           ignoreUntilTime.setTime(new Date(lastIgnoredTime));
           ignoreUntilTime.add(Calendar.MONTH, MONTHS_TO_IGNORE_NOTIFICATION);
-          Log.d(TAG,"now: " + now.getTime() + ", ignore til: " + ignoreUntilTime.getTime());
           if (now.compareTo(ignoreUntilTime) < 0) {
             return true;
           }
@@ -576,7 +575,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   public void cancelLexicalModelUpdate(String aLangId, String aModelId)
   {
-    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
     setPrefKeyIgnoreNotifications(aModelId);
     removeOpenUpdate(createLexicalModelId(aLangId,aModelId));
     if(openUpdates.isEmpty())
