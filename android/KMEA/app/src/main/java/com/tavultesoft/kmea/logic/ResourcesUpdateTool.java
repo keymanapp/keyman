@@ -1,6 +1,5 @@
 package com.tavultesoft.kmea.logic;
 
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationCompat.Builder;
 import androidx.core.app.NotificationManagerCompat;
-
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
@@ -39,8 +38,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler{
+  private static final String TAG = "ResourceUpdateTool";
 
   /**
    * Force resource update.
@@ -62,6 +65,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * Preferences key to save last update check time.
    */
   public static final String PREF_KEY_LAST_UPDATE_CHECK = "lastUpdateCheck";
+
+  /**
+   * Preference key for ignored notifications
+   */
+  public static final String PREF_KEY_IGNORE_NOTIFICATIONS = "ignoredNotifications";
 
   /**
    * Months to ignore update notification
@@ -281,22 +289,75 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * @param id keyboard or lexical model ID
    * @return true if the notification should be ignored
    */
-  private boolean checkIfNotificationShouldBeIgnored(String id) {
-    // Check preference if notification is to be ignored
+  private boolean shouldIgnoreNotification(String id) {
     SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
-    Long lastIgnoredTime = prefs.getLong(id, 0);
-    if (lastIgnoredTime > 0) {
-      Calendar now = Calendar.getInstance();
-      Calendar ignoreUntilTime = Calendar.getInstance();
-      ignoreUntilTime.setTime(new Date(lastIgnoredTime));
-      ignoreUntilTime.add(Calendar.MONTH, MONTHS_TO_IGNORE_NOTIFICATION);
-      if (now.compareTo(ignoreUntilTime) > 0) {
-        return true;
+    String ignoredNotificationsStr = prefs.getString(PREF_KEY_IGNORE_NOTIFICATIONS, null);
+
+    /*
+     * Preference is a JSON Object (as a string)
+     * { PREF_KEY_IGNORE_NOTIFICATIONS :
+     *   { id1 : time1 ignored,
+     *     id2 : time2 ignored
+     *   }
+     * }
+     */
+    JSONObject ignoredNotificationsObj;
+    if (ignoredNotificationsStr != null) {
+      try {
+        ignoredNotificationsObj = new JSONObject(ignoredNotificationsStr);
+
+        Long lastIgnoredTime = ignoredNotificationsObj.optLong(id, 0);
+        if (lastIgnoredTime > 0) {
+          Calendar now = Calendar.getInstance();
+          Calendar ignoreUntilTime = Calendar.getInstance();
+          ignoreUntilTime.setTime(new Date(lastIgnoredTime));
+          ignoreUntilTime.add(Calendar.MONTH, MONTHS_TO_IGNORE_NOTIFICATION);
+          Log.d(TAG,"now: " + now.getTime() + ", ignore til: " + ignoreUntilTime.getTime());
+          if (now.compareTo(ignoreUntilTime) < 0) {
+            return true;
+          }
+        }
+      } catch (JSONException e) {
+        Log.e(TAG, "JSON Exception parsing ignoreNotifications preference");
       }
     }
 
     return false;
+  }
+
+  /**
+   * Update preference to ignore notifications for keyboard / lexical model ID
+   * @param id : keyboard or lexical model ID to ignore for MONTHS_TO_IGNORE_NOTIFICATION months
+   */
+  private void setPrefKeyIgnoreNotifications(String id) {
+    SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    String ignoredNotificationsStr = prefs.getString(PREF_KEY_IGNORE_NOTIFICATIONS, null);
+
+    /*
+     * Preference is a JSON Object (stored as a string)
+     * { PREF_KEY_IGNORE_NOTIFICATIONS :
+     *   { id1 : time1 ignored,
+     *     id2 : time2 ignored
+     *   }
+     * }
+     */
+    JSONObject ignoredNotificationsObj;
+    try {
+      if (ignoredNotificationsStr == null) {
+        ignoredNotificationsObj = new JSONObject();
+      } else {
+        ignoredNotificationsObj = new JSONObject(ignoredNotificationsStr);
+      }
+
+      Calendar now = Calendar.getInstance();
+      ignoredNotificationsObj.put(id, now.getTime().getTime());
+      editor.putString(PREF_KEY_IGNORE_NOTIFICATIONS, ignoredNotificationsObj.toString());
+      editor.commit();
+    } catch (JSONException e) {
+      Log.e(TAG, "JSON Exception updating ignoreNotifications preference");
+    }
   }
 
   /**
@@ -320,10 +381,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
       String modelName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME);
       message = currentContext.getString(R.string.dictionary_update_message, langName, modelName);
-      if (!checkIfNotificationShouldBeIgnored(modelid)) {
+      if (!shouldIgnoreNotification(modelid)) {
         addOpenUpdate(createLexicalModelId(langid, modelid), notification_id, theResourceBundle);
       } else {
         // Update notification should be ignored
+        notificationManager.cancel(notification_id);
         return;
       }
     }
@@ -331,10 +393,11 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       String kbid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_ID);
       String kbName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_KB_NAME);
       message =  currentContext.getString(R.string.keyboard_update_message, langName, kbName);
-      if (!checkIfNotificationShouldBeIgnored(kbid)) {
+      if (!shouldIgnoreNotification(kbid)) {
         addOpenUpdate(createKeyboardId(langid, kbid), notification_id, theResourceBundle);
       } else {
         // Update notification should be ignored
+        notificationManager.cancel(notification_id);
         return;
       }
 
@@ -505,6 +568,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   public void cancelKeyboardUpdate(String aLangId, String aKbId)
   {
+    setPrefKeyIgnoreNotifications(aKbId);
     removeOpenUpdate(createKeyboardId(aLangId,aKbId));
     if(openUpdates.isEmpty())
       checkingUpdates = false;
@@ -512,6 +576,8 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   public void cancelLexicalModelUpdate(String aLangId, String aModelId)
   {
+    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(currentContext);
+    setPrefKeyIgnoreNotifications(aModelId);
     removeOpenUpdate(createLexicalModelId(aLangId,aModelId));
     if(openUpdates.isEmpty())
       checkingUpdates = false;
