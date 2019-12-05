@@ -57,9 +57,9 @@ int main(int argc, char *argv[])
 
 	if(!LoadKeyboard(argv[1], &kbd, &lpBitmap, &cbBitmap)) return 2;
 
-	_splitpath(argv[1], drive, dir, filename, NULL);
-	_makepath(buf, drive, dir, filename, ".kmn");
-	_makepath(buf2, drive, dir, filename, ".bmp");
+	_splitpath_s(argv[1], drive, _MAX_DRIVE, dir, _MAX_DIR, filename, _MAX_FNAME, NULL, 0);
+	_makepath_s(buf, _MAX_PATH, drive, dir, filename, ".kmn");
+	_makepath_s(buf2, _MAX_PATH, drive, dir, filename, ".bmp");
 
 	int n = SaveKeyboardSource(kbd, lpBitmap, cbBitmap, buf, buf2);
 	
