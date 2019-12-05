@@ -14,6 +14,8 @@ type
     procedure actModelCompileExecute(Sender: TObject);
     procedure actModelIncludeDebugInformationExecute(Sender: TObject);
     procedure actModelTestExecute(Sender: TObject);
+    procedure actModelCompileUpdate(Sender: TObject);
+    procedure actModelTestUpdate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -59,6 +61,12 @@ begin
   end;
 end;
 
+procedure TmodActionsModelEditor.actModelCompileUpdate(Sender: TObject);
+begin
+  actModelCompile.Enabled := ActiveModelEditor <> nil;
+  frmKeymanDeveloper.mnuModel.Visible := actModelCompile.Enabled;
+end;
+
 procedure TmodActionsModelEditor.actModelIncludeDebugInformationExecute(
   Sender: TObject);
 begin
@@ -68,6 +76,11 @@ end;
 procedure TmodActionsModelEditor.actModelTestExecute(Sender: TObject);
 begin
   (ActiveModelProjectFile.UI as TProjectFileUI).DoAction(pfaTestKeymanWeb, False);   // I4687
+end;
+
+procedure TmodActionsModelEditor.actModelTestUpdate(Sender: TObject);
+begin
+  actModelTest.Enabled := ActiveModelEditor <> nil;
 end;
 
 end.

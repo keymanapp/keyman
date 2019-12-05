@@ -157,8 +157,8 @@ type
     Edit1: TMenuItem;
     View1: TMenuItem;
     Project1: TMenuItem;
-    Keyboards1: TMenuItem;
-    Debug2: TMenuItem;
+    mnuKeyboard: TMenuItem;
+    mnuDebug: TMenuItem;
     ools1: TMenuItem;
     Help1: TMenuItem;
     New1: TMenuItem;
@@ -270,6 +270,10 @@ type
     DebugTests1: TMenuItem;
     CrashTest1: TMenuItem;
     CloseProject1: TMenuItem;
+    mnuModel: TMenuItem;
+    CompileModel1: TMenuItem;
+    N2: TMenuItem;
+    estLexicalModel1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -1429,6 +1433,9 @@ begin
     if PrevFocus.Visible then
       PrevFocus.SetFocus;
   end;
+
+  modActionsKeyboardEditor.actKeyboardCompile.Update;
+  modActionsModelEditor.actModelCompile.Update;
 end;
 
 procedure TfrmKeymanDeveloper.UDUI_Error(Sender: TUnicodeData;

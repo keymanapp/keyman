@@ -12,6 +12,7 @@ object modActionsModelEditor: TmodActionsModelEditor
       ImageIndex = 37
       ShortCut = 118
       OnExecute = actModelCompileExecute
+      OnUpdate = actModelCompileUpdate
     end
     object actModelIncludeDebugInformation: TAction
       Category = 'Lexical Model'
@@ -22,6 +23,7 @@ object modActionsModelEditor: TmodActionsModelEditor
       Category = 'Lexical Model'
       Caption = 'Test &Lexical Model'
       OnExecute = actModelTestExecute
+      OnUpdate = actModelTestUpdate
     end
   end
 end

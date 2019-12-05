@@ -2950,7 +2950,19 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Action = modActionsMain.actProjectSettings
       end
     end
-    object Keyboards1: TMenuItem
+    object mnuModel: TMenuItem
+      Caption = '&Model'
+      object CompileModel1: TMenuItem
+        Action = modActionsModelEditor.actModelCompile
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object estLexicalModel1: TMenuItem
+        Action = modActionsModelEditor.actModelTest
+      end
+    end
+    object mnuKeyboard: TMenuItem
       Caption = '&Keyboard'
       object CompileKeyboard1: TMenuItem
         Action = modActionsKeyboardEditor.actKeyboardCompile
@@ -2989,7 +3001,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Action = modActionsKeyboardEditor.actKeyboardFontHelper
       end
     end
-    object Debug2: TMenuItem
+    object mnuDebug: TMenuItem
       Caption = '&Debug'
       object SetBreakpoint1: TMenuItem
         Action = modActionsKeyboardEditor.actDebugSetClearBreakpoint
