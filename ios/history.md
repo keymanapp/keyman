@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-12-05 12.0.62 stable
+* Fix situation where lexical models would not install (#2420)
+
 ## 2019-11-14 12.0.54 stable
 * Confine system keyboard popup-key positioning (#2317)
 * Fix initialization of system keyboard width (#2318)
