@@ -169,6 +169,10 @@
       <Component>
         <File Name="kmdecomp.exe" KeyPath="yes" />
       </Component>
+
+      <Component>
+        <File Name="kmdecomp.md" KeyPath="yes" Souce="..\..\developer\kmdecomp\kmdecomp.md" />
+      </Component>
       
       <Component>
         <File Name="kmcomp.exe" KeyPath="yes" />
