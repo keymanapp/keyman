@@ -50,7 +50,7 @@ describe('LMLayer using dummy model', function () {
       if(navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
         // Our wordbreaking uses the IE-unsupported .codePointAt() function.
         console.warn("Bypassing wordbreak test on IE.");
-        return;
+        this.skip();
       }
 
       this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
