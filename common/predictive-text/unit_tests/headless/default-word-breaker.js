@@ -24,7 +24,9 @@ describe('The default word breaker', function () {
   // The following tests are performed with model integration as an internal
   // test for the wordbreaking API.
   it('recognizes a word at end of complete lefthand context', function () {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords // wordBreakers['default'] when fully integrated.
+    });
 
     // Standard case - wordbreaking at the end of a word.
     var context = { 
@@ -40,7 +42,9 @@ describe('The default word breaker', function () {
   // Same test as before, but we want to be sure the start/end of buffer flags
   // don't affect our results.
   it('recognizes a word at end of incomplete lefthand context', function () {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords
+    });
 
     // Standard case - wordbreaking at the end of a word.
     var context = { 
@@ -54,7 +58,9 @@ describe('The default word breaker', function () {
   });
 
   it('returns text for a word in-progress', function() {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords
+    });
 
     // Standard case - midword (xylophone) call
     var context = { 
@@ -68,7 +74,9 @@ describe('The default word breaker', function () {
   });
     
   it('returns empty string when called without word text', function() {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords
+    });
 
     // Wordbreaking on a empty space => no word.
     context = { 
@@ -82,7 +90,9 @@ describe('The default word breaker', function () {
   });
 
   it('returns empty string when called with empty context', function() {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords
+    });
 
     // Wordbreaking on a empty space => no word.
     context = { 
@@ -96,7 +106,9 @@ describe('The default word breaker', function () {
   });
 
   it('returns empty string when called with nil context', function() {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords
+    });
 
     // Wordbreaking on a empty space => no word.
     context = { 
@@ -110,7 +122,9 @@ describe('The default word breaker', function () {
   });
 
   it.skip('correctly breaks a word when the caret is placed within it', function() {
-    var model = new TrieModel(jsonFixture('tries/english-1000'));
+    var model = new TrieModel(jsonFixture('tries/english-1000'), {
+      wordBreaker: breakWords
+    });
 
     // A limitation of the current implementation; we should fix this before release.
     // Then again, when typing this is probably fine; just not when not typing.
