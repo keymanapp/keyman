@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-12-01 12.0.59 stable
+* Bug Fix: Using supplementary plane characters could cause rules to fail to match (#2398) 
+
 ## 2019-11-15 12.0.54 stable
 * Bug Fix: On Screen Keyboard restored to wrong screen and position when reloading (#2330)
 

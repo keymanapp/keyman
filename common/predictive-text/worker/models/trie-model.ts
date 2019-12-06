@@ -85,7 +85,7 @@
         trieData['totalWeight'],
         options.searchTermToKey as Wordform2Key || defaultWordform2Key
       );
-      this.breakWords = options.wordBreaker || wordBreakers.placeholder;
+      this.breakWords = options.wordBreaker || wordBreakers['default'];
       this.punctuation = options.punctuation;
     }
 

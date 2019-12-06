@@ -108,7 +108,6 @@
 
 #define BK_DEADKEY		1
 #define BK_BACKSPACE	2
-#define BK_SUPP2      3 // I1389 - Second backspace for supplementary pairs - so we can ignore it on Vista, etc
 /*
  A blank key (in a group without "using keys") cannot be '0' as that is
  used for error testing and blanking out unused keys and you don't really
