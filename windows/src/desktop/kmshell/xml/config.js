@@ -285,3 +285,15 @@ function keyboard_checkclick(n,toggle) {
   li.focus();
   return true;
 }
+
+/* QRCode popup */
+
+function showKeyboardLink(id) {
+  var e = document.getElementById('qrcode-'+id);
+  e.className='qrcode qrcode-visible';
+}
+
+function hideKeyboardLink(id) {
+  var e = document.getElementById('qrcode-'+id);
+  e.className='qrcode';
+}
