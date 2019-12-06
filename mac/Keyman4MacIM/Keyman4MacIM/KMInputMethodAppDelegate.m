@@ -233,6 +233,8 @@ id _lastServerWithOSKShowing = nil;
     if (_kvk != nil && (_alwaysShowOSK || _lastServerWithOSKShowing == newServer)) {
         [self showOSK];
     }
+
+    _lastServerWithOSKShowing = nil;
 }
 
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
