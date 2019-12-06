@@ -18,7 +18,7 @@ describe('LMLayer using the trie model', function () {
       if(navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
         // Our wordbreaking uses the IE-unsupported .codePointAt() function.
         console.warn("Bypassing wordbreak test on IE.");
-        return;
+        this.skip();
       }
 
       // We're testing many as asynchronous messages in a row.
