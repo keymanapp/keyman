@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-12-06 12.0.62 stable
+* Bug Fix: Shortcuts in text editors were not working after #2331 (#2424)
+
 ## 2019-11-18 12.0.55 stable
 * Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
 
