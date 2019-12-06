@@ -135,6 +135,7 @@
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
 		CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */; };
+		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -298,6 +299,7 @@
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -521,6 +523,7 @@
 				9845A7C71A439A9200544E2E /* SetUpViewController */,
 				98ABADBA176935E400B62590 /* Supporting Files */,
 				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
+				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
 				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
 				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
@@ -924,6 +927,7 @@
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
 				C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */,
+				CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */,
 				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
 				C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */,
 				162E2C9920926C8600F40769 /* UIView+Extensions.swift in Sources */,

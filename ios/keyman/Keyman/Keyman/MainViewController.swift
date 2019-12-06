@@ -122,6 +122,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       observer: self,
       function: MainViewController.keyboardRemoved)
 
+    // Unfortunately, it's the main app with the file definitions.
+    // We have to gerry-rig this so that the framework-based SettingsViewController
+    // can launch the app-based DocumentViewController.
+    if #available(iOS 11.0, *) {
+      Manager.shared.fileBrowserLauncher = { navController in
+      let vc = PackageBrowserViewController()
+        navController.pushViewController(vc, animated: true)
+      }
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {

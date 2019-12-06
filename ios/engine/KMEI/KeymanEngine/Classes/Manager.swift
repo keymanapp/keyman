@@ -44,6 +44,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   public static let shared = Manager()
 
+  public var fileBrowserLauncher: ((UINavigationController) -> Void)? = nil
+
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
   
