@@ -43,9 +43,9 @@ void SaveBitmapFile(LPBYTE lpBitmap, DWORD cbBitmap, char *bmpfile);
 
 LPKEYBOARD g_kbd;
 
-PWCHAR wcscat2(PWCHAR c1, const PWCHAR c2)
+PWCHAR wcscat2(PWCHAR c1, size_t sz, const PWCHAR c2)
 {
-	wcscat(c1, c2);
+	wcscat_s(c1, sz, c2);
 	return wcschr(c1, 0);
 }
 
@@ -134,23 +134,23 @@ PWCHAR flagstr(int flag)
 {
 	static WCHAR buf[256];
 	*buf = 0;
-	if(flag & LCTRLFLAG)       wcscat2(buf, L"LCTRL ");
-	if(flag & RCTRLFLAG)       wcscat2(buf, L"RCTRL ");
-	if(flag & LALTFLAG)        wcscat2(buf, L"LALT ");
-	if(flag & RALTFLAG)        wcscat2(buf, L"RALT ");
-	if(flag & K_SHIFTFLAG)     wcscat2(buf, L"SHIFT ");
-	if(flag & K_CTRLFLAG)      wcscat2(buf, L"CTRL ");
-	if(flag & K_ALTFLAG)       wcscat2(buf, L"ALT ");
-	if(flag & CAPITALFLAG)     wcscat2(buf, L"CAPS ");
-	if(flag & NOTCAPITALFLAG)  wcscat2(buf, L"NCAPS ");
-	if(flag & NUMLOCKFLAG)     wcscat2(buf, L"NUM ");
-	if(flag & NOTNUMLOCKFLAG)  wcscat2(buf, L"NNUM ");
-	if(flag & SCROLLFLAG)      wcscat2(buf, L"SCROLL ");
-	if(flag & NOTSCROLLFLAG)   wcscat2(buf, L"NSCROLL ");
+	if(flag & LCTRLFLAG)       wcscat2(buf, _countof(buf), L"LCTRL ");
+	if(flag & RCTRLFLAG)       wcscat2(buf, _countof(buf), L"RCTRL ");
+	if(flag & LALTFLAG)        wcscat2(buf, _countof(buf), L"LALT ");
+	if(flag & RALTFLAG)        wcscat2(buf, _countof(buf), L"RALT ");
+	if(flag & K_SHIFTFLAG)     wcscat2(buf, _countof(buf), L"SHIFT ");
+	if(flag & K_CTRLFLAG)      wcscat2(buf, _countof(buf), L"CTRL ");
+	if(flag & K_ALTFLAG)       wcscat2(buf, _countof(buf), L"ALT ");
+	if(flag & CAPITALFLAG)     wcscat2(buf, _countof(buf), L"CAPS ");
+	if(flag & NOTCAPITALFLAG)  wcscat2(buf, _countof(buf), L"NCAPS ");
+	if(flag & NUMLOCKFLAG)     wcscat2(buf, _countof(buf), L"NUM ");
+	if(flag & NOTNUMLOCKFLAG)  wcscat2(buf, _countof(buf), L"NNUM ");
+	if(flag & SCROLLFLAG)      wcscat2(buf, _countof(buf), L"SCROLL ");
+	if(flag & NOTSCROLLFLAG)   wcscat2(buf, _countof(buf), L"NSCROLL ");
 	return buf;
 }
 
-PWCHAR GetVKeyName(LPKEY key)  // I3438
+PCWCHAR GetVKeyName(LPKEY key)  // I3438
 {
   static WCHAR buf[100];
   if(key->Key <= VK__MAX) 
@@ -187,9 +187,10 @@ PWCHAR ifvalue(WCHAR ch)
   return L"=";
 }
 
+#define BUFSIZE 512
 PWCHAR ExtString(PWCHAR str)
 {
-	static WCHAR buf[2][512], bufpointer = 0;	// allows for multiple strings in one printf
+	static WCHAR buf[2][BUFSIZE], bufpointer = 0;	// allows for multiple strings in one printf
 												// dodgy hack?
 
 	PWCHAR p;
@@ -203,7 +204,7 @@ PWCHAR ExtString(PWCHAR str)
 		if(*str == UC_SENTINEL)
 		{
 			str++;
-			if(inquotes) p = wcscat2(p, L"\" ");
+			if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
 			inquotes = 0;
 			switch(*str)
 			{
@@ -219,10 +220,10 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcschr(p, 0);
 				break;
 			case CODE_CONTEXT:
-				p = wcscat2(p, L"context ");
+				p = wcscat2(p, BUFSIZE, L"context ");
 				break;
 			case CODE_NUL:
-				p = wcscat2(p, L"nul ");
+				p = wcscat2(p, BUFSIZE, L"nul ");
 				break;
 			case CODE_USE:
 				str++;
@@ -230,10 +231,10 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcschr(p, 0);
 				break;
 			case CODE_RETURN:
-				p = wcscat2(p, L"return ");
+				p = wcscat2(p, BUFSIZE, L"return ");
 				break;
 			case CODE_BEEP:
-				p = wcscat2(p, L"beep ");
+				p = wcscat2(p, BUFSIZE, L"beep ");
 				break;
 			case CODE_DEADKEY:
 				str++;
@@ -257,13 +258,13 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcschr(p, 0);
 				break;
 			case CODE_SWITCH:
-				p = wcscat2(p, L"switch<deprecated> ");
+				p = wcscat2(p, BUFSIZE, L"switch<deprecated> ");
 				break;
 			case CODE_KEY:
-				p = wcscat2(p, L"key<deprecated> ");
+				p = wcscat2(p, BUFSIZE, L"key<deprecated> ");
 				break;
 			case CODE_CLEARCONTEXT:
-				p = wcscat2(p, L"clearcontext ");
+				p = wcscat2(p, BUFSIZE, L"clearcontext ");
 				break;
 			case CODE_CALL:
 				str++;
@@ -321,7 +322,7 @@ PWCHAR ExtString(PWCHAR str)
         break;
 
 			default:
-				p = wcscat2(p, L"unknown() ");
+				p = wcscat2(p, BUFSIZE, L"unknown() ");
 				break;
 			}
 		}
@@ -329,13 +330,13 @@ PWCHAR ExtString(PWCHAR str)
 		{
 			if(*str == L'"')
 			{
-				if(inquotes) p = wcscat2(p, L"\" ");
+				if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
 				inquotes = 0;
-				p = wcscat2(p, L"'\"' ");
+				p = wcscat2(p, BUFSIZE, L"'\"' ");
 			}
 			else if(*str < 32)
 			{
-				if(inquotes) p = wcscat2(p, L"\" ");
+				if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
 				inquotes = 0;
 				wsprintfW(p, L"x%x ", *str);
 				p = wcschr(p, 0);
@@ -345,7 +346,7 @@ PWCHAR ExtString(PWCHAR str)
 				if(!inquotes)
 				{
 					inquotes = 1;
-					p = wcscat2(p, L"\"");
+					p = wcscat2(p, BUFSIZE, L"\"");
 				}
 				*p++ = *str;
 				*p = 0;
@@ -353,7 +354,7 @@ PWCHAR ExtString(PWCHAR str)
 		}
 	}
 
-	if(inquotes) p = wcscat2(p, L"\" ");
+	if(inquotes) p = wcscat2(p, BUFSIZE, L"\" ");
 	return buf[bufpointer];
 }
 
@@ -376,10 +377,12 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
 
 	g_kbd = kbd;
 
-	fp = fopen(filename, "wb");
-	fwrite(UTF16Sig, 2, 1, fp);
+  if (fopen_s(&fp, filename, "wb") != 0) {
+    Err("Unable to create output file.");
+    return 3;
+  }
 
-	if(!fp) { Err("Unable to create output file."); return 3; }
+  fwrite(UTF16Sig, 2, 1, fp);
 
 	wsprintfW(buf, L"c Keyboard created by KMDECOMP\n"); wr(fp, buf);
 	wsprintfW(buf, L"c\n"); wr(fp, buf);
@@ -450,7 +453,9 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
 
 void SaveBitmapFile(LPBYTE lpBitmap, DWORD cbBitmap, char *bmpfile)
 {
-  FILE * fp = fopen(bmpfile, "wb");
-  fwrite(lpBitmap, cbBitmap, 1, fp);
-  fclose(fp);
+  FILE *fp;
+  if (fopen_s(&fp, bmpfile, "wb") == 0) {
+    fwrite(lpBitmap, cbBitmap, 1, fp);
+    fclose(fp);
+  }
 }
