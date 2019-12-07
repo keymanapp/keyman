@@ -204,7 +204,12 @@ function ShowMenu(name,align) {
   menudiv.style.visibility='visible';
   if(align=='right') menudiv.style.left = (pb.x+button.offsetWidth-menudiv.offsetWidth) + 'px';
   else menudiv.style.left = pb.x + 'px';
-  menudiv.style.top = (pb.y+button.offsetHeight) + 'px';
+
+  if(pb.y + button.offsetHeight + menudiv.offsetHeight > window.innerHeight - 4) {
+    menudiv.style.top = (pb.y - menudiv.offsetHeight) + 'px';
+  } else {
+    menudiv.style.top = (pb.y + button.offsetHeight) + 'px';
+  }
 
   document.getElementById('menubackground').className = 'show';
 }
