@@ -3,7 +3,12 @@
 ## 13.0 alpha
 * Start version 13.0
 * Feature: Add unsupported kmdecomp decompiler utility (#2419)
-
+* Feature: Add x64 version of kmcomp for macOS (#2352)
+* Fix: Remove version info from .kps when follow-keyboard-version is set (#2417)
+* Fix: Make sure popup menus are never obscured in Project view (#2415)
+* Fix: 'Show Help' was not working on Distribution tab in Project view (#2397)
+* Fix: Missing author email was causing lexical model compiler to fail (#2388)
+ 
 ## 2019-11-18 12.0.55 stable
 * Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
 

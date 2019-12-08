@@ -1,4 +1,4 @@
-# Keyman for Android
+# Keyman for Android Version History
 
 ## 13.0 alpha
 * Start version 13.0
@@ -20,6 +20,7 @@
   * Add linting to Debug builds and resolve lint errors (#2305)
   * Fix memory issues during build process (#2361)
   * Fix crashes when parsing JSON data from Cloud (#2393)
+  * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
 
 ## 2019-11-27 12.0.4211 stable
 * Bug fix:

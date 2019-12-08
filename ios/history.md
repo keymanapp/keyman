@@ -2,6 +2,8 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Bug Fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403)
+* Bug Fix: If malformed data was returned from an online API, Keyman could crash (#2368)
 * Testing for upcoming patch to stable:
   * Fixes for deprecated code, improving maintainability (#2282)
 

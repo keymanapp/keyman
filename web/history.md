@@ -2,7 +2,9 @@
 
 ## 13.0 alpha
 * Start version 13.0
-
+* Bug Fix: Default wordbreaker was not working correctly (#2405)
+* Bug Fix: Firefox on macOS was not being detected correctly (#2379)
+        
 ## 2019-11-13 12.0.102 stable
 * Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2288)
 * Fix for iOS Safari's "Request Desktop Website" option disabling touch interactivity (#2283)
