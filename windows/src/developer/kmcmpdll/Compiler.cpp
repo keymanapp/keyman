@@ -2813,8 +2813,8 @@ DWORD ProcessHotKey(PWSTR p, DWORD *hk)
     }
 
     if (ShiftFlags & K_SHIFTFLAG) *hk |= HK_SHIFT;
-    if (ShiftFlags & K_CTRLFLAG) *hk |= HK_SHIFT;
-    if (ShiftFlags & K_ALTFLAG) *hk |= HK_SHIFT;
+    if (ShiftFlags & K_CTRLFLAG) *hk |= HK_CTRL;
+    if (ShiftFlags & K_ALTFLAG) *hk |= HK_ALT;
 
     *hk |= Key;
 
