@@ -3,7 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 * Feature: Add unsupported kmdecomp decompiler utility (#2419)
-* Feature: Hotkeys defined in .kmn no longer need to be quoted (#138)
+* Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
 
 ## 2019-11-18 12.0.55 stable
 * Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
