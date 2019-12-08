@@ -2792,6 +2792,8 @@ DWORD ProcessEthnologueStore(PWSTR p) // I2646
   return res;
 }
 
+#define K_HOTKEYSHIFTFLAGS (K_SHIFTFLAG | K_CTRLFLAG | K_ALTFLAG | ISVIRTUALKEY)
+
 DWORD ProcessHotKey(PWSTR p, DWORD *hk)
 {
 	PWSTR q, r;
@@ -2799,6 +2801,25 @@ DWORD ProcessHotKey(PWSTR p, DWORD *hk)
 	int j, i;
 
 	*hk = 0;
+
+  if(*p == UC_SENTINEL && *(p+1) == CODE_EXTENDED) {
+    WORD Key = *(p + 3);
+    WORD ShiftFlags = *(p + 2);
+
+    // Convert virtual key to hotkey (different bitflags)
+
+    if (ShiftFlags & ~K_HOTKEYSHIFTFLAGS) {
+      AddWarning(CWARN_HotkeyHasInvalidModifier);
+    }
+
+    if (ShiftFlags & K_SHIFTFLAG) *hk |= HK_SHIFT;
+    if (ShiftFlags & K_CTRLFLAG) *hk |= HK_SHIFT;
+    if (ShiftFlags & K_ALTFLAG) *hk |= HK_SHIFT;
+
+    *hk |= Key;
+
+    return CERR_None;
+  }
 
 	q = wcschr(p, '[');
 	if(q)
