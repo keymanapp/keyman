@@ -286,7 +286,9 @@ uses
   Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
   Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
   Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
-  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas';
+  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas',
+  DelphiZXIngQRCode in '..\..\ext\zxingqrcode\Source\DelphiZXIngQRCode.pas',
+  Keyman.System.QRCode in '..\..\global\delphi\general\Keyman.System.QRCode.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
