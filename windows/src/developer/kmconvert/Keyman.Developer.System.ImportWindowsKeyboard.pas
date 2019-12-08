@@ -73,6 +73,7 @@ uses
   Keyman.Developer.System.ImportKeyboardDLL,
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
   Keyman.System.Util.RenderLanguageIcon,
+  Keyman.System.KeyboardUtils,
   KeymanVersion,
   KeyboardParser,
   kmxfileconsts,
@@ -107,7 +108,7 @@ begin
         r.ValueExists(SRegValue_KeyboardLayoutText) then
       Exit(False);
 
-    KeyboardID := ChangeFileExt(r.ReadString(SRegValue_KeyboardLayoutFile), '');
+    KeyboardID := TKeyboardUtils.CleanKeyboardID(ChangeFileExt(r.ReadString(SRegValue_KeyboardLayoutFile), ''));
     Name := r.ReadString(SRegValue_KeyboardLayoutText);
   finally
     r.Free;
