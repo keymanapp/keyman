@@ -14,13 +14,6 @@ describe('LMLayer using the trie model', function () {
                                                   // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
 
-      // As noted in worker-dummy-integration as well.
-      if(navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
-        // Our wordbreaking uses the IE-unsupported .codePointAt() function.
-        console.warn("Bypassing wordbreak test on IE.");
-        this.skip();
-      }
-
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
       // alas some of our browsers don't support it.
