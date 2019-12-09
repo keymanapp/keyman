@@ -283,10 +283,15 @@ uses
   Keyman.Developer.System.ProjectTemplate in '..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas',
   Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters},
   Keyman.Developer.System.Project.wordlistTsvProjectFile in 'project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
-  Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
+  Keyman.Developer.UI.UframeWordlistEditor in 'child\Keyman.Developer.UI.UframeWordlistEditor.pas' {frameWordlistEditor},
   Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
   Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
-  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas';
+  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas',
+  Keyman.Developer.UI.UfrmModelEditor in 'child\Keyman.Developer.UI.UfrmModelEditor.pas' {frmModelEditor},
+  Keyman.Developer.System.LexicalModelParser in 'main\Keyman.Developer.System.LexicalModelParser.pas',
+  Keyman.Developer.System.LexicalModelParserTypes in 'main\Keyman.Developer.System.LexicalModelParserTypes.pas',
+  Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
+  Keyman.Developer.UI.dmActionsModelEditor in 'actions\Keyman.Developer.UI.dmActionsModelEditor.pas' {modActionsModelEditor: TDataModule};
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -314,8 +319,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  Application.Run;
+      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+      Application.Run;
     end;
   finally
     FInitializeCEF.Free;

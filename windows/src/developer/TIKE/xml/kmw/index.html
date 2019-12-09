@@ -59,6 +59,7 @@
 
       .touch-device #install-link,
       .touch-device #install-link-packages,
+      .touch-device #model-link,
       .touch-device-ios #install-link-ios,
       .touch-device-android #install-link-android {
         display: inline-block;
@@ -132,10 +133,6 @@
   <script src="resource/keymanweb.js"></script>
   <script src="resource/kmwuibutton.js"></script>
 
-  <!-- The following dynamic script will register each of the additional keyboards -->
-
-  <script src="/inc/keyboards.js" type="text/javascript"></script>
-
   <!-- This script loads the dynamic keyboard fonts -->
 
   <link href="/inc/keyboards.css" type="text/css" rel="stylesheet" />
@@ -156,7 +153,15 @@
   <body class='osk-always-visible'>
     <div class='header'>
       <div><h2>Keyboard Test</h2></div>
-      <div class='float-right'><a href='/packages.html' class='install-link' id='install-link-packages'>Install packages</a></div>
+      <div class='float-right'>
+        <span id='model-link' class='install-link' onclick=''>Models</span>
+        <div id='model-list'>
+          <div id='model-list-inner'>
+            <span id='model-list-empty'>No models are currently loaded.</span>
+          </div>
+        </div>
+        <a href='/packages.html' class='install-link' id='install-link-packages'>Install packages</a>
+      </div>
       <div class='clear'></div>
     </div>
 
@@ -322,7 +327,62 @@
             //document.getElementById('ta1').focus();
             keyman.moveToElement('ta1');
           }, 10);
+
+          document.getElementById('model-link').addEventListener('click', modelLinkClick);
       }
+
+      /* Lexical models */
+
+      var firstModel = true;
+
+      /**
+       * Register a model for debugging. Called by keyboards.js. The
+       * first model registered will be activated automatically.
+       */
+      function registerModel(model, src) {
+        var list = document.getElementById('model-list-inner');
+        var a = document.createElement('a');
+        a.href = '#';
+        a.innerText = model;
+        a.addEventListener('click', function(ev) {
+          ev.returnValue = false;
+
+          var lastModel = keyman.modelManager.activeModel;
+          if(lastModel)
+            keyman.modelManager.deregister(lastModel.id);
+          keyman.modelManager.register({
+            id: model,
+            languages: ['en'],
+            path: 'http://'+location.host+'/model/'+src
+          });
+        });
+        list.appendChild(a);
+
+        if(firstModel) {
+          keyman.modelManager.register({
+            id: model,
+            languages: ['en'],
+            path: 'http://'+location.host+'/model/'+src
+          });
+          document.getElementById('model-list-empty').style.display = 'none';
+          firstModel = false;
+        }
+      }
+
+      /**
+       * Toggle visibility of the model menu
+       */
+      function modelLinkClick(e) {
+        var elem = document.getElementById('model-list');
+        elem.className = elem.className == '' ? 'model-list-visible' : '';
+        e.returnValue = false;
+        return false;
+      }
+
     </script>
+
+    <!-- The following dynamic script will register each of the additional keyboards -->
+    <script src="/inc/keyboards.js" type="text/javascript"></script>
+
   </body>
 </html>
