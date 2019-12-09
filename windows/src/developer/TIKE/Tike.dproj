@@ -529,8 +529,8 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
-        <DCCReference Include="child\Keyman.Developer.UI.UfrmWordlistEditor.pas">
-            <Form>frmWordlistEditor</Form>
+        <DCCReference Include="child\Keyman.Developer.UI.UframeWordlistEditor.pas">
+            <Form>frameWordlistEditor</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
@@ -538,6 +538,21 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.WelcomeRenderer.pas"/>
         <DCCReference Include="..\..\ext\zxingqrcode\Source\DelphiZXIngQRCode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.QRCode.pas"/>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmModelEditor.pas">
+            <Form>frmModelEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="main\Keyman.Developer.System.LexicalModelParser.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.LexicalModelParserTypes.pas"/>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmWordlistEditor.pas">
+            <Form>frmWordlistEditor</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="actions\Keyman.Developer.UI.dmActionsModelEditor.pas">
+            <Form>modActionsModelEditor</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

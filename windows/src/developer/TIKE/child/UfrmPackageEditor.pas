@@ -1672,7 +1672,7 @@ var
   FHasDesktopTarget, FHasMobileTarget: Boolean;
 begin
   FHasDesktopTarget := False;
-  FHasMobileTarget := False;
+  FHasMobileTarget := pack.LexicalModels.Count > 0;
   for k in pack.Keyboards do
   begin
     for i := 0 to pack.Files.Count - 1 do

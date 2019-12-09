@@ -222,5 +222,6 @@ END
 STRINGTABLE
 BEGIN
     CWARN_LanguageHeadersDeprecatedInKeyman10 "This language header has been deprecated in Keyman 10. Instead, add language metadata in the package file"
+    CWARN_HotkeyHasInvalidModifier            "Hotkey has modifiers that are not supported. Use only SHIFT, CTRL and ALT"
     CINFO_NonUnicodeFile                      "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"
 END

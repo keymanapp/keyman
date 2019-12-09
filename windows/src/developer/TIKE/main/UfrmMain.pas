@@ -97,6 +97,7 @@ uses
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
+  Keyman.Developer.UI.dmActionsModelEditor,
   dmActionsMain, UnicodeData, UserMessages, webhelp,
   dmActionsKeyboardEditor, Dialogs, UfrmTike, AppEvnts,
   DropTarget,
@@ -156,8 +157,8 @@ type
     Edit1: TMenuItem;
     View1: TMenuItem;
     Project1: TMenuItem;
-    Keyboards1: TMenuItem;
-    Debug2: TMenuItem;
+    mnuKeyboard: TMenuItem;
+    mnuDebug: TMenuItem;
     ools1: TMenuItem;
     Help1: TMenuItem;
     New1: TMenuItem;
@@ -269,6 +270,10 @@ type
     DebugTests1: TMenuItem;
     CrashTest1: TMenuItem;
     CloseProject1: TMenuItem;
+    mnuModel: TMenuItem;
+    CompileModel1: TMenuItem;
+    N2: TMenuItem;
+    estLexicalModel1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -341,6 +346,7 @@ type
     procedure SaveDockLayout;
     procedure CEFShutdownComplete(Sender: TObject);
     procedure ActivateActiveChild;
+    function OpenModelEditor(FFileName: string): TfrmTikeEditor;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -432,6 +438,7 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmWordlistEditor,
+  Keyman.Developer.UI.UfrmModelEditor,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -479,6 +486,7 @@ begin
   modActionsTextEditor := TmodActionsTextEditor.Create(Self);
   modActionsKeyboardEditor := TmodActionsKeyboardEditor.Create(Self);
   modActionsMain := TmodActionsMain.Create(Self);
+  modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
   FProjectMRU := TMRUList.Create('Project');
   FProjectMRU.OnChange := ProjectMRUChange;
@@ -1104,6 +1112,11 @@ begin
 end;
 
 function TfrmKeymanDeveloper.OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
+  function FileHasModelTsExt(Filename: string): Boolean;
+  begin
+    // We cannot use ExtractFileExt because of the two-part extension
+    Result := Filename.ToLower.EndsWith('.model.ts');
+  end;
 var
   ext: string;
 begin
@@ -1137,6 +1150,7 @@ begin
         else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
       end;
 
@@ -1164,6 +1178,11 @@ function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmWordlistEditor);
     //else Result := OpenEditor(FFileName, TfrmEditor);
+end;
+
+function TfrmKeymanDeveloper.OpenModelEditor(FFileName: string): TfrmTikeEditor;
+begin
+  Result := OpenEditor(FFileName, TfrmModelEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenKPSEditor(FFileName: string): TfrmTikeEditor;
@@ -1414,6 +1433,9 @@ begin
     if PrevFocus.Visible then
       PrevFocus.SetFocus;
   end;
+
+  modActionsKeyboardEditor.actKeyboardCompile.Update;
+  modActionsModelEditor.actModelCompile.Update;
 end;
 
 procedure TfrmKeymanDeveloper.UDUI_Error(Sender: TUnicodeData;
