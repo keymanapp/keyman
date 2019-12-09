@@ -34,6 +34,9 @@
     "kmlmp": "dist/kmlmp.js",
     "kmlmi": "dist/kmlmi.js"
   },
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "dependencies": {
     "commander": "^3.0.0",
     "node-zip": "^1.1.1",
