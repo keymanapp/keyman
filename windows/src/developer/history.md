@@ -3,6 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 * Feature: Add unsupported kmdecomp decompiler utility (#2419)
+* Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
 * Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
 
 ## 2019-11-18 12.0.55 stable
