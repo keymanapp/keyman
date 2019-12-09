@@ -284,7 +284,7 @@ inherited frmModelEditor: TfrmModelEditor
         object panBuildLexicalModel: TPanel
           Left = 10
           Top = 112
-          Width = 424
+          Width = 471
           Height = 353
           BevelOuter = bvNone
           Color = 15921906
@@ -328,6 +328,14 @@ inherited frmModelEditor: TfrmModelEditor
               'ill also be available.'
             WordWrap = True
           end
+          object imgQRCode: TImage
+            Left = 309
+            Top = 152
+            Width = 128
+            Height = 128
+            Proportional = True
+            Stretch = True
+          end
           object cmdTestLexicalModel: TButton
             Left = 12
             Top = 122
@@ -352,6 +360,7 @@ inherited frmModelEditor: TfrmModelEditor
             Height = 97
             ItemHeight = 13
             TabOrder = 4
+            OnClick = lbDebugHostsClick
           end
           object cmdSendURLsToEmail: TButton
             Left = 12

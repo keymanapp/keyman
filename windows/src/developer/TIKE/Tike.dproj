@@ -536,6 +536,8 @@
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.WelcomeRenderer.pas"/>
+        <DCCReference Include="..\..\ext\zxingqrcode\Source\DelphiZXIngQRCode.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.QRCode.pas"/>
         <DCCReference Include="child\Keyman.Developer.UI.UfrmModelEditor.pas">
             <Form>frmModelEditor</Form>
             <FormType>dfm</FormType>

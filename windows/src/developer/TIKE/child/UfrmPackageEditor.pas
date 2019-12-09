@@ -197,6 +197,7 @@ type
     cmdLexicalModelLanguageEdit: TButton;
     chkLexicalModelRTL: TCheckBox;
     editLexicalModelFilename: TEdit;
+    imgQRCode: TImage;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdAddFileClick(Sender: TObject);
     procedure cmdRemoveFileClick(Sender: TObject);
@@ -254,6 +255,7 @@ type
     procedure cmdLexicalModelLanguageRemoveClick(Sender: TObject);
     procedure chkLexicalModelRTLClick(Sender: TObject);
     procedure editLexicalModelDescriptionChange(Sender: TObject);
+    procedure lbDebugHostsClick(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -300,6 +302,7 @@ type
     function ShowAddLanguageForm(grid: TStringGrid;
       langs: TPackageKeyboardLanguageList): Boolean;
     procedure RefreshLexicalModelList;
+    procedure UpdateQRCode;
 
   protected
     function GetHelpTopic: string; override;
@@ -338,6 +341,7 @@ uses
   KeymanVersion,
   Keyman.System.PackageInfoRefreshKeyboards,
   Keyman.System.PackageInfoRefreshLexicalModels,
+  Keyman.System.QRCode,
   Keyman.System.KeyboardUtils,
   Keyman.System.LexicalModelUtils,
   kmxfileconsts,
@@ -757,6 +761,11 @@ end;
 {$EXTERNALSYM SHGetFileInfoW}
 function SHGetFileInfoW(pszPath: PWideChar; dwFileAttributes: DWORD;
   var psfi: TSHFileInfoW; cbFileInfo, uFlags: UINT): DWORD; stdcall; external shell32;
+
+procedure TfrmPackageEditor.lbDebugHostsClick(Sender: TObject);
+begin
+  UpdateQRCode;
+end;
 
 procedure TfrmPackageEditor.lbFilesClick(Sender: TObject);
 var
@@ -1337,6 +1346,7 @@ begin
   modWebHttpServer.GetURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
+  UpdateQRCode;
   EnableCompileTabControls;
 end;
 
@@ -1956,6 +1966,23 @@ begin
   Assert(Assigned(lm));
   lm.RTL := chkLexicalModelRTL.Checked;
   Modified := True;
+end;
+
+procedure TfrmPackageEditor.UpdateQRCode;
+var
+  b: TBitmap;
+begin
+  imgQRCode.Picture := nil;
+  if lbDebugHosts.ItemIndex >= 0 then
+  begin
+    b := TBitmap.Create;
+    try
+      DrawQRCode(lbDebugHosts.Items[lbDebugHosts.ItemIndex] + '/packages.html', b);
+      imgQRCode.Picture.Bitmap := b;
+    finally
+      b.Free;
+    end;
+  end;
 end;
 
 end.
