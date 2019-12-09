@@ -111,6 +111,10 @@ wrap-worker-code ( ) {
   # but also adds a lot more code the worker doesn't need to use.
   # Recommended by MDN while keeping the worker lean and efficient.
   cat "node_modules/string.prototype.codepointat/codepointat.js"
+
+  # This one's straight from MDN - I didn't find any NPM ones that don't
+  # use the node `require` statement.
+  cat "polyfills/array.from.js"
   echo ""
 
   cat "${js}"
