@@ -1,55 +1,81 @@
-    html, body {
-      margin: 0;
-      padding: 0;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+}
 
-    h2 {
-        font-family: sans-serif
-    }
+h2 {
+    font-family: sans-serif
+}
 
-    .install-link {
-      background: none repeat scroll 0 0 #CCCCCC;
-      border: 1px solid #444444;
-      border-radius: 4px;
-      box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
-      display: inline-block;
-      color: #444444;
-      font-family: Sans-serif;
-      font-size: 10pt;
-      padding: 6px;
-      margin: 12px 2px 0 2px;
-      text-decoration: none;
-    }
+.install-link {
+  background: none repeat scroll 0 0 #CCCCCC;
+  border: 1px solid #444444;
+  border-radius: 4px;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+  display: inline-block;
+  color: #444444;
+  font-family: Sans-serif;
+  font-size: 10pt;
+  padding: 6px;
+  margin: 12px 2px 0 2px;
+  text-decoration: none;
+}
 
-    .header {
-      padding: 4px 8px;
-      background: #424248;
-      color: #f0f0ff;
-    }
+.header {
+  padding: 4px 8px;
+  background: #424248;
+  color: #f0f0ff;
+}
 
-    .header div {
-      display: inline-block;
-    }
+.header div {
+  display: inline-block;
+}
 
-    .header div h2 {
-      margin: 4px;
-    }
+.header div h2 {
+  margin: 4px;
+}
 
-    .header div.float-right {
-      display: block;
-      position: absolute;
-      right: 0;
-      top: 0;
-    }
+.header div.float-right {
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
 
-    .float-right a.install-link {
-      margin: 8px 8px 0 0 ;
-    }
+.float-right a.install-link {
+  margin: 8px 8px 0 0 ;
+}
 
-    .clear {
-      clear: both;
-    }
+.clear {
+  clear: both;
+}
 
-    #content {
-      margin: 8px 16px;
-    }
+#content {
+  margin: 8px 16px;
+}
+
+/* Lexical model menu */
+
+.model-list-visible#model-list {
+  display: block;
+}
+
+#model-list {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  margin-top: 4px;
+  padding: 5px 5px 5px 5px;
+  background: #424248;
+  border-left: solid 1px #442244;
+  border-right: solid 1px #442244;
+  border-bottom: solid 1px #442244;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 4px 4px 4px rgba(64,64,64,0.5);
+}
+
+#model-list a {
+  display: block;
+  color: white;
+  padding: 6px;
+}

@@ -23,7 +23,7 @@ object modActionsKeyboardEditor: TmodActionsKeyboardEditor
     end
     object actKeyboardCreatePackage: TAction
       Category = 'Keyboard'
-      Caption = '&Package for Distribution...'
+      Caption = 'Package for Distribution...'
       ImageIndex = 40
       OnExecute = actKeyboardCreatePackageExecute
     end
