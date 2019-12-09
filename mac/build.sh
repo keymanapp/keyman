@@ -265,7 +265,7 @@ displayInfo "" \
 
 ### Validate notarization environment variables ###
 
-if $LOCALDEPLOY || $PREPRELEASE ; then
+if $PREPRELEASE ; then
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Code signing must be configured for deployment. See build.sh -help for details."
   fi
@@ -372,7 +372,7 @@ fi
 
 ### Notarize the app for localdeploy and preprelease ###
 
-if $LOCALDEPLOY || $PREPRELEASE ; then
+if $PREPRELEASE ; then
   echo_heading "Notarizing app"
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
