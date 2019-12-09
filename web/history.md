@@ -2,8 +2,16 @@
 
 ## 13.0 alpha
 * Start version 13.0
-* Bug Fix: Default wordbreaker was not working correctly (#2405)
-* Bug Fix: Firefox on macOS was not being detected correctly (#2379)
+
+## 2019-11-28 12.0.105 stable
+* Bug Fix: Keyman was not working on old Android browsers (#2358)
+* Bug Fix: Firefox on macOS was not being detected correctly (#2383)
+
+## 2019-11-26 12.0.104 stable
+* Updates to build environment (#2364)
+
+## 2019-11-25 12-0.103 stable
+* Updates to build environment only (#2372)
         
 ## 2019-11-13 12.0.102 stable
 * Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2288)
