@@ -4,7 +4,6 @@ import 'mocha';
 
 import {makePathToFixture, compileModelSourceCode} from './helpers';
 
-
 describe('LexicalModelCompiler', function () {
   describe('#generateLexicalModelCode', function () {
     it('should compile a trivial word list', function () {
@@ -105,3 +104,4 @@ describe('LexicalModelCompiler', function () {
     assert.match(code, /\btotalWeight\b["']?:\s*27596\b/);
   });
 });
+
