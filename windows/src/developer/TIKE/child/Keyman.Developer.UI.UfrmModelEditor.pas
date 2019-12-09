@@ -73,6 +73,7 @@ type
     dlgBrowseTestKeyboard: TOpenDialog;
     Label5: TLabel;
     editOutPath: TEdit;
+    imgQRCode: TImage;
     procedure FormDestroy(Sender: TObject);
     procedure cmdAddWordlistClick(Sender: TObject);
     procedure cmdRemoveWordlistClick(Sender: TObject);
@@ -87,6 +88,7 @@ type
     procedure cmdSendURLsToEmailClick(Sender: TObject);
     procedure cmdBrowseTestKeyboardClick(Sender: TObject);
     procedure editTestKeyboardChange(Sender: TObject);
+    procedure lbDebugHostsClick(Sender: TObject);
   private
     type
       TWordlist = class
@@ -115,6 +117,7 @@ type
     procedure SourceChanged(Sender: TObject);
     function CheckModifiedWordlistsForRemoval(
       newParser: TLexicalModelParser): Boolean;
+    procedure UpdateQRCode;
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -135,6 +138,7 @@ implementation
 uses
   System.UITypes,
   Keyman.Developer.System.Project.modeltsProjectFileAction,
+  Keyman.System.QRCode,
   TextFileFormat,
   UmodWebHttpServer,
   UfrmSendURLsToEmail,
@@ -237,6 +241,7 @@ begin
   modWebHttpServer.GetURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
+  UpdateQRCode;
   EnableControls;
 end;
 
@@ -303,6 +308,11 @@ end;
 procedure TfrmModelEditor.gridWordlistsDblClick(Sender: TObject);
 begin
   pages.ActivePageIndex := gridWordlists.Row + 1;
+end;
+
+procedure TfrmModelEditor.lbDebugHostsClick(Sender: TObject);
+begin
+  UpdateQRCode;
 end;
 
 procedure TfrmModelEditor.memoCommentsChange(Sender: TObject);
@@ -564,6 +574,23 @@ begin
   Frame.Free;
   Tab.Free;
   inherited Destroy;
+end;
+
+procedure TfrmModelEditor.UpdateQRCode;
+var
+  b: Vcl.Graphics.TBitmap;
+begin
+  imgQRCode.Picture := nil;
+  if lbDebugHosts.ItemIndex >= 0 then
+  begin
+    b := Vcl.Graphics.TBitmap.Create;
+    try
+      DrawQRCode(lbDebugHosts.Items[lbDebugHosts.ItemIndex], b);
+      imgQRCode.Picture.Bitmap := b;
+    finally
+      b.Free;
+    end;
+  end;
 end;
 
 end.
