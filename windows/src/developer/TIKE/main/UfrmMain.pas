@@ -1544,14 +1544,6 @@ procedure InitClasses;  // I3350
 const
   CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/'+SKeymanVersion+')';   // I4045
 begin
-  with TRegistryErrorControlled.Create do   // I3887
-  try
-    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation_CU, True) then   // I4436
-      WriteInteger('tike.exe', 9000);   // I4874
-  finally
-    Free;
-  end;
-
    OleCheck(UrlMkSetSessionOption(URLMON_OPTION_USERAGENT, PAnsiChar(CUserAgent), Length(CUserAgent), 0));   // I4045
 end;
 

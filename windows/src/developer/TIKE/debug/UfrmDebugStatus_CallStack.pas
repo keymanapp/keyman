@@ -106,7 +106,7 @@ begin
   if not Assigned(lbCallStack.Items.Objects[lbCallStack.ItemIndex]) then Exit;
   rule := lbCallStack.Items.Objects[lbCallStack.ItemIndex] as TDebugEventRuleData;
   if not SetEditorCursorLine(rule.Line)
-    then ShowMessage('TIKE could not find the line for this rule.')
+    then ShowMessage('Keyman Developer could not find the line for this rule.')
     else EditorMemo.SetFocus;
 end;
 

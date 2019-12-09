@@ -6,6 +6,7 @@
 * Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
 * Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
 * Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
+* Chore: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
 
 ## 2019-11-18 12.0.55 stable
 * Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
