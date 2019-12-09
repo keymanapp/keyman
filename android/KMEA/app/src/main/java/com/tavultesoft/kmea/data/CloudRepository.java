@@ -356,7 +356,7 @@ public class CloudRepository {
     }
   }
 
-  protected List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
+  protected static List<Keyboard> processKeyboardJSON(JSONObject query, boolean fromKMP) {
     List<Keyboard> keyboardsList = new ArrayList<>();
     if (query.length() == 0) {
       return keyboardsList;
@@ -389,7 +389,7 @@ public class CloudRepository {
           hashMap.put(KMManager.KMKey_PackageID, pkgID);
           hashMap.put(KMManager.KMKey_KeyboardID, kbID);
           hashMap.put(KMManager.KMKey_LanguageName, langName);
-          hashMap.put(KMManager.KMKey_LanguageID, langID);
+          hashMap.put(KMManager.KMKey_LanguageID, langID.toLowerCase());
           hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
           hashMap.put(KMManager.KMKey_Font, kbFont);
@@ -409,7 +409,7 @@ public class CloudRepository {
     return keyboardsList;
   }
 
-  protected List<LexicalModel> processLexicalModelJSON(JSONArray models) {
+  protected static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
@@ -451,7 +451,7 @@ public class CloudRepository {
 
         HashMap<String, String> hashMap = new HashMap<String, String>();
         hashMap.put(KMManager.KMKey_PackageID, packageID);
-        hashMap.put(KMManager.KMKey_LanguageID, languageID);
+        hashMap.put(KMManager.KMKey_LanguageID, languageID.toLowerCase());
         hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
         hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
         hashMap.put(KMManager.KMKey_LanguageName, langName);

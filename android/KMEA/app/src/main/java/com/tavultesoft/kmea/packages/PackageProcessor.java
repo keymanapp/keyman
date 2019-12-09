@@ -156,7 +156,7 @@ public class PackageProcessor {
       keyboards[i].put(KMManager.KMKey_PackageID, packageId);
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
-      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id").toLowerCase());
       keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
       if (jsonEntry.has("displayFont")) {

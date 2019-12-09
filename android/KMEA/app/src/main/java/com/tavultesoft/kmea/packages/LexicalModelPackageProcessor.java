@@ -72,7 +72,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
         models[i].put(KMManager.KMKey_LexicalModelID, jsonEntry.getString("id"));
         // Use package version for the lexical model version
         models[i].put(KMManager.KMKey_LexicalModelVersion, packageVersion);
-        models[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+        models[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id").toLowerCase());
         models[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
 
         if (welcomeExists(packageId)) {
