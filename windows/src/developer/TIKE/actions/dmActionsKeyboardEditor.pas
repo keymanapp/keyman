@@ -446,7 +446,10 @@ end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardCompileUpdate(Sender: TObject);
 begin
+  // TODO: Split Keyboard menu and package editor functions
   actKeyboardCompile.Enabled := (ActiveEditor <> nil) or (ActivePackageEditor <> nil);
+  frmKeymanDeveloper.mnuKeyboard.Visible := actKeyboardCompile.Enabled;
+  frmKeymanDeveloper.mnuDebug.Visible := ActiveEditor <> nil;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardCreatePackageExecute(Sender: TObject);
