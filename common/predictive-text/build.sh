@@ -115,6 +115,7 @@ wrap-worker-code ( ) {
   # This one's straight from MDN - I didn't find any NPM ones that don't
   # use the node `require` statement.
   cat "polyfills/array.from.js"
+  cat "polyfills/string.startswith.js"
   echo ""
 
   cat "${js}"
