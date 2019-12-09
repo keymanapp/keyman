@@ -677,7 +677,7 @@ begin
   try
     j.AddPair('x', TJSONNumber.Create(X));
     j.AddPair('y', TJSONNumber.Create(Y));
-    j.AddPair('text', cdo.Text[cdo.InsertType]);
+    j.AddPair('text', cdo.Text[cmimCharacter]); // It never makes sense to drop anything other than char
     BuilderCommand('charmapDragDrop', j);
   finally
     j.Free;
