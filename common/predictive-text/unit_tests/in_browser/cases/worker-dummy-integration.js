@@ -47,12 +47,6 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      if(navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
-        // Our wordbreaking uses the IE-unsupported .codePointAt() function.
-        console.warn("Bypassing wordbreak test on IE.");
-        this.skip();
-      }
-
       this.timeout(config.timeouts.standard * 3); // This one makes multiple subsequent calls across
                                                   // the WebWorker boundary, so we should be generous here.
       var lmLayer = new LMLayer(helpers.defaultCapabilities);
