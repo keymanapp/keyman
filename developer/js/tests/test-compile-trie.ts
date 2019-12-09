@@ -99,7 +99,7 @@ describe('LexicalModelCompiler', function () {
     }
 
     // Sanity check: the word list has three total unweighted words, with a
-    // total weight of 44,103!
+    // total weight of 27,596!
     assert.match(code, /\btotalWeight\b["']?:\s*27596\b/);
   });
 });
