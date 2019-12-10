@@ -1482,8 +1482,6 @@ begin
   else if FGlobalProject.Untitled
     then Caption := '(Untitled project) - Keyman Developer'
     else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
-
-  Application.Title := Caption;
 end;
 
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);
