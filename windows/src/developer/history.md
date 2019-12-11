@@ -8,6 +8,9 @@
 * Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
 * Change: Application title no longer shows active project, only main window (#2441)
 
+## 2019-12-06 12.0.62 stable
+* Bug Fix: Shortcuts in text editors were not working after #2331 (#2424)
+
 ## 2019-11-18 12.0.55 stable
 * Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
 
