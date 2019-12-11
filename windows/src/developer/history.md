@@ -5,6 +5,7 @@
 * Feature: Add unsupported kmdecomp decompiler utility (#2419)
 * Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
 * Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
+* Feature: F7 in Project window compiles the whole project (#2442)
 * Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
 * Change: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
 * Change: Application title no longer shows active project, only main window (#2441)
