@@ -12,9 +12,9 @@
       BLOCK "0C0904E4"
       BEGIN
         VALUE "CompanyName", "SIL International\0"
-        VALUE "FileDescription", "Integrated Keyboard Editor\0"
+        VALUE "FileDescription", "Keyman Developer\0"
         VALUE "FileVersion", "$VERSION\0"
-        VALUE "InternalName", "TIKE\0"
+        VALUE "InternalName", "Keyman Developer\0"
         VALUE "LegalCopyright", "© SIL International\0"
         VALUE "LegalTrademarks", "\0"
         VALUE "OriginalFilename", "TIKE.EXE\0"
