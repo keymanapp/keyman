@@ -1922,21 +1922,21 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 0:
 			  if(_wcsnicmp(p, L"deadkey", z = 7) == 0 ||
 				  _wcsnicmp(p, L"dk", z = 2) == 0 )
-              {
+        {
 				  p += z;
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-				  if(!q) return CERR_InvalidDeadkey;
+				  if(!q || !*q) return CERR_InvalidDeadkey;
 
 				  DWORD n = fk->cxDeadKeyArray;
 
-                  tstr[mx++] = UC_SENTINEL;
+          tstr[mx++] = UC_SENTINEL;
 				  tstr[mx++] = CODE_DEADKEY;
 				  if(!strvalidchrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
 				  tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
 				  tstr[mx] = 0;
 			  }
 			  else
-              {
+        {
 				  n = xatoi(&p);
 				  if(*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
 				  if((err = UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
@@ -1970,7 +1970,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  if(sFlag) return CERR_AnyInVirtualKeySection;
 			  p += 3;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			  if(!q) return CERR_InvalidAny;
+			  if(!q || !*q) return CERR_InvalidAny;
 
 			  for(i = 0; i < fk->cxStoreArray; i++)
               {
@@ -2001,6 +2001,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           if(sFlag) return CERR_InvalidInVirtualKeySection;
 			    p += 10;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
+          if (!q || !*q) return CERR_InvalidToken;
           err = process_baselayout(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
         }
@@ -2015,7 +2016,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           if(sFlag) return CERR_InvalidInVirtualKeySection;
           p += 2;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidIf;
+          if(!q || !*q) return CERR_InvalidIf;
 
           err = process_if(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2027,7 +2028,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			    p += 5;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
 
-			    if(!q) return CERR_InvalidIndex;
+			    if(!q || !*q) return CERR_InvalidIndex;
 
           {
             wchar_t *context = NULL;
@@ -2058,7 +2059,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  if(sFlag) return CERR_OutsInVirtualKeySection;
 			  p += 4;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			  if(!q) return CERR_InvalidOuts;
+			  if(!q || !*q) return CERR_InvalidOuts;
 
 			  for(i = 0; i < fk->cxStoreArray; i++)
         {
@@ -2083,7 +2084,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  p += 7;
 
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-				  if(q)
+				  if(q && *q)
 				  {
             VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
 					  int n1;
@@ -2114,7 +2115,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  if(sFlag) return CERR_CallInVirtualKeySection;
 				  p += 4;
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-				  if(!q) return CERR_InvalidCall;
+				  if(!q || !*q) return CERR_InvalidCall;
 
 				  for(i = 0; i < fk->cxStoreArray; i++)
 				  {
@@ -2142,7 +2143,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			    if(sFlag) return CERR_AnyInVirtualKeySection;
 			    p += 6;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			    if(!q) return CERR_InvalidAny;
+			    if(!q || !*q) return CERR_InvalidAny;
 
 			    for(i = 0; i < fk->cxStoreArray; i++)
           {
@@ -2182,7 +2183,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  p += 3;
 
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			  if(!q) return CERR_InvalidUse;
+			  if(!q || !*q) return CERR_InvalidUse;
         tstr[mx++] = UC_SENTINEL;
 			  tstr[mx++] = CODE_USE;
 			  tstr[mx] = GetGroupNum(fk, q);
@@ -2196,7 +2197,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           if(sFlag) return CERR_InvalidInVirtualKeySection;
           p += 5;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidReset;
+          if(!q || !*q) return CERR_InvalidReset;
 
           err = process_reset(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2366,7 +2367,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 3;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidSet;
+          if(!q || !*q) return CERR_InvalidSet;
 
           err = process_set(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2376,7 +2377,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 4;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidSave;
+          if(!q || !*q) return CERR_InvalidSave;
 
           err = process_save(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2386,7 +2387,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			    if(_wcsnicmp(p, L"switch", 6) != 0) return CERR_InvalidToken;
 			    p += 6;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			    if(!q) return CERR_InvalidSwitch;
+			    if(!q || !*q) return CERR_InvalidSwitch;
           tstr[mx++] = UC_SENTINEL;
 			    tstr[mx++] = CODE_SWITCH;
 			    tstr[mx++] = atoiW(q);
@@ -2431,6 +2432,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         if(sFlag) return CERR_InvalidInVirtualKeySection;
 			  p += 8;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidToken;
         err = process_platform(fk, q, tstr, &mx);
         if(err != CERR_None) return err;
         continue;
@@ -2440,6 +2442,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         if(sFlag) return CERR_InvalidInVirtualKeySection;
 			  p += 5;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidToken;
         err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
         if(err != CERR_None) return err;
         continue;
