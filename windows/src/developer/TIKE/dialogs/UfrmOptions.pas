@@ -41,7 +41,7 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
 //  Themes,
   StdCtrls, ComCtrls, ExtCtrls,
-  UfrmTike, UserMessages, PaintPanel;
+  UfrmTike, UserMessages, PaintPanel, Browse4Folder;
 
 type
   TfrmOptions = class(TTikeForm)
@@ -94,6 +94,10 @@ type
     lblEditorCustomTheme: TLabel;
     lblEditorTheme: TLabel;
     chkAllowMultipleInstances: TCheckBox;
+    gbDefaultProjectPath: TGroupBox;
+    editDefaultProjectPath: TEdit;
+    cmdBrowseDefaultProjectPath: TButton;
+    dlgBrowseDefaultProjectPath: TBrowse4Folder;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -105,6 +109,7 @@ type
     procedure cmdSMTPSettingsClick(Sender: TObject);
     procedure cmdResetToolWindowsClick(Sender: TObject);
     procedure cbEditorThemeClick(Sender: TObject);
+    procedure cmdBrowseDefaultProjectPathClick(Sender: TObject);
   private
     FDefaultFont, FQuotedFont: TFont;
     { Private declarations }
@@ -120,6 +125,7 @@ implementation
 
 uses
   System.JSON,
+  System.UITypes,
 
   Keyman.Developer.System.HelpTopics,
 
@@ -180,6 +186,7 @@ begin
     chkOpenKeyboardFilesInSourceView.Checked := OpenKeyboardFilesInSourceView;   // I4751
 
     editExternalEditorPath.Text := ExternalEditorPath;
+    editDefaultProjectPath.Text := DefaultProjectPath;
 
     editIndentSize.Text := IntToStr(IndentSize);
 
@@ -237,6 +244,19 @@ procedure TfrmOptions.cmdOKClick(Sender: TObject);
 var
   i: Integer;
 begin
+  if not DirectoryExists(editDefaultProjectPath.Text) then
+  begin
+    if MessageDlg('The default project folder '+editDefaultProjectPath.Text+' does not exist. Do you want to create it now?',
+      mtConfirmation, mbYesNoCancel, 0) <> mrYes then Exit;
+
+    if not ForceDirectories(editDefaultProjectPath.Text) then
+    begin
+      ShowMessage('Keyman Developer was unable to create the default project folder '+editDefaultProjectPath.Text+
+        '. The error was: '+SysErrorMessage(GetLastError));
+      Exit;
+    end;
+  end;
+
   with FKeymanDeveloperOptions do
   begin
     UseOldDebugger := chkUseOldDebugger.Checked;
@@ -262,6 +282,7 @@ begin
     OpenKeyboardFilesInSourceView := chkOpenKeyboardFilesInSourceView.Checked;   // I4751
 
     ExternalEditorPath := editExternalEditorPath.Text;
+    DefaultProjectPath := IncludeTrailingPathDelimiter(editDefaultProjectPath.Text);
 
     Write;
   end;
@@ -380,6 +401,13 @@ begin
   end
   else
     lblEditorCustomTheme.Caption := '';
+end;
+
+procedure TfrmOptions.cmdBrowseDefaultProjectPathClick(Sender: TObject);
+begin
+  dlgBrowseDefaultProjectPath.InitialDir := editDefaultProjectPath.Text;
+  if dlgBrowseDefaultProjectPath.Execute then
+    editDefaultProjectPath.Text := dlgBrowseDefaultProjectPath.FileName;
 end;
 
 procedure TfrmOptions.cmdCharMapRebuildDatabaseClick(Sender: TObject);

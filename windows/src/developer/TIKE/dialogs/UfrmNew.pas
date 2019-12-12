@@ -90,7 +90,7 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.System.KeyboardUtils,
   Keyman.System.LexicalModelUtils,
-  shlobj,
+  KeymanDeveloperOptions,
   utilsystem;
 
 {$R *.DFM}
@@ -218,7 +218,7 @@ var
 begin
   inherited;
   if FGlobalProject.Untitled
-    then FRootPath := GetFolderPath(CSIDL_PERSONAL)
+    then FRootPath := FKeymanDeveloperOptions.DefaultProjectPath
     else FRootPath := ExtractFilePath(FGlobalProject.FileName);
 
   lvItems.Selected := lvItems.Items[0];

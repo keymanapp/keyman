@@ -117,14 +117,12 @@ function ShowNewModelProjectParameters(Owner: TComponent): Boolean;
 implementation
 
 uses
-  Winapi.ShlObj,
-
   Keyman.System.LanguageCodeUtils,
   Keyman.System.LexicalModelUtils,
   BCP47Tag,
   utilstr,
-  utilsystem,
   dmActionsMain,
+  KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
@@ -179,7 +177,7 @@ end;
 procedure TfrmNewModelProjectParameters.FormCreate(Sender: TObject);
 begin
   inherited;
-  editPath.Text := GetFolderPath(CSIDL_PERSONAL);
+  editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
 
   pack := TKPSFile.Create;
   pack.LexicalModels.Add(TPackageLexicalModel.Create(pack));
