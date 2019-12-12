@@ -20,6 +20,7 @@
   * Add linting to Debug builds and resolve lint errors (#2305)
   * Fix memory issues during build process (#2361)
   * Fix crashes when parsing JSON data from Cloud (#2393)
+  * Propagate custom help links (#2448)
 
 ## 2019-12-12 12.0.4214 stable
 * Bug fix:
