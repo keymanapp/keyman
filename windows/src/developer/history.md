@@ -6,6 +6,7 @@
 * Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
 * Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
 * Feature: F7 in Project window compiles the whole project (#2442)
+* Feature: Default Project Path is now Documents\Keyman Developer\Projects (#2449)
 * Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
 * Bug Fix: Zero-length store names are no longer permitted (#2443)
 * Change: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
