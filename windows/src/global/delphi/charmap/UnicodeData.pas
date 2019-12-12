@@ -201,7 +201,7 @@ type
   end;
 
 const
-  SKRebuildDatabase = 'TIKE has a Unicode character database, for use in the Character Map, '+
+  SKRebuildDatabase = 'Keyman Developer has a Unicode character database, for use in the Character Map, '+
     'that needs to be built.  This may take up to a minute to complete.'#13#10#13#10+
     'Do you want to do this now?';
 

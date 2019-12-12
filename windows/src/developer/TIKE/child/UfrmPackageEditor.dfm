@@ -1213,7 +1213,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object panBuildMobile: TPanel
           Left = 328
           Top = 162
-          Width = 310
+          Width = 457
           Height = 265
           BevelOuter = bvNone
           Color = 15921906
@@ -1238,6 +1238,14 @@ inherited frmPackageEditor: TfrmPackageEditor
             Font.Name = 'Tahoma'
             Font.Style = [fsBold]
             ParentFont = False
+          end
+          object imgQRCode: TImage
+            Left = 315
+            Top = 64
+            Width = 128
+            Height = 128
+            Proportional = True
+            Stretch = True
           end
           object cmdStartTestOnline: TButton
             Left = 12
@@ -1264,6 +1272,7 @@ inherited frmPackageEditor: TfrmPackageEditor
             Height = 97
             ItemHeight = 13
             TabOrder = 1
+            OnClick = lbDebugHostsClick
           end
         end
         object panBuildDesktop: TPanel

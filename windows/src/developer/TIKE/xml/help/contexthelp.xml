@@ -239,8 +239,8 @@
   </Form>
 
   <Form Name="context/must-include-debug">
-    <Control Name="*" Title="TIKE Debugger 'Include Debug Information' Confirmation Screen">
-      <p>TIKE Debugger</p>
+    <Control Name="*" Title="Keyman Developer Debugger 'Include Debug Information' Confirmation Screen">
+      <p>Keyman Developer Debugger</p>
       <p>Debug information must be included in the compile keyboard before the debugger process can be started. From the Keyboard menu select Include Debug Information. The debug information will display the error sources when compiling.</p>
       <p>The debugger can be used without the debug information by clicking on Test without debugger.</p>
     </Control>

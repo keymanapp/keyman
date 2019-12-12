@@ -228,11 +228,17 @@ function IsTextEditor(control: TObject): Boolean;
 begin
   Result :=
     Assigned(control) and
-    (control is TWinControl) and
+    (control is TWinControl);
+  if not Result then
+    Exit;
+
+  if control.ClassName <> 'TframeCEFHost' then
+    control := TWinControl(control).Owner;
+
+  Result := Assigned(control) and
+    (control.ClassName = 'TframeCEFHost') and
     Assigned(TControl(control).Owner) and
-    (TControl(control).Owner.ClassName = 'TframeCEFHost') and
-    Assigned(TControl(control).Owner.Owner) and
-    Supports(TControl(control).Owner.Owner, IKMDTextEditorActions);
+    Supports(TControl(control).Owner, IKMDTextEditorActions);
 end;
 
 function GetTextEditorController(control: TObject): IKMDTextEditorActions;
@@ -240,7 +246,21 @@ begin
   if not IsTextEditor(control) then
     Exit(nil);
 
-  Result := TControl(control).Owner.Owner as IKMDTextEditorActions;
+  if control.ClassName <> 'TframeCEFHost' then
+    control := TWinControl(control).Owner;
+
+  Result := TControl(control).Owner as IKMDTextEditorActions;
+end;
+
+function GetEditController(control: TObject): IKMDEditActions;
+begin
+  if not IsTextEditor(control) then
+    Exit(nil);
+
+  if control.ClassName <> 'TframeCEFHost' then
+    control := TWinControl(control).Owner;
+
+  Result := TControl(control).Owner as IKMDEditActions;
 end;
 
 { TKMDEditAction }
@@ -262,7 +282,7 @@ end;
 function TKMDEditAction.GetInterface(Target: TObject): IKMDEditActions;
 begin
   if IsTextEditor(Target) then
-    Result := TControl(Target).Owner.Owner as IKMDEditActions
+    Result := GetEditController(Target)
   else if not Supports(TWinControl(Target), IKMDEditActions, Result) then
     if not Supports(TWinControl(Target).Owner, IKMDEditActions, Result) then
       raise Exception.Create('Unable to get interface for edit actions');
