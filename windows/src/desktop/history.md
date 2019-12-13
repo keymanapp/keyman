@@ -2,7 +2,9 @@
 
 ## 13.0 alpha
 * Start version 13.0
-* Add 64-bit version of kmcomp and kmcmpdll for cross-platform support (#2352)
+* Feature: Add QRCode link popup to share an installed package (#2426)
+* Feature: Hotkeys are now only triggered with left modifiers, avoiding conflicts with Right Alt (#2360)
+* Bug Fix: SMP characters could break input in some applications (#2399)
 
 ## 2019-12-01 12.0.59 stable
 * Bug Fix: Using supplementary plane characters could cause rules to fail to match (#2398) 
