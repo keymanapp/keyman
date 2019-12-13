@@ -6,6 +6,7 @@
 * Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
 * Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
 * Feature: F7 in Project window compiles the whole project (#2442)
+* Feature: Default Project Path is now Documents\Keyman Developer\Projects (#2449)
 * Bug Fix: Remove version info from .kps when follow-keyboard-version is set (#2417)
 * Bug Fix: Make sure popup menus are never obscured in Project view (#2415)
 * Bug Fix: 'Show Help' was not working on Distribution tab in Project view (#2397)

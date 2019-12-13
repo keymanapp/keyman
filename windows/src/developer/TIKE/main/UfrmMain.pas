@@ -416,6 +416,7 @@ implementation
 uses
   System.Math,
   Winapi.WinInet,
+  Winapi.ShlObj,
   Winapi.Urlmon,
   Winapi.UxTheme,
   System.Win.ComObj,
@@ -478,6 +479,13 @@ var
   FActiveProject: string;
 begin
   inherited;
+
+  if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
+  begin
+    // Fall back to Documents folder if we cannot create the default project path
+    // Documents folder should always exist
+    FKeymanDeveloperOptions.DefaultProjectPath := GetFolderPath(CSIDL_PERSONAL);
+  end;
 
   FFirstShow := True;
 
