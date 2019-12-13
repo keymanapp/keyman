@@ -442,7 +442,7 @@ inherited frmOptions: TfrmOptions
     Top = 403
   end
   object dlgBrowseDefaultProjectPath: TBrowse4Folder
-    InitialDir = 'C:\Users\mcdurdin\Desktop\'
+    InitialDir = ''
     Root = Desktop
     Title = 'Browse for Default Project Folder'
     Left = 176
