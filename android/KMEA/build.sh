@@ -7,12 +7,13 @@
 # KMW  - Keyman Web
 
 display_usage ( ) {
-    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon]"
+    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test]"
     echo
     echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
     echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
     echo "  -no-kmw                 Don't build KMW. Don't copy artifacts"
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
+    echo "  -no-test                Don't run the unit-test suite."
     exit 1
 }
 
@@ -44,6 +45,7 @@ die ( ) {
 # Default is building KMW and copying artifacts
 DO_BUILD=true
 DO_COPY=true
+DO_TEST=true
 NO_DAEMON=false
 EMBED_BUILD=-embed
 KMW_PATH=
@@ -65,11 +67,14 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -debug)
             DEBUG_BUILD=true
-            EMBED_BUILD=-debug_embedded
-            KMW_PATH=unminified
+            #EMBED_BUILD=-debug_embedded
+            #KMW_PATH=unminified
             ;;
         -h|-?)
             display_usage
+            ;;
+        -no-test)
+            DO_TEST=false
             ;;
     esac
     shift # past argument
@@ -94,8 +99,10 @@ fi
 
 PLATFORM=`uname -s`
 
-# Report JUnit test results to CI
-echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
+if [ DO_TEST = true ]; then
+    # Report JUnit test results to CI
+    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
+fi
 
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
@@ -131,9 +138,11 @@ cd $KMA_ROOT/KMEA
 if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
 fi
-./gradlew $DAEMON_FLAG test
-if [ $? -ne 0 ]; then
-    die "ERROR: KMEA test cases failed"
+if [ DO_TEST = true ]; then
+    ./gradlew $DAEMON_FLAG test
+    if [ $? -ne 0 ]; then
+        die "ERROR: KMEA test cases failed"
+    fi
 fi
 
 echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
