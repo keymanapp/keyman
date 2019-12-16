@@ -67,8 +67,8 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -debug)
             DEBUG_BUILD=true
-            #EMBED_BUILD=-debug_embedded
-            #KMW_PATH=unminified
+            EMBED_BUILD=-debug_embedded
+            KMW_PATH=unminified
             ;;
         -h|-?)
             display_usage
