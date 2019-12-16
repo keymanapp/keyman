@@ -106,11 +106,14 @@ wrap-worker-code ( ) {
 
   # Since the worker is compiled with "allowJS=false" so that we can make
   # declaration files, we have to insert polyfills here.
-  #
+  
   # This one's a minimal, targeted polyfill.  es6-shim could do the same,
   # but also adds a lot more code the worker doesn't need to use.
   # Recommended by MDN while keeping the worker lean and efficient.
   cat "node_modules/string.prototype.codepointat/codepointat.js"
+
+  # Needed to ensure functionality on some older Android devices.  (API 19-23 or so)
+  cat "node_modules/string.prototype.startswith/startswith.js"
 
   # This one's straight from MDN - I didn't find any NPM ones that don't
   # use the node `require` statement.
