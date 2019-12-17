@@ -17,4 +17,5 @@
     <dimen name="close_button_margin">12dp</dimen>
     <dimen name="fab_margin">10dp</dimen>
     <dimen name="fab_padding">70dp</dimen>
+    <dimen name="qr_height">250dp</dimen>
 </resources>

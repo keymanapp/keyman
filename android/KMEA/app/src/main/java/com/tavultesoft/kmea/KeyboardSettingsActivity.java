@@ -13,14 +13,18 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -30,6 +34,7 @@ import android.widget.Toast;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.QRCodeUtil;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
 
@@ -173,6 +178,23 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
         }
       }
     });
+
+    // If QRGen library included, also display QR code for sharing keyboard
+    if (QRCodeUtil.exists(context)) {
+      String url = String.format("%s%s%s", QRCodeUtil.QR_BASE, kbID, "/share");
+
+      // Shorten listView so the QR code will show
+      ViewGroup.LayoutParams lp = listView.getLayoutParams();
+      lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+      listView.setLayoutParams(lp);
+
+      LinearLayout qrLayout = findViewById(R.id.qrLayout);
+      qrLayout.setVisibility(View.VISIBLE);
+
+      Bitmap myBitmap = QRCodeUtil.toBitmap(url);
+      ImageView imageView = (ImageView) findViewById(R.id.qrCode);
+      imageView.setImageBitmap(myBitmap);
+    }
   }
 
   @Override
