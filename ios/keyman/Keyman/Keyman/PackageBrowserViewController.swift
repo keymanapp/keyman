@@ -77,6 +77,8 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
 
         // Now, install it as if we'd just downloaded it.
         let resourceManager = ResourceDownloadManager.shared
+        // Obviously, a BIG assumption here:  that it's a lexical model, not a keyboard.
+        // Pardon the proof of concept.
         guard let lexicalModels = resourceManager.installLexicalModelPackage(at: destinationUrl) else {
           log.info("Could not install KMP at \(documentUrl)")
           return
