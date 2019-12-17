@@ -13,7 +13,8 @@ display_usage ( ) {
     echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
     echo "  -no-kmw                 Don't build KMW. Don't copy artifacts"
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
-    echo "  -no-test                Don't run the unit-test suite."
+    echo "  -no-test                Don't run the unit-test suite.  Use for development builds"
+    echo "                          to facilitate manual debugging and testing"
     exit 1
 }
 
@@ -83,6 +84,7 @@ done
 echo
 echo "DO_BUILD: $DO_BUILD"
 echo "DO_COPY: $DO_COPY"
+echo "DO_TEST: $DO_TEST"
 echo "NO_DAEMON: $NO_DAEMON"
 echo "DEBUG_BUILD: $DEBUG_BUILD"
 echo "EMBED_BUILD: $EMBED_BUILD"
