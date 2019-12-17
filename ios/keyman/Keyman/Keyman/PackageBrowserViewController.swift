@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftUI
+import KeymanEngine
 
 @available(iOS 11.0, *)
 class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
@@ -54,14 +55,50 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
 
     // MARK: Document Presentation
 
-    func presentDocument(at documentURL: URL) {
+    func presentDocument(at documentUrl: URL) {
         // Once selected, start the standard install process.
-        log.info("TODO:  install KMP at \(documentURL)")
+        log.info("Installing KMP at \(documentUrl)")
 
-        // Re-use the function called by iOS for file-sharing.
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let success = appDelegate.application(UIApplication.shared, open: documentURL)
+        // Step 1: Copy it to within the app's controlled space, making it a .zip in the process
+        var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        destinationUrl.appendPathComponent("\(documentUrl.lastPathComponent).zip")
 
-        log.info("Attempt success: \(success)")
+        let fileManager = FileManager.default
+        do {
+          if fileManager.fileExists(atPath: destinationUrl.path) {
+            try fileManager.removeItem(at: destinationUrl)
+          }
+          try fileManager.copyItem(at: documentUrl, to: destinationUrl)
+        } catch {
+          showKMPError(KMPError.copyFiles)
+          log.error(error)
+          return
+        }
+
+        // Now, install it as if we'd just downloaded it.
+        let resourceManager = ResourceDownloadManager.shared
+        guard let lexicalModels = resourceManager.installLexicalModelPackage(at: destinationUrl) else {
+          log.info("Could not install KMP at \(documentUrl)")
+          return
+        }
+
+        log.info("Attempt success!")
+    }
+
+    // The following are raw copies from AppDelegate.  Not great, but it's a useful
+    // start while developing.
+    public func showKMPError(_ error: KMPError) {
+      showSimpleAlert(title: "Error", message: error.rawValue)
+    }
+
+    public func showSimpleAlert(title: String, message: String) {
+      let alertController = UIAlertController(title: title, message: message,
+                                              preferredStyle: UIAlertController.Style.alert)
+      alertController.addAction(UIAlertAction(title: "OK",
+                                              style: UIAlertAction.Style.default,
+                                              handler: nil))
+
+      // This part is tweaked (in comparison to the AppDelegate version).
+      self.navigationController?.present(alertController, animated: true, completion: nil)
     }
 }
