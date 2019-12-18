@@ -22,6 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ app: UIApplication, open url: URL,
                    options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+    // We really should validate that it is a .kmp first... but the app doesn't yet
+    // process URL links, so it's fine for now.  (Will change with QR code stuff.)
+
     // .kmp package install, Keyman 10 onwards
     var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
@@ -77,13 +80,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //TODO: OR browse documents Dir from new keyboard window
     //self.installAdhocKeyboard(filePath: "")
 
-    return true
-  }
-
-  func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-    NotificationCenter.default.post(name: launchedFromUrlNotification, object: self,
-        userInfo: [urlKey: url]
-    )
     return true
   }
 
@@ -152,72 +148,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   public func promptAdHocInstall(_ kmp: KeymanPackage) {
-    _adhocDirectory = kmp.sourceFolder
-    let isKbd = kmp.isKeyboard()
+    let vc = PackageInstallViewController(for: kmp, completionHandler: { error in
+      if let err = error {
+        if let kmpError = err as? KMPError {
+          self.showKMPError(kmpError)
+        }
+      } else {
+        self.showSimpleAlert(title: "Success", message: "Installed successfully.")
+      }
+    })
 
-    let vc = UIViewController()
-    vc.view.backgroundColor = .red
-    let wkWebView = WKWebView.init(frame: vc.view.frame)
-    wkWebView.backgroundColor = .white
-    vc.view.addSubview(wkWebView)
-    let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
-                                    target: self,
-                                    action: #selector(cancelAdHocBtnHandler))
-    let installBtn = UIBarButtonItem(title: "Install", style: .plain,
-                                     target: self,
-                                     action: (isKbd ? #selector(installAdHocKeyboardBtnHandler) :
-                                       #selector(installAdHocLexicalModelBtnHandler)) )
-    vc.navigationItem.leftBarButtonItem = cancelBtn
-    vc.navigationItem.rightBarButtonItem = installBtn
     let nvc = UINavigationController.init(rootViewController: vc)
 
-    self.window?.rootViewController?.present(nvc, animated: true, completion: {
-      wkWebView.loadHTMLString(kmp.infoHtml(), baseURL: nil)
-    })
-  }
-
-  @objc func installAdHocKeyboardBtnHandler() {
-    if let adhocDir = _adhocDirectory {
-      self.window?.rootViewController?.dismiss(animated: true, completion: {
-        do {
-          try Manager.shared.parseKbdKMP(adhocDir)
-          self.showSimpleAlert(title: "Success", message: "Installed successfully.")
-        } catch {
-          self.showKMPError(error as! KMPError)
-        }
-
-        //this can fail gracefully and not show errors to users
-        do {
-          try FileManager.default.removeItem(at: adhocDir)
-        } catch {
-          log.error("unable to delete temp files")
-        }
-      })
-    }
-  }
-
-  @objc func installAdHocLexicalModelBtnHandler() {
-    if let adhocDir = _adhocDirectory {
-      self.window?.rootViewController?.dismiss(animated: true, completion: {
-        do {
-          try Manager.parseLMKMP(adhocDir)
-          self.showSimpleAlert(title: "Success", message: "Installed successfully.")
-        } catch {
-          self.showKMPError(error as! KMPError)
-        }
-
-        //this can fail gracefully and not show errors to users
-        do {
-          try FileManager.default.removeItem(at: adhocDir)
-        } catch {
-          log.error("unable to delete temp files")
-        }
-      })
-    }
-  }
-
-  @objc func cancelAdHocBtnHandler() {
-    self.window?.rootViewController?.dismiss(animated: true, completion: nil)
+    self.window?.rootViewController?.present(nvc, animated: true, completion: nil)
   }
 
   @objc func registerCustomFonts() {
