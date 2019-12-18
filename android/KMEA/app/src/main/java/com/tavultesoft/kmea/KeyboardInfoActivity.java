@@ -158,8 +158,8 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     });
 
     // If QRGen library included, also display QR code for sharing keyboard
-    if (QRCodeUtil.exists(context)) {
-      String url = String.format("%s%s%s", QRCodeUtil.QR_BASE, kbID, "/share");
+    if (QRCodeUtil.libraryExists(context)) {
+      String url = String.format("%s%s", QRCodeUtil.QR_BASE, kbID);
 
       // Shorten listView so the QR code will show
       ViewGroup.LayoutParams lp = listView.getLayoutParams();

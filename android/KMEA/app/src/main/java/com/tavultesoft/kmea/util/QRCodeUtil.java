@@ -11,7 +11,7 @@ import net.glxn.qrgen.android.QRCode;
 public final class QRCodeUtil {
   public static final int DEFAULT_HEIGHT = 800;
   public static final int DEFAULT_WIDTH = 800;
-  public static final String QR_BASE = "https://keyman.com/go/keyboard/";
+  public static final String QR_BASE = "https://keyman.com/go/keyboard/%s/share";
 
   /**
    * Generate QR Code as a Bitmap
@@ -23,7 +23,7 @@ public final class QRCodeUtil {
     return result;
   }
 
-  public static boolean exists(Context context) {
+  public static boolean libraryExists(Context context) {
     boolean result = false;
     try {
       Class.forName("net.glxn.qrgen.android.QRCode");
