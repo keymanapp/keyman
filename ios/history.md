@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2019-12-19 12.0.63 stable
+* Fixed issue with reinstalling or updating previously installed language resources from local files (#2461)
+
 ## 2019-12-05 12.0.62 stable
 * Fix situation where lexical models would not install (#2420)
 
