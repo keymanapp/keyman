@@ -23,6 +23,15 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="Divider">
+        <item name="android:background">@android:color/holo_red_dark</item>
+    </style>
+
+    <style name="Divider.horizontal" parent="Divider">
+      <item name="android:layout_width">match_parent</item>
+      <item name="android:layout_height">1dp</item>
+    </style>
+
     <style name="PopupAnim">
         <item name="android:windowEnterAnimation">@anim/fade_in</item>
         <item name="android:windowExitAnimation">@anim/fade_out</item>

@@ -396,6 +396,8 @@ const
   SRegValue_IDEOpt_WebLadderLength = 'web ladder length';                           // CU
   CRegValue_IDEOpt_WebLadderLength_Default = 100;
 
+  SRegValue_IDEOpt_DefaultProjectPath = 'default project path';
+
   { SRegKey_KCT values }
 
 //  SRegValue_KCTTemplatePath = 'template path';                                      // LM

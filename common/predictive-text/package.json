@@ -44,6 +44,8 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
-    "es6-shim": "^0.35.5"
+    "es6-shim": "^0.35.5",
+    "string.prototype.codepointat": "^0.2.1",
+    "string.prototype.startswith": "^0.2.0"
   }
 }

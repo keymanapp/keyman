@@ -66,11 +66,8 @@ type
 implementation
 
 uses
-  ShlObj,
-
-  Keyman.Developer.System.HelpTopics,
-
-  utilsystem;
+  KeymanDeveloperOptions,
+  Keyman.Developer.System.HelpTopics;
 
 {$R *.DFM}
 
@@ -109,7 +106,7 @@ end;
 procedure TfrmNewFileDetails.SetBaseFileName(Value: string);
 begin
   if ExtractFilePath(Value) = ''   // I4798
-    then editFilePath.Text := ExcludeTrailingPathDelimiter(GetFolderPath(CSIDL_PERSONAL))   // I4798
+    then editFilePath.Text := ExcludeTrailingPathDelimiter(FKeymanDeveloperOptions.DefaultProjectPath)   // I4798
     else editFilePath.Text := ExtractFileDir(Value);   // I4798
   editFileName.Text := '';   // I4798
 end;

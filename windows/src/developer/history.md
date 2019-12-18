@@ -1,11 +1,16 @@
 # Keyman Developer Version History
 
 ## 13.0 alpha
-* Start version 13.0
 * Feature: Add unsupported kmdecomp decompiler utility (#2419)
-* Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
+* Feature: Add x64 version of kmcomp for macOS (#2352)
 * Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
+* Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
 * Feature: F7 in Project window compiles the whole project (#2442)
+* Feature: Default Project Path is now Documents\Keyman Developer\Projects (#2449)
+* Bug Fix: Remove version info from .kps when follow-keyboard-version is set (#2417)
+* Bug Fix: Make sure popup menus are never obscured in Project view (#2415)
+* Bug Fix: 'Show Help' was not working on Distribution tab in Project view (#2397)
+* Bug Fix: Missing author email was causing lexical model compiler to fail (#2388)
 * Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
 * Bug Fix: Zero-length store names are no longer permitted (#2443)
 * Change: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)

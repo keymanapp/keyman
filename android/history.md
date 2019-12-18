@@ -1,4 +1,4 @@
-# Keyman for Android
+# Keyman for Android Version History
 
 ## 13.0 alpha
 * Start version 13.0
@@ -10,6 +10,7 @@
   * Show available keyboard updates as android system notifications (#2335)
   * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
   * Add preference so update notifications can be ignored 3 months (#2412)
+  * Add QR Codes to Keyboard Info pages so users can share keyboard downloads (#2458)
 * Changes:
   * Update target Android SDK version to 29 (#2279)
   * Add simple UI tests for keyboard picker and keyboard info screens (#2326)
@@ -20,6 +21,7 @@
   * Add linting to Debug builds and resolve lint errors (#2305)
   * Fix memory issues during build process (#2361)
   * Fix crashes when parsing JSON data from Cloud (#2393)
+  * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
   * Propagate custom help links (#2448)
 
 ## 2019-12-12 12.0.4214 stable
