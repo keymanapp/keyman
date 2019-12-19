@@ -1,8 +1,8 @@
 //
-//  ResourceManager.swift
+//  ResourceFileManager.swift
 //  KeymanEngine
 //
-//  Created by Joshua Horton on 12/18/19.
+//  Created by Joshua Horton on December 18, 2019.
 //  Copyright © 2019 SIL International. All rights reserved.
 //
 
