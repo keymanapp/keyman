@@ -25,11 +25,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // We really should validate that it is a .kmp first... but the app doesn't yet
     // process URL links, so it's fine for now.  (Will change with QR code stuff.)
 
-    guard let destinationUrl = ResourceFileManager.shared.importFile(url) else {
+    let rfm = ResourceFileManager.shared
+    guard let destinationUrl = rfm.importFile(url) else {
       return false
     }
 
-    ResourceFileManager.shared.installFile(destinationUrl)
+    if let vc = window?.rootViewController {
+      rfm.prepareKMPInstall(from: destinationUrl,
+                            alertHost: vc,
+                            completionHandler: { package in
+                              rfm.promptAdHocInstall(package, in: vc)
+                            })
+    } else {
+      log.error("Cannot find app's root UIViewController")
+    }
+
     return true
   }
 

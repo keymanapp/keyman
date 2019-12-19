@@ -56,47 +56,55 @@ public class ResourceFileManager {
 
   /**
    * Use this function to "install" external KMP files to within the Keyman app's alloted iOS file management domain.
-   * Note that we don't request permissions to support opening/modifying files "in place," so we need to copy .kmps
-   * before unzipping them.
-   *
-   * This implementation does not change how files are managed by the app; only where the file management code
-   * is located.
+   * Note that we don't request permissions to support opening/modifying files "in place," so  .kmps should already be
+   * located in app-space (by use of `importFile`)  before unzipping them.
    */
-  @available(iOSApplicationExtension, unavailable)
-  public func installFile(_ url: URL) {
-      // Once selected, start the standard install process.
-      log.info("Installing KMP from \(url)")
+  public func prepareKMPInstall(from url: URL, completionHandler: @escaping (KeymanPackage?, Error?) -> Void) {
+    // Once selected, start the standard install process.
+    log.info("Installing KMP from \(url)")
 
-      // Step 1: Copy it to a temporary location, making it a .zip in the process
-      var destinationUrl = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-      destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
+    // Step 1: Copy it to a temporary location, making it a .zip in the process
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    var archiveUrl = cacheDirectory
+    archiveUrl.appendPathComponent("\(url.lastPathComponent).zip")
 
-      do {
-        try copyWithOverwrite(from: url, to: destinationUrl)
-        installAdhocKeyboard(url: destinationUrl)
-      } catch {
-        showKMPError(KMPError.copyFiles)
-        log.error(error)
+    do {
+      try copyWithOverwrite(from: url, to: archiveUrl)
+    } catch {
+      log.error(error)
+      completionHandler(nil, KMPError.copyFiles)
+      return
+    }
+
+    var extractionFolder = cacheDirectory
+    extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
+
+    KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder, complete: { kmp in
+      if let kmp = kmp {
+        completionHandler(kmp, nil)
+      } else {
+        log.error(KMPError.invalidPackage)
+        completionHandler(nil, KMPError.invalidPackage)
       }
+    })
   }
 
+  /**
+   * A  utility version of `prepareKMPInstall` that displays default UI alerts if errors occur when preparing a KMP for installation.
+   */
   @available(iOSApplicationExtension, unavailable)
-  private func installAdhocKeyboard(url: URL) {
-    let documentsDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    var destination = documentsDirectory
-    destination.appendPathComponent("temp/\(url.lastPathComponent)")
-
-    KeymanPackage.extract(fileUrl: url, destination: destination, complete: { kmp in
-      if let kmp = kmp {
-        self.promptAdHocInstall(kmp)
+  public func prepareKMPInstall(from url: URL, alertHost: UIViewController, completionHandler: @escaping (KeymanPackage) -> Void) {
+    self.prepareKMPInstall(from: url, completionHandler: { package, error in
+      if error != nil {
+        self.showKMPError(KMPError.copyFiles)
       } else {
-        self.showKMPError(KMPError.invalidPackage)
+        completionHandler(package!)
       }
     })
   }
 
   @available(iOSApplicationExtension, unavailable)
-  private func promptAdHocInstall(_ kmp: KeymanPackage) {
+  public func promptAdHocInstall(_ kmp: KeymanPackage, in rootVC: UIViewController) {
     let vc = PackageInstallViewController(for: kmp, completionHandler: { error in
       if let err = error {
         if let kmpError = err as? KMPError {
@@ -108,7 +116,7 @@ public class ResourceFileManager {
     })
 
     let nvc = UINavigationController.init(rootViewController: vc)
-    UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true, completion: nil)
+    rootVC.present(nvc, animated: true, completion: nil)
   }
 
   @available(iOSApplicationExtension, unavailable)
@@ -125,5 +133,32 @@ public class ResourceFileManager {
                                             handler: nil))
 
     UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
+  }
+
+  /**
+   * Performs the actual installation of a package's resources once confirmation has been received from the user.
+   */
+  public func finalizePackageInstall(_ package: KeymanPackage, completionHandler: (Error?) -> Void) {
+    do {
+      // Time to pass the package off to the final installers - the parse__KMP methods.
+      // TODO: (14.0+) These functions should probably be refactored to within this class eventually.
+      if package.isKeyboard() {
+        try Manager.shared.parseKbdKMP(package.sourceFolder)
+      } else {
+        try Manager.parseLMKMP(package.sourceFolder)
+      }
+      completionHandler(nil)
+    } catch {
+      log.error(error as! KMPError)
+      completionHandler(error)
+    }
+
+    //this can fail gracefully and not show errors to users
+    do {
+      try FileManager.default.removeItem(at: package.sourceFolder)
+    } catch {
+      log.error("unable to delete temp files: \(error)")
+      completionHandler(error)
+    }
   }
 }
