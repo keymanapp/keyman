@@ -26,11 +26,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
     do {
-      try FileManager.default.copyItem(at: url, to: destinationUrl)
+      let fileManager = FileManager.default
+
+      // For now, we'll always allow overwriting.
+      if fileManager.fileExists(atPath: destinationUrl.path) {
+        try fileManager.removeItem(at: destinationUrl)
+      }
+
+      // Throws an error if the destination file already exists, and there's no
+      // built-in override parameter.  Hence, the previous if-block.
+      try fileManager.copyItem(at: url, to: destinationUrl)
       installAdhocKeyboard(url: destinationUrl)
       return true
     } catch {
       showKMPError(KMPError.copyFiles)
+      log.error(error)
       return false
     }
   }
