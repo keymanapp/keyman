@@ -34,7 +34,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       rfm.prepareKMPInstall(from: destinationUrl,
                             alertHost: vc,
                             completionHandler: { package in
-                              rfm.promptAdHocInstall(package, in: vc)
+                              // We choose to prompt the user for comfirmation, rather
+                              // than automatically installing the package.
+                              rfm.promptPackageInstall(of: package, in: vc)
                             })
     } else {
       log.error("Cannot find app's root UIViewController")

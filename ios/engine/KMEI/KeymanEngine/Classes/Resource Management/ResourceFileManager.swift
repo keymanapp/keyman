@@ -92,26 +92,27 @@ public class ResourceFileManager {
   /**
    * A  utility version of `prepareKMPInstall` that displays default UI alerts if errors occur when preparing a KMP for installation.
    */
-  @available(iOSApplicationExtension, unavailable)
   public func prepareKMPInstall(from url: URL, alertHost: UIViewController, completionHandler: @escaping (KeymanPackage) -> Void) {
     self.prepareKMPInstall(from: url, completionHandler: { package, error in
       if error != nil {
-        self.showKMPError(KMPError.copyFiles)
+        let alert = self.buildKMPError(KMPError.copyFiles)
+        alertHost.present(alert, animated: true, completion: nil)
       } else {
         completionHandler(package!)
       }
     })
   }
 
-  @available(iOSApplicationExtension, unavailable)
-  public func promptAdHocInstall(_ kmp: KeymanPackage, in rootVC: UIViewController) {
-    let vc = PackageInstallViewController(for: kmp, completionHandler: { error in
+  public func promptPackageInstall(of package: KeymanPackage, in rootVC: UIViewController) {
+    let vc = PackageInstallViewController(for: package, completionHandler: { error in
       if let err = error {
         if let kmpError = err as? KMPError {
-          self.showKMPError(kmpError)
+          let alert = self.buildKMPError(kmpError)
+          rootVC.present(alert, animated: true, completion: nil)
         }
       } else {
-        self.showSimpleAlert(title: "Success", message: "Installed successfully.")
+        let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.")
+        rootVC.present(alert, animated: true, completion: nil)
       }
     })
 
@@ -119,20 +120,19 @@ public class ResourceFileManager {
     rootVC.present(nvc, animated: true, completion: nil)
   }
 
-  @available(iOSApplicationExtension, unavailable)
-  public func showKMPError(_ error: KMPError) {
-    showSimpleAlert(title: "Error", message: error.rawValue)
+  public func buildKMPError(_ error: KMPError) -> UIAlertController {
+    return buildSimpleAlert(title: "Error", message: error.rawValue)
   }
 
-  @available(iOSApplicationExtension, unavailable)
-  public func showSimpleAlert(title: String, message: String) {
+  public func buildSimpleAlert(title: String, message: String) -> UIAlertController {
     let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
                                             style: UIAlertAction.Style.default,
                                             handler: nil))
 
-    UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
+    //UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
+    return alertController
   }
 
   /**
