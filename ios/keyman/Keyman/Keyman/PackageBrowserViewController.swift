@@ -68,7 +68,13 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
                             completionHandler: { package in
                               // We choose to prompt the user for comfirmation, rather
                               // than automatically installing the package.
-                              rfm.promptPackageInstall(of: package, in: self)
+                              rfm.promptPackageInstall(of: package, in: self, successHandler: { _ in
+                                // Auto-dismiss the document browser upon successful KMP install.
+                                // It's likely quite rare that someone would want to install 2+ at once.
+                                //
+                                // Problem:  the dismissal isn't 'smooth' yet - it aborts straight to the main screen.
+                                self.dismiss(animated: true, completion: nil)
+                              })
                             })
     }
 }
