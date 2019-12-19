@@ -5,18 +5,21 @@
 package com.tavultesoft.kmea;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +55,6 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
-    final String authority = FileProviderUtils.getAuthority(context);
 
     setContentView(R.layout.activity_list_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
@@ -129,14 +131,51 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
           Intent i = new Intent(Intent.ACTION_VIEW);
 
           if (customHelpLink != null) {
+            // Display local welcome.htm help file, including associated assets
             if (FileUtils.isWelcomeFile(customHelpLink) && ! KMManager.isTestMode()) {
               File customHelp = new File(new File(customHelpLink).getAbsolutePath());
               i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
               // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
               try {
+                final String authority = FileProviderUtils.getAuthority(context);
                 Uri contentUri = FileProvider.getUriForFile(
                   context, authority, customHelp);
                 i.setDataAndType(contentUri, "text/html");
+
+                // Grant read permission to all the files in the package so embedded assets can be viewed
+                ClipData clipData = new ClipData(null,
+                  new String[] {
+                    ClipDescription.MIMETYPE_TEXT_HTML,
+                    "text/css",
+                    "image/gif",
+                    "image/jpeg",
+                    "image/png"
+                  }, new ClipData.Item(contentUri));
+
+                // Exclude html help files and JS files. Treat rest of the files as assets
+                FileFilter _fileFilter = new FileFilter() {
+                  @Override
+                  public boolean accept(File pathname) {
+                  String name = pathname.getName();
+                  if (pathname.isFile() && (FileUtils.isReadmeFile(name) ||
+                      FileUtils.isWelcomeFile(name) || FileUtils.hasJavaScriptExtension(name))) {
+                    return false;
+                  }
+                  return true;
+                  }
+                };
+
+                File packageDir = new File(
+                  context.getDir("data", Context.MODE_PRIVATE), "packages" + File.separator + packageID + File.separator);
+                File[] files = packageDir.listFiles(_fileFilter);
+                for(File assetFile : files) {
+                  Uri assetUri = FileProvider.getUriForFile(
+                    context, authority, assetFile);
+                  clipData.addItem(new ClipData.Item(assetUri));
+                }
+
+                // Associate assets in clipData to the intent
+                i.setClipData(clipData);
               } catch (NullPointerException e) {
                 String message = "FileProvider undefined in app to load" + customHelp.toString();
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
