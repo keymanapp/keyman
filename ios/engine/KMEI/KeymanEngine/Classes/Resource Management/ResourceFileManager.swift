@@ -45,6 +45,12 @@ public class ResourceFileManager {
     var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     destinationUrl.appendPathComponent(url.lastPathComponent)
 
+    // Since it's possible to request an install from a KMP in our owned document space,
+    // we need to check that it's not already in place where we want it.
+    if url == destinationUrl {
+      return url
+    }
+
     do {
       try copyWithOverwrite(from: url, to: destinationUrl)
       return destinationUrl
