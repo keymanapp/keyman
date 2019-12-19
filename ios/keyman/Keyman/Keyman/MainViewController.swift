@@ -476,7 +476,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
       let error = notification.error
-      appDelegate.showSimpleAlert(title: "Keyboard Download Error", message: error.localizedDescription)
+      ResourceFileManager.shared.showSimpleAlert(title: "Keyboard Download Error", message: error.localizedDescription)
       launchUrl = nil
     }
   }
@@ -825,7 +825,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if let urlString = params["url"] {
       // Download and set custom keyboard
       guard let url = URL(string: urlString) else {
-        appDelegate.showSimpleAlert(title: "Custom Keyboard",
+        ResourceFileManager.shared.showSimpleAlert(title: "Custom Keyboard",
                                     message: "The keyboard could not be installed: Invalid Url")
         launchUrl = nil
         return

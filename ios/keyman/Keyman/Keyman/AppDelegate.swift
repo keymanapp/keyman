@@ -22,27 +22,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ app: UIApplication, open url: URL,
                    options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-    // .kmp package install, Keyman 10 onwards
-    var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    destinationUrl.appendPathComponent("\(url.lastPathComponent).zip")
-    do {
-      let fileManager = FileManager.default
+    // We really should validate that it is a .kmp first... but the app doesn't yet
+    // process URL links, so it's fine for now.  (Will change with QR code stuff.)
 
-      // For now, we'll always allow overwriting.
-      if fileManager.fileExists(atPath: destinationUrl.path) {
-        try fileManager.removeItem(at: destinationUrl)
-      }
-
-      // Throws an error if the destination file already exists, and there's no
-      // built-in override parameter.  Hence, the previous if-block.
-      try fileManager.copyItem(at: url, to: destinationUrl)
-      installAdhocKeyboard(url: destinationUrl)
-      return true
-    } catch {
-      showKMPError(KMPError.copyFiles)
-      log.error(error)
+    guard let destinationUrl = ResourceFileManager.shared.importFile(url) else {
       return false
     }
+
+    ResourceFileManager.shared.installFile(destinationUrl)
+    return true
   }
 
   func application(_ application: UIApplication,
@@ -80,13 +68,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
 
-  func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
-    NotificationCenter.default.post(name: launchedFromUrlNotification, object: self,
-        userInfo: [urlKey: url]
-    )
-    return true
-  }
-
   func applicationDidEnterBackground(_ application: UIApplication) {
     _overlayWindow = nil
     FontManager.shared.unregisterCustomFonts()
@@ -121,103 +102,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
     }
     return _overlayWindow!
-  }
-
-  public func installAdhocKeyboard(url: URL) {
-    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    var destination =  documentsDirectory
-    destination.appendPathComponent("temp/\(url.lastPathComponent)")
-
-    KeymanPackage.extract(fileUrl: url, destination: destination, complete: { kmp in
-      if let kmp = kmp {
-        self.promptAdHocInstall(kmp)
-      } else {
-        self.showKMPError(KMPError.invalidPackage)
-      }
-    })
-  }
-
-  public func showKMPError(_ error: KMPError) {
-    showSimpleAlert(title: "Error", message: error.rawValue)
-  }
-
-  public func showSimpleAlert(title: String, message: String) {
-    let alertController = UIAlertController(title: title, message: message,
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: nil))
-
-    self.window?.rootViewController?.present(alertController, animated: true, completion: nil)
-  }
-
-  public func promptAdHocInstall(_ kmp: KeymanPackage) {
-    _adhocDirectory = kmp.sourceFolder
-    let isKbd = kmp.isKeyboard()
-
-    let vc = UIViewController()
-    vc.view.backgroundColor = .red
-    let wkWebView = WKWebView.init(frame: vc.view.frame)
-    wkWebView.backgroundColor = .white
-    vc.view.addSubview(wkWebView)
-    let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
-                                    target: self,
-                                    action: #selector(cancelAdHocBtnHandler))
-    let installBtn = UIBarButtonItem(title: "Install", style: .plain,
-                                     target: self,
-                                     action: (isKbd ? #selector(installAdHocKeyboardBtnHandler) :
-                                       #selector(installAdHocLexicalModelBtnHandler)) )
-    vc.navigationItem.leftBarButtonItem = cancelBtn
-    vc.navigationItem.rightBarButtonItem = installBtn
-    let nvc = UINavigationController.init(rootViewController: vc)
-
-    self.window?.rootViewController?.present(nvc, animated: true, completion: {
-      wkWebView.loadHTMLString(kmp.infoHtml(), baseURL: nil)
-    })
-  }
-
-  @objc func installAdHocKeyboardBtnHandler() {
-    if let adhocDir = _adhocDirectory {
-      self.window?.rootViewController?.dismiss(animated: true, completion: {
-        do {
-          try Manager.shared.parseKbdKMP(adhocDir)
-          self.showSimpleAlert(title: "Success", message: "Installed successfully.")
-        } catch {
-          self.showKMPError(error as! KMPError)
-        }
-
-        //this can fail gracefully and not show errors to users
-        do {
-          try FileManager.default.removeItem(at: adhocDir)
-        } catch {
-          log.error("unable to delete temp files")
-        }
-      })
-    }
-  }
-
-  @objc func installAdHocLexicalModelBtnHandler() {
-    if let adhocDir = _adhocDirectory {
-      self.window?.rootViewController?.dismiss(animated: true, completion: {
-        do {
-          try Manager.parseLMKMP(adhocDir)
-          self.showSimpleAlert(title: "Success", message: "Installed successfully.")
-        } catch {
-          self.showKMPError(error as! KMPError)
-        }
-
-        //this can fail gracefully and not show errors to users
-        do {
-          try FileManager.default.removeItem(at: adhocDir)
-        } catch {
-          log.error("unable to delete temp files")
-        }
-      })
-    }
-  }
-
-  @objc func cancelAdHocBtnHandler() {
-    self.window?.rootViewController?.dismiss(animated: true, completion: nil)
   }
 
   @objc func registerCustomFonts() {
