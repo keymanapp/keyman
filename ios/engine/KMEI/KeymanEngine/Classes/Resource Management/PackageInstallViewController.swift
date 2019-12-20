@@ -57,28 +57,7 @@ public class PackageInstallViewController: UIViewController {
 
   @objc func installBtnHandler() {
     dismiss(animated: true, completion: {
-      let package = self.package
-      do {
-        // Time to pass the package off to the final installers - the parse__KMP methods.
-        // ... they should probably be moved to ResourceFileManager eventually.
-        if package.isKeyboard() {
-          try Manager.shared.parseKbdKMP(package.sourceFolder)
-        } else {
-          try Manager.parseLMKMP(package.sourceFolder)
-        }
-        self.completionHandler(nil)
-      } catch {
-        log.error(error as! KMPError)
-        self.completionHandler(error)
-      }
-
-      //this can fail gracefully and not show errors to users
-      do {
-        try FileManager.default.removeItem(at: package.sourceFolder)
-      } catch {
-        log.error("unable to delete temp files: \(error)")
-        self.completionHandler(error)
-      }
+      ResourceFileManager.shared.finalizePackageInstall(self.package, completionHandler: self.completionHandler)
     })
   }
 }
