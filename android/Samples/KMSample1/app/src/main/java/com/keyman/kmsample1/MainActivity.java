@@ -1,6 +1,8 @@
 package com.keyman.kmsample1;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,19 +14,20 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
 
+  public static Context context;
   private KMTextView textView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
+    context = this;
 
     KMManager.setDebugMode(true);
     KMManager.initialize(this, KeyboardType.KEYBOARD_TYPE_INAPP);
@@ -43,6 +46,15 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     kbInfo.put(KMManager.KMKey_Font, "aava1.ttf");
     //kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont); // Use the default font
     KMManager.addKeyboard(this, kbInfo);
+
+    // Add a dictionary
+    HashMap<String, String>lexicalModelInfo = new HashMap<String, String>();
+    lexicalModelInfo.put(KMManager.KMKey_PackageID, "example.ta.wordlist");
+    lexicalModelInfo.put(KMManager.KMKey_LanguageID, "ta");
+    lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, "example.ta.wordlist");
+    lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, "1.0");
+    KMManager.addLexicalModel(context, lexicalModelInfo);
+    KMManager.registerAssociatedLexicalModel("ta");
   }
 
   @Override

@@ -1,12 +1,59 @@
-# Keyman for Android
+# Keyman for Android Version History
 
 ## 13.0 alpha
 * Start version 13.0
 * New Features:
-  * Adding a download manager to execute downloads in background (#2247,#2275)
+  * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308, #2365)
+  * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)
   * Improve custom package installation: Show readme.htm before starting installation process (#2286)
+  * Check for keyboard updates during keyman startup (#2335)
+  * Show available keyboard updates as android system notifications (#2335)
+  * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
+  * Add preference so update notifications can be ignored 3 months (#2412)
+  * Add QR Codes to Keyboard Info pages so users can share keyboard downloads (#2458)
+* Changes:
   * Update target Android SDK version to 29 (#2279)
+  * Add simple UI tests for keyboard picker and keyboard info screens (#2326)
+  * Add example dictionary to KMSample1 project (#2369)
+  * Prevent lower-cased API returns from causing mismatches (#2404)
+* Bug fix:
+  * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
   * Add linting to Debug builds and resolve lint errors (#2305)
+  * Fix memory issues during build process (#2361)
+  * Fix crashes when parsing JSON data from Cloud (#2393)
+  * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
+
+## 2019-12-12 12.0.4214 stable
+* Bug fix:
+  * Fix crash involving 0-length context (#2444)
+
+## 2019-12-09 12.0.4213 stable
+* Bug fix:
+  * Always use lower-case langauge ID's when processing API returns (#2406)
+  * Add checks when accessing the Cloud to avoid exceptions (#2393)
+  * Improve Keymanweb and KMEA compatability with devices Android API 19-23 (#2358)
+
+* Change
+  * Update default nrc.en.mtnt model to version 0.1.3 (#2389)
+
+## 2019-11-27 12.0.4211 stable
+* Bug fix:
+  * Fix crashes involving context manipulation of invalid context (#2377)
+  * Fix Package ID so other languages from a keyboard .kmp package can be installed (#2378)
+  * Fix crashes when accessing the Cloud for downloading keyboards (#2378)
+
+## 2019-11-26 12.0.4210 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2322)
+
+## 2019-11-25 12.0.4209 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2372)
+
+## 2019-11-22 12.0.4208 stable
+* Bug fix:
+  * Fix context manipulation to work around Chromium issue (#2281)
+
+## 2019-11-13 12.0.4207 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2288)
 
 ## 2019-10-30 12.0.4206 stable
 * Bug fix:

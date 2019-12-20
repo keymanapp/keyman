@@ -20,6 +20,7 @@
                     09 Aug 2015 - mcdurdin - I4844 - Tidy up PostDummyKeyEvent calls
 */
 #include "pch.h"
+#include "kbd.h"
 
 /**
   do_keybd_event adds a keyboard event into the keyboard event queue.
@@ -77,7 +78,7 @@ void do_keybd_event(LPINPUT pInputs, int *n, BYTE vk, BYTE scan, DWORD flags, UL
     break;
 
   case VK_RSHIFT:
-    scan = 0x36;
+    scan = SCANCODE_RSHIFT; // from kbd.h
   case VK_LSHIFT:
     vk = VK_SHIFT;
     break;

@@ -21,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,13 +42,16 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
   private static ListView listView = null;
   private static final String TAG = "KeyboardListActivity";
 
+  private DataSetObserver repoObserver;
+  private Dataset repo;
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     final Context context = this;
 
-    setContentView(R.layout.activity_list_layout);
+    setContentView(R.layout.activity_list_with_progress_layout);
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -61,7 +66,20 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     String langID = getIntent().getStringExtra("languageCode");
     String langName = getIntent().getStringExtra("languageName");
 
-    Dataset repo = CloudRepository.shared.fetchDataset(this);
+    repo = CloudRepository.shared.fetchDataset(this);
+
+    // add listener to dataset to get event for catalog update.
+    repoObserver = new DataSetObserver() {
+      @Override
+      public void onChanged() {
+        updateProgressBar();
+      }
+    };
+    repo.registerDataSetObserver(repoObserver);
+
+    // init progress bar state
+    updateProgressBar();
+
     final FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(this, repo, langID);
 
     textView.setText(langName);
@@ -103,6 +121,25 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     });
   }
 
+  /**
+   * switch between progress and listview.
+   */
+  private void updateProgressBar()
+  {
+    RelativeLayout _progress = findViewById(R.id.progress);
+    boolean _updaterunning= CloudRepository.shared.updateIsRunning();
+    ListView _list = findViewById(R.id.listView);
+    if(_updaterunning)
+    {
+      _progress.setVisibility(View.VISIBLE);
+      _list.setVisibility(View.GONE);
+    }
+    else {
+      _progress.setVisibility(View.GONE);
+      _list.setVisibility(View.VISIBLE);
+    }
+  }
+
   @Override
   protected void onResume() {
     super.onResume();
@@ -116,6 +153,14 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
     // Intentionally not removing KeyboardDownloadEventListener to
     // ensure onKeyboardDownloadFinished() gets called
   }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    // remove listener from dataset.
+    repo.unregisterDataSetObserver(repoObserver);
+  }
+
 
   @Override
   public boolean onSupportNavigateUp() {
@@ -145,8 +190,6 @@ public final class KeyboardListActivity extends AppCompatActivity implements OnK
       String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
 
       KeyboardPickerActivity.addKeyboard(this, keyboardInfo);
-      if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-        KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
     }
     finish();
   }

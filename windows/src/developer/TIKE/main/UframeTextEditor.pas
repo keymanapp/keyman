@@ -656,7 +656,6 @@ end;
 
 procedure TframeTextEditor.SetFocus;
 begin
-  inherited;
   cef.SetFocus;
 end;
 
@@ -1117,7 +1116,15 @@ begin
   try
     j.AddPair('x', TJSONNumber.Create(X));
     j.AddPair('y', TJSONNumber.Create(Y));
-    j.AddPair('text', cdo.Text[cdo.InsertType]);
+
+    // The character map insert format actually only
+    // makes sense for the .kmn source editor. For all
+    // other contexts, we currently only support cmimCharacter.
+    // It would be possible to do \uxxxx for JS/JSON etc but
+    // for now that is low priority.
+    if FEditorFormat = efKMN
+      then j.AddPair('text', cdo.Text[cdo.InsertType])
+      else j.AddPair('text', cdo.Text[cmimCharacter]);
     ExecuteCommand('charmapDragDrop', j);
   finally
     j.Free;

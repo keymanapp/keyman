@@ -4,6 +4,7 @@ describe('Attachment API', function() {
   this.timeout(kmwconfig.timeouts.standard);
 
   before(function(done) {
+    assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
     fixture.setBase('unit_tests/fixtures');
 
     this.timeout(kmwconfig.timeouts.scriptLoad * 3);

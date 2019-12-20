@@ -23,8 +23,6 @@ interface Element {
     kmwInput: boolean,
     _kmwResizeHandler: (e: any) => void,
 
-    onselectstart: any,
-
     // Used by our util.wait / util.alert system
     dismiss: () => void
 }

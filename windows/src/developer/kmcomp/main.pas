@@ -88,6 +88,7 @@ var
   FParamSourcePath: string;
   FParamHelpLink: string;
   FColorMode: TProjectLogConsole.TColorMode;
+  cmd, spc: string;
 begin
   FSilent := False;
   FFullySilent := False;
@@ -192,23 +193,29 @@ begin
 
   if (not FSilent and not FNologo) or FError then   // I4706
   begin
-    writeln(SKeymanDeveloperName + ' Compiler');
+{$IFDEF WIN64}
+    writeln(SKeymanDeveloperName + ' Compiler (64-bit)');
+{$ELSE}
+    writeln(SKeymanDeveloperName + ' Compiler (32-bit)');
+{$ENDIF}
     writeln('Version ' + GetVersionString + ', ' + GetVersionCopyright);
   end;
 
   if FError or (FParamInfile = '') then
   begin
+    cmd := ChangeFileExt(ExtractFileName(ParamStr(0)), '');
+    spc := StringOfChar(' ', cmd.Length);
     writeln('');
-    writeln('Usage: kmcomp [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
-    writeln('              [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
-    writeln('              [-add-help-link path] [-color|-no-color]');
-    writeln('              [-extract-keyboard-info field[,field...]]');
+    writeln('Usage: '+cmd+' [-s[s]] [-nologo] [-c] [-d] [-w] [-cfc] [-v[s|d]] [-source-path path] [-schema-path path] ');
+    writeln('       '+spc+' [-m] infile [-m infile] [-t target] [outfile.kmx|outfile.js [error.log]]');   // I4699
+    writeln('       '+spc+' [-add-help-link path] [-color|-no-color]');
+    writeln('       '+spc+' [-extract-keyboard-info field[,field...]]');
     writeln('          infile        can be a .kmn file (Keyboard Source, .kps file (Package Source), or .kpj (project)');   // I4699   // I4825
     writeln('                        if -v specified, can also be a .keyboard_info file');
     writeln('          outfile.kmx   can only be specified for a .kmn infile');
     writeln('          outfile.js    write a KeymanWeb file');
     writeln('          error.log     write to an error log; outfile must be specified');   // I4825
-    writeln('');
+    writeln;
     writeln('          -s             silent; don''t print information-level messages');
     writeln('          -ss            fully silent; don''t print anything (except fatal errors)');
     writeln('          -nologo        don''t print the compiler description');

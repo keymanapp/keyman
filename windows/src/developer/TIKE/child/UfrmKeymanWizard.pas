@@ -266,6 +266,7 @@ type
     panLanguageKeyman10: TPanel;
     lblLanguageKeyman10Note: TLabel;
     lblLanguageKeyman10Title: TLabel;
+    imgQRCode: TImage;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -330,6 +331,7 @@ type
     procedure pagesTouchLayoutChange(Sender: TObject);
     procedure pagesTouchLayoutChanging(Sender: TObject;
       var AllowChange: Boolean);
+    procedure lbDebugHostsClick(Sender: TObject);
   private
     frameSource: TframeTextEditor;
 
@@ -465,6 +467,7 @@ type
     function GetIsDebugVisible: Boolean;   // I4557
     function ShouldShowLanguageControls(field: TSystemStore): Boolean;
     procedure OrderDetailsPanels;
+    procedure UpdateQRCode;
 
   protected
     function GetHelpTopic: string; override;
@@ -552,6 +555,7 @@ uses
   System.Win.ComObj,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.System.QRCode,
   Keyman.UI.FontUtils,
 
   CharacterDragObject,
@@ -2083,6 +2087,11 @@ begin
   Result := True;
 end;
 
+procedure TfrmKeymanWizard.lbDebugHostsClick(Sender: TObject);
+begin
+  UpdateQRCode;
+end;
+
 procedure TfrmKeymanWizard.lbWinLang_SupportedClick(Sender: TObject);
 begin
   EnableControls;
@@ -2535,6 +2544,7 @@ begin
   modWebHttpServer.GetURLs(lbDebugHosts.Items);
   if lbDebugHosts.Items.Count > 0 then
     lbDebugHosts.ItemIndex := 0;
+  UpdateQRCode;
   EnableControls;
 end;
 
@@ -3307,6 +3317,23 @@ begin
   end;
   chkVKOnlyUseWithUnderlyingLayout.Caption := '&Only use this layout with the underlying keyboard "'+t+'" ('+s+')';
 end;*)
+
+procedure TfrmKeymanWizard.UpdateQRCode;
+var
+  b: TBitmap;
+begin
+  imgQRCode.Picture := nil;
+  if lbDebugHosts.ItemIndex >= 0 then
+  begin
+    b := TBitmap.Create;
+    try
+      DrawQRCode(lbDebugHosts.Items[lbDebugHosts.ItemIndex], b);
+      imgQRCode.Picture.Bitmap := b;
+    finally
+      b.Free;
+    end;
+  end;
+end;
 
 end.
 

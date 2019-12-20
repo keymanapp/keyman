@@ -13,6 +13,13 @@
 // * Strings element is not yet checked to be correct
 //
 
+interface KpsPackage {
+  /**
+   * <Package> -- the root element.
+   */
+  package: KpsFile;
+}
+
 interface KpsFile {
   system: KpsFileSystem;
   options: KpsFileOptions;

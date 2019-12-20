@@ -22,6 +22,15 @@ export function compileModel(filename: string): string {
 }
 
 /**
+ * An ECMAScript module as emitted by the TypeScript compiler.
+ */
+interface ES2015Module {
+  /** This is always true. */
+  __esModule: boolean;
+  'default'?: unknown;
+}
+
+/**
  * Loads a lexical model's source module from the given filename.
  *
  * @param filename path to the model source file.
@@ -38,14 +47,17 @@ export function loadFromFilename(filename: string): LexicalModelSource {
   });
   // Turn the module into a function in which we can inject a global.
   let moduleCode = '(function(exports){' + compilationOutput + '})';
+
   // Run the module; its exports will be assigned to `moduleExports`.
-  let moduleExports = {};
+  let moduleExports: Partial<ES2015Module> = {};
   let module = eval(moduleCode);
   module(moduleExports);
+
   if (!moduleExports['__esModule'] || !moduleExports['default']) {
     console.error(`Model source '${filename}' does have a default export. Did you remember to write \`export default source;\`?`);
     // TODO: throw an Error instead.
     process.exit(SysExits.EX_DATAERR);
   }
+
   return moduleExports['default'] as LexicalModelSource;
 }

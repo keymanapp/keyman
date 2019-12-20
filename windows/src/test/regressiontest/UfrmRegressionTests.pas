@@ -754,7 +754,7 @@ begin
 
           if not TUtilExecute.Shell(Handle, t + 'tike.exe', FilePath, '"'+FilePath + s + '.kmn"') then
           begin
-            ShowMessage('Could not find TIKE to edit the keyboard.');
+            ShowMessage('Could not find Keyman Developer to edit the keyboard.');
             Exit;
           end;
         end;

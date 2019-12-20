@@ -120,12 +120,20 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation "com.google.firebase:firebase-core:17.2.1"
+    implementation "com.google.firebase:firebase-analytics:17.2.1"
+    implementation "com.google.firebase:firebase-messaging:20.0.1"
     implementation "com.google.firebase:firebase-crash:16.2.1"
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
     implementation 'androidx.preference:preference:1.1.0'
+
+    // Add dependency for generating QR Codes
+    // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
+    // we "lose" it in the dependency management)
+    implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
+        transitive = true
+    }
 }
 
 /*def void dumpProperties(it){

@@ -33,6 +33,9 @@ public class JSONUtils {
    * Will need to swap kmp.json (keyboards : languages) to cloud order (languages : keyboards)
    */
   public static JSONArray getLanguages() {
+    if (resourceRoot == null) {
+      return new JSONArray();
+    }
     File[] packages = resourceRoot.listFiles();
     JSONArray languagesArray = new JSONArray();
     JSONParser parser = new JSONParser();
@@ -121,8 +124,8 @@ public class JSONUtils {
 
   /**
    * Iterate through a JSONArray to determine if a language/keyboard/model ID exists.
-   * @param {a} JSONArray to search
-   * @param {id} String of the language/keyboard ID
+   * @param a JSONArray to search
+   * @param id String of the language/keyboard ID
    * @return int - Index if the ID is found (starting with 0). -1 if the ID doesn't exist
    */
   public static int findID(JSONArray a, String id) {
@@ -171,7 +174,7 @@ public class JSONUtils {
 
   /**
    * Mirror options information that comes from keyboard cloud catalog
-   * @param String deviceType
+   * @param deviceType
    * @return JSONObject
    */
   public static JSONObject defaultOptions(String deviceType) {

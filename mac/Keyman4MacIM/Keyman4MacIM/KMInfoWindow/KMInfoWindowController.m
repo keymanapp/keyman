@@ -92,11 +92,20 @@
         "p.header {display:inline; color:white; font-family:arial; font-weight:bold; font-size:16px; padding-left:10px; vertical-align:bottom;}"
         "p.title {display:inline; font-family:arial; font-weight:bold; font-size:14px;}"
         "p.body {display:inline; font-family:arial; font-size:14px;}"
+        "#qrcode-container {display:block; width: 128px; height: 166px; padding: 8px; float: right; background: white; border: solid 1px black}"
+        "#qrcode-caption {font-family: arial; font-size: 11px; margin-top: 4px; text-align: center}"
         "</style>"
+        "<script src='qrcode.min.js'></script>"
         "</head>"
         "<body style='margin:0px'>"
         "<div class='header'><img src='info.png' class='icon'><p class='header'>%@</p></div>"
         "<div class='body'>"
+        "<div id='qrcode-container'>"
+          "<div id='qrcode'></div>"
+          "<script>new QRCode(document.getElementById('qrcode'), {text:'%@',width:128,height:128})</script>"
+          "<div id='qrcode-caption'>Scan this code to load this keyboard on another device or "
+          "<a href='%@'>share online</a></div>"
+        "</div>"
         "<p class='title'>Keyboard Layouts:</p><br>"
         "%@"
         "<br>"
@@ -144,8 +153,10 @@
         else {
             fontsStr = [NSMutableString stringWithString:@"<p class='body'><none></p><br>"];
         }
-        
+
         NSString *linkFormat = @"<a href='%@'>%@</a>";
+        NSString *packageId = [self.packagePath lastPathComponent];
+        NSString *shareUrl = [NSString stringWithFormat:@"https://keyman.com/go/keyboard/%@/share", packageId];
         NSString *name = [[self.infoDict objectForKey:kName] objectAtIndex:0];
         if (name == nil)
             name = @"Unknown Keyboard Package";
@@ -184,7 +195,8 @@
         else if (copyrightV2.length)
             copyright = [NSString stringWithFormat:linkFormat, copyrightV2, copyrightV2];
         
-        NSString *htmlStr = [NSString stringWithFormat:htmlFormat, name, kbsStr, fontsStr, version, author, website, copyright];
+        NSString *htmlStr = [NSString stringWithFormat:htmlFormat, name, shareUrl, shareUrl,
+                             kbsStr, fontsStr, version, author, website, copyright];
         
         return htmlStr;
     }

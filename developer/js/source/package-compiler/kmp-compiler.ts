@@ -1,11 +1,12 @@
-// <reference path="lexical-model.ts" />
 /// <reference path="kps-file.ts" />
 /// <reference path="kmp-json-file.ts" />
 
-let fs = require('fs');
-let path = require('path');
-let xml2js = require('xml2js');
-let zip = require('node-zip')();
+import * as fs from 'fs';
+import * as path from 'path';
+import * as xml2js from 'xml2js';
+import * as JSZip from 'jszip';
+
+let zip = JSZip();
 
 export default class KmpCompiler {
 
@@ -14,16 +15,16 @@ export default class KmpCompiler {
     // Load the KPS data from XML as JS structured data.
 
     let kpsPackage = (() => {
-        let a;
+        let a: KpsPackage;
         let parser = new xml2js.Parser({
           tagNameProcessors: [xml2js.processors.firstCharLowerCase],
           explicitArray: false
         });
-        parser.parseString(kpsString, (e, r) => { a = r });
+        parser.parseString(kpsString, (e: unknown, r: unknown) => { a = r as KpsPackage });
         return a;
     })();
 
-    let kps: KpsFile = kpsPackage.package as KpsFile;
+    let kps: KpsFile = kpsPackage.package;
 
     //
     // To convert to kmp.json, we need to:
@@ -40,17 +41,18 @@ export default class KmpCompiler {
     let kpsInfoToKmpInfo = function (info: KpsFileInfo): KmpJsonFileInfo {
       let ni: KmpJsonFileInfo = {};
 
-      ['author', 'copyright', 'name', 'version', 'website'].forEach(element => {
-        if(info[element]) {
-          ni[element] = {description: info[element]._ || info[element]};
+      let keys: (keyof KpsFileInfo)[] = ['author', 'copyright', 'name', 'version', 'website'];
+      for (let element of keys) {
+        if (info[element]) {
+          ni[element] = {description: info[element]._ || info[element].toString()};
           if(info[element].$ && info[element].$.URL) ni[element].url = info[element].$.URL;
         }
-      });
+      }
       return ni;
     };
 
-    let arrayWrap = function(a) {
-      if(Array.isArray(a)) {
+    let arrayWrap = function(a: unknown) {
+      if (Array.isArray(a)) {
         return a;
       }
       return [a];
@@ -71,9 +73,15 @@ export default class KmpCompiler {
 
     // Fill in additional fields
 
-    ['executeProgram', 'graphicFile', 'msiFilename', 'msiOptions', 'readmeFile'].forEach((element) => {
-      if(kps.options[element]) kmp.options[element] = kps.options[element];
-    });
+    let keys: (keyof KpsFileOptions & keyof KmpJsonFileOptions)[] = ['executeProgram', 'graphicFile', 'msiFilename', 'msiOptions', 'readmeFile'];
+    for (let element of keys) {
+      if (kps.options[element]) {
+        // TypeScript thinks it's possible to assign to followKeyboardVersion (a
+        // boolean), but in reality, all of the other keys are strings.
+        // Politely inform TypeScript that it's okay to do this assignment:
+        (<string> kmp.options[element]) = kps.options[element];
+      }
+    }
 
     if(kps.info) {
       kmp.info = kpsInfoToKmpInfo(kps.info);

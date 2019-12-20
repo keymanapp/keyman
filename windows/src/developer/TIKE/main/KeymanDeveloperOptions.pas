@@ -58,6 +58,7 @@ type
     FDisplayTheme: string;
     FEditorTheme: string;
     FFix183_LadderLength: Integer;
+    FDefaultProjectPath: string;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -93,6 +94,7 @@ type
     property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
     property OpenKeyboardFilesInSourceView: Boolean read FOpenKeyboardFilesInSourceView write FOpenKeyboardFilesInSourceView;   // I4751
+    property DefaultProjectPath: string read FDefaultProjectPath write FDefaultProjectPath;
 
     property DisplayTheme: string read FDisplayTheme write FDisplayTheme;   // I4796
 
@@ -117,9 +119,14 @@ const
     (Name: 'hc-black'; Desc: 'High Constrast (hc-black)')
   );
 
+const
+  CDefaultProjectPath = 'Keyman Developer\Projects\';
+
 implementation
 
 uses
+  Winapi.ShlObj,
+  utilsystem,
   OnlineConstants,
   GetOSVersion;
 
@@ -195,6 +202,8 @@ begin
     FTestEmailAddresses := regReadString(SRegValue_IDEOptTestEmailAddresses, '');   // I4506
 
     FFix183_LadderLength := regReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
+
+    FDefaultProjectPath := IncludeTrailingPathDelimiter(regReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
   finally
     CloseRegistry;
   end;
@@ -231,6 +240,8 @@ begin
     regWriteString(SRegValue_IDEOptTestEmailAddresses,          FTestEmailAddresses);   // I4506
 
     regWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
+
+    regWriteString(SRegValue_IDEOpt_DefaultProjectPath, FDefaultProjectPath);
   finally
     CloseRegistry;
   end;

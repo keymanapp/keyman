@@ -280,6 +280,8 @@ type
 implementation
 
 uses
+  System.Types,
+
   CommCtrl,
   GraphUtil,
   KeymanHints,
@@ -303,7 +305,7 @@ uses
   VistaMessages,
   MessageIdentifierConsts,
   messageidentifiers,
-  BitmapIPicture, Types;
+  BitmapIPicture;
 
 {$R *.DFM}
 
@@ -1331,12 +1333,62 @@ begin
 end;
 
 procedure TfrmVisualKeyboard.LoadSettings;
-  procedure MoveBounds(R: TRect);
+  function FitRectInBounds(R, BR: TRect): TRect;
   begin
-    if (R.Left < R.Right) and (R.Top < R.Bottom) and (R.Left >= 0) and (R.Top >= 0) and
-        (R.Bottom <= Screen.Height) and (R.Right <= Screen.Width) then
-      BoundsRect := R;
+    if R.Width > BR.Width then
+      R.Width := BR.Width;
+
+    if R.Height > BR.Height then
+      R.Height := BR.Height;
+
+    if R.Left < BR.Left then
+      R.Offset(BR.Left-R.Left, 0);
+
+    if R.Right > BR.Right then
+      R.Offset(BR.Right-R.Right, 0);
+
+    if R.Top < BR.Top then
+      R.Offset(0, BR.Top-R.Top);
+
+    if R.Bottom > BR.Bottom then
+      R.Offset(0, BR.Bottom-R.Bottom);
+
+    Result := R;
   end;
+
+  procedure MoveBounds(R: TRect);
+  var
+    area, i: Integer;
+    m: Integer;
+    BR, RI: TRect;
+  begin
+    // Adjust the rectangle to ensure TopLeft <= BottomRight
+    R.NormalizeRect;
+
+    // Move the rect onto the screen (e.g. when monitor is disconnected,
+    // we don't want to show the OSK off the screen). It is valid for the window
+    // rect to go negative, if for example primary monitor is not left-most.
+
+    // If the OSK is partially on-screen, move it onto the monitor where it has
+    // the most real-estate.
+    m := 0; area := 0;
+    for i := 0 to Screen.MonitorCount - 1 do
+    begin
+      if System.Types.IntersectRect(RI, R, Screen.Monitors[i].BoundsRect) then
+      begin
+        if RI.Width * RI.Height > area then
+        begin
+          area := RI.Width * RI.Height;
+          m := i;
+        end;
+      end;
+    end;
+
+    BR := Screen.Monitors[m].WorkareaRect;
+
+    Self.BoundsRect := FitRectInBounds(R, BR);
+  end;
+
   procedure MoveDefault;
   begin
     SetBounds(Screen.WorkAreaRect.Right - Width, Screen.WorkAreaRect.Bottom - Height, Width, Height);

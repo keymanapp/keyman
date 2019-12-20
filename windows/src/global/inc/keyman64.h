@@ -347,6 +347,13 @@ BOOL ShouldDebug_1(); // TSDMState state);
 
 #endif
 
+#ifdef _DEBUG
+#define OutputThreadDebugString(s) _OutputThreadDebugString(s)
+void _OutputThreadDebugString(char *s);
+#else
+#define OutputThreadDebugString(s) 
+#endif
+
 /* Keyboard selection functions */ 
 
 void HandleRefresh(int code, LONG tag);
@@ -415,6 +422,7 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd);
 void ReportActiveKeyboard(PKEYMAN64THREADDATA _td, WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(PKEYMAN64THREADDATA _td, DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
 BOOL SelectKeyboardTSF(PKEYMAN64THREADDATA _td, DWORD KeymanID, BOOL foreground);   // I3933   // I3949   // I4271
+BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 
 #endif
 

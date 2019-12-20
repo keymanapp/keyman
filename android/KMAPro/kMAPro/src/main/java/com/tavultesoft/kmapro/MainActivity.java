@@ -4,6 +4,8 @@
 
 package com.tavultesoft.kmapro;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,6 +33,7 @@ import com.tavultesoft.kmea.util.DownloadIntentService;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -41,6 +44,8 @@ import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
@@ -64,6 +69,8 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+import androidx.appcompat.widget.PopupMenu;
+
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -73,8 +80,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
@@ -100,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
+
 
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
@@ -149,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
+    KMManager.executeResourceUpdate(this);
     setContentView(R.layout.activity_main);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
@@ -375,11 +386,115 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     invalidateOptionsMenu();
   }
 
+
+  @Override
+  public boolean onPrepareOptionsMenu(final Menu menu) {
+    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+
+    if(_overflowMenuItem!=null) {
+      final ViewGroup _rootView = (ViewGroup) _overflowMenuItem.getActionView();
+
+      _rootView.findViewById(R.id.counterBackground).setBackground(
+        this.getResources().getDrawable(R.drawable.ic_light_action_overflow));
+
+      _rootView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          PopupMenu _popup = new PopupMenu(context, _rootView);
+          getMenuInflater().inflate(R.menu.overflow_menu, _popup.getMenu());
+
+          updateUpdateCountIndicator(
+            _popup.getMenu().findItem(R.id.action_update_keyboards),
+            KMManager.getUpdateTool().getOpenUpdateCount(),true);
+
+          _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem theItem) {
+              return onOptionsItemSelected(theItem);
+            }
+          });
+
+          MenuPopupHelper _menuHelper = new MenuPopupHelper(context, (MenuBuilder) _popup.getMenu(), _rootView);
+          _menuHelper.setForceShowIcon(true);
+          _menuHelper.show();
+        }
+      });
+      return super.onPrepareOptionsMenu(menu);
+    }
+
+    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+    if(_keyboardupdate==null)
+      return super.onPrepareOptionsMenu(menu);
+
+    final ViewGroup _rootView = (ViewGroup) _keyboardupdate.getActionView();
+
+    _rootView.findViewById(R.id.counterBackground).setBackground(
+      this.getResources().getDrawable(R.drawable.ic_cloud_download));
+
+    _rootView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        onOptionsItemSelected(_keyboardupdate);
+      }
+    });
+    return super.onPrepareOptionsMenu(menu);
+  }
+
+  private void updateUpdateCountIndicator(int anUpdateCount) {
+    if (menu == null)
+      return;
+    final MenuItem _overflowMenuItem = menu.findItem(R.id.action_overflow);
+    if (_overflowMenuItem != null)
+      updateUpdateCountIndicator(_overflowMenuItem,anUpdateCount,false);
+
+    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+    if (_keyboardupdate != null)
+      updateUpdateCountIndicator(_keyboardupdate,anUpdateCount,true);
+
+  }
+
+  private void updateUpdateCountIndicator(MenuItem theItem, int anUpdateCount, boolean aHideMenuitem)
+  {
+    final ViewGroup _rootView = (ViewGroup) theItem.getActionView();
+
+    if(anUpdateCount==0)
+    {
+      if(aHideMenuitem)
+        theItem.setVisible(false);
+      else if(_rootView!=null)
+        _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
+    }
+    else {
+      if(aHideMenuitem)
+        theItem.setVisible(true);
+      else if(_rootView!=null)
+      _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
+    }
+
+    if(_rootView==null)
+      return;
+
+    TextView _t = _rootView.findViewById(R.id.update_count_indicator);
+    _t.setText(String.valueOf(anUpdateCount));
+  }
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     this.menu = menu;
+
+    KMManager.getUpdateTool().addPropertyChangeListener(new PropertyChangeListener()
+      {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if(!evt.getPropertyName().equals("updateCount"))
+            return;
+          updateUpdateCountIndicator(
+            evt.getNewValue()==null?0:(Integer) evt.getNewValue());
+        }
+      }
+    );
+    updateUpdateCountIndicator(KMManager.getUpdateTool().getOpenUpdateCount());
     return true;
   }
 
@@ -406,6 +521,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         return true;
       case R.id.action_settings:
         showSettings();
+        return true;
+      case R.id.action_update_keyboards:
+        KMManager.getUpdateTool().executeOpenUpdates();
         return true;
       default:
         return super.onOptionsItemSelected(item);
@@ -854,20 +972,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           kbInfo.put(KMManager.KMKey_KeyboardVersion, kbVersion);
           kbInfo.put(KMManager.KMKey_Font, kFont);
           kbInfo.put(KMManager.KMKey_OskFont, kOskFont);
-          if (i == 0) {
-            if (KMManager.addKeyboard(this, kbInfo)) {
-              if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-                KMManager.setKeyboard(packageID, keyboardID, langId, keyboardName, langName, kFont, kOskFont);
-            }
-          } else {
-            KMManager.addKeyboard(this, kbInfo);
-          }
+
+          KMManager.addKeyboard(this, kbInfo);
+
         }
       } else {
-        if (KMManager.addKeyboard(this, keyboardInfo)) {
-          if (!KMKeyboardDownloaderActivity.USE_DOWNLOAD_MANAGER)
-            KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
-        }
+        KMManager.addKeyboard(this, keyboardInfo);
       }
     } else {
       // Error notifications handled in LanguageListActivity

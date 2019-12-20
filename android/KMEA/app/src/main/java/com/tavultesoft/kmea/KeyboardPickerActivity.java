@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -104,6 +104,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     });
 
     listView = (ListView) findViewById(R.id.listView);
+
+    //TODO: put into a logic class
     keyboardsList = getKeyboardsList(context);
     if (keyboardsList == null) {
       keyboardsList = new ArrayList<HashMap<String, String>>();
@@ -147,7 +149,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switchKeyboard(position,dismissOnSelect);
+        switchKeyboard(position,dismissOnSelect && ! KMManager.isTestMode());
         if (dismissOnSelect)
           finish();
       }
@@ -838,7 +840,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     }
   }
 
-  static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+  public static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
     String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
     String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
     String kbKey = String.format("%s_%s", languageID, keyboardID);

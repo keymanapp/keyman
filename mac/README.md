@@ -23,7 +23,7 @@ test builds. This requires additional configuration for your build environment.
    be either your 10-digit Team Identifier or a shortname that can be extracted with
    the following command:
 
-   `/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u '<Username>' -p '<Password>' -account_type itunes_connect -v off`
+   `/Applications/Xcode.app/Contents/Developer/usr/bin/iTMSTransporter -m provider -u '<Username>' -p '<Password>' -account_type itunes_connect -v off`
 
    Note: Use your Apple ID for `<Username>` and the app-specific password you generated above
    for `<Password>`. You'll use these in the next step as well.

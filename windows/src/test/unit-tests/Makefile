@@ -4,7 +4,7 @@
 
 # ----------------------------------------------------------------------
 
-TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler
+TARGETS=group-helper-rsp19902 kmcomp shared-data lexical-model-compiler kmcomp-x64-structures
 
 test:
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -34,6 +34,9 @@ lexical-model-compiler:
     start /wait ./build.sh -test
 !endif
 
+kmcomp-x64-structures:
+	cd $(ROOT)\src\test\unit-tests\group-helper-rsp19902
+	$(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
 

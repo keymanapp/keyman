@@ -1177,6 +1177,11 @@ describe('Element Input/Output Interfacing', function() {
    * TODO:  Design and implement some 'complex', cross-Node selection tests.
    */
   describe('Wrapper: Content-Editable Elements (using DIVs)', function() {
+    before(function() {
+      // These tests require use of KMW's device-detection functionality.
+      assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+    })
+
     describe('Caret Handling', function() {
       describe('hasSelection', function() {
         it('correctly recognizes Selection ownership', function () {
@@ -1263,6 +1268,11 @@ describe('Element Input/Output Interfacing', function() {
     // We're asynchronously loading IFrames, and sequentially at that.
     // We'll need a larger timeout.
     this.timeout(kmwconfig.timeouts.scriptLoad);
+
+    before(function() {
+      // These tests require use of KMW's device-detection functionality.
+      assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+    })
 
     beforeEach(function(done) {
       // Per-test creation of reg. pair and dummy elements, since IFrames are async.

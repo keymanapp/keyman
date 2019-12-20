@@ -53,11 +53,13 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
-import com.tavultesoft.kmea.data.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -69,6 +71,7 @@ public final class KMManager {
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
+  private static ResourcesUpdateTool updateTool;
 
   // Keyboard types
   public enum KeyboardType {
@@ -102,6 +105,7 @@ public final class KMManager {
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
+
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static int sysKbIndexOnLockScreen = -1;
@@ -140,6 +144,7 @@ public final class KMManager {
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
+  public static final String KMKey_Version = "version";
   public static final String KMKey_PackageID = "packageId";
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
@@ -236,7 +241,7 @@ public final class KMManager {
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
-    if (!didCopyAssets) {
+    if (!didCopyAssets || isTestMode()) {
       copyAssets(appContext);
       migrateOldKeyboardFiles(appContext);
       updateOldKeyboardsList(appContext);
@@ -254,7 +259,22 @@ public final class KMManager {
     JSONUtils.initialize(new File(getPackagesDir()));
 
     CloudDownloadMgr.getInstance().initialize(appContext);
-    //TODO: Add resource update here
+  }
+
+  public static void executeResourceUpdate(Context aContext)
+  {
+    getUpdateTool().checkForResourceUpdates(aContext,true);
+  }
+
+  public static ResourcesUpdateTool getUpdateTool() {
+    if(updateTool==null) {
+      updateTool = new ResourcesUpdateTool();
+      updateTool.createNotificationChannel(appContext);
+
+      KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(updateTool);
+
+    }
+    return updateTool;
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -385,9 +405,11 @@ public final class KMManager {
   public static void onDestroy() {
     if (InAppKeyboard != null) {
       InAppKeyboard.onDestroy();
+      InAppKeyboard = null;
     }
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
+      SystemKeyboard = null;
     }
     CloudDownloadMgr.getInstance().shutdown(appContext);
   }
@@ -447,12 +469,6 @@ public final class KMManager {
         packagesDir.mkdir();
       }
 
-      // Lexical models directory
-      File lexicalModelsDir = new File(getLexicalModelsDir());
-      if (!lexicalModelsDir.exists()) {
-        lexicalModelsDir.mkdir();
-      }
-
       // Copy default cloud keyboard
       File cloudDir = new File(getCloudDir());
       if (!cloudDir.exists()) {
@@ -461,6 +477,23 @@ public final class KMManager {
       String[] keyboardFiles = assetManager.list(KMDefault_UndefinedPackageID);
       for (String keyboardFile : keyboardFiles) {
         copyAsset(context, keyboardFile, KMDefault_UndefinedPackageID, true);
+      }
+
+      // Copy lexical model directory and subfolders
+      File lexicalModelsDir = new File(getLexicalModelsDir());
+      if (!lexicalModelsDir.exists()) {
+        lexicalModelsDir.mkdir();
+      }
+      String[] modelNames = assetManager.list(KMDefault_LexicalModelPackages);
+      for (String modelName : modelNames) {
+        File lexicalModelDir = new File(lexicalModelsDir, modelName);
+        if (!lexicalModelDir.exists()) {
+          lexicalModelDir.mkdir();
+        }
+        String[] modelFiles = assetManager.list(KMDefault_LexicalModelPackages + File.separator + modelName);
+        for (String modelFile : modelFiles) {
+          copyAsset(context, modelFile, KMDefault_LexicalModelPackages + File.separator + modelName, true);
+        }
       }
     } catch (Exception e) {
       Log.e(TAG, "Failed to copy assets. Error: " + e);
@@ -938,7 +971,7 @@ public final class KMManager {
     boolean result1 = false;
     boolean result2 = false;
 
-    if (InAppKeyboard != null && InAppKeyboardLoaded)
+    if (InAppKeyboard != null && (InAppKeyboardLoaded || isTestMode()))
       result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
@@ -1187,6 +1220,13 @@ public final class KMManager {
 
   public static boolean isDebugMode() {
     return debugMode;
+  }
+
+  /**
+   * @return check for unit test.
+   */
+  public static boolean isTestMode() {
+    return Boolean.parseBoolean(System.getProperty("kmeaTestMode"));
   }
 
   public static void setShouldAllowSetKeyboard(boolean value) {
@@ -2093,17 +2133,8 @@ public final class KMManager {
           }
 
           // Perform left-deletions
-          for (int i = 0; i < dn; i++) {
-            CharSequence chars = ic.getTextBeforeCursor(1, 0);
-            if (chars != null && chars.length() > 0) {
-              char c = chars.charAt(0);
-              SystemKeyboardShouldIgnoreSelectionChange = true;
-              if (Character.isLowSurrogate(c)) {
-                ic.deleteSurroundingText(2, 0);
-              } else {
-                ic.deleteSurroundingText(1, 0);
-              }
-            }
+          if (dn > 0) {
+            performLeftDeletions(ic, dn);
           }
 
           // Perform right-deletions
@@ -2122,7 +2153,9 @@ public final class KMManager {
 
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
-            ic.commitText(s, s.length());
+
+            // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
+            ic.commitText(s, 1);
           }
 
           ic.endBatchEdit();
@@ -2133,6 +2166,79 @@ public final class KMManager {
     private void keyDownUp(int keyEventCode) {
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+    }
+
+    /*
+    // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
+    // instead of one code-point. See Chromium issue #1024738
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
+    //
+    // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
+    // for surrogate pairs + a long grapheme cluster.
+    // This buffer will be used to put back characters as-needed
+    */
+    private static void performLeftDeletions(InputConnection ic, int dn) {
+      int originalBufferLength = dn*2 + 16; // characters
+      CharSequence charsBackup = getCharacterSequence(ic, originalBufferLength);
+
+      int lastIndex = charsBackup.length()-1;
+
+      // Exit if there's no context to delete
+      if (lastIndex < 0) {
+        return;
+      }
+
+      int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
+
+      // Chop dn+numPairs code points from the end of charsBackup
+      // subSequence indices are start(inclusive) to end(exclusive)
+      CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+      ic.deleteSurroundingText(dn + numPairs, 0);
+      CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
+
+      CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
+      if (charsToRestore.length() > 0) {
+        // Restore expectedChars that Chromium deleted.
+        // Use newCusorPosition 1 so cursor will be after the inserted string
+        ic.commitText(charsToRestore, 1);
+      }
+    }
+
+    /**
+     * Get a character sequence from the InputConnection.
+     * Sometimes the WebView can split a surrogate pair at either end,
+     * so chop that and update the cursor
+     * @param ic - the InputConnection
+     * @param length - number of characters to get
+     * @return CharSequence
+     */
+    private static CharSequence getCharacterSequence(InputConnection ic, int length) {
+      if (ic == null || length <= 0) {
+        return "";
+      }
+
+      CharSequence sequence = ic.getTextBeforeCursor(length, 0);
+      if (sequence == null || sequence.length() <= 0) {
+        return "";
+      }
+
+      // Move the cursor back if there's a split surrogate pair
+      if (Character.isHighSurrogate(sequence.charAt(sequence.length()-1))) {
+        ic.commitText("", -1);
+        sequence = ic.getTextBeforeCursor(length, 0);
+      }
+
+      if (sequence == null || sequence.length() <= 0) {
+        return "";
+      }
+
+      if (Character.isLowSurrogate(sequence.charAt(0))) {
+        // Adjust if the first char is also a split surrogate pair
+        // subSequence indices are start(inclusive) to end(exclusive)
+        sequence = sequence.subSequence(1, sequence.length());
+      }
+
+      return sequence;
     }
   }
 }

@@ -138,7 +138,11 @@ PKEYMAN64THREADDATA Globals_InitThread()
 
 void Globals_UninitThread()
 {
-  if(!Globals_ProcessInitialised()) return;
+  OutputThreadDebugString("Globals_UninitThread");
+  if (!Globals_ProcessInitialised()) {
+    OutputThreadDebugString("Globals_UninitThread aborted without cleanup");
+    return;
+  }
 
   CloseTSF();   // I3933
 
@@ -185,6 +189,7 @@ void Globals_UninitProcess()
   TlsFree(dwTlsIndex);
   dwTlsIndex = TLS_OUT_OF_INDEXES;
   LeaveCriticalSection(&csGlobals);
+  DeleteCriticalSection(&csGlobals);
 }
 
 PKEYMAN64THREADDATA ThreadGlobals()

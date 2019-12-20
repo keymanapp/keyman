@@ -241,6 +241,9 @@
 # VS Code
 .vscode
 
+# IDE files
+**/.idea/**/*.xml
+**/.idea/**/*.iml
 
 .DS_Store
 
