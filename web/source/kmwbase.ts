@@ -1,7 +1,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
 // Includes a promise polyfill (needed for IE)
-/// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
+/// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
 // Defines build-environment includes, since `tsc` doesn't provide a compile-time define.
 /// <reference path="environment.inc.ts" />
 // Defines the web-page interface object.

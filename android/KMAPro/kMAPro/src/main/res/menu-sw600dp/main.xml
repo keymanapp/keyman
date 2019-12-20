@@ -45,4 +45,10 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_settings" />
 
+    <item
+      android:id="@+id/action_update_keyboards"
+      android:title="@string/action_install_updates"
+      app:showAsAction="always"
+      app:actionLayout="@layout/update_count_view"/>
+
 </menu>

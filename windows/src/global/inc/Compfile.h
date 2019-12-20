@@ -151,6 +151,19 @@ struct FILE_KEYBOARD {
 
 typedef FILE_KEYBOARD *PFILE_KEYBOARD;
 
+/*
+  These size values are used in unit tests to ensure
+  that the structure sizes correspond precisely across
+  compilers (pas and c++).
+*/
+
+const DWORD sz_FILE_STORE = sizeof(FILE_STORE);
+const DWORD sz_FILE_KEY = sizeof(FILE_KEY);
+const DWORD sz_FILE_GROUP = sizeof(FILE_GROUP);
+const DWORD sz_FILE_DEADKEY = sizeof(FILE_DEADKEY);
+const DWORD sz_FILE_VKDICTIONARY = sizeof(FILE_VKDICTIONARY);
+const DWORD sz_FILE_KEYBOARD = sizeof(FILE_KEYBOARD);
+
 struct COMPMSG {
 	char szText[SZMAX_ERRORTEXT];
 	DWORD Line;

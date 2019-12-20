@@ -34,7 +34,7 @@ int IsCJKUnifiedIdeograph(const char *codename, int *code);
 BOOL FileExists(const char *filename)
 {
 	_finddata_t fi;
-	long n;
+	intptr_t n;
 
 	if((n = _findfirst(filename, &fi)) != -1)  // I3056   // I3512
 	{

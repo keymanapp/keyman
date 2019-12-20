@@ -37,9 +37,8 @@ int main(int argc, char *argv[])
 	if(argc < 3)
 	{
 		puts("Usage: kcframe infile.kmn outfile.kmx");
-		return 0;
+		return 1;
 	}
 
-	CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc);   // I4865   // I4866
-	return 1;
+	return CompileKeyboardFile(argv[1], argv[2], TRUE, FALSE, TRUE, msgproc) ? 0 : 1;   // I4865   // I4866
 }

@@ -76,7 +76,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) 
     SelectKeyboard(KEYMANID_NONKEYMAN);   // I3594
   }
   
-  ReportActiveKeyboard(_td, 0);   // I3961
+  ReportActiveKeyboard(_td, PC_UPDATE);   // I3961
   return TRUE;
 }
 

@@ -32,6 +32,11 @@ android {
         }
     }
 
+    // TODO: Remove this when SDK > 17
+    lintOptions {
+        disable 'ResourceType'
+    }
+
     testOptions {
         unitTests {
             // Allows use of a simulated Android API for tests.  (Thanks, roboelectric!)
@@ -44,6 +49,7 @@ android {
                 outputs.upToDateWhen {false}
                 //showStandardStreams = true // If we want test console log output to show during builds.
             }
+            systemProperty 'kmeaTestMode', 'true'
             workingDir = "../" // Defaults to the `app` subdirectory, which is different from Android Studio's default.
 
             //Avoid Warning: an illegal reflective access operation has occurred
@@ -63,7 +69,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'commons-io:commons-io:2.6'
-    implementation 'org.apache.commons:commons-text:1.8'
 
     // Robolectric
     testImplementation 'androidx.test:core:1.2.0'
@@ -74,6 +79,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation 'com.google.firebase:firebase-crash:16.2.1'
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
+        transitive = true
+    }
+
+    // Generate QR Codes
+    implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
         transitive = true
     }
 

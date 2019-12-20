@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 
 public enum APIKeyboardFetchError: Error {
+  case duplicateLanguageCodes
   case networkError(Error)
   case noData
   case parsingError(Error)
@@ -22,6 +23,34 @@ public class APIKeyboardRepository: KeyboardRepository {
   public private(set) var languages: [String: Language]?
   public private(set) var keyboards: [String: Keyboard]?
   private(set) var options: Options?
+
+  private func resultsToDictionary(for result: LanguagesAPICall, handler: (_ error: Error) -> Void) -> Dictionary<String, Language>? {
+    // Detect duplicate ids - this scenario indicates an infrastructure problem.
+    var dictionary = Dictionary<String, Language>()
+    var duplicates: [String] = []
+
+    result.languages.forEach { language in
+      // Does an entry for this ID already exist?  Trouble if so.
+      if let _ = dictionary[language.id] {
+        if duplicates.firstIndex(of: language.id) != -1 {
+          duplicates.append(language.id)
+        }
+      }
+
+      dictionary.updateValue(language, forKey: language.id)
+    }
+
+    guard duplicates.count == 0 else {
+      // This indicates an issue in our keyboard API infrastructure.
+      // Don't let it crash the app, but definitely make note of it
+      // as something to be fixed.
+      log.error("Corrupt data detected in API returns - duplicate language codes: \(duplicates)")
+      handler(APIKeyboardFetchError.duplicateLanguageCodes)
+      return nil
+    }
+
+    return dictionary
+  }
 
   public func fetch(completionHandler: CompletionHandler?) {
     let deviceType = UIDevice.current.userInterfaceIdiom == .phone ? "iphone" : "ipad"
@@ -75,7 +104,16 @@ public class APIKeyboardRepository: KeyboardRepository {
     }
 
     options = result.options
-    languages = Dictionary(uniqueKeysWithValues: result.languages.map { ($0.id, $0) })
+
+    // Detect duplicate ids - this scenario indicates an infrastructure problem.
+    guard let dictionary = resultsToDictionary(for: result, handler: errorHandler) else {
+      // The helper performs any relevant error handling on our behalf.
+      return
+    }
+
+    // Now that we've successfully processed the API returns, assign
+    // the results to the proper field.
+    languages = dictionary
 
     let keyboardsWithID = result.languages.flatMap { language in
       language.keyboards?.map { kb in (kb.id, kb) } ?? []

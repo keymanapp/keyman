@@ -30,7 +30,7 @@ import org.json.JSONObject;
  * KMEA engine.  This is primarily for installing keyboard packages.
  */
 public class PackageProcessor {
-  protected static File resourceRoot = null;
+  protected File resourceRoot = null;
 
   public static final String PP_DEFAULT_VERSION = "1.0";
   public static final String PP_DEFAULT_METADATA = "kmp.json";
@@ -156,7 +156,7 @@ public class PackageProcessor {
       keyboards[i].put(KMManager.KMKey_PackageID, packageId);
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
-      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id").toLowerCase());
       keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
       if (jsonEntry.has("displayFont")) {

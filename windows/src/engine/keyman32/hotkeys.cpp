@@ -45,6 +45,18 @@ Hotkeys *Hotkeys::Instance() {   // I4326
   return g_Hotkeys;
 }
 
+void Hotkeys::Unload() {
+  if (GetCurrentThreadId() != Globals::get_InitialisingThread()) {
+    OutputThreadDebugString("Unexpected: no other thread should be attempting to unload hotkeys");
+    return;
+  }
+
+  if (g_Hotkeys != NULL) {
+    delete g_Hotkeys;
+    g_Hotkeys = NULL;
+  }
+}
+
 void Hotkeys::Reload() {   // I4326   // I4390
   Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
   if(hotkeys == NULL) {

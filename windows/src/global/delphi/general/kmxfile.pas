@@ -95,6 +95,19 @@ procedure GetKeyboardInfo(const FileName: string; FReturnDump: Boolean; var ki: 
 function PRIMARYLANGID(n: DWORD): WORD;
 function SUBLANGID(n: DWORD): WORD;
 
+{
+  These sanity checks help ensure we don't
+  break on-disk struct sizes when we cross
+  compilers, bitness and platforms. They must
+  correspond to the equivalent constants in
+  compiler.h
+}
+const
+  KEYBOARDFILEHEADER_SIZE = 64;
+  KEYBOARDFILESTORE_SIZE = 12;
+  KEYBOARDFILEGROUP_SIZE = 24;
+  KEYBOARDFILEKEY_SIZE = 20;
+
 type
   TKeyboardFileHeader = packed record
     dwIdentifier: Dword;    // Keyman compiled keyboard id
@@ -117,6 +130,10 @@ type
 
   PKeyboardFileHeader = ^TKeyboardFileHeader;
 
+{$IF SizeOf(TKeyboardFileHeader) <> KEYBOARDFILEHEADER_SIZE}
+  {$MESSAGE ERROR 'SizeOf(TKeyboardFileHeader) must be KEYBOARDFILEHEADER_SIZE bytes'}
+{$ENDIF}
+
   TKeyboardFileStore = packed record
     dwSystemID: DWORD;
 	  dpName: DWORD;
@@ -124,6 +141,10 @@ type
   end;
 
   PKeyboardFileStore = ^TKeyboardFileStore;
+
+{$IF SizeOf(TKeyboardFileStore) <> KEYBOARDFILESTORE_SIZE}
+  {$MESSAGE ERROR 'SizeOf(TKeyboardFileStore) must be KEYBOARDFILESTORE_SIZE bytes'}
+{$ENDIF}
 
   TKeyboardFileGroup = packed record
 	  dpName: DWORD;
@@ -135,6 +156,10 @@ type
 
   PKeyboardFileGroup = ^TKeyboardFileGroup;
 
+{$IF SizeOf(TKeyboardFileGroup) <> KEYBOARDFILEGROUP_SIZE}
+  {$MESSAGE ERROR 'SizeOf(TKeyboardFileGroup) must be KEYBOARDFILEGROUP_SIZE bytes'}
+{$ENDIF}
+
   TKeyboardFileKey = packed record
     Key: WORD; packing: WORD;
     Line: DWORD;
@@ -144,6 +169,10 @@ type
   end;
 
   PKeyboardFileKey = ^TKeyboardFileKey;
+
+{$IF SizeOf(TKeyboardFileKey) <> KEYBOARDFILEKEY_SIZE}
+  {$MESSAGE ERROR 'SizeOf(TKeyboardFileKey) must be KEYBOARDFILEKEY_SIZE bytes'}
+{$ENDIF}
 
 function EncodingsAsString(ke: TKIEncodings): string;
 function HotkeyAsString(hotkey: DWord): string;

@@ -15,32 +15,37 @@ extra_projects="keyboardprocessor keyman-config"
 
 if [ "$1" != "" ]; then
     if [ "$1" == "keyboardprocessor" ]; then
-	echo "reconfiguring only keyboardprocessor"
+        echo "reconfiguring only keyboardprocessor"
         extra_projects="keyboardprocessor"
         autotool_projects=""
     elif [ ! -d "$1" ]; then
         echo "project $1 does not exist"
         exit 1
     elif [ "$1" == "keyman-config" ]; then
-	echo "reconfiguring only keyman-config"
+        echo "reconfiguring only keyman-config"
         extra_projects="keyman-config"
         autotool_projects=""
     else
-	echo "reconfiguring only $1"
+        echo "reconfiguring only $1"
         autotool_projects="$1"
         extra_projects=""
     fi
 fi
 
-JENKINS=${JENKINS:="no"}
-oldvers=`cat VERSION`
+if [ -n "$SKIPVERSION" -a -f OLDVERSION ]; then
+    oldvers=$(cat OLDVERSION)
+    newvers=$(cat VERSION)
+else
+    JENKINS=${JENKINS:="no"}
+    oldvers=`cat VERSION`
 
-. $(dirname "$0")/version.sh
+    . $(dirname "$0")/version.sh
 
-version
+    version
 
-echo "version: ${newvers}"
-echo "${newvers}" > VERSION
+    echo "version: ${newvers}"
+    echo "${newvers}" > VERSION
+fi
 
 # autoreconf the projects
 for proj in ${autotool_projects}; do

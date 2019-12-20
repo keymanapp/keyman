@@ -27,11 +27,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,31 +45,15 @@ import java.util.Map;
  * Keyman Settings --> Languages Settings
  * Displays a list of installed languages and a count of their associated installed keyboards.
  */
-public final class LanguagesSettingsActivity extends AppCompatActivity
-    implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler {
+public final class LanguagesSettingsActivity extends AppCompatActivity {
 
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static ImageButton addButton = null;
 
-  // ********* ONLY USED BY UPDATE CODE ***********
-
-  private static boolean updateCheckFailed = false;
-  private static boolean updateFailed = false;
-  private static Calendar lastUpdateCheck = null;
-  private static boolean checkingUpdates = false;
-
-  private static int updateCount = 0;
-  private static int failedUpdateCount = 0;
-  private static ProgressDialog updateProgress;
-
-  // ****** END - ONLY USED BY UPDATE CODE ********
-
   private boolean dismissOnSelect = false;
   protected static boolean canAddNewKeyboard = true;
-
-  private static String TAG = "LanguagesSettingsActivity";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -152,53 +138,8 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
   public void onResume() {
     super.onResume();
 
-    // From here on is update-specific stuff.
-    KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
 
-    final Context context = this;
-    Handler handler = new Handler();
-    handler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        boolean shouldCheckUpdate = false;
-        if (lastUpdateCheck == null) {
-          SharedPreferences prefs = context.getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          Long lastUpdateCheckTime = prefs.getLong("lastUpdateCheck", 0);
-          if (lastUpdateCheckTime > 0) {
-            lastUpdateCheck = Calendar.getInstance();
-            lastUpdateCheck.setTime(new Date(lastUpdateCheckTime));
-          }
-        }
-
-        if (lastUpdateCheck != null) {
-          Calendar lastChecked = Calendar.getInstance();
-          lastChecked.setTime(lastUpdateCheck.getTime());
-          if (updateCheckFailed || updateFailed) {
-            lastChecked.add(Calendar.HOUR_OF_DAY, 1);
-          } else {
-            lastChecked.add(Calendar.HOUR_OF_DAY, 24);
-          }
-
-          Calendar now = Calendar.getInstance();
-          if (now.compareTo(lastChecked) > 0) {
-            shouldCheckUpdate = true;
-          }
-        } else {
-          shouldCheckUpdate = true;
-        }
-
-        // TODO:  Extremely temporary code for testing - remove before merging!
-        shouldCheckUpdate = true;
-
-        if (shouldCheckUpdate) {
-          updateCheckFailed = false;
-          updateFailed = false;
-          if (!checkingUpdates) {
-            checkResourceUpdates(context);
-          }
-        }
-      }
-    }, 1000);
+    KMManager.getUpdateTool().checkForResourceUpdates(this,false);
   }
 
   @Override
@@ -281,150 +222,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity
     }
   }
 
-  private void checkResourceUpdates(final Context context) {
 
-    Runnable onSuccess = new Runnable() {
-      public void run() {
-        if(updateCount > 0) {
-          return;
-        }
 
-        Toast.makeText(context, context.getString(R.string.update_check_current), Toast.LENGTH_SHORT).show();
-        lastUpdateCheck = Calendar.getInstance();
-        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
-        editor.commit();
-        checkingUpdates = false;
-      }
-    };
 
-    Runnable onFailure = new Runnable() {
-      public void run() {
-        if(updateCount > 0) {
-          return;
-        }
-
-        Toast.makeText(context, context.getString(R.string.update_check_unavailable), Toast.LENGTH_SHORT).show();
-        lastUpdateCheck = Calendar.getInstance();
-        updateCheckFailed = true;
-        checkingUpdates = false;
-      }
-    };
-
-    checkingUpdates = true;
-    CloudRepository.shared.updateDatasetIfNeeded(this, this, onSuccess, onFailure);
-  }
-
-  public void onUpdateDetection(final List<Bundle> updatableResources) {
-    failedUpdateCount = 0;
-    updateCount = updatableResources.size();
-    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-    dialogBuilder.setTitle(context.getString(R.string.keyboard_updates_available));
-    dialogBuilder.setMessage(context.getString(R.string.confirm_update));
-    dialogBuilder.setPositiveButton(context.getString(R.string.label_update), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        // Update keyboards
-        if (KMManager.hasConnection(context)) {
-          // For each updatable keyboard, one at a time, do the update.
-          // TODO:  May need a reework to better handle large amounts of updates -
-          //        these calls will stack within the Android subsystem and may have issues accordingly.
-          for (Bundle resourceBundle: updatableResources) {
-            Intent intent = new Intent(context, KMKeyboardDownloaderActivity.class);
-            intent.putExtras(resourceBundle);
-            context.startActivity(intent);
-          }
-        } else {
-          Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-          checkingUpdates = false;
-        }
-      }
-    });
-
-    dialogBuilder.setNegativeButton(context.getString(R.string.label_later), new DialogInterface.OnClickListener() {
-      public void onClick(DialogInterface dialog, int which) {
-        lastUpdateCheck = Calendar.getInstance();
-        checkingUpdates = false;
-      }
-    });
-
-    AlertDialog dialog = dialogBuilder.create();
-    if (!((AppCompatActivity) context).isFinishing()) {
-      dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-        @Override
-        public void onCancel(DialogInterface dialog) {
-          lastUpdateCheck = Calendar.getInstance();
-          checkingUpdates = false;
-        }
-      });
-      dialog.show();
-    } else {
-      checkingUpdates = false;
-    }
-  }
-
-  @Override
-  public void onKeyboardDownloadStarted(HashMap<String, String> keyboardInfo) {
-    // Do nothing
-  }
-
-  @Override
-  public void onKeyboardDownloadFinished(HashMap<String, String> keyboardInfo, int result) {
-    if (result > 0) {
-      KeyboardPickerActivity.handleDownloadedKeyboard(this, keyboardInfo);
-    } else if (result < 0) {
-      failedUpdateCount++;
-    }
-
-    if (updateCount > 0) {
-      updateCount--;
-    }
-
-    tryFinalizeUpdate();
-  }
-
-  @Override
-  public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // Do nothing
-  }
-
-  @Override
-  public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-    if (updateCount > 0) {
-      updateCount -= lexicalModelsInstalled.size();
-    }
-
-    tryFinalizeUpdate();
-  }
-
-  void tryFinalizeUpdate() {
-    if (updateCount == 0 && updateProgress != null && updateProgress.isShowing()) {
-      if (updateProgress != null && updateProgress.isShowing()) {
-        try {
-          updateProgress.dismiss();
-          updateProgress = null;
-        } catch (Exception e) {
-          updateProgress = null;
-        }
-      }
-
-      if (failedUpdateCount > 0) {
-        Toast.makeText(this, "One or more resources failed to update!", Toast.LENGTH_SHORT).show();
-        lastUpdateCheck = Calendar.getInstance();
-        updateFailed = true;
-        checkingUpdates = false;
-      } else {
-        Toast.makeText(this, "Resources successfully updated!", Toast.LENGTH_SHORT).show();
-        lastUpdateCheck = Calendar.getInstance();
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck.getTime().getTime());
-        editor.commit();
-        checkingUpdates = false;
-      }
-    }
-    if (updateProgress != null && updateProgress.isShowing()) {
-      updateProgress.dismiss();
-    }
-  }
 }

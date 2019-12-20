@@ -183,7 +183,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageLexicalModels
+    ActivePage = pageFiles
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -1119,6 +1119,9 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Compile'
@@ -1210,7 +1213,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object panBuildMobile: TPanel
           Left = 328
           Top = 162
-          Width = 310
+          Width = 457
           Height = 265
           BevelOuter = bvNone
           Color = 15921906
@@ -1235,6 +1238,14 @@ inherited frmPackageEditor: TfrmPackageEditor
             Font.Name = 'Tahoma'
             Font.Style = [fsBold]
             ParentFont = False
+          end
+          object imgQRCode: TImage
+            Left = 315
+            Top = 64
+            Width = 128
+            Height = 128
+            Proportional = True
+            Stretch = True
           end
           object cmdStartTestOnline: TButton
             Left = 12
@@ -1261,6 +1272,7 @@ inherited frmPackageEditor: TfrmPackageEditor
             Height = 97
             ItemHeight = 13
             TabOrder = 1
+            OnClick = lbDebugHostsClick
           end
         end
         object panBuildDesktop: TPanel

@@ -215,6 +215,9 @@ public class FileUtilsTest {
     filename = "test/welcome.HTM";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));
 
+    filename = "test\\welcome.htm";
+    Assert.assertTrue(FileUtils.isWelcomeFile(filename));
+
     filename = "test/WELCOME.HTM";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));
 
@@ -226,6 +229,7 @@ public class FileUtilsTest {
 
     filename = "test/welcomehtm";
     Assert.assertFalse(FileUtils.isWelcomeFile(filename));
+
 
     filename = "";
     Assert.assertFalse(FileUtils.isWelcomeFile(filename));

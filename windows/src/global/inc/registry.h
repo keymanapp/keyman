@@ -114,9 +114,13 @@
 
 #define REGSZ_Keyman_Debug  REGSZ_KeymanCU "\\Debug"
 
-/* DWORD: Enable/disable serialized input, default 1 */
+/* REGSZ_Keyman_Debug DWORD: Enable/disable serialized input, default 1 */
 
 #define REGSZ_Flag_ShouldSerializeInput "Flag_ShouldSerializeInput"
+
+/* REGSZ_Keyman_Debug DWORD: Use old non-chiral Win32 API RegisterHotkey instead of left-only hotkeys */
+
+#define REGSZ_Flag_UseRegisterHotkey  "Flag_UseRegisterHotkey"
 
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 

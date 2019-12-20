@@ -93,6 +93,11 @@ describe('TouchAliasElement', function() {
   });
 
   describe("With ['base']", function() {
+    before(function() {
+      // These tests require use of KMW's device-detection functionality.
+      assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
+    })
+    
     it('correctly aliases upon construction', function(done) {
       var input = document.getElementById(DynamicElements.addInput());
       input.value = "apples";

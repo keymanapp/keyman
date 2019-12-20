@@ -23,6 +23,7 @@ unit DebugPaths;  // I3306
 interface
 
 function GetDebugPath(const RegValue, Default: WideString; TerminateInSlash: Boolean = True): WideString;
+function Reg_GetDebugFlag(const RegValue: string; Default: Boolean = False): Boolean;
 
 implementation
 
@@ -41,6 +42,18 @@ begin
   end;
   if TerminateInSlash and (Result <> '') then
     Result := IncludeTrailingPathDelimiter(Result);
+end;
+
+function Reg_GetDebugFlag(const RegValue: string; Default: Boolean): Boolean;
+begin
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    if OpenKeyReadOnly(SRegKey_KeymanEngineDebug_CU) and ValueExists(RegValue)
+      then Result := ReadInteger(RegValue) <> 0
+      else Result := Default;
+  finally
+    Free;
+  end;
 end;
 
 end.

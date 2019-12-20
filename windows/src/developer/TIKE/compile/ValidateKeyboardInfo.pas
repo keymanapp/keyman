@@ -29,6 +29,7 @@ uses
   Winapi.Windows,
 
   BCP47Tag,
+  compile,
 //  Keyman.Developer.System.Project.ProjectLogConsole,
   Keyman.System.KeyboardInfoFile,
   Keyman.System.KMXFileLanguages;
@@ -45,8 +46,9 @@ var
 
 type TValidateJsonMessageProc = function (offset: Int64; message: PAnsiChar): BOOL; stdcall;
 
+// TODO: dynamically load this
 function ValidateJsonFile(pwszSchemaFile, pwszJsonFile: PWideChar; MessageProc: TValidateJsonMessageProc): BOOL;
-  stdcall; external 'kmcmpdll.dll';
+  stdcall; external kmcmpdll_lib;
 
 function ValidateMessageProc(offset: Int64; message: PAnsiChar): BOOL; stdcall;
 begin

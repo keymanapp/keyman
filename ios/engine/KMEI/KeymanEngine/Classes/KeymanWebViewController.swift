@@ -142,6 +142,10 @@ class KeymanWebViewController: UIViewController {
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
     fixLayout()
+
+    // Initialize the keyboard's size/scale.  In iOS 13 (at least), the system
+    // keyboard's width will be set at this stage, but not in viewWillAppear.
+    keyboardSize = view.bounds.size
   }
 }
 
@@ -530,7 +534,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
-    
+
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
     
@@ -852,9 +856,10 @@ extension KeymanWebViewController {
   func resizeKeyboard() {
     fixLayout()
 
-    // Ensures the height is properly updated.
+     // Ensures the width and height are properly updated.
     // Note:  System Keyboard init currently requires this for the keyboard to display properly
     // the first time.
+    setOskWidth(Int(kbSize.width))
     setOskHeight(Int(kbSize.height))
   }
   

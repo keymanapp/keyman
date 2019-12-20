@@ -34,7 +34,8 @@ type
   TmodelTsProjectFile = class(TOpenableProjectFile)
   private
     FDebug: Boolean;
-    FWarnAsError: Boolean;   // I4706
+    FWarnAsError: Boolean;
+    FTestKeyboard: string;   // I4706
 
     function GetTargetFilename: string;
   protected
@@ -49,10 +50,10 @@ type
     procedure SaveState(node: IXMLNode); override;   // I4698
 
     property Debug: Boolean read FDebug write FDebug;
+    property TestKeyboard: string read FTestKeyboard write FTestKeyboard;
 
     property WarnAsError: Boolean read FWarnAsError write FWarnAsError;   // I4706
 
-//    property OutputFilename: string read GetOutputFilename;
     property TargetFilename: string read GetTargetFilename;
   end;
 
@@ -80,6 +81,7 @@ procedure TmodelTsProjectFile.SaveState(node: IXMLNode);   // I4698
 begin
   inherited SaveState(node);
   node.AddChild('Debug').NodeValue := FDebug;
+  node.AddChild('TestKeyboard').NodeValue := FTestKeyboard;
 end;
 
 procedure TmodelTsProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698
@@ -95,8 +97,12 @@ begin
   inherited LoadState(node);
   try
     if node.ChildNodes.IndexOf('Debug') >= 0 then FDebug := node.ChildValues['Debug'];
+    if node.ChildNodes.IndexOf('TestKeyboard') >= 0
+      then FTestKeyboard := node.ChildValues['TestKeyboard']
+      else FTestKeyboard := '';
   except
     FDebug := False;
+    FTestKeyboard := '';
   end;
 end;
 

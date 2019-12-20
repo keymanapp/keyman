@@ -29,6 +29,7 @@
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>config.js</xsl:attribute><xsl:text> </xsl:text></script>
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu.js</xsl:attribute><xsl:text> </xsl:text></script>
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu-frame.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>qrcode.min.js</xsl:attribute><xsl:text> </xsl:text></script>
       </head>
 
       <body visited="white">

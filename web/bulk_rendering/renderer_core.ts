@@ -3,7 +3,7 @@
 // Needed for OSK rendering to image files.
 /// <reference path="../node_modules/html2canvas/dist/html2canvas.js" />
 // Ensure that Promises are within scope.
-/// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
+/// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
 
 type KeyboardMap = {[id: string]: any};
 

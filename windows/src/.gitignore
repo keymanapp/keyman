@@ -1,10 +1,15 @@
 **/*.aps
+**/BuildLog.htm
 
 # Delphi target folders -- by including Debug/ and Release/ we avoid accidentally matching folders that we might create otherwise
 **/Win64/Debug/
 **/Win64/Release/
 **/Win32/Debug/
 **/Win32/Release/
+
+# These are intermediate and output folders for VC++
+**/obj
+**/x64
 
 # KeymanWeb is copied from /web/src during Developer build
 developer/TIKE/xml/kmw/resource

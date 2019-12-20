@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tavultesoft.kmea.data.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -23,12 +23,10 @@ import com.tavultesoft.kmea.util.MapCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,19 +35,24 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
+
 public final class KeyboardPickerActivity extends AppCompatActivity {
 
+  //TODO: view instances should not be static
   private static Toolbar toolbar = null;
   private static ListView listView = null;
   private static Button closeButton = null;
   private static KMKeyboardPickerAdapter listAdapter = null;
 
+  public static final String  KMKEY_INTERNAL_NEW_KEYBOARD = "_internal_new_keyboard_";
+
+  // TODO: Refactoring to remove keyboard selection into own keyboard manager class (MVC)
   // Lists of installed keyboards and installed lexical models
   private static ArrayList<HashMap<String, String>> keyboardsList = null;
   private static ArrayList<HashMap<String, String>> lexicalModelsList = null;
@@ -101,6 +104,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     });
 
     listView = (ListView) findViewById(R.id.listView);
+
+    //TODO: put into a logic class
     keyboardsList = getKeyboardsList(context);
     if (keyboardsList == null) {
       keyboardsList = new ArrayList<HashMap<String, String>>();
@@ -144,7 +149,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switchKeyboard(position);
+        switchKeyboard(position,dismissOnSelect && ! KMManager.isTestMode());
         if (dismissOnSelect)
           finish();
       }
@@ -176,6 +181,39 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
     int curKbPos = getCurrentKeyboardIndex();
     setSelection(curKbPos);
+
+    KMKeyboard.addOnKeyboardEventListener(new KeyboardEventHandler.OnKeyboardEventListener() {
+      @Override
+      public void onKeyboardLoaded(KMManager.KeyboardType keyboardType) {
+
+      }
+
+      @Override
+      public void onKeyboardChanged(String newKeyboard) {
+          int _index = getKeyboardIndex(context,newKeyboard);
+          if(_index>=0)
+          {
+            Map<String,String> _keyboard = keyboardsList.get(_index);
+            if(_keyboard==null)
+              return;
+            if(_keyboard.get(KMKEY_INTERNAL_NEW_KEYBOARD)==null)
+              return;
+            _keyboard.remove(KMKEY_INTERNAL_NEW_KEYBOARD);
+            saveList(context, KMManager.KMFilename_KeyboardsList);
+            notifyKeyboardsUpdate(context);
+          }
+      }
+
+      @Override
+      public void onKeyboardShown() {
+
+      }
+
+      @Override
+      public void onKeyboardDismissed() {
+
+      }
+    });
   }
 
   @Override
@@ -301,7 +339,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     selectedIndex = position;
   }
 
-  private static void switchKeyboard(int position) {
+  /**
+   * switch to the given keyboard.
+   * @param position the keyboard index in list
+   * @param aPrepareOnly prepare switch, it is executed on keyboard reload
+   */
+  private static void switchKeyboard(int position, boolean aPrepareOnly) {
     setSelection(position);
     int listPosition = (position >= keyboardsList.size()) ? keyboardsList.size()-1 : position;
     HashMap<String, String> kbInfo = keyboardsList.get(listPosition);
@@ -315,7 +358,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     String langName = kbInfo.get(KMManager.KMKey_LanguageName);
     String kFont = kbInfo.get(KMManager.KMKey_Font);
     String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
-    KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+    if(aPrepareOnly)
+      KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
+    else
+      KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
 
   protected static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
@@ -343,9 +389,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         if (kbKey.length() >= 3) {
           int x = getKeyboardIndex(context, kbKey);
           if (x >= 0) {
+            if(keyboardsList.get(x).get(KMKEY_INTERNAL_NEW_KEYBOARD)!=null)
+              keyboardInfo.put(KMKEY_INTERNAL_NEW_KEYBOARD,KMKEY_INTERNAL_NEW_KEYBOARD);
             keyboardsList.set(x, keyboardInfo);
             result = saveList(context, KMManager.KMFilename_KeyboardsList);
           } else {
+            keyboardInfo.put(KMKEY_INTERNAL_NEW_KEYBOARD,KMKEY_INTERNAL_NEW_KEYBOARD);
             keyboardsList.add(keyboardInfo);
             result = saveList(context, KMManager.KMFilename_KeyboardsList);
             if (!result) {
@@ -428,7 +477,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
       }
       if (position == curKbPos && listView != null) {
-        switchKeyboard(0);
+        switchKeyboard(0,false);
       } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = getCurrentKeyboardIndex();
         setSelection(curKbPos);
@@ -791,7 +840,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     }
   }
 
-  static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+  public static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {
     String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
     String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
     String kbKey = String.format("%s_%s", languageID, keyboardID);

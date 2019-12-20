@@ -1,29 +1,30 @@
-/**
+/*
  * Copyright (C) 2019 SIL International. All rights reserved.
  */
-
 package com.tavultesoft.kmea;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -33,20 +34,18 @@ import android.widget.Toast;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.QRCodeUtil;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
-
-  private static Toolbar toolbar = null;
-  private static ListView listView = null;
-  private DialogFragment dialog;
+  private static final String TAG = "KbSettingsActivity";
   private static ArrayList<HashMap<String, String>> infoList = null;
-  protected static Typeface titleFont = null;
-  private final String titleKey = "title";
-  private final String subtitleKey = "subtitle";
-  private final String iconKey = "icon";
+  private static Typeface titleFont = null;
+  private static final String titleKey = "title";
+  private static final String subtitleKey = "subtitle";
+  private static final String iconKey = "icon";
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -56,13 +55,13 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String authority = FileProviderUtils.getAuthority(context);
 
     setContentView(R.layout.activity_list_layout);
-    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    listView = (ListView) findViewById(R.id.listView);
+    final ListView listView = findViewById(R.id.listView);
 
     final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
     final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
@@ -71,22 +70,22 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
     final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
 
-    final TextView textView = (TextView) findViewById(R.id.bar_title);
+    final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
     if (titleFont != null)
       textView.setTypeface(titleFont, Typeface.BOLD);
 
-    infoList = new ArrayList<HashMap<String, String>>();
+    infoList = new ArrayList<>();
     // Display keyboard version title
     final String noIcon = "0";
-    HashMap<String, String> hashMap = new HashMap<String, String>();
+    HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
     // Display keyboard help link
-    hashMap = new HashMap<String, String>();
+    hashMap = new HashMap<>();
     final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
@@ -104,7 +103,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     // Display uninstall keyboard
     if (!packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) ||
         !kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
-      hashMap = new HashMap<String, String>();
+      hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
       hashMap.put(subtitleKey, "");
       hashMap.put(iconKey, noIcon);
@@ -117,7 +116,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
       @Override
       public boolean isEnabled(int position) {
-        HashMap<String, String> hashMap = (HashMap<String, String>)infoList.get(position);
+        HashMap<String, String> hashMap = infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
@@ -155,7 +154,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
               } catch (NullPointerException e) {
                 String message = "FileProvider undefined in app to load" + customHelp.toString();
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.e("KeyboardSettingsActivity", message);
+                Log.e("TAG", message);
               }
             }
             else {
@@ -173,12 +172,29 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
           // Uninstall selected keyboard
           String title = String.format("%s: %s", languageName, kbName);
           String keyboardKey = String.format("%s_%s", languageID, kbID);
-          DialogFragment dialog = ConfirmDialogFragment.newInstance(
+          DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
             DIALOG_TYPE_DELETE_KEYBOARD, title, getString(R.string.confirm_delete_keyboard), keyboardKey);
           dialog.show(getFragmentManager(), "dialog");
         }
       }
     });
+
+    // If QRGen library included, also display QR code for sharing keyboard
+    if (QRCodeUtil.libraryExists(context)) {
+      String url = String.format("%s%s", QRCodeUtil.QR_BASE, kbID);
+
+      // Shorten listView so the QR code will show
+      ViewGroup.LayoutParams lp = listView.getLayoutParams();
+      lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+      listView.setLayoutParams(lp);
+
+      LinearLayout qrLayout = findViewById(R.id.qrLayout);
+      qrLayout.setVisibility(View.VISIBLE);
+
+      Bitmap myBitmap = QRCodeUtil.toBitmap(url);
+      ImageView imageView = (ImageView) findViewById(R.id.qrCode);
+      imageView.setImageBitmap(myBitmap);
+    }
   }
 
   @Override
@@ -190,9 +206,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
   @Override
   public void onDestroy(){
     super.onDestroy();
-    if ( dialog !=null ){
-      dialog.dismiss();
-    }
+
   }
 
 }

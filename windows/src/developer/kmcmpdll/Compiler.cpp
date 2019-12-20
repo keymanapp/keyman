@@ -1796,7 +1796,8 @@ LinePrefixType GetLinePrefixType(PWSTR *p)
 
 int LineTokenType(PWSTR *str)
 {
-	int i, l;
+  int i;
+  size_t l;
 	PWSTR p = *str;
 
   LinePrefixType lpt = GetLinePrefixType(&p);
@@ -1921,21 +1922,21 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 		  case 0:
 			  if(_wcsnicmp(p, L"deadkey", z = 7) == 0 ||
 				  _wcsnicmp(p, L"dk", z = 2) == 0 )
-              {
+        {
 				  p += z;
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-				  if(!q) return CERR_InvalidDeadkey;
+				  if(!q || !*q) return CERR_InvalidDeadkey;
 
 				  DWORD n = fk->cxDeadKeyArray;
 
-                  tstr[mx++] = UC_SENTINEL;
+          tstr[mx++] = UC_SENTINEL;
 				  tstr[mx++] = CODE_DEADKEY;
 				  if(!strvalidchrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
 				  tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
 				  tstr[mx] = 0;
 			  }
 			  else
-              {
+        {
 				  n = xatoi(&p);
 				  if(*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
 				  if((err = UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
@@ -1969,7 +1970,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  if(sFlag) return CERR_AnyInVirtualKeySection;
 			  p += 3;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			  if(!q) return CERR_InvalidAny;
+			  if(!q || !*q) return CERR_InvalidAny;
 
 			  for(i = 0; i < fk->cxStoreArray; i++)
               {
@@ -2000,6 +2001,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           if(sFlag) return CERR_InvalidInVirtualKeySection;
 			    p += 10;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
+          if (!q || !*q) return CERR_InvalidToken;
           err = process_baselayout(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
         }
@@ -2014,7 +2016,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           if(sFlag) return CERR_InvalidInVirtualKeySection;
           p += 2;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidIf;
+          if(!q || !*q) return CERR_InvalidIf;
 
           err = process_if(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2026,7 +2028,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			    p += 5;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
 
-			    if(!q) return CERR_InvalidIndex;
+			    if(!q || !*q) return CERR_InvalidIndex;
 
           {
             wchar_t *context = NULL;
@@ -2057,7 +2059,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  if(sFlag) return CERR_OutsInVirtualKeySection;
 			  p += 4;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			  if(!q) return CERR_InvalidOuts;
+			  if(!q || !*q) return CERR_InvalidOuts;
 
 			  for(i = 0; i < fk->cxStoreArray; i++)
         {
@@ -2082,7 +2084,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  p += 7;
 
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-				  if(q)
+				  if(q && *q)
 				  {
             VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
 					  int n1;
@@ -2113,7 +2115,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 				  if(sFlag) return CERR_CallInVirtualKeySection;
 				  p += 4;
 				  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-				  if(!q) return CERR_InvalidCall;
+				  if(!q || !*q) return CERR_InvalidCall;
 
 				  for(i = 0; i < fk->cxStoreArray; i++)
 				  {
@@ -2141,7 +2143,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			    if(sFlag) return CERR_AnyInVirtualKeySection;
 			    p += 6;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			    if(!q) return CERR_InvalidAny;
+			    if(!q || !*q) return CERR_InvalidAny;
 
 			    for(i = 0; i < fk->cxStoreArray; i++)
           {
@@ -2181,7 +2183,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			  p += 3;
 
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			  if(!q) return CERR_InvalidUse;
+			  if(!q || !*q) return CERR_InvalidUse;
         tstr[mx++] = UC_SENTINEL;
 			  tstr[mx++] = CODE_USE;
 			  tstr[mx] = GetGroupNum(fk, q);
@@ -2195,7 +2197,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           if(sFlag) return CERR_InvalidInVirtualKeySection;
           p += 5;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidReset;
+          if(!q || !*q) return CERR_InvalidReset;
 
           err = process_reset(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2365,7 +2367,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 3;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidSet;
+          if(!q || !*q) return CERR_InvalidSet;
 
           err = process_set(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2375,7 +2377,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
           p += 4;
           q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-          if(!q) return CERR_InvalidSave;
+          if(!q || !*q) return CERR_InvalidSave;
 
           err = process_save(fk, q, tstr, &mx);
           if(err != CERR_None) return err;
@@ -2385,7 +2387,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
 			    if(_wcsnicmp(p, L"switch", 6) != 0) return CERR_InvalidToken;
 			    p += 6;
 			    q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
-			    if(!q) return CERR_InvalidSwitch;
+			    if(!q || !*q) return CERR_InvalidSwitch;
           tstr[mx++] = UC_SENTINEL;
 			    tstr[mx++] = CODE_SWITCH;
 			    tstr[mx++] = atoiW(q);
@@ -2430,6 +2432,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         if(sFlag) return CERR_InvalidInVirtualKeySection;
 			  p += 8;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidToken;
         err = process_platform(fk, q, tstr, &mx);
         if(err != CERR_None) return err;
         continue;
@@ -2439,6 +2442,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
         if(sFlag) return CERR_InvalidInVirtualKeySection;
 			  p += 5;
 			  q = GetDelimitedString(&p, L"()", GDS_CUTLEAD | GDS_CUTFOLL);
+        if (!q || !*q) return CERR_InvalidToken;
         err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
         if(err != CERR_None) return err;
         continue;
@@ -2791,6 +2795,8 @@ DWORD ProcessEthnologueStore(PWSTR p) // I2646
   return res;
 }
 
+#define K_HOTKEYSHIFTFLAGS (K_SHIFTFLAG | K_CTRLFLAG | K_ALTFLAG | ISVIRTUALKEY)
+
 DWORD ProcessHotKey(PWSTR p, DWORD *hk)
 {
 	PWSTR q, r;
@@ -2798,6 +2804,25 @@ DWORD ProcessHotKey(PWSTR p, DWORD *hk)
 	int j, i;
 
 	*hk = 0;
+
+  if(*p == UC_SENTINEL && *(p+1) == CODE_EXTENDED) {
+    WORD Key = *(p + 3);
+    WORD ShiftFlags = *(p + 2);
+
+    // Convert virtual key to hotkey (different bitflags)
+
+    if (ShiftFlags & ~K_HOTKEYSHIFTFLAGS) {
+      AddWarning(CWARN_HotkeyHasInvalidModifier);
+    }
+
+    if (ShiftFlags & K_SHIFTFLAG) *hk |= HK_SHIFT;
+    if (ShiftFlags & K_CTRLFLAG) *hk |= HK_CTRL;
+    if (ShiftFlags & K_ALTFLAG) *hk |= HK_ALT;
+
+    *hk |= Key;
+
+    return CERR_None;
+  }
 
 	q = wcschr(p, '[');
 	if(q)
@@ -2894,7 +2919,8 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 	PCOMP_STORE sp;
 	PCOMP_KEY kp;
 	PBYTE buf;
-	DWORD size, offset;
+	size_t offset;
+  size_t size;
 	DWORD i, j;
 
 	// Calculate how much memory to allocate
@@ -2965,27 +2991,27 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 	wcscpy((PWSTR)(buf + offset), fk->szMessage);
 	offset += wcslen(fk->szMessage)*2 + 2;*/
 
-	ck->dpStoreArray = offset;
+	ck->dpStoreArray = (DWORD) offset;
 	sp = (PCOMP_STORE)(buf+offset);
 	fsp = fk->dpStoreArray;
 	offset += sizeof(COMP_STORE) * ck->cxStoreArray;
 	for( i = 0; i < ck->cxStoreArray; i++, sp++, fsp++ )
     {
 		sp->dwSystemID = fsp->dwSystemID;
-		sp->dpString = offset;
+		sp->dpString = (DWORD) offset;
 		wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fsp->dpString);  // I3481   // I3641
 		offset += wcslen(fsp->dpString)*2 + 2;
 
     if(FSaveDebug || fsp->fIsOption)
 		{
-			sp->dpName = offset;
+			sp->dpName = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fsp->szName);  // I3481   // I3641
 			offset += wcslen(fsp->szName)*2 + 2;
 		}
 		else sp->dpName = 0;
 	}
 
-	ck->dpGroupArray = offset;
+	ck->dpGroupArray = (DWORD) offset;
 	gp = (PCOMP_GROUP)(buf+offset);
 	fgp = fk->dpGroupArray;
 
@@ -3000,26 +3026,26 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 
 		if(fgp->dpMatch)
         {
-			gp->dpMatch = offset;
+			gp->dpMatch = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fgp->dpMatch);  // I3481   // I3641
 			offset += wcslen(fgp->dpMatch)*2 + 2;
 			}
 		if(fgp->dpNoMatch)
         {
-			gp->dpNoMatch = offset;
+			gp->dpNoMatch = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fgp->dpNoMatch);  // I3481   // I3641
 			offset += wcslen(fgp->dpNoMatch)*2 + 2;
 		}
 
 		if(FSaveDebug)
 		{
-			gp->dpName = offset;
+			gp->dpName = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fgp->szName);  // I3481   // I3641
 			offset += wcslen(fgp->szName)*2 + 2;
 		}
 		else gp->dpName = 0;
 
-		gp->dpKeyArray = offset;
+		gp->dpKeyArray = (DWORD) offset;
 		kp = (PCOMP_KEY) (buf + offset);
 		fkp = fgp->dpKeyArray;
 		offset += gp->cxKeyArray * sizeof(COMP_KEY);
@@ -3028,27 +3054,28 @@ DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, HANDLE hOutfile)
 			kp->Key = fkp->Key;
 			if(FSaveDebug) kp->Line = fkp->Line; else kp->Line = 0;
 			kp->ShiftFlags = fkp->ShiftFlags;
-			kp->dpOutput = offset;
+			kp->dpOutput = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fkp->dpOutput);  // I3481   // I3641
 			offset += wcslen(fkp->dpOutput)*2 + 2;
-			kp->dpContext = offset;
+			kp->dpContext = (DWORD) offset;
 			wcscpy_s((PWSTR)(buf+offset), (size-offset) / sizeof(WCHAR), fkp->dpContext);  // I3481   // I3641
 			offset += wcslen(fkp->dpContext)*2 + 2;
 		}
 	}
 
 	ck->dwBitmapSize = fk->dwBitmapSize;
-	ck->dpBitmapOffset = offset;
+	ck->dpBitmapOffset = (DWORD) offset;
 	memcpy(buf + offset, fk->lpBitmap, fk->dwBitmapSize);
 	offset += fk->dwBitmapSize;
 
 	if(offset != size) return CERR_SomewhereIGotItWrong;
 
-	SetChecksum(buf, &ck->dwCheckSum, size);
+	SetChecksum(buf, &ck->dwCheckSum, (DWORD) size);
 
-	WriteFile(hOutfile, buf, size, &offset, NULL);
+  DWORD dwBytesWritten = 0;
+	WriteFile(hOutfile, buf, (DWORD) size, &dwBytesWritten, NULL);
 
-	if(offset != size) return CERR_UnableToWriteFully;
+	if(dwBytesWritten != size) return CERR_UnableToWriteFully;
 
 	delete buf;
 
@@ -3306,7 +3333,8 @@ int UTF32ToUTF16(int n, int *n1, int *n2)
 
 DWORD BuildVKDictionary(PFILE_KEYBOARD fk)  // I3438
 {
-  DWORD i, len = 0;
+  DWORD i;
+  size_t len = 0;
   if(fk->cxVKDictionary == 0) return CERR_None;
   for(i = 0; i < fk->cxVKDictionary; i++)
   {
@@ -3454,7 +3482,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
         // because we don't support HINT/INFO messages yet and we don't want
         // this to cause a blocking compile at this stage
         poutbuf = strtowstr((PSTR)buf);
-        WriteFile(hOutfile, poutbuf, wcslen(poutbuf) * 2, &len2, NULL);
+        WriteFile(hOutfile, poutbuf, (DWORD) wcslen(poutbuf) * 2, &len2, NULL);
         delete poutbuf;
       }
       else {

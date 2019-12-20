@@ -1,7 +1,6 @@
-/**
+/*
  * Copyright (C) 2017 SIL International. All rights reserved.
  */
-
 package com.tavultesoft.kmea;
 
 import java.io.File;
@@ -18,14 +17,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,10 +35,7 @@ import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_
 // Public access is necessary to avoid IllegalAccessException
 public final class ModelInfoActivity extends AppCompatActivity {
 
-  private static Toolbar toolbar = null;
-  private static ListView listView = null;
   private static ArrayList<HashMap<String, String>> infoList = null;
-  protected static Typeface titleFont = null;
   private final String titleKey = "title";
   private final String subtitleKey = "subtitle";
   private final String iconKey = "icon";
@@ -55,13 +48,13 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String authority = FileProviderUtils.getAuthority(context);
 
     setContentView(R.layout.activity_list_layout);
-    toolbar = (Toolbar) findViewById(R.id.list_toolbar);
+    final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    listView = (ListView) findViewById(R.id.listView);
+    final ListView listView = findViewById(R.id.listView);
 
     final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
     final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
@@ -69,23 +62,20 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
     final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
 
-    final TextView textView = (TextView) findViewById(R.id.bar_title);
+    final TextView textView = findViewById(R.id.bar_title);
     textView.setText(String.format(getString(R.string.model_info_header), modelName));
-    if (titleFont != null)
-      textView.setTypeface(titleFont, Typeface.BOLD);
 
-
-    infoList = new ArrayList<HashMap<String, String>>();
+    infoList = new ArrayList<>();
     // Display model version title
     final String noIcon = "0";
-    HashMap<String, String> hashMap = new HashMap<String, String>();
+    HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.model_version));
     hashMap.put(subtitleKey, modelVersion);
     hashMap.put(iconKey, noIcon);
     infoList.add(hashMap);
 
     // Display model help link
-    hashMap = new HashMap<String, String>();
+    hashMap = new HashMap<>();
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
     // Currently, model help only available if custom link exists
@@ -102,7 +92,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     infoList.add(hashMap);
 
     // Display link to uninstall model
-    hashMap = new HashMap<String, String>();
+    hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.uninstall_model));
     hashMap.put(subtitleKey, "");
     hashMap.put(iconKey, noIcon);
@@ -114,7 +104,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     ListAdapter adapter = new SimpleAdapter(context, infoList, R.layout.list_row_layout2, from, to) {
       @Override
       public boolean isEnabled(int position) {
-        HashMap<String, String> hashMap = (HashMap<String, String>)infoList.get(position);
+        HashMap<String, String> hashMap = infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
         if (itemTitle.equals(getString(R.string.model_version))) {
@@ -168,7 +158,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
         } else if (itemTitle.equals(getString(R.string.uninstall_model))) {
           // Uninstall selected model
           String lexicalModelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
-          DialogFragment dialog = ConfirmDialogFragment.newInstance(
+          DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
             DIALOG_TYPE_DELETE_MODEL, modelName, getString(R.string.confirm_delete_model), lexicalModelKey);
           dialog.show(getFragmentManager(), "dialog");
 
