@@ -187,6 +187,17 @@
 
 .tablet.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
 
+/* Probably best to make this its own CSS that can be optionally included? */
+@media (prefers-color-scheme: dark) {
+  .tablet.ios .kmw-key-layer-group {background-color: #0f1319}
+  .tablet.ios .kmw-key.kmw-key-default {color:#fff;background-color:#3d3d3e}
+  .tablet.ios .kmw-key.kmw-key-shift,
+  .tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
+  .tablet.ios .kmw-key.kmw-key-shift-on,
+  .tablet.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#3d3d3e;}
+  .tablet.ios .kmw-key.kmw-key-touched {background-color:#447;}
+}
+
 .tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 
 .tablet.android .kmw-key-layer-group {background-color: #b4b4b8; border-top: 1px solid #666;}
