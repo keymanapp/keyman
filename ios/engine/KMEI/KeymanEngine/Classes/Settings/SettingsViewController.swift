@@ -32,6 +32,8 @@ open class SettingsViewController: UITableViewController {
   }
   
   @objc func doneClicked(_ sender: Any) {
+    // While the called method might should be renamed, it does the job well enough.
+    // This resets KMW so that any new and/or updated resources can be properly loaded.
     Manager.shared.dismissKeyboardPicker(self)
   }
   
