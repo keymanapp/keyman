@@ -1211,6 +1211,16 @@ namespace com.keyman {
 
       return this.checkFont(fd);
     }
+
+    /**
+     * Checks is a user's browser is in dark mode, if the feature is supported.  Returns false otherwise.
+     * 
+     * Thanks to https://stackoverflow.com/a/57795518 for this code.
+     */
+    prefersDarkMode(): boolean {
+      // Ensure the detector exists (otherwise, returns false)
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
   }
 }
 

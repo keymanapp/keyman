@@ -96,6 +96,13 @@
   color: #000;
 }
 
+.phone.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
+
+.phone.ios.kmw-osk-frame,
+.tablet.ios.kmw-osk-frame {
+  background-color: #cfd3d9;
+}
+
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
   .ios .kmw-banner-bar {
@@ -110,14 +117,12 @@
   .ios .kmw-suggestion-text {
     color: #fff;
   }
+
+  .phone.ios.kmw-osk-frame,
+  .tablet.ios.kmw-osk-frame {
+    background-color: #0f1319;
+  } 
 }
-
-.phone.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
-
-.phone.ios.kmw-osk-frame,
-.tablet.ios.kmw-osk-frame {
-  background-color: #cfd3d9;
-} 
 
 .phone.android .kmw-key-layer-group {background-color: #333;}  
 .phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
@@ -302,6 +307,18 @@ div.ios div.kmw-keytip {
   position:fixed; left:0; top:0; width:3em; height:3em; background-color:rgb(0,0,0,0);overflow:visible;
 }
 
+/* Dark mode - ensure text is colored appropriately for key tips. */
+@media (prefers-color-scheme: dark) {
+  div.ios div.kmw-keytip {
+    color:#fff;
+  }
+
+  /* Style for callout used on phones */
+  #kmw-popup-callout {
+    background-color: #0f1319;
+  }
+}
+
 div.android div.kmw-keytip {
   position:fixed; left:0; top:0; width:3em; height:3em; 
   color:#fff;
@@ -363,6 +380,12 @@ div.android #keytip {background-color:#f00;}
 
 .phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#ccc; padding:5px 5px 0 0;} 
 .tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;} 
+
+@media (prefers-color-scheme: dark) {
+  #kmw-popup-keys {
+    background-color: #0f1319;
+  }
+}
 
 /* Filter (shim) to darken screen and highlight popup keys */
 #kmw-popup-shim { 
