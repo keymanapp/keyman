@@ -22,6 +22,7 @@
   * Fix memory issues during build process (#2361)
   * Fix crashes when parsing JSON data from Cloud (#2393)
   * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
+  * Propagate custom help links (#2448)
 
 ## 2019-12-12 12.0.4214 stable
 * Bug fix:
