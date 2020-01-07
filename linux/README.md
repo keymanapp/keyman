@@ -15,7 +15,7 @@
 - It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
 
 - Install packages required for building and developing KMFL and Keyman for Linux
-`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential devtools dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml python3-magic python3-numpy python3-pil python3-pip python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli`
+`sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml python3-magic python3-numpy python3-pil python3-pip python3-requests python3-requests-cache python3 python3-gi dconf-cli`
 
 ### Compiling from Command Line
 
