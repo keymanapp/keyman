@@ -838,6 +838,7 @@ extension KeymanWebViewController {
       if kbSize != size {
         kbSize = size
         setOskWidth(Int(size.width))
+        log.info("KMW height: \(size.height)")
         setOskHeight(Int(size.height))
       }
     }

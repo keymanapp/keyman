@@ -21,6 +21,40 @@ public enum MenuBehaviour {
   case showNever
 }
 
+class CustomInputView: UIInputView {
+  var setFrame: CGRect = CGRect.zero
+
+  override init(frame: CGRect, inputViewStyle: UIInputView.Style) { //UIInputView(frame: CGRect.zero, inputViewStyle: .keyboard)
+    super.init(frame: frame, inputViewStyle: inputViewStyle)
+    self.setFrame = frame
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
+  override var intrinsicContentSize: CGSize {
+    /*
+     * This function is the motivating reason for this class to exist as-is.  If we return the default value
+     * for this property, we cannot properly control the keyboard's scale in a manner consistent across both
+     * use cases: in-app and system-wide.
+     */
+    return self.setFrame.size
+  }
+
+  // Allows us to intercept value assignments to keep `intrinsicContentSize` properly updated.
+  override var frame: CGRect {
+    get {
+      return super.frame
+    }
+
+    set(value) {
+      super.frame = value
+      self.setFrame = value
+    }
+  }
+}
+
 open class InputViewController: UIInputViewController, KeymanWebDelegate {
   public var menuCloseButtonTitle: String?
   public var isInputClickSoundEnabled = true
@@ -109,7 +143,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   open override func loadView() {
     let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
-    let baseView = UIInputView(frame: CGRect.zero, inputViewStyle: .keyboard)
+    // STUFF!
+    // let baseView = CustomInputView(frame: CGRect.zero, inputViewStyle: .keyboard)
+    let baseView = CustomInputView(frame: CGRect(x:0, y:0, width: 0, height: 250), inputViewStyle: .keyboard)
 
     baseView.backgroundColor = bgColor
 
@@ -320,9 +356,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private func setInnerConstraints() {
-    let container = keymanWeb.view!
+    let container = inputView! //keymanWeb.view!
 
     if #available(iOSApplicationExtension 11.0, *) {
+      // topAnchor needed if sys kbd, not if in-app?  (Why, iOS?)
       container.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
       container.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
       container.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
@@ -344,11 +381,15 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       kbdWidthConstraint.priority = .defaultHigh
       kbdWidthConstraint.isActive = true
     }
-    
+
+    //let constraints = container.heightAnchor.constraintsAffectingLayout
+
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeight = container.heightAnchor.constraint(equalToConstant: 80 + keymanWeb.constraintTargetHeight(isPortrait: true))
+    portraitHeight.identifier = "Height constraint for portrait mode"
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: 80 + keymanWeb.constraintTargetHeight(isPortrait: false))
+    landscapeHeight.identifier = "Height constraint for landscape mode"
     landscapeHeight.priority = .defaultHigh
 
     portraitConstraint = portraitHeight
