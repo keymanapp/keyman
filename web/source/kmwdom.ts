@@ -1631,6 +1631,10 @@ namespace com.keyman {
         // Display the OSK (again) if enabled, in order to set its position correctly after
         // adding the UI to the page 
         this.keyman.osk._Show();     
+      } else if(this.keyman.isEmbedded) {
+        // UI modules aren't utilized in embedded mode.  There's nothing to init, so we simply
+        // return instead of waiting for a UI module that will never come.
+        return;
       } else {
         window.setTimeout(this.initializeUI.bind(this),1000);
       }
