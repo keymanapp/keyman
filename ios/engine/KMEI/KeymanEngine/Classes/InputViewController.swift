@@ -107,7 +107,7 @@ private class CustomInputView: UIInputView {
     let alwaysShow = userData.bool(forKey: "ShouldShowBanner")
 
     var topBarHeight: CGFloat = 0.0
-    if alwaysShow || keymanWeb.activeModel {
+    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
       topBarHeight = InputViewController.topBarHeight
     }
     portraitConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true)
@@ -372,11 +372,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .doNothing:
         break
       }
+
+      // If we allow the system keyboard to show no banners, this line is needed
+      // for variable system keyboard height.
+      updateShowBannerSetting()
     } else { // Use in-app keyboard behavior instead.
       if !(Manager.shared.currentResponder?.showKeyboardPicker() ?? false) {
         _ = Manager.shared.switchToNextKeyboard
       }
     }
+  }
+
+  // Needed due to protection level on the `keymanWeb` property
+  func updateShowBannerSetting() {
+    keymanWeb.updateShowBannerSetting()
   }
 
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
