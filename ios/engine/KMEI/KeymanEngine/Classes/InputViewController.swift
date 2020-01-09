@@ -85,8 +85,6 @@ private class CustomInputView: UIInputView {
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
-    //let constraints = container.heightAnchor.constraintsAffectingLayout
-
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
     let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: InputViewController.topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.identifier = "Height constraint for portrait mode"
@@ -193,10 +191,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func clearModel() {
-    keymanWeb.activeModel = false
-  }
-
   open override func updateViewConstraints() {
     resetKeyboardState()
 
@@ -205,7 +199,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   open override func loadView() {
     let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
-    // STUFF!
     let baseView = CustomInputView(frame: CGRect.zero, innerVC: keymanWeb, inputViewStyle: .keyboard)
 
     baseView.backgroundColor = bgColor
