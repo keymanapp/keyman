@@ -424,6 +424,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return keymanWeb.keyboardHeight
   }
 
+  func clearModel() {
+    keymanWeb.activeModel = false
+  }
+
   private func setInnerConstraints() {
     let iv = self.inputView as! CustomInputView
     iv.setConstraints()
