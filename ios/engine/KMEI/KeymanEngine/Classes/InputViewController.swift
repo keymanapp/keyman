@@ -21,12 +21,19 @@ public enum MenuBehaviour {
   case showNever
 }
 
-class CustomInputView: UIInputView {
+private class CustomInputView: UIInputView {
   var setFrame: CGRect = CGRect.zero
+  var keymanWeb: KeymanWebViewController!
 
-  override init(frame: CGRect, inputViewStyle: UIInputView.Style) { //UIInputView(frame: CGRect.zero, inputViewStyle: .keyboard)
+  // Constraints dependent upon the device's current rotation state.
+  // For now, should be mostly upon keymanWeb.view.heightAnchor.
+  var portraitConstraint: NSLayoutConstraint?
+  var landscapeConstraint: NSLayoutConstraint?
+
+  init(frame: CGRect, innerVC: KeymanWebViewController!, inputViewStyle: UIInputView.Style) {
     super.init(frame: frame, inputViewStyle: inputViewStyle)
     self.setFrame = frame
+    self.keymanWeb = innerVC
   }
 
   required init?(coder: NSCoder) {
@@ -50,10 +57,72 @@ class CustomInputView: UIInputView {
 
     set(value) {
       super.frame = value
+
+      // Store the originally-intended value, just in case iOS changes it later without our consent.
       self.setFrame = value
     }
   }
+
+  func setConstraints() {
+    let innerView = keymanWeb.view!
+
+    var guide: UILayoutGuide
+
+    if #available(iOSApplicationExtension 11.0, *) {
+      guide = self.safeAreaLayoutGuide
+    } else {
+      guide = self.layoutMarginsGuide
+    }
+
+    // Fallback on earlier versions
+    innerView.topAnchor.constraint(equalTo:    guide.topAnchor).isActive = true
+    innerView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
+    innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
+    innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+
+    // Allow these to be broken if/as necessary to resolve layout issues.
+    let kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+    kbdWidthConstraint.priority = .defaultHigh
+    kbdWidthConstraint.isActive = true
+
+    //let constraints = container.heightAnchor.constraintsAffectingLayout
+
+    // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
+    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: InputViewController.topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true))
+    portraitHeight.identifier = "Height constraint for portrait mode"
+    portraitHeight.priority = .defaultHigh
+    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: InputViewController.topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
+    landscapeHeight.identifier = "Height constraint for landscape mode"
+    landscapeHeight.priority = .defaultHigh
+
+    portraitConstraint = portraitHeight
+    landscapeConstraint = landscapeHeight
+    // .isActive will be set according to the current portrait/landscape perspective.
+  }
+
+  override func updateConstraints() {
+    super.updateConstraints()
+
+    // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
+    // TODO:  actually check that the banner should be displayed!  The property doesn't do this.
+    let topBarHeight = InputViewController.topBarHeight
+    portraitConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true)
+    landscapeConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: false)
+
+    // Activate / deactivate layout-specific constraints.
+    if InputViewController.isPortrait {
+      landscapeConstraint?.isActive = false
+      portraitConstraint?.isActive = true
+    } else {
+      portraitConstraint?.isActive = false
+      landscapeConstraint?.isActive = true
+    }
+
+    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
+  }
 }
+
+// ---------------------------
 
 open class InputViewController: UIInputViewController, KeymanWebDelegate {
   public var menuCloseButtonTitle: String?
@@ -79,7 +148,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     return UIScreen.main.bounds.width < UIScreen.main.bounds.height
   }
 
-  open class var topBarHeight: Int {
+  open class var topBarHeight: CGFloat {
     if InputViewController.isPortrait {
       return 41
     }
@@ -124,19 +193,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
+  func clearModel() {
+    keymanWeb.activeModel = false
+  }
+
   open override func updateViewConstraints() {
     resetKeyboardState()
-
-    // Activate / deactivate layout-specific constraints.
-    if InputViewController.isPortrait {
-      landscapeConstraint?.isActive = false
-      portraitConstraint?.isActive = true
-    } else {
-      portraitConstraint?.isActive = false
-      landscapeConstraint?.isActive = true
-    }
-    
-    keymanWeb.setBannerHeight(to: InputViewController.topBarHeight)
 
     super.updateViewConstraints()
   }
@@ -144,8 +206,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func loadView() {
     let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
     // STUFF!
-    // let baseView = CustomInputView(frame: CGRect.zero, inputViewStyle: .keyboard)
-    let baseView = CustomInputView(frame: CGRect(x:0, y:0, width: 0, height: 250), inputViewStyle: .keyboard)
+    let baseView = CustomInputView(frame: CGRect.zero, innerVC: keymanWeb, inputViewStyle: .keyboard)
 
     baseView.backgroundColor = bgColor
 
@@ -356,45 +417,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private func setInnerConstraints() {
-    let container = inputView! //keymanWeb.view!
-
-    if #available(iOSApplicationExtension 11.0, *) {
-      // topAnchor needed if sys kbd, not if in-app?  (Why, iOS?)
-      container.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-      container.bottomAnchor.constraint(equalTo:view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-      container.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-      container.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
-
-      // Allow these to be broken if/as necessary to resolve layout issues.
-      let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor)
-      kbdWidthConstraint.priority = .defaultHigh
-      kbdWidthConstraint.isActive = true
-    } else {
-      // Fallback on earlier versions
-      container.topAnchor.constraint(equalTo:view.layoutMarginsGuide.topAnchor).isActive = true
-      container.bottomAnchor.constraint(equalTo:view.layoutMarginsGuide.bottomAnchor).isActive = true
-      container.leftAnchor.constraint(equalTo:view.layoutMarginsGuide.leftAnchor).isActive = true
-      container.rightAnchor.constraint(equalTo:view.layoutMarginsGuide.rightAnchor).isActive = true
-
-      // Allow these to be broken if/as necessary to resolve layout issues.
-      let kbdWidthConstraint = container.widthAnchor.constraint(equalTo: view.layoutMarginsGuide.widthAnchor)
-      kbdWidthConstraint.priority = .defaultHigh
-      kbdWidthConstraint.isActive = true
-    }
-
-    //let constraints = container.heightAnchor.constraintsAffectingLayout
-
-    // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = container.heightAnchor.constraint(equalToConstant: 80 + keymanWeb.constraintTargetHeight(isPortrait: true))
-    portraitHeight.identifier = "Height constraint for portrait mode"
-    portraitHeight.priority = .defaultHigh
-    let landscapeHeight = container.heightAnchor.constraint(equalToConstant: 80 + keymanWeb.constraintTargetHeight(isPortrait: false))
-    landscapeHeight.identifier = "Height constraint for landscape mode"
-    landscapeHeight.priority = .defaultHigh
-
-    portraitConstraint = portraitHeight
-    landscapeConstraint = landscapeHeight
-    // .isActive will be set according to the current portrait/landscape perspective.
+    let iv = self.inputView as! CustomInputView
+    iv.setConstraints()
 
     self.updateViewConstraints()
     fixLayout()
