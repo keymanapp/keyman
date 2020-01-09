@@ -86,10 +86,10 @@ private class CustomInputView: UIInputView {
     kbdWidthConstraint.isActive = true
 
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: InputViewController.topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.identifier = "Height constraint for portrait mode"
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: InputViewController.topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
     landscapeHeight.identifier = "Height constraint for landscape mode"
     landscapeHeight.priority = .defaultHigh
 
@@ -103,7 +103,13 @@ private class CustomInputView: UIInputView {
 
     // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
     // TODO:  actually check that the banner should be displayed!  The property doesn't do this.
-    let topBarHeight = InputViewController.topBarHeight
+    let userData = Storage.active.userDefaults
+    let alwaysShow = userData.bool(forKey: "ShouldShowBanner")
+
+    var topBarHeight: CGFloat = 0.0
+    if alwaysShow || keymanWeb.activeModel {
+      topBarHeight = InputViewController.topBarHeight
+    }
     portraitConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true)
     landscapeConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: false)
 
@@ -239,7 +245,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
     if (!Manager.shared.didSynchronize || shouldSynchronize) && Storage.shared != nil {
       Manager.shared.synchronizeSWKeyboard()
-      if Manager.shared.currentKeyboardID != nil {
+      if Manager.shared.currentKeyboardID != nil || Manager.shared.shouldReloadKeyboard {
         Manager.shared.shouldReloadKeyboard = true
         reload()
       }

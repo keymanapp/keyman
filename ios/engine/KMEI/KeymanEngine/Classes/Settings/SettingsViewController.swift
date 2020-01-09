@@ -123,7 +123,7 @@ open class SettingsViewController: UITableViewController {
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
         showBannerSwitch.frame = switchFrame
         
-        showBannerSwitch.isOn = false //TODO: find the setting this is to show!
+        showBannerSwitch.isOn = showBanner
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
@@ -161,9 +161,13 @@ open class SettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       // actually this should call into KMW, which controls the banner
-      userData.set(toggle.isOn, forKey: "ShouldShowBanner") //???
+      userData.set(toggle.isOn, forKey: "ShouldShowBanner")
       userData.synchronize()
     }
+
+    // Necessary for the keyboard to visually update to match
+    // the new setting.
+    Manager.shared.shouldReloadKeyboard = true
   }
   
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
@@ -172,6 +176,11 @@ open class SettingsViewController: UITableViewController {
       userData.set(toggle.isOn, forKey: "ShouldShowGetStarted")
       userData.synchronize()
     }
+  }
+
+  private var showBanner: Bool {
+    let userData = Storage.active.userDefaults
+    return userData.bool(forKey: "ShouldShowBanner")
   }
   
   private var showGetStarted: Bool {
