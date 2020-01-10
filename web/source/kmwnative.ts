@@ -233,14 +233,9 @@ namespace com.keyman.osk {
     // Define appearance of preview (cannot be done directly in CSS)
     if(device.OS == 'Android') {
       var wx=(w1+w2)/2; 
-      w1 = w2 = wx;    
-      ctx.fillStyle = '#999';
-    } else {
-      // #0f1319 is the current dark-mode background color set in kmwosk.css.
-      // There might be a way to automatically retrieve it, but that'll take a
-      // bit of research to find.
-      ctx.fillStyle = util.prefersDarkMode() ? '#0f1319' : '#ffffff';
-    }  
+      w1 = w2 = wx;
+    }
+    ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
     ctx.lineWidth = 1;
     ctx.strokeStyle = '#cccccc';
 
