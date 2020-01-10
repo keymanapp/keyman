@@ -57,6 +57,7 @@ private class CustomInputView: UIInputView {
 
     set(value) {
       super.frame = value
+      print("frame set to ", value)
 
       // Store the originally-intended value, just in case iOS changes it later without our consent.
       self.setFrame = value
@@ -102,16 +103,17 @@ private class CustomInputView: UIInputView {
     super.updateConstraints()
 
     // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
-    // TODO:  actually check that the banner should be displayed!  The property doesn't do this.
     let userData = Storage.active.userDefaults
     let alwaysShow = userData.bool(forKey: "ShouldShowBanner")
 
-    var topBarHeight: CGFloat = 0.0
+    var hideBanner = true
     if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      topBarHeight = InputViewController.topBarHeight
+      hideBanner = false
     }
-    portraitConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: true)
-    landscapeConstraint?.constant = topBarHeight + keymanWeb.constraintTargetHeight(isPortrait: false)
+    let topBarDelta = hideBanner ? 0 : InputViewController.topBarHeight
+
+    portraitConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: true)
+    landscapeConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: false)
 
     // Activate / deactivate layout-specific constraints.
     if InputViewController.isPortrait {
@@ -153,10 +155,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open class var topBarHeight: CGFloat {
-    if InputViewController.isPortrait {
-      return 41
-    }
-    return UIDevice.current.userInterfaceIdiom == .phone ? 34 : 39
+    // iPhone SE predictive banner height: 38
+    return 38
   }
 
   open override var hasFullAccess: Bool {
@@ -538,5 +538,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   open func setBannerImage(to path: String) {
     keymanWeb.setBannerImage(to: path)
+  }
+
+  @available(iOSApplicationExtension 11.0, *)
+  public override func viewSafeAreaInsetsDidChange() {
+    log.info("vsaidc: \(inputView!.safeAreaInsets)")
   }
 }

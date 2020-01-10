@@ -15,17 +15,17 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
 private let subKeyColorHighlighted = #colorLiteral(red: 136.0 / 255.0, green: 136.0 / 255.0, blue: 1.0, alpha: 1.0)
 
-// UI In-App Keyboard Constants
-private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
-private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
-private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
-private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
-
-// UI System Keyboard Constants
-private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
-private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
-private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
-private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
+//// UI In-App Keyboard Constants
+//private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
+//private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
+//private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
+//private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
+//
+//// UI System Keyboard Constants
+//private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
+//private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
+//private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
+//private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
 
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
@@ -791,19 +791,21 @@ extension KeymanWebViewController {
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if isPortrait {
-        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
-      }
-    }
+//    if UIDevice.current.userInterfaceIdiom == .pad {
+//      if isPortrait {
+//        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
+//      } else {
+//        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
+//      }
+//    } else {
+//      if isPortrait {
+//        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
+//      } else {
+//        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
+//      }
+//    }
+
+    return KeyboardScaleMap.getBaseTargetHeight(forPortrait: isPortrait)
   }
 
   var keyboardWidth: CGFloat {
