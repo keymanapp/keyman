@@ -127,7 +127,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // can launch the app-based DocumentViewController.
     if #available(iOS 11.0, *) {
       Manager.shared.fileBrowserLauncher = { navController in
-      let vc = PackageBrowserViewController()
+        let vc = PackageBrowserViewController()
         navController.pushViewController(vc, animated: true)
       }
     }
