@@ -978,9 +978,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   
   // Keyboard download notification observers
   private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    // TODO:  Only do this if it's an update.  We'll need a bit of notification retooling for this first.
+    // There's little harm in reloading the keyboard (and thus, KMW) for a clean reset
+    // after resource downloads or updates.  That said, we should avoid *directly*
+    // triggering an immediate reset, as an extra reset will occur once we leave the
+    // settings menu.  The delay also helps any chained downloads (keyboard > lexical model)
+    // to fully complete first.
     shouldReloadKeyboard = true
-    inputViewController.reload()
   }
 
   /*-----------------------------
