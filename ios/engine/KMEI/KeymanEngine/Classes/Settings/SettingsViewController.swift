@@ -70,6 +70,16 @@ open class SettingsViewController: UITableViewController {
       "subtitle": "",
       "reuseid" : "showgetstarted"
       ])
+
+    // The iOS Files app is only available with 11.0+.
+    if #available(iOS 11.0, *) {
+      itemsArray.append([
+        "title": "Install From File",
+        "subtitle": "Browse for .kmp files",
+        "reuseid" : "installfile"
+        ])
+    }
+
     _ = view
   }
 
@@ -85,8 +95,7 @@ open class SettingsViewController: UITableViewController {
     }
 
   override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 3
+        return itemsArray.count
     }
   
   public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
@@ -149,6 +158,8 @@ open class SettingsViewController: UITableViewController {
           showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
+      case "installfile":
+        cell.accessoryType = .disclosureIndicator
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
@@ -188,6 +199,8 @@ open class SettingsViewController: UITableViewController {
 
     if indexPath.row == 0 {
       cell.accessoryType = .disclosureIndicator
+    } else if indexPath.row == 3 {
+      cell.accessoryType = .disclosureIndicator
     } else {
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = false
@@ -208,7 +221,18 @@ open class SettingsViewController: UITableViewController {
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
-      showLanguages()
+      switch indexPath.row {
+      case 0:
+        showLanguages()
+      case 3:
+        if let block = Manager.shared.fileBrowserLauncher {
+          block(navigationController!)
+        } else {
+          log.info("Listener for framework signal to launch file browser is missing")
+        }
+      default:
+        break
+      }
     default:
       break
     }
