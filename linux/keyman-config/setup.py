@@ -11,7 +11,7 @@ setup(
     scripts=['km-config', 'km-package-get',
              'km-package-install', 'km-kvk2ldml',
              'km-package-uninstall',
-             'km-package-list-installed', ],
+             'km-package-list-installed'],
 
     install_requires=[
         'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
