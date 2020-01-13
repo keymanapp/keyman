@@ -37,7 +37,7 @@ public class CloudDataJsonUtil {
 
   public static HashMap<String,String> createKeyboardInfoMap(String aPackageId,String aLanguageId, String aLanguageName, String aKeyboardId,
                                                    String aKeyboardName, String aKeyboardVersion, String anIsCustomKeyboard,
-                                                   String aFont, String aOskFont)
+                                                   String aFont, String aOskFont, String aCustomHelpLink)
   {
     HashMap<String, String> keyboardInfo = new HashMap<String, String>();
     keyboardInfo.put(KMManager.KMKey_PackageID, aPackageId);
@@ -48,8 +48,12 @@ public class CloudDataJsonUtil {
     keyboardInfo.put(KMManager.KMKey_KeyboardVersion, aKeyboardVersion);
     keyboardInfo.put(KMManager.KMKey_CustomKeyboard, anIsCustomKeyboard);
     keyboardInfo.put(KMManager.KMKey_Font, aFont);
-    if (aOskFont != null)
+    if (aOskFont != null) {
       keyboardInfo.put(KMManager.KMKey_OskFont, aOskFont);
+    }
+    if (aCustomHelpLink != null) {
+      keyboardInfo.put(KMManager.KMKey_CustomHelpLink, aCustomHelpLink);
+    }
 
     return keyboardInfo;
   }
@@ -81,9 +85,10 @@ public class CloudDataJsonUtil {
           String kbName = keyboardJSON.getString(KMManager.KMKey_Name);
           String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
           String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
+          String customHelpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink, null);
 
           //String kbKey = String.format("%s_%s", langID, kbID);
-          HashMap<String, String> hashMap = createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null);
+          HashMap<String, String> hashMap = createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null, customHelpLink);
 
 
 //          if (keyboardModifiedDates.get(kbID) == null) {
