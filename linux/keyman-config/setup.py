@@ -15,7 +15,7 @@ setup(
 
     install_requires=[
         'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
-        'python-magic',
+        'python-magic', 'qrcode'
     ],
 
 # metadata to display on PyPI

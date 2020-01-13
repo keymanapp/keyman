@@ -299,20 +299,22 @@ class KeyboardDetailsView(Gtk.Window):
         grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
         prevlabel = lbl_pad
 
-        # Generate QR code to share keyboard package
-        # Span 2 columns so it will be centered
-        qr = qrcode.QRCode(
-             version = 1,
-             error_correction = qrcode.constants.ERROR_CORRECT_H,
-             box_size = 4,
-             border = 4)
-        url = "https://keyman.com/go/keyboard/" + kmp['packageID'] + "/share"
-        qr.add_data(url)
-        qr.make(fit=True)
+        # If it doesn't exist, generate QR code to share keyboard package
         path_qr = packageDir + "/qrcode.png"
-        img = qr.make_image()
-        img.save(path_qr)
+        if not os.path.isfile(path_qr):
+            qr = qrcode.QRCode(
+                 version = 1,
+                 error_correction = qrcode.constants.ERROR_CORRECT_H,
+                 box_size = 4,
+                 border = 4)
+            url = "https://keyman.com/go/keyboard/" + kmp['packageID'] + "/share"
+            qr.add_data(url)
+            qr.make(fit=True)
 
+            img = qr.make_image()
+            img.save(path_qr)
+
+        # Display QR Code, spanning 2 columns so it will be centered
         image = Gtk.Image()
         image.set_from_file(path_qr)
         grid.attach_next_to(image, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
