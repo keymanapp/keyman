@@ -155,8 +155,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open class var topBarHeight: CGFloat {
-    // iPhone SE predictive banner height: 38
-    return 38
+    let scaling = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: self.isPortrait)
+
+    return scaling?.bannerHeight ?? 38 // default for iPhone SE, older/smaller devices
   }
 
   open override var hasFullAccess: Bool {

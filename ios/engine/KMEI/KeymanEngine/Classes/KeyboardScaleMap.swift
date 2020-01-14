@@ -114,15 +114,31 @@ class KeyboardScaleMap {
     return device.realDevice.description
   }
 
-  static func getBaseTargetHeight(forPortrait: Bool) -> CGFloat {
+  static func getDeviceDefaultKeyboardScale(forPortrait: Bool) -> KeyboardSize? {
     let device = Device.current
 
     if let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: device)] {
-      return forPortrait ? scaling.portrait.keyboardHeight : scaling.landscape.keyboardHeight
+      return forPortrait ? scaling.portrait : scaling.landscape
     }
 
-    // VERY temporary stop-gap.
-    let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: Device.iPhoneSE)]!
-    return forPortrait ? scaling.portrait.keyboardHeight : scaling.landscape.keyboardHeight
+    switch device {
+      case .unknown(_):
+        // The expected case; applies to future models of iPhone and iPad.  DeviceKit is of no help here.
+
+        // VERY temporary stop-gap.  A better rule-of-thumb is needed.
+        let dev = UIDevice.current
+        var scaling: Scaling
+
+        if(dev.userInterfaceIdiom == .phone) {
+          scaling = shared.scalings[KeyboardScaleMap.hashKey(for: Device.iPhoneSE)]!
+        } else {
+          scaling = shared.scalings[KeyboardScaleMap.hashKey(for: Device.iPad5)]!
+        }
+
+        return forPortrait ? scaling.portrait : scaling.landscape
+      default:
+        log.error("Keyboard scaling definition missing for device \(device.description)")
+        return nil
+    }
   }
 }
