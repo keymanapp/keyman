@@ -410,7 +410,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       //baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.layoutMarginsGuide.widthAnchor)
       baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.widthAnchor)
     }
-
     baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
     baseWidthConstraint.isActive = true
   }

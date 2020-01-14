@@ -950,7 +950,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
   
   var vibrationSupportLevel: VibrationSupport {
-    let device = Device()
+    let device = Device.current
 
     if device.isPod {
       return .none
