@@ -147,17 +147,17 @@ interface LoadMessage {
    */
   capabilities: {
     /**
-     * The maximum amount of UTF-16 code units that the keyboard will provide to
+     * The maximum amount of UTF-16 code points that the keyboard will provide to
      * the left of the cursor, as an integer.
      */
-    maxLeftContextCodeUnits: number,
+    maxLeftContextCodePoints: number,
 
     /**
-     * The maximum amount of code units that the keyboard will provide to the
+     * The maximum amount of code points that the keyboard will provide to the
      * right of the cursor, as an integer. The value 0 or the absence of this
      * rule implies that the right contexts are not supported.
      */
-    maxRightContextCodeUnits?: number,
+    maxRightContextCodePoints?: number,
 
     /**
      * Whether the platform supports deleting to the right. The absence of this
@@ -221,7 +221,7 @@ interface ReadyMessage {
   message: 'ready';
   configuration: {
     /**
-     * How many UTF-16 code units maximum to send as the context to the
+     * How many UTF-16 code points maximum to send as the context to the
      * left of the cursor ("left" in the Unicode character stream).
      *
      * Affects the `context` property sent in `predict` messages.
@@ -229,10 +229,10 @@ interface ReadyMessage {
      * While the left context MUST NOT bisect surrogate pairs, they MAY
      * bisect graphical clusters.
      */
-    leftContextCodeUnits: number,
+    leftContextCodePoints: number,
 
     /**
-     * How many UTF-16 code units maximum to send as the context to the
+     * How many UTF-16 code points maximum to send as the context to the
      * right of the cursor ("right" in the Unicode character stream).
      *
      * Affects the `context` property sent in `predict` messages.
@@ -240,7 +240,7 @@ interface ReadyMessage {
      * While the left context MUST NOT bisect surrogate pairs, they MAY
      * bisect graphical clusters.
      */
-    rightContextCodeUnits: number,
+    rightContextCodePoints: number,
   };
 }
 ```
@@ -291,7 +291,7 @@ transform is applied to the buffer.
 ```typescript
 interface Context {
   /**
-   * Up to maxLeftContextCodeUnits code points of Unicode scalar value
+   * Up to maxLeftContextCodePoints code points of Unicode scalar value
    * (i. e., characters) to the left of the insertion point in the
    * buffer. If there is nothing to the left of the buffer, this returns
    * an empty string.
@@ -299,7 +299,7 @@ interface Context {
   left: USVString;
 
   /**
-   * Up to maxRightContextCodeUnits code points of Unicode scalar value
+   * Up to maxRightContextCodePoints code points of Unicode scalar value
    * (i. e., characters) to the right of the insertion point in the
    * buffer. If there is nothing to the right of the buffer, this returns
    * an empty string.

@@ -50,8 +50,8 @@ namespace models {
 
     configure(capabilities: Capabilities): Configuration {
       this.configuration = {
-        leftContextCodeUnits: capabilities.maxLeftContextCodeUnits,
-        rightContextCodeUnits: capabilities.maxRightContextCodeUnits
+        leftContextCodePoints: capabilities.maxLeftContextCodePoints,
+        rightContextCodePoints: capabilities.maxRightContextCodePoints
       };
       
       return this.configuration;

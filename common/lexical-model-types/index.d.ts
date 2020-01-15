@@ -230,17 +230,17 @@ declare type Distribution<T> = ProbabilityMass<T>[];
  */
 declare interface Capabilities {
   /**
-   * The maximum amount of UTF-16 code units that the keyboard will provide to
+   * The maximum amount of UTF-16 code points that the keyboard will provide to
    * the left of the cursor, as an integer.
    */
-  readonly maxLeftContextCodeUnits: number,
+  readonly maxLeftContextCodePoints: number,
 
   /**
-   * The maximum amount of code units that the keyboard will provide to the
+   * The maximum amount of code points that the keyboard will provide to the
    * right of the cursor, as an integer. The value 0 or the absence of this
    * rule implies that the right contexts are not supported.
    */
-  readonly maxRightContextCodeUnits?: number,
+  readonly maxRightContextCodePoints?: number,
 
   /**
    * Whether the platform supports deleting to the right. The absence of this
@@ -262,7 +262,9 @@ declare interface Configuration {
    * While the left context MUST NOT bisect surrogate pairs, they MAY
    * bisect graphical clusters.
    */
-  leftContextCodeUnits: number;
+  leftContextCodePoints: number;
+  /** deprecated; use `leftContextCodePoints` instead! */
+  leftContextCodeUnits?: number,
 
   /**
    * How many UTF-16 code units maximum to send as the context to the
@@ -273,7 +275,9 @@ declare interface Configuration {
    * While the right context MUST NOT bisect surrogate pairs, they MAY
    * bisect graphical clusters.
    */
-  rightContextCodeUnits: number;
+  rightContextCodePoints: number;
+  /** deprecated; use `leftContextCodePoints` instead! */
+  rightContextCodeUnits?: number,
 }
 
 

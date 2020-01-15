@@ -91,8 +91,8 @@
 
     configure(capabilities: Capabilities): Configuration {
       return this.configuration = {
-        leftContextCodeUnits: capabilities.maxLeftContextCodeUnits,
-        rightContextCodeUnits: capabilities.maxRightContextCodeUnits
+        leftContextCodePoints: capabilities.maxLeftContextCodePoints,
+        rightContextCodePoints: capabilities.maxRightContextCodePoints
       };
     }
 
