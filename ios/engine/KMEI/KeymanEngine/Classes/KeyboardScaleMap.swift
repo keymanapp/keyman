@@ -82,6 +82,11 @@ class KeyboardScaleMap {
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir)] = Scaling(portrait: KeyboardSize(w: 768, h: 258, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir2)] = Scaling(portrait: KeyboardSize(w: 768, h: 258, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
 
+    scalings[KeyboardScaleMap.hashKey(for: Device.iPadMini2)] = Scaling(portrait: KeyboardSize(w: 768, h: 258, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
+    scalings[KeyboardScaleMap.hashKey(for: Device.iPadMini3)] = Scaling(portrait: KeyboardSize(w: 768, h: 258, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
+
+
+
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadPro10Inch)] = Scaling(portrait: KeyboardSize(w: 834, h: 258, b: 55), landscape: KeyboardSize(w: 1112, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadPro12Inch)] = Scaling(portrait: KeyboardSize(w: 1024, h: 323, b: 55), landscape: KeyboardSize(w: 1366, h: 416, b: 55))
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadPro12Inch2)] = Scaling(portrait: KeyboardSize(w: 1024, h: 323, b: 55), landscape: KeyboardSize(w: 1366, h: 416, b: 55))
@@ -104,6 +109,9 @@ class KeyboardScaleMap {
     scalings[KeyboardScaleMap.hashKey(for: Device.iPhone11Pro)]  = Scaling(portrait: KeyboardSize(w: 375, h: 216, b: 45), landscape: KeyboardSize(w: 724, h: 150, b: 38))  // insets:  p: 34, l: 21
     scalings[KeyboardScaleMap.hashKey(for: Device.iPhone11ProMax)]  = Scaling(portrait: KeyboardSize(w: 414, h: 226, b: 45), landscape: KeyboardSize(w: 808, h: 150, b: 38))  // insets:  p: 34, l: 21
 
+    scalings[KeyboardScaleMap.hashKey(for: Device.iPadMini4)] = Scaling(portrait: KeyboardSize(w: 768, h: 265, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
+    scalings[KeyboardScaleMap.hashKey(for: Device.iPadMini5)] = Scaling(portrait: KeyboardSize(w: 768, h: 265, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
+
     scalings[KeyboardScaleMap.hashKey(for: Device.iPad7)] = Scaling(portrait: KeyboardSize(w: 810, h: 265, b: 55), landscape: KeyboardSize(w: 1080, h: 353, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir3)] = Scaling(portrait: KeyboardSize(w: 810, h: 265, b: 55), landscape: KeyboardSize(w: 1112, h: 353, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadPro9Inch)] = Scaling(portrait: KeyboardSize(w: 768, h: 265, b: 55), landscape: KeyboardSize(w: 1024, h: 353, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
@@ -112,14 +120,14 @@ class KeyboardScaleMap {
 
     // The following definitions are in sorted order of increasing device resolution.
     // Currrently, this also tends to correlates with the underlying devices' release dates.
-    phoneScalingThresholds =  [ Device.iPhoneSE, // smallest phone for 13.0
+    phoneScalingThresholds =  [ Device.iPhoneSE, // smallest phone for 13.x
                                 Device.iPhone8,  // is 'pre-notch'
                                 Device.iPhoneX,  // smallest with 'notch'
                                 Device.iPhoneXR, // largest current model
                               ]
 
-    tabletScalingThresholds = [ Device.iPad5, // smallest supported tablet
-                                Device.iPad7, // smallest 13.0 tablet
+    tabletScalingThresholds = [ Device.iPadMini4, // smallest supported tablet (and is also 13.x)
+                                Device.iPad7,
                                 Device.iPadAir3,
                                 Device.iPadPro11Inch,
                                 Device.iPadPro12Inch3, // taller than others of width, but is most recent at the same scale.
@@ -133,7 +141,7 @@ class KeyboardScaleMap {
     pointSizes[KeyboardScaleMap.hashKey(for: Device.iPhoneX)] = CGSize(width: 375, height: 812)
     pointSizes[KeyboardScaleMap.hashKey(for: Device.iPhoneXR)] = CGSize(width: 414, height: 896)
 
-    pointSizes[KeyboardScaleMap.hashKey(for: Device.iPad5)] = CGSize(width: 768, height: 1024)
+    pointSizes[KeyboardScaleMap.hashKey(for: Device.iPadMini4)] = CGSize(width: 768, height: 1024)
     pointSizes[KeyboardScaleMap.hashKey(for: Device.iPad7)] = CGSize(width: 810, height: 1080)
     pointSizes[KeyboardScaleMap.hashKey(for: Device.iPadAir3)] = CGSize(width: 834, height: 1112)
     pointSizes[KeyboardScaleMap.hashKey(for: Device.iPadPro11Inch)] = CGSize(width: 834, height: 1194)

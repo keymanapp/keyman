@@ -57,7 +57,6 @@ private class CustomInputView: UIInputView {
 
     set(value) {
       super.frame = value
-      print("frame set to ", value)
 
       // Store the originally-intended value, just in case iOS changes it later without our consent.
       self.setFrame = value
@@ -538,10 +537,5 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   
   open func setBannerImage(to path: String) {
     keymanWeb.setBannerImage(to: path)
-  }
-
-  @available(iOSApplicationExtension 11.0, *)
-  public override func viewSafeAreaInsetsDidChange() {
-    log.info("vsaidc: \(inputView!.safeAreaInsets)")
   }
 }
