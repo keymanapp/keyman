@@ -291,7 +291,7 @@
    * @param index The index in the prefix. Initially 0.
    */
   function findPrefix(node: Node, key: SearchKey, index: number = 0): Node | null {
-    if (node.type === 'leaf' || index === key.length) {
+    if (node.type === 'leaf' || index === key.kmwLength()) {
       return node;
     }
 

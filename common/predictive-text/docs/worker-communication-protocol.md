@@ -291,7 +291,7 @@ transform is applied to the buffer.
 ```typescript
 interface Context {
   /**
-   * Up to maxLeftContextCodeUnits code units of Unicode scalar value
+   * Up to maxLeftContextCodeUnits code points of Unicode scalar value
    * (i. e., characters) to the left of the insertion point in the
    * buffer. If there is nothing to the left of the buffer, this returns
    * an empty string.
@@ -299,7 +299,7 @@ interface Context {
   left: USVString;
 
   /**
-   * Up to maxRightContextCodeUnits code units of Unicode scalar value
+   * Up to maxRightContextCodeUnits code points of Unicode scalar value
    * (i. e., characters) to the right of the insertion point in the
    * buffer. If there is nothing to the right of the buffer, this returns
    * an empty string.
@@ -336,14 +336,14 @@ interface Transform {
   insert: USVString;
 
   /**
-   * The number of code units to delete to the left of the cursor.
+   * The number of code points to delete to the left of the cursor.
    *
    * Corresponds to `dn` in com.keyman.KeyboardInterface.output.
    */
   deleteLeft: number;
 
   /**
-   * The number of code units to delete to the right of the cursor.
+   * The number of code points to delete to the right of the cursor.
    * Not available on all platforms.
    */
   deleteRight?: number;
