@@ -719,8 +719,9 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       button.tag = i
       button.backgroundColor = subKeyColor
       button.setRoundedBorder(withRadius: 4.0, borderWidth: 1.0, color: .gray)
-      button.setTitleColor(.black, for: .disabled)
-      button.setTitleColor(.black, for: .highlighted)
+      button.setTitleColor(Colors.keyText, for: .disabled)
+      button.setTitleColor(Colors.keyText, for: .highlighted)
+      button.setTitleColor(Colors.keyText, for: .normal)
 
       if let oskFontName = oskFontName {
         button.titleLabel?.font = UIFont(name: oskFontName, size: fontSize)

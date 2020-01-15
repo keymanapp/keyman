@@ -300,6 +300,7 @@
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
+		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -516,6 +517,7 @@
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
 				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
+				CE7A26D523CEEB8D0005955C /* UIColors.swift */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				9845A7B71A4398B200544E2E /* DropDownList */,

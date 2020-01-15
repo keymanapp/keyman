@@ -16,8 +16,8 @@ class KeyPreviewView: UIView {
   private let adjY: CGFloat
 
   private let borderColor = Colors.popupBorder
-  private var bgColor = UIColor.white
-  private let bgColor2 = UIColor.white
+  private var bgColor = Colors.keyboardBackground
+  private let bgColor2 = Colors.keyboardBackground
   private let label: UILabel
 
   override init(frame: CGRect) {
@@ -59,7 +59,7 @@ class KeyPreviewView: UIView {
     label.shadowColor = UIColor.lightText
     label.shadowOffset = CGSize(width: 1.0, height: 1.0)
     label.backgroundColor = UIColor.clear
-    label.textColor = UIColor.darkText
+    label.textColor = Colors.keyText
     label.text = ""
 
     super.init(frame: CGRect(x: viewPosX, y: viewPosY, width: viewWidth, height: viewHeight))
