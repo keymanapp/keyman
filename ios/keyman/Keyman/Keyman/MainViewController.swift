@@ -345,6 +345,17 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     return UIBarButtonItem(customView: containerView)
   }
 
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    guard let previousTraitCollection = previousTraitCollection else {return}
+    if #available(iOS 13.0, *) {
+      if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
+          // do things
+          log.info("Transition needed!")
+      }
+    }
+  }
+
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
