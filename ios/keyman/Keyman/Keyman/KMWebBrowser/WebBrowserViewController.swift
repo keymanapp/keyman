@@ -54,6 +54,14 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     webView.delegate = self
     webView.scalesPageToFit = true
 
+    if #available(iOS 13.0, *) {
+      // Dark mode settings must be applied through this new property,
+      // its class, and others like it.
+      navBar.standardAppearance.configureWithOpaqueBackground()
+    } else {
+      // Fallback on earlier versions
+    }
+
     // Setup NavigationBar
     navbarBackground = KMNavigationBarBackgroundView()
     navbarBackground.hideLogo()
@@ -111,7 +119,12 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    navBarTopConstraint.constant = AppDelegate.statusBarHeight()
+
+    if #available(iOS 13.0, *) {
+      // 13.0 auto-adjusts the top to avoid the status bar.
+    } else {
+      navBarTopConstraint.constant = AppDelegate.statusBarHeight()
+    }
   }
 
   override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
