@@ -307,9 +307,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
           self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
         }
       } else if nil == lexicalModels {
-        log.info("No lexical models available for language \(language.id) (nil)")
+        noModelsAvailable(cause: "nil")
       } else if 0 == lexicalModels?.count {
-        log.info("No lexical models available for language \(language.id) (empty)")
+        noModelsAvailable(cause: "empty")
       } else {
         log.info("Fetched lexical model list for "+language.id+".")
         // show the list of lexical models (on the main thread)
@@ -324,6 +324,22 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     }
     
     Manager.shared.apiLexicalModelRepository.fetchList(languageID: language.id, completionHandler: listCompletionHandler)
+  }
+
+  func noModelsAvailable(cause: String = "nil") {
+    let msg = "No dictionaries available"
+    let logMsg = "No lexical models available for language \(language.id) (\(cause))"
+    log.info(logMsg)
+
+    let alertController = UIAlertController(title: title, message: msg,
+                                            preferredStyle: UIAlertController.Style.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertAction.Style.default,
+                                            handler: { _ in
+                                              self.navigationController?.popViewController(animated: true)
+                                            }))
+
+    self.present(alertController, animated: true, completion: nil)
   }
   
 }
