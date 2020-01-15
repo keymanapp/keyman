@@ -187,15 +187,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         // Dark mode settings must be applied through this new property,
         // its class, and others like it.
         navbar.standardAppearance.configureWithOpaqueBackground()
-
-/*
-        // The various options we offer at the top level need significant
-        // image work to be properly dark-mode ready.
-        //
-        // This simply overrides it to have a "light mode" appearance,
-        // even in dark mode.  It's a small bar, so there should be little issue.
-        navbar.standardAppearance.backgroundColor = UIColor.white
-*/
       } else {
         // Fallback on earlier versions
       }
