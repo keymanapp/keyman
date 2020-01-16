@@ -25,10 +25,7 @@ struct VersionResourceSet {
   }
 }
 
-public class Migrations {
-  private init() {
-  }
-
+public enum Migrations {
   static let resourceHistory: [VersionResourceSet] = {
     let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
 
