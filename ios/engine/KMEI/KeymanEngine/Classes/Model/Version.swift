@@ -11,9 +11,15 @@ import Foundation
 /// Dotted-decimal version.
 public struct Version: Comparable {
   public static let fallback = Version("1.0")!
-  public static let current = Version("12.0")!
+  public static let current = Version("13.0")!
+
   // The Engine first started tracking the 'last loaded version' in 12.0.
   public static let firstTracked = Version("12.0")!
+
+  // The Keyman App's file browser was first added in 13.0 alpha;
+  // this prompted a mild rework of KMP installation file management,
+  // since this exposed byproducts to the users in the Files app.
+  public static let fileBrowserImplemented = Version("13.0")!
 
   private let components: [Int]
   public let string: String
@@ -49,5 +55,10 @@ public struct Version: Comparable {
 
   public static func ==(lhs: Version, rhs: Version) -> Bool {
     return lhs.components == rhs.components
+  }
+
+  // For nice logging output.
+  public var description: String {
+    return self.string
   }
 }
