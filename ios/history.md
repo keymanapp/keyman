@@ -3,6 +3,7 @@
 ## 13.0 alpha
 * Start version 13.0
 * Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457)
+* Adds support for iOS 13.0's dark mode feature
 * Testing for upcoming patch to stable:
   * Fixes for deprecated code, improving maintainability (#2282)
 

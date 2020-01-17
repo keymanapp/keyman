@@ -134,6 +134,7 @@
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
+		CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE79CDB42370111200010C06 /* Themes+Colors.xcassets */; };
 		CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */; };
 		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
 /* End PBXBuildFile section */
@@ -298,6 +299,8 @@
 		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
+		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -513,6 +516,8 @@
 				162E2C9420926C8600F40769 /* Classes */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
+				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
+				CE7A26D523CEEB8D0005955C /* UIColors.swift */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				9845A7B71A4398B200544E2E /* DropDownList */,
@@ -828,6 +833,7 @@
 				9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */,
 				9845A8D31A439F1000544E2E /* 786-browser@2x.png in Resources */,
 				981AFACF19EF44DE006706BF /* textsize_selected@2x.png in Resources */,
+				CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */,
 				CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */,
 				981AFAD319EF44DE006706BF /* navbar-Landscape-568h@2x.png in Resources */,
 				9845A8CC1A439F1000544E2E /* 715-globe-toolbar.png in Resources */,
