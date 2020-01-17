@@ -317,7 +317,7 @@ extension KeymanWebViewController {
       webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
     }
     
-    setBannerHeight(to: InputViewController.topBarHeight)
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
   
   func showBanner(_ display: Bool) {
