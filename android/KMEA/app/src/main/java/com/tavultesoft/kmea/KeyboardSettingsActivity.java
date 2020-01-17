@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
+import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
@@ -140,33 +141,19 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
         // "Help" link clicked
         if (itemTitle.equals(getString(R.string.help_link))) {
-          Intent i = new Intent(Intent.ACTION_VIEW);
-
           if (customHelpLink != null) {
-            if (FileUtils.isWelcomeFile(customHelpLink)) {
-              File customHelp = new File(new File(customHelpLink).getAbsolutePath());
-              i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-              // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
-              try {
-                Uri contentUri = FileProvider.getUriForFile(
-                  context, authority, customHelp);
-                i.setDataAndType(contentUri, "text/html");
-              } catch (NullPointerException e) {
-                String message = "FileProvider undefined in app to load" + customHelp.toString();
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.e("TAG", message);
-              }
-            }
-            else {
-              i.setData(Uri.parse(customHelpLink));
-            }
-            if (FileProviderUtils.exists(context)) {
+            // Display local welcome.htm help file, including associated assets
+            Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
+
+            if (FileProviderUtils.exists(context) || KMManager.isTestMode()) {
               startActivity(i);
             }
           } else {
+            Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(helpUrlStr));
             startActivity(i);
           }
+
         // "Uninstall Keyboard" clicked
         } else if (itemTitle.equals(getString(R.string.uninstall_keyboard))) {
           // Uninstall selected keyboard

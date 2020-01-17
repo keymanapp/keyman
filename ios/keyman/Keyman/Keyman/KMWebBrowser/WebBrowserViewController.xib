@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,7 +15,7 @@
                 <outlet property="forwardButton" destination="gAN-yP-fo0" id="nIW-b5-oh0"/>
                 <outlet property="globeButton" destination="FAf-8V-Xif" id="8vj-hi-L51"/>
                 <outlet property="navBar" destination="eMY-54-gDT" id="y2L-FV-l7u"/>
-                <outlet property="navBarTopConstraint" destination="BWd-xc-GUc" id="LgI-e3-nk7"/>
+                <outlet property="navBarTopConstraint" destination="Lng-0G-CkY" id="KAc-HX-WJ2"/>
                 <outlet property="toolBar" destination="e8W-i1-0tJ" id="Mcg-JL-n0Q"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
                 <outlet property="webView" destination="b82-37-gRv" id="eju-Rj-ygh"/>
@@ -29,13 +27,13 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eMY-54-gDT">
-                    <rect key="frame" x="0.0" y="20" width="320" height="44"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="44" id="qmb-kf-rzZ"/>
                     </constraints>
                 </navigationBar>
                 <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="b82-37-gRv">
-                    <rect key="frame" x="0.0" y="64" width="320" height="460"/>
+                    <rect key="frame" x="0.0" y="44" width="320" height="480"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </webView>
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="e8W-i1-0tJ">
@@ -76,9 +74,9 @@
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="b82-37-gRv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="7td-a1-zrM"/>
-                <constraint firstItem="eMY-54-gDT" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="20" id="BWd-xc-GUc"/>
                 <constraint firstAttribute="trailing" secondItem="eMY-54-gDT" secondAttribute="trailing" id="Fhu-rh-yya"/>
                 <constraint firstAttribute="trailing" secondItem="e8W-i1-0tJ" secondAttribute="trailing" id="Gez-bV-UCa"/>
+                <constraint firstItem="eMY-54-gDT" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Lng-0G-CkY"/>
                 <constraint firstAttribute="bottom" secondItem="e8W-i1-0tJ" secondAttribute="bottom" id="NlX-66-QU0"/>
                 <constraint firstAttribute="trailing" secondItem="b82-37-gRv" secondAttribute="trailing" id="d54-Rv-22d"/>
                 <constraint firstItem="b82-37-gRv" firstAttribute="top" secondItem="eMY-54-gDT" secondAttribute="bottom" id="f8L-DB-mjH"/>

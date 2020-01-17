@@ -3,7 +3,7 @@
 version()
 {
     if [[ -z "${TIER}" ]]; then
-        tier="beta"
+        tier="alpha"
     else
         tier="${TIER}"
     fi

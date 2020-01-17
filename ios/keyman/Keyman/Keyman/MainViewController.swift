@@ -122,6 +122,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       observer: self,
       function: MainViewController.keyboardRemoved)
 
+    // Unfortunately, it's the main app with the file definitions.
+    // We have to gerry-rig this so that the framework-based SettingsViewController
+    // can launch the app-based DocumentViewController.
+    if #available(iOS 11.0, *) {
+      Manager.shared.fileBrowserLauncher = { navController in
+        let vc = PackageBrowserViewController()
+        navController.pushViewController(vc, animated: true)
+      }
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -143,8 +152,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.apiKeyboardRepository.fetch()
     Manager.shared.apiLexicalModelRepository.fetch()
 
-    // TODO:  For dark mode implementation, we'll need to change the color here.
-    let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
+    // Implement a default color...
+    var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
+    // And if the iOS version is current enough, override it from the palette.
+    if #available(iOS 11.0, *) {
+      bgColor = UIColor(named: "InputBackground")!
+    }
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
@@ -174,13 +187,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         // Dark mode settings must be applied through this new property,
         // its class, and others like it.
         navbar.standardAppearance.configureWithOpaqueBackground()
-
-        // The various options we offer at the top level need significant
-        // image work to be properly dark-mode ready.
-        //
-        // This simply overrides it to have a "light mode" appearance,
-        // even in dark mode.  It's a small bar, so there should be little issue.
-        navbar.standardAppearance.backgroundColor = UIColor.white
       } else {
         // Fallback on earlier versions
       }
@@ -198,7 +204,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textView.isScrollEnabled = true
     textView.isUserInteractionEnabled = true
     textView.font = textView.font?.withSize(textSize)
-    textView.textColor = UIColor.black // Dark mode will use white otherwise
     view?.addSubview(textView!)
 
     // Setup Info View
@@ -240,60 +245,60 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
 
     let imageScaleF: CGFloat = 0.9
-    let moreButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"),
-                                        highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
+    let moreButton = createNavBarButton(with: UIImage(named: "IconMore")!,
+                                        highlightedImage: UIImage(named: "IconMoreSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.showDropDownMenu),
                                         orientation: orientation)
     moreButton.title = "More"
 
-    let infoButton = createNavBarButton(with: #imageLiteral(resourceName: "724-info.png"),
-                                        highlightedImage: #imageLiteral(resourceName: "724-info-selected.png"),
+    let infoButton = createNavBarButton(with: UIImage(named: "IconInfo")!,
+                                        highlightedImage: UIImage(named: "IconInfoSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.infoButtonClick),
                                         orientation: orientation)
     infoButton.title = "Info"
 
-    let getStartedButton = createNavBarButton(with: #imageLiteral(resourceName: "887-notepad.png"),
-                                              highlightedImage: #imageLiteral(resourceName: "887-notepad-selected.png"),
+    let getStartedButton = createNavBarButton(with: UIImage(named: "IconNotepad")!,
+                                              highlightedImage: UIImage(named: "IconNotepadSelected")!,
                                               imageScale: imageScaleF,
                                               action: #selector(self.showGetStartedView),
                                               orientation: orientation)
     getStartedButton.title = "Get Started"
 
-    let trashButton = createNavBarButton(with: #imageLiteral(resourceName: "711-trash.png"),
-                                         highlightedImage: #imageLiteral(resourceName: "711-trash-selected.png"),
+    let trashButton = createNavBarButton(with: UIImage(named: "IconTrash")!,
+                                         highlightedImage: UIImage(named: "IconTrashSelected")!,
                                          imageScale: imageScaleF,
                                          action: #selector(self.trashButtonClick),
                                          orientation: orientation)
     trashButton.title = "Clear Text"
 
-    let textSizeButton = createNavBarButton(with: #imageLiteral(resourceName: "textsize.png"),
-                                            highlightedImage: #imageLiteral(resourceName: "textsize_selected.png"),
+    let textSizeButton = createNavBarButton(with: UIImage(named: "IconTextSize")!,
+                                            highlightedImage: UIImage(named: "IconTextSizeSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.textSizeButtonClick),
                                             orientation: orientation)
     textSizeButton.title = "Text Size"
 
-    let browserButton = createNavBarButton(with: #imageLiteral(resourceName: "786-browser.png"),
-                                           highlightedImage: #imageLiteral(resourceName: "786-browser-selected.png"),
+    let browserButton = createNavBarButton(with: UIImage(named: "IconBrowser")!,
+                                           highlightedImage: UIImage(named: "IconBrowserSelected")!,
                                            imageScale: 1.0,
                                            action: #selector(self.showKMWebBrowserView),
                                            orientation: orientation)
     browserButton.title = "Browser"
 
-    let actionButton = createNavBarButton(with: #imageLiteral(resourceName: "702-share.png"),
-                                          highlightedImage: #imageLiteral(resourceName: "702-share-selected.png"),
+    let actionButton = createNavBarButton(with: UIImage(named: "IconShare")!,
+                                          highlightedImage: UIImage(named: "IconShareSelected")!,
                                           imageScale: imageScaleF,
                                           action: #selector(self.actionButtonClick),
                                           orientation: orientation)
     actionButton.title = "Share"
 
-    let settingsButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"), // should find a gear image and use that instead of re-using 'more'
-                                          highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
-                                          imageScale: imageScaleF,
-                                          action: #selector(self.settingsButtonClick),
-                                          orientation: orientation)
+    let settingsButton = createNavBarButton(with: UIImage(named: "IconMore")!,
+                                            highlightedImage: UIImage(named: "IconMoreSelected")!,
+                                            imageScale: imageScaleF,
+                                            action: #selector(self.settingsButtonClick),
+                                            orientation: orientation)
     settingsButton.title = "Settings"
 
     dropdownItems = [textSizeButton, trashButton, infoButton, getStartedButton, settingsButton]
@@ -336,6 +341,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: icon.size.width, height: navBarHeight))
     containerView.backgroundColor = UIColor.clear
     containerView.addSubview(customButton)
+
     return UIBarButtonItem(customView: containerView)
   }
 
@@ -646,14 +652,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let eframe = CGRect(x: sframe.origin.x, y: sframe.origin.y - h - 8, width: w, height: h)
     let containerView = UIView(frame: sframe)
     containerView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleRightMargin]
+    containerView.backgroundColor = Colors.systemBackground
     containerView.tag = 1
-    containerView.backgroundColor = UIColor.white
     containerView.layer.cornerRadius = 4.0
 
     let doneButton = UIButton(type: .roundedRect)
     doneButton.addTarget(self, action: #selector(self.dismissTextSizeVC), for: .touchUpInside)
 
-    doneButton.backgroundColor = UIColor.white
     doneButton.setTitle("Done", for: .normal)
     doneButton.titleLabel?.font = doneButton.titleLabel?.font?.withSize(21.0)
     doneButton.setTitleColor(UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0), for: .normal)
@@ -664,8 +669,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     let lframe = CGRect(x: 0, y: bframe.origin.y - 1, width: sframe.size.width, height: 1)
     let borderLine = UIView(frame: lframe)
-    let c: CGFloat = 230.0 / 255.0
-    borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
+    if #available(iOS 13.0, *) {
+      borderLine.backgroundColor = UIColor.separator
+    } else {
+      let c: CGFloat = 230.0 / 255.0
+      borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
+    }
     containerView.addSubview(borderLine)
 
     let tframe = CGRect(x: 0, y: 0, width: bframe.size.width, height: 40)
@@ -674,7 +683,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textSizeTitle.backgroundColor = UIColor.clear
     textSizeTitle.text = "Text size: \(Int(textSize))"
     textSizeTitle.textAlignment = .center
-    textSizeTitle.textColor = UIColor.gray
+    if #available(iOS 13.0, *) {
+      textSizeTitle.textColor = UIColor.secondaryLabel
+    } else {
+      textSizeTitle.textColor = UIColor.gray
+    }
     textSizeTitle.font = textSizeTitle.font.withSize(14.0)
     containerView.addSubview(textSizeTitle)
 
@@ -746,7 +759,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     overlayWindow.isHidden = false
     let activityView = UIActivityIndicatorView(style: .whiteLarge)
     let containerView = UIView(frame: activityView.bounds.insetBy(dx: -10.0, dy: -10.0))
-    containerView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
+    containerView.backgroundColor = Colors.spinnerBackground
     containerView.layer.cornerRadius = 6.0
     containerView.center = overlayWindow.center
     containerView.tag = activityIndicatorViewTag
