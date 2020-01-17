@@ -25,7 +25,7 @@ _.createMessageEventWithData = function createMessageEventWithData(data) {
  */
 _.capabilities = function capabilities() {
   return {
-    maxLeftContextCodeUnits: 64
+    maxLeftContextCodePoints: 64
   }
 }
 
