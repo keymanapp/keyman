@@ -1,5 +1,6 @@
 // Includes version-related functionality
 ///<reference path="utils/version.ts"/>
+///<reference path="utils/styleConstants.ts" />
 
 // The Device object definition -------------------------------------------------
 
@@ -13,6 +14,10 @@ namespace com.keyman {
     version: string;
     orientation: string|number;
     browser: string;
+    colorScheme: 'light' | 'dark';
+
+    private detected: boolean = false;
+    private _styles: utils.StyleConstants;
 
     // Generates a default Device value.
     constructor() {
@@ -178,6 +183,9 @@ namespace com.keyman {
           }
         }
       }
+
+      this.colorScheme = this.prefersDarkMode() ? 'dark' : 'light';
+      this.detected = true;
     }
 
     static _GetIEVersion() {
@@ -218,6 +226,28 @@ namespace com.keyman {
       }
     
       return 999;
+    }
+
+    /**
+     * Checks is a user's browser is in dark mode, if the feature is supported.  Returns false otherwise.
+     * 
+     * Thanks to https://stackoverflow.com/a/57795518 for this code.
+     */
+    private prefersDarkMode(): boolean {
+      // Ensure the detector exists (otherwise, returns false)
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    public get styles(): utils.StyleConstants {
+      if(!this._styles) {
+        if(!this.detected) {
+          this.detect();
+        }
+        
+        this._styles = new utils.StyleConstants(this);
+      }
+
+      return this._styles;
     }
   }
 }

@@ -2,6 +2,7 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Revert default tier to alpha (#2474)
 
 ## 2019-09-19 12.0.18 beta
 * Bug Fix:
