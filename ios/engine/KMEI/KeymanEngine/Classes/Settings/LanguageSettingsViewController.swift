@@ -365,7 +365,8 @@ class LanguageSettingsViewController: UITableViewController {
       }
       let kbIndex:Int = index
       let thisKb = globalUserKeyboards[kbIndex]
-      let infoView = KeyboardInfoViewController()
+      //let infoView = KeyboardInfoViewController()
+      let infoView = ResourceInfoViewController(for: globalUserKeyboards[index])
       infoView.title = thisKb.name
       infoView.keyboardCount = globalUserKeyboards.count
       infoView.keyboardIndex = index

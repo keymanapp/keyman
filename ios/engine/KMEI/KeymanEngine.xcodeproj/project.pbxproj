@@ -213,6 +213,8 @@
 		CE71705823A9C14D00A924A1 /* ResourceFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */; };
 		CE71705F23A9C97F00A924A1 /* PackageInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */; };
 		CE79B24923C711FF007E72AE /* KeyboardScaleMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */; };
+		CE754A0223D151B90030CB79 /* ResourceInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE754A0123D151B90030CB79 /* ResourceInfoView.xib */; };
+		CE754A0423D162E90030CB79 /* ResourceInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE754A0323D162E90030CB79 /* ResourceInfoViewController.swift */; };
 		CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */; };
 		CE7A26D423CEE71B0005955C /* Keyboard Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */; };
 		CE7A26D823CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
@@ -425,6 +427,8 @@
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
 		CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleMap.swift; sourceTree = "<group>"; };
+		CE754A0123D151B90030CB79 /* ResourceInfoView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ResourceInfoView.xib; sourceTree = "<group>"; };
+		CE754A0323D162E90030CB79 /* ResourceInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceInfoViewController.swift; sourceTree = "<group>"; };
 		CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Keyboard Colors.xcassets"; sourceTree = "<group>"; };
 		CE7A26D723CEEC630005955C /* Colors+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors+Extension.swift"; sourceTree = "<group>"; };
 		CE7A26DA23CEEF640005955C /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
@@ -832,6 +836,7 @@
 			isa = PBXGroup;
 			children = (
 				C08C62141F67C8D500268D03 /* KeyboardInfoViewController.swift */,
+				CE754A0323D162E90030CB79 /* ResourceInfoViewController.swift */,
 				9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */,
 				9A3E832422EAC14A00D22D2A /* KeyboardSwitcherViewController.swift */,
 				9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */,
@@ -841,6 +846,7 @@
 				C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */,
 				98C0B11817A22DB5007ECAFC /* PickerButtons */,
 				98C0B11C17A2302E007ECAFC /* TableViewCells */,
+				CE754A0123D151B90030CB79 /* ResourceInfoView.xib */,
 			);
 			name = KeyboardPicker;
 			path = LanguagePicker;
@@ -1079,6 +1085,7 @@
 			files = (
 				C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */,
 				9ADC459F22E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
+				CE754A0223D151B90030CB79 /* ResourceInfoView.xib in Resources */,
 				9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */,
 				CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */,
 			);
@@ -1280,6 +1287,7 @@
 				C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */,
 				165EB3A12098993900040A69 /* KeyboardError.swift in Sources */,
 				C05F432D1FBD5A4C0058CBD4 /* KeyboardAPICall.swift in Sources */,
+				CE754A0423D162E90030CB79 /* ResourceInfoViewController.swift in Sources */,
 				C055E6EB1F99ED090035C2DD /* RegisteredFont.swift in Sources */,
 				1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */,
 				C0324B931F87689B00AF3785 /* KeymanURLProtocol.swift in Sources */,
