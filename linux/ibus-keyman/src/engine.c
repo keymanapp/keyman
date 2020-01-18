@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009-2018 SIL International
+ * Copyright (C) 2009-2020 SIL International
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -385,43 +385,21 @@ ibus_keyman_engine_constructor (GType                   type,
     // TODO: Will need to handle multiple options. For now, keyboards are only 
     // setting one option.
     g_message("Loading options for kb_name: %s", keyman->kb_name);
-
-    /*
-    keyboard_opts[3].scope = KM_KBP_OPT_KEYBOARD;
-    //cp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
-    cp = g_utf8_to_utf16("option_key", -1, NULL, NULL, NULL);
-    keyboard_opts[3].key = cp;
-    //cp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
-    cp = g_utf8_to_utf16("jianpu", -1, NULL, NULL, NULL);
-    keyboard_opts[3].value = cp;
-    */
-
     gchar **options = ibus_keyman_engine_keyboard_options(keyman->kb_name, keyman->kb_name);
     if (options != NULL) 
     {
-        
-        keyboard_opts[3].scope = KM_KBP_OPT_KEYBOARD;
-        cp = g_utf8_to_utf16("option_key", -1, NULL, NULL, NULL);
-        keyboard_opts[3].key = cp;
-        cp = g_utf8_to_utf16("jianpu", -1, NULL, NULL, NULL);
-        keyboard_opts[3].value = cp;
-        
-        /*
         gchar **option_tokens = g_strsplit(options[0], "=", 2);
         if (option_tokens != NULL)
         {
-            //g_message("option %s=%s", option_tokens[0], option_tokens[1]);
+            g_message("option %s=%s", option_tokens[0], option_tokens[1]);
             keyboard_opts[3].scope = KM_KBP_OPT_KEYBOARD;
-            //cp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
-            cp = g_utf8_to_utf16("option_key", -1, NULL, NULL, NULL);
+            cp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
             keyboard_opts[3].key = cp;
-            //cp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
-            cp = g_utf8_to_utf16("jianpu", -1, NULL, NULL, NULL);
+            cp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
             keyboard_opts[3].value = cp;
             //g_strfreev(option_tokens);
         }
         //g_free(options);
-        */
     }
 
     // keyboard_opts[4] already initialised to {0, 0, 0}
@@ -1034,8 +1012,7 @@ ibus_keyman_engine_keyboard_options(gchar *package_id,
                                     gchar *keyboard_id)
 {
     g_message("ibus_keyman_engine_keyboard_options");
-    //GSettings *settings = g_settings_new(KEYMAN_DCONF_NAME);
-    gchar *path = g_strdup_printf("%s%s/%s/options/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
+    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
     GSettings *child_settings = g_settings_new_with_path(KEYMAN_CHILD_DCONF_NAME, path);
     gchar **options = NULL;
     if (child_settings != NULL)
@@ -1049,44 +1026,3 @@ ibus_keyman_engine_keyboard_options(gchar *package_id,
     return options;
 }
 
-static void
-ibus_keyman_engine_update_keyboard_options(IBusEngine *engine, gchar **options)
-{
-    IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
-
-    if (options == NULL)
-    {
-        return;
-    }
-
-    // TODO: Handle more than 1 set of options
-    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 2);
-
-    gchar **option_tokens = g_strsplit(options[0], "=", 2);
-    km_kbp_cp *cp;
-    if (option_tokens != NULL) {
-        g_message("option %s=%s", option_tokens[0], option_tokens[1]);     
-        keyboard_opts[0].scope = KM_KBP_OPT_KEYBOARD;
-        cp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
-        keyboard_opts[0].key = cp;
-        cp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
-        keyboard_opts[0].value = cp;
-
-        // keyboard_opts[1] already initialised to {0, 0, 0}
-
-        km_kbp_status event_status = km_kbp_state_options_update(keyman->state,
-            keyboard_opts);
-
-        if (event_status != KM_KBP_STATUS_OK)
-        {
-            g_warning("problem updating km_kbp_state_options_update");
-        }
-        for (int i =0; i < 1; i++) {
-            g_free((km_kbp_cp *)keyboard_opts[i].key);
-            g_free((km_kbp_cp *)keyboard_opts[i].value);
-        }
-    }
-
-    g_strfreev(option_tokens);
-    g_free(keyboard_opts);
-}
