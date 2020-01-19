@@ -271,12 +271,13 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
       String _font = _keyboard.optString(KMManager.KMKey_Font);
       String _oskFont = _keyboard.optString(KMManager.KMKey_OskFont);
+      String _customHelpLink = _keyboard.optString(KMManager.KMKey_CustomHelpLink, null);
 
 
       theKbData.additionalDownloadid = CloudKeyboardDataDownloadCallback.createDownloadId(_key_id);
       theKbData.keyboardInfo = CloudDataJsonUtil
         .createKeyboardInfoMap(
-          _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _kbIsCustom, _font, _oskFont);
+          _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _kbIsCustom, _font, _oskFont, _customHelpLink);
       theKbData.additionalDownloads = urls;
     }
     catch(JSONException _e)

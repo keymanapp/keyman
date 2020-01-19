@@ -3,7 +3,7 @@ inherited frmDebuggerInput: TfrmDebuggerInput
   Top = 325
   Width = 258
   Height = 157
-  Caption = 'TIKE Debug Input'
+  Caption = 'Keyman Developer Debug Input'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -33,7 +33,7 @@ inherited frmDebuggerInput: TfrmDebuggerInput
       Width = 205
       Height = 40
       Alignment = taCenter
-      Caption = 'The TIKE debugger is awaiting input'
+      Caption = 'The Keyman Developer debugger is awaiting input'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16

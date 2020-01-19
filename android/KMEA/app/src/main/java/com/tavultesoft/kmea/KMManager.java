@@ -2224,12 +2224,15 @@ public final class KMManager {
 
       // Move the cursor back if there's a split surrogate pair
       if (Character.isHighSurrogate(sequence.charAt(sequence.length()-1))) {
-        String origChars = sequence.toString();
         ic.commitText("", -1);
         sequence = ic.getTextBeforeCursor(length, 0);
       }
 
-      if (sequence != null && Character.isLowSurrogate(sequence.charAt(0))) {
+      if (sequence == null || sequence.length() <= 0) {
+        return "";
+      }
+
+      if (Character.isLowSurrogate(sequence.charAt(0))) {
         // Adjust if the first char is also a split surrogate pair
         // subSequence indices are start(inclusive) to end(exclusive)
         sequence = sequence.subSequence(1, sequence.length());

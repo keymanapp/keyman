@@ -1,4 +1,4 @@
-# Keyman for Android
+# Keyman for Android Version History
 
 ## 13.0 alpha
 * Start version 13.0
@@ -9,15 +9,34 @@
   * Check for keyboard updates during keyman startup (#2335)
   * Show available keyboard updates as android system notifications (#2335)
   * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
+  * Add preference so update notifications can be ignored 3 months (#2412)
+  * Add QR Codes to Keyboard Info pages so users can share keyboard downloads (#2458)
 * Changes:
   * Update target Android SDK version to 29 (#2279)
   * Add simple UI tests for keyboard picker and keyboard info screens (#2326)
   * Add example dictionary to KMSample1 project (#2369)
+  * Prevent lower-cased API returns from causing mismatches (#2404)
 * Bug fix:
   * Sanitize the app version to `#.#.#` for the API cloud query (#2319)
   * Add linting to Debug builds and resolve lint errors (#2305)
   * Fix memory issues during build process (#2361)
   * Fix crashes when parsing JSON data from Cloud (#2393)
+  * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
+  * Propagate custom help links (#2448)
+  * Fix file permissions for viewing welcome.htm assets (#2465)
+
+## 2019-12-12 12.0.4214 stable
+* Bug fix:
+  * Fix crash involving 0-length context (#2444)
+
+## 2019-12-09 12.0.4213 stable
+* Bug fix:
+  * Always use lower-case langauge ID's when processing API returns (#2406)
+  * Add checks when accessing the Cloud to avoid exceptions (#2393)
+  * Improve Keymanweb and KMEA compatability with devices Android API 19-23 (#2358)
+
+* Change
+  * Update default nrc.en.mtnt model to version 0.1.3 (#2389)
 
 ## 2019-11-27 12.0.4211 stable
 * Bug fix:

@@ -10,4 +10,5 @@
 
     <include layout="@layout/list_layout" />
 
+    <include layout="@layout/qr_layout" />
 </LinearLayout>

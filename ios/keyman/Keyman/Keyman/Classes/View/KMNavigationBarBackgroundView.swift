@@ -55,7 +55,7 @@ class KMNavigationBarBackgroundView: UIView {
     }
 
     func setupLogo() {
-        let image = UIImage(named: "keyman_logo")
+        let image = UIImage(named: "Logo")
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false

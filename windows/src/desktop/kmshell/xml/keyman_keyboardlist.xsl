@@ -275,6 +275,45 @@
                             <xsl:value-of select="copyright"/>
                         </td></tr>
                       </xsl:if>
+
+                      <xsl:if test="$singlekeyboardpackage = '1' or //KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
+                        <tr>
+                          <td class="table_header" colspan="2">
+
+                            <xsl:call-template name="button">
+                              <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Keyboard_Share']"/></xsl:with-param>
+                              <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                            </xsl:call-template>
+
+                            <div class='qrcode'>
+                              <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
+                              <div class='qrcode-back'>
+                                <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+                              </div>
+                              <div class='qrcode-popup'>
+                                <div>
+                                  <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
+                                </div>
+                                <div class='qrcode-caption'>
+                                  <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_QRCode']"/>
+                                  <a>
+                                    <xsl:attribute name="href">keyman:link?url=https://keyman.com/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
+                                    <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_Link']"/>
+                                  </a>
+                                  <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_LinkSuffix']"/>
+                                </div>
+                                <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
+                                    text: 'https://keyman.com/go/keyboard/<xsl:value-of select="../../id"/>/share',
+                                    width: 256,
+                                    height: 256
+                                  });
+                                </script>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>    
+                      </xsl:if>
+
                     </table>
                   </div>
                   <div style="clear:both">&#160;</div>

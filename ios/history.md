@@ -2,8 +2,14 @@
 
 ## 13.0 alpha
 * Start version 13.0
+* Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457)
+* Adds support for iOS 13.0's dark mode feature
 * Testing for upcoming patch to stable:
   * Fixes for deprecated code, improving maintainability (#2282)
+
+## 2019-12-09 12.0.62 stable
+* Bug Fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403)
+* Bug Fix: If malformed data was returned from an online API, Keyman could crash (#2368)
 
 ## 2019-09-20 12.0.39 beta
 * App info / help now points to the equivalent pages on help.keyman.com in a multi-page format (#2088)

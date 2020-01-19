@@ -12,8 +12,8 @@ import AudioToolbox
 
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
-private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
-private let subKeyColorHighlighted = #colorLiteral(red: 136.0 / 255.0, green: 136.0 / 255.0, blue: 1.0, alpha: 1.0)
+private let subKeyColor = Colors.popupKey
+private let subKeyColorHighlighted = Colors.popupKeyHighlighted
 
 // UI In-App Keyboard Constants
 private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
@@ -317,7 +317,7 @@ extension KeymanWebViewController {
       webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
     }
     
-    setBannerHeight(to: InputViewController.topBarHeight)
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
   
   func showBanner(_ display: Bool) {
@@ -719,8 +719,9 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       button.tag = i
       button.backgroundColor = subKeyColor
       button.setRoundedBorder(withRadius: 4.0, borderWidth: 1.0, color: .gray)
-      button.setTitleColor(.black, for: .disabled)
-      button.setTitleColor(.black, for: .highlighted)
+      button.setTitleColor(Colors.keyText, for: .disabled)
+      button.setTitleColor(Colors.keyText, for: .highlighted)
+      button.setTitleColor(Colors.keyText, for: .normal)
 
       if let oskFontName = oskFontName {
         button.titleLabel?.font = UIFont(name: oskFontName, size: fontSize)
@@ -753,7 +754,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       }
 
       button.setTitle(displayText, for: .normal)
-      button.tintColor = UIColor(red: 181.0 / 255.0, green: 181.0 / 255.0, blue: 181.0 / 255.0, alpha: 1.0)
+      button.tintColor = Colors.popupKeyTint
       button.isEnabled = false
       return button
     }
@@ -911,11 +912,9 @@ extension KeymanWebViewController {
     self.helpBubbleView?.removeFromSuperview()
     let helpBubbleView = PopoverView(frame: CGRect.zero)
     self.helpBubbleView = helpBubbleView
-    helpBubbleView.backgroundColor = UIColor(red: 253.0 / 255.0, green: 244.0 / 255.0,
-                                             blue: 196.0 / 255.0, alpha: 1.0)
-    helpBubbleView.backgroundColor2 = UIColor(red: 233.0 / 255.0, green: 224.0 / 255.0,
-                                              blue: 176.0 / 255.0, alpha: 1.0)
-    helpBubbleView.borderColor = UIColor(red: 0.5, green: 0.25, blue: 0.25, alpha: 1.0)
+    helpBubbleView.backgroundColor = Colors.helpBubbleGradient1
+    helpBubbleView.backgroundColor2 = Colors.helpBubbleGradient2
+    helpBubbleView.borderColor = Colors.popupBorder
 
     let isPad = UIDevice.current.userInterfaceIdiom == .pad
     let sizeMultiplier = CGFloat(isPad ? 1.5 : 1.0)
@@ -959,7 +958,7 @@ extension KeymanWebViewController {
     helpText.backgroundColor = UIColor.clear
     helpText.font = helpText.font.withSize(fontSize)
     helpText.textAlignment = .center
-    helpText.textColor = UIColor.darkText
+    //helpText.textColor = UIColor.darkText
     helpText.lineBreakMode = .byWordWrapping
     helpText.numberOfLines = 0
     helpText.text = keyboardChangeHelpText

@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -52,6 +53,13 @@ public class LexicalModel implements Serializable, LanguageResource {
     return this.map.get(KMManager.KMKey_PackageID);
   }
 
+  public String getCustomHelpLink() {
+    if (this.map.containsKey(KMManager.KMKey_CustomHelpLink)) {
+      return this.map.get(KMManager.KMKey_CustomHelpLink);
+    }
+    return null;
+  }
+
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
 
@@ -64,8 +72,6 @@ public class LexicalModel implements Serializable, LanguageResource {
       return null;
     }
 
-    String customHelpLink = map.get(KMManager.KMKey_CustomHelpLink);
-
     bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, getResourceId());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, getLanguageCode());
@@ -73,7 +79,11 @@ public class LexicalModel implements Serializable, LanguageResource {
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, getLanguageName());
     bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, false);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL, modelURL);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_CUSTOM_HELP_LINK, customHelpLink);
+
+    String customHelpLink = map.get(KMManager.KMKey_CustomHelpLink);
+    if (customHelpLink != null) {
+      bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, customHelpLink);
+    }
 
     return bundle;
   }
