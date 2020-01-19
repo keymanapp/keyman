@@ -397,9 +397,9 @@ ibus_keyman_engine_constructor (GType                   type,
             keyboard_opts[3].key = cp;
             cp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
             keyboard_opts[3].value = cp;
-            //g_strfreev(option_tokens);
+            g_strfreev(option_tokens);
         }
-        //g_free(options);
+        g_free(options);
     }
 
     // keyboard_opts[4] already initialised to {0, 0, 0}
