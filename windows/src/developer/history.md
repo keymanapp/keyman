@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2020-01-20 12.0.65 stable
+* Bug Fix: Lexical model compiler fails to compile packages that don't contain email address (#2496)
+
 ## 2019-12-06 12.0.62 stable
 * Bug Fix: Shortcuts in text editors were not working after #2331 (#2424)
 

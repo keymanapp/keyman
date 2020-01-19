@@ -9,6 +9,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { minKeymanVersion } from "../util/min-keyman-version";
+import {SysExits} from "../util/sysexits";
 
 
 export class ModelInfoOptions {
@@ -84,10 +85,21 @@ export function writeMergedModelMetadataFile(
   setModelMetadata('id', options.model_id);
 
   setModelMetadata('name', options.kmpJsonData.info.name.description);
-  setModelMetadata('authorName', options.kmpJsonData.info.author.description);
 
-  // we strip the mailto: from the .kps file for the .model_info
-  setModelMetadata('authorEmail', options.kmpJsonData.info.author.url.match(/^(mailto\:)?(.+)$/)[2], false);
+  let author = options.kmpJsonData.info.author;
+  setModelMetadata('authorName', author.description);
+
+  if (author.url) {
+    // we strip the mailto: from the .kps file for the .model_info
+    let match = author.url.match(/^(mailto\:)?(.+)$/);
+    if (match === null) {
+      console.error(`Invalid author email: ${author.url}`);
+      process.exit(SysExits.EX_DATAERR);
+    }
+
+    let email = match[2];
+    setModelMetadata('authorEmail', email, false);
+  }
 
   // extract the language identifiers from the language metadata
   // arrays for each of the lexical models in the kmp.json file,
