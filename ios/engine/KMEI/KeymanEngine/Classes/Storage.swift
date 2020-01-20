@@ -122,7 +122,7 @@ class Storage {
     return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
   
-  func lexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = true) -> URL {
+  func lexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
     // Our unzipping dependency requires a .zip extension to function, so we append that here.
     return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
   }

@@ -187,6 +187,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
     }
     Migrations.updateResources(storage: Storage.active)
+    Migrations.engineVersion = Version.current
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false

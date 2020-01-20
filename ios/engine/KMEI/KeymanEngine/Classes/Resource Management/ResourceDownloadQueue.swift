@@ -424,7 +424,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         }
       } else if batch.type == .lexicalModel {
         let task = batch.tasks[0] as! DownloadTask // It's always at this index.
-        if let lm = installLexicalModelPackage(downloadedPackageFile: URL.init(string: task.request.destinationFile!)!) {
+        if let lm = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!)) {
           if !isUpdate {
             downloadSucceeded(forLexicalModel: lm)
           }
@@ -531,23 +531,26 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   // is called by other class funcs
   public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
     var installedLexicalModel: InstallableLexicalModel? = nil
-    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    var destination =  documentsDirectory
-    destination.appendPathComponent("temp/\(downloadedPackageFile.lastPathComponent)")
-    
-    KeymanPackage.extract(fileUrl: downloadedPackageFile, destination: destination, complete: { kmp in
+
+    ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile, completionHandler: { kmp, error in
       if let kmp = kmp as! LexicalModelKeymanPackage? {
         do {
-          try Manager.parseLMKMP(kmp.sourceFolder)
-          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
-          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
+          ResourceFileManager.shared.finalizePackageInstall(kmp, completionHandler: { error in
+              if error != nil {
+                log.error("Error installing the lexical model: \(String(describing: error))")
+              } else {
+                log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
+                installedLexicalModel = kmp.models[0].installableLexicalModels[0]
+              }
+            })
+
           //this can fail gracefully and not show errors to users
           try FileManager.default.removeItem(at: downloadedPackageFile)
         } catch {
           log.error("Error installing the lexical model: \(error)")
         }
       } else {
-        log.error("Error extracting the lexical model from the package: \(KMPError.invalidPackage)")
+        log.error("Error extracting the lexical model from the package: \(String(describing: error))")
       }
     })
     return installedLexicalModel
