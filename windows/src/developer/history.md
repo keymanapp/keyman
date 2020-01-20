@@ -16,6 +16,9 @@
 * Change: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
 * Change: Application title no longer shows active project, only main window (#2441)
 
+## 2020-01-20 12.0.66 stable
+* Bug Fix: Character Map was not reliably dropping into Text Editor (#2504)
+
 ## 2019-12-06 12.0.62 stable
 * Bug Fix: Shortcuts in text editors were not working after #2331 (#2424)
 
