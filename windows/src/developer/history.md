@@ -16,6 +16,9 @@
 * Change: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
 * Change: Application title no longer shows active project, only main window (#2441)
 
+## 2020-01-20 12.0.66 stable
+* Bug Fix: Character Map was not reliably dropping into Text Editor (#2504)
+
 ## 2020-01-20 12.0.65 stable
 * Bug Fix: Missing author email was causing lexical model compiler to fail (#2496)
 
