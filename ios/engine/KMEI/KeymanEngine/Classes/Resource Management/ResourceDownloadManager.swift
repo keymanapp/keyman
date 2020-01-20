@@ -581,4 +581,8 @@ public class ResourceDownloadManager {
 
     return updateQueue
   }
+
+  public func installLexicalModelPackage(at packageURL: URL) -> InstallableLexicalModel? {
+    return downloader.installLexicalModelPackage(downloadedPackageFile: packageURL)
+  }
 }

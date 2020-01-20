@@ -45,6 +45,12 @@ public class ResourceFileManager {
     var destinationUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     destinationUrl.appendPathComponent(url.lastPathComponent)
 
+    // Since it's possible to request an install from a KMP in our owned document space,
+    // we need to check that it's not already in place where we want it.
+    if url == destinationUrl {
+      return url
+    }
+
     do {
       try copyWithOverwrite(from: url, to: destinationUrl)
       return destinationUrl
@@ -103,7 +109,9 @@ public class ResourceFileManager {
     })
   }
 
-  public func promptPackageInstall(of package: KeymanPackage, in rootVC: UIViewController) {
+  public func promptPackageInstall(of package: KeymanPackage,
+                                   in rootVC: UIViewController,
+                                   successHandler: ((KeymanPackage) -> Void)? = nil) {
     let vc = PackageInstallViewController(for: package, completionHandler: { error in
       if let err = error {
         if let kmpError = err as? KMPError {
@@ -111,7 +119,9 @@ public class ResourceFileManager {
           rootVC.present(alert, animated: true, completion: nil)
         }
       } else {
-        let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.")
+        let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.", completionHandler: {
+            successHandler?(package)
+          })
         rootVC.present(alert, animated: true, completion: nil)
       }
     })
@@ -124,12 +134,14 @@ public class ResourceFileManager {
     return buildSimpleAlert(title: "Error", message: error.rawValue)
   }
 
-  public func buildSimpleAlert(title: String, message: String) -> UIAlertController {
+  public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {
     let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
                                             style: UIAlertAction.Style.default,
-                                            handler: nil))
+                                            handler: { _ in
+                                              completionHandler?()
+                                            }))
 
     //UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true, completion: nil)
     return alertController

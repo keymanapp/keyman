@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
+import com.tavultesoft.kmea.util.HelpFile;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_MODEL;
@@ -81,7 +82,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     // Currently, model help only available if custom link exists
     String icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if both custom help and File Provider don't exist
-	// TODO: Update this when model help available on help.keyman.com
+    // TODO: Update this when model help available on help.keyman.com
     if ( (!customHelpLink.equals("") && !FileProviderUtils.exists(context)) ||
         customHelpLink.equals("") ){
       icon = noIcon;
@@ -128,32 +129,17 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
         // "Help" link clicked
         if (itemTitle.equals(getString(R.string.help_link))) {
-          Intent i = new Intent(Intent.ACTION_VIEW);
-
           if (!customHelpLink.equals("")) {
-            if (FileUtils.isWelcomeFile(customHelpLink)) {
-              File customHelp = new File(new File(customHelpLink).getAbsolutePath());
-              i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-              // Starting with Android N, you can't pass file:// to intents, so we use FileProvider
-              try {
-                Uri contentUri = FileProvider.getUriForFile(
-                  context, authority, customHelp);
-                i.setDataAndType(contentUri, "text/html");
-              } catch (NullPointerException e) {
-                String message = "FileProvider undefined in app to load" + customHelp.toString();
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.e("ModelInfoActivity", message);
-              }
-            }
-            else {
-              i.setData(Uri.parse(customHelpLink));
-            }
-            if (FileProviderUtils.exists(context)) {
+            // Display local welcome.htm help file, including associated assets
+            Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
+
+            if (FileProviderUtils.exists(context) || KMManager.isTestMode()) {
               startActivity(i);
             }
           } else {
             // We should always have a help file packaged with models.
           }
+
         // "Uninstall Model" clicked
         } else if (itemTitle.equals(getString(R.string.uninstall_model))) {
           // Uninstall selected model

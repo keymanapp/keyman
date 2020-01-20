@@ -204,10 +204,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
   
   open override func loadView() {
-    let bgColor = UIColor(red: 210.0 / 255.0, green: 214.0 / 255.0, blue: 220.0 / 255.0, alpha: 1.0)
     let baseView = CustomInputView(frame: CGRect.zero, innerVC: keymanWeb, inputViewStyle: .keyboard)
-
-    baseView.backgroundColor = bgColor
+    baseView.backgroundColor = Colors.keyboardBackground
 
     // TODO: If the following line is enabled, the WKWebView does not respond to touch events
     // Can figure out why one day maybe
