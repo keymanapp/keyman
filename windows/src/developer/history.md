@@ -3,6 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 
+## 2020-01-20 12.0.66 stable
+* Bug Fix: Character Map was not reliably dropping into Text Editor (#2504)
+
 ## 2020-01-20 12.0.65 stable
 * Bug Fix: Lexical model compiler fails to compile packages that don't contain email address (#2496)
 
