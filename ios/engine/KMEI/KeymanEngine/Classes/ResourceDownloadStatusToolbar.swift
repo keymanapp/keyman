@@ -37,7 +37,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
   }
   
   private func setup() {
-    barTintColor = UIColor(red: 0.5, green: 0.75, blue: 0.25, alpha: 0.9)
+    barTintColor = Colors.statusToolbar
   }
   
   /**
@@ -78,7 +78,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
     button.frame = CGRect(x: frame.origin.x, y: frame.origin.y,
                           width: frame.width * 0.95, height: frame.height * 0.7)
     button.center = CGPoint(x: frame.width / 2, y: frame.height / 2)
-    button.tintColor = UIColor(red: 0.75, green: 1.0, blue: 0.5, alpha: 1.0)
+    button.tintColor = Colors.statusResourceUpdateButton
     button.setTitleColor(UIColor.white, for: .normal)
     button.setTitle(text, for: .normal)
     button.autoresizingMask =  [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,

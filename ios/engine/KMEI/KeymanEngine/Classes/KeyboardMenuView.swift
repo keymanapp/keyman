@@ -9,10 +9,11 @@
 import  Foundation
 import  UIKit
 
+// Used by the system keyboard as its globe key menu.
 class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate {
-  private let bgColor = UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
-  private let bgColor2 = UIColor(red: 255.0 / 255.0, green: 255.0 / 255.0, blue: 255.0 / 255.0, alpha: 1.0)
-  private let borderColor = UIColor(red: 134.0 / 255.0, green: 137.0 / 255.0, blue: 139.0 / 255.0, alpha: 1.0)
+  private let bgColor = Colors.systemBackground
+  private let bgColor2 = Colors.systemBackground
+  private let borderColor = Colors.popupBorder
   private var borderRadius: CGFloat = 5.0
   private var strokeWidth: CGFloat = 0.75
 
@@ -251,7 +252,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     let cell = UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 74.0 / 255.0, green: 186.0 / 255.0, blue: 208.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionSecondary
     cell.selectedBackgroundView = selectionColor
     return cell
   }

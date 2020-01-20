@@ -110,7 +110,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
     let cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }
@@ -172,7 +172,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     view.isUserInteractionEnabled = false
     let indicatorView = UIActivityIndicatorView(style: .whiteLarge)
     let activityView = UIView(frame: indicatorView.bounds.insetBy(dx: -10.0, dy: -10.0))
-    activityView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
+    activityView.backgroundColor = Colors.spinnerBackground
     activityView.layer.cornerRadius = 6.0
     activityView.center = view.center
     activityView.tag = activityViewTag

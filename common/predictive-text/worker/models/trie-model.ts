@@ -91,8 +91,8 @@
 
     configure(capabilities: Capabilities): Configuration {
       return this.configuration = {
-        leftContextCodeUnits: capabilities.maxLeftContextCodeUnits,
-        rightContextCodeUnits: capabilities.maxRightContextCodeUnits
+        leftContextCodePoints: capabilities.maxLeftContextCodePoints,
+        rightContextCodePoints: capabilities.maxRightContextCodePoints
       };
     }
 
@@ -113,7 +113,7 @@
       let newContext = models.applyTransform(transform, context);
 
       // Computes the different in word length after applying the transform above.
-      let leftDelOffset = transform.deleteLeft - transform.insert.length;
+      let leftDelOffset = transform.deleteLeft - transform.insert.kmwLength();
 
       // All text to the left of the cursor INCLUDING anything that has
       // just been typed.
@@ -127,7 +127,7 @@
           // Delete whatever the prefix that the user wrote.
           // Note: a separate capitalization/orthography engine can take this
           // result and transform it as needed.
-          deleteLeft: leftDelOffset + prefix.length,
+          deleteLeft: leftDelOffset + prefix.kmwLength(),
         },
         displayAs: text,
         p: p
@@ -291,7 +291,7 @@
    * @param index The index in the prefix. Initially 0.
    */
   function findPrefix(node: Node, key: SearchKey, index: number = 0): Node | null {
-    if (node.type === 'leaf' || index === key.length) {
+    if (node.type === 'leaf' || index === key.kmwLength()) {
       return node;
     }
 
