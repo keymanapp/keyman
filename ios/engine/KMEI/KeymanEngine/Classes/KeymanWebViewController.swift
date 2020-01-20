@@ -572,7 +572,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
   func updateShowBannerSetting() {
     let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: "ShouldShowBanner")
+    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
     if Manager.shared.isSystemKeyboard || alwaysShow {
       showBanner(true)
     } else {

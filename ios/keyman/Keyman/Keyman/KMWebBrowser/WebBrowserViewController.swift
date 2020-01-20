@@ -167,7 +167,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let url: URL? = request.mainDocumentURL
     addressField.text = url?.absoluteString
     let userData = UserDefaults.standard
-    userData.set(url?.absoluteString, forKey: "KMWebBrowserLastURL")
+    userData.set(url?.absoluteString, forKey: webBrowserLastURLKey)
     userData.synchronize()
   }
 

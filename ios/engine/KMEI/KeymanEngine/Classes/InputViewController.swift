@@ -104,7 +104,7 @@ private class CustomInputView: UIInputView {
     // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
     // TODO:  actually check that the banner should be displayed!  The property doesn't do this.
     let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: "ShouldShowBanner")
+    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
 
     var topBarHeight: CGFloat = 0.0
     if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {

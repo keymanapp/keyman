@@ -173,7 +173,7 @@ open class SettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       // actually this should call into KMW, which controls the banner
-      userData.set(toggle.isOn, forKey: "ShouldShowBanner")
+      userData.set(toggle.isOn, forKey: Key.optShouldShowBanner)
       userData.synchronize()
     }
 
@@ -185,19 +185,19 @@ open class SettingsViewController: UITableViewController {
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: "ShouldShowGetStarted")
+      userData.set(toggle.isOn, forKey: Key.optShouldShowGetStarted)
       userData.synchronize()
     }
   }
 
   private var showBanner: Bool {
     let userData = Storage.active.userDefaults
-    return userData.bool(forKey: "ShouldShowBanner")
+    return userData.bool(forKey: Key.optShouldShowBanner)
   }
   
   private var showGetStarted: Bool {
     let userData = Storage.active.userDefaults
-    return userData.bool(forKey: "ShouldShowGetStarted")
+    return userData.bool(forKey: Key.optShouldShowGetStarted)
   }
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
