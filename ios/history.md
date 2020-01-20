@@ -3,7 +3,9 @@
 ## 13.0 alpha
 * Start version 13.0
 * Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457)
-* Adds support for iOS 13.0's dark mode feature
+* Adds support for iOS 13.0's dark mode feature (#2468)
+* Keyboards now scale to match the default system keyboard's size for known devices (#2487)
+* Fixes bug where the keyboard might display within the settings menu (#2470)
 * Testing for upcoming patch to stable:
   * Fixes for deprecated code, improving maintainability (#2282)
 
