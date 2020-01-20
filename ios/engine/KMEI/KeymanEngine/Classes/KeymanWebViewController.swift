@@ -15,18 +15,6 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted
 
-// UI In-App Keyboard Constants
-private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
-private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
-private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
-private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
-
-// UI System Keyboard Constants
-private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
-private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
-private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
-private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
-
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
   let storage: Storage
@@ -35,6 +23,7 @@ class KeymanWebViewController: UIViewController {
 
   // Views
   var webView: WKWebView?
+  var activeModel: Bool = false
   private var helpBubbleView: PopoverView?
   private var keyPreviewView: KeyPreviewView?
   private var subKeysView: SubKeysView?
@@ -316,7 +305,8 @@ extension KeymanWebViewController {
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
     }
-    
+
+    self.activeModel = true
     setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
   
@@ -552,14 +542,8 @@ extension KeymanWebViewController: KeymanWebDelegate {
       log.info("Setting initial keyboard.")
       _ = Manager.shared.setKeyboard(newKb)
     }
-    
-    if Manager.shared.isSystemKeyboard {
-      showBanner(true)
-    } else {
-      // TODO:  Set banner to visible / not visible based on the toggle in Settings.
-      //        Problem:  we need access to the banner image path there.  It's only set for the system keyboard variant!
-      showBanner(false)
-    }
+
+    updateShowBannerSetting()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
@@ -571,6 +555,16 @@ extension KeymanWebViewController: KeymanWebDelegate {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
       Manager.shared.shouldReloadKeyboard = false
+    }
+  }
+
+  func updateShowBannerSetting() {
+    let userData = Storage.active.userDefaults
+    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
+    if Manager.shared.isSystemKeyboard || alwaysShow {
+      showBanner(true)
+    } else {
+      showBanner(false)
     }
   }
   
@@ -786,19 +780,7 @@ extension KeymanWebViewController {
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if isPortrait {
-        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
-      }
-    }
+    return KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
   }
 
   var keyboardWidth: CGFloat {
@@ -891,6 +873,9 @@ extension KeymanWebViewController {
   // MARK: - Show/hide views
   func reloadKeyboard() {
     webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+
+    // Check for a change of "always show banner" state
+    updateShowBannerSetting()
   }
 
   @objc func showHelpBubble() {

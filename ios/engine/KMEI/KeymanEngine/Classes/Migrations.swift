@@ -25,7 +25,7 @@ struct VersionResourceSet {
   }
 }
 
-enum Migrations {
+public enum Migrations {
   static let resourceHistory: [VersionResourceSet] = {
     let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
 
@@ -85,6 +85,20 @@ enum Migrations {
     } else {
       log.info("KMP directory migration already performed. Skipping.")
     }
+
+    // Version-based migrations
+    if let version = engineVersion {
+      if version < Version.fileBrowserImplemented {
+        do {
+          try migrateDocumentsFromPreBrowser()
+        } catch {
+          log.error("Could not migrate Documents directory contents: \(error)")
+        }
+      } else {
+        log.info("Documents directory structure compatible with \(Version.fileBrowserImplemented)")
+      }
+    }
+
     storage.userDefaults.synchronize()
   }
 
@@ -119,8 +133,19 @@ enum Migrations {
     return possibleMatches
   }
 
+  // The only part actually visible outside of KeymanEngine.
+  public internal(set) static var engineVersion: Version? {
+    get {
+      return Storage.active.userDefaults.lastEngineVersion
+    }
+
+    set(value) {
+      Storage.active.userDefaults.lastEngineVersion = value!
+    }
+  }
+
   static func updateResources(storage: Storage) {
-    var lastVersion = storage.userDefaults.lastEngineVersion
+    var lastVersion = engineVersion
     if (lastVersion ?? Version.fallback) >= Version.current {
       // We're either current or have just been downgraded; no need to do modify resources.
       // If it's a downgrade, it's near-certainly a testing environment.
@@ -392,5 +417,35 @@ enum Migrations {
       }
     }
     return latestVersion
+  }
+
+  static func migrateDocumentsFromPreBrowser() throws {
+    log.info("Cleaning Documents folder due to 12.0 installation artifacts")
+
+    // Actually DO it.
+    let documentFolderURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    // The String-based version will break, at least in Simulator.
+    let contents = try FileManager.default.contentsOfDirectory(at: documentFolderURL, includingPropertiesForKeys: nil, options: [])
+
+    try contents.forEach { fileURL in
+      // 12.0: extracts .kmp files by first putting them in Documents and giving
+      // them this suffix.
+      if fileURL.lastPathComponent.hasSuffix(".kmp.zip") {
+        // Renames the .kmp.zip files back to their original .kmp filename.
+        let destFile = fileURL.lastPathComponent.replacingOccurrences(of: ".kmp.zip", with: ".kmp")
+        let destURL = fileURL.deletingLastPathComponent().appendingPathComponent(destFile)
+
+        log.debug("\(fileURL) -> \(destURL)")
+        try FileManager.default.moveItem(at: fileURL, to: destURL)
+      } else if fileURL.lastPathComponent == "temp" {
+        // Removes the 'temp' installation directory; that shouldn't be visible to users.
+        log.debug("Deleting directory: \(fileURL)")
+        try FileManager.default.removeItem(at: fileURL)
+      } else if fileURL.lastPathComponent.hasSuffix(".kmp") {
+        // Do nothing; this file is fine.
+      } else {
+        log.info("Unexpected file found in documents folder during upgrade: \(fileURL)")
+      }
+    }
   }
 }
