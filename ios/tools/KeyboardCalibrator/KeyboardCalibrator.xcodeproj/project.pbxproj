@@ -58,6 +58,7 @@
 
 /* Begin PBXFileReference section */
 		CE722FD923CC18E40095F94E /* DummyInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummyInputViewController.swift; sourceTree = "<group>"; };
+		CE728D2123D546890050FD62 /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		CE7CCC1E23CD61300032DF1A /* Calibration.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Calibration.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE7CCC2223CD61300032DF1A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE7CCC2B23CD61680032DF1A /* Calibration.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Calibration.entitlements; sourceTree = "<group>"; };
@@ -118,6 +119,7 @@
 		CEE8C53E23C84B4B0093480E = {
 			isa = PBXGroup;
 			children = (
+				CE728D2123D546890050FD62 /* readme.md */,
 				CEE8C54923C84B4B0093480E /* KeyboardCalibrator */,
 				CE7CCC1F23CD61300032DF1A /* CalibrationKbd */,
 				CEE8C54823C84B4B0093480E /* Products */,
@@ -384,7 +386,7 @@
 		CE7CCC2723CD61300032DF1A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Calibration/Calibration.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CalibrationKbd/Calibration.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WHE552KZN5;
 				INFOPLIST_FILE = CalibrationKbd/Info.plist;
@@ -405,7 +407,7 @@
 		CE7CCC2823CD61300032DF1A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Calibration/Calibration.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CalibrationKbd/Calibration.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WHE552KZN5;
 				INFOPLIST_FILE = CalibrationKbd/Info.plist;

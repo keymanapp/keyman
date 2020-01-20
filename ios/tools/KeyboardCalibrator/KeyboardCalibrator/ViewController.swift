@@ -188,7 +188,8 @@ class ViewController: UIViewController {
         operationControl.selectedSegmentIndex = CaptureOperation.calibrate.rawValue
         operationChanged(self) // is NOT automatically called otherwise!
       case .calibrate:
-        // May require multiple recalibrations.
+        operationControl.selectedSegmentIndex = CaptureOperation.check.rawValue
+        operationChanged(self)
         break
       case .check:
         // Process is complete, so there's nothing automatic to do here.
