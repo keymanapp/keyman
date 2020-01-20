@@ -326,6 +326,16 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
     }
     if Manager.shared.setKeyboard(kb) {
       tableView?.reloadData()
+      
+      // If we allow the system keyboard to show no banners, these lines are needed
+      // for properly-managed variable system keyboard height.
+      //
+      // It's not quite perfect yet, though - the rescale only works if the first
+      // keyboard loaded does not provide suggestions.  Parking it here as it's not
+      // worth pursuing further at this stage.
+      inputViewController?.updateViewConstraints()
+      inputViewController?.updateShowBannerSetting()
+      return
     }
   }
 }

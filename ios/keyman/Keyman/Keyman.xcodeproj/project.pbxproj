@@ -134,6 +134,18 @@
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
+		CE79B23C23C6E8E6007E72AE /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
+		CE79B23D23C6ECB2007E72AE /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */; };
+		CE79B23E23C6ECB4007E72AE /* banner-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */; };
+		CE79B23F23C6ECB6007E72AE /* banner-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D619E64A580006C017 /* banner-Landscape.png */; };
+		CE79B24023C6ECB9007E72AE /* banner-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D719E64A580006C017 /* banner-Landscape@2x.png */; };
+		CE79B24123C6ECBB007E72AE /* banner-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D819E64A580006C017 /* banner-Landscape@2x~ipad.png */; };
+		CE79B24223C6ECBE007E72AE /* banner-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D919E64A580006C017 /* banner-Landscape~ipad.png */; };
+		CE79B24323C6ECC0007E72AE /* banner-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DA19E64A580006C017 /* banner-Portrait.png */; };
+		CE79B24423C6ECC2007E72AE /* banner-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DB19E64A580006C017 /* banner-Portrait@2x.png */; };
+		CE79B24523C6ECC5007E72AE /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DC19E64A580006C017 /* banner-Portrait@2x~ipad.png */; };
+		CE79B24623C6ECC7007E72AE /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
+		CE79B24723C6ECC9007E72AE /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
 		CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE79CDB42370111200010C06 /* Themes+Colors.xcassets */; };
 		CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */; };
 		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
@@ -773,8 +785,10 @@
 				9845A8D61A439F1000544E2E /* UIButtonBarArrowLeft@2x.png in Resources */,
 				981AFAA219EF44DE006706BF /* navbar-Portrait@2x.png in Resources */,
 				9845A8D01A439F1000544E2E /* 786-browser-selected@2x.png in Resources */,
+				CE79B24223C6ECBE007E72AE /* banner-Landscape~ipad.png in Resources */,
 				9822CB6D1A3A8E3200D73CAA /* more-selected@2x.png in Resources */,
 				9845A7B01A43983300544E2E /* kmwb-navbar-Landscape@2x~ipad.png in Resources */,
+				CE79B23F23C6ECB6007E72AE /* banner-Landscape.png in Resources */,
 				9845A7AD1A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png in Resources */,
 				9845A7B61A43983300544E2E /* kmwb-navbar-Portrait~ipad.png in Resources */,
 				9845A7AF1A43983300544E2E /* kmwb-navbar-Landscape@2x.png in Resources */,
@@ -802,7 +816,9 @@
 				9820CE521A144F0400EA909A /* navbar-Landscape-568h@3x.png in Resources */,
 				162E2C9020924EEE00F40769 /* keyman_logo@3x.png in Resources */,
 				981AFAB719EF44DE006706BF /* navbar-Portrait@2x~ipad.png in Resources */,
+				CE79B24423C6ECC2007E72AE /* banner-Portrait@2x.png in Resources */,
 				981AFAB819EF44DE006706BF /* textsize_down.png in Resources */,
+				CE79B23D23C6ECB2007E72AE /* banner-Landscape-568h@2x.png in Resources */,
 				981AFAB919EF44DE006706BF /* 887-notepad-selected@2x.png in Resources */,
 				9845A8CF1A439F1000544E2E /* 786-browser-selected.png in Resources */,
 				981AFABA19EF44DE006706BF /* textsize_down@2x.png in Resources */,
@@ -812,6 +828,7 @@
 				CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */,
 				981AFABC19EF44DE006706BF /* 887-notepad@2x.png in Resources */,
 				981AFABE19EF44DE006706BF /* textsize_up.png in Resources */,
+				CE79B24523C6ECC5007E72AE /* banner-Portrait@2x~ipad.png in Resources */,
 				982D148F19FF462A007D4629 /* 711-trash-selected@3x.png in Resources */,
 				981AFABF19EF44DE006706BF /* textsize_up@2x.png in Resources */,
 				9845A7D01A439A9200544E2E /* GetStartedViewController.xib in Resources */,
@@ -820,11 +837,14 @@
 				981AFAC519EF44DE006706BF /* 724-info-selected.png in Resources */,
 				981AFAC619EF44DE006706BF /* 711-trash-selected@2x.png in Resources */,
 				981AFAC719EF44DE006706BF /* navbar-Landscape@2x~ipad.png in Resources */,
+				CE79B23E23C6ECB4007E72AE /* banner-Landscape-568h@3x.png in Resources */,
 				981AFAC819EF44DE006706BF /* navbar-Portrait.png in Resources */,
 				981AFAC919EF44DE006706BF /* 711-trash.png in Resources */,
 				9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */,
+				CE79B24723C6ECC9007E72AE /* banner-Portrait~ipad.png in Resources */,
 				9845A8D51A439F1000544E2E /* UIAccessoryButtonX@2x.png in Resources */,
 				982D149919FF462A007D4629 /* 887-notepad@3x.png in Resources */,
+				CE79B24023C6ECB9007E72AE /* banner-Landscape@2x.png in Resources */,
 				982D149719FF462A007D4629 /* 887-notepad-selected@3x.png in Resources */,
 				9845A7B41A43983300544E2E /* kmwb-navbar-Portrait@2x~ipad.png in Resources */,
 				981AFACD19EF44DE006706BF /* 711-trash@2x.png in Resources */,
@@ -840,9 +860,12 @@
 				981AFAD419EF44DE006706BF /* 887-notepad.png in Resources */,
 				981AFAD619EF44DE006706BF /* 702-share-selected.png in Resources */,
 				982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */,
+				CE79B24623C6ECC7007E72AE /* banner-Portrait@3x.png in Resources */,
+				CE79B24123C6ECBB007E72AE /* banner-Landscape@2x~ipad.png in Resources */,
 				982D149119FF462A007D4629 /* 711-trash@3x.png in Resources */,
 				982D148D19FF462A007D4629 /* 702-share@3x.png in Resources */,
 				9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */,
+				CE79B24323C6ECC0007E72AE /* banner-Portrait.png in Resources */,
 				9822CB691A3A77D200D73CAA /* MainViewController_.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -941,6 +964,7 @@
 				C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */,
 				C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */,
 				C0E943FA1F6124E100E7D98C /* AppDelegate.swift in Sources */,
+				CE79B23C23C6E8E6007E72AE /* KeyboardViewController.swift in Sources */,
 				C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */,
 				162E2C9D2092BFE400F40769 /* KMUnderscoreView.swift in Sources */,
 				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,

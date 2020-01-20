@@ -152,7 +152,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   var currentResponder: KeymanResponder?
   
   // This allows for 'lazy' initialization of the keyboard.
-  var inputViewController: InputViewController! {
+  open var inputViewController: InputViewController! {
     get {
       // Occurs for the in-app keyboard ONLY.
       if _inputViewController == nil {
@@ -305,6 +305,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
+
+    // Now to handle lexical model + banner management
+    inputViewController.clearModel()
     
     let userDefaults: UserDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
