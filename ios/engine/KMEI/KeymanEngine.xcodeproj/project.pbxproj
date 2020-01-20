@@ -212,6 +212,7 @@
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
 		CE71705823A9C14D00A924A1 /* ResourceFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */; };
 		CE71705F23A9C97F00A924A1 /* PackageInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */; };
+		CE79B24923C711FF007E72AE /* KeyboardScaleMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */; };
 		CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */; };
 		CE7A26D423CEE71B0005955C /* Keyboard Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */; };
 		CE7A26D823CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
@@ -423,6 +424,7 @@
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
+		CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleMap.swift; sourceTree = "<group>"; };
 		CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Keyboard Colors.xcassets"; sourceTree = "<group>"; };
 		CE7A26D723CEEC630005955C /* Colors+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors+Extension.swift"; sourceTree = "<group>"; };
 		CE7A26DA23CEEF640005955C /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
@@ -874,6 +876,7 @@
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
 				C05B14321FD914870082A316 /* Log.swift */,
 				C08E698C1FDA392D0026056B /* Migrations.swift */,
+				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1312,6 +1315,7 @@
 				C07A9D8E1FD1798900828ADD /* APIKeyboardRepository.swift in Sources */,
 				C0959CD41F99C44E00B616BC /* Constants.swift in Sources */,
 				C0452BAD1F9F21270064431A /* Keyboard.swift in Sources */,
+				CE79B24923C711FF007E72AE /* KeyboardScaleMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
