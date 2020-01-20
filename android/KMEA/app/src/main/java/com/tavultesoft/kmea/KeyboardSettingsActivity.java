@@ -6,6 +6,7 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -31,6 +32,9 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.HelpFile;
@@ -38,6 +42,7 @@ import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
+import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
@@ -70,6 +75,22 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String kbID = getIntent().getStringExtra(KMManager.KMKey_KeyboardID);
     final String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
     final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
+    String latestKbdCloudVersion = kbVersion;
+
+    // Determine if keyboard update is available from the cloud
+    Dataset dataset = CloudRepository.shared.fetchDataset(this);
+    HashMap<String, String> kbInfo = new HashMap<>();
+    kbInfo.put(KMManager.KMKey_PackageID, packageID);
+    kbInfo.put(KMManager.KMKey_LanguageID, languageID);
+    kbInfo.put(KMManager.KMKey_LanguageName, languageName);
+    kbInfo.put(KMManager.KMKey_KeyboardID, kbID);
+    kbInfo.put(KMManager.KMKey_KeyboardName, kbName);
+
+    Keyboard kbdQuery = new Keyboard(kbInfo);
+    final Keyboard latestKbd = dataset.keyboards.findMatch(kbdQuery);
+    if (latestKbd != null) {
+      latestKbdCloudVersion = latestKbd.getVersion();
+    }
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
@@ -79,10 +100,15 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     infoList = new ArrayList<>();
     // Display keyboard version title
     final String noIcon = "0";
+    String icon = noIcon;
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    hashMap.put(iconKey, noIcon);
+    // Display arrow to download update if latestKbdCloudVersion > kbVersion (installed)
+    if (FileUtils.compareVersions(latestKbdCloudVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+      icon = String.valueOf(R.drawable.ic_arrow_forward);
+    }
+    hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
     // Display keyboard help link
@@ -90,7 +116,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
-    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
     if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
          (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {
@@ -120,8 +146,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
-        if (itemTitle.equals(getString(R.string.keyboard_version))) {
-          // No point in 'clicking' on version info.
+        if (itemTitle.equals(getString(R.string.keyboard_version)) && icon.equals(noIcon)) {
+          // No point in 'clicking' on version info if no update available
           return false;
         // Visibly disables the help option when help isn't available
         } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
@@ -136,11 +162,22 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        HashMap<String, String> hashMap = (HashMap<String, String>)parent.getItemAtPosition(position);
+        HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
+        // "Version" link clicked to download latest from cloud
+        if (itemTitle.equals(getString(R.string.keyboard_version))) {
+          String title = getString(R.string.keyboard_update_message, languageName, kbName);
+          String keyboardKey = String.format("%s_%s", languageID, kbID);
+          DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
+            DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard), keyboardKey);
+          dialog.show(getFragmentManager(), "dialog");
+
+          //final List<Bundle> updateBundles = cloudResource.buildDownloadBundle();new ArrayList<>();
+          //updateBundles.add(latestKbd);
+
         // "Help" link clicked
-        if (itemTitle.equals(getString(R.string.help_link))) {
+        } else if (itemTitle.equals(getString(R.string.help_link))) {
           if (customHelpLink != null) {
             // Display local welcome.htm help file, including associated assets
             Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
@@ -182,6 +219,13 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);
     }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    KMManager.getUpdateTool().checkForResourceUpdates(this,false);
   }
 
   @Override
