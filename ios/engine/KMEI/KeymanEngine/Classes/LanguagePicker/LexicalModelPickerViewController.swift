@@ -41,8 +41,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       navigationItem.rightBarButtonItem = addButton
     }
     
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
-                                                          blue: 0.25, alpha: 0.9)
+    navigationController?.toolbar?.barTintColor = Colors.statusToolbar
     
     lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.lexicalModelDownloadStarted,
@@ -92,7 +91,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }

@@ -168,8 +168,8 @@ describe('LMLayerWorker', function() {
       sinon.assert.calledWithMatch(fakePostMessage, {
         message: 'ready',
         configuration: {
-          leftContextCodeUnits: maxCodeUnits,
-          rightContextCodeUnits: 0,
+          leftContextCodePoints: maxCodeUnits,
+          rightContextCodePoints: 0,
         }
       });
     });

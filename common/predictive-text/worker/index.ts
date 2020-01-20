@@ -30,6 +30,7 @@
  */
 
 /// <reference path="../message.d.ts" />
+/// <reference path="../../../web/source/text/kmwstring.ts" />
 /// <reference path="models/dummy-model.ts" />
 /// <reference path="word_breaking/ascii-word-breaker.ts" />
 /// <reference path="./model-compositor.ts" />
@@ -182,12 +183,20 @@ class LMLayerWorker {
     try {
       let configuration = model.configure(this._platformCapabilities);
 
-      // Set reasonable defaults for the configuration.
-      if (!configuration.leftContextCodeUnits) {
-        configuration.leftContextCodeUnits = this._platformCapabilities.maxLeftContextCodeUnits;
+      // Handle deprecations.
+      if(!configuration.leftContextCodePoints) {
+        configuration.leftContextCodePoints = configuration.leftContextCodeUnits;
       }
-      if (!configuration.rightContextCodeUnits) {
-        configuration.rightContextCodeUnits = this._platformCapabilities.maxRightContextCodeUnits || 0;
+      if(!configuration.rightContextCodePoints) {
+        configuration.rightContextCodePoints = configuration.rightContextCodeUnits;
+      }
+
+      // Set reasonable defaults for the configuration.
+      if (!configuration.leftContextCodePoints) {
+        configuration.leftContextCodePoints = this._platformCapabilities.maxLeftContextCodePoints;
+      }
+      if (!configuration.rightContextCodePoints) {
+        configuration.rightContextCodePoints = this._platformCapabilities.maxRightContextCodePoints || 0;
       }
 
       this.transitionToReadyState(model);

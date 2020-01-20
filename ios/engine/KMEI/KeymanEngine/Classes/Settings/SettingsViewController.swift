@@ -27,8 +27,7 @@ open class SettingsViewController: UITableViewController {
                                      action: #selector(self.doneClicked))
     navigationItem.leftBarButtonItem = doneButton
 
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
-                                                          blue: 0.25, alpha: 0.9)
+    navigationController?.toolbar?.barTintColor = Colors.statusToolbar
   }
   
   @objc func doneClicked(_ sender: Any) {
@@ -134,7 +133,7 @@ open class SettingsViewController: UITableViewController {
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
         showBannerSwitch.frame = switchFrame
         
-        showBannerSwitch.isOn = false //TODO: find the setting this is to show!
+        showBannerSwitch.isOn = showBanner
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
@@ -174,22 +173,31 @@ open class SettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       // actually this should call into KMW, which controls the banner
-      userData.set(toggle.isOn, forKey: "ShouldShowBanner") //???
+      userData.set(toggle.isOn, forKey: Key.optShouldShowBanner)
       userData.synchronize()
     }
+
+    // Necessary for the keyboard to visually update to match
+    // the new setting.
+    Manager.shared.shouldReloadKeyboard = true
   }
   
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: "ShouldShowGetStarted")
+      userData.set(toggle.isOn, forKey: Key.optShouldShowGetStarted)
       userData.synchronize()
     }
+  }
+
+  private var showBanner: Bool {
+    let userData = Storage.active.userDefaults
+    return userData.bool(forKey: Key.optShouldShowBanner)
   }
   
   private var showGetStarted: Bool {
     let userData = Storage.active.userDefaults
-    return userData.bool(forKey: "ShouldShowGetStarted")
+    return userData.bool(forKey: Key.optShouldShowGetStarted)
   }
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {

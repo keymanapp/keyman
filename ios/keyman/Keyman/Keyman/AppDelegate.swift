@@ -58,6 +58,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
 
+    // TODO:  Assign a subclassed version of InputViewController that implements the image stuff.
+    Manager.shared.inputViewController = KeyboardViewController(forSystem: false)
+
     window = UIWindow(frame: UIScreen.main.bounds)
 
     // Initialize overlayWindow
