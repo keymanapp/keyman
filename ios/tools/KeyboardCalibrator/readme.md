@@ -22,13 +22,14 @@ This tool was designed to facilitate collection of values for use with `KeymanEn
     - You may want to revisit a previous setting and set it back to the default system keyboard for comparison; _Check_ will only ever display the calibration keyboard, so this will allow for easier visual confirmation.
     
 ![iPhone SE complete](readme_imgs/iPhone-SE-complete.png)
-![iPhone X complete](readme_imgs/iPhone-X-complete.png)
 
 7.  Repeat steps 2 through 6 for the other device orientation.
 
 ## Notes
 
 On tablet devices, the default "banner" may not disappear when prediction is turned off for an input.  In this case, the banner's height will generally be reported as the "system inset" instead.  Said "System inset" (on phones) corresponds to the part of the iOS phone keyboard that never disappears on iPhone X and later devices _below_ the keyboard.
+
+![iPhone X complete](readme_imgs/iPhone-X-complete.png)
 
 Note that the green and blue components that display in-app for _Check_ will never display within the system keyboard.  These refer to regions not available to the Keyman keyboard that resulted in the final calibrated height reported by the app.
 - Blue:  refers to "safe area insets" due to device screen curvature
