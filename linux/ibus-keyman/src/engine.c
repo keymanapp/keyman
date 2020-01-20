@@ -123,10 +123,6 @@ static gchar**  ibus_keyman_engine_keyboard_options
                                             (gchar *package_id,
                                              gchar *keyboard_id);
 
-static void ibus_keyman_engine_update_keyboard_options
-                                            (IBusEngine *engine,
-                                             gchar **options);
-
 static IBusEngineClass *parent_class = NULL;
 
 GType
