@@ -48,7 +48,7 @@
                                                 <constraint firstAttribute="width" secondItem="ysW-nc-xvg" secondAttribute="height" multiplier="1:1" id="zHh-Ye-Nlf"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="301" verticalHuggingPriority="301" horizontalCompressionResistancePriority="800" verticalCompressionResistancePriority="800" text="Scan this code to load this resource on another device" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z2O-MT-IoV">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="301" verticalHuggingPriority="301" horizontalCompressionResistancePriority="800" verticalCompressionResistancePriority="800" text="Scan this code to load this keyboard on another device" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z2O-MT-IoV">
                                             <rect key="frame" x="20" y="203" width="280" height="173"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="4SB-pP-7eT"/>
