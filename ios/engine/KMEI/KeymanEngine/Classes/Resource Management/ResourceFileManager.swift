@@ -111,8 +111,9 @@ public class ResourceFileManager {
 
   public func promptPackageInstall(of package: KeymanPackage,
                                    in rootVC: UIViewController,
+                                   isCustom: Bool,
                                    successHandler: ((KeymanPackage) -> Void)? = nil) {
-    let vc = PackageInstallViewController(for: package, completionHandler: { error in
+    let vc = PackageInstallViewController(for: package, isCustom: isCustom, completionHandler: { error in
       if let err = error {
         if let kmpError = err as? KMPError {
           let alert = self.buildKMPError(kmpError)
@@ -150,14 +151,14 @@ public class ResourceFileManager {
   /**
    * Performs the actual installation of a package's resources once confirmation has been received from the user.
    */
-  public func finalizePackageInstall(_ package: KeymanPackage, completionHandler: (Error?) -> Void) {
+  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool, completionHandler: (Error?) -> Void) {
     do {
       // Time to pass the package off to the final installers - the parse__KMP methods.
       // TODO: (14.0+) These functions should probably be refactored to within this class eventually.
       if package.isKeyboard() {
-        try Manager.shared.parseKbdKMP(package.sourceFolder)
+        try Manager.shared.parseKbdKMP(package.sourceFolder, isCustom: isCustom)
       } else {
-        try Manager.parseLMKMP(package.sourceFolder)
+        try Manager.parseLMKMP(package.sourceFolder, isCustom: isCustom)
       }
       completionHandler(nil)
     } catch {
