@@ -348,7 +348,6 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   func showKeyboardInfoView(kb: Keyboard) {
-    let version = kb.version
     let matchingFullID = FullKeyboardID(keyboardID: kb.id, languageID: language.id)
 
     let userData = Storage.active.userDefaults
@@ -365,13 +364,10 @@ class LanguageSettingsViewController: UITableViewController {
       }
       let kbIndex:Int = index
       let thisKb = globalUserKeyboards[kbIndex]
-      let infoView = KeyboardInfoViewController()
+      let infoView = ResourceInfoViewController(for: thisKb)
       infoView.title = thisKb.name
       infoView.keyboardCount = globalUserKeyboards.count
       infoView.keyboardIndex = index
-      infoView.keyboardID = thisKb.id
-      infoView.languageID = language.id
-      infoView.keyboardVersion = version
       infoView.isCustomKeyboard = thisKb.isCustom
       navigationController?.pushViewController(infoView, animated: true)
     } else {

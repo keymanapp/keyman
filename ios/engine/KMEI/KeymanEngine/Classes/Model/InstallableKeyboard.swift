@@ -33,6 +33,20 @@ public struct InstallableKeyboard: Codable, LanguageResource {
   public var oskFont: Font?
   public var isCustom: Bool
 
+  public static let sharingLink = "https://keyman.com/go/keyboard/%@/share"
+
+  public var sharableURL: String? {
+    get {
+      // We don't host custom keyboards, so we can't provide a QR link to share
+      // them at this time.
+      if isCustom {
+        return nil
+      } else {
+        return String(format: InstallableKeyboard.sharingLink, id)
+      }
+    }
+  }
+
   public var languageID: String {
     return lgCode.lowercased()
   }

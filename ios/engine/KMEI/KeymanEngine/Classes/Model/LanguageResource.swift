@@ -15,4 +15,8 @@ public enum LanguageResourceType {
 public protocol LanguageResource {
   var id: String { get }
   var languageID: String { get }
+  var version: String { get }
+
+  // Used for generating QR codes.
+  var sharableURL: String? { get }
 }

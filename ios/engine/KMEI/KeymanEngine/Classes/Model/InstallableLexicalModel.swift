@@ -32,6 +32,13 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
   public var languageID: String {
     return lgCode.lowercased()
   }
+
+  public var sharableURL: String? {
+    get {
+      // We currently don't have any available sharing links for lexical models online.
+      return nil
+    }
+  }
   
   public var fullID: FullLexicalModelID {
     return FullLexicalModelID(lexicalModelID: id, languageID: languageID)

@@ -1,23 +1,49 @@
 //
-//  KeyboardInfoViewController.swift
+//  ResourceInfoViewController.swift
 //  KeymanEngine
 //
-//  Created by Gabriel Wong on 2017-09-12.
-//  Copyright © 2017 SIL International. All rights reserved.
+//  Created by Joshua Horton on 1/17/20.
+//  Copyright © 2020 SIL International. All rights reserved.
 //
 
+import Foundation
 import UIKit
 
-class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
+/**
+ * At present, this class only supports keyboard resources.  The base design is partially refactored to
+ * eventually support lexical model resources as well, but additional work is needed before this class
+ * will be ready... possibly as a common base class. 
+ */
+class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
+  // Collectively used to determine if a keyboard may be deleted.
   var keyboardCount: Int = 0
   var keyboardIndex: Int = 0
-  var keyboardID: String = ""
-  var languageID: String = ""
-  var keyboardVersion: String = ""
+  var isCustomKeyboard: Bool = false // also used to toggle QR code gen + display
+
   var keyboardCopyright: String = ""
-  var isCustomKeyboard: Bool = false
 
   private var infoArray = [[String: String]]()
+
+  let resource: LanguageResource
+
+  @IBOutlet weak var scrollView: UIScrollView!
+  @IBOutlet weak var contentView: UIView!
+
+  @IBOutlet weak var tableView: UITableView!
+  @IBOutlet weak var qrImageView: UIImageView!
+  @IBOutlet weak var shareLabel: UILabel!
+  @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
+  @IBOutlet weak var labelHeightConstraint: NSLayoutConstraint!
+
+  init(for resource: LanguageResource) {
+    self.resource = resource
+
+    super.init(nibName: "ResourceInfoView", bundle: Bundle.init(for: ResourceInfoViewController.self))
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -25,7 +51,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     infoArray = [[String: String]]()
     infoArray.append([
       "title": "Keyboard version",
-      "subtitle": keyboardVersion
+      "subtitle": resource.version
       ])
 
     if !isCustomKeyboard {
@@ -38,19 +64,53 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
       "title": "Uninstall keyboard",
       "subtitle": ""
       ])
+
+    tableView.dataSource = self
+    tableView.delegate = self
+
+    tableView.reloadData()
+    
+    // Generate & display the QR code!
+    if let resourceURL = resource.sharableURL {
+      if let qrImg = generateQRCode(from: resourceURL) {
+        qrImageView.image = qrImg
+      } else {
+        log.info("Unable to generate QR code for URL: \(resourceURL)")
+      }
+    } else {
+      // No resource-sharing link available.  Hide the text label!
+      shareLabel.isHidden = true
+    }
+  }
+
+  // Should be supported in iOS 7+.  We only support 9+, so we should be fine here.
+  // Many thanks to https://www.hackingwithswift.com/example-code/media/how-to-create-a-qr-code
+  func generateQRCode(from string: String) -> UIImage? {
+    let data = string.data(using: String.Encoding.ascii)
+
+    if let filter = CIFilter(name: "CIQRCodeGenerator") {
+      filter.setValue(data, forKey: "inputMessage")
+      let transform = CGAffineTransform(scaleX: 5, y: 5) // Results in 175 px x 175 px
+
+      if let output = filter.outputImage?.transformed(by: transform) {
+        return UIImage(ciImage: output)
+      }
+    }
+
+    return nil
   }
 
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     navigationController?.setToolbarHidden(true, animated: true)
-    log.info("didAppear: KeyboardInfoViewController")
+    log.info("didAppear: ResourceInfoViewController")
 }
 
-  override func numberOfSections(in tableView: UITableView) -> Int {
+  func numberOfSections(in tableView: UITableView) -> Int {
     return 1
   }
 
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if isCustomKeyboard {
       return 2
     } else {
@@ -58,7 +118,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     }
   }
 
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "Cell"
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       return cell
@@ -66,10 +126,10 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     return UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
   }
 
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
-        let url = URL(string: "http://help.keyman.com/keyboard/\(keyboardID)/\(keyboardVersion)/")!
+        let url = URL(string: "http://help.keyman.com/keyboard/\(resource.id)/\(resource.version)/")!
         if let openURL = Manager.shared.openURL {
           _ = openURL(url)
         } else {
@@ -97,7 +157,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     tableView.reloadData()
   }
 
-  override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     cell.selectionStyle = .none
     cell.accessoryType = .none
     cell.textLabel?.text = infoArray[indexPath.row]["title"]
@@ -143,7 +203,7 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     alertController.addAction(UIAlertAction(title: "Delete",
                                             style: UIAlertAction.Style.default,
                                             handler: deleteHandler))
-    
+
     self.present(alertController, animated: true, completion: nil)
   }
 
@@ -151,5 +211,18 @@ class KeyboardInfoViewController: UITableViewController, UIAlertViewDelegate {
     if Manager.shared.removeKeyboard(at: keyboardIndex) {
         navigationController?.popToRootViewController(animated: true)
     }
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.updateViewConstraints()
+
+    // Sets scrolling height
+    scrollView.contentSize = contentView.frame.size
+
+    // Set the table's height to match its contents, plus a bit of space
+    // so that the separator below the final item appears.
+    tableHeightConstraint.constant = self.tableView.contentSize.height + 4
+
+    labelHeightConstraint.constant = self.shareLabel.intrinsicContentSize.height
   }
 }
