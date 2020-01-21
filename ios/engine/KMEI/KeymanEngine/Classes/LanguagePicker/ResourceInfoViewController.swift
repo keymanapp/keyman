@@ -9,14 +9,18 @@
 import Foundation
 import UIKit
 
+/**
+ * At present, this class only supports keyboard resources.  The base design is partially refactored to
+ * eventually support lexical model resources as well, but additional work is needed before this class
+ * will be ready... possibly as a common base class. 
+ */
 class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
+  // Collectively used to determine if a keyboard may be deleted.
   var keyboardCount: Int = 0
   var keyboardIndex: Int = 0
-  var keyboardID: String = ""
-  var languageID: String = ""
-  var keyboardVersion: String = ""
+  var isCustomKeyboard: Bool = false // also used to toggle QR code gen + display
+
   var keyboardCopyright: String = ""
-  var isCustomKeyboard: Bool = false
 
   private var infoArray = [[String: String]]()
 
@@ -47,7 +51,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     infoArray = [[String: String]]()
     infoArray.append([
       "title": "Keyboard version",
-      "subtitle": keyboardVersion
+      "subtitle": resource.version
       ])
 
     if !isCustomKeyboard {
@@ -65,7 +69,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     tableView.delegate = self
 
     tableView.reloadData()
-
+    
     // Generate & display the QR code!
     if let resourceURL = resource.sharableURL {
       if let qrImg = generateQRCode(from: resourceURL) {
@@ -99,7 +103,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     navigationController?.setToolbarHidden(true, animated: true)
-    log.info("didAppear: KeyboardInfoViewController")
+    log.info("didAppear: ResourceInfoViewController")
 }
 
   func numberOfSections(in tableView: UITableView) -> Int {
@@ -125,7 +129,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
-        let url = URL(string: "http://help.keyman.com/keyboard/\(keyboardID)/\(keyboardVersion)/")!
+        let url = URL(string: "http://help.keyman.com/keyboard/\(resource.id)/\(resource.version)/")!
         if let openURL = Manager.shared.openURL {
           _ = openURL(url)
         } else {

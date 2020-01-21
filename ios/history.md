@@ -6,6 +6,7 @@
 * Adds support for iOS 13.0's dark mode feature (#2468)
 * Keyboards now scale to match the default system keyboard's size for known devices (#2487)
 * Fixes bug where the keyboard might display within the settings menu (#2470)
+* Adds QR code to keyboard info pages for easier sharing with internet availability (#2509)
 * Testing for upcoming patch to stable:
   * Fixes for deprecated code, improving maintainability (#2282)
 
