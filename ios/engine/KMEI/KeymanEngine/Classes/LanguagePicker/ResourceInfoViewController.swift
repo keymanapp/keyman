@@ -29,6 +29,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   @IBOutlet weak var qrImageView: UIImageView!
   @IBOutlet weak var shareLabel: UILabel!
   @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
+  @IBOutlet weak var labelHeightConstraint: NSLayoutConstraint!
 
   init(for resource: LanguageResource) {
     self.resource = resource
@@ -214,7 +215,10 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     // Sets scrolling height
     scrollView.contentSize = contentView.frame.size
 
-    // Sets the table's height constraint to use the exact needed height for its constant
+    // Set the table's height to match its contents, plus a bit of space
+    // so that the separator below the final item appears.
     tableHeightConstraint.constant = self.tableView.contentSize.height + 4
+
+    labelHeightConstraint.constant = self.shareLabel.intrinsicContentSize.height
   }
 }
