@@ -37,7 +37,7 @@
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
     <string name="confirm_delete_keyboard" translatable="false">Would you like to delete this keyboard?</string>
-    <string name="confirm_download_keyboard" translatable="false">Would you like to download this keyboard?</string>
+    <string name="confirm_download_keyboard" translatable="false">Would you like to download the latest version of this keyboard?</string>
     <string name="confirm_update" translatable="false">Would you like to update keyboards and dictionaries now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>

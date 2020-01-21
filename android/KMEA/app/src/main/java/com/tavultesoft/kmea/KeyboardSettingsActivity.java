@@ -6,7 +6,6 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -42,7 +41,6 @@ import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.util.QRCodeUtil;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DELETE_KEYBOARD;
-import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
 
 // Public access is necessary to avoid IllegalAccessException
 public final class KeyboardSettingsActivity extends AppCompatActivity {
@@ -165,16 +163,12 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
-        // "Version" link clicked to download latest from cloud
+        // "Version" link clicked to download latest keyboard version from cloud
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
-          String title = getString(R.string.keyboard_update_message, languageName, kbName);
-          String keyboardKey = String.format("%s_%s", languageID, kbID);
-          DialogFragment dialog = ConfirmDialogFragment.newInstanceForItemKeyBasedAction(
-            DIALOG_TYPE_DOWNLOAD_KEYBOARD, title, getString(R.string.confirm_download_keyboard), keyboardKey);
-          dialog.show(getFragmentManager(), "dialog");
-
-          //final List<Bundle> updateBundles = cloudResource.buildDownloadBundle();new ArrayList<>();
-          //updateBundles.add(latestKbd);
+          Bundle args = latestKbd.buildDownloadBundle();
+          Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+          i.putExtras(args);
+          startActivity(i);
 
         // "Help" link clicked
         } else if (itemTitle.equals(getString(R.string.help_link))) {
@@ -219,13 +213,6 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);
     }
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-
-    KMManager.getUpdateTool().checkForResourceUpdates(this,false);
   }
 
   @Override
