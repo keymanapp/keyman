@@ -27,6 +27,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var qrImageView: UIImageView!
+  @IBOutlet weak var shareLabel: UILabel!
   @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
 
   init(for resource: LanguageResource) {
@@ -64,11 +65,34 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
     tableView.reloadData()
 
-//    // do constraints
-//    if parent?.view != nil {
-//      view.widthAnchor.constraint(equalTo: self.parent!.view!.widthAnchor).isActive = true
-//      view.heightAnchor.constraint(equalTo: self.parent!.view!.heightAnchor).isActive = true
-//    }
+    // Generate & display the QR code!
+    if let resourceURL = resource.sharableURL {
+      if let qrImg = generateQRCode(from: resourceURL) {
+        qrImageView.image = qrImg
+      } else {
+        log.info("Unable to generate QR code for URL: \(resourceURL)")
+      }
+    } else {
+      // No resource-sharing link available.  Hide the text label!
+      shareLabel.isHidden = true
+    }
+  }
+
+  // Should be supported in iOS 7+.  We only support 9+, so we should be fine here.
+  // Many thanks to https://www.hackingwithswift.com/example-code/media/how-to-create-a-qr-code
+  func generateQRCode(from string: String) -> UIImage? {
+    let data = string.data(using: String.Encoding.ascii)
+
+    if let filter = CIFilter(name: "CIQRCodeGenerator") {
+      filter.setValue(data, forKey: "inputMessage")
+      let transform = CGAffineTransform(scaleX: 5, y: 5) // Results in 175 px x 175 px
+
+      if let output = filter.outputImage?.transformed(by: transform) {
+        return UIImage(ciImage: output)
+      }
+    }
+
+    return nil
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -191,6 +215,6 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     scrollView.contentSize = contentView.frame.size
 
     // Sets the table's height constraint to use the exact needed height for its constant
-    tableHeightConstraint.constant = self.tableView.contentSize.height
+    tableHeightConstraint.constant = self.tableView.contentSize.height + 4
   }
 }
