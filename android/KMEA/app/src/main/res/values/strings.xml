@@ -59,7 +59,7 @@
 
     <!-- Model Updates -->
     <string name="getting_model_catalog" translatable="false">Getting dictionary catalog.\nThis may take a while&#8230;</string>
-    <string name="confirm_download_model" translatable="false">Would you like to download this dictionary?</string>
+    <string name="confirm_download_model" translatable="false">Would you like to download the latest version of this dictionary?</string>
     <string name="checking_model_download" translatable="false">Checking to download dictionary&#8230;</string>
     <string name="downloading_model" translatable="false">Downloading dictionary&#8230;</string>
     <string name="catalog_unavailable" translatable="false">The resource catalog is unavailable\n</string>
