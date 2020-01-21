@@ -26,6 +26,10 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.HelpFile;
@@ -62,6 +66,21 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String modelID = getIntent().getStringExtra(KMManager.KMKey_LexicalModelID);
     final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
     final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
+    String latestModelCloudVersion = modelVersion;
+
+    // Determine if model update is available from the cloud
+    Dataset dataset = CloudRepository.shared.fetchDataset(this);
+    HashMap<String, String> modelInfo = new HashMap<>();
+    modelInfo.put(KMManager.KMKey_PackageID, packageID);
+    modelInfo.put(KMManager.KMKey_LanguageID, languageID);
+    modelInfo.put(KMManager.KMKey_LexicalModelID, modelID);
+    modelInfo.put(KMManager.KMKey_LexicalModelName, modelName);
+
+    LexicalModel modelQuery = new LexicalModel(modelInfo);
+    final LexicalModel latestModel = dataset.lexicalModels.findMatch(modelQuery);
+    if (latestModel != null) {
+      latestModelCloudVersion = latestModel.getVersion();
+    }
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(String.format(getString(R.string.model_info_header), modelName));
@@ -69,10 +88,15 @@ public final class ModelInfoActivity extends AppCompatActivity {
     infoList = new ArrayList<>();
     // Display model version title
     final String noIcon = "0";
+    String icon = noIcon;
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.model_version));
     hashMap.put(subtitleKey, modelVersion);
-    hashMap.put(iconKey, noIcon);
+    // Display arrow to download update if latestModelCloudVersion > modelVersion (installed)
+    if (FileUtils.compareVersions(latestModelCloudVersion, modelVersion) == FileUtils.VERSION_GREATER) {
+      icon = String.valueOf(R.drawable.ic_arrow_forward);
+    }
+    hashMap.put(iconKey, icon);
     infoList.add(hashMap);
 
     // Display model help link
@@ -80,7 +104,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
     // Check if app declared FileProvider
     // Currently, model help only available if custom link exists
-    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if both custom help and File Provider don't exist
     // TODO: Update this when model help available on help.keyman.com
     if ( (!customHelpLink.equals("") && !FileProviderUtils.exists(context)) ||
@@ -108,8 +132,8 @@ public final class ModelInfoActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = infoList.get(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
         String icon = MapCompat.getOrDefault(hashMap, iconKey, noIcon);
-        if (itemTitle.equals(getString(R.string.model_version))) {
-          // No point in 'clicking' on version info.
+        if (itemTitle.equals(getString(R.string.model_version)) && icon.equals(noIcon)) {
+          // No point in 'clicking' on version info if no update available.
           return false;
         // Visibly disables the help option when custom help isn't available
         } else if (itemTitle.equals(getString(R.string.help_link)) && icon.equals(noIcon)) {
@@ -124,11 +148,18 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        HashMap<String, String> hashMap = (HashMap<String, String>)parent.getItemAtPosition(position);
+        HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
+        // "Version" link clicked to download latest model version from cloud
+        if (itemTitle.equals(getString(R.string.model_version))) {
+          Bundle args = latestModel.buildDownloadBundle();
+          Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
+          i.putExtras(args);
+          startActivity(i);
+
         // "Help" link clicked
-        if (itemTitle.equals(getString(R.string.help_link))) {
+        } else if (itemTitle.equals(getString(R.string.help_link))) {
           if (!customHelpLink.equals("")) {
             // Display local welcome.htm help file, including associated assets
             Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
