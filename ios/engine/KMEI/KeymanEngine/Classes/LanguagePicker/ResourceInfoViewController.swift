@@ -22,8 +22,12 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
   let resource: LanguageResource
 
+  @IBOutlet weak var scrollView: UIScrollView!
+  @IBOutlet weak var contentView: UIView!
+
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var qrImageView: UIImageView!
+  @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
 
   init(for resource: LanguageResource) {
     self.resource = resource
@@ -178,5 +182,15 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     if Manager.shared.removeKeyboard(at: keyboardIndex) {
         navigationController?.popToRootViewController(animated: true)
     }
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.updateViewConstraints()
+
+    // Sets scrolling height
+    scrollView.contentSize = contentView.frame.size
+
+    // Sets the table's height constraint to use the exact needed height for its constant
+    tableHeightConstraint.constant = self.tableView.contentSize.height
   }
 }
