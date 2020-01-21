@@ -61,10 +61,15 @@ end;
 
   This code is pretty dependent on the implementation in Vcl.Grids.pas,
   so it should be checked if we upgrade to new version of Delphi.
+
+  Tested on VER320 (10.2)
+  Tested on VER330 (10.3) - 29 Oct 2019 - mcdurdin
 }
 
+{$IFNDEF VER330}
 {$IFNDEF VER320}
-{$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2' }
+{$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2, 10.3' }
+{$ENDIF}
 {$ENDIF}
 
 procedure TTntFixedDrawGrid.MouseDown(Button: TMouseButton;

@@ -97,6 +97,7 @@ uses
   mrulist,
   UfrmUnicodeDataStatus,
   CharacterDragObject,
+  Keyman.Developer.UI.dmActionsModelEditor,
   dmActionsMain, UnicodeData, UserMessages, webhelp,
   dmActionsKeyboardEditor, Dialogs, UfrmTike, AppEvnts,
   DropTarget,
@@ -156,8 +157,8 @@ type
     Edit1: TMenuItem;
     View1: TMenuItem;
     Project1: TMenuItem;
-    Keyboards1: TMenuItem;
-    Debug2: TMenuItem;
+    mnuKeyboard: TMenuItem;
+    mnuDebug: TMenuItem;
     ools1: TMenuItem;
     Help1: TMenuItem;
     New1: TMenuItem;
@@ -269,6 +270,10 @@ type
     DebugTests1: TMenuItem;
     CrashTest1: TMenuItem;
     CloseProject1: TMenuItem;
+    mnuModel: TMenuItem;
+    CompileModel1: TMenuItem;
+    N2: TMenuItem;
+    estLexicalModel1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
@@ -341,6 +346,7 @@ type
     procedure SaveDockLayout;
     procedure CEFShutdownComplete(Sender: TObject);
     procedure ActivateActiveChild;
+    function OpenModelEditor(FFileName: string): TfrmTikeEditor;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -410,6 +416,7 @@ implementation
 uses
   System.Math,
   Winapi.WinInet,
+  Winapi.ShlObj,
   Winapi.Urlmon,
   Winapi.UxTheme,
   System.Win.ComObj,
@@ -423,7 +430,7 @@ uses
   keymanapi_TLB,
   KeymanVersion,
   OnlineConstants,
-  OnlineUpdateCheck,
+  Keyman.Developer.UI.TikeOnlineUpdateCheck,
   GlobalProxySettings,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.Project.ProjectFileType,
@@ -432,6 +439,7 @@ uses
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.Project.ProjectUI,
   Keyman.Developer.UI.UfrmWordlistEditor,
+  Keyman.Developer.UI.UfrmModelEditor,
   TextFileFormat,
   RedistFiles,
   ErrorControlledRegistry,
@@ -472,6 +480,13 @@ var
 begin
   inherited;
 
+  if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
+  begin
+    // Fall back to Documents folder if we cannot create the default project path
+    // Documents folder should always exist
+    FKeymanDeveloperOptions.DefaultProjectPath := GetFolderPath(CSIDL_PERSONAL);
+  end;
+
   FFirstShow := True;
 
   hInputLangChangeHook := SetWindowsHookEx(WH_CALLWNDPROC, CallWndProc_InputLangChange, 0, GetCurrentThreadId);
@@ -479,6 +494,7 @@ begin
   modActionsTextEditor := TmodActionsTextEditor.Create(Self);
   modActionsKeyboardEditor := TmodActionsKeyboardEditor.Create(Self);
   modActionsMain := TmodActionsMain.Create(Self);
+  modActionsModelEditor := TmodActionsModelEditor.Create(Self);
 
   FProjectMRU := TMRUList.Create('Project');
   FProjectMRU.OnChange := ProjectMRUChange;
@@ -1104,6 +1120,11 @@ begin
 end;
 
 function TfrmKeymanDeveloper.OpenFile(FFileName: string; FCloseNewFile: Boolean): TfrmTikeChild;
+  function FileHasModelTsExt(Filename: string): Boolean;
+  begin
+    // We cannot use ExtractFileExt because of the two-part extension
+    Result := Filename.ToLower.EndsWith('.model.ts');
+  end;
 var
   ext: string;
 begin
@@ -1137,6 +1158,7 @@ begin
         else if ext = '.kvks' then Result := OpenKVKEditor(FFileName)
         else if ext = '.bmp'  then Result := OpenEditor(FFileName, TfrmBitmapEditor)
         else if ext = '.tsv'  then Result := OpenTSVEditor(FFileName)
+        else if FileHasModelTsExt(FFileName) then Result := OpenModelEditor(FFileName)
         else                       Result := OpenEditor(FFileName, TfrmEditor);
       end;
 
@@ -1164,6 +1186,11 @@ function TfrmKeymanDeveloper.OpenTSVEditor(FFileName: string): TfrmTikeEditor;
 begin
   Result := OpenEditor(FFileName, TfrmWordlistEditor);
     //else Result := OpenEditor(FFileName, TfrmEditor);
+end;
+
+function TfrmKeymanDeveloper.OpenModelEditor(FFileName: string): TfrmTikeEditor;
+begin
+  Result := OpenEditor(FFileName, TfrmModelEditor);
 end;
 
 function TfrmKeymanDeveloper.OpenKPSEditor(FFileName: string): TfrmTikeEditor;
@@ -1414,6 +1441,9 @@ begin
     if PrevFocus.Visible then
       PrevFocus.SetFocus;
   end;
+
+  modActionsKeyboardEditor.actKeyboardCompile.Update;
+  modActionsModelEditor.actModelCompile.Update;
 end;
 
 procedure TfrmKeymanDeveloper.UDUI_Error(Sender: TUnicodeData;
@@ -1460,8 +1490,6 @@ begin
   else if FGlobalProject.Untitled
     then Caption := '(Untitled project) - Keyman Developer'
     else Caption := ChangeFileExt(ExtractFileName(FGlobalProject.FileName), '') + ' - Keyman Developer';
-
-  Application.Title := Caption;
 end;
 
 procedure TfrmKeymanDeveloper.UpdateChildCaption(Window: TfrmTikeChild);
@@ -1522,14 +1550,6 @@ procedure InitClasses;  // I3350
 const
   CUserAgent: AnsiString = 'Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.1; WOW64; Trident/5.0; TIKE/'+SKeymanVersion+')';   // I4045
 begin
-  with TRegistryErrorControlled.Create do   // I3887
-  try
-    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation_CU, True) then   // I4436
-      WriteInteger('tike.exe', 9000);   // I4874
-  finally
-    Free;
-  end;
-
    OleCheck(UrlMkSetSessionOption(URLMON_OPTION_USERAGENT, PAnsiChar(CUserAgent), Length(CUserAgent), 0));   // I4045
 end;
 

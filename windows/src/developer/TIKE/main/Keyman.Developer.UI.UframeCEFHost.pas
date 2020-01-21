@@ -35,7 +35,6 @@ const
   CEF_AFTERCREATE = WM_USER + 302;
   CEF_SHOW = WM_USER + 303;
   CEF_LOADEND = WM_USER + 304;
-  CEF_SETFOCUS = WM_USER + 305;
   CEF_KEYEVENT = WM_USER + 306;
   CEF_BEFOREBROWSE = WM_USER + 307;
   CEF_CONSOLEMESSAGE = WM_USER + 308;
@@ -106,7 +105,6 @@ type
                              var settings: TCefBrowserSettings;
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
-    procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
     procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
       source: TCefFocusSource; out Result: Boolean);
   private
@@ -134,7 +132,6 @@ type
     procedure Handle_CEF_AFTERCREATE(var Message: TMessage);
     procedure Handle_CEF_SHOW(var message: TMessage);
     procedure Handle_CEF_LOADEND(var message: TMessage);
-    procedure Handle_CEF_SETFOCUS(var message: TMessage);
     procedure Handle_CEF_KEYEVENT(var message: TMessage);
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
     procedure Handle_CEF_CONSOLEMESSAGE(var message: TMessage);
@@ -268,14 +265,6 @@ begin
   CreateBrowser;
 end;
 
-procedure TframeCEFHost.cefWidgetCompMsg(var aMessage: TMessage;
-  var aHandled: Boolean);
-begin
-  AssertCefThread;
-  if aMessage.Msg = WM_SETFOCUS then
-    PostMessage(FCallbackWnd, CEF_SETFOCUS, 0, 0);
-end;
-
 procedure TframeCEFHost.CreateBrowser;
 begin
   AssertVclThread;
@@ -308,9 +297,11 @@ end;
 procedure TframeCEFHost.SetFocus;
 begin
   AssertVclThread;
-  inherited;
-  if not FIsClosing and cefwp.CanFocus then
-    cefwp.SetFocus;
+  if not FIsClosing and cefwp.CanFocus and Assigned(cef) then
+  begin
+    GetParentForm(Self).ActiveControl := Self;
+    cef.SetFocus(True);
+  end;
 end;
 
 procedure TframeCEFHost.CallbackWndProc(var Message: TMessage);
@@ -322,7 +313,6 @@ begin
     CEF_AFTERCREATE: Handle_CEF_AFTERCREATE(Message);
     CEF_SHOW: Handle_CEF_SHOW(Message);
     CEF_LOADEND: Handle_CEF_LOADEND(Message);
-    CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
     CEF_KEYEVENT: Handle_CEF_KEYEVENT(Message);
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
     CEF_CONSOLEMESSAGE: Handle_CEF_CONSOLEMESSAGE(Message);
@@ -534,13 +524,6 @@ begin
     FOnLoadEnd(Self);
 end;
 
-procedure TframeCEFHost.Handle_CEF_SETFOCUS(var message: TMessage);
-begin
-  AssertVclThread;
-  if Assigned(cefwp) and cefwp.Visible and cefwp.CanFocus then
-    GetParentForm(cefwp).ActiveControl := cefwp;
-end;
-
 procedure TframeCEFHost.cefPreKeyEvent(Sender: TObject;
   const browser: ICefBrowser; const event: PCefKeyEvent; osEvent: PMsg;
   out isKeyboardShortcut, Result: Boolean);
@@ -614,7 +597,7 @@ end;
 procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
-  Result := source <> FOCUS_SOURCE_NAVIGATION;
+  Result := source = FOCUS_SOURCE_NAVIGATION;
 end;
 
 procedure TframeCEFHost.WMEnterMenuLoop(var aMessage: TMessage);

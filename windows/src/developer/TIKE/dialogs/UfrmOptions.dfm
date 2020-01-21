@@ -24,9 +24,13 @@ inherited frmOptions: TfrmOptions
     object tabGeneral: TTabSheet
       Caption = 'General'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object cmdProxySettings: TButton
         Left = 8
-        Top = 160
+        Top = 209
         Width = 125
         Height = 25
         Caption = '&Proxy Settings...'
@@ -36,29 +40,29 @@ inherited frmOptions: TfrmOptions
       object gbExternalEditor: TGroupBox
         Left = 8
         Top = 71
-        Width = 237
+        Width = 401
         Height = 45
         Caption = '&External Editor Path'
         TabOrder = 1
         object editExternalEditorPath: TEdit
           Left = 8
           Top = 16
-          Width = 141
+          Width = 311
           Height = 21
           TabOrder = 0
         end
         object cmdBrowseExternalEditor: TButton
-          Left = 156
+          Left = 325
           Top = 16
-          Width = 73
+          Width = 69
           Height = 21
           Caption = '&Browse...'
           TabOrder = 1
         end
       end
       object cmdSMTPSettings: TButton
-        Left = 139
-        Top = 160
+        Left = 8
+        Top = 240
         Width = 125
         Height = 25
         Caption = 'S&MTP Settings...'
@@ -75,7 +79,7 @@ inherited frmOptions: TfrmOptions
       end
       object cmdResetToolWindows: TButton
         Left = 8
-        Top = 129
+        Top = 178
         Width = 125
         Height = 25
         Caption = '&Reset tool windows'
@@ -90,9 +94,37 @@ inherited frmOptions: TfrmOptions
         Caption = '&Allow multiple instances of Keyman Developer'
         TabOrder = 5
       end
+      object gbDefaultProjectPath: TGroupBox
+        Left = 8
+        Top = 122
+        Width = 401
+        Height = 45
+        Caption = '&Default Project Folder'
+        TabOrder = 6
+        object editDefaultProjectPath: TEdit
+          Left = 8
+          Top = 16
+          Width = 311
+          Height = 21
+          TabOrder = 0
+        end
+        object cmdBrowseDefaultProjectPath: TButton
+          Left = 325
+          Top = 16
+          Width = 69
+          Height = 21
+          Caption = '&Browse...'
+          TabOrder = 1
+          OnClick = cmdBrowseDefaultProjectPathClick
+        end
+      end
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbEditorSpaces: TGroupBox
         Left = 11
         Top = 16
@@ -212,6 +244,10 @@ inherited frmOptions: TfrmOptions
     object tabDebugger: TTabSheet
       Caption = 'Debugger'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbDebuggerSettings: TGroupBox
         Left = 8
         Top = 8
@@ -288,6 +324,10 @@ inherited frmOptions: TfrmOptions
     object tabCharMap: TTabSheet
       Caption = 'Character Map'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object gbCharMapCharacterLookups: TGroupBox
         Left = 8
         Top = 8
@@ -400,5 +440,12 @@ inherited frmOptions: TfrmOptions
     Title = 'Browse for Editor Theme'
     Left = 212
     Top = 403
+  end
+  object dlgBrowseDefaultProjectPath: TBrowse4Folder
+    InitialDir = ''
+    Root = Desktop
+    Title = 'Browse for Default Project Folder'
+    Left = 176
+    Top = 400
   end
 end

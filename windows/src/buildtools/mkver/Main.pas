@@ -34,8 +34,16 @@ uses
   Xml.XMLIntf,
   Xml.XMLDoc;
 
+// This is the default build number used when doing a build outside of CI, and is
+// appended to the release version found in resources/version.md
+const
+  S_DebugBuildVersion = '9999';
+
+type
+  TMKVerMode = (mmUnknown, mmSetRootVersionFromBuild, mmSetRootVersionFromVersionMd, mmWriteVersionedFile, mmWriteManifestFile);
 var
-  IncrementVersion, DebugVersion: Boolean;
+  FMode: TMKVerMode = mmUnknown;
+  BuildVersion, ResourceMdFilename: string;
   RootTemplateFileName, TemplateFileName, ResourceFileName: string;
   UpdateFiles: TStringList;
 
@@ -71,22 +79,31 @@ var
 begin
   Result := False;
 
+  FMode := mmUnknown;
+
   s := LowerCase(ParamStr(1));
 
-  if s = '-i' then
+  if s = '-c' then
   begin
-    IncrementVersion := True;
-    n := 2;
-    if ParamStr(n) = '-d' then begin Inc(n); DebugVersion := True; end;
-    TemplateFileName := ParamStr(n);
-    RootTemplateFileName := ParamStr(n+1);
-    if (TemplateFileName = '') or (RootTemplateFileName = '') then Exit;
+    RootTemplateFileName := ParamStr(2);
+    if SameText(ParamStr(3), '-b') then
+    begin
+      FMode := mmSetRootVersionFromBuild;
+      BuildVersion := ParamStr(4);
+    end
+    else if SameText(ParamStr(3), '-r') then
+    begin
+      FMode := mmSetRootVersionFromVersionMd;
+      ResourceMdFilename := ParamStr(4);
+    end
+    else
+      Exit;
   end
   else if s = '-v' then
   begin
+    FMode := mmWriteVersionedFile;
     n := 2;
     while ParamStr(n) = '-u' do begin Inc(n); UpdateFiles.Add(ParamStr(n)+'='+ParamStr(n+1)); Inc(n,2); end;
-    IncrementVersion := False;
     TemplateFileName := ParamStr(n);
     if TemplateFileName = '' then Exit;
     ResourceFileName := ParamStr(n+1);
@@ -95,7 +112,7 @@ begin
   else if s = '-m' then
   begin
     n := 2;
-    IncrementVersion := False;
+    FMode := mmWriteManifestFile;
     TemplateFileName := ParamStr(n);
     if TemplateFileName = '' then Exit;
     ResourceFileName := 'manifest.xml';
@@ -124,63 +141,6 @@ end;
 //     22 is build
 //     0  is reserved for later use
 //
-
-procedure IncrementTemplate;
-var
-  i, n, j: Integer;
-  pv: string;
-begin
-  writeln('Incrementing product version');
-  pv := '';
-  with TStringList.Create do
-  try
-    LoadFromFile(RootTemplateFileName);
-    for i := 0 to Count - 1 do
-      case GetTagValue(Strings[i], 1, PredefTags) of
-        TAG_PRODUCTVERSION: // Update the major, minor, and build numbers (final num stays untouched for later use)
-          pv := GetTag(Strings[i], 2);
-      end;
-  finally
-    Free;
-  end;
-
-  if DebugVersion and (TemplateFileName = RootTemplateFileName) then
-  begin
-    n := 0;
-    for i := 1 to Length(pv) do
-    begin
-      if pv[i] = ',' then inc(n);
-      if n = 3 then
-      begin
-        j := StrToInt(Copy(pv, i+1, 100));
-        pv := Copy(pv, 1, i) + IntToStr(j+1);
-        Break;
-      end;
-    end;
-  end;
-
-  if pv = '' then raise Exception.Create('Could not retrieve product version');
-
-  with TStringList.Create do
-  try
-    LoadFromFile(TemplateFileName);
-    for i := 0 to Count - 1 do
-      case GetTagValue(Strings[i], 1, PredefTags) of
-        TAG_PRODUCTVERSION: // Update the major, minor, and build numbers (final num stays untouched for later use)
-          begin
-            Strings[i] := UpdateTag(Strings[i], 2, pv);
-            writeln('New version is ' + pv);
-          end;
-        TAG_FILEFLAGS:  // Update VS_FF_DEBUG, VS_FF_PRERELEASE
-          if DebugVersion
-            then Strings[i] := UpdateTag(Strings[i], 2, '0x1L')
-            else Strings[i] := UpdateTag(Strings[i], 2, '0x0L');
-      end;
-    SaveToFile(TemplateFileName);
-  finally
-    Free;
-  end;
-end;
 
 procedure UpdateResource;
 var
@@ -226,7 +186,7 @@ begin
 
   if ResourceFileName = 'manifest.xml' then
   begin
-    xml := LoadXMLDocument(ResourceFileName);
+    xml := LoadXMLDocument(ChangeFileExt(ResourceFileName, '.in'));
     xml.DocumentElement.ChildNodes['assemblyIdentity'].Attributes['version'] := StringProductVersion;
     xml.SaveToFile(ResourceFileName);
     xml := nil;
@@ -236,7 +196,7 @@ begin
     StringProductVersion := '"' + StringProductVersion + '\0"';
     with TStringList.Create do
     try
-      LoadFromFile(ResourceFileName);
+      LoadFromFile(ChangeFileExt(ResourceFileName, '.in'));
 
       for i := 0 to Count - 1 do
         case GetTagValue(Strings[i], 1, PredefTags) of
@@ -348,6 +308,45 @@ begin
   CloseFile(tfo);
 end;
 
+procedure WriteRootVersionTemplateFromBuild;
+begin
+  // Transform the string from 1.2.3.4 to 1,2,3,4 for version.txt/version.rc format
+  BuildVersion := StringReplace(BuildVersion, '.', ',', [rfReplaceAll]);
+
+  with TStringList.Create do
+  try
+    Add('PRODUCTVERSION '+BuildVersion);
+    SaveToFile(RootTemplateFileName);
+  finally
+    Free;
+  end;
+end;
+
+procedure WriteRootVersionTemplateFromVersionMd;
+begin
+  with TStringList.Create do
+  try
+    LoadFromFile(ResourceMdFilename);
+    BuildVersion := Strings[0];
+  finally
+    Free;
+  end;
+
+  // Transform the string from 1.2 to 1,2 to match version.txt/version.rc format
+  BuildVersion := StringReplace(BuildVersion, '.', ',', [rfReplaceAll]);
+
+  // And add the static 9999 version
+  BuildVersion := BuildVersion + ',' + S_DebugBuildVersion+',0';
+
+  with TStringList.Create do
+  try
+    Add('PRODUCTVERSION '+BuildVersion);
+    SaveToFile(RootTemplateFileName);
+  finally
+    Free;
+  end;
+end;
+
 procedure Run;
 var
   i: Integer;
@@ -359,12 +358,11 @@ begin
   if not Init then
   begin
     UpdateFiles.Free;
-    writeln(#13#10+'Usage: kmver -i '{[-m|-n] }+'[-d] <template> <root>');
+    writeln(#13#10+'Usage: kmver -c <root-version.txt> (-b <version> | -r <VERSION.md>)');
     writeln(' or    kmver -v [-u f.in f.out]* <template> [version.rc]');
-    writeln('   -i:         Updates the template build version from src\version.txt');
-    //writeln('   -m:         Also increments major version (resets minor version number)');
-    //writeln('   -n:         Also increments minor version');
-    writeln('   -d:         Debug version ');
+    writeln('   -c:         Sets the root template version');
+    writeln('       -r:     Use major.minor version data from VERSION.md and appends .9999.0 to indicate custom built version');
+    writeln('       -b:     For CI, use the specific version number specified');
     writeln('   -v:         Update the version.rc with the template information');
     writeln('   -m:         Update manifest.xml with the template information');
     writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
@@ -381,14 +379,20 @@ begin
     Exit;
   end;
 
-  if IncrementVersion
-    then IncrementTemplate
-    else if UpdateFiles.Count = 0 then UpdateResource;
+  if FMode = mmSetRootVersionFromBuild then
+    WriteRootVersionTemplateFromBuild
+  else if FMode = mmSetRootVersionFromVersionMd then
+    WriteRootVersionTemplateFromVersionMd
+  else
+  begin
+    if UpdateFiles.Count = 0 then
+      UpdateResource;
 
-  for i := 0 to UpdateFiles.Count - 1 do
-    UpdateFile(UpdateFiles.Names[i], UpdateFiles.Values[UpdateFiles.Names[i]]);
+    for i := 0 to UpdateFiles.Count - 1 do
+      UpdateFile(UpdateFiles.Names[i], UpdateFiles.Values[UpdateFiles.Names[i]]);
+  end;
+
   UpdateFiles.Free;
-
   CoUninitialize;
 end;
 

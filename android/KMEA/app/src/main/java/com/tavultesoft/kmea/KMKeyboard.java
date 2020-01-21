@@ -12,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
@@ -35,8 +34,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +45,6 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
@@ -360,7 +356,7 @@ final class KMKeyboard extends WebView {
   /**
    * Return the full path to the special OSK font,
    * which is with all the keyboard assets at the root app_data folder
-   * @param String filename
+   * @param filename
    * @return String
    */
   public String specialOSKFontFilename(String filename) {
@@ -456,6 +452,47 @@ final class KMKeyboard extends WebView {
     }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
+    return retVal;
+  }
+
+  /**
+   * preapre keyboard switch. The switch is executed in next reload.
+   * @param packageID the package id
+   * @param keyboardID the keyman keyboard id
+   * @param languageID the langauge id
+   * @param keyboardName the keyboard name
+   * @return the result
+   */
+  public boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID,  String keyboardName)
+  {
+    if (packageID == null || keyboardID == null || languageID == null)
+      return false;
+
+    boolean retVal = true;
+    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
+    if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      keyboardID = KMManager.KMDefault_KeyboardID;
+      languageID = KMManager.KMDefault_LanguageID;
+      retVal = false;
+    }
+    String kbKey = String.format("%s_%s", languageID, keyboardID);
+
+    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
+
+    setKeyboardRoot(packageID);
+
+    // Escape single-quoted names for javascript call
+    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
+
+    this.packageID = packageID;
+    this.keyboardID = keyboardID;
+    this.keyboardName = keyboardName;
+    this.keyboardVersion = keyboardVersion;
+    currentKeyboard = kbKey;
+    saveCurrentKeyboardIndex();
+
     return retVal;
   }
 
@@ -616,7 +653,9 @@ final class KMKeyboard extends WebView {
     params.putString("keyboardName", this.keyboardName);
     params.putString("keyboardVersion", this.keyboardVersion);
 
-    mFirebaseAnalytics.logEvent("kmw_console_error", params);
+    if(mFirebaseAnalytics != null) {
+      mFirebaseAnalytics.logEvent("kmw_console_error", params);
+    }
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
@@ -1300,12 +1339,12 @@ final class KMKeyboard extends WebView {
         popupKeysList = null;
       }
       break;
-    }  
+    }
   }
   */
 
-  /* 
-   * Override onDraw method to render missing characters for Android API 17 & 18 font rendering bug. 
+  /*
+   * Override onDraw method to render missing characters for Android API 17 & 18 font rendering bug.
     private Bitmap keyboardImage;
     private Canvas keyboardCanvas;
     private Paint paint;

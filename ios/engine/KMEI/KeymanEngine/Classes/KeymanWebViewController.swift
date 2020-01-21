@@ -12,20 +12,8 @@ import AudioToolbox
 
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
-private let subKeyColor = #colorLiteral(red: 244.0 / 255.0, green: 244.0 / 255.0, blue: 244.0 / 255.0, alpha: 1.0)
-private let subKeyColorHighlighted = #colorLiteral(red: 136.0 / 255.0, green: 136.0 / 255.0, blue: 1.0, alpha: 1.0)
-
-// UI In-App Keyboard Constants
-private let phonePortraitInAppKeyboardHeight: CGFloat = 183.0
-private let phoneLandscapeInAppKeyboardHeight: CGFloat = 183.0
-private let padPortraitInAppKeyboardHeight: CGFloat = 385.0
-private let padLandscapeInAppKeyboardHeight: CGFloat = 385.0
-
-// UI System Keyboard Constants
-private let phonePortraitSystemKeyboardHeight: CGFloat = 216.0
-private let phoneLandscapeSystemKeyboardHeight: CGFloat = 162.0
-private let padPortraitSystemKeyboardHeight: CGFloat = 264.0
-private let padLandscapeSystemKeyboardHeight: CGFloat = 352.0
+private let subKeyColor = Colors.popupKey
+private let subKeyColorHighlighted = Colors.popupKeyHighlighted
 
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
@@ -35,6 +23,7 @@ class KeymanWebViewController: UIViewController {
 
   // Views
   var webView: WKWebView?
+  var activeModel: Bool = false
   private var helpBubbleView: PopoverView?
   private var keyPreviewView: KeyPreviewView?
   private var subKeysView: SubKeysView?
@@ -128,9 +117,9 @@ class KeymanWebViewController: UIViewController {
     view.addGestureRecognizer(hold)
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-                                           name: .UIKeyboardWillShow, object: nil)
+                                           name: UIResponder.keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-                                           name: .UIKeyboardWillHide, object: nil)
+                                           name: UIResponder.keyboardWillHideNotification, object: nil)
 
     reloadKeyboard()
   }
@@ -142,6 +131,10 @@ class KeymanWebViewController: UIViewController {
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
     fixLayout()
+
+    // Initialize the keyboard's size/scale.  In iOS 13 (at least), the system
+    // keyboard's width will be set at this stage, but not in viewWillAppear.
+    keyboardSize = view.bounds.size
   }
 }
 
@@ -312,8 +305,9 @@ extension KeymanWebViewController {
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.registerModel(\(stubString));", completionHandler: nil)
     }
-    
-    setBannerHeight(to: InputViewController.topBarHeight)
+
+    self.activeModel = true
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
   }
   
   func showBanner(_ display: Bool) {
@@ -530,7 +524,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     log.info("Loaded keyboard.")
-    
+
     resizeKeyboard()
     setDeviceType(UIDevice.current.userInterfaceIdiom)
     
@@ -548,14 +542,8 @@ extension KeymanWebViewController: KeymanWebDelegate {
       log.info("Setting initial keyboard.")
       _ = Manager.shared.setKeyboard(newKb)
     }
-    
-    if Manager.shared.isSystemKeyboard {
-      showBanner(true)
-    } else {
-      // TODO:  Set banner to visible / not visible based on the toggle in Settings.
-      //        Problem:  we need access to the banner image path there.  It's only set for the system keyboard variant!
-      showBanner(false)
-    }
+
+    updateShowBannerSetting()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
@@ -567,6 +555,16 @@ extension KeymanWebViewController: KeymanWebDelegate {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
       Manager.shared.shouldReloadKeyboard = false
+    }
+  }
+
+  func updateShowBannerSetting() {
+    let userData = Storage.active.userDefaults
+    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
+    if Manager.shared.isSystemKeyboard || alwaysShow {
+      showBanner(true)
+    } else {
+      showBanner(false)
     }
   }
   
@@ -715,8 +713,9 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       button.tag = i
       button.backgroundColor = subKeyColor
       button.setRoundedBorder(withRadius: 4.0, borderWidth: 1.0, color: .gray)
-      button.setTitleColor(.black, for: .disabled)
-      button.setTitleColor(.black, for: .highlighted)
+      button.setTitleColor(Colors.keyText, for: .disabled)
+      button.setTitleColor(Colors.keyText, for: .highlighted)
+      button.setTitleColor(Colors.keyText, for: .normal)
 
       if let oskFontName = oskFontName {
         button.titleLabel?.font = UIFont(name: oskFontName, size: fontSize)
@@ -735,7 +734,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       button.addTarget(self, action: #selector(subKeyButtonClick), for: .touchUpInside)
 
       // Detect the text width for subkeys.  The 'as Any' silences an inappropriate warning from Swift.
-      let textSize = subKeyText.size(withAttributes: [NSAttributedStringKey.font: button.titleLabel?.font! as Any])
+      let textSize = subKeyText.size(withAttributes: [NSAttributedString.Key.font: button.titleLabel?.font! as Any])
       var displayText = subKeyText
       
       if textSize.width <= 0 && subKeyText.count > 0 {
@@ -749,7 +748,7 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
       }
 
       button.setTitle(displayText, for: .normal)
-      button.tintColor = UIColor(red: 181.0 / 255.0, green: 181.0 / 255.0, blue: 181.0 / 255.0, alpha: 1.0)
+      button.tintColor = Colors.popupKeyTint
       button.isEnabled = false
       return button
     }
@@ -781,19 +780,7 @@ extension KeymanWebViewController {
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      if isPortrait {
-        return Util.isSystemKeyboard ? padPortraitSystemKeyboardHeight : padPortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? padLandscapeSystemKeyboardHeight : padLandscapeInAppKeyboardHeight
-      }
-    } else {
-      if isPortrait {
-        return Util.isSystemKeyboard ? phonePortraitSystemKeyboardHeight : phonePortraitInAppKeyboardHeight
-      } else {
-        return Util.isSystemKeyboard ? phoneLandscapeSystemKeyboardHeight : phoneLandscapeInAppKeyboardHeight
-      }
-    }
+    return KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
   }
 
   var keyboardWidth: CGFloat {
@@ -852,9 +839,10 @@ extension KeymanWebViewController {
   func resizeKeyboard() {
     fixLayout()
 
-    // Ensures the height is properly updated.
+     // Ensures the width and height are properly updated.
     // Note:  System Keyboard init currently requires this for the keyboard to display properly
     // the first time.
+    setOskWidth(Int(kbSize.width))
     setOskHeight(Int(kbSize.height))
   }
   
@@ -885,6 +873,9 @@ extension KeymanWebViewController {
   // MARK: - Show/hide views
   func reloadKeyboard() {
     webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+
+    // Check for a change of "always show banner" state
+    updateShowBannerSetting()
   }
 
   @objc func showHelpBubble() {
@@ -906,11 +897,9 @@ extension KeymanWebViewController {
     self.helpBubbleView?.removeFromSuperview()
     let helpBubbleView = PopoverView(frame: CGRect.zero)
     self.helpBubbleView = helpBubbleView
-    helpBubbleView.backgroundColor = UIColor(red: 253.0 / 255.0, green: 244.0 / 255.0,
-                                             blue: 196.0 / 255.0, alpha: 1.0)
-    helpBubbleView.backgroundColor2 = UIColor(red: 233.0 / 255.0, green: 224.0 / 255.0,
-                                              blue: 176.0 / 255.0, alpha: 1.0)
-    helpBubbleView.borderColor = UIColor(red: 0.5, green: 0.25, blue: 0.25, alpha: 1.0)
+    helpBubbleView.backgroundColor = Colors.helpBubbleGradient1
+    helpBubbleView.backgroundColor2 = Colors.helpBubbleGradient2
+    helpBubbleView.borderColor = Colors.popupBorder
 
     let isPad = UIDevice.current.userInterfaceIdiom == .pad
     let sizeMultiplier = CGFloat(isPad ? 1.5 : 1.0)
@@ -954,7 +943,7 @@ extension KeymanWebViewController {
     helpText.backgroundColor = UIColor.clear
     helpText.font = helpText.font.withSize(fontSize)
     helpText.textAlignment = .center
-    helpText.textColor = UIColor.darkText
+    //helpText.textColor = UIColor.darkText
     helpText.lineBreakMode = .byWordWrapping
     helpText.numberOfLines = 0
     helpText.text = keyboardChangeHelpText

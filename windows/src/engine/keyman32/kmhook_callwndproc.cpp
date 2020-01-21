@@ -66,6 +66,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   LRESULT res = 0;
+
 #ifdef _DEBUG_EXCEPTION
 	res = _kmnCallWndProc(nCode,wParam,lParam);
 #else
@@ -77,7 +78,7 @@ LRESULT CALLBACK kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 	}
 #endif
-	return res;
+  return res;
 }
    // I3617
 BOOL IsSysTrayWindow(HWND hwnd);
@@ -197,7 +198,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
         break;
 		  case WM_INPUTLANGCHANGE:
         SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_INPUTLANGCHANGE %x %x Hwnd=%x Parent=%x Focus=%x Active=%x", cp->wParam, cp->lParam, cp->hwnd, GetParent(cp->hwnd), GetFocus(), GetActiveWindow());
-          ReportActiveKeyboard(_td, 0);   // I4288
+          ReportActiveKeyboard(_td, PC_UPDATE);   // I4288
 
           // The input language has changed, so tell Keyman window about it
         break;

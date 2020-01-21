@@ -21,7 +21,13 @@ namespace wordBreakers {
       let start = boundaries[i];
       let end = boundaries[i + 1];
       let span = new LazySpan(text, start, end);
+
       if (isNonSpace(span.text)) {
+        spans.push(span);
+        // Preserve a sequence-final space if it exists.  Needed to signal "end of word".
+      } else if (i == boundaries.length - 2) { // if "we just checked the final boundary"...
+        // We don't want to return the whitespace itself; the correct token is simply ''.
+        span = new LazySpan(text, end, end);
         spans.push(span);
       }
     }

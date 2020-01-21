@@ -144,6 +144,11 @@ namespace com.keyman.dom {
 
       let start = this.getCarets().start;
 
+      // Bounds-check on the number of chars to delete.
+      if(dn > start.offset) {
+        dn = start.offset;
+      }
+
       if(start.node.nodeType != 3) {
         console.warn("Deletion of characters requested without available context!");
         return; // No context to delete characters from.

@@ -37,6 +37,8 @@ type
     function GetDebug: Boolean;
     procedure SetDebug(const Value: Boolean);
     function CompileModel(FSilent: Boolean): Boolean;
+    function TestKeymanWeb(FSilent: Boolean): Boolean;
+    function TestModelState(FCompiledName: string; FSilent: Boolean): Boolean;
   public
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
     property Debug: Boolean read GetDebug write SetDebug;
@@ -51,10 +53,13 @@ uses
   Vcl.Dialogs,
   Vcl.Graphics,
   Vcl.Controls,
+
   dmActionsMain,
+  KeyboardFonts,
+  UmodWebHttpServer,
   UfrmMain,
   UfrmMDIEditor,
-  KeyboardFonts,
+  Keyman.Developer.UI.UfrmModelEditor,
   KeymanDeveloperUtils,
   KeymanDeveloperOptions,
   System.Classes,
@@ -64,8 +69,9 @@ uses
 function TmodelTsProjectFileUI.DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean;
 begin
   case action of
-    pfaCompile:   Result := CompileModel(FSilent);
-    pfaClean:      Result := ProjectFile.Clean;
+    pfaCompile:       Result := CompileModel(FSilent);
+    pfaClean:         Result := ProjectFile.Clean;
+    pfaTestKeymanWeb: Result := TestKeymanWeb(FSilent);
   else
     Result := False;
   end;
@@ -106,6 +112,73 @@ end;
 procedure TmodelTsProjectFileUI.SetDebug(const Value: Boolean);
 begin
   ProjectFile.Debug := Value;
+end;
+
+function TmodelTsProjectFileUI.TestKeymanWeb(FSilent: Boolean): Boolean;
+var
+  FCompiledName: string;
+  editor: TfrmTikeEditor;
+  wizard: TfrmModelEditor;
+  FontNames: TKeyboardFontArray;
+  i: TKeyboardFont;
+begin
+  editor := frmKeymanDeveloper.FindEditorByFileName(ProjectFile.FileName);   // I4021
+  if not Assigned(editor) or not (editor is TfrmModelEditor) then
+    Exit(False);
+  wizard := editor as TfrmModelEditor;
+
+  FCompiledName := ProjectFile.TargetFilename;
+  if not TestModelState(FCompiledName, FSilent) then
+    Exit(False);
+
+  for i := Low(TKeyboardFont) to High(TKeyboardFont) do
+    FontNames[i] := '';
+
+  if FileExists(ProjectFile.TestKeyboard) then
+    modWebHttpServer.Debugger.RegisterKeyboard(ProjectFile.TestKeyboard, '1.0', FontNames);
+  modWebHttpServer.Debugger.RegisterModel(FCompiledName);
+
+  wizard.NotifyStartedWebDebug;   // I4021
+
+  Result := True;
+end;
+
+function TmodelTsProjectFileUI.TestModelState(FCompiledName: string;
+  FSilent: Boolean): Boolean;
+var
+  ftts, ftjs: TDateTime;
+begin
+  Result := False;
+
+  if not FileExists(FCompiledName) then
+    if FSilent then
+    begin
+      if not CompileModel(FSilent) then Exit;
+    end
+    else
+      case MessageDlg('You need to compile the model before you can continue.  Compile now?',
+          mtConfirmation, mbOkCancel, 0) of
+        mrOk:     if not CompileModel(FSilent) then Exit;
+        mrCancel: Exit;
+      end;
+
+  FileAge(ProjectFile.FileName, ftts);
+  FileAge(FCompiledName, ftjs);
+
+  if ProjectFile.Modified or (ftts > ftjs) then
+    if FSilent then
+    begin
+      if not CompileModel(FSilent) then Exit;
+    end
+    else
+      case MessageDlg('The source file has changed.  Recompile before continuing?',
+          mtConfirmation, mbYesNoCancel, 0) of
+        mrYes:    if not CompileModel(FSilent) then Exit;
+        mrNo:     ;
+        mrCancel: Exit;
+      end;
+
+  Result := True;
 end;
 
 initialization

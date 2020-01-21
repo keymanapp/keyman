@@ -1,12 +1,15 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'name.remal.default-plugins'
+    id 'com.android.library'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
 
         String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity, so all caps
         String env_build_counter = System.getenv("build_counter")
@@ -29,6 +32,11 @@ android {
         }
     }
 
+    // TODO: Remove this when SDK > 17
+    lintOptions {
+        disable 'ResourceType'
+    }
+
     testOptions {
         unitTests {
             // Allows use of a simulated Android API for tests.  (Thanks, roboelectric!)
@@ -41,26 +49,51 @@ android {
                 outputs.upToDateWhen {false}
                 //showStandardStreams = true // If we want test console log output to show during builds.
             }
+            systemProperty 'kmeaTestMode', 'true'
             workingDir = "../" // Defaults to the `app` subdirectory, which is different from Android Studio's default.
+
+            //Avoid Warning: an illegal reflective access operation has occurred
+            //Change argument jdk.module.illegalAccess=warn for detailed information which module needs to be opened
+            //Problem is caused by robolectric: see https://github.com/robolectric/robolectric/issues/4776
+            if(JavaVersion.current().isJava9Compatible()){
+                jvmArgs ('-Djdk.module.illegalAccess=permit')
+                jvmArgs('--add-opens', 'java.base/java.lang=ALL-UNNAMED')
+                jvmArgs('--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED')
+            }
+
         }
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'commons-io:commons-io:2.6'
-    implementation 'org.apache.commons:commons-text:1.6'
 
     // Robolectric
-    testImplementation 'androidx.test:core:1.1.0'
-    testImplementation 'androidx.test.ext:junit:1.1.0'
-    testImplementation 'org.robolectric:robolectric:4.2'
+    testImplementation 'androidx.test:core:1.2.0'
+    testImplementation 'androidx.test.ext:junit:1.1.1'
+    testImplementation 'org.robolectric:robolectric:4.3.1'
 
     /* We only want these Firebase Crashlytics dependencies for KMEA */
-    implementation 'com.google.firebase:firebase-analytics:16.4.0'
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation 'com.google.firebase:firebase-crash:16.2.1'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
-        transitive = true;
+    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
+        transitive = true
     }
+
+    // Generate QR Codes
+    implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
+        transitive = true
+    }
+
+    // Assign the annotation processor for tests.
+    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
 }
+//Show deprecation compiler warnings
+/*
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
+}*/

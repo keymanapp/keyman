@@ -195,7 +195,7 @@ typedef struct tagKEYMAN64THREADDATA
   LPMSG msgbuf;						// Message buffer (alloc at runtime)
 
   int nKeyboards;						// nLoadedKeyboards
-  int nLanguages;           // I1087
+  int nLanguages;           // I1087 //TODO UNUSED
 
   LPWORD IndexStack;
   LPWSTR miniContext;

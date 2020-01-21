@@ -6,13 +6,13 @@
 
 build: version.res manifest.res icons
     $(DCC32) setup.dpr
-    $(TDS2DBG) setup.exe 
+    $(TDS2DBG) setup.exe
     $(MAKEJCLDBG) setup.map
     $(COPY) setup.exe $(PROGRAM)\desktop
 
 setup_dialog.res:
     rc setup_dialog.rc
-    
+
 icons:
     rc icons.rc
 
@@ -32,10 +32,11 @@ test-manifest:
 debug-manifest:
     # make a non-elevated manifest for testing purposes
     -del manifest.res
-    copy manifest.xml std-manifest.xml
-    copy debug-manifest.xml manifest.xml
+    copy manifest.in std-manifest.tmp
+    copy debug-manifest.in manifest.in
     $(MAKE) manifest.res
-    copy std-manifest.xml manifest.xml
+    copy std-manifest.tmp manifest.in
+    -del std-manifest.tmp
 
 install:
     rem

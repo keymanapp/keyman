@@ -204,6 +204,32 @@ namespace com.keyman.text {
         DOMEventHandlers.states._IgnoreNextSelChange = 1;
       }
     }
+
+            
+    /**
+     * Function     _NotifyKeyboard
+     * Scope        Private
+     * @param       {number}    _PCommand     event code (16,17,18) or 0
+     * @param       {Object}    _PTarget      target element
+     * @param       {number}    _PData        1 or 0    
+     * Description  Notifies keyboard of keystroke or other event
+     */    
+    notifyKeyboard(_PCommand: number, _PTarget: OutputTarget|HTMLElement|Document, _PData: number) { // I2187
+      let keyman = com.keyman.singleton;
+      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+
+      var target: OutputTarget;
+      if(_PTarget instanceof text.OutputTarget) {
+        target = _PTarget;
+      } else {
+        target = text.Processor.getOutputTarget(_PTarget as HTMLElement);
+      }
+
+      // Good example use case - the Japanese CJK-picker keyboard
+      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
+        activeKeyboard['KNS'](_PCommand, target, _PData);
+      }
+    }
       
     /**
      * Function     KT
@@ -816,7 +842,9 @@ namespace com.keyman.text {
       // We want to control exactly which deadkeys get removed.
       if(dn > 0) {
         context = this._BuildExtendedContext(dn, dn, outputTarget);
-        for(var i=0; i < context.deadContext.length; i++) {
+        let nulCount = 0;
+
+        for(var i=0; i < context.valContext.length; i++) {
           var dk = context.deadContext[i];
 
           if(dk) {
@@ -825,7 +853,17 @@ namespace com.keyman.text {
 
             // Reduce our reported context size.
             dn--;
+          } else if(context.valContext[i] == "\uFFFE") {
+            // Count any `nul` sentinels that would contribute to our deletion count.
+            nulCount++;
           }
+        }
+
+        // Prevent attempts to delete nul sentinels, as they don't exist in the actual context.
+        // (Addresses regression from KMW v 12.0 paired with Developer bug through same version)
+        let contextLength = context.valContext.length - nulCount;
+        if(dn > contextLength) {
+          dn = contextLength;
         }
       }
 

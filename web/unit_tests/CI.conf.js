@@ -49,21 +49,12 @@ module.exports = function(config) {
       os: 'OS X',
       os_version: 'Mojave'
     },
-    // Unfortunately, BrowserStack's Safari test clients have been quite unstable recently,
-    // failing to even start running their tests.  We're disabling them until the issue goes away.
-
-    // bs_safari_mac_hs: {
-    //   browser: 'safari',
-    //   browser_version: '11.1',
-    //   os: 'OS X',
-    //   os_version: 'High Sierra'
-    // },
-    // bs_safari_mac_m: {
-    //   browser: 'safari',
-    //   browser_version: '12',
-    //   os: 'OS X',
-    //   os_version: 'Mojave'
-    // },
+    bs_safari_mac_m: {
+      browser: 'safari',
+      browser_version: '13',
+      os: 'OS X',
+      os_version: 'Catalina'
+    },
     bs_chrome_mac: {
       browser: 'chrome',
       browser_version: '70.0',
@@ -117,13 +108,6 @@ module.exports = function(config) {
   }
 
   var CURRENT_ANDROID_LAUNCHERS = {
-    bs_native_android: {
-      os: 'android',
-      os_version: '7.1',
-      browser: 'firefox',
-      real_mobile: true,
-      device: 'Samsung Galaxy Note 8'
-    },
     bs_chrome_android: {
       os: 'android',
       os_version: '7.1',
@@ -176,7 +160,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DEBUG,
 
     // Concurrency level
     // For CI, it really helps to keep a nice, clean set of output logs.

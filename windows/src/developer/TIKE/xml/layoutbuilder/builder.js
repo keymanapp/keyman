@@ -2186,15 +2186,15 @@ $(function () {
       function(data) {
         builder.loadingState = false;
         if(typeof data === 'object') {
-          if(data.platform) {
+          if(data.platform && KVKL[data.platform]) {
             $('#selPlatform').val(data.platform);
-            builder.selectPlatform();
           }
-          if(data.presentation) {
+          builder.selectPlatform();
+          if(data.presentation && builder.presentations[data.presentation]) {
             $('#selPlatformPresentation').val(data.presentation);
             builder.prepareLayer();
           }
-          if(data.layer) {
+          if(data.layer && KVKL[builder.lastPlatform][data.layer]) {
             $('#selLayer').val(data.layer);
             builder.selectLayer();
           }

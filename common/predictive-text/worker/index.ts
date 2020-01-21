@@ -30,6 +30,7 @@
  */
 
 /// <reference path="../message.d.ts" />
+/// <reference path="../../../web/source/text/kmwstring.ts" />
 /// <reference path="models/dummy-model.ts" />
 /// <reference path="word_breaking/ascii-word-breaker.ts" />
 /// <reference path="./model-compositor.ts" />
@@ -95,6 +96,14 @@ class LMLayerWorker {
     this.setupConfigState();
   }
 
+  public error(message: string, error?: any) {
+    // error isn't a fan of being cloned across the worker boundary.
+    this.cast('error', {
+      log: message,
+      error: (error && error.stack) ? error.stack : undefined
+    });
+  }
+
   /**
    * A function that can be set as self.onmessage (the Worker
    * message handler).
@@ -123,7 +132,10 @@ class LMLayerWorker {
     if(im.message == 'load') {
       let data = im as LoadMessage;
       if(data.model == this._currentModelSource) {
-        console.warn("Duplicate model load message detected - squashing!");
+        // Some JS implementations don't allow web workers access to the console.
+        if(typeof console !== 'undefined') {
+          console.warn("Duplicate model load message detected - squashing!");
+        }
         return;
       } else {
         this._currentModelSource = data.model;
@@ -163,24 +175,45 @@ class LMLayerWorker {
   public loadModel(model: LexicalModel) {
     // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
     // returning a Configuration.
-    let configuration = model.configure(this._platformCapabilities);
 
-    // Set reasonable defaults for the configuration.
-    if (!configuration.leftContextCodeUnits) {
-      configuration.leftContextCodeUnits = this._platformCapabilities.maxLeftContextCodeUnits;
-    }
-    if (!configuration.rightContextCodeUnits) {
-      configuration.rightContextCodeUnits = this._platformCapabilities.maxRightContextCodeUnits || 0;
-    }
+    /* Note that this function is typically called from within an `importScripts` call.
+     * For meaningful error messages to be successfully logged, we must catch what we can here
+     * and pass a message to outside the worker - otherwise a generic "Script error" occurs.
+     */
+    try {
+      let configuration = model.configure(this._platformCapabilities);
 
-    this.transitionToReadyState(model);
-    this.cast('ready', { configuration });
+      // Handle deprecations.
+      if(!configuration.leftContextCodePoints) {
+        configuration.leftContextCodePoints = configuration.leftContextCodeUnits;
+      }
+      if(!configuration.rightContextCodePoints) {
+        configuration.rightContextCodePoints = configuration.rightContextCodeUnits;
+      }
+
+      // Set reasonable defaults for the configuration.
+      if (!configuration.leftContextCodePoints) {
+        configuration.leftContextCodePoints = this._platformCapabilities.maxLeftContextCodePoints;
+      }
+      if (!configuration.rightContextCodePoints) {
+        configuration.rightContextCodePoints = this._platformCapabilities.maxRightContextCodePoints || 0;
+      }
+
+      this.transitionToReadyState(model);
+      this.cast('ready', { configuration });
+    } catch (err) {
+      this.error("loadModel failed!", err);
+    }
   }
 
   private loadModelFile(url: string) {
     // The self/global WebWorker method, allowing us to directly import another script file into WebWorker scope.
     // If built correctly, the model's script file will auto-register the model with loadModel() above.
-    this._importScripts(url);
+    try {
+      this._importScripts(url);
+    } catch (err) {
+      this.error("Error occurred when attempting to load dictionary", err);
+    }
   }
 
   public unloadModel() {

@@ -21,6 +21,13 @@ type
 {$IFDEF VER320}
 const
   SBDSExe = 'C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\BDS.EXE';
+{$ELSE}
+{$IFDEF VER330}
+const
+  SBDSExe = 'C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\BDS.EXE';
+{$ELSE}
+ERROR: SBDSExe is not defined
+{$ENDIF}
 {$ENDIF}
 
 implementation

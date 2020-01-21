@@ -1,3 +1,7 @@
+// Includes version-related functionality
+///<reference path="utils/version.ts"/>
+///<reference path="utils/styleConstants.ts" />
+
 // The Device object definition -------------------------------------------------
 
 namespace com.keyman {
@@ -10,6 +14,10 @@ namespace com.keyman {
     version: string;
     orientation: string|number;
     browser: string;
+    colorScheme: 'light' | 'dark';
+
+    private detected: boolean = false;
+    private _styles: utils.StyleConstants;
 
     // Generates a default Device value.
     constructor() {
@@ -46,6 +54,7 @@ namespace com.keyman {
 
     detect() : void {
       var IEVersion = Device._GetIEVersion();
+      var possMacSpoof = false;
       
       if(navigator && navigator.userAgent) {
         var agent=navigator.userAgent;
@@ -70,7 +79,24 @@ namespace com.keyman {
         } else if(agent.indexOf('Linux') >= 0) {
           this.OS='Linux';
         } else if(agent.indexOf('Macintosh') >= 0) {
-          this.OS='MacOSX';
+          // Starting with 13.1, "Macintosh" can reflect iPads (by default) or iPhones 
+          // (by user setting); a new "Request Desktop Website" setting for Safari will
+          // change the user agent string to match a desktop Mac.
+          //
+          // Firefox uses '.' between version components, while Chrome and Safari use
+          // '_' instead.  So, we have to check for both.  Yay.
+          let regex = /Intel Mac OS X (10(?:[_\.]\d+)+)/i;
+          let results = regex.exec(agent);
+          
+          // Match result:  a version string with components separated by underscores.
+          if(results.length > 1 && results[1]) {
+            // Convert version string into a usable form.
+            let versionString = results[1].replace('_', '.');
+            let version = new utils.Version(versionString);
+
+            possMacSpoof = utils.Version.MAC_POSSIBLE_IPAD_ALIAS.compareTo(version) <= 0;
+            this.OS='MacOSX';
+          }
         } else if(agent.indexOf('Windows NT') >= 0) {
           this.OS='Windows';
           if(agent.indexOf('Touch') >= 0) {
@@ -133,6 +159,33 @@ namespace com.keyman {
           }
         } 
       }
+
+      if(possMacSpoof && this.browser == 'safari') {
+        // Indistinguishable user agent string!  We need a different test; fortunately, true macOS
+        // Safari doesn't support TouchEvents.  (Chrome does, though!  Hence the filter above.)
+        if(window['TouchEvent']) {
+          this.OS='iOS';
+          this.formFactor='tablet';
+          this.dyPortrait=this.dyLandscape=0;
+
+          // It's currently impossible to differentiate between iPhone and iPad here
+          // except for by screen dimensions.
+          let aspectRatio = screen.height / screen.width;
+          if(aspectRatio < 1) {
+            aspectRatio = 1 / aspectRatio;
+          }
+
+          // iPhones usually have a ratio of 16:9 (or 1.778) or higher, while iPads use 4:3 (or 1.333)
+          if(aspectRatio > 1.6) {
+            // Override - we'll treat this device as an iPhone.
+            this.formFactor = 'phone';
+            this.dyPortrait=this.dyLandscape=25;
+          }
+        }
+      }
+
+      this.colorScheme = this.prefersDarkMode() ? 'dark' : 'light';
+      this.detected = true;
     }
 
     static _GetIEVersion() {
@@ -173,6 +226,28 @@ namespace com.keyman {
       }
     
       return 999;
+    }
+
+    /**
+     * Checks is a user's browser is in dark mode, if the feature is supported.  Returns false otherwise.
+     * 
+     * Thanks to https://stackoverflow.com/a/57795518 for this code.
+     */
+    private prefersDarkMode(): boolean {
+      // Ensure the detector exists (otherwise, returns false)
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    public get styles(): utils.StyleConstants {
+      if(!this._styles) {
+        if(!this.detected) {
+          this.detect();
+        }
+        
+        this._styles = new utils.StyleConstants(this);
+      }
+
+      return this._styles;
     }
   }
 }

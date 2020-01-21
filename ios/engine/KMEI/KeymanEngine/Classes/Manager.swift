@@ -44,6 +44,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   public static let shared = Manager()
 
+  public var fileBrowserLauncher: ((UINavigationController) -> Void)? = nil
+
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
   
@@ -150,7 +152,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   var currentResponder: KeymanResponder?
   
   // This allows for 'lazy' initialization of the keyboard.
-  var inputViewController: InputViewController! {
+  open var inputViewController: InputViewController! {
     get {
       // Occurs for the in-app keyboard ONLY.
       if _inputViewController == nil {
@@ -185,6 +187,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
     }
     Migrations.updateResources(storage: Storage.active)
+    Migrations.engineVersion = Version.current
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
@@ -303,6 +306,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
+
+    // Now to handle lexical model + banner management
+    inputViewController.clearModel()
     
     let userDefaults: UserDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
@@ -331,7 +337,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
-    if let index = userKeyboards.index(where: { $0.fullID == keyboard.fullID }) {
+    if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
       userKeyboards[index] = keyboard
     } else {
       userKeyboards.append(keyboard)
@@ -396,7 +402,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     var userLexicalModels = userDefaults.userLexicalModels ?? []
     
     // Update lexical model if it exists
-    if let index = userLexicalModels.index(where: { $0.fullID == lexicalModel.fullID }) {
+    if let index = userLexicalModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
       userLexicalModels[index] = lexicalModel
     } else {
       userLexicalModels.append(lexicalModel)
@@ -412,7 +418,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     // Remove keyboard from the list if it exists
-    let index = Storage.active.userDefaults.userKeyboards?.index { $0.fullID == fullID }
+    let index = Storage.active.userDefaults.userKeyboards?.firstIndex { $0.fullID == fullID }
     if let index = index {
       return removeKeyboard(at: index)
     }
@@ -473,7 +479,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: The lexical model exists and was removed
   public func removeLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
     // Remove lexical model from the list if it exists
-    let index = Storage.active.userDefaults.userLexicalModels?.index { $0.fullID == fullID }
+    let index = Storage.active.userDefaults.userLexicalModels?.firstIndex { $0.fullID == fullID }
     if let index = index {
       return removeLexicalModel(at: index)
     }
@@ -555,7 +561,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
-      let index = userKeyboards.index(where: { self.currentKeyboardID == $0.fullID })
+      let index = userKeyboards.firstIndex(where: { self.currentKeyboardID == $0.fullID })
     else {
       return nil
     }
@@ -697,11 +703,28 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       let data = try Data(contentsOf: path, options: .mappedIfSafe)
       let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
       if let jsonResult = jsonResult as? [String:AnyObject] {
+        var version: String = "1.0"
+
+        if let info = jsonResult["info"] as? [String:AnyObject] {
+          if let versionEntry = info["version"] as? [String:AnyObject] {
+            if let description = versionEntry["description"] as? String {
+              version = description;
+            }
+          }
+        }
+
+        // Version uses a 'conditional initializer'.  If it fails, the version info is invalid.
+        if let _ = Version(version) {
+          // No problem
+        } else {
+          // Lazy-handle the error and replace version with 1.0.  Legacy decision from 2005.
+          version = "1.0"
+        }
+
         if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
           for k in lexicalModels {
             let name = k["name"] as! String
             let lexicalModelID = k["id"] as! String
-            let version = k["version"] as! String
             
             //TODO: handle errors if languages do not exist
             //var languageName = ""
@@ -930,7 +953,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
   
   var vibrationSupportLevel: VibrationSupport {
-    let device = Device()
+    let device = Device.current
 
     if device.isPod {
       return .none
@@ -959,9 +982,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   
   // Keyboard download notification observers
   private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    // TODO:  Only do this if it's an update.  We'll need a bit of notification retooling for this first.
+    // There's little harm in reloading the keyboard (and thus, KMW) for a clean reset
+    // after resource downloads or updates.  That said, we should avoid *directly*
+    // triggering an immediate reset, as an extra reset will occur once we leave the
+    // settings menu.  The delay also helps any chained downloads (keyboard > lexical model)
+    // to fully complete first.
     shouldReloadKeyboard = true
-    inputViewController.reload()
   }
 
   /*-----------------------------

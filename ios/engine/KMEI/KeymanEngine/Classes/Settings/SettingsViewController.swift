@@ -27,11 +27,12 @@ open class SettingsViewController: UITableViewController {
                                      action: #selector(self.doneClicked))
     navigationItem.leftBarButtonItem = doneButton
 
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
-                                                          blue: 0.25, alpha: 0.9)
+    navigationController?.toolbar?.barTintColor = Colors.statusToolbar
   }
   
   @objc func doneClicked(_ sender: Any) {
+    // While the called method might should be renamed, it does the job well enough.
+    // This resets KMW so that any new and/or updated resources can be properly loaded.
     Manager.shared.dismissKeyboardPicker(self)
   }
   
@@ -70,6 +71,16 @@ open class SettingsViewController: UITableViewController {
       "subtitle": "",
       "reuseid" : "showgetstarted"
       ])
+
+    // The iOS Files app is only available with 11.0+.
+    if #available(iOS 11.0, *) {
+      itemsArray.append([
+        "title": "Install From File",
+        "subtitle": "Browse for .kmp files",
+        "reuseid" : "installfile"
+        ])
+    }
+
     _ = view
   }
 
@@ -85,8 +96,7 @@ open class SettingsViewController: UITableViewController {
     }
 
   override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 3
+        return itemsArray.count
     }
   
   public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
@@ -123,7 +133,7 @@ open class SettingsViewController: UITableViewController {
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
         showBannerSwitch.frame = switchFrame
         
-        showBannerSwitch.isOn = false //TODO: find the setting this is to show!
+        showBannerSwitch.isOn = showBanner
         showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
                                       for: .valueChanged)
         cell.addSubview(showBannerSwitch)
@@ -149,6 +159,8 @@ open class SettingsViewController: UITableViewController {
           showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
           showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         }
+      case "installfile":
+        cell.accessoryType = .disclosureIndicator
       default:
         log.error("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
         cell.accessoryType = .none
@@ -161,22 +173,31 @@ open class SettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       // actually this should call into KMW, which controls the banner
-      userData.set(toggle.isOn, forKey: "ShouldShowBanner") //???
+      userData.set(toggle.isOn, forKey: Key.optShouldShowBanner)
       userData.synchronize()
     }
+
+    // Necessary for the keyboard to visually update to match
+    // the new setting.
+    Manager.shared.shouldReloadKeyboard = true
   }
   
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
-      userData.set(toggle.isOn, forKey: "ShouldShowGetStarted")
+      userData.set(toggle.isOn, forKey: Key.optShouldShowGetStarted)
       userData.synchronize()
     }
+  }
+
+  private var showBanner: Bool {
+    let userData = Storage.active.userDefaults
+    return userData.bool(forKey: Key.optShouldShowBanner)
   }
   
   private var showGetStarted: Bool {
     let userData = Storage.active.userDefaults
-    return userData.bool(forKey: "ShouldShowGetStarted")
+    return userData.bool(forKey: Key.optShouldShowGetStarted)
   }
 
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -187,6 +208,8 @@ open class SettingsViewController: UITableViewController {
     cell.isUserInteractionEnabled = true
 
     if indexPath.row == 0 {
+      cell.accessoryType = .disclosureIndicator
+    } else if indexPath.row == 3 {
       cell.accessoryType = .disclosureIndicator
     } else {
       cell.textLabel?.isEnabled = true
@@ -208,7 +231,18 @@ open class SettingsViewController: UITableViewController {
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
-      showLanguages()
+      switch indexPath.row {
+      case 0:
+        showLanguages()
+      case 3:
+        if let block = Manager.shared.fileBrowserLauncher {
+          block(navigationController!)
+        } else {
+          log.info("Listener for framework signal to launch file browser is missing")
+        }
+      default:
+        break
+      }
     default:
       break
     }

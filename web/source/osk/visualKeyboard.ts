@@ -204,7 +204,7 @@ namespace com.keyman.osk {
         ts.fontFamily=spec['font'];
       }
 
-      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != 0) {
+      if(typeof spec['fontsize'] == 'string' && spec['fontsize'] != '') {
         ts.fontSize=spec['fontsize'];
       }
 
@@ -564,12 +564,12 @@ namespace com.keyman.osk {
     // Function fields (fleshed out by kmwnative.ts and/or kmwembedded.ts)
     touchHold: (key: KeyElement) => void;
     optionKey: (e: KeyElement, keyName: string, keyDown: boolean) => void;
-    highlightSubKeys: (key: KeyElement, x: number, y: number) => void = this.highlightSubKeys || function(k,x,y) {};
+    highlightSubKeys: (key: KeyElement, x: number, y: number) => void;
     showKeyTip: (key: KeyElement, on: boolean) => void;
-    drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void = this.drawPreview || function(c,w,h,e) {};
+    drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void;
     createKeyTip: () => void;
-    addCallout: (key: KeyElement) => HTMLDivElement = this.addCallout || function(key) {return null};
-    waitForFonts: (kfd,ofd) => boolean = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
+    addCallout: (key: KeyElement) => HTMLDivElement;
+    waitForFonts: (kfd,ofd) => boolean;
 
     //#region OSK constructor and helpers
 
@@ -581,6 +581,14 @@ namespace com.keyman.osk {
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
     constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number) {
+      // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
+      this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
+      this.drawPreview = this.drawPreview || function(c,w,h,e) {};
+      this.addCallout = this.addCallout || function(key) {return null};
+      this.waitForFonts = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
+      
+      // Do normal constructor stuff.
+
       let keyman = com.keyman.singleton;
 
       let util = keyman.util;
@@ -617,7 +625,12 @@ namespace com.keyman.osk {
       }
 
       // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      if(typeof layout['displayUnderlying'] != 'undefined') {
+        layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+      } else {
+        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+      }
+
       let divLayerContainer = this.deviceDependentLayout(layout, util.device.formFactor);
 
       this.ddOSK = true;
@@ -2126,7 +2139,11 @@ namespace com.keyman.osk {
 
       // Cannot create an OSK if no layout defined, just return empty DIV
       if(layout != null) {
-        layout.keyLabels=((typeof(PKbd['KDU']) != 'undefined') && PKbd['KDU']);
+        if(typeof layout['displayUnderlying'] != 'undefined') {
+          layout.keyLabels = layout['displayUnderlying'] == true; // force bool
+        } else {
+          layout.keyLabels = typeof(PKbd['KDU']) != 'undefined' && PKbd['KDU'];
+        }        
       }
 
       // TODO:  Fix this method's link!

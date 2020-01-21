@@ -143,8 +143,8 @@ uses
   UfrmDebugStatus in 'child\UfrmDebugStatus.pas' {frmDebugStatus},
   UfrmDebugStatus_Key in 'debug\UfrmDebugStatus_Key.pas' {frmDebugStatus_Key},
   UfrmDebugStatus_Child in 'debug\UfrmDebugStatus_Child.pas' {frmDebugStatus_Child},
-  OnlineUpdateCheck in '..\..\global\delphi\online\OnlineUpdateCheck.pas',
-  UfrmOnlineUpdateNewVersion in '..\..\global\delphi\online\UfrmOnlineUpdateNewVersion.pas' {frmOnlineUpdateNewVersion},
+  Keyman.Developer.UI.TikeOnlineUpdateCheck in 'update\Keyman.Developer.UI.TikeOnlineUpdateCheck.pas',
+  Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion in 'update\Keyman.Developer.UI.UfrmTikeOnlineUpdateNewVersion.pas' {frmTikeOnlineUpdateNewVersion},
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   MessageDefaults in 'kct\MessageDefaults.pas',
   UfrmDownloadProgress in 'main\UfrmDownloadProgress.pas' {frmDownloadProgress},
@@ -152,8 +152,8 @@ uses
   UfrmOSKEditor in 'child\UfrmOSKEditor.pas' {frmOSKEditor},
   utilxml in '..\..\global\delphi\general\utilxml.pas',
   UfrmTike in 'main\UfrmTike.pas' {TikeForm},
-  UfrmOnlineUpdateSetup in '..\..\global\delphi\online\UfrmOnlineUpdateSetup.pas' {frmOnlineUpdateSetup},
-  OnlineUpdateCheckMessages in 'main\OnlineUpdateCheckMessages.pas',
+  Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup in 'update\Keyman.Developer.UI.UfrmTikeOnlineUpdateSetup.pas' {frmTikeOnlineUpdateSetup},
+  Keyman.Developer.System.TikeOnlineUpdateCheckMessages in 'update\Keyman.Developer.System.TikeOnlineUpdateCheckMessages.pas',
   VisualKeyboardExportBMP in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportBMP.pas',
   VisualKeyboardExportPNG in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportPNG.pas',
   MSXML2_TLB in '..\..\global\delphi\tlb\MSXML2_TLB.pas',
@@ -283,10 +283,17 @@ uses
   Keyman.Developer.System.ProjectTemplate in '..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas',
   Keyman.Developer.UI.Project.UfrmNewModelProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas' {frmNewModelProjectParameters},
   Keyman.Developer.System.Project.wordlistTsvProjectFile in 'project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
-  Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
+  Keyman.Developer.UI.UframeWordlistEditor in 'child\Keyman.Developer.UI.UframeWordlistEditor.pas' {frameWordlistEditor},
   Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
   Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
-  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas';
+  Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas',
+  DelphiZXIngQRCode in '..\..\ext\zxingqrcode\Source\DelphiZXIngQRCode.pas',
+  Keyman.System.QRCode in '..\..\global\delphi\general\Keyman.System.QRCode.pas',
+  Keyman.Developer.UI.UfrmModelEditor in 'child\Keyman.Developer.UI.UfrmModelEditor.pas' {frmModelEditor},
+  Keyman.Developer.System.LexicalModelParser in 'main\Keyman.Developer.System.LexicalModelParser.pas',
+  Keyman.Developer.System.LexicalModelParserTypes in 'main\Keyman.Developer.System.LexicalModelParserTypes.pas',
+  Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
+  Keyman.Developer.UI.dmActionsModelEditor in 'actions\Keyman.Developer.UI.dmActionsModelEditor.pas' {modActionsModelEditor: TDataModule};
 
 {$R *.RES}
 {$R ICONS.RES}

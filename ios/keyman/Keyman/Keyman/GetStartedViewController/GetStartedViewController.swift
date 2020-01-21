@@ -26,7 +26,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     super.viewDidLoad()
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.refreshTable),
-                                           name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+                                           name: UIApplication.didBecomeActiveNotification, object: nil)
 
     tableView.isScrollEnabled = false
 
@@ -68,7 +68,8 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     footer.addSubview(label)
     footer.addSubview(dontShowAgainSwitch)
     footer.addSubview(line)
-    footer.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
+    footer.backgroundColor = Colors.systemBackground
+
     tableView.tableHeaderView = header
     tableView.tableFooterView = footer
   }
@@ -92,7 +93,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
 
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionSecondary
     cell.selectedBackgroundView = selectionColor
     cell.textLabel?.font = cell.textLabel?.font?.withSize(12.0)
     cell.detailTextLabel?.font = cell.detailTextLabel?.font?.withSize(10.0)

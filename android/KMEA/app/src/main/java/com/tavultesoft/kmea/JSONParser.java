@@ -26,11 +26,12 @@ import com.tavultesoft.kmea.util.Connection;
 import android.util.Log;
 
 public final class JSONParser {
+  private final String TAG = "JSONParser";
 
   public JSONParser() {
   }
 
-  private <T extends Object> T getJSONObjectFromReader(BufferedReader reader, Class<T> type) {
+  public <T extends Object> T getJSONObjectFromReader(BufferedReader reader, Class<T> type) {
     String jsonStr = "";
     T obj = null;
     String logTag = "JSONObjectFromReader";
@@ -77,14 +78,19 @@ public final class JSONParser {
   }
 
   public JSONObject getJSONObjectFromFile(File path) {
+    return getJSONObjectFromFile(path,JSONObject.class);
+  }
+
+  public <T extends Object> T getJSONObjectFromFile(File path, Class<T> type) {
     BufferedReader reader = null;
-    JSONObject jsonObj = null;
+    T jsonObj = null;
 
     try {
       reader = new BufferedReader(new FileReader(path));
-      jsonObj = getJSONObjectFromReader(reader, JSONObject.class);
+      jsonObj = getJSONObjectFromReader(reader, type);
     } catch (FileNotFoundException e) {
-      Log.e("JSONObjectFromFile", (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage());
+      String errorString = (e.getMessage() == null) ? "FileNotFoundException" : e.getMessage();
+      Log.e(TAG, "JSONObjectFromFile error " + errorString);
       jsonObj = null;
       System.err.println(e);
     } finally {
@@ -92,6 +98,7 @@ public final class JSONParser {
         try {
           reader.close();
         } catch (IOException e) {
+          Log.e(TAG, "getJSONObjectFromFile error: " + e);
           // Ignore.
         }
       }

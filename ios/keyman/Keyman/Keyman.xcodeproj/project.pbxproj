@@ -14,11 +14,8 @@
 		162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */; };
 		165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3992097165B00040A69 /* UIColor+Extensions.swift */; };
 		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
-		1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8F1FD8221800D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
-		1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
-		1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
@@ -117,7 +114,6 @@
 		985EA9E819E64A580006C017 /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
 		985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
 		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
-		9A0FCA0022D7C22000D33F86 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
@@ -138,6 +134,21 @@
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE6138021FB999C8009D0EF2 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */; };
+		CE79B23C23C6E8E6007E72AE /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
+		CE79B23D23C6ECB2007E72AE /* banner-Landscape-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D419E64A580006C017 /* banner-Landscape-568h@2x.png */; };
+		CE79B23E23C6ECB4007E72AE /* banner-Landscape-568h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D519E64A580006C017 /* banner-Landscape-568h@3x.png */; };
+		CE79B23F23C6ECB6007E72AE /* banner-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D619E64A580006C017 /* banner-Landscape.png */; };
+		CE79B24023C6ECB9007E72AE /* banner-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D719E64A580006C017 /* banner-Landscape@2x.png */; };
+		CE79B24123C6ECBB007E72AE /* banner-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D819E64A580006C017 /* banner-Landscape@2x~ipad.png */; };
+		CE79B24223C6ECBE007E72AE /* banner-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9D919E64A580006C017 /* banner-Landscape~ipad.png */; };
+		CE79B24323C6ECC0007E72AE /* banner-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DA19E64A580006C017 /* banner-Portrait.png */; };
+		CE79B24423C6ECC2007E72AE /* banner-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DB19E64A580006C017 /* banner-Portrait@2x.png */; };
+		CE79B24523C6ECC5007E72AE /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DC19E64A580006C017 /* banner-Portrait@2x~ipad.png */; };
+		CE79B24623C6ECC7007E72AE /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
+		CE79B24723C6ECC9007E72AE /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
+		CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE79CDB42370111200010C06 /* Themes+Colors.xcassets */; };
+		CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */; };
+		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -158,11 +169,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9A0FCA0022D7C22000D33F86 /* Reachability.framework in Embed Frameworks */,
-				1687ACCA1FD8269C00926D69 /* Zip.framework in Embed Frameworks */,
-				1687ACD71FD8DE8000926D69 /* XCGLogger.framework in Embed Frameworks */,
 				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
-				1687ACD51FD8DE8000926D69 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -304,6 +311,10 @@
 		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE6138031FB999C8009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE79CDB42370111200010C06 /* Themes+Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Themes+Colors.xcassets"; sourceTree = "<group>"; };
+		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
+		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -478,6 +489,7 @@
 		98ABADA7176935E400B62590 = {
 			isa = PBXGroup;
 			children = (
+				CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */,
 				9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */,
 				CE2B1E4B21B6112B007D092E /* DeviceKit.framework */,
 				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
@@ -516,6 +528,8 @@
 				162E2C9420926C8600F40769 /* Classes */,
 				9845A7BE1A439A9200544E2E /* GetStartedViewController */,
 				98C893F119F0811A000B9AC8 /* Images.xcassets */,
+				CE79CDB42370111200010C06 /* Themes+Colors.xcassets */,
+				CE7A26D523CEEB8D0005955C /* UIColors.swift */,
 				9845A7C21A439A9200544E2E /* InfoViewController */,
 				984FA1E21974B06C0037EE5D /* Keyman.entitlements */,
 				9845A7B71A4398B200544E2E /* DropDownList */,
@@ -526,6 +540,7 @@
 				9845A7C71A439A9200544E2E /* SetUpViewController */,
 				98ABADBA176935E400B62590 /* Supporting Files */,
 				C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */,
+				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
 				C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */,
 				C0E943F71F61234C00E7D98C /* UIImage+Helpers.swift */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
@@ -664,13 +679,13 @@
 			buildConfigurationList = 981AFADE19EF44DE006706BF /* Build configuration list for PBXNativeTarget "Keyman" */;
 			buildPhases = (
 				981AFA7A19EF44DE006706BF /* Sources */,
+				1687ACCB1FD826D000926D69 /* Run Script */,
 				981AFA8319EF44DE006706BF /* Frameworks */,
 				981AFA8E19EF44DE006706BF /* Resources */,
+				989E4DB91B1EB5C200A345FB /* Run Script */,
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
-				989E4DB91B1EB5C200A345FB /* ShellScript */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
 				C01AB5981F8343F7009B37D3 /* Embed Frameworks */,
-				1687ACCB1FD826D000926D69 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -685,7 +700,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 98CD126819CA85710089385F /* Build configuration list for PBXNativeTarget "SWKeyboard" */;
 			buildPhases = (
-				CE06AA671F161422006D91C3 /* ShellScript */,
+				CE06AA671F161422006D91C3 /* Run Script */,
 				98CD125819CA85710089385F /* Sources */,
 				98CD125919CA85710089385F /* Frameworks */,
 				98CD125A19CA85710089385F /* Resources */,
@@ -770,8 +785,10 @@
 				9845A8D61A439F1000544E2E /* UIButtonBarArrowLeft@2x.png in Resources */,
 				981AFAA219EF44DE006706BF /* navbar-Portrait@2x.png in Resources */,
 				9845A8D01A439F1000544E2E /* 786-browser-selected@2x.png in Resources */,
+				CE79B24223C6ECBE007E72AE /* banner-Landscape~ipad.png in Resources */,
 				9822CB6D1A3A8E3200D73CAA /* more-selected@2x.png in Resources */,
 				9845A7B01A43983300544E2E /* kmwb-navbar-Landscape@2x~ipad.png in Resources */,
+				CE79B23F23C6ECB6007E72AE /* banner-Landscape.png in Resources */,
 				9845A7AD1A43983300544E2E /* kmwb-navbar-Landscape-568h@3x.png in Resources */,
 				9845A7B61A43983300544E2E /* kmwb-navbar-Portrait~ipad.png in Resources */,
 				9845A7AF1A43983300544E2E /* kmwb-navbar-Landscape@2x.png in Resources */,
@@ -799,15 +816,19 @@
 				9820CE521A144F0400EA909A /* navbar-Landscape-568h@3x.png in Resources */,
 				162E2C9020924EEE00F40769 /* keyman_logo@3x.png in Resources */,
 				981AFAB719EF44DE006706BF /* navbar-Portrait@2x~ipad.png in Resources */,
+				CE79B24423C6ECC2007E72AE /* banner-Portrait@2x.png in Resources */,
 				981AFAB819EF44DE006706BF /* textsize_down.png in Resources */,
+				CE79B23D23C6ECB2007E72AE /* banner-Landscape-568h@2x.png in Resources */,
 				981AFAB919EF44DE006706BF /* 887-notepad-selected@2x.png in Resources */,
 				9845A8CF1A439F1000544E2E /* 786-browser-selected.png in Resources */,
 				981AFABA19EF44DE006706BF /* textsize_down@2x.png in Resources */,
 				982D148B19FF462A007D4629 /* 702-share-selected@3x.png in Resources */,
 				9845A7B21A43983300544E2E /* kmwb-navbar-Portrait.png in Resources */,
 				981AFABB19EF44DE006706BF /* 887-notepad-selected.png in Resources */,
+				CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */,
 				981AFABC19EF44DE006706BF /* 887-notepad@2x.png in Resources */,
 				981AFABE19EF44DE006706BF /* textsize_up.png in Resources */,
+				CE79B24523C6ECC5007E72AE /* banner-Portrait@2x~ipad.png in Resources */,
 				982D148F19FF462A007D4629 /* 711-trash-selected@3x.png in Resources */,
 				981AFABF19EF44DE006706BF /* textsize_up@2x.png in Resources */,
 				9845A7D01A439A9200544E2E /* GetStartedViewController.xib in Resources */,
@@ -816,11 +837,14 @@
 				981AFAC519EF44DE006706BF /* 724-info-selected.png in Resources */,
 				981AFAC619EF44DE006706BF /* 711-trash-selected@2x.png in Resources */,
 				981AFAC719EF44DE006706BF /* navbar-Landscape@2x~ipad.png in Resources */,
+				CE79B23E23C6ECB4007E72AE /* banner-Landscape-568h@3x.png in Resources */,
 				981AFAC819EF44DE006706BF /* navbar-Portrait.png in Resources */,
 				981AFAC919EF44DE006706BF /* 711-trash.png in Resources */,
 				9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */,
+				CE79B24723C6ECC9007E72AE /* banner-Portrait~ipad.png in Resources */,
 				9845A8D51A439F1000544E2E /* UIAccessoryButtonX@2x.png in Resources */,
 				982D149919FF462A007D4629 /* 887-notepad@3x.png in Resources */,
+				CE79B24023C6ECB9007E72AE /* banner-Landscape@2x.png in Resources */,
 				982D149719FF462A007D4629 /* 887-notepad-selected@3x.png in Resources */,
 				9845A7B41A43983300544E2E /* kmwb-navbar-Portrait@2x~ipad.png in Resources */,
 				981AFACD19EF44DE006706BF /* 711-trash@2x.png in Resources */,
@@ -829,15 +853,19 @@
 				9845A8D91A439F1000544E2E /* UIButtonBarStop@2x.png in Resources */,
 				9845A8D31A439F1000544E2E /* 786-browser@2x.png in Resources */,
 				981AFACF19EF44DE006706BF /* textsize_selected@2x.png in Resources */,
+				CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */,
 				CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */,
 				981AFAD319EF44DE006706BF /* navbar-Landscape-568h@2x.png in Resources */,
 				9845A8CC1A439F1000544E2E /* 715-globe-toolbar.png in Resources */,
 				981AFAD419EF44DE006706BF /* 887-notepad.png in Resources */,
 				981AFAD619EF44DE006706BF /* 702-share-selected.png in Resources */,
 				982D149F19FF462A007D4629 /* textsize_up@3x.png in Resources */,
+				CE79B24623C6ECC7007E72AE /* banner-Portrait@3x.png in Resources */,
+				CE79B24123C6ECBB007E72AE /* banner-Landscape@2x~ipad.png in Resources */,
 				982D149119FF462A007D4629 /* 711-trash@3x.png in Resources */,
 				982D148D19FF462A007D4629 /* 702-share@3x.png in Resources */,
 				9845A7AB1A43983300544E2E /* WebBrowserViewController.xib in Resources */,
+				CE79B24323C6ECC0007E72AE /* banner-Portrait.png in Resources */,
 				9822CB691A3A77D200D73CAA /* MainViewController_.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -863,7 +891,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1687ACCB1FD826D000926D69 /* ShellScript */ = {
+		1687ACCB1FD826D000926D69 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -875,6 +903,7 @@
 				"$(SRCROOT)/../../Carthage/Build/iOS/DeviceKit.framework",
 				"$(SRCROOT)/../../Carthage/Build/iOS/Reachability.framework",
 			);
+			name = "Run Script";
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Zip.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
@@ -887,13 +916,14 @@
 			shellScript = "echo \"-- Copying Frameworks --\"\n/usr/local/bin/carthage copy-frameworks\n\n\n";
 			showEnvVarsInLog = 0;
 		};
-		989E4DB91B1EB5C200A345FB /* ShellScript */ = {
+		989E4DB91B1EB5C200A345FB /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -901,13 +931,14 @@
 			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		CE06AA671F161422006D91C3 /* ShellScript */ = {
+		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -925,6 +956,7 @@
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
 				C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */,
+				CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */,
 				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
 				C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */,
 				162E2C9920926C8600F40769 /* UIView+Extensions.swift in Sources */,
@@ -932,6 +964,7 @@
 				C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */,
 				C0A1A6371F5E8C9100EAF822 /* WebBrowserViewController.swift in Sources */,
 				C0E943FA1F6124E100E7D98C /* AppDelegate.swift in Sources */,
+				CE79B23C23C6E8E6007E72AE /* KeyboardViewController.swift in Sources */,
 				C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */,
 				162E2C9D2092BFE400F40769 /* KMUnderscoreView.swift in Sources */,
 				C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */,
@@ -985,7 +1018,6 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_STYLE = Manual;
@@ -1007,7 +1039,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1018,7 +1050,6 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_STYLE = Manual;
@@ -1039,7 +1070,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "XC iOS: Tavultesoft.Keyman";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1193,7 +1224,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1231,7 +1262,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

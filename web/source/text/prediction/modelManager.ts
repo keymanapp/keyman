@@ -108,9 +108,9 @@ namespace com.keyman.text.prediction {
       // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
       // model may expect.
       let capabilities: Capabilities = {
-        maxLeftContextCodeUnits: 64,
+        maxLeftContextCodePoints: 64,
         // Since the apps don't yet support right-deletions.
-        maxRightContextCodeUnits: keyman.isEmbedded ? 0 : 64
+        maxRightContextCodePoints: keyman.isEmbedded ? 0 : 64
       }
 
       if(!this.canEnable()) {

@@ -47,8 +47,12 @@
 
 #define KMC_PROFILECHANGED  18  // 9.0.426.0   // I3933
 
+#define PC_UPDATE 0                   // Tell Keyman to update its display of active keyboard
+#define PC_UPDATE_LANGUAGESWITCH 1    // Tell Keyman to update its display of active keyboard and then open language switch form
+#define PC_HOTKEYCHANGE 2             // Tell Keyman that a hotkey was pressed to switch keyboard
+
 //#define KMC_KEYBOARDHOTKEY  19  // 9.0.459.0   // I4326 Deprecated in favour of language hotkeys
-//#define KMC_LANGUAGEHOTKEY  20  // 9.0.460.0    // I4451 Now using keyman.exe RegisterHotkey
+#define KMC_LANGUAGEHOTKEY  20
 //TOUCH  #define KMC_CONTEXT 19  // 9.0.450.0
 
 #define RWM_KEYMAN_CONTROL "WM_KEYMAN_CONTROL"

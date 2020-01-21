@@ -14,7 +14,7 @@ private let toolbarButtonTag = 100
 
 class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate {
   public var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
-  public var accessoryType: UITableViewCellAccessoryType = .none
+  public var accessoryType: UITableViewCell.AccessoryType = .none
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -38,7 +38,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
   }
   
   public func scroll(toSelectedKeyboard animated: Bool) {
-    let index = userKeyboards.index { kb in
+    let index = userKeyboards.firstIndex { kb in
       return Manager.shared.currentKeyboardID == kb.fullID
     }
     
@@ -69,7 +69,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }

@@ -181,6 +181,10 @@ begin
     if r.OpenKey(SRegKey_KeymanRoot_CU, True) then
     begin
       GrantPermissionToAllApplicationPackages(r.CurrentKey, KEY_READ);
+      // #1680 - on some systems, HKCU\Software\Keyman\Keyman Engine is not
+      // inheriting permissions from HKCU\Software\Keyman
+      if r.OpenKey('\' + SRegKey_KeymanEngineRoot_CU, True) then
+        GrantPermissionToAllApplicationPackages(r.CurrentKey, KEY_READ);
     end;
   finally
     r.Free;

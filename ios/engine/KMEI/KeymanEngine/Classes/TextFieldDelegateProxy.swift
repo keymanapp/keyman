@@ -50,7 +50,7 @@ class TextFieldDelegateProxy: NSObject, UITextFieldDelegate {
   }
 
   @available(iOS 10.0, *)
-  func textFieldDidEndEditing(_ textField: UITextField, reason: UITextFieldDidEndEditingReason) {
+  func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
     self.textField.textFieldDidEndEditing?(textField, reason: reason)
     keymanDelegate?.textFieldDidEndEditing?(textField, reason: reason)
   }

@@ -204,7 +204,8 @@ namespace com.keyman.osk {
    *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
    */
   VisualKeyboard.prototype.drawPreview = function(this: VisualKeyboard, canvas: HTMLCanvasElement, w: number, h: number, edge: number) {
-    let device = com.keyman.singleton.util.device;
+    let util = com.keyman.singleton.util;
+    let device = util.device;
 
     var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height,
         w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
@@ -232,11 +233,9 @@ namespace com.keyman.osk {
     // Define appearance of preview (cannot be done directly in CSS)
     if(device.OS == 'Android') {
       var wx=(w1+w2)/2; 
-      w1 = w2 = wx;    
-      ctx.fillStyle = '#999';
-    } else {
-      ctx.fillStyle = '#ffffff';
-    }  
+      w1 = w2 = wx;
+    }
+    ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
     ctx.lineWidth = 1;
     ctx.strokeStyle = '#cccccc';
 

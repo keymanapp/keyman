@@ -30,7 +30,7 @@ import org.json.JSONObject;
  * KMEA engine.  This is primarily for installing keyboard packages.
  */
 public class PackageProcessor {
-  protected static File resourceRoot = null;
+  protected File resourceRoot = null;
 
   public static final String PP_DEFAULT_VERSION = "1.0";
   public static final String PP_DEFAULT_METADATA = "kmp.json";
@@ -139,10 +139,12 @@ public class PackageProcessor {
    * Generates a list of keyboard data maps designed to mirror the `download` method output of
    * KMKeyboardDownloader as closely as practical.
    * @param jsonEntry  One entry of the master JSONArray of the top-level "keyboards" property.
+   * @param packageId  Package ID
+   * @param packageVersion Package version (used for lexical model version)
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
 
     String keyboardId = jsonEntry.getString("id");
@@ -154,7 +156,7 @@ public class PackageProcessor {
       keyboards[i].put(KMManager.KMKey_PackageID, packageId);
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
-      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id"));
+      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id").toLowerCase());
       keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
       if (jsonEntry.has("displayFont")) {
@@ -213,7 +215,7 @@ public class PackageProcessor {
    * @param json The metadata JSONObject for the package.
    * @return The version number (via String)
    */
-  public String getPackageVersion(JSONObject json) {
+  public static String getPackageVersion(JSONObject json) {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
     } catch (Exception e) {
@@ -420,6 +422,10 @@ public class PackageProcessor {
     JSONObject newInfoJSON = loadPackageInfo(tempPath);
     String packageId = getPackageID(path);
 
+    // For lexical model packages, lexical model version is determined by the package version
+    // (Default to "1.0")
+    String packageVersion = getPackageVersion(newInfoJSON);
+
     File permPath = constructPath(path, false);
     if (permPath.exists()) {
       // Out with the old.  "In with the new" is identical to a new package installation.
@@ -440,7 +446,7 @@ public class PackageProcessor {
       JSONArray entries = newInfoJSON.getJSONArray(key);
 
       for (int i = 0; i < entries.length(); i++) {
-        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId);
+        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion);
         if (maps != null) {
           specs.addAll(Arrays.asList(maps));
         }

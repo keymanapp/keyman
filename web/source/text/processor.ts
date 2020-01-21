@@ -149,9 +149,21 @@ namespace com.keyman.text {
           //     kbdInterface.defaultBackspace();
           //   }
         }
-      } else if(Lkc.Lcode == 8) {  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-        keyman.interface.defaultBackspace();
-        return '';
+
+        // Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
+        //
+        // Can easily occur from mnemonic keyboards, which create synthetic events without
+        // the appropriate kName value.
+        //
+        // Not strictly if `Lkc.vkCode` is properly maintained, but it's good to have an
+        // extra safety; this would have blocked the backspace bug as well.
+      } else if(Lkc.Lcode == 8) {
+        if(disableDOM) {
+          return '\b'; // the escape sequence for backspace.
+        } else {
+          keyman.interface.defaultBackspace();
+          return '';
+        }
       }
 
       // Translate numpad keystrokes into their non-numpad equivalents
@@ -560,13 +572,26 @@ namespace com.keyman.text {
           mappingEvent[key] = Lkc[key];
         }
         
+        // To facilitate storing relevant commands, we should probably reverse-lookup
+        // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = null;
-        var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false, true);
+        var mappedChar: string = this.defaultKeyOutput(mappingEvent, (shifted ? 0x10 : 0), false, true);
+        
+        /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
+         * rules, but allows us to replicate/emulate commands after rule processing if needed.
+         * (Like backspaces)
+         */
+        Lkc.vkCode = Lkc.Lcode;
         if(mappedChar) {
-          // FIXME;  Warning - will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
+          // Will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
+          // That stated, we're in mnemonic mode - this keyboard's rules are based on the char codes.
           Lkc.Lcode = mappedChar.charCodeAt(0);
-        } // No 'else' - avoid blocking modifier keys, etc.
+        } else {
+          // Don't let command-type keys (like K_DEL, which will output '.' otherwise!)
+          // trigger keyboard rules.
+          delete Lkc.Lcode;
+        }
       }
 
       if(capsActive) {
@@ -955,7 +980,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          keyman.keyboardManager.notifyKeyboard(Levent.Lcode, Levent.Ltarg, 1); 
+          keyman['interface'].notifyKeyboard(Levent.Lcode, Levent.Ltarg, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -964,7 +989,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        keyman.keyboardManager.notifyKeyboard(0, Levent.Ltarg, 1); 
+        keyman['interface'].notifyKeyboard(0, Levent.Ltarg, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 

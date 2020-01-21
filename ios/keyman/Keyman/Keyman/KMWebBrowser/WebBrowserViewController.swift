@@ -54,6 +54,14 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     webView.delegate = self
     webView.scalesPageToFit = true
 
+    if #available(iOS 13.0, *) {
+      // Dark mode settings must be applied through this new property,
+      // its class, and others like it.
+      navBar.standardAppearance.configureWithOpaqueBackground()
+    } else {
+      // Fallback on earlier versions
+    }
+
     // Setup NavigationBar
     navbarBackground = KMNavigationBarBackgroundView()
     navbarBackground.hideLogo()
@@ -82,7 +90,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let refreshSize = CGSize(width: 18, height: 22)
     let refreshIcon = #imageLiteral(resourceName: "UIButtonBarRefresh.png").resize(to: refreshSize)
       .withRenderingMode(.alwaysOriginal)
-    refreshButton = UIButton(type: UIButtonType.system)
+    refreshButton = UIButton(type: UIButton.ButtonType.system)
     refreshButton.setImage(refreshIcon, for: .normal)
     refreshButton.frame = rightView.frame
     refreshButton.addTarget(self, action: #selector(self.refresh), for: .touchUpInside)
@@ -92,7 +100,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let stopSize = CGSize(width: 17, height: 17)
     let stopIcon = #imageLiteral(resourceName: "UIButtonBarStop.png").resize(to: stopSize)
       .withRenderingMode(.alwaysOriginal)
-    stopButton = UIButton(type: UIButtonType.system)
+    stopButton = UIButton(type: UIButton.ButtonType.system)
     stopButton.setImage(stopIcon, for: .normal)
     stopButton.frame = rightView.frame
     stopButton.addTarget(self, action: #selector(self.stop), for: .touchUpInside)
@@ -111,7 +119,12 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    navBarTopConstraint.constant = AppDelegate.statusBarHeight()
+
+    if #available(iOS 13.0, *) {
+      // 13.0 auto-adjusts the top to avoid the status bar.
+    } else {
+      navBarTopConstraint.constant = AppDelegate.statusBarHeight()
+    }
   }
 
   override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
@@ -154,7 +167,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     let url: URL? = request.mainDocumentURL
     addressField.text = url?.absoluteString
     let userData = UserDefaults.standard
-    userData.set(url?.absoluteString, forKey: "KMWebBrowserLastURL")
+    userData.set(url?.absoluteString, forKey: webBrowserLastURLKey)
     userData.synchronize()
   }
 
@@ -190,7 +203,7 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
 
   func webView(_ webView: UIWebView,
                shouldStartLoadWith request: URLRequest,
-               navigationType: UIWebViewNavigationType) -> Bool {
+               navigationType: UIWebView.NavigationType) -> Bool {
     updateAddress(request)
     return true
   }
@@ -211,9 +224,9 @@ class WebBrowserViewController: UIViewController, UIWebViewDelegate, UIAlertView
     updateButtons()
     let alertController = UIAlertController(title: "Cannot Open Page",
                                             message: error.localizedDescription,
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.default,
+                                            style: UIAlertAction.Style.default,
                                             handler: nil))
     self.present(alertController, animated: true, completion: nil)
   }
