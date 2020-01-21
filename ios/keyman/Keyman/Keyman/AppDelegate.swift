@@ -36,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             completionHandler: { package in
                               // We choose to prompt the user for comfirmation, rather
                               // than automatically installing the package.
-                              rfm.promptPackageInstall(of: package, in: vc)
+                              rfm.promptPackageInstall(of: package, in: vc, isCustom: true)
                             })
     } else {
       log.error("Cannot find app's root UIViewController")
