@@ -10,6 +10,7 @@
   * Show available keyboard updates as android system notifications (#2335)
   * Add update indicator icon to inform user about updates and install updates in keyman app (#2335)
   * Add preference so update notifications can be ignored 3 months (#2412)
+  * Indicate when keyboard or model updates are available on the "Keyboard Settings" and "Model Info" pages (#2511)
   * Add QR Codes to Keyboard Info pages so users can share keyboard downloads (#2458)
 * Changes:
   * Update target Android SDK version to 29 (#2279)
