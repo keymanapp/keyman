@@ -3,7 +3,7 @@
 //  DefaultKeyboardHost
 //
 //  Created by Joshua Horton on 1/13/20.
-//  Copyright © 2020 Joshua Horton. All rights reserved.
+//  Copyright © 2020 SIL International. All rights reserved.
 //
 
 import Foundation
