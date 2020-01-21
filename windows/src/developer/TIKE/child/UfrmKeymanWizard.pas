@@ -467,6 +467,7 @@ type
     function GetIsDebugVisible: Boolean;   // I4557
     function ShouldShowLanguageControls(field: TSystemStore): Boolean;
     procedure OrderDetailsPanels;
+    function ValidateFileHasNoUnicodeCharacters(sw: WideString): Boolean;
     procedure UpdateQRCode;
 
   protected
@@ -2035,11 +2036,28 @@ begin
   Result := (pages.ActivePage <> pageLayout) or (pagesLayout.ActivePage <> pageLayoutCode);
 end;
 
+function TfrmKeymanWizard.ValidateFileHasNoUnicodeCharacters(sw: WideString): Boolean;
+begin
+  if WideString(AnsiString(sw)) <> sw then
+  begin
+    case MessageDlg('The file '+FileName+' is currently in ANSI format but the '+
+        'editor contains Unicode characters that cannot be represented in ANSI and will be lost '+
+        'if you continue. Do you want to change the format to UTF-8 to preserve the content?',
+        mtWarning, mbYesNoCancel, 0) of
+      mrYes: SetTextFileFormat(tffUTF8);
+      mrNo: ;
+      mrCancel: Exit(False);
+    end;
+  end;
+  Exit(True);
+end;
+
 function TfrmKeymanWizard.DoSaveFile: Boolean;
 var
   sw: WideString;
   FEncoding: TEncoding;
   FKey: TKeyboardParser_FeatureID;
+
 begin
   Result := False;
 
@@ -2053,6 +2071,9 @@ begin
 
     sw := FKeyboardParser.KeyboardText;
 
+    if (FTextFileFormat = tffANSI) and
+      not ValidateFileHasNoUnicodeCharacters(sw) then Exit;
+
     for FKey in FKeyboardParser.Features.Keys do
     begin
       SaveFeature(FKey);
@@ -2065,6 +2086,7 @@ begin
         tffUTF16: FEncoding := TEncoding.Unicode;
         else raise Exception.Create('Invalid encoding');
       end;
+
       with TStringList.Create do  // I3337
       try
         Text := sw;
