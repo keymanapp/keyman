@@ -79,9 +79,7 @@ namespace com.keyman.dom {
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
 
-      //Forces scrolling; the re-focus triggers the scroll, at least.
-      this.root.blur();
-      this.root.focus();
+      Utils.forceScroll(this.root);
     }
 
     getTextBeforeCaret(): string {

@@ -134,5 +134,15 @@ namespace com.keyman.dom {
         return false;
       }
     }
+
+    static forceScroll(element: HTMLElement) {
+      let attachment = element._kmwAttachment;
+      //Forces scrolling; the re-focus triggers the scroll, at least.
+
+      DOMEventHandlers.states._IgnoreBlurFocus = true;
+      element.blur();
+      element.focus();
+      DOMEventHandlers.states._IgnoreBlurFocus = false;
+    }
   }
 }

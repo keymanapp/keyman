@@ -9,6 +9,7 @@ namespace com.keyman {
   export class CommonDOMStates {
     _DisableInput: boolean = false;         // Should input be disabled?
     _IgnoreNextSelChange: number = 0;       // when a visual keyboard key is mouse-down, ignore the next sel change because this stuffs up our history  
+    _IgnoreBlurFocus: boolean = false;      // Used to temporarily ignore focus changes
     _Selection = null;
     _SelectionControl: any = null;   // Type behavior is as with activeElement and the like.
     
@@ -72,6 +73,10 @@ namespace com.keyman {
       var Ltarg: HTMLElement, Ln;
       var device = this.keyman.util.device;
       var osk = this.keyman.osk;
+
+      if(DOMEventHandlers.states._IgnoreBlurFocus) {
+        return true;
+      }
 
       e = this.keyman._GetEventObject<FocusEvent>(e);     // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
@@ -186,6 +191,10 @@ namespace com.keyman {
       e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
+        return true;
+      }
+
+      if(DOMEventHandlers.states._IgnoreBlurFocus) {
         return true;
       }
 
