@@ -136,13 +136,16 @@ namespace com.keyman.dom {
     }
 
     static forceScroll(element: HTMLElement) {
-      let attachment = element._kmwAttachment;
-      //Forces scrolling; the re-focus triggers the scroll, at least.
-
-      DOMEventHandlers.states._IgnoreBlurFocus = true;
-      element.blur();
-      element.focus();
-      DOMEventHandlers.states._IgnoreBlurFocus = false;
+      // Needed to allow ./build_dev_resources.sh to complete;
+      // only executes when com.keyman.DOMEventHandlers is defined.
+      if(com && com.keyman && com.keyman['DOMEventHandlers']) {
+        let DOMEventHandlers = com.keyman['DOMEventHandlers'];
+        DOMEventHandlers.states._IgnoreBlurFocus = true;
+        //Forces scrolling; the re-focus triggers the scroll, at least.
+        element.blur();
+        element.focus();
+        DOMEventHandlers.states._IgnoreBlurFocus = false;
+      }
     }
   }
 }
