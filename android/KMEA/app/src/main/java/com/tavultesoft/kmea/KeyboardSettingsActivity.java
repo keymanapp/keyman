@@ -198,18 +198,14 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       }
     });
 
-    // If QRGen library included, also display QR code for sharing keyboard
+    // If QRGen library included, append the QR code View to the
+    // scrollable listview for sharing keyboard
+    View view = getLayoutInflater().inflate(R.layout.qr_layout, null);
     if (QRCodeUtil.libraryExists(context)) {
+      LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
+      listView.addFooterView(qrLayout);
+
       String url = String.format("%s%s", QRCodeUtil.QR_BASE, kbID);
-
-      // Shorten listView so the QR code will show
-      ViewGroup.LayoutParams lp = listView.getLayoutParams();
-      lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-      listView.setLayoutParams(lp);
-
-      LinearLayout qrLayout = findViewById(R.id.qrLayout);
-      qrLayout.setVisibility(View.VISIBLE);
-
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);
