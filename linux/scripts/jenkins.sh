@@ -52,7 +52,7 @@ JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $sourcename
 log "Make origdist"
 ./scripts/dist.sh origdist $sourcename
 log "Make deb source"
-./scripts/deb.sh sourcepackage $sourcename
+./scripts/deb.sh sourcepackage $proj
 
 #sign source package
 for file in `ls builddebs/*.dsc`; do
