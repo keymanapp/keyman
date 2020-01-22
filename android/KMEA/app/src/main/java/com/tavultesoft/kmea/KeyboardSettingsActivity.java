@@ -104,6 +104,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     hashMap.put(subtitleKey, kbVersion);
     // Display notification to download update if latestKbdCloudVersion > kbVersion (installed)
     if (FileUtils.compareVersions(latestKbdCloudVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+      hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }
     hashMap.put(iconKey, icon);

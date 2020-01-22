@@ -45,6 +45,7 @@
     <string name="keyboard_failed_to_download" translatable="false">Error: Keyboard failed to download</string>
     <string name="keyboard_updates_channel" translatable="false">Resource Updates</string>
     <string name="keyboard_updates_available" translatable="false">Resource Updates Available</string>
+    <string name="update_available" translatable="false">%s (Update Available)</string>
     <string name="keyboard_update_message" translatable="false">Updates available for keyboard %s: %s </string>
     <string name="dictionary_update_message" translatable="false">Updates available for dictionary %s: %s </string>
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>

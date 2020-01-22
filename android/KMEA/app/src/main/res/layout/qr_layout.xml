@@ -24,8 +24,8 @@
     android:text="@string/keyboard_qr_code"
     android:textSize="16sp"
     android:textStyle="bold"
-    android:layout_marginTop="15dp"
-    android:layout_marginBottom="15dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:layout_gravity="center"
     />
 
