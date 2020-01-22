@@ -102,9 +102,9 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    // Display arrow to download update if latestKbdCloudVersion > kbVersion (installed)
+    // Display notification to download update if latestKbdCloudVersion > kbVersion (installed)
     if (FileUtils.compareVersions(latestKbdCloudVersion, kbVersion) == FileUtils.VERSION_GREATER) {
-      icon = String.valueOf(R.drawable.ic_arrow_forward);
+      icon = String.valueOf(R.drawable.ic_cloud_download);
     }
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);

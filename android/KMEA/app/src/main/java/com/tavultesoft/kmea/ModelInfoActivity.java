@@ -92,9 +92,9 @@ public final class ModelInfoActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.model_version));
     hashMap.put(subtitleKey, modelVersion);
-    // Display arrow to download update if latestModelCloudVersion > modelVersion (installed)
+    // Display notification to download update if latestModelCloudVersion > modelVersion (installed)
     if (FileUtils.compareVersions(latestModelCloudVersion, modelVersion) == FileUtils.VERSION_GREATER) {
-      icon = String.valueOf(R.drawable.ic_arrow_forward);
+      icon = String.valueOf(R.drawable.ic_cloud_download);
     }
     hashMap.put(iconKey, icon);
     infoList.add(hashMap);
