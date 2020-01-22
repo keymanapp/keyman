@@ -26,6 +26,7 @@ uninstall: # run as sudo
 	rm -f /usr/local/bin/km-package-install
 	rm -f /usr/local/bin/km-package-list-installed
 	rm -f /usr/local/bin/km-package-uninstall
+	rm -f /usr/local/bin/qr
 
 clean:
 	-rm -rf dist make_deb build keyman_config/version.py *.egg-info __pycache__
