@@ -595,7 +595,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
     
   // MARK: - Adhoc keyboards
-  public func parseKbdKMP(_ folder: URL) throws -> Void {
+  public func parseKbdKMP(_ folder: URL, isCustom: Bool) throws -> Void {
     do {
       var path = folder
       path.appendPathComponent("kmp.json")
@@ -640,7 +640,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                   isRTL: isrtl,
                   font: displayFont,
                   oskFont: oskFont,
-                  isCustom: false))
+                  isCustom: isCustom))
               }
             }
             
@@ -696,7 +696,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
     
   // MARK: - Adhoc lexical models
-  static public func parseLMKMP(_ folder: URL) throws -> Void {
+  static public func parseLMKMP(_ folder: URL, isCustom: Bool) throws -> Void {
     do {
       var path = folder
       path.appendPathComponent("kmp.json")
@@ -742,7 +742,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                   languageID: languageId,
 //                  languageName: languageName,
                   version: version,
-                  isCustom: false))
+                  isCustom: isCustom))
               }
             }
             
@@ -1032,14 +1032,14 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
   }
 
-  public func parseKMP(_ folder: URL, type: LanguageResourceType = .keyboard) throws -> Void {
+  public func parseKMP(_ folder: URL, type: LanguageResourceType = .keyboard, isCustom: Bool) throws -> Void {
     switch type {
       case .keyboard:
-        try! parseKbdKMP(folder)
+        try! parseKbdKMP(folder, isCustom: isCustom)
         break
       case .lexicalModel:
         // Yep.  Unlike the original, THIS one is static.
-        try! Manager.parseLMKMP(folder)
+        try! Manager.parseLMKMP(folder, isCustom: isCustom)
         break
     }
   }

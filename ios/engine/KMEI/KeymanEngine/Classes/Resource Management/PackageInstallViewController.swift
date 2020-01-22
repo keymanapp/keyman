@@ -15,10 +15,12 @@ public class PackageInstallViewController: UIViewController {
   let package: KeymanPackage
   var wkWebView: WKWebView?
   let completionHandler: CompletionHandler
+  let isCustom: Bool
 
-  public init(for package: KeymanPackage, completionHandler: @escaping CompletionHandler) {
+  public init(for package: KeymanPackage, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
     self.package = package
     self.completionHandler = completionHandler
+    self.isCustom = isCustom
     super.init(nibName: nil, bundle: nil)
 
     _ = view
@@ -57,7 +59,7 @@ public class PackageInstallViewController: UIViewController {
 
   @objc func installBtnHandler() {
     dismiss(animated: true, completion: {
-      ResourceFileManager.shared.finalizePackageInstall(self.package, completionHandler: self.completionHandler)
+      ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom, completionHandler: self.completionHandler)
     })
   }
 }

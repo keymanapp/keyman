@@ -535,7 +535,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile, completionHandler: { kmp, error in
       if let kmp = kmp as! LexicalModelKeymanPackage? {
         do {
-          ResourceFileManager.shared.finalizePackageInstall(kmp, completionHandler: { error in
+          ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false, completionHandler: { error in
               if error != nil {
                 log.error("Error installing the lexical model: \(String(describing: error))")
               } else {
