@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# $1 - project name with appended tier, e.g. ibus-kmfl-alpha
 
 . $HOME/ci-builder-scripts/bash/common.sh
 init --no-package
@@ -50,7 +51,7 @@ fi
 log "Make origdist"
 ./scripts/dist.sh origdist $proj
 log "Make deb source"
-./scripts/deb.sh sourcepackage $1
+./scripts/deb.sh sourcepackage $proj
 
 #sign source package
 for file in `ls builddebs/*.dsc`; do
