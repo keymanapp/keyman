@@ -82,10 +82,10 @@ public final class ModelPickerActivity extends AppCompatActivity {
     super.onResume();
     if (!didExecuteParser) {
       didExecuteParser = true;
-      //new JSONParse().execute();
       repo = CloudRepository.shared.fetchDataset(context);
 
-      listView.setAdapter(new FilteredLexicalModelAdapter(context, repo, languageID));
+      // Initialize the dataset of installed lexical models
+      listView.setAdapter(new FilteredLexicalModelAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), languageID));
       listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
         @Override

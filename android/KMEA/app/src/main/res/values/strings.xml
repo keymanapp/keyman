@@ -37,7 +37,7 @@
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
     <string name="confirm_delete_keyboard" translatable="false">Would you like to delete this keyboard?</string>
-    <string name="confirm_download_keyboard" translatable="false">Would you like to download this keyboard?</string>
+    <string name="confirm_download_keyboard" translatable="false">Would you like to download the latest version of this keyboard?</string>
     <string name="confirm_update" translatable="false">Would you like to update keyboards and dictionaries now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
@@ -45,6 +45,7 @@
     <string name="keyboard_failed_to_download" translatable="false">Error: Keyboard failed to download</string>
     <string name="keyboard_updates_channel" translatable="false">Resource Updates</string>
     <string name="keyboard_updates_available" translatable="false">Resource Updates Available</string>
+    <string name="update_available" translatable="false">%s (Update Available)</string>
     <string name="keyboard_update_message" translatable="false">Updates available for keyboard %s: %s </string>
     <string name="dictionary_update_message" translatable="false">Updates available for dictionary %s: %s </string>
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
@@ -59,7 +60,7 @@
 
     <!-- Model Updates -->
     <string name="getting_model_catalog" translatable="false">Getting dictionary catalog.\nThis may take a while&#8230;</string>
-    <string name="confirm_download_model" translatable="false">Would you like to download this dictionary?</string>
+    <string name="confirm_download_model" translatable="false">Would you like to download the latest version of this dictionary?</string>
     <string name="checking_model_download" translatable="false">Checking to download dictionary&#8230;</string>
     <string name="downloading_model" translatable="false">Downloading dictionary&#8230;</string>
     <string name="catalog_unavailable" translatable="false">The resource catalog is unavailable\n</string>
