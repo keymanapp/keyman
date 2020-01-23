@@ -48,8 +48,6 @@ namespace com.keyman {
     private keyman: KeymanBase; // Closure doesn't like relying on the global object from within a class def.
 
     constructor(keyman: any) {
-      this.initDevices();
-
       this.keyman = keyman;
     }
 
@@ -63,9 +61,9 @@ namespace com.keyman {
       }
     }
 
-    initDevices(): void {
-      this.device = new Device();
-      this.physicalDevice = new Device();
+    public initDevices(option?: DeviceDetectOption): void {
+      this.device = new Device(option);
+      this.physicalDevice = new Device(option);
       this.activeDevice = this.device;
 
       // Initialize the true device values.

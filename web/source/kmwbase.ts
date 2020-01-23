@@ -140,11 +140,6 @@ namespace com.keyman {
       this['loaded'] = true;
     }
 
-    delayedInit() {
-      // Track the selected Event-handling object.
-      this.touchAliasing = this.util.device.touchable ? this.domManager.touchHandlers : this.domManager.nonTouchHandlers;
-    }
-
     /**
      * Triggers a KeymanWeb engine shutdown to facilitate a full system reset.
      * This function is designed for use with KMW unit-testing, which reloads KMW

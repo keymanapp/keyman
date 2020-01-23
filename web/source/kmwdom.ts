@@ -51,12 +51,6 @@ namespace com.keyman {
 
     constructor(keyman: KeymanBase) {
       this.keyman = keyman;
-      
-      if(keyman.util.device.touchable) {
-        this.touchHandlers = new DOMTouchHandlers(keyman);
-      }
-
-      this.nonTouchHandlers = new DOMEventHandlers(keyman);
     }
 
     shutdown() {
@@ -1376,8 +1370,9 @@ namespace com.keyman {
      * @param       {Object}  arg     object array of user-defined properties
      * Description  KMW window initialization  
      */    
-    init: (arg:any) => Promise<any> = function(arg): Promise<any> { 
-      var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
+    init: (this: DOMManager, arg:any) => Promise<any> = function(this: DOMManager, arg: any): Promise<any> {
+      let keyman = com.keyman.singleton; 
+      var p, dTrailer, ds;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
       var device = util.device;
@@ -1408,7 +1403,7 @@ namespace com.keyman {
       }.bind(this);
       
       // Explicit (user-defined) parameter initialization       
-      opt=this.keyman.options;
+      let opt=keyman.options;
       if(typeof(arg) == 'object' && arg !== null)
       {
         for(p in opt)
@@ -1442,14 +1437,24 @@ namespace com.keyman {
       }
 
       // Set default device options
-      this.keyman.setDefaultDeviceOptions(opt);   
+      keyman.setDefaultDeviceOptions(opt);
+
+      keyman.util.initDevices(opt['deviceDetection'] as DeviceDetectOption);
+
+      // Requires Device initialization; establishes appropriate device-specific handler objects.
+      this.nonTouchHandlers = new DOMEventHandlers(keyman);
+      if(keyman.util.device.touchable) {
+        this.touchHandlers = new DOMTouchHandlers(keyman);
+        keyman.touchAliasing = this.touchHandlers;
+      } else {
+        keyman.touchAliasing = this.nonTouchHandlers;
+      }
       
       // Only do remainder of initialization once!  
       if(this.keyman.initialized) {
         return Promise.resolve();
       }
 
-      var keyman: KeymanBase = this.keyman;
       var domManager = this;
 
       // Do not initialize until the document has been fully loaded
@@ -1578,7 +1583,7 @@ namespace com.keyman {
         } else {
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
-            if((<any>keyman).hideOnRelease && !osk.lgList) osk.hideNow();
+            if((<any>keyman).hideOnRelease && !osk['lgList']) osk.hideNow();
             (<any>keyman).hideOnRelease=false;
           };
           (<any>this.keyman).hideOskIfOnBody = function(e) {

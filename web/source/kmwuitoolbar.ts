@@ -26,9 +26,6 @@ if(!window['keyman']['ui']['name']) {
 
     // Declare KeymanWeb, OnScreen keyboard and Util objects
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],dbg=keymanweb['debug'];
-
-    // Disable UI for touch devices
-    if(util['isTouchDevice']()) throw '';
     
     // User interface local variables
     keymanweb['ui'] = {
@@ -122,6 +119,10 @@ if(!window['keyman']['ui']['name']) {
     ui['initialize'] = ui.initToolbarUI = function()
     {
       if(!keymanweb['initialized'] || ui.init) return;
+
+      if(util['isTouchDevice']()) {
+        return;
+      }
     
       // Find the controller DIV, insert at top of body if undefined
       var e = document.getElementById('KeymanWebControl');    
@@ -142,8 +143,6 @@ if(!window['keyman']['ui']['name']) {
       e.style.visibility='hidden'; e.style.maxHeight='35px';
 
       ui.init = true;
-      
-      if(util['isTouchDevice']()) return;
 
       util['linkStyleSheet'](util['getOption']('resources')+'ui/toolbar/kmwuitoolbar.css');
         

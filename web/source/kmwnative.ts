@@ -435,7 +435,7 @@ if(!window['keyman']['initialized']) {
   /*****************************************/
   (function() {
     // Declare KeymanWeb object
-    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'],device=util.device;
+    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'];
     var dbg=keymanweb.debug;
     var dom = com.keyman.dom;
 
@@ -448,7 +448,7 @@ if(!window['keyman']['initialized']) {
      */
     keymanweb.setDefaultDeviceOptions=function(opt) {
       // Element attachment type
-      if(opt['attachType'] == '') opt['attachType'] = (device.touchable ? 'manual' : 'auto');
+      if(opt['attachType'] == '') opt['attachType'] = (keymanweb.util.device.touchable ? 'manual' : 'auto');
     }
 
   /**
@@ -513,7 +513,7 @@ if(!window['keyman']['initialized']) {
      * 
      **/
     keymanweb.alignInputs = function(eleList: HTMLElement[]) {
-      if(device.touchable) {
+      if(keymanweb.util.device.touchable) {
         var domManager = keymanweb.domManager;
         var processList: HTMLElement[] = [];
 
@@ -556,7 +556,7 @@ if(!window['keyman']['initialized']) {
      **/
     keymanweb.hideInputs = function() {
       var domManager = keymanweb.domManager;
-      if(device.touchable) {
+      if(keymanweb.util.device.touchable) {
         for(var i=0; i<domManager.inputList.length; i++) {
           domManager.inputList[i].style.visibility='hidden';
           domManager.inputList[i].base.style.visibility='visible';
@@ -571,7 +571,7 @@ if(!window['keyman']['initialized']) {
      * @return  {boolean}
      **/          
     keymanweb.isPositionSynthesized = function() {
-      return device.touchable;
+      return keymanweb.util.device.touchable;
     }
 
     /**

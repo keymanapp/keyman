@@ -5,7 +5,13 @@
 // The Device object definition -------------------------------------------------
 
 namespace com.keyman {
+  export type DeviceDetectOption = 'default' |     // For now, same as 'preferTouch'.  May change if/when touchscreen desktops become supported.
+                            'naive' |       // Automatically believes the user string, disregarding potential aliasing
+                            'touchOnly' |   // Forces activation of a touch form factor.
+                            'desktopOnly';  // Forces activation of a desktop form factor.
+
   export class Device {
+    app?: string;
     touchable: boolean;
     OS: string;
     formFactor: string;
@@ -19,8 +25,10 @@ namespace com.keyman {
     private detected: boolean = false;
     private _styles: utils.StyleConstants;
 
+    private readonly detectionMode: DeviceDetectOption;
+
     // Generates a default Device value.
-    constructor() {
+    constructor(detectionMode?: DeviceDetectOption) {
       this.touchable = !!('ontouchstart' in window);
       this.OS = '';
       this.formFactor='desktop';
@@ -29,6 +37,8 @@ namespace com.keyman {
       this.version='0';
       this.orientation=window.orientation;
       this.browser='';
+
+      this.detectionMode = detectionMode ? detectionMode : 'default';
     }
 
     /**
@@ -55,9 +65,11 @@ namespace com.keyman {
     detect() : void {
       var IEVersion = Device._GetIEVersion();
       var possMacSpoof = false;
-      
+
       if(navigator && navigator.userAgent) {
         var agent=navigator.userAgent;
+
+        let checkMacSpoof = this.detectionMode != 'naive' && this.detectionMode != 'desktopOnly';
 
         if(agent.indexOf('iPad') >= 0) {
           this.OS='iOS';
@@ -78,7 +90,7 @@ namespace com.keyman {
           } catch(ex) {}
         } else if(agent.indexOf('Linux') >= 0) {
           this.OS='Linux';
-        } else if(agent.indexOf('Macintosh') >= 0) {
+        } else if(agent.indexOf('Macintosh') >= 0 && checkMacSpoof) {
           // Starting with 13.1, "Macintosh" can reflect iPads (by default) or iPhones 
           // (by user setting); a new "Request Desktop Website" setting for Safari will
           // change the user agent string to match a desktop Mac.
@@ -185,6 +197,24 @@ namespace com.keyman {
       }
 
       this.colorScheme = this.prefersDarkMode() ? 'dark' : 'light';
+
+      // And now to utilize our device-detection options.
+      switch(this.detectionMode) {
+        case 'desktopOnly':
+          if(this.formFactor != 'desktop') {
+            this.formFactor = 'desktop';
+          }
+          break;
+        case 'touchOnly':
+          if(this.formFactor == 'desktop') {
+            // Desktops have high resolution, which better matches tablets.
+            this.formFactor = 'tablet';
+          }
+          break;
+        default:
+          break;
+      }
+
       this.detected = true;
     }
 

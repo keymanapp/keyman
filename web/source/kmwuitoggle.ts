@@ -29,9 +29,6 @@ if(!window['keyman']['ui']['name']) {
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
     var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'];
     var dbg=keymanweb['debug'];
-    
-    // Disable UI for touch devices
-    if(util['isTouchDevice']()) throw '';
 
     // Initialize user interface common variables       
     var ui:any=keymanweb['ui'] = {
@@ -394,6 +391,11 @@ if(!window['keyman']['ui']['name']) {
     { 
       //Never initialize before KMW!
       if(!keymanweb['initialized'] || util['isTouchDevice']()) return;
+
+      // Disable UI for touch devices
+      if(util['isTouchDevice']()) {
+        return;
+      }
         
       if(!ui.initialized)  // I2403 - Allow toggle design to be loaded twice
       {
@@ -583,6 +585,9 @@ if(!window['keyman']['ui']['name']) {
     ui.updateMenu = function(kbdName,lgCode)
     {        
       var i,_k=document.getElementById('KMWSel_$');
+      if(!ui.initialized) {
+        return;
+      }
 
       for(i=0; i<ui.keyboards.length; i++)
       { 

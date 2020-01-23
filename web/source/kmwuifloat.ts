@@ -31,9 +31,6 @@ if(!window['keyman']['ui']['name']) {
     var util=keymanweb['util'];
     var osk=keymanweb['osk'];
     var dbg=keymanweb['debug'];
-
-    // Disable UI for touch devices
-    if(util['isTouchDevice']()) throw '';
     
     // User interface global and local variables
     keymanweb['ui'] = {};
@@ -79,7 +76,9 @@ if(!window['keyman']['ui']['name']) {
         window.setTimeout(ui.Initialize,50); return;
       }
       
-      if(ui.initialized || util['isTouchDevice']()) return;
+      if(ui.initialized || util['isTouchDevice']()) {
+        return;
+      }
           
       var imgPath=util['getOption']('resources')+"ui/float/";
       

@@ -60,12 +60,19 @@ namespace com.keyman.dom {
 
     __resizeHandler: () => void;
 
+    // Used for unit-tests when detached from KeymanEngine.
     private static device: Device;
 
     private static getDevice(): Device {
       if(!TouchAliasData.device) {
-        let device = new com.keyman.Device();
-        device.detect();
+        var device: com.keyman.Device;
+
+        if(com.keyman['singleton']) {
+          device = com.keyman['singleton']['util']['device'];
+        } else {
+          device = new com.keyman.Device();
+          device.detect();
+        }
 
         TouchAliasData.device = device;
       }

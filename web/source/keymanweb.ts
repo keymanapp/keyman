@@ -105,8 +105,6 @@ if(!window['keyman']['initialized']) {
      */
     keymanweb.debugElement=null;
     var dbg=keymanweb.debug;
-        
-    keymanweb.delayedInit();
 
     // I732 START - Support for European underlying keyboards #1
     if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 

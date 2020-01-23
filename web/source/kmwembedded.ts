@@ -162,13 +162,13 @@ namespace com.keyman.text {
 
 (function() {
   // Declare KeymanWeb and related objects
-  var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'],device=util.device;
+  var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'];
   var dom = com.keyman.dom;
-  var Layouts = com.keyman.osk.Layouts;
-  var kbdInterface=keymanweb['interface'];
 
   // Allow definition of application name
   keymanweb.options['app']='';
+  // Embedded mode should exclusively use touch form-factors.
+  keymanweb.options['deviceDetection'] = 'touchOnly';
   
   // Flag to control refreshing of a keyboard that is already loaded
   keymanweb.mustReloadKeyboard = true;
@@ -181,6 +181,7 @@ namespace com.keyman.text {
   // Set default device options
   keymanweb.setDefaultDeviceOptions = function(opt) {
     opt['attachType'] = 'manual';
+    let device = (keymanweb as KeymanBase).util.device;
     device.app=opt['app'];
     device.touchable=true; 
     device.formFactor='phone'; 

@@ -28,9 +28,6 @@ if(!window['keyman']['ui']['name']) {
     var keymanweb=window['keyman'],osk=keymanweb['osk'],
       util=keymanweb['util'],dbg=keymanweb['debug'];
     
-    // Disable UI for touch devices
-    if(util['isTouchDevice']()) throw '';
-    
     // User interface global and variables      
     keymanweb['ui'] = {};
     var ui=keymanweb['ui'];
@@ -278,7 +275,9 @@ if(!window['keyman']['ui']['name']) {
         window.setTimeout(ui.Initialize,250); return;
       }
       
-      if(ui.init || util['isTouchDevice']()) return; 
+      if(ui.init || util['isTouchDevice']()) {
+        return;
+      }
       
       ui.init = true;
           
