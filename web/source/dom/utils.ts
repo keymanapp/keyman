@@ -143,7 +143,9 @@ namespace com.keyman.dom {
     static forceScroll(element: HTMLInputElement | HTMLTextAreaElement) {
       // Needed to allow ./build_dev_resources.sh to complete;
       // only executes when com.keyman.DOMEventHandlers is defined.
-      if(com && com.keyman && com.keyman['DOMEventHandlers']) {
+      //
+      // We also bypass this whenever operating in the embedded format.
+      if(com && com.keyman && com.keyman['DOMEventHandlers'] && !com.keyman.singleton.isEmbedded) {
         let DOMEventHandlers = com.keyman['DOMEventHandlers'];
 
         let selectionStart = element.selectionStart;
