@@ -60,20 +60,26 @@ namespace com.keyman {
     }
 
     shutdown() {
-      if(this.enablementObserver) {
-        this.enablementObserver.disconnect();
-      }
-      if(this.attachmentObserver) {
-        this.attachmentObserver.disconnect();
-      }
-  
-      for(let input of this.inputList) {
-        this.disableInputElement(input);
-      }
+      // Catch and notify of any shutdown errors, but don't let errors fail unit tests.
+      try {
+        if(this.enablementObserver) {
+          this.enablementObserver.disconnect();
+        }
+        if(this.attachmentObserver) {
+          this.attachmentObserver.disconnect();
+        }
+    
+        for(let input of this.inputList) {
+          this.disableInputElement(input);
+        }
 
-      // On shutdown, we remove our general focus-suppression handlers as well.
-      this.keyman.util.detachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
-      this.keyman.util.detachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
+        // On shutdown, we remove our general focus-suppression handlers as well.
+        this.keyman.util.detachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
+        this.keyman.util.detachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
+      } catch (e) {
+        console.error("Error occurred during shutdown");
+        console.error(e);
+      }
     }
 
     /**

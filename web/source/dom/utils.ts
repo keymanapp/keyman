@@ -110,6 +110,11 @@ namespace com.keyman.dom {
 
       var scopedClass;
 
+      if(!Pelem) {
+        // If we're bothering to check something's type, null references don't match
+        // what we're looking for. 
+        return false;
+      }
       if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
         return className == 'Window';
       } else if (Pelem['defaultView']) { // Covers Document.
