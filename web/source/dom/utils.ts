@@ -140,16 +140,25 @@ namespace com.keyman.dom {
       }
     }
 
-    static forceScroll(element: HTMLElement) {
+    static forceScroll(element: HTMLInputElement | HTMLTextAreaElement) {
       // Needed to allow ./build_dev_resources.sh to complete;
       // only executes when com.keyman.DOMEventHandlers is defined.
       if(com && com.keyman && com.keyman['DOMEventHandlers']) {
         let DOMEventHandlers = com.keyman['DOMEventHandlers'];
+
+        let selectionStart = element.selectionStart;
+        let selectionEnd = element.selectionEnd;
+
         DOMEventHandlers.states._IgnoreBlurFocus = true;
         //Forces scrolling; the re-focus triggers the scroll, at least.
         element.blur();
         element.focus();
         DOMEventHandlers.states._IgnoreBlurFocus = false;
+
+        // On Edge, it appears that the blur/focus combination will reset the caret position
+        // under certain scenarios during unit tests.  So, we re-set it afterward.
+        element.selectionStart = selectionStart;
+        element.selectionEnd = selectionEnd;
       }
     }
   }
