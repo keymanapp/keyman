@@ -58,21 +58,22 @@ public class Colors {
 
   public static var popupKeyHighlighted: UIColor {
     get {
-//      if #available(iOSApplicationExtension 11.0, *) {
-//        return UIColor(named: "SelectionPrimary")!
-//      } else {
+      if #available(iOSApplicationExtension 11.0, *) {
+        return UIColor(named: "SelectedKey", in: engineBundle, compatibleWith: nil)!
+      } else {
         return UIColor(red: 136.0 / 255.0,
                        green: 136.0 / 255.0,
                        blue: 1.0,
                        alpha: 1.0)
-//      }
+      }
     }
   }
 
+  // I'm not 100% on the distinction, but this should be fine for now.
   public static var popupKeyTint: UIColor {
     get {
       if #available(iOSApplicationExtension 11.0, *) {
-        return UIColor(named: "SelectionPrimary")!
+        return UIColor(named: "SelectedKey", in: engineBundle, compatibleWith: nil)!
       } else {
         return UIColor(red: 181.0 / 255.0,
                        green: 181.0 / 255.0,
