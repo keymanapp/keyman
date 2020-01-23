@@ -78,6 +78,8 @@ namespace com.keyman.dom {
 
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
+
+      Utils.forceScroll(this.root);
     }
 
     getTextBeforeCaret(): string {

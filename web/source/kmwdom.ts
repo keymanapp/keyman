@@ -60,15 +60,25 @@ namespace com.keyman {
     }
 
     shutdown() {
-      if(this.enablementObserver) {
-        this.enablementObserver.disconnect();
-      }
-      if(this.attachmentObserver) {
-        this.attachmentObserver.disconnect();
-      }
-  
-      for(let input of this.inputList) {
-        this.disableInputElement(input);
+      // Catch and notify of any shutdown errors, but don't let errors fail unit tests.
+      try {
+        if(this.enablementObserver) {
+          this.enablementObserver.disconnect();
+        }
+        if(this.attachmentObserver) {
+          this.attachmentObserver.disconnect();
+        }
+    
+        for(let input of this.inputList) {
+          this.disableInputElement(input);
+        }
+
+        // On shutdown, we remove our general focus-suppression handlers as well.
+        this.keyman.util.detachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
+        this.keyman.util.detachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
+      } catch (e) {
+        console.error("Error occurred during shutdown");
+        console.error(e);
       }
     }
 
@@ -1618,6 +1628,15 @@ namespace com.keyman {
       }
 
       // Set exposed initialization flag to 2 to indicate deferred initialization also complete
+
+      /* To prevent propagation of focus & blur events from the input-scroll workaround,
+       * we attach top-level capturing listeners to the focus & blur events.  They prevent propagation
+       * but NOT default behavior, allowing the scroll to complete while preventing nearly all
+       * possible event 'noise' that could result from the workaround.
+       */
+      this.keyman.util.attachDOMEvent(document.body, 'focus', DOMManager.suppressFocusCheck, true);
+      this.keyman.util.attachDOMEvent(document.body, 'blur', DOMManager.suppressFocusCheck, true);
+
       this.keyman.setInitialized(2);
       return Promise.resolve();
     }.bind(this);
@@ -1638,6 +1657,16 @@ namespace com.keyman {
       } else {
         window.setTimeout(this.initializeUI.bind(this),1000);
       }
+    }
+
+    static suppressFocusCheck(e: Event) {
+      if(DOMEventHandlers.states._IgnoreBlurFocus) {
+        // Prevent triggering other blur-handling events (as possible)
+        e.stopPropagation();
+        e.cancelBubble = true;
+      }
+      // But DO perform default event behavior (actually blurring & focusing the affected element)
+      return true;
     }
   }
 }

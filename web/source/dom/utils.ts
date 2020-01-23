@@ -110,6 +110,11 @@ namespace com.keyman.dom {
 
       var scopedClass;
 
+      if(!Pelem) {
+        // If we're bothering to check something's type, null references don't match
+        // what we're looking for. 
+        return false;
+      }
       if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
         return className == 'Window';
       } else if (Pelem['defaultView']) { // Covers Document.
@@ -132,6 +137,30 @@ namespace com.keyman.dom {
         return Pelem instanceof scopedClass;
       } else {
         return false;
+      }
+    }
+
+    static forceScroll(element: HTMLInputElement | HTMLTextAreaElement) {
+      // Needed to allow ./build_dev_resources.sh to complete;
+      // only executes when com.keyman.DOMEventHandlers is defined.
+      //
+      // We also bypass this whenever operating in the embedded format.
+      if(com && com.keyman && com.keyman['DOMEventHandlers'] && !com.keyman.singleton.isEmbedded) {
+        let DOMEventHandlers = com.keyman['DOMEventHandlers'];
+
+        let selectionStart = element.selectionStart;
+        let selectionEnd = element.selectionEnd;
+
+        DOMEventHandlers.states._IgnoreBlurFocus = true;
+        //Forces scrolling; the re-focus triggers the scroll, at least.
+        element.blur();
+        element.focus();
+        DOMEventHandlers.states._IgnoreBlurFocus = false;
+
+        // On Edge, it appears that the blur/focus combination will reset the caret position
+        // under certain scenarios during unit tests.  So, we re-set it afterward.
+        element.selectionStart = selectionStart;
+        element.selectionEnd = selectionEnd;
       }
     }
   }
