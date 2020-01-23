@@ -87,7 +87,8 @@ namespace com.keyman {
       'keyboards':'',
       'fonts':'',
       'attachType':'',
-      'ui':null
+      'ui':null,
+      'deviceDetection': 'default'
     };
 
 

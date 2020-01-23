@@ -460,7 +460,7 @@ if(!window['keyman']['ui']['name']) {
      **/   
     ui.updateKeyboardList=function()
     {                 
-      if(!(keymanweb['initialized'] || ui.initialized)) return; //TODO: may want to restart the timer??
+      if(!(keymanweb['initialized'] && ui.initialized)) return; //TODO: may want to restart the timer??
                       
       ui.updateList = false;
 

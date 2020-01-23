@@ -204,12 +204,14 @@ namespace com.keyman {
           if(this.formFactor != 'desktop') {
             this.formFactor = 'desktop';
           }
+          this.touchable = false;
           break;
         case 'touchOnly':
           if(this.formFactor == 'desktop') {
             // Desktops have high resolution, which better matches tablets.
             this.formFactor = 'tablet';
           }
+          this.touchable = true;
           break;
         default:
           break;
