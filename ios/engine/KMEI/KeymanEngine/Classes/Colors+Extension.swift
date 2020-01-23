@@ -115,4 +115,30 @@ extension Colors {
       }
     }
   }
+
+  public static var helpBubbleGradient1: UIColor {
+    get {
+      if #available(iOSApplicationExtension 11.0, *) {
+        return UIColor(named: "HelpBubbleGradient1")!
+      } else {
+        return UIColor(red: 253.0 / 255.0,
+                       green: 244.0 / 255.0,
+                       blue: 196.0 / 255.0,
+                       alpha: 1.0)
+      }
+    }
+  }
+
+  public static var helpBubbleGradient2: UIColor {
+    get {
+      if #available(iOSApplicationExtension 11.0, *) {
+        return UIColor(named: "HelpBubbleGradient2")!
+      } else {
+        return UIColor(red: 233.0 / 255.0,
+                       green: 224.0 / 255.0,
+                       blue: 176.0 / 255.0,
+                       alpha: 1.0)
+      }
+    }
+  }
 }
