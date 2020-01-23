@@ -1436,10 +1436,10 @@ namespace com.keyman {
         opt['attachType'] = 'auto';
       }
 
-      // Set default device options
-      keyman.setDefaultDeviceOptions(opt);
-
       keyman.util.initDevices(opt['deviceDetection'] as DeviceDetectOption);
+
+      // Set default device options (must come after they are initialized)
+      keyman.setDefaultDeviceOptions(opt);
 
       // Requires Device initialization; establishes appropriate device-specific handler objects.
       this.nonTouchHandlers = new DOMEventHandlers(keyman);
