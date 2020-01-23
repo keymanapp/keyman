@@ -74,10 +74,6 @@ namespace com.keyman {
       var device = this.keyman.util.device;
       var osk = this.keyman.osk;
 
-      if(DOMEventHandlers.states._IgnoreBlurFocus) {
-        return true;
-      }
-
       e = this.keyman._GetEventObject<FocusEvent>(e);     // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
       if (Ltarg == null) {
@@ -195,6 +191,9 @@ namespace com.keyman {
       }
 
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
+        // Prevent triggering other blur-handling events (as possible)
+        e.cancelBubble = true;
+        e.stopPropagation();
         return true;
       }
 
