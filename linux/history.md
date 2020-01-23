@@ -1,9 +1,9 @@
 # Keyman for Linux Version History
 
 ## 13.0 alpha
-* Start version 13.0
 * Revert default tier to alpha (#2474)
 * Add QR Codes to share keyboards (#2486)
+* Work on Linux packaging (#2263, #2290, #2320, #2321, #2325, #2474, #2515)
 
 ## 2019-09-19 12.0.18 beta
 * Bug Fix:
