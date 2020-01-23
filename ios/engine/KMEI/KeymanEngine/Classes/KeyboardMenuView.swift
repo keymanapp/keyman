@@ -252,7 +252,7 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
 
     let cell = UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = Colors.selectionSecondary
+    selectionColor.backgroundColor = Colors.popupKeyTint
     cell.selectedBackgroundView = selectionColor
     return cell
   }
