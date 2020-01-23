@@ -1375,7 +1375,6 @@ namespace com.keyman {
       var p, dTrailer, ds;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
-      var device = util.device;
 
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 
@@ -1456,6 +1455,8 @@ namespace com.keyman {
       }
 
       var domManager = this;
+      // Could not be initialized at top.
+      let device = util.device;
 
       // Do not initialize until the document has been fully loaded
       if(document.readyState !== 'complete')
