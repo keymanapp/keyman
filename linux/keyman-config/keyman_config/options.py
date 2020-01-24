@@ -8,6 +8,7 @@ import urllib.parse
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, WebKit2
+from urllib.parse import parse_qsl, urlencode
 from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.dconf_util import get_option, set_option
 
@@ -25,18 +26,14 @@ class OptionsView(Gtk.Window):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
         # Keyman Desktop gets current option settings from the registry.
-        # Similarly, we'll read Keyman options from dconf and update optionurl
+        # Similarly, we'll read Keyman options from DConf and update optionurl
         info = {"packageID": self.packageID, "keyboardID": self.keyboardID}
-        array_option = get_option(info)
+        self.options = get_option(info)
         params = ""
-        if array_option:
-            # Convert options from dconf into form parameters to pass to options.htm
-            for index, param in enumerate(array_option):
-                if index == 0:
-                    params = "?"
-                else:
-                    params += "&"
-                params += param
+
+        if self.options:
+            # Convert dictionary to query
+            params = "?" + urlencode(self.options)
 
         s = Gtk.ScrolledWindow()
         self.webview = WebKit2.WebView()
@@ -66,13 +63,11 @@ class OptionsView(Gtk.Window):
                     pass
                 elif parsed.path == "ok":
                     logging.debug("submit options form")
-                    # Parse the response for the option_key value
+                    # Parse the response for the option_key value and merge the updates
                     if parsed.query:
-                        array_option = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
-                        list_option = []
-                        for index, tuple_option in enumerate(array_option):
-                            list_option.append(tuple_option[0] + "=" + tuple_option[1])
-                        self.process_option(list_option)
+                        updated_options = parse_qsl(parsed.query, keep_blank_values=True)
+                        self.options.update(updated_options)
+                        self.process_option()
 
                 self.close()
                 return True
@@ -84,10 +79,8 @@ class OptionsView(Gtk.Window):
                 return True
         return False
 
-    def process_option(self, list_option):
-        #print(self.packageID + " list_option " + str(list_option))
-
-        # Write the Keyman option to dconf
-        info = { "packageID": self.packageID, "keyboardID": self.keyboardID, "list": list_option }
-        set_option(info)
+    def process_option(self):
+        # Write the Keyman options to DConf
+        info = { "packageID": self.packageID, "keyboardID": self.keyboardID}
+        set_option(info, self.options)
 
