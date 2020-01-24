@@ -460,9 +460,7 @@ namespace com.keyman.text {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      let retVal = processor.processKeyEvent(Lkc, true);
-
-      return retVal;
+      return processor.processKeyEvent(Lkc, true);
   };
 
   /**
