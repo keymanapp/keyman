@@ -409,6 +409,7 @@ namespace com.keyman.text {
           // It should be within the popupBaseKey's subkey list.
           for(let subKey of baseKey.sk) {
             if(subKey.id == keyName) {
+              // ... to consider:  why are we not just taking the keyspec wholesale right here?
               nextLayer = subKey.nextlayer;
               found = true;
               break;
@@ -437,7 +438,8 @@ namespace com.keyman.text {
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
-        kName: keyName
+        kName: keyName,
+        kNextLayer: nextLayer
       };
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
@@ -458,7 +460,9 @@ namespace com.keyman.text {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      return processor.processKeyEvent(Lkc, true);
+      let retVal = processor.processKeyEvent(Lkc, true);
+
+      return retVal;
   };
 
   /**
