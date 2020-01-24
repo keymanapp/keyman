@@ -14,6 +14,7 @@
 * Bug fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403, 12.0:#2420) 
 * Bug fix: If malformed data was returned from an online API, Keyman could crash (#2368)
 * Bug fix: Unable to replace previously installed KMP from ad-hoc file (#2459, 12.0:#2461)
+* Bug fix: Default model (MTNT) installation was not happening (#2532)
 
 ## 2019-12-09 12.0.62 stable
 * Bug Fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2420)
