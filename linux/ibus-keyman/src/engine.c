@@ -338,7 +338,7 @@ ibus_keyman_engine_constructor (GType                   type,
     int num_options = g_queue_get_length(queue_options);
 
     // Allocate enough options for: 3 environments plus num_options plus 1 pad struct of 0's
-    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 3 + num_options + 1);
+    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1);
 
     keyboard_opts[0].scope = KM_KBP_OPT_ENVIRONMENT;
     km_kbp_cp *cp = g_utf8_to_utf16 ("platform", -1, NULL, NULL, NULL);
@@ -385,10 +385,9 @@ ibus_keyman_engine_constructor (GType                   type,
     keyboard_opts[2].value = cp;
 
     // If queue_options contains keyboard options, pop them into keyboard_opts[3] onward
-    int index = 3;
     for(int i=0; i<num_options; i++)
     {
-        memmove(&(keyboard_opts[index+i]), g_queue_pop_head(queue_options), sizeof(km_kbp_option_item));
+        memmove(&(keyboard_opts[KEYMAN_ENVIRONMENT_OPTIONS+i]), g_queue_pop_head(queue_options), sizeof(km_kbp_option_item));
     }
 
     // keyboard_opts[tail] already initialised to {0, 0, 0}
@@ -408,7 +407,7 @@ ibus_keyman_engine_constructor (GType                   type,
     {
         g_warning("problem creating km_kbp_state");
     }
-    for (int i =0; i < 3 + num_options + 1; i++) {
+    for (int i=0; i < KEYMAN_ENVIRONMENT_OPTIONS + num_options + 1; i++) {
         g_free((km_kbp_cp *)keyboard_opts[i].key);
         g_free((km_kbp_cp *)keyboard_opts[i].value);
     }
@@ -1022,7 +1021,7 @@ ibus_keyman_engine_keyboard_options(gchar *package_id,
         while (options[index] != NULL)
         {
             gchar **option_tokens = g_strsplit(options[index], "=", 2);
-            if (*option_tokens != NULL && option_tokens[0] != NULL && option_tokens[1] != NULL)
+            if (option_tokens != NULL && option_tokens[0] != NULL && option_tokens[1] != NULL)
             {
                 g_message("Keyboard Option [%d], %s=%s", index, option_tokens[0], option_tokens[1]);
                 km_kbp_option_item *opt = g_new0(km_kbp_option_item, 1);
