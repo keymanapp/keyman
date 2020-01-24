@@ -189,7 +189,8 @@ extension Storage {
 
     // Perform an auto-install of the lexical model's KMP if not already installed.
     let lexicalModelURLasZIP = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
-                                                                     version: Defaults.lexicalModel.version)
+                                                                     version: Defaults.lexicalModel.version,
+                                                                    asZip: true)
     let lexicalModelURL = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
                                                                 version: Defaults.lexicalModel.version,
                                                                 asZip: false)
