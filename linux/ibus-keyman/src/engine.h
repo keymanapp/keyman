@@ -34,7 +34,6 @@
 // Number of default Keyboard processor environment options for: "platform", "baseLayout", and "baseLayoutAlt"
 #define KEYMAN_ENVIRONMENT_OPTIONS 3
 
-#define
 #define IBUS_TYPE_KEYMAN_ENGINE	\
 	(ibus_keyman_engine_get_type ())
 
