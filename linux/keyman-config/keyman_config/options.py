@@ -12,6 +12,7 @@ from urllib.parse import parse_qsl, urlencode
 from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.dconf_util import get_option, set_option
 
+
 class OptionsView(Gtk.Window):
 
     def __init__(self, info):
@@ -83,4 +84,3 @@ class OptionsView(Gtk.Window):
         # Write the Keyman options to DConf
         info = { "packageID": self.packageID, "keyboardID": self.keyboardID}
         set_option(info, self.options)
-

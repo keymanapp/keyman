@@ -64,6 +64,7 @@ def set_option(info, options):
 if __name__ == '__main__':
     info = {"packageID": "invalid", "keyboardID": "invalid"}
     options = get_option(info)
+    assert(options == {})
 
     info = {"packageID": "sil_cipher_music", "keyboardID": "sil_cipher_music"}
     options = get_option(info)
