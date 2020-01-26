@@ -172,7 +172,9 @@ function TMRUList.EllipsisFile(Index: Integer): WideString;
 begin
   Result := Files[Index];
 
-  if not PathCompactPath(0, PWideChar(Result), GetSystemMetrics(SM_CXSCREEN) div 3) then   // I4697
+  if PathCompactPath(0, PWideChar(Result), GetSystemMetrics(SM_CXSCREEN) div 3) then   // I4697
+    Result := string(PChar(Result))  // This removes the terminating nul
+  else
     Result := ExtractFileName(Files[Index]);
 end;
 
