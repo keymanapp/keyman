@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Reachability
 
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
@@ -196,10 +195,6 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
   }
 
-  private func showDownloadErrorAlert() {
-    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
-  }
-
   private func keyboardDownloadStarted() {
     log.info("keyboardDownloadStarted: LanguageDetailViewController")
     view.isUserInteractionEnabled = false
@@ -208,7 +203,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func keyboardDownloadFailed() {
     log.info("keyboardDownloadFailed: LanguageDetailViewController")
-    showDownloadErrorAlert()
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
+
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
