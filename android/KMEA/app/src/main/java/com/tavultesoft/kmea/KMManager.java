@@ -405,11 +405,9 @@ public final class KMManager {
   public static void onDestroy() {
     if (InAppKeyboard != null) {
       InAppKeyboard.onDestroy();
-      InAppKeyboard = null;
     }
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
-      SystemKeyboard = null;
     }
     CloudDownloadMgr.getInstance().shutdown(appContext);
   }
