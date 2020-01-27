@@ -139,6 +139,9 @@ implementation
 uses
   ComObj,
   Forms,
+  Vcl.Menus,
+  Winapi.Windows,
+
   KMDActions,
   KMDActionInterfaces,
   Keyman.Developer.System.Project.kmnProjectFile,
@@ -454,6 +457,11 @@ begin
     (ActiveEditor <> nil) or
     (ActivePackageEditor <> nil) or
     (frmKeymanDeveloper.ActiveChild is TfrmProject);
+
+  if actKeyboardCompile.Enabled
+    then actKeyboardCompile.ShortCut := Vcl.Menus.Shortcut(VK_F7, [])
+    else actKeyboardCompile.ShortCut := scNone;
+
   frmKeymanDeveloper.mnuKeyboard.Visible := actKeyboardCompile.Enabled;
   frmKeymanDeveloper.mnuDebug.Visible := ActiveEditor <> nil;
 end;
