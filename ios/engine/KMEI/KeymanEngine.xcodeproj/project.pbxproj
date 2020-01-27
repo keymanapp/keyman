@@ -218,6 +218,7 @@
 		CE7A26D823CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
 		CE7A26D923CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
 		CE7A26DB23CEEF640005955C /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26DA23CEEF640005955C /* Colors.swift */; };
+		CE7ADD6623DE89FC00BC9A00 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */; };
 		CE808A48236697BE00713E6B /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE808A4B236697D400713E6B /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; };
 		CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
@@ -429,6 +430,7 @@
 		CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Keyboard Colors.xcassets"; sourceTree = "<group>"; };
 		CE7A26D723CEEC630005955C /* Colors+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors+Extension.swift"; sourceTree = "<group>"; };
 		CE7A26DA23CEEF640005955C /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
 		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -879,6 +881,7 @@
 				C05B14321FD914870082A316 /* Log.swift */,
 				C08E698C1FDA392D0026056B /* Migrations.swift */,
 				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
+				CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1284,6 +1287,7 @@
 				C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */,
 				165EB3A12098993900040A69 /* KeyboardError.swift in Sources */,
 				C05F432D1FBD5A4C0058CBD4 /* KeyboardAPICall.swift in Sources */,
+				CE7ADD6623DE89FC00BC9A00 /* Alerts.swift in Sources */,
 				CE754A0423D162E90030CB79 /* ResourceInfoViewController.swift in Sources */,
 				C055E6EB1F99ED090035C2DD /* RegisteredFont.swift in Sources */,
 				1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */,
