@@ -7,6 +7,7 @@
 //
 import QuartzCore
 import UIKit
+import Reachability
 
 private let activityViewTag = -2
 private let toolbarButtonTag = 100
@@ -249,6 +250,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func keyboardDownloadFailed() {
+    showDownloadErrorAlert()
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
@@ -307,16 +309,31 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     return userKeyboards["\(languageID)_\(keyboardID)"] != nil
   }
 
-  private func showConnectionErrorAlert() {
+  // This really should be refactored to a common method.
+  private func showErrorAlert(title: String, msg: String) {
     dismissActivityView()
-    let alertController = UIAlertController(title: "Connection Error",
-                                            message: "Could not reach Keyman server. Please try again later.",
+    let alertController = UIAlertController(title: title,
+                                            message: msg,
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
                                             style: UIAlertAction.Style.default,
                                             handler: errorAcknowledgmentHandler))
     
     self.present(alertController, animated: true, completion: nil)
+  }
+
+  private func showConnectionErrorAlert() {
+    showErrorAlert(title: "Connection Error", msg: "Could not reach Keyman server.  Please try again later.")
+  }
+
+  private func showDownloadErrorAlert() {
+    let networkReachable = Reachability(hostname: "www.keyman.com")
+    if networkReachable?.connection == Reachability.Connection.none {
+      showConnectionErrorAlert()
+    } else {
+      // Show a different alert!
+      showErrorAlert(title: "Download error", msg: "Error occurred during download or installation.")
+    }
   }
 }
 

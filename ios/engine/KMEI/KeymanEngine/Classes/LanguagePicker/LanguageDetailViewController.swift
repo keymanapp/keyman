@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Reachability
 
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
@@ -190,17 +191,32 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     activityView?.removeFromSuperview()
     view.isUserInteractionEnabled = true
   }
-  
-  private func showConnectionErrorAlert() {
+
+  // This really should be refactored to a common method.
+  private func showErrorAlert(title: String, msg: String) {
     dismissActivityView()
-    let alertController = UIAlertController(title: "Connection Error",
-                                            message: "Could not reach Keyman server. Please try again later.",
+    let alertController = UIAlertController(title: title,
+                                            message: msg,
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
                                             style: UIAlertAction.Style.default,
                                             handler: errorAcknowledgmentHandler))
-    
+
     self.present(alertController, animated: true, completion: nil)
+  }
+
+  private func showConnectionErrorAlert() {
+    showErrorAlert(title: "Connection Error", msg: "Could not reach Keyman server.  Please try again later.")
+  }
+
+  private func showDownloadErrorAlert() {
+    let networkReachable = Reachability(hostname: "www.keyman.com")
+    if networkReachable?.connection == Reachability.Connection.none {
+      showConnectionErrorAlert()
+    } else {
+      // Show a different alert!
+      showErrorAlert(title: "Download error", msg: "Error occurred during download or installation.")
+    }
   }
   
   func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
@@ -215,6 +231,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func keyboardDownloadFailed() {
     log.info("keyboardDownloadFailed: LanguageDetailViewController")
+    showDownloadErrorAlert()
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
