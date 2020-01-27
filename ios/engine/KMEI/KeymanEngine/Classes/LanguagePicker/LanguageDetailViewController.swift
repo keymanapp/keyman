@@ -192,35 +192,12 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     view.isUserInteractionEnabled = true
   }
 
-  // This really should be refactored to a common method.
-  private func showErrorAlert(title: String, msg: String) {
-    dismissActivityView()
-    let alertController = UIAlertController(title: title,
-                                            message: msg,
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: errorAcknowledgmentHandler))
-
-    self.present(alertController, animated: true, completion: nil)
-  }
-
   private func showConnectionErrorAlert() {
-    showErrorAlert(title: "Connection Error", msg: "Could not reach Keyman server.  Please try again later.")
+    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
   }
 
   private func showDownloadErrorAlert() {
-    let networkReachable = Reachability(hostname: "www.keyman.com")
-    if networkReachable?.connection == Reachability.Connection.none {
-      showConnectionErrorAlert()
-    } else {
-      // Show a different alert!
-      showErrorAlert(title: "Download error", msg: "Error occurred during download or installation.")
-    }
-  }
-  
-  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    navigationController?.popToRootViewController(animated: true)
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
   }
 
   private func keyboardDownloadStarted() {

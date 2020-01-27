@@ -233,10 +233,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     langDetailView.title = title
     navigationController?.pushViewController(langDetailView, animated: true)
   }
-
-  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    navigationController?.popToRootViewController(animated: true)
-  }
     
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
@@ -309,31 +305,12 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     return userKeyboards["\(languageID)_\(keyboardID)"] != nil
   }
 
-  // This really should be refactored to a common method.
-  private func showErrorAlert(title: String, msg: String) {
-    dismissActivityView()
-    let alertController = UIAlertController(title: title,
-                                            message: msg,
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: errorAcknowledgmentHandler))
-    
-    self.present(alertController, animated: true, completion: nil)
-  }
-
   private func showConnectionErrorAlert() {
-    showErrorAlert(title: "Connection Error", msg: "Could not reach Keyman server.  Please try again later.")
+    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
   }
 
   private func showDownloadErrorAlert() {
-    let networkReachable = Reachability(hostname: "www.keyman.com")
-    if networkReachable?.connection == Reachability.Connection.none {
-      showConnectionErrorAlert()
-    } else {
-      // Show a different alert!
-      showErrorAlert(title: "Download error", msg: "Error occurred during download or installation.")
-    }
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
   }
 }
 
