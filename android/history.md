@@ -24,6 +24,12 @@
   * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
   * Propagate custom help links (#2448)
   * Fix file permissions for viewing welcome.htm assets (#2465)
+  * Fix UI flicker during keyboard switching (#2296)
+  * Fix compatibility with older Android devices (4.4 KitKat and later) (#2401, 12.0:#2358, #2454, 12.0:#2453)
+
+## 2019-12-18 12.0.4215 stable
+* Bug fix:
+  * Fix compatibility with older Android devices (4.4 KitKat and later) (#2453)
 
 ## 2019-12-12 12.0.4214 stable
 * Bug fix:
@@ -33,7 +39,7 @@
 * Bug fix:
   * Always use lower-case langauge ID's when processing API returns (#2406)
   * Add checks when accessing the Cloud to avoid exceptions (#2393)
-  * Improve Keymanweb and KMEA compatability with devices Android API 19-23 (#2358)
+  * Improve Keymanweb and KMEA compatability with devices Android API 19-23 (4.4 KitKat and later) (#2358)
 
 * Change
   * Update default nrc.en.mtnt model to version 0.1.3 (#2389)
