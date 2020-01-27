@@ -192,7 +192,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func showConnectionErrorAlert() {
-    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
+    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
   }
 
   private func keyboardDownloadStarted() {
@@ -203,7 +203,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func keyboardDownloadFailed() {
     log.info("keyboardDownloadFailed: LanguageDetailViewController")
-    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNevigationRootHandler(for: self))
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
 
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)

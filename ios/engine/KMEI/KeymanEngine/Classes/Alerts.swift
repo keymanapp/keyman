@@ -38,7 +38,7 @@ open class Alerts {
     }
   }
 
-  public static func popToNevigationRootHandler(for vc: UIViewController) -> AcceptanceHandler {
+  public static func popToNavigationRootHandler(for vc: UIViewController) -> AcceptanceHandler {
     return { alertAction in
       vc.navigationController?.popToRootViewController(animated: true)
     }
