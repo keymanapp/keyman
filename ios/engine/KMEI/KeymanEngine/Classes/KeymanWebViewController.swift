@@ -530,7 +530,8 @@ extension KeymanWebViewController: KeymanWebDelegate {
     
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
     var newKb = Defaults.keyboard
-    if Manager.shared.currentKeyboardID == nil && !shouldReloadKeyboard {
+
+    if !shouldReloadKeyboard { // otherwise, we automatically reload anyway.
       let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
       if let id = userData.currentKeyboardID {
         if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
