@@ -1,6 +1,6 @@
 # Keyman for iPhone and iPad Version History
 
-## 13.0 alpha
+## 2020-01-28 13.0.60 beta
 * Feature: Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457, #2489, #2510)
 * Feature: Adds support for iOS 13.0's dark mode feature (#2277, #2312, #2468, #2521)
 * Feature: Adds QR code to keyboard info pages for easier sharing with internet availability (#2509)

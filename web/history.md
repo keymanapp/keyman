@@ -1,6 +1,6 @@
 # KeymanWeb Version History
 
-## 13.0 alpha
+## 2020-01-28 13.0.32 beta
 * Start version 13.0
 * Feature: iOS dark mode support (#2468, #2484)
 * Bug fix: Scroll characters into view on Chrome when editing (#2514)

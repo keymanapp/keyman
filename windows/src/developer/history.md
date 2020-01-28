@@ -1,6 +1,6 @@
 # Keyman Developer Version History
 
-## 13.0 alpha
+## 2020-01-28 13.0.65 beta
 * Feature(Compiler): Hotkeys defined in .kmn no longer need to be quoted (#2432)
 * Feature(IDE): Enhanced Lexical Model Editor (#2396)
 * Feature(IDE): Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
