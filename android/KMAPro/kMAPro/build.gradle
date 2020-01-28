@@ -5,6 +5,9 @@ plugins {
     id 'name.remal.default-plugins'
 }
 
+ext.rootPath = '../../'
+apply from: "$rootPath/version.gradle"
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -30,18 +33,9 @@ android {
             }
         }
 
-        String env_build_number = System.getenv("BUILD_NUMBER") //assigned by TeamCity, so all caps
-        String env_build_counter = System.getenv("build_counter")
-        if (env_build_number != null) {
-            println "Using build number $env_build_number and counter $env_build_counter from environment"
-            versionCode env_build_counter as Integer
-            versionName env_build_number
-        } else {
-            String majorMinorVersion = file('$projectDir/../../../../resources/VERSION.md').text.trim()
-            versionCode 100
-            versionName majorMinorVersion + '.0.0'
-            println "Using build $majorMinorVersion from project VERSION.md"
-        }
+        // VERSION_CODE and VERSION_NAME from version.gradle
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
     }
 
     String env_release_store_file = System.getenv("release_store_file")

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+KMA_ROOT="$KEYMAN_ROOT/android"
+
 # Uses the open-source `wget` utility to create an embedding-friendly offline mirror
 # equivalent of online help.
 
@@ -20,14 +28,12 @@ OPTIONS="--no-host-directories"
 
 DEVICE=android
 HELP_SITE_SECTION=products/android
-HELP_ROOT=KMAPro/kMAPro/src/main/assets/info
+HELP_ROOT="$KMA_ROOT/KMAPro/kMAPro/src/main/assets/info"
 
 # Clear previous help file downloads (if they exist)
 if [ -d "$HELP_ROOT" ]; then
   rm -r "$HELP_ROOT"
 fi
-
-VERSION=`cat ../resources/VERSION.md`
 
 # If TIER is set to "alpha", use the previous version.  Help is usually only updated during
 # the "beta" process.
@@ -37,10 +43,8 @@ if [ -z $TIER ]; then
 fi
 
 if [ $TIER = "alpha" ]; then
-  # More readable:  (major).minor
-  [[ "$VERSION" =~ ([0-9]+)\.[0-9]+ ]]
   # Construct a decremented version string with .minor set to .0
-  VERSION="$((${BASH_REMATCH[1]}-1)).0"
+  VERSION="$(($VERSION_MAJOR-1)).0"
 fi
 
 do_offline_mirror() {
@@ -69,8 +73,8 @@ do_offline_mirror() {
 do_offline_mirror "phone"
 
 # Now for some magic... we rename the page's folder and redownload with the other setting.
-mv ./$HELP_ROOT/$HELP_SITE_SECTION/$VERSION ./$HELP_ROOT/$HELP_SITE_SECTION/phone
+mv $HELP_ROOT/$HELP_SITE_SECTION/$VERSION $HELP_ROOT/$HELP_SITE_SECTION/phone
 
 do_offline_mirror "tablet"
 
-mv ./$HELP_ROOT/$HELP_SITE_SECTION/$VERSION ./$HELP_ROOT/$HELP_SITE_SECTION/tablet
+mv $HELP_ROOT/$HELP_SITE_SECTION/$VERSION $HELP_ROOT/$HELP_SITE_SECTION/tablet
