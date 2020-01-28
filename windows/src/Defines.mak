@@ -2,7 +2,7 @@
 
 # TODO: Eliminate this hard coded version; used only in windows/src/desktop/help/Makefile
 #       so convert to .in with mkver transform
-KEYMAN_VERSION=13.0
+KEYMAN_VERSION=14.0
 
 #
 # Paths

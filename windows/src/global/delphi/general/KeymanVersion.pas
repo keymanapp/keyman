@@ -23,6 +23,7 @@ interface
 // we have a back-compat need to refer to a specific version.
 
 const
+  SKeymanVersion140 = '14.0';
   SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';
   SKeymanVersion110 = '11.0';
