@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>Keyman needs to send key events to the target application.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
@@ -25,6 +23,8 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleGetInfoString</key>
+	<string>$(GET_INFO_STRING)</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
@@ -36,7 +36,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(PRODUCT_VERSION)</string>
+	<string>13.0.99</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -51,13 +51,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>$(PRODUCT_VERSION)</string>
-	<key>CFBundleGetInfoString</key>
-	<string>$(GET_INFO_STRING)</string>
+	<string>13.0.99</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
-		<string>68056571ada44ad2d93864380272808ada308b24</string>
+		<string>4efced22a226f98e05442a7e472b377d89fcc294</string>
 		<key>Kits</key>
 		<array>
 			<dict>
@@ -80,6 +78,8 @@
 	<true/>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Keyman needs to send key events to the target application.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(COPYRIGHT_STRING)</string>
 	<key>NSMainNibFile</key>

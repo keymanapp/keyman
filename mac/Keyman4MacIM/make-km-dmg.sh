@@ -44,11 +44,11 @@ popd  > /dev/null
 
 . $KEYMAN_MACIM_BASE_PATH/../bashHelperFunctions.sh
 
-KM_APP_NAME="Keyman.app"
-SOURCE_KM_APP="$KEYMAN_MACIM_BASE_PATH/build/Release/$KM_APP_NAME"
+KM_APP_NAME="Install Keyman.app"
 OUTPUT_DIR="$KEYMAN_MACIM_BASE_PATH/output"
 STAGING_DIR="$OUTPUT_DIR/temp"
 DEST_DIR="$OUTPUT_DIR/upload"
+SOURCE_KM_APP="$OUTPUT_DIR/$KM_APP_NAME"
 ADD_VERSION_TO_DEST_DIR=true
 TEMPLATE_IMAGE="$KEYMAN_MACIM_BASE_PATH/Keyman-template.dmg"
 VERBOSITY=""
@@ -139,6 +139,8 @@ elif [[ ! -d "$DEST_DIR" ]]; then
 	fail "Destination dir exists but is not a directory: $2"
 fi
 
+# TODO: Check that no Keyman volume is already mounted.
+
 # Step 1 - Copy template to working copy to prevent unintended changes
 WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$KM_VERSION.dmg"
 displayInfo "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
@@ -165,8 +167,12 @@ fi
 
 # Step 3 - Replace existing application files with new version
 displayInfo "Copying files from \"$SOURCE_KM_APP\"..."
+find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 
+echo "---------"
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf
 cp -fR "$SOURCE_KM_APP/" "$DEST_KM_APP"
+
+ls -la /Volumes/Keyman/background/
 
 # Step 4 - Detach/unmount the temporary image/staging area
 displayInfo "Detaching \"$WORKING_COPY_OF_IMAGE\""

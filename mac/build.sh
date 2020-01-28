@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # Include our resource functions; they're pretty useful!
 . ../resources/shellHelperFunctions.sh
 
@@ -445,6 +447,10 @@ if $LOCALDEPLOY ; then
 elif $PREPRELEASE ; then
     echo_heading "Preparing files for release deployment..."
     # Create the disk image
+    pushd setup
+    eval "./build.sh"
+    popd
+
     eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" -version $KM_VERSION $QUIET_FLAG
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
