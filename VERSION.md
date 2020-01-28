@@ -1,1 +1,1 @@
-Please see resources/VERSION.md for the current target build version.
+14.0.1
