@@ -40,7 +40,7 @@ const
   S_DebugBuildVersion = '9999';
 
 type
-  TMKVerMode = (mmUnknown, mmSetRootVersionFromBuild, mmSetRootVersionFromVersionMd, mmWriteVersionedFile, mmWriteManifestFile);
+  TMKVerMode = (mmUnknown, mmSetRootVersionFromVersionMd, mmWriteVersionedFile, mmWriteManifestFile);
 var
   FMode: TMKVerMode = mmUnknown;
   BuildVersion, ResourceMdFilename: string;
@@ -86,12 +86,7 @@ begin
   if s = '-c' then
   begin
     RootTemplateFileName := ParamStr(2);
-    if SameText(ParamStr(3), '-b') then
-    begin
-      FMode := mmSetRootVersionFromBuild;
-      BuildVersion := ParamStr(4);
-    end
-    else if SameText(ParamStr(3), '-r') then
+    if SameText(ParamStr(3), '-r') then
     begin
       FMode := mmSetRootVersionFromVersionMd;
       ResourceMdFilename := ParamStr(4);
@@ -308,20 +303,6 @@ begin
   CloseFile(tfo);
 end;
 
-procedure WriteRootVersionTemplateFromBuild;
-begin
-  // Transform the string from 1.2.3.4 to 1,2,3,4 for version.txt/version.rc format
-  BuildVersion := StringReplace(BuildVersion, '.', ',', [rfReplaceAll]);
-
-  with TStringList.Create do
-  try
-    Add('PRODUCTVERSION '+BuildVersion);
-    SaveToFile(RootTemplateFileName);
-  finally
-    Free;
-  end;
-end;
-
 procedure WriteRootVersionTemplateFromVersionMd;
 begin
   with TStringList.Create do
@@ -335,8 +316,9 @@ begin
   // Transform the string from 1.2 to 1,2 to match version.txt/version.rc format
   BuildVersion := StringReplace(BuildVersion, '.', ',', [rfReplaceAll]);
 
-  // And add the static 9999 version
-  BuildVersion := BuildVersion + ',' + S_DebugBuildVersion+',0';
+  // VERSION.MD has only major.minor.patch, so append ,0 to satisfy Windows
+  // version patterns
+  BuildVersion := BuildVersion + ',0';
 
   with TStringList.Create do
   try
@@ -358,11 +340,10 @@ begin
   if not Init then
   begin
     UpdateFiles.Free;
-    writeln(#13#10+'Usage: kmver -c <root-version.txt> (-b <version> | -r <VERSION.md>)');
+    writeln(#13#10+'Usage: kmver -c <root-version.txt> -r <VERSION.md>');
     writeln(' or    kmver -v [-u f.in f.out]* <template> [version.rc]');
     writeln('   -c:         Sets the root template version');
-    writeln('       -r:     Use major.minor version data from VERSION.md and appends .9999.0 to indicate custom built version');
-    writeln('       -b:     For CI, use the specific version number specified');
+    writeln('       -r:     Use major.minor.patch version data from VERSION.md');
     writeln('   -v:         Update the version.rc with the template information');
     writeln('   -m:         Update manifest.xml with the template information');
     writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
@@ -379,9 +360,7 @@ begin
     Exit;
   end;
 
-  if FMode = mmSetRootVersionFromBuild then
-    WriteRootVersionTemplateFromBuild
-  else if FMode = mmSetRootVersionFromVersionMd then
+  if FMode = mmSetRootVersionFromVersionMd then
     WriteRootVersionTemplateFromVersionMd
   else
   begin
