@@ -12,8 +12,16 @@
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
+# Here is how to include this script reliably, cross-platform:
+#    ## START STANDARD BUILD SCRIPT INCLUDE
+#    # adjust relative paths as necessary
+#    THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+#    . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+#    # END STANDARD BUILD SCRIPT INCLUDE
+#
 
 function die () {
+    # TODO: consolidate this with fail() from shellHelperFunctions.sh
     echo
     echo "$*"
     echo
@@ -27,6 +35,7 @@ function findRepositoryRoot() {
 
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
+    readonly KEYMAN_ROOT
 }
 
 function findVersion() {
@@ -42,7 +51,15 @@ function findVersion() {
         exit 1;
     }
 
+    # Used for Windows, which requires a four part version string
     VERSION_WIN="$VERSION.0"
+
+    readonly VERSION
+    readonly VERSION_MAJOR
+    readonly VERSION_MINOR
+    readonly VERSION_PATCH
+    readonly VERSION_RELEASE
+    readonly VERSION_WIN
 }
 
 function findTier() {
