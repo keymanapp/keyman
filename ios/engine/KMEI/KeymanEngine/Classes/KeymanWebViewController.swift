@@ -560,7 +560,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
 
     NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb!)
     if shouldReloadKeyboard {
-      log.debug("IVC: Setting timer to reload keyboard.")
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
       Manager.shared.shouldReloadKeyboard = false
