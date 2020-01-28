@@ -274,7 +274,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///
   /// - Throws: error if the keyboard was unchanged
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
-    if kb.fullID == currentKeyboardID {
+    // KeymanWebViewController relies upon this method to activate the keyboard after a page reload,
+    // and as a system keyboard, the controller is rebuilt each time the keyboard is loaded.
+    //
+    // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
+    // blank keyboard bug!
+    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
      // throw KeyboardError.unchanged
