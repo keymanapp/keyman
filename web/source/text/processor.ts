@@ -78,6 +78,7 @@ namespace com.keyman.text {
             return '';
           case Codes.keyCodes['K_TAB']:
             if(keyman.isEmbedded) {
+              // In embedded mode, let the device handle the tab character
               return '\t';
             }
             if(!disableDOM) {
