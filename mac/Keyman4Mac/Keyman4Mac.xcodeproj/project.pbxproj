@@ -190,6 +190,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -396,7 +397,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 14.0;
+				PRODUCT_VERSION = 0.0.1;
 			};
 			name = Debug;
 		};
@@ -417,7 +418,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.Keyman4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 14.0;
+				PRODUCT_VERSION = 0.0.1;
 			};
 			name = Release;
 		};

@@ -1,5 +1,11 @@
 #!/bin/sh
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
   echo "This build script will only run in a Mac environment."
@@ -11,11 +17,7 @@ display_usage() {
     echo "to describe the downloadable Keyman Input Method app."
     echo "Typically called from the Keyman mac build script."
     echo
-    echo "usage: write-download_info.sh -version #.#.# -tier TIER [-destDir DIR]"
-    echo
-    echo "  -version #.#.#  Specifies the build version number, which should be in the"
-    echo "                  form Major.Minor.BuildCounter"
-    echo "  -tier TIER      Specifies tier (typically one of: alpha, beta, stable)."
+    echo "usage: write-download_info.sh [-destDir DIR]"
     echo
     echo "  Optional switches:"
     echo "  -destDir DIR    Directory where the download_info file should be created"
@@ -37,25 +39,14 @@ popd  > /dev/null
 DEST_DIR="$KEYMAN_MACIM_BASE_PATH/output/upload"
 ADD_VERSION_TO_DEST_DIR=true
 
+KM_BLD_COUNTER="$((${VERSION##*.}))"
+
 # Parse args
 shopt -s nocasematch
 
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -version)
-            assertValidVersionNbr "$2"
-            KM_VERSION="$2"
-            KM_BLD_COUNTER="$((${KM_VERSION##*.}))"
-            shift # past argument
-            ;;
-        -tier)
-            if [[ "$2" == "" || "$2" =~ ^\- ]]; then
-                fail "Missing tier name on command line!"
-            fi
-            KM_TIER=$2
-            shift # past argument
-            ;;
         -destDir)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
                 fail "Missing destination directory on command line."
@@ -75,16 +66,8 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-if [ "$KM_VERSION" = "" ]; then
-  fail "Required -version parameter not specified!"
-fi
-
-if [ "$KM_TIER" = "" ]; then
-  fail "Required -tier parameter not specified!"
-fi
-
 if $ADD_VERSION_TO_DEST_DIR ; then
-    DEST_DIR="$DEST_DIR/$KM_VERSION"
+    DEST_DIR="$DEST_DIR/$VERSION"
 fi
 if [[ ! -e $DEST_DIR ]]; then
 	mkdir -p $DEST_DIR
@@ -92,7 +75,7 @@ elif [[ ! -d $DEST_DIR ]]; then
 	fail "Destination dir exists but is not a directory: $2"
 fi
 
-DMG_FILENAME="keyman-$KM_VERSION.dmg"
+DMG_FILENAME="keyman-$VERSION.dmg"
 DMG_FILEPATH="$DEST_DIR/$DMG_FILENAME"
 DOWNLOAD_INFO_FILEPATH="${DMG_FILEPATH}.download_info"
 if [[ ! -f "$DMG_FILEPATH" ]]; then
@@ -107,10 +90,10 @@ fi
 
 echo { > "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"name\": \"Keyman4MacIM\"," >> "$DOWNLOAD_INFO_FILEPATH"
-echo "  \"version\": \"${KM_VERSION}\"," >> "$DOWNLOAD_INFO_FILEPATH"
+echo "  \"version\": \"${VERSION}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"date\": \"$(date "+%Y-%m-%d")\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"platform\": \"mac\"," >> "$DOWNLOAD_INFO_FILEPATH"
-echo "  \"stability\": \"${KM_TIER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
+echo "  \"stability\": \"${TIER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"file\": \"${DMG_FILENAME}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"md5\": \"${DMG_MD5}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"type\": \"dmg\"," >> "$DOWNLOAD_INFO_FILEPATH"
