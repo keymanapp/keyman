@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2020-01-29 13.0.61 beta
+* Bug fix: System keyboard would sometimes appear blank (#2545)
+
 ## 2020-01-28 13.0.60 beta
 * Feature: Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457, #2489, #2510)
 * Feature: Adds support for iOS 13.0's dark mode feature (#2277, #2312, #2468, #2521)
