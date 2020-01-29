@@ -1,6 +1,10 @@
 #!/bin/sh
 
-
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
@@ -58,11 +62,6 @@ QUIET=false
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -version)
-            assertValidVersionNbr "$2"
-            VERSION="$2"
-            shift # past argument
-            ;;
         -sourceApp)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
                 fail "Missing source directory on command line."
