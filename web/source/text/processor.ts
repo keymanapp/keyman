@@ -77,6 +77,9 @@ namespace com.keyman.text {
             }
             return '';
           case Codes.keyCodes['K_TAB']:
+            if(keyman.isEmbedded) {
+              return '\t';
+            }
             if(!disableDOM) {
               domManager.moveToNext(keyShiftState);
             }
