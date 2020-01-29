@@ -813,6 +813,19 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                 break;
             case KM_KBP_IT_PERSIST_OPT:
                 g_message("PERSIST_OPT action %d/%d", i+1, (int)num_action_items);
+                // Save keyboard option
+                if (action_items[i].option != NULL)
+                {
+                    // Allocate for 1 option plus 1 pad struct of 0's
+                    km_kbp_option_item *keyboard_opts = g_new0(km_kbp_option_item, 2);
+                    memmove(&(keyboard_opts[0]), action_items[i].option, sizeof(km_kbp_option_item));
+                    event_status = km_kbp_state_options_update(keyman->state, keyboard_opts);
+                    if (event_status != KM_KBP_STATUS_OK)
+                    {
+                        g_warning("problem saving option for km_kbp_keyboard");
+                    }
+                    g_free(keyboard_opts);
+                }
                 break;
             case KM_KBP_IT_EMIT_KEYSTROKE:
                 if (keyman->char_buffer != NULL)
