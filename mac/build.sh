@@ -275,6 +275,7 @@ execBuildCommand() {
 }
 
 updatePlist() {
+    # TODO: use set_version() to update plist after build instead of the currenet pattern. See ios for example
 	if $UPDATE_VERSION_IN_PLIST ; then
 	    KM_COMPONENT_BASE_PATH="$1"
 	    KM_COMPONENT_NAME="$2"
