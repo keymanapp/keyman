@@ -421,7 +421,7 @@ if $LOCALDEPLOY ; then
 elif $PREPRELEASE ; then
     echo_heading "Preparing files for release deployment..."
     # Create the disk image
-    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" -version $VERSION $QUIET_FLAG
+    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
     else
@@ -429,7 +429,7 @@ elif $PREPRELEASE ; then
     fi
 
     # Create download info
-    eval "$KM4MIM_BASE_PATH/write-download_info.sh" -version $VERSION -tier $TIER
+    eval "$KM4MIM_BASE_PATH/write-download_info.sh"
     if [ $? == 0 ]; then
         displayInfo "Writing download_info file succeeded!" ""
     else
