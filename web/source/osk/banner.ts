@@ -320,7 +320,10 @@ namespace com.keyman.osk {
       if(suggestion.displayAs == null || suggestion.displayAs == '') {
         suggestionText = '\xa0';  // default:  nbsp.
       } else {
-        suggestionText = suggestion.displayAs;
+        // Default the LTR ordering to match that of the active keyboard.
+        let rtl = keyman.keyboardManager.isRTL();
+        let orderCode = rtl ? 0x202e /* RTL */ : 0x202d /* LTR */;
+        suggestionText = String.fromCharCode(orderCode) + suggestion.displayAs;
       }
 
       let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
