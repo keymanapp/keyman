@@ -2,6 +2,7 @@
 
 version()
 {
-    tier=`cat ../TIER.md`
-    version=`cat VERSION`
+    tier=${TIER}
+    newvers=${VERSION}
+    echo "Found tier ${tier}, version ${newvers}"
 }
