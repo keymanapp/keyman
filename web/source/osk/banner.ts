@@ -360,7 +360,19 @@ namespace com.keyman.osk {
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let d = new BannerSuggestion(i);
         this.options[i] = d;
-        this.getDiv().appendChild(d.div);
+      }
+
+      /* LTR behavior:  the default (index 0) suggestion should be at the left
+       * RTL behavior:  the default (index 0) suggestion should be at the right
+       *
+       * The cleanest way to make it work - simply invert the order in which
+       * the elements are inserted for RTL.  This allows the banner to be RTL
+       * for visuals/UI while still being internally LTR.
+       */
+      let rtl = com.keyman.singleton.keyboardManager.isRTL();
+      for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
+        let indexToInsert = rtl ? SuggestionBanner.SUGGESTION_LIMIT - i -1 : i;
+        this.getDiv().appendChild(this.options[indexToInsert].div);
       }
 
       this.manager = new SuggestionManager(this.getDiv(), this.options);
