@@ -326,12 +326,6 @@ namespace com.keyman.osk {
         suggestionText = String.fromCharCode(orderCode) + suggestion.displayAs;
       }
 
-      let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
-      if(keyboardManager.isRTL()) {
-        // Add the RTL marker to ensure it displays correctly.
-        suggestionText = '\u200f' + suggestionText;
-      }
-
       // TODO:  Dynamic suggestion text resizing.  (Refer to OSKKey.getTextWidth in visualKeyboard.ts.)
 
       // Finalize the suggestion text
