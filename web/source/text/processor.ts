@@ -519,6 +519,12 @@ namespace com.keyman.text {
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       }
 
+      // Special case for embedded to pass K_TAB back to device to process
+      if(keyman.isEmbedded && (keyEvent.Lcode == Codes.keyCodes["K_TAB"] ||
+          keyEvent.Lcode == Codes.keyCodes["K_TABBACK"] || keyEvent.Lcode == Codes.keyCodes["K_TABFWD"])) {
+        return false;
+      }
+
       return !LeventMatched;
     }
 

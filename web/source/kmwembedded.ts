@@ -135,11 +135,9 @@ namespace com.keyman.text {
     let Codes = com.keyman.text.Codes;
     let code = Lkc.Lcode;
 
-    // Intentionally not assigning K_ENTER so KMW will pass them back
-    // to the mobile apps to handle (insert characters).
-    if (code == Codes.keyCodes.K_TAB) {
-      return '\t';
-    } else if (code == Codes.keyCodes.K_SPACE) {
+    // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
+    // to the mobile apps to handle (insert characters or navigate forms).
+    if (code == Codes.keyCodes.K_SPACE) {
       return ' ';
     } else if (code == Codes.keyCodes.K_BKSP) {
       if(!disableDOM) {
