@@ -21,7 +21,7 @@ public enum MenuBehaviour {
   case showNever
 }
 
-private class CustomInputView: UIInputView {
+private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
   var setFrame: CGRect = CGRect.zero
   var keymanWeb: KeymanWebViewController!
 
@@ -38,6 +38,13 @@ private class CustomInputView: UIInputView {
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  public var enableInputClicksWhenVisible: Bool {
+    get {
+      // Implemented as noted by https://developer.apple.com/documentation/uikit/uidevice/1620050-playinputclick.
+      return true
+    }
   }
 
   override var intrinsicContentSize: CGSize {
@@ -308,7 +315,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
 
     if isInputClickSoundEnabled {
-      DispatchQueue.global(qos: .default).async { AudioServicesPlaySystemSound(0x450) }
+      UIDevice.current.playInputClick()
 
       // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
       isInputClickSoundEnabled = false
