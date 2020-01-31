@@ -1,6 +1,9 @@
 # KeymanWeb Version History
 
-## 2020-01-28 13.0.32 beta
+## 2020-01-31 13.0.32 beta
+* Bug fix: Fixed external keyboard key "tab" for embedded devices (#2546)
+
+## 2020-01-28 13.0.31 beta
 * Start version 13.0
 * Feature: iOS dark mode support (#2468, #2484)
 * Bug fix: Scroll characters into view on Chrome when editing (#2514)
