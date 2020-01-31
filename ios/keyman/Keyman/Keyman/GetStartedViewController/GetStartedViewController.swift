@@ -114,7 +114,13 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       }
     case 1:
       cell.textLabel?.text = "Set up Keyman as system-wide keyboard"
-      cell.detailTextLabel?.text = ""
+      if #available(iOS 11.0, *) {
+        // We can expedite this via near-direct settings link.
+        // So, let's add the one extra needed detail to our detail text.
+        cell.detailTextLabel?.text = "Keyboards > Enable \"Keyman\""
+      } else {
+        cell.detailTextLabel?.text = ""
+      }
       if !AppDelegate.isKeymanEnabledSystemWide() {
         cell.accessoryType = .none
       } else {
@@ -145,9 +151,17 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       mainViewController.dismissGetStartedView(nil)
       mainViewController.showInstalledLanguages()
     case 1:
+      if #available(iOS 11.0, *),  // if "Keyboards" is an option in our app's settings menu
+         let appSettings = URL(string: UIApplication.openSettingsURLString) {
+        UIApplication.shared.openURL(appSettings)
+      } else {
+        let setUpVC = SetUpViewController()
+        mainViewController.present(setUpVC, animated: true, completion: nil)
+      }
+
+      // While it'd be nice to keep it in view, it seems to be automatically dismissed.
+      // This at least helps keep the app's state properly managed.
       mainViewController.dismissGetStartedView(nil)
-      let setUpVC = SetUpViewController()
-      mainViewController.present(setUpVC, animated: true, completion: nil)
     case 2:
       mainViewController.dismissGetStartedView(nil)
       mainViewController.infoButtonClick(nil)

@@ -2,6 +2,7 @@
 
 ## 2020-01-30 13.0.32 beta
 * Bug fix: Predictive-text tweaks for RTL language lexical models (#2553, #2554)
+* Bug fix: Fixed external keyboard key "tab" for embedded devices (#2546)
 
 ## 2020-01-28 13.0.31 beta
 * Start version 13.0

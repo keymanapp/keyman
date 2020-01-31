@@ -145,7 +145,7 @@ namespace com.keyman.dom {
       // only executes when com.keyman.DOMEventHandlers is defined.
       //
       // We also bypass this whenever operating in the embedded format.
-      if(com && com.keyman && com.keyman['DOMEventHandlers'] && !com.keyman.singleton.isEmbedded) {
+      if(com && com.keyman && com.keyman['DOMEventHandlers'] && !com.keyman['singleton']['isEmbedded']) {
         let DOMEventHandlers = com.keyman['DOMEventHandlers'];
 
         let selectionStart = element.selectionStart;
