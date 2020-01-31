@@ -1,6 +1,7 @@
 # Keyman for iPhone and iPad Version History
 
 ## 2020-01-30 13.0.62 beta
+* Feature: Initial keyboard setup process simplified with direct Settings link [iOS 11.0+ only] (#2548)
 * Bug fix: System keyboard now respects "Sounds > Keyboard Clicks" setting (#2550)
 
 ## 2020-01-29 13.0.61 beta
