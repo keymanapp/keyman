@@ -55,7 +55,7 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <string.h>
-
+#include <keyman/keyboardprocessor.h>
 
 #include "keymanutil.h"
 #include "kmpdetails.h"
@@ -299,6 +299,131 @@ ibus_keyman_get_component (void)
     g_list_free (engines);
     return component;
 }
+
+
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+//
+// Parameters:
+// package_id (gchar *): Package ID
+// keyboard_id (gchar *): Keyboard ID
+//
+// Returns a newly allocated ghcar**;
+gchar**
+keyman_get_options_fromdconf(gchar *package_id,
+                              gchar *keyboard_id)
+{
+    g_message("keyman_get_options_fromdconf");
+
+    // Obtain keyboard options from DConf
+    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
+    GSettings *child_settings = g_settings_new_with_path(KEYMAN_CHILD_DCONF_NAME, path);
+    gchar **options = NULL;
+    if (child_settings != NULL)
+    {
+        options = g_settings_get_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY);
+    }
+
+    g_free(path);
+
+    return options;
+}
+
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+//
+// Parameters:
+// package_id (gchar *): Package ID
+// keyboard_id (gchar *): Keyboard ID
+//
+// Return a newly allocated GQueue; free with g_queue_free_full()
+GQueue*
+keyman_get_options_queue_fromdconf(gchar *package_id,
+                             gchar *keyboard_id)
+{
+    g_message("keyman_get_options_queue_fromdconf");
+    GQueue *queue_options = g_queue_new();
+
+    // Obtain keyboard options from DConf
+    gchar **options = keyman_get_options_fromdconf(package_id, keyboard_id);
+
+    // Parse options into queue_options
+    if (*options != NULL)
+    {
+        int index = 0;
+        while (options[index] != NULL)
+        {
+            gchar **option_tokens = g_strsplit(options[index], "=", 2);
+            if (option_tokens != NULL && option_tokens[0] != NULL && option_tokens[1] != NULL)
+            {
+                g_message("Keyboard Option [%d], %s=%s", index, option_tokens[0], option_tokens[1]);
+                km_kbp_option_item *opt = g_new0(km_kbp_option_item, 1);
+                opt[0].scope = KM_KBP_OPT_KEYBOARD;
+                km_kbp_cp *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
+                opt[0].key = ocp;
+                ocp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
+                opt[0].value = ocp;
+                g_queue_push_tail(queue_options, opt);
+            }
+        index++;
+        }
+    }
+
+    return queue_options;
+}
+
+void
+keyman_put_options_todconf(gchar *package_id, 
+                           gchar *keyboard_id,
+                           gchar *option_key,
+                           gchar *option_value)
+{
+    g_message("keyman_put_options_todconf");
+    if (package_id == NULL || keyboard_id == NULL || option_key == NULL || option_value == NULL)
+    {
+        return;
+    }
+
+    // Obtain keyboard options from DConf
+    gchar **options = keyman_get_options_fromdconf(package_id, keyboard_id);
+    gchar *needle = g_strdup_printf("%s=", option_key);
+    gchar *kvp = g_strdup_printf("%s=%s", option_key, option_value);
+
+    // See if option_key already exists
+    if (*options != NULL)
+    {
+        int index = 0;
+        gboolean option_updated = FALSE;
+        while (options[index] != NULL)
+        {
+            if (g_strrstr(options[index], needle) != NULL)
+            {
+                options[index] = kvp;
+                option_updated = TRUE;
+                break;
+            }
+            index++;
+        }
+
+        if (!option_updated)
+        {
+            // Resize to add new option and null-terminate
+            options = g_realloc(options, strlen(kvp) * sizeof(gchar) + sizeof(gchar));
+            options[index] = kvp;
+            options[index+1] = '\0';
+        }
+    }
+
+    // Write to DConf
+    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
+    GSettings *child_settings = g_settings_new_with_path(KEYMAN_CHILD_DCONF_NAME, path);
+    if (child_settings != NULL)
+    {
+        g_message("writing keyboard options to DConf");
+        g_settings_set_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY, options);
+    }
+}
+
 
 #ifdef DEBUG
 #include <locale.h>

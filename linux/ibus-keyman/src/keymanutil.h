@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2018 SIL International
+ * Copyright (C) 2018, 2020 SIL International
  *
  * kmflutil is dual licensed under the MIT or GPL licenses as described below.
  *
@@ -53,9 +53,35 @@
 #define __KEYMANUTIL_H__
 
 #include <ibus.h>
+#include <gmodule.h>
+
 #include <keyman/keyboardprocessor.h>
+
+// Number of default Keyboard processor environment options for: "platform", "baseLayout", and "baseLayoutAlt"
+#define KEYMAN_ENVIRONMENT_OPTIONS 3
+
+// Path information for Keyman keyboard options in DConf
+#define KEYMAN_DCONF_NAME "com.keyman.options"
+#define KEYMAN_CHILD_DCONF_NAME "com.keyman.options.child"
+#define KEYMAN_DCONF_PATH "/desktop/ibus/keyman/options/"
+#define KEYMAN_DCONF_OPTIONS_KEY "options"
 
 void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
+
+gchar**  keyman_get_options_fromdconf
+                                            (gchar *package_id,
+                                             gchar *keyboard_id);
+
+GQueue*  keyman_get_options_queue_fromdconf
+                                            (gchar *package_id,
+                                             gchar *keyboard_id);
+
+void keyman_put_options_todconf
+                                            (gchar *package_id, 
+                                             gchar *keyboard_id,
+                                             gchar *option_key,
+                                             gchar *option_value);
+
 #endif

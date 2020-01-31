@@ -27,7 +27,6 @@
 
 #include <gdk/gdk.h>
 #include <gio/gio.h>
-#include <gmodule.h>
 #include <keyman/keyboardprocessor.h>
 
 #include "keymanutil.h"
@@ -119,10 +118,6 @@ static void ibus_keyman_engine_property_hide
 static void ibus_keyman_engine_commit_string
                                             (IBusKeymanEngine         *kmfl,
                                              const gchar            *string);
-
-static GQueue*  ibus_keyman_engine_keyboard_options   
-                                            (gchar *package_id,
-                                             gchar *keyboard_id);
 
 static IBusEngineClass *parent_class = NULL;
 
@@ -334,7 +329,7 @@ ibus_keyman_engine_constructor (GType                   type,
     // Retrieve keyboard options from DConf
     // TODO: May need unique packageID and keyboard ID
     g_message("Loading options for kb_name: %s", keyman->kb_name);
-    GQueue *queue_options = ibus_keyman_engine_keyboard_options(keyman->kb_name, keyman->kb_name);
+    GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
     int num_options = g_queue_get_length(queue_options);
 
     // Allocate enough options for: 3 environments plus num_options plus 1 pad struct of 0's
@@ -832,7 +827,10 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     {
                         g_message("Saving keyboard option to DConf");
                         // Load the current keyboard options from DConf
-                        GQueue *queue_options = ibus_keyman_engine_keyboard_options(keyman->kb_name, keyman->kb_name);
+                        keyman_put_options_todconf(keyman->kb_name, keyman->kb_name, action_items[i].option->key, action_items[i].option->value);
+
+                        /*
+                        GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
                         int num_options = g_queue_get_length(queue_options);
                         gchar *option_kvp = g_strdup_printf("'%s=%s'", action_items[i].option->key, action_items[i].option->value);
                         gboolean kvp_added = FALSE;
@@ -840,7 +838,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                         // Update with the keyboard option to save
                         for(int i=0; i<num_options; i++)
                         {
-                            if (g_strcasecmp(queue_options[i], option_kvp == 0)
+                            if (g_strcasecmp(queue_options[i].op, option_kvp) == 0)
                             {
                                 queue_options[i] = option_kvp;
                                 kvp_added = TRUE;
@@ -855,6 +853,7 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                         // Write keyboard options back to DConf
 
                         g_queue_free_full(queue_options, NULL);
+                        */
                     }
                 }
                 break;
@@ -1040,53 +1039,4 @@ ibus_keyman_engine_property_activate (IBusEngine  *engine,
     parent_class->property_activate (engine, prop_name, prop_state);
 }
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
-// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
-//
-// Parameters:
-// package_id (gchar *): Package ID
-// keyboard_id (gchar *): Keyboard ID
-//
-// Return a newly allocated GQueue; free with g_queue_free_full()
-static GQueue*
-ibus_keyman_engine_keyboard_options(gchar *package_id,
-                                    gchar *keyboard_id)
-{
-    g_message("ibus_keyman_engine_keyboard_options");
-    GQueue *queue_options = g_queue_new();
 
-    // Obtain keyboard options from DConf
-    gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_PATH, package_id, keyboard_id);
-    GSettings *child_settings = g_settings_new_with_path(KEYMAN_CHILD_DCONF_NAME, path);
-    gchar **options = NULL;
-    if (child_settings != NULL)
-    {
-        options = g_settings_get_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY);
-    }
-
-    // Parse options into queue_options
-    if (*options != NULL)
-    {
-        int index = 0;
-        while (options[index] != NULL)
-        {
-            gchar **option_tokens = g_strsplit(options[index], "=", 2);
-            if (option_tokens != NULL && option_tokens[0] != NULL && option_tokens[1] != NULL)
-            {
-                g_message("Keyboard Option [%d], %s=%s", index, option_tokens[0], option_tokens[1]);
-                km_kbp_option_item *opt = g_new0(km_kbp_option_item, 1);
-                opt[0].scope = KM_KBP_OPT_KEYBOARD;
-                km_kbp_cp *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
-                opt[0].key = ocp;
-                ocp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
-                opt[0].value = ocp;
-                g_queue_push_tail(queue_options, opt);
-            }
-        index++;
-        }
-    }
-
-    g_free(path);
-
-    return queue_options;
-}
