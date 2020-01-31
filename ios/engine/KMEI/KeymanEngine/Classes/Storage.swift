@@ -235,7 +235,7 @@ extension Storage {
     dst.userDefaults.synchronize()
   }
 
-  private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL, excludeFromBackup: Bool = true) throws {
+  private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL, excludeFromBackup: Bool = false) throws {
     guard let srcURL = bundle.url(forResource: resourceName, withExtension: nil) else {
       let message = "Could not locate \(resourceName) in the Keyman bundle"
       throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
@@ -265,7 +265,7 @@ extension Storage {
   static func copy(at src: URL,
                    to dst: URL,
                    shouldOverwrite: Bool = true,
-                   excludeFromBackup: Bool = true) throws {
+                   excludeFromBackup: Bool = false) throws {
     let fm = FileManager.default
 
     var isDirectory: ObjCBool = false
