@@ -810,9 +810,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
-      try Storage.copyAndExcludeFromBackup(at: url,
-                                           to: keyboardDir.appendingPathComponent(url.lastPathComponent),
-                                           shouldOverwrite: shouldOverwrite)
+      try Storage.copy(at: url,
+                       to: keyboardDir.appendingPathComponent(url.lastPathComponent),
+                       shouldOverwrite: shouldOverwrite,
+                       excludeFromBackup: true)
     }
   }
 

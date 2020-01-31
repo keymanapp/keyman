@@ -157,35 +157,43 @@ extension Storage {
   func copyKMWFiles(from bundle: Bundle) throws {
     try Storage.copy(from: bundle,
                      resourceName: Resources.kmwFilename,
-                     dstDir: baseDir)
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
-                     dstDir: baseDir)
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
     // For debug compilations - IF we have a sourcemap file, copy that over too.
     if bundle.url(forResource: "keyman.js.map", withExtension: nil) != nil {
       try Storage.copy(from: bundle,
                        resourceName: "keyman.js.map",
-                       dstDir: baseDir)
+                       dstDir: baseDir,
+                       excludeFromBackup: true)
     }
     try Storage.copy(from: bundle,
                      resourceName: "kmwosk.css",
-                     dstDir: baseDir)
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "keymanweb-osk.ttf",
-                     dstDir: baseDir)
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
     let defaultKeyboardDir = self.keyboardDir(forID: Defaults.keyboard.id)
     let defaultLexicalModelDir = self.lexicalModelDir(forID: Defaults.lexicalModel.id)
     try FileManager.default.createDirectory(at: defaultKeyboardDir, withIntermediateDirectories: true)
     try FileManager.default.createDirectory(at: defaultLexicalModelDir, withIntermediateDirectories: true)
     try Storage.copy(from: bundle,
                      resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
-                     dstDir: defaultKeyboardDir)
+                     dstDir: defaultKeyboardDir,
+                     excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "DejaVuSans.ttf",
-                     dstDir: defaultKeyboardDir)
+                     dstDir: defaultKeyboardDir,
+                     excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "\(Defaults.lexicalModel.id)-\(Defaults.lexicalModel.version).model.kmp",
-                     dstDir: defaultLexicalModelDir)
+                     dstDir: defaultLexicalModelDir,
+                     excludeFromBackup: true)
 
     // Perform an auto-install of the lexical model's KMP if not already installed.
     let lexicalModelURLasZIP = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
@@ -197,7 +205,7 @@ extension Storage {
 
     // Because of how our .zip dependency works, we need to make the .kmp look like a .zip.  A simple rename will do.
     do {
-      try Storage.copyAndExcludeFromBackup(at: lexicalModelURL, to: lexicalModelURLasZIP)
+      try Storage.copy(at: lexicalModelURL, to: lexicalModelURLasZIP, excludeFromBackup: true)
       let downloader = ResourceDownloadQueue()
 
       // Hijacking the download queue's KMP installer.
@@ -227,20 +235,20 @@ extension Storage {
     dst.userDefaults.synchronize()
   }
 
-  private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL) throws {
+  private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL, excludeFromBackup: Bool = true) throws {
     guard let srcURL = bundle.url(forResource: resourceName, withExtension: nil) else {
       let message = "Could not locate \(resourceName) in the Keyman bundle"
       throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
     }
     let dstURL = dstDir.appendingPathComponent(srcURL.lastPathComponent)
 
-    return try Storage.copyAndExcludeFromBackup(at: srcURL, to: dstURL)
+    return try Storage.copy(at: srcURL, to: dstURL, excludeFromBackup: true)
   }
 
   private static func copyDirectoryContents(at srcDir: URL, to dstDir: URL) throws {
     let srcContents = try FileManager.default.contentsOfDirectory(at: srcDir, includingPropertiesForKeys: [])
     for srcFile in srcContents {
-      try Storage.copyAndExcludeFromBackup(at: srcFile, to: dstDir.appendingPathComponent(srcFile.lastPathComponent))
+      try Storage.copy(at: srcFile, to: dstDir.appendingPathComponent(srcFile.lastPathComponent), excludeFromBackup: true)
     }
   }
 
@@ -254,9 +262,10 @@ extension Storage {
   }
 
   /// Copy and exclude from iCloud backup if `src` is newer than `dst`. Does nothing for a directory.
-  static func copyAndExcludeFromBackup(at src: URL,
-                                       to dst: URL,
-                                       shouldOverwrite: Bool = true) throws {
+  static func copy(at src: URL,
+                   to dst: URL,
+                   shouldOverwrite: Bool = true,
+                   excludeFromBackup: Bool = true) throws {
     let fm = FileManager.default
 
     var isDirectory: ObjCBool = false
@@ -278,6 +287,9 @@ extension Storage {
     } else {
       return
     }
-    try Storage.addSkipBackupAttribute(to: dst)
+
+    if excludeFromBackup {
+      try Storage.addSkipBackupAttribute(to: dst)
+    }
   }
 }
