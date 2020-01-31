@@ -6,24 +6,24 @@
 
 default:
     @echo The following make targets are available:
-    @echo ï¿½ï¿½ï¿½ï¿½buildï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½builds everything except help files (-DBUILDHELP to build help)
-    @echo ï¿½ï¿½ï¿½ï¿½install ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½installs packages into Delphi IDE (run after a build)
-    @echo ï¿½ï¿½ï¿½ï¿½cleanï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½removes all temp files
-    @echo ï¿½ï¿½ï¿½ï¿½releaseï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½make a release
-    @echo ï¿½ï¿½ï¿½ï¿½web-installï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sends the documentation to the website
-    @echo ï¿½ï¿½ï¿½ï¿½test-certificateï¿½ï¿½ï¿½ï¿½ï¿½ï¿½create a test certificate + CA (and install test CA)
-    @echo ï¿½ï¿½ï¿½ï¿½signcodeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sign the build artifacts
+    @echo     build                 builds everything except help files (-DBUILDHELP to build help)
+    @echo     install               installs packages into Delphi IDE (run after a build)
+    @echo     clean                 removes all temp files
+    @echo     release               make a release
+    @echo     web-install           sends the documentation to the website
+    @echo     test-certificate      create a test certificate + CA (and install test CA)
+    @echo     signcode              sign the build artifacts
     @echo.
-    @echo ï¿½ï¿½ï¿½ï¿½Build flags:
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DEBUG ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Include debug information
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½SC_TIMESTAMP ï¿½ï¿½ï¿½Don't timestamp certificates (for internal releases only, offline)
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BUILDHELP ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Build the helpfiles (implicit when 'make release')
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½LINT ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Turns on $MESSAGE hints and warnings and all extra string warnings
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½QUIET ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ignore hints and warnings
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½RELEASE_OEM ï¿½ï¿½ï¿½ï¿½Build executables for third party products in oem folder (e.g. FirstVoices)
+    @echo     Build flags:
+    @echo           DEBUG           Include debug information
+    @echo           SC_TIMESTAMP    Don't timestamp certificates (for internal releases only, offline)
+    @echo           BUILDHELP       Build the helpfiles (implicit when 'make release')
+    @echo           LINT            Turns on $MESSAGE hints and warnings and all extra string warnings
+    @echo           QUIET           Ignore hints and warnings
+    @echo           RELEASE_OEM     Build executables for third party products in oem folder (e.g. FirstVoices)
     @echo.
-    @echo ï¿½ï¿½ï¿½ï¿½To view help on the build process, in /src/inst, run:
-    @echo ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½make help
+    @echo     To view help on the build process, in /src/inst, run:
+    @echo           make help
     @echo.
 
 # ----------------------------------------------------------------------
