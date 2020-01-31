@@ -26,6 +26,14 @@
 
 #include <ibus.h>
 
+#define KEYMAN_DCONF_NAME "com.keyman.options"
+#define KEYMAN_CHILD_DCONF_NAME "com.keyman.options.child"
+#define KEYMAN_DCONF_PATH "/desktop/ibus/keyman/options/"
+#define KEYMAN_DCONF_OPTIONS_KEY "options"
+
+// Number of default Keyboard processor environment options for: "platform", "baseLayout", and "baseLayoutAlt"
+#define KEYMAN_ENVIRONMENT_OPTIONS 3
+
 #define IBUS_TYPE_KEYMAN_ENGINE	\
 	(ibus_keyman_engine_get_type ())
 
