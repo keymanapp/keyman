@@ -1,4 +1,8 @@
 #!/bin/bash
+
+echo "**TODO** Update script to work with new history/versioning"
+exit 1
+
 FAIL=0
 ./validateHistory.sh android || FAIL=$(($FAIL + 1))
 ./validateHistory.sh desktop || FAIL=$(($FAIL + 2))

@@ -1,3 +1,6 @@
+echo "**TODO** Update script to work with new history/versioning"
+exit 1
+
 _hu_base_dir=$(dirname "$BASH_SOURCE")/..
 
 . $_hu_base_dir/resources/historyUtils.sh

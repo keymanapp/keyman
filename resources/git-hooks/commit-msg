@@ -16,7 +16,7 @@
 # Configurable options for types, scopes and message length.
 #
 
-types=(fix feat chore change docs style refactor test)
+types=(fix feat chore change docs style refactor test auto)
 scopes=(android ci common developer ios linux mac web windows)
 min_length=4
 max_length=72

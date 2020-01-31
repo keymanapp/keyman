@@ -719,7 +719,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# check that our PRODUCT_VERSION matches this git branch's KM_VERSION from ../../resources/VERSION.md\n(cd .. ; ./is_same_version.sh Keyman4MacIM || exit 1 ; cd -)\n";
+			shellScript = "# check that our PRODUCT_VERSION matches this git branch's VERSION from ../../VERSION.md\n(cd .. ; ./is_same_version.sh Keyman4MacIM || exit 1 ; cd -)\n";
 			showEnvVarsInLog = 0;
 		};
 		D2FF67BB6C749BA6861F5E25 /* [CP] Check Pods Manifest.lock */ = {
@@ -969,7 +969,7 @@
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = "keyman.inputmethod.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 13.0;
+				PRODUCT_VERSION = 0.0.1;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -1009,7 +1009,7 @@
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = "keyman.inputmethod.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PRODUCT_VERSION = 13.0;
+				PRODUCT_VERSION = 0.0.1;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_INSTALLED_PRODUCT = YES;

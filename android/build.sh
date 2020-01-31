@@ -1,12 +1,11 @@
 #!/bin/sh
 # Build Keyman Engine Android and KMAPro
 
-die () {
-    echo
-    echo "$*"
-    echo
-    exit 1
-}
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 #
 # Prevents 'clear' on exit of mingw64 bash shell
@@ -17,7 +16,7 @@ echo Build KMEA and KMAPro:
 
 # Building Keyman Engine for Android
 
-cd KMEA
+cd "$KEYMAN_ROOT/android/KMEA"
 ./build.sh "$@"
 
 if [ $? -ne 0 ]; then
@@ -26,19 +25,19 @@ fi
 
 # Building Keyman for Android
 
-cd ../KMAPro
+cd "$KEYMAN_ROOT/android/KMAPro"
 ./build.sh "$@"
 
 if [ $? -ne 0 ]; then
     die "ERROR: KMAPro/build.sh failed"
 fi
 
-cd ../
+cd "$KEYMAN_ROOT/android"
 
 # Building OEM apps
 
 if [ ! -z "$RELEASE_OEM" ]; then
-  pushd ../oem/firstvoices/android
+  pushd "$KEYMAN_ROOT/oem/firstvoices/android"
   ./build.sh -lib-nobuild "$@"
 
   if [ $? -ne 0 ]; then

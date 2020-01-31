@@ -8,7 +8,13 @@
 
 set -e
 
-BASEDIR=`pwd`
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+BASEDIR="$KEYMAN_ROOT/linux"
 echo "basedir is $BASEDIR"
 autotool_projects="kmflcomp libkmfl ibus-kmfl ibus-keyman"
 extra_projects="keyboardprocessor keyman-config"
@@ -32,20 +38,8 @@ if [ "$1" != "" ]; then
     fi
 fi
 
-if [ -n "$SKIPVERSION" -a -f OLDVERSION ]; then
-    oldvers=$(cat OLDVERSION)
-    newvers=$(cat VERSION)
-else
-    JENKINS=${JENKINS:="no"}
-    oldvers=`cat VERSION`
-
-    . $(dirname "$0")/version.sh
-
-    version
-
-    echo "version: ${newvers}"
-    echo "${newvers}" > VERSION
-fi
+. "$BASEDIR/scripts/version.sh"
+version
 
 # autoreconf the projects
 for proj in ${autotool_projects}; do
@@ -60,6 +54,8 @@ done
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         rm -rf keyboardprocessor
+        #TODO: update meson version to 0.50.0+ and use `meson rewrite`
+        #meson rewrite kwargs set project / version "${newvers}"
         sed -i "s/version: '.*'/version: '${newvers}'/" ../common/engine/keyboardprocessor/meson.build
         meson ../common/engine/keyboardprocessor keyboardprocessor
     fi
@@ -67,10 +63,7 @@ for proj in ${extra_projects}; do
         cd keyman-config
         make clean
         cd keyman_config
-        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${oldvers}/g" version.py.in > version.py
+        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" version.py.in > version.py
     fi
     cd $BASEDIR
 done
-
-# reset VERSION file
-echo "${oldvers}" > VERSION

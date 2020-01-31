@@ -101,7 +101,7 @@ To upload the packages to launchpad, run the following script from the `linux/` 
 ```
 **Parameters**  
 UPLOAD="yes" do the dput for real  
-TIER="\<tier>" alpha, beta, or stable, default beta  
+TIER="\<tier>" alpha, beta, or stable, default from ../TIER.md
 PROJECT="\<project>" only upload this project  
 DIST="\<dist>" only upload for this distribution  
 PACKAGEVERSION="\<version>" normally use the default so don't specify it. But if you change packaging and run another upload you need to increment the number at the end of `PACKAGEVERSION`. e.g. next one is `1~sil2` then `1~sil3`...
@@ -122,13 +122,6 @@ You may want to install extra packages to get other ibus input methods e.g ibus-
 Run `ibus restart` after installing any of them
 
 #### Getting a Keyman keyboard
-
-- There are some kmfl keyboards available on packages.sil.org. Search for "kmfl-keyboard". These will also install the ibus-kmfl package.
-
-- You can find more `.kmn` source keyboards at the [Keyboards repo](https://github.com/keymanapp/keyboards). They may or may not currently work with KMFL.
-
-- The `.kmn` file should be put in `/usr/share/kmfl` or `~/.kmfl`, preferably `~/.kmfl`
-    * TODO: let ibus-kmfl find keyboards in `/usr/local/share/kmfl` as well
 
 - After installing a Keyman keyboard you need to run `ibus restart` so that ibus will look for it. (TODO: double check this)
 
