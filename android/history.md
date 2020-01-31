@@ -3,6 +3,7 @@
 ## 2020-01-31 13.0.6051 beta
 * Bug fix:
   * Fix cancelling dictionary update notifications (#2547)
+  * Fix external keyboard key "tab" (updated Keyman Web Engine #2546)
 
 ## 2020-01-28 13.0.6050 beta
 * New Features:
