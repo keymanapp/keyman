@@ -27,24 +27,24 @@ If applicable, add screenshots to help explain your problem.
 
 (Delete the irrelevant sections)
 
-**Keyman Desktop, Keyman for macOS, Keyman for Linux (please complete the following information):**
+**Keyman Desktop, Keyman for macOS, Keyman for Linux:**
  - OS: [e.g. Windows 7, Windows 10 1803, macOS Mojave, Ubuntu 18.04]
  - Keyman version: [e.g. 10.0.1206.0]
  - Target Application: [e.g. Firefox 55]
   
-**iPhone/iPad/Android (please complete the following information):**
+**iPhone/iPad/Android:**
  - Device: [e.g. iPhone 6]
  - OS: [e.g. iOS 8.1]
  - Keyman version [e.g. 10.0.111]
  - Target application: [e.g. Notes, Keyman]
 
-**KeymanWeb (please complete the following information):
+**KeymanWeb:**
  - OS: [e.g. Windows 7, Windows 10 1803, macOS Mojave, Ubuntu 18.04, Android 8.1]
  - Browser: [e.g. Chrome, Firefox]
  - KeymanWeb Version: [e.g. 10.0.201]
  - URL: [e.g. https://example.com/web_keyboard/]
  
-**Keyman Developer (please complete the following information):
+**Keyman Developer:**
  - OS: [e.g. Windows 7, Windows 10 1803]
  - Keyman Developer version: [e.g. 10.0.1206.0]
  
