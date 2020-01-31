@@ -1,5 +1,8 @@
 # Keyman for iPhone and iPad Version History
 
+## 2020-01-30 13.0.62 beta
+* Bug fix: System keyboard now respects "Sounds > Keyboard Clicks" setting (#2550)
+
 ## 2020-01-29 13.0.61 beta
 * Bug fix: System keyboard would sometimes appear blank (#2545)
 
