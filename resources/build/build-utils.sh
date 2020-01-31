@@ -1,14 +1,16 @@
 #!/bin/bash
 #
 # This script sets build environment variables:
-#   VERSION:         Full current build version, e.g. "14.0.1"
-#   VERSION_WIN:     Full current build version for Windows, e.g. "14.0.1.0"
-#   VERSION_RELEASE: Current release version, e.g. "14.0"
-#   VERSION_MAJOR:   Major version, e.g. "14"
-#   VERSION_MINOR:   Minor version, e.g. "0"
-#   VERSION_PATCH:   Patch version, e.g. "1"
-#   TIER:            Current tier, one of "alpha", "beta" or "stable"
-#   KEYMAN_ROOT:     fully resolved root path of Keyman repository
+#   VERSION:          Full current build version, e.g. "14.0.1"
+#   VERSION_WIN:      Full current build version for Windows, e.g. "14.0.1.0"
+#   VERSION_RELEASE:  Current release version, e.g. "14.0"
+#   VERSION_MAJOR:    Major version, e.g. "14"
+#   VERSION_MINOR:    Minor version, e.g. "0"
+#   VERSION_PATCH:    Patch version, e.g. "1"
+#   TIER:             Current tier, one of "alpha", "beta" or "stable"
+#   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-pr-1234][-local]
+#   VERSION_WITH_TAG: e.g. "14.0.1-alpha-pr-1234" or "14.0.5-beta-local"
+#   KEYMAN_ROOT:      fully resolved root path of Keyman repository
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
@@ -54,12 +56,39 @@ function findVersion() {
     # Used for Windows, which requires a four part version string
     VERSION_WIN="$VERSION.0"
 
+    #
+    # Build a tag to append to the version string. This is not assigned
+    # to the version number used in the projects but may be used as a 
+    # display string and in TeamCity configuration
+    #
+
+    if [ "$TIER" == "alpha" ] || [ "$TIER" == "beta" ]; then
+        VERSION_TAG="-$TIER"
+    else
+        VERSION_TAG=
+    fi 
+
+    if [ -z "${TEAMCITY_VERSION-}" ]; then
+        # Local dev machine, not TeamCity
+        VERSION_TAG="$VERSION_TAG-local"
+    else
+        # On TeamCity; are we running a pull request build or
+        # a master/beta/stable build?
+        if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+            VERSION_TAG="$VERSION_TAG-pr-$TEAMCITY_PR_NUMBER"
+        fi
+    fi
+
+    VERSION_WITH_TAG="$VERSION$VERSION_TAG"
+
     readonly VERSION
     readonly VERSION_MAJOR
     readonly VERSION_MINOR
     readonly VERSION_PATCH
     readonly VERSION_RELEASE
     readonly VERSION_WIN
+    readonly VERSION_TAG
+    readonly VERSION_WITH_TAG
 }
 
 function findTier() {
@@ -71,18 +100,28 @@ function findTier() {
     }
 }
 
+function printBuildNumberForTeamCity() {
+    echo "##teamcity[buildNumber '$VERSION_WITH_TAG']"
+}
+
 function printVersionUtilsDebug() {
-    echo "KEYMAN_ROOT:     $KEYMAN_ROOT"
-    echo "VERSION:         $VERSION"
-    echo "VERSION_WIN:     $VERSION_WIN"
-    echo "VERSION_RELEASE: $VERSION_RELEASE"
-    echo "VERSION_MAJOR:   $VERSION_MAJOR"
-    echo "VERSION_MINOR:   $VERSION_MINOR"
-    echo "VERSION_PATCH:   $VERSION_PATCH"
-    echo "TIER:            $TIER"
+    echo "KEYMAN_ROOT:      $KEYMAN_ROOT"
+    echo "VERSION:          $VERSION"
+    echo "VERSION_WIN:      $VERSION_WIN"
+    echo "VERSION_RELEASE:  $VERSION_RELEASE"
+    echo "VERSION_MAJOR:    $VERSION_MAJOR"
+    echo "VERSION_MINOR:    $VERSION_MINOR"
+    echo "VERSION_PATCH:    $VERSION_PATCH"
+    echo "TIER:             $TIER"
+    echo "VERSION_TAG:      $VERSION_TAG"
+    echo "VERSION_WITH_TAG: $VERSION_WITH_TAG"
 }
 
 findRepositoryRoot
-findVersion
 findTier
-#printVersionUtilsDebug
+findVersion
+# printVersionUtilsDebug
+
+if [ ! -z "${TEAMCITY_VERSION-}" ]; then
+    printBuildNumberForTeamCity
+fi
