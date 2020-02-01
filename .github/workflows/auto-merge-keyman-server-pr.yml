@@ -21,8 +21,9 @@ jobs:
       with:
         github-token: "${{ secrets.GITHUB_TOKEN }}"
     - name: auto merge PR from keyman-server
-      uses: ridedott/merge-me-action@v1.1.3
+      uses: "pascalgn/automerge-action@7854d3bd607dccdaf0b2c134b699a812c8960213"
       if: github.actor == 'keyman-server'
-      with:
-        GITHUB_LOGIN: keyman-server
+      env:
         GITHUB_TOKEN: "${{ secrets.AUTOINC_GITHUB_TOKEN }}"
+        MERGE_LABELS: ""
+        MERGE_FORKS: false
