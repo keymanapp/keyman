@@ -101,7 +101,17 @@ function findTier() {
 }
 
 function printBuildNumberForTeamCity() {
-    echo "##teamcity[buildNumber '$VERSION_WITH_TAG']"
+    if [ ! -z "${TEAMCITY_VERSION-}" ]; then
+        if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+            echo "##teamcity[buildNumber '$VERSION_WITH_TAG']"
+        else
+            # For alpha/beta builds, for now we don't append the
+            # version tag as buildNumber is used in the delivery
+            # of the build version. We may improve this in the 
+            # future.
+            echo "##teamcity[buildNumber '$VERSION']"
+        fi
+    fi
 }
 
 function printVersionUtilsDebug() {
@@ -121,7 +131,4 @@ findRepositoryRoot
 findTier
 findVersion
 # printVersionUtilsDebug
-
-if [ ! -z "${TEAMCITY_VERSION-}" ]; then
-    printBuildNumberForTeamCity
-fi
+printBuildNumberForTeamCity
