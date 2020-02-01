@@ -70,14 +70,39 @@ void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
 
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+//
+// Parameters:
+// package_id  (gchar *): Package ID
+// keyboard_id (gchar *): Keyboard ID
+//
+// Returns a newly allocated gchar**; free with g_strfreev()
 gchar**  keyman_get_options_fromdconf
                                             (gchar *package_id,
                                              gchar *keyboard_id);
 
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+//
+// Parameters:
+// package_id  (gchar *): Package ID
+// keyboard_id (gchar *): Keyboard ID
+//
+// Return a newly allocated GQueue; free with g_queue_free_full()
 GQueue*  keyman_get_options_queue_fromdconf
                                             (gchar *package_id,
                                              gchar *keyboard_id);
 
+// Write new keyboard option to DConf.
+// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+// If the option key already exists, the value is updated. Otherwise a new string 'option_key=option_value' is appended.
+//
+// Parameters:
+// package_id   (gchar *): Package ID
+// keyboard_id  (gchar *): Keyboard ID
+// option_key   (gchar *): Key for the new option
+// option_value (gchar *): Value of the new option
 void keyman_put_options_todconf
                                             (gchar *package_id, 
                                              gchar *keyboard_id,

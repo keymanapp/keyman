@@ -827,33 +827,8 @@ ibus_keyman_engine_process_key_event (IBusEngine     *engine,
                     {
                         g_message("Saving keyboard option to DConf");
                         // Load the current keyboard options from DConf
-                        keyman_put_options_todconf(keyman->kb_name, keyman->kb_name, action_items[i].option->key, action_items[i].option->value);
-
-                        /*
-                        GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
-                        int num_options = g_queue_get_length(queue_options);
-                        gchar *option_kvp = g_strdup_printf("'%s=%s'", action_items[i].option->key, action_items[i].option->value);
-                        gboolean kvp_added = FALSE;
-
-                        // Update with the keyboard option to save
-                        for(int i=0; i<num_options; i++)
-                        {
-                            if (g_strcasecmp(queue_options[i].op, option_kvp) == 0)
-                            {
-                                queue_options[i] = option_kvp;
-                                kvp_added = TRUE;
-                                break;
-                            }
-                        }
-                        if (!kvp_added) 
-                        {
-                            g_queue_push_tail(queue_options, option_kvp);
-                        }
-
-                        // Write keyboard options back to DConf
-
-                        g_queue_free_full(queue_options, NULL);
-                        */
+                        keyman_put_options_todconf(keyman->kb_name, keyman->kb_name,
+                                action_items[i].option->key, action_items[i].option->value);
                     }
                 }
                 break;

@@ -305,13 +305,13 @@ ibus_keyman_get_component (void)
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
-// package_id (gchar *): Package ID
+// package_id  (gchar *): Package ID
 // keyboard_id (gchar *): Keyboard ID
 //
-// Returns a newly allocated ghcar**;
+// Returns a newly allocated gchar**; free with g_strfreev()
 gchar**
 keyman_get_options_fromdconf(gchar *package_id,
-                              gchar *keyboard_id)
+                             gchar *keyboard_id)
 {
     g_message("keyman_get_options_fromdconf");
 
@@ -324,6 +324,7 @@ keyman_get_options_fromdconf(gchar *package_id,
         options = g_settings_get_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY);
     }
 
+    g_object_unref(G_OBJECT(child_settings));
     g_free(path);
 
     return options;
@@ -333,13 +334,13 @@ keyman_get_options_fromdconf(gchar *package_id,
 // DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
 //
 // Parameters:
-// package_id (gchar *): Package ID
+// package_id  (gchar *): Package ID
 // keyboard_id (gchar *): Keyboard ID
 //
 // Return a newly allocated GQueue; free with g_queue_free_full()
 GQueue*
 keyman_get_options_queue_fromdconf(gchar *package_id,
-                             gchar *keyboard_id)
+                                   gchar *keyboard_id)
 {
     g_message("keyman_get_options_queue_fromdconf");
     GQueue *queue_options = g_queue_new();
@@ -365,15 +366,24 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
                 opt[0].value = ocp;
                 g_queue_push_tail(queue_options, opt);
             }
-        index++;
+            index++;
         }
     }
 
     return queue_options;
 }
 
+// Write new keyboard option to DConf.
+// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+// If the option key already exists, the value is updated. Otherwise a new string 'option_key=option_value' is appended.
+//
+// Parameters:
+// package_id   (gchar *): Package ID
+// keyboard_id  (gchar *): Keyboard ID
+// option_key   (gchar *): Key for the new option
+// option_value (gchar *): Value of the new option
 void
-keyman_put_options_todconf(gchar *package_id, 
+keyman_put_options_todconf(gchar *package_id,
                            gchar *keyboard_id,
                            gchar *option_key,
                            gchar *option_value)
@@ -389,13 +399,13 @@ keyman_put_options_todconf(gchar *package_id,
     gchar *needle = g_strdup_printf("%s=", option_key);
     gchar *kvp = g_strdup_printf("%s=%s", option_key, option_value);
 
-    // See if option_key already exists
     if (*options != NULL)
     {
         int index = 0;
         gboolean option_updated = FALSE;
         while (options[index] != NULL)
         {
+            // If option_key already exists, update value with option_value
             if (g_strrstr(options[index], needle) != NULL)
             {
                 options[index] = kvp;
@@ -408,10 +418,17 @@ keyman_put_options_todconf(gchar *package_id,
         if (!option_updated)
         {
             // Resize to add new option and null-terminate
-            options = g_realloc(options, strlen(kvp) * sizeof(gchar) + sizeof(gchar));
+            options = g_realloc(options, strlen(kvp) + 1);
             options[index] = kvp;
-            options[index+1] = '\0';
+            options[index+1] = NULL;
         }
+    }
+    else
+    {
+        // If options don't exist, allocate space for new option and null-terminate
+        options = g_malloc(strlen(kvp) + 1);
+        options[0] = kvp;
+        options[1] = NULL;
     }
 
     // Write to DConf
@@ -422,6 +439,12 @@ keyman_put_options_todconf(gchar *package_id,
         g_message("writing keyboard options to DConf");
         g_settings_set_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY, options);
     }
+
+    g_object_unref(G_OBJECT(child_settings));
+    g_free(path);
+    g_free(kvp);
+    g_free(needle);
+    g_free(options);
 }
 
 
