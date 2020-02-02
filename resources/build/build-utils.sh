@@ -42,7 +42,7 @@ function findRepositoryRoot() {
 
 function findVersion() {
     local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
-    VERSION=`cat $VERSION_MD`
+    VERSION=`cat $VERSION_MD | tr -d "[:space:]"`
     [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
         VERSION_MAJOR="${BASH_REMATCH[1]}"
         VERSION_MINOR="${BASH_REMATCH[2]}"
@@ -93,7 +93,7 @@ function findVersion() {
 
 function findTier() {
     local TIER_MD="$KEYMAN_ROOT/TIER.md"
-    TIER=`cat $TIER_MD`
+    TIER=`cat $TIER_MD | tr -d "[:space:]"`
     [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
         echo "Invalid TIER.md file: expected alpha, beta or stable."
         exit 1;
