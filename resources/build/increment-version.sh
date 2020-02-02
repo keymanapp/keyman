@@ -83,8 +83,6 @@ node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b 
 # Push the result
 #
 
-exit 1
-
 if [ "$action" == "commit" ]; then
   VERSION_MD="$KEYMAN_ROOT/VERSION.md"
   NEWVERSION=`cat $VERSION_MD | tr -d "[:space:]"`
@@ -92,10 +90,11 @@ if [ "$action" == "commit" ]; then
   pushd "$KEYMAN_ROOT" > /dev/null
   message="auto: increment $base version to $NEWVERSION"
   branch="auto/version-$base-$NEWVERSION"
+  git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
   git commit -m "$message"
-  git push origin "$branch"
+  git push --tags origin "$branch"
   hub pull-request -f --no-edit -b $base -l auto
   git checkout $base
   git branch -D "$branch"
