@@ -1,5 +1,8 @@
 # Keyman for Linux Version History
 
+## 2020-02-04 13.0.23 beta
+* Remove cosmic and disco releases. Add eoan (#2574)
+
 ## 2020-01-28 13.0.21 beta
 * Revert default tier to alpha (#2474)
 * Add QR Codes to share keyboards (#2486)
