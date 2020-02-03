@@ -50,7 +50,7 @@ fi
 if [ "${DIST}" != "" ]; then
     distributions="${DIST}"
 else
-    distributions="xenial bionic"
+    distributions="xenial bionic eoan"
 fi
 
 if [ "${PACKAGEVERSION}" != "" ]; then
