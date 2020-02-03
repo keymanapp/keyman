@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.4 alpha
+
+chore(ci): trigger builds after version increment (#2572)
+
 ## 14.0.3 alpha
 
 chore(ci): increment version final (#2568)
