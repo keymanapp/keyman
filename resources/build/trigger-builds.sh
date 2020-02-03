@@ -25,7 +25,6 @@ function triggerBuild() {
   local TEAMCITY_BUILDTYPE="$1"
   local TEAMCITY_VCS_ID="$2"
 
-# 2caf29b27b3b364433c9298ec4d032fd178a210e
   local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
 
