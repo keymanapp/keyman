@@ -18,15 +18,15 @@
 
 types=(fix feat chore change docs style refactor test auto)
 scopes=( \
-  android android/engine android/browser android/app \
+  android android/app android/browser android/engine android/oem \
   ci \
-  common common/core \
+  common common/core common/lmlayer \
   developer developer/compiler developer/ide developer/tools \
-  ios ios/engine ios/browser ios/app \
-  linux linux/ibus linux/engine linux/config \
-  mac mac/engine mac/config \
-  web web/engine web/lmlayer web/ui \
-  windows windows/engine windows/config \
+  ios ios/app ios/browser ios/engine ios/oem \
+  linux linux/config linux/engine linux/ibus linux/oem \
+  mac mac/config mac/engine mac/oem \
+  web web/engine web/oem web/ui \
+  windows windows/config windows/engine windows/oem \
 )
 min_length=4
 max_length=128
