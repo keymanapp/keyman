@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2020-02-03 13.0.33 beta
+* Bug fix: BKSP not working corrrectly with design-mode iframes (#2561)
+
 ## 2020-01-30 13.0.32 beta
 * Bug fix: Predictive-text tweaks for RTL language lexical models (#2553, #2554)
 * Bug fix: Fixed external keyboard key "tab" for embedded devices (#2546)
