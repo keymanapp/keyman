@@ -130,9 +130,12 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
 
   let changed = false;
 
+  const date = new Date().toISOString().substring(0,10);
+  const heading = `## ${version} ${tier} ${date}`;
+
   if(historyChunks.current.length == 0) {
     changed = true;
-    const heading = `## ${version} ${tier}`;
+
     console.log(`-- Adding ${heading}`);
     historyChunks.current.push(heading);
     historyChunks.current.push('');
@@ -173,6 +176,12 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
     // Formatting: add blank line at end of section if not there yet.
     historyChunks.current.push('');
     changed = true;
+  }
+
+  if(historyChunks.current.length) {
+    // We update the heading to refresh the date
+    // But we won't assume changes otherwise
+    historyChunks.current[0] = heading;
   }
 
   //
