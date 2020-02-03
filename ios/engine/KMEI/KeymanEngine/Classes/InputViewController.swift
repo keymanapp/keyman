@@ -74,9 +74,11 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     let innerView = keymanWeb.view!
 
     var guide: UILayoutGuide
+    var conditionalGuide: Bool = false
 
     if #available(iOSApplicationExtension 11.0, *) {
       guide = self.safeAreaLayoutGuide
+      conditionalGuide = true
     } else {
       guide = self.layoutMarginsGuide
     }
@@ -84,11 +86,21 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     // Fallback on earlier versions
     innerView.topAnchor.constraint(equalTo:    guide.topAnchor).isActive = true
     innerView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
-    innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
-    innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+    if conditionalGuide {
+      innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
+      innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+    } else {
+      innerView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+      innerView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+    }
 
     // Allow these to be broken if/as necessary to resolve layout issues.
-    let kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+    var kbdWidthConstraint: NSLayoutConstraint
+    if conditionalGuide {
+      kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+    } else {
+      kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: self.widthAnchor)
+    }
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
