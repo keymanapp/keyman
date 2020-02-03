@@ -16,10 +16,20 @@
 # Configurable options for types, scopes and message length.
 #
 
-types=(fix feat chore change docs style refactor test)
-scopes=(android ci common developer ios linux mac web windows)
+types=(fix feat chore change docs style refactor test auto)
+scopes=( \
+  android android/engine android/browser android/app \
+  ci \
+  common common/core \
+  developer developer/compiler developer/ide developer/tools \
+  ios ios/engine ios/browser ios/app \
+  linux linux/ibus linux/engine linux/config \
+  mac mac/engine mac/config \
+  web web/engine web/lmlayer web/ui \
+  windows windows/engine windows/config \
+)
 min_length=4
-max_length=72
+max_length=128
 
 #
 # Define terminal colours.
@@ -80,7 +90,7 @@ function build_regex() {
   remessage=".{$min_length,$max_length}[^.]"
   refixes="(\. Fixes #[[:digit:]]+)?"
 
-  regexp="^${retypes}${rescope}: ${remessage}${refixes}\s*$"
+  regexp="^${retypes}${rescope}: ${remessage}${refixes}[[:space:]]*$"
 }
 
 # Print out a standard error message which explains
