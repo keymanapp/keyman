@@ -3,7 +3,7 @@
 # If needed set cowbuilder up for building Keyman Debian packages
 # Then cowbuilder update
 
-distributions='bionic xenial'
+distributions='eoan bionic xenial'
 
 dpkgcheck=`dpkg-query -l cowbuilder`
 if [ $? != 0 ]; then
