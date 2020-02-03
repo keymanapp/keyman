@@ -19,6 +19,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
+
 gitbranch=`git branch --show-current`
 
 if [[ $# -gt 0 ]]; then
@@ -59,7 +61,6 @@ fi
 # avoid transient errors
 git pull origin $base
 
-
 #
 # Run the increment + history refresh
 #
@@ -69,15 +70,19 @@ npm install
 npm run build:ts
 popd > /dev/null
 
-pushd "$KEYMAN_ROOT"
-node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" || (
+pushd "$KEYMAN_ROOT" > /dev/null
+ABORT=0
+node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" || ABORT=1
+
+if [[ $ABORT = 1 ]]; then
   echo "Skipping version increment from $VERSION: no recently merged pull requests were found"
   if [ ! -z "${TEAMCITY_VERSION-}" ]; then
     # Send TeamCity a build status
     echo "##teamcity[buildStatus status='SUCCESS' text='Skipping version increment from $VERSION: no recently merged pull requests were found']"
   fi
   exit 0
-)
+fi
+popd > /dev/null
 
 #
 # Push the result
@@ -100,7 +105,17 @@ if [ "$action" == "commit" ]; then
   git branch -D "$branch"
   popd > /dev/null
 
-  echo "Version was incremented and pull request was created"
+  #
+  # Trigger builds for the previous version on TeamCity
+  #
+
+  triggerBuilds
+
+  #
+  # Done
+  #
+
+  echo "Version was incremented and pull request was created, and builds were triggered"
   if [ ! -z "${TEAMCITY_VERSION-}" ]; then
     # Send TeamCity a build status
     echo "##teamcity[buildStatus status='SUCCESS' text='Version was incremented from $VERSION to $NEWVERSION and pull request was created']"
