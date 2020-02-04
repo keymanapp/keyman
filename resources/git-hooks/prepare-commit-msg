@@ -4,10 +4,11 @@
 # This prepare-commit-msg hook prepares commit messages to ensure 
 # that they meet our conventional commit standard.
 #
+# Whenever `git` detects an incoming commit, it will trigger this hook.  If the message does not
+# our conventional commit format, it will set it to the following format.  (commit and merge only)
 #
-#   "type: message"
 #   "type(scope): message"
-#   Optionally, append ". Fixes #1234"
+#   If an issue number is detected at the front of the message and it is not a merge, also adds "___. Fixes #1234"
 #
 # Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 #
@@ -52,7 +53,6 @@ function prepend_scope() {
   # Step 1:  if the branch follows our preferred branch conventions, we can use that!
   branch=$(git rev-parse --abbrev-ref HEAD)
   build_regex
-  echo "branch: $branch"
 
   # Perform the actual regex check.
   if [[ $branch =~ $regexp ]]; then
@@ -73,13 +73,17 @@ function prepend_scope() {
     if [ -n "${ISSUE// }" ]; then # Refer to https://unix.stackexchange.com/a/146945 for explanation.
       # This technically does pass the conventional commits test - it doesn't -ensure- that the
       # "Fixes #____" section doesn't count toward the core message.
-      postfix="___. Fixes #$ISSUE"
+      postfix="\n"
+      postfix="${postfix}# Keyman Conventional Commit suggestions:\n"
+      postfix="${postfix}# - Consider appending the text \". Fixes #$ISSUE\" to your commit message."
     else
       postfix=""
     fi
-    prefix="$TYPE($SCOPE): $postfix"
+    prefix="$TYPE($SCOPE): "
     
-    echo -e "$prefix$(cat $COMMIT_MSG_FILE)" > $COMMIT_MSG_FILE
+    # Reuse any existing message text, wrapping it in our conventional commit formatting before
+    # presenting it to the user for any final edits.
+    echo -e "$prefix$(cat $COMMIT_MSG_FILE)$postfix" > $COMMIT_MSG_FILE
   fi
 
   # If it doesn't follow our branch-name format, we can't provide any help.
