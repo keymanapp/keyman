@@ -22,8 +22,10 @@ case $1 in
       # https://stackoverflow.com/a/39160850/1836776
       WinPWD=$(cmd //C cd)
       cmd //C "mklink $WinPWD\\.git\\hooks\\commit-msg $WinPWD\\resources\\git-hooks\\commit-msg"
+      cmd //C "mklink $WinPWD\\.git\\hooks\\prepare-commit-msg $WinPWD\\resources\\git-hooks\\prepare-commit-msg"
     else
       ln -sf "$PWD/resources/git-hooks/commit-msg" "$PWD/.git/hooks/commit-msg"
+      ln -sf "$PWD/resources/git-hooks/prepare-commit-msg" "$PWD/.git/hooks/prepare-commit-msg"
     fi
     ;;
   *)

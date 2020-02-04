@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#
+# This prepare-commit-msg hook prepares commit messages to ensure 
+# that they meet our conventional commit standard.
+#
+#
+#   "type: message"
+#   "type(scope): message"
+#   Optionally, append ". Fixes #1234"
+#
+# Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
+#
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+HOOK_DIRECTORY=`git rev-parse --git-dir`/hooks
+
+#
+# Configurable options for types, scopes and message length.
+#
+
+# Definitions from commit-msg; we should match the format.
+#
+# types=(fix feat chore change docs style refactor test)
+# scopes=(android ci common developer ios linux mac web windows)
+# min_length=4
+# max_length=72
+
+# Step 1 - is the prepared message already in our conventional commits format?
+$HOOK_DIRECTORY/commit-msg -q $COMMIT_MSG_FILE
+isConventional=$? # Grabs the exit code. 
+
+echo "pre-commit hook says hi"
+
+if [ $isConventional -eq 0 ]; then
+  # If so, great!  Don't do a thing!
+  exit 0
+fi

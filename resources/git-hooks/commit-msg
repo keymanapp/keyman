@@ -51,6 +51,15 @@ if (git remote -v | grep -E "origin|upstream" | grep -Eq "keyboards|lexical-mode
   exit 0
 fi
 
+# If this script is called by another hook, it may insert a -q parameter to silence the help text.
+QUIET=0
+case $1 in
+  -q|--quiet)
+    shift   # Remove the parameter, making it equivalent to a standard git-hook call.
+    QUIET=1
+    ;;
+esac
+
 # build the regex pattern based on the config file
 function build_regex() {
   retypes=
@@ -97,6 +106,8 @@ build_regex
 
 if [[ ! $msg =~ $regexp ]]; then
   # commit message is invalid according to config - block commit
-  print_error
+  if [ $QUIET -eq 0 ]; then
+    print_error
+  fi
   exit 1
 fi
