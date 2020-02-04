@@ -8,8 +8,8 @@
 #   VERSION_MINOR:    Minor version, e.g. "0"
 #   VERSION_PATCH:    Patch version, e.g. "1"
 #   TIER:             Current tier, one of "alpha", "beta" or "stable"
-#   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-pr-1234][-local]
-#   VERSION_WITH_TAG: e.g. "14.0.1-alpha-pr-1234" or "14.0.5-beta-local"
+#   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
+#   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
@@ -72,10 +72,15 @@ function findVersion() {
         # Local dev machine, not TeamCity
         VERSION_TAG="$VERSION_TAG-local"
     else
-        # On TeamCity; are we running a pull request build or
-        # a master/beta/stable build?
+        # On TeamCity; are we running a pull request build or a master/beta/stable build?
         if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
-            VERSION_TAG="$VERSION_TAG-pr-$TEAMCITY_PR_NUMBER"
+            # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
+            # This indicates we are running a Test build.
+            if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
+                VERSION_TAG="$VERSION_TAG-test"
+            else
+                VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
+            fi
         fi
     fi
 

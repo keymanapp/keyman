@@ -1,56 +1,48 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "**TODO** Update script to work with new history/versioning"
-exit 1
+#set -x 
+#DEBUG=1
 
-_hu_base_dir=$(dirname "$BASH_SOURCE")/..
+_hu_base_dir=$(dirname "$BASH_SOURCE")/../../..
 
 . $_hu_base_dir/resources/shellHelperFunctions.sh
 
-get_history_file_path() {
-  get_platform_folder $1
+_hu_debug() {
+  if [[ $DEBUG == 1 ]]; then echo "$1"; fi
+}
 
-  history_file_path="$platform_folder/history.md"
+get_history_file_path() {
+  history_file_path="$_hu_base_dir/HISTORY.md"
 }
 
 # Creates and initializes a variable called `history_file` that contains the raw content
 # of the specified project's `history.md` file.
 get_history_file() {
-  get_history_file_path "$1"
+  get_history_file_path
 
   history_file=`cat $history_file_path`
 }
 
 ### Parsing Utilities ###
-enum_line_types=("published-version", "pending-version", "legacy-version", "erroneous-version", "header", "title", "whitespace", "listitem", "other")
+enum_line_types=("version-header", "title", "whitespace", "listitem", "other")
 
+# Title Match: # Keyman Version History
 # ${BASH_REMATCH[1]} - history.md's "Title" text.
 re_title="^#[^#](.+)"
 
-# ${BASH_REMATCH[1]} - publishing date
-# ${BASH_REMATCH[2]} - version
-# ${BASH_REMATCH[3]} - tier
-re_published="^##[^#0-9]*([0-9]{4}-[0-9]{2}-[0-9]{2})[^0-9]*([0-9]+\.[0-9]+\.[0-9]+).*(alpha|beta|stable)"
-re_v_err="^##[^#0-9]*([0-9]{4}-[0-9]{2}-[0-9]{2})[^0-9]*([0-9]+\.[0-9]+).*(alpha|beta|stable)"
-
+# Release Subtitle Match: ## version tier date
+# Example: ## 14.0.2 alpha 2020-02-02
 # ${BASH_REMATCH[1]} - version
-# ${BASH_REMATCH[2]} - tier (alpha)
-re_pending="^##[^#0-9]*([0-9]+\.[0-9]+)[^\.].*(alpha|beta|stable)"
+# ${BASH_REMATCH[2]} - tier
+# ${BASH_REMATCH[3]} - publishing date
+re_header="^##[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*(alpha|beta|stable)[[:space:]]*([0-9]{4}-[0-9]{2}-[0-9]{2})"
 
-# ${BASH_REMATCH{1}} - version
-# ${BASH_REMATCH{2}} - tier
-re_legacy="^##[^#0-9]*([0-9]+\.[0-9]+\.[0-9]+).*(alpha|beta|stable)"
-
+# Entry in release log
 # ${BASH_REMATCH[1]} - the full line of text
-# ${BASH_REMATCH[2]} - just the text after the bullet, with optional single leading space removed
-re_item="([ \t]*\*[[:blank:]]?(.+))"
+re_item="(.+)"
 
 # Checks that it's a simple line of whitespace.
 re_blank="^[[:space:]]*$"
-
-# Checks that it's a changelog subheader for a specified version.
-# ${BASH_REMATCH[1]} - header text
-re_header="^###[^#](.*)"
 
 re_v_major="^([0-9]+)\.[0-9]+"
 re_v_alpha="^([0-9]+\.[0-9]+)"
@@ -64,26 +56,21 @@ get_line_type() {
 
   if [[ "$1" =~ $re_title ]]; then
     line_type="title"
-  elif [[ "$1" =~ $re_published ]]; then
-    line_type="published-version"
-  elif [[ "$1" =~ $re_pending ]]; then
-    line_type="pending-version" 
-  elif [[ "$1" =~ $re_legacy ]]; then
-    line_type="legacy-version"
-  elif [[ "$1" =~ $re_v_err ]]; then
-    line_type="erroneous-version"
-  elif [[ "$1" =~ $re_item ]]; then
-    line_type="listitem"
+  elif [[ "$1" =~ $re_header ]]; then
+    line_type="version-header"
+    line_version="${BASH_REMATCH[1]}"
+    line_tier="${BASH_REMATCH[2]}"
+    line_date="${BASH_REMATCH[3]}"
   elif [[ "$1" =~ $re_blank ]]; then
     line_type="whitespace"
-  elif [[ "$1" =~ $re_header ]]; then
-    line_type="header"
+  elif [[ "$1" =~ $re_item ]]; then
+    line_type="listitem"
   fi
 
   # This section is quite useful for debugging purposes.
-  # if [[ $line_type != "other" ]]; then
-  #   echo "$line_type: $1"
-  # fi
+  #if [[ $line_type != "other" ]]; then
+     _hu_debug "$line_type: $1"
+  #fi
 }
 
 # $1 - the markdown block to be processed.  May be the subset of a file, rather than its full body.
@@ -95,70 +82,8 @@ process_history_loop() {
   while IFS= read -r line || [[ -n "$line" ]]; do
     # Do things with the $line.
     # Like, what kind of $line is this?
-    $2 "$line" "$3" "$4"
+    $2 "$line" "$3" "$4" "$5"
   done <<< "$1"  # The triple <<< forces the loop to evaluate within the same script, preserving variable changes.
-}
-
-###                                 History Validation                            ###
-
-# $1 - one line of history data.
-validate_history_line() {
-  get_line_type "$1"
-
-  if [ $line_type = "published-version" ]; then
-    if [ ${BASH_REMATCH[3]} = "alpha" ]; then
-      warn "Error in entry for version ${BASH_REMATCH[2]} ${BASH_REMATCH[3]} - date and/or build number present for alpha."
-      validation_error=true
-    fi
-  elif [ $line_type = "pending-version" ]; then
-    if [[ ${BASH_REMATCH[2]} = "stable" || ${BASH_REMATCH[2]} = "beta" ]]; then
-      warn "Error in entry for version ${BASH_REMATCH[1]} ${BASH_REMATCH[2]} - build number missing for ${BASH_REMATCH[2]} tier."
-      validation_error=true
-    fi
-  elif [ $line_type = "legacy-version" ]; then
-    version="${BASH_REMATCH[1]}"
-    tier="${BASH_REMATCH[2]}"
-
-    # It's 'legacy' because these come from pre-10 versions that we no longer have date-data for.
-    # They'll never be releases again, so it's fine for THOSE versions - not new ones.
-    [[ "${BASH_REMATCH[1]}" =~ $re_v_major ]]
-    if [ $tier = "alpha" ]; then
-      warn "Error in entry for version ${version} ${tier} - build number should be absent for the 'alpha' tier."
-      validation_error=true
-    elif [ "${BASH_REMATCH[1]}" -ge "10" ]; then
-      warn "Error in entry for version ${version} ${tier} - no date present for non-legacy history."
-
-      validation_error=true
-    fi
-  elif [ $line_type = "erroneous-version" ]; then
-    if [ ${BASH_REMATCH[3]} = "alpha" ]; then
-      warn "Error in entry for version ${BASH_REMATCH[2]} ${BASH_REMATCH[3]} - alphas should not be dated."
-	  validation_error=true
-    else
-	  version="${BASH_REMATCH[2]}"
-	  tier="${BASH_REMATCH[3]}"
-	  
-	  # This branch's conditional lack of error 'grandfathers' Android versions 1.0-2.4 stable, which are dated but lack build numbers.
-    [[ "${BASH_REMATCH[2]}" =~ $re_v_major ]]
-      if [ "${BASH_REMATCH[1]}" -ge "10" ]; then
-        warn "Error in entry for version ${version} ${tier} - build number missing for ${tier} tier."
-        validation_error=true
-      fi
-    fi
-  fi
-}
-
-# $1 - the product for which history.md will be validated.
-validate_history_file() {
-  validation_error=false
-  get_history_file "$1"
-  process_history_loop "${history_file}" validate_history_line
-
-  if [ $validation_error = true ]; then
-    fail "Errors detected in $1/history.md - please correct the issues noted above."
-  else
-    echo "$1/history.md validity check passed."
-  fi
 }
 
 ###                           Version Changelog Extraction                            ###
@@ -188,51 +113,53 @@ get_build_number() {
 
 # Used internally by get_version_notes, passed as a pseudo-functor to process_history_loop.
 get_version_helper() {
-  get_line_type "$1"
+  local line="$1"
+  local version="$2"
+  local tier="$3"
+  local product="$4"
+  get_line_type "$line"
 
   if [ $in_block = true ]; then
-    if [[ $line_type = "published-version" ]]; then
+    if [[ $line_type = "version-header" ]]; then
       in_block=false
-    elif [[ $line_type = "pending-version" || $line_type = "legacy-version" ]]; then
-      in_block=false
-    else
-      # Might should convert these to build a string instead.  That string could then be formatted a few
-      # different ways via shell-scripting, while the base retrieval stays the same.
-      if [[ $line_type = "header" ]]; then
-        echo "${BASH_REMATCH[1]}"
-      elif [[ $line_type = "listitem" ]]; then
-        echo "$1"
-      elif [[ $line_type = "whitespace" ]]; then
-        echo "";
+    elif [[ $line_type = "listitem" ]]; then
+      if [[ "$product" == "ios" ]]; then
+        # We have to filter out other platforms to satisfy Apple
+        if [[ "$line" =~ \(ios|web|common ]]; then
+          echo "$line" | sed -e "s/Android/mobile platform/"
+        fi
+      else
+        if [[ "$line" =~ "\($product|web|common" ]]; then
+          echo "$line"
+        fi
       fi
+    elif [[ $line_type = "whitespace" ]]; then
+      echo "";
     fi
   else
     v= # Must be cleared initially for the test to work correctly!
     t=
     d=
 
-    if [[ $line_type = "published-version" ]]; then\
-      d="${BASH_REMATCH[1]}"
-      v="${BASH_REMATCH[2]}"
-      t="${BASH_REMATCH[3]}"
-    elif [[ $line_type = "pending-version" || $line_type = "legacy-version" ]]; then
-      v="${BASH_REMATCH[1]}"
-      t="${BASH_REMATCH[2]}"
+    if [[ $line_type = "version-header" ]]; then
+      d="$line_date"
+      v="$line_version"
+      t="$line_tier"
     fi
 
     # Splits the version numbers into their components to facilitate finding
     # 1) the FIRST version in history.md
     # 2) with equal to or lesser version
     # 3) of the same tier.
-    if [[ "$v" != "" && "$t" = "$3" && $version_found = false ]]; then
+    if [[ "$v" != "" && "$t" = "$tier" && $version_found = false ]]; then
       get_alpha_version "$v"
       get_build_number "$v"
 
       found_v="$v_alpha"
       found_b="$v_build"
 
-      get_alpha_version "$2"
-      get_build_number "$2"
+      get_alpha_version "$version"
+      get_build_number "$version"
 
       search_v="$v_alpha"
       search_b="$v_build"
@@ -257,18 +184,15 @@ get_version_notes() {
   in_block=false
   version_found=false
 
-  vn_version=$2
+  local vn_product=$1
+  local vn_version=$2
+  local vn_tier=$3
 
-  if [ $3 = "alpha" ]; then
-    get_alpha_version "$2"
-    vn_version=$v_alpha
-  fi
-
-  get_history_file "$1"
-  process_history_loop "${history_file}" get_version_helper "$vn_version" "$3"
+  get_history_file
+  process_history_loop "${history_file}" get_version_helper "$vn_version" "$vn_tier" "$vn_product"
 
   if [ $version_found = false ]; then
-    fail "Could not find changelog information for $1 version $vn_version $3."
+    fail "Could not find changelog information for $vn_product version $vn_version $vn_tier."
   fi
 }
 

@@ -17,9 +17,19 @@
 #
 
 types=(fix feat chore change docs style refactor test auto)
-scopes=(android ci common developer ios linux mac web windows)
+scopes=( \
+  android android/app android/browser android/engine android/oem \
+  ci \
+  common common/core common/lmlayer \
+  developer developer/compiler developer/ide developer/tools \
+  ios ios/app ios/browser ios/engine ios/oem \
+  linux linux/config linux/engine linux/ibus linux/oem \
+  mac mac/config mac/engine mac/oem \
+  web web/engine web/oem web/ui \
+  windows windows/config windows/engine windows/oem \
+)
 min_length=4
-max_length=72
+max_length=128
 
 #
 # Define terminal colours.
@@ -69,9 +79,9 @@ function build_regex() {
   rescope="(\((${rescope%?})\))?"
 
   remessage=".{$min_length,$max_length}[^.]"
-  refixes="( \. Fixes #\d+)?"
+  refixes="(\. Fixes #[[:digit:]]+)?"
 
-  regexp="^${retypes}${rescope}: ${remessage}${refixes}\s*$"
+  regexp="^${retypes}${rescope}: ${remessage}${refixes}[[:space:]]*$"
 }
 
 # Print out a standard error message which explains
