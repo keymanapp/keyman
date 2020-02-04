@@ -78,7 +78,7 @@ function build_regex() {
   rescope="(\((${rescope%?})\))?"
 
   remessage=".{$min_length,$max_length}[^.]"
-  refixes="( \. Fixes #\d+)?"
+  refixes="(\. Fixes #[[:digit:]]+)?"
 
   regexp="^${retypes}${rescope}: ${remessage}${refixes}\s*$"
 }
