@@ -178,22 +178,35 @@ extension Storage {
                      resourceName: "keymanweb-osk.ttf",
                      dstDir: baseDir,
                      excludeFromBackup: true)
+  }
+
+  func installDefaultKeyboard(from bundle: Bundle) throws {
     let defaultKeyboardDir = self.keyboardDir(forID: Defaults.keyboard.id)
-    let defaultLexicalModelDir = self.lexicalModelDir(forID: Defaults.lexicalModel.id)
     try FileManager.default.createDirectory(at: defaultKeyboardDir, withIntermediateDirectories: true)
-    try FileManager.default.createDirectory(at: defaultLexicalModelDir, withIntermediateDirectories: true)
+
+    // Since we only want to do this installation the first time (rather than constantly force-reinstalling
+    // the resource), we don't want this excluded from backup.
     try Storage.copy(from: bundle,
                      resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
                      dstDir: defaultKeyboardDir,
-                     excludeFromBackup: true)
+                     excludeFromBackup: false)
     try Storage.copy(from: bundle,
                      resourceName: "DejaVuSans.ttf",
                      dstDir: defaultKeyboardDir,
-                     excludeFromBackup: true)
+                     excludeFromBackup: false)
+  }
+
+  func installDefaultLexicalModel(from bundle: Bundle) throws {
+    let defaultLexicalModelDir = self.lexicalModelDir(forID: Defaults.lexicalModel.id)
+
+    try FileManager.default.createDirectory(at: defaultLexicalModelDir, withIntermediateDirectories: true)
+
+    // Since we only want to do this installation the first time (rather than constantly force-reinstalling
+    // the resource), we don't want this excluded from backup.
     try Storage.copy(from: bundle,
                      resourceName: "\(Defaults.lexicalModel.id)-\(Defaults.lexicalModel.version).model.kmp",
                      dstDir: defaultLexicalModelDir,
-                     excludeFromBackup: true)
+                     excludeFromBackup: false)
 
     // Perform an auto-install of the lexical model's KMP if not already installed.
     let lexicalModelURLasZIP = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
@@ -215,7 +228,6 @@ extension Storage {
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
     }
-
   }
 
   func copyFiles(to dst: Storage) throws {

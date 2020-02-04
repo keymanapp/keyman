@@ -213,6 +213,12 @@ public enum Migrations {
     }) {
       userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
       Storage.active.userDefaults.userKeyboards = userKeyboards
+
+      do {
+        try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+      } catch {
+        log.error("Failed to copy default keyboard from bundle: \(error)")
+      }
     }
 
     if !userModels.contains(where: { lex in
@@ -220,9 +226,13 @@ public enum Migrations {
     }) {
       userModels = [Defaults.lexicalModel] + userModels
       Storage.active.userDefaults.userLexicalModels = userModels
-    }
 
-    // Must still do the actual install.  This comes after the copyKMWFiles step, though.
+      do {
+        try Storage.active.installDefaultLexicalModel(from: Resources.bundle)
+      } catch {
+        log.error("Failed to copy default lexical model from bundle: \(error)")
+      }
+    }
 
     // Store the version we just upgraded to.
     storage.userDefaults.lastEngineVersion = Version.current
