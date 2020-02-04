@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.5 alpha 2020-02-04
+
+chore(ci): support test builds on master/beta/stable-x.y (#2576)
+
 ## 14.0.4 alpha 2020-02-03
 
 chore(ci): trigger builds after version increment (#2572)
