@@ -73,6 +73,7 @@ type
   TKeyman32GetInitialisedFunction = function(var FSingleApp: BOOL): BOOL; stdcall;
   TKeyman32ControllerSendMessageFunction = function(msg: UINT; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
   TKeyman32ControllerPostMessageFunction = procedure(msg: UINT; wParam: WPARAM; lParam: LPARAM); stdcall;
+  TKeyman32UpdateTouchPanelVisibilityFunction = procedure(Value: BOOL); stdcall;
 
   TKeymanControl = class(TKeymanAutoObject, IKeymanCustomisationAccess, IIntKeymanControl, IKeymanControl, IKeymanEngineControl)
   private
@@ -92,6 +93,7 @@ type
     FKeyman_PostMasterController: TKeyman32ControllerPostMessageFunction;
     FKeyman_PostControllers: TKeyman32ControllerPostMessageFunction;
     FKeyman_StartExit: TKeyman32ExitFunction;  // I3092
+    FKeyman_UpdateTouchPanelVisibility: TKeyman32UpdateTouchPanelVisibilityFunction;
     procedure LoadKeyman32;
     procedure StartKeyman32;
     procedure Do_Keyman_Exit;
@@ -133,7 +135,7 @@ type
     procedure StopKeyman; safecall;
     procedure StopVisualKeyboard; safecall;
 
-    { IKeymanControlRestart }
+    { IKeymanEngineControl }
     procedure RestartEngine; safecall;    // 32 bit only
     procedure ShutdownKeyman32Engine; safecall;    // 32 bit only
     procedure StartKeyman32Engine; safecall;    // 32 bit only
@@ -143,6 +145,7 @@ type
     procedure UnregisterControllerWindow(Value: LongWord); safecall;    // 32 bit only
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
+    procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
 
     { IIntKeymanControl }
     procedure AutoApplyKeyman;
@@ -570,6 +573,16 @@ begin
 {$ENDIF}
 end;
 
+procedure TKeymanControl.UpdateTouchPanelVisibility(Value: Boolean);
+begin
+{$IFDEF WIN64}
+  Error(Cardinal(E_NOTIMPL));
+{$ELSE}
+  LoadKeyman32;
+  FKeyman_UpdateTouchPanelVisibility(Value);
+{$ENDIF}
+end;
+
 procedure TKeymanControl.ShutdownKeyman32Engine;
 begin
 {$IFDEF WIN64}
@@ -707,6 +720,7 @@ begin
     @FKeyman_SendMasterController := ProcAddr('Keyman_SendMasterController');
     @FKeyman_PostMasterController := ProcAddr('Keyman_PostMasterController');
     @FKeyman_PostControllers := ProcAddr('Keyman_PostControllers');
+    @FKeyman_UpdateTouchPanelVisibility := ProcAddr('Keyman_UpdateTouchPanelVisibility');
   end;
 end;
 
