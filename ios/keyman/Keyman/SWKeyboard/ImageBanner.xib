@@ -16,7 +16,7 @@
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="ImageBannerView" customModule="Keyman" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="320" height="37"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Splash Gradient" translatesAutoresizingMaskIntoConstraints="NO" id="nhQ-tS-3kk" userLabel="Gradient Bar">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="4"/>
@@ -34,12 +34,12 @@
             </subviews>
             <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
             <constraints>
-                <constraint firstItem="nhQ-tS-3kk" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="6wd-mB-hwX"/>
+                <constraint firstItem="nhQ-tS-3kk" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="6wd-mB-hwX"/>
                 <constraint firstAttribute="bottom" secondItem="Pdh-PS-d4S" secondAttribute="bottom" constant="4" id="7f1-6N-Mnm"/>
-                <constraint firstItem="Pdh-PS-d4S" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="10" id="CM0-KJ-Fkj"/>
-                <constraint firstItem="nhQ-tS-3kk" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Gq2-6V-JXL"/>
+                <constraint firstItem="Pdh-PS-d4S" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="CM0-KJ-Fkj"/>
+                <constraint firstItem="nhQ-tS-3kk" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Gq2-6V-JXL"/>
                 <constraint firstItem="Pdh-PS-d4S" firstAttribute="top" secondItem="nhQ-tS-3kk" secondAttribute="bottom" constant="6" id="JbM-dC-tUa"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="nhQ-tS-3kk" secondAttribute="trailing" id="jYD-e9-Jgc"/>
+                <constraint firstAttribute="trailing" secondItem="nhQ-tS-3kk" secondAttribute="trailing" id="jYD-e9-Jgc"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <nil key="simulatedBottomBarMetrics"/>

@@ -13,6 +13,11 @@ import KeymanEngine // for log commands
 class ImageBannerView: UIView {
   var intendedFrame: CGRect = .zero
 
+  // Since we never actually put this UIView into the view hierarchy, we need controlled constraints
+  // to control the actual frame size.
+  var widthConstraint: NSLayoutConstraint?
+  var heightConstraint: NSLayoutConstraint?
+
   override init(frame: CGRect) {
     super.init(frame: frame)
 
@@ -28,6 +33,11 @@ class ImageBannerView: UIView {
   func initialize() {
     self.translatesAutoresizingMaskIntoConstraints = false
     self.clipsToBounds = true
+
+    widthConstraint = self.widthAnchor.constraint(equalToConstant: 0)
+    widthConstraint!.isActive = true
+    heightConstraint = self.heightAnchor.constraint(equalToConstant: 0)
+    heightConstraint!.isActive = true
   }
 
   override var intrinsicContentSize: CGSize {
@@ -39,15 +49,16 @@ class ImageBannerView: UIView {
       return super.frame
     }
     set(value) {
-      super.frame = value
       intendedFrame = value
+      widthConstraint?.constant = value.width
+      heightConstraint?.constant = value.height
+      super.frame = value
       self.invalidateIntrinsicContentSize()
     }
   }
 }
 
 class ImageBannerViewController: UIViewController {
-
   init() {
     super.init(nibName: "ImageBanner", bundle: Bundle(for: ImageBannerViewController.self))
   }
@@ -57,7 +68,7 @@ class ImageBannerViewController: UIViewController {
   }
 
   func renderToImage(size: CGSize) -> UIImage? {
-    if size.height == 0 {
+    if size.width == 0 || size.height == 0 {
       return nil
     }
 
@@ -66,7 +77,6 @@ class ImageBannerViewController: UIViewController {
     log.debug("Rendering banner image of size \(size)")
     self.view.frame = frame
     self.view.setNeedsLayout()
-    self.view.updateConstraints()
     self.view.layoutIfNeeded()
 
     // Many thanks to https://stackoverflow.com/a/4334902

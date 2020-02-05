@@ -63,4 +63,16 @@ class KeyboardViewController: InputViewController {
 
     self.setBannerImage(to: path)
   }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    guard let previousTraitCollection = previousTraitCollection else {return}
+    if #available(iOS 13.0, *) {
+      if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
+        // Ensure that the keyboard banner image transitions!
+        // The backing view isn't in the view hierarchy, so we need to force-trigger the listener.
+        topBarImageSource.traitCollectionDidChange(previousTraitCollection)
+      }
+    }
+  }
 }
