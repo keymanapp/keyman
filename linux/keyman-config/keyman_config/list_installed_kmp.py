@@ -15,6 +15,32 @@ class InstallArea(GObject.GEnum):
     IA_USER = 3
     IA_UNKNOWN = 99
 
+
+def get_install_area_path(area):
+    """
+    Get the path of an install area.
+
+    Args:
+      area (InstallArea): install area to check
+            InstallArea.IA_USER: ~/.local/share/keyman
+            InstallArea.IA_SHARED: /usr/local/share/keyman
+            InstallArea.IA_OS: /usr/share/keyman
+            InstallArea.IA_UNKNOWN: /usr/share/keyman
+
+    Returns:
+        string: path of the install area
+    """
+    check_path = "/usr/share/keyman"
+    if area == InstallArea.IA_USER:
+        check_path = user_keyman_dir()
+    elif area == InstallArea.IA_SHARED:
+        check_path = "/usr/local/share/keyman"
+    elif area == InstallArea.IA_OS:
+        check_path = "/usr/share/keyman"
+
+    return check_path
+
+
 def get_installed_kmp(area):
     """
     Get list of installed kmp in an install area.
@@ -35,13 +61,7 @@ def get_installed_kmp(area):
                 path (str): base path where keyboard is installed
                 description (str): Keyboard description
     """
-    check_paths = []
-    if area == InstallArea.IA_USER:
-        check_paths = [ user_keyman_dir() ]
-    elif area == InstallArea.IA_SHARED:
-        check_paths = [ "/usr/local/share/keyman" ]
-    elif area == InstallArea.IA_OS:
-        check_paths = [ "/usr/share/keyman" ]
+    check_paths = [ get_install_area_path(area) ]
 
     return get_installed_kmp_paths(check_paths)
 
@@ -57,12 +77,15 @@ def get_installed_kmp_paths(check_paths):
         list: Installed kmp
             dict: Keyboard
                 packageID (str): kmp ID
+                keyboardID (str): Keyboard ID
                 name (str): Keyboard name
                 kmpname (str): Keyboard name in local
                 version (str): Keyboard version
                 kmpversion (str):
-                path (str): base path of area where kmp is installed
+                areapath (str): base path of area where kmp is installed
                 description (str): Keyboard description
+                has_kbjson (bool): Keyboard is in the json file
+                has_kboptions (bool): Keyboard uses options.htm form
     """
     installed_keyboards = {}
     for keymanpath in check_paths:
@@ -96,7 +119,15 @@ def get_installed_kmp_paths(check_paths):
                         version = md_version
                         name = md_name
 
-                    installed_keyboards[o] = { "packageID" : o, "keyboardID" : keyboardID, "name" : name, "kmpname" : md_name, "version" : version, "kmpversion" : md_version, "areapath" : keymanpath, "description" : description, "has_kbjson" : has_kbjson}
+                    has_kboptions = False
+                    if files:
+                        for fileinfo in files:
+                            if fileinfo['name'] == "options.htm":
+                                has_kboptions = True
+                                break
+                    installed_keyboards[o] = {"packageID" : o, "keyboardID" : keyboardID, "name" : name, "kmpname" : md_name,
+                                              "version" : version, "kmpversion" : md_version, "areapath" : keymanpath,
+                                              "description" : description, "has_kbjson" : has_kbjson, "has_kboptions" : has_kboptions}
     return installed_keyboards
 
 
@@ -117,7 +148,7 @@ def get_kmp_version(packageID):
     os_kmp = get_installed_kmp(InstallArea.IA_OS)
 
     if packageID in os_kmp:
-        version = os_kmp[keyboardid]['version']
+        version = os_kmp[packageID]['version']
 
     if packageID in shared_kmp:
         shared_version = shared_kmp[packageID]['version']
@@ -148,7 +179,7 @@ def get_kmp_version_user(packageID):
         str: kmp version if kmp ID is installed
         None: if not found
     """
-    user_kmp = get_installed_kmp_user()
+    user_kmp = get_installed_kmp(InstallArea.IA_USER)
     if packageID in user_kmp:
         return user_kmp[packageID]['version']
     else:
