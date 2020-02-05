@@ -1,5 +1,9 @@
 # Keyman for Linux Version History
 
+## 2020-02-05 13.0.25 beta
+* Bug Fix:
+  * Fix "About" keyboard when missing copyright info (#2583)
+
 ## 2020-02-04 13.0.23 beta
 * Remove cosmic and disco releases. Add eoan (#2574)
 
