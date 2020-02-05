@@ -127,7 +127,7 @@ namespace com.keyman.osk {
   export class ImageBanner extends Banner {
     private img: HTMLElement;
 
-    constructor(imagePath, height?: number) {
+    constructor(imagePath: string, height?: number) {
       if (imagePath.length > 0) {
         super();
         if (height) {
@@ -137,7 +137,11 @@ namespace com.keyman.osk {
         super(0);
       }
 
-      console.log("Loading img with src '" + imagePath + "'");
+      if(imagePath.indexOf('base64') >=0) {
+        console.log("Loading img from base64 data");
+      } else {
+        console.log("Loading img with src '" + imagePath + "'");
+      }
       this.img = document.createElement('img');
       this.img.setAttribute('src', imagePath);
       let ds = this.img.style;

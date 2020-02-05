@@ -10,6 +10,8 @@ import KeymanEngine
 import UIKit
 
 class KeyboardViewController: InputViewController {
+  var topBarImageSource: ImageBannerViewController!
+
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
@@ -18,6 +20,8 @@ class KeyboardViewController: InputViewController {
       KeymanEngine.log.outputLevel = .warning
     #endif
     Manager.applicationGroupIdentifier = "group.KM4I"
+
+    topBarImageSource = ImageBannerViewController()
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
@@ -33,40 +37,25 @@ class KeyboardViewController: InputViewController {
       return
     }
 
-    setupTopBarImage(isPortrait: InputViewController.isPortrait)
+    setupTopBarImage(size: view.frame.size)
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupTopBarImage(isPortrait: InputViewController.isPortrait)
+    setupTopBarImage(size: view.frame.size)
   }
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
-    setupTopBarImage(isPortrait: UIDevice.current.orientation.isPortrait)
+    setupTopBarImage(size: size)
   }
 
-  func getTopBarImage(isPortrait: Bool) -> String? {
-    if isPortrait {
-      return Bundle.main.path(forResource: "banner-Portrait@2x", ofType: "png")
-    }
-
-    // iPad
-    if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
-      return Bundle.main.path(forResource: "banner-Landscape@2x", ofType: "png")
-    }
-
-    // iPhone
-    let screenRect = UIScreen.main.bounds
-    if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
-      return Bundle.main.path(forResource: "banner-Landscape-568h@2x", ofType: "png")
-    } else {
-      return Bundle.main.path(forResource: "banner-Landscape@2x", ofType: "png")
-    }
+  func getTopBarImage(size: CGSize) -> String? {
+    return topBarImageSource.renderAsBase64(size: CGSize(width: size.width, height: self.activeTopBarHeight))
   }
 
-  func setupTopBarImage(isPortrait: Bool) {
-    let imgPath = getTopBarImage(isPortrait: isPortrait)
+  func setupTopBarImage(size: CGSize) {
+    let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
       log.error("No image specified for the image banner!")
       return

@@ -149,6 +149,10 @@
 		CE79CDB52370111200010C06 /* Themes+Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE79CDB42370111200010C06 /* Themes+Colors.xcassets */; };
 		CE7C1AE2236925D800100C2C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */; };
 		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
+		CEF4E55623E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
+		CEF4E55723E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
+		CEF4E55923E967140065B9C7 /* ImageBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */; };
+		CEF4E55A23E967140065B9C7 /* ImageBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -315,6 +319,8 @@
 		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
+		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
+		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -633,6 +639,8 @@
 				98CD127619CA866B0089385F /* SWKeyboard.entitlements */,
 				98CD125E19CA85710089385F /* Supporting Files */,
 				C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */,
+				CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */,
+				CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */,
 			);
 			path = SWKeyboard;
 			sourceTree = "<group>";
@@ -841,6 +849,7 @@
 				981AFAC819EF44DE006706BF /* navbar-Portrait.png in Resources */,
 				981AFAC919EF44DE006706BF /* 711-trash.png in Resources */,
 				9845A7D51A439A9200544E2E /* SetUpViewController.xib in Resources */,
+				CEF4E55623E95B7B0065B9C7 /* ImageBanner.xib in Resources */,
 				CE79B24723C6ECC9007E72AE /* banner-Portrait~ipad.png in Resources */,
 				9845A8D51A439F1000544E2E /* UIAccessoryButtonX@2x.png in Resources */,
 				982D149919FF462A007D4629 /* 887-notepad@3x.png in Resources */,
@@ -883,6 +892,7 @@
 				985EA9E119E64A580006C017 /* banner-Landscape.png in Resources */,
 				985EA9DF19E64A580006C017 /* banner-Landscape-568h@2x.png in Resources */,
 				985EA9E619E64A580006C017 /* banner-Portrait@2x.png in Resources */,
+				CEF4E55723E95B7B0065B9C7 /* ImageBanner.xib in Resources */,
 				985EA9E219E64A580006C017 /* banner-Landscape@2x.png in Resources */,
 				985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */,
 			);
@@ -959,6 +969,7 @@
 				CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */,
 				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
 				C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */,
+				CEF4E55923E967140065B9C7 /* ImageBannerViewController.swift in Sources */,
 				162E2C9920926C8600F40769 /* UIView+Extensions.swift in Sources */,
 				162E2C9B20926C9B00F40769 /* KMNavigationBarBackgroundView.swift in Sources */,
 				C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */,
@@ -979,6 +990,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEF4E55A23E967140065B9C7 /* ImageBannerViewController.swift in Sources */,
 				C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

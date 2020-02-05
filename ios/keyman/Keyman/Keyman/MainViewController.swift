@@ -346,8 +346,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     guard let previousTraitCollection = previousTraitCollection else {return}
     if #available(iOS 13.0, *) {
       if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
-          // do things
-          log.info("Transition needed!")
+        // Ensure that the keyboard banner image transitions!
+        Manager.shared.inputViewController.updateViewConstraints()
       }
     }
   }
