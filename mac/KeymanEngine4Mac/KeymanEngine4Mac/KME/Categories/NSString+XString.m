@@ -322,7 +322,7 @@
             }
         }
         else {
-            [mStr appendString:[NSString stringWithFormat:@"%C", c]];
+            [mStr appendString:[NSString stringWithFormat:@"U+%x", c]];
             i++;
         }
     }
