@@ -10,3 +10,4 @@ Carthage/**
 **/build
 **/output
 localenv.sh
+setup/textinputsource/textinputsource
