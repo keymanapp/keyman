@@ -31,6 +31,7 @@ type
     procedure UnregisterControllerWindow(Value: LongWord); safecall;
     procedure DisableUserInterface; safecall;
     procedure EnableUserInterface; safecall;
+    procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
   end;
 
 implementation

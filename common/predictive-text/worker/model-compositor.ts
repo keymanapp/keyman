@@ -130,7 +130,15 @@ class ModelCompositor {
     // Add the surrounding quotes to the "keep" option's display string:
     if (keepOption) {
       let { open, close } = punctuation.quotesForKeepSuggestion;
-      keepOption.displayAs = open + keepOption.displayAs + close;
+      
+      // Should we also ensure that we're using the default quote marks first?
+      // Or is it reasonable to say that the "left" mark is always the one
+      // called "open"?
+      if(!punctuation.isRTL) {
+        keepOption.displayAs = open + keepOption.displayAs + close;
+      } else {
+        keepOption.displayAs = close + keepOption.displayAs + open;
+      }
     }
 
     // Now that we've calculated a unique set of probability masses, time to make them into a proper
@@ -176,8 +184,11 @@ class ModelCompositor {
       quotesForKeepSuggestion = defaults.quotesForKeepSuggestion;
     }
 
+    let isRTL = specifiedPunctuation.isRTL;
+    // Default:  false / undefined, so no need to directly specify it.
+
     return {
-      insertAfterWord, quotesForKeepSuggestion
+      insertAfterWord, quotesForKeepSuggestion, isRTL
     }
   }
 }

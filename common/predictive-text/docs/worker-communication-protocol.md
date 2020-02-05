@@ -139,7 +139,7 @@ After this, it is safe to assume the `config` was performed successfully and is 
 The LMLayer needs to know the platform's abilities and restrictions (capabilities).
 
 ```typescript
-interface LoadMessage {
+interface ConfigMessage {
   message: 'load';
 
   /**

@@ -73,7 +73,13 @@ namespace com.keyman.text {
             if(disableDOM) {
               return '\b'; // the escape sequence for backspace.
             } else {
-              keyman.interface.defaultBackspace();
+              // If we have an available target (via Lkc/Lelem), use that instead of 
+              // forcing defaultBackspace to search for it.
+              var target: OutputTarget;
+              if(Lelem && Lelem._kmwAttachment) {
+                target = Lelem._kmwAttachment.interface;
+              }
+              keyman.interface.defaultBackspace(target);
             }
             return '';
           case Codes.keyCodes['K_TAB']:
