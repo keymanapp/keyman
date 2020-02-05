@@ -155,7 +155,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -deploy-only)
             SKIP_BUILD=true
-            shift # past argument
+            #shift # past argument
             ;;
         -tier)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
