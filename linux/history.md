@@ -13,6 +13,9 @@
 * Work on Linux packaging (#2263, #2290, #2320, #2321, #2325, #2474, #2515, #2551)
 
 ## 2019-09-19 12.0.18 beta
+* New Feature:
+  * Add ability to set keyboard options from options.htm dialog (#2566)
+
 * Bug Fix:
   * Extract icon from kmx instead of downloading it (#2075)
 
