@@ -102,7 +102,6 @@ if [ "$action" == "commit" ]; then
   git push --tags origin "$branch"
   hub pull-request -f --no-edit -b $base -l auto
   git checkout $base
-  git branch -D "$branch"
   popd > /dev/null
 
   #
@@ -120,6 +119,16 @@ if [ "$action" == "commit" ]; then
     # Send TeamCity a build status
     echo "##teamcity[buildStatus status='SUCCESS' text='Version was incremented from $VERSION to $NEWVERSION and pull request was created']"
   fi
+
+  #
+  # After this script finishes in CI, we will be pushing the new history to 
+  # downloads.keyman.com, so we need to finish with the branch here that has the
+  # latest history in it. We don't need to cleanup the branch because the CI will 
+  # do that for us.
+  #
+
+  cd "$KEYMAN_ROOT"
+  git checkout "$branch"
 fi
 
 exit 0
