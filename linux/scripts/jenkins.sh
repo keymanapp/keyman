@@ -43,6 +43,10 @@ checkAndInstallRequirements()
 		TOINSTALL="$TOINSTALL dh-python"
 	fi
 
+	if ! dpkg -l | grep -q python3-all; then
+		TOINSTALL="$TOINSTALL python3-all"
+	fi
+
 	if [ ! -f /usr/bin/help2man ]; then
 		TOINSTALL="$TOINSTALL help2man"
 	fi
