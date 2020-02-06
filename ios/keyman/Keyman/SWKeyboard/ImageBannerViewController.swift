@@ -104,44 +104,4 @@ class ImageBannerViewController: UIViewController {
       return nil
     }
   }
-
-//  public func updateImageWithTraitCollection(_ traitCollection: UITraitCollection?) {
-////    imgLogo.image = UIImage(named: imgName,
-////                            in: Bundle(for: ImageBannerViewController.self),
-////                            compatibleWith: traitCollection)
-//    if #available(iOS 12.0, *) {
-//      let ois = self.traitCollection.userInterfaceStyle
-//
-//
-//    if #available(iOS 13.0, *), let userInterfaceStyle = traitCollection?.userInterfaceStyle {
-//      self.overrideUserInterfaceStyle = userInterfaceStyle
-//      self.view.setNeedsDisplay()
-//    }
-//
-//
-//      let nis = self.traitCollection.userInterfaceStyle
-//
-//      log.debug("Should be set to \(nis.description) mode, was \(ois.description) mode, was given \(traitCollection?.userInterfaceStyle.description)")
-//      // This is properly set... so why doesn't it visually change in the renders?
-//      log.debug("Image style: \(imgLogo.traitCollection.userInterfaceStyle.description)")
-//
-//      // An attempt to force the style change to follow through; it's currently refusing this.
-//    }
-//  }
 }
-
-//@available(iOS 12.0, *)
-//extension UIUserInterfaceStyle {
-//  public var description: String {
-//    switch self {
-//      case .unspecified:
-//        return "unspecified"
-//      case .light:
-//        return "light"
-//      case .dark:
-//        return "dark"
-//      default:
-//        return "unknown \(self.rawValue)"
-//    }
-//  }
-//}
