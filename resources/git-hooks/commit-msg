@@ -12,24 +12,16 @@
 # Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 #
 
-#
-# Configurable options for types, scopes and message length.
-#
+# Step 1 - resolve the source directory of the hook, ALSO resolving any symlinks.
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+HOOK_DIRECTORY="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-types=(fix feat chore change docs style refactor test auto)
-scopes=( \
-  android android/app android/browser android/engine android/oem \
-  ci \
-  common common/core common/lmlayer \
-  developer developer/compiler developer/ide developer/tools \
-  ios ios/app ios/browser ios/engine ios/oem \
-  linux linux/config linux/engine linux/ibus linux/oem \
-  mac mac/config mac/engine mac/oem \
-  web web/engine web/oem web/ui \
-  windows windows/config windows/engine windows/oem \
-)
-min_length=4
-max_length=128
+. $HOOK_DIRECTORY/commit-msg-defs
 
 #
 # Define terminal colours.

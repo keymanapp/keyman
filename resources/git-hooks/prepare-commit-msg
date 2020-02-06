@@ -16,14 +16,20 @@
 COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
 SHA1=$3
-HOOK_DIRECTORY=`git rev-parse --git-dir`/hooks
+
+# Step 1 - resolve the source directory of the hook, ALSO resolving any symlinks.
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+HOOK_DIRECTORY="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+. $HOOK_DIRECTORY/commit-msg-defs
 
 # build the regex pattern based on the config file
 function build_regex() {
-  # Definitions from commit-msg.
-  types=(fix feat chore change docs style refactor test)
-  scopes=(android ci common developer ios linux mac web windows)
-
   retypes=
   for type in "${types[@]}"
   do
