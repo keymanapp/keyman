@@ -39,13 +39,15 @@ sourcename=${sourcename%"-beta"}
 checkAndInstallRequirements()
 {
 	local TOINSTALL
-	if ! dpkg -l | grep -q dh-python; then
-		TOINSTALL="$TOINSTALL dh-python"
-	fi
 
-	if ! dpkg -l | grep -q python3-all; then
-		TOINSTALL="$TOINSTALL python3-all"
-	fi
+	for p in dh-python gir1.2-webkit2-4.0 python3-all python3-setuptools \
+		python3-requests python3-requests-cache python3-numpy python3-pil python3-lxml \
+		python3-gi python3-magic python3-qrcode
+	do
+		if ! dpkg -l | grep -q $p; then
+			TOINSTALL="$TOINSTALL $p"
+		fi
+	done
 
 	if [ ! -f /usr/bin/help2man ]; then
 		TOINSTALL="$TOINSTALL help2man"
