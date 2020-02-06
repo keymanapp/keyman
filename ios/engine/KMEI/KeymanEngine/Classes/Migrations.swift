@@ -50,6 +50,12 @@ public enum Migrations {
                                          oskFont: nil,
                                          isCustom: false)
 
+    let nrc_en_mtnt_0_1_2 = InstallableLexicalModel(id: "nrc.en.mtnt",
+                                                    name: "English dictionary (MTNT)",
+                                                    languageID: "en",
+                                                    version: "0.1.2",
+                                                    isCustom: false)
+
     let sil_euro_latin = Defaults.keyboard  // We're already storing the exact metadata needed.
     let nrc_en_mtnt = Defaults.lexicalModel
 
@@ -62,12 +68,14 @@ public enum Migrations {
     let legacy_resources = VersionResourceSet(version: Version.fallback, resources: [european])
     let v10_resources = VersionResourceSet(version: Version("10.0")!, resources: [european2])
     let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin])
-    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin, nrc_en_mtnt])
+    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin, nrc_en_mtnt_0_1_2])
+    let v13_resources = VersionResourceSet(version: Version("13.0.65")!, resources: [sil_euro_latin, nrc_en_mtnt])
 
     timeline.append(legacy_resources)
     timeline.append(v10_resources)
     timeline.append(v11_resources)
     timeline.append(v12_resources)
+    timeline.append(v13_resources)
 
     return timeline
   }()
@@ -177,9 +185,19 @@ public enum Migrations {
 
     if lastVersion != nil {
       // Time to deinstall the old version's resources.
-      let resources = resourceHistory.first(where: { set in
-        return set.version == lastVersion
-      })!.resources
+      // First, find the most recent version with a listed history.
+      let possibleHistories: [VersionResourceSet] = resourceHistory.compactMap { set in
+        if set.version <= lastVersion! {
+          return set
+        } else {
+          return nil
+        }
+      }
+
+      // Assumes the history definition is in ascending Version order; takes the last in the list
+      // as the correct "old version" resource set.  This allows covering gaps,
+      // such as for a 'plain' 13.0 prior install.
+      let resources = possibleHistories[possibleHistories.count-1].resources
 
       resources.forEach { res in
         if let kbd = res as? InstallableKeyboard {
@@ -205,8 +223,11 @@ public enum Migrations {
     // Now to install the new version's resources.
     var userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
     var userModels = Storage.active.userDefaults.userLexicalModels ?? []
+    let defaultsNeedBackup = (lastVersion ?? Version.fallback) < Version.defaultsNeedBackup
+    var installKbd = false
+    var installLex = false
 
-    // Don't add the keyboard a second time if it's already installed!  Can happen
+    // Don't add the keyboard a second time if it's already installed and backed up.  Can happen
     // if multiple Keyman versions match.
     if !userKeyboards.contains(where: { kbd in
       kbd.id == Defaults.keyboard.id && kbd.languageID == Defaults.keyboard.languageID
@@ -214,6 +235,9 @@ public enum Migrations {
       userKeyboards = [Defaults.keyboard] + userKeyboards  // Make sure the default goes in the first slot!
       Storage.active.userDefaults.userKeyboards = userKeyboards
 
+      installKbd = true
+    }
+    if(defaultsNeedBackup || installKbd) {
       do {
         try Storage.active.installDefaultKeyboard(from: Resources.bundle)
       } catch {
@@ -227,6 +251,9 @@ public enum Migrations {
       userModels = [Defaults.lexicalModel] + userModels
       Storage.active.userDefaults.userLexicalModels = userModels
 
+      installLex = true
+    }
+    if(defaultsNeedBackup || installLex) {
       do {
         try Storage.active.installDefaultLexicalModel(from: Resources.bundle)
       } catch {

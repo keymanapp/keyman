@@ -11,7 +11,7 @@ import Foundation
 /// Dotted-decimal version.
 public struct Version: Comparable {
   public static let fallback = Version("1.0")!
-  public static let current = Version("13.0")!
+  public static let current = Version("13.0.65")!
 
   // The Engine first started tracking the 'last loaded version' in 12.0.
   public static let firstTracked = Version("12.0")!
@@ -20,6 +20,7 @@ public struct Version: Comparable {
   // this prompted a mild rework of KMP installation file management,
   // since this exposed byproducts to the users in the Files app.
   public static let fileBrowserImplemented = Version("13.0")!
+  public static let defaultsNeedBackup = Version("13.0.65")!
 
   private let components: [Int]
   public let string: String
