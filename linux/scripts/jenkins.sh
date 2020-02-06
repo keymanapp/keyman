@@ -36,6 +36,30 @@ fi
 sourcename=${fullsourcename%"-alpha"}
 sourcename=${sourcename%"-beta"}
 
+checkAndInstallRequirements()
+{
+	local TOINSTALL
+	if ! dpkg -l | grep -q dh-python; then
+		TOINSTALL="$TOINSTALL dh-python"
+	fi
+
+	if [ ! -f /usr/bin/help2man ]; then
+		TOINSTALL="$TOINSTALL help2man"
+	fi
+
+	if [ ! -f /usr/bin/meson ]; then
+		TOINSTALL="$TOINSTALL meson"
+	fi
+
+	if [ -n "$TOINSTALL" ]; then
+		log "Installing prerequisites:$TOINSTALL"
+		sudo apt-get update
+		sudo apt-get -qy install $TOINSTALL
+	fi
+}
+
+checkAndInstallRequirements
+
 # clean up prev deb builds
 log "cleaning previous builds of $1"
 
