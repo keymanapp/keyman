@@ -71,7 +71,9 @@ class KeyboardViewController: InputViewController {
       if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
         // Ensure that the keyboard banner image transitions!
         // The backing view isn't in the view hierarchy, so we need to force-trigger the listener.
-        topBarImageSource.traitCollectionDidChange(previousTraitCollection)
+        //topBarImageSource.updateImageWithTraitCollection(traitCollection)
+        topBarImageSource = ImageBannerViewController()
+        setupTopBarImage(size: view.frame.size)
       }
     }
   }
