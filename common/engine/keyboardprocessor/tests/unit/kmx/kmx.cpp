@@ -317,9 +317,9 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
 
-  std::cout << "expected: " << expected << std::endl;
+  std::cout << "expected  : " << expected << std::endl;
   std::cout << "text store: " << text_store << std::endl;
-  std::cout << "result: " << buf << std::endl;
+  std::cout << "result    : " << buf << std::endl;
 
   // Compare internal context with expected result
   if (buf != expected) return __LINE__;
