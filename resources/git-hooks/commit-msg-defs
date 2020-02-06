@@ -1,4 +1,4 @@
-#
+#!/bin/bash
 # Configurable options for types, scopes and message length.
 #
 
