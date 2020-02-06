@@ -1,7 +1,7 @@
 c Description: Tests context longer than 64 chars
 c keys: [K_SPACE][K_F]
-c expected: fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\u0020
-c context:  fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+c expected: 012345678901234567890123456789012345678901234567890123456789012\u0020
+c context:  012345678901234567890123456789012345678901234567890123456789012
 
 store(&version) '6.0'
 
