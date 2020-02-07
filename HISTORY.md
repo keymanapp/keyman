@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.8 alpha 2020-02-07
+
+* chore(ci): Tweak history management (#2602)
+* chore(common): Update README.md (#2598)
+* chore: update history (#2605)
+* chore: merge beta P9S1 changes to master (#2606)
+* chore(ci): is build required? (#2603)
+* fix(linux): Install requirements before packaging (#2599)
+
 ## 14.0.7 alpha 2020-02-07
 
 * chore(ci): Tweak history management (#2602)
