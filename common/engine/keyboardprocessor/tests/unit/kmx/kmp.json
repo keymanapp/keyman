@@ -389,6 +389,28 @@
           "id": "und"
         }
       ]
+    },
+    {
+      "name": "041 - long context and deadkeys",
+      "id": "041 - long context and deadkeys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
+    },
+    {
+      "name": "042 - long context and split deadkeys",
+      "id": "042 - long context and split deadkeys",
+      "version": "0.0",
+      "languages": [
+        {
+          "name": "Undetermined",
+          "id": "und"
+        }
+      ]
     }
    ]
 }
