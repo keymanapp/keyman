@@ -50,6 +50,13 @@ if [[ ! "$platform" =~ android|ios|linux|mac|web|windows ]]; then
   invalid=true
 fi
 
+if [ "$platform" == "android" ]; then
+  echo "Testing cancellation of build! Skipping build."
+  echo "##teamcity[buildStatus status='SUCCESS' text='Testing cancellation of build - status message! Skipping build.']"
+  echo "##teamcity[buildStop comment='Testing cancellation of build - cancel message! Skipping build.']"
+  exit 0
+fi
+
 if [[ $invalid == true ]]; then
   echo "Usage: $(basename "$THIS_SCRIPT") [platform [prnum]]"
   echo "platform can be one of:"
@@ -102,9 +109,9 @@ if [ "$prfiles" == "abort" ]; then
   # Exit 1 will fail the build, but we override the failure with the buildStatus text!
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
   echo "##teamcity[buildStatus status='SUCCESS' text='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
-  exit 1
+  echo "##teamcity[buildStop comment='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
+  exit 0
 fi
-
 
 # Which platform are we watching?
 eval watch='$'watch_$platform
@@ -124,7 +131,8 @@ done <<< "$prfiles"
 
 popd >/dev/null
 
-# Exit 1 will fail the build, but we override the failure with the buildStatus text!
+# Cancel the build.
 echo "Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build."
 echo "##teamcity[buildStatus status='SUCCESS' text='Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build.']"
-exit 1
+echo "##teamcity[buildStop comment='Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build.']"
+exit 0
