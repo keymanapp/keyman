@@ -52,7 +52,6 @@ fi
 
 if [ "$platform" == "android" ]; then
   echo "Testing cancellation of build! Skipping build."
-  echo "##teamcity[buildStatus status='SUCCESS' text='Testing cancellation of build - status message! Skipping build.']"
   echo "##teamcity[buildStop comment='Testing cancellation of build - cancel message! Skipping build.']"
   exit 0
 fi
@@ -106,9 +105,8 @@ prhead=`echo ${prinfo} | sed -E 's/.+"head".+"ref":"([^"]+)".+"base".+"ref":.+/\
 
 prfiles=`git diff "origin/$prbase"..."origin/$prhead" --name-only || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
 if [ "$prfiles" == "abort" ]; then
-  # Exit 1 will fail the build, but we override the failure with the buildStatus text!
+  # Cancel the build
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
-  echo "##teamcity[buildStatus status='SUCCESS' text='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
   echo "##teamcity[buildStop comment='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
   exit 0
 fi
@@ -131,8 +129,7 @@ done <<< "$prfiles"
 
 popd >/dev/null
 
-# Cancel the build.
+# Cancel the build
 echo "Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build."
-echo "##teamcity[buildStatus status='SUCCESS' text='Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build.']"
 echo "##teamcity[buildStop comment='Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build.']"
 exit 0
