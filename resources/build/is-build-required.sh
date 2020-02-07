@@ -97,7 +97,14 @@ prhead=`echo ${prinfo} | sed -E 's/.+"head".+"ref":"([^"]+)".+"base".+"ref":.+/\
 # We work from origin so we don't need the branches checked out ourselves
 #
 
-prfiles=`git diff "origin/$prbase"..."origin/$prhead" --name-only`
+prfiles=`git diff "origin/$prbase"..."origin/$prhead" --name-only || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
+if [ "$prfiles" == "abort" ]; then
+  # Exit 1 will fail the build, but we override the failure with the buildStatus text!
+  echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
+  echo "##teamcity[buildStatus status='SUCCESS' text='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
+  exit 1
+fi
+
 
 # Which platform are we watching?
 eval watch='$'watch_$platform
