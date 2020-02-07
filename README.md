@@ -1,8 +1,8 @@
 ![Keyman](https://keyman.com/cdn/dev/img/logo2.png)
 
-Open Source
+[Keyman](https://keyman.com) makes it possible for you to type in any language on Windows, macOS, Linux, iPhone, iPad, Android tablets and phones, and even instantly in your web browser. Create keyboard layouts with Keyman Developer and share them with the community in the [keyboards repository](https://github.com/keymanapp/keyboards). The [Keyman Developer Community](https://community.software.sil.org/c/keyman) have already contributed keyboard layouts for over 1,500 languages!
 
-[Keyman](https://keyman.com) makes it possible for you to type in over 1,000 languages on Windows, iPhone, iPad, Android tablets and phones, and even instantly in your web browser.
+Keyman is an open source project distributed under the MIT license.
 
 [comment]: # (CI Build statuses)
 
@@ -39,7 +39,7 @@ Each platform maintains multiple types of releases:
 
 # License
 
-Copyright (c) 2018-2019 SIL International. All rights reserved.
+Copyright (c) 2018-2020 SIL International. All rights reserved.
 
 Licensed under the [MIT](./windows/src/LICENSE.md) License.
 

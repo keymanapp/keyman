@@ -25,7 +25,7 @@ if [[ -z "${TIER}" ]]; then
     # In master branch this should be alpha and the debian/watch files should check alpha dir
 #    tier="alpha"
 #    tier="beta"
-    tier="stable"
+    tier=`cat ../TIER.md`
 else
     tier="${TIER}"
 fi

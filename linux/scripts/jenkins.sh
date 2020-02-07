@@ -1,6 +1,8 @@
 #!/bin/bash -e
 # $1 - project name with appended tier, e.g. ibus-kmfl-alpha
 
+PROGRAM_NAME="$(basename "$0")"
+
 . $HOME/ci-builder-scripts/bash/common.sh
 init --no-package
 
