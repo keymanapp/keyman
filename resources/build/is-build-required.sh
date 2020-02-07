@@ -52,6 +52,7 @@ fi
 
 if [ "$platform" == "android" ]; then
   echo "Testing cancellation of build! Skipping build."
+  echo "##teamcity[buildStatus status='SUCCESS' text='Testing cancellation of build - status message! Skipping build.']"
   echo "##teamcity[buildStop comment='Testing cancellation of build - cancel message! Skipping build.']"
   exit 0
 fi
