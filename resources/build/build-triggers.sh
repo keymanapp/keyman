@@ -7,8 +7,8 @@
 # e.g. android='common/predictive-text|common/lexical-model-types'
 # will expand into android='^(android|(oem/[^/]+/android)|common/predictive-text|common/lexical-model-types)'
 
-watch_android='android|common/predictive-text|common/lexical-model-types'
-watch_ios='common/predictive-text|common/lexical-model-types'
+watch_android='web|common/predictive-text|common/lexical-model-types'
+watch_ios='web|common/predictive-text|common/lexical-model-types'
 watch_linux='common/engine'
 watch_mac='common/engine'
 watch_web='common/predictive-text|common/lexical-model-types'
