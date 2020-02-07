@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.7 alpha 2020-02-07
+
+* chore(ci): Tweak history management (#2602)
+* chore(common): Update README.md (#2598)
+
 ## 14.0.6 alpha 2020-02-06
 
 * fix(linux): cherry-pick packaging changes from beta branch (#2589)
