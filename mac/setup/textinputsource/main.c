@@ -91,7 +91,7 @@ main (int argc, char * argv[])
             case 'h':
             case '?':
             default:
-                fprintf(stderr, "Usage: %s %s\n\t\%s\n\t%s\n\t%s\n\t%s\n\t%s\n",
+                fprintf(stderr, "Usage: %s %s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n",
                     basename(argv[0]),
                     "[-s|e|d|t name]",
                     "-s : select source name (enable it as needed)",

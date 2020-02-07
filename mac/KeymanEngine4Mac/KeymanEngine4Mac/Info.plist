@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>13.0.99</string>
+	<string>Keyman Engine $(PRODUCT_VERSION) for macOS</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>13.0.99</string>
+	<string>$(PRODUCT_VERSION)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
 	<key>NSPrincipalClass</key>
