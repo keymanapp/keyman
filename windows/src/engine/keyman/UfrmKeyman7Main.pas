@@ -150,6 +150,7 @@ uses
 
   Keyman.System.DebugLogClient,
   Keyman.System.DebugLogManager,
+  Keyman.System.FrameworkInputPane,
 
   keymanapi_TLB,
 //TOUCH    UfrmTouchKeyboard,
@@ -198,10 +199,12 @@ type
     mnu: TPopupMenu;
     tmrTestKeymanFunctioning: TTimer;
     tmrOnlineUpdateCheck: TTimer;
+    tmrCheckInputPane: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrTestKeymanFunctioningTimer(Sender: TObject);
     procedure tmrOnlineUpdateCheckTimer(Sender: TObject);
+    procedure tmrCheckInputPaneTimer(Sender: TObject);
   private
     InMenuLoop: Integer;  // I1082 - Avoid menu nasty flicker with rapid click
     FClosingApp: Boolean;
@@ -224,6 +227,9 @@ type
 
     FHotkeyWindow: HWND;
     FHotkeys: TIntegerList;
+
+    FInputPane: TFrameworkInputPane;
+    FIsInputPaneVisible: Boolean;
 
     //TOUCH      FCurrentContext: string;
 
@@ -533,6 +539,8 @@ begin
   ChangeWindowMessageFilter(sMsg_TaskbarRestart, MSGFLT_ADD);
   ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 
+  FInputPane := TFrameworkInputPane.Create;
+
   PostMessage(Handle, WM_USER_Start, 0, 0);
 end;
 
@@ -543,6 +551,8 @@ end;}
 
 procedure TfrmKeyman7Main.FormDestroy(Sender: TObject);
 begin
+  FreeAndNil(FInputPane);
+
   ClosePlatformComms64;
 
   UnregisterHotkeys;
@@ -1765,6 +1775,23 @@ end;
 //TOUCH      then Result := False
 //TOUCH      else Result := kmcom.Options['koUseTouchLayout'].Value;
 //TOUCH  end;
+
+procedure TfrmKeyman7Main.tmrCheckInputPaneTimer(Sender: TObject);
+var
+  r: TRect;
+  isVisible: Boolean;
+begin
+  if Assigned(FInputPane) and FInputPane.GetLocation(r) then
+  begin
+    isVisible := not r.IsEmpty;
+    if FIsInputPaneVisible <> isVisible then
+    begin
+      FIsInputPaneVisible := isVisible;
+      kmint.KeymanEngineControl.UpdateTouchPanelVisibility(isVisible);
+    end;
+    //TDebugLogClient.Instance.WriteMessage('InputPane Location: %d, %d, %d, %d', [r.Left, r.Top, r.Right, r.Bottom]);
+  end;
+end;
 
 procedure TfrmKeyman7Main.tmrOnlineUpdateCheckTimer(Sender: TObject);
 begin

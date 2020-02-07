@@ -1,6 +1,16 @@
 # Keyman for iPhone and iPad Version History
 
-## 13.0 alpha
+## 2020-02-03 13.0.63 beta
+* Bug fix: Fixes keyboard widths/margins in iOS 9 and 10 (#2560)
+
+## 2020-01-30 13.0.62 beta
+* Feature: Initial keyboard setup process simplified with direct Settings link [iOS 11.0+ only] (#2548)
+* Bug fix: System keyboard now respects "Sounds > Keyboard Clicks" setting (#2550)
+
+## 2020-01-29 13.0.61 beta
+* Bug fix: System keyboard would sometimes appear blank (#2545)
+
+## 2020-01-28 13.0.60 beta
 * Feature: Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457, #2489, #2510)
 * Feature: Adds support for iOS 13.0's dark mode feature (#2277, #2312, #2468, #2521)
 * Feature: Adds QR code to keyboard info pages for easier sharing with internet availability (#2509)

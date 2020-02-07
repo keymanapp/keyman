@@ -34,4 +34,10 @@ object frmKeyman7Main: TfrmKeyman7Main
     Left = 280
     Top = 104
   end
+  object tmrCheckInputPane: TTimer
+    Interval = 500
+    OnTimer = tmrCheckInputPaneTimer
+    Left = 96
+    Top = 104
+  end
 end

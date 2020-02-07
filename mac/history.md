@@ -1,6 +1,6 @@
 # Keyman for macOS Version History
 
-## 13.0 alpha
+## 2020-01-28 13.0.14 beta
 * Feature: Add QR Code to share keyboards (#2427)
 * Bug fix: On Screen Keyboard should not show base letters for blank keycaps (#2414)
 * Bug fix: On Screen Keyboard would sometimes show unexpectedly (#2413)

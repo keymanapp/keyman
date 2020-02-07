@@ -49,13 +49,14 @@ public class ConfirmDialogFragment extends DialogFragment {
   }
 
   public static ConfirmDialogFragment newInstanceForLexicalModel(DialogType dialogType, String title, String message,
-                                                             String aModelId,
+                                                             String aLangId, String aModelId,
                                                              ArrayList<CloudApiTypes.CloudApiParam> aQueries) {
     ConfirmDialogFragment frag = new ConfirmDialogFragment();
     Bundle args = new Bundle();
     args.putSerializable(ARG_DIALOG_TYPE, dialogType);
     args.putString(ARG_TITLE, title);
     args.putString(ARG_MESSAGE, message);
+    args.putString(ARG_LANG_ID_KEY, aLangId);
     args.putString(ARG_MODEL_ID_KEY, aModelId);
     args.putSerializable(ARG_DOWNLOAD_QUERIES_KEY,aQueries);
     frag.setArguments(args);

@@ -1,6 +1,9 @@
 # Keyman Desktop Version History
 
-## 13.0 alpha
+## 2020-02-04 13.0.67 beta
+* Bug Fix(System): Windows touch keyboard would be dismissed on each keystroke if Keyman was running (#2580)
+
+## 2020-01-28 13.0.65 beta
 * Feature(Config): Add QRCode link popup to share an installed package (#2426)
 * Feature(Hotkeys): Hotkeys are now only triggered with left modifiers, avoiding conflicts with Right Alt (#2360)
 * Bug Fix(Config): "(Start Product)" package shortcuts would not install correctly (#2500)

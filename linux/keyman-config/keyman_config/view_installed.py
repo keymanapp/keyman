@@ -9,8 +9,9 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
 
-from keyman_config.list_installed_kmp import get_installed_kmp, InstallArea
+from keyman_config.list_installed_kmp import get_install_area_path, get_installed_kmp, InstallArea
 from keyman_config.welcome import WelcomeView
+from keyman_config.options import OptionsView
 from keyman_config.keyboard_details import KeyboardDetailsView
 from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
@@ -68,7 +69,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
 # window is split left/right hbox
 # right is ButtonBox
 #     possibly 2 ButtonBox in a vbox
-#         top one with _Remove, _About, ?_Welcome? or ?Read_Me?
+#         top one with _Remove, _About, ?_Welcome? or ?Read_Me?, _Options
 #         bottom one with _Download, _Install, Re_fresh, _Close
 # left is GtkTreeView - does it need to be inside anything else apart from the hbox?
 #     with liststore which defines columns
@@ -91,7 +92,8 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             str,    # version
             str,    # packageID
             int,    # enum InstallArea (KmpArea is GObject version)
-            str)    # path to welcome file if it exists or None
+            str,    # path to welcome file if it exists or None
+            str)    # path to options file if it exists or None
 
         # add installed keyboards to the the store e.g.
         # treeiter = store.append([GdkPixbuf.Pixbuf.new_from_file_at_size("/usr/local/share/keyman/libtralo/libtralo.ico.png", 16, 16), \
@@ -136,6 +138,12 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.help_button.connect("clicked", self.on_help_clicked)
         bbox_top.add(self.help_button)
 
+        self.options_button = Gtk.Button.new_with_mnemonic("_Options")
+        self.options_button.set_tooltip_text("Settings for keyboard")
+        self.options_button.connect("clicked", self.on_options_clicked)
+        self.options_button.set_sensitive(False)
+        bbox_top.add(self.options_button)
+
         vbox.pack_start(bbox_top, False, False, 12)
 
 
@@ -176,16 +184,19 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
 
             if install_area == InstallArea.IA_USER:
                 welcome_file = os.path.join(user_keyboard_dir(kmpdata['packageID']), "welcome.htm")
+                options_file = os.path.join(user_keyboard_dir(kmpdata['packageID']), "options.htm")
                 icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['packageID'] + bmppng)
                 if not os.path.isfile(icofile):
                     icofile = os.path.join(user_keyboard_dir(kmpdata['packageID']), kmpdata['keyboardID'] + bmppng)
             elif install_area == InstallArea.IA_SHARED:
                 welcome_file = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], "welcome.htm")
+                options_file = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], "options.htm")
                 icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + bmppng)
                 if not os.path.isfile(icofile):
                     icofile = os.path.join("/usr/local/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + bmppng)
             else:
                 welcome_file = os.path.join("/usr/share/keyman", kmpdata['packageID'], "welcome.htm")
+                options_file = os.path.join("/usr/share/keyman", kmpdata['packageID'], "options.htm")
                 icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['packageID'] + bmppng)
                 if not os.path.isfile(icofile):
                     icofile = os.path.join("/usr/share/keyman", kmpdata['packageID'], kmpdata['keyboardID'] + bmppng)
@@ -194,13 +205,15 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
 
             if not os.path.isfile(welcome_file):
                 welcome_file = None
-
+            if not os.path.isfile(options_file):
+                options_file = None
             treeiter = store.append([GdkPixbuf.Pixbuf.new_from_file_at_size(icofile, 16, 16), \
                 kmpdata['name'], \
                 kmpdata['version'], \
                 kmpdata['packageID'], \
                 install_area, \
-                welcome_file])
+                welcome_file, \
+                options_file])
 
     def refresh_installed_kmp(self):
         logging.debug("Refreshing listview")
@@ -225,13 +238,13 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 self.incomplete_kmp.append(kmpdata)
         self.addlistitems(os_kmp, self.store, InstallArea.IA_OS)
 
-
     def on_tree_selection_changed(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
             self.uninstall_button.set_tooltip_text("Uninstall keyboard package " + model[treeiter][1])
             self.help_button.set_tooltip_text("Help for keyboard package " + model[treeiter][1])
             self.about_button.set_tooltip_text("About keyboard package " + model[treeiter][1])
+            self.options_button.set_tooltip_text("Settings for keyboard package " + model[treeiter][1])
             logging.debug("You selected %s version %s", model[treeiter][1], model[treeiter][2])
             if model[treeiter][4] == InstallArea.IA_USER:
                 logging.debug("Enabling uninstall button for %s in %s", model[treeiter][3], model[treeiter][4])
@@ -239,10 +252,16 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             else:
                 self.uninstall_button.set_sensitive(False)
                 logging.debug("Disabling uninstall button for %s in %s  ", model[treeiter][3], model[treeiter][4])
+            # welcome file if it exists
             if model[treeiter][5]:
                 self.help_button.set_sensitive(True)
             else:
                 self.help_button.set_sensitive(False)
+            # options file if it exists
+            if model[treeiter][6]:
+                self.options_button.set_sensitive(True)
+            else:
+                self.options_button.set_sensitive(False)
 
     def on_help_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
@@ -257,6 +276,22 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 w.show_all()
             else:
                 logging.info("welcome.htm not available")
+
+    def on_options_clicked(self, button):
+      model, treeiter = self.tree.get_selection().get_selected()
+      if treeiter is not None:
+          logging.info("Open options.htm for %s if available", model[treeiter][1])
+          options_file = model[treeiter][6]
+          if options_file and os.path.isfile(options_file):
+              uri_path = pathlib.Path(options_file).as_uri()
+              logging.info("opening" + uri_path)
+              # TODO: Determine keyboardID
+              info = { "optionurl": uri_path, "packageID": model[treeiter][3], "keyboardID": model[treeiter][3] }
+              w = OptionsView(info)
+              w.resize(800, 600)
+              w.show_all()
+          else:
+              logging.info("options.htm not available")
 
     def on_uninstall_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
@@ -281,12 +316,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         model, treeiter = self.tree.get_selection().get_selected()
         if treeiter is not None:
             logging.info("Show keyboard details of " + model[treeiter][1])
-            if model[treeiter][4] == InstallArea.IA_USER:
-                areapath = user_keyman_dir()
-            elif model[treeiter][4] == InstallArea.IA_SHARED:
-                areapath = "/usr/local/share/keyman"
-            else:
-                areapath = "/usr/share/keyman"
+            areapath = get_install_area_path(model[treeiter][4])
             kmp = { "name" : model[treeiter][1], "version" : model[treeiter][2], "packageID" : model[treeiter][3],  "areapath" : areapath}
             w = KeyboardDetailsView(kmp)
             w.resize(800, 450)

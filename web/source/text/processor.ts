@@ -73,7 +73,13 @@ namespace com.keyman.text {
             if(disableDOM) {
               return '\b'; // the escape sequence for backspace.
             } else {
-              keyman.interface.defaultBackspace();
+              // If we have an available target (via Lkc/Lelem), use that instead of 
+              // forcing defaultBackspace to search for it.
+              var target: OutputTarget;
+              if(Lelem && Lelem._kmwAttachment) {
+                target = Lelem._kmwAttachment.interface;
+              }
+              keyman.interface.defaultBackspace(target);
             }
             return '';
           case Codes.keyCodes['K_TAB']:
@@ -517,6 +523,12 @@ namespace com.keyman.text {
       
       if(fromOSK && !keyman.isEmbedded) {
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+      }
+
+      // Special case for embedded to pass K_TAB back to device to process
+      if(keyman.isEmbedded && (keyEvent.Lcode == Codes.keyCodes["K_TAB"] ||
+          keyEvent.Lcode == Codes.keyCodes["K_TABBACK"] || keyEvent.Lcode == Codes.keyCodes["K_TABFWD"])) {
+        return false;
       }
 
       return !LeventMatched;

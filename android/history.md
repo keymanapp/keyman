@@ -1,6 +1,11 @@
 # Keyman for Android Version History
 
-## 13.0 alpha
+## 2020-01-31 13.0.6051 beta
+* Bug fix:
+  * Fix cancelling dictionary update notifications (#2547)
+  * Fix external keyboard key "tab" (updated Keyman Web Engine #2546)
+
+## 2020-01-28 13.0.6050 beta
 * New Features:
   * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308, #2365)
   * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)

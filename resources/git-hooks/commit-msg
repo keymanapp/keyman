@@ -12,24 +12,17 @@
 # Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 #
 
-#
-# Configurable options for types, scopes and message length.
-#
+# Step 1 - resolve the source directory of the hook, ALSO resolving any symlinks.
+# From https://stackoverflow.com/a/246128.
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+HOOK_DIRECTORY="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-types=(fix feat chore change docs style refactor test auto)
-scopes=( \
-  android android/app android/browser android/engine android/oem \
-  ci \
-  common common/core common/lmlayer \
-  developer developer/compiler developer/ide developer/tools \
-  ios ios/app ios/browser ios/engine ios/oem \
-  linux linux/config linux/engine linux/ibus linux/oem \
-  mac mac/config mac/engine mac/oem \
-  web web/engine web/oem web/ui \
-  windows windows/config windows/engine windows/oem \
-)
-min_length=4
-max_length=128
+. $HOOK_DIRECTORY/commit-msg-defs
 
 #
 # Define terminal colours.
@@ -60,6 +53,15 @@ if (git remote -v | grep -E "origin|upstream" | grep -Eq "keyboards|lexical-mode
   # echo "Keyboards or Lexical-Models. We still don't care."
   exit 0
 fi
+
+# If this script is called by another hook, it may insert a -q parameter to silence the help text.
+QUIET=0
+case $1 in
+  -q|--quiet)
+    shift   # Remove the parameter, making it equivalent to a standard git-hook call.
+    QUIET=1
+    ;;
+esac
 
 # build the regex pattern based on the config file
 function build_regex() {
@@ -107,6 +109,8 @@ build_regex
 
 if [[ ! $msg =~ $regexp ]]; then
   # commit message is invalid according to config - block commit
-  print_error
+  if [ $QUIET -eq 0 ]; then
+    print_error
+  fi
   exit 1
 fi

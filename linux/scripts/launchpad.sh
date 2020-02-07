@@ -30,6 +30,11 @@ else
     tier="${TIER}"
 fi
 
+if [ "${tier}" == "stable" ]; then
+    ppa="ppa:keymanapp/keyman"
+else
+    ppa="ppa:keymanapp/keyman-daily"
+fi
 
 if [ ! `which xmllint` ]; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
@@ -96,7 +101,7 @@ for proj in ${projects}; do
     done
     cd ..
     for dist in ${distributions}; do
-        dput ${SIM} ppa:keymanapp/keyman-daily ${proj}_${version}-${packageversion}~${dist}_source.changes
+        dput ${SIM} ${ppa} ${proj}_${version}-${packageversion}~${dist}_source.changes
     done
     cd ${BASEDIR}
 done
