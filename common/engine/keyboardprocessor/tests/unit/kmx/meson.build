@@ -55,7 +55,9 @@ tests = [
   '037 - options - double reset',
   '038 - punctkeys',
   '039 - generic ctrlalt',
-  '040 - long context'
+  '040 - long context',
+  '041 - long context and deadkeys',
+  '042 - long context and split deadkeys'
 ]
 
 if build_machine.system() == 'windows'

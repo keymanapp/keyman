@@ -1,0 +1,12 @@
+c Description: Tests that we don't split a dk in context
+c keys: [K_SPACE]
+c context: \u00ffff\u000008\u00000001abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh
+c expected: \u00ffff\u000008\u00000001abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh\u0020
+
+store(&version) '6.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh' + ' ' > 'FAIL'
