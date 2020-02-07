@@ -165,7 +165,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<number> =
     }
 
     if(!found) {
-      const entry = `${pull.title} (#${pull.number})`;
+      const entry = `* ${pull.title} (#${pull.number})`;
       console.log(`-- Adding ${entry}`);
       historyChunks.current.splice(2, 0, entry);
       changed = true;
