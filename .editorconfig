@@ -10,3 +10,6 @@ trim_trailing_whitespace = true
 
 [*.md]
 max_line_length = off
+
+[{Makefile,rules}]
+indent_style = tab

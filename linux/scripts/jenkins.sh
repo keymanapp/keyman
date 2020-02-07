@@ -36,6 +36,36 @@ fi
 sourcename=${fullsourcename%"-alpha"}
 sourcename=${sourcename%"-beta"}
 
+checkAndInstallRequirements()
+{
+	local TOINSTALL
+
+	for p in dh-python gir1.2-webkit2-4.0 python3-all python3-setuptools \
+		python3-requests python3-requests-cache python3-numpy python3-pil python3-lxml \
+		python3-gi python3-magic python3-qrcode
+	do
+		if ! dpkg -l | grep -q $p; then
+			TOINSTALL="$TOINSTALL $p"
+		fi
+	done
+
+	if [ ! -f /usr/bin/help2man ]; then
+		TOINSTALL="$TOINSTALL help2man"
+	fi
+
+	if [ ! -f /usr/bin/meson ]; then
+		TOINSTALL="$TOINSTALL meson"
+	fi
+
+	if [ -n "$TOINSTALL" ]; then
+		log "Installing prerequisites:$TOINSTALL"
+		sudo apt-get update
+		sudo apt-get -qy install $TOINSTALL
+	fi
+}
+
+checkAndInstallRequirements
+
 # clean up prev deb builds
 log "cleaning previous builds of $1"
 
