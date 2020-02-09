@@ -22,28 +22,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 #
 
 invalid=false
-
-if [ $# -lt 1 ]; then
-  if [ ! -z "${TEAMCITY_PLATFORM}" ]; then
-    platform="$TEAMCITY_PLATFORM"
-  else
-    echo "Either TEAMCITY_PLATFORM env var must be set, or must pass as first parameter"
-    invalid=true
-  fi
-else
-  platform="$1"
-fi
-
-if [ $# -lt 2 ]; then
-  if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
-    PRNUM="$TEAMCITY_PR_NUMBER"
-  else
-    echo "Either TEAMCITY_PR_NUMBER env var must be set, or must pass as second parameter"
-    invalid=true
-  fi
-else
-  PRNUM="$2"
-fi
+platform="$TEAMCITY_PLATFORM"
+PRNUM="$TEAMCITY_PR_NUMBER"
 
 if [[ ! "$platform" =~ android|ios|linux|mac|web|windows ]]; then
   echo "Invalid platform $platform"
@@ -52,9 +32,10 @@ fi
 
 if [ "$platform" == "android" ]; then
   echo "Testing cancellation of build! Skipping build."
-  echo "##teamcity[buildStatus status='SUCCESS' text='Testing cancellation of build - status message! Skipping build.']"
+  # echo "##teamcity[buildStatus status='SUCCESS' text='Testing cancellation of build - status message! Skipping build.']"
   echo "##teamcity[buildStop comment='Testing cancellation of build - cancel message! Skipping build.']"
-  exit 0
+  ./report-build-status.sh finish "$@"
+  exit 1
 fi
 
 if [[ $invalid == true ]]; then
@@ -109,6 +90,7 @@ if [ "$prfiles" == "abort" ]; then
   # Cancel the build
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
   echo "##teamcity[buildStop comment='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
+  ./report-build-status.sh finish "$@"
   exit 0
 fi
 
@@ -133,4 +115,5 @@ popd >/dev/null
 # Cancel the build
 echo "Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build."
 echo "##teamcity[buildStop comment='Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build.']"
+./report-build-status.sh finish "$@"
 exit 0
