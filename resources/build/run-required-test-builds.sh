@@ -44,13 +44,23 @@ available_platforms=(android ios linux mac web windows)
 function triggerTestBuilds() {
   # Note: we always run builds for 'all' platforms
   local platforms=( `echo "all $1"` )
+  local branch="$2"
+
+  # Translate simple pull request number vs branch name
+  # back to required branch specification to trigger build
+  if [[ "$branch" =~ ^[[:digit:]]+$ ]]; then
+    branch=refs/pull/$branch/head
+  else
+    branch="refs/heads/$branch"
+  fi
+
   for platform in "${platforms[@]}"; do
     echo "# $platform: changes detected"
     eval test_builds='(${'bc_test_$platform'[@]})'
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
       echo "  -- Triggering build configuration $test_build"
-      triggerBuild "$test_build" $vcs_test
+      triggerBuild "$test_build" "$vcs_test" "$branch"
     done
   done
 }
@@ -62,7 +72,7 @@ function triggerTestBuilds() {
 
 if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
   echo ". Branch $PRNUM needs to pass tests on all platforms."
-  triggerTestBuilds "`echo ${available_platforms[@]}`"
+  triggerTestBuilds "`echo ${available_platforms[@]}`" "$PRNUM"
   exit 0
 fi
 
@@ -133,6 +143,6 @@ done <<< "$prfiles"
 #
 
 echo ". Start test builds"
-triggerTestBuilds "`echo ${build_platforms[@]}`"
+triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
 
 exit 0

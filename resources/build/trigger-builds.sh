@@ -25,6 +25,13 @@ function triggerBuild() {
   local TEAMCITY_BUILDTYPE="$1"
   local TEAMCITY_VCS_ID="$2"
 
+  if [[ $# -gt 2 ]]; then
+    local TEAMCITY_BRANCH_NAME="$3"
+    TEAMCITY_BRANCH_NAME="branchName='$TEAMCITY_BRANCH_NAME'"
+  else
+    local TEAMCITY_BRANCH_NAME=
+  fi
+
   local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
 
@@ -34,5 +41,5 @@ function triggerBuild() {
     -H "Accept: application/json" \
     -H "Origin: $TEAMCITY_SERVER" \
     $TEAMCITY_SERVER/app/rest/buildQueue \
-    -d "<build><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
+    -d "<build><buildType id='$TEAMCITY_BUILDTYPE' $TEAMCITY_BRANCH_NAME /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
 }
