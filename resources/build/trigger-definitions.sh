@@ -26,19 +26,12 @@ watch_windows='common|developer|web'
 # One day we may have tests that run on all platform changes
 bc_test_all=()
 
-bc_test_android=(KeymanAndroid_TestPullRequests)
-bc_test_ios=()
-bc_test_linux=()
-bc_test_mac=()
-bc_test_windows=()
-bc_test_web=()
-
-# bc_test_android=(KeymanAndroid_TestPullRequests KeymanAndroid_TestSamplesAndTestProjects)
-# bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
-# bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_Linux)
-# bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
-# bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
-# bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests)
+bc_test_android=(KeymanAndroid_TestPullRequests KeymanAndroid_TestSamplesAndTestProjects)
+bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
+bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_Linux)
+bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
+bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
+bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests)
 # Keymanweb_TestPullRequestRegressions : currently this is timing out so disabled until we have
 #                                        time to investigate further
 
