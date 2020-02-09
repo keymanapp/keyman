@@ -50,7 +50,7 @@ function triggerTestBuilds() {
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
       echo "  -- Triggering build configuration $test_build"
-      # triggerBuild "$test_build" $vcs_test
+      triggerBuild "$test_build" $vcs_test
     done
   done
 }
