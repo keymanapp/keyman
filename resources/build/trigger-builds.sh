@@ -27,7 +27,8 @@ function triggerBuild() {
 
   if [[ $# -gt 2 ]]; then
     local TEAMCITY_BRANCH_NAME="$3"
-    TEAMCITY_BRANCH_NAME="branchName='$TEAMCITY_BRANCH_NAME'"
+    echo "  Triggering build for: $TEAMCITY_BRANCH_NAME"
+    TEAMCITY_BRANCH_NAME="branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'"
   else
     local TEAMCITY_BRANCH_NAME=
   fi
@@ -35,11 +36,15 @@ function triggerBuild() {
   local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
 
+  local command="<build><buildType id='$TEAMCITY_BUILDTYPE' $TEAMCITY_BRANCH_NAME /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
+
+  echo "Call: $command"
+
   curl -s --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
     -H "Accept: application/json" \
     -H "Origin: $TEAMCITY_SERVER" \
     $TEAMCITY_SERVER/app/rest/buildQueue \
-    -d "<build><buildType id='$TEAMCITY_BUILDTYPE' $TEAMCITY_BRANCH_NAME /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
+    -d "$command"
 }
