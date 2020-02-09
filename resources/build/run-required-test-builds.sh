@@ -46,14 +46,6 @@ function triggerTestBuilds() {
   local platforms=( `echo "all $1"` )
   local branch="$2"
 
-  # Translate simple pull request number vs branch name
-  # back to required branch specification to trigger build
-  if [[ "$branch" =~ ^[[:digit:]]+$ ]]; then
-    branch=refs/pull/$branch/head
-  else
-    branch="refs/heads/$branch"
-  fi
-
   for platform in "${platforms[@]}"; do
     echo "# $platform: changes detected"
     eval test_builds='(${'bc_test_$platform'[@]})'

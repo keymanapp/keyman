@@ -27,7 +27,7 @@ function triggerBuild() {
 
   if [[ $# -gt 2 ]]; then
     local TEAMCITY_BRANCH_NAME="$3"
-    echo "  Triggering build for: $TEAMCITY_BRANCH_NAME"
+    #debug echo "  Triggering build for: $TEAMCITY_BRANCH_NAME"
     TEAMCITY_BRANCH_NAME="branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'"
   else
     local TEAMCITY_BRANCH_NAME=
@@ -38,7 +38,7 @@ function triggerBuild() {
 
   local command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID,buildType:(id:$TEAMCITY_BUILDTYPE)'/></lastChanges></build>"
 
-  echo "Call: $command"
+  #debug echo "Call: $command"
 
   curl -s --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
