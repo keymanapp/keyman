@@ -34,7 +34,7 @@ if [ "$platform" == "android" ]; then
   echo "Testing cancellation of build! Skipping build."
   # echo "##teamcity[buildStatus status='SUCCESS' text='Testing cancellation of build - status message! Skipping build.']"
   echo "##teamcity[buildStop comment='Testing cancellation of build - cancel message! Skipping build.']"
-  ./report-build-status.sh finish "$@"
+  # "$(dirname "$THIS_SCRIPT")/report-build-status.sh" finish "$@"
   exit 1
 fi
 
@@ -59,6 +59,7 @@ fi
 
 if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
   echo "Branch spec $PRNUM is not a pull request number; not stopping build."
+  "$(dirname "$THIS_SCRIPT")/report-build-status.sh" start "$@"
   exit 0
 fi
 
@@ -90,7 +91,7 @@ if [ "$prfiles" == "abort" ]; then
   # Cancel the build
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
   echo "##teamcity[buildStop comment='Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build.']"
-  ./report-build-status.sh finish "$@"
+  # "$(dirname "$THIS_SCRIPT")/report-build-status.sh" finish "$@"
   exit 0
 fi
 
@@ -106,6 +107,7 @@ while IFS= read -r line; do
   # echo "... $line"
   if [[ "$line" =~ $watch ]]; then
     echo "Platform $platform is impacted by changes found in PR #$PRNUM. Continuing build."
+    "$(dirname "$THIS_SCRIPT")/report-build-status.sh" start "$@"
     exit 0
   fi
 done <<< "$prfiles"
@@ -115,5 +117,5 @@ popd >/dev/null
 # Cancel the build
 echo "Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build."
 echo "##teamcity[buildStop comment='Platform $platform is not impacted by the changes found in PR #$PRNUM. Skipping build.']"
-./report-build-status.sh finish "$@"
+# "$(dirname "$THIS_SCRIPT")/report-build-status.sh" finish "$@"
 exit 0

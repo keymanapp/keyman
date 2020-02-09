@@ -29,7 +29,8 @@ else
   if [[ "$BUILDSTATE" == "SUCCESS" ]]; then
     STATE="success"
   elif [[ "$BUILDSTATE" == "UNKNOWN" ]]; then
-    STATE="success"
+    # This is a cancelled build; we don't report it
+    exit 0
   elif [[ "$BUILDSTATE" == "FAILURE" ]]; then
     STATE="failure"
   else
