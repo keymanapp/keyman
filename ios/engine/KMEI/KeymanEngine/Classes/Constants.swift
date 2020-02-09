@@ -77,7 +77,7 @@ public enum Defaults {
   public static let lexicalModel = InstallableLexicalModel(id: "nrc.en.mtnt",
                                                    name: "English dictionary (MTNT)",
                                                    languageID: "en",
-                                                   version: "0.1.2",
+                                                   version: "0.1.4",
                                                    isCustom: false)
 }
 
