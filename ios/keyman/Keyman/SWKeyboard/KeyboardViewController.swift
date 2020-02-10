@@ -21,7 +21,7 @@ class KeyboardViewController: InputViewController {
     #endif
     Manager.applicationGroupIdentifier = "group.KM4I"
 
-    topBarImageSource = ImageBannerViewController()
+    topBarImageSource = ImageBannerViewController(nibName: "ImageBanner", bundle: Bundle(for: KeyboardViewController.self))
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
