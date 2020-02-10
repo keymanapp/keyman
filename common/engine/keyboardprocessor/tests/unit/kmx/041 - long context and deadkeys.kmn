@@ -12,12 +12,14 @@ group(Main) using keys
 c Test 1 
 dk(1) 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh' + '1' > context '1'
 
-c Test 2
+c Test 2: Test that we haven't split a deadkey code: UC_SENTINEL CODE_DEADKEY <deadkey_number>
+c         because: CODE_DEADKEY = U+0008; deadkey_number = U+0001
 U+0008 U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh1' + '2' > 'FAIL TEST 2'
 U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh1' + '2' > 'FAIL TEST 2'
 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh1' + '2' > context '2'
 
-c Test 3
+c Test 3: Test that we haven't split a deadkey code: UC_SENTINEL CODE_DEADKEY <deadkey_number>
+c         because: CODE_DEADKEY = U+0008; deadkey_number = U+0001
 U+0008 U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh12' + '3' > 'FAIL TEST 3'
 U+0001 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh12' + '3' > 'FAIL TEST 3'
 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh12' + '3' > context '3'

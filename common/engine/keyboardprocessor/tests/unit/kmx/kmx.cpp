@@ -362,8 +362,8 @@ std::u16string parse_source_string(std::string const & s) {
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 8);
         v = std::stoul(s1, &n, 16);
-        // Allow deadkey characters onward
-        assert(v >= CODE_ANY && v <= 0x10FFFF);
+        // Allow deadkey_number (U+0001) characters and onward
+        assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n-1;
         if (v < 0x10000) {
           t += km_kbp_cp(v);
