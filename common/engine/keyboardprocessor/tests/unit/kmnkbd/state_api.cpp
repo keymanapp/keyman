@@ -151,6 +151,13 @@ int main(int, char * [])
   if(km_kbp_context_length(km_kbp_state_context(test_clone)) != 0)
     return __LINE__;
 
+  std::cout << "___ doc1 Expected ___" << std::endl
+            << doc1_expected << std::endl;
+
+  auto doc1 = get_json_doc(*test_state);
+  std::cout << "___ doc1 Actual -- before modification ___" << std::endl
+            << doc1 << std::endl;
+
   // Overwrite some data.
   km_kbp_option_item new_opt[] = {
     {u"hello", u"globe", KM_KBP_OPT_ENVIRONMENT},
@@ -163,6 +170,7 @@ int main(int, char * [])
   if (attrs->current - attrs->age > KM_KBP_LIB_CURRENT
       || attrs->current < KM_KBP_LIB_CURRENT) return __LINE__;
   if (attrs->max_context < 16) return __LINE__;
+
 
   try_status(km_kbp_process_event(test_state, KM_KBP_VKEY_S,
                                   KM_KBP_MODIFIER_SHIFT));
@@ -183,10 +191,12 @@ int main(int, char * [])
                       {uintptr_t(&expected_persist_opt)}}}));
 
   // Test debug dump
-  auto doc1 = get_json_doc(*test_state),
-       doc2 = get_json_doc(*test_clone);
+  doc1 = get_json_doc(*test_state);
+  auto doc2 = get_json_doc(*test_clone);
 
-  std::cout << doc1 << std::endl;
+  std::cout << "___ doc1 Actual ___" << std::endl
+            << doc1 << std::endl;
+
   std::cout << doc2 << std::endl;
 
   // These should not be equal.

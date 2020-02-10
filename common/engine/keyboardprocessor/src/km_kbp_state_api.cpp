@@ -158,7 +158,6 @@ json & operator << (json & j, actions const & acts)
     return j;
 }
 
-
 km_kbp_status km_kbp_state_to_json(km_kbp_state const *state,
                                         char *buf,
                                         size_t *space)
