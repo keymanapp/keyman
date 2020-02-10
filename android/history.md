@@ -1,5 +1,15 @@
 # Keyman for Android Version History
 
+## 2020-02-10 13.0.6055 beta
+* Change:
+  * Update default nrc.en.mtnt model to version 0.1.4 (#2608)
+
+## 2020-02-06 13.0.6054 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2561)
+
+## 2020-02-04 13.0.6053 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2559)
+
 ## 2020-01-31 13.0.6051 beta
 * Bug fix:
   * Fix cancelling dictionary update notifications (#2547)
