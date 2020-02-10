@@ -16,7 +16,7 @@ install-temp:
 	mkdir -p /tmp/kmfl/`python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)'`
 	PYTHONUSERBASE=/tmp/kmfl python3 setup.py install --user
 
-uninstall: # run as sudo
+uninstall: clean # run as sudo
 	rm -rf /usr/local/share/keyman/icons
 	rm -f /usr/local/share/man/man1/km-*.1
 	pip3 uninstall keyman_config
