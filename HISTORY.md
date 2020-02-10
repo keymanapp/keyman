@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.9 alpha 2020-02-10
+
+* fix(common/core): buffer overrun in context api (#2614)
+* fix(ci): refactor trigger of test builds (#2611)
+* fix(linux): Fix packaging of keyman-config on Xenial (#2609)
+
 ## 14.0.8 alpha 2020-02-07
 
 * chore(ci): Tweak history management (#2602)
