@@ -242,7 +242,7 @@ json & operator << (json & j, km::kbp::context const & ctxt) {
 
 json & operator << (json & j, km_kbp_context_item const & i)
 {
-  utf8::codeunit_t cps[4] = {0,};
+  utf8::codeunit_t cps[7] = {0,};
   int8_t l = 4;
 
   switch (i.type)
