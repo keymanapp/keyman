@@ -317,7 +317,13 @@ extension KeymanWebViewController {
   
   func setBannerImage(to path: String) {
     bannerImgPath = path // Save the path in case delayed initializaiton is needed.
-    log.debug("Banner image path: '\(path).'")
+    var logString: String
+    if path.contains("base64") || path.count > 256 {
+      logString = "<base64 image>"
+    } else {
+      logString = path
+    }
+    log.debug("Banner image path: '\(logString).'")
     webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
   }
   

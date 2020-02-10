@@ -10,6 +10,8 @@ import KeymanEngine
 import UIKit
 
 class KeyboardViewController: InputViewController {
+  var topBarImageSource: ImageBannerViewController!
+
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
@@ -18,6 +20,8 @@ class KeyboardViewController: InputViewController {
       KeymanEngine.log.outputLevel = .warning
     #endif
     Manager.applicationGroupIdentifier = "group.KM4I"
+
+    topBarImageSource = ImageBannerViewController(nibName: "ImageBanner", bundle: Bundle(for: KeyboardViewController.self))
 
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
@@ -33,45 +37,58 @@ class KeyboardViewController: InputViewController {
       return
     }
 
-    setupTopBarImage(isPortrait: InputViewController.isPortrait)
+    setupTopBarImage(size: view.frame.size)
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupTopBarImage(isPortrait: InputViewController.isPortrait)
+    setupTopBarImage(size: view.frame.size)
   }
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
-    setupTopBarImage(isPortrait: UIDevice.current.orientation.isPortrait)
+    setupTopBarImage(size: size)
   }
 
-  func getTopBarImage(isPortrait: Bool) -> String? {
-    if isPortrait {
-      return Bundle.main.path(forResource: "banner-Portrait@2x", ofType: "png")
-    }
-
-    // iPad
-    if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.phone {
-      return Bundle.main.path(forResource: "banner-Landscape@2x", ofType: "png")
-    }
-
-    // iPhone
-    let screenRect = UIScreen.main.bounds
-    if CGFloat.maximum(screenRect.height, screenRect.width) >= 568.0 {
-      return Bundle.main.path(forResource: "banner-Landscape-568h@2x", ofType: "png")
-    } else {
-      return Bundle.main.path(forResource: "banner-Landscape@2x", ofType: "png")
-    }
+  func getTopBarImage(size: CGSize) -> String? {
+    return topBarImageSource.renderAsBase64(size: CGSize(width: size.width, height: self.activeTopBarHeight))
   }
 
-  func setupTopBarImage(isPortrait: Bool) {
-    let imgPath = getTopBarImage(isPortrait: isPortrait)
+  func setupTopBarImage(size: CGSize) {
+    let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
       log.error("No image specified for the image banner!")
       return
     }
 
     self.setBannerImage(to: path)
+  }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    guard let previousTraitCollection = previousTraitCollection else {return}
+    if #available(iOS 13.0, *) {
+      if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
+        /* Ensure that the keyboard banner image transitions!  Noting that the backing view isn't in the view hierarchy,
+         * and that manipulating said hierarchy is key for triggering the appearance change
+         * (see https://developer.apple.com/documentation/uikit/uiappearance)...
+         *
+         * We have to reload the banner's backing view to trigger the change.  Thanks, Apple.
+         * The only other alternative - creating a new instance of the view & its controller.
+         *
+         * With loadView, at least we can reuse the old instance, which would serve far better
+         * for engine API calls if we decide to let the base InputViewController perform UIView
+         * render functionality (as a KMEI offering) instead of having it only in our app.
+         * That said, note https://developer.apple.com/documentation/uikit/uiviewcontroller/1621454-loadview:
+         *
+         * > You should never call this method directly.
+         *
+         * Well... I wouldn't, if it weren't the only way to trigger this without requiring a new instance.
+         * We should be fine since we never place the banner's backing view into the actual hierarchy.
+         */
+        topBarImageSource.loadView()
+        setupTopBarImage(size: view.frame.size)
+      }
+    }
   }
 }
