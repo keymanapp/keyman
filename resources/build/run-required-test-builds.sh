@@ -31,12 +31,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
 
 #
-# Definitions
-#
-
-available_platforms=(android ios linux mac web windows)
-
-#
 # Iterate through the platforms 'array' passed in and 
 # run builds associated with each platform found
 #
@@ -63,6 +57,7 @@ function triggerTestBuilds() {
 #
 
 if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
+  # branch name is 'master', 'beta' [, or 'stable' -- in the future]
   echo ". Branch $PRNUM needs to pass tests on all platforms."
   triggerTestBuilds "`echo ${available_platforms[@]}`" "$PRNUM"
   exit 0

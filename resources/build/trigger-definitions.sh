@@ -3,6 +3,8 @@
 # This file maps specific paths to build triggers
 #
 
+available_platforms=(android ios linux mac web windows)
+
 # the base folder for each pattern does not need to be included, nor oem folders
 # e.g. android='common/predictive-text|common/lexical-model-types'
 # will expand into android='^(android|(oem/[^/]+/android)|common/predictive-text|common/lexical-model-types)'
