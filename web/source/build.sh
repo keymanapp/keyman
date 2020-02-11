@@ -6,9 +6,10 @@
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
     echo
-    echo "  -ui               to compile desktop user interface modules to output folder"
+    echo "  -ui               to compile only desktop user interface modules"
     echo "  -test             to compile for testing without copying resources or" 
-    echo "                    updating the saved version number."
+    echo "                    updating the saved version number.  Assumes dependencies
+                              are unaltered."
     echo "  -embed            to compile only the KMEA/KMEI embedded engine."
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
@@ -41,14 +42,6 @@ fail() {
 WEB_TARGET=( "keymanweb.js" )
 UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
 EMBED_TARGET=( "keyman.js" )
-
-# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
 
 # Variables for the LMLayer
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
@@ -295,6 +288,14 @@ readonly BUILD_FULLWEB
 readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
 readonly DO_MINIFY
+
+# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
+echo "Node.js + dependencies check"
+npm install --no-optional
+
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
 
 generate_environment_ts_file ( ) {
     if [ -f $ENVIRONMENT_FILE ];
