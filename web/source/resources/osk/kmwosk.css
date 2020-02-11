@@ -84,12 +84,13 @@
 }
 
 .ios .kmw-banner-bar .kmw-suggest-option {
-  background-color: #fdfdfe;
   display:inline-block;
   text-align: center;
-  border-radius: 5px;
-  border-bottom: solid 1px #8a8d90;
-  vertical-align: top;
+  vertical-align: middle;
+}
+
+.ios .kmw-banner-bar .kmw-banner-separator {
+  border-left: solid 1px #b2b9c5;
 }
 
 .ios .kmw-suggestion-text {
@@ -108,10 +109,9 @@
   .ios .kmw-banner-bar {
     background-color: #0f1319; 
   }
-  
-  .ios .kmw-banner-bar .kmw-suggest-option {
-    background-color: #3d3d3e;
-    border-bottom: solid 1px #8a8d90;
+
+  .ios .kmw-banner-bar .kmw-banner-separator {
+    border-left: solid 1px #8a8d90
   }
   
   .ios .kmw-suggestion-text {
@@ -147,11 +147,9 @@
 }
 
 .phone.android .kmw-banner-bar .kmw-suggest-option {
-  background-color: #333;
   display:inline-block;
   text-align: center;
-  border-radius: 5px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .phone.android .kmw-suggestion-text {
@@ -221,11 +219,9 @@
 }
 
 .tablet.android .kmw-banner-bar .kmw-suggest-option {
-  background-color: #b4b4b8; 
   display:inline-block; 
   text-align: center; 
-  border-radius: 5px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .tablet.android .kmw-suggestion-text {
@@ -272,8 +268,9 @@
 .kmw-title-bar-actions{position: absolute; cursor: default; right:2px; top:0; width: 33px; height: 13px;}
 .kmw-footer-caption{color:#fff;font:0.7em Arial;margin:0 0 0 4px;}
 
-.kmw-banner-bar{height:100%; width:100%; margin:0; background-color:darkorange; display: inline-block;}
-.kmw-banner-bar .kmw-suggest-option {background-color: orange; display:inline-block; text-align: center; height: 85%; border-radius: 5px;overflow-x:scroll}
+.kmw-banner-bar{height:100%; width:100%; margin:0; background-color:darkorange; display: inline-block; white-space: nowrap;}
+.kmw-banner-bar .kmw-banner-separator {border-left: solid 1px #8a8d90; width: 0px; vertical-align: middle; height: 45%; display: inline-block;}
+.kmw-banner-bar .kmw-suggest-option {display:inline-block; text-align: center; height: 85%; overflow-x:hidden}
 .kmw-suggestion-text{color:#fff; line-height: normal; position: relative; vertical-align: middle;}
 
 .kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;
