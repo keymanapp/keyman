@@ -73,12 +73,6 @@ minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedL
 minifier_lang_specs="--language_in ECMASCRIPT5 --language_out ECMASCRIPT5"
 minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_warnings --generate_exports $minifier_lang_specs"
 
-if ! [ -f $minifier ];
-then
-    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-    exit 1
-fi
-
 readonly minifier
 readonly minifycmd
 
@@ -295,6 +289,13 @@ npm install --no-optional
 
 if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
+
+# NPM install is required for the file to be present.
+if ! [ -f $minifier ];
+then
+    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
+    exit 1
 fi
 
 generate_environment_ts_file ( ) {
