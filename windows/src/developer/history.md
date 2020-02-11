@@ -1,6 +1,7 @@
 # Keyman Developer Version History
 
 ## 2020-02-11 13.0.66 beta
+* Bug Fix(Compiler): Merge of .keyboard_info files would not always get platform support correct (#2621)
 * Bug Fix(Compiler): Missing keyboard file led to misleading error in package compiler (#2620)
 * Bug Fix(Compiler): Double-click to drop character onto touch layout was disabled (#2619)
 
