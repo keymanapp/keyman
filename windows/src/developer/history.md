@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2020-02-12 13.0.72 beta
+* Bug Fix(IDE/Debugger): MIME type mismatch on some systems could cause web test to fail (#2633)
+
 ## 2020-02-11 13.0.66 beta
 * Bug Fix(Compiler): Merge of .keyboard_info files would not always get platform support correct (#2621)
 * Bug Fix(Compiler): Missing keyboard file led to misleading error in package compiler (#2620)
