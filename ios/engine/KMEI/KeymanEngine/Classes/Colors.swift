@@ -22,9 +22,6 @@ public class Colors {
 
   public static var popupBorder: UIColor {
     get {
-//      if #available(iOSApplicationExtension 11.0, *) {
-//        return UIColor(named: "SelectionPrimary")!
-//      } else {
         return UIColor(red: 134.0 / 255.0,
                        green: 137.0 / 255.0,
                        blue: 139.0 / 255.0,
@@ -91,6 +88,19 @@ public class Colors {
         return UIColor(red: 210.0 / 255.0,
                        green: 214.0 / 255.0,
                        blue: 220.0 / 255.0,
+                       alpha: 1.0)
+      }
+    }
+  }
+
+  public static var keyboardSelectionPrimary: UIColor {
+    get {
+      if #available(iOS 11.0, *) {
+        return UIColor(named: "KeyboardSelectionPrimary", in: engineBundle, compatibleWith: nil)!
+      } else {
+        return UIColor(red: 204.0 / 255.0,
+                       green: 136.0 / 255.0,
+                       blue: 34.0 / 255.0,
                        alpha: 1.0)
       }
     }
