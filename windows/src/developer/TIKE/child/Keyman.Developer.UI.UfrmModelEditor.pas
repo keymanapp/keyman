@@ -118,6 +118,7 @@ type
     function CheckModifiedWordlistsForRemoval(
       newParser: TLexicalModelParser): Boolean;
     procedure UpdateQRCode;
+    procedure WordlistModifiedChanged(Sender: TObject);
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -465,6 +466,15 @@ begin
 
   Result.Frame.Parent := Result.Tab;
   Result.Frame.Visible := True;
+
+  Result.Frame.OnModifiedChanged := WordlistModifiedChanged;
+end;
+
+procedure TfrmModelEditor.WordlistModifiedChanged(Sender: TObject);
+begin
+  // We only go from clean to dirty, not vice-versa, on this notification
+  if (Sender as TframeWordlistEditor).Modified then
+    Modified := True;
 end;
 
 { TfrmModelEditor.TWordlists }
