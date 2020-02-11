@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.HashMap;
@@ -56,7 +57,13 @@ public class CloudDownloadMgr{
   {
     if(isInitialized)
       return;
-    aContext.registerReceiver(completeListener,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    try {
+      aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    } catch (Exception e) {
+      String message = "CloudDownloadMgr re-initializing";
+      Toast.makeText(aContext, message,
+        Toast.LENGTH_SHORT).show();
+    }
     isInitialized = true;
   }
 
@@ -68,7 +75,13 @@ public class CloudDownloadMgr{
   {
     if(!isInitialized)
       return;
-    aContext.unregisterReceiver(completeListener);
+    try {
+      aContext.unregisterReceiver(completeListener);
+    } catch (Exception e) {
+      String message = "CloudDownloadMgr shutting down.";
+      Toast.makeText(aContext, message,
+        Toast.LENGTH_SHORT).show();
+    }
     isInitialized = false;
   }
 
@@ -184,8 +197,10 @@ public class CloudDownloadMgr{
                                 ICloudDownloadCallback<ModelType,ResultType> aCallback,
                                 CloudApiTypes.CloudApiParam... params)
   {
-    if(!isInitialized)
-      throw new IllegalStateException("Downloadmanager is not initialize. Call KMManger.initialize before");
+    if(!isInitialized) {
+      Log.w(TAG, "Downloadmanager not initialized. Initializing CloudDownloadMgr.");
+      initialize(aContext);
+    }
 
     synchronized (downloadSetByDownloadIdentifier) {
 
