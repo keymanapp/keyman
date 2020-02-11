@@ -118,6 +118,7 @@ uses
   BCP47Tag,
   JsonUtil,
   Keyman.System.KeyboardInfoFile,
+  Keyman.System.KeyboardUtils,
   Keyman.System.LanguageCodeUtils,
   utilfiletypes,
   VersionInfo;
@@ -925,6 +926,17 @@ var
     end;
   end;
 
+  function packageContainsKeyboardJs(const id: string): Boolean;
+  var
+    kf: TKeyboardInfoMap;
+  begin
+    for kf in FPackageJSFileInfos do
+      if SameText(TKeyboardUtils.KeyboardFileNameToID(kf.Filename), id) then
+        Exit(True);
+
+    Result := False;
+  end;
+
 begin
   try
     // Validate pre-existing platformSupport
@@ -978,8 +990,11 @@ begin
       AddNewPair('windows', 'full');
       AddNewPair('macos', 'full');
       AddNewPair('linux', 'full');
-      AddNewPair('android', 'full');
-      AddNewPair('ios', 'full');
+      if packageContainsKeyboardJs(TKeyboardUtils.KeyboardFileNameToId(keyboardFile.Filename)) then
+      begin
+        AddNewPair('android', 'full');
+        AddNewPair('ios', 'full');
+      end;
     end
     else
     begin
@@ -1006,20 +1021,23 @@ begin
         if target = ktLinux then
           AddNewPair('linux', 'full');
 
-        // FPackageKMXFileInfos can contain target information for web/mobile targets.
-        // This is a current limitation of FPackageJSFileInfos if there's no kmx files
-        if (target = ktMobile) then
+        if packageContainsKeyboardJs(TKeyboardUtils.KeyboardFileNameToId(keyboardFile.Filename)) then
         begin
-          AddNewPair('android', 'full');
-          AddNewPair('ios', 'full');
-        end;
-        if (target = ktIphone) or (target = ktIpad) then
-        begin
-          AddNewPair('ios', 'full');
-        end;
-        if (target = ktAndroidphone) or (target = ktAndroidtablet) then
-        begin
-          AddNewPair('android', 'full');
+          // FPackageKMXFileInfos can contain target information for web/mobile targets.
+          // This is a current limitation of FPackageJSFileInfos if there's no kmx files
+          if (target = ktMobile) then
+          begin
+            AddNewPair('android', 'full');
+            AddNewPair('ios', 'full');
+          end;
+          if (target = ktIphone) or (target = ktIpad) then
+          begin
+            AddNewPair('ios', 'full');
+          end;
+          if (target = ktAndroidphone) or (target = ktAndroidtablet) then
+          begin
+            AddNewPair('android', 'full');
+          end;
         end;
       end;
     end;
