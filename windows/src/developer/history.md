@@ -1,5 +1,9 @@
 # Keyman Developer Version History
 
+## 2020-02-11 13.0.66 beta
+* Bug Fix(Compiler): Missing keyboard file led to misleading error in package compiler (#2620)
+* Bug Fix(Compiler): Double-click to drop character onto touch layout was disabled (#2619)
+
 ## 2020-01-28 13.0.65 beta
 * Feature(Compiler): Hotkeys defined in .kmn no longer need to be quoted (#2432)
 * Feature(IDE): Enhanced Lexical Model Editor (#2396)
