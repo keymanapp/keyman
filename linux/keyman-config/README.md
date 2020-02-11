@@ -6,12 +6,19 @@ If you are running from the repo or installing keyman-config manually rather tha
 then you will need to
 
 `sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil python3-requests 
-python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli python3-setuptools`
+python3-requests-cache python3 python3-gi gir1.2-webkit-2.4 dconf-cli python3-setuptools`
 
 You will also need kmflcomp either from a package or built and installed locally.
 
-run the script `./createkeymandirs.sh` to create the directories for these programs to
+Run the script `./createkeymandirs.sh` to create the directories for these programs to
 install the packages to
+
+Also copy and compile the GSettings schema
+```bash
+cd keyman_config
+sudo cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas
+```
 
 ### Installing manually from the repo
 
@@ -32,6 +39,7 @@ This displays a configuration panel that shows the currently installed Keyman ke
 * `Uninstall` - uninstall selected keyboard
 * `About` - show information about selected keyboard
 * `Help` - display help documentation about selected keyboard
+* `Options` - display options.htm form for setting keyboard options
 -----------------------------------
 
 * `Refresh` - useful if you install or uninstall on the commandline while running km-config.
@@ -43,12 +51,9 @@ This displays a configuration panel that shows the currently installed Keyman ke
 
 This uses the keyman.com website to install kmps.
 
-The website doesn't know about linux yet (until after 10.0 release) so
-pretending to be a mac for now.
-
-Search for a language or keyboard in the search box
-Select a keyboard from the list
-In 'Downloads for your device' there will be a 'Install keyboard' button for the keyboard for macOS
+Search for a language or keyboard in the search box.
+Select a keyboard from the list.
+In 'Downloads for your device' there will be an 'Install keyboard' button for the keyboard for Linux.
 Click it to download the keyboard and bring up the `InstallKmpWindow` for more details and to confirm installing.
 
 Secondary-click gives you a menu including 'Back' to go back a page.

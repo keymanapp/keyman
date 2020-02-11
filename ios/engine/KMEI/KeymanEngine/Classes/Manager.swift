@@ -183,10 +183,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
     Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
     if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+
+      // Ensure the default keyboard is installed in this case.
+      do {
+        try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+      } catch {
+        log.error("Failed to copy default keyboard from bundle: \(error)")
+      }
     }
-    Migrations.updateResources(storage: Storage.active)
     Migrations.engineVersion = Version.current
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
@@ -810,9 +818,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
-      try Storage.copyAndExcludeFromBackup(at: url,
-                                           to: keyboardDir.appendingPathComponent(url.lastPathComponent),
-                                           shouldOverwrite: shouldOverwrite)
+      try Storage.copy(at: url,
+                       to: keyboardDir.appendingPathComponent(url.lastPathComponent),
+                       shouldOverwrite: shouldOverwrite,
+                       excludeFromBackup: true)
     }
   }
 

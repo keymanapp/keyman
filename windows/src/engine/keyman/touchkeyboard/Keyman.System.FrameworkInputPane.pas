@@ -63,6 +63,7 @@ type
 implementation
 
 uses
+  System.Types,
   Winapi.ActiveX,
   Keyman.System.DebugLogClient;
 

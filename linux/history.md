@@ -1,5 +1,17 @@
 # Keyman for Linux Version History
 
+## 2020-02-10 13.0.27 beta
+* Bug Fix:
+  * Fix setting context when >= 64 characters (common #2607)
+
+## 2020-02-06 13.0.26 beta
+* New Feature:
+  * Add ability to set keyboard options from options.htm dialog (#2566)
+
+## 2020-02-05 13.0.25 beta
+* Bug Fix:
+  * Fix "About" keyboard when missing copyright info (#2583)
+
 ## 2020-02-04 13.0.23 beta
 * Remove cosmic and disco releases. Add eoan (#2574)
 

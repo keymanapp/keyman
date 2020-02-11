@@ -533,7 +533,7 @@ public class ResourceDownloadManager {
           }
         }
       } else if let lex = res as? InstallableLexicalModel {
-        if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.filename,
+        if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
            let path = URL.init(string: filename) {
           if let batch = self.buildLexicalModelDownloadBatch(for: lex, withFilename: path, asActivity: .update) {
             batches.append(batch)
