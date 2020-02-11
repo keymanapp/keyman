@@ -1,5 +1,9 @@
 # Keyman for iPhone and iPad Version History
 
+## 2020-02-11 13.0.67 beta
+* Bug fix: fixed issue with sample apps and engine keyboard switcher (#2626)
+* Bug fix: fixed issue with dictionary updates (#2627)
+
 ## 2020-02-10 13.0.66 beta
 * Bug fix: Fixed migration of old resources to new app versions, updated default MTNT dictionary (#2512)
 * Bug fix: Fixed issues when iOS system transitions between light and dark modes (#2593, #2594)
