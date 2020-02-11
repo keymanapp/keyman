@@ -6,7 +6,7 @@ If you are running from the repo or installing keyman-config manually rather tha
 then you will need to
 
 `sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil python3-requests 
-python3-requests-cache python3 python3-gi gir1.2-webkit-3.0 dconf-cli python3-setuptools`
+python3-requests-cache python3 python3-gi gir1.2-webkit-2.4 dconf-cli python3-setuptools`
 
 You will also need kmflcomp either from a package or built and installed locally.
 
