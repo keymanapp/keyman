@@ -127,7 +127,7 @@ if(!window['keyman']['ui']['name']) {
 
       // Check required interface alignment and default keyboard
       var opt=util['getOption']('ui'),dfltKeyboard='English';
-      if(typeof(opt) == 'object')
+      if(opt && typeof(opt) == 'object')
       {
         if(typeof(opt['position']) == 'string' && opt['position'] == 'right') 
           ui.floatRight = true;
@@ -484,7 +484,7 @@ if(!window['keyman']['ui']['name']) {
     keymanweb['addEventListener']('controlfocused',
       function(params)
       {
-        if(params['activeControl'] == null || params['activeControl']['LEnabled'])
+        if(params['activeControl'] == null || params['activeControl']['_kmwAttachment'])
         {
           /*if(keymanweb._IsIEEditableIframe(Ltarg))
             Ltarg = Ltarg.ownerDocument.parentWindow.frameElement;
