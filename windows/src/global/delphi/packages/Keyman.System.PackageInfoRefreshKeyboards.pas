@@ -63,6 +63,7 @@ const
   SError_KeyboardVersionsDoNotMatch = 'Keyboard with ID ''%0:s'' is included with two differing versions: ''%1:s'', ''%2:s''. The keyboard versions must be consistent.';
   SError_TooManyTargetFilesForKeyboardID = 'Keyboard with ID ''%0:s'' is included too many times (%1:d) in the package. You should have at most 1 .kmx and 1 .js file';
   SError_CannotHaveSameKeyboardTwiceWithSameTarget = 'Keyboard with ID ''%0:s'' should have at most 1 .kmx and 1 .js file in the package';
+  SWarning_CannotFindKeyboardFile = 'Keyboard file ''%0:s'' cannot be found to verify file version. Skipping verification.';
 
   SError_LanguageTagIsNotValid = 'Keyboard with ID ''%0:s'' has a BCP 47 error: %2:s.';
   SWarning_LanguageTagIsNotCanonical = 'Keyboard with ID ''%0:s'' has a BCP 47 warning: %2:s.';
@@ -140,6 +141,7 @@ var
   i, j: Integer;
   v: array[0..1] of TPackageKeyboardInfo;
   ids: TIntegerDynArray;
+  FileNotFound: Boolean;
 begin
   // Test that each keyboard has at most one target file for each platform and
   // that the versions match
@@ -165,8 +167,16 @@ begin
       Exit(False);
     end;
 
+    FileNotFound := False;
     for j := 0 to 1 do
-      FillKeyboardDetails(pack.Files[ids[j]], v[j]);
+      if not FillKeyboardDetails(pack.Files[ids[j]], v[j]) then
+      begin
+        DoError(Format(SWarning_CannotFindKeyboardFile, [pack.Files[ids[j]].FileName]), plsWarning);
+        FileNotFound := True;
+        Break;
+      end;
+    if FileNotFound then
+      Continue;
 
     if v[1].Version <> v[0].Version then
     begin

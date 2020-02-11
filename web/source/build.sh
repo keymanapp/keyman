@@ -6,9 +6,10 @@
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
     echo
-    echo "  -ui               to compile desktop user interface modules to output folder"
+    echo "  -ui               to compile only desktop user interface modules"
     echo "  -test             to compile for testing without copying resources or" 
-    echo "                    updating the saved version number."
+    echo "                    updating the saved version number.  Assumes dependencies
+                              are unaltered."
     echo "  -embed            to compile only the KMEA/KMEI embedded engine."
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
@@ -42,29 +43,9 @@ WEB_TARGET=( "keymanweb.js" )
 UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
 EMBED_TARGET=( "keyman.js" )
 
-# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-
 # Variables for the LMLayer
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
-
-# Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
-cd ../../common/predictive-text/
-echo ""
-echo "Compiling the Language Modeling layer module..."
-./build.sh || fail "Failed to compile the language modeling layer module."
-cd ../../web/source
-echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
-echo "Language Modeling layer compilation successful."
-echo ""
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
 
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
@@ -91,12 +72,6 @@ minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedL
 # excess code.
 minifier_lang_specs="--language_in ECMASCRIPT5 --language_out ECMASCRIPT5"
 minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_warnings --generate_exports $minifier_lang_specs"
-
-if ! [ -f $minifier ];
-then
-    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-    exit 1
-fi
 
 readonly minifier
 readonly minifycmd
@@ -233,6 +208,7 @@ compilecmd="$compiler"
 
 # Establish default build parameters
 set_default_vars ( ) {
+    BUILD_LMLAYER=true
     BUILD_UI=true
     BUILD_EMBED=true
     BUILD_FULLWEB=true
@@ -255,12 +231,14 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -ui)
             set_default_vars
+            BUILD_LMLAYER=false
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
             ;;
         -test)
             set_default_vars
+            BUILD_LMLAYER=false
             BUILD_TEST=true
             BUILD_UI=false
             BUILD_EMBED=false
@@ -297,12 +275,28 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
+readonly BUILD_LMLAYER
 readonly BUILD_UI
 readonly BUILD_EMBED
 readonly BUILD_FULLWEB
 readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
 readonly DO_MINIFY
+
+# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
+echo "Node.js + dependencies check"
+npm install --no-optional
+
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
+
+# NPM install is required for the file to be present.
+if ! [ -f $minifier ];
+then
+    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
+    exit 1
+fi
 
 generate_environment_ts_file ( ) {
     if [ -f $ENVIRONMENT_FILE ];
@@ -317,13 +311,25 @@ namespace com.keyman.environment {
 " >> $ENVIRONMENT_FILE
 }
 
+if [ $BUILD_LMLAYER = true ]; then
+    # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
+    cd ../../common/predictive-text/
+    echo ""
+    echo "Compiling the Language Modeling layer module..."
+    ./build.sh || fail "Failed to compile the language modeling layer module."
+    cd ../../web/source
+    echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
+    echo "Language Modeling layer compilation successful."
+    echo ""
+fi
+
 generate_environment_ts_file
 
 if [ $FULL_BUILD = true ]; then
     echo Compiling build $BUILD
     echo ""
 fi
-
 
 if [ $BUILD_EMBED = true ]; then
     echo Compile KMEI/KMEA build $BUILD
