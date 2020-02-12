@@ -601,7 +601,9 @@ namespace com.keyman.dom {
 
       if(window['keyman']) {
         var osk = window['keyman'].osk;
-        oskHeight = osk._Box.offsetHeight;
+        if(osk && osk._Box) {
+          oskHeight = osk._Box.offsetHeight;
+        }
       }
 
       // Get the absolute position of the caret
