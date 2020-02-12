@@ -1,5 +1,9 @@
 # Keyman for Android Version History
 
+## 2020-02-12 13.0.6056 beta
+* Change:
+  * Update in-app help for 13.0 (#2641)
+
 ## 2020-02-10 13.0.6055 beta
 * Change:
   * Update default nrc.en.mtnt model to version 0.1.4 (#2608)
