@@ -1,5 +1,12 @@
 # Keyman Developer Version History
 
+## 2020-02-13 13.0.73 beta
+* Bug Fix(IDE/Model Editor): Would never be set into modified state for changes exclusively in a wordlist. (#2634)
+* Bug Fix(IDE/Model Editor): Add context help (#2634)
+* Bug Fix(IDE/Model Editor): Add Ctrl+PgUp/Ctrl+PgDn hotkeys for switching pages (#2634)
+* Bug Fix(IDE/Model Editor): Add Alt+Left/Alt+Right hotkeys for switching views (#2634)
+* Bug Fix(IDE/Model Editor): Saving file from source view now gets latest changes correctly (#2634)
+
 ## 2020-02-12 13.0.72 beta
 * Bug Fix(IDE/Debugger): MIME type mismatch on some systems could cause web test to fail (#2633)
 

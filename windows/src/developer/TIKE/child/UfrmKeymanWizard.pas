@@ -2466,7 +2466,13 @@ begin
     case FView of
       cdvDesign: if pagesTouchLayout.ActivePage <> pageTouchLayoutDesign then pagesTouchLayout.SelectNextPage(False);
       cdvCode:   if pagesTouchLayout.ActivePage <> pageTouchLayoutCode then pagesTouchLayout.SelectNextPage(True);
-    end;
+    end
+  else if pages.ActivePage = pageOnScreenKeyboard then
+    case FView of
+      cdvDesign: if frameOSK.pages.ActivePage <> frameOSK.pageDesign then frameOSK.pages.SelectNextPage(False);
+      cdvCode:   if frameOSK.pages.ActivePage <> frameOSK.pageCode then frameOSK.pages.SelectNextPage(False);
+    end
+
 end;
 
 procedure TfrmKeymanWizard.CharFontChanged;
