@@ -49,6 +49,8 @@ namespace com.keyman.text {
       let domManager = keyman.domManager;
       let activeKeyboard = keyman.keyboardManager.activeKeyboard;
 
+      let quiet = keyman.interface.activeTargetOutput instanceof Mock;
+
       var ch = '', checkCodes = false;
       var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
@@ -58,7 +60,9 @@ namespace com.keyman.text {
         checkCodes = true; 
         keyShiftState = 1; // It's used as an index.
       } else {
-        console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
+        if(!quiet) {
+          console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
+        }
       }
 
       // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
@@ -194,7 +198,9 @@ namespace com.keyman.text {
         if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
           // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
           // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-          console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+          if(!quiet) {
+            console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+          }
           return ch;
         } else {
           // String.fromCharCode() is inadequate to handle the entire range of Unicode
@@ -214,7 +220,9 @@ namespace com.keyman.text {
             ch = Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
           }
         } catch (e) {
-          console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
+          if(!quiet) {
+            console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
+          }
         }
       }
       return ch;
@@ -361,7 +369,9 @@ namespace com.keyman.text {
 
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+        kbdInterface.activeTargetOutput = outputTarget;
         var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
+        kbdInterface.activeTargetOutput = null;
         if(ch) {
           if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
             // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
