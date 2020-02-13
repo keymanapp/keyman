@@ -2,8 +2,9 @@ Source: keyman-config
 Maintainer: Daniel Glassey <wdg@debian.org>
 Section: python
 Priority: optional
-Build-Depends: dh-python, python3-setuptools, python3-all, debhelper (>= 9), bash-completion,
- python3-magic, python3-qrcode
+Build-Depends: dh-python, python3-setuptools, python3-all, python3-pip, debhelper (>= 9), bash-completion,
+ python3-magic, python3-qrcode <!pkg.keyman-config.xenial>,
+ python-qrcode <pkg.keyman-config.xenial>
 Standards-Version: 4.5.0
 Homepage: http://www.keyman.com/
 
