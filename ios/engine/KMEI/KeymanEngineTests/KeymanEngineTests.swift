@@ -26,7 +26,9 @@ class KeymanEngineTests: XCTestCase {
   func testExample() {
     let testUrl = URL(fileURLWithPath: "/Users/Shared/testpackage.kmp");
     let outUrl  = URL(fileURLWithPath: "/Users/Shared/outPackageFolder")
-    
+
+    // Note:  does not detect failure to extract!  This is basically leftover material from a previous dev's
+    //        original attempt to add unit testing.
     KeymanPackage.extract(fileUrl: testUrl, destination: outUrl, complete: { kmp in
       if let kmp = kmp {
         // extracted ok, test kmp
