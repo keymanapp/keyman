@@ -29,6 +29,8 @@ class KeymanEngineTests: XCTestCase {
 
     // Note:  does not detect failure to extract!  This is basically leftover material from a previous dev's
     //        original attempt to add unit testing.
+    //
+    //        Honestly, that's the only reason this passes.  This test isn't actually functional yet.
     KeymanPackage.extract(fileUrl: testUrl, destination: outUrl, complete: { kmp in
       if let kmp = kmp {
         // extracted ok, test kmp
