@@ -1,5 +1,8 @@
 # Keyman for macOS Version History
 
+## 2020-02-14 13.0.17 beta
+* Feature: Keyman now includes an installer for macOS to streamline the install experience (#2537)
+
 ## 13.0 alpha
 * Start version 13.0
 * Fix: On Screen Keyboard should not show base letters for blank keycaps (#2414)

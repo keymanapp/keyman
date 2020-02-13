@@ -19,6 +19,17 @@ TARGETAPP="$TARGETPATH/Install Keyman.app"
 KEYMANAPP=../Keyman4MacIM/build/Release/Keyman.app
 
 #
+# Build basic app and copy icons
+#
+
+if [ -f "$SOURCEAPP" ]; then
+  rm -rf "$SOURCEAPP"
+fi
+
+osacompile -o "$SOURCEAPP" -x source/install.applescript
+cp source/applet.icns "$SOURCEAPP/Contents/Resources/applet.icns"
+
+#
 # Build textinputsource
 #
 
@@ -37,7 +48,7 @@ popd
 mkdir -p "$TARGETPATH"
 rm -rf "$TARGETAPP" || true
 
-# Copy new install image to output foldercer
+# Copy new install image to output folder
 cp -R "$SOURCEAPP" "$TARGETPATH/"
 
 # Copy Keyman.app into install image
