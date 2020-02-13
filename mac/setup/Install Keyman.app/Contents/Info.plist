@@ -50,7 +50,7 @@
 	<key>DTPlatformName</key>
 	<string>macosx</string>
 	<key>DTPlatformVersion</key>
-	<string>10.15</string>
+	<string>10.7</string>
 	<key>DTSDKBuild</key>
 	<string>19C38</string>
 	<key>DTSDKName</key>
@@ -62,7 +62,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.15</string>
+	<string>10.7</string>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>This script needs to control other applications to run.</string>
 	<key>NSAppleMusicUsageDescription</key>
