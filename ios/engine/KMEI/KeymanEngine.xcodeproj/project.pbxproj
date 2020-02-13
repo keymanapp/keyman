@@ -33,93 +33,24 @@
 		98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98D4190B17695E58008D2FF3 /* Default-568h@2x.png */; };
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
 		9A079DCA222E050E00581263 /* LexicalModelKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */; };
-		9A079DD2223194B100581263 /* KeymanEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* KeymanEngineTests.swift */; };
 		9A079DD4223194B100581263 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
-		9A079DDA2231A0B900581263 /* KeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5942036C6FF0076C51B /* KeymanPackage.swift */; };
-		9A079DDB2231A0F100581263 /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
-		9A079DDC2231A11000581263 /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAE1F9F22A80064431A /* Font.swift */; };
-		9A079DDD2231A11C00581263 /* InstallableKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */; };
-		9A079DDE2231A13100581263 /* FullKeyboardID.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08E69901FDA6F6F0026056B /* FullKeyboardID.swift */; };
-		9A079DDF2231A13A00581263 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAC1F9F21270064431A /* Keyboard.swift */; };
-		9A079DE02231A14200581263 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAA1F9F1FE10064431A /* Language.swift */; };
-		9A079DE12231A14D00581263 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E30C8B1FC40D0400C80416 /* Storage.swift */; };
-		9A079DE22231A15900581263 /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A93A531F8B21240079948B /* Manager.swift */; };
-		9A079DE32231A16600581263 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0959CD31F99C44E00B616BC /* Constants.swift */; };
-		9A079DE42231A1ED00581263 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B14321FD914870082A316 /* Log.swift */; };
 		9A079DE62231A69D00581263 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A079DE52231A69D00581263 /* Foundation.framework */; };
-		9A079DE72236134B00581263 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
-		9A079DE82236138800581263 /* HTTPDownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */; };
-		9A079DE9223613E400581263 /* APIKeyboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07A9D8D1FD1798900828ADD /* APIKeyboardRepository.swift */; };
-		9A079E28223619D300581263 /* Options.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35D1F9F33490055C7CF /* Options.swift */; };
-		9A079E29223619F100581263 /* InputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04514891F85DF9000D88416 /* InputViewController.swift */; };
-		9A079E2A223619FC00581263 /* KeymanWebDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */; };
-		9A079E2B22361A3200581263 /* KeymanWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */; };
-		9A079E2C22361B4B00581263 /* KeyboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07A9D891FD1762700828ADD /* KeyboardRepository.swift */; };
-		9A079E2D22361B5900581263 /* KeyboardRepositoryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07A9D8B1FD176AB00828ADD /* KeyboardRepositoryDelegate.swift */; };
-		9A079E2E22361B8100581263 /* KeymanResponder+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */; };
-		9A079E3022361C2D00581263 /* KeyboardAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05F432C1FBD5A4C0058CBD4 /* KeyboardAPICall.swift */; };
-		9A079E3122361C3400581263 /* KeymanURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */; };
-		9A079E3222361C3B00581263 /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08E698C1FDA392D0026056B /* Migrations.swift */; };
-		9A079E352236235700581263 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = C042ED5C1FC6A65A001D82F4 /* Version.swift */; };
 		9A079E372238680700581263 /* KMPLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E362238680700581263 /* KMPLexicalModel.swift */; };
-		9A079E382238680700581263 /* KMPLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E362238680700581263 /* KMPLexicalModel.swift */; };
 		9A079E3A223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */; };
-		9A079E3B223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */; };
 		9A079E3D223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */; };
-		9A079E3E223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E3C223B5FAF00581263 /* InstallableLexicalModel.swift */; };
 		9A079E40223B602B00581263 /* LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E3F223B602B00581263 /* LexicalModel.swift */; };
-		9A079E41223B602B00581263 /* LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E3F223B602B00581263 /* LexicalModel.swift */; };
 		9A079E43223B61AE00581263 /* FullLexicalModelID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E42223B61AE00581263 /* FullLexicalModelID.swift */; };
-		9A079E44223B61AE00581263 /* FullLexicalModelID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079E42223B61AE00581263 /* FullLexicalModelID.swift */; };
-		9A079E45223DBEF000581263 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A5FF361F6682EB00BE740C /* PopoverView.swift */; };
-		9A079E46223DBEF900581263 /* KeyPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */; };
-		9A079E47223DBF0100581263 /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
-		9A079E48223DBF0A00581263 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
-		9A079E49223F176100581263 /* String+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C075EB051F8EFF870041F4BD /* String+Helpers.swift */; };
 		9A082559227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */; };
-		9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A082558227589360051EBB0 /* Formatter+ISODateExtension.swift */; };
 		9A0FCA0422D7C49700D33F86 /* DeviceKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0522D7C49E00D33F86 /* Reachability.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0622D7C4E100D33F86 /* XCGLogger.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0722D7C50800D33F86 /* Zip.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0822D7C53500D33F86 /* ObjcExceptionBridging.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F27FCB51157FE3CE00FBBA20 /* Keyman.bundle */; };
-		9A31E2C1224AAD8300D9A491 /* FontManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B09EAD1FCFD10F002F39AF /* FontManager.swift */; };
-		9A31E2C2224AAD9A00D9A491 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0CB633B1FA6F61500617CDB /* Notifications.swift */; };
-		9A31E2C3224AADBB00D9A491 /* NotificationName.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9931FA6EB470060583B /* NotificationName.swift */; };
-		9A31E2C4224AB2A300D9A491 /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */; };
-		9A31E2C5224AE83D00D9A491 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */; };
-		9A31E2C6224AE85000D9A491 /* UserDefaults+Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B901A91FA1AFC200764EB8 /* UserDefaults+Types.swift */; };
-		9A31E2C7224AE85700D9A491 /* Collection+SafeAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */; };
-		9A31E2C8224AE87600D9A491 /* RegisteredFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */; };
-		9A31E2C9224AE88600D9A491 /* LanguagesAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */; };
-		9A31E2CA224AE88E00D9A491 /* LexicalModelAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */; };
-		9A31E2CB224AE89600D9A491 /* LexicalModelKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */; };
-		9A31E2CC224AE89F00D9A491 /* NotificationCenter+Typed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9951FA6EC650060583B /* NotificationCenter+Typed.swift */; };
-		9A31E2CD224AE8A700D9A491 /* NotificationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C024C9971FA6F2330060583B /* NotificationObserver.swift */; };
-		9A31E2CE224AE8B100D9A491 /* LexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB083224170F700231FB9 /* LexicalModelRepository.swift */; };
-		9A31E2CF224AE8B800D9A491 /* LexicalModelRepositoryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0852241717C00231FB9 /* LexicalModelRepositoryDelegate.swift */; };
-		9A31E2D0224AE8BF00D9A491 /* APILexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */; };
-		9A3B14BC228F59380052A11F /* LanguageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092D8381F6A70C8005C5485 /* LanguageDetailViewController.swift */; };
-		9A3B14BD228F593C0052A11F /* LexicalModelPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */; };
-		9A3B14BE228F59420052A11F /* LexicalModelInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */; };
-		9A3B14C0228F59490052A11F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A60764322893A4E003BCFBA /* SettingsViewController.swift */; };
-		9A3B14C1228F595A0052A11F /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
-		9A3B14C3228F59C10052A11F /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
-		9A3B14C4228F59C70052A11F /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
-		9A3B14C6228F59E00052A11F /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50F1F8606E300901EE4 /* TextField.swift */; };
-		9A3B14C7228F59E40052A11F /* TextFieldDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8C1F87480700AF3785 /* TextFieldDelegateProxy.swift */; };
-		9A3B14C8228F59EE0052A11F /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8E1F8750B700AF3785 /* TextView.swift */; };
-		9A3B14C9228F59F10052A11F /* TextViewDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */; };
-		9A3B14CA228F5AF60052A11F /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
 		9A3B14D2229370B20052A11F /* InstalledLanguagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3B14D1229370B20052A11F /* InstalledLanguagesViewController.swift */; };
-		9A3B14D3229370B20052A11F /* InstalledLanguagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3B14D1229370B20052A11F /* InstalledLanguagesViewController.swift */; };
 		9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3E832422EAC14A00D22D2A /* KeyboardSwitcherViewController.swift */; };
-		9A3E832622EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3E832422EAC14A00D22D2A /* KeyboardSwitcherViewController.swift */; };
 		9A4609972241B39B00B0BFD1 /* LexicalModelInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609962241B39B00B0BFD1 /* LexicalModelInfoViewController.swift */; };
 		9A4609992242047400B0BFD1 /* LexicalModelAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A4609982242047400B0BFD1 /* LexicalModelAPICall.swift */; };
-		9A5091B122B418140094B99C /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
-		9A5091B422B419B10094B99C /* LanguageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04C2A6C1F6B7D9A00BA42B6 /* LanguageViewController.swift */; };
 		9A60764422893A4E003BCFBA /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A60764322893A4E003BCFBA /* SettingsViewController.swift */; };
 		9A9CB08022416E5400231FB9 /* LexicalModelPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB07F22416E5400231FB9 /* LexicalModelPickerViewController.swift */; };
 		9A9CB0822241704800231FB9 /* APILexicalModelRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0812241704800231FB9 /* APILexicalModelRepository.swift */; };
@@ -127,10 +58,8 @@
 		9A9CB0862241717C00231FB9 /* LexicalModelRepositoryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9CB0852241717C00231FB9 /* LexicalModelRepositoryDelegate.swift */; };
 		9AD4F53C229F85AC007992D3 /* LanguageSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD4F53A229F85AC007992D3 /* LanguageSettingsViewController.swift */; };
 		9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AD4F53B229F85AC007992D3 /* LanguageSettingsViewController.xib */; };
-		9AD4F53E22A8A25B007992D3 /* LanguageSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD4F53A229F85AC007992D3 /* LanguageSettingsViewController.swift */; };
 		9AD4F53F22A8A286007992D3 /* LanguageSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9AD4F53B229F85AC007992D3 /* LanguageSettingsViewController.xib */; };
 		9ADC459D22E1895D004C78C6 /* LanguageLMDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC459B22E1895D004C78C6 /* LanguageLMDetailViewController.swift */; };
-		9ADC459E22E1895D004C78C6 /* LanguageLMDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC459B22E1895D004C78C6 /* LanguageLMDetailViewController.swift */; };
 		9ADC459F22E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADC459C22E1895D004C78C6 /* LanguageLMDetailViewController.xib */; };
 		9ADC45A022E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9ADC459C22E1895D004C78C6 /* LanguageLMDetailViewController.xib */; };
 		C007C4651F9F52D8006461B9 /* LanguagesAPICall.swift in Sources */ = {isa = PBXBuildFile; fileRef = C007C4641F9F52D8006461B9 /* LanguagesAPICall.swift */; };
@@ -215,7 +144,6 @@
 		CE79B24923C711FF007E72AE /* KeyboardScaleMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */; };
 		CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */; };
 		CE7A26D423CEE71B0005955C /* Keyboard Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */; };
-		CE7A26D823CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
 		CE7A26D923CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
 		CE7A26DB23CEEF640005955C /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26DA23CEEF640005955C /* Colors.swift */; };
 		CE7ADD6623DE89FC00BC9A00 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */; };
@@ -226,6 +154,7 @@
 		CE808A532366980A00713E6B /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
 		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE8EDEB123F53D1A009E1FF6 /* KeymanEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* KeymanEngineTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1169,78 +1098,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A079E45223DBEF000581263 /* PopoverView.swift in Sources */,
-				9A3B14C4228F59C70052A11F /* KeyboardPickerBarButtonItem.swift in Sources */,
-				9A3B14BE228F59420052A11F /* LexicalModelInfoViewController.swift in Sources */,
-				9A3B14C7228F59E40052A11F /* TextFieldDelegateProxy.swift in Sources */,
-				9A3B14CA228F5AF60052A11F /* KeyboardNameTableViewCell.swift in Sources */,
-				9A31E2CC224AE89F00D9A491 /* NotificationCenter+Typed.swift in Sources */,
-				9A079E2C22361B4B00581263 /* KeyboardRepository.swift in Sources */,
-				9A31E2C8224AE87600D9A491 /* RegisteredFont.swift in Sources */,
-				9A5091B422B419B10094B99C /* LanguageViewController.swift in Sources */,
-				9A079E352236235700581263 /* Version.swift in Sources */,
-				9ADC459E22E1895D004C78C6 /* LanguageLMDetailViewController.swift in Sources */,
-				9A079DDC2231A11000581263 /* Font.swift in Sources */,
-				9A079E49223F176100581263 /* String+Helpers.swift in Sources */,
-				9A079DE82236138800581263 /* HTTPDownloadRequest.swift in Sources */,
-				9A079E3E223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */,
-				9A079E2D22361B5900581263 /* KeyboardRepositoryDelegate.swift in Sources */,
-				9A31E2C6224AE85000D9A491 /* UserDefaults+Types.swift in Sources */,
-				9A079E44223B61AE00581263 /* FullLexicalModelID.swift in Sources */,
-				9A079DE72236134B00581263 /* HTTPDownloader.swift in Sources */,
-				9AD4F53E22A8A25B007992D3 /* LanguageSettingsViewController.swift in Sources */,
-				9A079E46223DBEF900581263 /* KeyPreviewView.swift in Sources */,
-				9A5091B122B418140094B99C /* KeyboardCommandStructs.swift in Sources */,
-				9A079DE32231A16600581263 /* Constants.swift in Sources */,
-				9A31E2C1224AAD8300D9A491 /* FontManager.swift in Sources */,
-				9A3B14C6228F59E00052A11F /* TextField.swift in Sources */,
-				9A3B14C3228F59C10052A11F /* KeyboardPickerButton.swift in Sources */,
-				9A079E29223619F100581263 /* InputViewController.swift in Sources */,
-				9A079E28223619D300581263 /* Options.swift in Sources */,
-				9A079DE42231A1ED00581263 /* Log.swift in Sources */,
-				9A31E2C5224AE83D00D9A491 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift in Sources */,
-				9A079DDB2231A0F100581263 /* KMPKeyboard.swift in Sources */,
-				9A3B14BD228F593C0052A11F /* LexicalModelPickerViewController.swift in Sources */,
-				9A079DDF2231A13A00581263 /* Keyboard.swift in Sources */,
-				9A31E2C2224AAD9A00D9A491 /* Notifications.swift in Sources */,
-				9A079DDD2231A11C00581263 /* InstallableKeyboard.swift in Sources */,
-				9A079DD2223194B100581263 /* KeymanEngineTests.swift in Sources */,
-				9A079E41223B602B00581263 /* LexicalModel.swift in Sources */,
-				9A3E832622EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
-				9A3B14C0228F59490052A11F /* SettingsViewController.swift in Sources */,
-				9A31E2CE224AE8B100D9A491 /* LexicalModelRepository.swift in Sources */,
-				9A079E2E22361B8100581263 /* KeymanResponder+Types.swift in Sources */,
-				9A079DE12231A14D00581263 /* Storage.swift in Sources */,
-				9A079E3B223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */,
-				9A079E3122361C3400581263 /* KeymanURLProtocol.swift in Sources */,
-				9A079DE02231A14200581263 /* Language.swift in Sources */,
-				9A31E2CB224AE89600D9A491 /* LexicalModelKeymanPackage.swift in Sources */,
-				9A31E2CF224AE8B800D9A491 /* LexicalModelRepositoryDelegate.swift in Sources */,
-				9A31E2C9224AE88600D9A491 /* LanguagesAPICall.swift in Sources */,
-				9A3B14C1228F595A0052A11F /* KeyboardError.swift in Sources */,
-				9A079E2B22361A3200581263 /* KeymanWebViewController.swift in Sources */,
-				9A31E2CD224AE8A700D9A491 /* NotificationObserver.swift in Sources */,
-				9A079E382238680700581263 /* KMPLexicalModel.swift in Sources */,
-				9A3B14BC228F59380052A11F /* LanguageDetailViewController.swift in Sources */,
-				9A31E2C4224AB2A300D9A491 /* UIButton+Helpers.swift in Sources */,
-				9A079DDE2231A13100581263 /* FullKeyboardID.swift in Sources */,
-				9A3B14C9228F59F10052A11F /* TextViewDelegateProxy.swift in Sources */,
-				9A31E2CA224AE88E00D9A491 /* LexicalModelAPICall.swift in Sources */,
-				9A079E3222361C3B00581263 /* Migrations.swift in Sources */,
-				9A3B14D3229370B20052A11F /* InstalledLanguagesViewController.swift in Sources */,
-				9A08255A227589360051EBB0 /* Formatter+ISODateExtension.swift in Sources */,
-				9A079E2A223619FC00581263 /* KeymanWebDelegate.swift in Sources */,
-				9A31E2C3224AADBB00D9A491 /* NotificationName.swift in Sources */,
-				9A3B14C8228F59EE0052A11F /* TextView.swift in Sources */,
-				9A079DDA2231A0B900581263 /* KeymanPackage.swift in Sources */,
-				9A079DE22231A15900581263 /* Manager.swift in Sources */,
-				9A079E47223DBF0100581263 /* SubKeysView.swift in Sources */,
-				9A31E2D0224AE8BF00D9A491 /* APILexicalModelRepository.swift in Sources */,
-				9A079DE9223613E400581263 /* APIKeyboardRepository.swift in Sources */,
-				9A079E48223DBF0A00581263 /* KeyboardMenuView.swift in Sources */,
-				9A31E2C7224AE85700D9A491 /* Collection+SafeAccess.swift in Sources */,
-				CE7A26D823CEEC640005955C /* Colors+Extension.swift in Sources */,
-				9A079E3022361C2D00581263 /* KeyboardAPICall.swift in Sources */,
+				CE8EDEB123F53D1A009E1FF6 /* KeymanEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1498,7 +1356,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1538,7 +1396,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
