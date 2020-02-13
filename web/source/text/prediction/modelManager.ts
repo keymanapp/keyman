@@ -374,7 +374,7 @@ namespace com.keyman.text.prediction {
     }
 
     public get enabled(): boolean {
-      return this._mayPredict;
+      return this.activeModel && this._mayPredict;
     }
 
     private canEnable(): boolean {
