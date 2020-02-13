@@ -152,7 +152,7 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
       let mm: ModelManager = this;
 
-      if(!this.enabled) {
+      if(!this.mayPredict) {
         return Promise.resolve();
       }
 
@@ -185,7 +185,7 @@ namespace com.keyman.text.prediction {
             // Because this is executed from a Promise, it's possible to have a race condition
             // where the 'loaded' event triggers after an 'unloaded' event meant to disable the model.
             // (Especially in the embedded apps.)  This will catch these cases.
-            if(mm.enabled) {
+            if(mm.mayPredict) {
               keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
             } else {
               mm.unloadModel();
@@ -422,7 +422,7 @@ namespace com.keyman.text.prediction {
       }
 
       this._mayPredict = flag;
-      if(enabled != this.enabled) {
+      if(enabled != this.enabled || flag) {
         this.doEnable(flag);
       }
     }
