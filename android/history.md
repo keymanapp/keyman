@@ -1,5 +1,10 @@
 # Keyman for Android Version History
 
+## 2020-02-13 13.0.6058 beta
+* Change:
+  * Update rest of Android apps' dependency to `androidx.appcompat:appcompat:1.2.0-alpha02` to
+    fix WebView crash on Android 5.0 devices (#2644)
+
 ## 2020-02-12 13.0.6057 beta
 * Change:
   * Update in-app help for 13.0 (#2641)
