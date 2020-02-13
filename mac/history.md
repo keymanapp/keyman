@@ -1,6 +1,9 @@
 # Keyman for macOS Version History
 
-## 2020-01-28 13.0.14 beta
+## 2020-02-14 13.0.17 beta
+* Bug fix: Modifier keys no longer cause keyboards to work incorrectly in several apps (#2588)
+
+## 2020-01-28 13.0.13 beta
 * Feature: Add QR Code to share keyboards (#2427)
 * Bug fix: On Screen Keyboard should not show base letters for blank keycaps (#2414)
 * Bug fix: On Screen Keyboard would sometimes show unexpectedly (#2413)
