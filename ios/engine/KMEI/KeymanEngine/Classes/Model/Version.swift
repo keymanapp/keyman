@@ -14,6 +14,7 @@ public struct Version: Comparable {
   public static let current = Version("13.0.65")!
 
   // The Engine first started tracking the 'last loaded version' in 12.0.
+  public static let freshInstall = Version("0.0")!
   public static let firstTracked = Version("12.0")!
 
   // The Keyman App's file browser was first added in 13.0 alpha;
