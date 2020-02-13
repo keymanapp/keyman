@@ -1,5 +1,8 @@
 # KeymanWeb Version History
 
+## 2020-02-13
+* Bug fix: language menu not positioned correctly for touch-based devices (#2642)
+
 ## 2020-02-03 13.0.33 beta
 * Bug fix: BKSP not working corrrectly with design-mode iframes (#2561)
 
