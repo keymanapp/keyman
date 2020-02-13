@@ -8,11 +8,13 @@ function run_test() {
   DEVICE=$1
   VERSION=$2
 
+  # a bit of thanks to https://stackoverflow.com/a/37971495.
   xcodebuild \
     -workspace keymanios.xcworkspace \
-    -scheme KeymanEngineTests \
+    -scheme KeymanEngine \
     -sdk iphonesimulator \
     -destination "platform=iOS Simulator,name=$DEVICE,OS=$VERSION" \
+    -only-testing KeymanEngineTests \
     test
 }
 

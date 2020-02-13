@@ -37,6 +37,16 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9A079DCE223194B100581263"
+               BuildableName = "KeymanEngineTests.xctest"
+               BlueprintName = "KeymanEngineTests"
+               ReferencedContainer = "container:engine/KMEI/KeymanEngine.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
