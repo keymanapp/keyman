@@ -1,6 +1,6 @@
 # KeymanWeb Version History
 
-## 2020-02-13
+## 2020-02-13 13.0.38 beta
 * Bug fix: language menu not positioned correctly for touch-based devices (#2642)
 
 ## 2020-02-03 13.0.33 beta
