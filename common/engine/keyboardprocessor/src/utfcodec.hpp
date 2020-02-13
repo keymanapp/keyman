@@ -22,7 +22,7 @@ typedef uint32_t  uchar_t;
 /* Intentional fallthrough */
 #if defined(__clang__)
 #define fallthrough [[clang::fallthrough]]
-#elif defined(__GNUC__) && __GNUC___ >=  7
+#elif defined(__GNUC__) && __GNUC__ >=  7
 #define fallthrough [[gnu::fallthrough]]
 #else
 #define fallthrough ((void)0)
