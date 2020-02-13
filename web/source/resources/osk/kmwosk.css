@@ -104,6 +104,10 @@
   background-color: #cfd3d9;
 }
 
+.kmw-embedded .ios .kmw-banner-bar {
+  top: 10px;
+}
+
 /* Probably best to make this its own CSS that can be optionally included? */
 @media (prefers-color-scheme: dark) {
   .ios .kmw-banner-bar {
