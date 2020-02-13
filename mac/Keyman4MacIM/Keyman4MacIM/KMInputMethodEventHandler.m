@@ -351,8 +351,12 @@ NSRange _previousSelRange;
             return NO;
         }
     }
-    else
+    else {
+        if ([self.AppDelegate debugMode]) {
+            NSLog(@"willDeleteNullChar = true");
+        }
         return NO;
+    }
 
     if ([self.AppDelegate debugMode]) {
         NSLog(@"actions = %@", actions);
@@ -379,9 +383,11 @@ NSRange _previousSelRange;
                 // Each null in the context buffer presumably corresponds to a space we inserted when
                 // processing the Q_BACK, which we now need to replace with the text we're inserting.
                 if (nc > 0) {
-                    if ([self.AppDelegate debugMode])
-                        NSLog(@"nc = %lu", nc);
                     NSUInteger pos = [self getSelectionRangefromClient:sender].location;
+                    if ([self.AppDelegate debugMode]) {
+                        NSLog(@"nc = %lu", nc);
+                        NSLog(@"pos = %lu", pos);
+                    }
                     if (pos >= nc && pos != NSNotFound) {
                         if ([self.AppDelegate debugMode]) {
                             NSLog(@"Replacement index = %lu", pos - nc);
@@ -570,78 +576,12 @@ NSRange _previousSelRange;
 
     BOOL handled = [self handleKeymanEngineActions:event in: sender];
 
-    if (!handled) {
-        NSUInteger nc = [self.contextBuffer deleteLastNullChars];
-        if (nc > 0) {
-            if ([self.AppDelegate debugMode])
-                NSLog(@"Deleted %li null characters from context buffer", nc);
-            // This can presumably only happen if a previous event resulted in a chain of
-            // actions that had a Q_BACK not followed by a Q_STR.
-            self.willDeleteNullChar = YES;
-            [self postDeleteBacks:nc for:event];
-            _keyCodeOfOriginalEvent = event.keyCode;
-
-            return YES;
-        }
-
-        // For other events that the Keyman engine does not have rules, just apply context changes
-        // and let client handle the event
-        NSString* charactersToAppend = nil;
-        BOOL updateEngineContext = YES;
-        unsigned short keyCode = event.keyCode;
-        switch (keyCode) {
-            case kVK_Delete:
-                [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
-                break;
-
-            case kVK_LeftArrow:
-                // I had started some code to try to guess where in the context we ended up after a left arrow,
-                // but too many potential pitfalls. Marc says it's better to just let it be dumb.
-            case kVK_RightArrow:
-            case kVK_UpArrow:
-            case kVK_DownArrow:
-            case kVK_Home:
-            case kVK_End:
-            case kVK_PageUp:
-            case kVK_PageDown:
-                _contextOutOfDate = YES;
-                updateEngineContext = NO;
-                break;
-
-            case kVK_Return:
-            case kVK_ANSI_KeypadEnter:
-                charactersToAppend = @"\n";
-                break;
-
-            default:
-                {
-                    // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
-                    // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
-                    // can generate more than one character in event.characters.
-                    unichar ch = [event.characters characterAtIndex:0];
-                    if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
-                        charactersToAppend = event.characters;
-                    }
-                    else {
-                        // Other keys
-                    }
-                }
-                break;
-        }
-        if (charactersToAppend != nil) {
-            if ([self.AppDelegate debugMode]) {
-                NSLog(@"Adding \"%@\" to context buffer", charactersToAppend);
-            }
-            [self.contextBuffer appendString:charactersToAppend];
-            if (_legacyMode) {
-                _previousSelRange.location += charactersToAppend.length;
-                _previousSelRange.length = 0;
-            }
-        }
-
-        if (updateEngineContext) {
-            [self.kme setContextBuffer:self.contextBuffer];
-        }
+    if(handled) {
+        // TODO: Send the final transform that we've built up
+        // [self sendFinalTransformToClient: sender deleteLeft: nDeleteLeft textToInsert: strTextToInsert];
+    }
+    else {
+        handled = [self handleDefaultKeymanEngineActions:event in: sender];
     }
 
     if ([self.AppDelegate debugMode]) {
@@ -660,6 +600,93 @@ NSRange _previousSelRange;
     // Note: Although this would seem to be the obvious place to set _previousSelRange (in legacy mode), we can't
     // because the selection range doesn't get updated until after we return from this method.
     return handled;
+}
+
+/*
+- (void)sendFinalTransformToClient:(id) sender for:(NSEvent *)event deleteLeft:(NSUInteger)deleteLeft textToInsert:(NSString*) strTextToInsert {
+    // deleteLeft is now the number of characters to delete from the client.
+    if (deleteLeft > 0) {
+        deleteBackPosted = [self deleteLeft:n in:sender for: event];
+    }
+   if(str != null && str.length > 0) {
+       insert
+   }
+}
+*/
+
+- (BOOL)handleDefaultKeymanEngineActions:(NSEvent*) event in:(id) sender {
+    NSUInteger nc = [self.contextBuffer deleteLastNullChars];
+    if (nc > 0) {
+        if ([self.AppDelegate debugMode])
+            NSLog(@"Deleted %li null characters from context buffer", nc);
+        // This can presumably only happen if a previous event resulted in a chain of
+        // actions that had a Q_BACK not followed by a Q_STR.
+        self.willDeleteNullChar = YES;
+        [self postDeleteBacks:nc for:event];
+        _keyCodeOfOriginalEvent = event.keyCode;
+
+        return YES;
+    }
+
+    // For other events that the Keyman engine does not have rules, just apply context changes
+    // and let client handle the event
+    NSString* charactersToAppend = nil;
+    BOOL updateEngineContext = YES;
+    unsigned short keyCode = event.keyCode;
+    switch (keyCode) {
+        case kVK_Delete:
+            [self processUnhandledDeleteBack: sender updateEngineContext: &updateEngineContext];
+            break;
+
+        case kVK_LeftArrow:
+            // I had started some code to try to guess where in the context we ended up after a left arrow,
+            // but too many potential pitfalls. Marc says it's better to just let it be dumb.
+        case kVK_RightArrow:
+        case kVK_UpArrow:
+        case kVK_DownArrow:
+        case kVK_Home:
+        case kVK_End:
+        case kVK_PageUp:
+        case kVK_PageDown:
+            _contextOutOfDate = YES;
+            updateEngineContext = NO;
+            break;
+
+        case kVK_Return:
+        case kVK_ANSI_KeypadEnter:
+            charactersToAppend = @"\n";
+            break;
+
+        default:
+            {
+                // NOTE: Although ch is usually the same as keyCode, when the option key is depressed (and
+                // perhaps in some other cases) it may not be (keyCode can be 0). Likewise, the option key
+                // can generate more than one character in event.characters.
+                unichar ch = [event.characters characterAtIndex:0];
+                if (keyCode < 0x33 || (ch >= 0x2A && ch <= 0x39)) { // Main keys, Numpad char range, normal punctuation
+                    charactersToAppend = event.characters;
+                }
+                else {
+                    // Other keys
+                }
+            }
+            break;
+    }
+    if (charactersToAppend != nil) {
+        if ([self.AppDelegate debugMode]) {
+            NSLog(@"Adding \"%@\" to context buffer", charactersToAppend);
+        }
+        [self.contextBuffer appendString:charactersToAppend];
+        if (_legacyMode) {
+            _previousSelRange.location += charactersToAppend.length;
+            _previousSelRange.length = 0;
+        }
+    }
+
+    if (updateEngineContext) {
+        [self.kme setContextBuffer:self.contextBuffer];
+    }
+    return NO;
 }
 
 - (BOOL)deleteBack:(NSUInteger)n in:(id) client for:(NSEvent *) event {
