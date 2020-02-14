@@ -12,10 +12,13 @@ import Foundation
 extension Storage {
   /// Storage that is not shared with the other process (app or extension).
   static let nonShared: Storage? = {
-    let paths = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)
+    var directory: FileManager.SearchPathDirectory = .libraryDirectory
+
+    let paths = FileManager.default.urls(for: directory, in: .userDomainMask)
     if paths.isEmpty {
       return nil
     }
+
     return Storage(baseURL: paths[0], userDefaults: UserDefaults.standard)
   }()
 
@@ -302,6 +305,14 @@ extension Storage {
 
     if excludeFromBackup {
       try Storage.addSkipBackupAttribute(to: dst)
+    }
+  }
+
+  internal func erase() {
+    do {
+      try FileManager.default.removeItem(at: self.baseDir)
+    } catch {
+      log.error(error)
     }
   }
 }

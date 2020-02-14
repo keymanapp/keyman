@@ -136,6 +136,19 @@
 		CE2B1E4721B60E89007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4821B60E8A007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4A21B60FB1007D092E /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE4459E723FBBB4A003151FD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4459CD23FBBA8D003151FD /* AppDelegate.swift */; };
+		CE4459E823FBBB79003151FD /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
+		CE4459E923FBBB79003151FD /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE4459EE23FBBB8F003151FD /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
+		CE4459EF23FBBB8F003151FD /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE4459F023FBBB8F003151FD /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; };
+		CE4459F123FBBB8F003151FD /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE4459F223FBBB8F003151FD /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
+		CE4459F323FBBB8F003151FD /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE4459F423FBBB8F003151FD /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
+		CE4459F523FBBB8F003151FD /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE4459F623FBBB8F003151FD /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
+		CE4459F723FBBB8F003151FD /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
 		CE71705823A9C14D00A924A1 /* ResourceFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */; };
 		CE71705F23A9C97F00A924A1 /* PackageInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */; };
@@ -201,6 +214,27 @@
 			remoteGlobalIDString = C06D372A1F81F4E100F61AE0;
 			remoteInfo = KeymanEngine;
 		};
+		CE4459CB23FBB8DA003151FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F243887514BBD43000A3E055 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F243887D14BBD43000A3E055;
+			remoteInfo = KeymanEngineDemo;
+		};
+		CE4459EA23FBBB79003151FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F243887514BBD43000A3E055 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C06D372A1F81F4E100F61AE0;
+			remoteInfo = KeymanEngine;
+		};
+		CE4459F823FBBCB3003151FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F243887514BBD43000A3E055 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE4459D223FBBB34003151FD;
+			remoteInfo = KeymanEngineTestHost;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -241,6 +275,22 @@
 				C06D375E1F82089200F61AE0 /* KeymanEngine.framework in Embed Frameworks */,
 				CE2B1E4A21B60FB1007D092E /* DeviceKit.framework in Embed Frameworks */,
 				C07705E01FD8ED9E00D2F3C7 /* XCGLogger.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE4459EC23FBBB79003151FD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CE4459F523FBBB8F003151FD /* XCGLogger.framework in Embed Frameworks */,
+				CE4459E923FBBB79003151FD /* KeymanEngine.framework in Embed Frameworks */,
+				CE4459EF23FBBB8F003151FD /* DeviceKit.framework in Embed Frameworks */,
+				CE4459F123FBBB8F003151FD /* ObjcExceptionBridging.framework in Embed Frameworks */,
+				CE4459F723FBBB8F003151FD /* Zip.framework in Embed Frameworks */,
+				CE4459F323FBBB8F003151FD /* Reachability.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -354,6 +404,9 @@
 		CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadQueue.swift; sourceTree = "<group>"; };
 		CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeymanResponder+Types.swift"; sourceTree = "<group>"; };
 		CE2B1E4521B60E7C007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		CE4459CD23FBBA8D003151FD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineTestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE4459ED23FBBB7F003151FD /* Carthage */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Carthage; path = ../../Carthage; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
@@ -407,6 +460,19 @@
 				CE808A48236697BE00713E6B /* DeviceKit.framework in Frameworks */,
 				CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */,
 				CE808A4B236697D400713E6B /* ObjcExceptionBridging.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE4459D023FBBB34003151FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE4459F423FBBB8F003151FD /* XCGLogger.framework in Frameworks */,
+				CE4459E823FBBB79003151FD /* KeymanEngine.framework in Frameworks */,
+				CE4459EE23FBBB8F003151FD /* DeviceKit.framework in Frameworks */,
+				CE4459F023FBBB8F003151FD /* ObjcExceptionBridging.framework in Frameworks */,
+				CE4459F623FBBB8F003151FD /* Zip.framework in Frameworks */,
+				CE4459F223FBBB8F003151FD /* Reachability.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -577,6 +643,7 @@
 				9A079DD1223194B100581263 /* KeymanEngineTests.swift */,
 				9A079DD3223194B100581263 /* Info.plist */,
 				CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */,
+				CE4459CD23FBBA8D003151FD /* AppDelegate.swift */,
 			);
 			path = KeymanEngineTests;
 			sourceTree = "<group>";
@@ -722,6 +789,7 @@
 				98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */,
 				C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */,
 				9A079DCF223194B100581263 /* KeymanEngineTests.xctest */,
+				CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -729,6 +797,7 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CE4459ED23FBBB7F003151FD /* Carthage */,
 				9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */,
 				9A079DE52231A69D00581263 /* Foundation.framework */,
 				CE2B1E4521B60E7C007D092E /* DeviceKit.framework */,
@@ -886,6 +955,8 @@
 			);
 			dependencies = (
 				9A079DD6223194B100581263 /* PBXTargetDependency */,
+				CE4459CC23FBB8DA003151FD /* PBXTargetDependency */,
+				CE4459F923FBBCB3003151FD /* PBXTargetDependency */,
 			);
 			name = KeymanEngineTests;
 			productName = KeymanEngineTests;
@@ -909,6 +980,25 @@
 			productName = KeymanEngine;
 			productReference = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		CE4459D223FBBB34003151FD /* KeymanEngineTestHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE4459E423FBBB36003151FD /* Build configuration list for PBXNativeTarget "KeymanEngineTestHost" */;
+			buildPhases = (
+				CE4459CF23FBBB34003151FD /* Sources */,
+				CE4459D023FBBB34003151FD /* Frameworks */,
+				CE4459D123FBBB34003151FD /* Resources */,
+				CE4459EC23FBBB79003151FD /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CE4459EB23FBBB79003151FD /* PBXTargetDependency */,
+			);
+			name = KeymanEngineTestHost;
+			productName = KeymanEngineTestHost;
+			productReference = CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */;
+			productType = "com.apple.product-type.application";
 		};
 		F243887D14BBD43000A3E055 /* KeymanEngineDemo */ = {
 			isa = PBXNativeTarget;
@@ -939,8 +1029,8 @@
 		F243887514BBD43000A3E055 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				DefaultBuildSystemTypeForWorkspace = Original;
-				LastSwiftUpdateCheck = 1010;
+				DefaultBuildSystemTypeForWorkspace = Latest;
+				LastSwiftUpdateCheck = 1120;
 				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "SIL International";
 				TargetAttributes = {
@@ -959,11 +1049,17 @@
 						CreatedOnToolsVersion = 10.1;
 						DevelopmentTeam = 3YE4W86L3G;
 						ProvisioningStyle = Automatic;
+						TestTargetID = CE4459D223FBBB34003151FD;
 					};
 					C06D372A1F81F4E100F61AE0 = {
 						CreatedOnToolsVersion = 9.0;
 						DevelopmentTeam = 3YE4W86L3G;
 						ProvisioningStyle = Manual;
+					};
+					CE4459D223FBBB34003151FD = {
+						CreatedOnToolsVersion = 11.2.1;
+						DevelopmentTeam = WHE552KZN5;
+						ProvisioningStyle = Automatic;
 					};
 					F243887D14BBD43000A3E055 = {
 						DevelopmentTeam = 3YE4W86L3G;
@@ -995,6 +1091,7 @@
 				F243887D14BBD43000A3E055 /* KeymanEngineDemo */,
 				98F9D6961954112F0087AA43 /* SystemKeyboard */,
 				9A079DCE223194B100581263 /* KeymanEngineTests */,
+				CE4459D223FBBB34003151FD /* KeymanEngineTestHost */,
 			);
 		};
 /* End PBXProject section */
@@ -1026,6 +1123,13 @@
 				CE754A0223D151B90030CB79 /* ResourceInfoView.xib in Resources */,
 				9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */,
 				CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE4459D123FBBB34003151FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1194,6 +1298,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CE4459CF23FBBB34003151FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE4459E723FBBB4A003151FD /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F243887A14BBD43000A3E055 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1236,6 +1348,21 @@
 			isa = PBXTargetDependency;
 			target = C06D372A1F81F4E100F61AE0 /* KeymanEngine */;
 			targetProxy = C06D37CA1F83204200F61AE0 /* PBXContainerItemProxy */;
+		};
+		CE4459CC23FBB8DA003151FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F243887D14BBD43000A3E055 /* KeymanEngineDemo */;
+			targetProxy = CE4459CB23FBB8DA003151FD /* PBXContainerItemProxy */;
+		};
+		CE4459EB23FBBB79003151FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C06D372A1F81F4E100F61AE0 /* KeymanEngine */;
+			targetProxy = CE4459EA23FBBB79003151FD /* PBXContainerItemProxy */;
+		};
+		CE4459F923FBBCB3003151FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE4459D223FBBB34003151FD /* KeymanEngineTestHost */;
+			targetProxy = CE4459F823FBBCB3003151FD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1365,12 +1492,13 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.randy.boring.KeymanEngineTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.testing.KeymanEngineTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KeymanEngineTestHost.app/KeymanEngineTestHost";
 			};
 			name = Debug;
 		};
@@ -1404,10 +1532,11 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.randy.boring.KeymanEngineTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.testing.KeymanEngineTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KeymanEngineTestHost.app/KeymanEngineTestHost";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1533,6 +1662,80 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "arm64 armv7s armv7 x86_64 i386";
+			};
+			name = Release;
+		};
+		CE4459E523FBBB36003151FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = WHE552KZN5;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = KeymanEngineTestHost/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.testing.KeymanEngineTestHost;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CE4459E623FBBB36003151FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = WHE552KZN5;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = KeymanEngineTestHost/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.testing.KeymanEngineTestHost;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -1715,6 +1918,15 @@
 			buildConfigurations = (
 				C06D37C81F82364E00F61AE0 /* Debug */,
 				C06D37C91F82364E00F61AE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE4459E423FBBB36003151FD /* Build configuration list for PBXNativeTarget "KeymanEngineTestHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE4459E523FBBB36003151FD /* Debug */,
+				CE4459E623FBBB36003151FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

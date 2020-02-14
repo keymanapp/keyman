@@ -13,6 +13,7 @@ import DeviceKit
 
 
 class KeymanEngineTests: XCTestCase {
+  public static let TEST_BUNDLE_IDENTIFIER = "com.keyman.testing.KeymanEngineTests"
   
   override func setUp() {
     // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,7 +22,18 @@ class KeymanEngineTests: XCTestCase {
   override func tearDown() {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
   }
-  
+
+  func testStorageAccess() {
+    // Xcode unit tests cannot use capabilities, and thus we cannot access a true app group.
+    // So, we'll use a sandboxed analogue for this instead.
+
+    // Critical core aspect - access to the following property should return something sandboxed but usable.
+    let storage = Storage.active!
+    log.info(storage.baseDir)
+
+    Storage.active.erase()
+  }
+
   // AMDD acceptance test for existing KeymanPackage so I'll know what has to keep working despite my changers
   func testExample() {
     let testUrl = URL(fileURLWithPath: "/Users/Shared/testpackage.kmp");
