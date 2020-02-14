@@ -69,7 +69,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = Colors.selectionPrimary
+    selectionColor.backgroundColor = Colors.keyboardSelectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }
