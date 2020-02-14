@@ -36,7 +36,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             completionHandler: { package in
                               // We choose to prompt the user for comfirmation, rather
                               // than automatically installing the package.
-                              rfm.promptPackageInstall(of: package, in: vc, isCustom: true)
+                              rfm.promptPackageInstall(of: package, in: vc, isCustom: true, successHandler: { _ in
+                                do {
+                                  // Since we've successfully installed the resource, delete the original file.
+                                  // The 'imported' file will continue to exist.
+                                  if url != destinationUrl {
+                                    try FileManager.default.removeItem(at: url)
+                                  }
+                                } catch {
+                                  log.error(error)
+                                }
+                              })
                             })
     } else {
       log.error("Cannot find app's root UIViewController")

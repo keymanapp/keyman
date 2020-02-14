@@ -69,6 +69,15 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
                               // We choose to prompt the user for comfirmation, rather
                               // than automatically installing the package.
                               rfm.promptPackageInstall(of: package, in: self, isCustom: true, successHandler: { _ in
+                                do {
+                                  // Since we've successfully installed the resource, delete the original file.
+                                  // The 'imported' file will continue to exist.
+                                  if url != destinationUrl {
+                                    try FileManager.default.removeItem(at: url)
+                                  }
+                                } catch {
+                                  log.error(error)
+                                }
                                 // Auto-dismiss the document browser upon successful KMP install.
                                 // It's likely quite rare that someone would want to install 2+ at once.
                                 self.navigationController?.popViewController(animated: true)
