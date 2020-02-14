@@ -1,6 +1,7 @@
 # Keyman for macOS Version History
 
 ## 2020-02-14 13.0.17 beta
+* Feature: Keyman now includes an installer for macOS to streamline the install experience (#2537)
 * Bug fix: Modifier keys no longer cause keyboards to work incorrectly in several apps (#2588)
 
 ## 2020-01-28 13.0.13 beta
