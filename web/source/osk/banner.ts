@@ -211,11 +211,10 @@ namespace com.keyman.osk {
       }
 
       // Ensures that a reasonable width % is set.
-      let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.SUGGESTION_LIMIT + 1);
+      let usableWidth = 100 - SuggestionBanner.MARGIN * (SuggestionBanner.SUGGESTION_LIMIT - 1);
       let widthpc = usableWidth / SuggestionBanner.SUGGESTION_LIMIT;
 
       ds.width = widthpc + '%';
-      ds.marginLeft = SuggestionBanner.MARGIN + '%';
 
       this.div['suggestion'] = this;
     }
@@ -374,6 +373,18 @@ namespace com.keyman.osk {
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let indexToInsert = rtl ? SuggestionBanner.SUGGESTION_LIMIT - i -1 : i;
         this.getDiv().appendChild(this.options[indexToInsert].div);
+
+        if(i != SuggestionBanner.SUGGESTION_LIMIT) {
+          // Adds a 'separator' div element for UI purposes.
+          let separatorDiv = com.keyman.singleton.util._CreateElement('div');
+          separatorDiv.className = 'kmw-banner-separator';
+
+          let ds = separatorDiv.style;
+          ds.marginLeft = (SuggestionBanner.MARGIN / 2) + '%';
+          ds.marginRight = (SuggestionBanner.MARGIN / 2) + '%';
+
+          this.getDiv().appendChild(separatorDiv);
+        }
       }
 
       this.manager = new SuggestionManager(this.getDiv(), this.options);
