@@ -52,7 +52,7 @@
       
     // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.  
-    kmw.addKeyboards('french', 'european2@no,sv', '@he'); // Loads all from uniquely-identifying strings.
+    kmw.addKeyboards('french', 'sil_euro_latin@no,sv', '@he'); // Loads all from uniquely-identifying strings.
   
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
@@ -67,7 +67,7 @@
           // Example:
           //font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
-      filename:'./lao_2008_basic.js'
+      filename:'./lao_2008_basic-1.2.js'
       });   
 
     // The following two optional calls should be delayed until language menus are fully loaded:

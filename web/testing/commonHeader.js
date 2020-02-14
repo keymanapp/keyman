@@ -64,7 +64,7 @@
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.
     kmw.addKeyboards('french','@he');
-    kmw.addKeyboards({id:'european2', name:'EuroLatin2', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
+    kmw.addKeyboards({id:'sil_euro_latin', name:'SIL EuroLatin', languages: [{id:'no'}, {id:'sv'}]}); // Loads from partial stub instead of the compact string.
   
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
@@ -76,7 +76,7 @@
       languages: {
           id:'lo',name:'Lao',region:'Asia',
         },
-      filename:(prefix + 'lao_2008_basic.js')
+      filename:(prefix + 'lao_2008_basic-1.2.js')
       });   
 
     // The following two optional calls should be delayed until language menus are fully loaded:
