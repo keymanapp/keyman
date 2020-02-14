@@ -4,10 +4,25 @@ from setuptools import setup, find_packages
 
 exec(open('keyman_config/version.py').read())
 
+gschema_dir_suffix = 'share/glib-2.0/schemas'
+
+class install_data():
+    def run(self):
+        super().run()
+
+        # Compile '*.gschema.xml'
+        info("compiling gsettings schemas")
+        gschema_dir = os.path.join(self.install_dir, gschema_dir_suffix)
+        exec('glib-compile-schemas ', gschema_dir)
+
 setup(
     name="keyman_config",
     version=__version__,
     packages=find_packages(),
+
+    data_files = [
+        (gschema_dir_suffix, ['com.keyman.gschema.xml'])],
+
     scripts=['km-config', 'km-package-get',
              'km-package-install', 'km-kvk2ldml',
              'km-package-uninstall',
