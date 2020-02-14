@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.HashMap;
@@ -59,10 +58,9 @@ public class CloudDownloadMgr{
       return;
     try {
       aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    } catch (Exception e) {
-      String message = "CloudDownloadMgr re-initializing";
-      Toast.makeText(aContext, message,
-        Toast.LENGTH_SHORT).show();
+    } catch (IllegalStateException e) {
+      String message = "initialize error: ";
+      Log.e(TAG, message + e);
     }
     isInitialized = true;
   }
@@ -77,10 +75,9 @@ public class CloudDownloadMgr{
       return;
     try {
       aContext.unregisterReceiver(completeListener);
-    } catch (Exception e) {
-      String message = "CloudDownloadMgr shutting down.";
-      Toast.makeText(aContext, message,
-        Toast.LENGTH_SHORT).show();
+    } catch (IllegalStateException e) {
+      String message = "shutdown error: ";
+      Log.e(TAG, message + e);
     }
     isInitialized = false;
   }
