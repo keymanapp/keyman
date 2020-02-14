@@ -187,9 +187,24 @@ echo "---- End Listing ----"
 
 # Step 4 - Detach/unmount the temporary image/staging area
 displayInfo "Detaching \"$WORKING_COPY_OF_IMAGE\""
-hdiutil detach $STAGING_DIR $VERBOSITY
-if  [[ $? != 0 || -d "$STAGING_DIR" ]] ; then
-    fail "Failed to unmount: \"$STAGING_DIR\""
+
+# Attempt to detach 10 times, waiting 5 seconds each time
+# because macOS may still be working in the folder in the
+# background
+DETACH_SUCCESS=0
+while (( DETACH_SUCCESS < 10 )); do
+    hdiutil detach $STAGING_DIR $VERBOSITY
+    if  [[ $? != 0 || -d "$STAGING_DIR" ]] ; then
+        (( DETACH_SUCCESS++ ))
+        echo "Failed to unmount: \"$STAGING_DIR\" on attempt #$DETACH_SUCCESS. Waiting 5 seconds to try again."
+        sleep 5
+    else
+        DETACH_SUCCESS=999
+    fi
+done
+
+if (( DETACH_SUCCESS < 999 )); then
+    fail "Unable to unmount \"$STAGING_DIR\". Aborting build."
 fi
 
 # Step 5 - Convert image to a compressed readonly DMG image
