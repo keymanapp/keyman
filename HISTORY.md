@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.10 alpha 2020-02-14
+
+* refactor(mac): initial steps of input pathway (#2643)
+
 ## 14.0.9 alpha 2020-02-10
 
 * fix(common/core): buffer overrun in context api (#2614)
