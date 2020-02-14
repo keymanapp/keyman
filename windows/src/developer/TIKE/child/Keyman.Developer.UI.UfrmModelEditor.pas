@@ -1,4 +1,3 @@
-//TODO: CEF destruction is incorrect in this unit
 unit Keyman.Developer.UI.UfrmModelEditor;
 
 interface
@@ -22,6 +21,7 @@ uses
   Keyman.Developer.UI.dmActionsModelEditor,
   dmActionsMain,
   LeftTabbedPageControl,
+  UfrmMDIChild,
   UfrmMDIEditor,
   UframeTextEditor,
   Keyman.Developer.System.Project.ProjectFile,
@@ -112,12 +112,14 @@ type
     procedure UpdateWordlistTabs;
     function AddWordlistTab(
       const WordlistFilename: string): TfrmModelEditor.TWordlist;
+    function WordlistFromTab(tab: TTabSheet): TfrmModelEditor.TWordlist;
     function MoveDesignToSource: Boolean;
     function MoveSourceToDesign: Boolean;
     procedure SourceChanged(Sender: TObject);
     function CheckModifiedWordlistsForRemoval(
       newParser: TLexicalModelParser): Boolean;
     procedure UpdateQRCode;
+    procedure WordlistModifiedChanged(Sender: TObject);
     { Private declarations }
   protected
     function GetHelpTopic: string; override;
@@ -128,6 +130,12 @@ type
 
     function GetProjectFile: TProjectFile; override;
 
+    function CanChangeTab(FForward: Boolean): Boolean; override;
+    procedure ChangeTab(FForward: Boolean); override;
+
+    function CanChangeView(FView: TCodeDesignView): Boolean; override;
+    procedure ChangeView(FView: TCodeDesignView); override;
+
   public
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
     procedure NotifyStartedWebDebug;
@@ -137,6 +145,8 @@ implementation
 
 uses
   System.UITypes,
+
+  Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.modeltsProjectFileAction,
   Keyman.System.QRCode,
   TextFileFormat,
@@ -191,6 +201,11 @@ function TfrmModelEditor.DoSaveFile: Boolean;
 var
   wordlist: TWordlist;
 begin
+  if pages.ActivePage = pageSource then
+  begin
+    if not MoveSourceToDesign then Exit(False);
+  end;
+
   for wordlist in wordlists do
   begin
     wordlist.Frame.SaveToFile(wordlist.Frame.Filename);
@@ -282,7 +297,7 @@ end;
 
 function TfrmModelEditor.GetDefaultExt: string;
 begin
-  Result := '.model.ts';  // TODO: test if this actually works!
+  Result := '.model.ts';
 end;
 
 function TfrmModelEditor.GetFileNameFilter: string;
@@ -292,7 +307,7 @@ end;
 
 function TfrmModelEditor.GetHelpTopic: string;
 begin
-  Result := ''; //SHelpTopic_Context_WordlistEditor;  // TODO: use a better topic
+  Result := SHelpTopic_Context_ModelEditor;
 end;
 
 function TfrmModelEditor.GetProjectFile: TProjectFile;
@@ -328,6 +343,23 @@ begin
   if FSetup > 0 then
     Exit;
   Modified := True;
+end;
+
+procedure TfrmModelEditor.ChangeTab(FForward: Boolean);
+begin
+  pages.SelectNextPage(FForward);
+end;
+
+procedure TfrmModelEditor.ChangeView(FView: TCodeDesignView);
+var
+  wordlist: TWordlist;
+begin
+  wordlist := WordlistFromTab(pages.ActivePage);
+  if not Assigned(wordlist) then Exit;
+  case FView of
+    cdvDesign: if wordlist.Frame.pages.ActivePage <> wordlist.Frame.pageDesign then wordlist.Frame.pages.SelectNextPage(False);
+    cdvCode:   if wordlist.Frame.pages.ActivePage <> wordlist.Frame.pageCode then wordlist.Frame.pages.SelectNextPage(True);
+  end;
 end;
 
 function TfrmModelEditor.CheckModifiedWordlistsForRemoval(newParser: TLexicalModelParser): Boolean;
@@ -465,6 +497,25 @@ begin
 
   Result.Frame.Parent := Result.Tab;
   Result.Frame.Visible := True;
+
+  Result.Frame.OnModifiedChanged := WordlistModifiedChanged;
+end;
+
+function TfrmModelEditor.WordlistFromTab(
+  tab: TTabSheet): TfrmModelEditor.TWordlist;
+begin
+  for Result in wordlists do
+    if Result.Tab = tab then
+      Exit;
+
+  Result := nil;
+end;
+
+procedure TfrmModelEditor.WordlistModifiedChanged(Sender: TObject);
+begin
+  // We only go from clean to dirty, not vice-versa, on this notification
+  if (Sender as TframeWordlistEditor).Modified then
+    Modified := True;
 end;
 
 { TfrmModelEditor.TWordlists }
@@ -479,6 +530,16 @@ begin
 end;
 
 { Wordlist management }
+
+function TfrmModelEditor.CanChangeTab(FForward: Boolean): Boolean;
+begin
+  Result := True;
+end;
+
+function TfrmModelEditor.CanChangeView(FView: TCodeDesignView): Boolean;
+begin
+  Result := WordlistFromTab(pages.ActivePage) <> nil;
+end;
 
 procedure TfrmModelEditor.cbFormatClick(Sender: TObject);
 begin

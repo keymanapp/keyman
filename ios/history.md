@@ -1,5 +1,11 @@
 # Keyman for iPhone and iPad Version History
 
+## 2020-02-14 13.0.70 beta
+* Change: restyles suggestion banner to more closely match the iOS system default (#2629)
+
+## 2020-02-12 13.0.68 beta
+* Bug fix: fixed keyboard display logic when sharing with other apps (#2631)
+
 ## 2020-02-11 13.0.67 beta
 * Bug fix: fixed issue with sample apps and engine keyboard switcher (#2626)
 * Bug fix: fixed issue with dictionary updates (#2627)

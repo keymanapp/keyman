@@ -234,9 +234,8 @@ namespace com.keyman.osk {
       }
       s.height=menuHeight+'px';
 
-      // Position menu at bottom of screen, but referred to top (works for both iOS and Firefox)
-      s.top=(dom.Utils.getAbsoluteY(osk._Box)+osk._Box.offsetHeight-menuHeight+window.pageYOffset-6)+'px';
-      s.bottom='auto';
+      // Position menu at bottom of screen using the same positioning model as the OSK.
+      s.bottom='0px';
 
       // Explicitly set the scroller and index heights to the container height
       mx.style.height=m2.style.height=s.height;

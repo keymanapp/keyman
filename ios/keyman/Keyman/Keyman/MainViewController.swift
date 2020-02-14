@@ -618,7 +618,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                         UIActivity.ActivityType.saveToCameraRoll]
     activityVC.completionWithItemsHandler = {(_ activityType: UIActivity.ActivityType?, _ completed: Bool,
       _ returnedItems: [Any]?, _ activityError: Error?) -> Void in
-      self.textView.isUserInteractionEnabled = true
+
+      // If a share was completed -OR- if the user backed out of the share selection menu.
+      if completed || activityType == nil {
+        self.textView.isUserInteractionEnabled = true
+      } // else (if the user started to share but backed out to the menu) do nothing.
     }
 
     textView.isUserInteractionEnabled = false

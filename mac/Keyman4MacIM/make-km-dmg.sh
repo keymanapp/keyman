@@ -44,11 +44,11 @@ popd  > /dev/null
 
 . $KEYMAN_MACIM_BASE_PATH/../bashHelperFunctions.sh
 
-KM_APP_NAME="Keyman.app"
-SOURCE_KM_APP="$KEYMAN_MACIM_BASE_PATH/build/Release/$KM_APP_NAME"
+KM_APP_NAME="Install Keyman.app"
 OUTPUT_DIR="$KEYMAN_MACIM_BASE_PATH/output"
-STAGING_DIR="$OUTPUT_DIR/temp"
+STAGING_DIR="/Volumes/Keyman"
 DEST_DIR="$OUTPUT_DIR/upload"
+SOURCE_KM_APP="$OUTPUT_DIR/$KM_APP_NAME"
 ADD_VERSION_TO_DEST_DIR=true
 TEMPLATE_IMAGE="$KEYMAN_MACIM_BASE_PATH/Keyman-template.dmg"
 VERBOSITY=""
@@ -139,6 +139,8 @@ elif [[ ! -d "$DEST_DIR" ]]; then
 	fail "Destination dir exists but is not a directory: $2"
 fi
 
+# TODO: Check that no Keyman volume is already mounted.
+
 # Step 1 - Copy template to working copy to prevent unintended changes
 WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$KM_VERSION.dmg"
 displayInfo "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
@@ -149,9 +151,8 @@ cp -f "$TEMPLATE_IMAGE" "$WORKING_COPY_OF_IMAGE"
 
 # Step 2 - Mount (copy of) template image - writeable
 displayInfo "Attaching \"$WORKING_COPY_OF_IMAGE\"" "Mounting as \"$STAGING_DIR\"..."
-if [[ -e "$STAGING_DIR" && "$VERBOSITY" != "-quiet" ]] ; then
-    warn "Overwriting: $STAGING_DIR"
-    rm -rf "$STAGING_DIR"
+if [[ -e "$STAGING_DIR" ]]; then
+    fail "Mount folder $STAGING_DIR is already present. Unmount it first."
 fi
 hdiutil attach "$WORKING_COPY_OF_IMAGE" -readwrite -mountpoint "$STAGING_DIR" $VERBOSITY
 if  ! [[ $? == 0 && -d "$STAGING_DIR" ]] ; then
@@ -163,16 +164,47 @@ if  ! [[ -d "$DEST_KM_APP" ]] ; then
     fail "Expected mounted image to contain Keyman app, but \"$DEST_KM_APP\" does not exist."
 fi
 
+echo "---- Listing info in /Volumes/Keyman/ ----"
+echo "DEST_KM_APP=$DEST_KM_APP"
+echo "STAGING_DIR=$STAGING_DIR"
+ls -la "$STAGING_DIR"
+ls -la "$STAGING_DIR/background"
+echo "---- End Listing ----"
+
 # Step 3 - Replace existing application files with new version
 displayInfo "Copying files from \"$SOURCE_KM_APP\"..."
+find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 
+echo "---------"
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf
 cp -fR "$SOURCE_KM_APP/" "$DEST_KM_APP"
 
+echo "---- Listing info in /Volumes/Keyman/ ----"
+echo "DEST_KM_APP=$DEST_KM_APP"
+echo "STAGING_DIR=$STAGING_DIR"
+ls -la "$STAGING_DIR"
+ls -la "$STAGING_DIR/background"
+echo "---- End Listing ----"
+
 # Step 4 - Detach/unmount the temporary image/staging area
 displayInfo "Detaching \"$WORKING_COPY_OF_IMAGE\""
-hdiutil detach $STAGING_DIR $VERBOSITY
-if  [[ $? != 0 || -d "$STAGING_DIR" ]] ; then
-    fail "Failed to unmount: \"$STAGING_DIR\""
+
+# Attempt to detach 10 times, waiting 5 seconds each time
+# because macOS may still be working in the folder in the
+# background
+DETACH_SUCCESS=0
+while (( DETACH_SUCCESS < 10 )); do
+    hdiutil detach $STAGING_DIR $VERBOSITY
+    if  [[ $? != 0 || -d "$STAGING_DIR" ]] ; then
+        (( DETACH_SUCCESS++ ))
+        echo "Failed to unmount: \"$STAGING_DIR\" on attempt #$DETACH_SUCCESS. Waiting 5 seconds to try again."
+        sleep 5
+    else
+        DETACH_SUCCESS=999
+    fi
+done
+
+if (( DETACH_SUCCESS < 999 )); then
+    fail "Unable to unmount \"$STAGING_DIR\". Aborting build."
 fi
 
 # Step 5 - Convert image to a compressed readonly DMG image

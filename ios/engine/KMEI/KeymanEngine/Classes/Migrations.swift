@@ -116,6 +116,11 @@ public enum Migrations {
 
     // Detect possible version matches.
     let userResources = Storage.active.userDefaults.userResources ?? []
+
+    // If there are no pre-existing resources and we need to detect a version, this is a fresh install.
+    if userResources.count == 0 {
+      return [Version.freshInstall]
+    }
     let possibleMatches: [Version] = resourceHistory.compactMap { set in
       if set.version < Version("12.0")! {
         // Are all of the version's default resources present?
@@ -183,7 +188,7 @@ public enum Migrations {
       }
     }
 
-    if lastVersion != nil {
+    if lastVersion != nil && lastVersion != Version.freshInstall {
       // Time to deinstall the old version's resources.
       // First, find the most recent version with a listed history.
       let possibleHistories: [VersionResourceSet] = resourceHistory.compactMap { set in
