@@ -1,18 +1,56 @@
 # Keyman for iPhone and iPad Version History
 
-## 13.0 alpha
-* Start version 13.0
-* Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457)
-* Adds support for iOS 13.0's dark mode feature (#2468)
-* Keyboards now scale to match the default system keyboard's size for known devices (#2487)
-* Fixes bug where the keyboard might display within the settings menu (#2470)
-* Adds QR code to keyboard info pages for easier sharing with internet availability (#2509)
-* Testing for upcoming patch to stable:
-  * Fixes for deprecated code, improving maintainability (#2282)
+## 2020-02-12 13.0.68 beta
+* Bug fix: fixed keyboard display logic when sharing with other apps (#2631)
+
+## 2020-02-11 13.0.67 beta
+* Bug fix: fixed issue with sample apps and engine keyboard switcher (#2626)
+* Bug fix: fixed issue with dictionary updates (#2627)
+
+## 2020-02-10 13.0.66 beta
+* Bug fix: Fixed migration of old resources to new app versions, updated default MTNT dictionary (#2512)
+* Bug fix: Fixed issues when iOS system transitions between light and dark modes (#2593, #2594)
+
+## 2020-02-03 13.0.63 beta
+* Bug fix: Fixes keyboard widths/margins in iOS 9 and 10 (#2560)
+
+## 2020-01-30 13.0.62 beta
+* Feature: Initial keyboard setup process simplified with direct Settings link [iOS 11.0+ only] (#2548)
+* Bug fix: System keyboard now respects "Sounds > Keyboard Clicks" setting (#2550)
+
+## 2020-01-29 13.0.61 beta
+* Bug fix: System keyboard would sometimes appear blank (#2545)
+
+## 2020-01-28 13.0.60 beta
+* Feature: Adds file browsing for installable KMPs and makes KMPs for resources installed this way available to the Files app (#2457, #2489, #2510)
+* Feature: Adds support for iOS 13.0's dark mode feature (#2277, #2312, #2468, #2521)
+* Feature: Adds QR code to keyboard info pages for easier sharing with internet availability (#2509)
+* Feature: Show clear message when a language does not have any lexical models (#2475)
+* Bug fix: "Always show banner" option now works more consistently (#2479)
+* Bug fix: Keyboards now scale to match the default system keyboard's size for known devices (#2487)
+* Bug fix: Rotation of keyboard into landscape scales wrongly (#2301, 12.0:#2318)
+* Bug fix: Multi-row longpress keys not contained within keyboard bounds (#2306, 12.0:#2317)
+* Bug fix: Fixes bug where the keyboard might display within the settings menu (#2470)
+* Bug fix: Fix situation where lexical model fails to install with missing version number (#2191, 12.0:#2193)
+* Bug fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403, 12.0:#2420) 
+* Bug fix: If malformed data was returned from an online API, Keyman could crash (#2368)
+* Bug fix: Unable to replace previously installed KMP from ad-hoc file (#2459, 12.0:#2461)
+* Bug fix: Default model (MTNT) installation was not happening (#2532)
 
 ## 2019-12-09 12.0.62 stable
-* Bug Fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403)
-* Bug Fix: If malformed data was returned from an online API, Keyman could crash (#2368)
+* Bug Fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2420)
+
+## 2019-11-25 12.0.60 stable
+* Bug Fix: Unable to replace previously installed KMP from ad-hoc file (12.0:#2461)
+
+## 2019-11-13 12.0.55 stable
+* Bug Fix: Multi-row longpress keys not contained within keyboard bounds (#2317)
+
+## 2019-11-11 12.0.54 stable
+* Bug fix: Rotation of keyboard into landscape scales wrongly (#2318)
+
+## 2019-10-19 12.0.52 stable
+* Bug fix: Fix situation where lexical model fails to install with missing version number (#2193)
 
 ## 2019-09-20 12.0.39 beta
 * App info / help now points to the equivalent pages on help.keyman.com in a multi-page format (#2088)

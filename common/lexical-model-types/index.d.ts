@@ -361,4 +361,11 @@ interface LexicalModelPunctuation {
    * Default: ` `
    */
   readonly insertAfterWord: string;
+
+  /**
+   * Whether or not the model's language is typically displayed in RTL form.
+   * 
+   * Default: false (or undefined)
+   */
+  readonly isRTL?: boolean;
 }

@@ -317,7 +317,13 @@ extension KeymanWebViewController {
   
   func setBannerImage(to path: String) {
     bannerImgPath = path // Save the path in case delayed initializaiton is needed.
-    log.debug("Banner image path: '\(path).'")
+    var logString: String
+    if path.contains("base64") || path.count > 256 {
+      logString = "<base64 image>"
+    } else {
+      logString = path
+    }
+    log.debug("Banner image path: '\(logString).'")
     webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
   }
   
@@ -529,18 +535,26 @@ extension KeymanWebViewController: KeymanWebDelegate {
     setDeviceType(UIDevice.current.userInterfaceIdiom)
     
     let shouldReloadKeyboard = Manager.shared.shouldReloadKeyboard
-    var newKb = Defaults.keyboard
-    if Manager.shared.currentKeyboardID == nil && !shouldReloadKeyboard {
+    var newKb = Manager.shared.currentKeyboard
+
+    if !shouldReloadKeyboard { // otherwise, we automatically reload anyway.
       let userData = Manager.shared.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
-      if let id = userData.currentKeyboardID {
-        if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
-          newKb = kb
+      if newKb == nil {
+        if let id = userData.currentKeyboardID {
+          if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
+            newKb = kb
+          }
+        } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
+          newKb = userKbs[0]
         }
-      } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
-        newKb = userKbs[0]
       }
       log.info("Setting initial keyboard.")
-      _ = Manager.shared.setKeyboard(newKb)
+      _ = Manager.shared.setKeyboard(newKb!)
+    }
+
+    // in case `shouldReloadKeyboard == true`.  Is set otherwise above.
+    if(newKb == nil) {
+      newKb = Defaults.keyboard
     }
 
     updateShowBannerSetting()
@@ -550,7 +564,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     
     fixLayout()
 
-    NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb)
+    NotificationCenter.default.post(name: Notifications.keyboardLoaded, object: self, value: newKb!)
     if shouldReloadKeyboard {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)

@@ -1,7 +1,35 @@
 # Keyman for Android Version History
 
-## 13.0 alpha
-* Start version 13.0
+## 2020-02-13 13.0.6058 beta
+* Change:
+  * Update rest of Android apps' dependency to `androidx.appcompat:appcompat:1.2.0-alpha02` to
+    fix WebView crash on Android 5.0 devices (#2644)
+
+## 2020-02-12 13.0.6057 beta
+* Change:
+  * Update in-app help for 13.0 (#2641)
+  * Update oem dependency to `androidx.appcompat:appcompat:1.2.0-alpha02` to
+    fix WebView crash on Android 5.0 devices (#2640)
+
+## 2020-02-11 13.0.6056 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2623)
+
+## 2020-02-10 13.0.6055 beta
+* Change:
+  * Update default nrc.en.mtnt model to version 0.1.4 (#2608)
+
+## 2020-02-06 13.0.6054 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2561)
+
+## 2020-02-04 13.0.6053 beta
+* No change to Keyman for Android (updated Keyman Web Engine, #2559)
+
+## 2020-01-31 13.0.6051 beta
+* Bug fix:
+  * Fix cancelling dictionary update notifications (#2547)
+  * Fix external keyboard key "tab" (updated Keyman Web Engine #2546)
+
+## 2020-01-28 13.0.6050 beta
 * New Features:
   * Adding a download manager to execute downloads in background and cleanup the existing implementation (#2247, #2275, #2308, #2365)
   * Show spinner (without blocking UI), if user wants to add a language/keyboard and catalog download is in progress (#2313)
@@ -25,6 +53,12 @@
   * Improve compatibility with applications such as Gmail, Chrome that do not conform to the Android input APIs (#2382, #2376)
   * Propagate custom help links (#2448)
   * Fix file permissions for viewing welcome.htm assets (#2465)
+  * Fix UI flicker during keyboard switching (#2296)
+  * Fix compatibility with older Android devices (4.4 KitKat and later) (#2401, 12.0:#2358, #2454, 12.0:#2453)
+
+## 2019-12-18 12.0.4215 stable
+* Bug fix:
+  * Fix compatibility with older Android devices (4.4 KitKat and later) (#2453)
 
 ## 2019-12-12 12.0.4214 stable
 * Bug fix:
@@ -34,7 +68,7 @@
 * Bug fix:
   * Always use lower-case langauge ID's when processing API returns (#2406)
   * Add checks when accessing the Cloud to avoid exceptions (#2393)
-  * Improve Keymanweb and KMEA compatability with devices Android API 19-23 (#2358)
+  * Improve Keymanweb and KMEA compatability with devices Android API 19-23 (4.4 KitKat and later) (#2358)
 
 * Change
   * Update default nrc.en.mtnt model to version 0.1.3 (#2389)

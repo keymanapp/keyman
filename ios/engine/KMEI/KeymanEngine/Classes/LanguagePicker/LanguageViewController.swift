@@ -232,10 +232,6 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     langDetailView.title = title
     navigationController?.pushViewController(langDetailView, animated: true)
   }
-
-  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    navigationController?.popToRootViewController(animated: true)
-  }
     
   func downloadHandler(_ keyboardIndex: Int) {
     let language = languages[selectedSection]
@@ -249,6 +245,8 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func keyboardDownloadFailed() {
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
+
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
@@ -308,15 +306,7 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   private func showConnectionErrorAlert() {
-    dismissActivityView()
-    let alertController = UIAlertController(title: "Connection Error",
-                                            message: "Could not reach Keyman server. Please try again later.",
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: errorAcknowledgmentHandler))
-    
-    self.present(alertController, animated: true, completion: nil)
+    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
   }
 }
 

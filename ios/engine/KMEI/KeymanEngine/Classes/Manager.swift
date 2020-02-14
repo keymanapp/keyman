@@ -183,10 +183,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
     Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
     if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+
+      // Ensure the default keyboard is installed in this case.
+      do {
+        try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+      } catch {
+        log.error("Failed to copy default keyboard from bundle: \(error)")
+      }
     }
-    Migrations.updateResources(storage: Storage.active)
     Migrations.engineVersion = Version.current
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
@@ -274,7 +282,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///
   /// - Throws: error if the keyboard was unchanged
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
-    if kb.fullID == currentKeyboardID {
+    // KeymanWebViewController relies upon this method to activate the keyboard after a page reload,
+    // and as a system keyboard, the controller is rebuilt each time the keyboard is loaded.
+    //
+    // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
+    // blank keyboard bug!
+    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
      // throw KeyboardError.unchanged
@@ -805,9 +818,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
-      try Storage.copyAndExcludeFromBackup(at: url,
-                                           to: keyboardDir.appendingPathComponent(url.lastPathComponent),
-                                           shouldOverwrite: shouldOverwrite)
+      try Storage.copy(at: url,
+                       to: keyboardDir.appendingPathComponent(url.lastPathComponent),
+                       shouldOverwrite: shouldOverwrite,
+                       excludeFromBackup: true)
     }
   }
 

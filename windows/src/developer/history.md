@@ -1,35 +1,60 @@
 # Keyman Developer Version History
 
-## 13.0 alpha
-* Feature: Add unsupported kmdecomp decompiler utility (#2419)
-* Feature: Add x64 version of kmcomp for macOS (#2352)
-* Feature: Hotkeys defined in .kmn no longer need to be quoted (#2432)
-* Feature: Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
-* Feature: F7 in Project window compiles the whole project (#2442)
-* Feature: Default Project Path is now Documents\Keyman Developer\Projects (#2449)
-* Bug Fix: Remove version info from .kps when follow-keyboard-version is set (#2417)
-* Bug Fix: Make sure popup menus are never obscured in Project view (#2415)
-* Bug Fix: 'Show Help' was not working on Distribution tab in Project view (#2397)
-* Bug Fix: Missing author email was causing lexical model compiler to fail (#2388, #2496)
-* Bug Fix: Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
-* Bug Fix: Zero-length store names are no longer permitted (#2443)
-* Change: Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
-* Change: Application title no longer shows active project, only main window (#2441)
+## 2020-02-13 13.0.73 beta
+* Bug Fix(IDE/Model Editor): Would never be set into modified state for changes exclusively in a wordlist. (#2634)
+* Bug Fix(IDE/Model Editor): Add context help (#2634)
+* Bug Fix(IDE/Model Editor): Add Ctrl+PgUp/Ctrl+PgDn hotkeys for switching pages (#2634)
+* Bug Fix(IDE/Model Editor): Add Alt+Left/Alt+Right hotkeys for switching views (#2634)
+* Bug Fix(IDE/Model Editor): Saving file from source view now gets latest changes correctly (#2634)
+
+## 2020-02-12 13.0.72 beta
+* Bug Fix(IDE/Debugger): MIME type mismatch on some systems could cause web test to fail (#2633)
+
+## 2020-02-11 13.0.66 beta
+* Bug Fix(Compiler): Merge of .keyboard_info files would not always get platform support correct (#2621)
+* Bug Fix(Compiler): Missing keyboard file led to misleading error in package compiler (#2620)
+* Bug Fix(Compiler): Double-click to drop character onto touch layout was disabled (#2619)
+
+## 2020-01-28 13.0.65 beta
+* Feature(Compiler): Hotkeys defined in .kmn no longer need to be quoted (#2432)
+* Feature(IDE): Enhanced Lexical Model Editor (#2396)
+* Feature(IDE): Show QRCode for web debugger URLs in Keyboard and Package editors (#2433)
+* Feature(IDE): F7 in Project window compiles the whole project (#2442)
+* Feature(IDE): Default Project Path is now Documents\Keyman Developer\Projects (#2449)
+* Feature(Tools): Add unsupported kmdecomp decompiler utility (#2419)
+* Feature(Tools): Add x64 version of kmcomp for macOS (#2352)
+* Bug Fix(Compiler): Missing author email was causing lexical model compiler to fail (#2388, 12.0:#2496)
+* Bug Fix(Compiler): Lexical model compiler was not handling SMP characters (#2438, 12.0:#2502)
+* Bug Fix(Compiler): Zero-length store names are no longer permitted (#2443)
+* Bug Fix(Compiler): Some keyboards were incorrectly marked as mobile-capable (#2334, 12.0:#2343)
+* Bug Fix(Compiler): nul in context caused incorrect context deletion for web keyboards 10.0 or newer (#2295)
+* Bug Fix(IDE): Remove version info from .kps when follow-keyboard-version is set (#2417)
+* Bug Fix(IDE): Make sure popup menus are never obscured in Project view (#2415)
+* Bug Fix(IDE): 'Show Help' was not working on Distribution tab in Project view (#2397)
+* Bug Fix(IDE): Character Map now drops characters instead of codes in visual editors (#2428)
+* Bug Fix(IDE): Text editor and other controls did not receive focus correctly (#2331, 12.0:#2340)
+* Bug Fix(IDE): Shortcuts in text editors were not working after #2331 (#2424, 12.0:#2425)
+* Bug Fix(IDE): Unicode characters could be silently lost when editing legacy Windows-1252 files (#2416)
+* Bug Fix(IDE): Deleting select platform in code view of touch layout editor could crash (#2294)
+* Bug Fix(Tools): Keyboard ID was not clean by default with Import Windows Keyboard (#2431)
+* Change(IDE): Rename UI references of 'TIKE' to 'Keyman Developer' (#2439)
+* Change(IDE): Application title no longer shows active project, only main window (#2441, #2291)
 
 ## 2020-01-20 12.0.66 stable
 * Bug Fix: Character Map was not reliably dropping into Text Editor (#2504)
+* Bug Fix: Lexical model compiler was not handling SMP characters (#2502)
 
 ## 2020-01-20 12.0.65 stable
 * Bug Fix: Missing author email was causing lexical model compiler to fail (#2496)
 
 ## 2019-12-06 12.0.62 stable
-* Bug Fix: Shortcuts in text editors were not working after #2331 (#2424)
+* Bug Fix: Shortcuts in text editors were not working after #2331 (#2425)
 
 ## 2019-11-18 12.0.55 stable
-* Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2334)
+* Bug Fix: Some keyboards were incorrectly marked as mobile-capable (#2343)
 
 ## 2019-11-15 12.0.54 stable
-* Bug Fix: Text editor and other controls did not receive focus correctly (#2331)
+* Bug Fix: Text editor and other controls did not receive focus correctly (#2340)
 
 ## 2019-10-07 12.0.50 stable
 * Release 12.0

@@ -1,25 +1,54 @@
 # KeymanWeb Version History
 
-## 13.0 alpha
+## 2020-02-13 13.0.38 beta
+* Bug fix: language menu not positioned correctly for touch-based devices (#2642)
+
+## 2020-02-03 13.0.33 beta
+* Bug fix: BKSP not working corrrectly with design-mode iframes (#2561)
+
+## 2020-01-30 13.0.32 beta
+* Bug fix: Predictive-text tweaks for RTL language lexical models (#2553, #2554)
+* Bug fix: Fixed external keyboard key "tab" for embedded devices (#2546)
+
+## 2020-01-28 13.0.31 beta
 * Start version 13.0
+* Feature: iOS dark mode support (#2468, #2484)
+* Bug fix: Scroll characters into view on Chrome when editing (#2514)
+* Bug fix: Support SMP characters in Trie lexical models (#2477, #2518)
+* Bug fix: Prevents infinite loop (w timeout) for ui init when embedded (#2476)
+* Bug fix: Fixes issue with keyboards requiring special state notifications, such as the CJK picker keyboards (#2187, 12.0:#2194)
+* Bug fix: Fix for iOS Safari's "Request Desktop Website" option disabling touch interactivity (#2268, 12.0:#2283)
+* Bug fix: Fix for keyboards using rules with the `nul` statement that replace the full context (#2274, 12.0:#2284)
+* Bug fix: Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2287, 12.0:#2288)
+* Bug fix: Ctrl+Shift+double-click of status bar in OSK was not showing version number (#2309)
+* Bug fix: displayUnderlying flag was being ignored (#2353, 12.0:#2355)
+* Bug fix: Firefox on macOS was not being detected correctly (#2381, 12.0:#2383)
+* Bug fix: Default word breaker for lexical models was not working correctly (#2405)
+* Bug fix: Default word breaker for lexical models did not support old platforms (#2440, 12.0:#2434)
+* Change: Updates to build environment (#2354, 12.0:#2364)
+* Change: Updates to build environment only (#2371, 12.0:#2372)
+
+## 2019-12-18 12.0.106 stable
+* Bug fix: Default word breaker for lexical models did not support old platforms (#2434)
 
 ## 2019-11-28 12.0.105 stable
-* Bug Fix: Keyman was not working on old Android browsers (#2358)
-* Bug Fix: Firefox on macOS was not being detected correctly (#2383)
+* Bug fix: Keyman was not working on old Android browsers (#2358)
+* Bug fix: Firefox on macOS was not being detected correctly (#2383)
 
 ## 2019-11-26 12.0.104 stable
-* Updates to build environment (#2364)
+* Bug fix: displayUnderlying flag was being ignored (#2355)
+* Change: Updates to build environment (#2364)
 
 ## 2019-11-25 12-0.103 stable
-* Updates to build environment only (#2372)
+* Change: Updates to build environment only (#2372)
         
 ## 2019-11-13 12.0.102 stable
-* Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2288)
-* Fix for iOS Safari's "Request Desktop Website" option disabling touch interactivity (#2283)
-* Fix for keyboards using rules with the `nul` statement that replace the full context (#2284)
+* Bug fix: Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2288)
+* Bug fix: Fix for iOS Safari's "Request Desktop Website" option disabling touch interactivity (#2283)
+* Bug fix: Fix for keyboards using rules with the `nul` statement that replace the full context (#2284)
 
 ## 2019-10-10 12.0.101 stable
-* Fixes issue with keyboards requiring special state notifications, such as the CJK picker keyboards (#2194)
+* Bug fix: Fixes issue with keyboards requiring special state notifications, such as the CJK picker keyboards (#2194)
 
 ## 2019-10-07 12.0.100 stable
 * Release 12.0

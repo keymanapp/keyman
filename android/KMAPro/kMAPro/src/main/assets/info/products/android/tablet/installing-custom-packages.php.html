@@ -15,19 +15,19 @@
   <script type='text/javascript' src='../../../cdn/dev/js/keyrenderer.js'></script>
   <script type="text/javascript">
    // Add a script element as a child of the body
-   
+
     function downloadJS(src) {
       var element = document.createElement("script");
       element.src = src;
       document.body.appendChild(element);
     }
-   
+
     function downloadJSAtOnload() {
       downloadJS("/cdn/dev/js/jquery1-11-1.min.js");
               downloadJS("/cdn/dev/js/kmlive.js");
             //downloadJS("/cdn/dev/js/keyrenderer.js");
     }
-    
+
    // Check for browser support of event handling capability
    if (window.addEventListener)
    window.addEventListener("load", downloadJSAtOnload, false);
@@ -35,23 +35,41 @@
    window.attachEvent("onload", downloadJSAtOnload);
    else window.onload = downloadJSAtOnload;
   </script>
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  <script>
+  function isIEOnWin81orEarlier() {
+    // If we are running IE11/or earlier on Windows 8.1 or earlier, then
+    // the autolink generates filenames that are misrecognised for download links,
+    // meaning users on those browesrs cannot easily download Keyman.
+    // Easiest way to test this is to test against navigator.userAgent
+    // Yes, we get some muddled analytics of cross-site of IE visitors but
+    // it's a small enough percentage that we don't need to worry about it.
+    return (navigator.userAgent.indexOf('Trident/') >= 0 && navigator.userAgent.indexOf('Windows NT 6') >= 0) ||
+           (document.documentMode < 11);
+  }
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-249828-1',  'auto', {'allowLinker': true});
-    ga('require', 'linker');
-    ga('linker:autoLink', 
-      ['keyman.com', 'www.keyman.com', 
-       'keymanweb.com', 'www.keymanweb.com', 
-       'help.keyman.com',
-       'blog.keyman.com',
-       'www.tavultesoft.com', 'tavultesoft.com', 'secure.tavultesoft.com'] );
-    ga('send', 'pageview');
-  </script>
-  </head>
+    ga('create', 'UA-249828-1',  'auto', {'allowLinker': !isIEOnWin81orEarlier()});
+    if(!isIEOnWin81orEarlier()) {
+      ga('require', 'linker');
+      ga('linker:autoLink',
+        ['keyman.com', 'www.keyman.com',
+          'keymanweb.com', 'www.keymanweb.com',
+          'help.keyman.com',
+          'blog.keyman.com',
+          'donate.keyman.com',
+          'downloads.keyman.com',
+          'developer.keyman.com',
+          'keyman.dev',
+          'keyman.blog',
+          'blog.tavultesoft.com',
+          'www.tavultesoft.com', 'tavultesoft.com', 'secure.tavultesoft.com'] );
+    }
+  ga('send', 'pageview');
+</script>
+</head>
 <body data-device="Unknown">
   <div id="container">
     <div class="header">
@@ -84,8 +102,8 @@
   Step 1) Click the link to your custom package file.
 </p>
 <p>
-  <img class="phone" id="dist-url-screen-ap" src="../../../cdn/dev/img/app/12.0/dist-url-screen-ap.png">
-  <img class="tablet" id="dist-url-screen-at" src="../../../cdn/dev/img/app/12.0/dist-url-screen-at.png">
+  <img class="phone" id="dist-url-screen-ap" src="../../../cdn/dev/img/app/13.0/dist-url-screen-ap.png">
+  <img class="tablet" id="dist-url-screen-at" src="../../../cdn/dev/img/app/13.0/dist-url-screen-at.png">
 </p>
 <p>
   Step 2) Once the KMP file is on your device, you will need to browse to the KMP file and select it.
@@ -93,14 +111,14 @@
   <br/>
   From the Keyman Settings menu, select 'Add Keyboard from Device'.
 </p>
-<p><img id="settings-add-keyboard-from-device-ap" src="../../../cdn/dev/img/app/12.0/settings-language-ap.png"></p>
+<p><img id="settings-add-keyboard-from-device-ap" src="../../../cdn/dev/img/app/13.0/settings-language-ap.png"></p>
 <p>
   The device will launch a file browser where you'll browse to the directory of your KMP file.
   A common place to look is the "Downloads" folder.
 </p>
 <p>
-  <img class="phone" id="dist-file-browser-ap" src="../../../cdn/dev/img/app/12.0/dist-file-browser-ap.png">
-  <img class="tablet" id="dist-file-browser-at" src="../../../cdn/dev/img/app/12.0/dist-file-browser-at.png">
+  <img class="phone" id="dist-file-browser-ap" src="../../../cdn/dev/img/app/13.0/dist-file-browser-ap.png">
+  <img class="tablet" id="dist-file-browser-at" src="../../../cdn/dev/img/app/13.0/dist-file-browser-at.png">
 </p>
 <p>
   Selecting the KMP file should bring you to Step 3)
@@ -111,36 +129,48 @@
   Keyman for Android won't need to ask for storage permission again, unless the user revokes or uninstalls the app.
 </p>
 <p>
-  <img class="phone" id="dist-storrage-permission-ap" src="../../../cdn/dev/img/app/12.0/dist-storage-permission-ap.png">
-  <img class="tablet" id="dist-storrage-permission-at" src="../../../cdn/dev/img/app/12.0/dist-storage-permission-at.png">
+  <img class="phone" id="dist-storrage-permission-ap" src="../../../cdn/dev/img/app/13.0/dist-storage-permission-ap.png">
+  <img class="tablet" id="dist-storrage-permission-at" src="../../../cdn/dev/img/app/13.0/dist-storage-permission-at.png">
 </p>
 <p>
   Older versions of Android grant Storage permissions at app installation time, so those users can skip this step.
 </p>
 <p>
-  Step 4) Keyman for Android will parse the metadata in the package. If the keyboard package includes a "welcome.htm"
-  file, this will be displayed at the confirmation to install the keyboard package.
+  Step 4) Keyman for Android will verify the package, and display more information about it, including package version and 'readme' notes if available.
+  This will be displayed at the confirmation to install the keyboard package.
 </p>
 <p>
-  <img class="phone" id="dist-welcome-ap" src="../../../cdn/dev/img/app/12.0/dist-welcome-ap.png">
-  <img class="tablet" id="dist-welcome-at" src="../../../cdn/dev/img/app/12.0/dist-welcome-at.png">
+  If "readme.htm" is not included, a generic page with the package ID and package version will be shown. Click the
+  "Install" button to install the entire keyboard package.
 </p>
 <p>
-  If "welcome.htm" is not included, a generic page with the package ID and package version will be shown. Click the
-  left "Install" button to install the entire keyboard package.
+  <img class="phone" id="dist-readme-ap" src="../../../cdn/dev/img/app/13.0/dist-readme-ap.png">
+  <img class="tablet" id="dist-readme-at" src="../../../cdn/dev/img/app/13.0/dist-readme-at.png">
 </p>
+
+
 <p>
   Step 5) All the keyboards in the package are installed as a group. In this example, the package only has the
   "Khmer Angkor" keyboard, so it becomes the active keyboard. For custom dictionary packages, only one dictionary
   will be installed.
 </p>
 <p>
-  <img class="phone" id="dist-install1-ap" src="../../../cdn/dev/img/app/12.0/dist-install1-ap.png">
-  <img class="tablet" id="dist-install1-at" src="../../../cdn/dev/img/app/12.0/dist-install1-at.png">
+  If the keyboard package includes Welcome documentation, it will be displayed after the keyboard package is installed.
+  This documentation helps you to get started using the keyboard.
 </p>
 <p>
-  Once the keyboard has been installed, you should be able to use it as normal.
-  <br/>
+  <img class="phone" id="dist-welcome-ap" src="../../../cdn/dev/img/app/13.0/dist-welcome-ap.png">
+  <img class="tablet" id="dist-welcome-at" src="../../../cdn/dev/img/app/13.0/dist-welcome-at.png">
+</p>
+<p>
+  Click the "OK" button to finish installing the keyboard. You should be able to select it from the Keyman globe
+  and start typing with it in any app.
+</p>
+<p>
+  <img class="phone" id="dist-install1-ap" src="../../../cdn/dev/img/app/13.0/dist-install1-ap.png">
+  <img class="tablet" id="dist-install1-at" src="../../../cdn/dev/img/app/13.0/dist-install1-at.png">
+</p>
+<p>
   To learn how to create a custom installable keyboard,
   <a href="https://help.keyman.com/developer/12.0/guides/distribute/">click here</a>.
 </p>
@@ -157,8 +187,8 @@
   storage permission. The screenshot below is from Android 9.0 Pie.
 </p>
 <p>
-  <img class="phone" id="keyman-storage-permission-ap" src="../../../cdn/dev/img/app/12.0/keyman-storage-permission-ap.png">
-  <img class="tablet" id="keyman-storage-permission-at" src="../../../cdn/dev/img/app/12.0/keyman-storage-permission-at.png">
+  <img class="phone" id="keyman-storage-permission-ap" src="../../../cdn/dev/img/app/13.0/keyman-storage-permission-ap.png">
+  <img class="tablet" id="keyman-storage-permission-at" src="../../../cdn/dev/img/app/13.0/keyman-storage-permission-at.png">
 </p>
 
 <h2>Help Index</h2>

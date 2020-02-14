@@ -686,7 +686,7 @@ end;
 
 procedure TframeTouchLayoutBuilder.SetupCharMapDrop;
 begin
-  GetCharMapDropTool.Handle(cef.cefwp, cmimDefault, CharMapDragOver, CharMapDragDrop);
+  GetCharMapDropTool.Handle(cef, cmimDefault, CharMapDragOver, CharMapDragDrop);
 end;
 
 end.

@@ -3,7 +3,10 @@ unit Keyman.Developer.UI.dmActionsModelEditor;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Actions, Vcl.ActnList;
+  System.SysUtils,
+  System.Classes,
+  System.Actions,
+  Vcl.ActnList;
 
 type
   TmodActionsModelEditor = class(TDataModule)
@@ -30,6 +33,9 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 uses
+  Vcl.Menus,
+  Winapi.Windows,
+
   UfrmMain,
   UfrmMessages,
   Keyman.Developer.System.Project.ProjectFile,
@@ -64,6 +70,9 @@ end;
 procedure TmodActionsModelEditor.actModelCompileUpdate(Sender: TObject);
 begin
   actModelCompile.Enabled := ActiveModelEditor <> nil;
+  if actModelCompile.Enabled
+    then actModelCompile.ShortCut := Vcl.Menus.Shortcut(VK_F7, [])
+    else actModelCompile.ShortCut := scNone;
   frmKeymanDeveloper.mnuModel.Visible := actModelCompile.Enabled;
 end;
 

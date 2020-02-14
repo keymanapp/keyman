@@ -122,16 +122,17 @@ class KeyboardDetailsView(Gtk.Window):
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_auth, Gtk.PositionType.RIGHT, 1, 1)
 
-        lbl_pkg_cpy = Gtk.Label()
-        lbl_pkg_cpy.set_text("Package copyright:   ")
-        lbl_pkg_cpy.set_halign(Gtk.Align.END)
-        grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-        prevlabel = lbl_pkg_cpy
-        label = Gtk.Label()
-        label.set_text(info['copyright']['description'])
-        label.set_halign(Gtk.Align.START)
-        label.set_selectable(True)
-        grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)
+        if "copyright" in info:
+            lbl_pkg_cpy = Gtk.Label()
+            lbl_pkg_cpy.set_text("Package copyright:   ")
+            lbl_pkg_cpy.set_halign(Gtk.Align.END)
+            grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+            prevlabel = lbl_pkg_cpy
+            label = Gtk.Label()
+            label.set_text(info['copyright']['description'])
+            label.set_halign(Gtk.Align.START)
+            label.set_selectable(True)
+            grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)
 
         # Padding and full width horizontal divider
         lbl_pad = Gtk.Label()

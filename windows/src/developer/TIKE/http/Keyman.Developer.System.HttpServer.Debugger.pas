@@ -652,6 +652,7 @@ begin
       Delete(doc, 1, 6);
 
       // Models always expire immediately
+      AResponseInfo.ContentType := 'application/javascript';
       AResponseInfo.Expires := EncodeDate(1990, 1, 1);   // I4037
       AResponseInfo.CacheControl := 'no-cache, no-store';   // I4037
       AResponseInfo.LastModified := Now;   // I4037
@@ -686,7 +687,11 @@ begin
 
     // Serve the file
 
-    AResponseInfo.ContentType :=  AResponseInfo.HTTPServer.MIMETable.GetFileMIMEType(doc);
+    if AResponseInfo.ContentType = '' then
+    begin
+      AResponseInfo.HTTPServer.MIMETable.LoadTypesFromOS := False;
+      AResponseInfo.ContentType :=  AResponseInfo.HTTPServer.MIMETable.GetFileMIMEType(doc);
+    end;
     AResponseInfo.CharSet := 'UTF-8';
     AResponseInfo.ContentLength := FileSizeByName(doc);
   //AResponseInfo.LastModified := GetFileDate(doc);

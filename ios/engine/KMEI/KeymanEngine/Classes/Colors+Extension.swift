@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-// TODO:  Relocated to the Keyman App's project.  Not possible while the Settings menus are part of KMEI.
+// TODO:  Relocate to the Keyman App's project.  Not possible while the Settings menus are part of KMEI.
 extension Colors {
   public static var systemBackground: UIColor {
     get {

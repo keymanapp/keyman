@@ -208,7 +208,7 @@ namespace com.keyman.osk {
             }
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
-            var specialChar = Layouts.modifierSpecials[layerID];
+            var specialChar = Layouts.modifierSpecials[layerID]; 
             shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
           }
         } else {

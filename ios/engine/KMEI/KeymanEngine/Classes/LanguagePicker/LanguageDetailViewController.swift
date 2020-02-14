@@ -190,21 +190,9 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     activityView?.removeFromSuperview()
     view.isUserInteractionEnabled = true
   }
-  
+
   private func showConnectionErrorAlert() {
-    dismissActivityView()
-    let alertController = UIAlertController(title: "Connection Error",
-                                            message: "Could not reach Keyman server. Please try again later.",
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: errorAcknowledgmentHandler))
-    
-    self.present(alertController, animated: true, completion: nil)
-  }
-  
-  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    navigationController?.popToRootViewController(animated: true)
+    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
   }
 
   private func keyboardDownloadStarted() {
@@ -215,6 +203,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func keyboardDownloadFailed() {
     log.info("keyboardDownloadFailed: LanguageDetailViewController")
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
+
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

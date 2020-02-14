@@ -18,6 +18,7 @@ const
   SHelpTopic_Context_Help = 'context/help';
   SHelpTopic_Context_KeyTest = 'context/key-test';
   SHelpTopic_Context_KeyboardFonts = 'context/keyboard-fonts';
+  SHelpTopic_Context_ModelEditor = 'context/model-editor';
   SHelpTopic_Context_Messages = 'context/messages';
   SHelpTopic_Context_MustIncludeDebug = 'context/must-include-debug';
   SHelpTopic_Context_New = 'context/new';

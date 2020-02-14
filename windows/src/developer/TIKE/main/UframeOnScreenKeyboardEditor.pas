@@ -858,7 +858,7 @@ begin
   FKey.Bitmap := nil;
 
   with Source as TCharacterDragObject do
-    s := Text[cmimText];
+    s := Text[cmimCharacter];
 
   if GetAsyncKeyState(VK_CONTROL) < 0
     then FKey.Text := FKey.Text + s

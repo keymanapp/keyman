@@ -144,7 +144,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
       title = String.format("%s: %s", langName, modelName);
       dialog = ConfirmDialogFragment.newInstanceForLexicalModel(
         DIALOG_TYPE_DOWNLOAD_MODEL, title, getString(R.string.confirm_download_model),
-        modelID,
+        langID, modelID,
         prepareCloudApiParamsForLexicalModelDownload());
     } else {
       dialog = ConfirmDialogFragment.newInstanceForKeyboard(

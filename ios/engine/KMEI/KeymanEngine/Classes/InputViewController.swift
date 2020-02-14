@@ -21,7 +21,7 @@ public enum MenuBehaviour {
   case showNever
 }
 
-private class CustomInputView: UIInputView {
+private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
   var setFrame: CGRect = CGRect.zero
   var keymanWeb: KeymanWebViewController!
 
@@ -38,6 +38,13 @@ private class CustomInputView: UIInputView {
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  public var enableInputClicksWhenVisible: Bool {
+    get {
+      // Implemented as noted by https://developer.apple.com/documentation/uikit/uidevice/1620050-playinputclick.
+      return true
+    }
   }
 
   override var intrinsicContentSize: CGSize {
@@ -67,9 +74,11 @@ private class CustomInputView: UIInputView {
     let innerView = keymanWeb.view!
 
     var guide: UILayoutGuide
+    var conditionalGuide: Bool = false
 
     if #available(iOSApplicationExtension 11.0, *) {
       guide = self.safeAreaLayoutGuide
+      conditionalGuide = true
     } else {
       guide = self.layoutMarginsGuide
     }
@@ -77,11 +86,21 @@ private class CustomInputView: UIInputView {
     // Fallback on earlier versions
     innerView.topAnchor.constraint(equalTo:    guide.topAnchor).isActive = true
     innerView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
-    innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
-    innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+    if conditionalGuide {
+      innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
+      innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+    } else {
+      innerView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+      innerView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+    }
 
     // Allow these to be broken if/as necessary to resolve layout issues.
-    let kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+    var kbdWidthConstraint: NSLayoutConstraint
+    if conditionalGuide {
+      kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+    } else {
+      kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: self.widthAnchor)
+    }
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
@@ -308,7 +327,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     }
 
     if isInputClickSoundEnabled {
-      DispatchQueue.global(qos: .default).async { AudioServicesPlaySystemSound(0x450) }
+      UIDevice.current.playInputClick()
 
       // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
       isInputClickSoundEnabled = false
@@ -412,9 +431,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint.isActive = true
   }
 
+  public var isTopBarActive: Bool {
+    let userData = Storage.active.userDefaults
+    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
+
+    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
+      return true
+    }
+
+    return false
+  }
+
   public var activeTopBarHeight: CGFloat {
     // If 'isSystemKeyboard' is true, always show the top bar.
-    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
+    return isTopBarActive ? CGFloat(InputViewController.topBarHeight) : 0
   }
   
   public var kmwHeight: CGFloat {

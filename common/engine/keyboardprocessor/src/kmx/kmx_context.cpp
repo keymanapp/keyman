@@ -78,11 +78,28 @@ void KMX_Context::Set(const KMX_WCHAR *buf)
 {
   const KMX_WCHAR *p;
   KMX_WCHAR *q;
-  for(p = buf, q = CurContext; *p && (int)(q-CurContext) < MAXCONTEXT - 1; p++, q++)
+
+  // We may be past a buffer longer than our internal
+  // buffer. So we shift to make sure we capture the end
+  // of the string, not the start
+  p = u16chr(buf, 0);
+  q = (KMX_WCHAR*)p;
+  while(p > buf && (int)(q-p) < MAXCONTEXT - 1) {
+    p = decxstr((KMX_WCHAR*)p);
+  }
+
+  // If the first character in the buffer is a surrogate pair,
+  // or a deadkey, our buffer may be too long, so move to the
+  // next character in the buffer
+  if ((int)(q-p) > MAXCONTEXT - 1) {
+    p = incxstr((KMX_WCHAR*)p);
+  }
+
+  for(q = CurContext; *p; p++, q++)
   {
     *q = *p;
-    if(*p >= 0xD800 && *p <= 0xDBFF) { *(++q) = *(++p); }
   }
+
   *q = 0;
   pos = (int)(q-CurContext);
   CurContext[MAXCONTEXT-1] = 0; 

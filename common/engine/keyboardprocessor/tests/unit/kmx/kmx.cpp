@@ -317,9 +317,9 @@ int run_test(const km::kbp::path & source, const km::kbp::path & compiled) {
   try_status(km_kbp_context_items_to_utf16(citems, buf, &n));
   km_kbp_context_items_dispose(citems);
 
-  std::cout << "expected: " << expected << std::endl;
+  std::cout << "expected  : " << expected << std::endl;
   std::cout << "text store: " << text_store << std::endl;
-  std::cout << "result: " << buf << std::endl;
+  std::cout << "result    : " << buf << std::endl;
 
   // Compare internal context with expected result
   if (buf != expected) return __LINE__;
@@ -362,7 +362,8 @@ std::u16string parse_source_string(std::string const & s) {
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 8);
         v = std::stoul(s1, &n, 16);
-        assert(v >= 0x20 && v <= 0x10FFFF);
+        // Allow deadkey_number (U+0001) characters and onward
+        assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n-1;
         if (v < 0x10000) {
           t += km_kbp_cp(v);

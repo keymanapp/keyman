@@ -140,7 +140,8 @@ uses
   Keyman.System.DebugLogCommon in '..\..\global\delphi\debug\Keyman.System.DebugLogCommon.pas',
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
-  Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas';
+  Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
+  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
