@@ -1,8 +1,17 @@
 #!/bin/bash
 
-# compares the version of this branch (in ../resources/VERSION.md) to the 
+# compares the version of this branch (in ../VERSION.md) to the 
 #	version in the Xcode project file of the subproject named in $1
 # returns zero if they are the same, non-zero if not the same or a problem occurs
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+#TODO:
+exit 0
 
 if [ $# -eq 1 ]
 then
@@ -32,18 +41,15 @@ echo $PROJ_PROD_VERSION_LINE | sed /\ /s///g > ./PROJ_VERSION.md
 . ./PROJ_VERSION.md
 echo Product version in the project file PRODUCT_VERSION is $PRODUCT_VERSION
 
-KM_VERSION=`cat ../resources/VERSION.md`
+echo Keyman version VERSION is $VERSION
 
-echo Keyman version KM_VERSION is $KM_VERSION
-
-if [ x$KM_VERSION = x$PRODUCT_VERSION ]
+if [ x$VERSION = x$PRODUCT_VERSION ]
 then
 	echo the versions are the same, all is well.
 	# clean up
 	rm ./PROJ_VERSION.md
 	exit 0
 else
-	echo the version $KM_VERSION and $PRODUCT_VERSION are NOT the same!
+	echo the version $VERSION and $PRODUCT_VERSION are NOT the same!
 	exit 1
 fi
-

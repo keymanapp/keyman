@@ -6,6 +6,12 @@
 # KMEA - Keyman Engine Android
 # KMW  - Keyman Web
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 display_usage ( ) {
     echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test]"
     echo
@@ -26,9 +32,9 @@ echo Build KMEA
 SHLVL=0
 
 # Path definitions
-KM_ROOT="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-KMA_ROOT="$KM_ROOT/android"
-KMW_ROOT="$KM_ROOT/web"
+
+KMA_ROOT="$KEYMAN_ROOT/android"
+KMW_ROOT="$KEYMAN_ROOT/web"
 KMW_SOURCE="$KMW_ROOT/source"
 KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
 

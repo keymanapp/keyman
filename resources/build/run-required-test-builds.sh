@@ -24,21 +24,14 @@ fi
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-
-KEYMAN_ROOT=$(dirname $(dirname $(dirname "$THIS_SCRIPT")))
-readonly KEYMAN_ROOT
-
-# THIS DOESN'T WORK FOR 13.0 BETA
-# but we don't need it
-# . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
-
+. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$(dirname "$THIS_SCRIPT")/trigger-definitions.sh"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
 
 #
-# Iterate through the platforms 'array' passed in and 
+# Iterate through the platforms 'array' passed in and
 # run builds associated with each platform found
 #
 
@@ -116,7 +109,7 @@ popd > /dev/null
 echo ". Find platforms that have changes"
 build_platforms=()
 
-# Scan the files found 
+# Scan the files found
 while IFS= read -r line; do
   # for each platform
   for platform in "${available_platforms[@]}"; do

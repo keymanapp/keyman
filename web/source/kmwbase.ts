@@ -63,7 +63,6 @@ namespace com.keyman {
     static _srcPath: string;
     static _rootPath: string;
     static _protocol: string;
-    static __BUILD__: number;
 
     // Internal objects
     ['util']: Util;
@@ -127,7 +126,7 @@ namespace com.keyman {
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
 
       // Load properties from their static variants.
-      this['build'] = KeymanBase.__BUILD__;
+      this['build'] = com.keyman.environment.BUILD;
       this.srcPath = KeymanBase._srcPath;
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
@@ -621,9 +620,6 @@ import KeymanBase = com.keyman.KeymanBase;
 KeymanBase._srcPath = sPath;
 KeymanBase._rootPath = sPath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
 KeymanBase._protocol = sPath.replace(/(.{3,5}:)(.*)/,'$1');
-
-/** @define {number} build counter that gets set by the build environment */
-KeymanBase.__BUILD__ = 299;
 
 /**  
  * Base code: Declare major component namespaces, instances, and utility functions 
