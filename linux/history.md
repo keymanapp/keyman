@@ -1,10 +1,11 @@
 # Keyman for Linux Version History
 
 # 2020-02-17 13.0.29 beta
-* Bug Fix: 
+* Bug Fix:
+  * Fix how tier is determined for debian watch files (#2664)
   * Fix keyboard processor compilation for Xenial (#2648)
- 
-# 2020-02-11 13.0.28.beta
+
+# 2020-02-11 13.0.28 beta
 * Bug Fix:
   * Incorporate packaging fixes from 14.0 development (#2624)
 
