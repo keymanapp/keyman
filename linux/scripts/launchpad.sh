@@ -77,6 +77,10 @@ for proj in ${projects}; do
     else
         tarname="${proj}"
     fi
+
+    # Update tier in Debian watch file
+    sed 's/$tier/${tier}/g' debian/watch
+
     version=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -`
     dirversion=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6`
     echo "${proj} version is ${version}"
