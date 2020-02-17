@@ -140,7 +140,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   public static void createNotificationChannel(Context aContext) {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && SEND_UPDATE_NOTIFICATIONS) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && SEND_UPDATE_NOTIFICATIONS && aContext != null) {
       CharSequence name = aContext.getString(R.string.keyboard_updates_channel);
       String description = aContext.getString(R.string.keyboard_updates_available);
       int importance = NotificationManager.IMPORTANCE_DEFAULT;

@@ -1,5 +1,11 @@
 # Keyman for Android Version History
 
+## 2020-02-14 13.0.6059 beta
+* Bug fix:
+  * Re-initialize CloudDownloadManager when downloading resources after Keyman app is closed (#2635)
+* Change:
+  * Restyles the suggestion banner for predictions (#2629)
+
 ## 2020-02-13 13.0.6058 beta
 * Change:
   * Update rest of Android apps' dependency to `androidx.appcompat:appcompat:1.2.0-alpha02` to
