@@ -224,6 +224,8 @@
 		CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE808A4F236697D800713E6B /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
 		CE808A532366980A00713E6B /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
+		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
+		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -304,6 +306,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C059FCB81FD924DC00BD1A64 /* Zip.framework in Embed Frameworks */,
+				CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */,
 				C07705DE1FD8ED9E00D2F3C7 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C06D375E1F82089200F61AE0 /* KeymanEngine.framework in Embed Frameworks */,
 				CE2B1E4A21B60FB1007D092E /* DeviceKit.framework in Embed Frameworks */,
@@ -481,6 +484,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D37571F82060900F61AE0 /* KeymanEngine.framework in Frameworks */,
+				CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */,
 				C07705DD1FD8ED9E00D2F3C7 /* ObjcExceptionBridging.framework in Frameworks */,
 				C07705DF1FD8ED9E00D2F3C7 /* XCGLogger.framework in Frameworks */,
 				CE2B1E4821B60E8A007D092E /* DeviceKit.framework in Frameworks */,
