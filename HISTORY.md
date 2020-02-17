@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.11 alpha 2020-02-17
+
+* chore: merge beta changes to master 🍒 (#2659)
+* fix(mac): invalid build script params removed (#2660)
+
 ## 14.0.10 alpha 2020-02-14
 
 * refactor(mac): initial steps of input pathway (#2643)
