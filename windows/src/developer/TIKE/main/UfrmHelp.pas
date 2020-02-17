@@ -132,7 +132,7 @@ begin
           FormName := (FHelpControl as TTIKEForm).HelpTopic
         else if FHelpControl is TCustomForm then
           FormName := FHelpControl.ClassName
-        else
+        else if (FHelpControl <> nil) then
         begin
           o := FHelpControl.Owner;
           while ((o is TframeCEFHost) or not(o is TTIKEForm)) and (o <> nil) do
