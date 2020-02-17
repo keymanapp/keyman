@@ -443,7 +443,7 @@ elif $PREPRELEASE ; then
     eval "./build.sh"
     popd
 
-    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" -version $KM_VERSION $QUIET_FLAG
+    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
     else
