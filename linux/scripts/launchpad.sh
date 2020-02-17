@@ -6,7 +6,7 @@
 
 # parameters: [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
-# TIER="<tier>" alpha, beta or stable, default beta
+# TIER="<tier>" alpha, beta or stable tier. If not provided, use TIER.md
 # PROJECT="<project>" only upload this project
 # DIST="<dist>" only upload for this distribution
 
@@ -19,13 +19,12 @@ else
     SIM="-s"
 fi
 
-if [[ -z "${TIER}" ]]; then
-    # This is the tier that the latest version is currently found on
-    # This should be changed to stable before the first stable build
-    # In master branch this should be alpha and the debian/watch files should check alpha dir
-#    tier="alpha"
-#    tier="beta"
-    tier="stable"
+# Determine the tier. First check if TIER.md exists
+if [[ -f ../TIER.md ]]; then
+    tier=`cat ../TIER.md`
+elif [[ -z "${TIER}" ]]; then
+    echo "TIER.md or \${TIER} must be set to (alpha, beta, stable) to use this script"
+    exit 1
 else
     tier="${TIER}"
 fi
@@ -78,8 +77,8 @@ for proj in ${projects}; do
         tarname="${proj}"
     fi
 
-    # Update tier in Debian watch file
-    sed 's/$tier/${tier}/g' debian/watch
+    # Update tier in Debian watch files (replacing any previously set tier)
+    sed -i "s/\$tier\|alpha\|beta\|stable/$tier/g" debian/watch
 
     version=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -`
     dirversion=`uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6`
