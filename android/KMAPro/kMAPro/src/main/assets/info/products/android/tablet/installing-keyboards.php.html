@@ -15,19 +15,19 @@
   <script type='text/javascript' src='../../../cdn/dev/js/keyrenderer.js'></script>
   <script type="text/javascript">
    // Add a script element as a child of the body
-   
+
     function downloadJS(src) {
       var element = document.createElement("script");
       element.src = src;
       document.body.appendChild(element);
     }
-   
+
     function downloadJSAtOnload() {
       downloadJS("/cdn/dev/js/jquery1-11-1.min.js");
               downloadJS("/cdn/dev/js/kmlive.js");
             //downloadJS("/cdn/dev/js/keyrenderer.js");
     }
-    
+
    // Check for browser support of event handling capability
    if (window.addEventListener)
    window.addEventListener("load", downloadJSAtOnload, false);
@@ -35,23 +35,41 @@
    window.attachEvent("onload", downloadJSAtOnload);
    else window.onload = downloadJSAtOnload;
   </script>
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  <script>
+  function isIEOnWin81orEarlier() {
+    // If we are running IE11/or earlier on Windows 8.1 or earlier, then
+    // the autolink generates filenames that are misrecognised for download links,
+    // meaning users on those browesrs cannot easily download Keyman.
+    // Easiest way to test this is to test against navigator.userAgent
+    // Yes, we get some muddled analytics of cross-site of IE visitors but
+    // it's a small enough percentage that we don't need to worry about it.
+    return (navigator.userAgent.indexOf('Trident/') >= 0 && navigator.userAgent.indexOf('Windows NT 6') >= 0) ||
+           (document.documentMode < 11);
+  }
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-249828-1',  'auto', {'allowLinker': true});
-    ga('require', 'linker');
-    ga('linker:autoLink', 
-      ['keyman.com', 'www.keyman.com', 
-       'keymanweb.com', 'www.keymanweb.com', 
-       'help.keyman.com',
-       'blog.keyman.com',
-       'www.tavultesoft.com', 'tavultesoft.com', 'secure.tavultesoft.com'] );
-    ga('send', 'pageview');
-  </script>
-  </head>
+    ga('create', 'UA-249828-1',  'auto', {'allowLinker': !isIEOnWin81orEarlier()});
+    if(!isIEOnWin81orEarlier()) {
+      ga('require', 'linker');
+      ga('linker:autoLink',
+        ['keyman.com', 'www.keyman.com',
+          'keymanweb.com', 'www.keymanweb.com',
+          'help.keyman.com',
+          'blog.keyman.com',
+          'donate.keyman.com',
+          'downloads.keyman.com',
+          'developer.keyman.com',
+          'keyman.dev',
+          'keyman.blog',
+          'blog.tavultesoft.com',
+          'www.tavultesoft.com', 'tavultesoft.com', 'secure.tavultesoft.com'] );
+    }
+  ga('send', 'pageview');
+</script>
+</head>
 <body data-device="Unknown">
   <div id="container">
     <div class="header">
@@ -87,14 +105,14 @@
 </p><p>
   From the Keyman Settings menu, select 'Installed languages'
 </p><p>
-  <img id="settings-language-ap" src="../../../cdn/dev/img/app/12.0/settings-language-ap.png">
+  <img id="settings-language-ap" src="../../../cdn/dev/img/app/13.0/settings-language-ap.png">
 </p><p>
   Step 3)
 </p><p>
   From the 'Installed languages' menu, touch the <span class="command">+</span>
   button in the bottom right corner of your screen.
 </p><p>
-  <img id="plus-a" src="../../../cdn/dev/img/app/12.0/plus-a.png">
+  <img id="plus-a" src="../../../cdn/dev/img/app/13.0/plus-a.png">
 </p><p>
   Step 4)
 </p><p>
@@ -102,29 +120,29 @@
   the language you want to install. Languages marked with a right arrow have multiple keyboards - for
   example we have 10+ different Tamil keyboards.
 </p><p>
-  <img class="phone" id="lang-list-ap" src="../../../cdn/dev/img/app/12.0/lang-list-ap.png">
-  <img class="tablet" id="lang-list-at" src="../../../cdn/dev/img/app/12.0/lang-list-at.png">
+  <img class="phone" id="lang-list-ap" src="../../../cdn/dev/img/app/13.0/lang-list-ap.png">
+  <img class="tablet" id="lang-list-at" src="../../../cdn/dev/img/app/13.0/lang-list-at.png">
 </p><p>
   Select the language and keyboard you want to install - a popup will ask for confirmation,
   hit the <span class="command">Download</span> button.
 </p><p>
-  <img class="phone" id="confirm-dl-ap" src="../../../cdn/dev/img/app/12.0/confirm-dl-ap.png">
-  <img class="tablet" id="confirm-dl-at" src="../../../cdn/dev/img/app/12.0/confirm-dl-at.png">
+  <img class="phone" id="confirm-dl-ap" src="../../../cdn/dev/img/app/13.0/confirm-dl-ap.png">
+  <img class="tablet" id="confirm-dl-at" src="../../../cdn/dev/img/app/13.0/confirm-dl-at.png">
 </p><p>
   Step 5)
 </p><p>
   Once the download is complete, the new keyboard will be selected. Touch the <span class="command">&larr;</span>
   button on the top left corner of the popup several times and the new keyboard will become active.
 </p><p>
-  <img class="phone" id="success-ap" src="../../../cdn/dev/img/app/12.0/dl-success-ap.png">
-  <img class="tablet" id="success-at" src="../../../cdn/dev/img/app/12.0/dl-success-at.png">
+  <img class="phone" id="success-ap" src="../../../cdn/dev/img/app/13.0/dl-success-ap.png">
+  <img class="tablet" id="success-at" src="../../../cdn/dev/img/app/13.0/dl-success-at.png">
 </p><p>
   Alternate Step for System Keyboard)
 </p><p>
   The Keyman system keyboard has an additional <span class="command">CLOSE KEYMAN</span> button at the bottom left of
   the "Keyboards" menu. Pushing this button will close Keyman and switch to the next non-Keyman system keyboard.
 </p><p>
-  <img id="close-keyman-a" src="../../../cdn/dev/img/app/12.0/close-keyman-a.png"/>
+  <img id="close-keyman-a" src="../../../cdn/dev/img/app/13.0/close-keyman-a.png"/>
 </p>
 
 <h2>Help Index</h2>

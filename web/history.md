@@ -1,5 +1,12 @@
 # KeymanWeb Version History
 
+## 2020-02-14 13.0.39 beta
+* Bug fix: spurious console warnings generated for desktop-based keyboards used in touch mode (#2647)
+* Change: Updated predictive-text banner styling (#2629)
+
+## 2020-02-13 13.0.38 beta
+* Bug fix: language menu not positioned correctly for touch-based devices (#2642)
+
 ## 2020-02-03 13.0.33 beta
 * Bug fix: BKSP not working corrrectly with design-mode iframes (#2561)
 

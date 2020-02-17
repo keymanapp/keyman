@@ -596,6 +596,11 @@ if(!window['keyman']['ui']['name']) {
         _k.className='selected'; ui.selectedMenuItem=_k;
       }
 
+      // Occurs for desktop form-factors when no keyboard (aka the sys default) is active.
+      if(!ui.oskButton) {
+        return;
+      }
+
       // Hide the OSK button for CJK keyboards (or non-mapped)
       if(lgCode=='cmn' || lgCode=='jpn' || lgCode=='kor')
       {

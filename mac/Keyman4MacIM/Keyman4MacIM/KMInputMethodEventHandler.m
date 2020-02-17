@@ -531,8 +531,22 @@ NSRange _previousSelRange;
     /*if (event.type == NSKeyDown)
      [self.AppDelegate handleKeyEvent:event];*/
 
-    if (event.type == NSFlagsChanged) {
-        _contextOutOfDate = YES;
+    if (event.type == NSEventTypeFlagsChanged) {
+        // We mark the context as out of date only for the Command keys
+        switch([event keyCode]) {
+            case kVK_RightCommand:
+            case kVK_Command:
+                _contextOutOfDate = YES;
+                break;
+            case kVK_Shift:
+            case kVK_RightShift:
+            case kVK_CapsLock:
+            case kVK_Option:
+            case kVK_RightOption:
+            case kVK_Control:
+            case kVK_RightControl:
+                break;
+        }
         return NO;
     }
 

@@ -431,9 +431,20 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint.isActive = true
   }
 
+  public var isTopBarActive: Bool {
+    let userData = Storage.active.userDefaults
+    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
+
+    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
+      return true
+    }
+
+    return false
+  }
+
   public var activeTopBarHeight: CGFloat {
     // If 'isSystemKeyboard' is true, always show the top bar.
-    return isSystemKeyboard ? CGFloat(InputViewController.topBarHeight) : 0
+    return isTopBarActive ? CGFloat(InputViewController.topBarHeight) : 0
   }
   
   public var kmwHeight: CGFloat {

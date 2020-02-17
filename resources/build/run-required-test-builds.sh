@@ -31,7 +31,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
 
 #
-# Iterate through the platforms 'array' passed in and 
+# Iterate through the platforms 'array' passed in and
 # run builds associated with each platform found
 #
 
@@ -109,7 +109,7 @@ popd > /dev/null
 echo ". Find platforms that have changes"
 build_platforms=()
 
-# Scan the files found 
+# Scan the files found
 while IFS= read -r line; do
   # for each platform
   for platform in "${available_platforms[@]}"; do

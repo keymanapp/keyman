@@ -1,5 +1,6 @@
 #!/bin/sh
 
+set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
@@ -26,6 +27,7 @@ display_usage() {
     echo "  -deploy DEST    Deploys result of Keyman4MacIM. DEST options:"
     echo "                  n|none (default) Not deployed."
     echo "                  l|local          $HOME/Library/Input Methods (kills running process if needed)"
+    echo "                  q|quicklocal     Same as local but does not notarize the build (see README.md)"
     echo "                  p|preprelease    Builds a DMG and download_info file in output\upload."
     echo "  -deploy-only    Suppresses build/clean/test for all targets."
     echo "  -config NAME    NAME is passed to xcodebuild as -configuration parameter. Defaults to Debug, unless"
@@ -126,6 +128,7 @@ BUILD_ACTIONS="build"
 TEST_ACTION=""
 CLEAN=false
 QUIET=false
+NOTARIZE=false
 SKIP_BUILD=false
 
 # Parse args
@@ -140,9 +143,15 @@ while [[ $# -gt 0 ]] ; do
             # the deployed version cannot be run in the debugger.
             if [[ "$2" =~ ^(l(ocal)?)$ ]]; then
                 LOCALDEPLOY=true
+                NOTARIZE=true
+                CONFIG="Release"
+            elif [[ "$2" =~ ^(q(uick(local)?)?)$ ]]; then
+                LOCALDEPLOY=true
+                NOTARIZE=false
                 CONFIG="Release"
             elif [[ "$2" =~ ^(p(rep(release)?)?)$ ]]; then
                 PREPRELEASE=true
+                NOTARIZE=true
                 CONFIG="Release"
             elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
                 fail "Invalid deploy option. Must be 'none', 'local' or 'preprelease'."
@@ -151,7 +160,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -deploy-only)
             SKIP_BUILD=true
-            shift # past argument
+            #shift # past argument
             ;;
         -config)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
@@ -240,7 +249,16 @@ displayInfo "" \
 
 ### Validate notarization environment variables ###
 
-if $LOCALDEPLOY || $PREPRELEASE ; then
+if $LOCALDEPLOY && ! $NOTARIZE ; then
+    if [ "$(spctl --status)" == "assessments enabled" ]; then
+      echo
+      warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
+      warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
+      fail "Re-run with '-deploy local' or disable SecAssessment."
+    fi
+fi
+
+if $PREPRELEASE || $NOTARIZE ; then
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Code signing must be configured for deployment. See build.sh -help for details."
   fi
@@ -346,9 +364,9 @@ if $DO_KEYMANTESTAPP ; then
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
-### Notarize the app for localdeploy and preprelease ###
+### Notarize the app for preprelease ###
 
-if $LOCALDEPLOY || $PREPRELEASE ; then
+if $PREPRELEASE || $NOTARIZE; then
   echo_heading "Notarizing app"
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
@@ -421,7 +439,11 @@ if $LOCALDEPLOY ; then
 elif $PREPRELEASE ; then
     echo_heading "Preparing files for release deployment..."
     # Create the disk image
-    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
+    pushd setup
+    eval "./build.sh"
+    popd
+
+    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" -version $KM_VERSION $QUIET_FLAG
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
     else

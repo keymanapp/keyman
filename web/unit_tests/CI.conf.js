@@ -103,7 +103,7 @@ module.exports = function(config) {
       os: 'Windows',
       os_version: '10',
       browser: 'edge',
-      browser_version: '17.0'
+      version: '18.0'
     }
   }
 
@@ -122,10 +122,16 @@ module.exports = function(config) {
   /*
    * Final selection of the sets to be used for BrowserStack testing.
    */
-  var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_ANDROID_LAUNCHERS,
-                                            CURRENT_IOS_LAUNCHERS,
-                                            CURRENT_WIN_LAUNCHERS,
-                                            CURRENT_MAC_LAUNCHERS);
+  // var FINAL_LAUNCHER_DEFS = mergeLaunchers( CURRENT_ANDROID_LAUNCHERS,
+  //                                           CURRENT_IOS_LAUNCHERS,
+  //                                           CURRENT_WIN_LAUNCHERS,
+  //                                           CURRENT_MAC_LAUNCHERS);
+
+  var FINAL_LAUNCHER_DEFS = mergeLaunchers(
+    {
+      bs_edge_win: CURRENT_WIN_LAUNCHERS.bs_edge_win
+    }
+  );
 
   var FINAL_BROWSER_LIST = toBrowserList(FINAL_LAUNCHER_DEFS);
 

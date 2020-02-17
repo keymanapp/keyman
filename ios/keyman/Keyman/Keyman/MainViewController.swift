@@ -319,26 +319,22 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                   imageScale scaleF: CGFloat,
                                   action selector: Selector,
                                   orientation: UIInterfaceOrientation) -> UIBarButtonItem {
-    let icon = image.resize(to: CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF))
-        .withRenderingMode(.alwaysOriginal)
-    let iconHighlighted = imageHighlighted.resize(to:
-        CGSize(width: imageHighlighted.size.width * scaleF, height: imageHighlighted.size.height * scaleF))
-        .withRenderingMode(.alwaysOriginal)
+    let size = CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF)
 
     let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
     let vAdjLscpe: CGFloat = -1.6
 
     let vAdj = orientation.isPortrait ? vAdjPort : vAdjLscpe
     let navBarHeight = self.navBarHeight()
-    let y = (navBarHeight - icon.size.height) / 2.0 + vAdj
+    let y = (navBarHeight - size.height) / 2.0 + vAdj
 
     let customButton = UIButton(type: .custom)
-    customButton.setImage(icon, for: .normal)
-    customButton.setImage(iconHighlighted, for: .highlighted)
-    customButton.frame = CGRect(x: 0.0, y: y, width: icon.size.width, height: icon.size.height)
+    customButton.setImage(image, for: .normal)
+    customButton.setImage(imageHighlighted, for: .highlighted)
+    customButton.frame = CGRect(x: 0.0, y: y, width: size.width, height: size.height)
     customButton.addTarget(self, action: selector, for: .touchUpInside)
 
-    let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: icon.size.width, height: navBarHeight))
+    let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size.width, height: navBarHeight))
     containerView.backgroundColor = UIColor.clear
     containerView.addSubview(customButton)
 
@@ -622,7 +618,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                         UIActivity.ActivityType.saveToCameraRoll]
     activityVC.completionWithItemsHandler = {(_ activityType: UIActivity.ActivityType?, _ completed: Bool,
       _ returnedItems: [Any]?, _ activityError: Error?) -> Void in
-      self.textView.isUserInteractionEnabled = true
+
+      // If a share was completed -OR- if the user backed out of the share selection menu.
+      if completed || activityType == nil {
+        self.textView.isUserInteractionEnabled = true
+      } // else (if the user started to share but backed out to the menu) do nothing.
     }
 
     textView.isUserInteractionEnabled = false
