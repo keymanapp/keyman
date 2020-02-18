@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-ext.rootPath = '../../'
+ext.rootPath = '../../../'
 apply from: "$rootPath/version.gradle"
 
 android {
