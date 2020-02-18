@@ -1,5 +1,12 @@
 # Keyman Developer Version History
 
+## 2020-02-18 13.0.76 beta
+* Bug Fix(Install): Upgrading would lose user settings (resolves after 2 upgrades) (#2668)
+
+## 2020-02-17 13.0.75 beta
+* Bug Fix(IDE): In some situations, the context help window could cause Developer to crash (#2661)
+* Bug Fix(IDE): Attempting to import a blank OSK into the Touch Layout Editor would eventually crash (#2663)
+
 ## 2020-02-13 13.0.73 beta
 * Bug Fix(IDE/Model Editor): Would never be set into modified state for changes exclusively in a wordlist. (#2634)
 * Bug Fix(IDE/Model Editor): Add context help (#2634)
