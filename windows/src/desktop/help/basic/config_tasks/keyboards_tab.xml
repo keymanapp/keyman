@@ -9,7 +9,7 @@
       </imageobject>
     </inlinemediaobject>
   </para>
-  
+
   <bridgehead>Opening the Keyboard Layouts Tab</bridgehead>
   <para>To open the Keyboard Layouts tab of Keyman Configuration:</para>
   <orderedlist>
@@ -21,10 +21,10 @@
     </listitem>
     <listitem>
       <para>Select the Keyboard Layouts tab.</para>
-	  <tip>Keyman Configuration opens in the same tab you last closed it in.</tip> 
-    </listitem>	
+	  <tip>Keyman Configuration opens in the same tab you last closed it in.</tip>
+    </listitem>
   </orderedlist>
-  
+
   <bridgehead>Installing a Keyboard</bridgehead>
   <para>There are two ways to install a Keyman keyboard from the Keyboard Layouts tab of Keyman Configuration:</para>
   <itemizedlist>
@@ -35,10 +35,10 @@
 		<para>To install a keyboard layout online, see: <link linkend='install_tav'>Downloading &amp; Installing a Keyman Keyboard within Keyman Desktop</link></para>
 	</listitem>
    </itemizedlist>
-   
+
    <bridgehead>Uninstalling a Keyboard</bridgehead>
    <para>To uninstall a Keyman keyboard from the Keyboard Layouts tab of Keyman Configuration, see: <xref linkend='basic_uninstall_keyboard'></xref></para>
-	
+
    <bridgehead>Enabling and Disabling a Keyboard</bridgehead>
    <para>To enable or disable a Keyman keyboard from the Keyboard Layouts tab of Keyman Configuration, see: <xref linkend='basic_disable_keyboard'></xref></para>
 
@@ -54,14 +54,14 @@
 				<imagedata fileref="desktop_images/hotkeys-change.png"></imagedata>
 			  </imageobject>
 			</inlinemediaobject>
-		  </para>	
+		  </para>
 		</listitem>
 		<listitem>
 
 		  <para>Select a default hotkey or click <guibutton>Custom</guibutton> and type the hotkey you wish to use.</para>
 		  <note><para>If you press a single letter or <keycap>Shift</keycap> plus a single letter, the hotkey will default to <keycap>Ctrl</keycap> + <keycap>Alt</keycap> plus the letter you pressed, in order to avoid conflicts with standard keyboard input.</para></note>
 		  <note><para>To clear a hotkey that has been set previously, click <guibutton>Clear Hotkey</guibutton> or press <keycap>Backspace</keycap>.</para></note>
-		  <note><para>Be aware that you can set the hotkey to replace common Windows hotkeys (<keycap>Ctrl</keycap> + <keycap>C</keycap>, <keycap>Ctrl</keycap> + <keycap>V</keycap>, etc).</para></note>	  
+		  <note><para>Be aware that you can set the hotkey to replace common Windows hotkeys (<keycap>Ctrl</keycap> + <keycap>C</keycap>, <keycap>Ctrl</keycap> + <keycap>V</keycap>, etc).</para></note>
 		</listitem>
 		<listitem>
 		  <para>Click <guibutton>OK</guibutton> to save your selection.</para>
@@ -78,8 +78,8 @@
 		<listitem><para>Find a keyboard in the keyboard list.</para></listitem>
 		<listitem><para>Click on the question mark icon (<inlinemediaobject><imageobject><imagedata fileref="desktop_images/icon-introductory-help.png" /></imageobject></inlinemediaobject>) beside the keyboard name. The keyboard help documentation will be shown.</para>
 		</listitem>
-    </orderedlist>		
-	
+    </orderedlist>
+
   <bridgehead>Viewing Keyboard Details</bridgehead>
 	<para>To view details for a Keyman keyboard from the Keyboard Layouts tab of Keyman Configuration:</para>
 	<orderedlist>
@@ -104,10 +104,25 @@
 		  <listitem><para>Documentation status.</para></listitem>
 		  <listitem><para>Copyright details.</para></listitem>
 		  <listitem><para>Installation details.</para></listitem>
-		 </itemizedlist> 
+		 </itemizedlist>
 		</listitem>
     </orderedlist>
-	
+
+	<bridgehead>Sharing a keyboard with other users and devices</bridgehead>
+	<para>If you installed a keyboard layout using the <guibutton>Download keyboard</guibutton> button, then you can share the keyboard with other devices and users using a QR Code.</para>
+	<orderedlist>
+		<listitem><para>Expand the keyboard details for the keyboard you wish to share, and click <guibutton>Share keyboard</guibutton>.</para></listitem>
+		<listitem><para>A popup will appear with a QR Code. This QR Code can be scanned with a mobile phone camera to automatically open a web page with a download link to install the keyboard.</para>
+					<para>
+						<inlinemediaobject>
+						  <imageobject>
+							<imagedata fileref="desktop_images/keyboard-share.png"></imagedata>
+						  </imageobject>
+						</inlinemediaobject>
+					</para>
+		</listitem>
+	</orderedlist>
+
   <bridgehead>Associating a keyboard with a Windows language</bridgehead>
   <para>All Keyman keyboards are associated with a Windows language by default. To change the association, or add a new association, see the following:</para>
   <itemizedlist>
@@ -115,7 +130,7 @@
       <para><xref linkend="start_configure_computer"></xref></para>
     </listitem>
   </itemizedlist>
-  
+
   <bridgehead>Related Topics</bridgehead>
   <itemizedlist>
     <listitem>
