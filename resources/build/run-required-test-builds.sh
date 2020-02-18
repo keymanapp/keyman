@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Determine if we need to do a build based on rules in
-# trigger-definitions.sh, rather than calculating changes in
+# trigger-definitions.config, rather than calculating changes in
 # TeamCity. If a build is needed, then we ask TeamCity to
 # start the build.
 #
@@ -27,7 +27,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.sh"
+. "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
 
 #
@@ -103,7 +103,7 @@ fi
 popd > /dev/null
 
 #
-# Find the platforms that have changes based on the watch_ variables in trigger-definitions.sh
+# Find the platforms that have changes based on the watch_ variables in trigger-definitions.config
 #
 
 echo ". Find platforms that have changes"
