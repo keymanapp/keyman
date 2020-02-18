@@ -101,6 +101,11 @@ class LanguageSettingsViewController: UITableViewController {
         // re-register the model - that'll enact the settings.
         _ = Manager.shared.registerLexicalModel(lm)
       }
+      // Based on how Manager chooses the model in setKeyboard.
+    } else if let lm = userDefaults.userLexicalModels?.first(where: { $0.languageID == self.language.id }) {
+      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
+        _ = Manager.shared.registerLexicalModel(lm)
+      }
     }
   }
   
@@ -113,6 +118,11 @@ class LanguageSettingsViewController: UITableViewController {
     if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
       if Manager.shared.currentKeyboardID?.languageID == self.language.id {
         // re-register the model - that'll enact the settings.
+        _ = Manager.shared.registerLexicalModel(lm)
+      }
+      // Based on how Manager chooses the model in setKeyboard.
+    } else if let lm = userDefaults.userLexicalModels?.first(where: { $0.languageID == self.language.id }) {
+      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
         _ = Manager.shared.registerLexicalModel(lm)
       }
     }
