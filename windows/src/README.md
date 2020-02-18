@@ -15,6 +15,7 @@
 10. In order to run Keyman Developer in the development build, you need to specify where the
    https://github.com/keymanapp/CEF4Delphi_binary repo is on your system, with the registry setting `HKCU\Software\Keyman\Debug`,
    `Debug_CEFPath`.
+11. npm must use cmd for its shell: `npm config delete script-shell` (we may change this in the future)
 
 ### Release build prerequisites
 
