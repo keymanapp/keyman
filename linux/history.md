@@ -1,5 +1,9 @@
 # Keyman for Linux Version History
 
+# 2020-02-18 13.0.30 beta
+* Bug Fix:
+  * Include Keyman gsettings schema for packaging (#2675)
+
 # 2020-02-17 13.0.29 beta
 * Bug Fix:
   * Fix how tier is determined for debian watch files (#2664)
