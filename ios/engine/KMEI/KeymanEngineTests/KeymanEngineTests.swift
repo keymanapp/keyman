@@ -31,6 +31,9 @@ class KeymanEngineTests: XCTestCase {
     let storage = Storage.active!
     log.info(storage.baseDir)
 
+    let userDefaults = storage.userDefaults
+    let dictionary = userDefaults.dictionaryRepresentation()
+
     Storage.active.erase()
   }
 

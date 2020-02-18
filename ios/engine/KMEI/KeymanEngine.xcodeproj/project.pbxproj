@@ -165,10 +165,10 @@
 		CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE808A4F236697D800713E6B /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
 		CE808A532366980A00713E6B /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
-		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
-		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE8EDEB123F53D1A009E1FF6 /* KeymanEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* KeymanEngineTests.swift */; };
 		CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */; };
+		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
+		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1691,7 +1691,7 @@
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = KeymanEngineTestHost/Info.plist;
+				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1726,7 +1726,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = KeymanEngineTestHost/Info.plist;
+				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
