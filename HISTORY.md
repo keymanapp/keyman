@@ -1,5 +1,8 @@
 # Keyman Version History
 
+## 14.0.12 alpha 2020-02-18
+* test(android): Fix build for KMSample1 project (#2669)
+
 ## 14.0.11 alpha 2020-02-17
 
 * chore: merge beta changes to master 🍒 (#2659)
