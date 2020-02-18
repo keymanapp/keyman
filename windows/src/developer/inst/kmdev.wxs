@@ -173,7 +173,7 @@
       <Component>
         <File Name="kmdecomp.md" KeyPath="yes" Source="..\..\developer\kmdecomp\kmdecomp.md" />
       </Component>
-      
+
       <Component>
         <File Name="kmcomp.exe" KeyPath="yes" />
       </Component>
@@ -273,7 +273,7 @@
     <ComponentGroup Id="AppData">
       <Component Id="AppDataRemovals" Guid="{780C99E9-E97E-4EB0-BBF5-D4591EEABA7C}" Directory="App_KeymanDev_Databases">
         <RegistryValue KeyPath="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" Name="root path" Type="string" Value="[INSTALLDIR]" />
-        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCU" Key="Software\Keyman\Keyman Developer" />
+        <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="no" Root="HKCU" Key="Software\Keyman\Keyman Developer" />
         <RemoveFolder Id="AD_Uninstall" On="uninstall" Directory="App_KeymanRoot" />
         <RemoveFolder Id="AD_KeymanDev_Uninstall" On="uninstall" Directory="App_KeymanDev" />
         <RemoveFolder Id="AD_KeymanDev_Databases_Uninstall" On="uninstall" Directory="App_KeymanDev_Databases" />
