@@ -130,13 +130,13 @@ type
 
     function GetProjectFile: TProjectFile; override;
 
+  public
     function CanChangeTab(FForward: Boolean): Boolean; override;
     procedure ChangeTab(FForward: Boolean); override;
 
     function CanChangeView(FView: TCodeDesignView): Boolean; override;
     procedure ChangeView(FView: TCodeDesignView); override;
 
-  public
     procedure FindError(const Filename: string; s: string; line: Integer); override;   // I4081
     procedure NotifyStartedWebDebug;
   end;
