@@ -2,6 +2,8 @@
 
 ## 14.0.12 alpha 2020-02-18
 * test(android): Fix build for KMSample1 project (#2669)
+* fix(developer): upgrade removes preferences (#2668)
+* chore(ci): Rename trigger-definitions.sh to *.config (#2665)
 
 ## 14.0.11 alpha 2020-02-17
 
