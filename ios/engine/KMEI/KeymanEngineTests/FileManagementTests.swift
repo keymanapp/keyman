@@ -34,11 +34,9 @@ class FileManagementTests: XCTestCase {
 
   // AMDD acceptance test for existing KeymanPackage so I'll know what has to keep working despite my changers
   func testKeyboardPackageExtraction() throws {
-    let khmerPackageURL = TestUtils.keyboardsBundle.url(forResource: "khmer_angkor", withExtension: "kmp")!
-
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.zip")
-    try FileManager.default.copyItem(at: khmerPackageURL, to: khmerPackageZip)
+    try FileManager.default.copyItem(at: TestUtils.Keyboards.khmerAngkorKMP, to: khmerPackageZip)
 
     let destinationFolderURL  = cacheDirectory.appendingPathComponent("khmer_angkor")
 
