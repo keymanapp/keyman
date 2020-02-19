@@ -1,7 +1,7 @@
 # Keyman for Linux Version History
 
 # 2020-02-20 13.0.101 stable
-* Bug Fix: Revert packaging change from #2675 ()
+* Bug Fix: Revert packaging change from #2675 (#2685)
 
 # 2020-02-19 13.0.100 stable
 * 13.0 stable release
