@@ -12,13 +12,10 @@ import Foundation
 extension Storage {
   /// Storage that is not shared with the other process (app or extension).
   static let nonShared: Storage? = {
-    var directory: FileManager.SearchPathDirectory = .libraryDirectory
-
-    let paths = FileManager.default.urls(for: directory, in: .userDomainMask)
+    let paths = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)
     if paths.isEmpty {
       return nil
     }
-
     return Storage(baseURL: paths[0], userDefaults: UserDefaults.standard)
   }()
 

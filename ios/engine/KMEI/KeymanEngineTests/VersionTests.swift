@@ -2,7 +2,7 @@
 //  VersionTests.swift
 //  KeymanEngineTests
 //
-//  Created by Joshua Horton on 2/13/20.
+//  Created by Joshua Horton on 2020-02-13.
 //  Copyright © 2020 SIL International. All rights reserved.
 //
 

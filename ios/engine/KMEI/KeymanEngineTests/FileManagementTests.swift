@@ -2,8 +2,8 @@
 //  KeymanEngineTests.swift
 //  KeymanEngineTests
 //
-//  Created by Randy Boring on 3/7/19.
-//  Copyright © 2019 SIL International. All rights reserved.
+//  Created by Joshua Horton on 2020-02-19.
+//  Copyright © 2020 SIL International. All rights reserved.
 //
 
 import XCTest
@@ -28,7 +28,6 @@ class FileManagementTests: XCTestCase {
     TestUtils.clearDirectory(at: cacheDirectory)
   }
 
-  // AMDD acceptance test for existing KeymanPackage so I'll know what has to keep working despite my changers
   func testKeyboardPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.zip")
@@ -48,13 +47,12 @@ class FileManagementTests: XCTestCase {
         } else {
           XCTAssert(false, "KeymanPackage.extract failed")
         }
-      }) // Use XCTAssert and related functions to verify your tests produce the correct results.
+      })
     } catch {
       XCTFail("KeymanPackage.extract failed with error \(error)")
     }
   }
 
-  // AMDD acceptance test for existing KeymanPackage so I'll know what has to keep working despite my changers
   func testLexicalModelPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let mtntZip = cacheDirectory.appendingPathComponent("mtnt.zip")
@@ -74,7 +72,7 @@ class FileManagementTests: XCTestCase {
         } else {
           XCTAssert(false, "KeymanPackage.extract failed")
         }
-      }) // Use XCTAssert and related functions to verify your tests produce the correct results.
+      })
     } catch {
       XCTFail("KeymanPackage.extract failed with error \(error)")
     }
