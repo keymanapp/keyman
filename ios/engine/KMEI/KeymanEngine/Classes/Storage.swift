@@ -307,12 +307,4 @@ extension Storage {
       try Storage.addSkipBackupAttribute(to: dst)
     }
   }
-
-  internal func erase() {
-    do {
-      try FileManager.default.removeItem(at: self.baseDir)
-    } catch {
-      log.error(error)
-    }
-  }
 }

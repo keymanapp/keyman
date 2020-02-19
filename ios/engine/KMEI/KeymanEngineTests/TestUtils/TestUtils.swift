@@ -7,11 +7,18 @@
 //
 
 import Foundation
+@testable import KeymanEngine
 
 /**
  * This enum will 'namespace' the various testing utility functions used for our unit tests.
  * It's a common Swift pattern, used because enums can't be instantiated.
  */
 enum TestUtils {
-
+  static func eraseStorage(_ storage: Storage) {
+    do {
+      try FileManager.default.removeItem(at: storage.baseDir)
+    } catch {
+      log.error(error)
+    }
+  }
 }

@@ -136,6 +136,7 @@
 		CE2B1E4721B60E89007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4821B60E8A007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE2B1E4A21B60FB1007D092E /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE37C38B23FCC9EE007031C6 /* Keyboards.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE37C38A23FCC9EE007031C6 /* Keyboards.bundle */; };
 		CE4459E723FBBB4A003151FD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4459CD23FBBA8D003151FD /* AppDelegate.swift */; };
 		CE4459E823FBBB79003151FD /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
 		CE4459E923FBBB79003151FD /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -165,7 +166,7 @@
 		CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE808A4F236697D800713E6B /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; };
 		CE808A532366980A00713E6B /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
-		CE8EDEB123F53D1A009E1FF6 /* KeymanEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* KeymanEngineTests.swift */; };
+		CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* FileManagementTests.swift */; };
 		CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */; };
 		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -322,7 +323,7 @@
 		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModelKeymanPackage.swift; sourceTree = "<group>"; };
 		9A079DCF223194B100581263 /* KeymanEngineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanEngineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9A079DD1223194B100581263 /* KeymanEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanEngineTests.swift; sourceTree = "<group>"; };
+		9A079DD1223194B100581263 /* FileManagementTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagementTests.swift; sourceTree = "<group>"; };
 		9A079DD3223194B100581263 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9A079DE52231A69D00581263 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9A079E362238680700581263 /* KMPLexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPLexicalModel.swift; sourceTree = "<group>"; };
@@ -406,6 +407,7 @@
 		CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadQueue.swift; sourceTree = "<group>"; };
 		CE24ECEF21B763740052D291 /* KeymanResponder+Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeymanResponder+Types.swift"; sourceTree = "<group>"; };
 		CE2B1E4521B60E7C007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
+		CE37C38A23FCC9EE007031C6 /* Keyboards.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyboards.bundle; sourceTree = "<group>"; };
 		CE4459CD23FBBA8D003151FD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineTestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE4459ED23FBBB7F003151FD /* Carthage */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Carthage; path = ../../Carthage; sourceTree = "<group>"; };
@@ -645,7 +647,8 @@
 			isa = PBXGroup;
 			children = (
 				CE9CD88123FCC4C7002BF2F8 /* TestUtils */,
-				9A079DD1223194B100581263 /* KeymanEngineTests.swift */,
+				CE37C38923FCC9AF007031C6 /* resources */,
+				9A079DD1223194B100581263 /* FileManagementTests.swift */,
 				9A079DD3223194B100581263 /* Info.plist */,
 				CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */,
 				CE4459CD23FBBA8D003151FD /* AppDelegate.swift */,
@@ -751,6 +754,14 @@
 				C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */,
 			);
 			name = HTTPRequest;
+			sourceTree = "<group>";
+		};
+		CE37C38923FCC9AF007031C6 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				CE37C38A23FCC9EE007031C6 /* Keyboards.bundle */,
+			);
+			path = resources;
 			sourceTree = "<group>";
 		};
 		CE67D95F228A6ECF0029F2B5 /* KeymanWebView */ = {
@@ -1123,6 +1134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9AD4F53F22A8A286007992D3 /* LanguageSettingsViewController.xib in Resources */,
+				CE37C38B23FCC9EE007031C6 /* Keyboards.bundle in Resources */,
 				9ADC45A022E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
 			);
@@ -1222,7 +1234,7 @@
 				CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
 				CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */,
-				CE8EDEB123F53D1A009E1FF6 /* KeymanEngineTests.swift in Sources */,
+				CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
