@@ -25,15 +25,7 @@ class FileManagementTests: XCTestCase {
     }
 
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    do {
-      // We'll run into problems if we delete the cache directory.  Instead, we delete all the items within it.
-      let itemsInCache = try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
-      try itemsInCache.forEach { item in
-        try FileManager.default.removeItem(at: item)
-      }
-    } catch {
-      log.error(error)
-    }
+    TestUtils.clearDirectory(at: cacheDirectory)
   }
 
   // AMDD acceptance test for existing KeymanPackage so I'll know what has to keep working despite my changers
