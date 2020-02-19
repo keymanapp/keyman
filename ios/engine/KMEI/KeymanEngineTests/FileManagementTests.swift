@@ -26,7 +26,11 @@ class FileManagementTests: XCTestCase {
 
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     do {
-      try FileManager.default.removeItem(at: cacheDirectory)
+      // We'll run into problems if we delete the cache directory.  Instead, we delete all the items within it.
+      let itemsInCache = try FileManager.default.contentsOfDirectory(at: cacheDirectory, includingPropertiesForKeys: nil)
+      try itemsInCache.forEach { item in
+        try FileManager.default.removeItem(at: item)
+      }
     } catch {
       log.error(error)
     }
