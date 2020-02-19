@@ -306,6 +306,7 @@ end;
 
 function TframeTouchLayoutBuilder.Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
 var
+  FLastFilename: string;
   FBaseFileName: string;
   FNewLayoutJS: string;
   FTouchLayout: TTouchLayout;
@@ -319,6 +320,7 @@ var
 begin
   FLastErrorOffset := -1;
   FLastError := '';
+  FLastFilename := FFilename;
 
   if FFilename <> '' then
   begin
@@ -327,66 +329,70 @@ begin
   end;
 
   UnregisterSources;
+  try
 
-  if ALoadFromString then
-  begin
-    FNewLayoutJS := AFilename;
-    FFilename := GetNextFilename;
-  end
-  else
-  begin
-    if ALoadFromTemplate or (AFileName = '') or not FileExists(AFileName) then
+    if ALoadFromString then
     begin
-      FBaseFileName := FTemplateFileName;
+      FNewLayoutJS := AFilename;
       FFilename := GetNextFilename;
     end
     else
     begin
-      FBaseFileName := AFileName;
-      FFilename := AFileName;
-    end;
-
-    with TStringList.Create do
-    try
-      LoadFromFile(FBaseFileName, TEncoding.UTF8);
-      FNewLayoutJS := Text;
-    finally
-      Free;
-    end;
-  end;
-
-  FTouchLayout := TTouchLayout.Create;   // I3642
-  try
-    if not FTouchLayout.Load(FNewLayoutJS) then
-    begin
-      FLastError := FTouchLayout.LoadError;   // I4083
-      FLastErrorOffset := FTouchLayout.LoadErrorOffset;   // I4083
-      Exit(False);
-    end
-    else
-    begin
-      if (FSavedLayoutJS <> '') and ALoadFromTemplate then
+      if ALoadFromTemplate or (AFileName = '') or not FileExists(AFileName) then
       begin
-        FOldLayout := TTouchLayout.Create;
-        try
-          FOldLayout.Load(FSavedLayoutJS);
-          if FTouchLayout.Merge(FOldLayout)
-            then FSavedLayoutJS := FTouchLayout.Save(False)
-            else FSavedLayoutJS := FNewLayoutJS;
-        finally
-          FOldLayout.Free;
-        end;
+        FBaseFileName := FTemplateFileName;
+        FFilename := GetNextFilename;
       end
       else
-        FSavedLayoutJS := FNewLayoutJS;
-    end;
-  finally
-    FTouchLayout.Free;
-  end;
+      begin
+        FBaseFileName := AFileName;
+        FFilename := AFileName;
+      end;
 
-  RegisterSource;
-  if FState <> '' then
-    modWebHttpServer.AppSource.RegisterSource(FFilename + '#state', FState, True);
+      with TStringList.Create do
+      try
+        LoadFromFile(FBaseFileName, TEncoding.UTF8);
+        FNewLayoutJS := Text;
+      finally
+        Free;
+      end;
+    end;
+
+    FTouchLayout := TTouchLayout.Create;   // I3642
+    try
+      if not FTouchLayout.Load(FNewLayoutJS) then
+      begin
+        FLastError := FTouchLayout.LoadError;   // I4083
+        FLastErrorOffset := FTouchLayout.LoadErrorOffset;   // I4083
+        FFilename := FLastFilename;
+        Exit(False);
+      end
+      else
+      begin
+        if (FSavedLayoutJS <> '') and ALoadFromTemplate then
+        begin
+          FOldLayout := TTouchLayout.Create;
+          try
+            FOldLayout.Load(FSavedLayoutJS);
+            if FTouchLayout.Merge(FOldLayout)
+              then FSavedLayoutJS := FTouchLayout.Save(False)
+              else FSavedLayoutJS := FNewLayoutJS;
+          finally
+            FOldLayout.Free;
+          end;
+        end
+        else
+          FSavedLayoutJS := FNewLayoutJS;
+      end;
+    finally
+      FTouchLayout.Free;
+    end;
+
+  finally
+    RegisterSource;
+    if FState <> '' then
+      modWebHttpServer.AppSource.RegisterSource(FFilename + '#state', FState, True);
+  end;
 
   try
     DoLoad;

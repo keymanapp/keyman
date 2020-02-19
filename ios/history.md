@@ -1,5 +1,9 @@
 # Keyman for iPhone and iPad Version History
 
+## 2020-02-19 13.0.72 beta
+* Fixes issue with KeymanEngine demo app and missing color definition in KeymanEngine library (#2662)
+* Updates offline help content for 13.0 release (#2671)
+
 ## 2020-02-14 13.0.70 beta
 * Change: restyles suggestion banner to more closely match the iOS system default (#2629)
 
