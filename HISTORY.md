@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.13 alpha 2020-02-19
+
+* chore: merge p9s2 beta part 2 to master (#2683)
+
 ## 14.0.12 alpha 2020-02-18
 * test(android): Fix build for KMSample1 project (#2669)
 * fix(developer): upgrade removes preferences (#2668)
