@@ -23,29 +23,6 @@ class KeymanEngineTests: XCTestCase {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
   }
 
-  func getAssignedDictionary(for userDefaults: UserDefaults) -> [String: Any] {
-    var currentDictionary = userDefaults.dictionaryRepresentation()
-    clearSettings(of: userDefaults)
-    let baseDict = userDefaults.dictionaryRepresentation()
-
-    baseDict.forEach({ pair in
-      currentDictionary.removeValue(forKey: pair.key)
-    })
-
-    // The return value is now properly constructed.  Now to put the defaults back in place before we leave.
-    //userDefaults.register(defaults: currentDictionary) // adds them in an unclearable way!
-    currentDictionary.forEach({ pair in
-      userDefaults.set(pair.value, forKey: pair.key)
-    })
-    return currentDictionary
-  }
-
-  func clearSettings(of userDefaults: UserDefaults) {
-    let domain = Bundle.main.bundleIdentifier!
-    userDefaults.synchronize()
-    userDefaults.removePersistentDomain(forName: domain)
-  }
-
   func testStorageAccess() {
     // Xcode unit tests cannot use capabilities, and thus we cannot access a true app group.
     // So, we'll use a sandboxed analogue for this instead.
@@ -57,7 +34,7 @@ class KeymanEngineTests: XCTestCase {
     // Diff-magic for determining the dictionary to be utilized for a test.
     let userDefaults = storage.userDefaults
     userDefaults.set(4, forKey: "testEntry")
-    let dictCheck = getAssignedDictionary(for: userDefaults)
+    let dictCheck = TestUtils.UserDefaults.getAndResetUserDefaultsDictionary(from: storage)
 
     Storage.active.erase()
   }
