@@ -9,8 +9,9 @@
 import Foundation
 
 /**
- * This class will 'namespace' the various testing utility functions used for our unit tests.
+ * This enum will 'namespace' the various testing utility functions used for our unit tests.
+ * It's a common Swift pattern, used because enums can't be instantiated.
  */
-class TestUtils {
+enum TestUtils {
 
 }
