@@ -15,7 +15,13 @@ import Foundation
  */
 enum TestUtils {
   static let mainBundle = Bundle(for: FileManagementTests.self)  // Can't use TestUtils, as it's an enum
-  static let keyboardsBundle = Bundle(path: TestUtils.mainBundle.path(forResource: "Keyboards", ofType: ".bundle")!)!
+
+  private static func findSubBundle(forResource resource: String, ofType type: String) -> Bundle {
+    return Bundle(path: mainBundle.path(forResource: resource, ofType: type)!)!
+  }
+
+  static let keyboardsBundle = findSubBundle(forResource: "Keyboards", ofType: "bundle")
+  static let lexicalModelsBundle = findSubBundle(forResource: "Lexical Models", ofType: "bundle")
 
   static func eraseStorage(_ storage: Storage) {
     do {

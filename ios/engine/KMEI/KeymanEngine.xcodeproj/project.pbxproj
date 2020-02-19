@@ -138,6 +138,8 @@
 		CE2B1E4A21B60FB1007D092E /* DeviceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE37C38B23FCC9EE007031C6 /* Keyboards.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE37C38A23FCC9EE007031C6 /* Keyboards.bundle */; };
 		CE37C38D23FCD41E007031C6 /* Keyboards.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE37C38C23FCD41E007031C6 /* Keyboards.swift */; };
+		CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE37C38E23FCD52F007031C6 /* Lexical Models.bundle */; };
+		CE37C39123FCD617007031C6 /* LexicalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE37C39023FCD617007031C6 /* LexicalModels.swift */; };
 		CE4459E723FBBB4A003151FD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4459CD23FBBA8D003151FD /* AppDelegate.swift */; };
 		CE4459E823FBBB79003151FD /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; };
 		CE4459E923FBBB79003151FD /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -410,6 +412,8 @@
 		CE2B1E4521B60E7C007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE37C38A23FCC9EE007031C6 /* Keyboards.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Keyboards.bundle; sourceTree = "<group>"; };
 		CE37C38C23FCD41E007031C6 /* Keyboards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboards.swift; sourceTree = "<group>"; };
+		CE37C38E23FCD52F007031C6 /* Lexical Models.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Lexical Models.bundle"; sourceTree = "<group>"; };
+		CE37C39023FCD617007031C6 /* LexicalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexicalModels.swift; sourceTree = "<group>"; };
 		CE4459CD23FBBA8D003151FD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineTestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE4459ED23FBBB7F003151FD /* Carthage */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Carthage; path = ../../Carthage; sourceTree = "<group>"; };
@@ -762,6 +766,7 @@
 			isa = PBXGroup;
 			children = (
 				CE37C38A23FCC9EE007031C6 /* Keyboards.bundle */,
+				CE37C38E23FCD52F007031C6 /* Lexical Models.bundle */,
 			);
 			path = resources;
 			sourceTree = "<group>";
@@ -792,6 +797,7 @@
 				CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */,
 				CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */,
 				CE37C38C23FCD41E007031C6 /* Keyboards.swift */,
+				CE37C39023FCD617007031C6 /* LexicalModels.swift */,
 			);
 			path = TestUtils;
 			sourceTree = "<group>";
@@ -1140,6 +1146,7 @@
 				CE37C38B23FCC9EE007031C6 /* Keyboards.bundle in Resources */,
 				9ADC45A022E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
+				CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1234,6 +1241,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE37C39123FCD617007031C6 /* LexicalModels.swift in Sources */,
 				CE37C38D23FCD41E007031C6 /* Keyboards.swift in Sources */,
 				CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
