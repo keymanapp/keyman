@@ -201,13 +201,9 @@ build-release-wrapper-oem:
 global-versions: mkver-app
     # Build our root version.txt
     cd $(ROOT)\src
-!ifdef BUILD_NUMBER
-    # If CI has defined a version for us, then use that.
-    $(MKVER_APP) -c $(ROOT)\src\version.txt -b $(BUILD_NUMBER)
-!else
-    # Otherwise, we use the major version from resources/VERSION.md and build 9999 for 'debug'
-    $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\resources\VERSION.md
-!endif
+
+    # We use the version from VERSION.md
+    $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\VERSION.md
 
     $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h $(ROOT)\src\version.txt
     $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc $(ROOT)\src\version.txt

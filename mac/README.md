@@ -4,7 +4,8 @@
 
 Install Xcode 11.3.1 or later (it might also work to use an older version)
 Install [Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below
-Install cocoapods (sudo gem install cocoapods) if not already installed.
+Install cocoapods (`sudo gem install cocoapods`) if not already installed.
+Install coreutils (`brew install coreutils`)
 
 ## Keyman for macOS Development
 

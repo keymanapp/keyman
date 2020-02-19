@@ -41,6 +41,7 @@ clean:
 	-del keymandesktop.log
 	-del toc.hhc
   -del help.suo
+  -del /Q install.mak
 
 #-------------------------------------------------------
 # CHM build
@@ -110,8 +111,9 @@ bightml_images: dirs
 #-------------------------------------------------------
 
 install:
-  if not exist $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop exit 1
-  -rd /s/q $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\$(KEYMAN_VERSION)\docs
-  xcopy /s/q/y $(ROOT)\bin\help\php\desktop\* $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\$(KEYMAN_VERSION)\docs\ #
+  cd $(ROOT)\src\desktop\help
+  $(PROGRAM)\buildtools\mkver -v -u install.in install.mak $(ROOT)\src\desktop\version.txt
+  $(MAKE) -finstall.mak install
+  -del /Q install.mak
 
 !include ..\..\Target.mak

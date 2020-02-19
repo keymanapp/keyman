@@ -1,0 +1,39 @@
+// version.gradle
+
+//
+// This depends on ext.rootPath = path to /android folder in repository
+// It can be a relative path. Gradle does not appear to support relative
+// paths from included scripts.
+//
+
+def getVersionCode = { ->
+    String env_build_counter = System.getenv("build_counter")
+    if(env_build_counter != null) {
+        // This has been assigned by TeamCity, so use it if present
+        println "Using version code $env_build_counter from environment (TeamCity)"
+        return env_build_counter
+    }
+
+    println "Using fixed version code 100"
+    return 100
+}
+
+def getVersionName = { ->
+    String env_version = System.getenv("VERSION")
+    String env_tier = System.getenv("TIER")
+    if (env_version != null && env_tier != null) {
+        // If building from script, we have build number in VERSION and tier in TIER
+        return "$env_version-$env_tier"
+    } else {
+        // Building probably from IDE, so let's use VERSION.md and TIER.md directly
+        String version_md = file("$rootPath/../VERSION.md").text.trim()
+        String tier_md = file("$rootPath/../TIER.md").text.trim()
+        println "Using build $version_md-$tier_md from project VERSION.md"
+        return "$version_md-$tier_md"
+    }
+}
+
+ext {
+    VERSION_CODE=getVersionCode()
+    VERSION_NAME=getVersionName()
+}

@@ -164,10 +164,10 @@ if [ $CODE_SIGN = true ]; then
     assertDirExists "$ARCHIVE_PATH"
 
     # Pass the build number information along to the Plist file of the app.
-    if [ $BUILD_NUMBER ]; then
-      echo "Setting version numbers to $BUILD_NUMBER."
-      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
-      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
+    if [ $VERSION ]; then
+      echo "Setting version numbers to $VERSION."
+      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $VERSION" "$ARCHIVE_PATH/Info.plist"
+      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $VERSION" "$ARCHIVE_PATH/Info.plist"
 
       ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/$TARGET.app"
       ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"

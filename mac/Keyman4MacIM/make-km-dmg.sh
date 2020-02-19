@@ -1,5 +1,11 @@
 #!/bin/sh
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
   echo "This build script will only run in a Mac environment."
@@ -10,10 +16,8 @@ display_usage() {
     echo "Used to create a disk image containing the Keyman Input Method app."
     echo "Typically called from the Keyman mac build script."
     echo
-    echo "usage: make-km-dmg.sh -version #.#.#"
+    echo "usage: make-km-dmg.sh"
     echo
-    echo "  -version #.#.#  Specifies the build version number, which should be in the"
-    echo "                  form Major.Minor.BuildCounter"
     echo "Optional switches:"
     echo "  -sourceApp APP  The Keyman.app to put into the DMG"
     echo "  -template DMG   The DMG image to use as a template (with background image, etc.)"
@@ -58,12 +62,6 @@ QUIET=false
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -version)
-            assertValidVersionNbr "$2"
-            KM_VERSION="$2"
-            KM_BLD_COUNTER="$((${KM_VERSION##*.}))"
-            shift # past argument
-            ;;
         -sourceApp)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
                 fail "Missing source directory on command line."
@@ -112,7 +110,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Step 0 - check parameter and initial file state
-if [ "$KM_VERSION" = "" ]; then
+if [ "$VERSION" = "" ]; then
   fail "Required -version parameter not specified!"
 fi
 
@@ -131,7 +129,7 @@ elif [[ ! -d "$OUTPUT_DIR" ]]; then
 fi
 
 if $ADD_VERSION_TO_DEST_DIR ; then
-    DEST_DIR="$DEST_DIR/$KM_VERSION"
+    DEST_DIR="$DEST_DIR/$VERSION"
 fi
 if [[ ! -e "$DEST_DIR" ]]; then
 	mkdir -p "$DEST_DIR"
@@ -142,7 +140,7 @@ fi
 # TODO: Check that no Keyman volume is already mounted.
 
 # Step 1 - Copy template to working copy to prevent unintended changes
-WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$KM_VERSION.dmg"
+WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$VERSION.dmg"
 displayInfo "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
 if [[ -e "$WORKING_COPY_OF_IMAGE" && "$VERBOSITY" != "-quiet" ]] ; then
     warn "Overwriting: $WORKING_COPY_OF_IMAGE"
@@ -208,7 +206,7 @@ if (( DETACH_SUCCESS < 999 )); then
 fi
 
 # Step 5 - Convert image to a compressed readonly DMG image
-DMG_FILE_PATH="$DEST_DIR/keyman-$KM_VERSION.dmg"
+DMG_FILE_PATH="$DEST_DIR/keyman-$VERSION.dmg"
 displayInfo "Converting/compressing image to create \"$DMG_FILE_PATH\""
 if [[ -e "$DMG_FILE_PATH" ]] ; then
     if [[ "$VERBOSITY" != "-quiet" ]] ; then
