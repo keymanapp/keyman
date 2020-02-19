@@ -14,6 +14,9 @@ import Foundation
  * It's a common Swift pattern, used because enums can't be instantiated.
  */
 enum TestUtils {
+  static let mainBundle = Bundle(for: FileManagementTests.self)  // Can't use TestUtils, as it's an enum
+  static let keyboardsBundle = Bundle(path: TestUtils.mainBundle.path(forResource: "Keyboards", ofType: ".bundle")!)!
+
   static func eraseStorage(_ storage: Storage) {
     do {
       try FileManager.default.removeItem(at: storage.baseDir)

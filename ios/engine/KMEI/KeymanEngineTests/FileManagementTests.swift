@@ -23,24 +23,40 @@ class FileManagementTests: XCTestCase {
       TestUtils.eraseStorage(storage)
       TestUtils.UserDefaults.clearUserDefaults(from: storage)
     }
+
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    do {
+      try FileManager.default.removeItem(at: cacheDirectory)
+    } catch {
+      log.error(error)
+    }
   }
 
   // AMDD acceptance test for existing KeymanPackage so I'll know what has to keep working despite my changers
-  func testExample() {
-    let testUrl = URL(fileURLWithPath: "/Users/Shared/testpackage.kmp");
-    let outUrl  = URL(fileURLWithPath: "/Users/Shared/outPackageFolder")
+  func testKeyboardPackageExtraction() throws {
+    let khmerPackageURL = TestUtils.keyboardsBundle.url(forResource: "khmer_angkor", withExtension: "kmp")!
 
-    // Note:  does not detect failure to extract!  This is basically leftover material from a previous dev's
-    //        original attempt to add unit testing.
-    //
-    //        Honestly, that's the only reason this passes.  This test isn't actually functional yet.
-    KeymanPackage.extract(fileUrl: testUrl, destination: outUrl, complete: { kmp in
-      if let kmp = kmp {
-        // extracted ok, test kmp
-        XCTAssert(kmp.sourceFolder == outUrl, "the sourceFolder should be outURL")
-      } else {
-        XCTAssert(false, "KeymanPackage.extract failed")
-      }
-    }) // Use XCTAssert and related functions to verify your tests produce the correct results.
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.zip")
+    try FileManager.default.copyItem(at: khmerPackageURL, to: khmerPackageZip)
+
+    let destinationFolderURL  = cacheDirectory.appendingPathComponent("khmer_angkor")
+
+    // Requires that the source file is already .zip, not .kmp.  It's a ZipUtils limitation.
+    do {
+      try KeymanPackage.extract(fileUrl: khmerPackageZip, destination: destinationFolderURL, complete: { kmp in
+        if let kmp = kmp {
+          XCTAssertTrue(kmp.isKeyboard(), "Keyboard KMP test extraction did not yield a keyboard package!")
+
+          // extracted ok, test kmp
+          XCTAssert(kmp.sourceFolder == destinationFolderURL,
+                    "The KMP's reported 'source folder' should match the specified destination folder")
+        } else {
+          XCTAssert(false, "KeymanPackage.extract failed")
+        }
+      }) // Use XCTAssert and related functions to verify your tests produce the correct results.
+    } catch {
+      XCTFail("KeymanPackage.extract failed with error \(error)")
+    }
   }
 }

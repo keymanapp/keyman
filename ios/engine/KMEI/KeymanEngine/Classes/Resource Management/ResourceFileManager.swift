@@ -85,14 +85,18 @@ public class ResourceFileManager {
     var extractionFolder = cacheDirectory
     extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
 
-    KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder, complete: { kmp in
-      if let kmp = kmp {
-        completionHandler(kmp, nil)
-      } else {
-        log.error(KMPError.invalidPackage)
-        completionHandler(nil, KMPError.invalidPackage)
-      }
-    })
+    do {
+      try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder, complete: { kmp in
+        if let kmp = kmp {
+          completionHandler(kmp, nil)
+        } else {
+          log.error(KMPError.invalidPackage)
+          completionHandler(nil, KMPError.invalidPackage)
+        }
+      })
+    } catch {
+      log.error(error)
+    }
   }
 
   /**
