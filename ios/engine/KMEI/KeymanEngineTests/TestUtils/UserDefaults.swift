@@ -11,10 +11,10 @@ import Foundation
 
 extension TestUtils {
   class UserDefaults {
-    static func getAndResetUserDefaultsDictionary(from storage: Storage) -> [String: Any] {
+    static func getAndResetDictionary(from storage: Storage) -> [String: Any] {
       let userDefaults = storage.userDefaults
       var currentDictionary = userDefaults.dictionaryRepresentation()
-      clearUserDefaults(from: storage)
+      clear(from: storage)
       let baseDict = userDefaults.dictionaryRepresentation()
 
       baseDict.forEach({ pair in
@@ -24,22 +24,22 @@ extension TestUtils {
       return currentDictionary
     }
 
-    static func addDefaultsDictionary(_ dictionary: [String: Any], storage: Storage) {
+    static func addDictionary(_ dictionary: [String: Any], storage: Storage) {
       //userDefaults.register(defaults: currentDictionary) // adds them in an unclearable way!
       dictionary.forEach({ pair in
         storage.userDefaults.set(pair.value, forKey: pair.key)
       })
     }
 
-    static func getUserDefaultsDictionary(from storage: Storage) -> [String: Any] {
-      let currentDictionary = getAndResetUserDefaultsDictionary(from: storage)
+    static func getDictionary(from storage: Storage) -> [String: Any] {
+      let currentDictionary = getAndResetDictionary(from: storage)
 
       // The return value is now properly constructed.  Now to put the defaults back in place before we leave.
-      addDefaultsDictionary(currentDictionary, storage: storage)
+      addDictionary(currentDictionary, storage: storage)
       return currentDictionary
     }
 
-    static func clearUserDefaults(from storage: Storage) {
+    static func clear(from storage: Storage) {
       let userDefaults = storage.userDefaults
       let domain = Bundle.main.bundleIdentifier!
       userDefaults.synchronize()

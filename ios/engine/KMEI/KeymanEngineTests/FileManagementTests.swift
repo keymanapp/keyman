@@ -21,7 +21,7 @@ class FileManagementTests: XCTestCase {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     if let storage = Storage.active {
       TestUtils.eraseStorage(storage)
-      TestUtils.UserDefaults.clearUserDefaults(from: storage)
+      TestUtils.UserDefaults.clear(from: storage)
     }
 
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -77,6 +77,66 @@ class FileManagementTests: XCTestCase {
       }) // Use XCTAssert and related functions to verify your tests produce the correct results.
     } catch {
       XCTFail("KeymanPackage.extract failed with error \(error)")
+    }
+  }
+
+  func testKeyboardInstallation() {
+    // We'll need to reference Manager.shared, which unfortunately carries a LOT of init code.
+    _ = Manager.shared
+
+    // So, we'll "de-init" all the file system and defaults changes that the init triggers.
+    TestUtils.eraseStorage(Storage.active)
+    TestUtils.UserDefaults.clear(from: Storage.active)
+
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
+      XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
+      XCTAssertNil(error, "Error occurred while preparing KMP for installation")
+      XCTAssertTrue(kmp!.isKeyboard(), "KMP resource type improperly recognized - expected a keyboard package!")
+
+      ResourceFileManager.shared.finalizePackageInstall(kmp!, isCustom: true) { innerError in
+        XCTAssertNil(innerError, "Error occurred while finalizing KMP installation")
+
+        let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                      "Could not find installed keyboard file")
+
+        let keyboards = Storage.active.userDefaults.userKeyboards!
+
+        XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
+        XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
+      }
+    }
+  }
+
+  func testLexicalModelInstallation() {
+    // We may need to reference Manager.shared, which unfortunately carries a LOT of init code.
+    _ = Manager.shared
+
+    // So, we'll "de-init" all the file system and defaults changes that the init triggers.
+    TestUtils.eraseStorage(Storage.active)
+    TestUtils.UserDefaults.clear(from: Storage.active)
+
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, error in
+      XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
+      XCTAssertNil(error, "Error occurred while preparing KMP for installation")
+      XCTAssertFalse(kmp!.isKeyboard(), "KMP resource type improperly recognized - expected a lexical model package!")
+
+      ResourceFileManager.shared.finalizePackageInstall(kmp!, isCustom: true) { innerError in
+        XCTAssertNil(innerError, "Error occurred while finalizing KMP installation")
+
+        let installURL = Storage.active.lexicalModelURL(forID: "nrc.en.mtnt", version: "0.1.4")
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                      "Could not find installed lexical model file")
+
+        let models = Storage.active.userDefaults.userLexicalModels!
+
+        // Yep, the model auto-installs for all language ids, even when there's no matching keyboard.
+        // That's the current state of affairs in Keyman Engine for iOS.
+        XCTAssertEqual(models.count, 3, "Unexpected number of models were installed")
+        XCTAssertEqual(models[0].id, "nrc.en.mtnt", "Installed lexical model ID mismatch")
+      }
     }
   }
 }
