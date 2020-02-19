@@ -1,4 +1,5 @@
 recursive-include keyman_config/icons *
 recursive-include icons *
 include README.md
+include com.keyman.gschema.xml
 include *.bash-completion
