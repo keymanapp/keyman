@@ -48,7 +48,7 @@ if compiler.get_id() == 'msvc'
   links = []
 endif
 
-lib = library('kmnkbp0',
+lib = shared_library('kmnkbp0',
     'option.cpp',
     'keyboard.cpp',
 	'state.cpp',
