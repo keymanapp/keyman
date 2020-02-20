@@ -6,22 +6,24 @@
 
 function triggerBuilds() {
   local base=`git branch --show-current`
-  if [[ $base == master ]]; then
-    local TEAMCITY_BUILDTYPES=( KeymanAndroid_Build Keyman_iOS_Master KeymanLinux_Master KeymanMac_Master Keyman_Build Keymanweb_Build )
-    local TEAMCITY_VCS_ID=HttpsGithubComKeymanappKeyman
-  elif [[ $base == beta ]]; then
-    local TEAMCITY_BUILDTYPES=( KeymanAndroid_Beta Keyman_iOS_Beta KeymanLinux_Beta KeymanMac_Beta KeymanDesktop_Beta Keymanweb_Beta )
-    local TEAMCITY_VCS_ID=Keyman_KeymanappKeymanBeta
-  else
-    exit 1
-  fi
+  eval TEAMCITY_VCS_ID='${'vcs_$base'}'
+  echo "base=$base, TEAMCITY_VCS_ID=${TEAMCITY_VCS_ID}"
 
-  for TEAMCITY_BUILDTYPE in "${TEAMCITY_BUILDTYPES[@]}"; do
-    triggerBuild $TEAMCITY_BUILDTYPE $TEAMCITY_VCS_ID
+  for platform in ${available_platforms[@]}; do
+    eval builds='(${'bc_${base}_${platform}'[@]})'
+    for build in "${builds[@]}"; do
+      if [[ $build == "" ]]; then continue; fi
+      if [ "${build:(-8)}" == "_Jenkins" ]; thend
+        local job=${build%_Jenkins}
+        echo triggerJenkinsBuild "$job" "$base" "true"
+      else
+        echo triggerTeamCityBuild $build $TEAMCITY_VCS_ID
+      fi
+    done
   done
 }
 
-function triggerBuild() {
+function triggerTeamCityBuild() {
   local TEAMCITY_BUILDTYPE="$1"
   local TEAMCITY_VCS_ID="$2"
 
@@ -40,11 +42,39 @@ function triggerBuild() {
 
   #debug echo "Call: $command"
 
-  curl -s --header "Authorization: Bearer $TEAMCITY_TOKEN" \
+  curl -s  --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
     -H "Accept: application/json" \
     -H "Origin: $TEAMCITY_SERVER" \
     $TEAMCITY_SERVER/app/rest/buildQueue \
     -d "$command"
+}
+
+function triggerJenkinsBuild() {
+  local JENKINS_JOB="$1"
+  local JENKINS_BRANCH="${2:-master}"
+
+  local JENKINS_SERVER=https://jenkins.lsdev.sil.org
+
+  local FORCE=""
+  if [ "$3" == "true" ]; then
+    FORCE=", \"force\": true"
+  fi
+
+  if [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
+    JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
+  fi
+
+  if curl --silent --write-out '\n' \
+    -X POST \
+    --header "token: $JENKINS_TOKEN" \
+    --header "Content-Type: application/json" \
+    $JENKINS_SERVER/generic-webhook-trigger/invoke \
+    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $FORCE }" \
+     | grep -q "\"triggered\":true"; then
+    echo "     job triggered"
+  else
+    echo "     triggering failed"
+  fi
 }

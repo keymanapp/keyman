@@ -45,8 +45,14 @@ function triggerTestBuilds() {
     eval test_builds='(${'bc_test_$platform'[@]})'
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
-      echo "  -- Triggering build configuration $test_build"
-      triggerBuild "$test_build" "$vcs_test" "$branch"
+      if [ "${test_build:(-8)}" == "_Jenkins" ]; then
+        local job=${test_build%_Jenkins}
+        echo "  -- Triggering build configuration $job/$branch on Jenkins"
+        triggerJenkinsBuild "$job" "$branch"
+      else
+        echo "  -- Triggering build configuration $test_build on teamcity"
+        triggerTeamCityBuild "$test_build" "$vcs_test" "$branch"
+      fi
     done
   done
 }
