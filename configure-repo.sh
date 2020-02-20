@@ -26,9 +26,6 @@ case $1 in
     else
       ln -sf "$PWD/resources/git-hooks/commit-msg" "$PWD/.git/hooks/commit-msg"
       ln -sf "$PWD/resources/git-hooks/prepare-commit-msg" "$PWD/.git/hooks/prepare-commit-msg"
-
-      # For Linux
-      ln -sf "$PWD/resources/git-hooks/commit-msg-defs" "$PWD/.git/hooks/commit-msg-defs"
     fi
     ;;
   *)
