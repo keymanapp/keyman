@@ -58,7 +58,7 @@ function triggerJenkinsBuild() {
   local JENKINS_SERVER=https://jenkins.lsdev.sil.org
 
   local FORCE=""
-  if [ "$3" == "true" ]; then
+  if [ "${3:-false}" == "true" ]; then
     FORCE=", \"force\": true"
   fi
 
