@@ -2,7 +2,6 @@ DerivedData
 .DS_Store
 project.xcworkspace
 xcuserdata
-*.xcscheme
 build
 keyman/Keyman/KeymanEngine.framework
 samples/KMSample1/KeymanEngine.framework
