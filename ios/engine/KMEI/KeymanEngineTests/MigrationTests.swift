@@ -22,9 +22,9 @@ class MigrationTests: XCTestCase {
     userDefaults.lastEngineVersion = Version("12.0")!
 
     let versionResources = TestUtils.Migrations.getVersionHistory(for: Version("12.0")!)
-    userDefaults.userKeyboards?.append(versionResources[0] as! InstallableKeyboard)
-    userDefaults.userKeyboards?.append(TestUtils.Keyboards.khmer_angkor)
-    userDefaults.userLexicalModels?.append(versionResources[1] as! InstallableLexicalModel)
+    TestUtils.UserDefaults.addKeyboard(versionResources[0] as! InstallableKeyboard)
+    TestUtils.UserDefaults.addKeyboard(TestUtils.Keyboards.khmer_angkor)
+    TestUtils.UserDefaults.addLexicalModel(versionResources[1] as! InstallableLexicalModel)
 
     Migrations.updateResources(storage: Storage.active)
 
@@ -32,8 +32,9 @@ class MigrationTests: XCTestCase {
     // v 0.1.2 -> 0.1.4.
     // Minor surprise (as of 13.0) is that 0.1.2's file actually remains!
 
-    let mtnt = userDefaults.userLexicalModels?[0]
-    XCTAssertEqual(mtnt?.version, "0.1.4")
+    let defaultModel = userDefaults.userLexicalModels![0]
+    XCTAssertEqual(defaultModel.id, Defaults.lexicalModel.id)
+    XCTAssertEqual(defaultModel.version, Defaults.lexicalModel.version)
     let modelURL = Storage.active.lexicalModelURL(for: TestUtils.LexicalModels.mtnt) // The bundled, 0.1.4 version.
     XCTAssert(FileManager.default.fileExists(atPath: modelURL.path))
   }
@@ -43,7 +44,7 @@ class MigrationTests: XCTestCase {
 
     let userDefaults = Storage.active.userDefaults
     userDefaults.lastEngineVersion = Version("12.0")!
-    userDefaults.userKeyboards?.append(TestUtils.Keyboards.khmer10)
+    TestUtils.UserDefaults.addKeyboard(TestUtils.Keyboards.khmer10)
 
     Migrations.migrate(storage: Storage.active)
 
@@ -57,5 +58,54 @@ class MigrationTests: XCTestCase {
     // so that it may be used for sharing.
     let kmpURL = URL(fileURLWithPath: documentsContents[0])
     XCTAssertEqual(kmpURL.lastPathComponent, "khmer10.kmp")
+  }
+
+  func testVersion10ResourceMigration() {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_10)
+
+    let userDefaults = Storage.active.userDefaults
+    TestUtils.UserDefaults.addKeyboard(TestUtils.Migrations.european2)
+
+    Migrations.updateResources(storage: Storage.active)
+
+    // The old keyboard should be gone entirely, replaced by the current version's default resources.
+    // There should only be one default resource per type (at least, as of 13.0.)
+    XCTAssertEqual(userDefaults.userKeyboards!.count, 1, "Unexpected keyboard count after migration!")
+    // 3, b/c all language-code variants are counted.
+    XCTAssertEqual(userDefaults.userLexicalModels!.count, 3, "Unexpected lexical model count after migration!")
+
+    let defaultKeyboard = userDefaults.userKeyboards![0]
+    XCTAssertNotEqual(TestUtils.Migrations.european2.id, defaultKeyboard.id) // Double-ensure that the ID is new.
+    XCTAssertEqual(defaultKeyboard.id, Defaults.keyboard.id)
+    XCTAssertEqual(defaultKeyboard.version, Defaults.keyboard.version)
+
+    let defaultModel = userDefaults.userLexicalModels![0]
+    XCTAssertEqual(defaultModel.id, Defaults.lexicalModel.id)
+    XCTAssertEqual(defaultModel.version, Defaults.lexicalModel.version)
+
+    let keyboardURL = Storage.active.keyboardURL(for: Defaults.keyboard)
+    let modelURL = Storage.active.lexicalModelURL(for: Defaults.lexicalModel)
+    XCTAssert(FileManager.default.fileExists(atPath: keyboardURL.path))
+    XCTAssert(FileManager.default.fileExists(atPath: modelURL.path))
+  }
+
+  func testNoDefaultVersion10ResourceMigration() {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.noDefault_10)
+
+    let userDefaults = Storage.active.userDefaults
+    TestUtils.UserDefaults.addKeyboard(TestUtils.Keyboards.khmer_angkor)
+
+    Migrations.updateResources(storage: Storage.active)
+
+    // No new resources should be installed - only what was originally present should be there.
+    XCTAssertEqual(userDefaults.userKeyboards!.count, 1, "Unexpected keyboard count after migration!")
+    // There was no prior lexical model installed, so the installation still proceeds.  The user just won't see it.
+    XCTAssertNil(userDefaults.userLexicalModels, "Unexpected lexical model(s) installed after migration!")
+
+    let keyboard = userDefaults.userKeyboards![0]
+    XCTAssertEqual(keyboard.id, TestUtils.Keyboards.khmer_angkor.id, "Unexpected keyboard was installed after migration!")
+    XCTAssertEqual(keyboard.version, TestUtils.Keyboards.khmer_angkor.version)
+
+    // If successful, confirms that the current default resources are not installed - as expected.
   }
 }

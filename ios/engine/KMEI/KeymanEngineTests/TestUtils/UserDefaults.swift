@@ -45,5 +45,35 @@ extension TestUtils {
       userDefaults.synchronize()
       userDefaults.removePersistentDomain(forName: domain)
     }
+
+    static func addKeyboard(_ keyboard: InstallableKeyboard) {
+      // Lifted from Manager.addKeyboard
+      let userDefaults = Storage.active.userDefaults
+      var userKeyboards = userDefaults.userKeyboards ?? []
+
+      // Update keyboard if it exists
+      if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
+        userKeyboards[index] = keyboard
+      } else {
+        userKeyboards.append(keyboard)
+      }
+
+      userDefaults.userKeyboards = userKeyboards
+    }
+
+    static func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
+      // Lifted from Manager.addKeyboard
+      let userDefaults = Storage.active.userDefaults
+      var userModels = userDefaults.userLexicalModels ?? []
+
+      // Update keyboard if it exists
+      if let index = userModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
+        userModels[index] = lexicalModel
+      } else {
+        userModels.append(lexicalModel)
+      }
+
+      userDefaults.userLexicalModels = userModels
+    }
   }
 }

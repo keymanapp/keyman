@@ -20,6 +20,20 @@ extension TestUtils {
     // Bundle references
     static let simple_12 = TestUtils.findSubBundle(forResource: "Simple 12.0 Migration", ofType: ".bundle")
     static let adhoc_12 = TestUtils.findSubBundle(forResource: "12.0 Ad-hoc Migration", ofType: ".bundle")
+    static let simple_10 = TestUtils.findSubBundle(forResource: "Simple 10.0 Migration", ofType: ".bundle")
+    static let noDefault_10 = TestUtils.findSubBundle(forResource: "No-defaults 10.0 Migration", ofType: ".bundle")
+
+    // The default keyboard in version 10.0.
+    static let european2_font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
+    static let european2 = InstallableKeyboard(id: "european2",
+                                              name: "EuroLatin2 Keyboard",
+                                              languageID: "en",
+                                              languageName: "English",
+                                              version: "1.6",
+                                              isRTL: false,
+                                              font: european2_font,
+                                              oskFont: nil,
+                                              isCustom: false)
 
     static func applyBundleToFileSystem(_ bundle: Bundle) {
       let fileManager = FileManager.default
