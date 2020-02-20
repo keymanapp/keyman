@@ -11,3 +11,5 @@ if [ ! -z "$RELEASE_OEM" ]; then
   ./build.sh -lib-nobuild $*
   popd > /dev/null
 fi
+
+./test.sh
