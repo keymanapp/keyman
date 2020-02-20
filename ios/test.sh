@@ -22,7 +22,7 @@ function run_test() {
   # much less problematic.
   xcodebuild \
     -workspace keymanios.xcworkspace \
-    -scheme KeymanEngine \
+    -scheme Keyman \
     -sdk iphonesimulator \
     -destination "platform=iOS Simulator,name=$DEVICE" \
     -only-testing KeymanEngineTests \

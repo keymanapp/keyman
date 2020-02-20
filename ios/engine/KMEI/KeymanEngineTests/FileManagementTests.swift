@@ -14,18 +14,11 @@ import DeviceKit
 
 class FileManagementTests: XCTestCase {
   override func setUp() {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+    TestUtils.setupAndDeinitManager()
   }
   
   override func tearDown() {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    if let storage = Storage.active {
-      TestUtils.eraseStorage(storage)
-      TestUtils.UserDefaults.clear(from: storage)
-    }
-
-    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    TestUtils.clearDirectory(at: cacheDirectory)
+    TestUtils.standardTearDown()
   }
 
   func testKeyboardPackageExtraction() throws {
@@ -79,13 +72,6 @@ class FileManagementTests: XCTestCase {
   }
 
   func testKeyboardInstallation() {
-    // We'll need to reference Manager.shared, which unfortunately carries a LOT of init code.
-    _ = Manager.shared
-
-    // So, we'll "de-init" all the file system and defaults changes that the init triggers.
-    TestUtils.eraseStorage(Storage.active)
-    TestUtils.UserDefaults.clear(from: Storage.active)
-
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")
@@ -108,13 +94,6 @@ class FileManagementTests: XCTestCase {
   }
 
   func testLexicalModelInstallation() {
-    // We may need to reference Manager.shared, which unfortunately carries a LOT of init code.
-    _ = Manager.shared
-
-    // So, we'll "de-init" all the file system and defaults changes that the init triggers.
-    TestUtils.eraseStorage(Storage.active)
-    TestUtils.UserDefaults.clear(from: Storage.active)
-
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")

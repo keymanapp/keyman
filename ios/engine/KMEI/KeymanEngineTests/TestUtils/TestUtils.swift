@@ -54,4 +54,25 @@ enum TestUtils {
       XCTFail("Could not properly erase & reinit KeymanEngine Storage because of error: \(error)")
     }
   }
+
+  static func setupAndDeinitManager() {
+    // Ensures that Manager has been initialized...
+    _ = Manager.shared
+
+    // and then "de-init" the file system and defaults changes that the init triggers.
+    TestUtils.eraseStorage(Storage.active)
+    TestUtils.UserDefaults.clear(from: Storage.active)
+  }
+
+  static func standardTearDown() {
+    if let storage = Storage.active {
+      TestUtils.eraseStorage(storage)
+      TestUtils.UserDefaults.clear(from: storage)
+    }
+
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    TestUtils.clearDirectory(at: cacheDirectory)
+    TestUtils.clearDirectory(at: documentsDirectory)
+  }
 }
