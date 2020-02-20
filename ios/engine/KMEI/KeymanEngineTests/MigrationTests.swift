@@ -37,4 +37,25 @@ class MigrationTests: XCTestCase {
     let modelURL = Storage.active.lexicalModelURL(for: TestUtils.LexicalModels.mtnt) // The bundled, 0.1.4 version.
     XCTAssert(FileManager.default.fileExists(atPath: modelURL.path))
   }
+
+  func testVersion12AdhocMigration() throws {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.adhoc_12)
+
+    let userDefaults = Storage.active.userDefaults
+    userDefaults.lastEngineVersion = Version("12.0")!
+    userDefaults.userKeyboards?.append(TestUtils.Keyboards.khmer10)
+
+    Migrations.migrate(storage: Storage.active)
+
+    // The files in the .documents directory should be erased after this method is run.
+
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    let documentsContents = try FileManager.default.contentsOfDirectory(atPath: documentsDirectory.path)
+    XCTAssertEqual(documentsContents.count, 1, "Documents directory was not purged of installation by-products during ad-hoc resource migration!")
+
+    // The .kmp.zip is converted back into its original .kmp file, which remains in the Documents directory
+    // so that it may be used for sharing.
+    let kmpURL = URL(fileURLWithPath: documentsContents[0])
+    XCTAssertEqual(kmpURL.lastPathComponent, "khmer10.kmp")
+  }
 }

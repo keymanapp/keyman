@@ -21,16 +21,14 @@ extension TestUtils {
                                                    font: nil,
                                                    oskFont: nil,
                                                    isCustom: false)
+    static let khmer10 =  InstallableKeyboard(id: "khmer10",
+                                              name: "Khmer (NiDA)",
+                                              languageID: "kh",
+                                              languageName: "Khmer (Central)",
+                                              version: "1.3",
+                                              isRTL: false,
+                                              font: nil,
+                                              oskFont: nil,
+                                              isCustom: false)
   }
-
-  static let khmer10 =  InstallableKeyboard(id: "khmer10",
-                                            name: "Khmer (NiDA)",
-                                            languageID: "kh",
-                                            languageName: "Khmer (Central)",
-                                            version: "1.3",
-                                            isRTL: false,
-                                            font: nil,
-                                            oskFont: nil,
-                                            isCustom: false)
-
 }
