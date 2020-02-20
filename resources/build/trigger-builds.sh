@@ -13,7 +13,7 @@ function triggerBuilds() {
     eval builds='(${'bc_${base}_${platform}'[@]})'
     for build in "${builds[@]}"; do
       if [[ $build == "" ]]; then continue; fi
-      if [ "${build:(-8)}" == "_Jenkins" ]; thend
+      if [ "${build:(-8)}" == "_Jenkins" ]; then
         local job=${build%_Jenkins}
         echo triggerJenkinsBuild "$job" "$base" "true"
       else
