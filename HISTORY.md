@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.14 alpha 2020-02-21
+
+* chore(linux): allow to trigger Jenkins build from script (#2697)
+* fix(ios): Resource update issues (#2703)
+* fix(web): Web CI target reversion (#2693)
+* refactor(common): Simplify and improve getting hook directory (#2701)
+
 ## 14.0.13 alpha 2020-02-19
 
 * chore: merge p9s2 beta part 2 to master (#2683)
