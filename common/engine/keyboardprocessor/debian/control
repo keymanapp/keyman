@@ -1,6 +1,6 @@
 Source: keyman-keyboardprocessor
 Build-Depends: debhelper (>=9~),
-               meson (>= 0.40),
+               meson (>= 0.29),
                ninja-build
 Section: text
 Priority: optional
