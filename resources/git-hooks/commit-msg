@@ -12,15 +12,8 @@
 # Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 #
 
-# Step 1 - resolve the source directory of the hook, ALSO resolving any symlinks.
-# From https://stackoverflow.com/a/246128.
-SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
-  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
-  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-HOOK_DIRECTORY="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
+# Get the directory where this script lives, i.e. resources/git-hooks
+HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
 
 . $HOOK_DIRECTORY/commit-msg-defs
 
