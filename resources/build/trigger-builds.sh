@@ -42,6 +42,8 @@ function triggerTeamCityBuild() {
 
   #debug echo "Call: $command"
 
+  # adjust indentation for output of curl
+  echo -n "     "
   curl -s  --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
@@ -66,15 +68,28 @@ function triggerJenkinsBuild() {
     JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
   fi
 
-  if curl --silent --write-out '\n' \
+  local OUTPUT=$(curl --silent --write-out '\n' \
     -X POST \
     --header "token: $JENKINS_TOKEN" \
     --header "Content-Type: application/json" \
     $JENKINS_SERVER/generic-webhook-trigger/invoke \
-    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $FORCE }" \
-     | grep -q "\"triggered\":true"; then
-    echo "     job triggered"
+    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $FORCE }")
+
+  if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
+    echo -n "     job triggered: "
   else
-    echo "     triggering failed"
+    echo -n "     triggering failed: "
   fi
+
+  # Strip {"jobs":{ from the beginning of OUTPUT
+  OUTPUT=${OUTPUT#\{\"jobs\":\{}
+  # Split json string to lines with one job each
+  local jobs
+  IFS='|' jobs=(${OUTPUT//\},\"pipeline/\},|\"pipeline})
+  # Find job that actually got triggered (or that we should have triggered)
+  for line in "${jobs[@]}"; do
+    if [[ $line == \"$JENKINS_JOB/$JENKINS_BRANCH* ]]; then
+      echo "$line"
+    fi
+  done
 }
