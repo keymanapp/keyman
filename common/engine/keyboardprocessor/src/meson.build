@@ -22,9 +22,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-fvisibility=hidden',
     '-fvisibility-inlines-hidden'
   ]
-  links = [
-    '-Wno-undefined'
-  ]
+  links = []
 
   if compiler.get_id() == 'clang'
     warns += [
@@ -51,29 +49,31 @@ if compiler.get_id() == 'msvc'
 endif
 
 lib = shared_library('kmnkbp0',
-    'option.cpp',
-    'keyboard.cpp',
-	'state.cpp',
-    'km_kbp_context_api.cpp',
-    'km_kbp_keyboard_api.cpp',
-    'km_kbp_options_api.cpp',
-    'km_kbp_state_api.cpp',
-	'km_kbp_processevent_api.cpp',
-    'json.cpp',
-	'mock/mock_processor.cpp',
-	'kmx/kmx_consts.cpp',
-	'kmx/kmx_processevent.cpp',
-	'kmx/kmx_actions.cpp',
-	'kmx/kmx_capslock.cpp',
-	'kmx/kmx_context.cpp',
-	'kmx/kmx_debug.cpp',
-    'kmx/kmx_environment.cpp',
-	'kmx/kmx_file.cpp',
-	'kmx/kmx_modifiers.cpp',
-	'kmx/kmx_options.cpp',
-	'kmx/kmx_processor.cpp',
-	'kmx/kmx_xstring.cpp',
-    'utfcodec.cpp',
+    sources: [
+      'option.cpp',
+      'keyboard.cpp',
+      'state.cpp',
+      'km_kbp_context_api.cpp',
+      'km_kbp_keyboard_api.cpp',
+      'km_kbp_options_api.cpp',
+      'km_kbp_state_api.cpp',
+      'km_kbp_processevent_api.cpp',
+      'json.cpp',
+      'mock/mock_processor.cpp',
+      'kmx/kmx_consts.cpp',
+      'kmx/kmx_processevent.cpp',
+      'kmx/kmx_actions.cpp',
+      'kmx/kmx_capslock.cpp',
+      'kmx/kmx_context.cpp',
+      'kmx/kmx_debug.cpp',
+      'kmx/kmx_environment.cpp',
+      'kmx/kmx_file.cpp',
+      'kmx/kmx_modifiers.cpp',
+      'kmx/kmx_options.cpp',
+      'kmx/kmx_processor.cpp',
+      'kmx/kmx_xstring.cpp',
+      'utfcodec.cpp'
+    ],
     cpp_args: defns + warns + flags,
     link_args: links,
     version: lib_version,
