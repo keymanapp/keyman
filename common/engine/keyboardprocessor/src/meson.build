@@ -22,7 +22,9 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-fvisibility=hidden',
     '-fvisibility-inlines-hidden'
   ]
-  links = []
+  links = [
+    '-unresolved-symbols=ignore-in-shared-libs' 
+  ]
 
   if compiler.get_id() == 'clang'
     warns += [
