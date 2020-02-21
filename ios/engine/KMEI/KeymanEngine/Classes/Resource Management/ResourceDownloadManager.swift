@@ -371,13 +371,13 @@ public class ResourceDownloadManager {
     
     guard let _ = Manager.shared.apiLexicalModelRepository.lexicalModels else {
       if fetchRepositoryIfNeeded {
-        log.info("Fetching repository from API for keyboard download")
-        Manager.shared.apiLexicalModelRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
-          self.downloadKeyboard(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
+        log.info("Fetching repository from API for lexicalModel download")
+        Manager.shared.apiLexicalModelRepository.fetch(completionHandler: fetchHandler(for: .lexicalModel) {
+          self.downloadLexicalModel(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
         })
         return
       } else {
-        let message = "Keyboard repository not yet fetched"
+        let message = "Lexical model repository not yet fetched"
         let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
         downloader.downloadFailed(forKeyboards: [], error: error)
         return
@@ -505,10 +505,13 @@ public class ResourceDownloadManager {
     isDidUpdateCheck = true
     
     var updatables: [LanguageResource] = []
-    
+
+    // Gets the list of current, local keyboards in need of an update.
+    // Version matches the current version, not the updated version.
     let kbds = getUpdatableKeyboards()
     updatables.append(contentsOf: kbds)
-    
+
+    // Likewise for lexical models.
     let lexModels = getUpdatableLexicalModels()
     updatables.append(contentsOf: lexModels)
     
@@ -527,15 +530,17 @@ public class ResourceDownloadManager {
     resources.forEach { res in
       if let kbd = res as? InstallableKeyboard {
         if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
+          let kbdUpdate = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbd.id, languageID: kbd.languageID),
            let options = Manager.shared.apiKeyboardRepository.options {
-          if let batch = self.buildKeyboardDownloadBatch(for: kbd, withFilename: filename, asActivity: .update, withOptions: options) {
+          if let batch = self.buildKeyboardDownloadBatch(for: kbdUpdate, withFilename: filename, asActivity: .update, withOptions: options) {
             batches.append(batch)
           }
         }
       } else if let lex = res as? InstallableLexicalModel {
         if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
+           let lexUpdate = Manager.shared.apiLexicalModelRepository.installableLexicalModel(withID: lex.id, languageID: lex.languageID),
            let path = URL.init(string: filename) {
-          if let batch = self.buildLexicalModelDownloadBatch(for: lex, withFilename: path, asActivity: .update) {
+          if let batch = self.buildLexicalModelDownloadBatch(for: lexUpdate, withFilename: path, asActivity: .update) {
             batches.append(batch)
           }
         }

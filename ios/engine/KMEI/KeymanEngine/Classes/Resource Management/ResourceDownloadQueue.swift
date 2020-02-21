@@ -416,6 +416,12 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
           if(!isUpdate) {
             downloadSucceeded(forKeyboards: keyboards)
+          } else {
+            // Since we don't generate the notification as above, we need to manually update
+            // the keyboards' metadata.
+            keyboards.forEach { keyboard in
+              Manager.shared.addKeyboard(keyboard)
+            }
           }
 
           let userDefaults = Storage.active.userDefaults
@@ -427,6 +433,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         if let lm = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!)) {
           if !isUpdate {
             downloadSucceeded(forLexicalModel: lm)
+          } else {
+            // Since we don't generate the notification as above, we need to manually update
+            // the lexical model's metadata.
+            Manager.shared.updateUserLexicalModels(with: lm)
           }
         } else if !isUpdate {
           let installError = NSError(domain: "Keyman", code: 0,
