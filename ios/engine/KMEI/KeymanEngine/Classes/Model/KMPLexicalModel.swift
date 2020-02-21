@@ -32,14 +32,16 @@ public class KMPLexicalModel
       && FileManager.default.fileExists(atPath: kmp.sourceFolder.appendingPathComponent("\(lexicalModelId!).model.js").path)
   }
   
-  public func parse(json: [String:AnyObject]) {
+  public func parse(json: [String:AnyObject], version: String) {
     if let name = json["name"] as? String {
       self.name = name
     }
     if let lexicalModelId = json["id"] as? String {
       self.lexicalModelId = lexicalModelId
     }
-    if let version = json["version"] as? String {
+    if let _version = json["version"] as? String {
+      self.version = _version
+    } else {
       self.version = version
     }
     

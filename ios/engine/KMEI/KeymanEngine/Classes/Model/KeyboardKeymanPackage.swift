@@ -12,13 +12,13 @@ public class KeyboardKeymanPackage : KeymanPackage
 {
   private var keyboards: [KMPKeyboard]!
   
-  public override func parse(json: [String:AnyObject]) {
+  public override func parse(json: [String:AnyObject], version: String) {
     self.keyboards = []
     
     if let packagedKeyboards = json["keyboards"] as? [[String:AnyObject]] {
       for keyboardJson in packagedKeyboards {
         let keyboard = KMPKeyboard.init(kmp: self)
-        keyboard.parse(json: keyboardJson)
+        keyboard.parse(json: keyboardJson, version: version)
         
         if(keyboard.isValid) {
           keyboards.append(keyboard)

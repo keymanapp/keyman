@@ -51,14 +51,16 @@ public class KMPKeyboard
       && FileManager.default.fileExists(atPath: kmp.sourceFolder.appendingPathComponent("\(keyboardId!).js").path)
   }
   
-  public func parse(json: [String:AnyObject]) {
+  public func parse(json: [String:AnyObject], version: String) {
     if let name = json["name"] as? String {
       self.name = name
     }
     if let keyboardId = json["id"] as? String {
       self.keyboardId = keyboardId
     }
-    if let version = json["version"] as? String {
+    if let _version = json["version"] as? String {
+      self.version = _version
+    } else {
       self.version = version
     }
     
