@@ -33,15 +33,6 @@ URLSessionDataDelegate {
     downloadSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
   }
 
-  /**
-   * Used to facilitate unit-testing with mocked URL sessions.
-   */
-  internal init(_ handler: HTTPDownloadDelegate?, _ session: URLSession) {
-    super.init()
-    self.handler = handler
-    downloadSession = session
-  }
-
   func addRequest(_ request: HTTPDownloadRequest) {
     queue.append(request)
   }
