@@ -68,9 +68,6 @@ type
     cef: TframeCEFHost;
 
     procedure cefLoadEnd(Sender: TObject); virtual;
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean); virtual;
-    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
-      out Handled: Boolean); virtual;  // I4989
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); virtual;
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); virtual;
     procedure cefCommand(Sender: TObject; const command: string;
@@ -79,7 +76,6 @@ type
     procedure cefHelpTopic(Sender: TObject); virtual;
 
     procedure FireCommand(const command: WideString; params: TStringList); virtual;
-    function ShouldProcessAllCommands: Boolean; virtual;
     function ShouldSetAppTitle: Boolean; virtual; // I2786
     function ShouldSetCaption: Boolean; virtual;
 
@@ -200,11 +196,6 @@ begin
     cef.SetFocus;
 end;
 
-function TfrmWebContainer.ShouldProcessAllCommands: Boolean;
-begin
-  Result := False;
-end;
-
 function TfrmWebContainer.ShouldSetAppTitle: Boolean; // I2786
 begin
   Result := False;
@@ -212,7 +203,7 @@ end;
 
 function TfrmWebContainer.ShouldSetCaption: Boolean;
 begin
-  Result := TRue;
+  Result := True;
 end;
 
 procedure TfrmWebContainer.TntFormCreate(Sender: TObject);
@@ -224,29 +215,12 @@ begin
   cef.Parent := Self;
   cef.Visible := True;
   cef.ShouldOpenRemoteUrlsInBrowser := True;
-  cef.OnBeforeBrowse := cefBeforeBrowse;
-  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
   cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
   cef.OnKeyEvent := cefKeyEvent;
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
   cef.OnResizeFromDocument := cefResizeFromDocument;
   cef.OnHelpTopic := cefHelpTopic;
-end;
-
-procedure TfrmWebContainer.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
-var
-  aparams: TStringList;
-  acommand: string;
-begin
-  if ShouldProcessAllCommands then
-  begin
-    GetParamsFromURLEx(URL, aparams);
-    acommand := aparams[0];
-    aparams.Delete(0);
-    FireCommand(acommand, aparams);
-    aparams.Free;
-  end;
 end;
 
 procedure TfrmWebContainer.cefCommand(Sender: TObject; const command: string; params: TStringList);
@@ -257,21 +231,6 @@ end;
 procedure TfrmWebContainer.cefHelpTopic(Sender: TObject);
 begin
   Application.HelpJump('context_'+lowercase(FDialogName));
-end;
-
-procedure TfrmWebContainer.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
-var
-  params: TStringList;
-begin
-  AssertCefThread;
-  if ShouldProcessAllCommands then
-  begin
-    GetParamsFromURLEx(URL, params);
-    Handled := True;
-    params.Free;
-  end
-  else
-    Handled := False;
 end;
 
 procedure TfrmWebContainer.cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData;

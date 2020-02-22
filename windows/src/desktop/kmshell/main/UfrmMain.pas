@@ -217,6 +217,9 @@ procedure TfrmMain.TntFormCreate(Sender: TObject);
 begin
   inherited;
 
+  // Prevents keep-in-touch opening in browser
+  cef.ShouldOpenRemoteUrlsInBrowser := False;
+
   kmcom.AutoApply := False;
 
   with TRegistryErrorControlled.Create do  // I2890
