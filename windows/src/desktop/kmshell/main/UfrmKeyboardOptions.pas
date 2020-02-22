@@ -29,12 +29,6 @@ uses
 
 type
   TfrmKeyboardOptions = class(TfrmWebContainer)
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
   private
     kbd: IKeymanKeyboardInstalled;
     FKeyboardName: WideString;
@@ -42,7 +36,6 @@ type
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure DoNavigate;
   protected
-    function ShouldProcessAllCommands: Boolean; override;
     procedure FireCommand(const command: WideString; params: TStringList); override;
 
   public
@@ -87,7 +80,7 @@ begin
     for i := 0 to kbd.Options.Count - 1 do
       kbd.Options[i].Value := '';
 
-    for i := 1 to params.Count - 1 do
+    for i := 0 to params.Count - 1 do
       kbd.Options[params.Names[i]].Value := params.ValueFromIndex[i];
     ModalResult := mrOk;
   end
@@ -101,30 +94,6 @@ procedure TfrmKeyboardOptions.SetKeyboardName(const Value: WideString);
 begin
   FKeyboardName := Value;
   DoNavigate;
-end;
-
-function TfrmKeyboardOptions.ShouldProcessAllCommands: Boolean;
-begin
-  Result := True;
-end;
-
-procedure TfrmKeyboardOptions.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-begin
-  if Pos('options.htm', URL) > 0 then Exit
-  else inherited;
-end;
-
-procedure TfrmKeyboardOptions.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-begin
-  if Pos('options.htm', string(bstrURL)) > 0 then
-  begin
-    Cancel := True;
-  end
-  else inherited;
 end;
 
 procedure TfrmKeyboardOptions.DoNavigate;
@@ -150,11 +119,6 @@ begin
   s := ExtractFilePath(kbd.OwnerPackage.Filename) + 'options.htm' + s;
 
   cef.Navigate(s);
-{$MESSAGE HINT 'TODO: Override the onbeforenavigate'}
-//  web.OnBeforeNavigate2 := nil;
-//  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-//  web.Navigate(s, v);
-//  web.OnBeforeNavigate2 := webBeforeNavigate2;
 end;
 
 procedure TfrmKeyboardOptions.WMUser_ContentRender(var Message: TMessage);
