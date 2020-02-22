@@ -64,18 +64,19 @@ type
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure DownloadUILanguages;
     procedure ContributeUILanguages;
-    procedure cefLoadEnd(Sender: TObject);
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
-    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
-      out Handled: Boolean);   // I4989
-    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
-    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
-    procedure cefCommand(Sender: TObject; const command: string;
-      params: TStringList);
-    procedure cefResizeFromDocument(Sender: TObject; awidth, aheight: Integer);
-    procedure cefHelpTopic(Sender: TObject);
   protected
     cef: TframeCEFHost;
+
+    procedure cefLoadEnd(Sender: TObject); virtual;
+    procedure cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean); virtual;
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
+      out Handled: Boolean); virtual;  // I4989
+    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); virtual;
+    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); virtual;
+    procedure cefCommand(Sender: TObject; const command: string;
+      params: TStringList); virtual;
+    procedure cefResizeFromDocument(Sender: TObject; awidth, aheight: Integer); virtual;
+    procedure cefHelpTopic(Sender: TObject); virtual;
 
     procedure FireCommand(const command: WideString; params: TStringList); virtual;
     function ShouldProcessAllCommands: Boolean; virtual;
@@ -195,8 +196,8 @@ end;
 
 procedure TfrmWebContainer.SetFocus;  // I2720
 begin
-//  if Assigned(cef) then
-//    cef.SetFocus;
+  if Assigned(cef) then
+    cef.SetFocus;
 end;
 
 function TfrmWebContainer.ShouldProcessAllCommands: Boolean;
@@ -363,9 +364,12 @@ begin
 
   with Message do
     case Msg of
-      WM_ACTIVATE, WM_SETFOCUS, WM_KILLFOCUS:
+      WM_SETFOCUS:
+        if Assigned(cef) then
+          cef.SetFocus;
+      WM_ACTIVATE:
         begin
-          if Assigned(cef) then
+          if (Message.WParam <> 0) and Assigned(cef) then
             cef.SetFocus;
         end;
     end;
