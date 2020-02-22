@@ -39,6 +39,7 @@ const
   CEF_TITLECHANGE = WM_USER + 309;
   CEF_COMMAND = WM_USER + 310;
   CEF_RESIZEFROMDOCUMENT = WM_USER + 311;
+  CEF_SETFOCUS = WM_USER + 312;
 
 type
   TCEFHostKeyEventData = record
@@ -120,6 +121,7 @@ type
     procedure cefProcessMessageReceived(Sender: TObject;
       const browser: ICefBrowser; sourceProcess: TCefProcessId;
       const message: ICefProcessMessage; out Result: Boolean);
+    procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
   private
     FApplicationHandle: THandle;
     FNextURL: string;
@@ -155,6 +157,7 @@ type
     procedure Handle_CEF_TITLECHANGE(var message: TMessage);
     procedure Handle_CEF_COMMAND(var message: TMessage);
     procedure Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
+    procedure Handle_CEF_SETFOCUS(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -363,6 +366,7 @@ begin
     CEF_TITLECHANGE: Handle_CEF_TITLECHANGE(Message);
     CEF_COMMAND: Handle_CEF_COMMAND(Message);
     CEF_RESIZEFROMDOCUMENT: Handle_CEF_RESIZEFROMDOCUMENT(Message);
+    CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
   end;
 
   if Self <> nil then
