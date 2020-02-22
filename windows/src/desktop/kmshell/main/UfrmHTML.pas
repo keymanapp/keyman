@@ -169,7 +169,7 @@ begin
   cmdPrint.Caption := MsgFromId(SKButtonPrint);
 
   cef := TframeCEFHost.Create(Self);
-  cef.Parent := Self;
+  cef.Parent := panHTML;
   cef.Visible := True;
   cef.ShouldOpenRemoteUrlsInBrowser := True;
 
