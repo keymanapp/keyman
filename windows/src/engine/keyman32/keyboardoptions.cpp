@@ -41,9 +41,10 @@ void LoadSharedKeyboardOptions(LPINTKEYBOARDINFO kp)
 
 void FreeKeyboardOptions(LPINTKEYBOARDINFO kp)
 {
-  assert(kp != NULL);
-  assert(kp->Keyboard != NULL);
-  assert(kp->KeyboardOptions != NULL);
+  // This is a cleanup routine; we don't want to precondition all calls to it
+  // so we do not assert
+  if (kp == NULL || kp->Keyboard == NULL || kp->KeyboardOptions == NULL)
+    return;
 
   for(DWORD i = 0; i < kp->Keyboard->cxStoreArray; i++)
     if(kp->KeyboardOptions[i].Value)

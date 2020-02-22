@@ -79,6 +79,7 @@ public class LexicalModelPackageProcessorTest {
     Assert.assertEquals(en_custom, models[0]);
 
     // Lexical model same, but different language pairing
+    // Verifies en-US from kmp.json gets lower-cased
     en_custom.put(KMManager.KMKey_LanguageID, "en-us");
     en_custom.put(KMManager.KMKey_LanguageName, "English (US)");
 

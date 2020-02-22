@@ -55,6 +55,12 @@ public enum Key {
   static let downloadTask = "downloadTask"
   static let downloadBatch = "downloadBatch"
   static let downloadQueueFrame = "queueFrame"
+
+  // Settings-related keys
+  static let optShouldShowBanner = "ShouldShowBanner"
+  // This one SHOULD be app-only, but is needed by the currently
+  // in-engine Settings menus.  Alas.
+  static let optShouldShowGetStarted = "ShouldShowGetStarted"
 }
 
 public enum Defaults {
@@ -71,7 +77,7 @@ public enum Defaults {
   public static let lexicalModel = InstallableLexicalModel(id: "nrc.en.mtnt",
                                                    name: "English dictionary (MTNT)",
                                                    languageID: "en",
-                                                   version: "0.1.2",
+                                                   version: "0.1.4",
                                                    isCustom: false)
 }
 

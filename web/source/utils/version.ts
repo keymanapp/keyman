@@ -1,3 +1,6 @@
+// Ensure that this class contains no reference into core KMW code - it is referenced
+// by components intended to be modular and possible to separate from core KMW.
+
 namespace com.keyman.utils {
   // Dotted-decimal version
   export class Version {
@@ -8,6 +11,8 @@ namespace com.keyman.utils {
     // For 12.0, the old default behavior of adding missing keycaps to the default layers was removed,
     // as it results in unexpected, bug-like behavior for keyboard designers when it is unwanted.
     public static readonly NO_DEFAULT_KEYCAPS = new Version([12, 0]);
+
+    public static readonly MAC_POSSIBLE_IPAD_ALIAS = new Version([10, 15]);
 
     private readonly components: number[]
 

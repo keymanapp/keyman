@@ -27,22 +27,24 @@ default:
     @echo.
 
 # ----------------------------------------------------------------------
-    
+
 TARGETS=ext global buildtools developer engine desktop support
 RELEASE_TARGETS=desktop
 CLEANS=test unit-tests cleanroot
 MANIFESTS=engine desktop developer
 
 EXCLUDEPATHDEFINES=1
+BUILDPREREQ=global-versions
 
 !include Header.mak
 
 # ----------------------------------------------------------------------
-    
+
 cleanroot:
     -del tds.zip
     -del tds.exe
     -del PathDefines.mak
+    -del version.txt
 
 global: build-tools
     cd $(ROOT)\src\global
@@ -88,7 +90,7 @@ unit-tests:
     cd $(ROOT)\src\unit-tests
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
-    
+
 # ----------------------------------------------------------------------
 # release
 # ----------------------------------------------------------------------
@@ -157,21 +159,9 @@ test-uiaccess:
     $(MAKE) test-uiaccess
     cd $(ROOT)\src
 
-#
-# Update version numbers for all subfolders
-#
-    
-update-version: build-tools mkver-app
-    cd $(ROOT)\src
-    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\buildtools\version.txt $(ROOT)\src\version.txt
-    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\developer\version.txt $(ROOT)\src\version.txt
-    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\desktop\version.txt $(ROOT)\src\version.txt
-    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\engine\version.txt $(ROOT)\src\version.txt
-    $(PROGRAM)\buildtools\mkver -i $(ROOT)\src\support\version.txt $(ROOT)\src\version.txt
-
 # Build a release
-    
-build-release-wrapper: clean-output update-version
+
+build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src
     $(MAKE) dirs
     $(MAKE) build-tools
@@ -202,21 +192,31 @@ build-release-wrapper-oem:
     $(MAKE) setup
 !else
     echo Not building OEM releases
-!endif    
+!endif
 
 #
 # Tools needed to complete a build
 #
 
 global-versions: mkver-app
+    # Build our root version.txt
     cd $(ROOT)\src
+
+    # We use the version from VERSION.md
+    $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\VERSION.md
+
     $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h $(ROOT)\src\version.txt
     $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\buildtools\version.in $(ROOT)\src\buildtools\version.txt $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\developer\version.in $(ROOT)\src\developer\version.txt $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\desktop\version.in $(ROOT)\src\desktop\version.txt $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\engine\version.in $(ROOT)\src\engine\version.txt $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\support\version.in $(ROOT)\src\support\version.txt $(ROOT)\src\version.txt
 
 build-tools: global-versions
     cd $(ROOT)\src\buildtools\devtools
     $(MAKE)
-    
+
     # We'll build a default PathDefines.mak if it is missing here so we can
     # go on and do the rest of the build
     $(PROGRAM)\buildtools\devtools -ti
@@ -250,7 +250,7 @@ test-certificate:
     -del KeymanTest-sha1.*
     -del KeymanTest-sha256.*
     -del KeymanTestCA-sha256.*
-    
+
     makecert -r -pe -n "CN=Keyman Test CA SHA1" -ss CA -sr CurrentUser -a sha1 -cy authority -sky signature -sv KeymanTestCA-sha1.pvk KeymanTestCA-sha1.cer
     certutil -user -addstore Root KeymanTestCA-sha1.cer
     makecert -pe -n "CN=Keyman Test Certificate SHA1" -a sha1 -cy end -sky signature -ic KeymanTestCA-sha1.cer -iv KeymanTestCA-sha1.pvk -sv KeymanTest-sha1.pvk KeymanTest-sha1.cer
@@ -260,7 +260,7 @@ test-certificate:
     certutil -user -addstore Root KeymanTestCA-sha256.cer
     makecert -pe -n "CN=Keyman Test Certificate" -a sha256 -cy end -sky signature -ic KeymanTestCA-sha256.cer -iv KeymanTestCA-sha256.pvk -sv KeymanTest-sha256.pvk KeymanTest-sha256.cer
     pvk2pfx -pvk KeymanTest-sha256.pvk -spc KeymanTest-sha256.cer -pfx KeymanTest-sha256.pfx
-    
+
 !include Target.mak
 
 # ----------------------------------------------------------------------

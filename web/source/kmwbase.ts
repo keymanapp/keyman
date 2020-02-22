@@ -1,7 +1,7 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
 // Includes a promise polyfill (needed for IE)
-/// <reference path="../node_modules/promise-polyfill/lib/polyfill.js" />
+/// <reference path="../node_modules/es6-shim/es6-shim.min.js" />
 // Defines build-environment includes, since `tsc` doesn't provide a compile-time define.
 /// <reference path="environment.inc.ts" />
 // Defines the web-page interface object.
@@ -63,7 +63,6 @@ namespace com.keyman {
     static _srcPath: string;
     static _rootPath: string;
     static _protocol: string;
-    static __BUILD__: number;
 
     // Internal objects
     ['util']: Util;
@@ -127,7 +126,7 @@ namespace com.keyman {
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
 
       // Load properties from their static variants.
-      this['build'] = KeymanBase.__BUILD__;
+      this['build'] = com.keyman.environment.BUILD;
       this.srcPath = KeymanBase._srcPath;
       this.rootPath = KeymanBase._rootPath;
       this.protocol = KeymanBase._protocol;
@@ -621,9 +620,6 @@ import KeymanBase = com.keyman.KeymanBase;
 KeymanBase._srcPath = sPath;
 KeymanBase._rootPath = sPath.replace(/(https?:\/\/)([^\/]*)(.*)/,'$1$2/');
 KeymanBase._protocol = sPath.replace(/(.{3,5}:)(.*)/,'$1');
-
-/** @define {number} build counter that gets set by the build environment */
-KeymanBase.__BUILD__ = 299;
 
 /**  
  * Base code: Declare major component namespaces, instances, and utility functions 

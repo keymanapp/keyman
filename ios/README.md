@@ -6,6 +6,7 @@
 * SwiftLint (`brew install swiftlint`)
 * Carthage (`brew install carthage`)
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+* Coreutils (`brew install coreutils`)
 
 ## Keyman App
 

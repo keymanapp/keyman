@@ -85,6 +85,8 @@ namespace com.keyman.dom {
 
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
+
+      Utils.forceScroll(this.root);
     }
 
     getTextBeforeCaret(): string {
@@ -115,32 +117,15 @@ namespace com.keyman.dom {
       return this.root.value;
     }
 
-    /**
-     * Facilitates temporary caching of the TextArea's scroll position.
-     */
-    saveProperties() {
-      this.scrollLeft = this.root.scrollLeft;
-      this.scrollTop = this.root.scrollTop;
-    }
-
-    /**
-     * Restores a previously-saved scroll position for the TextArea.
-     */
-    restoreProperties() {
-      if(this.scrollLeft !== undefined) {
-        this.root.scrollLeft = this.scrollLeft;
-        this.root.scrollTop = this.scrollTop;
-
-        delete this.scrollLeft;
-        delete this.scrollTop;
-      }
-    }
-
     deleteCharsBeforeCaret(dn: number) {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
         let caret = this.getCaret();
 
+        if(dn > caret) {
+          dn = caret;
+        }
+        
         this.adjustDeadkeys(-dn);
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));
         this.setCaret(caret - dn);

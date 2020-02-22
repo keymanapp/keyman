@@ -33,6 +33,9 @@ public class JSONUtils {
    * Will need to swap kmp.json (keyboards : languages) to cloud order (languages : keyboards)
    */
   public static JSONArray getLanguages() {
+    if (resourceRoot == null) {
+      return new JSONArray();
+    }
     File[] packages = resourceRoot.listFiles();
     JSONArray languagesArray = new JSONArray();
     JSONParser parser = new JSONParser();
@@ -121,8 +124,8 @@ public class JSONUtils {
 
   /**
    * Iterate through a JSONArray to determine if a language/keyboard/model ID exists.
-   * @param {a} JSONArray to search
-   * @param {id} String of the language/keyboard ID
+   * @param a JSONArray to search
+   * @param id String of the language/keyboard ID
    * @return int - Index if the ID is found (starting with 0). -1 if the ID doesn't exist
    */
   public static int findID(JSONArray a, String id) {
@@ -171,7 +174,7 @@ public class JSONUtils {
 
   /**
    * Mirror options information that comes from keyboard cloud catalog
-   * @param String deviceType
+   * @param deviceType
    * @return JSONObject
    */
   public static JSONObject defaultOptions(String deviceType) {
@@ -208,6 +211,7 @@ public class JSONUtils {
           try {
             String packageID = pkg.getName();
             JSONObject kmp = parser.getJSONObjectFromFile(file);
+            String packageVersion = PackageProcessor.getPackageVersion(kmp);
             JSONArray kmpModels = kmp.getJSONArray("lexicalModels");
 
             // Determine if kmp contains welcome.htm help file
@@ -218,7 +222,6 @@ public class JSONUtils {
               JSONObject kmpModelObj = kmpModels.getJSONObject(i);
               String modelName = kmpModelObj.getString(KMManager.KMKey_Name);
               String modelID = kmpModelObj.getString(KMManager.KMKey_ID);
-              String modelVersion = kmpModelObj.getString("version");
               String modelFilename = pkg.getName() + "/" + modelID + FileUtils.LEXICALMODEL;
 
               // Merge languages
@@ -230,10 +233,10 @@ public class JSONUtils {
 
                 JSONObject modelObj = new JSONObject();
                 modelObj.put(KMManager.KMKey_PackageID, packageID);
-                modelObj.put("id", modelID);
+                modelObj.put(KMManager.KMKey_ID, modelID);
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
-                modelObj.put(KMManager.KMKey_KeyboardVersion, modelVersion);
+                modelObj.put(KMManager.KMKey_LexicalModelVersion, packageVersion);
                 modelObj.put(KMManager.KMKey_CustomModel, "Y");
                 if (containsHelp) {
                   File welcomeFile = new File(pkg, "welcome.htm");

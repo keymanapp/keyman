@@ -1,7 +1,19 @@
 #!/bin/sh
 
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
+
 # Include our resource functions; they're pretty useful!
-. ../resources/shellHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+# This script runs from its own folder
+cd "$(dirname "$THIS_SCRIPT")"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -55,7 +67,7 @@ while [[ $# -gt 0 ]] ; do
             DO_KEYMANAPP=false
             ;;
         -no-codesign)
-            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM"
+            CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO $DEV_TEAM CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
             DO_ARCHIVE=false
             ;;
         -no-archive)
@@ -191,10 +203,10 @@ if [ $DO_KEYMANAPP = true ]; then
       assertDirExists "$ARCHIVE_PATH"
 
       # Pass the build number information along to the Plist file of the app.
-      if [ $BUILD_NUMBER ]; then
-        echo "Setting version numbers to $BUILD_NUMBER."
-        /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $BUILD_NUMBER" "$ARCHIVE_PATH/Info.plist"
+      if [ $VERSION ]; then
+        echo "Setting version numbers to $VERSION."
+        /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $VERSION" "$ARCHIVE_PATH/Info.plist"
+        /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $VERSION" "$ARCHIVE_PATH/Info.plist"
 
         ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/Keyman.app"
         ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"

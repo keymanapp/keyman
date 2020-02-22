@@ -28,6 +28,7 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.IniFiles,
   System.JSON,
   System.SysUtils,
@@ -216,6 +217,9 @@ var
   i: Integer;
   ANode: IXMLNode;
 begin
+  if (Options as TKPSOptions).FollowKeyboardVersion then
+    Info.Desc[PackageInfo_Version] := '';
+
   Options.FileVersion := SKeymanVersion70;
 
   if FileName <> '' then

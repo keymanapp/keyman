@@ -2,8 +2,17 @@
 
 ## Prerequisites
 * Android Studio 3.3.2+
-* Java SE Development Kit 8
+* Java SE Development Kit 8 
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
+
+## Install Java
+It is recommended to use openJDK because of oracle license issues.
+Tested with latest release for openJDK 8 from
+https://github.com/ojdkbuild/ojdkbuild
+
+1. Download and unpack the zip archive
+2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
+3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
 
 ## Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)
@@ -153,13 +162,20 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.google.firebase:firebase-core:15.0.2'
-    implementation 'com.google.firebase:firebase-crash:15.0.2'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
+    implementation 'androidx.appcompat:appcompat:1.1.1'
+    implementation 'com.google.android.material:material:1.0.0'
+    api (name:'keyman-engine', ext:'aar')
+    implementation "com.google.firebase:firebase-analytics:17.2.1"
+    implementation "com.google.firebase:firebase-messaging:20.0.1"
+    implementation "com.google.firebase:firebase-crash:16.2.1"
+    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
-    api (name:'keyman-engine', ext:'aar')
+
+    // Include this if you want to have QR Codes displayed on Keyboard Info
+    implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
+        transitive = true
+    }
 }
 
 ````

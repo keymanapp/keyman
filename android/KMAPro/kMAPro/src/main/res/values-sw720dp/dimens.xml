@@ -12,4 +12,5 @@
     <dimen name="checkbox_margin_left">15dp</dimen>
     <dimen name="checkbox_padding">10dp</dimen>
     <dimen name="preference_icon">32dp</dimen>
+    <dimen name="update_indicator_bg_margin">10dp</dimen>
 </resources>

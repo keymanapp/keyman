@@ -37,13 +37,17 @@
     <string name="cannot_connect" translatable="false">Cannot connect to Keyman server!</string>
     <string name="checking_keyboard_updates" translatable="false">Checking keyboard updates&#8230;</string>
     <string name="confirm_delete_keyboard" translatable="false">Would you like to delete this keyboard?</string>
-    <string name="confirm_download_keyboard" translatable="false">Would you like to download this keyboard?</string>
+    <string name="confirm_download_keyboard" translatable="false">Would you like to download the latest version of this keyboard?</string>
     <string name="confirm_update" translatable="false">Would you like to update keyboards and dictionaries now?</string>
     <string name="custom_keyboard" translatable="false">Custom Keyboard</string>
     <string name="downloading_keyboard" translatable="false">Downloading keyboard&#8230;</string>
     <string name="font_failed_to_download" translatable="false">Warning: Font failed to download</string>
     <string name="keyboard_failed_to_download" translatable="false">Error: Keyboard failed to download</string>
+    <string name="keyboard_updates_channel" translatable="false">Resource Updates</string>
     <string name="keyboard_updates_available" translatable="false">Resource Updates Available</string>
+    <string name="update_available" translatable="false">%s (Update Available)</string>
+    <string name="keyboard_update_message" translatable="false">Updates available for keyboard %s: %s </string>
+    <string name="dictionary_update_message" translatable="false">Updates available for dictionary %s: %s </string>
     <string name="getting_keyboard_catalog" translatable="false">Getting keyboard catalog.\nThis may take a while&#8230;</string>
     <string name="updating_keyboards" translatable="false">Updating keyboards&#8230;</string>
 
@@ -51,15 +55,28 @@
     <string name="keyboard_version" translatable="false">Keyboard version</string>
     <string name="help_link" translatable="false">Help link</string>
     <string name="uninstall_keyboard" translatable="false">Uninstall keyboard</string>
+    <string name="keyboard_picker_new_keyboard_prefix" translatable="false">[new]</string>
+    <string name="keyboard_qr_code" translatable="false">Scan this code to load this\nkeyboard on another device</string>
 
     <!-- Model Updates -->
     <string name="getting_model_catalog" translatable="false">Getting dictionary catalog.\nThis may take a while&#8230;</string>
-    <string name="confirm_download_model" translatable="false">Would you like to download this dictionary?</string>
+    <string name="confirm_download_model" translatable="false">Would you like to download the latest version of this dictionary?</string>
     <string name="checking_model_download" translatable="false">Checking to download dictionary&#8230;</string>
     <string name="downloading_model" translatable="false">Downloading dictionary&#8230;</string>
     <string name="catalog_unavailable" translatable="false">The resource catalog is unavailable\n</string>
 
-    <!-- General Updates -->
+  <!-- Background download messages-->
+    <string name="catalog_download_start_in_background" translatable="false">Catalog update started in background.\n</string>
+    <string name="catalog_download_is_running_in_background" translatable="false">The catalog is still downloading; please try again in a moment!\n</string>
+    <string name="progress_message_catalog_download_is_running" translatable="false">The catalog is still downloading!\n</string>
+    <string name="keyboard_download_start_in_background" translatable="false">Downloading keyboard started in Background</string>
+    <string name="keyboard_download_is_running_in_background" translatable="false">The selected keyboard is already downloading; please try again in a moment!</string>
+    <string name="keyboard_download_finished" translatable="false">Keyboard download is finished!</string>
+    <string name="dictionary_download_start_in_background" translatable="false">Downloading dictionary started in Background</string>
+    <string name="dictionary_download_is_running_in_background" translatable="false">The selected dictionary is already downloading; please try again in a moment!</string>
+    <string name="dictionary_download_finished" translatable="false">Dictionary download is finished.</string>
+
+  <!-- General Updates -->
     <string name="update_check_unavailable" translatable="false">Failed to access server!\n</string>
     <string name="update_check_current" translatable="false">"All resources are up to date!"</string>
 

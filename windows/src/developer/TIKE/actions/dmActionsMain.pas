@@ -251,7 +251,7 @@ uses
   Graphics,
   Messages,
   OnlineConstants,
-  OnlineUpdateCheck,
+  Keyman.Developer.UI.TikeOnlineUpdateCheck,
   Printers,
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,

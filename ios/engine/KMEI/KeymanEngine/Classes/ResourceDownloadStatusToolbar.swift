@@ -37,7 +37,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
   }
   
   private func setup() {
-    barTintColor = UIColor(red: 0.5, green: 0.75, blue: 0.25, alpha: 0.9)
+    barTintColor = Colors.statusToolbar
   }
   
   /**
@@ -62,7 +62,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
    * Creates the classic spinning-wheel 'activity in progress' indicator.
    */
   private func setupActivityIndicator() -> UIActivityIndicatorView {
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    let indicatorView = UIActivityIndicatorView(style: .gray)
     indicatorView.center = CGPoint(x: frame.width - indicatorView.frame.width,
                                    y: frame.height * 0.5)
     indicatorView.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin]
@@ -78,7 +78,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
     button.frame = CGRect(x: frame.origin.x, y: frame.origin.y,
                           width: frame.width * 0.95, height: frame.height * 0.7)
     button.center = CGPoint(x: frame.width / 2, y: frame.height / 2)
-    button.tintColor = UIColor(red: 0.75, green: 1.0, blue: 0.5, alpha: 1.0)
+    button.tintColor = Colors.statusResourceUpdateButton
     button.setTitleColor(UIColor.white, for: .normal)
     button.setTitle(text, for: .normal)
     button.autoresizingMask =  [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
@@ -123,7 +123,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
     
     actionButton = setupActionButton(text, for: target, onClick: callback)
     addSubview(actionButton!)
-    bringSubview(toFront: actionButton!)
+    bringSubviewToFront(actionButton!)
     
     // Automatically display if we're hidden and have access to our owning UINavigationController.
     if navigationController?.isToolbarHidden ?? false {

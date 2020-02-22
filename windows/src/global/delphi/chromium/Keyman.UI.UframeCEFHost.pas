@@ -34,7 +34,6 @@ const
   CEF_AFTERCREATE = WM_USER + 302;
   CEF_SHOW = WM_USER + 303;
   CEF_LOADEND = WM_USER + 304;
-  CEF_SETFOCUS = WM_USER + 305;
   CEF_KEYEVENT = WM_USER + 306;
   CEF_BEFOREBROWSE = WM_USER + 307;
   CEF_TITLECHANGE = WM_USER + 309;
@@ -114,7 +113,6 @@ type
                              var settings: TCefBrowserSettings;
                              var noJavascriptAccess: Boolean;
                              var Result: Boolean);
-    procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
     procedure cefSetFocus(Sender: TObject; const browser: ICefBrowser;
       source: TCefFocusSource; out Result: Boolean);
     procedure cefTitleChange(Sender: TObject; const browser: ICefBrowser;
@@ -152,7 +150,6 @@ type
     procedure Handle_CEF_AFTERCREATE(var Message: TMessage);
     procedure Handle_CEF_SHOW(var message: TMessage);
     procedure Handle_CEF_LOADEND(var message: TMessage);
-    procedure Handle_CEF_SETFOCUS(var message: TMessage);
     procedure Handle_CEF_KEYEVENT(var message: TMessage);
     procedure Handle_CEF_BEFOREBROWSE(var message: TMessage);
     procedure Handle_CEF_TITLECHANGE(var message: TMessage);
@@ -345,9 +342,11 @@ end;
 procedure TframeCEFHost.SetFocus;
 begin
   AssertVclThread;
-  inherited;
-  if not FIsClosing and cefwp.CanFocus then
-    cefwp.SetFocus;
+  if not FIsClosing and cefwp.CanFocus and Assigned(cef) then
+  begin
+    GetParentForm(Self).ActiveControl := Self;
+    cef.SetFocus(True);
+  end;
 end;
 
 procedure TframeCEFHost.CallbackWndProc(var Message: TMessage);
@@ -359,7 +358,6 @@ begin
     CEF_AFTERCREATE: Handle_CEF_AFTERCREATE(Message);
     CEF_SHOW: Handle_CEF_SHOW(Message);
     CEF_LOADEND: Handle_CEF_LOADEND(Message);
-    CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
     CEF_KEYEVENT: Handle_CEF_KEYEVENT(Message);
     CEF_BEFOREBROWSE: Handle_CEF_BEFOREBROWSE(Message);
     CEF_TITLECHANGE: Handle_CEF_TITLECHANGE(Message);
@@ -672,7 +670,7 @@ end;
 procedure TframeCEFHost.cefSetFocus(Sender: TObject; const browser: ICefBrowser;
   source: TCefFocusSource; out Result: Boolean);
 begin
-  Result := source <> FOCUS_SOURCE_NAVIGATION;
+  Result := source = FOCUS_SOURCE_NAVIGATION;
 end;
 
 procedure TframeCEFHost.cefTitleChange(Sender: TObject;

@@ -139,6 +139,9 @@ implementation
 uses
   ComObj,
   Forms,
+  Vcl.Menus,
+  Winapi.Windows,
+
   KMDActions,
   KMDActionInterfaces,
   Keyman.Developer.System.Project.kmnProjectFile,
@@ -146,6 +149,7 @@ uses
   Keyman.Developer.System.Project.kpsProjectFile,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.Project.UfrmProject,
   UframeTextEditor,
   UfrmKeymanWizard,
   UfrmDebug,
@@ -441,12 +445,25 @@ begin
   else if ActivePackageEditor <> nil then
   begin
     (ActivePackageProjectFile.UI as TProjectFileUI).DoAction(pfaCompile, False);
-  end;
+  end
+  else if frmKeymanDeveloper.ActiveChild is TfrmProject then
+    (frmKeymanDeveloper.ActiveChild as TfrmProject).CompileAll;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardCompileUpdate(Sender: TObject);
 begin
-  actKeyboardCompile.Enabled := (ActiveEditor <> nil) or (ActivePackageEditor <> nil);
+  // TODO: Split Keyboard menu and package editor functions
+  actKeyboardCompile.Enabled :=
+    (ActiveEditor <> nil) or
+    (ActivePackageEditor <> nil) or
+    (frmKeymanDeveloper.ActiveChild is TfrmProject);
+
+  if actKeyboardCompile.Enabled
+    then actKeyboardCompile.ShortCut := Vcl.Menus.Shortcut(VK_F7, [])
+    else actKeyboardCompile.ShortCut := scNone;
+
+  frmKeymanDeveloper.mnuKeyboard.Visible := actKeyboardCompile.Enabled;
+  frmKeymanDeveloper.mnuDebug.Visible := ActiveEditor <> nil;
 end;
 
 procedure TmodActionsKeyboardEditor.actKeyboardCreatePackageExecute(Sender: TObject);

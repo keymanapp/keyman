@@ -15,19 +15,19 @@
   <script type='text/javascript' src='../../../cdn/dev/js/keyrenderer.js'></script>
   <script type="text/javascript">
    // Add a script element as a child of the body
-   
+
     function downloadJS(src) {
       var element = document.createElement("script");
       element.src = src;
       document.body.appendChild(element);
     }
-   
+
     function downloadJSAtOnload() {
       downloadJS("/cdn/dev/js/jquery1-11-1.min.js");
               downloadJS("/cdn/dev/js/kmlive.js");
             //downloadJS("/cdn/dev/js/keyrenderer.js");
     }
-    
+
    // Check for browser support of event handling capability
    if (window.addEventListener)
    window.addEventListener("load", downloadJSAtOnload, false);
@@ -35,23 +35,41 @@
    window.attachEvent("onload", downloadJSAtOnload);
    else window.onload = downloadJSAtOnload;
   </script>
-    <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  <script>
+  function isIEOnWin81orEarlier() {
+    // If we are running IE11/or earlier on Windows 8.1 or earlier, then
+    // the autolink generates filenames that are misrecognised for download links,
+    // meaning users on those browesrs cannot easily download Keyman.
+    // Easiest way to test this is to test against navigator.userAgent
+    // Yes, we get some muddled analytics of cross-site of IE visitors but
+    // it's a small enough percentage that we don't need to worry about it.
+    return (navigator.userAgent.indexOf('Trident/') >= 0 && navigator.userAgent.indexOf('Windows NT 6') >= 0) ||
+           (document.documentMode < 11);
+  }
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-249828-1',  'auto', {'allowLinker': true});
-    ga('require', 'linker');
-    ga('linker:autoLink', 
-      ['keyman.com', 'www.keyman.com', 
-       'keymanweb.com', 'www.keymanweb.com', 
-       'help.keyman.com',
-       'blog.keyman.com',
-       'www.tavultesoft.com', 'tavultesoft.com', 'secure.tavultesoft.com'] );
-    ga('send', 'pageview');
-  </script>
-  </head>
+    ga('create', 'UA-249828-1',  'auto', {'allowLinker': !isIEOnWin81orEarlier()});
+    if(!isIEOnWin81orEarlier()) {
+      ga('require', 'linker');
+      ga('linker:autoLink',
+        ['keyman.com', 'www.keyman.com',
+          'keymanweb.com', 'www.keymanweb.com',
+          'help.keyman.com',
+          'blog.keyman.com',
+          'donate.keyman.com',
+          'downloads.keyman.com',
+          'developer.keyman.com',
+          'keyman.dev',
+          'keyman.blog',
+          'blog.tavultesoft.com',
+          'www.tavultesoft.com', 'tavultesoft.com', 'secure.tavultesoft.com'] );
+    }
+  ga('send', 'pageview');
+</script>
+</head>
 <body data-device="Unknown">
   <div id="container">
     <div class="header">
@@ -93,7 +111,7 @@
   From the Keyman Settings menu, select 'Installed languages'
 </p>
 <p>
-  <img id="settings-languages-ap" src="../../../cdn/dev/img/app/12.0/settings-languages-ap.png">
+  <img id="settings-languages-ap" src="../../../cdn/dev/img/app/13.0/settings-languages-ap.png">
 </p>
 <p>
   Step 3)
@@ -103,7 +121,7 @@
   we will be removing the "MTNT Dictionary" for the English language.
 </p>
 <p>
-  <img id="settings-two-installed-languages-ap" src="../../../cdn/dev/img/app/12.0/settings-two-installed-languages-ap.png">
+  <img id="settings-two-installed-languages-ap" src="../../../cdn/dev/img/app/13.0/settings-two-installed-languages-ap.png">
 </p>
 <p>
   Step 4)
@@ -113,7 +131,7 @@
   Select the dictionary you want to uninstall at the bottom of the page.
 </p>
 <p>
-  <img id="english-settings-ap" src="../../../cdn/dev/img/app/12.0/english-settings-ap.png">
+  <img id="english-settings-ap" src="../../../cdn/dev/img/app/13.0/english-settings-ap.png">
 </p>
 <p>
   Step 5)
@@ -123,7 +141,7 @@
   Select the dictionary to display the info menu.
 </p>
 <p>
-  <img id="english-dictionaries-ap" src="../../../cdn/dev/img/app/12.0/english-dictionaries-ap.png">
+  <img id="english-dictionaries-ap" src="../../../cdn/dev/img/app/13.0/english-dictionaries-ap.png">
 </p>
 <p>
   Step 6)
@@ -133,7 +151,7 @@
   Select 'Uninstall dictionary' to get a prompt to delete the dictionary.
 </p>
 <p>
-  <img id="english-dictionary-info-ap" src="../../../cdn/dev/img/app/12.0/english-dictionary-info-ap.png">
+  <img id="english-dictionary-info-ap" src="../../../cdn/dev/img/app/13.0/english-dictionary-info-ap.png">
 </p>
 <p>
   Step 7)
@@ -142,13 +160,13 @@
   Press "Delete" to uninstall the dictionary.
 </p>
 <p>
-  <img id="confirm-english-dictionary-delete-ap" src="../../../cdn/dev/img/app/12.0/confirm-english-dictionary-delete-ap.png">
+  <img id="confirm-english-dictionary-delete-ap" src="../../../cdn/dev/img/app/13.0/confirm-english-dictionary-delete-ap.png">
 </p>
 <p>
   You'll see a notification when the dictionary is deleted.
 </p>
 <p>
-  <img id="uninstall-dictionary-notification-ap" src="../../../cdn/dev/img/app/12.0/uninstall-dictionary-notification-ap.png">
+  <img id="uninstall-dictionary-notification-ap" src="../../../cdn/dev/img/app/13.0/uninstall-dictionary-notification-ap.png">
 </p>
 
 <h2>Help Index</h2>

@@ -134,7 +134,6 @@ begin
 
     // Add model and package to project
     kpj.Files.Add(TmodelTsProjectFile.Create(kpj, GetModelFilename, nil));
-    kpj.Files.Add(TwordlistTsvProjectFile.Create(kpj, GetWordlistFilename, nil));
     kpj.Files.Add(TkpsProjectFile.Create(kpj, GetPackageFilename, nil));
 
     // Add metadata files to project

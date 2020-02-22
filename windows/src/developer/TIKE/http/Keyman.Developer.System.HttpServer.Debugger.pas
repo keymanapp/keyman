@@ -54,13 +54,23 @@ type
     property Name: string read FName;
   end;
 
+  TWebDebugModelInfo = class
+  strict private
+    FFilename: string;
+  public
+    constructor Create(const AFilename: string);
+    property Filename: string read FFilename;
+  end;
+
   TDebuggerHttpResponder = class(TBaseHttpResponder)
   private
-    FKeyboardsCS, FPackagesCS: TCriticalSection;   // I4036
+    FModelsCS, FKeyboardsCS, FPackagesCS: TCriticalSection;   // I4036
+    FModels: TObjectDictionary<string,TWebDebugModelInfo>;
     FKeyboards: TObjectDictionary<string,TWebDebugKeyboardInfo>;   // I4063
     FPackages: TObjectDictionary<string,TWebDebugPackageInfo>;
     function GetKeyboardStoredFileName(const WebFilename: string): string;
     function GetPackageStoredFileName(const WebFilename: string): string;
+    function GetModelStoredFileName(const WebFilename: string): string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -68,6 +78,8 @@ type
     procedure UnregisterKeyboard(const Filename: string);
     procedure RegisterPackage(const Filename, Name: string);
     procedure UnregisterPackage(const Filename: string);
+    procedure RegisterModel(const Filename: string);
+    procedure UnregisterModel(const Filename: string);
 
     procedure ProcessRequest(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
@@ -114,6 +126,9 @@ begin
 
   FPackagesCS := TCriticalSection.Create;
   FPackages := TObjectDictionary<string,TWebDebugPackageInfo>.Create;   // I4063
+
+  FModelsCS := TCriticalSection.Create;
+  FModels := TObjectDictionary<string,TWebDebugModelInfo>.Create;   // I4063
 end;
 
 destructor TDebuggerHttpResponder.Destroy;
@@ -123,6 +138,9 @@ begin
 
   FreeAndNil(FPackages);
   FreeAndNil(FPackagesCS);   // I4036
+
+  FreeAndNil(FModels);
+  FreeAndNil(FModelsCS);   // I4036
 
   inherited Destroy;
 end;
@@ -136,6 +154,18 @@ begin
     else Result := '';
   finally
     FKeyboardsCS.Leave;
+  end;
+end;
+
+function TDebuggerHttpResponder.GetModelStoredFileName(
+  const WebFilename: string): string;
+begin
+  FModelsCS.Enter;   // I4036
+  try
+    if FModels.ContainsKey(WebFilename) then Result := FModels[WebFilename].Filename
+    else Result := '';
+  finally
+    FModelsCS.Leave;
   end;
 end;
 
@@ -214,9 +244,10 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
     key: string;
     response: string;
     value: TWebDebugKeyboardInfo;
-    src: string;
+    id, src: string;
     n: Integer;
     srcVersion: string;
+    model: string;
   begin
     // Get dynamic keyboard registration
 
@@ -261,6 +292,17 @@ procedure TDebuggerHttpResponder.ProcessRequest(AContext: TIdContext;
       end;
     finally
       FKeyboardsCS.Leave;
+    end;
+
+    FModelsCS.Enter;
+    try
+      for model in FModels.Keys do
+      begin
+        id := ChangeFileExt(model, '');
+        response := response + Format('registerModel("%s", "%s");', [id, model]);
+      end;
+    finally
+      FModelsCS.Leave;
     end;
 
     response := response + '})();';
@@ -605,6 +647,27 @@ begin
         Exit;
       end;
     end
+    else if Copy(doc, 1, 6) = 'model/' then
+    begin
+      Delete(doc, 1, 6);
+
+      // Models always expire immediately
+      AResponseInfo.ContentType := 'application/javascript';
+      AResponseInfo.Expires := EncodeDate(1990, 1, 1);   // I4037
+      AResponseInfo.CacheControl := 'no-cache, no-store';   // I4037
+      AResponseInfo.LastModified := Now;   // I4037
+      if not FFileRegExp.Exec(doc) then
+      begin
+        Respond404;
+        Exit;
+      end;
+      doc := GetModelStoredFileName(doc);
+      if doc = '' then
+      begin
+        Respond404;
+        Exit;
+      end;
+    end
     else
     begin
       if not FFileRegExp.Exec(doc) then
@@ -624,7 +687,11 @@ begin
 
     // Serve the file
 
-    AResponseInfo.ContentType :=  AResponseInfo.HTTPServer.MIMETable.GetFileMIMEType(doc);
+    if AResponseInfo.ContentType = '' then
+    begin
+      AResponseInfo.HTTPServer.MIMETable.LoadTypesFromOS := False;
+      AResponseInfo.ContentType :=  AResponseInfo.HTTPServer.MIMETable.GetFileMIMEType(doc);
+    end;
     AResponseInfo.CharSet := 'UTF-8';
     AResponseInfo.ContentLength := FileSizeByName(doc);
   //AResponseInfo.LastModified := GetFileDate(doc);
@@ -650,6 +717,19 @@ begin
   end;
 end;
 
+procedure TDebuggerHttpResponder.RegisterModel(const Filename: string);
+var
+  m: TWebDebugModelInfo;
+begin
+  m := TWebDebugModelInfo.Create(Filename);
+  FModelsCS.Enter;
+  try
+    FModels.AddOrSetValue(ExtractFileName(Filename), m);
+  finally
+    FModelsCS.Leave;
+  end;
+end;
+
 procedure TDebuggerHttpResponder.RegisterPackage(const Filename, Name: string);
 var
   p: TWebDebugPackageInfo;
@@ -670,6 +750,16 @@ begin
     FKeyboards.Remove(ExtractFileName(Filename));
   finally
     FKeyboardsCS.Leave;
+  end;
+end;
+
+procedure TDebuggerHttpResponder.UnregisterModel(const Filename: string);
+begin
+  FModelsCS.Enter;   // I4036
+  try
+    FModels.Remove(ExtractFileName(Filename));
+  finally
+    FModelsCS.Leave;
   end;
 end;
 
@@ -796,6 +886,14 @@ constructor TWebDebugPackageInfo.Create(const AFilename, AName: string);
 begin
   FFilename := AFilename;
   FName := AName;
+end;
+
+{ TWebDebugModelInfo }
+
+constructor TWebDebugModelInfo.Create(const AFilename: string);
+begin
+  inherited Create;
+  FFilename := AFilename;
 end;
 
 end.

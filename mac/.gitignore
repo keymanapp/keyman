@@ -9,3 +9,6 @@ Keyman4Mac/Keyman4Mac/Frameworks/**
 Carthage/**
 **/build
 **/output
+localenv.sh
+setup/textinputsource/textinputsource
+setup/Install Keyman.app

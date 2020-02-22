@@ -105,13 +105,11 @@ function ShowNewProjectParameters(Owner: TComponent): Boolean;
 implementation
 
 uses
-  Winapi.ShlObj,
-
   Keyman.System.LanguageCodeUtils,
   BCP47Tag,
   utilstr,
-  utilsystem,
   dmActionsMain,
+  KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
@@ -178,7 +176,7 @@ var
   i: TKeymanTarget;
 begin
   inherited;
-  editPath.Text := GetFolderPath(CSIDL_PERSONAL);
+  editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
 
   dlgBrowse.InitialDir := editPath.Text;
   dlgBrowse.Options := [OnlySelectFileSysDir, ShowEditBox, UseNewDialogStyle];

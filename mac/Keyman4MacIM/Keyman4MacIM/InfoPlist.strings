@@ -21,7 +21,3 @@ CFBundleDisplayName = "Keyman";
 //CFBundleShortVersionString = "10.0";
 //CFBundleVersion = "10.0";
 //CFBundleGetInfoString = "Keyman 10.0 for macOS, Copyright 2018, SIL International";
-
-// The PRODUCT_VERSION only needs to be changed once per version.  It should be in sync with
-//  ../resources/VERSION.md
-//  There is a Run Script that checks to be sure

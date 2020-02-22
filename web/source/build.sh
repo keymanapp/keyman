@@ -3,12 +3,22 @@
 # Compile keymanweb and copy compiled javascript and resources to output/embedded folder
 #
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+# This script runs from its own folder
+cd "$(dirname "$THIS_SCRIPT")"
+
 display_usage ( ) {
     echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
     echo
-    echo "  -ui               to compile desktop user interface modules to output folder"
+    echo "  -ui               to compile only desktop user interface modules"
     echo "  -test             to compile for testing without copying resources or" 
-    echo "                    updating the saved version number."
+    echo "                    updating the saved version number.  Assumes dependencies
+                              are unaltered."
     echo "  -embed            to compile only the KMEA/KMEI embedded engine."
     echo "  -web              to compile only the KeymanWeb engine."
     echo "  -debug_embedded   to compile a readable version of the embedded KMEA/KMEI code"
@@ -42,29 +52,9 @@ WEB_TARGET=( "keymanweb.js" )
 UI_TARGET=( "kmwuibutton.js" "kmwuifloat.js" "kmwuitoggle.js" "kmwuitoolbar.js" )
 EMBED_TARGET=( "keyman.js" )
 
-# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-
 # Variables for the LMLayer
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
-
-# Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
-cd ../../common/predictive-text/
-echo ""
-echo "Compiling the Language Modeling layer module..."
-./build.sh || fail "Failed to compile the language modeling layer module."
-cd ../../web/source
-echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
-echo "Language Modeling layer compilation successful."
-echo ""
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
 
 : ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
 : ${JAVA:=java}
@@ -82,14 +72,15 @@ minifier="$CLOSURECOMPILERPATH/compiler.jar"
 #
 # `jsDocMissingType` prevents errors on type documentation Closure thinks is missing.  TypeScript may not
 # have the same requirements, and we trust TypeScript over Closure.
-minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType"
-minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_warnings --generate_exports"
+minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode"
 
-if ! [ -f $minifier ];
-then
-    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-    exit 1
-fi
+# We use these to prevent Closure from auto-inserting its own polyfills.  Turns out, they can break in the 
+# WebView used by Android API 19, which our app still supports.
+#
+# Also, we currently apply all needed polyfills either manually or during TS compilation; we don't need the extra,
+# excess code.
+minifier_lang_specs="--language_in ECMASCRIPT5 --language_out ECMASCRIPT5"
+minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_warnings --generate_exports $minifier_lang_specs"
 
 readonly minifier
 readonly minifycmd
@@ -170,7 +161,7 @@ copy_resources ( ) {
     echo Copy source to $1/src
     cp -Rf $SOURCE/*.js $1/src
     cp -Rf $SOURCE/*.ts $1/src
-    echo $BUILD > $1/src/version.txt
+    echo $VERSION_PATCH > $1/src/version.txt
 
     # Remove KMW Recorder source.
     rm -f $1/src/recorder_*.ts
@@ -205,17 +196,9 @@ NODE_SOURCE="source"
 
 ENVIRONMENT_FILE="environment.inc.ts"
 
-VERSION=`cat ../../resources/VERSION.md`
-
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
 readonly SOURCE
-
-# Get build version -- if not building in TeamCity, then always use 300
-: ${BUILD_COUNTER:=300}
-BUILD=$BUILD_COUNTER
-
-readonly BUILD
 
 # Ensures that we rely first upon the local npm-based install of Typescript.
 # (Facilitates automated setup for build agents.)
@@ -226,6 +209,7 @@ compilecmd="$compiler"
 
 # Establish default build parameters
 set_default_vars ( ) {
+    BUILD_LMLAYER=true
     BUILD_UI=true
     BUILD_EMBED=true
     BUILD_FULLWEB=true
@@ -248,12 +232,14 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -ui)
             set_default_vars
+            BUILD_LMLAYER=false
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
             ;;
         -test)
             set_default_vars
+            BUILD_LMLAYER=false
             BUILD_TEST=true
             BUILD_UI=false
             BUILD_EMBED=false
@@ -290,12 +276,28 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
+readonly BUILD_LMLAYER
 readonly BUILD_UI
 readonly BUILD_EMBED
 readonly BUILD_FULLWEB
 readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
 readonly DO_MINIFY
+
+# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
+echo "Node.js + dependencies check"
+npm install --no-optional
+
+if [ $? -ne 0 ]; then
+    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+fi
+
+# NPM install is required for the file to be present.
+if ! [ -f $minifier ];
+then
+    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
+    exit 1
+fi
 
 generate_environment_ts_file ( ) {
     if [ -f $ENVIRONMENT_FILE ];
@@ -305,21 +307,34 @@ generate_environment_ts_file ( ) {
 
     echo "//Autogenerated file - do not modify!
 namespace com.keyman.environment {
-  export var VERSION = \"$VERSION\";
+  export var VERSION = \"$VERSION_RELEASE\";
+  export var BUILD = $VERSION_PATCH;
 }  
 " >> $ENVIRONMENT_FILE
 }
 
-generate_environment_ts_file
-
-if [ $FULL_BUILD = true ]; then
-    echo Compiling build $BUILD
+if [ $BUILD_LMLAYER = true ]; then
+    # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
+    cd ../../common/predictive-text/
+    echo ""
+    echo "Compiling the Language Modeling layer module..."
+    ./build.sh || fail "Failed to compile the language modeling layer module."
+    cd ../../web/source
+    echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
+    echo "Language Modeling layer compilation successful."
     echo ""
 fi
 
+generate_environment_ts_file
+
+if [ $FULL_BUILD = true ]; then
+    echo Compiling version $VERSION
+    echo ""
+fi
 
 if [ $BUILD_EMBED = true ]; then
-    echo Compile KMEI/KMEA build $BUILD
+    echo Compile KMEI/KMEA version $VERSION
 
     $compilecmd -p $NODE_SOURCE/tsconfig.embedded.json
     if [ $? -ne 0 ]; then
@@ -340,7 +355,7 @@ if [ $BUILD_EMBED = true ]; then
 
         rm $EMBED_OUTPUT/keyman.js 2>/dev/null
 
-        minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
+        minify keyman.js $EMBED_OUTPUT SIMPLE_OPTIMIZATIONS
         assert $EMBED_OUTPUT/keyman.js
         echo Compiled embedded application saved as $EMBED_OUTPUT/keyman.js
 
@@ -351,7 +366,7 @@ if [ $BUILD_EMBED = true ]; then
 
         # Update build number if successful
         echo
-        echo KMEA/KMEI build $BUILD compiled and saved under $EMBED_OUTPUT
+        echo KMEA/KMEI version $VERSION compiled and saved under $EMBED_OUTPUT
         echo
     fi
 fi
@@ -374,7 +389,7 @@ if [ $BUILD_COREWEB = true ]; then
         rm $WEB_OUTPUT/keymanweb.js 2>/dev/null
 
         echo Minifying KeymanWeb...
-        minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "KeymanBase.__BUILD__=$BUILD"
+        minify keymanweb.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS
         assert $WEB_OUTPUT/keymanweb.js
 
         echo Compiled KeymanWeb application saved as $WEB_OUTPUT/keymanweb.js
@@ -385,7 +400,7 @@ if [ $BUILD_FULLWEB = true ] && [ $DO_MINIFY = true ]; then
     copy_resources "$WEB_OUTPUT"
     # Update build number if successful
     echo
-    echo KeymanWeb $VERSION build $BUILD compiled and saved under $WEB_OUTPUT
+    echo KeymanWeb $VERSION compiled and saved under $WEB_OUTPUT
     echo
 fi
 

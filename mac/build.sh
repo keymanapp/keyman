@@ -1,7 +1,20 @@
 #!/bin/sh
 
+set -e
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
+
 # Include our resource functions; they're pretty useful!
-. ../resources/shellHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+# This script runs from its own folder
+cd "$(dirname "$THIS_SCRIPT")"
+
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -14,14 +27,12 @@ display_usage() {
     echo "  -deploy DEST    Deploys result of Keyman4MacIM. DEST options:"
     echo "                  n|none (default) Not deployed."
     echo "                  l|local          $HOME/Library/Input Methods (kills running process if needed)"
+    echo "                  q|quicklocal     Same as local but does not notarize the build (see README.md)"
     echo "                  p|preprelease    Builds a DMG and download_info file in output\upload."
     echo "  -deploy-only    Suppresses build/clean/test for all targets."
-    echo "  -tier TIER      Used with -deploy p to specify tier: alpha (default), beta, or stable."
-    echo "  -version #.#.#  Used to specify the build version number, which should be in the"
-    echo "                  form Major.Minor.BuildCounter (optional, but expected if deploy preprelease)"
     echo "  -config NAME    NAME is passed to xcodebuild as -configuration parameter. Defaults to Debug, unless"
     echo "                  the -deploy option is used, in which configuration will be Release (i.e., -config option"
-    echo"                   is ignored)."
+    echo "                  is ignored)."
     echo "  -clean          Removes all previously-existing build products for anything to be built before building."
     echo "  -test           Runs unit tests (not applicable to 'testapp' target)"
     echo "  -no-codesign    Disables code-signing for Keyman4MacIM, allowing it to be performed separately later"
@@ -42,7 +53,7 @@ display_usage() {
     echo "          already configured in the project."
     echo "  * APPSTORECONNECT_PROVIDER: The shortname of the preferred provider in your Apple Developer account"
     echo "          To find this, run:"
-    echo "          /Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter \\"
+    echo "          /Applications/Xcode.app/Contents/Developer/usr/bin/iTMSTransporter \\"
     echo "            -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off"
     echo "  * APPSTORECONNECT_USERNAME: Your Apple ID login name."
     echo "  * APPSTORECONNECT_PASSWORD: Your Apple ID password (may need to be a app-specific password)."
@@ -50,15 +61,6 @@ display_usage() {
 }
 
 ### DEFINE HELPER FUNCTIONS ###
-
-KEYMAN_MAC_BASE_PATH="${BASH_SOURCE[0]}";
-if ([ -h "${KEYMAN_MAC_BASE_PATH}" ]) then
-	while([ -h "${KEYMAN_MAC_BASE_PATH}" ]) do KEYMAN_MAC_BASE_PATH=`readlink "${KEYMAN_MAC_BASE_PATH}"`; done
-fi
-pushd . > /dev/null
-cd `dirname ${KEYMAN_MAC_BASE_PATH}` > /dev/null
-KEYMAN_MAC_BASE_PATH=`pwd`;
-popd  > /dev/null
 
 assertOptionsPrecedeTargets() {
     if [[ "$1" =~ ^\- ]]; then
@@ -116,9 +118,7 @@ PROCESSING_TARGETS=false
 CONFIG="Debug"
 LOCALDEPLOY=false
 PREPRELEASE=false
-KM_TIER="alpha"
-KM_VERSION=`cat ../resources/VERSION.md`.0
-UPDATE_VERSION_IN_PLIST=false
+UPDATE_VERSION_IN_PLIST=true
 DO_KEYMANENGINE=true
 DO_KEYMANIM=true
 DO_KEYMANTESTAPP=false
@@ -128,6 +128,7 @@ BUILD_ACTIONS="build"
 TEST_ACTION=""
 CLEAN=false
 QUIET=false
+NOTARIZE=false
 SKIP_BUILD=false
 
 # Parse args
@@ -142,9 +143,15 @@ while [[ $# -gt 0 ]] ; do
             # the deployed version cannot be run in the debugger.
             if [[ "$2" =~ ^(l(ocal)?)$ ]]; then
                 LOCALDEPLOY=true
+                NOTARIZE=true
+                CONFIG="Release"
+            elif [[ "$2" =~ ^(q(uick(local)?)?)$ ]]; then
+                LOCALDEPLOY=true
+                NOTARIZE=false
                 CONFIG="Release"
             elif [[ "$2" =~ ^(p(rep(release)?)?)$ ]]; then
                 PREPRELEASE=true
+                NOTARIZE=true
                 CONFIG="Release"
             elif ! [[ "$2" =~ ^(n(one)?)$ ]]; then
                 fail "Invalid deploy option. Must be 'none', 'local' or 'preprelease'."
@@ -153,30 +160,7 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -deploy-only)
             SKIP_BUILD=true
-            shift # past argument
-            ;;
-        -tier)
-            if [[ "$2" == "" || "$2" =~ ^\- ]]; then
-                warn "Missing tier name on command line. Using '$KM_TIER' as default..."
-            else
-                if [[ "$2" =~ ^(a(lpha)?)$ ]]; then
-                    KM_TIER="alpha"
-                elif [[ "$2" =~ ^(b(eta)?)$ ]]; then
-                    KM_TIER="beta"
-                elif [[ "$2" =~ ^(s(table)?)$ ]]; then
-                    KM_TIER="stable"
-                else
-                	KM_TIER=$2
-                    fail "Unexpected tier: '$KM_TIER'"
-                fi
-                shift # past argument
-            fi
-            ;;
-        -version)
-            assertValidVersionNbr "$2"
-            KM_VERSION="$2"
-            UPDATE_VERSION_IN_PLIST=true
-            shift # past argument
+            #shift # past argument
             ;;
         -config)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
@@ -246,11 +230,11 @@ if $SKIP_BUILD ; then
     CODESIGNING_SUPPRESSION=""
 fi
 
-BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS"
+BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
 
 displayInfo "" \
-    "KM_VERSION: $KM_VERSION" \
-    "KM_TIER: $KM_TIER" \
+    "VERSION: $VERSION" \
+    "TIER: $TIER" \
     "LOCALDEPLOY: $LOCALDEPLOY" \
     "PREPRELEASE: $PREPRELEASE" \
     "CLEAN: $CLEAN" \
@@ -265,7 +249,16 @@ displayInfo "" \
 
 ### Validate notarization environment variables ###
 
-if $LOCALDEPLOY || $PREPRELEASE ; then
+if $LOCALDEPLOY && ! $NOTARIZE ; then
+    if [ "$(spctl --status)" == "assessments enabled" ]; then
+      echo
+      warn "WARNING: Notarization is disabled but SecAssessment security policy is still active. Keyman will not run correctly."
+      warn "         Disable SecAssessment with 'sudo spctl --master-disable' (or do notarized builds)"
+      fail "Re-run with '-deploy local' or disable SecAssessment."
+    fi
+fi
+
+if $PREPRELEASE || $NOTARIZE ; then
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Code signing must be configured for deployment. See build.sh -help for details."
   fi
@@ -300,14 +293,15 @@ execBuildCommand() {
 }
 
 updatePlist() {
+    # TODO: use set_version() to update plist after build instead of the currenet pattern. See ios for example
 	if $UPDATE_VERSION_IN_PLIST ; then
 	    KM_COMPONENT_BASE_PATH="$1"
 	    KM_COMPONENT_NAME="$2"
 		KM_PLIST="$KM_COMPONENT_BASE_PATH/$KM_COMPONENT_NAME/Info.plist"
 		if [ -f "$KM_PLIST" ]; then
-			echo "Setting $KM_COMPONENT_NAME version to $KM_VERSION in $KM_PLIST"
-			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $KM_VERSION" "$KM_PLIST"
-			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KM_VERSION" "$KM_PLIST"
+			echo "Setting $KM_COMPONENT_NAME version to $VERSION in $KM_PLIST"
+			/usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
+			/usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$KM_PLIST"
 			if [[ "$CONFIG" == "Release" && "$KM_COMPONENT_NAME" == "$IM_NAME" ]]; then
 				echo "Setting Fabric APIKey for release build in $KM_PLIST"
 				if [ "$FABRIC_API_KEY_KEYMAN4MACIM" == "" ]; then
@@ -370,9 +364,9 @@ if $DO_KEYMANTESTAPP ; then
     execBuildCommand $TESTAPP_NAME "xcodebuild -project \"$KMTESTAPP_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS"
 fi
 
-### Notarize the app for localdeploy and preprelease ###
+### Notarize the app for preprelease ###
 
-if $LOCALDEPLOY || $PREPRELEASE ; then
+if $PREPRELEASE || $NOTARIZE; then
   echo_heading "Notarizing app"
   if [ "${CODESIGNING_SUPPRESSION}" != "" ] && [ -z "${CERTIFICATE_ID}" ]; then
     fail "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
@@ -445,7 +439,11 @@ if $LOCALDEPLOY ; then
 elif $PREPRELEASE ; then
     echo_heading "Preparing files for release deployment..."
     # Create the disk image
-    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" -version $KM_VERSION $QUIET_FLAG
+    pushd setup
+    eval "./build.sh"
+    popd
+
+    eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
     if [ $? == 0 ]; then
         displayInfo "Creating disk image succeeded!" ""
     else
@@ -453,7 +451,7 @@ elif $PREPRELEASE ; then
     fi
 
     # Create download info
-    eval "$KM4MIM_BASE_PATH/write-download_info.sh" -version $KM_VERSION -tier $KM_TIER
+    eval "$KM4MIM_BASE_PATH/write-download_info.sh"
     if [ $? == 0 ]; then
         displayInfo "Writing download_info file succeeded!" ""
     else

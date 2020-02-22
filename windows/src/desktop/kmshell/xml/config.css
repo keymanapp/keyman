@@ -170,7 +170,7 @@ html
   padding: 6px 4px 0 0;
   float: right;
   font-size: 12px;
-  font-weight: normal;  
+  font-weight: normal;
 }
 .helplinks a
 {
@@ -388,30 +388,30 @@ table tr
 }
 
 #keyboards .item .list_icon {
-  float: left; 
+  float: left;
   margin: 2px 6px 4px 1px;
 }
 
 /* no keyboards installed box */
 
 .info#keyboards {
-  position: absolute; 
+  position: absolute;
   top: 25%;
 }
 
 .info#keyboards > div {
-  position: relative; 
-  left: 0; 
-  top: 0; 
-  font-size: 13.3px; 
-  margin: 0 12px; 
-  border: solid 1px gray; 
-  padding: 8px; 
+  position: relative;
+  left: 0;
+  top: 0;
+  font-size: 13.3px;
+  margin: 0 12px;
+  border: solid 1px gray;
+  padding: 8px;
   background: #F5F6BE
 }
 
 .info#keyboards > div > img {
-  float: left; 
+  float: left;
   margin: 0 8px 0 0;
 }
 
@@ -555,8 +555,8 @@ table tr
   font-size: 16px;
 }
 #options
-{	
-  left: 0;  
+{
+  left: 0;
   top: 0;
   xpadding: 6px 4px 4px 4px;
 }
@@ -597,11 +597,11 @@ table tr
   overflow: hidden;
 }
 
-#options_base_keyboard_current { 
-  display: inline-block; 
+#options_base_keyboard_current {
+  display: inline-block;
   padding-top: 5px;
 }
-  
+
 /* Hotkey Styles */
 
 #subcontent_hotkeys .list_item
@@ -940,16 +940,16 @@ th
 }
 
 .keyboard-language-title {
-  color: #444444; 
-  float:right; 
-  padding-top: 5px; 
+  color: #444444;
+  float:right;
+  padding-top: 5px;
   margin-right: 8px;
   text-decoration: none;
 }
 
 .keyboard-language-title .language-icon {
-  padding-top: 0px; 
-  margin-top: -2px; 
+  padding-top: 0px;
+  margin-top: -2px;
   margin-left: 8px;
   visibility: visible;
 }
@@ -965,7 +965,7 @@ th
   padding-left: 8px;
 }
 
-.keyboard-language-title:hover, 
+.keyboard-language-title:hover,
 .keyboard-language-title:active {
   text-decoration: underline;
   cursor: pointer;
@@ -988,7 +988,7 @@ th
 }
 
 #keepintouch_content {
-  height: 100%; 
+  height: 100%;
   overflow: hidden;
 }
 
@@ -997,4 +997,44 @@ th
   width:100%;
   height:100%;
   border:none;
+}
+
+/* QRCodes */
+
+.qrcode .qrcode-back {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(64,64,64,0.5);
+  z-index: 100;
+  display: none;
+}
+
+.qrcode.qrcode-visible .qrcode-popup,
+.qrcode.qrcode-visible .qrcode-back {
+  display: block;
+}
+
+.qrcode .qrcode-popup {
+  position: fixed;
+  display: none;
+  width: 256px;
+  height: 324px;
+  margin: -180px 0 0 -128px;
+  left: 50%;
+  top: 50%;
+  border: solid 1px black;
+  background: white;
+  text-align: center;
+  z-index: 101;
+  padding: 10px;
+}
+
+.qrcode .qrcode-caption {
+  display: block;
+  white-space: normal;
+  font-size: 12pt;
+  padding: 8px;
 }

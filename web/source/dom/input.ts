@@ -78,6 +78,8 @@ namespace com.keyman.dom {
 
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
+
+      Utils.forceScroll(this.root);
     }
 
     getTextBeforeCaret(): string {
@@ -112,6 +114,10 @@ namespace com.keyman.dom {
       if(dn > 0) {
         let curText = this.getTextBeforeCaret();
         let caret = this.getCaret();
+
+        if(dn > caret) {
+          dn = caret;
+        }
 
         this.adjustDeadkeys(-dn);
         this.setTextBeforeCaret(curText.kmwSubstring(0, this.getCaret() - dn));

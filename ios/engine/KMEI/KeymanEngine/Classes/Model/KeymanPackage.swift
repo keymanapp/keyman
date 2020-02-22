@@ -30,7 +30,7 @@ public class KeymanPackage
   }
 
   // to be overridden by subclasses
-  public func parse(json: [String:AnyObject]) {
+  public func parse(json: [String:AnyObject], version: String) {
     return
   }
   
@@ -59,6 +59,15 @@ public class KeymanPackage
         let data = try Data(contentsOf: path, options: .mappedIfSafe)
         let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
         if let jsonResult = jsonResult as? [String:AnyObject] {
+          // The 'version' info has moved, and is no longer available in the original
+          // location for lexical models.  Still present for keyboards, though!
+          var version: String = ""
+          if let info = jsonResult["info"] as? [String:AnyObject] {
+            if let versionBlock = info["version"] as? [String:AnyObject] {
+              version = versionBlock["description"] as? String ?? ""
+            }
+          }
+
           if let _ = jsonResult["keyboards"] as? [[String:AnyObject]] {
             if let _ = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
                 //TODO: rrb show error to user, for now, just log
@@ -66,12 +75,12 @@ public class KeymanPackage
               return nil
             }
             let kmp = KeyboardKeymanPackage.init(folder: folder)
-            kmp.parse(json: jsonResult)
+            kmp.parse(json: jsonResult, version: version)
             return kmp
           }
           else if let _ = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
             let kmm = LexicalModelKeymanPackage.init(folder: folder)
-            kmm.parse(json: jsonResult)
+            kmm.parse(json: jsonResult, version: version)
             return kmm
           }
         }

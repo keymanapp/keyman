@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -26,6 +28,12 @@ public class Keyboard implements Serializable, LanguageResource {
     this.map = kbdData;
   }
 
+
+
+  public boolean isNewKeyboard() {
+    return map.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD)!=null;
+  }
+
   public String getResourceId() {
     return this.map.get(KMManager.KMKey_KeyboardID);
   }
@@ -43,6 +51,13 @@ public class Keyboard implements Serializable, LanguageResource {
     return this.map.get(KMManager.KMKey_KeyboardName);
   }
 
+  public String getCustomHelpLink() {
+    if (this.map.containsKey(KMManager.KMKey_CustomHelpLink)) {
+      return this.map.get(KMManager.KMKey_CustomHelpLink);
+    }
+    return null;
+  }
+
   public String getVersion() {
     return this.map.get(KMManager.KMKey_KeyboardVersion);
   }
@@ -53,6 +68,7 @@ public class Keyboard implements Serializable, LanguageResource {
 
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
+
     bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, getResourceId());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, getLanguageCode());
@@ -63,8 +79,12 @@ public class Keyboard implements Serializable, LanguageResource {
     if(isCustom == null) {
       isCustom = "N";
     }
-
     bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustom.equals("Y"));
+
+    String customHelpLink = map.get(KMManager.KMKey_CustomHelpLink);
+    if (customHelpLink != null) {
+      bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, getCustomHelpLink());
+    }
 
     return bundle;
   }

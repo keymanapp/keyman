@@ -82,10 +82,10 @@ public final class ModelPickerActivity extends AppCompatActivity {
     super.onResume();
     if (!didExecuteParser) {
       didExecuteParser = true;
-      //new JSONParse().execute();
       repo = CloudRepository.shared.fetchDataset(context);
 
-      listView.setAdapter(new FilteredLexicalModelAdapter(context, repo, languageID));
+      // Initialize the dataset of installed lexical models
+      listView.setAdapter(new FilteredLexicalModelAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), languageID));
       listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
         @Override
@@ -201,13 +201,6 @@ public final class ModelPickerActivity extends AppCompatActivity {
   @Override
   public void onBackPressed() {
     finish();
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (resultCode == 1) {
-      finish();
-    }
   }
 
   // Uses the repo dataset's master lexical model list to create a filtered adapter for use here.

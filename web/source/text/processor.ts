@@ -49,6 +49,8 @@ namespace com.keyman.text {
       let domManager = keyman.domManager;
       let activeKeyboard = keyman.keyboardManager.activeKeyboard;
 
+      let quiet = keyman.interface.activeTargetOutput instanceof Mock;
+
       var ch = '', checkCodes = false;
       var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
@@ -58,7 +60,9 @@ namespace com.keyman.text {
         checkCodes = true; 
         keyShiftState = 1; // It's used as an index.
       } else {
-        console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
+        if(!quiet) {
+          console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
+        }
       }
 
       // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
@@ -73,7 +77,13 @@ namespace com.keyman.text {
             if(disableDOM) {
               return '\b'; // the escape sequence for backspace.
             } else {
-              keyman.interface.defaultBackspace();
+              // If we have an available target (via Lkc/Lelem), use that instead of 
+              // forcing defaultBackspace to search for it.
+              var target: OutputTarget;
+              if(Lelem && Lelem._kmwAttachment) {
+                target = Lelem._kmwAttachment.interface;
+              }
+              keyman.interface.defaultBackspace(target);
             }
             return '';
           case Codes.keyCodes['K_TAB']:
@@ -149,9 +159,21 @@ namespace com.keyman.text {
           //     kbdInterface.defaultBackspace();
           //   }
         }
-      } else if(Lkc.Lcode == 8) {  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-        keyman.interface.defaultBackspace();
-        return '';
+
+        // Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
+        //
+        // Can easily occur from mnemonic keyboards, which create synthetic events without
+        // the appropriate kName value.
+        //
+        // Not strictly if `Lkc.vkCode` is properly maintained, but it's good to have an
+        // extra safety; this would have blocked the backspace bug as well.
+      } else if(Lkc.Lcode == 8) {
+        if(disableDOM) {
+          return '\b'; // the escape sequence for backspace.
+        } else {
+          keyman.interface.defaultBackspace();
+          return '';
+        }
       }
 
       // Translate numpad keystrokes into their non-numpad equivalents
@@ -176,7 +198,9 @@ namespace com.keyman.text {
         if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
           // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
           // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-          console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+          if(!quiet) {
+            console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+          }
           return ch;
         } else {
           // String.fromCharCode() is inadequate to handle the entire range of Unicode
@@ -196,7 +220,9 @@ namespace com.keyman.text {
             ch = Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
           }
         } catch (e) {
-          console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
+          if(!quiet) {
+            console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
+          }
         }
       }
       return ch;
@@ -343,7 +369,9 @@ namespace com.keyman.text {
 
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+        kbdInterface.activeTargetOutput = outputTarget;
         var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
+        kbdInterface.activeTargetOutput = null;
         if(ch) {
           if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
             // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
@@ -507,6 +535,12 @@ namespace com.keyman.text {
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
       }
 
+      // Special case for embedded to pass K_TAB back to device to process
+      if(keyman.isEmbedded && (keyEvent.Lcode == Codes.keyCodes["K_TAB"] ||
+          keyEvent.Lcode == Codes.keyCodes["K_TABBACK"] || keyEvent.Lcode == Codes.keyCodes["K_TABFWD"])) {
+        return false;
+      }
+
       return !LeventMatched;
     }
 
@@ -560,13 +594,26 @@ namespace com.keyman.text {
           mappingEvent[key] = Lkc[key];
         }
         
+        // To facilitate storing relevant commands, we should probably reverse-lookup
+        // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = null;
-        var mappedChar: string = this.defaultKeyOutput(Lkc, (shifted ? 0x10 : 0), false, true);
+        var mappedChar: string = this.defaultKeyOutput(mappingEvent, (shifted ? 0x10 : 0), false, true);
+        
+        /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
+         * rules, but allows us to replicate/emulate commands after rule processing if needed.
+         * (Like backspaces)
+         */
+        Lkc.vkCode = Lkc.Lcode;
         if(mappedChar) {
-          // FIXME;  Warning - will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
+          // Will return 96 for 'a', which is a keycode corresponding to Codes.keyCodes('K_NP1') - a numpad key.
+          // That stated, we're in mnemonic mode - this keyboard's rules are based on the char codes.
           Lkc.Lcode = mappedChar.charCodeAt(0);
-        } // No 'else' - avoid blocking modifier keys, etc.
+        } else {
+          // Don't let command-type keys (like K_DEL, which will output '.' otherwise!)
+          // trigger keyboard rules.
+          delete Lkc.Lcode;
+        }
       }
 
       if(capsActive) {

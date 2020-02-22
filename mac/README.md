@@ -1,16 +1,35 @@
 # Keyman for macOS
 
 ## Mac Tools Requirements/Setup
-Install Xcode 8.3.3 or later (it might also work to use an older version)
+
+Install Xcode 11.3.1 or later (it might also work to use an older version)
 Install [Carthage](https://github.com/Carthage/Carthage/blob/master/README.md) *see Homebrew note below
-Install cocoapods (sudo gem install cocoapods) if not already installed.
+Install cocoapods (`sudo gem install cocoapods`) if not already installed.
+Install coreutils (`brew install coreutils`)
 
 ## Keyman for macOS Development
+
 Keyman for macOS can be built from a command line (preferred) or Xcode.
 
 ### Setting up your code signing and notarization environment.
-With macOS 10.14 and later, Keyman must be signed then notarized by Apple, even for local
-test builds. This requires additional configuration for your build environment.
+
+With macOS 10.14 and later, Keyman must be notarized in order to be permitted to interact with
+keyboard input. You have two options for local builds:
+
+1. You can disable security checks for the system with the command:
+
+    `sudo spctl --master-disable`
+
+   This has obvious security implications and the risk is up to you. However, builds are
+   much, much, faster than with the alternative option below, and for extensive local
+   debugging is far less painful.
+
+2. Or, you must sign and notarize every build. See below. (Use --deploy local)
+
+### Signing and notarizing builds
+
+Keyman must be signed then notarized by Apple, even for local test builds. This requires additional 
+configuration for your build environment.
 
 1. First, open XCode, Preferences, Accounts, and select Manage Certificates for the identity
    you wish to use for signing. Click **+** and select **Developer ID Application**. A
@@ -23,7 +42,7 @@ test builds. This requires additional configuration for your build environment.
    be either your 10-digit Team Identifier or a shortname that can be extracted with
    the following command:
 
-   `/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u '<Username>' -p '<Password>' -account_type itunes_connect -v off`
+   `/Applications/Xcode.app/Contents/Developer/usr/bin/iTMSTransporter -m provider -u '<Username>' -p '<Password>' -account_type itunes_connect -v off`
 
    Note: Use your Apple ID for `<Username>` and the app-specific password you generated above
    for `<Password>`. You'll use these in the next step as well.
@@ -37,6 +56,7 @@ test builds. This requires additional configuration for your build environment.
         export APPSTORECONNECT_PASSWORD=<Password>
 
 ### Compiling from Command Line
+
 To build Keyman for macOS, do the following:
 1. Open a Terminal window.
 2. cd to **keyman/mac**. **build.sh** must be run in the directory containing the script.
@@ -48,15 +68,17 @@ To build Keyman for macOS, do the following:
 Note: If Carthage prompts you to allow it access to your github credentials, it's fine to click Deny.
 
 ### Running Keyman
+
 1. Deploy Keyman locally using `./build.sh -deploy local -deploy-only`.
     * This will notarize the app, signing with your local credentials if not already signed, and copy **keyman/mac/Keyman4MacIM/build/Debug/Keyman.app** to **~/Library/Input Methods**
 2. If running for the first time, follow the installation instructions at
 [Installing Keyman for Mac OS X](https://help.keyman.com/products/mac/1.0/docs/start_download-install_keyman.php).
 
 You can also use `./build.sh -no-codesign -deploy local` to do a single-step build, notarize,
-and deploy.
+and deploy (see above for faster options).
 
 ### Compiling from Xcode
+
 To build using Xcode, you will need to build KeymanEngine4Mac first and then build Keyman4MacIM. The very _first_ time after getting the source code (and any time the Podfile is edited; e.g., to install new pods), you need to go to **keyman/mac/Keyman4MacIM** and run "pod install" in Terminal.
 
 1. Launch Xcode
@@ -71,16 +93,18 @@ To build using Xcode, you will need to build KeymanEngine4Mac first and then bui
 6. Build the project. Refer to [Running Keyman](#running-keyman) on how to install the app.
 
 ### Testing
+
 The Keyman4Mac project builds a test-bed app that can be used to test keyboards without installing the input method.
 It can also be used as reference for the usage of Keyman Engine.
 
 Keyman4Mac tests are run using `./build.sh -test -no-codesign`.
 
-*note about Homebrew:
-Installing Carthage directly from the pkg file is simple. Homebrew seemed simple, but it
-changes a lot of settings and I think it messed up the build in a way that took me a long
-time to sort out. One specific problem is that using Homebrew seems to mess up the
-command-line tools, so you will probably get this error from xcodebuild:
-    Error: xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory is a command line tools instance
-To fix it run this command:
-   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+### A note about Homebrew and xcodebuild
+
+If you get this error from xcodebuild:
+
+`Error: xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory is a command line tools instance`
+
+Then run this command to fix the build environment:
+
+`sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`

@@ -1,0 +1,128 @@
+#!/bin/bash
+
+#
+# This prepare-commit-msg hook prepares commit messages to ensure 
+# that they meet our conventional commit standard.
+#
+# Whenever `git` detects an incoming commit, it will trigger this hook.  If the message does not
+# our conventional commit format, it will set it to the following format.  (commit and merge only)
+#
+#   "type(scope): message"
+#   If an issue number is detected at the front of the message and it is not a merge, also adds "___. Fixes #1234"
+#
+# Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
+#
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# Get the directory where this script lives, i.e. resources/git-hooks
+HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
+
+. $HOOK_DIRECTORY/commit-msg-defs
+
+# build the regex pattern based on the config file
+function build_regex() {
+  retypes=
+  for type in "${types[@]}"
+  do
+    retypes="${retypes}$type|"
+  done
+  retypes="(${retypes%?})"
+
+  rescope=
+  for scope in "${scopes[@]}"
+  do
+    rescope="${rescope}$scope|"
+  done
+  # %? removes last |
+  rescope="(${rescope%?})?"
+
+  recherry="(cherry-pick\/)?"
+
+  # Optionally captures an issue number at the front of the branch's name.
+  rebranchname="(([[:digit:]]+)\-)?(.+)"
+
+  regexp="^${retypes}\/${rescope}\/?${recherry}${rebranchname}\s*$"
+}
+
+function prepend_scope() {
+  # COMMIT_MSG_FILE and $COMMIT_SOURCE are already available.
+
+  # Step 1:  if the branch follows our preferred branch conventions, we can use that!
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  build_regex
+
+  # Perform the actual regex check.
+  if [[ $branch =~ $regexp ]]; then
+    TYPE=${BASH_REMATCH[1]}
+    SCOPE=${BASH_REMATCH[2]}
+    # 3 - cherry-pick (if it exists)
+    # 4 - just ISSUE, but with an appended '-'.  Ashame BASH doesn't support non-capture groups.
+    ISSUE=${BASH_REMATCH[5]}
+    NAME=${BASH_REMATCH[6]}
+
+    EXTRA_WHITESPACE="\n"
+
+    # For known merge commits, consider the merge operation to be a 'chore'.
+    if [ "${COMMIT_SOURCE}" = "merge" ]; then
+      TYPE="chore"
+      ISSUE= # Invalidates adding the 'postfix' for these commit types.
+      EXTRA_WHITESPACE=
+    fi
+
+    # Now that we have the components finalized, we can proceed.
+    if [ -n "${ISSUE// }" ]; then # Refer to https://unix.stackexchange.com/a/146945 for explanation.
+      # This technically does pass the conventional commits test - it doesn't -ensure- that the
+      # "Fixes #____" section doesn't count toward the core message.
+      postfix="\n"
+      postfix="${postfix}# Keyman Conventional Commit suggestions:\n"
+      postfix="${postfix}# - Consider appending the text \". Fixes #$ISSUE\" to your commit message."
+    else
+      postfix=""
+    fi
+    prefix="$TYPE($SCOPE): $EXTRA_WHITESPACE"
+    
+    # Reuse any existing message text, wrapping it in our conventional commit formatting before
+    # presenting it to the user for any final edits.
+    echo -e "$prefix$(cat $COMMIT_MSG_FILE)$postfix" > $COMMIT_MSG_FILE
+  fi
+
+  # If it doesn't follow our branch-name format, we can't provide any help.
+}
+
+#
+# Configurable options for types, scopes and message length.
+#
+
+# Step 1 - is the prepared message already in our conventional commits format?
+$HOOK_DIRECTORY/commit-msg -q $COMMIT_MSG_FILE
+isConventional=$? # Grabs the exit code. 
+
+if [ $isConventional -eq 0 ]; then
+  # If so, great!  Don't do a thing!
+  exit 0
+fi
+
+# Debugging aides
+#echo "COMMIT_MSG_FILE=$COMMIT_MSG_FILE"
+#echo "COMMIT_SOURCE=$COMMIT_SOURCE"
+
+# The default message is NOT in conventional format.  Time to help out with that.
+case $COMMIT_SOURCE in
+  squash)
+    # We don't help with squashes - this tends to combine two separate messages,
+    # and that can be messy.
+    exit 0
+    ;;
+  merge|commit|'') # '' = plain `git commit`
+    # We can help here!
+    prepend_scope
+    ;;
+  *)
+    # Default handler - we don't handle these types yet.  Might be worth considering.
+    # Known possibilities:  message (-m), template (-t)
+    exit 0
+    ;;
+esac

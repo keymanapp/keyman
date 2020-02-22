@@ -22,13 +22,13 @@ public class LexicalModelKeymanPackage : KeymanPackage {
   
   // may be called parse()
   // returns a dictionary mapping language ID to lexical model ID
-  public override func parse(json: [String:AnyObject]) {
+  override public func parse(json: [String:AnyObject], version: String) {
     self.models = []
     
     if let packagedModels = json["lexicalModels"] as? [[String:AnyObject]] {
       for modelJson in packagedModels {
         let model = KMPLexicalModel.init(kmp: self)
-        model.parse(json: modelJson)
+        model.parse(json: modelJson, version: version)
         
         if(model.isValid) {
           models.append(model)

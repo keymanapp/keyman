@@ -1,8 +1,33 @@
 # Keyman Desktop Version History
 
-## 13.0 alpha
-* Started work on Keyman Desktop 13.
-* Removed dependency on legacy Internet Explorer components; integrate Chromium.
+## 2020-02-04 13.0.67 beta
+* Bug Fix(System): Windows touch keyboard would be dismissed on each keystroke if Keyman was running (#2580)
+
+## 2020-01-28 13.0.65 beta
+* Feature(Config): Add QRCode link popup to share an installed package (#2426)
+* Feature(Hotkeys): Hotkeys are now only triggered with left modifiers, avoiding conflicts with Right Alt (#2360)
+* Bug Fix(Config): "(Start Product)" package shortcuts would not install correctly (#2500)
+* Bug Fix(Install): Upgrades from 11.0 and 12.0 were losing installed keyboards and settings (#2213, 12.0:#2214)
+* Bug Fix(OSK): On Screen Keyboard restored to wrong screen and position when reloading (#2330, 12.0:#2341)
+* Bug Fix(System): Using supplementary plane characters could cause rules to fail to match (#2399, 12.0:#2400)
+* Bug Fix(System): Address instability when exiting Keyman on some systems (#2297, 12.0:#2324)
+* Bug Fix(System): Keyman was not working with Skype, Windows Search on some systems (#2316, 12.0:#2324)
+
+## 2019-12-01 12.0.59 stable
+* Bug Fix: Using supplementary plane characters could cause rules to fail to match (#2400)
+
+## 2019-11-15 12.0.54 stable
+* Bug Fix: On Screen Keyboard restored to wrong screen and position when reloading (#2341)
+
+## 2019-11-12 12.0.53 stable
+* Bug Fix: Address instability when exiting Keyman on some systems (#2324)
+* Bug Fix: Keyman was not working with Skype, Windows Search on some systems (#2324)
+
+## 2019-10-20 12.0.52 stable
+* Upgrades from 11.0 and 12.0 were losing installed keyboards and settings (#2214)
+
+## 2019-10-07 12.0.50 stable
+* Release 12.0
 
 ## 2019-10-03 12.0.42 beta
 * Bug Fix: Additional shutdown issues that sporadically occurred (#2157)

@@ -5,6 +5,7 @@
 import json
 import logging
 import os.path
+import qrcode
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -61,7 +62,7 @@ class KeyboardDetailsView(Gtk.Window):
 
         # kbdatapath = os.path.join("/usr/local/share/keyman", kmp["id"], kmp["id"] + ".json")
 
-# Package info
+        # Package info
 
         lbl_pkg_name = Gtk.Label()
         lbl_pkg_name.set_text("Package name:   ")
@@ -121,21 +122,30 @@ class KeyboardDetailsView(Gtk.Window):
             label.set_selectable(True)
             grid.attach_next_to(label, lbl_pkg_auth, Gtk.PositionType.RIGHT, 1, 1)
 
-        lbl_pkg_cpy = Gtk.Label()
-        lbl_pkg_cpy.set_text("Package copyright:   ")
-        lbl_pkg_cpy.set_halign(Gtk.Align.END)
-        grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
-        prevlabel = lbl_pkg_cpy
-        label = Gtk.Label()
-        label.set_text(info['copyright']['description'])
-        label.set_halign(Gtk.Align.START)
-        label.set_selectable(True)
-        grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)
+        if "copyright" in info:
+            lbl_pkg_cpy = Gtk.Label()
+            lbl_pkg_cpy.set_text("Package copyright:   ")
+            lbl_pkg_cpy.set_halign(Gtk.Align.END)
+            grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
+            prevlabel = lbl_pkg_cpy
+            label = Gtk.Label()
+            label.set_text(info['copyright']['description'])
+            label.set_halign(Gtk.Align.START)
+            label.set_selectable(True)
+            grid.attach_next_to(label, lbl_pkg_cpy, Gtk.PositionType.RIGHT, 1, 1)
+
+        # Padding and full width horizontal divider
+        lbl_pad = Gtk.Label()
+        lbl_pad.set_text("")
+        lbl_pad.set_halign(Gtk.Align.END)
+        grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+        prevlabel = lbl_pad
+
+        divider_pkg = Gtk.HSeparator()
+        grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
 
 
-
-
-# Keyboard info for each keyboard
+        # Keyboard info for each keyboard
 
         if keyboards:
             for kbd in keyboards:
@@ -228,6 +238,16 @@ class KeyboardDetailsView(Gtk.Window):
                         label.set_line_wrap(80)
                         grid.attach_next_to(label, lbl_kbd_desc, Gtk.PositionType.RIGHT, 1, 1)
 
+                        # Padding and full width horizontal divider
+                        lbl_pad = Gtk.Label()
+                        lbl_pad.set_text("")
+                        lbl_pad.set_halign(Gtk.Align.END)
+                        grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+                        prevlabel = lbl_pad
+
+                        divider_pkg = Gtk.HSeparator()
+                        grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+
                         # label7 = Gtk.Label()
                         # label7.set_text("On Screen Keyboard:   ")
                         # label7.set_halign(Gtk.Align.END)
@@ -272,6 +292,41 @@ class KeyboardDetailsView(Gtk.Window):
 
         hbox = Gtk.Box(spacing=6)
         vbox.pack_start(hbox, False, False, 0)
+
+        # Add an entire row of padding
+        lbl_pad = Gtk.Label()
+        lbl_pad.set_text("")
+        lbl_pad.set_halign(Gtk.Align.END)
+        grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+        prevlabel = lbl_pad
+
+        # If it doesn't exist, generate QR code to share keyboard package
+        path_qr = packageDir + "/qrcode.png"
+        if not os.path.isfile(path_qr):
+            qr = qrcode.QRCode(
+                 version = 1,
+                 error_correction = qrcode.constants.ERROR_CORRECT_H,
+                 box_size = 4,
+                 border = 4)
+            url = "https://keyman.com/go/keyboard/" + kmp['packageID'] + "/share"
+            qr.add_data(url)
+            qr.make(fit=True)
+
+            img = qr.make_image()
+            img.save(path_qr)
+
+        # Display QR Code, spanning 2 columns so it will be centered
+        image = Gtk.Image()
+        image.set_from_file(path_qr)
+        grid.attach_next_to(image, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+
+        lbl_share_kbd = Gtk.Label()
+        lbl_share_kbd.set_text("Scan this code to load this keyboard\n"
+                               "on another device or share online")
+        lbl_share_kbd.set_halign(Gtk.Align.CENTER)
+        lbl_share_kbd.set_line_wrap(True)
+        grid.attach_next_to(lbl_share_kbd, image, Gtk.PositionType.BOTTOM, 2, 1)
+        prevlabel = lbl_share_kbd
 
         button = Gtk.Button.new_with_mnemonic("_Close")
         button.set_tooltip_text("Close window")

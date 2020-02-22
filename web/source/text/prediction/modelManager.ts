@@ -33,16 +33,16 @@ namespace com.keyman.text.prediction {
 
     constructor(mock: Mock, config: Configuration) {
       this.left = mock.getTextBeforeCaret();
-      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodeUnits;
+      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodePoints;
       if(!this.startOfBuffer) {
         // Our custom substring version will return the last n characters if param #1 is given -n.
-        this.left = this.left._kmwSubstr(-config.leftContextCodeUnits);
+        this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
       }
 
       this.right = mock.getTextAfterCaret();
-      this.endOfBuffer = this.right._kmwLength() > config.rightContextCodeUnits;
+      this.endOfBuffer = this.right._kmwLength() > config.leftContextCodePoints;
       if(!this.endOfBuffer) {
-        this.right = this.right._kmwSubstr(0, config.rightContextCodeUnits);
+        this.right = this.right._kmwSubstr(0, config.leftContextCodePoints);
       }
     }
   }
@@ -108,9 +108,9 @@ namespace com.keyman.text.prediction {
       // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
       // model may expect.
       let capabilities: Capabilities = {
-        maxLeftContextCodeUnits: 64,
+        maxLeftContextCodePoints: 64,
         // Since the apps don't yet support right-deletions.
-        maxRightContextCodeUnits: keyman.isEmbedded ? 0 : 64
+        maxRightContextCodePoints: keyman.isEmbedded ? 0 : 64
       }
 
       if(!this.canEnable()) {
@@ -152,7 +152,7 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
       let mm: ModelManager = this;
 
-      if(!this.enabled) {
+      if(!this.mayPredict) {
         return Promise.resolve();
       }
 
@@ -185,7 +185,7 @@ namespace com.keyman.text.prediction {
             // Because this is executed from a Promise, it's possible to have a race condition
             // where the 'loaded' event triggers after an 'unloaded' event meant to disable the model.
             // (Especially in the embedded apps.)  This will catch these cases.
-            if(mm.enabled) {
+            if(mm.mayPredict) {
               keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
             } else {
               mm.unloadModel();
@@ -374,7 +374,7 @@ namespace com.keyman.text.prediction {
     }
 
     public get enabled(): boolean {
-      return this._mayPredict;
+      return this.activeModel && this._mayPredict;
     }
 
     private canEnable(): boolean {
@@ -422,7 +422,7 @@ namespace com.keyman.text.prediction {
       }
 
       this._mayPredict = flag;
-      if(enabled != this.enabled) {
+      if(enabled != this.enabled || flag) {
         this.doEnable(flag);
       }
     }

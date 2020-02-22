@@ -9,6 +9,7 @@ interface
 // in the Embarcadero libraries, that the unit test will fail, so we will be able
 // to proactively resolve it without sending out an accidentally broken version.
 //
+// Fixed in VER330 (Delphi 10.3 Rio, 20.0)
 
 uses
   DUnitX.TestFramework,
@@ -76,9 +77,14 @@ begin
   m := TRegEx.Match(s, r);
   Assert.IsTrue(m.Success);
   writeln(Format('FAILED:(%s) at position %d (length %d): %s', ['x', m.Groups[1].Index, m.Groups[1].Length, m.Groups[1].Value]));
+{$IFDEF VER320}
   if ShouldPassBuiltinTest
     then Assert.AreEqual(x, m.Groups[1].Value)
     else Assert.AreNotEqual(x, m.Groups[1].Value);
+{$ELSE}
+  // Fixed in VER330
+  Assert.AreEqual(x, m.Groups[1].Value);
+{$ENDIF}
 
   g := TGroupHelperRSP19902.Create(m.Groups[1], s);
   writeln(Format('PASSED:(%s) at position %d (length %d): %s [expected %s]', ['x', g.FixedIndex, g.FixedLength, g.FixedValue, x]));

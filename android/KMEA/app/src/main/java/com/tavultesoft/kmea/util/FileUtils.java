@@ -43,6 +43,7 @@ public final class FileUtils {
   public static final String MODELPACKAGE = ".model.kmp";
   public static final String KEYMANPACKAGE = ".kmp";
   public static final String WELCOME_HTM = "welcome.htm";
+  public static final String README_HTM = "readme.htm";
 
   /**
    * Utility to download a file from urlStr and store it at destinationDir/destinationFilename.
@@ -218,7 +219,10 @@ public final class FileUtils {
   public static String getFilename(String urlStr) {
     String filename = "unknown";
     if (urlStr != null && !urlStr.isEmpty()) {
-      filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
+      if(urlStr.indexOf(File.separator)>=0)
+        filename = urlStr.substring(urlStr.lastIndexOf(File.separator) + 1);
+      else
+        filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
   }
@@ -403,6 +407,11 @@ public final class FileUtils {
   public static boolean isWelcomeFile(String filename) {
     String f = getFilename(filename);
     return f.equalsIgnoreCase(WELCOME_HTM);
+  }
+
+  public static boolean isReadmeFile(String filename) {
+    String f = getFilename(filename);
+    return f.equalsIgnoreCase(README_HTM);
   }
 
   /**

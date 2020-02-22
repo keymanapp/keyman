@@ -2,6 +2,8 @@ var tabselected = -1;
 var showHelp = true;
 var state = null;
 
+var MAX_TABS = 5;
+
 var projectPath = (function(s) {
   var search = s.match(/path=(.+?)(&|$)/);
   return search ? decodeURIComponent(search[1]) : null;
@@ -40,7 +42,7 @@ function showhideupper()
 {
   var n = document.getElementById('upperexpand').className;
   document.getElementById('upperexpand').className = (n=='checkbox'?'checkbox checked':'checkbox');
-  for ( var i=0; i<4; i++ ) {
+  for ( var i=0; i < MAX_TABS; i++ ) {
     document.getElementById('uppertext'+i).style.display = (n=='checkbox'?'block':'none');
   }
   savestate();
@@ -62,10 +64,10 @@ document.onkeydown = function()
     }
     break;
   case 34: //pgdn
-    if(tabselected < 4) {
+    if(tabselected < MAX_TABS - 1) {
       do {
         selecttabb(tabselected+1);
-      } while(!isTabVisible(tabselected) && tabselected < 4)
+      } while(!isTabVisible(tabselected) && tabselected < MAX_TABS - 1)
     }
     break;
   default:
@@ -135,10 +137,11 @@ function loadstate() {
     document.getElementById('upperexpand').className = 'checkbox';
   } else {
     document.getElementById('upperexpand').className = 'checkbox checked';
-    var n = document.getElementById('upperexpand').className;
-    for (var i=0; i<4; i++ ) {
-      document.getElementById('uppertext'+i).style.display = (n=='checkbox'?'none':'block');
-    }
+  }
+
+  var n = document.getElementById('upperexpand').className;
+  for (var i=0; i < MAX_TABS; i++ ) {
+    document.getElementById('uppertext'+i).style.display = (n=='checkbox'?'none':'block');
   }
 
   // Expand files

@@ -61,7 +61,9 @@ class SetUpViewController: UIViewController, UIWebViewDelegate {
 
     // Yes, .php.html.  That's how `wget` is set to retrieve it, since Safari won't recognize the contents
     // without the .html ending, it seems.
-    let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard.php", ofType: "html", inDirectory: nil)
+    let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard.php",
+                                          ofType: "html",
+                                          inDirectory: nil)
     webView.loadRequest(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
 

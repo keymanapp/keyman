@@ -4,7 +4,7 @@
 
 TARGETS=kmshell setup insthelp
 RELEASE_TARGETS=help
-CLEANS=inst
+CLEANS=inst clean-desktop
 MANIFESTS=kmshell setup insthelp
 
 !include ..\Header.mak
@@ -26,13 +26,19 @@ help:
 insthelp:
   cd $(ROOT)\src\desktop\insthelp
   $(MAKE) $(TARGET)
-  
+
 inst:
   cd $(ROOT)\src\desktop\inst
   $(MAKE) $(TARGET)
 
+# ----------------------------------------------------------------------
+
+clean-desktop:
+    cd $(ROOT)\src\desktop
+    -del version.txt
+
 !include ..\Target.mak
-  
+
 # ----------------------------------------------------------------------
 # EOF
 # ----------------------------------------------------------------------

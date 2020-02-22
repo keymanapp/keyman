@@ -301,7 +301,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
     Left = 304
     Top = 236
     Bitmap = {
-      494C01010A000E00000110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010A000E00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -710,7 +710,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
     Left = 236
     Top = 236
     Bitmap = {
-      494C01013B004000000110001000C0C0C000FF10FFFFFFFFFFFFFFFF424D3600
+      494C01013B004000040010001000C0C0C000FF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000F0000000010020000000000000F0
       000000000000000000000000000000000000C0C0C000C0C0C000C0C0C000C0C0
       C000C0C0C000C6C6C600F7730000CE5A0000CE5A0000F7730000C6C6C600C0C0
@@ -2950,7 +2950,19 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Action = modActionsMain.actProjectSettings
       end
     end
-    object Keyboards1: TMenuItem
+    object mnuModel: TMenuItem
+      Caption = '&Model'
+      object CompileModel1: TMenuItem
+        Action = modActionsModelEditor.actModelCompile
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object estLexicalModel1: TMenuItem
+        Action = modActionsModelEditor.actModelTest
+      end
+    end
+    object mnuKeyboard: TMenuItem
       Caption = '&Keyboard'
       object CompileKeyboard1: TMenuItem
         Action = modActionsKeyboardEditor.actKeyboardCompile
@@ -2989,7 +3001,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Action = modActionsKeyboardEditor.actKeyboardFontHelper
       end
     end
-    object Debug2: TMenuItem
+    object mnuDebug: TMenuItem
       Caption = '&Debug'
       object SetBreakpoint1: TMenuItem
         Action = modActionsKeyboardEditor.actDebugSetClearBreakpoint

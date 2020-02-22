@@ -85,6 +85,7 @@ type
       eventFlags: Cardinal; out Result: Boolean);
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+    procedure cefLoadEnd(Sender: TObject);
 
     procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
     procedure WMUser_SyntaxColourChange(var Message: TMessage); message WM_USER_SYNTAXCOLOURCHANGE;
@@ -95,7 +96,6 @@ type
     procedure ExecuteLineCommand(ALine: Integer; const command: string);
     procedure UpdateToken(command: string);
     procedure SetCursorPosition(AColumn, ARow: Integer);
-    procedure cefLoadEnd(Sender: TObject);
     procedure DoBreakpointClicked(const line: string);
     procedure UpdateEditorFonts;
     procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
@@ -324,12 +324,13 @@ end;
 
 procedure TframeTextEditor.SetupCharMapDrop;
 begin
-  GetCharMapDropTool.Handle(cef.cefwp, cmimDefault, CharMapDragOver, CharMapDragDrop);
+  GetCharMapDropTool.Handle(cef, cmimDefault, CharMapDragOver, CharMapDragDrop);
 end;
 
 procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
 begin
   FHasBeenLoaded := True;
+  SetupCharMapDrop;
 end;
 
 type
@@ -655,7 +656,6 @@ end;
 
 procedure TframeTextEditor.SetFocus;
 begin
-  inherited;
   cef.SetFocus;
 end;
 
@@ -1116,7 +1116,15 @@ begin
   try
     j.AddPair('x', TJSONNumber.Create(X));
     j.AddPair('y', TJSONNumber.Create(Y));
-    j.AddPair('text', cdo.Text[cdo.InsertType]);
+
+    // The character map insert format actually only
+    // makes sense for the .kmn source editor. For all
+    // other contexts, we currently only support cmimCharacter.
+    // It would be possible to do \uxxxx for JS/JSON etc but
+    // for now that is low priority.
+    if FEditorFormat = efKMN
+      then j.AddPair('text', cdo.Text[cdo.InsertType])
+      else j.AddPair('text', cdo.Text[cmimCharacter]);
     ExecuteCommand('charmapDragDrop', j);
   finally
     j.Free;

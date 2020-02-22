@@ -20,6 +20,7 @@ const NSTimeInterval repeatInterval = 0.05f;
 @property (nonatomic, assign) NSUInteger keyCode;
 @property (nonatomic, assign) BOOL hasKeyCaption;
 @property (nonatomic, assign) BOOL isModifierKey;
+@property (nonatomic, assign) BOOL isSpecialKey;
 @property (nonatomic, strong) KeyLabel *label;
 @property (nonatomic, strong) NSTextField *caption;
 @property (nonatomic, strong) NSImageView *bitmapView;
@@ -52,29 +53,29 @@ const NSTimeInterval repeatInterval = 0.05f;
         [_label setTextColor:[NSColor blackColor]];
         [_label setStringValue:@""];
         [self addSubview:_label];
-        
+
         bgColor1 = [self getOpaqueColorWithRed:209 green:211 blue:212];
         bgColor2 = [self getOpaqueColorWithRed:166 green:169 blue:172];
     }
-    
+
     return self;
 }
 
 - (void)drawRect:(NSRect)rect {
     [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
     NSRectFillUsingOperation(rect, NSCompositeSourceOver);
-    
+
     // Drawing code here.
     CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
     CGContextSetLineJoin(context, kCGLineJoinRound);
     CGContextSetLineWidth(context, lw);
     CGContextSetStrokeColorWithColor(context, bgColor1.CGColor);
-    
+
     CGFloat x = rect.origin.x + lw;
     CGFloat y = rect.origin.y + lw;
     CGFloat w = rect.size.width - 2*lw;
     CGFloat h = rect.size.height - 2*lw;
-    
+
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, w/2.0, y);
     CGContextAddArcToPoint(context, w, y, w, y+h, r);
@@ -83,7 +84,7 @@ const NSTimeInterval repeatInterval = 0.05f;
     CGContextAddArcToPoint(context, x, y, w/2.0, y, r);
     CGContextClosePath(context);
     CGContextDrawPath(context, kCGPathStroke);
-    
+
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, w/2.0, y);
     CGContextAddArcToPoint(context, w, y, w, y+h, r);
@@ -92,13 +93,12 @@ const NSTimeInterval repeatInterval = 0.05f;
     CGContextAddArcToPoint(context, x, y, w/2.0, y, r);
     CGContextClosePath(context);
     CGContextClip(context);
-    
+
     NSColor *bgColor = bgColor1;
-    if (self.keyCode >= MVK_CAPS_LOCK && self.keyCode <= MVK_RIGHT_ALT)
+
+    if ([self isSpecialKey])
         bgColor = bgColor2;
-    else if (self.keyCode == MVK_ENTER || self.keyCode == MVK_TAB || self.keyCode == MVK_BACKSPACE)
-        bgColor = bgColor2;
-    
+
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGFloat gradientLocations[] = {0, 1};
     NSArray *gradientColors = [NSArray arrayWithObjects:(id)bgColor.CGColor, bgColor.CGColor, nil];
@@ -118,7 +118,10 @@ const NSTimeInterval repeatInterval = 0.05f;
     _key = key;
     [self setKeyCode:key.keyCode];
     [self setTag:key.keyCode|0x1000];
-    [self setLabelText:key.caption];
+    if ([self isSpecialKey])
+        [self setLabelText:key.caption];
+    else
+        [self setLabelText:@""];
     if (key.scale == 1.0)
         [self setCaptionText:key.caption];
 }
@@ -131,6 +134,13 @@ const NSTimeInterval repeatInterval = 0.05f;
         _isModifierKey = YES;
     else if (keyCode == MVK_LEFT_CTRL || keyCode == MVK_RIGHT_CTRL)
         _isModifierKey = YES;
+
+    if (keyCode >= MVK_CAPS_LOCK && keyCode <= MVK_RIGHT_ALT)
+        _isSpecialKey = YES;
+    else if (self.keyCode == MVK_ENTER || self.keyCode == MVK_TAB || self.keyCode == MVK_BACKSPACE)
+        _isSpecialKey = YES;
+    else
+        _isSpecialKey = NO;
 }
 
 - (void)setLabelText:(NSString *)text {
@@ -156,7 +166,7 @@ const NSTimeInterval repeatInterval = 0.05f;
 - (void)setCaptionFont:(NSString *)fontName {
     if (_caption == nil)
         [self setHasKeyCaption:YES];
-    
+
     CGFloat fontSize = [_caption.font pointSize];
     if (fontName != nil) {
         NSFont *font = [NSFont fontWithName:fontName size:fontSize];
@@ -270,7 +280,7 @@ const NSTimeInterval repeatInterval = 0.05f;
     @synchronized(self.target) {
         //NSLog(@"KeyView TIMER - Fired for key %lu", [self keyCode]);
         [self processKeyClick];
-        
+
         if ([timer timeInterval] == delayBeforeRepeating) {
             // Fired following a normal (non-modifier key press). As long as user continues to hold
             // down that key, it will now begin to repeat every 0.05 seconds. All we really want to

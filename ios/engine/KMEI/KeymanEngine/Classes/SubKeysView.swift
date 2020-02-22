@@ -11,6 +11,7 @@ import  UIKit
 class SubKeysView: UIView {
   private let borderRadius: CGFloat = 5.0
   private let strokeWidth: CGFloat = 1.0
+  private var baseKeyYDelta: CGFloat = 0.0
 
   private var keyFrame = CGRect.zero
   private var adjX: CGFloat = 0.0
@@ -18,9 +19,9 @@ class SubKeysView: UIView {
   private var rows: Int = 0
 
   private let scale = UIScreen.main.scale
-  private let bgColor = UIColor.white
-  private let bgColor2 = UIColor.white
-  private let borderColor = UIColor(red: 145.0 / 255.0, green: 148.0 / 255.0, blue: 152.0 / 255.0, alpha: 1.0)
+  private let bgColor = Colors.keyboardBackground
+  private let bgColor2 = Colors.keyboardBackground
+  private let borderColor = Colors.popupBorder
 
   let containerView: UIView
 
@@ -88,7 +89,14 @@ class SubKeysView: UIView {
     let baseHeight = keyFrame.size.height + marginY
     let viewHeight = baseHeight + containerHeight - marginY + strokeWidth
     var viewPosX = keyFrame.origin.x - (viewWidth - keyFrame.size.width) / 2.0
-    let viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.size.height + strokeWidth)
+    var viewPosY = keyFrame.origin.y - (viewHeight - keyFrame.size.height + strokeWidth)
+
+    // Ensure that the system keyboard doesn't try to display off the top of the keyboard's view area.
+    if viewPosY < 0 && isSystemKeyboard {
+      baseKeyYDelta = viewPosY // We'll need this to adjust the visualization.
+      viewPosY = 0
+    }
+
     adjX = 0
     adjY = 0
 
@@ -173,6 +181,10 @@ class SubKeysView: UIView {
     let viewTop = strokeWidth
 
     var viewBottom = viewHeight - strokeWidth * 0.75 - (CGFloat(rows - 1) * 0.25)
+    viewBottom += baseKeyYDelta
+
+    let showBaseKeyPopup = (viewBottom > midY)
+
     if scale == 3.0 {
       viewBottom -= CGFloat(3 - rows) * 0.4
     } else if scale == 2.0 {
@@ -198,16 +210,21 @@ class SubKeysView: UIView {
     context.move(to: CGPoint(x: viewMid, y: viewTop))
     context.addArc(tangent1End: CGPoint(x: viewLeft, y: viewTop),
                    tangent2End: CGPoint(x: viewLeft, y: midY), radius: r1)
-    context.addArc(tangent1End: CGPoint(x: viewLeft, y: midY),
-                   tangent2End: CGPoint(x: keyLeft, y: midY), radius: r1)
-    context.addArc(tangent1End: CGPoint(x: keyLeft, y: midY),
-                   tangent2End: CGPoint(x: keyLeft, y: viewBottom), radius: r2)
-    context.addArc(tangent1End: CGPoint(x: keyLeft, y: viewBottom),
-                   tangent2End: CGPoint(x: keyRight, y: viewBottom), radius: r0)
-    context.addArc(tangent1End: CGPoint(x: keyRight, y: viewBottom),
-                   tangent2End: CGPoint(x: keyRight, y: midY), radius: r0)
-    context.addArc(tangent1End: CGPoint(x: keyRight, y: midY),
-                   tangent2End: CGPoint(x: viewRight, y: midY), radius: r2)
+    if showBaseKeyPopup {
+      context.addArc(tangent1End: CGPoint(x: viewLeft, y: midY),
+                     tangent2End: CGPoint(x: keyLeft, y: midY), radius: r1)
+      context.addArc(tangent1End: CGPoint(x: keyLeft, y: midY),
+                     tangent2End: CGPoint(x: keyLeft, y: viewBottom), radius: r2)
+      context.addArc(tangent1End: CGPoint(x: keyLeft, y: viewBottom),
+                     tangent2End: CGPoint(x: keyRight, y: viewBottom), radius: r0)
+      context.addArc(tangent1End: CGPoint(x: keyRight, y: viewBottom),
+                     tangent2End: CGPoint(x: keyRight, y: midY), radius: r0)
+      context.addArc(tangent1End: CGPoint(x: keyRight, y: midY),
+                     tangent2End: CGPoint(x: viewRight, y: midY), radius: r2)
+    } else {
+      context.addArc(tangent1End: CGPoint(x: viewLeft, y: midY),
+                     tangent2End: CGPoint(x: viewRight, y: midY), radius: r0)
+    }
     context.addArc(tangent1End: CGPoint(x: viewRight, y: midY),
                    tangent2End: CGPoint(x: viewRight, y: viewTop), radius: r1)
     context.addArc(tangent1End: CGPoint(x: viewRight, y: viewTop),
@@ -219,16 +236,21 @@ class SubKeysView: UIView {
     context.move(to: CGPoint(x: viewMid, y: viewTop))
     context.addArc(tangent1End: CGPoint(x: viewLeft, y: viewTop),
                    tangent2End: CGPoint(x: viewLeft, y: midY), radius: r1)
-    context.addArc(tangent1End: CGPoint(x: viewLeft, y: midY),
-                   tangent2End: CGPoint(x: keyLeft, y: midY), radius: r1)
-    context.addArc(tangent1End: CGPoint(x: keyLeft, y: midY),
-                   tangent2End: CGPoint(x: keyLeft, y: viewBottom), radius: r2)
-    context.addArc(tangent1End: CGPoint(x: keyLeft, y: viewBottom),
-                   tangent2End: CGPoint(x: keyRight, y: viewBottom), radius: r0)
-    context.addArc(tangent1End: CGPoint(x: keyRight, y: viewBottom),
-                   tangent2End: CGPoint(x: keyRight, y: midY), radius: r0)
-    context.addArc(tangent1End: CGPoint(x: keyRight, y: midY),
-                   tangent2End: CGPoint(x: viewRight, y: midY), radius: r2)
+    if showBaseKeyPopup {
+      context.addArc(tangent1End: CGPoint(x: viewLeft, y: midY),
+                     tangent2End: CGPoint(x: keyLeft, y: midY), radius: r1)
+      context.addArc(tangent1End: CGPoint(x: keyLeft, y: midY),
+                     tangent2End: CGPoint(x: keyLeft, y: viewBottom), radius: r2)
+      context.addArc(tangent1End: CGPoint(x: keyLeft, y: viewBottom),
+                     tangent2End: CGPoint(x: keyRight, y: viewBottom), radius: r0)
+      context.addArc(tangent1End: CGPoint(x: keyRight, y: viewBottom),
+                     tangent2End: CGPoint(x: keyRight, y: midY), radius: r0)
+      context.addArc(tangent1End: CGPoint(x: keyRight, y: midY),
+                     tangent2End: CGPoint(x: viewRight, y: midY), radius: r2)
+    } else {
+      context.addArc(tangent1End: CGPoint(x: viewLeft, y: midY),
+                     tangent2End: CGPoint(x: viewRight, y: midY), radius: r0)
+    }
     context.addArc(tangent1End: CGPoint(x: viewRight, y: midY),
                    tangent2End: CGPoint(x: viewRight, y: viewTop), radius: r1)
     context.addArc(tangent1End: CGPoint(x: viewRight, y: viewTop),

@@ -415,8 +415,6 @@ BOOL ProcessGroup(LPGROUP gp)
       else 
 			{
 				_td->app->QueueAction(QIT_BACK, 0);
-				if(*p >= 0xD800 && *p <= 0xDBFF)
-          _td->app->QueueAction(QIT_BACK, BK_SUPP2);  // I1389 - supp chars on vista default to single backspace - use BK_SUPP2 flag
 			}
 		}
         p = kkp->dpOutput;

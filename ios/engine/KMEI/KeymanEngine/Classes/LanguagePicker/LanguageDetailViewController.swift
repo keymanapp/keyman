@@ -110,7 +110,7 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
     let cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }
@@ -151,12 +151,12 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     
         let alertController = UIAlertController(title: "\(language.name): \(keyboard.name)",
                                                 message: "Would you like to download this keyboard?",
-                                                preferredStyle: UIAlertControllerStyle.alert)
+                                                preferredStyle: UIAlertController.Style.alert)
         alertController.addAction(UIAlertAction(title: "Cancel",
-                                                style: UIAlertActionStyle.cancel,
+                                                style: UIAlertAction.Style.cancel,
                                                 handler: nil))
         alertController.addAction(UIAlertAction(title: "Download",
-                                                style: UIAlertActionStyle.default,
+                                                style: UIAlertAction.Style.default,
                                                 handler: {_ in self.downloadHandler(keyboardIndex)} ))
         
         self.present(alertController, animated: true, completion: nil)
@@ -170,9 +170,9 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   
   func showActivityView() {
     view.isUserInteractionEnabled = false
-    let indicatorView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let indicatorView = UIActivityIndicatorView(style: .whiteLarge)
     let activityView = UIView(frame: indicatorView.bounds.insetBy(dx: -10.0, dy: -10.0))
-    activityView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
+    activityView.backgroundColor = Colors.spinnerBackground
     activityView.layer.cornerRadius = 6.0
     activityView.center = view.center
     activityView.tag = activityViewTag
@@ -190,21 +190,9 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
     activityView?.removeFromSuperview()
     view.isUserInteractionEnabled = true
   }
-  
+
   private func showConnectionErrorAlert() {
-    dismissActivityView()
-    let alertController = UIAlertController(title: "Connection Error",
-                                            message: "Could not reach Keyman server. Please try again later.",
-                                            preferredStyle: UIAlertControllerStyle.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.default,
-                                            handler: errorAcknowledgmentHandler))
-    
-    self.present(alertController, animated: true, completion: nil)
-  }
-  
-  func errorAcknowledgmentHandler(withAction action: UIAlertAction) {
-    navigationController?.popToRootViewController(animated: true)
+    Alerts.showConnectionErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
   }
 
   private func keyboardDownloadStarted() {
@@ -215,6 +203,8 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
 
   private func keyboardDownloadFailed() {
     log.info("keyboardDownloadFailed: LanguageDetailViewController")
+    Alerts.showDownloadErrorAlert(in: self, handler: Alerts.popToNavigationRootHandler(for: self))
+
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }

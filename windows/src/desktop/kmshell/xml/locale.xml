@@ -126,6 +126,11 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboards_NoKeyboardsInstalled" Version="7.0.230.0" Description="Keyboard Layouts - notice of no keyboard layouts installed">You do not have any keyboards installed.  Click the Download Keyboard button to install a keyboard layout from the Keyman website.</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="SKUninstallRequireAdmin" Version="7.1.251.0" Parameters="%0:s = keyboard layout name" Description="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">You can only uninstall the keyboard '%0:s' if you are an Administrator</String>
 
+<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboard_Share" Version="13.0.40.0" Description="Keyboard Layouts - share selected keyboard button">Share keyboard</String>
+<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboard_Share_QRCode" Version="13.0.40.0" Description="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">Scan this code to load this keyboard on another device or </String>
+<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboard_Share_Link" Version="13.0.40.0" Description="Keyboard Layouts - text for link to share">share online</String>
+<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Keyboard_Share_LinkSuffix" Version="13.0.40.0" Description="Keyboard Layouts - suffix for link to share"></String>
+
 <!-- Options tab -->
 
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="kogGeneral" Version="7.0.230.0" Description="Options section - General">General</String>

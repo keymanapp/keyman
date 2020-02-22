@@ -83,7 +83,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
     
     let cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }
@@ -124,12 +124,12 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       
       let alertController = UIAlertController(title: "\(language.name): \(lexicalModel.name)",
         message: "Would you like to download this dictionary?",
-        preferredStyle: UIAlertControllerStyle.alert)
+        preferredStyle: UIAlertController.Style.alert)
       alertController.addAction(UIAlertAction(title: "Cancel",
-                                              style: UIAlertActionStyle.cancel,
+                                              style: UIAlertAction.Style.cancel,
                                               handler: nil))
       alertController.addAction(UIAlertAction(title: "Download",
-                                              style: UIAlertActionStyle.default,
+                                              style: UIAlertAction.Style.default,
                                               handler: {_ in self.downloadHandler(lexicalModelIndex)} ))
       
       self.present(alertController, animated: true, completion: nil)

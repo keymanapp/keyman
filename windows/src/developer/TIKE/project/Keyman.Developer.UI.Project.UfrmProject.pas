@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.UI.Project.UfrmProject
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    9 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework for Keyman 7
                     23 Aug 2006 - mcdurdin - Fix broken focus of web browser
@@ -93,6 +93,7 @@ type
     procedure SetFocus; override;
     procedure SetGlobalProject;
     procedure StartClose; override;
+    procedure CompileAll;
   end;
 
 implementation
@@ -279,6 +280,26 @@ begin
   WebCommand(LowerCase(command), params);
 end;
 
+procedure TfrmProject.CompileAll;
+var
+  i: Integer;
+begin
+  ClearMessages;
+  for i := 0 to FGlobalProject.Files.Count - 1 do
+  begin
+    if (FGlobalProject.Files[i] is TkmnProjectFile) or
+      (FGlobalProject.Files[i] is TmodelTsProjectFile) then
+    begin
+      if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
+    end;
+  end;
+  for i := 0 to FGlobalProject.Files.Count - 1 do
+  begin
+    if FGlobalProject.Files[i] is TkpsProjectFile then
+      if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
+  end;
+end;
+
 procedure TfrmProject.ClearMessages;
 begin
   frmMessages.Clear;
@@ -459,20 +480,7 @@ begin
   end
   else if Command = 'compileall' then   // I4686
   begin
-    ClearMessages;
-    for i := 0 to FGlobalProject.Files.Count - 1 do
-    begin
-      if (FGlobalProject.Files[i] is TkmnProjectFile) or
-        (FGlobalProject.Files[i] is TmodelTsProjectFile) then
-      begin
-        if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
-      end;
-    end;
-    for i := 0 to FGlobalProject.Files.Count - 1 do
-    begin
-      if FGlobalProject.Files[i] is TkpsProjectFile then
-        if not (FGlobalProject.Files[i].UI as TProjectFileUI).DoAction(pfaCompile, False) then Exit;   // I4687
-    end;
+    CompileAll;
   end
   else if Command = 'cleanall' then   // I4692
   begin

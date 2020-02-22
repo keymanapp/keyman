@@ -41,8 +41,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       navigationItem.rightBarButtonItem = addButton
     }
     
-    navigationController?.toolbar?.barTintColor = UIColor(red: 0.5, green: 0.75,
-                                                          blue: 0.25, alpha: 0.9)
+    navigationController?.toolbar?.barTintColor = Colors.statusToolbar
     
     lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.lexicalModelDownloadStarted,
@@ -92,7 +91,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 204.0 / 255.0, green: 136.0 / 255.0, blue: 34.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionPrimary
     cell.selectedBackgroundView = selectionColor
     return cell
   }
@@ -106,7 +105,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     return true
   }
   
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle,
+  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                           forRowAt indexPath: IndexPath) {
     if editingStyle != .delete {
       return
@@ -216,9 +215,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: { _ in
                                               self.navigationController?.popToRootViewController(animated: true)
                                             }))
@@ -271,7 +270,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func scroll(toSelectedLexicalModel animated: Bool) {
-    let index = userLexicalModels.index { lm in
+    let index = userLexicalModels.firstIndex { lm in
       return Manager.shared.currentLexicalModelID == lm.fullID
     }
     
@@ -308,9 +307,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
           self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
         }
       } else if nil == lexicalModels {
-        log.info("No lexical models available for language \(language.id) (nil)")
+        noModelsAvailable(cause: "nil")
       } else if 0 == lexicalModels?.count {
-        log.info("No lexical models available for language \(language.id) (empty)")
+        noModelsAvailable(cause: "empty")
       } else {
         log.info("Fetched lexical model list for "+language.id+".")
         // show the list of lexical models (on the main thread)
@@ -325,6 +324,22 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     }
     
     Manager.shared.apiLexicalModelRepository.fetchList(languageID: language.id, completionHandler: listCompletionHandler)
+  }
+
+  func noModelsAvailable(cause: String = "nil") {
+    let msg = "No dictionaries available"
+    let logMsg = "No lexical models available for language \(language.id) (\(cause))"
+    log.info(logMsg)
+
+    let alertController = UIAlertController(title: title, message: msg,
+                                            preferredStyle: UIAlertController.Style.alert)
+    alertController.addAction(UIAlertAction(title: "OK",
+                                            style: UIAlertAction.Style.default,
+                                            handler: { _ in
+                                              self.navigationController?.popViewController(animated: true)
+                                            }))
+
+    self.present(alertController, animated: true, completion: nil)
   }
   
 }

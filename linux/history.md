@@ -1,7 +1,37 @@
 # Keyman for Linux Version History
 
-## 13.0 alpha
-* Start version 13.0
+# 2020-02-18 13.0.30 beta
+* Bug Fix:
+  * Include Keyman gsettings schema for packaging (#2675)
+
+# 2020-02-17 13.0.29 beta
+* Bug Fix:
+  * Fix how tier is determined for debian watch files (#2664)
+  * Fix keyboard processor compilation for Xenial (#2648)
+
+# 2020-02-11 13.0.28 beta
+* Bug Fix:
+  * Incorporate packaging fixes from 14.0 development (#2624)
+
+## 2020-02-10 13.0.27 beta
+* Bug Fix:
+  * Fix setting context when >= 64 characters (common #2607)
+
+## 2020-02-06 13.0.26 beta
+* New Feature:
+  * Add ability to set keyboard options from options.htm dialog (#2566)
+
+## 2020-02-05 13.0.25 beta
+* Bug Fix:
+  * Fix "About" keyboard when missing copyright info (#2583)
+
+## 2020-02-04 13.0.23 beta
+* Remove cosmic and disco releases. Add eoan (#2574)
+
+## 2020-01-28 13.0.21 beta
+* Revert default tier to alpha (#2474)
+* Add QR Codes to share keyboards (#2486)
+* Work on Linux packaging (#2263, #2290, #2320, #2321, #2325, #2474, #2515, #2551)
 
 ## 2019-09-19 12.0.18 beta
 * Bug Fix:

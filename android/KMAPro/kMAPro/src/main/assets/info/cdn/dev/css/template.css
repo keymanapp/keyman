@@ -1290,128 +1290,51 @@ body[data-device='Unknown'] #osk-tablet-container {
 	float: left;
 }
 
-/**************************************
- * JIRA FEEDBACK CSS
+ /**************************************
+ * FOOTER TABS
  * ***********************************/
 
-#jira-feedback{
-	width: 300px;
-	height: 320px;
+.footer-tab-holder{
+	width: 70px;
+	height: 20px;
 	padding: 9px;
-	background: #f2f2f2;
 	position: fixed;
 	top: 100%;
 	left: 100%;
+	z-index: 4;
+}
+
+#footer-tab-support {
 	margin-left: -340px;
-	border-top-left-radius: 6px;
-	border: solid 1px #000;
-  z-index: 4;
 }
 
-#jira-feedback.selected{
-	margin-top: -339px;
+#footer-tab-edit {
+	margin-left: -260px;
 }
 
-#jira-feedback-tab{
+.footer-tab{
 	float: right;
 	position: relative;
-	top: -50px;
+	font-size: 10pt;
+	top: -34px;
 	right: -10px;
-	z-index: 4;
 	background: #69B7D2;
-	height: 30px;
-	line-height: 30px;
-	padding: 5px 10px;
+	height: 20px;
+	padding: 5px 0px;
 	text-align: center;
-	border-top-left-radius: 6px;
-	border-top-right-radius: 6px;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
 	width: 70px;
 	margin-left: 210px;
 	cursor: pointer;
-	border-top: solid 1px #000;
-	border-left: solid 1px #000;
-	border-right: solid 1px #000;
+	border-top: solid 1px #444;
+	border-left: solid 1px #444;
+	border-right: solid 1px #444;
 }
 
-#jira-feedback-tab h4{
-	color: #fff;
-}
-
-#jira-feedback-form{
-	position: relative;
-	top: -30px;
-}
-
-#jira-feedback input, #jira-feedback textarea, #jira-feedback select{
-	width: 288px;
-	border: solid 1px #000;
-	padding: 4px 5px;
-	margin: 5px 0px 10px 0px;
-}
-
-#jira-feedback textarea{
-	height: 100px;
-}
-
-#jira-feedback select{
-	width: 298px;
-}
-
-#jira-submit{
-	float: right;
-	width: 140px;
-	height: 40px;
-	border-radius: 6px;
-	border: solid 3px #fff;
-	margin: 10px 0px;
-	cursor: pointer;
-	background: #91db51; /* Old browsers */
-	background: -moz-linear-gradient(top,  #69B7D2 0%, #5A9EB5 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#69B7D2), color-stop(100%,#5A9EB5)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #69B7D2 0%,#5A9EB5 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #69B7D2 0%,#5A9EB5 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #69B7D2 0%,#5A9EB5 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #69B7D2 0%,#5A9EB5 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#69B7D2', endColorstr='#5A9EB5',GradientType=0 ); /* IE6-9 */
-}
-
-#jira-submit input{
-	color: #fff;
-	line-height: 40px;
-	text-align: center;
-	font-weight: bold;
-  width: auto;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-#jira-submit:hover{
-	background: #91db51; /* Old browsers */
-	background: -moz-linear-gradient(top,  #5A9EB5 0%, #477C8E 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5A9EB5), color-stop(100%,#477C8E)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #5A9EB5 0%,#477C8E 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #5A9EB5 0%,#477C8E 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #5A9EB5 0%,#477C8E 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #5A9EB5 0%,#477C8E 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5A9EB5', endColorstr='#477C8E',GradientType=0 ); /* IE6-9 */
-}
-
-#jira-feedback form{
-	width: 300px;
-}
-
-#jira-feedback p{
-	float: left;
-	width: 300px;
-	text-align: left;
-	font-size: 12pt !important;
-	position: relative;
-	top: -30px;
-}
-
-#jira-feedback p#jira-title {
-  top: -40px;
+.footer-tab a{
+	color: #444;
+	text-decoration: none;
 }
 
 /**************************************
@@ -1477,7 +1400,7 @@ body[data-device='Unknown'] #osk-tablet-container {
 		height: 280px;
 		font-size: 1.8em !important;
 	}
-	#jira-feedback{
+	.footer-tab-holder{
 		display: none;
 	}
 }
@@ -1538,7 +1461,7 @@ body[data-device='Unknown'] #osk-tablet-container {
 		height: 220px;
 		font-size: 1.5em !important;
 	}
-	#jira-feedback{
+	.footer-tab-holder{
 		display: none;
 	}
 }
@@ -1666,7 +1589,7 @@ body[data-device='Unknown'] #osk-tablet-container {
 	#keymanExample table{
 		width: 1000px;
 	}
-	#jira-feedback{
+	.footer-tab-holder{
 		display: none;
 	}
 }

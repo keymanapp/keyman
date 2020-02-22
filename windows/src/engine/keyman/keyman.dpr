@@ -1,7 +1,5 @@
 ﻿program keyman;
 
-
-
 uses
   Forms,
   Dialogs,
@@ -140,11 +138,17 @@ uses
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
-  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost};
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
+  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
 {$R MANIFEST.RES}
+
+//
+// PEOPTFLAGS $140 turns on Data Execution Prevention
+//
+{$SETPEOPTFLAGS $140}
 
 begin
   //InitTntEnvironment;

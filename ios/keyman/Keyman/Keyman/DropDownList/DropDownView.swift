@@ -7,17 +7,18 @@
 //
 
 import UIKit
+import KeymanEngine // Defines useful color constants
 
 class DropDownView: UIView {
   let strokeWidth: CGFloat = 2.0
   let borderRadius: CGFloat = 5.0
   let arrowWidth: CGFloat = 21.0
   let arrowHeight: CGFloat = 7.0
-  private let borderColor = UIColor.lightGray
+  private let borderColor = Colors.listSeparator
 
   private var _arrowPosX: CGFloat
-  private var bgColor = UIColor(white: 1.0, alpha: 1.0)
-  var backgroundColor2 = UIColor(white: 1.0, alpha: 1.0)
+  private var bgColor = Colors.systemBackground
+  var backgroundColor2 = Colors.systemBackground
 
   override init(frame: CGRect) {
     _arrowPosX = frame.width / 2.0

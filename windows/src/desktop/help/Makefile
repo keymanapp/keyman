@@ -17,9 +17,9 @@ XSLSTYLE_PHP=php.xsl
 # Main targets
 #-------------------------------------------------------
 
-build: 
+build:
     @rem
-    
+
 build-release: chm html php
     copy /Y keymandesktop.chm $(ROOT)\bin\desktop
 
@@ -41,6 +41,7 @@ clean:
 	-del keymandesktop.log
 	-del toc.hhc
   -del help.suo
+  -del /Q install.mak
 
 #-------------------------------------------------------
 # CHM build
@@ -70,7 +71,6 @@ html_cleanbin:
 html_images: dirs
   -rd /s/q $(ROOT)\bin\help\desktop\desktop_images
   xcopy /s/q $(ROOT)\src\desktop\help\desktop_images $(ROOT)\bin\help\desktop\desktop_images\ #
-  copy $(ROOT)\src\desktop\help\topicresponse.js $(ROOT)\bin\help\desktop
   copy $(ROOT)\src\desktop\help\kmhelp.css $(ROOT)\bin\help\desktop
 
 #-------------------------------------------------------
@@ -87,7 +87,6 @@ php_cleanbin:
 php_images: dirs
   -rd /s/q $(ROOT)\bin\help\php\desktop\desktop_images
   xcopy /s/q $(ROOT)\src\desktop\help\desktop_images $(ROOT)\bin\help\php\desktop\desktop_images\ #
-  copy $(ROOT)\src\desktop\help\topicresponse.js $(ROOT)\bin\help\php\desktop
   copy $(ROOT)\src\desktop\help\kmhelp.css $(ROOT)\bin\help\php\desktop
 
 #-------------------------------------------------------
@@ -112,8 +111,9 @@ bightml_images: dirs
 #-------------------------------------------------------
 
 install:
-  if not exist $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop exit 1
-  -rd /s/q $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\$(KEYMAN_VERSION)\docs
-  xcopy /s/q/y $(ROOT)\bin\help\php\desktop\* $(KEYMAN_SITE_ROOT)\help.keyman.com\products\desktop\$(KEYMAN_VERSION)\docs\ #
+  cd $(ROOT)\src\desktop\help
+  $(PROGRAM)\buildtools\mkver -v -u install.in install.mak $(ROOT)\src\desktop\version.txt
+  $(MAKE) -finstall.mak install
+  -del /Q install.mak
 
 !include ..\..\Target.mak

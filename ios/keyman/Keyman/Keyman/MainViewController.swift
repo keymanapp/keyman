@@ -36,7 +36,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private var getStartedVC: GetStartedViewController!
   private var infoView: InfoViewController!
-  private var popover: UIPopoverController?
+  private var popover: UIViewController?
   private var textSizeController: UISlider!
   private var dropdownItems: [UIBarButtonItem]!
 
@@ -88,11 +88,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup Notifications
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-        name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        name: UIResponder.keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidShow),
-        name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        name: UIResponder.keyboardDidShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-        name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        name: UIResponder.keyboardWillHideNotification, object: nil)
     keyboardLoadedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardLoaded,
       observer: self,
@@ -122,6 +122,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       observer: self,
       function: MainViewController.keyboardRemoved)
 
+    // Unfortunately, it's the main app with the file definitions.
+    // We have to gerry-rig this so that the framework-based SettingsViewController
+    // can launch the app-based DocumentViewController.
+    if #available(iOS 11.0, *) {
+      Manager.shared.fileBrowserLauncher = { navController in
+        let vc = PackageBrowserViewController()
+        navController.pushViewController(vc, animated: true)
+      }
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -143,7 +152,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.apiKeyboardRepository.fetch()
     Manager.shared.apiLexicalModelRepository.fetch()
 
-    let bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
+    // Implement a default color...
+    var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
+    // And if the iOS version is current enough, override it from the palette.
+    if #available(iOS 11.0, *) {
+      bgColor = UIColor(named: "InputBackground")!
+    }
     view?.backgroundColor = bgColor
 
     // Check for configuration profiles/fonts to install
@@ -169,6 +183,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup NavigationBar
     if let navbar = navigationController?.navigationBar {
+      if #available(iOS 13.0, *) {
+        // Dark mode settings must be applied through this new property,
+        // its class, and others like it.
+        navbar.standardAppearance.configureWithOpaqueBackground()
+      } else {
+        // Fallback on earlier versions
+      }
       navbarBackground = KMNavigationBarBackgroundView()
       navbarBackground.addToNavbar(navbar)
       navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
@@ -224,60 +245,60 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let fixedSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
 
     let imageScaleF: CGFloat = 0.9
-    let moreButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"),
-                                        highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
+    let moreButton = createNavBarButton(with: UIImage(named: "IconMore")!,
+                                        highlightedImage: UIImage(named: "IconMoreSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.showDropDownMenu),
                                         orientation: orientation)
     moreButton.title = "More"
 
-    let infoButton = createNavBarButton(with: #imageLiteral(resourceName: "724-info.png"),
-                                        highlightedImage: #imageLiteral(resourceName: "724-info-selected.png"),
+    let infoButton = createNavBarButton(with: UIImage(named: "IconInfo")!,
+                                        highlightedImage: UIImage(named: "IconInfoSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.infoButtonClick),
                                         orientation: orientation)
     infoButton.title = "Info"
 
-    let getStartedButton = createNavBarButton(with: #imageLiteral(resourceName: "887-notepad.png"),
-                                              highlightedImage: #imageLiteral(resourceName: "887-notepad-selected.png"),
+    let getStartedButton = createNavBarButton(with: UIImage(named: "IconNotepad")!,
+                                              highlightedImage: UIImage(named: "IconNotepadSelected")!,
                                               imageScale: imageScaleF,
                                               action: #selector(self.showGetStartedView),
                                               orientation: orientation)
     getStartedButton.title = "Get Started"
 
-    let trashButton = createNavBarButton(with: #imageLiteral(resourceName: "711-trash.png"),
-                                         highlightedImage: #imageLiteral(resourceName: "711-trash-selected.png"),
+    let trashButton = createNavBarButton(with: UIImage(named: "IconTrash")!,
+                                         highlightedImage: UIImage(named: "IconTrashSelected")!,
                                          imageScale: imageScaleF,
                                          action: #selector(self.trashButtonClick),
                                          orientation: orientation)
     trashButton.title = "Clear Text"
 
-    let textSizeButton = createNavBarButton(with: #imageLiteral(resourceName: "textsize.png"),
-                                            highlightedImage: #imageLiteral(resourceName: "textsize_selected.png"),
+    let textSizeButton = createNavBarButton(with: UIImage(named: "IconTextSize")!,
+                                            highlightedImage: UIImage(named: "IconTextSizeSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.textSizeButtonClick),
                                             orientation: orientation)
     textSizeButton.title = "Text Size"
 
-    let browserButton = createNavBarButton(with: #imageLiteral(resourceName: "786-browser.png"),
-                                           highlightedImage: #imageLiteral(resourceName: "786-browser-selected.png"),
+    let browserButton = createNavBarButton(with: UIImage(named: "IconBrowser")!,
+                                           highlightedImage: UIImage(named: "IconBrowserSelected")!,
                                            imageScale: 1.0,
                                            action: #selector(self.showKMWebBrowserView),
                                            orientation: orientation)
     browserButton.title = "Browser"
 
-    let actionButton = createNavBarButton(with: #imageLiteral(resourceName: "702-share.png"),
-                                          highlightedImage: #imageLiteral(resourceName: "702-share-selected.png"),
+    let actionButton = createNavBarButton(with: UIImage(named: "IconShare")!,
+                                          highlightedImage: UIImage(named: "IconShareSelected")!,
                                           imageScale: imageScaleF,
                                           action: #selector(self.actionButtonClick),
                                           orientation: orientation)
     actionButton.title = "Share"
 
-    let settingsButton = createNavBarButton(with: #imageLiteral(resourceName: "more.png"), // should find a gear image and use that instead of re-using 'more'
-                                          highlightedImage: #imageLiteral(resourceName: "more-selected.png"),
-                                          imageScale: imageScaleF,
-                                          action: #selector(self.settingsButtonClick),
-                                          orientation: orientation)
+    let settingsButton = createNavBarButton(with: UIImage(named: "IconMore")!,
+                                            highlightedImage: UIImage(named: "IconMoreSelected")!,
+                                            imageScale: imageScaleF,
+                                            action: #selector(self.settingsButtonClick),
+                                            orientation: orientation)
     settingsButton.title = "Settings"
 
     dropdownItems = [textSizeButton, trashButton, infoButton, getStartedButton, settingsButton]
@@ -298,28 +319,25 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                   imageScale scaleF: CGFloat,
                                   action selector: Selector,
                                   orientation: UIInterfaceOrientation) -> UIBarButtonItem {
-    let icon = image.resize(to: CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF))
-        .withRenderingMode(.alwaysOriginal)
-    let iconHighlighted = imageHighlighted.resize(to:
-        CGSize(width: imageHighlighted.size.width * scaleF, height: imageHighlighted.size.height * scaleF))
-        .withRenderingMode(.alwaysOriginal)
+    let size = CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF)
 
     let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
     let vAdjLscpe: CGFloat = -1.6
 
-    let vAdj = UIInterfaceOrientationIsPortrait(orientation) ? vAdjPort : vAdjLscpe
+    let vAdj = orientation.isPortrait ? vAdjPort : vAdjLscpe
     let navBarHeight = self.navBarHeight()
-    let y = (navBarHeight - icon.size.height) / 2.0 + vAdj
+    let y = (navBarHeight - size.height) / 2.0 + vAdj
 
     let customButton = UIButton(type: .custom)
-    customButton.setImage(icon, for: .normal)
-    customButton.setImage(iconHighlighted, for: .highlighted)
-    customButton.frame = CGRect(x: 0.0, y: y, width: icon.size.width, height: icon.size.height)
+    customButton.setImage(image, for: .normal)
+    customButton.setImage(imageHighlighted, for: .highlighted)
+    customButton.frame = CGRect(x: 0.0, y: y, width: size.width, height: size.height)
     customButton.addTarget(self, action: selector, for: .touchUpInside)
 
-    let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: icon.size.width, height: navBarHeight))
+    let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size.width, height: navBarHeight))
     containerView.backgroundColor = UIColor.clear
     containerView.addSubview(customButton)
+
     return UIBarButtonItem(customView: containerView)
   }
 
@@ -460,7 +478,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if launchUrl != nil {
       perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
       let error = notification.error
-      appDelegate.showSimpleAlert(title: "Keyboard Download Error", message: error.localizedDescription)
+      let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Keyboard Download Error",
+                                                              message: error.localizedDescription)
+      self.present(alert, animated: true, completion: nil)
       launchUrl = nil
     }
   }
@@ -593,20 +613,27 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     printText.font = textView.font
 
     let activityVC = UIActivityViewController(activityItems: [activityProvider, printText], applicationActivities: nil)
-    activityVC.excludedActivityTypes = [UIActivityType.assignToContact, UIActivityType.postToWeibo,
-                                        UIActivityType.saveToCameraRoll]
-    activityVC.completionWithItemsHandler = {(_ activityType: UIActivityType?, _ completed: Bool,
+    activityVC.excludedActivityTypes = [UIActivity.ActivityType.assignToContact,
+                                        UIActivity.ActivityType.postToWeibo,
+                                        UIActivity.ActivityType.saveToCameraRoll]
+    activityVC.completionWithItemsHandler = {(_ activityType: UIActivity.ActivityType?, _ completed: Bool,
       _ returnedItems: [Any]?, _ activityError: Error?) -> Void in
-      self.textView.isUserInteractionEnabled = true
+
+      // If a share was completed -OR- if the user backed out of the share selection menu.
+      if completed || activityType == nil {
+        self.textView.isUserInteractionEnabled = true
+      } // else (if the user started to share but backed out to the menu) do nothing.
     }
 
     textView.isUserInteractionEnabled = false
     if UIDevice.current.userInterfaceIdiom == .phone {
       present(activityVC, animated: true, completion: nil)
     } else {
-      popover = UIPopoverController(contentViewController: activityVC)
-      popover!.present(from: (navigationItem.rightBarButtonItems?[8])!, permittedArrowDirections: .any,
-                      animated: true)
+      activityVC.modalPresentationStyle = UIModalPresentationStyle.popover
+      activityVC.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[12]
+      self.present(activityVC, animated: true)
+
+      popover = activityVC
     }
   }
 
@@ -625,14 +652,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let eframe = CGRect(x: sframe.origin.x, y: sframe.origin.y - h - 8, width: w, height: h)
     let containerView = UIView(frame: sframe)
     containerView.autoresizingMask = [.flexibleTopMargin, .flexibleLeftMargin, .flexibleRightMargin]
+    containerView.backgroundColor = Colors.systemBackground
     containerView.tag = 1
-    containerView.backgroundColor = UIColor.white
     containerView.layer.cornerRadius = 4.0
 
     let doneButton = UIButton(type: .roundedRect)
     doneButton.addTarget(self, action: #selector(self.dismissTextSizeVC), for: .touchUpInside)
 
-    doneButton.backgroundColor = UIColor.white
     doneButton.setTitle("Done", for: .normal)
     doneButton.titleLabel?.font = doneButton.titleLabel?.font?.withSize(21.0)
     doneButton.setTitleColor(UIColor(red: 0.0, green: 0.5, blue: 1.0, alpha: 1.0), for: .normal)
@@ -643,8 +669,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     let lframe = CGRect(x: 0, y: bframe.origin.y - 1, width: sframe.size.width, height: 1)
     let borderLine = UIView(frame: lframe)
-    let c: CGFloat = 230.0 / 255.0
-    borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
+    if #available(iOS 13.0, *) {
+      borderLine.backgroundColor = UIColor.separator
+    } else {
+      let c: CGFloat = 230.0 / 255.0
+      borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
+    }
     containerView.addSubview(borderLine)
 
     let tframe = CGRect(x: 0, y: 0, width: bframe.size.width, height: 40)
@@ -653,7 +683,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textSizeTitle.backgroundColor = UIColor.clear
     textSizeTitle.text = "Text size: \(Int(textSize))"
     textSizeTitle.textAlignment = .center
-    textSizeTitle.textColor = UIColor.gray
+    if #available(iOS 13.0, *) {
+      textSizeTitle.textColor = UIColor.secondaryLabel
+    } else {
+      textSizeTitle.textColor = UIColor.gray
+    }
     textSizeTitle.font = textSizeTitle.font.withSize(14.0)
     containerView.addSubview(textSizeTitle)
 
@@ -674,7 +708,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     } else {
       let vc = UIViewController()
       vc.modalPresentationStyle = .popover
-      vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
+      vc.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[8]
       vc.view = containerView
       vc.preferredContentSize = containerView.frame.size
       present(vc, animated: true, completion: nil)
@@ -712,7 +746,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     let cancel = UIAlertAction(title: "Cancel", style: .default, handler: nil)
     alert.addAction(clear)
     alert.addAction(cancel)
-    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[4]
+    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
     present(alert, animated: true, completion: nil)
   }
 
@@ -723,9 +757,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     dismissGetStartedView(nil)
     overlayWindow.isHidden = false
-    let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let activityView = UIActivityIndicatorView(style: .whiteLarge)
     let containerView = UIView(frame: activityView.bounds.insetBy(dx: -10.0, dy: -10.0))
-    containerView.backgroundColor = UIColor(white: 0.5, alpha: 0.8)
+    containerView.backgroundColor = Colors.spinnerBackground
     containerView.layer.cornerRadius = 6.0
     containerView.center = overlayWindow.center
     containerView.tag = activityIndicatorViewTag
@@ -806,8 +840,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     if let urlString = params["url"] {
       // Download and set custom keyboard
       guard let url = URL(string: urlString) else {
-        appDelegate.showSimpleAlert(title: "Custom Keyboard",
+        let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Custom Keyboard",
                                     message: "The keyboard could not be installed: Invalid Url")
+        self.present(alert, animated: true, completion: nil)
         launchUrl = nil
         return
       }
@@ -902,12 +937,12 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     dismissGetStartedView(nil)
 
     let alertController = UIAlertController(title: title, message: msg,
-                                            preferredStyle: UIAlertControllerStyle.alert)
+                                            preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: "Cancel",
-                                            style: UIAlertActionStyle.cancel,
+                                            style: UIAlertAction.Style.cancel,
                                             handler: cbHandler))
     alertController.addAction(UIAlertAction(title: "Install",
-                                              style: UIAlertActionStyle.default,
+                                              style: UIAlertAction.Style.default,
                                               handler: installHandler))
 
     self.present(alertController, animated: true, completion: nil)

@@ -1,18 +1,18 @@
 (*
   Name:             UfrmKeyman7Main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Use TKeymanTrayIcon, rework for Keyman 7
                     14 Sep 2006 - mcdurdin - Remove debug controls
@@ -150,6 +150,7 @@ uses
 
   Keyman.System.DebugLogClient,
   Keyman.System.DebugLogManager,
+  Keyman.System.FrameworkInputPane,
 
   keymanapi_TLB,
 //TOUCH    UfrmTouchKeyboard,
@@ -198,10 +199,12 @@ type
     mnu: TPopupMenu;
     tmrTestKeymanFunctioning: TTimer;
     tmrOnlineUpdateCheck: TTimer;
+    tmrCheckInputPane: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrTestKeymanFunctioningTimer(Sender: TObject);
     procedure tmrOnlineUpdateCheckTimer(Sender: TObject);
+    procedure tmrCheckInputPaneTimer(Sender: TObject);
   private
     InMenuLoop: Integer;  // I1082 - Avoid menu nasty flicker with rapid click
     FClosingApp: Boolean;
@@ -221,9 +224,14 @@ type
     FGlobalKeyboardChangeManager: TGlobalKeyboardChangeManager;   // I4271
     FActiveHKL: Integer;
     FTrayIcon: TIcon;   // I4359
+
     FHotkeyWindow: HWND;
     FHotkeys: TIntegerList;
-//TOUCH      FCurrentContext: string;
+
+    FInputPane: TFrameworkInputPane;
+    FIsInputPaneVisible: Boolean;
+
+    //TOUCH      FCurrentContext: string;
 
     function AddTaskbarIcon: Boolean;
 
@@ -238,8 +246,6 @@ type
     procedure TrayIconUnresponsive(Sender: TObject; RetryCount: Integer; var ShouldCancel: Boolean);
     procedure TrayIconMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ShowBalloon(Value: Integer);
-
-    procedure DoInterfaceHotkey(Target: Integer);
 
     procedure WMUserStart(var Message: TMessage); message WM_USER_Start;
     procedure WMUserParameterPass(var Message: TMessage); message WM_USER_ParameterPass;
@@ -290,13 +296,17 @@ type
     procedure UnregisterControllerWindows;   // I4731
     function IsSysTrayWindow(AHandle: THandle): Boolean;
     procedure GetTrayIconHandle;   // I4731
+
     procedure RegisterHotkeys;
     procedure UnregisterHotkeys;
     procedure HotkeyWndProc(var Message: TMessage);
+
     procedure DoLanguageHotkey(Index: Integer);
     procedure CEFShutdownComplete(Sender: TObject);
   protected
+    procedure DoInterfaceHotkey(Target: Integer);
 
+  protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure WndProc(var Message: TMessage); override;
   public
@@ -383,6 +393,7 @@ const
 implementation
 
 uses
+  DebugPaths,
   UfrmHelp,
   UILanguages,
   UfrmOSKCharacterMap,
@@ -444,6 +455,10 @@ begin
   begin
     olestrm := TOLEStream.Create(istrm);
     try
+      // In some situations, launching the app multiple times rapidly can
+      // cause the icon to be loaded multiple times. Make sure we reset the
+      // stream position before we try and read.
+      olestrm.Position := 0;
       Application.Icon.LoadFromStream(olestrm);
     finally
       olestrm.Free;
@@ -527,6 +542,8 @@ begin
   ChangeWindowMessageFilter(sMsg_TaskbarRestart, MSGFLT_ADD);
   ChangeWindowMessageFilter(WM_USER_PlatformComms, MSGFLT_ADD);
 
+  FInputPane := TFrameworkInputPane.Create;
+
   PostMessage(Handle, WM_USER_Start, 0, 0);
 end;
 
@@ -537,6 +554,8 @@ end;}
 
 procedure TfrmKeyman7Main.FormDestroy(Sender: TObject);
 begin
+  FreeAndNil(FInputPane);
+
   ClosePlatformComms64;
 
   UnregisterHotkeys;
@@ -797,8 +816,9 @@ begin
     KMC_SETFOCUSINFO:
       begin
         UpdateFocusInfo;   // I4731
-        RequestCurrentActiveKeyboard(0);   // I3961
+        RequestCurrentActiveKeyboard(PC_UPDATE);   // I3961
       end;
+
     KMC_INTERFACEHOTKEY:
       begin
         DoInterfaceHotkey(wParam);
@@ -887,7 +907,7 @@ begin
     khCharacterMap: MnuCharacterMap(nil);
     khTextEditor: MnuOpenTextEditor(nil);
     khLanguageSwitch:
-      RequestCurrentActiveKeyboard(1);   // I4124
+      RequestCurrentActiveKeyboard(PC_UPDATE_LANGUAGESWITCH);   // I4124
 
   end;
 end;
@@ -1204,7 +1224,7 @@ end;
 function TfrmKeyman7Main.StartKeymanEngine: Boolean;  // I1951
 begin
   Result := True;
-  
+
   if Assigned(kmcom) then Exit;
 
   try
@@ -1282,6 +1302,22 @@ begin
 end;
 
 procedure TfrmKeyman7Main.ProcessProfileChange(CommandAndAtom: DWORD);   // I3933   // I3949
+
+  procedure ProcessHotkeyChange(hkl: DWORD; guidProfile: TGUID);
+  var
+    kbd: TLangSwitchKeyboard;
+  begin
+    kbd := FLangSwitchManager.FindKeyboard(hkl, guidProfile);
+    if Assigned(kbd) then
+    begin
+      // Handle toggle hotkey
+      if (kbd = FLangSwitchManager.ActiveKeyboard) and (kmcom.Options['koKeyboardHotkeysAreToggle'].Value) then
+          kbd := FLangSwitchManager.Languages[0].Keyboards[0];
+
+      ActivateKeyboard(kbd);
+    end;
+  end;
+
 var
   val, FLangID: Integer;
   param2, param3: string;
@@ -1290,14 +1326,17 @@ var
   buf: string;
   FActiveKeyboard: TLangSwitchKeyboard;
   i: Integer;
+  wCommand: Word;
 begin
   if GlobalGetAtomName(HiWord(CommandAndAtom), buftext, 128) = 0 then   // I3949
     Exit;   // I4286
 
+  wCommand := LoWord(CommandAndAtom);
+
   GlobalDeleteAtom(HiWord(CommandAndAtom));   // I3949
   buf := buftext;
 
-  OutputDebugString(PChar('ProcessProfileChange("'+buf+'")'#13#10));
+  //OutputDebugString(PChar('ProcessProfileChange("'+buf+'")'#13#10));
 
   {debug := } StrToken(buf, '|');   // I4285
 
@@ -1310,13 +1349,22 @@ begin
       OutputDebugString(PChar('Could not process profile change'#13#10));
       Exit;
     end;
-    FLangSwitchManager.UpdateActive(FLangID, lsitWinKeyboard, val);   // I3949
-    if FLangSwitchManager.ActiveKeyboard = nil then   // I4715
+
+    if (wCommand = PC_UPDATE) or (wCommand = PC_UPDATE_LANGUAGESWITCH) then
     begin
-      FLangSwitchManager.Refresh;
       FLangSwitchManager.UpdateActive(FLangID, lsitWinKeyboard, val);   // I3949
+      if FLangSwitchManager.ActiveKeyboard = nil then   // I4715
+      begin
+        FLangSwitchManager.Refresh;
+        FLangSwitchManager.UpdateActive(FLangID, lsitWinKeyboard, val);   // I3949
+      end;
+      FActiveHKL := val;   // I4359
+    end
+    else if wCommand = PC_HOTKEYCHANGE then
+    begin
+      ProcessHotkeyChange(val, GUID_NULL);
+      Exit;
     end;
-    FActiveHKL := val;   // I4359
   end
   else
   begin
@@ -1331,12 +1379,21 @@ begin
         Exit;
       end;
     end;
-    FLangSwitchManager.UpdateActive(FLangID, lsitTIP, FClsid, FProfileGuid);
 
-    if FLangSwitchManager.ActiveKeyboard = nil then   // I4715
+    if (wCommand = PC_UPDATE) or (wCommand = PC_UPDATE_LANGUAGESWITCH) then
     begin
-      FLangSwitchManager.Refresh;
       FLangSwitchManager.UpdateActive(FLangID, lsitTIP, FClsid, FProfileGuid);
+
+      if FLangSwitchManager.ActiveKeyboard = nil then   // I4715
+      begin
+        FLangSwitchManager.Refresh;
+        FLangSwitchManager.UpdateActive(FLangID, lsitTIP, FClsid, FProfileGuid);
+      end;
+    end
+    else if wCommand = PC_HOTKEYCHANGE then
+    begin
+      ProcessHotkeyChange(0, FProfileGuid);
+      Exit;
     end;
   end;
 
@@ -1370,9 +1427,9 @@ begin
 //TOUCH      frmTouchKeyboard.RefreshSelectedKeyboard;
 //TOUCH    end;
 
-  if LoWord(CommandAndAtom) = 1 then   // I4124
+  if wCommand = PC_UPDATE_LANGUAGESWITCH then   // I4124
   begin                                                           // TODO fixup product id
-    OutputDebugString(PChar('Showing language switch form'#13#10));
+    //OutputDebugString(PChar('Showing language switch form'#13#10));
     ShowLanguageSwitchForm;
   end;
 end;
@@ -1727,6 +1784,23 @@ end;
 //TOUCH      else Result := kmcom.Options['koUseTouchLayout'].Value;
 //TOUCH  end;
 
+procedure TfrmKeyman7Main.tmrCheckInputPaneTimer(Sender: TObject);
+var
+  r: TRect;
+  isVisible: Boolean;
+begin
+  if Assigned(FInputPane) and FInputPane.GetLocation(r) then
+  begin
+    isVisible := not r.IsEmpty;
+    if FIsInputPaneVisible <> isVisible then
+    begin
+      FIsInputPaneVisible := isVisible;
+      kmint.KeymanEngineControl.UpdateTouchPanelVisibility(isVisible);
+    end;
+    //TDebugLogClient.Instance.WriteMessage('InputPane Location: %d, %d, %d, %d', [r.Left, r.Top, r.Right, r.Bottom]);
+  end;
+end;
+
 procedure TfrmKeyman7Main.tmrOnlineUpdateCheckTimer(Sender: TObject);
 begin
   with TRegistryErrorControlled.Create do  // I2890
@@ -1872,6 +1946,8 @@ var
   language: IKeymanLanguage;
   id: Integer;
 begin
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseRegisterHotkey) then Exit;
+
   TDebugLogClient.Instance.WriteMessage('Enter RegisterHotkeys', []);
 
   if FHotkeyWindow = 0 then
@@ -1924,6 +2000,8 @@ procedure TfrmKeyman7Main.UnregisterHotkeys;
 var
   i, hk: Integer;
 begin
+  if not Reg_GetDebugFlag(SRegValue_Flag_UseRegisterHotkey) then Exit;
+
   TDebugLogClient.Instance.WriteMessage('Enter UnregisterHotkeys', []);
 
   if not Assigned(FHotkeys) then

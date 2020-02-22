@@ -100,6 +100,8 @@ type
     FValue: WideString;
     procedure SetValue(Value: WideString);
     class function IsSystemStoreName(Value: WideString): Boolean;
+    class function ParseKeyOrXStr(ALine: WideString;
+      var Output: WideString): Boolean; static;
   protected
     procedure InitLine(ALine: WideString); override;
   public
@@ -803,7 +805,7 @@ begin
     FSystemStoreType := SystemStoreFromName(GetTag(ALine));
     Assert(FSystemStoreType <> ssNone);
     Assert(WideSameText(GetTag(ALine), ')'));
-    Assert(GetXStr(ALine, FValue));
+    Assert(ParseKeyOrXStr(ALine, FValue));
   end
   else
   begin
@@ -887,6 +889,27 @@ begin
   Result := SystemStoreFromName(Value) <> ssNone;
 end;
 
+class function TKeyboardParser_SystemStore.ParseKeyOrXStr(ALine: WideString; var Output: WideString): Boolean;
+var
+  t, ALine2: WideString;
+  FShift: TExtShiftState;
+  FVKey: Integer;
+begin
+  ALine2 := ALine;
+  t := GetTag(ALine);
+  if t = '[' then
+  begin
+    Result := ParseKey(ALine2, FVKey, FShift);
+    if Result then
+    begin
+      // We'll wrap the hotkey in quotes and treat it like a
+      Output := '['+ExtShiftStateToString(FShift)+VKeyNames[FVKey]+']';
+    end;
+  end
+  else
+    Result := GetXStr(ALine2, Output); // it should be an xstring
+end;
+
 class function TKeyboardParser_SystemStore.IsType(ALine: WideString): Boolean;
 var
   t, s: WideString;
@@ -898,7 +921,7 @@ begin
     WideSameText(GetTag(ALine), '(') and
     IsSystemStoreName(GetTag(ALine)) and
     WideSameText(GetTag(ALine), ')') and
-    GetXStr(ALine, s);
+    ParseKeyOrXStr(ALine, s);
 
   if not Result then
   begin

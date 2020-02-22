@@ -23,6 +23,7 @@ setup:
 
     $(MAKE) -fcopydev.mak candle
     $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
+    $(MAKE) -fcopydev.mak clean-heat
 
     #
     # Sign the installation archive

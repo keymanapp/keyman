@@ -24,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
-import android.inputmethodservice.Keyboard;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -51,15 +50,16 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tavultesoft.kmea.KMKeyboardJSHandler;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.KMScanCodeMap;
+import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 
 import org.json.JSONArray;
@@ -71,6 +71,7 @@ public final class KMManager {
   private static final String TAG = "KMManager";
 
   private static FirebaseAnalytics mFirebaseAnalytics;
+  private static ResourcesUpdateTool updateTool;
 
   // Keyboard types
   public enum KeyboardType {
@@ -104,6 +105,7 @@ public final class KMManager {
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
+
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static int sysKbIndexOnLockScreen = -1;
@@ -117,11 +119,32 @@ public final class KMManager {
   protected static KMKeyboard InAppKeyboard = null;
   protected static KMKeyboard SystemKeyboard = null;
   protected static HashMap<String, String> currentLexicalModel = null;
-  protected static String currentBanner = "blank";
+
+  /**
+   * Banner state value: "blank" - no banner available.
+   */
+  protected static final String KM_BANNER_STATE_BLANK = "blank";
+  /**
+   * Banner state value: "suggestion" - dictionary suggestions are shown.
+   */
+  protected static final String KM_BANNER_STATE_SUGGESTION = "suggestion";
+
+  //TODO: should be part of kmkeyboard
+  /**
+   * Current banner state.
+   */
+  protected static String currentBanner = KM_BANNER_STATE_BLANK;
+
+
+  // Special override for when keyboard is entering a password text field.
+  // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
+  // regardless what the Settings preference is.
+  private static boolean mayPredictOverride = false;
 
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
+  public static final String KMKey_Version = "version";
   public static final String KMKey_PackageID = "packageId";
   public static final String KMKey_LanguageID = "langId";
   public static final String KMKey_LanguageName = "langName";
@@ -213,12 +236,12 @@ public final class KMManager {
     return false;
   }
 
-  public static void initialize(Context context, KeyboardType keyboardType) {
+  public static void initialize(final Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
-    if (!didCopyAssets) {
+    if (!didCopyAssets || isTestMode()) {
       copyAssets(appContext);
       migrateOldKeyboardFiles(appContext);
       updateOldKeyboardsList(appContext);
@@ -234,6 +257,24 @@ public final class KMManager {
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
+
+    CloudDownloadMgr.getInstance().initialize(appContext);
+  }
+
+  public static void executeResourceUpdate(Context aContext)
+  {
+    getUpdateTool().checkForResourceUpdates(aContext,true);
+  }
+
+  public static ResourcesUpdateTool getUpdateTool() {
+    if(updateTool==null) {
+      updateTool = new ResourcesUpdateTool();
+      updateTool.createNotificationChannel(appContext);
+
+      KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(updateTool);
+
+    }
+    return updateTool;
   }
 
   public static void setInputMethodService(InputMethodService service) {
@@ -368,6 +409,7 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
     }
+    CloudDownloadMgr.getInstance().shutdown(appContext);
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {
@@ -425,12 +467,6 @@ public final class KMManager {
         packagesDir.mkdir();
       }
 
-      // Lexical models directory
-      File lexicalModelsDir = new File(getLexicalModelsDir());
-      if (!lexicalModelsDir.exists()) {
-        lexicalModelsDir.mkdir();
-      }
-
       // Copy default cloud keyboard
       File cloudDir = new File(getCloudDir());
       if (!cloudDir.exists()) {
@@ -439,6 +475,23 @@ public final class KMManager {
       String[] keyboardFiles = assetManager.list(KMDefault_UndefinedPackageID);
       for (String keyboardFile : keyboardFiles) {
         copyAsset(context, keyboardFile, KMDefault_UndefinedPackageID, true);
+      }
+
+      // Copy lexical model directory and subfolders
+      File lexicalModelsDir = new File(getLexicalModelsDir());
+      if (!lexicalModelsDir.exists()) {
+        lexicalModelsDir.mkdir();
+      }
+      String[] modelNames = assetManager.list(KMDefault_LexicalModelPackages);
+      for (String modelName : modelNames) {
+        File lexicalModelDir = new File(lexicalModelsDir, modelName);
+        if (!lexicalModelDir.exists()) {
+          lexicalModelDir.mkdir();
+        }
+        String[] modelFiles = assetManager.list(KMDefault_LexicalModelPackages + File.separator + modelName);
+        for (String modelFile : modelFiles) {
+          copyAsset(context, modelFile, KMDefault_LexicalModelPackages + File.separator + modelName, true);
+        }
       }
     } catch (Exception e) {
       Log.e(TAG, "Failed to copy assets. Error: " + e);
@@ -648,7 +701,7 @@ public final class KMManager {
       }
 
       if (shouldClearCache) {
-        File cache = LanguageListActivity.getCacheFile(appContext);
+        File cache = CloudDataJsonUtil.getKeyboardCacheFile(appContext);
         if (cache.exists()) {
           cache.delete();
         }
@@ -669,6 +722,26 @@ public final class KMManager {
     }
 
     return isCustom;
+  }
+
+  /**
+   * Sets mayPredictOverride true if the InputType field is a hidden password text field
+   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * @param inputType android.text.InputType
+   */
+  public static void setMayPredictOverride(int inputType) {
+    mayPredictOverride =
+      ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
+       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)));
+  }
+
+  /**
+   * Get the value of mayPredictOverride
+   * @return boolean
+   */
+  public static boolean getMayPredictOverride() {
+    return mayPredictOverride;
   }
 
   /**
@@ -729,8 +802,10 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
+    // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
+    boolean mayPredict = (mayPredictOverride) ? false :
+      prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 
     RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
@@ -757,6 +832,18 @@ public final class KMManager {
     }
 
     if (SystemKeyboard != null) { // && SystemKeyboardLoaded) {
+      SystemKeyboard.loadJavascript(url);
+    }
+    return true;
+  }
+
+  public static boolean setBannerOptions(boolean mayPredict) {
+    String url = String.format("setBannerOptions(%s)", mayPredict);
+    if (InAppKeyboard != null) {
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
     }
     return true;
@@ -837,11 +924,52 @@ public final class KMManager {
     return (result1 || result2);
   }
 
-  public static boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+  /**
+   * Prepare keyboard switch for inapp keyboard and systemkeyboard
+   * @param packageID the package id
+   * @param keyboardID the keyboard id
+   * @param languageID the language id
+   * @param keyboardName keyboard name
+   * @return the success result
+   */
+  public static boolean prepareKeyboardSwitch(String packageID, String keyboardID, String languageID, String keyboardName) {
+
+
     boolean result1 = false;
     boolean result2 = false;
 
     if (InAppKeyboard != null && InAppKeyboardLoaded)
+    {
+      result1 = InAppKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
+    }
+    if (SystemKeyboard != null && SystemKeyboardLoaded)
+    {
+      result2 = SystemKeyboard.prepareKeyboardSwitch(packageID, keyboardID, languageID,keyboardName);
+    }
+
+    if(result1 || result2)
+    {
+      //reset banner state if new language has no lexical model
+      if(currentBanner.equals(KMManager.KM_BANNER_STATE_SUGGESTION)
+        && getAssociatedLexicalModel(languageID)==null)
+        currentBanner = KMManager.KM_BANNER_STATE_BLANK;
+
+      if(result1)
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+      if(result2)
+        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+    }
+
+    registerAssociatedLexicalModel(languageID);
+
+    return (result1 || result2);
+  }
+
+  public static boolean setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont) {
+    boolean result1 = false;
+    boolean result2 = false;
+
+    if (InAppKeyboard != null && (InAppKeyboardLoaded || isTestMode()))
       result1 = InAppKeyboard.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
 
     if (SystemKeyboard != null && SystemKeyboardLoaded)
@@ -1074,7 +1202,7 @@ public final class KMManager {
 
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (currentBanner.equals("suggestion")) {
+    if (currentBanner.equals(KM_BANNER_STATE_SUGGESTION)) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;
@@ -1090,6 +1218,13 @@ public final class KMManager {
 
   public static boolean isDebugMode() {
     return debugMode;
+  }
+
+  /**
+   * @return check for unit test.
+   */
+  public static boolean isTestMode() {
+    return Boolean.parseBoolean(System.getProperty("kmeaTestMode"));
   }
 
   public static void setShouldAllowSetKeyboard(boolean value) {
@@ -1509,7 +1644,8 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        currentBanner = (change.equals("loaded")) ?
+          KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
@@ -1744,7 +1880,7 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? "suggestion" : "blank";
+        currentBanner = (change.equals("loaded")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
@@ -1995,17 +2131,8 @@ public final class KMManager {
           }
 
           // Perform left-deletions
-          for (int i = 0; i < dn; i++) {
-            CharSequence chars = ic.getTextBeforeCursor(1, 0);
-            if (chars != null && chars.length() > 0) {
-              char c = chars.charAt(0);
-              SystemKeyboardShouldIgnoreSelectionChange = true;
-              if (Character.isLowSurrogate(c)) {
-                ic.deleteSurroundingText(2, 0);
-              } else {
-                ic.deleteSurroundingText(1, 0);
-              }
-            }
+          if (dn > 0) {
+            performLeftDeletions(ic, dn);
           }
 
           // Perform right-deletions
@@ -2024,7 +2151,9 @@ public final class KMManager {
 
           if (s.length() > 0) {
             SystemKeyboardShouldIgnoreSelectionChange = true;
-            ic.commitText(s, s.length());
+
+            // Commit the string s. Use newCursorPosition 1 so cursor will end up after the string.
+            ic.commitText(s, 1);
           }
 
           ic.endBatchEdit();
@@ -2035,6 +2164,79 @@ public final class KMManager {
     private void keyDownUp(int keyEventCode) {
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
       IMService.getCurrentInputConnection().sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyEventCode));
+    }
+
+    /*
+    // TODO: Chromium has a bug where deleteSurroundingText deletes an entire grapheme cluster
+    // instead of one code-point. See Chromium issue #1024738
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
+    //
+    // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
+    // for surrogate pairs + a long grapheme cluster.
+    // This buffer will be used to put back characters as-needed
+    */
+    private static void performLeftDeletions(InputConnection ic, int dn) {
+      int originalBufferLength = dn*2 + 16; // characters
+      CharSequence charsBackup = getCharacterSequence(ic, originalBufferLength);
+
+      int lastIndex = charsBackup.length()-1;
+
+      // Exit if there's no context to delete
+      if (lastIndex < 0) {
+        return;
+      }
+
+      int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
+
+      // Chop dn+numPairs code points from the end of charsBackup
+      // subSequence indices are start(inclusive) to end(exclusive)
+      CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+      ic.deleteSurroundingText(dn + numPairs, 0);
+      CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
+
+      CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
+      if (charsToRestore.length() > 0) {
+        // Restore expectedChars that Chromium deleted.
+        // Use newCusorPosition 1 so cursor will be after the inserted string
+        ic.commitText(charsToRestore, 1);
+      }
+    }
+
+    /**
+     * Get a character sequence from the InputConnection.
+     * Sometimes the WebView can split a surrogate pair at either end,
+     * so chop that and update the cursor
+     * @param ic - the InputConnection
+     * @param length - number of characters to get
+     * @return CharSequence
+     */
+    private static CharSequence getCharacterSequence(InputConnection ic, int length) {
+      if (ic == null || length <= 0) {
+        return "";
+      }
+
+      CharSequence sequence = ic.getTextBeforeCursor(length, 0);
+      if (sequence == null || sequence.length() <= 0) {
+        return "";
+      }
+
+      // Move the cursor back if there's a split surrogate pair
+      if (Character.isHighSurrogate(sequence.charAt(sequence.length()-1))) {
+        ic.commitText("", -1);
+        sequence = ic.getTextBeforeCursor(length, 0);
+      }
+
+      if (sequence == null || sequence.length() <= 0) {
+        return "";
+      }
+
+      if (Character.isLowSurrogate(sequence.charAt(0))) {
+        // Adjust if the first char is also a split surrogate pair
+        // subSequence indices are start(inclusive) to end(exclusive)
+        sequence = sequence.subSequence(1, sequence.length());
+      }
+
+      return sequence;
     }
   }
 }

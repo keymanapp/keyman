@@ -396,6 +396,8 @@ const
   SRegValue_IDEOpt_WebLadderLength = 'web ladder length';                           // CU
   CRegValue_IDEOpt_WebLadderLength_Default = 100;
 
+  SRegValue_IDEOpt_DefaultProjectPath = 'default project path';
+
   { SRegKey_KCT values }
 
 //  SRegValue_KCTTemplatePath = 'template path';                                      // LM
@@ -424,7 +426,11 @@ const
   SRegKey_Keyman_Exception_CU = SRegKey_KeymanRoot_CU + '\Exception';
   SRegValue_SymbolPath = 'SymbolPath';
 
+  { Debug Flags - Reg_GetDebugFlag in DebugPaths.pas }
 
+  SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
+
+  SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
 // Fixed path names
 const
   // PF = CSIDL_PROGRAM_FILES

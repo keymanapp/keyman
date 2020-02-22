@@ -6,16 +6,16 @@
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Keyman Desktop User Guide</title>
 
-   <!-- About --> 
-  
+   <!-- About -->
+
   <chapter id="about">
     <title>About Keyman Desktop</title>
     <xi:include href="about/welcome.xml" />
     <xi:include href="about/whatsnew.xml" />
     <xi:include href="about/requirements.xml" />
     <xi:include href="about/history.xml" />
-    <xi:include href="about/credits.xml" />	
-    <xi:include href="about/license.xml" />		
+    <xi:include href="about/credits.xml" />
+    <xi:include href="about/license.xml" />
   </chapter>
 
   <!-- Getting Started -->
@@ -41,7 +41,7 @@
   <chapter id="basic">
 
     <title>Basic Help</title>
-    
+
     <xi:include href="basic/newways.xml" />
 
     <xi:include href="basic/engine_tasks/update.xml" />
@@ -59,7 +59,7 @@
     <xi:include href="basic/toolbox_tasks/charactermap.xml" />
 
     <xi:include href="basic/languageswitcher.xml" />
-    
+
     <xi:include href="basic/text_editor.xml" />
 
     <xi:include href="basic/config_tasks/config_menu.xml" />
@@ -82,7 +82,7 @@
 	<xi:include href="advanced/text_services_framework.xml" />
 
   </chapter>
-  
+
     <!-- FAQ -->
   <chapter id="common">
     <title>Common Questions</title>
@@ -90,7 +90,7 @@
     <xi:include href="common/editions.xml" />
     <xi:include href="common/os.xml" />
     <xi:include href="common/requirements.xml" />
-    <xi:include href="common/adware.xml" />	
+    <xi:include href="common/adware.xml" />
     <xi:include href="common/mac.xml" />
     <xi:include href="common/linux.xml" />
     <xi:include href="common/osk.xml" />
@@ -98,28 +98,28 @@
     <xi:include href="common/compatibility.xml" />
     <xi:include href="common/old_version.xml" />
     <xi:include href="common/support.xml" />
-    <xi:include href="common/bug.xml" />	
-	
+    <xi:include href="common/bug.xml" />
+
   </chapter>
-  
+
     <!-- KnowledgeBase -->
   <chapter id="troubleshooting">
 
     <title>Troubleshooting Index</title>
 
-	<xi:include href="troubleshooting/font.xml" />	
-    	<xi:include href="troubleshooting/sigma.xml" />	
-		
+	<xi:include href="troubleshooting/font.xml" />
+    	<xi:include href="troubleshooting/sigma.xml" />
+
 	    <xi:include href="troubleshooting/excel.xml" />
-		
+
 		<xi:include href="troubleshooting/securitysoftware.xml" />
 		<xi:include href="troubleshooting/bootstrapper.xml" />
-		
+
       <xi:include href="troubleshooting/hidden.xml" />
   </chapter>
 
     <!-- Contextual help from windows, menus, etc -->
-  
+
   <chapter id="context">
 
     <title>Context Help</title>
@@ -128,18 +128,16 @@
     <xi:include href="context/tutorial.xml" />
 
     <xi:include href="context/splash.xml" />
-    <xi:include href="context/proxyconfiguration.xml" />	
+    <xi:include href="context/proxyconfiguration.xml" />
     <xi:include href="context/onlineupdate.xml" />
 
-    <xi:include href="context/selectlanguage.xml" />	
-	
+    <xi:include href="context/selectlanguage.xml" />
+
     <xi:include href="context/installkeyboard.xml" />
     <xi:include href="context/downloadkeyboard.xml" />
 
-    <xi:include href="context/langsetup.xml" />	
-	
     <xi:include href="context/traymenu.xml" />
-	
+
     <xi:include href="context/keyman.xml" />
     <xi:include href="context/configuration_keyboards.xml" />
     <xi:include href="context/configuration_options.xml" />
@@ -152,7 +150,7 @@
     <xi:include href="context/fonthelper.xml" />
     <xi:include href="context/charactermap.xml" />
 
-    <xi:include href="context/langsetup/psrtwindowslanguage.xml" />	
+    <xi:include href="context/langsetup/psrtwindowslanguage.xml" />
     <xi:include href="context/langsetup/psrtmsofficelanguage.xml" />
   </chapter>
 

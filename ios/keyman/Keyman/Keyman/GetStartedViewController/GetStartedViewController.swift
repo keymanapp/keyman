@@ -26,7 +26,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     super.viewDidLoad()
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.refreshTable),
-                                           name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
+                                           name: UIApplication.didBecomeActiveNotification, object: nil)
 
     tableView.isScrollEnabled = false
 
@@ -68,7 +68,8 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     footer.addSubview(label)
     footer.addSubview(dontShowAgainSwitch)
     footer.addSubview(line)
-    footer.backgroundColor = UIColor(white: 1.0, alpha: 1.0)
+    footer.backgroundColor = Colors.systemBackground
+
     tableView.tableHeaderView = header
     tableView.tableFooterView = footer
   }
@@ -92,7 +93,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
 
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     let selectionColor = UIView()
-    selectionColor.backgroundColor = UIColor(red: 95.0 / 255.0, green: 196.0 / 255.0, blue: 217.0 / 255.0, alpha: 1.0)
+    selectionColor.backgroundColor = Colors.selectionSecondary
     cell.selectedBackgroundView = selectionColor
     cell.textLabel?.font = cell.textLabel?.font?.withSize(12.0)
     cell.detailTextLabel?.font = cell.detailTextLabel?.font?.withSize(10.0)
@@ -113,7 +114,13 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       }
     case 1:
       cell.textLabel?.text = "Set up Keyman as system-wide keyboard"
-      cell.detailTextLabel?.text = ""
+      if #available(iOS 11.0, *) {
+        // We can expedite this via near-direct settings link.
+        // So, let's add the one extra needed detail to our detail text.
+        cell.detailTextLabel?.text = "Keyboards > Enable \"Keyman\""
+      } else {
+        cell.detailTextLabel?.text = ""
+      }
       if !AppDelegate.isKeymanEnabledSystemWide() {
         cell.accessoryType = .none
       } else {
@@ -144,9 +151,17 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       mainViewController.dismissGetStartedView(nil)
       mainViewController.showInstalledLanguages()
     case 1:
+      if #available(iOS 11.0, *),  // if "Keyboards" is an option in our app's settings menu
+         let appSettings = URL(string: UIApplication.openSettingsURLString) {
+        UIApplication.shared.openURL(appSettings)
+      } else {
+        let setUpVC = SetUpViewController()
+        mainViewController.present(setUpVC, animated: true, completion: nil)
+      }
+
+      // While it'd be nice to keep it in view, it seems to be automatically dismissed.
+      // This at least helps keep the app's state properly managed.
       mainViewController.dismissGetStartedView(nil)
-      let setUpVC = SetUpViewController()
-      mainViewController.present(setUpVC, animated: true, completion: nil)
     case 2:
       mainViewController.dismissGetStartedView(nil)
       mainViewController.infoButtonClick(nil)

@@ -209,6 +209,11 @@ begin
     begin
       s := LowerCase(ParamStr(i));
       if s = '-s' then FSilent := True
+      else if s.StartsWith('-unique-') then
+        // Ignore this parameter. Used just to avoid Start Menu hiding
+        // shortcut entries which are pointing at the same target for
+        // package installation. See https://superuser.com/a/1395288/521575 and
+        // https://github.com/keymanapp/keyman/issues/2467
       else if s = '-f' then FForce := True
       else if s = '-c' then   FMode := fmMain
       else if s = '-m' then   FMode := fmMigrate

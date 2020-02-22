@@ -1,14 +1,19 @@
 apply plugin: 'com.android.application'
 
+ext.rootPath = '../../../'
+apply from: "$rootPath/version.gradle"
+
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "com.keyman.kmsample2"
         minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 29
+
+        // VERSION_CODE and VERSION_NAME from version.gradle
+        versionCode VERSION_CODE as Integer
+        versionName VERSION_NAME
     }
     buildTypes {
         release {
@@ -27,12 +32,12 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     api (name:'keyman-engine', ext:'aar')
-    implementation "com.google.firebase:firebase-core:16.0.8"
+    implementation "com.google.firebase:firebase-core:17.2.1"
     implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.9@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
 }

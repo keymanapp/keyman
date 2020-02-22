@@ -41,7 +41,7 @@ public class KeyboardPickerButton: UIButton {
   }
 
   // Clear images if the developer sets a title
-  public override func setTitle(_ title: String?, for state: UIControlState) {
+  public override func setTitle(_ title: String?, for state: UIControl.State) {
     setImage(nil, for: state)
     super.setTitle(title, for: state)
   }

@@ -54,7 +54,8 @@ var
   params: string;
   n: Integer;
   workingdir: string;
-  desc: WideString;
+  guidUniquifier: TGUID;
+  Uniquifier, desc: WideString;
 
   function GetHHIcon: string;
   var
@@ -71,6 +72,11 @@ var
 begin
   if inf.StartMenu.DoCreate then
   begin
+    // This ensures that multiple start menu entries will be visible even when
+    // they have the same target. See https://superuser.com/a/1395288/521575
+    CreateGuid(guidUniquifier);
+    Uniquifier := '-unique-'+GuidToString(guidUniquifier);
+
     if ShortcutRootPath <> '' then programs := ShortcutRootPath
     else if not AllUsers
       then programs := GetFolderPath(CSIDL_PROGRAMS)          // Programs menu for 95/98, or restricted user in NT
@@ -151,36 +157,40 @@ begin
       // Keyman 6 compatability
       if AnsiCompareText(srcfile, '$keyman\KMSHELL.EXE') = 0 then
       begin
-        srcfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + ' -c';
+        srcfile := '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + '" -c '+Uniquifier;
         iconfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_CfgIcon);
       end
       else if AnsiCompareText(srcfile, '$keyman\KEYMAN.EXE') = 0 then
       begin
-        srcfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+        srcfile := '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" '+Uniquifier;
         iconfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_AppIcon);
       end;
 
       // Keyman 7 tags
       if AnsiCompareText(srcfile, '(Start Product)') = 0 then
       begin
-        srcfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + ' -c';
+        srcfile := '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" '+Uniquifier;
         iconfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_AppIcon);
       end
       else if AnsiCompareText(srcfile, '(Product Configuration)') = 0 then
       begin
-        srcfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+        srcfile := '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" -c '+Uniquifier;
         iconfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_CfgIcon);
       end
       else if AnsiCompareText(srcfile, '(Product Help)') = 0 then
       begin
-        srcfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + ' -h';
+        srcfile := '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + '" -h '+Uniquifier;
         iconfile := GetHHIcon;
       end
       else if AnsiCompareText(srcfile, '(About Product)') = 0 then
       begin
-        srcfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + ' -a';
+        srcfile := '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell) + '" -a '+Uniquifier;
         iconfile := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_CfgIcon);
       end;
+
+      //
+      // Split source file and parameters
+      //
 
       if Copy(srcfile, 1, 1) = '"' then
       begin

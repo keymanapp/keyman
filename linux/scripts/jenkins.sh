@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# $1 - project name with appended tier, e.g. ibus-kmfl-alpha
+
+PROGRAM_NAME="$(basename "$0")"
 
 . $HOME/ci-builder-scripts/bash/common.sh
 init --no-package
@@ -18,18 +21,50 @@ proj=${proj%"-alpha"}
 proj=${proj%"-beta"}
 
 if [ "$proj" == "keyman-keyboardprocessor" ]; then
-	sourcename="keyboardprocessor"
+	fullsourcename="keyboardprocessor"
 	sourcedir="../common/engine/keyboardprocessor"
 else
 	# check if project is known
 	if [[ $keyman_projects =~ (^|[[:space:]])$proj($|[[:space:]]) ]]; then
-		sourcename="$1"
+		fullsourcename="$1"
 		sourcedir="$proj"
 	else
 		stderr "$proj not in known projects ($keyman_projects)"
 		exit -1
 	fi
 fi
+sourcename=${fullsourcename%"-alpha"}
+sourcename=${sourcename%"-beta"}
+
+checkAndInstallRequirements()
+{
+	local TOINSTALL
+
+	for p in dh-python gir1.2-webkit2-4.0 python3-all python3-setuptools \
+		python3-requests python3-requests-cache python3-numpy python3-pil python3-lxml \
+		python3-gi python3-magic python3-qrcode
+	do
+		if ! dpkg -l | grep -q $p; then
+			TOINSTALL="$TOINSTALL $p"
+		fi
+	done
+
+	if [ ! -f /usr/bin/help2man ]; then
+		TOINSTALL="$TOINSTALL help2man"
+	fi
+
+	if [ ! -f /usr/bin/meson ]; then
+		TOINSTALL="$TOINSTALL meson"
+	fi
+
+	if [ -n "$TOINSTALL" ]; then
+		log "Installing prerequisites:$TOINSTALL"
+		sudo apt-get update
+		sudo apt-get -qy install $TOINSTALL
+	fi
+}
+
+checkAndInstallRequirements
 
 # clean up prev deb builds
 log "cleaning previous builds of $1"
@@ -39,18 +74,17 @@ rm -rf builddebs
 rm -rf $sourcedir/${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 rm -rf $sourcedir/../${1}_*.{dsc,build,buildinfo,changes,tar.?z,log}
 
-log "Make source package for $sourcename"
+log "Make source package for $fullsourcename"
 log "reconfigure"
 if [ "$proj" == "keyman-keyboardprocessor" ]; then
 	mkdir -p keyboardprocessor
-	JENKINS="yes" TIER="$tier" ./scripts/reconf.sh keyboardprocessor
-else
-	JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $proj
 fi
+JENKINS="yes" TIER="$tier" ./scripts/reconf.sh $sourcename
+
 log "Make origdist"
-./scripts/dist.sh origdist $proj
+./scripts/dist.sh origdist $sourcename
 log "Make deb source"
-./scripts/deb.sh sourcepackage $1
+./scripts/deb.sh sourcepackage $proj
 
 #sign source package
 for file in `ls builddebs/*.dsc`; do

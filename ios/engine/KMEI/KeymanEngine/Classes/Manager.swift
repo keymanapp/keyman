@@ -44,6 +44,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   public static let shared = Manager()
 
+  public var fileBrowserLauncher: ((UINavigationController) -> Void)? = nil
+
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
   
@@ -150,7 +152,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   var currentResponder: KeymanResponder?
   
   // This allows for 'lazy' initialization of the keyboard.
-  var inputViewController: InputViewController! {
+  open var inputViewController: InputViewController! {
     get {
       // Occurs for the in-app keyboard ONLY.
       if _inputViewController == nil {
@@ -181,10 +183,19 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
     Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
     if Storage.active.userDefaults.userKeyboards?.isEmpty ?? true {
       Storage.active.userDefaults.userKeyboards = [Defaults.keyboard]
+
+      // Ensure the default keyboard is installed in this case.
+      do {
+        try Storage.active.installDefaultKeyboard(from: Resources.bundle)
+      } catch {
+        log.error("Failed to copy default keyboard from bundle: \(error)")
+      }
     }
-    Migrations.updateResources(storage: Storage.active)
+    Migrations.engineVersion = Version.current
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
@@ -271,7 +282,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///
   /// - Throws: error if the keyboard was unchanged
   public func setKeyboard(_ kb: InstallableKeyboard) -> Bool {
-    if kb.fullID == currentKeyboardID {
+    // KeymanWebViewController relies upon this method to activate the keyboard after a page reload,
+    // and as a system keyboard, the controller is rebuilt each time the keyboard is loaded.
+    //
+    // We MUST NOT shortcut this method as a result; doing so may (rarely) result in the infamous
+    // blank keyboard bug!
+    if kb.fullID == currentKeyboardID && !self.isSystemKeyboard {
       log.info("Keyboard unchanged: \(kb.fullID)")
       return false
      // throw KeyboardError.unchanged
@@ -303,6 +319,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
+
+    // Now to handle lexical model + banner management
+    inputViewController.clearModel()
     
     let userDefaults: UserDefaults = Storage.active.userDefaults
     // If we have a lexical model for the keyboard's language, activate it.
@@ -331,7 +350,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     var userKeyboards = userDefaults.userKeyboards ?? []
 
     // Update keyboard if it exists
-    if let index = userKeyboards.index(where: { $0.fullID == keyboard.fullID }) {
+    if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
       userKeyboards[index] = keyboard
     } else {
       userKeyboards.append(keyboard)
@@ -396,7 +415,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     var userLexicalModels = userDefaults.userLexicalModels ?? []
     
     // Update lexical model if it exists
-    if let index = userLexicalModels.index(where: { $0.fullID == lexicalModel.fullID }) {
+    if let index = userLexicalModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
       userLexicalModels[index] = lexicalModel
     } else {
       userLexicalModels.append(lexicalModel)
@@ -412,7 +431,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     // Remove keyboard from the list if it exists
-    let index = Storage.active.userDefaults.userKeyboards?.index { $0.fullID == fullID }
+    let index = Storage.active.userDefaults.userKeyboards?.firstIndex { $0.fullID == fullID }
     if let index = index {
       return removeKeyboard(at: index)
     }
@@ -473,7 +492,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: The lexical model exists and was removed
   public func removeLexicalModel(withFullID fullID: FullLexicalModelID) -> Bool {
     // Remove lexical model from the list if it exists
-    let index = Storage.active.userDefaults.userLexicalModels?.index { $0.fullID == fullID }
+    let index = Storage.active.userDefaults.userLexicalModels?.firstIndex { $0.fullID == fullID }
     if let index = index {
       return removeLexicalModel(at: index)
     }
@@ -555,7 +574,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
-      let index = userKeyboards.index(where: { self.currentKeyboardID == $0.fullID })
+      let index = userKeyboards.firstIndex(where: { self.currentKeyboardID == $0.fullID })
     else {
       return nil
     }
@@ -589,7 +608,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
     
   // MARK: - Adhoc keyboards
-  public func parseKbdKMP(_ folder: URL) throws -> Void {
+  public func parseKbdKMP(_ folder: URL, isCustom: Bool) throws -> Void {
     do {
       var path = folder
       path.appendPathComponent("kmp.json")
@@ -634,7 +653,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                   isRTL: isrtl,
                   font: displayFont,
                   oskFont: oskFont,
-                  isCustom: false))
+                  isCustom: isCustom))
               }
             }
             
@@ -690,7 +709,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
     
   // MARK: - Adhoc lexical models
-  static public func parseLMKMP(_ folder: URL) throws -> Void {
+  static public func parseLMKMP(_ folder: URL, isCustom: Bool) throws -> Void {
     do {
       var path = folder
       path.appendPathComponent("kmp.json")
@@ -736,7 +755,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                   languageID: languageId,
 //                  languageName: languageName,
                   version: version,
-                  isCustom: false))
+                  isCustom: isCustom))
               }
             }
             
@@ -799,9 +818,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
-      try Storage.copyAndExcludeFromBackup(at: url,
-                                           to: keyboardDir.appendingPathComponent(url.lastPathComponent),
-                                           shouldOverwrite: shouldOverwrite)
+      try Storage.copy(at: url,
+                       to: keyboardDir.appendingPathComponent(url.lastPathComponent),
+                       shouldOverwrite: shouldOverwrite,
+                       excludeFromBackup: true)
     }
   }
 
@@ -947,7 +967,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
   
   var vibrationSupportLevel: VibrationSupport {
-    let device = Device()
+    let device = Device.current
 
     if device.isPod {
       return .none
@@ -976,9 +996,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   
   // Keyboard download notification observers
   private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    // TODO:  Only do this if it's an update.  We'll need a bit of notification retooling for this first.
+    // There's little harm in reloading the keyboard (and thus, KMW) for a clean reset
+    // after resource downloads or updates.  That said, we should avoid *directly*
+    // triggering an immediate reset, as an extra reset will occur once we leave the
+    // settings menu.  The delay also helps any chained downloads (keyboard > lexical model)
+    // to fully complete first.
     shouldReloadKeyboard = true
-    inputViewController.reload()
   }
 
   /*-----------------------------
@@ -1023,14 +1046,14 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
   }
 
-  public func parseKMP(_ folder: URL, type: LanguageResourceType = .keyboard) throws -> Void {
+  public func parseKMP(_ folder: URL, type: LanguageResourceType = .keyboard, isCustom: Bool) throws -> Void {
     switch type {
       case .keyboard:
-        try! parseKbdKMP(folder)
+        try! parseKbdKMP(folder, isCustom: isCustom)
         break
       case .lexicalModel:
         // Yep.  Unlike the original, THIS one is static.
-        try! Manager.parseLMKMP(folder)
+        try! Manager.parseLMKMP(folder, isCustom: isCustom)
         break
     }
   }

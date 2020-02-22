@@ -117,14 +117,12 @@ function ShowNewModelProjectParameters(Owner: TComponent): Boolean;
 implementation
 
 uses
-  Winapi.ShlObj,
-
   Keyman.System.LanguageCodeUtils,
   Keyman.System.LexicalModelUtils,
   BCP47Tag,
   utilstr,
-  utilsystem,
   dmActionsMain,
+  KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
@@ -179,8 +177,7 @@ end;
 procedure TfrmNewModelProjectParameters.FormCreate(Sender: TObject);
 begin
   inherited;
-
-  editPath.Text := GetFolderPath(CSIDL_PERSONAL);
+  editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
 
   dlgBrowse := TBrowse4Folder.Create(Self);
   dlgBrowse.InitialDir := editPath.Text;
@@ -460,7 +457,7 @@ end;
 procedure TfrmNewModelProjectParameters.UpdateAuthorIDFromAuthor;
 begin
   editAuthorID.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(Author);
-  editCopyright.Text := '© '+FormatDateTime('yyyy', Now)+' '+Author;
+  editCopyright.Text := 'ï¿½ '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewModelProjectParameters.UpdateUniqFromModelName;

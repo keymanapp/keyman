@@ -3,7 +3,7 @@ inherited frmMustIncludeDebug: TfrmMustIncludeDebug
   Top = 114
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'TIKE Debugger'
+  Caption = 'Keyman Developer Debugger'
   ClientHeight = 133
   ClientWidth = 393
   Color = clBtnFace

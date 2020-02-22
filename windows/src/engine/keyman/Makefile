@@ -7,7 +7,7 @@
 build: version.res manifest.res keymanmenuitem.res icons.res osktoolbar.res dirs
     rc langswitch\langswitchmanager.rc
     $(DCC32) keyman.dpr
-    $(TDS2DBG) keyman.exe 
+    $(TDS2DBG) keyman.exe
     $(MAKEJCLDBG) keyman.map
     $(COPY) keyman.exe $(PROGRAM)\engine
     if exist keyman.dbg $(COPY) keyman.dbg $(DEBUGPATH)\engine
@@ -31,17 +31,18 @@ osktoolbar.res:
 
 debug-manifest:
     -del manifest.res
-    copy manifest.xml std-manifest.xml
-    copy debug-manifest.xml manifest.xml
+    copy manifest.in std-manifest.tmp
+    copy debug-manifest.in manifest.in
     $(MAKE) manifest.res
-    copy std-manifest.xml manifest.xml
+    copy std-manifest.tmp manifest.in
+    -del std-manifest.tmp
 
 install:
     $(COPY) $(PROGRAM)\engine\keyman.exe "$(INSTALLPATH_KEYMANENGINE)"
     $(COPY) keyman.rsm "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
-    grep -c "uiAccess=\"true\"" manifest.xml
+    grep -c "uiAccess=\"true\"" manifest.in
 
 test-manifest:
     # test that (a) linked manifest exists and correct, and (b) has uiAccess=true
