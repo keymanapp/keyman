@@ -155,7 +155,8 @@ uses
   UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
   Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas',
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
-  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas';
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas',
+  UfrmHelp in 'help\UfrmHelp.pas' {frmHelp};
 
 {$R VERSION.RES}
 {$R manifest.res}

@@ -35,8 +35,8 @@ uses
   SysUtils,
   Windows;
 
-procedure ShowKMShellHint(AHint: TKeymanHint);
-function ShowKMShellHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult;
+function ShowKMShellHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload;
+function ShowKMShellHintQuery(AHint: string): TModalResult; overload;
 
 implementation
 
@@ -45,12 +45,20 @@ uses
   UfrmHint,
   XMLRenderer;
 
-procedure ShowKMShellHint(AHint: TKeymanHint);
+function ShowKMShellHintQuery(AHint: string): TModalResult; overload;
+var
+  h: TKeymanHint;
 begin
-  ShowKMShellHintQuery(AHint, [mbOk], mrOk);
+  h := GetHintFromName(AHint);
+  if h = KH_NULL then
+    Exit(mrOk);
+
+  if KeymanHintData[h].IsQuestion
+    then Result := ShowKMShellHintQuery(h, mbOKCancel, mrOk)
+    else Result := ShowKMShellHintQuery(h, [mbOk], mrOk);
 end;
 
-function ShowKMShellHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult;
+function ShowKMShellHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload;
 begin
   Result := ADefaultResult;
   if IsHintEnabled(AHint) then

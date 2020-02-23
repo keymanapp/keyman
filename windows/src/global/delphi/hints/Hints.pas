@@ -33,6 +33,7 @@ procedure EnableAllHints;
 procedure ResetAllHints;
 
 function GetHintName(const Hint: TKeymanHint): string;
+function GetHintFromName(const Name: string): TKeymanHint;
 
 implementation
 
@@ -42,6 +43,17 @@ uses
 function GetHintName(const Hint: TKeymanHint): string;
 begin
   Result := GetEnumName(TypeInfo(TKeymanHint), Ord(Hint));
+end;
+
+function GetHintFromName(const Name: string): TKeymanHint;
+var
+  v: Integer;
+begin
+  v := GetEnumValue(TypeInfo(TKeymanHint), Name);
+  if v < 0 then
+    Result := KH_NULL
+  else
+    Result := TKeymanHint(v);
 end;
 
 function IsHintEnabled(Hint: TKeymanHint): Boolean;

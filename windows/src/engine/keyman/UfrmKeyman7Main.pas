@@ -394,7 +394,6 @@ implementation
 
 uses
   DebugPaths,
-  UfrmHelp,
   UILanguages,
   UfrmOSKCharacterMap,
   utilstr,
@@ -1141,7 +1140,7 @@ end;
 
 procedure TfrmKeyman7Main.MnuExitKeyman(Sender: TObject);
 begin
-  if ShowKeymanHintQuery(KH_EXITPRODUCT, mbOkCancel, mrOk) = mrCancel then Exit;
+  if not ShowKeymanHint(KH_EXITPRODUCT) then Exit;
 
   UnloadProduct;
 end;
@@ -1550,19 +1549,7 @@ end;
 
 procedure TfrmKeyman7Main.MnuOpenProductHelp(Sender: TObject);
 begin
-  with TfrmHelp.Create(Self) do  // I1236 - Integrate keyboard help with Keyman help
-  try
-    HelpJump := 'context_traymenu';
-    ActiveKeyboard := Self.ActiveKeyboard;
-    ShowModal;
-    case HelpTarget of
-      htNone: ;
-      htProduct: OpenProductHelp;
-      htKeyboard: OpenKeyboardHelp;
-    end;
-  finally
-    Free;
-  end;
+  TKeymanDesktopShell.OpenHelpJump('context_traymenu', Self.ActiveKeyboard);
 end;
 
 procedure TfrmKeyman7Main.MnuRunProgram(Sender: TObject);   // I4606

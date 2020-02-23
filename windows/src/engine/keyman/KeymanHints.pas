@@ -23,12 +23,8 @@ unit KeymanHints;  // I3306
 interface
 
 uses
-  Classes,
-  Consts,
-  Controls,
-  Dialogs,
-  Forms,
-  Graphics,
+  System.Classes,
+  Vcl.Controls,
   HintConsts,
   Math,
   Messages,
@@ -36,61 +32,50 @@ uses
   SysUtils,
   Windows;
 
-function ShowKeymanHint(AHint: TKeymanHint): TModalResult;   // I4242
-function ShowKeymanHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult;
+function ShowKeymanHint(AHint: TKeymanHint): Boolean;   // I4242
 
 implementation
 
 uses
   Hints,
   keymanapi_TLB,
-  kmint,
-  UfrmHint,
+  KeymanDesktopShell,
+  kmint;
 //  UfrmKeyman7Main,
-  XMLRenderer;
+//  XMLRenderer;
 
-function ShowKeymanHint(AHint: TKeymanHint): TModalResult;   // I4242
-begin
-  Result := ShowKeymanHintQuery(AHint, [mbOk], mrOk);   // I4242
-end;
-
-function ShowKeymanHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult;
 var
-  hwnd: THandle;
+  InHint: Boolean = False;
+
+function ShowKeymanHint(AHint: TKeymanHint): Boolean;
+var
+//  hwnd: THandle;
+  ec: Cardinal;
 begin
-  Result := ADefaultResult;
+  if InHint then
+    Exit(False);
 
-  if TfrmHint.Instance <> nil then   // I4242
-  begin
-    TfrmHint.Instance.BringToFront;
-    Exit(mrCancel);
-  end;
+  Result := True;
 
-  if not Assigned(kmcom) then Exit;
-  hwnd := kmcom.Control.LastFocusWindow;
+  InHint := True;
+  try
+    if not Assigned(kmcom) then Exit;
+  //  hwnd := kmcom.Control.LastFocusWindow;
 
-  if IsHintEnabled(AHint) then
-  begin
-    if FileExists(GetXMLTemplatePath('hint.xsl')+'hint.xsl') then
+    if not IsHintEnabled(AHint) then Exit;
+
+    if KeymanHintData[AHint].IsQuestion then
     begin
-      with TfrmHint.Create(nil) do   // I4242
-      try
-        Hint := AHint;
-        Buttons := AButtons;
-        DefaultResult := ADefaultResult;   // I3554 -> removed fsStayOnStop
-        Result := ShowModal;
-      finally
-        Free;
-      end;
-    end;
+      //TODO: Make this background with a post message to main to close
+      TKeymanDesktopShell.WaitForKeymanConfiguration('-showhint '+GetHintName(AHint), ec);
+      if ec = 1 then
+        Result := False
+    end
+    else
+      TKeymanDesktopShell.RunKeymanConfiguration('-showhint '+GetHintName(AHint));
+  finally
+    InHint := False;
   end;
-
-  if not Assigned(kmcom) then Exit;  // This can happen if Keyman exits while the hint window is visible
-
-  AttachThreadInput(GetCurrentThreadId, GetWindowThreadProcessId(hwnd, nil), TRUE);
-  Windows.SetForegroundWindow(kmcom.Control.LastActiveWindow);
-  Windows.SetFocus(hwnd);
-  AttachThreadInput(GetCurrentThreadId, GetwindowThreadProcessId(hwnd, nil), FALSE);
 end;
 
 end.

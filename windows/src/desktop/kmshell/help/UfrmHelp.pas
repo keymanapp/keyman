@@ -45,6 +45,7 @@ type
     { Private declarations }
   public
     { Public declarations }
+    class procedure Execute(const Context, ActiveKeyboardID: string);
     procedure OpenKeyboardHelp;
     procedure OpenProductHelp;
     property ActiveKeyboard: IKeymanKeyboardInstalled read FActiveKeyboard write FActiveKeyboard;
@@ -57,7 +58,7 @@ implementation
 {$R *.dfm}
 
 uses
-  KeymanDesktopShell,
+  help,
   kmint,
   MessageIdentifierConsts,
   MessageIdentifiers,
@@ -66,6 +67,27 @@ uses
   utilxml;
 
 { TfrmHelp }
+
+class procedure TfrmHelp.Execute(const Context, ActiveKeyboardID: string);
+begin
+  with TfrmHelp.Create(nil) do   // I1251 - Combine help with keyboard help
+  try
+    HelpJump := Context;
+    if ActiveKeyboardID = ''
+      then ActiveKeyboard := nil
+      else ActiveKeyboard := kmint.kmcom.Keyboards.Items[ActiveKeyboardID];
+
+    ShowModal;
+
+    case HelpTarget of
+      htNone: ;
+      htProduct: OpenProductHelp;
+      htKeyboard: OpenKeyboardHelp;
+    end;
+  finally
+    Free;
+  end;
+end;
 
 procedure TfrmHelp.FireCommand(const command: WideString; params: TStringList);
 begin
@@ -90,8 +112,8 @@ end;
 procedure TfrmHelp.OpenProductHelp;
 begin
   if FHelpJump = ''
-    then TKeymanDesktopShell.OpenHelp('index')
-    else TKeymanDesktopShell.OpenHelp(FHelpJump);
+    then OpenHelp('index')
+    else OpenHelp(FHelpJump);
 end;
 
 procedure TfrmHelp.TntFormCreate(Sender: TObject);

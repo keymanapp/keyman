@@ -88,7 +88,11 @@ type
                     fmBaseKeyboard,   // I4169
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
-                    fmKeepInTouch);   // I4773
+                    fmKeepInTouch,
+
+                    // Commands from Keyman Engine
+                    fmShowHint,
+                    fmShowHelp);   // I4773
 
 var
   ApplicationRunning: Boolean = False;
@@ -108,6 +112,7 @@ uses
   KeymanPaths,
   KLog,
   kmint,
+  KMShellHints,
   KeymanMutex,
   OnlineUpdateCheck,
   ExternalExceptionHandler,
@@ -118,6 +123,7 @@ uses
   UfrmInstallKeyboardLanguage,
   //UfrmSelectLanguage,
   UfrmSplash,
+  UfrmHelp,
   UfrmHTML,
   UfrmKeepInTouch,
   UfrmMain,
@@ -254,6 +260,11 @@ begin
         FQuery := Trim(FQuery);
       end
       else if Copy(s, 1, 3) = '-ur' then UnRegCRC := StrToIntDef('$'+Copy(s, 4, 8), 0)
+
+      // Controls from Keyman Engine
+      else if s = '-showhint' then FMode := fmShowHint
+      else if s = '-showhelp' then FMode := fmShowHelp
+
       else Exit;
     end
     else
@@ -493,6 +504,13 @@ begin
         ExitCode := 0;
     fmKeepInTouch:
       ShowKeepInTouchForm(True);   // I4658
+
+    fmShowHint:
+      if ShowKMShellHintQuery(FirstKeyboardFileName) = mrOk
+        then ExitCode := 0
+        else ExitCode := 1;
+    fmShowHelp:
+      TfrmHelp.Execute(FirstKeyboardFileName, SecondKeyboardFileName);
   end;
 
   if FMode <> fmMain then

@@ -296,7 +296,6 @@ uses
   KeymanDesktopShell,
   RegistryKeys,
   Keyman.System.Util.RenderLanguageIcon,
-  UfrmHelp,
   UfrmKeyman7Main,
   UnicodeData,
   utildir,
@@ -1623,27 +1622,7 @@ end;
 
 procedure TfrmVisualKeyboard.BtnHelpClick(Sender: TObject);
 begin
-  with TfrmHelp.Create(Self) do   // I1251 - Combine help with keyboard help
-  try
-    HelpJump := 'context_onscreenkeyboard';
-    ActiveKeyboard := frmKeyman7Main.ActiveKeyboard;// KeymanInterface.Control.ActiveKeyboard;
-    ShowModal;
-    case HelpTarget of
-      htNone: ;
-      htProduct: OpenProductHelp;
-      htKeyboard: OpenKeyboardHelp;
-    end;
-  finally
-    Free;
-  end;
-
-  {case ActivePage of
-    apKeyboard: prod.OpenHelp('context_onscreenkeyboard');
-    apCharacterMap: prod.OpenHelp('context_charactermap');
-    apEntryHelper: prod.OpenHelp('context_entryhelper');
-    apKeyboardUsage: prod.OpenHelp('context_keyboardusage');
-    apFontHelper:
-  end;}
+  TKeymanDesktopShell.OpenHelpJump('context_onscreenkeyboard', frmKeyman7Main.ActiveKeyboard);
 end;
 
 procedure TfrmVisualKeyboard.BtnHideHint(Sender: TObject);
