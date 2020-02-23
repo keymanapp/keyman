@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -224,8 +226,20 @@ public final class KMManager {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
+  /**
+   * Extract app version #.#.# from VERSION_NAME
+   * @return String
+   */
   public static String getVersion() {
-    return com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    // Regex needs to match the entire string
+    String appVersion = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+).*");
+    Matcher matcher = pattern.matcher(appVersion);
+    if (matcher.matches() && matcher.groupCount() >= 1) {
+      appVersion = matcher.group(1);
+    }
+
+    return appVersion;
   }
 
   // Check if a keyboard namespace is reserved
