@@ -45,27 +45,29 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       Left = 0
       Top = 27
       Width = 547
-      Height = 198
+      Height = 219
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
       Visible = False
+      ExplicitHeight = 198
     end
     object panEntryHelper: TPanel
       Left = 0
       Top = 27
       Width = 547
-      Height = 198
+      Height = 219
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
       Visible = False
+      ExplicitHeight = 198
     end
     object panKeyboard: TPanel
       Left = 0
       Top = 27
       Width = 547
-      Height = 198
+      Height = 219
       Margins.Left = 2
       Margins.Top = 1
       Margins.Right = 2
@@ -76,6 +78,7 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       ParentBackground = False
       TabOrder = 2
       VerticalAlignment = taAlignTop
+      ExplicitHeight = 198
     end
     object status: TStatusBar
       Left = 0
@@ -212,7 +215,7 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       Left = 0
       Top = 27
       Width = 547
-      Height = 198
+      Height = 219
       Margins.Left = 2
       Margins.Top = 1
       Margins.Right = 2
@@ -224,21 +227,13 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       TabOrder = 5
       VerticalAlignment = taAlignTop
       Visible = False
-    end
-    object panHint: TPanel
-      Left = 0
-      Top = 225
-      Width = 547
-      Height = 21
-      Align = alBottom
-      BevelOuter = bvNone
-      TabOrder = 6
+      ExplicitHeight = 198
     end
     object panFontHelper: TPanel
       Left = 0
       Top = 27
       Width = 547
-      Height = 198
+      Height = 219
       Margins.Left = 2
       Margins.Top = 1
       Margins.Right = 2
@@ -247,9 +242,10 @@ object frmVisualKeyboard: TfrmVisualKeyboard
       BevelOuter = bvNone
       ParentBackground = False
       ParentColor = True
-      TabOrder = 7
+      TabOrder = 6
       VerticalAlignment = taAlignTop
       Visible = False
+      ExplicitHeight = 198
     end
   end
   object tmrFade: TTimer

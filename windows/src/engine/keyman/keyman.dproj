@@ -176,20 +176,10 @@
             <Form>frmKeymanBase</Form>
             <DesignClass>TTntForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\global\delphi\ui\UfrmWebContainer.pas">
-            <Form>frmWebContainer</Form>
-            <DesignClass>TTntForm</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\..\global\delphi\ui\XMLRenderer.pas"/>
-        <DCCReference Include="..\..\global\delphi\ui\GenericXMLRenderer.pas"/>
         <DCCReference Include="..\..\global\delphi\hints\Hints.pas"/>
-        <DCCReference Include="viskbd\UfrmOSKKeyboardUsage.pas">
-            <Form>frmOSKKeyboardUsage</Form>
-        </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\WideStringClass.pas"/>
-        <DCCReference Include="..\..\global\delphi\comp\WebBrowserManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="..\..\global\delphi\ui\UFixupMissingFile.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
@@ -218,9 +208,6 @@
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\MSXMLDomCreate.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\UfrmScriptError.pas">
-            <Form>frmScriptError</Form>
-        </DCCReference>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
@@ -254,11 +241,6 @@
         <DCCReference Include="Keyman.System.SharedBuffers.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.Security.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas"/>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
-            <Form>frameCEFHost</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="touchkeyboard\Keyman.System.FrameworkInputPane.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">

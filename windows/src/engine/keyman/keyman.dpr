@@ -72,15 +72,10 @@ uses
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
   KeymanHints in 'KeymanHints.pas',
   UfrmKeymanBase in '..\..\global\delphi\ui\UfrmKeymanBase.pas' {frmKeymanBase: TTntForm},
-  UfrmWebContainer in '..\..\global\delphi\ui\UfrmWebContainer.pas' {frmWebContainer: TTntForm},
-  XMLRenderer in '..\..\global\delphi\ui\XMLRenderer.pas',
-  GenericXMLRenderer in '..\..\global\delphi\ui\GenericXMLRenderer.pas',
   Hints in '..\..\global\delphi\hints\Hints.pas',
-  UfrmOSKKeyboardUsage in 'viskbd\UfrmOSKKeyboardUsage.pas' {frmOSKKeyboardUsage},
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   WideStringClass in '..\..\global\delphi\general\WideStringClass.pas',
-  WebBrowserManager in '..\..\global\delphi\comp\WebBrowserManager.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
@@ -101,7 +96,6 @@ uses
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
-  UfrmScriptError in '..\..\global\delphi\general\UfrmScriptError.pas' {frmScriptError},
   OnScreenKeyboardData in '..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
@@ -135,8 +129,6 @@ uses
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
-  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas';
 
 {$R ICONS.RES}

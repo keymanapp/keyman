@@ -39,7 +39,6 @@ uses
   System.SysUtils,
 
   GetOsVersion,
-  Keyman.System.CEFManager,
   Keyman.System.Security,
   Keyman.Winapi.VersionHelpers,
   KeymanVersion,
@@ -64,16 +63,8 @@ procedure RunProgram; forward;
 
 procedure Run;
 begin
-  FInitializeCEF := TCEFManager.Create;
-  try
-    if FInitializeCEF.Start then
-    begin
-      RunProgram;
-      frmKeyman7Main.Free;
-    end;
-  finally
-    FInitializeCEF.Free;
-  end;
+  RunProgram;
+  frmKeyman7Main.Free;
 end;
 
 procedure RunProgram;

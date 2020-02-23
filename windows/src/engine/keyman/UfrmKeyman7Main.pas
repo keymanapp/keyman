@@ -302,7 +302,6 @@ type
     procedure HotkeyWndProc(var Message: TMessage);
 
     procedure DoLanguageHotkey(Index: Integer);
-    procedure CEFShutdownComplete(Sender: TObject);
   protected
     procedure DoInterfaceHotkey(Target: Integer);
 
@@ -332,7 +331,6 @@ type
     procedure MnuVisualKeyboard(Sender: TObject);
     procedure MnuCharacterMap(Sender: TObject);
     procedure MnuFontHelper(Sender: TObject);
-    procedure MnuKeyboardUsage(Sender: TObject);
 
     procedure MnuRunProgram(Sender: TObject);
     procedure MnuSelectKeyboard(Sender: TObject);   // I4606
@@ -411,7 +409,6 @@ uses
   RegistryKeys,
   klog,
   GetOsVersion,
-  Keyman.System.CEFManager,
   System.Win.ComObj, {tlhelp32,}
   VistaMessages,
   Vcl.AxCtrls,
@@ -695,16 +692,8 @@ begin
 
     FClosingApp := True;
     ReleaseMutex(hProgramMutex); // We are not controlling Keyman any more - another copy of Keyman.exe may start
-    if not (csDestroying in ComponentState) then
-    begin
-      FInitializeCEF.StartShutdown(CEFShutdownComplete);
-    end;
+    Close;
   end;
-end;
-
-procedure TfrmKeyman7Main.CEFShutdownComplete(Sender: TObject);
-begin
-  Close;
 end;
 
 { TRunningProduct }
@@ -901,7 +890,6 @@ begin
     khKeyboardMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, True, Rect(0,0,0,0)); // I1377 - Show the menu down near the tray when hotkey is pressed   // I3990
     khVisualKeyboard: MnuVisualKeyboard(nil);
     khKeymanConfiguration: TKeymanDesktopShell.RunKeymanConfiguration('-c 0');
-    khKeyboardUsage: MnuKeyboardUsage(nil);
     khFontHelper: MnuFontHelper(nil);
     khCharacterMap: MnuCharacterMap(nil);
     khTextEditor: MnuOpenTextEditor(nil);
@@ -1616,14 +1604,6 @@ begin
       then HideVisualKeyboard
       else ShowVisualKeyboard(apKeyboard);
 //TOUCH    end;
-end;
-
-procedure TfrmKeyman7Main.MnuKeyboardUsage(Sender: TObject);
-begin
-  SetLastFocus;     // I1289 - Focus not returned to active app when OSK opened
-  if VisualKeyboardVisible(apKeyboardUsage)
-    then HideVisualKeyboard
-    else ShowVisualKeyboard(apKeyboardUsage);
 end;
 
 procedure TfrmKeyman7Main.MnuFontHelper(Sender: TObject);

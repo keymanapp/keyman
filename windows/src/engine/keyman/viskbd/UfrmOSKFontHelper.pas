@@ -40,9 +40,8 @@ uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, UfrmOSKPlugInBase,
-  keymanapi_TLB, xmlrenderer, UfrmKeymanBase, utilcheckfonts,
-  UserMessages, Keyman.UI.UframeCEFHost,
-  TempFileManager;
+  keymanapi_TLB, UfrmKeymanBase, utilcheckfonts,
+  UserMessages, Vcl.Grids, Vcl.ExtCtrls;
 
 type
   TKeyboardProps = record
@@ -52,24 +51,21 @@ type
     HasWelcome: Boolean;
   end;
 
-  TfrmOSKFontHelper = class(TfrmOSKPlugInBase) // I2721
+  TfrmOSKFontHelper = class(TfrmOSKPlugInBase)
+    panNoKeyboard: TPanel;
+    panFonts: TPanel;
+    gridFonts: TDrawGrid; // I2721
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    {$MESSAGE HINT 'TODO: Refactor to use TWebBrowserManager'}
-    cef: TframeCEFHost;
-    FXML: string;   // I4181
-    FXMLFileName: TTempFile;   // I4181
-    FXMLRenderers: TXMLRenderers;
-    FDialogName: WideString;
+    FCharsData: array of string;
+    FSelectedKeyboard: TCheckFontKeyboard;
     FCheckFontsThread: TCheckFontsThread;
     FCheckFontKeyboards: TCheckFontKeyboards;
     FLastSelectedKeyboardID: WideString;
     FLastSelectedKeymanID: Integer;
     FLastSelectedKeyboardName: WideString;
 
-    procedure Content_Render;
-    procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure WMUser_FontChange(var Message: TMessage); message WM_USER_FontChange;  // I3390   // I3519
 
     procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
@@ -77,11 +73,7 @@ type
     procedure CheckFontsThreadComplete(Sender: TObject);
     procedure DisplayKeyboardFonts;
     procedure StartCheckingFonts(Keyboard: IKeymanKeyboardInstalled);
-    procedure Do_Content_Render(const AXML: WideString);
-    procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
-    procedure cefLoadEnd(Sender: TObject);
-    procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
-    procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
+    procedure SetDisplay(const msg: string);
   public
     { Public declarations }
     procedure SelectKeyboard(KeymanID: Integer);
@@ -94,17 +86,10 @@ uses
   KLog,
   kmint,
   custinterfaces,
-  uCEFTypes,
-  uCEFConstants,
   UfrmKeyman7Main,
   UfrmVisualKeyboard,
   Unicode,
-  USendInputString,
-  utilexecute,
-  utilhttp,
-  utilsystem,
-  utilxml,
-  WideStringClass;
+  USendInputString;
 
 {$R *.dfm}
 
@@ -134,73 +119,6 @@ begin
   DisplayKeyboardFonts; // Displays default details
 end;
 
-procedure TfrmOSKFontHelper.cefCommand(Sender: TObject; const command: string; params: TStringList);
-begin
-  FireCommand(command, params);
-end;
-
-procedure TfrmOSKFontHelper.cefKeyEvent(Sender: TObject;
-  e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
-begin
-  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
-  begin
-    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
-      PostMessage(Handle, WM_USER_ContentRender, 0, 0)
-    else if e.event.windows_key_code = VK_F1 then
-      Application.HelpJump('context_'+lowercase(FDialogName));
-  end;
-end;
-
-procedure TfrmOSKFontHelper.cefLoadEnd(Sender: TObject);
-begin
-  FreeAndNil(FXMLFileName);   // I4181
-end;
-
-
-procedure TfrmOSKFontHelper.cefPreKeySyncEvent(Sender: TObject;
-  e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
-begin
-  if e.event.kind in [KEYEVENT_RAWKEYDOWN, KEYEVENT_KEYDOWN] then
-    if (e.event.windows_key_code = VK_F5) and ((e.event.modifiers and EVENTFLAG_CONTROL_DOWN) = EVENTFLAG_CONTROL_DOWN) then
-      Handled := True
-    else if e.event.windows_key_code = VK_F1 then
-      Handled := True;
-end;
-
-{$MESSAGE HINT 'TODO: Support context menu'}
-{procedure TfrmOSKFontHelper.webShowContextMenu(Sender: TCustomEmbeddedWB;
-  const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-  const Context: IDispatch; var Result: HRESULT);
-begin
-  PostMessage(Handle, WM_CONTEXTMENU, web.Handle, MAKELONG(ppt.X, ppt.Y));
-  Result := S_OK;
-//Result := S_FALSE;
-end;}
-
-
-procedure TfrmOSKFontHelper.WMUser_ContentRender(var Message: TMessage);
-begin
-  DisplayKeyboardFonts;  // I3216   // I3520
-end;
-
-procedure TfrmOSKFontHelper.Content_Render;
-var
-  AdditionalData: WideString;
-begin
-  AdditionalData := FXML;
-
-  FreeAndNil(FXMLFileName);   // I4181
-
-  if not FileExists(GetXMLTemplatePath(FXMLRenderers.RenderTemplate)+FXMLRenderers.RenderTemplate) then
-    Exit;
-
-  FXMLFileName := FXMLRenderers.RenderToFile(False, AdditionalData);
-
-  FDialogName := ChangeFileExt(ExtractFileName(FXMLRenderers.RenderTemplate), '');
-  //HelpType := htKeyword;
-  //HelpKeyword := FDialogName;
-end;
-
 procedure TfrmOSKFontHelper.FireCommand(const command: WideString; params: TStringList);
 var
   hwnd: THandle;
@@ -210,9 +128,9 @@ var
   s: WideString;
   v: Integer;
 begin
-  if command = 'link' then TUtilExecute.URL(params.Values['url'])  // I3349
-  else if command = 'tutorial' then //(ActiveProduct as IKeymanProduct2).OpenTutorial
-  else if command = 'osk' then frmKeyman7Main.frmVisualKeyboard.ActivePage := apKeyboard
+//  if command = 'link' then TUtilExecute.URL(params.Values['url'])  // I3349
+//  else if command = 'tutorial' then //(ActiveProduct as IKeymanProduct2).OpenTutorial
+  if command = 'osk' then frmKeyman7Main.frmVisualKeyboard.ActivePage := apKeyboard
   else if command = 'welcome' then frmKeyman7Main.MnuOpenKeyboardHelp(nil)
   else if command = 'help' then frmKeyman7Main. MnuOpenProductHelp(frmKeyman7Main.frmVisualKeyboard)
   else if command = '' then
@@ -221,10 +139,12 @@ begin
   begin
     hwnd := kmcom.Control.LastFocusWindow;
 
+    // TODO: something like this will be issued by the grid in the future
+
     ch := Trim(params.Values['chars']);
 
     // I1429 - fix U+xxxx in insertchars URL
-    
+
     n := Pos(' ', ch); if n = 0 then n := Length(ch)+1;
 
     while ch <> '' do
@@ -257,15 +177,6 @@ procedure TfrmOSKFontHelper.FormCreate(Sender: TObject);
 begin
   inherited;
   FCheckFontKeyboards := TCheckFontKeyboards.Create;
-
-  cef := TframeCEFHost.Create(Self);
-  cef.Parent := Self;
-  cef.Visible := True;
-  cef.ShouldOpenRemoteUrlsInBrowser := True;
-  cef.OnCommand := cefCommand;
-  cef.OnLoadEnd := cefLoadEnd;
-  cef.OnKeyEvent := cefKeyEvent;
-  cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
 end;
 
 procedure TfrmOSKFontHelper.FormDestroy(Sender: TObject);
@@ -278,7 +189,6 @@ begin
     FCheckFontsThread := nil;
   end;
 
-  FreeAndNil(FXMLFileName);   // I4181
   FreeAndNil(FCheckFontKeyboards);
 end;
 
@@ -327,12 +237,11 @@ begin
 
   if Keyboard.Encodings = keANSI then
   begin
-    // I1533 - hint for non-Unicode keyboard.
-    Do_Content_Render('<Keyboard Name="'+XmlEncode(FLastSelectedKeyboardName)+'" />');
+    SetDisplay('The selected keyboard is not a Unicode keyboard');
   end
   else
   begin
-    Do_Content_Render('<Searching /><Keyboard Name="'+XmlEncode(FLastSelectedKeyboardName)+'" />');
+    SetDisplay('Please wait while searching for related fonts for keyboard '+FLastSelectedKeyboardName);
 
     FCheckFontsThread := TCheckFontsThread.Create;
     FCheckFontsThread.FreeOnTerminate := True;
@@ -346,44 +255,39 @@ procedure TfrmOSKFontHelper.DisplayKeyboardFonts;
 var
   FKeyboard: TCheckFontKeyboard;
   J: Integer;
-
-  function CharCode(ch: WideChar): WideString;
-  begin
-    Result := IntToHex(Ord(ch), 4);
-  end;
-
 var
-  FFontsData: WideString;
   i: Integer;
   ch,ch2: WideChar;
 begin
-  FFontsData := '';
-
   FKeyboard := FCheckFontKeyboards.Keyboards[FLastSelectedKeyboardID];
   if (FLastSelectedKeyboardID <> '') and Assigned(FKeyboard) then
   begin
-    FFontsData := '<Chars>';
-
+    SetLength(FCharsData, Length(FKeyboard.Chars));
+    J := 0;
     I := 1;
     while I <= Length(FKeyboard.Chars) do  // I2712
     begin
       ch := FKeyboard.Chars[I];
-      if Uni_IsSurrogate1(ch) and (I < Length(FKeyboard.Chars)) then
+      if Uni_IsSurrogate1(ch) and (I < Length(FKeyboard.Chars)) and Uni_IsSurrogate2(FKeyboard.Chars[I+1]) then
       begin
         ch2 := FKeyboard.Chars[I+1];
-        FFontsData := FFontsData + '<Ch CharCode="'+IntToHex(Uni_SurrogateToUTF32(ch,ch2),5)+'">'+XmlEncode(ch+ch2)+'</Ch>';
+        FCharsData[J] := ch + ch2;
         Inc(I);
       end
       else
-        FFontsData := FFontsData + '<Ch CharCode="'+CharCode(ch)+'">'+XmlEncode(ch)+'</Ch>';
+        FCharsData[J] := ch;
       Inc(I);
+      Inc(J);
     end;
 
-    FFontsData := FFontsData + '</Chars>';
+    SetLength(FCharsData, J);
 
-    FFontsData := FFontsData + '<Fonts>';
+    gridFonts.ColCount := Length(FCharsData) + 1;
+    gridFonts.RowCount := FKeyboard.Fonts.Count + 1;
 
-    for I := 0 to FKeyboard.Fonts.Count - 1 do
+    FSelectedKeyboard := FKeyboard;
+
+(*    for I := 0 to FKeyboard.Fonts.Count - 1 do
     begin
       FFontsData := FFontsData + '<Font '+
         'Index="'+IntToStr(I)+'" '+
@@ -413,27 +317,31 @@ begin
     {finally
       FFonts.Free;
     end;}
+*)
+    SetDisplay('');
   end
   else
   begin
     if kmcom.Keyboards.Count = 0 then
-      FFontsData := '<NoKeyboards />';
+      SetDisplay('No keyboards are installed')
+    else
+      SetDisplay('Please select a Keyman keyboard to find related fonts');
   end;
-
-  Do_Content_Render(FFontsData);
 end;
 
-procedure TfrmOSKFontHelper.Do_Content_Render(const AXML: WideString);
+procedure TfrmOSKFontHelper.SetDisplay(const msg: string);
 begin
-  FXMLRenderers := TXMLRenderers.Create;
-  FXMLRenderers.RenderTemplate := 'FontHelper.xsl';
-
-  FXML := AXML;
-  Content_Render;
-  FreeAndNil(FXMLRenderers);
-
-  if Assigned(FXMLFileName) and FileExists(FXMLFileName.Name) then   // I4181
-    cef.Navigate(FXMLFileName.Name);   // I4181
+  if msg = '' then
+  begin
+    panFonts.Visible := True;
+    panNoKeyboard.Visible := False;
+  end
+  else
+  begin
+    panNoKeyboard.Caption := msg;
+    panNoKeyboard.Visible := True;
+    panFonts.Visible := False;
+  end;
 end;
 
 end.
