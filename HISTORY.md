@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.15 alpha 2020-02-24
+
+* fix(android): Sanitize app version string for api query (#2715)
+* chore(ci): Improve output when triggering Jenkins jobs (#2706)
+* fix(ci): Fix increment-version.sh script (#2714)
+
 ## 14.0.14 alpha 2020-02-21
 
 * chore(linux): allow to trigger Jenkins build from script (#2697)
