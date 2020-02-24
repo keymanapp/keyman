@@ -224,15 +224,15 @@ begin
   begin
     Result := GetEnvironmentVariable(S_CEF_EnvVar);
     if Result = ''
-      then Result := KeymanEngineInstallPath+S_CEF_SubFolder
+      then Result := KeymanDesktopInstallPath+S_CEF_SubFolder
       else Result := IncludeTrailingPathDelimiter(Result);
   end;
 end;
 
 class function TKeymanPaths.CEFSubprocessPath: string;
 begin
-  // Normal install location - in Keyman Engine install folder
-  Result := KeymanEngineInstallPath(S_CEF_SubProcess);
+  // Normal install location - in Keyman Desktop install folder
+  Result := KeymanDesktopInstallPath(S_CEF_SubProcess);
   if FileExists(Result) then Exit;
 
   // Same folder as executable
@@ -240,14 +240,14 @@ begin
   if FileExists(Result) then Exit;
 
   // Source repo, bin folder
-  Result := ExtractFilePath(ParamStr(0)) + '..\engine\' + S_CEF_SubProcess;
+  Result := ExtractFilePath(ParamStr(0)) + '..\desktop\' + S_CEF_SubProcess;
   if FileExists(Result) then Exit;
 
   // Source repo, source folder
-  Result := ExtractFilePath(ParamStr(0)) + '..\..\engine\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
+  Result := ExtractFilePath(ParamStr(0)) + '..\..\desktop\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
   if FileExists(Result) then Exit;
 
-  Result := ExtractFilePath(ParamStr(0)) + '..\..\engine\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
+  Result := ExtractFilePath(ParamStr(0)) + '..\..\desktop\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
 end;
 
 class function TKeymanPaths.CEFDataPath(const mode: string): string;

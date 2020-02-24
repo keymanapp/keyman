@@ -135,6 +135,10 @@
                 <File Name="unicodedata.mdb" Source="..\..\global\inst\data\unicodedata.mdb" />
               </Component>
 
+              <Component>
+                <File Id="kmbrowserhost.exe" Name="kmbrowserhost.exe" KeyPath="yes" />
+              </Component>
+
               <Component Id="Reg_RootPath" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="root path" Type="string" Value="[INSTALLDIR]" />
                 <RegistryValue Root="HKLM" Key="SOFTWARE\Keyman\Keyman Desktop" Name="version" Type="string" Value="$(var.VERSION)" />
@@ -254,6 +258,7 @@
       <ComponentRef Id="cfgicon.ico" />
       <ComponentRef Id="menutitle.png" />
       <ComponentRef Id="unicodedata.mdb" />
+      <ComponentRef Id="kmbrowserhost.exe" />
 
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="removeCU" />
