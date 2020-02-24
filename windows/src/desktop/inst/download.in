@@ -39,5 +39,4 @@ heat-cef:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 candle-cef: heat-cef
-  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
   $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
