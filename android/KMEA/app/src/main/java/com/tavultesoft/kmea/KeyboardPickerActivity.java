@@ -578,7 +578,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
     List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
     if (kbdMapList == null) {
-      Log.d(TAG, "kbdMapList == null");
       kbdMapList = new ArrayList<>(0);
     }
     List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
