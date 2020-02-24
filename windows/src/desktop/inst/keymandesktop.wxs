@@ -263,6 +263,7 @@
       <ComponentRef Id="Reg_RootPath" />
       <ComponentRef Id="removeCU" />
       <ComponentGroupRef Id="DesktopUI" />
+      <ComponentGroupRef Id="CEF" />
 
       <ComponentRef Id="locale_de" />
       <ComponentRef Id="locale_fr" />
