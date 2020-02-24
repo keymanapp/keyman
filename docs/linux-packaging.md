@@ -5,7 +5,8 @@
 We use different channels to build and distribute the Linux packages:
 
 - (older version) included in official repos since Ubuntu 19.04 and Debian Buster
-- [Launchpad repo](https://launchpad.net/~keymanapp) for stable and beta versions
+- Launchpad repo for [stable](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman) and
+  [beta](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily) versions
 - [pso](http://packages.sil.org/) and [llso](http://linux.lsdev.sil.org/ubuntu/)
   for stable, beta, and alpha versions
 - artifacts on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/view/change-requests/)
@@ -21,9 +22,9 @@ pso enabled.
 Package builds happen on Launchpad and Jenkins. Package builds for the official Ubuntu/Debian
 repos happen outside of our control.
 
-### Package builds on Jenkins
+## Package builds on Jenkins
 
-#### Build jobs
+### Build jobs
 
 The definition of the packaging jobs, the triggering of the jobs and the necessary build scripts
 are scattered over several source repos:
@@ -92,7 +93,7 @@ are scattered over several source repos:
     See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/) for
     details to the various files.
 
-#### Flow of a Linux package build
+### Flow of a Linux package build
 
 - [TeamCity job](https://build.palaso.org/buildConfiguration/Keyman_Test?) triggers a build on
   [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
@@ -125,12 +126,12 @@ The Jenkins build progress is visible in two ways:
 - [traditional view](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
 - [blue ocean view](https://jenkins.lsdev.sil.org/blue/organizations/jenkins/pipeline-keyman-packaging/activity)
 
-#### Local package builds
+### Local package builds
 
 It is possible to use the usual Debian/Ubuntu tools to create the package locally. For someone who
 only occasionally deals with packaging it might be easier to use the scripts that Jenkins runs:
 
-##### Prerequisites
+#### Prerequisites for local package builds
 
 Install `sbuild` (and probably some other packages that I forgot).
 
@@ -153,7 +154,7 @@ bash/update --dists "xenial bionic" --arches "amd64 i386"
 Set the `DEBSIGNKEY` environment variable to your public GPG key that will be used to sign
 the packages.
 
-##### Building packages
+#### Building packages
 
 Building packages happen in the [Keyman source tree](https://github.com/keymanapp/keyman).
 
@@ -197,15 +198,47 @@ work:
 git clean -dxf
 ```
 
-### Package builds on Launchpad
+## Package builds on Launchpad
 
 Package builds on Launchpad are triggered manually by running the Keyman script
 [linux/scripts/launchpad.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/launchpad.sh).
-This requires ssh and gpg key to launchpad.
+
+### Prerequisites for Launchpad
+
+1. If you don't have one, create an account at [launchpad.net](https://launchpad.net)
+2. Request to join the ["Keyman for Linux"](https://launchpad.net/~keymanapp) team.
+3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key and associate it
+   to your launchpad account
+4. Set the following environment variables in your `~/.profile` or `~/.bashrc` (so you don't have
+   to set them every time)
+  `export GPGKEY=[key_id]` using the `key_id` of your GPG key
+  `DEBEMAIL="your.email.address@example.org"`
+  `DEBFULLNAME="Firstname Lastname"`
+  `export DEBEMAIL DEBFULLNAME`
+
+### Building packages on Launchpad
 
 The `launchpad.sh` script downloads the current source code (beta or stable) from
 [downloads.keyman.com](https://downloads.keyman.com/linux/stable/), creates a Debian source package
 and uploads this to launchpad. Launchpad then rebuilds for the different distros and architectures.
+
+To upload the packages to launchpad, run the following script from the `linux/` directory:
+
+```bash
+./scripts/launchpad.sh [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
+```
+
+#### Parameters
+
+- `UPLOAD="yes"` - do the dput for real
+- `TIER="<tier>"` - alpha, beta, or stable, default from `../TIER.md`
+- `PROJECT="<project>"` - only upload this package
+- `DIST="<dist>"` - only upload for this distribution
+- `PACKAGEVERSION="<version>"` - normally use the default so don't specify it. But if you
+  change packaging and run another upload you need to increment the number at the end of
+  `PACKAGEVERSION`. e.g. next one is `1~sil2` then `1~sil3`…
+
+### Releasing a new version
 
 As part of releasing a new version it might be good to do some local testing first before uploading
 to Launchpad:
@@ -213,3 +246,13 @@ to Launchpad:
 - Run `launchpad.sh` with `UPLOAD="no"` to build the packages
 - Then install them on a clean VM and make sure no glaring bugs
 - Once you are happy with the packages you can run `launchpad.sh` with `UPLOAD="yes"`
+
+### Troubleshooting
+
+Refer to the [launchpad uploading help](https://help.launchpad.net/Packaging/PPA/Uploading)
+for troubleshooting and setting up for `dput` upload.
+
+## Reference
+
+See the [Linux readme](https://github.com/keymanapp/keyman/blob/master/linux/README.md)
+for how to build Keyman on Linux etc.
