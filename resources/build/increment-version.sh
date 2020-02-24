@@ -19,6 +19,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
 
 gitbranch=`git branch --show-current`
@@ -121,9 +122,9 @@ if [ "$action" == "commit" ]; then
   fi
 
   #
-  # After this script finishes in CI, we will be pushing the new history to 
+  # After this script finishes in CI, we will be pushing the new history to
   # downloads.keyman.com, so we need to finish with the branch here that has the
-  # latest history in it. We don't need to cleanup the branch because the CI will 
+  # latest history in it. We don't need to cleanup the branch because the CI will
   # do that for us.
   #
 
