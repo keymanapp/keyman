@@ -39,6 +39,7 @@ function triggerTestBuilds() {
   # Note: we always run builds for 'all' platforms
   local platforms=( `echo "all $1"` )
   local branch="$2"
+  local force="${3:-false}"
 
   for platform in "${platforms[@]}"; do
     echo "# $platform: changes detected"
@@ -48,7 +49,7 @@ function triggerTestBuilds() {
       if [ "${test_build:(-8)}" == "_Jenkins" ]; then
         local job=${test_build%_Jenkins}
         echo "  -- Triggering build configuration $job/$branch on Jenkins"
-        triggerJenkinsBuild "$job" "$branch"
+        triggerJenkinsBuild "$job" "$branch" "$force"
       else
         echo "  -- Triggering build configuration $test_build on teamcity"
         triggerTeamCityBuild "$test_build" "$vcs_test" "$branch"
@@ -65,7 +66,7 @@ function triggerTestBuilds() {
 if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
   # branch name is 'master', 'beta' [, or 'stable' -- in the future]
   echo ". Branch $PRNUM needs to pass tests on all platforms."
-  triggerTestBuilds "`echo ${available_platforms[@]}`" "$PRNUM"
+  triggerTestBuilds "`echo ${available_platforms[@]}`" "$PRNUM" "true"
   exit 0
 fi
 
