@@ -4,7 +4,6 @@
 
 !include ..\..\defines.mak
 
-
 default:
   echo Please don't call this file directly -- used by Makefile
 
@@ -18,3 +17,5 @@ prepareredist:
 clean:
   rem
 
+candle:
+  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
