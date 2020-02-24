@@ -29,7 +29,7 @@ prereq-resources:
     $(SIGNCODE) /d "Keyman Desktop Resources" desktop_resources.dll
 
 desktop: prereq
-    $(MAKE) -fdownload.mak candle-desktop
+    $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.msi
     $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
