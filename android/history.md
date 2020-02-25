@@ -3,6 +3,7 @@
 ## 2020-02-25 13.0.6201 stable
 * Bug fix:
   * Fix crash involving empty keyboard list (#2723)
+  * Sanitize app version for api query (#2724)
 
 ## 2020-02-19 13.0.6200 stable
 * Release 13.0
