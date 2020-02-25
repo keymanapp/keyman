@@ -227,8 +227,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     else
     {
       // Keyman cloud
+      // Sanitize appVersion to #.#.# to match the API spec
+      String appVersion = KMManager.getVersion();
       String _remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
-        kKeymanApiBaseURL, langID, kbID, BuildConfig.VERSION_NAME, deviceType);
+        kKeymanApiBaseURL, langID, kbID, appVersion, deviceType);
       cloudQueries.add(
         new CloudApiTypes.CloudApiParam(
           CloudApiTypes.ApiTarget.Keyboard, _remoteUrl)
