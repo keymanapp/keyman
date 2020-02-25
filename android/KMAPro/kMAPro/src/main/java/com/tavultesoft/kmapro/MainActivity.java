@@ -295,14 +295,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       switch (data.getScheme().toLowerCase()) {
         // Android DownloadManager
         case "content":
-          checkStoragePermission(data);
-          break;
         // Chrome downloads and Filebrowsers
         case "file":
           checkStoragePermission(data);
           break;
         case "http" :
         case "https" :
+        case "keyman" :
           Intent downloadIntent;
           String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
           if (url == null) {
@@ -312,18 +311,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             // URL contains KMP to download in background.
             boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
 
-            int index = url.lastIndexOf("/") + 1;
-            String filename = "unknown:";
-            if (index >= 0 && index <= url.length()) {
-              filename = url.substring(index);
+            String filename = data.getQueryParameter("filename");
+            if (filename == null) {
+              int index = url.lastIndexOf("/") + 1;
+              if (index >= 0 && index <= url.length()) {
+                filename = url.substring(index);
+              }
             }
 
-            // Only handle ad-hoc kmp packages
-            if (FileUtils.hasKeymanPackageExtension(url)) {
+            // Only handle ad-hoc kmp packages or from keyman.com
+            if (FileUtils.hasKeymanPackageExtension(url) || data.getScheme().toLowerCase().equals("keyman")) {
               try {
                 // Download the KMP to app cache
                 downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
                 downloadIntent.putExtra("url", url);
+                downloadIntent.putExtra("filename", filename);
                 downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
                 downloadIntent.putExtra("receiver", resultReceiver);
 
@@ -349,6 +351,15 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             }
           }
           break;
+          /*
+        case "keyman":
+          url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+          if (url != null) {
+            Uri uri = Uri.parse(url);
+            checkStoragePermission(uri);
+          }
+          break;
+          */
         default :
           Log.e(TAG, "Unrecognized protocol " + data.getScheme());
       }
