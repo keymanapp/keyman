@@ -1,5 +1,12 @@
 # Keyman for Android Version History
 
+## 2020-02-25 13.0.6201 stable
+* Bug fix:
+  * Fix crash involving empty keyboard list (#2723)
+
+## 2020-02-19 13.0.6200 stable
+* Release 13.0
+
 ## 2020-02-14 13.0.6059 beta
 * Bug fix:
   * Re-initialize CloudDownloadManager when downloading resources after Keyman app is closed (#2635)
