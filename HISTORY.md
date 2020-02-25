@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.16 alpha 2020-02-25
+
+* fix(android) Fix crash on kbdMapList (#2719)
+* fix(developer): crash when switching layout templates (#2726)
+
 ## 14.0.15 alpha 2020-02-24
 
 * fix(android): Sanitize app version string for api query (#2715)
