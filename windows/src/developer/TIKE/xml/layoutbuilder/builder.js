@@ -1328,7 +1328,7 @@ $(function () {
 
     $('.skcontrol.wedge-horz,.skcontrol.wedge-vert,div#btnDelSubKey,input#inpSubKeyCap').css('display', '');
     builder.selectedKey().removeClass('selected');
-    if (key) {
+    if (key && $(key).length) {
       $(key).addClass('selected');
       $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey,input#inpKeyCap').css('display', 'block');
       var rowOffset = $(key).parent().offset();
