@@ -59,6 +59,9 @@ type
     FEditorTheme: string;
     FFix183_LadderLength: Integer;
     FDefaultProjectPath: string;
+    FDebuggerAutoResetBeforeCompiling: Boolean;
+    FAutoSaveBeforeCompiling: Boolean;
+    FOSKAutoSaveBeforeImporting: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -88,6 +91,9 @@ type
     property DebuggerSingleStepAfterBreak: Boolean read FDebuggerSingleStepAfterBreak write FDebuggerSingleStepAfterBreak;
     property DebuggerShowStoreOffset: Boolean read FDebuggerShowStoreOffset write FDebuggerShowStoreOffset;
     property DebuggerAutoRecompileWithDebugInfo: Boolean read FDebuggerAutoRecompileWithDebugInfo write FDebuggerAutoRecompileWithDebugInfo;
+    property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
+    property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
+    property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
 
@@ -181,6 +187,9 @@ begin
     FDebuggerSingleStepAfterBreak  := regReadBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, False);
     FDebuggerShowStoreOffset       := regReadBool(SRegValue_IDEOptDebuggerShowStoreOffset,      False);
     FDebuggerAutoRecompileWithDebugInfo := regReadBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, False);
+    FDebuggerAutoResetBeforeCompiling := regReadBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, False);
+    FAutoSaveBeforeCompiling := regReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
+    FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
 
     FWebHostDefaultPort := regReadInt(SRegValue_IDEOptWebHostPort, 8008);
 
@@ -224,7 +233,13 @@ begin
     regWriteBool(SRegValue_IDEOptDebuggerShowStoreOffset,      FDebuggerShowStoreOffset);
     regWriteBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, FDebuggerAutoRecompileWithDebugInfo);
 
+    regWriteBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, FDebuggerAutoResetBeforeCompiling);
+    regWriteBool(SRegValue_IDEOptAutoSaveBeforeCompiling, FAutoSaveBeforeCompiling);
+    regWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
+
+
     regWriteInt(SRegValue_IDEOptWebHostPort, FWebHostDefaultPort);
+
 
     regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
     regWriteBool(SRegValue_IDEOptCharMapAutoLookup,             FCharMapAutoLookup);

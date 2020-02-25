@@ -377,6 +377,10 @@ const
   SRegValue_IDEOptDebuggerShowStoreOffset      = 'debugger show store offset';          // CU
   SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo = 'debugger recompile with debug info'; // CU
 
+  SRegValue_IDEOptDebuggerAutoResetBeforeCompiling = 'debugger auto reset before compilng'; // CU
+  SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
+  SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
+
   SRegValue_IDEOptWebHostPort = 'web host port';   // I4021
 
   SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU

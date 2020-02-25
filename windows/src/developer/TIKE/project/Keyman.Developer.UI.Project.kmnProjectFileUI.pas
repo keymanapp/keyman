@@ -60,6 +60,8 @@ uses
   Vcl.Graphics,
   Vcl.Controls,
   dmActionsMain,
+
+  Keyman.Developer.UI.UfrmMessageDlgWithSave,
   UfrmMain,
   UfrmFontHelper,
   UfrmKeymanWizard,
@@ -92,6 +94,8 @@ begin
 end;
 
 function TkmnProjectFileUI.CompileKeyboard(FSilent: Boolean): Boolean;
+var
+  FSave: Boolean;
 begin
   Result := False;
 
@@ -99,8 +103,21 @@ begin
   begin
     if not FSilent then
     begin
-      if MessageDlg('The keyboard file has been modified.  You must save before compiling.'+#13#10+'Save the keyboard and continue?',
-        mtConfirmation, mbOkCancel, 0) = mrCancel then Exit;
+      if not FKeymanDeveloperOptions.AutoSaveBeforeCompiling then
+      begin
+        if TfrmMessageDlgWithSave.Execute(
+            'The keyboard file has been modified.  You must save before compiling.'+#13#10#13#10+
+            'Save the keyboard and continue?',
+            'Always save automatically before compiling',
+            '', True, FSave) in [mrNo, mrCancel] then
+          Exit(False);
+        if FSave then
+        begin
+          FKeymanDeveloperOptions.AutoSaveBeforeCompiling := True;
+          FKeymanDeveloperOptions.Write;
+        end;
+      end;
+
       if not modActionsMain.actFileSave.Execute then Exit;
     end
     else
