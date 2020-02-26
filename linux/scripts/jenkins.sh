@@ -22,7 +22,7 @@ proj=${proj%"-beta"}
 
 if [ "$proj" == "keyman-keyboardprocessor" ]; then
 	fullsourcename="keyboardprocessor"
-	sourcedir="../common/engine/keyboardprocessor"
+	sourcedir="../common/core/keyboardprocessor"
 else
 	# check if project is known
 	if [[ $keyman_projects =~ (^|[[:space:]])$proj($|[[:space:]]) ]]; then

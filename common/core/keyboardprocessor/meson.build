@@ -6,7 +6,7 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        version: '11.0.0',
+        version: '14.0.17',
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14'])

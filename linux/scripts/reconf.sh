@@ -56,8 +56,8 @@ for proj in ${extra_projects}; do
         rm -rf keyboardprocessor
         #TODO: update meson version to 0.50.0+ and use `meson rewrite`
         #meson rewrite kwargs set project / version "${newvers}"
-        sed -i "s/version: '.*'/version: '${newvers}'/" ../common/engine/keyboardprocessor/meson.build
-        meson ../common/engine/keyboardprocessor keyboardprocessor
+        sed -i "s/version: '.*'/version: '${newvers}'/" ../common/core/keyboardprocessor/meson.build
+        meson ../common/core/keyboardprocessor keyboardprocessor
     fi
     if [ "${proj}" == "keyman-config" ]; then
         cd keyman-config

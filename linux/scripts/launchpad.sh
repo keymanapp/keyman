@@ -66,7 +66,7 @@ mkdir -p launchpad
 
 for proj in ${projects}; do
     if [ "${proj}" == "keyman-keyboardprocessor" ]; then
-       cd ${BASEDIR}/../common/engine/keyboardprocessor
+       cd ${BASEDIR}/../common/core/keyboardprocessor
     else
        cd ${proj}
     fi
