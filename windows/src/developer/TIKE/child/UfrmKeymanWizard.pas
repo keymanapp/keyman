@@ -575,6 +575,7 @@ uses
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.UI.Project.ProjectFileUI,
+  Keyman.Developer.UI.UfrmMessageDlgWithSave,
   RegExpr,
   ErrorControlledRegistry,
   RedistFiles,
@@ -1506,13 +1507,25 @@ begin
 end;
 
 function TfrmKeymanWizard.PrepareForBuild(var DebugReset: Boolean): Boolean;   // I4504
+var
+  FSave: Boolean;
 begin
   if IsDebugVisible then
   begin
-    case MessageDlg('You must reset the debugger before recompiling your keyboard.  Reset the debugger and recompile?',
-        mtConfirmation, mbYesNoCancel, 0) of
-      mrNo, mrCancel: Exit(False);
+    if not FKeymanDeveloperOptions.DebuggerAutoResetBeforeCompiling then
+    begin
+      if TfrmMessageDlgWithSave.Execute(
+          'You must reset the debugger before recompiling your keyboard.  Reset the debugger and recompile?',
+          'Always reset the debugger automatically before compiling',
+          '', True, FSave) in [mrNo, mrCancel] then
+        Exit(False);
+      if FSave then
+      begin
+        FKeymanDeveloperOptions.DebuggerAutoResetBeforeCompiling := True;
+        FKeymanDeveloperOptions.Write;
+      end;
     end;
+
     DebugReset := True;
     StopDebugging;
   end;
@@ -3207,6 +3220,8 @@ begin
 end;
 
 procedure TfrmKeymanWizard.cmdImportFromOnScreenClick(Sender: TObject);   // I3945   // I4034
+var
+  FSave: Boolean;
 begin
   if (FFeature[kfOSK].FileName = '') or not FKeyboardParser.Features.ContainsKey(kfOSK) then   // I4058   // I4138
   begin
@@ -3216,8 +3231,24 @@ begin
 
   if Self.Modified then   // I4059
   begin
-    ShowMessage('You must save changes to the keyboard before importing');
-    Exit;
+    if not FKeymanDeveloperOptions.OSKAutoSaveBeforeImporting then
+    begin
+      if TfrmMessageDlgWithSave.Execute(
+          'You must save changes to your keyboard before import. Save now and import?',
+          'Always save changes automatically before importing',
+          '', True, FSave) in [mrNo, mrCancel] then
+        Exit;
+      if FSave then
+      begin
+        FKeymanDeveloperOptions.OSKAutoSaveBeforeImporting := True;
+        FKeymanDeveloperOptions.Write;
+      end;
+
+      if not modActionsMain.actFileSave.Execute then
+      begin
+        Exit;
+      end;
+    end;
   end;
 
   Self.Modified := True;

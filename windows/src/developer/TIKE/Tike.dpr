@@ -80,7 +80,7 @@ uses
   UfrmRegressionTestFailure in 'dialogs\UfrmRegressionTestFailure.pas' {frmRegressionTestFailure},
   XString in '..\..\global\delphi\general\XString.pas',
   debugkeyboard in 'debug\debugkeyboard.pas',
-  UfrmMustIncludeDebug in 'dialogs\UfrmMustIncludeDebug.pas' {frmMustIncludeDebug},
+  Keyman.Developer.UI.UfrmMessageDlgWithSave in 'dialogs\Keyman.Developer.UI.UfrmMessageDlgWithSave.pas' {frmMessageDlgWithSave},
   debugdeadkeys in 'debug\debugdeadkeys.pas',
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
@@ -293,7 +293,8 @@ uses
   Keyman.Developer.System.LexicalModelParser in 'main\Keyman.Developer.System.LexicalModelParser.pas',
   Keyman.Developer.System.LexicalModelParserTypes in 'main\Keyman.Developer.System.LexicalModelParserTypes.pas',
   Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
-  Keyman.Developer.UI.dmActionsModelEditor in 'actions\Keyman.Developer.UI.dmActionsModelEditor.pas' {modActionsModelEditor: TDataModule};
+  Keyman.Developer.UI.dmActionsModelEditor in 'actions\Keyman.Developer.UI.dmActionsModelEditor.pas' {modActionsModelEditor: TDataModule},
+  UfrmMustIncludeDebug in 'dialogs\UfrmMustIncludeDebug.pas' {frmMustIncludeDebug};
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -321,8 +322,8 @@ begin
       if TikeActive then Exit;
       InitClasses;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-      Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-      Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
     end;
   finally
     FInitializeCEF.Free;

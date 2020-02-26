@@ -24,10 +24,6 @@ inherited frmOptions: TfrmOptions
     object tabGeneral: TTabSheet
       Caption = 'General'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object cmdProxySettings: TButton
         Left = 8
         Top = 209
@@ -118,13 +114,25 @@ inherited frmOptions: TfrmOptions
           OnClick = cmdBrowseDefaultProjectPathClick
         end
       end
+      object chkAutoSaveBeforeCompiling: TCheckBox
+        Left = 152
+        Top = 182
+        Width = 218
+        Height = 17
+        Caption = '&Automatically save before compiling'
+        TabOrder = 7
+      end
+      object chkOSKAutoSaveBeforeImporting: TCheckBox
+        Left = 152
+        Top = 205
+        Width = 218
+        Height = 17
+        Caption = '&Automatically save before importing OSK'
+        TabOrder = 8
+      end
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbEditorSpaces: TGroupBox
         Left = 11
         Top = 16
@@ -244,15 +252,11 @@ inherited frmOptions: TfrmOptions
     object tabDebugger: TTabSheet
       Caption = 'Debugger'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbDebuggerSettings: TGroupBox
         Left = 8
-        Top = 8
+        Top = 7
         Width = 313
-        Height = 129
+        Height = 146
         Caption = 'Settings'
         TabOrder = 0
         object chkUseOldDebugger: TCheckBox
@@ -289,16 +293,24 @@ inherited frmOptions: TfrmOptions
         end
         object chkDebuggerAutoRecompile: TCheckBox
           Left = 8
-          Top = 100
+          Top = 101
           Width = 289
           Height = 17
           Caption = '&Automatically recompile if no debug information available'
           TabOrder = 4
         end
+        object chkDebuggerAutoResetBeforeCompiling: TCheckBox
+          Left = 8
+          Top = 122
+          Width = 250
+          Height = 17
+          Caption = '&Automatically reset debugger before recompiling'
+          TabOrder = 5
+        end
       end
       object gbWebHost: TGroupBox
         Left = 8
-        Top = 143
+        Top = 159
         Width = 313
         Height = 89
         Caption = 'Web Host'
@@ -324,10 +336,6 @@ inherited frmOptions: TfrmOptions
     object tabCharMap: TTabSheet
       Caption = 'Character Map'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object gbCharMapCharacterLookups: TGroupBox
         Left = 8
         Top = 8
@@ -442,7 +450,7 @@ inherited frmOptions: TfrmOptions
     Top = 403
   end
   object dlgBrowseDefaultProjectPath: TBrowse4Folder
-    InitialDir = ''
+    InitialDir = 'C:\Users\mcdurdin\Desktop\'
     Root = Desktop
     Title = 'Browse for Default Project Folder'
     Left = 176
