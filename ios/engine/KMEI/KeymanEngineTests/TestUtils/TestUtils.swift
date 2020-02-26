@@ -18,7 +18,7 @@ import Foundation
 enum TestUtils {
   static let mainBundle = Bundle(for: FileManagementTests.self)  // Can't use TestUtils, as it's an enum
 
-  private static func findSubBundle(forResource resource: String, ofType type: String) -> Bundle {
+  static func findSubBundle(forResource resource: String, ofType type: String) -> Bundle {
     return Bundle(path: mainBundle.path(forResource: resource, ofType: type)!)!
   }
 
