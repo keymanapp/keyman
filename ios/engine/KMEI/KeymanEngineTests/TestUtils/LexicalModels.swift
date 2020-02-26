@@ -7,9 +7,11 @@
 //
 
 import Foundation
+@testable import KeymanEngine
 
 extension TestUtils {
   enum LexicalModels {
     static let mtntKMP = TestUtils.lexicalModelsBundle.url(forResource: "nrc.en.mtnt.model", withExtension: "kmp")!
+    static let mtnt = Defaults.lexicalModel
   }
 }
