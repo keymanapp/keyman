@@ -764,6 +764,9 @@ end;
 
 procedure TfrmKeymanWizard.FocusTabTouchLayout;   // I3885
 begin
+  if pagesTouchLayout.ActivePage = pageTouchLayoutDesign
+    then DoFocus(frameTouchLayout)
+    else DoFocus(frameTouchLayoutSource);
 end;
 
 {-----------------------------------------------------------------------------}
@@ -3185,7 +3188,9 @@ begin
   begin
     frameTouchLayoutSource.EditorText := frameTouchLayout.SaveToString;
     DoFocus(frameTouchLayoutSource);
-  end;
+  end
+  else
+    DoFocus(frameTouchLayout);
   FLoading := False;
 end;
 
