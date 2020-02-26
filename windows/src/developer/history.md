@@ -2,6 +2,7 @@
 
 ## 2020-02-24 13.0.101 stable
 * Bug Fix(Keyboard Editor): Touch Layout Editor could crash switching templates (#2721)
+* Bug Fix(Keyboard Editor): Touch Layout Editor would not always accept character map insertions (#2736)
 
 ## 2020-02-19 13.0.100 stable
 * Chore: Keyman Developer 13.0.100 release
