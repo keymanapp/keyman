@@ -1,19 +1,8 @@
 (*
-  Name:             UfrmMustIncludeDebug
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      1 Aug 2006
+  Copyright (C) 2020 SIL International.
 
-  Modified Date:    1 Aug 2006
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          
+  Show a message dialog with a check box to 'remember Yes choice
+  for next time'.
 *)
 unit Keyman.Developer.UI.UfrmMessageDlgWithSave;
 
