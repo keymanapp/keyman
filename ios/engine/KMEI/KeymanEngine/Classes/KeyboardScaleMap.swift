@@ -167,11 +167,9 @@ class KeyboardScaleMap {
    * Compares the detected dimensions of the current device to those of devices with known keyboard dimensions, returning
    * the largest device smaller than or equal to the detected dimensions.
    */
-  private static func getUnknownDeviceMapping() -> Device {
-    let _screenSize = UIScreen.main.bounds
-
+  private static func getUnknownDeviceMapping(screenSize _screenSize: CGSize = UIScreen.main.bounds.size, asPhone: Bool? = nil) -> Device {
     // Shouldn't happen, but just in case.
-    if _screenSize == CGRect.zero {
+    if _screenSize == CGSize.zero {
       log.error("Cannot detect device dimensions; defaulting to smallest device for form factor.")
     }
 
@@ -185,7 +183,7 @@ class KeyboardScaleMap {
 
     // Array for search is determined by form-factor.
     var searchSet: [Device]
-    if(UIDevice.current.userInterfaceIdiom == .phone) {
+    if asPhone ?? false {
       searchSet = KeyboardScaleMap.shared.phoneScalingThresholds
     } else {
       searchSet = KeyboardScaleMap.shared.tabletScalingThresholds
@@ -206,13 +204,14 @@ class KeyboardScaleMap {
       return searchSet[0] // in case no matches can be found (like the screenSize == CGRect.zero case) - use smallest
     } else {
       // Use the largest potential device, which is the last one returned from the mapping (b/c we presorted the base array)
-      return searchSet.last!
+      return potentialMatches.last!
     }
   }
 
-  static func getDeviceDefaultKeyboardScale(forPortrait: Bool) -> KeyboardSize? {
-    let device = Device.current
-
+  static func getDeviceDefaultKeyboardScale(forPortrait: Bool,
+                                            onDevice device: Device = Device.current,
+                                            screenSize: CGSize = UIScreen.main.bounds.size,
+                                            asPhone: Bool? = nil) -> KeyboardSize? {
     if let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: device)] {
       return forPortrait ? scaling.portrait : scaling.landscape
     }
@@ -231,7 +230,7 @@ class KeyboardScaleMap {
         // The expected case:  isUnknown = true.
         // Applies to future models of iPhone and iPad.  DeviceKit is of no help here, so we
         // compute the closest-resolution known device.
-        let mappedDevice = getUnknownDeviceMapping()
+        let mappedDevice = getUnknownDeviceMapping(screenSize: screenSize, asPhone: asPhone ?? (UIDevice.current.userInterfaceIdiom == .phone))
 
         // As noted in the scalings data-map, devices of the same dimensions tend to have the same
         // keyboard dimensions.  It's not a perfect rule, but should suffice for a stop-gap solution.

@@ -16,6 +16,7 @@ extension Storage {
     if paths.isEmpty {
       return nil
     }
+    log.info("\(paths[0])")
     return Storage(baseURL: paths[0], userDefaults: UserDefaults.standard)
   }()
 
