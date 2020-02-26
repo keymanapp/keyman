@@ -351,15 +351,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             }
           }
           break;
-          /*
-        case "keyman":
-          url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
-          if (url != null) {
-            Uri uri = Uri.parse(url);
-            checkStoragePermission(uri);
-          }
-          break;
-          */
         default :
           Log.e(TAG, "Unrecognized protocol " + data.getScheme());
       }
