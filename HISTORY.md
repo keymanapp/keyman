@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.17 alpha 2020-02-26
+
+* fix(android) Fix crash on kbdMapList (#2719)
+* fix(developer): crash when switching layout templates (#2726)
+* feat(developer): always save options (#2731)
+* feat(common): Support git worktree when configuring local hooks (#2722)
+* docs(linux): Add linux packaging documentation (#2720)
+* fix(developer): insert from charmap into touch editor 🍒 (#2737)
+* fix(developer): debugger breaking smp with bksp (#2739)
+* feat(ios): Adds keyboard-scale unit tests, fixes unknown-device bug (#2695)
+
 ## 14.0.16 alpha 2020-02-25
 
 * fix(android) Fix crash on kbdMapList (#2719)
