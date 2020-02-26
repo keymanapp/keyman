@@ -1,5 +1,11 @@
 # Keyman Developer Version History
 
+## 2020-02-24 13.0.101 stable
+* Bug Fix(Keyboard Editor): Touch Layout Editor could crash switching templates (#2721)
+
+## 2020-02-19 13.0.100 stable
+* Chore: Keyman Developer 13.0.100 release
+
 ## 2020-02-18 13.0.76 beta
 * Bug Fix(Install): Upgrading would lose user settings (resolves after 2 upgrades) (#2668)
 
