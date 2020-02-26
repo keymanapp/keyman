@@ -653,17 +653,12 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
   procedure Backspace(BackspaceType: Integer);
   var
     i, m, n: Integer;
-  const
-    BK_BACKSPACE = 2;
   begin
     n := memo.SelStart;
     m := n - 1;
 
-    case BackspaceType of
-      BK_BACKSPACE:
-        if (n > 1) and Uni_IsSurrogate2(memo.Text[n]) then
-          Dec(m);
-    end;
+    if (n > 1) and Uni_IsSurrogate2(memo.Text[n]) then
+      Dec(m);
 
     for i := 0 to deadkeys.Count-1 do
       if (TDeadKeyInfo(deadkeys[i]).Position >= m-1) and
@@ -671,7 +666,6 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         TDeadKeyInfo(deadkeys[i]).Delete;
 
     memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
-    // memo.Text.Substring(0, m)+memo.Text.Substring(n);
     memo.SelStart := m;
   end;
 
