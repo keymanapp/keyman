@@ -91,7 +91,7 @@ for proj in ${projects}; do
 	cp -a ../dist/${proj}_${vers}.orig.tar.gz .
 	tar xfz ${proj}_${vers}.orig.tar.gz
 	if [ "keyman-keyboardprocessor" == "$proj" ]; then
-		cp -a ../../common/core/keyboardprocessor/debian ${proj}-${vers}
+		cp -a ../../common/core/desktop/debian ${proj}-${vers}
 	else
 		cp -a ../${proj}/debian ${proj}-${vers}
 	fi

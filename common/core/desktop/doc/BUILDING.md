@@ -30,7 +30,7 @@ python3 -m pip install meson
 ## Building
 In your source directory do the following:
 ```
-cd keyboardprocessor
+cd desktop
 meson build --werror
 cd build
 ninja
