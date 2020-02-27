@@ -17,7 +17,6 @@
 		1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */; };
 		1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACD01FD8DE7600926D69 /* XCGLogger.framework */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
-		981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADBC176935E400B62590 /* InfoPlist.strings */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
 		981AFA9819EF44DE006706BF /* 724-info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725418E4F0930014DF0C /* 724-info.png */; };
 		981AFA9919EF44DE006706BF /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADD1176935E500B62590 /* MainViewController_iPad.xib */; };
@@ -113,7 +112,6 @@
 		985EA9E719E64A580006C017 /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DC19E64A580006C017 /* banner-Portrait@2x~ipad.png */; };
 		985EA9E819E64A580006C017 /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DD19E64A580006C017 /* banner-Portrait@3x.png */; };
 		985EA9E919E64A580006C017 /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 985EA9DE19E64A580006C017 /* banner-Portrait~ipad.png */; };
-		989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 989E4DBA1B1EB85200A345FB /* Settings.bundle */; };
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
@@ -283,9 +281,7 @@
 		98727A3019A71218005E17A1 /* 887-notepad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad@2x.png"; path = "Keyman Icons/887-notepad@2x.png"; sourceTree = "<group>"; };
 		987F3E9B19417F3D00209D4F /* textsize_selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textsize_selected.png; path = "Keyman Icons/textsize_selected.png"; sourceTree = "<group>"; };
 		987F3E9C19417F3D00209D4F /* textsize_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "textsize_selected@2x.png"; path = "Keyman Icons/textsize_selected@2x.png"; sourceTree = "<group>"; };
-		989E4DBA1B1EB85200A345FB /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Keyman-Free-Info.plist"; sourceTree = "<group>"; };
-		98ABADBD176935E400B62590 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		98ABADC1176935E400B62590 /* Keyman-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Prefix.pch"; sourceTree = "<group>"; };
 		98AD861219B56AAE00D25C26 /* 887-notepad-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected.png"; path = "Keyman Icons/887-notepad-selected.png"; sourceTree = "<group>"; };
 		98AD861319B56AAE00D25C26 /* 887-notepad-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "887-notepad-selected@2x.png"; path = "Keyman Icons/887-notepad-selected@2x.png"; sourceTree = "<group>"; };
@@ -320,7 +316,6 @@
 		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
-		CEA1487A240788EA00C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
 		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -501,7 +496,6 @@
 				9A0FC9FF22D7C21F00D33F86 /* Reachability.framework */,
 				CE2B1E4B21B6112B007D092E /* DeviceKit.framework */,
 				CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */,
-				989E4DBA1B1EB85200A345FB /* Settings.bundle */,
 				CE1F5ECC23331C1C00141F3E /* resources */,
 				98ABADB2176935E400B62590 /* Frameworks */,
 				98ABADB9176935E400B62590 /* Keyman */,
@@ -562,7 +556,6 @@
 			isa = PBXGroup;
 			children = (
 				16A9229D20325253003CC98E /* Keyman-Info.plist */,
-				98ABADBC176935E400B62590 /* InfoPlist.strings */,
 				98AFAEDB17FE2ACF00178C0A /* Keyman Icons */,
 				98AFAEDC17FE2B6A00178C0A /* Keyman Navbar */,
 				98ABADBB176935E400B62590 /* Keyman-Free-Info.plist */,
@@ -782,7 +775,6 @@
 				9845A8D41A439F1000544E2E /* 786-browser@3x.png in Resources */,
 				9845A7D31A439A9200544E2E /* InfoViewController_iPhone.xib in Resources */,
 				9845A8B51A439D3000544E2E /* Images.xcassets in Resources */,
-				981AFA9019EF44DE006706BF /* InfoPlist.strings in Resources */,
 				9845A8D71A439F1000544E2E /* UIButtonBarArrowRight@2x.png in Resources */,
 				981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */,
 				981AFA9819EF44DE006706BF /* 724-info.png in Resources */,
@@ -818,7 +810,6 @@
 				981AFAB119EF44DE006706BF /* 702-share.png in Resources */,
 				9845A7D21A439A9200544E2E /* InfoViewController_iPad.xib in Resources */,
 				981AFAB219EF44DE006706BF /* navbar-Portrait~ipad.png in Resources */,
-				989E4DBC1B1EB85200A345FB /* Settings.bundle in Resources */,
 				9822CB6F1A3A8E3200D73CAA /* more@2x.png in Resources */,
 				9820CE531A144F0400EA909A /* navbar-Portrait@3x.png in Resources */,
 				981AFAB519EF44DE006706BF /* 711-trash-selected.png in Resources */,
@@ -1002,15 +993,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		98ABADBC176935E400B62590 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				98ABADBD176935E400B62590 /* en */,
-				CEA1487A240788EA00C6ECD2 /* km */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */ = {
 			isa = PBXVariantGroup;
 			children = (

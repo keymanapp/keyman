@@ -250,7 +250,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                         imageScale: imageScaleF,
                                         action: #selector(self.showDropDownMenu),
                                         orientation: orientation)
-    moreButton.title = "More"
+    moreButton.title = NSLocalizedString("More", comment: "Displays the main screen's drop-down menu")
 
     let infoButton = createNavBarButton(with: UIImage(named: "IconInfo")!,
                                         highlightedImage: UIImage(named: "IconInfoSelected")!,
