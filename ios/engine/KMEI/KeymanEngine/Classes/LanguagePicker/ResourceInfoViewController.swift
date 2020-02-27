@@ -48,20 +48,22 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    let bundle = Bundle(for: Manager.self)
+
     infoArray = [[String: String]]()
     infoArray.append([
-      "title": "Keyboard version",
+      "title": NSLocalizedString("Keyboard version", bundle: bundle, comment: "As seen on the keyboard's information page"),
       "subtitle": resource.version
       ])
 
     if !isCustomKeyboard {
       infoArray.append([
-        "title": "Help link",
+        "title": NSLocalizedString("Help link", bundle: bundle, comment: "Links to the help page of the keyboard"),
         "subtitle": ""
         ])
     }
     infoArray.append([
-      "title": "Uninstall keyboard",
+      "title": NSLocalizedString("Uninstall keyboard", bundle: bundle, comment: "Removes the keyboard from the application"),
       "subtitle": ""
       ])
 

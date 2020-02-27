@@ -320,6 +320,7 @@
 		CE7A26D523CEEB8D0005955C /* UIColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIColors.swift; path = ../../../engine/KMEI/KeymanEngine/Classes/UIColors.swift; sourceTree = "<group>"; };
 		CE7C1AE1236925D800100C2C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
+		CEA1487A240788EA00C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
 		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -758,6 +759,7 @@
 			knownRegions = (
 				en,
 				Base,
+				km,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1004,6 +1006,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				98ABADBD176935E400B62590 /* en */,
+				CEA1487A240788EA00C6ECD2 /* km */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
