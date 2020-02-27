@@ -211,12 +211,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
       holder.textLang.setText(data.name);
       holder.img.setImageResource(R.drawable.ic_arrow_forward);
 
-      if(data.keyboards.size() == 1) {
-        holder.textCount.setText(this.getContext().getString(R.string.single_keyboard_count));
-      } else {
-        String msg = String.format(this.getContext().getString(R.string.multiple_keyboard_count), data.keyboards.size());
-        holder.textCount.setText(msg);
-      }
+      holder.textCount.setText(getContext().getResources().getQuantityString(R.plurals.keyboard_count, data.keyboards.size(), data.keyboards.size()));
 
       return convertView;
     }

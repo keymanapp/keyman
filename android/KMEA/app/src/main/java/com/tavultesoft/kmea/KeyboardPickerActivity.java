@@ -85,7 +85,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     TextView textView = (TextView) findViewById(R.id.bar_title);
-    textView.setText(getString(R.string.title_keyboards));
+    textView.setText(getResources().getQuantityString(R.plurals.title_keyboards, 2));
 
     closeButton = (Button) findViewById(R.id.close_keyman_button);
     Bundle bundle = getIntent().getExtras();
