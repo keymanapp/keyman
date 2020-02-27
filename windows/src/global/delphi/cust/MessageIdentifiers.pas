@@ -31,7 +31,7 @@ function MsgFromIdFormat(const msgid: TMessageIdentifier; const args: array of c
 
 implementation
 
-uses SysUtils, Unicode, kmint, custinterfaces;
+uses SysUtils, kmint, custinterfaces;
 
 
 function MsgFromStr(const str: WideString): WideString;

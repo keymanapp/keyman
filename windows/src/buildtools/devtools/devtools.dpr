@@ -21,7 +21,8 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   DevDelphiStarterCompileWrapper in 'DevDelphiStarterCompileWrapper.pas',
-  SourceRootPath in 'SourceRootPath.pas';
+  SourceRootPath in 'SourceRootPath.pas',
+  Keyman.System.Dev.BuildMessageConsts in 'Keyman.System.Dev.BuildMessageConsts.pas';
 
 begin
   try

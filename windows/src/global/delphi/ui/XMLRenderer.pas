@@ -186,6 +186,8 @@ begin
       s := GetLocalePathForLocale(LanguageCode); // + '/locale.xml';
       if not FileExists(s) then
         s := FTemplatePath + 'locale.xml';
+
+      s := 'c:\projects\keyman\app\windows\src\desktop\locale\locale.xml';
     end;
 
     FOutput.Add(
@@ -201,7 +203,7 @@ begin
         '<templatepath>'+XMLEncode(URLPath(FTemplatePath))+'</templatepath>'+
         '<scripttemplatepath>'+XMLEncode(ScriptUrlPath(FTemplatePath))+'</scripttemplatepath>'+
         '<uilanguages>'+GetUILanguages+'</uilanguages>'+
-        '<defaultlocalepath>'+XMLEncode(FTemplatePath)+'locale.xml</defaultlocalepath>'+
+        '<defaultlocalepath>c:\projects\keyman\app\windows\src\desktop\locale\locale.xml</defaultlocalepath>'+
         '<localepath>'+XMLEncode(s)+'</localepath>');
 
     for i := 0 to Count - 1 do

@@ -35,6 +35,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
   Winapi.ActiveX,
+  Keyman.System.Dev.BuildMessageConsts,
   DevCheckGitStatus,   // I5087
   DevDelphiCompileWrapper,
   DevDelphiStarterCompileWrapper,
@@ -76,6 +77,7 @@ begin
       writeln('  -dccq ...            : wrap a call to DCC32, ignoring hints and warnings');    // I3339  // I3378
       writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
+      writeln('  -locale root         : build messageidentifiers.pas, messageidentifierconsts.pas from locale.xml');
       ExitCode := 1;
       Exit;
     end;
@@ -102,6 +104,11 @@ begin
       Success := TReleaseBuildCheck.Run
     else if (ParamStr(1) = '-git') then   // I3726   // I5087
       Success := TCheckGitStatus.Run
+    else if (ParamStr(1) = '-locale') then
+    begin
+      Success := True;
+      TLocaleCompiler.CompileLocaleXml(ParamStr(2));
+    end
     else
     begin
       writeln('Invalid parameters');

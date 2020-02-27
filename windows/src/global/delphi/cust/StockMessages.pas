@@ -27,6 +27,7 @@ interface
 
 uses Classes, SysUtils;
 
+(*
 type
   TStockMessageParameter = class(TCollectionItem)
   private
@@ -109,11 +110,11 @@ type
     constructor Create(stream: TStream); reintroduce;
     destructor Destroy; override;
     procedure SaveToPas(FileName, DefaultsFileName: string);
-    procedure SaveToPoFile(FileName: string);
     procedure Save(stream: TStream);
   published
     property Sections: TStockMessageSections read FSections write SetSections;
   end;
+*)
 
 implementation
 
@@ -122,7 +123,7 @@ uses
   StrUtils;
 
 { TStockMessageString }
-
+(*
 constructor TStockMessageString.Create(Collection: TCollection);
 begin
   inherited Create(Collection);
@@ -296,52 +297,6 @@ begin
   CloseFile(f);
 end;
 
-procedure TStockMessages.SaveToPoFile(FileName: string);
-var
-  i, j, k: Integer;
-  s: string;
-begin
-  with TStringList.Create do
-  try
-    Add('msgid ""');
-    Add('msgstr ""');
-    Add('"Project-Id-Version: Keyman Desktop '+SKeymanVersion+' Translation\n"');
-    Add('"POT-Creation-Date: '+FormatDateTime('yyyy-dd-mm hh:nn', Now)+'\n"');
-    Add('"PO-Revision-Date: '+FormatDateTime('yyyy-dd-mm hh:nn', Now)+'\n"');
-    Add('"Last-Translator: Keyman <support@keyman.com>\n"');
-    Add('"Language-Team: Keyman <support@keyman.com>\n"');
-    Add('"MIME-Version: 1.0\n"');
-    Add('"Content-Type: text/plain; charset=UTF-8\n"');
-    Add('"Content-Transfer-Encoding: 8bit\n"');
-    Add('"License: Shareware\n"');
-    Add('');
-
-    for i := 0 to FSections.Count - 1 do
-    begin
-      for j := 0 to FSections[i].Strings.Count - 1 do
-      begin
-        Add('#  '+ReplaceText(FSections[i].Strings[j].Comment, #13#10, #13#10'#  '));
-        s := '';
-        for k := 0 to FSections[i].Strings[j].Parameters.Count - 1 do
-        begin
-          if k = 0
-            then s :=            '#  Parameters: '
-            else s := s + #13#10+'#              ';
-          s := s + FSections[i].Strings[j].Parameters[k].Value + ' = ' + ReplaceText(ReplaceText(FSections[i].Strings[j].Parameters[k].Description, '\','\\'), #13#10, ' ');
-        end;
-        if s <> '' then Add(s);
-        Add('msgid "'+FSections[i].Strings[j].Name+'"');
-        Add('msgstr "'+ReplaceText(ReplaceText(FSections[i].Strings[j].DefStr, '\','\\'), #13#10, '"'#13#10'"')+'"');
-        Add('');
-      end;
-    end;
-
-    SaveToFile(FileName, TEncoding.UTF8);  // I3310
-  finally
-    Free;
-  end;
-end;
-
 procedure TStockMessages.SetSections(const Value: TStockMessageSections);
 begin
   FSections.Assign(Value);
@@ -391,6 +346,7 @@ procedure TStockMessageSections.SetItem(Index: Integer; const Value: TStockMessa
 begin
   inherited SetItem(Index, Value);
 end;
+*)
 
 end.
 

@@ -5,23 +5,23 @@
   <xsl:output method="html" version="1.0" encoding="utf-8" omit-xml-declaration="yes" standalone="yes" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
   <!-- I978 - locale was not reliably selected due to undefined order of document() loading and | processing -->
-  <xsl:variable name="prilocale" select="document(/Keyman/localepath)/Locale" />
-  <xsl:variable name="altlocale" select="document(/Keyman/defaultlocalepath)/Locale/*[not(@Id = $prilocale//@Id)]" />
+  <xsl:variable name="prilocale" select="document(/Keyman/localepath)/resources" />
+  <xsl:variable name="altlocale" select="document(/Keyman/defaultlocalepath)/resources/*[not(@name = $prilocale//@name)]" />
   <xsl:variable name="comlocale">
       <xsl:copy-of select="$prilocale/*" />
       <xsl:copy-of select="$altlocale" />
   </xsl:variable>
   <xsl:variable name="locale" select="msxsl:node-set($comlocale)" />
-    
+
   <!--
   -
   - Generic list implementation: supports entry plus expanding details
   -
   -->
 
-  
-  
-  <!-- 
+
+
+  <!--
   -
   - Checkbox implementation
   -
@@ -35,7 +35,7 @@
     <xsl:param name="title" />
     <xsl:param name="disabled" />
     <xsl:param name="tabid" />
-   
+
     <input type="checkbox">
       <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
       <xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
@@ -47,12 +47,12 @@
     </input>
   </xsl:template>
 
-  <!-- 
+  <!--
   -
   - Button implementation
   -
   -->
-  
+
   <xsl:template name="button">
     <xsl:param name="caption" />
     <xsl:param name="command" />
@@ -78,7 +78,7 @@
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
             font-size: 12px;
-            height: 25px; 
+            height: 25px;
             display: inline-block;
             text-align: center;
             width: <xsl:value-of select="$width"/>;
@@ -87,7 +87,7 @@
           </xsl:attribute>
           <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;">
             <xsl:attribute name="src"><xsl:value-of select='/Keyman/templatepath' />shield.png</xsl:attribute>
-          </img> 
+          </img>
           <xsl:value-of select="$caption" />
         </button>
       </xsl:when>
@@ -115,7 +115,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- 
+  <!--
   -
   - Popup menu implementation
   -
@@ -138,7 +138,7 @@
       <xsl:copy-of select="$caption"/>
     </span>
   </xsl:template>
-  
+
   <xsl:template name="menubutton">
     <xsl:param name="caption" />
     <xsl:param name="menutemplate" />
@@ -147,7 +147,7 @@
     <xsl:param name="width" />
     <xsl:param name="className" />
     <xsl:param name="tabid" />
-    
+
     <xsl:call-template name="button">
       <xsl:with-param name="caption"><xsl:value-of select="$caption" /></xsl:with-param>
       <xsl:with-param name="onclick">ShowMenu('<xsl:value-of select="$id"/>','<xsl:value-of select="$align" />',0,0); return false;</xsl:with-param>
@@ -157,11 +157,11 @@
       <xsl:with-param name="width"><xsl:value-of select="$width"/></xsl:with-param>
       <xsl:with-param name="tabid"><xsl:value-of select="$tabid"/></xsl:with-param>
     </xsl:call-template>
-    
+
   </xsl:template>
 
   <!-- Replaces a string, e.g. ' with \' https://stackoverflow.com/a/7712434/1836776 -->
-  
+
   <xsl:template name="replace-string">
     <xsl:param name="text"/>
     <xsl:param name="replace"/>
@@ -182,5 +182,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>
