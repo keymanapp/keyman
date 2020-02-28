@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -98,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   Uri data;
 
   private static final String TAG = "MainActivity";
-  private FirebaseAnalytics mFirebaseAnalytics;
 
   private KMTextView textView;
   private final int minTextSize = 16;
@@ -157,8 +155,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     Sentry.captureMessage("This is a test 2");
 
     resultReceiver = new DownloadResultReceiver(new Handler());
-
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);

@@ -51,7 +51,6 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -72,7 +71,6 @@ public final class KMManager {
 
   private static final String TAG = "KMManager";
 
-  private static FirebaseAnalytics mFirebaseAnalytics;
   private static ResourcesUpdateTool updateTool;
 
   // Keyboard types
@@ -252,8 +250,6 @@ public final class KMManager {
 
   public static void initialize(final Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
-
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
     if (!didCopyAssets || isTestMode()) {
       copyAssets(appContext);
@@ -907,16 +903,14 @@ public final class KMManager {
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    // Log Firebase analytic event.
+    // Log Sentry analytic event.
     Bundle params = new Bundle();
     params.putString("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
     params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
     params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
     params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
 
-    if(mFirebaseAnalytics != null) {
-      mFirebaseAnalytics.logEvent("km_add_keyboard", params);
-    }
+    // TODO: Send to Sentry
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }

@@ -12,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -69,7 +68,6 @@ final class KMKeyboard extends WebView {
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
-  private static FirebaseAnalytics mFirebaseAnalytics;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -106,8 +104,6 @@ final class KMKeyboard extends WebView {
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   public void initKMKeyboard(final Context context) {
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-
     setFocusable(false);
     clearCache(true);
     getSettings().setJavaScriptEnabled(true);
@@ -139,7 +135,7 @@ final class KMKeyboard extends WebView {
           }
         }
 
-        // Send console errors to Firebase Analytics.
+        // Send console errors to Sentry.
         // (Ignoring spurious message "No keyboard stubs exist = ...")
         // TODO: Analyze if this error warrants reverting to default keyboard
         // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
@@ -653,9 +649,8 @@ final class KMKeyboard extends WebView {
     params.putString("keyboardName", this.keyboardName);
     params.putString("keyboardVersion", this.keyboardVersion);
 
-    if(mFirebaseAnalytics != null) {
-      mFirebaseAnalytics.logEvent("kmw_console_error", params);
-    }
+    // TODO: Send to Sentry
+
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.
