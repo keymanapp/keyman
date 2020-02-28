@@ -51,7 +51,7 @@
     <string name="uninstall_keyboard">Uninstall keyboard</string>
     <string name="keyboard_picker_new_keyboard_prefix">new</string>
     <string name="keyboard_qr_code" comment="QR Code description">
-      Scan this code to load this&lt;br>keyboard on another device</string>
+      Scan this code to load this\nkeyboard on another device</string>
 
     <!-- Model Updates -->
     <string name="confirm_download_model">Would you like to download the latest version of this dictionary?</string>
