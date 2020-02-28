@@ -86,6 +86,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.sentry.core.Sentry;
+
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
@@ -150,6 +152,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     context = this;
+
+    // Send a simple event to Sentry
+    Sentry.captureMessage("This is a test 2");
+
     resultReceiver = new DownloadResultReceiver(new Handler());
 
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
