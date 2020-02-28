@@ -9,6 +9,7 @@
 import KeymanEngine
 import UIKit
 import WebKit
+import Sentry
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -55,6 +56,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       KeymanEngine.log.outputLevel = .warning
       log.outputLevel = .warning
     #endif
+
+    // First things first:  enable Sentry for crash reporting.
+    do {
+      Client.shared = try Client(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
+      try Client.shared?.startCrashHandler()
+
+//      Client.shared?.snapshotStacktrace {
+//          let event = Event(level: .debug)
+//          event.message = "Hello world"
+//          Client.shared?.appendStacktrace(to: event)
+//          Client.shared?.send(event: event)
+//      }
+    } catch let error {
+      print("\(error)")
+    }
+
     Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
 

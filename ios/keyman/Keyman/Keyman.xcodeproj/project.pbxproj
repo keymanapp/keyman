@@ -130,6 +130,8 @@
 		C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E943FD1F61377900E7D98C /* MainViewController.swift */; };
 		C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */; };
 		C0FF769E1F5D4ECB00BD23C3 /* ActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */; };
+		CE002CB52408B4A5002026CE /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; };
+		CE002CB62408B4A5002026CE /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE002CB42408B4A5002026CE /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE1F5ECE23331DA400141F3E /* OfflineHelp.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */; };
 		CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4B21B6112B007D092E /* DeviceKit.framework */; };
 		CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -175,6 +177,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CE6138011FB99538009D0EF2 /* KeymanEngine.framework in Embed Frameworks */,
+				CE002CB62408B4A5002026CE /* Sentry.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,6 +315,7 @@
 		C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0FF769C1F5D4ECA00BD23C3 /* Keyman-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keyman-Bridging-Header.h"; sourceTree = "<group>"; };
 		C0FF769D1F5D4ECB00BD23C3 /* ActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = ActivityItemProvider.swift; sourceTree = "<group>"; tabWidth = 2; };
+		CE002CB42408B4A5002026CE /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CE1F5ECD23331DA400141F3E /* OfflineHelp.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = OfflineHelp.bundle; sourceTree = "<group>"; };
 		CE2B1E4B21B6112B007D092E /* DeviceKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceKit.framework; path = ../../Carthage/Build/iOS/DeviceKit.framework; sourceTree = "<group>"; };
 		CE6137FF1FB99538009D0EF2 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -330,6 +334,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE2B1E4C21B6112B007D092E /* DeviceKit.framework in Frameworks */,
+				CE002CB52408B4A5002026CE /* Sentry.framework in Frameworks */,
 				1687ACD41FD8DE8000926D69 /* ObjcExceptionBridging.framework in Frameworks */,
 				1687ACD61FD8DE8000926D69 /* XCGLogger.framework in Frameworks */,
 			);
@@ -521,6 +526,7 @@
 		98ABADB2176935E400B62590 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CE002CB42408B4A5002026CE /* Sentry.framework */,
 				1687ACD11FD8DE7600926D69 /* ObjcExceptionBridging.framework */,
 				1687ACD01FD8DE7600926D69 /* XCGLogger.framework */,
 				165C8B8F1FD8221800D4A78D /* Zip.framework */,
@@ -695,6 +701,7 @@
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
 				C01AB5981F8343F7009B37D3 /* Embed Frameworks */,
+				CE002CB32408B372002026CE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -942,6 +949,24 @@
 			shellPath = /bin/sh;
 			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
+		};
+		CE002CB32408B372002026CE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "# Uploads dSYM for use with Sentry.\n# Auto-generated at https://sentry.keyman.com/keyman/keyman-ios/getting-started/cocoa-swift/\n#\n# Note that we explicitly keep the SENTRY_AUTH_TOKEN parameter out of the project configs -\n# it should be placed for inclusion by the line below:\nsource ~/.zshrc\n\nif which sentry-cli >/dev/null; then\n  export SENTRY_URL=\"https://sentry.keyman.com\"\n  export SENTRY_ORG=keyman\n  export SENTRY_PROJECT=keyman-ios\n  ERROR=$(sentry-cli upload-dif \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n  if [ ! $? -eq 0 ]; then\n    echo \"warning: sentry-cli - $ERROR\"\n  fi\nelse\n  echo \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
