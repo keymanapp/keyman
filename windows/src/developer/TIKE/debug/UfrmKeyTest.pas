@@ -48,6 +48,12 @@ type
     chkLRDistinguish: TCheckBox;
     lblDistinguish: TLabel;
     AppEvent: TApplicationEvents;
+    lblScanCode: TLabel;
+    lblScanCodeCaption: TLabel;
+    lblISOPosition: TLabel;
+    lblISOPositionCaption: TLabel;
+    lblActiveLayout: TLabel;
+    lblActiveLayoutCaption: TLabel;
     procedure cmdCloseClick(Sender: TObject);
     procedure cmdInsertClick(Sender: TObject);
     procedure AppEventMessage(var Msg: tagMSG; var Handled: Boolean);
@@ -68,9 +74,15 @@ function FormatKeyName(Shift, Key: Integer):  string;
 implementation
 
 uses
+  System.Win.Registry,
+  RegistryKeys,
   Keyman.Developer.System.HelpTopics,
-
-UfrmMain, VKeys, KeyNames, UfrmMDIChild, CharMapInsertMode, CharMapDropTool;
+  UfrmMain,
+  KeyNames,
+  VKeys,
+  UfrmMDIChild,
+  CharMapInsertMode,
+  CharMapDropTool;
 
 {$R *.DFM}
 
@@ -132,6 +144,7 @@ var
   s: string;
   FDown: Boolean;
   n: Integer;
+  name: array[0..KL_NAMELENGTH] of Char;
 begin
   case Msg.message of
     WM_KEYDOWN, WM_SYSKEYDOWN:
@@ -193,6 +206,22 @@ begin
     if FLeftAlt or FRightAlt   then begin s := s + 'alt ';        n := n or KT_ALT;   end;
   end;
 
+  GetKeyboardLayoutName(name);
+  with TRegistry.Create do
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly(SRegKey_KeyboardLayouts_LM + '\' + name) and
+        ValueExists(SRegValue_KeyboardLayoutText) then
+      lblActiveLayout.Caption := ReadString(SRegValue_KeyboardLayoutText)
+    else
+      lblActiveLayout.Caption := name;
+  finally
+    Free;
+  end;
+
+  lblISOPosition.Caption := VKeyISO9995Names[LoWord(Key)];
+  lblScanCode.Caption := IntToHex((msg.lParam and $FF0000) shr 16, 2);
+
   if (Key = VK_RETURN) and ((msg.lParam and (1 shl 24)) <> 0) then
   begin
     lblKeyCode.Caption := s + 'Number Pad Enter ('+IntToStr(Key)+')';
@@ -208,6 +237,7 @@ begin
 
   FLastShift := n;
 end;
+
 
 end.
 
