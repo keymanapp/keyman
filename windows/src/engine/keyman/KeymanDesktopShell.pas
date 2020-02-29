@@ -3,12 +3,13 @@ unit KeymanDesktopShell;
 interface
 
 uses
-  keymanapi_tlb;
+  keymanapi_tlb,
+  utilexecute;
 
 type
   TKeymanDesktopShell = class
     class function RunKeymanConfiguration(params: string = ''): Boolean;
-    class function WaitForKeymanConfiguration(const params: string; var ec: Cardinal): Boolean;
+    class function WaitForKeymanConfiguration(const params: string; var ec: Cardinal; Callback: TUtilExecuteCallbackWaitEvent = nil): Boolean;
     class function IsTextEditorVisible: Boolean; static;
     class function OpenHelp(topic: string): Boolean;
     class function OpenHelpJump(const topic: string; ActiveKeyboard: IKeymanKeyboardInstalled): Boolean;
@@ -24,8 +25,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
 
-  KeymanPaths,
-  utilexecute;
+  KeymanPaths;
 
 class function TKeymanDesktopShell.GetRootDir: string;
 begin
@@ -48,9 +48,9 @@ begin
 end;
 
 class function TKeymanDesktopShell.WaitForKeymanConfiguration(
-  const params: string; var ec: Cardinal): Boolean;
+  const params: string; var ec: Cardinal; Callback: TUtilExecuteCallbackWaitEvent): Boolean;
 begin
-  Result := TUtilExecute.WaitForProcess('"'+GetShellPath+'" '+params, GetRootPath, ec);
+  Result := TUtilExecute.WaitForProcess('"'+GetShellPath+'" '+params, GetRootPath, ec, Callback);
 end;
 
 const

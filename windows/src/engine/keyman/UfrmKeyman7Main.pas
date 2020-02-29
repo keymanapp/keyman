@@ -855,6 +855,12 @@ begin
         // Record the active profile
         ProcessProfileChange(LParam);
       end;
+    KMC_HINTRESPONSE:
+      begin
+        ResetHintState;
+        if (TKeymanHint(lParam) = KH_EXITPRODUCT) and (wParam = mrOk) then
+          UnloadProduct;
+      end;
 //TOUCH    KMC_CONTEXT:
 //TOUCH      begin
 //TOUCH        if LParam <> 0 then

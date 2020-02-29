@@ -25,6 +25,7 @@ interface
 uses
   System.Classes,
   Vcl.Controls,
+  Vcl.Forms,
   HintConsts,
   Math,
   Messages,
@@ -33,6 +34,7 @@ uses
   Windows;
 
 function ShowKeymanHint(AHint: TKeymanHint): Boolean;   // I4242
+procedure ResetHintState;
 
 implementation
 
@@ -41,41 +43,33 @@ uses
   keymanapi_TLB,
   KeymanDesktopShell,
   kmint;
-//  UfrmKeyman7Main,
-//  XMLRenderer;
 
 var
   InHint: Boolean = False;
 
+procedure ResetHintState;
+begin
+  InHint := False;
+end;
+
 function ShowKeymanHint(AHint: TKeymanHint): Boolean;
-var
-//  hwnd: THandle;
-  ec: Cardinal;
 begin
   if InHint then
-    Exit(False);
+    Exit(True);
 
   Result := True;
 
-  InHint := True;
-  try
-    if not Assigned(kmcom) then Exit;
-  //  hwnd := kmcom.Control.LastFocusWindow;
+  if not Assigned(kmcom) then Exit;
+  if not IsHintEnabled(AHint) then Exit;
 
-    if not IsHintEnabled(AHint) then Exit;
+  InHint := True; // will be reset by the hint response
 
-    if KeymanHintData[AHint].IsQuestion then
-    begin
-      //TODO: Make this background with a post message to main to close
-      TKeymanDesktopShell.WaitForKeymanConfiguration('-showhint '+GetHintName(AHint), ec);
-      if ec = 1 then
-        Result := False
-    end
-    else
-      TKeymanDesktopShell.RunKeymanConfiguration('-showhint '+GetHintName(AHint));
-  finally
+  // We will receive the response and process asynchronously via
+  // wm_keyman_control message KMC_HINTRESPONSE
+  if not TKeymanDesktopShell.RunKeymanConfiguration('-showhint '+GetHintName(AHint)+' -parentwindow '+IntToStr(Application.MainForm.Handle)) then
     InHint := False;
-  end;
+
+  Result := not KeymanHintData[AHint].IsQuestion;
 end;
 
 end.

@@ -35,17 +35,18 @@ uses
   SysUtils,
   Windows;
 
-function ShowKMShellHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload;
-function ShowKMShellHintQuery(AHint: string): TModalResult; overload;
+function ShowKMShellHintQuery(AParentWindow: THandle; AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload;
+function ShowKMShellHintQuery(AParentWindow: THandle; AHint: string): TModalResult; overload;
 
 implementation
 
 uses
   Hints,
+  KeymanControlMessages,
   UfrmHint,
   XMLRenderer;
 
-function ShowKMShellHintQuery(AHint: string): TModalResult; overload;
+function ShowKMShellHintQuery(AParentWindow: THandle; AHint: string): TModalResult; overload;
 var
   h: TKeymanHint;
 begin
@@ -54,11 +55,13 @@ begin
     Exit(mrOk);
 
   if KeymanHintData[h].IsQuestion
-    then Result := ShowKMShellHintQuery(h, mbOKCancel, mrOk)
-    else Result := ShowKMShellHintQuery(h, [mbOk], mrOk);
+    then Result := ShowKMShellHintQuery(AParentWindow, h, mbOKCancel, mrOk)
+    else Result := ShowKMShellHintQuery(AParentWindow, h, [mbOk], mrOk);
 end;
 
-function ShowKMShellHintQuery(AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload;
+function ShowKMShellHintQuery(AParentWindow: THandle; AHint: TKeymanHint; AButtons: TMsgDlgButtons; ADefaultResult: TModalResult): TModalResult; overload
+var
+  wm_keyman_control: Integer;
 begin
   Result := ADefaultResult;
   if IsHintEnabled(AHint) then
@@ -72,6 +75,11 @@ begin
         DefaultResult := ADefaultResult;
         FormStyle := fsStayOnTop;
         Result := ShowModal;
+        if AParentWindow <> 0 then
+        begin
+          wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
+          PostMessage(AParentWindow, wm_keyman_control, MAKELONG(KMC_HINTRESPONSE, Result), Ord(AHint));
+        end;
       finally
         Free;
       end;
