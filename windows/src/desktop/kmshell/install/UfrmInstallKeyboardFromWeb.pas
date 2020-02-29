@@ -44,7 +44,6 @@ type
     FXML: WideString;
     FURL: WideString;
     FFileName: WideString;
-    FDownloadOnly: Boolean;
     procedure Download(params: TStringList);
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
 
@@ -137,20 +136,7 @@ var
               end;
             end;
 
-            if FDownloadOnly then
-            begin
-              dlgSaveFile.DefaultExt := Copy(ExtractFileExt(FTempFileName), 2, 10);
-              dlgSaveFile.FileName := ExtractFileName(FTempFileName);
-              while dlgSaveFile.Execute do
-              begin
-                if not CopyFile(PChar(FTempFileName), PChar(dlgSaveFile.FileName), False) then
-                  ShowMessage('Unable to save to file '+dlgSaveFile.FileName+' - '+SysErrorMessage(GetLastError))
-                else
-                  Break;
-              end;
-            end
-            else
-              if InstallFile(Self, FTempFileName, False, False, '') then Result := True;   // I4414
+            if InstallFile(Self, FTempFileName, False, False, '') then Result := True;   // I4414
           finally
             if FileExists(FTempFileName) then
               DeleteFile(FTempFileName);
@@ -198,17 +184,6 @@ procedure TfrmInstallKeyboardFromWeb.Download(params: TStringList);
 begin
   FURL := params.Values['url'];
   FFilename := params.Values['filename'];
-  FDownloadOnly := False;
-
-  // Query document>>
-{$MESSAGE HINT 'support downloadonly checkbox'}
-{TODO: support downloadonly if Assigned(web.Document) then
-  begin
-    doc := web.Document as IHTMLDocument3;
-    elem := doc.getElementById('chkDownloadOnly');
-    if Assigned(elem) then
-      FDownloadOnly := (elem as IHTMLInputElement).checked;
-  end;}
 
   with TfrmDownloadProgress.Create(Self) do
   try

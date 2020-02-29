@@ -84,32 +84,6 @@ begin
     cef.Navigate(FileName);
 end;
 
-{$MESSAGE HINT 'TODO: support navigation state changes'}
-{procedure TfrmHTML.webCommandStateChange(ASender: TObject; Command: Integer;
-  Enable: WordBool);
-begin
-  if Command = CSC_NAVIGATEFORWARD then
-    cmdForward.Enabled := Enable
-  else if Command = CSC_NAVIGATEBACK then
-    cmdBack.Enabled := Enable;
-end;}
-
-{procedure TfrmHTML.webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-  Shift: TShiftState);
-begin
-  inherited;
-  if Key = VK_ESCAPE then
-    Close;
-end;}
-
-{procedure TfrmHTML.webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-  var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-  bstrUrl: WideString);
-begin
-  Cancel := True;
-  TUtilExecute.URL(bstrUrl);  // I3349
-end;}
-
 procedure TfrmHTML.SetText(const Value: string);
 var
   buf, buf1: array[0..260] of char;
