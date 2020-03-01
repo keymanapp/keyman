@@ -60,6 +60,7 @@ clean:
     -del /Q *.exe
     -del /Q *.wixpdb
     -del /Q xml.wxs
+		-del /Q cef.wxs
     -del /Q templates.wxs
     -del /Q kmlmc.wxs
 

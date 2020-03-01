@@ -349,6 +349,7 @@
       <ComponentGroupRef Id="FontsAndRedist" />
       <ComponentGroupRef Id="AppData" />
       <ComponentGroupRef Id="XML" />
+      <ComponentGroupRef Id="CEF" />
       <ComponentGroupRef Id="Templates" />
       <ComponentGroupRef Id="ModelCompiler" />
       <ComponentGroupRef Id="Node" />
