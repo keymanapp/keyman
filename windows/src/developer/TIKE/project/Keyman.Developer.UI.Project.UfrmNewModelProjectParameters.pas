@@ -457,7 +457,7 @@ end;
 procedure TfrmNewModelProjectParameters.UpdateAuthorIDFromAuthor;
 begin
   editAuthorID.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(Author);
-  editCopyright.Text := '� '+FormatDateTime('yyyy', Now)+' '+Author;
+  editCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewModelProjectParameters.UpdateUniqFromModelName;
