@@ -6,11 +6,15 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        version: '14.0.17',
+        # Get version number from file.
+        # Fallback to "more" for Windows compatbility
+        version: run_command(find_program('cat', 'more'),
+                 files('../../../VERSION.md')).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14'])
 
+message('meson.project_version(): ' + meson.project_version() + '\n')
 compiler = meson.get_compiler('cpp')
 
 lib_version = '0.0.0'
