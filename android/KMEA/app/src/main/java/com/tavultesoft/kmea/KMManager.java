@@ -53,6 +53,8 @@ import android.widget.RelativeLayout;
 
 import io.sentry.core.Breadcrumb;
 import io.sentry.core.Sentry;
+import io.sentry.core.SentryLevel;
+
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -905,15 +907,25 @@ public final class KMManager {
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    // Log Sentry analytic event.
-    if (Sentry.isEnabled()) {
+    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
+    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
+
+    // Log Sentry analytic event, ignoring default keyboard
+    if (Sentry.isEnabled() && !packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) &&
+      !keyboardID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMManager.addKeyboard");
+      breadcrumb.setCategory("addKeyboard");
+      breadcrumb.setLevel(SentryLevel.INFO);
       breadcrumb.setData("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
       breadcrumb.setData("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
       breadcrumb.setData("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
       breadcrumb.setData("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
+      breadcrumb.setData("languageID", keyboardInfo.get(KMManager.KMKey_LanguageID));
+      breadcrumb.setData("languageName", keyboardInfo.get(KMManager.KMKey_LanguageName));
+
       Sentry.addBreadcrumb(breadcrumb);
+      Sentry.captureMessage("addKeyboard", SentryLevel.INFO);
     }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);

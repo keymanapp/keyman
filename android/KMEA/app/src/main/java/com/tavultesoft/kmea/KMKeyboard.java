@@ -49,6 +49,10 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.sentry.core.Breadcrumb;
+import io.sentry.core.Sentry;
+import io.sentry.core.SentryLevel;
+
 final class KMKeyboard extends WebView {
   private final Context context;
   private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
@@ -630,27 +634,32 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
-    Bundle params = new Bundle();
-    // Error info
-    params.putInt("cm_lineNumber", lineNumber);
-    params.putString("cm_sourceID", sourceId);
-    params.putString("cm_message", message);
+    if (Sentry.isEnabled()) {
+      Breadcrumb breadcrumb = new Breadcrumb();
+      breadcrumb.setMessage("KMKeyboard.sendKMWError");
+      breadcrumb.setCategory("KMWError");
+      breadcrumb.setLevel(SentryLevel.ERROR);
+      // Error info
+      breadcrumb.setData("cm_lineNumber", lineNumber);
+      breadcrumb.setData("cm_sourceID", sourceId);
+      breadcrumb.setData("cm_message", message);
 
-    // Keyboard info
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      params.putString("keyboardType", "INAPP");
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      params.putString("keyboardType", "SYSTEM");
-    }  else {
-      params.putString("keyboardType", "UNDEFINED");
+      // Keyboard info
+      if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+        breadcrumb.setData("keyboardType", "INAPP");
+      } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+        breadcrumb.setData("keyboardType", "SYSTEM");
+      } else {
+        breadcrumb.setData("keyboardType", "UNDEFINED");
+      }
+      breadcrumb.setData("packageID", this.packageID);
+      breadcrumb.setData("keyboardID", this.keyboardID);
+      breadcrumb.setData("keyboardName", this.keyboardName);
+      breadcrumb.setData("keyboardVersion", this.keyboardVersion);
+
+      Sentry.addBreadcrumb(breadcrumb);
+      Sentry.captureMessage("sendKMWError", SentryLevel.ERROR);
     }
-    params.putString("packageID", this.packageID);
-    params.putString("keyboardID", this.keyboardID);
-    params.putString("keyboardName", this.keyboardName);
-    params.putString("keyboardVersion", this.keyboardVersion);
-
-    // TODO: Send to Sentry
-
   }
 
   // Extract Unicode numbers (\\uxxxx) from a layer to character string.

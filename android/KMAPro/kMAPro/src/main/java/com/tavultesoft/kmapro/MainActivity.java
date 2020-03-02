@@ -85,6 +85,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
@@ -151,8 +152,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     super.onCreate(savedInstanceState);
     context = this;
 
+    SentryAndroid.init(context);
+
     // Send a simple event to Sentry
-    Sentry.captureMessage("This is a test 2");
+    //Sentry.captureMessage("This is a test 3");
 
     resultReceiver = new DownloadResultReceiver(new Handler());
 
