@@ -51,6 +51,8 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import io.sentry.core.Breadcrumb;
+import io.sentry.core.Sentry;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -904,13 +906,15 @@ public final class KMManager {
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
     // Log Sentry analytic event.
-    Bundle params = new Bundle();
-    params.putString("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
-    params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
-    params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
-    params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
-
-    // TODO: Send to Sentry
+    if (Sentry.isEnabled()) {
+      Breadcrumb breadcrumb = new Breadcrumb();
+      breadcrumb.setMessage("KMManager.addKeyboard");
+      breadcrumb.setData("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
+      breadcrumb.setData("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
+      breadcrumb.setData("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
+      breadcrumb.setData("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
+      Sentry.addBreadcrumb(breadcrumb);
+    }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }

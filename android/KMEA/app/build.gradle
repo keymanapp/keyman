@@ -1,7 +1,6 @@
 plugins {
-    //id 'io.sentry.android.gradle'
-    id 'name.remal.default-plugins'
     id 'com.android.library'
+    id 'name.remal.default-plugins'
 }
 
 ext.rootPath = '../../'
@@ -10,11 +9,6 @@ apply from: "$rootPath/version.gradle"
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 
     defaultConfig {
         minSdkVersion 16
@@ -70,7 +64,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'commons-io:commons-io:2.6'
-    //implementation 'io.sentry:sentry-android:2.0.0'
+    implementation 'io.sentry:sentry-android:2.0.1'
     implementation 'org.slf4j:slf4j-nop:1.7.25'
 
     // Robolectric
