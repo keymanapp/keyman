@@ -286,7 +286,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
   public static boolean isCustom(String u) {
     boolean ret = false;
-    if (u != null && !u.contains(kKeymanBaseURL)) {
+    if (u != null && !u.contains(KMKeyboardDownloaderActivity.kKeymanApiBaseURL) &&
+        !u.contains(KMKeyboardDownloaderActivity.kKeymanApiRemoteURL) && !u.contains(kKeymanBaseURL)) {
       ret = true;
     }
     return ret;
