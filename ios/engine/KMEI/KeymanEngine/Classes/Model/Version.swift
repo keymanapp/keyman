@@ -40,6 +40,26 @@ public struct Version: Comparable {
     self.components = components
   }
 
+  public init?(_ components: [Int]) {
+    if components.count == 0 {
+      return nil
+    }
+
+    var string = ""
+
+    for i in components {
+      guard i >= 0 else {
+        return nil
+      }
+
+      let dot = (string == "" ? "" : ".")
+      string = "\(string)\(dot)\(i)"
+    }
+
+    self.string = string
+    self.components = components  // Swift arrays are value types, not reference types!
+  }
+
   public static func <(lhs: Version, rhs: Version) -> Bool {
     let len = max(lhs.components.count, rhs.components.count)
     for i in 0..<len {
@@ -62,5 +82,14 @@ public struct Version: Comparable {
   // For nice logging output.
   public var description: String {
     return self.string
+  }
+
+  public var majorMinor: Version {
+    if(self.components.count >= 2) {
+      return Version([self.components[0], self.components[1]])!
+    } else {
+      // If we somehow have just a major version, append a simple '0'.
+      return Version([self.components[0], 0])!
+    }
   }
 }
