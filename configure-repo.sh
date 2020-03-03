@@ -6,7 +6,6 @@
 # Run this script once to configure your system to work with our Git workflow.
 #
 
-ROOT=$(git rev-parse --show-toplevel)
 if [[ -n "$WINDIR" ]]; then
   # https://stackoverflow.com/a/39160850/1836776
   SCRIPT_DIR=$(cmd //C cd)
@@ -32,8 +31,9 @@ case $1 in
       cmd //C "mklink $WinPWD\\.git\\hooks\\commit-msg $WinPWD\\resources\\git-hooks\\commit-msg"
       cmd //C "mklink $WinPWD\\.git\\hooks\\prepare-commit-msg $WinPWD\\resources\\git-hooks\\prepare-commit-msg"
     else
-      ln -sf "$SCRIPT_DIR/resources/git-hooks/commit-msg" "$ROOT/.git/hooks/commit-msg"
-      ln -sf "$SCRIPT_DIR/resources/git-hooks/prepare-commit-msg" "$ROOT/.git/hooks/prepare-commit-msg"
+      HOOKSDIR=$(git rev-parse --git-path hooks)
+      ln -sf "$SCRIPT_DIR/resources/git-hooks/commit-msg" "$HOOKSDIR/commit-msg"
+      ln -sf "$SCRIPT_DIR/resources/git-hooks/prepare-commit-msg" "$HOOKSDIR/prepare-commit-msg"
     fi
     ;;
   *)

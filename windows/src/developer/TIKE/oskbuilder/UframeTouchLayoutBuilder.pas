@@ -115,6 +115,7 @@ type
 
   public
     { Public declarations }
+    procedure SetFocus; override;
     procedure SetupCharMapDrop;
     function Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
     procedure Save(const AFilename: string);
@@ -606,6 +607,11 @@ end;
 procedure TframeTouchLayoutBuilder.SelectAll;
 begin
   cef.cef.SelectAll;
+end;
+
+procedure TframeTouchLayoutBuilder.SetFocus;
+begin
+  cef.SetFocus;
 end;
 
 procedure TframeTouchLayoutBuilder.SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057

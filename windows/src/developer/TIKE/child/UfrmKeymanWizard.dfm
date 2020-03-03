@@ -958,6 +958,10 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
@@ -1004,10 +1008,16 @@ inherited frmKeymanWizard: TfrmKeymanWizard
     object pageOnScreenKeyboard: TTabSheet
       Caption = 'On-Screen'
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageTouchLayout: TTabSheet
       Caption = 'Touch Layout'
       ImageIndex = 16
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pagesTouchLayout: TPageControl
         Left = 0
         Top = 0
@@ -1022,28 +1032,48 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         object pageTouchLayoutDesign: TTabSheet
           Caption = 'Design'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
         object pageTouchLayoutCode: TTabSheet
           Caption = 'Code'
           ImageIndex = -1
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
         end
       end
     end
     object pageIncludeCodes: TTabSheet
       Caption = 'Char Codes'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedJS: TTabSheet
       Caption = 'Embedded JS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWEmbedCSS: TTabSheet
       Caption = 'Embedded CSS'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageKMWHelp: TTabSheet
       Caption = 'Embedded Help'
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
@@ -1058,7 +1088,6 @@ inherited frmKeymanWizard: TfrmKeymanWizard
         Color = 14211288
         ParentBackground = False
         TabOrder = 0
-        ExplicitTop = -3
         object lblCongrats: TLabel
           Left = 10
           Top = 13

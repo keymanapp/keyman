@@ -92,24 +92,20 @@ public class KeymanPackage
     return nil
   }
   
-  static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) {
-    unzipFile(fileUrl: fileUrl, destination: destination) {
+  static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) throws {
+    try unzipFile(fileUrl: fileUrl, destination: destination) {
       complete(KeymanPackage.parse(destination))
     }
   }
 
-  static public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void) {
-    do {
-      try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
-                        password: nil,
-                        progress: { (progress) -> () in
-                          //TODO: add timeout
-                          if(progress == 1.0) {
-                            complete()
-                          }
-                        })
-    } catch {
-      log.error("error unzipping archive: \(error)")
-    }
+  static public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void) throws {
+    try Zip.unzipFile(fileUrl, destination: destination, overwrite: true,
+                      password: nil,
+                      progress: { (progress) -> () in
+                        //TODO: add timeout
+                        if(progress == 1.0) {
+                          complete()
+                        }
+                      })
   }
 }

@@ -98,6 +98,9 @@ type
     editDefaultProjectPath: TEdit;
     cmdBrowseDefaultProjectPath: TButton;
     dlgBrowseDefaultProjectPath: TBrowse4Folder;
+    chkAutoSaveBeforeCompiling: TCheckBox;
+    chkOSKAutoSaveBeforeImporting: TCheckBox;
+    chkDebuggerAutoResetBeforeCompiling: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -177,6 +180,10 @@ begin
     chkDebuggerSingleStepAfterBreak.Checked := DebuggerSingleStepAfterBreak;
     chkDebuggerShowStoreOffset.Checked :=      DebuggerShowStoreOffset;
     chkDebuggerAutoRecompile.Checked :=        DebuggerAutoRecompileWithDebugInfo;
+
+    chkDebuggerAutoResetBeforeCompiling.Checked := DebuggerAutoResetBeforeCompiling;
+    chkAutoSaveBeforeCompiling.Checked :=          AutoSaveBeforeCompiling;
+    chkOSKAutoSaveBeforeImporting.Checked :=       OSKAutoSaveBeforeImporting;
 
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
@@ -271,6 +278,10 @@ begin
     DebuggerSingleStepAfterBreak       := chkDebuggerSingleStepAfterBreak.Checked;
     DebuggerShowStoreOffset            := chkDebuggerShowStoreOffset.Checked;
     DebuggerAutoRecompileWithDebugInfo := chkDebuggerAutoRecompile.Checked;
+
+    DebuggerAutoResetBeforeCompiling := chkDebuggerAutoResetBeforeCompiling.Checked;
+    AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
+    OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
 
     WebHostDefaultPort := StrToIntDef(editWebHostDefaultPort.Text, 8008);   // I4021
 

@@ -29,7 +29,7 @@
     * `make fullbuild` to configure and build
     * `sudo make install` to install to /usr/local
 
-- Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`. 
+- Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`.
 
  - To do this run ` sudo make install`
 
@@ -41,7 +41,7 @@
     * If you already have the ibus-keyman package installed then it will move the file `/usr/share/ibus/component/keyman.xml` to `/usr/share/doc/ibus-keyman/`
 
         * run `sudo make uninstall` to uninstall everything and put it back again
-        
+
 ##### Tmp install
 Used by TC for validating PRs
 
@@ -54,22 +54,22 @@ This is only for testing the build, not for running ibus-kmfl or ibus-keyman in 
  * libkmfl requires kmfl.h header from kmflcomp
  * ibus-kfml requires kmfl.h and headers and lib from libkmfl
  * ibus-keyman requires headers and lib from keyboardprocessor
- 
- So 
+
+ So
   * kmflcomp must be built and installed before libkmfl
   * libkmfl must be built and installed before ibus-kmfl
   * keyboardprocessor must be built before ibus-keyman
-  
+
  For each project run `./configure && make && make install`.
- 
- You may prefer to create a different directory to build in and run configure from there e.g. 
- 
+
+ You may prefer to create a different directory to build in and run configure from there e.g.
+
  `mkdir ../build-kmflcomp;`
  `cd ../build-kmflcomp`
- `../kmflcomp/configure` 
+ `../kmflcomp/configure`
  `make `
  `make install`
-  
+
   The install of ibus-kmfl doesn't install everything to the correct location for it to be used - to be fixed
 
 ### Continuous integration
@@ -80,35 +80,11 @@ Nightly builds upload the most recent new master build to https://downloads.keym
 
 ### Building packages
 
-Jenkins now continuously builds Debian packages on every commit to master
-Periodically test packages will be uploaded to https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-daily
-
-### Launchpad
-This section is primarily for "Keyman for Linux" team members, and not needed for general building.
-
-1. If you don't have one, create an account at https://launchpad.net
-2. Request to join the ["Keyman for Linux"](https://launchpad.net/~keymanapp) team.
-3. Create a [GPG](https://help.ubuntu.com/community/GnuPrivacyGuardHowto) key and associate it to your launchpad account
-4. Set the following environment variables in your ~/.profile or ~/.bashrc (so you don't have to set them every time)  
-  `export GPGKEY=[key_id]` using the `key_id` of your GPG key  
-  `DEBEMAIL="your.email.address@example.org"`  
-  `DEBFULLNAME="Firstname Lastname"`  
-  `export DEBEMAIL DEBFULLNAME`  
-
-To upload the packages to launchpad, run the following script from the `linux/` directory:
-```
-./scripts/launchpad.sh [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
-```
-**Parameters**  
-UPLOAD="yes" do the dput for real  
-TIER="\<tier>" alpha, beta, or stable, default from ../TIER.md
-PROJECT="\<project>" only upload this project  
-DIST="\<dist>" only upload for this distribution  
-PACKAGEVERSION="\<version>" normally use the default so don't specify it. But if you change packaging and run another upload you need to increment the number at the end of `PACKAGEVERSION`. e.g. next one is `1~sil2` then `1~sil3`...
-
-Refer to https://help.launchpad.net/Packaging/PPA/Uploading for troubleshooting and setting up for dput upload.
+See [Linux packaging doc](https://github.com/keymanapp/keyman/blob/master/docs/linux-packaging.md)
+for details on building Linux packages for Keyman.
 
 ### Testing
+
 Tests to be created as there are no current tests
 
 ### Running Keyman for Linux
@@ -164,4 +140,4 @@ Use `Win-space` to switch between keyboards.
  * Click `Add` to add a keyman keyboard.
  * Click the 3 dots expander then search for "Other" and click it
  * The Keyman keyboards should be listed here to choose
-  
+
