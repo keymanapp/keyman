@@ -11,7 +11,16 @@ import Foundation
 /// Dotted-decimal version.
 public struct Version: Comparable {
   public static let fallback = Version("1.0")!
-  public static let current = Version("13.0.65")!
+  public static let latestFeature = Version("13.0.65")!
+
+  public static var current: Version {
+    // TODO:  actually update KMEI's version in the bundle during builds, not just the app's.
+    //let engineInfo = Bundle(for: Manager.self).infoDictionary
+
+    // For now, we just rely on the app's version instead.
+    let engineInfo = Bundle.main.infoDictionary
+    return Version(engineInfo!["CFBundleVersion"] as! String)!
+  }
 
   // The Engine first started tracking the 'last loaded version' in 12.0.
   public static let freshInstall = Version("0.0")!
@@ -27,7 +36,9 @@ public struct Version: Comparable {
   public let string: String
 
   public init?(_ string: String) {
-    let stringComponents = string.components(separatedBy: ".")
+    let tagComponents = string.components(separatedBy: "-")
+    let stringComponents = tagComponents[0].components(separatedBy: ".")
+
     var components: [Int] = []
     for s in stringComponents {
       guard let i = Int(s), i >= 0 else {

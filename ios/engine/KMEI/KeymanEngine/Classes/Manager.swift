@@ -195,7 +195,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         log.error("Failed to copy default keyboard from bundle: \(error)")
       }
     }
-    Migrations.engineVersion = Version.current
+    Migrations.engineVersion = Version.latestFeature
 
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
