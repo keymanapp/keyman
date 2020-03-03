@@ -61,7 +61,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let appVersion = Version.current
+    let appVersion = Version.current.majorMinor
     let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.string)/?embed=ios"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Info page URL: \(url)")
