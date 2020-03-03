@@ -240,6 +240,7 @@
 
 # VS Code
 .vscode
+.vs
 
 # IDE files
 **/.idea/**/*.xml
