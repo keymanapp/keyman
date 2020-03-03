@@ -11,6 +11,8 @@ import UIKit
 import WebKit
 import Sentry
 
+typealias SentryClient = Client
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -48,19 +50,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    #if DEBUG
-      KeymanEngine.log.outputLevel = .debug
-      log.outputLevel = .debug
-      KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-      log.outputLevel = .warning
-    #endif
 
     // First things first:  enable Sentry for crash reporting.
     do {
-      Client.shared = try Client(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
-      try Client.shared?.startCrashHandler()
+      SentryClient.shared = try SentryClient(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
+      try SentryClient.shared?.startCrashHandler()
+
+      #if NO_SENTRY
+        // If doing development debugging (and NOT for Sentry code), silence Sentry reporting.
+        SentryClient.shared?.enabled = false
+        log.debug("Sentry error logging disabled for development mode.")
+      #else
+        log.debug("Sentry error logging enabled.")
+      #endif
 
 //      Client.shared?.snapshotStacktrace {
 //          let event = Event(level: .debug)
@@ -69,8 +71,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //          Client.shared?.send(event: event)
 //      }
     } catch let error {
+      // Does not throw error if 'net is unavailable.
       print("\(error)")
     }
+
+    #if DEBUG
+      KeymanEngine.log.outputLevel = .debug
+      log.outputLevel = .debug
+      KeymanEngine.log.logAppDetails()
+    #else
+      KeymanEngine.log.outputLevel = .warning
+      log.outputLevel = .warning
+    #endif
 
     Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
