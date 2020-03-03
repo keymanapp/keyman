@@ -691,11 +691,11 @@
 				1687ACCB1FD826D000926D69 /* Run Script */,
 				981AFA8319EF44DE006706BF /* Frameworks */,
 				981AFA8E19EF44DE006706BF /* Resources */,
-				CE7E13D8240E285800252C00 /* ShellScript */,
-				989E4DB91B1EB5C200A345FB /* Run Script */,
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
 				C01AB5981F8343F7009B37D3 /* Embed Frameworks */,
+				CE7E13D8240E285800252C00 /* ShellScript */,
+				989E4DB91B1EB5C200A345FB /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -714,6 +714,7 @@
 				98CD125819CA85710089385F /* Sources */,
 				98CD125919CA85710089385F /* Frameworks */,
 				98CD125A19CA85710089385F /* Resources */,
+				CED3CFDA240E49DF001540A1 /* ShellScript */,
 				37BC8FFD1DE83BBD006AEBFF /* Headers */,
 			);
 			buildRules = (
@@ -973,7 +974,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# First, run our general build-utils resource script.\n# Note that this script's process will not have access to TC environment variables.\n. $KEYMAN_ROOT/resources/build/build-utils.sh\n\nif [[ $SWIFT_ACTIVE_COMPILATION_CONDITIONS == *\"DEBUG\" ]]; then\n  FULL_VERSION=\"$VERSION_WITH_TAG\"\nelse\n  FULL_VERSION=\"$VERSION\"\nfi\n\necho \"App version from repository: $FULL_VERSION\"\n\n# Now, to set the version.\n# Note that the base kmbuild.sh used by CI will re-perform this work afterward for CI builds.\n# However, that versioning assignment cannot affect GUI builds from within Xcode, hence this script.\n# Thanks to https://medium.com/@bestiosdevelope/automatic-build-incrementation-technique-for-ios-release-94eb0d08785b\n# for its documentation in this matter.\nAPP_PLIST=\"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\necho \"Adjusting $TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"$APP_PLIST\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleShortVersionString $FULL_VERSION\" \"$APP_PLIST\"\nif [ -f \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\" ]; then\n  DSYM_PLIST=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\"\n  echo \"Adjusting $DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"$DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $FULL_VERSION\" \"$DSYM_PLIST\"\nfi\n";
+			shellScript = "# For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.\nif [ -z $VERSION ]; then\n  # We're not a command-line build... so we'll need to retrieve these values ourselves.\n  # Run the repo's build-utils resource script.\n  # Note that this script's process will not have access to TC environment variables,\n  # but that's fine - GUI-builds aren't run under TC, anyway.\n  . $KEYMAN_ROOT/resources/build/build-utils.sh\n  echo \"App version from repository:\"\n  echo \"  Plain:  $VERSION\"\n  echo \"  Tagged: $VERSION_WITH_TAG\"\nfi\n\n# Now, to set the version.\n# Note that the base kmbuild.sh used by CI will re-perform this work afterward for CI builds.\n# However, that versioning assignment cannot affect GUI builds from within Xcode, hence this script.\n# Thanks to https://medium.com/@bestiosdevelope/automatic-build-incrementation-technique-for-ios-release-94eb0d08785b\n# for its documentation in this matter.\nAPP_PLIST=\"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\necho \"Adjusting $TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleVersion $VERSION\" \"$APP_PLIST\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"$APP_PLIST\"\n/usr/libexec/Plistbuddy -c \"Set :KeymanVersionWithTag $VERSION_WITH_TAG\" \"$APP_PLIST\"\n\nif [ -f \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\" ]; then\n  DSYM_PLIST=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\"\n  echo \"Adjusting $DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $VERSION\" \"$DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"$DSYM_PLIST\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		CED3CFDA240E49DF001540A1 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.\nif [ -z $VERSION ]; then\n  # We're not a command-line build... so we'll need to retrieve these values ourselves.\n  # Run the repo's build-utils resource script.\n  # Note that this script's process will not have access to TC environment variables,\n  # but that's fine - GUI-builds aren't run under TC, anyway.\n  . $KEYMAN_ROOT/resources/build/build-utils.sh\n  echo \"App version from repository:\"\n  echo \"  Plain:  $VERSION\"\n  echo \"  Tagged: $VERSION_WITH_TAG\"\nfi\n\n# Now, to set the version.\n# Note that the base kmbuild.sh used by CI will re-perform this work afterward for CI builds.\n# However, that versioning assignment cannot affect GUI builds from within Xcode, hence this script.\n# Thanks to https://medium.com/@bestiosdevelope/automatic-build-incrementation-technique-for-ios-release-94eb0d08785b\n# for its documentation in this matter.\nAPP_PLIST=\"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\necho \"Adjusting $TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleVersion $VERSION\" \"$APP_PLIST\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"$APP_PLIST\"\n\nif [ -f \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\" ]; then\n  DSYM_PLIST=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\"\n  echo \"Adjusting $DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $VERSION\" \"$DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"$DSYM_PLIST\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1248,6 +1267,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1287,6 +1307,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MTL_ENABLE_DEBUG_INFO = NO;

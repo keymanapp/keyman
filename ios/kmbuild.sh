@@ -165,7 +165,9 @@ echo
 echo "Building KMEI..."
 
 rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
-xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal
+xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
+           VERSION=$VERSION \
+           VERSION_WITH_TAG=$VERSION_WITH_TAG
 
 if [ $? -ne 0 ]; then
   fail "KMEI build failed."
@@ -185,7 +187,9 @@ if [ $DO_KEYMANAPP = true ]; then
     fi
 
     if [ $DO_ARCHIVE = false ]; then
-      xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman
+      xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
+                 VERSION=$VERSION \
+                 VERSION_WITH_TAG=$VERSION_WITH_TAG
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -198,7 +202,11 @@ if [ $DO_KEYMANAPP = true ]; then
       # Time to prepare the deployment archive data.
       echo ""
       echo "Preparing .ipa file for deployment."
-      xcodebuild $XCODEFLAGS_EXT -scheme Keyman -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
+      xcodebuild $XCODEFLAGS_EXT -scheme Keyman \
+                 -archivePath $ARCHIVE_PATH \
+                 archive -allowProvisioningUpdates \
+                 VERSION=$VERSION \
+                 VERSION_WITH_TAG=$VERSION_WITH_TAG
 
       assertDirExists "$ARCHIVE_PATH"
 
@@ -215,7 +223,9 @@ if [ $DO_KEYMANAPP = true ]; then
         set_version "$ARCHIVE_KBD"
       fi
 
-      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+      xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
+                 -exportOptionsPlist exportAppStore.plist \
+                 -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
     fi
 
     echo ""

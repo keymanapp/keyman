@@ -553,7 +553,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.rightBarButtonItem = infoDoneButton
 
       let versionLabel = UILabel()
-      let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+      let infoDict = Bundle.main.infoDictionary
+      let version = infoDict?["KeymanVersionWithTag"] as? String ?? ""
       versionLabel.text = "Version: \(version)"
       versionLabel.font = UIFont.systemFont(ofSize: 9.0)
       versionLabel.textAlignment = .right
