@@ -554,8 +554,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
       let versionLabel = UILabel()
       let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-      let build = Bundle.main.infoDictionary?[kCFBundleVersionKey as String] as? String ?? ""
-      versionLabel.text = "Version: \(version) (build \(build))"
+      versionLabel.text = "Version: \(version)"
       versionLabel.font = UIFont.systemFont(ofSize: 9.0)
       versionLabel.textAlignment = .right
       versionLabel.sizeToFit()

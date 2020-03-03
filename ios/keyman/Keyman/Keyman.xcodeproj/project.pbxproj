@@ -691,6 +691,7 @@
 				1687ACCB1FD826D000926D69 /* Run Script */,
 				981AFA8319EF44DE006706BF /* Frameworks */,
 				981AFA8E19EF44DE006706BF /* Resources */,
+				CE7E13D8240E285800252C00 /* ShellScript */,
 				989E4DB91B1EB5C200A345FB /* Run Script */,
 				981AFADC19EF44DE006706BF /* Embed App Extensions */,
 				37BC8FF91DE83B40006AEBFF /* Headers */,
@@ -957,6 +958,23 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
+		CE7E13D8240E285800252C00 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# First, run our general build-utils resource script.\n# Note that this script's process will not have access to TC environment variables.\n. $KEYMAN_ROOT/resources/build/build-utils.sh\n\nif [[ $SWIFT_ACTIVE_COMPILATION_CONDITIONS == *\"DEBUG\" ]]; then\n  FULL_VERSION=\"$VERSION_WITH_TAG\"\nelse\n  FULL_VERSION=\"$VERSION\"\nfi\n\necho \"App version from repository: $FULL_VERSION\"\n\n# Now, to set the version.\n# Note that the base kmbuild.sh used by CI will re-perform this work afterward for CI builds.\n# However, that versioning assignment cannot affect GUI builds from within Xcode, hence this script.\n# Thanks to https://medium.com/@bestiosdevelope/automatic-build-incrementation-technique-for-ios-release-94eb0d08785b\n# for its documentation in this matter.\nAPP_PLIST=\"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\necho \"Adjusting $TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"$APP_PLIST\"\n/usr/libexec/Plistbuddy -c \"Set :CFBundleShortVersionString $FULL_VERSION\" \"$APP_PLIST\"\nif [ -f \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\" ]; then\n  DSYM_PLIST=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist\"\n  echo \"Adjusting $DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"$DSYM_PLIST\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $FULL_VERSION\" \"$DSYM_PLIST\"\nfi\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1043,6 +1061,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
@@ -1075,6 +1094,7 @@
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = "Keyman-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
@@ -1142,10 +1162,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
-				"OTHER_SWIFT_FLAGS[arch=*]" = "-D DEBUG";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1198,6 +1218,7 @@
 				OTHER_LDFLAGS = "";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
