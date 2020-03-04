@@ -1562,7 +1562,7 @@ var
       case UpCase(FId[1]) of
         'T': Result := Key_Touch;
         'U': if (Copy(FId, 1, 2) = 'U_') and IsValidUnicodeValue(StrToIntDef('$'+Copy(FId,3,MaxInt), 0)) then Result := Key_Unicode;   // I4198
-        'K': if FindVKeyName(FId) <> $FFFF then Result := Key_Constant;
+        else if FindVKeyName(FId) <> $FFFF then Result := Key_Constant;
       end;
     end;
 

@@ -2330,7 +2330,7 @@ DWORD GetXString(PFILE_KEYBOARD fk, PWSTR str, PWSTR token, PWSTR output, int ma
           {
 					  for(i = 0; i <= VK__MAX; i++)
 					  {
-						  if(_wcsicmp(vkname, VKeyNames[i]) == 0)
+						  if(_wcsicmp(vkname, VKeyNames[i]) == 0 || _wcsicmp(vkname, VKeyISO9995Names[i]) == 0)
 							  break;
 					  }
           }
