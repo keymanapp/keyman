@@ -5,11 +5,13 @@ inherited frmKeyTest: TfrmKeyTest
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
   Caption = 'Virtual Key Identifier'
-  ClientHeight = 149
+  ClientHeight = 240
   ClientWidth = 297
   Font.Name = 'MS Sans Serif'
   KeyPreview = True
   Position = poScreenCenter
+  ExplicitWidth = 303
+  ExplicitHeight = 269
   PixelsPerInch = 96
   TextHeight = 13
   object lblTitle: TLabel
@@ -28,14 +30,14 @@ inherited frmKeyTest: TfrmKeyTest
   end
   object lblClose: TLabel
     Left = 36
-    Top = 96
+    Top = 187
     Width = 252
     Height = 13
     Caption = 'Press Shift+Enter to insert or Shift+Esc to close dialog'
   end
   object lblDistinguish: TLabel
     Left = 27
-    Top = 128
+    Top = 219
     Width = 91
     Height = 13
     Caption = 'left and right ctrl/alt'
@@ -44,38 +46,77 @@ inherited frmKeyTest: TfrmKeyTest
     Left = 8
     Top = 40
     Width = 281
-    Height = 49
+    Height = 129
     TabOrder = 0
     object lblKeyCodeCaption: TLabel
       Left = 8
-      Top = 8
+      Top = 41
       Width = 48
       Height = 13
       Caption = 'Key code:'
     end
     object lblKeymanNameCaption: TLabel
       Left = 8
-      Top = 28
+      Top = 60
       Width = 70
       Height = 13
       Caption = 'Keyman name:'
     end
     object lblKeyCode: TLabel
       Left = 88
-      Top = 8
+      Top = 40
       Width = 3
       Height = 13
     end
     object lblKeymanName: TLabel
       Left = 88
-      Top = 28
+      Top = 60
       Width = 3
       Height = 13
+    end
+    object lblScanCode: TLabel
+      Left = 88
+      Top = 79
+      Width = 3
+      Height = 13
+    end
+    object lblScanCodeCaption: TLabel
+      Left = 8
+      Top = 79
+      Width = 55
+      Height = 13
+      Caption = 'Scan code:'
+    end
+    object lblISOPosition: TLabel
+      Left = 88
+      Top = 98
+      Width = 3
+      Height = 13
+    end
+    object lblISOPositionCaption: TLabel
+      Left = 8
+      Top = 98
+      Width = 58
+      Height = 13
+      Caption = 'ISO Position'
+    end
+    object lblActiveLayout: TLabel
+      Left = 88
+      Top = 8
+      Width = 3
+      Height = 13
+    end
+    object lblActiveLayoutCaption: TLabel
+      Left = 8
+      Top = 8
+      Width = 64
+      Height = 13
+      Caption = 'Active layout:'
     end
   end
   object cmdClose: TButton
     Left = 216
-    Top = 116
+    Top = 207
     Width = 73
     Height = 25
     Caption = 'Close'
@@ -84,7 +125,7 @@ inherited frmKeyTest: TfrmKeyTest
   end
   object cmdInsert: TButton
     Left = 132
-    Top = 116
+    Top = 207
     Width = 73
     Height = 25
     Caption = 'Insert'
@@ -94,7 +135,7 @@ inherited frmKeyTest: TfrmKeyTest
   end
   object chkLRDistinguish: TCheckBox
     Left = 8
-    Top = 112
+    Top = 203
     Width = 117
     Height = 17
     Caption = '&Distinguish between'

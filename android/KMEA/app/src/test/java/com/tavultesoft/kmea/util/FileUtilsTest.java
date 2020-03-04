@@ -32,6 +32,28 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void test_isCustomKeyboard() {
+    // True because URL is null or empty (doesn't match *.keyman.com)
+    Assert.assertTrue(FileUtils.isCustomKeyboard(null));
+    Assert.assertTrue(FileUtils.isCustomKeyboard(""));
+
+    Assert.assertFalse(FileUtils.isCustomKeyboard("http://keyman.com/"));
+    Assert.assertFalse(FileUtils.isCustomKeyboard("https://keyman.com/"));
+    Assert.assertFalse(FileUtils.isCustomKeyboard("http://api.keyman.com/"));
+    Assert.assertFalse(FileUtils.isCustomKeyboard("https://api.keyman.com/"));
+    Assert.assertFalse(FileUtils.isCustomKeyboard("https://keyman.com/keyboard/khmer_angkor"));
+
+    // True because trailing slash is missing
+    Assert.assertTrue(FileUtils.isCustomKeyboard("http://keyman.com"));
+    Assert.assertTrue(FileUtils.isCustomKeyboard("https://keyman.com"));
+    Assert.assertTrue(FileUtils.isCustomKeyboard("http://api.keyman.com"));
+    Assert.assertTrue(FileUtils.isCustomKeyboard("https://api.keyman.com"));
+
+    // "custom" site
+    Assert.assertTrue(FileUtils.isCustomKeyboard("https://amerikeyman.com/"));
+  }
+
+  @Test
   public void test_compareVersions() {
     Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions(null, "1.0"));
     Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("" , "1.0"));
