@@ -11,6 +11,9 @@
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor">
 
+        <meta-data
+            android:name="io.sentry.dsn" android:value="https://a00ed3e10a2045acb3d93416be90d89a@sentry.keyman.com/7"/>
+
         <service
             android:name="com.firstvoices.keyboards.SystemKeyboard"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"

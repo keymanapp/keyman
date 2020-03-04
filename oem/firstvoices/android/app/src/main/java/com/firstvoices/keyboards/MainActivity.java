@@ -24,8 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: Register DSN
-        // SentryAndroid.init(this);
+        SentryAndroid.init(this);
 
         setContentView(R.layout.activity_main);
 
