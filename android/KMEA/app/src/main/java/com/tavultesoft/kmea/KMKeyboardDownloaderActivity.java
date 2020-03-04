@@ -41,10 +41,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_URL = "KMKeyboardActivity.url";
   public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
 
-  public static final String kKeymanBaseURL = "https://keyman.com";
   public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
   public static final String kKeymanApiModelURL = "https://api.keyman.com/model";
-  public static final String kKeymanApiRemoteURL = "https://r.keymanweb.com/api/2.0/remote?url=";
 
   private static final String TAG = "KMKbdDownloaderActivity"; // TAG needs to be less than 28 chars
 
@@ -282,18 +280,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
     ((AppCompatActivity) context).finish();
   }
-
-
-  public static boolean isCustom(String u) {
-    boolean ret = false;
-    if (u != null && !u.contains(KMKeyboardDownloaderActivity.kKeymanApiBaseURL) &&
-        !u.contains(KMKeyboardDownloaderActivity.kKeymanApiRemoteURL) && !u.contains(kKeymanBaseURL)) {
-      ret = true;
-    }
-    return ret;
-  }
-
-
 
   public static void addKeyboardDownloadEventListener(KeyboardEventHandler.OnKeyboardDownloadEventListener listener) {
     if (kbDownloadEventListeners == null) {
