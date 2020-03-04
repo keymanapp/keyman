@@ -162,6 +162,10 @@ if [ $DO_CARTHAGE = true ]; then
 fi
 
 echo
+echo "Build products will be set with the following version metadata:"
+echo "  * VERSION=$VERSION"
+echo "  * VERSION_WITH_TAG=$VERSION_WITH_TAG"
+echo
 echo "Building KMEI..."
 
 rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
@@ -174,9 +178,6 @@ if [ $? -ne 0 ]; then
 fi
 
 assertDirExists "$FRAMEWORK_PATH_UNIVERSAL"
-
-set_version "$FRAMEWORK_PATH_UNIVERSAL" "KeymanEngine"
-set_version "$FRAMEWORK_PATH_IOS"
 
 echo "KMEI build complete."
 
@@ -195,9 +196,6 @@ if [ $DO_KEYMANAPP = true ]; then
         fail "Keyman app build failed."
       fi
 
-      # Pass the build number information along to the Plist file of the app.
-      set_version "$APP_BUNDLE_PATH" "Keyman"
-      set_version "$APP_BUNDLE_PATH/Plugins/SWKeyboard.appex"
     else
       # Time to prepare the deployment archive data.
       echo ""
@@ -209,19 +207,6 @@ if [ $DO_KEYMANAPP = true ]; then
                  VERSION_WITH_TAG=$VERSION_WITH_TAG
 
       assertDirExists "$ARCHIVE_PATH"
-
-      # Pass the build number information along to the Plist file of the app.
-      if [ $VERSION ]; then
-        echo "Setting version numbers to $VERSION."
-        /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $VERSION" "$ARCHIVE_PATH/Info.plist"
-        /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $VERSION" "$ARCHIVE_PATH/Info.plist"
-
-        ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/Keyman.app"
-        ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"
-
-        set_version "$ARCHIVE_APP" "Keyman"
-        set_version "$ARCHIVE_KBD"
-      fi
 
       xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH \
                  -exportOptionsPlist exportAppStore.plist \
