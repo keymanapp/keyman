@@ -15,8 +15,8 @@ public class DownloadIntentService extends IntentService {
   @Override
   protected void onHandleIntent(Intent intent) {
     String url = intent.getStringExtra("url");
+    String filename = intent.getStringExtra("filename");
     String destination = intent.getStringExtra("destination");
-    String filename = FileUtils.getFilename(url);
     final ResultReceiver receiver = intent.getParcelableExtra("receiver");
     Bundle bundle = new Bundle();
 

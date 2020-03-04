@@ -13,6 +13,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
   * Limitations:
@@ -225,6 +227,24 @@ public final class FileUtils {
         filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
+  }
+
+  /**
+   * Utility to parse a URL and determine if it's a custom keyboard
+   * @param u String of the URL
+   * @return boolean false if URL matches [*.]keyman.com/
+   */
+  public static boolean isCustomKeyboard(String u) {
+    boolean ret = true;
+    if (u == null) {
+      return ret;
+    }
+    Pattern pattern = Pattern.compile("^http(s)?://(.+\\.)?keyman.com/.*");
+    Matcher matcher = pattern.matcher(u);
+    if (matcher.matches()) {
+      ret = false;
+    }
+    return ret;
   }
 
   /**
