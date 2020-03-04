@@ -314,6 +314,11 @@ namespace com.keyman.osk {
           var oldText=bsk[bsn]['text'];
           bsk[bsn]['text']=this.renameSpecialKey(oldText);
         }
+
+        // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
+        if(!bsk[bsn].layer) {
+          bsk[bsn].layer = btn.key.layer
+        }
       }
 
       // If a subkey array is defined, add an icon
