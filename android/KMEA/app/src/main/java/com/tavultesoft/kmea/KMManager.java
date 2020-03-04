@@ -911,8 +911,8 @@ public final class KMManager {
     String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
 
     // Log Sentry analytic event, ignoring default keyboard
-    if (Sentry.isEnabled() && !packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) &&
-      !keyboardID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
+    if (Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) &&
+      keyboardID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID))) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMManager.addKeyboard");
       breadcrumb.setCategory("addKeyboard");
