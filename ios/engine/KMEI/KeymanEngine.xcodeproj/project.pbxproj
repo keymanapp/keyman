@@ -1026,6 +1026,7 @@
 				C06D37271F81F4E100F61AE0 /* Frameworks */,
 				C06D37281F81F4E100F61AE0 /* Headers */,
 				C06D37291F81F4E100F61AE0 /* Resources */,
+				CE8D0366240F2FE4002D818C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1222,7 +1223,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "NAME=\"KeymanEngine\"\nUNIVERSAL_DIR=\"${BUILD_DIR}/${CONFIGURATION}-universal/${NAME}.framework\"\nIPHONE_DIR=\"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${NAME}.framework\"\nSIMULATOR_DIR=\"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${NAME}.framework\"\n\n# Build architecture that was not built\nif [ ${PLATFORM_NAME} = \"iphonesimulator\" ]; then\n    xcodebuild -scheme \"${NAME}\" ONLY_ACTIVE_ARCH=NO -configuration ${CONFIGURATION} -sdk iphoneos BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" build\nelse\n    xcodebuild -scheme \"${NAME}\" -configuration ${CONFIGURATION} -sdk iphonesimulator BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" build\nfi\n\n# Clean\nrm -rf \"${UNIVERSAL_DIR}\"\nmkdir -p \"${UNIVERSAL_DIR}\"\n\n# Use iPhone framework as base\ncp -R \"${IPHONE_DIR}/\" \"${UNIVERSAL_DIR}/\"\n\n# Copy Swift modules from simulator build\ncp -R \"${SIMULATOR_DIR}/Modules/${NAME}.swiftmodule/\" \"${UNIVERSAL_DIR}/Modules/${NAME}.swiftmodule/\"\n\n# Create universal binary using lipo\nlipo -create \"${IPHONE_DIR}/${NAME}\" \"${SIMULATOR_DIR}/${NAME}\" -output \"${UNIVERSAL_DIR}/${NAME}\"\n";
+			shellScript = "NAME=\"KeymanEngine\"\nUNIVERSAL_DIR=\"${BUILD_DIR}/${CONFIGURATION}-universal/${NAME}.framework\"\nIPHONE_DIR=\"${BUILD_DIR}/${CONFIGURATION}-iphoneos/${NAME}.framework\"\nSIMULATOR_DIR=\"${BUILD_DIR}/${CONFIGURATION}-iphonesimulator/${NAME}.framework\"\n\n# Build architecture that was not built\nif [ ${PLATFORM_NAME} = \"iphonesimulator\" ]; then\n    xcodebuild -scheme \"${NAME}\" ONLY_ACTIVE_ARCH=NO -configuration ${CONFIGURATION} -sdk iphoneos BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" build VERSION=$VERSION VERSION_WITH_TAG=$VERSION_WITH_TAG\nelse\n    xcodebuild -scheme \"${NAME}\" -configuration ${CONFIGURATION} -sdk iphonesimulator BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" build VERSION=$VERSION VERSION_WITH_TAG=$VERSION_WITH_TAG\nfi\n\n# Clean\nrm -rf \"${UNIVERSAL_DIR}\"\nmkdir -p \"${UNIVERSAL_DIR}\"\n\n# Use iPhone framework as base\ncp -R \"${IPHONE_DIR}/\" \"${UNIVERSAL_DIR}/\"\n\n# Copy Swift modules from simulator build\ncp -R \"${SIMULATOR_DIR}/Modules/${NAME}.swiftmodule/\" \"${UNIVERSAL_DIR}/Modules/${NAME}.swiftmodule/\"\n\n# Create universal binary using lipo\nlipo -create \"${IPHONE_DIR}/${NAME}\" \"${SIMULATOR_DIR}/${NAME}\" -output \"${UNIVERSAL_DIR}/${NAME}\"\n";
 		};
 		C0A5FF381F6684A300BE740C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1249,6 +1250,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#if which swiftlint >/dev/null; then\n#    swiftlint --config ../../.swiftlint.yml\n#else\n#    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\n#fi\n";
+		};
+		CE8D0366240F2FE4002D818C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ". $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2118,6 +2136,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2161,6 +2180,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

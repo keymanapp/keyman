@@ -159,7 +159,7 @@ public enum Migrations {
 
   static func updateResources(storage: Storage) {
     var lastVersion = engineVersion
-    if (lastVersion ?? Version.fallback) >= Version.current {
+    if (lastVersion ?? Version.fallback) >= Version.latestFeature {
       // We're either current or have just been downgraded; no need to do modify resources.
       // If it's a downgrade, it's near-certainly a testing environment.
       return
@@ -267,7 +267,7 @@ public enum Migrations {
     }
 
     // Store the version we just upgraded to.
-    storage.userDefaults.lastEngineVersion = Version.current
+    storage.userDefaults.lastEngineVersion = Version.latestFeature
   }
 
   static func migrateUserDefaultsToStructs(storage: Storage) {
