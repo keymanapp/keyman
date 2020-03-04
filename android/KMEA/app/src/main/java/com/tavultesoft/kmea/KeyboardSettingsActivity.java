@@ -19,7 +19,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
 
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -211,9 +210,6 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);
-
-      TextView qrDescription = (TextView) findViewById(R.id.qrDescription);
-      qrDescription.setText(Html.fromHtml(getString(R.string.keyboard_qr_code)));
     }
   }
 
