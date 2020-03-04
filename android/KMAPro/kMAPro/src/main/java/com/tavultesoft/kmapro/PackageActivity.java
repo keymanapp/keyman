@@ -170,7 +170,7 @@ public class PackageActivity extends AppCompatActivity {
       String targetString = "";
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         targetString = pkgName != null && pkgName.toLowerCase().endsWith("keyboard")
-          ? "" : String.format(" %s", getString(R.string.title_keyboard));
+          ? "" : String.format(" %s", getResources().getQuantityString(R.plurals.title_keyboards, 1));
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         targetString = pkgName != null && pkgName.toLowerCase().endsWith("model")
           ? "" :String.format(" %s", "model");
