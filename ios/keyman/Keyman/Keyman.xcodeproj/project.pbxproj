@@ -921,6 +921,7 @@
 				"$(SRCROOT)/../../Carthage/Build/iOS/XCGLogger.framework",
 				"$(SRCROOT)/../../Carthage/Build/iOS/DeviceKit.framework",
 				"$(SRCROOT)/../../Carthage/Build/iOS/Reachability.framework",
+				"$(SRCROOT)/../../Carthage/Build/iOS/Sentry.framework",
 			);
 			name = "Run Script";
 			outputPaths = (
