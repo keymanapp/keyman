@@ -968,8 +968,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/zsh;
-			shellScript = "# Uploads dSYM for use with Sentry.\n# Auto-generated at https://sentry.keyman.com/keyman/keyman-ios/getting-started/cocoa-swift/\n#\n# Note that we explicitly keep the SENTRY_AUTH_TOKEN parameter out of the project configs -\n# it should be placed for inclusion by the line below:\nsource ~/.zshrc\n\nif which sentry-cli >/dev/null; then\n  export SENTRY_URL=\"https://sentry.keyman.com\"\n  export SENTRY_ORG=keyman\n  export SENTRY_PROJECT=keyman-ios\n  ERROR=$(sentry-cli upload-dif \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n  if [ ! $? -eq 0 ]; then\n    echo \"warning: sentry-cli - $ERROR\"\n  fi\nelse\n  echo \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+			shellPath = /bin/bash;
+			shellScript = ". $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to perform the dSYM upload\nphaseSentryDsymUpload \"keyman-ios\"\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
