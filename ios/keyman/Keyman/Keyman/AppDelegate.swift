@@ -63,15 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       #else
         log.debug("Sentry error logging enabled.")
       #endif
-
-//      Client.shared?.snapshotStacktrace {
-//          let event = Event(level: .debug)
-//          event.message = "Hello world"
-//          Client.shared?.appendStacktrace(to: event)
-//          Client.shared?.send(event: event)
-//      }
     } catch let error {
-      // Does not throw error if 'net is unavailable.
+      // Does not throw error if 'net is unavailable.  It's for some sort of error within the Sentry system.
       print("\(error)")
     }
 
