@@ -2,7 +2,7 @@
 # Support Makefile
 #
 
-TARGETS=oskbulkrenderer
+TARGETS=oskbulkrenderer etl2log
 CLEANS=clean-support
 
 !include ..\Header.mak
@@ -11,6 +11,10 @@ CLEANS=clean-support
 
 oskbulkrenderer:
     cd $(ROOT)\src\support\oskbulkrenderer
+    $(MAKE) $(TARGET)
+
+etl2log:
+    cd $(ROOT)\src\support\etl2log
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------
