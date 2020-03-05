@@ -26,7 +26,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
-import io.sentry.core.Sentry;
 
 import java.util.HashMap;
 
@@ -46,9 +45,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
     }
-
-    Sentry.captureMessage("creating system keyboard");
-
     KMManager.addKeyboardEventListener(this);
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
     interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);

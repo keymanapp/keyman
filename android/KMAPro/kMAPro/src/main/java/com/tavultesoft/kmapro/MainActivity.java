@@ -153,9 +153,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
     SentryAndroid.init(context);
 
-    // Send a simple event to Sentry
-    //Sentry.captureMessage("This is a test 3");
-
     resultReceiver = new DownloadResultReceiver(new Handler());
 
     if (BuildConfig.DEBUG) {
