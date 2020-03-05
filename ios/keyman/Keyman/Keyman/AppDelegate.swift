@@ -68,6 +68,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       print("\(error)")
     }
 
+    SentryClient.shared?.shouldSendEvent = { event in
+      #if NO_SENTRY
+        // Prevents Sentry from buffering the event.
+        return false
+      #else
+        return true
+      #endif
+    }
+
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       log.outputLevel = .debug
