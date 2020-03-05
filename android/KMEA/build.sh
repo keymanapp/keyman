@@ -162,13 +162,6 @@ if [ DO_TEST = true ]; then
     fi
 fi
 
-# Upload symbols to sentry-cli
-if [ ! -z "$SENTRY_AUTH_TOKEN" ] && command -v sentry-cli >/dev/null 2>&1;
-then
-  echo "sentry-cli uploads: KMEA symbols and sources"
-  sentry-cli upload-dif ./ --include-sources
-fi
-
 echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
 mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar

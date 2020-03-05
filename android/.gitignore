@@ -7,6 +7,9 @@
 # Local configuration file (sdk path, etc)
 **/local.properties
 
+# Sentry configuration file
+sentry.properties
+
 # User-specific stuff:
 **/.idea/libraries/
 **/.idea/dictionaries

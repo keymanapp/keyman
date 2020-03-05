@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   package="com.tavultesoft.kmapro">
 
   <uses-permission android:name="android.permission.INTERNET" />
@@ -27,6 +28,9 @@
     <!--    how to enable Sentry's debug mode-->
     <meta-data
       android:name="io.sentry.debug" android:value="true" />
+    <!-- application initialize Sentry -->
+    <meta-data
+      android:name="io.sentry.auto-init" tools:node="replace" android:value="true" />
 
     <service
       android:name="com.keyman.android.SystemKeyboard"

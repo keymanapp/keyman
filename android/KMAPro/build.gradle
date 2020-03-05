@@ -9,7 +9,6 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.5.2'
         classpath 'com.google.gms:google-services:4.3.2'
         classpath 'io.sentry:sentry-android-gradle-plugin:1.7.31'
-        //classpath 'io.sentry:sentry-android:2.0.1'
         classpath 'name.remal:gradle-plugins:1.0.157'
     }
 }
