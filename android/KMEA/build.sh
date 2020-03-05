@@ -141,7 +141,17 @@ fi
 
 echo "Gradle Build of KMEA"
 cd $KMA_ROOT/KMEA
-./gradlew $DAEMON_FLAG clean aR lint
+
+if [ "$DEBUG_BUILD" = true ]; then
+  BUILD_FLAGS="assembleDebug lintDebug"
+  ARTIFACT="app-debug.aar"
+else
+  BUILD_FLAGS=aR lint
+  ARTIFACT="app-release.aar"
+fi
+
+echo "BUILD_FLAGS $BUILD_FLAGS"
+./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
 fi
@@ -155,12 +165,12 @@ fi
 # Upload symbols to sentry-cli
 if [ ! -z "$SENTRY_AUTH_TOKEN" ] && command -v sentry-cli >/dev/null 2>&1;
 then
-  echo "Uploading KMEA symbols and sources via sentry-cli"
+  echo "sentry-cli uploads: KMEA symbols and sources"
   sentry-cli upload-dif ./ --include-sources
 fi
 
 echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
-mv $KMA_ROOT/KMEA/app/build/outputs/aar/app-release.aar $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
+mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
 cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/keyman-engine.aar
