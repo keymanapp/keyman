@@ -107,7 +107,7 @@ fi
 
 PLATFORM=`uname -s`
 
-if [ DO_TEST = true ]; then
+if [ "$DO_TEST" = true ]; then
     # Report JUnit test results to CI
     echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 fi
@@ -117,7 +117,7 @@ if [ "$DO_BUILD" = true ]; then
     cd $KMW_SOURCE
 
     ./build.sh $EMBED_BUILD
-	
+
     if [ $? -ne 0 ]; then
         die "ERROR: keymanweb build failed. Exiting"
     fi
@@ -144,9 +144,11 @@ cd $KMA_ROOT/KMEA
 
 if [ "$DEBUG_BUILD" = true ]; then
   BUILD_FLAGS="assembleDebug lintDebug"
+  TEST_FLAGS="testDebug"
   ARTIFACT="app-debug.aar"
 else
   BUILD_FLAGS=aR lint
+  TEST_FLAGS="testRelease"
   ARTIFACT="app-release.aar"
 fi
 
@@ -155,8 +157,9 @@ echo "BUILD_FLAGS $BUILD_FLAGS"
 if [ $? -ne 0 ]; then
     die "ERROR: Build of KMEA failed"
 fi
-if [ DO_TEST = true ]; then
-    ./gradlew $DAEMON_FLAG test
+if [ "$DO_TEST" = true ]; then
+    echo "TEST_FLAGS $TEST_FLAGS"
+    ./gradlew $DAEMON_FLAG $TEST_FLAGS
     if [ $? -ne 0 ]; then
         die "ERROR: KMEA test cases failed"
     fi
