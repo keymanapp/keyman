@@ -112,12 +112,12 @@ function phaseSentryDsymUpload() {
   fi
 
   # Reference for this detection check for the input file: https://www.iosdev.recipes/xcode/input-output-files/
-  if [ -z $SCRIPT_INPUT_FILE_0 ]; then
+  if [ -z "$SCRIPT_INPUT_FILE_0" ]; then
     buildError "Run Script must have an input file set: \${DWARF_DSYM_FOLDER_PATH}/\${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/\${TARGET_NAME}"
     exit 1
   fi
 
-  if [ -z $SENTRY_AUTH_TOKEN ]; then
+  if [ -z "$SENTRY_AUTH_TOKEN" ]; then
     # Left as a warning so that builds aren't blocked for random contributors.
     # Likewise for the Sentry errors later.
     buildWarning "Cannot successfully upload the dSYM to sentry if a Sentry auth token is not provided."
@@ -128,6 +128,7 @@ function phaseSentryDsymUpload() {
     export SENTRY_URL="https://sentry.keyman.com"
     export SENTRY_ORG=keyman
     export SENTRY_PROJECT=$SENTRY_PROJECT_TARGET
+    export SENTRY_LOG_LEVEL=info
     ERROR=$(sentry-cli upload-dif "$DWARF_DSYM_FOLDER_PATH" 2>&1 >/dev/null)
     if [ ! $? -eq 0 ]; then
       buildWarning "sentry-cli - $ERROR"
