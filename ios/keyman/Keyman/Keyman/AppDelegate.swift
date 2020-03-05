@@ -11,8 +11,6 @@ import UIKit
 import WebKit
 import Sentry
 
-typealias SentryClient = Client
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -53,12 +51,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // First things first:  enable Sentry for crash reporting.
     do {
-      SentryClient.shared = try SentryClient(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
-      try SentryClient.shared?.startCrashHandler()
+      Sentry.Client.shared = try Sentry.Client(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
+      try Sentry.Client.shared?.startCrashHandler()
 
       #if NO_SENTRY
         // If doing development debugging (and NOT for Sentry code), silence Sentry reporting.
-        SentryClient.shared?.enabled = false
+        Sentry.Client.shared?.enabled = false
         log.debug("Sentry error logging disabled for development mode.")
       #else
         log.debug("Sentry error logging enabled.")
@@ -68,7 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       print("\(error)")
     }
 
-    SentryClient.shared?.shouldSendEvent = { event in
+    Sentry.Client.shared?.shouldSendEvent = { event in
       #if NO_SENTRY
         // Prevents Sentry from buffering the event.
         return false
