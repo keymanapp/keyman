@@ -48,31 +48,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    SentryManager.start()
 
-    // First things first:  enable Sentry for crash reporting.
-    do {
-      Sentry.Client.shared = try Sentry.Client(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
-      try Sentry.Client.shared?.startCrashHandler()
-
-      #if NO_SENTRY
-        // If doing development debugging (and NOT for Sentry code), silence Sentry reporting.
-        Sentry.Client.shared?.enabled = false
-        log.debug("Sentry error logging disabled for development mode.")
-      #else
-        log.debug("Sentry error logging enabled.")
-      #endif
-    } catch let error {
-      // Does not throw error if 'net is unavailable.  It's for some sort of error within the Sentry system.
-      print("\(error)")
-    }
-
-    Sentry.Client.shared?.shouldSendEvent = { event in
-      #if NO_SENTRY
-        // Prevents Sentry from buffering the event.
-        return false
-      #else
-        return true
-      #endif
+    // Temp code for development testing
+    Sentry.Client.shared?.enabled = false
+    Sentry.Client.shared?.snapshotStacktrace {
+        let event = Event(level: .debug)
+        event.message = "Testing app extension error handling"
+        Sentry.Client.shared?.appendStacktrace(to: event)
+        Sentry.Client.shared?.send(event: event)
     }
 
     #if DEBUG

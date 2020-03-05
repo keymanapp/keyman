@@ -8,11 +8,17 @@
 
 import KeymanEngine
 import UIKit
+import Sentry
 
 class KeyboardViewController: InputViewController {
   var topBarImageSource: ImageBannerViewController!
 
+  // The entrypoint for the app-extension.
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    if !SentryManager.hasStarted {
+      SentryManager.start(sendingEnabled: false)
+    }
+
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()
