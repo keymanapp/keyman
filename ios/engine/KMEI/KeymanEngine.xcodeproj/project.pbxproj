@@ -178,6 +178,7 @@
 		CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */; };
 		CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */; };
 		CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */; };
+		CEC0C66C2410AC9A003E1BCD /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; };
 		CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */; };
 		CEF888D223FE6ADF00667693 /* No-defaults 10.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEF888D023FE6ADE00667693 /* No-defaults 10.0 Migration.bundle */; };
 		CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */; };
@@ -440,6 +441,7 @@
 		CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 12.0 Migration.bundle"; sourceTree = "<group>"; };
 		CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		CEC0C66B2410AC9A003E1BCD /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
 		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
 		CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
@@ -482,6 +484,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE808A532366980A00713E6B /* Zip.framework in Frameworks */,
+				CEC0C66C2410AC9A003E1BCD /* Sentry.framework in Frameworks */,
 				CE808A4F236697D800713E6B /* XCGLogger.framework in Frameworks */,
 				CE808A48236697BE00713E6B /* DeviceKit.framework in Frameworks */,
 				CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */,
@@ -852,6 +855,7 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CEC0C66B2410AC9A003E1BCD /* Sentry.framework */,
 				CE4459ED23FBBB7F003151FD /* Carthage */,
 				9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */,
 				9A079DE52231A69D00581263 /* Foundation.framework */,
@@ -1027,6 +1031,7 @@
 				C06D37281F81F4E100F61AE0 /* Headers */,
 				C06D37291F81F4E100F61AE0 /* Resources */,
 				CE8D0366240F2FE4002D818C /* ShellScript */,
+				CEC0C66F2410B005003E1BCD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1267,6 +1272,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = ". $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+		};
+		CEC0C66F2410B005003E1BCD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n. $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to perform the dSYM upload\nphaseSentryDsymUpload \"keyman-ios\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

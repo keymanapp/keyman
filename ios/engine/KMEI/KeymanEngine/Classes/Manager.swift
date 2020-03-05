@@ -11,7 +11,9 @@ import WebKit
 import XCGLogger
 import DeviceKit
 import Reachability
+import Sentry
 
+typealias SentryClient = Client
 typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 
 // MARK: - Constants

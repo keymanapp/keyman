@@ -7,6 +7,7 @@
 * Carthage (`brew install carthage`)
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 * Coreutils (`brew install coreutils`)
+* sentry-cli (`brew install getsentry/tools/sentry-cli) to utilize Sentry-based error reporting
 
 ## Keyman App
 
