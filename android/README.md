@@ -48,17 +48,20 @@ Keyman for Android (formerly named KMAPro) can be built from a command line (pre
 
 Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
 
-### Crashlytics
-Firebase Crashlytics is used for crash reporting, and it depends on a configured google-services.json file. For this reason, only the Debug variant of KMAPro is intended to be built on a Developer machine. The analytics for Debug are associated with a "Package name" `com.tavultesoft.kmapro.debug`.
+### Crash Reporting
+Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
 
-If you need to view near real-time analytics in the Firebase DebugView console, enable Debug mode on the emulator with the command:
+#### Setting up sentry-cli
+Contact the Keyman team if you need access to sentry.keyman.com for development. 
+You will also need to install [sentry-cli](https://docs.sentry.io/cli/installation/) for uploading Debug symbols. 
+After setting up your personal [Auth token](http://sentry.keyman.com/settings/account/api/auth-tokens/), add the following to **~/.bashrc**
+```bash
+export SENTRY_AUTH_TOKEN={your Sentry auth token}
+export SENTRY_URL=https://sentry.keyman.com
+export SENTRY_ORG=keyman
+export SENTRY_PROJECT=keyman-android
 ```
- adb shell setprop debug.firebase.analytics.app com.tavultesoft.kmapro.debug
-```
-To disable Debug mode, use the command:
-```
-adb shell setprop debug.firebase.analytics.app .none.
-```
+To validate your configuration, from the `android/` folder run `sentry-cli info`.
  
 ### Compiling From Command Line
 1. Launch a command prompt

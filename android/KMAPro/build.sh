@@ -58,3 +58,9 @@ fi
 echo "BUILD_FLAGS $BUILD_FLAGS"
 ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
+# Upload symbols to sentry-cli
+if [ ! -z "$SENTRY_AUTH_TOKEN" ] && command -v sentry-cli >/dev/null 2>&1;
+then
+  echo "Uploading KMAPro symbols and sources via sentry-cli"
+  sentry-cli upload-dif ./ --include-sources
+fi

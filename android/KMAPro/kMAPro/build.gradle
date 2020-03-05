@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    //id 'io.sentry.android.gradle'
+    id 'io.sentry.android.gradle'
     id 'com.github.triplet.play' version '2.5.0' apply false
     id 'name.remal.default-plugins'
 }
@@ -62,6 +62,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            debuggable true
         }
         release {
             minifyEnabled false
@@ -80,6 +81,16 @@ android {
     }
 }
 
+// how to configure the sentry android gradle plugin
+/*
+sentry {
+    // Disables or enables the automatic configuration of Native symbols
+    uploadNativeSymbols true
+
+    // Does or doesn't include the source code of native code for Sentry
+    includeNativeSources true
+}
+*/
 String env_keys_json_file = System.getenv("keys_json_file")
 if (env_keys_json_file != null) {
     apply plugin: 'com.github.triplet.play'
@@ -119,7 +130,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     api(name: 'keyman-engine', ext: 'aar')
     implementation 'io.sentry:sentry-android:2.0.1'
-    implementation 'org.slf4j:slf4j-nop:1.7.25'
+    //implementation 'org.slf4j:slf4j-nop:1.7.25'
     implementation 'androidx.preference:preference:1.1.0'
 
     // Add dependency for generating QR Codes
