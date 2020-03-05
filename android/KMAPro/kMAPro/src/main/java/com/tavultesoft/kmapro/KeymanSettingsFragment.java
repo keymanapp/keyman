@@ -134,12 +134,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     }
 
-    if(langCount > 1) {
-      // Has a %d slot to insert the count.
-      return String.format(getString(R.string.installed_languages), langCount);
-    } else {
-      return getString(R.string.installed_languages_empty);
-    }
+    return getContext().getResources().getQuantityString(R.plurals.installed_languages, langCount, langCount);
   }
 
   @Override

@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.18 alpha 2020-03-04
+
+* feat(windows): etl2log support tool (#2758)
+* feat(developer): allow use of ISO9995 in key ids (#2741)
+* Feature: Android - Handle keyman:// protocol to download kmp keyboard (#2734)
+* change(android): Cleanup UI strings (#2751)
+* fix(ios): fixes broken online-help versioned link (#2773)
+
 ## 14.0.17 alpha 2020-02-26
 
 * fix(android) Fix crash on kbdMapList (#2719)

@@ -169,6 +169,17 @@
           android:pathPattern=".*\\.kmp"
           android:scheme="https" />
       </intent-filter>
+
+      <intent-filter>
+        <!-- deep linking to keyman.com/keyboards -->
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:scheme="keyman" />
+      </intent-filter>
     </activity>
     <activity
       android:name=".InfoActivity"

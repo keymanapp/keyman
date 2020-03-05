@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2019 SIL International. All rights reserved.
+ * Copyright (C) 2018-2020 SIL International. All rights reserved.
  */
 
 package com.tavultesoft.kmapro;
@@ -24,7 +24,6 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
@@ -298,61 +297,18 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (data != null) {
 
       switch (data.getScheme().toLowerCase()) {
-        // Android DownloadManager
+        // content:// Android DownloadManager
+        // file:// Chrome downloads and Filebrowsers
         case "content":
-          checkStoragePermission(data);
-          break;
-        // Chrome downloads and Filebrowsers
         case "file":
           checkStoragePermission(data);
           break;
         case "http" :
         case "https" :
-          Intent downloadIntent;
-          String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
-          if (url == null) {
-            url = data.toString();
-          }
-          if (url != null) {
-            // URL contains KMP to download in background.
-            boolean isCustom = KMKeyboardDownloaderActivity.isCustom(url);
-
-            int index = url.lastIndexOf("/") + 1;
-            String filename = "unknown:";
-            if (index >= 0 && index <= url.length()) {
-              filename = url.substring(index);
-            }
-
-            // Only handle ad-hoc kmp packages
-            if (FileUtils.hasKeymanPackageExtension(url)) {
-              try {
-                // Download the KMP to app cache
-                downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
-                downloadIntent.putExtra("url", url);
-                downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
-                downloadIntent.putExtra("receiver", resultReceiver);
-
-                progressDialog = new ProgressDialog(MainActivity.this);
-                String ellipsisStr = "\u2026";
-                progressDialog.setMessage(String.format("%s\n%s%s",
-                  getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-
-                startService(downloadIntent);
-              } catch (Exception e) {
-                if (progressDialog != null && progressDialog.isShowing()) {
-                  progressDialog.dismiss();
-                }
-                progressDialog = null;
-                break;
-              }
-            } else {
-              String message = "Download failed. Not a .kmp keyboard package.";
-              Toast.makeText(getApplicationContext(), message,
-                Toast.LENGTH_SHORT).show();
-            }
-          }
+          downloadKMP();
+          break;
+        case "keyman" :
+          downloadKMP();
           break;
         default :
           Log.e(TAG, "Unrecognized protocol " + data.getScheme());
@@ -586,6 +542,61 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       SharedPreferences.Editor editor = prefs.edit();
       editor.putBoolean(defaultDictionaryInstalled, true);
       editor.commit();
+    }
+  }
+
+  /**
+   * Parse the URI data to determine the URL for the .kmp keyboard package.
+   *
+   */
+  private void downloadKMP() {
+    Intent downloadIntent;
+    String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+    if (url == null) {
+      url = data.toString();
+    }
+    if (url != null) {
+      // URL contains KMP to download in background.
+      boolean isCustom = FileUtils.isCustomKeyboard(url);
+
+      String filename = data.getQueryParameter("filename");
+      if (filename == null) {
+        int index = url.lastIndexOf("/") + 1;
+        if (index >= 0 && index <= url.length()) {
+          filename = url.substring(index);
+        }
+      }
+
+      // Only handle ad-hoc kmp packages or from keyman.com
+      if (FileUtils.hasKeymanPackageExtension(url) || data.getScheme().toLowerCase().equals("keyman")) {
+        try {
+          // Download the KMP to app cache
+          downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
+          downloadIntent.putExtra("url", url);
+          downloadIntent.putExtra("filename", filename);
+          downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
+          downloadIntent.putExtra("receiver", resultReceiver);
+
+          progressDialog = new ProgressDialog(MainActivity.this);
+          String ellipsisStr = "\u2026";
+          progressDialog.setMessage(String.format("%s\n%s%s",
+            getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
+          progressDialog.setCancelable(false);
+          progressDialog.show();
+
+          startService(downloadIntent);
+        } catch (Exception e) {
+          if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+          }
+          progressDialog = null;
+          return;//break;
+        }
+      } else {
+        String message = "Download failed. Not a .kmp keyboard package.";
+        Toast.makeText(getApplicationContext(), message,
+          Toast.LENGTH_SHORT).show();
+      }
     }
   }
 
