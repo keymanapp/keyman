@@ -170,6 +170,6 @@ function exportEnvironmentDefinitionScript() {
 # someone else to intentionally use, so this check seems reasonable.
 #
 # https://gist.github.com/gdavis/6670468 has a representative copy of a standard Xcode environment variable setup.
-if [[ -z "${XCODE_VERSION_ACTUAL}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION}" ]]; then
+if [[ -z "${XCODE_VERSION_ACTUAL:-}" ]] && [[ -z "${XCODE_PRODUCT_BUILD_VERSION:-}" ]]; then
     exportEnvironmentDefinitionScript
 fi
