@@ -11,8 +11,12 @@
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor">
 
+        <!--    see the events from this app in sentry.keyman.com  dashboard -->
         <meta-data
             android:name="io.sentry.dsn" android:value="https://a00ed3e10a2045acb3d93416be90d89a@sentry.keyman.com/7"/>
+        <!--    how to enable Sentry's debug mode -->
+        <meta-data
+           android:name="io.sentry.debug" android:value="true" />
 
         <service
             android:name="com.firstvoices.keyboards.SystemKeyboard"
@@ -52,9 +56,5 @@
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Holo.Light.Dialog" >
         </activity>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="4efced22a226f98e05442a7e472b377d89fcc294"
-            />
     </application>
 </manifest>
