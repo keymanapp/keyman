@@ -164,6 +164,10 @@
 		CE7A26D923CEEC640005955C /* Colors+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26D723CEEC630005955C /* Colors+Extension.swift */; };
 		CE7A26DB23CEEF640005955C /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7A26DA23CEEF640005955C /* Colors.swift */; };
 		CE7ADD6623DE89FC00BC9A00 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */; };
+		CE805CE72411FF9100BF0617 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; };
+		CE805CE82411FF9100BF0617 /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE805CE92411FFAA00BF0617 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; };
+		CE805CEA2411FFAA00BF0617 /* Sentry.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE808A48236697BE00713E6B /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE2B1E4521B60E7C007D092E /* DeviceKit.framework */; };
 		CE808A4B236697D400713E6B /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCD1FD8DE5300926D69 /* ObjcExceptionBridging.framework */; };
 		CE808A4D236697D500713E6B /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
@@ -285,6 +289,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C059FCB81FD924DC00BD1A64 /* Zip.framework in Embed Frameworks */,
+				CE805CE82411FF9100BF0617 /* Sentry.framework in Embed Frameworks */,
 				CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */,
 				C07705DE1FD8ED9E00D2F3C7 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C06D375E1F82089200F61AE0 /* KeymanEngine.framework in Embed Frameworks */,
@@ -301,6 +306,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CE4459F523FBBB8F003151FD /* XCGLogger.framework in Embed Frameworks */,
+				CE805CEA2411FFAA00BF0617 /* Sentry.framework in Embed Frameworks */,
 				CE4459E923FBBB79003151FD /* KeymanEngine.framework in Embed Frameworks */,
 				CE4459EF23FBBB8F003151FD /* DeviceKit.framework in Embed Frameworks */,
 				CE4459F123FBBB8F003151FD /* ObjcExceptionBridging.framework in Embed Frameworks */,
@@ -499,6 +505,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE4459F423FBBB8F003151FD /* XCGLogger.framework in Frameworks */,
+				CE805CE92411FFAA00BF0617 /* Sentry.framework in Frameworks */,
 				CE4459E823FBBB79003151FD /* KeymanEngine.framework in Frameworks */,
 				CE4459EE23FBBB8F003151FD /* DeviceKit.framework in Frameworks */,
 				CE4459F023FBBB8F003151FD /* ObjcExceptionBridging.framework in Frameworks */,
@@ -512,6 +519,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D37571F82060900F61AE0 /* KeymanEngine.framework in Frameworks */,
+				CE805CE72411FF9100BF0617 /* Sentry.framework in Frameworks */,
 				CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */,
 				C07705DD1FD8ED9E00D2F3C7 /* ObjcExceptionBridging.framework in Frameworks */,
 				C07705DF1FD8ED9E00D2F3C7 /* XCGLogger.framework in Frameworks */,
@@ -1274,7 +1282,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = ". $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			shellScript = ". $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions true\n";
 		};
 		CEC0C66F2410B005003E1BCD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

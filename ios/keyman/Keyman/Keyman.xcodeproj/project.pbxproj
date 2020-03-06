@@ -1110,7 +1110,7 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}.dev";
+				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Keyman;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1293,7 +1293,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.dev.SWKeyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.SWKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman Development SWKeyboard";
@@ -1421,7 +1421,7 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}.dev";
+				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Keyman;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -1463,7 +1463,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.dev.SWKeyboard;
+				PRODUCT_BUNDLE_IDENTIFIER = Tavultesoft.Keyman.SWKeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman Development SWKeyboard";

@@ -15,8 +15,11 @@ class KeyboardViewController: InputViewController {
 
   // The entrypoint for the app-extension.
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    // Only true if it's the first init of the class under app-extension mode.
     if !SentryManager.hasStarted {
-      SentryManager.start(sendingEnabled: false)
+      // Sentry can send errors from app extensions when "Allow Full Access"
+      // is enabled.  They seem to get blocked otherwise, except in the Simulator.
+      SentryManager.start(sendingEnabled: true)
     }
 
     #if DEBUG

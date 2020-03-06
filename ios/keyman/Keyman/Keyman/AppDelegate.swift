@@ -50,15 +50,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
     SentryManager.start()
 
-    // Temp code for development testing
-    Sentry.Client.shared?.enabled = false
-    Sentry.Client.shared?.snapshotStacktrace {
-        let event = Event(level: .debug)
-        event.message = "Testing app extension error handling"
-        Sentry.Client.shared?.appendStacktrace(to: event)
-        Sentry.Client.shared?.send(event: event)
-    }
-
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       log.outputLevel = .debug
