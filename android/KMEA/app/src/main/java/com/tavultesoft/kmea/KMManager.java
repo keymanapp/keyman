@@ -925,7 +925,9 @@ public final class KMManager {
       breadcrumb.setData("languageName", keyboardInfo.get(KMManager.KMKey_LanguageName));
 
       Sentry.addBreadcrumb(breadcrumb);
-      Sentry.captureMessage("addKeyboard", SentryLevel.INFO);
+
+      // For now, not sending a Sentry.captureMessage()
+      // This means the breadcrumb won't get sent until a crash happens.
     }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
