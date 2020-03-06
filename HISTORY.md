@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.19 alpha 2020-03-06
+
+* fix(web): support otf extension for truetype fonts (#2780)
+
 ## 14.0.18 alpha 2020-03-04
 
 * feat(windows): etl2log support tool (#2758)
