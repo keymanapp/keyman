@@ -72,17 +72,17 @@ namespace com.keyman {
       this.device.detect();
 
       /* DEBUG: Force touch device   (Build 360)
-      
+
       device.touchable = true;
       device.browser = 'safari';
       device.formFactor = 'tablet';
       device.OS = 'iOS';
-      
+
       END DEBUG */
 
-      /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes 
+      /* If we've made it to this point of initialization and aren't anything else, KeymanWeb assumes
       * we're a desktop.  Since we don't yet support desktops with touch-based input, we disable it here.
-      */                     
+      */
       if(this.device.formFactor == 'desktop') {
         this.device.touchable = false;
       }
@@ -102,7 +102,7 @@ namespace com.keyman {
      * Function     arrayFromNodeList
      * Scope        Public
      * @param       {Object}    nl a node list, as returned from getElementsBy_____ methods.
-     * Description  Transforms a node list into an array.   * 
+     * Description  Transforms a node list into an array.   *
      * @return      {Array<Element>}
      */
     arrayFromNodeList(nl: NodeList|HTMLCollectionOf<Element>): HTMLElement[] {
@@ -118,45 +118,45 @@ namespace com.keyman {
      * Scope       Private
      * @param      {string}     event     name of event prefixed by module, e.g. osk.touchmove
      * @param      {function(Object)}   func      event handler
-     * @return     {boolean}         
-     * Description Add (or replace) an event listener for this component 
-     */    
+     * @return     {boolean}
+     * Description Add (or replace) an event listener for this component
+     */
     addEventListener(event: string, func: (Object) => boolean): boolean {
       this.removeEventListener(event, func);
       this.events[event].push(func);
       return true;
-    }    
-    
+    }
+
     /**
      * Function    removeEventListener
      * Scope       Private
      * @param      {string}     event     name of event prefixed by module, e.g. osk.touchmove
      * @param      {function(Object)}   func      event handler
-     * @return     {boolean}         
-     * Description Remove the specified function from the listeners for this event 
-     */    
+     * @return     {boolean}
+     * Description Remove the specified function from the listeners for this event
+     */
     removeEventListener(event: string, func: (Object) => boolean): boolean {
       if(typeof this.events[event] == 'undefined') {
         this.events[event] = [];
       }
 
       for(var i=0; i<this.events[event].length; i++) {
-        if(this.events[event][i] == func) { 
+        if(this.events[event][i] == func) {
           this.events[event].splice(i, 1);
           return true;
         }
       }
       return false;
     }
-    
+
     /**
      * Function    callEvent
      * Scope       Private
      * @param      {string}     event     name of event prefixed by module, e.g. osk.touchmove
      * @param      {Array}      params    parameter array for function
-     * @return     {boolean}         
-     * Description Invoke an event using any function with up to four arguments 
-     */    
+     * @return     {boolean}
+     * Description Invoke an event using any function with up to four arguments
+     */
     callEvent(event: string, params: Object|Object[]): boolean {
       if(typeof this.events[event] == 'undefined') {
         return true;
@@ -166,34 +166,34 @@ namespace com.keyman {
         return false;  // Avoid event messaging recursion!
       }
 
-      this.currentEvents.push(event);    
+      this.currentEvents.push(event);
 
       for(var i=0; i<this.events[event].length; i++) {
         var func=this.events[event][i], result=false;
         try {
-          result=func(params); 
+          result=func(params);
         } catch(strExcept) {
           console.error(strExcept);
-          result=false; 
-        } //don't know whether to use true or false here      
+          result=false;
+        } //don't know whether to use true or false here
         if(result === false) {
-          this.currentEvents.pop(); 
+          this.currentEvents.pop();
           return false;
         }
-      }    
+      }
       this.currentEvents.pop();
       return true;
     }
-    
+
     /**
-     * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events  
+     * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events
      * Scope        Public
      * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
      * @param       {string}    Peventname  Name of event without 'on' prefix
      * @param       {function(Object)}  Phandler    Event handler for event
-     * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element      
+     * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element
      * Description  Attaches event handler to element DOM event
-     */  
+     */
     attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
       Pelem.addEventListener(Peventname, Phandler, PuseCapture?true:false);
@@ -209,9 +209,9 @@ namespace com.keyman {
      * @param       {Object}    Pelem       Element from which event is being detached
      * @param       {string}    Peventname  Name of event without 'on' prefix
      * @param       {function(Object)}  Phandler    Event handler for event
-     * @param       {boolean=}  PuseCapture True if event was being handled on way to target element      
+     * @param       {boolean=}  PuseCapture True if event was being handled on way to target element
      * Description Detaches event handler from element [to prevent memory leaks]
-     */  
+     */
     detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
       Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
 
@@ -223,19 +223,19 @@ namespace com.keyman {
           break;
         }
       }
-    }    
+    }
 
     /**
      * Function     getOption
      * Scope        Public
      * @param       {string}    optionName  Name of option
      * @param       {*=}        dflt        Default value of option
-     * @return      {*}               
+     * @return      {*}
      * Description  Returns value of named option
-     */  
+     */
     getOption(optionName:string, dflt:any): any {
       if(optionName in this.keyman.options) {
-        return this.keyman.options[optionName]; 
+        return this.keyman.options[optionName];
       } else if(arguments.length > 1) {
         return dflt;
       } else {
@@ -260,7 +260,7 @@ namespace com.keyman {
      * @param       {string}    optionName  Name of option
      * @param       {*=}        value       Value of option
      * Description  Sets value of named option
-     */  
+     */
     setOption(optionName,value) {
       this.keyman.options[optionName] = value;
     }
@@ -279,9 +279,9 @@ namespace com.keyman {
      * Function     getAbsolute
      * Scope        Public
      * @param       {Object}    Pobj        HTML element
-     * @return      {Object.<string,number>}               
+     * @return      {Object.<string,number>}
      * Description  Returns absolute position of Pobj element with respect to page
-     */  
+     */
     getAbsolute(Pobj: HTMLElement) {
       var p={
         /* @ export */
@@ -294,16 +294,16 @@ namespace com.keyman {
 
     //  Unofficial API used by our desktop UIs.
     _GetAbsolute = this.getAbsolute;
-    
+
     /**
-     * Select start handler (to replace multiple inline handlers) (Build 360)  
+     * Select start handler (to replace multiple inline handlers) (Build 360)
      */
     selectStartHandler = function() {
       return false;
     }
 
     /**
-     * Default mouse down event handler (to replace multiple inline handlers) (Build 360)   
+     * Default mouse down event handler (to replace multiple inline handlers) (Build 360)
      */
     mouseDownPreventDefaultHandler(e: MouseEvent) {
       if(e) {
@@ -323,7 +323,7 @@ namespace com.keyman {
         e.style.KhtmlUserSelect="none";
         e.style.UserSelect="none";
         e.style.WebkitUserSelect="none";
-      }    
+      }
       return e;
     }
 
@@ -343,18 +343,18 @@ namespace com.keyman {
         e.cancelBubble=true;
         e.returnValue=false;
       } // I2409 - Avoid focus loss for visual keyboard events
-      
+
       return false;
     }
 
     createElement = this._CreateElement;
-                
+
     /**
      * Function     getIEVersion
      * Scope        Public
-     * @return      {number}               
+     * @return      {number}
      * Description  Return IE version number (or 999 if browser not IE)
-     */       
+     */
     getIEVersion() {
       return Device._GetIEVersion();
     }
@@ -397,43 +397,43 @@ namespace com.keyman {
 
     /**
      * Get browser-independent computed style value for element
-     * 
+     *
      * @param       {Element}     e             HTML element
-     * @param       {string}      s             CSS style name 
-     * @return      {*}               
-     */       
-    getStyleValue(e:HTMLElement, s:string) { 
-      // Build 349: error trap added, since on iOS, getPropertyValue may fail 
-      // and crash in some cases, possibly if passed a text node 
-      try  
+     * @param       {string}      s             CSS style name
+     * @return      {*}
+     */
+    getStyleValue(e:HTMLElement, s:string) {
+      // Build 349: error trap added, since on iOS, getPropertyValue may fail
+      // and crash in some cases, possibly if passed a text node
+      try
       {
         if(e && (typeof(window.getComputedStyle) != 'undefined')) {
             return window.getComputedStyle(e,'').getPropertyValue(s);
         }
-      }    
+      }
       catch(ex){}
-      
+
       // Return empty string if unable to get style value
       return '';
-    }    
+    }
 
     /**
      * Get browser-independent computed style integer value for element  (Build 349)
-     * 
+     *
      * @param       {Element}     e             HTML element
-     * @param       {string}      s             CSS style name 
-     * @param       {number=}     d             default value if NaN   
+     * @param       {string}      s             CSS style name
+     * @param       {number=}     d             default value if NaN
      * @return      {number}                    integer value of style
-     */       
+     */
     getStyleInt(e: HTMLElement, s: string, d?: number): number {
       var x=parseInt(this.getStyleValue(e,s),10);
       if(!isNaN(x)) {
         return x;
       }
-      
-      // Return the default value if numeric, else 0 
+
+      // Return the default value if numeric, else 0
       if(typeof(d) == 'number') {
-        return d; 
+        return d;
       } else {
         return 0;
       }
@@ -441,48 +441,48 @@ namespace com.keyman {
 
     /**
      * Expose the touchable state for UIs - will disable external UIs entirely
-     **/      
+     **/
     isTouchDevice(): boolean {
       return this.device.touchable;
     }
-    
+
     /**
      * Get orientation of tablet or phone  display
-     *    
-     * @return      {boolean}               
-     */       
+     *
+     * @return      {boolean}
+     */
     portraitView() { // new for I3363 (Build 301)
       return !this.landscapeView();
     }
-    
+
     /**
      * Get orientation of tablet or phone  display
-     *    
-     * @return      {boolean}               
-     */       
+     *
+     * @return      {boolean}
+     */
     landscapeView(): boolean	{ // new for I3363 (Build 301)
       var orientation: number;
 
       // Assume portrait mode if orientation undefined
       if(typeof window.orientation != 'undefined') { // Used by iOS Safari
-        // Else landscape for +/-90, portrait for 0, +/-180   
+        // Else landscape for +/-90, portrait for 0, +/-180
         orientation = window.orientation as number;
       } else if(typeof window.screen.orientation != 'undefined') { // Used by Firefox, Chrome
         orientation = window.screen.orientation.angle;
       }
-      
+
       if(orientation !== undefined) {
-        return (Math.abs(orientation/90) == 1); 
+        return (Math.abs(orientation/90) == 1);
       } else {
         return false;
       }
     }
-    
+
     /**
      * Get viewport scale factor for this document
-     *    
-     * @return      {number}               
-     */       
+     *
+     * @return      {number}
+     */
     getViewportScale(): number {
       // This can sometimes fail with some browsers if called before document defined,
       // so catch the exception
@@ -490,12 +490,12 @@ namespace com.keyman {
         // Get viewport width
         var viewportWidth = document.documentElement.clientWidth;
 
-        // Return a default value if screen width is greater than the viewport width (not fullscreen). 
+        // Return a default value if screen width is greater than the viewport width (not fullscreen).
         if(screen.width > viewportWidth) {
           return 1;
         }
-        
-        // Get the orientation corrected screen width 
+
+        // Get the orientation corrected screen width
         var screenWidth = screen.width;
         if(this.landscapeView()) {
           // Take larger of the two dimensions
@@ -514,13 +514,13 @@ namespace com.keyman {
         return 1;
       }
     }
-    
+
     /**
      * Return height of URL bar on mobile devices, if visible
-     * TODO: This does not seem to be right, so is not currently used   
-     *    
-     * @return      {number}               
-     */       
+     * TODO: This does not seem to be right, so is not currently used
+     *
+     * @return      {number}
+     */
     barHeight(): number {
       var dy=0;
       if(this.device.formFactor == 'phone') {
@@ -528,24 +528,24 @@ namespace com.keyman {
       }
       return dy;
     }
-    
+
     /**
      * Function     _EncodeEntities
      * Scope        Private
      * @param       {string}      P_txt         string to be encoded
-     * @return      {string}                    encoded (html-safe) string               
+     * @return      {string}                    encoded (html-safe) string
      * Description Encode angle brackets and ampersand in text string
-     */       
+     */
     _EncodeEntities(P_txt: string): string {
       return P_txt.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;');  // I1452 part 2
-    }  
+    }
 
     /**
      * Function     createShim
-     * Scope        Public  
+     * Scope        Public
      * Description  [Deprecated] Create an IFRAME element to go between KMW and drop down (to fix IE6 bug)
      * @deprecated
-     */    
+     */
     createShim(): void {    // I1476 - Handle SELECT overlapping BEGIN
       console.warn("The util.createShim function is deprecated, as its old functionality is no longer needed.  " +
         "It and references to its previously-produced shims may be safely removed.");
@@ -553,16 +553,16 @@ namespace com.keyman {
     }
 
     // I1476 - Handle SELECT overlapping BEGIN
-    
+
     /**
      * Function     showShim
      * Scope        Public
-     * @param       {Object}      Pvkbd         Visual keyboard DIV element 
+     * @param       {Object}      Pvkbd         Visual keyboard DIV element
      * @param       {Object}      Pframe        IFRAME shim element
-     * @param       {Object}      Phelp         OSK Help DIV element               
-     * Description  [Deprecated] Display iFrame under OSK at its currently defined position, to allow OSK to overlap SELECT elements (IE6 fix)  
+     * @param       {Object}      Phelp         OSK Help DIV element
+     * Description  [Deprecated] Display iFrame under OSK at its currently defined position, to allow OSK to overlap SELECT elements (IE6 fix)
      * @deprecated
-     */    
+     */
     showShim(Pvkbd: HTMLElement, Pframe: HTMLElement, Phelp: HTMLElement) {
       console.warn("The util.showShim function is deprecated, as its old functionality is no longer needed.  It may be safely removed.");
     }
@@ -573,9 +573,9 @@ namespace com.keyman {
      * @param       {Object}      Pframe        IFRAME shim element
      * Description  [Deprecated] Hide iFrame shim containing OSK
      * @deprecated
-     */    
+     */
     hideShim(Pframe: HTMLElement) {
-      console.warn("The util.hideShim function is deprecated, as its old functionality is no longer needed.  It may be safely removed."); 
+      console.warn("The util.hideShim function is deprecated, as its old functionality is no longer needed.  It may be safely removed.");
     }
 
     /**
@@ -588,31 +588,31 @@ namespace com.keyman {
      * @param       {number}      a           opacity value, 0-1.0
      * @return      {string}                  background colour style string
      * Description  Browser-independent alpha-channel management
-     */       
+     */
     rgba(s: HTMLStyleElement, r:number, g:number, b:number, a:number): string {
       var bgColor='transparent';
       try {
         bgColor='rgba('+r+','+g+','+b+','+a+')';
       } catch(ex) {
         bgColor='rgb('+r+','+g+','+b+')';
-      }    
+      }
 
       return bgColor;
     }
-    
+
     /**
-     * Add a stylesheet to a page programmatically, for use by the OSK, the UI or the page creator 
-     * 
+     * Add a stylesheet to a page programmatically, for use by the OSK, the UI or the page creator
+     *
      * @param       {string}        s             style string
      * @return      {Object}                      returns the object reference
-     **/      
+     **/
     addStyleSheet(s: string): HTMLStyleElement {
-      var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style'); 
+      var _ElemStyle: HTMLStyleElement = <HTMLStyleElement>document.createElement<'style'>('style');
 
       _ElemStyle.type = 'text/css';
       _ElemStyle.appendChild(document.createTextNode(s));
 
-      var _ElemHead=document.getElementsByTagName('HEAD'); 
+      var _ElemHead=document.getElementsByTagName('HEAD');
       if(_ElemHead.length > 0) {
         _ElemHead[0].appendChild(_ElemStyle);
       } else {
@@ -626,10 +626,10 @@ namespace com.keyman {
 
     /**
      * Remove a stylesheet element
-     * 
+     *
      * @param       {Object}        s             style sheet reference
      * @return      {boolean}                     false if element is not a style sheet
-     **/      
+     **/
     removeStyleSheet(s: HTMLStyleElement) {
       if(s == null || typeof(s) != 'object') {
         return false;
@@ -649,9 +649,9 @@ namespace com.keyman {
 
     /**
      * Add a reference to an external stylesheet file
-     * 
+     *
      * @param   {string}  s   path to stylesheet file
-     */      
+     */
     linkStyleSheet(s: string): void {
       var headElements=document.getElementsByTagName('head');
       if(headElements.length > 0) {
@@ -665,36 +665,37 @@ namespace com.keyman {
     }
 
     /**
-     * Add a stylesheet with a font-face CSS descriptor for the embedded font appropriate 
+     * Add a stylesheet with a font-face CSS descriptor for the embedded font appropriate
      * for the browser being used
-     *      
+     *
      * @param    {Object}  fd  keymanweb font descriptor
      **/
     addFontFaceStyleSheet(fd: any) { // TODO:  Font descriptor object needs definition!
       // Test if a valid font descriptor
       if(typeof(fd) == 'undefined') return;
 
-      if(typeof(fd['files']) == 'undefined') fd['files']=fd['source'];                                       
+      if(typeof(fd['files']) == 'undefined') fd['files']=fd['source'];
       if(typeof(fd['files']) == 'undefined') return;
 
       var i,ttf='',woff='',eot='',svg='',fList=[];
-      
+
   // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
-      
+
       // Do not add a new font-face style sheet if already added for this font
       for(i=0; i<this.embeddedFonts.length; i++) {
         if(this.embeddedFonts[i] == fd['family']) {
           return;
         }
       }
-      
+
       if(typeof(fd['files']) == 'string') {
         fList[0]=fd['files'];
       } else {
         fList=fd['files'];
       }
-      
+
       for(i=0;i<fList.length;i++) {
+        if(fList[i].toLowerCase().indexOf('.otf') > 0) ttf=fList[i];
         if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
         if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
         if(fList[i].toLowerCase().indexOf('.eot') > 0) eot=fList[i];
@@ -721,28 +722,28 @@ namespace com.keyman {
       // Build the font-face definition according to the browser being used
       var s='@font-face {\nfont-family:'
         +fd['family']+';\nfont-style:normal;\nfont-weight:normal;\n';
-      
+
       // Detect if Internet Explorer and version if so
-      var IE=Device._GetIEVersion(); 
-      
-      // Build the font source string according to the browser, 
+      var IE=Device._GetIEVersion();
+
+      // Build the font source string according to the browser,
       // but return without adding the style sheet if the required font type is unavailable
-      
+
       // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
       if(IE >= 9) {
-        if(this.device.OS == 'iOS') {       
-          if(ttf != '') { 
-            // Modify the url if required to prevent caching  
-            ttf = this.unCached(ttf);  
+        if(this.device.OS == 'iOS') {
+          if(ttf != '') {
+            // Modify the url if required to prevent caching
+            ttf = this.unCached(ttf);
             s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
           } else {
             return;
           }
         } else {
           var s0 = [];
-          
+
           if(this.device.OS == 'Android') {
-            // Android 4.2 and 4.3 have bugs in their rendering for some scripts 
+            // Android 4.2 and 4.3 have bugs in their rendering for some scripts
             // with embedded ttf or woff.  svg mostly works so is a better initial
             // choice on the Android browser.
             if(svg != '') {
@@ -773,7 +774,7 @@ namespace com.keyman {
           if(s0.length == 0) {
             return;
           }
-          
+
           s += 'src:'+s0.join(',')+';';
         }
       } else { // IE 6-8
@@ -784,30 +785,30 @@ namespace com.keyman {
         }
       }
 
-      s=s+'\n}\n';    
-    
+      s=s+'\n}\n';
+
       this.addStyleSheet(s);
       this.embeddedFonts.push(fd['family']);
     }
-    
+
     /**
      * Allow forced reload if necessary (stub only here)
-     *    
+     *
      *  @param  {string}  s unmodified URL
-     *  @return {string}    modified URL         
+     *  @return {string}    modified URL
      */
     unCached(s: string): string {
       // var t=(new Date().getTime());
       // s = s + '?v=' + t;
       return s;
-    }       
-    
+    }
+
     /**
      * Document cookie parsing for use by kernel, OSK, UI etc.
-     * 
+     *
      * @param       {string=}       cn        cookie name (optional)
      * @return      {Object}                  array of names and strings, or array of variables and values
-     */      
+     */
     loadCookie(cn?: string) {
       var v={};
       if(arguments.length > 0) {
@@ -824,8 +825,8 @@ namespace com.keyman {
               }
             }
           }
-        } 
-      } else { 
+        }
+      } else {
         if(typeof(document.cookie) != 'undefined' && document.cookie != '') {
           var c = document.cookie.split(/;\s*/);
           for(var i = 0; i < c.length; i++) {
@@ -838,13 +839,13 @@ namespace com.keyman {
       }
       return v;
     }
-    
+
     /**
      * Standard cookie saving for use by kernel, OSK, UI etc.
-     * 
+     *
      * @param       {string}      cn            name of cookie
      * @param       {Object}      cv            object with array of named arguments and values
-     */      
+     */
     saveCookie(cn: string, cv) {
       var s='';
       for(var v in cv) {
@@ -854,15 +855,15 @@ namespace com.keyman {
       var d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
       document.cookie = cn+'='+encodeURIComponent(s)+'; path=/; expires='+d;//Fri, 31 Dec 2099 23:59:59 GMT;';
     }
-    
+
     /**
      * Function     toNumber
      * Scope        Public
      * @param       {string}      s            numeric string
      * @param       {number}      dflt         default value
-     * @return      {number}               
+     * @return      {number}
      * Description  Return string converted to integer or default value
-     */       
+     */
     toNumber(s: string, dflt: number): number {
       var x = parseInt(s,10);
       return isNaN(x) ? dflt : x;
@@ -873,20 +874,20 @@ namespace com.keyman {
      * Scope        Public
      * @param       {string}      s            numeric string
      * @param       {number}      dflt         default value
-     * @return      {number}               
+     * @return      {number}
      * Description  Return string converted to real value or default value
-     */       
+     */
     toFloat(s: string, dflt: number): number {
       var x = parseFloat(s);
       return isNaN(x) ? dflt : x;
     }
-    
+
     /**
      * Function     toNzString
      * Scope        Public
      * @param       {*}           item         variable to test
      * @param       {?*=}         dflt         default value
-     * @return      {*}               
+     * @return      {*}
      * Description  Test if a variable is null, false, empty string, or undefined, and return as string
      */
     nzString(item: any, dflt: any): string {
@@ -916,16 +917,16 @@ namespace com.keyman {
      * @param       {Object}      p           object to copy
      * @param       {Array=}      c0          array member being copied
      * @return      {Object}                  clone ('deep copy') of object
-     * Description  Makes an actual copy (not a reference) of an object, copying simple members, 
+     * Description  Makes an actual copy (not a reference) of an object, copying simple members,
      *              arrays and member objects but not functions, so use with care!
-     */              
+     */
     deepCopy<T>(p:T, c0?): T {
       var c = c0 || {};
       for (var i in p) {
         if(typeof p[i] === 'object') {
           c[i] = (p[i].constructor === Array ) ? [] : {};
           this.deepCopy(p[i],c[i]);
-        } 
+        }
         else {
           c[i] = p[i];
         }
@@ -936,10 +937,10 @@ namespace com.keyman {
 
     /**
      * Return the event target for any browser
-     *    
+     *
      * @param       {Event}      e        event
      * @return      {Object}              HTML element
-     */       
+     */
     eventTarget(e: Event): EventTarget {
       if(!e) {
         return null;
@@ -956,10 +957,10 @@ namespace com.keyman {
 
     /**
      * Return the event type for any browser
-     *    
+     *
      * @param       {Event}      e        event
      * @return      {string}              type of event
-     */       
+     */
     eventType(e: Event): string {
       if(e && e.type) {         // most browsers
         return e.type;
@@ -969,17 +970,17 @@ namespace com.keyman {
         return '';              // shouldn't happen!
       }
     }
-    
+
     /**
-     * Customized alert 
-     *    
+     * Customized alert
+     *
      * @param     {string}        s       alert text
      * @param     {function()=}   fn      function to call when alert dismissed
-     */       
+     */
     alert(s: string, fn?: () => void): void {
       var bg = this.waiting, nn=bg.firstChild.childNodes;
       (nn[0] as HTMLElement).style.display='block';
-      (nn[1] as HTMLElement).className='kmw-alert-text'; 
+      (nn[1] as HTMLElement).className='kmw-alert-text';
       (nn[1] as HTMLElement).innerHTML=s;
       (nn[2] as HTMLElement).style.display='none';
       bg.style.display='block';
@@ -994,15 +995,15 @@ namespace com.keyman {
     wait(s: string|boolean): void {
 
     }
-    
+
     /**
      *  Prepare the background and keyboard loading wait message box
      *  Should not be called before options are defined during initialization
-     **/           
-    prepareWait(): void { 
+     **/
+    prepareWait(): void {
       var bg: HTMLDivElement = <HTMLDivElement>document.createElement('DIV'),
           lb=document.createElement('DIV'),
-          lt=document.createElement('DIV'),    
+          lt=document.createElement('DIV'),
           gr=document.createElement('DIV'),
           bx=document.createElement('DIV');
 
@@ -1013,7 +1014,7 @@ namespace com.keyman {
       gr.className='kmw-wait-graphic';
       bx.className='kmw-alert-close';
 
-      // Close alert if anywhere in box is touched, since close box is too small on mobiles 
+      // Close alert if anywhere in box is touched, since close box is too small on mobiles
       lb.onmousedown=lb.onclick=function(e) {
         // Ignore if waiting, only handle for alert
         if(bx.style.display == 'block') {
@@ -1028,7 +1029,7 @@ namespace com.keyman {
       bg.onmousedown=bg.onclick=function(e) {
         e.preventDefault();
         e.stopPropagation();
-      
+
       }
       bg.addEventListener('touchstart', bg.onclick, false);
       lb.appendChild(bx);
@@ -1036,7 +1037,7 @@ namespace com.keyman {
       lb.appendChild(gr);
       bg.appendChild(lb);
       document.body.appendChild(bg);
-      this.waiting=bg;    
+      this.waiting=bg;
     }
 
     shutdown() {
@@ -1064,16 +1065,16 @@ namespace com.keyman {
 
     /**
      * Get path of keymanweb script, for relative references
-     * 
-     * *** This is not currently used, but may possibly be needed if ***
-     * *** script identification during loading proves unreliable.   ***         
      *
-     *  @param    {string}      sName   filename prefix  
+     * *** This is not currently used, but may possibly be needed if ***
+     * *** script identification during loading proves unreliable.   ***
+     *
+     *  @param    {string}      sName   filename prefix
      *  @return   {string}      path to source, with trailing slash
-    **/           
+    **/
     myPath(sName: string): string {
       var i, scripts=document.getElementsByTagName('script'), ss;
-      
+
       for(i=0; i<scripts.length; i++) {
         ss=scripts[i];
         if(ss.src.indexOf(sName) >= 0) {
@@ -1087,7 +1088,7 @@ namespace com.keyman {
     // Prepend the appropriate protocol if not included in path
     prependProtocol(path: string): string {
       var pattern = new RegExp('^https?:');
-    
+
       if(pattern.test(path)) {
         return path;
       } else if(path.substr(0,2) == '//') {
@@ -1096,27 +1097,27 @@ namespace com.keyman {
         return this.keyman.protocol+'/'+path;
       } else {
         return this.keyman.protocol+'//'+path;
-      }  
+      }
     }
-    
+
     /**
      * Return the appropriate test string for a given font
-     * 
+     *
      * TODO: Tidy up and remove arrays once 'sample' included in font metadata
-     * 
+     *
      *  @param  {Object}    fd    font meta-data object
      *  @return {string}          string to compare width
      *
-     */                   
+     */
     testString(fd): string {
-      var fontName=fd['family'], 
+      var fontName=fd['family'],
       i,s='BESbswy';
 
       if('sample' in fd && typeof(fd['sample']) == 'string') {
         return s+fd['sample'];
       }
 
-      var f=['TamilWeb','TibetanWeb','LatinWeb','CherokeeWeb',    
+      var f=['TamilWeb','TibetanWeb','LatinWeb','CherokeeWeb',
             'EgyptianWeb','SinhalaWeb','KhmerWeb','ArabicWeb',
             'BurmeseWeb','LaoWeb','OriyaWeb','GeezWeb'],
           t=['\u0BBE\u0BF5','\u0F7F\u0FD0','\u02B0\u02A4','\u13D0\u13C9',
@@ -1129,18 +1130,18 @@ namespace com.keyman {
         }
       }
 
-      return s; 
+      return s;
     }
 
     /**
      * Test if a font is installed (or available) on the target platform
-     *    
+     *
      * @param       {Object}        fd    font structure
      * @return      {boolean}             true if font available
-     */       
+     */
     checkFont(fd): boolean {
       var fontReady=false, fontName=fd['family'];
-      
+
       // Create an absolute positioned div and two paragraph elements with spans for the test string.
       // The paragraph elements ensure that the spans are measured from the same point, otherwise
       // pixel rounding can result in different widths for the same string and styles.
@@ -1157,37 +1158,37 @@ namespace com.keyman {
       ds.visibility='hidden';
       document.body.appendChild(d);
       d.appendChild(p1);
-      d.appendChild(p2); 
+      d.appendChild(p2);
       p1.appendChild(t1);
-      p2.appendChild(t2); 
+      p2.appendChild(t2);
 
-      // Firefox fails without the !important prefix on the fallback font, 
+      // Firefox fails without the !important prefix on the fallback font,
       // apparently applying the same font to both elements.
-      // But it also fails to distinguish the two if !important is added to the test font!  
-      // *** TODO: See if still true after changes Dec 2013 *** 
+      // But it also fails to distinguish the two if !important is added to the test font!
+      // *** TODO: See if still true after changes Dec 2013 ***
       // Must apply !important tag to font-family, but must apply it to the CSS style, not the JS object member
-      // c.f. http://stackoverflow.com/questions/462537/overriding-important-style-using-javascript 
+      // c.f. http://stackoverflow.com/questions/462537/overriding-important-style-using-javascript
       t1.setAttribute('style','font-family:monospace !important');
-      s2.fontFamily=fontName+',monospace'; 
-      s1.fontSize=s2.fontSize='24px';      // Not too large, to avoid wrapping or overflow 
-      
+      s2.fontFamily=fontName+',monospace';
+      s1.fontSize=s2.fontSize='24px';      // Not too large, to avoid wrapping or overflow
+
       // Include narrow and wide characters from each unique script
-      t1.innerHTML=t2.innerHTML=this.testString(fd); 
-      
-      // Compare the actual width of each span. Checking monospace, serif, 
+      t1.innerHTML=t2.innerHTML=this.testString(fd);
+
+      // Compare the actual width of each span. Checking monospace, serif,
       // and sans-serif helps to avoid falsely reporting the font as ready
       // The width must be different for all three tests.
-      if(t1.offsetWidth != t2.offsetWidth) { 
+      if(t1.offsetWidth != t2.offsetWidth) {
         t1.setAttribute('style','font-family:sans-serif !important');
         s2.fontFamily=fontName+',sans-serif';
         if(t1.offsetWidth != t2.offsetWidth) {
           t1.setAttribute('style','font-family:serif !important');
-          s2.fontFamily=fontName+',serif';        
+          s2.fontFamily=fontName+',serif';
         }
       }
 
       fontReady=(t1.offsetWidth != t2.offsetWidth);
-      
+
       // Delete test elements
       p1.removeChild(t1);
       p2.removeChild(t2);
@@ -1200,11 +1201,11 @@ namespace com.keyman {
 
     /**
      * Check a font descriptor for font availability, returning true if undefined
-     * 
+     *
      *  @param  {Object}  fd  font descriptor member of keyboard stub
-     *  @return {boolean}           
+     *  @return {boolean}
      **/
-    checkFontDescriptor(fd): boolean {  
+    checkFontDescriptor(fd): boolean {
       if(typeof(fd) == 'undefined' || typeof(fd['family']) != 'string') {
         return true;
       }
