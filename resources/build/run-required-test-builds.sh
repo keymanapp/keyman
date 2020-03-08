@@ -100,7 +100,7 @@ git fetch origin > /dev/null
 #
 
 echo ". Get list of changed files in the pull request"
-prfiles=`git diff "origin/$prbase"..."origin/$prhead" --name-only || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
+prfiles=`git diff --name-only "origin/$prbase"..."origin/$prhead" || ( if [ $? == 128 ]; then echo abort; else exit $?; fi )`
 if [ "$prfiles" == "abort" ]; then
   # Don't trigger any builds, exit with success
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
