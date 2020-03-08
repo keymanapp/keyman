@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.20 alpha 2020-03-08
+
+* feat(windows): Chromium replacement for embedded MSHTML in for Keyman Desktop (#1720)
+* Refactor/common/rename core (#2735)
+
 ## 14.0.19 alpha 2020-03-06
 
 * fix(web): support otf extension for truetype fonts (#2780)
