@@ -122,7 +122,6 @@ dependencies {
     api(name: 'keyman-engine', ext: 'aar')
     implementation 'io.sentry:sentry-android:2.0.1'
     implementation 'androidx.preference:preference:1.1.0'
-    implementation 'io.sentry:sentry-android:2.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
