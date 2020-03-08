@@ -26,7 +26,6 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
@@ -51,17 +50,33 @@ uses
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   Glossary in '..\..\global\delphi\general\Glossary.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
-  SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
-  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas';
+  kmxfileconsts in '..\..\global\delphi\general\kmxfileconsts.pas',
+  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
+  UserMessages in '..\..\global\delphi\general\UserMessages.pas',
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
+  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas';
 
 {$R *.res}
 {$R manifest.res}
 {$R version.res}
 
 begin
-  Application.Title := 'Keyman Desktop System Information';
-  Application.Initialize;
-  Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
-  Application.Run;
+  FInitializeCEF := TCEFManager.Create;
+  try
+    try
+      if FInitializeCEF.Start then
+      begin
+        Application.Title := 'Keyman Desktop System Information';
+        Application.Initialize;
+        Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
+        Application.Run;
+      end;
+    finally
+      frmDiagnostics.Free;
+    end;
+  finally
+    FInitializeCEF.Free;
+  end;
 end.

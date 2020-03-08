@@ -88,7 +88,11 @@ type
                     fmBaseKeyboard,   // I4169
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
-                    fmKeepInTouch);   // I4773
+                    fmKeepInTouch,
+
+                    // Commands from Keyman Engine
+                    fmShowHint,
+                    fmShowHelp);   // I4773
 
 var
   ApplicationRunning: Boolean = False;
@@ -108,6 +112,7 @@ uses
   KeymanPaths,
   KLog,
   kmint,
+  KMShellHints,
   KeymanMutex,
   OnlineUpdateCheck,
   ExternalExceptionHandler,
@@ -118,6 +123,7 @@ uses
   UfrmInstallKeyboardLanguage,
   //UfrmSelectLanguage,
   UfrmSplash,
+  UfrmHelp,
   UfrmHTML,
   UfrmKeepInTouch,
   UfrmMain,
@@ -187,7 +193,7 @@ begin
 end;
 
 function Init(var FMode: TKMShellMode; KeyboardFileNames: TWideStrings; var FSilent, FForce, FNoWelcome: Boolean;
-  var FLogFile, FQuery: string; var FDisablePackages: string; var FStartWithConfiguration: Boolean): Boolean;
+  var FLogFile, FQuery: string; var FDisablePackages: string; var FStartWithConfiguration: Boolean; var FParentWindow: THandle): Boolean;
 var
   s: string;
   i: Integer;
@@ -254,6 +260,16 @@ begin
         FQuery := Trim(FQuery);
       end
       else if Copy(s, 1, 3) = '-ur' then UnRegCRC := StrToIntDef('$'+Copy(s, 4, 8), 0)
+
+      // Controls from Keyman Engine
+      else if s = '-showhint' then FMode := fmShowHint
+      else if s = '-parentwindow' then
+      begin
+        Inc(i);
+        FParentWindow := StrToIntDef(ParamStr(i), 0);
+      end
+      else if s = '-showhelp' then FMode := fmShowHelp
+
       else Exit;
     end
     else
@@ -275,7 +291,7 @@ begin
 end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean;
-  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean); forward;
+  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean; FParentWindow: THandle); forward;
 
 procedure Run;
 var
@@ -284,6 +300,7 @@ var
   FSilent: Boolean;
   FNoWelcome: Boolean;
   FForce: Boolean;
+  FParentWindow: THandle;
   FLogFile: string;
   FDisablePackages: string;
   FStartWithConfiguration: Boolean;
@@ -303,7 +320,8 @@ begin
 
   KeyboardFileNames := TWideStringList.Create;
   try
-    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration) then
+    FParentWindow := 0;
+    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration, FParentWindow) then
     begin
   //TODO:   TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
       Exit;
@@ -311,7 +329,7 @@ begin
 
     if not LoadKMCOM then Exit;
     try
-      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration);
+      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration, FParentWindow);
     finally
       kmcom := nil;
     end;
@@ -321,7 +339,7 @@ begin
 end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean;
-  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean);
+  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean; FParentWindow: THandle);
 var
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
@@ -493,6 +511,13 @@ begin
         ExitCode := 0;
     fmKeepInTouch:
       ShowKeepInTouchForm(True);   // I4658
+
+    fmShowHint:
+      if ShowKMShellHintQuery(FParentWindow, FirstKeyboardFileName) = mrOk
+        then ExitCode := 0
+        else ExitCode := 1;
+    fmShowHelp:
+      TfrmHelp.Execute(FirstKeyboardFileName, SecondKeyboardFileName);
   end;
 
   if FMode <> fmMain then

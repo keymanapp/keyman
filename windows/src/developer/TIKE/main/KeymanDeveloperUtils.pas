@@ -1,18 +1,18 @@
 (*
   Name:             KeymanDeveloperUtils
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     02 Aug 2006 - mcdurdin - Timeout when Beta expires
                     23 Aug 2006 - mcdurdin - Add WM_USER_WEBCOMMAND and WM_USER_INPUTLANGCHANGE
@@ -91,7 +91,8 @@ implementation
 
 uses
   Winapi.ShellApi,
-  Classes, SysUtils, ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
+  Classes, SysUtils,
+  ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, OnlineConstants, Dialogs, utilexecute,
      KeymanVersion, CRC32, VisualKeyboard, Controls;
 
@@ -169,7 +170,6 @@ begin
 
     Result := SUCCEEDED(hres);
 end;
-
 
 function GetFolderPath(csidl: Integer): string;
 var

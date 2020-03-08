@@ -4,6 +4,10 @@
 
 !include ..\..\defines.mak
 
+# We use different directories so that heat generates
+# different identifiers for the various folders
+KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
+
 default:
   echo Please don't call this file directly -- used by Makefile
 
@@ -19,7 +23,20 @@ prepareredist:
 clean:
   rem clean
 
+candle: candle-desktop candle-cef
+
 candle-desktop:
   $(WIXHEAT) dir ..\kmshell\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
 
+heat-cef:
+    # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+    mkdir $(KEYMAN_WIX_TEMP_CEF)
+    xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
+    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
+    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+
+candle-cef: heat-cef
+  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs

@@ -54,7 +54,6 @@ type
     lblModelName: TLabel;
     editModelName: TEdit;
     Bevel1: TBevel;
-    dlgBrowse: TBrowse4Folder;
     lblProjectFilename: TLabel;
     editProjectFilename: TEdit;
     procedure cmdOKClick(Sender: TObject);
@@ -76,6 +75,7 @@ type
   private
     pack: TKPSFile;
     FSetup: Integer;
+    dlgBrowse: TBrowse4Folder;
     function GetAuthor: string;
     function GetBasePath: string;
     function GetCopyright: string;
@@ -178,6 +178,12 @@ procedure TfrmNewModelProjectParameters.FormCreate(Sender: TObject);
 begin
   inherited;
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
+
+  dlgBrowse := TBrowse4Folder.Create(Self);
+  dlgBrowse.InitialDir := editPath.Text;
+  dlgBrowse.Options := [OnlySelectFileSysAncestors, ShowEditBox, UseNewDialogStyle];
+  dlgBrowse.Root := Desktop;
+  dlgBrowse.Title := 'Select folder to save project to';
 
   pack := TKPSFile.Create;
   pack.LexicalModels.Add(TPackageLexicalModel.Create(pack));
@@ -451,7 +457,7 @@ end;
 procedure TfrmNewModelProjectParameters.UpdateAuthorIDFromAuthor;
 begin
   editAuthorID.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(Author);
-  editCopyright.Text := '© '+FormatDateTime('yyyy', Now)+' '+Author;
+  editCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewModelProjectParameters.UpdateUniqFromModelName;

@@ -16,11 +16,11 @@ setup:
 
     cd $(ROOT)\src\developer\inst
     $(PROGRAM)\buildtools\mkver -v -u copydev.in copydev.mak $(ROOT)\src\developer\version.txt
-    
+
     #
     # Build the installation archive
     #
-    
+
     $(MAKE) -fcopydev.mak candle
     $(WIXLIGHT) -sice:ICE91 -sice:ICE60 -dWixUILicenseRtf=License.rtf -out keymandeveloper.msi -ext WixUIExtension $(DEVELOPER_FILES)
     $(MAKE) -fcopydev.mak clean-heat
@@ -40,13 +40,13 @@ setup:
 
 build:
     @rem
-	
+
 signcode:
     @rem
 
 backup:
     @rem
-	
+
 clean:
     cd $(ROOT)\src\developer\inst
     -del /Q copydev.mak
@@ -60,7 +60,7 @@ clean:
     -del /Q *.exe
     -del /Q *.wixpdb
     -del /Q xml.wxs
-    -del /Q cef.wxs
+		-del /Q cef.wxs
     -del /Q templates.wxs
     -del /Q kmlmc.wxs
 

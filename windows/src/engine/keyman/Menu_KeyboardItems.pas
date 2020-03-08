@@ -320,7 +320,8 @@ begin
       end;
 
 
-      if (cmi.ItemType = _mitKeyboardsList) or (cmi.Action = _miaSwitchKeymanOff) then Continue;
+      if (cmi.ItemType = _mitKeyboardsList) or (cmi.Action = _miaSwitchKeymanOff) or
+        (cmi.Action = miaOSK_ViewKeyboardUsage) then Continue;
 
 
       mi := CreateKeymanMenuItem(FKeyman, FMenu, cmi);
@@ -341,11 +342,6 @@ begin
           begin
             mi.Checked := frmKeyman7Main.VisualKeyboardVisible(apKeyboard);
             mi.OnClick := frmKeyman7Main.MnuVisualKeyboard;
-          end;
-        miaOSK_ViewKeyboardUsage:
-          begin
-            mi.Checked := frmKeyman7Main.VisualKeyboardVisible(apKeyboardUsage);
-            mi.OnClick := frmKeyman7Main.MnuKeyboardUsage;
           end;
         miaOSK_ViewFontHelper:
           begin

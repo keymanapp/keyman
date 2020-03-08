@@ -6,6 +6,8 @@
 
 # ----------------------------------------------------------------------
 
+ENGINE_FILES=keymanengine.wixobj components.wixobj
+
 setup: msm copy
 
 build:
@@ -20,7 +22,7 @@ backup:
     cd $(ROOT)\src\engine\inst\insthelper
     $(MAKE) backup
 
-msm: 
+msm:
     #
     # Copy files for installation
     #
@@ -33,11 +35,11 @@ msm:
 
     $(MAKE) -fdownload.mak prepareredist
     $(MAKE) -fdownload.mak candle
-    
-    # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
-    $(WIXLIGHT) -sw1072 -ext WixUtilExtension keymanengine.wixobj components.wixobj -o keymanengine.msm
 
-copy:    
+    # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
+    $(WIXLIGHT) -sw1072 -ext WixUtilExtension $(ENGINE_FILES) -o keymanengine.msm
+
+copy:
     #
     # Sign the installation archive
     #
@@ -73,4 +75,3 @@ install:
 # ----------------------------------------------------------------------
 # EOF
 # ----------------------------------------------------------------------
-	

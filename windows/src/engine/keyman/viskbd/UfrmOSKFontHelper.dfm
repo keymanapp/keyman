@@ -7,39 +7,74 @@ inherited frmOSKFontHelper: TfrmOSKFontHelper
   ExplicitHeight = 339
   PixelsPerInch = 96
   TextHeight = 13
-  object web: TKeymanEmbeddedWB
+  object panNoKeyboard: TPanel
     Left = 0
     Top = 0
     Width = 635
     Height = 339
     Align = alClient
+    BevelOuter = bvNone
     TabOrder = 0
-    Silent = False
-    RegisterAsDropTarget = False
-    OnBeforeNavigate2 = webBeforeNavigate2
-    OnDocumentComplete = webDocumentComplete
-    OnNewWindow3 = webNewWindow3
-    DisableCtrlShortcuts = 'N'
-    UserInterfaceOptions = [DisableTextSelect, DisableHelpMenu, DontUse3DBorders, EnableThemes]
-    OnShowHelpRequest = webShowHelpRequest1
-    OnShowContextMenu = webShowContextMenu
-    OnScriptError = webScriptError
-    About = ' EmbeddedWB http://bsalsa.com/'
-    DisableErrors.fpExceptions = False
-    PrintOptions.HTMLHeader.Strings = (
-      '<HTML></HTML>')
-    PrintOptions.Orientation = poPortrait
-    VisualEffects.DisableSounds = True
-    OnKeyDown = webKeyDown
-    ExplicitLeft = 32
-    ExplicitTop = 8
-    ExplicitWidth = 461
-    ExplicitHeight = 265
-    ControlData = {
-      4C000000A52F0000631B00000000000000000000000000000000000000000000
-      000000004C000000000000000000000001000000E0D057007335CF11AE690800
-      2B2E12620C000000000000004C0000000114020000000000C000000000000046
-      8000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000100000000000000000000000000000000000000}
+  end
+  object panFonts: TPanel
+    Left = 0
+    Top = 0
+    Width = 635
+    Height = 339
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 1
+    object grid: TDrawGrid
+      Left = 0
+      Top = 0
+      Width = 635
+      Height = 318
+      Align = alClient
+      DefaultRowHeight = 20
+      FixedCols = 0
+      FixedRows = 0
+      TabOrder = 0
+      OnDblClick = gridDblClick
+      OnDrawCell = gridDrawCell
+      OnKeyDown = gridKeyDown
+      OnMouseWheelDown = gridMouseWheelDown
+      OnMouseWheelUp = gridMouseWheelUp
+      ExplicitTop = -3
+    end
+    object panControls: TPanel
+      Left = 0
+      Top = 318
+      Width = 635
+      Height = 21
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 1
+      DesignSize = (
+        635
+        21)
+      object tbSize: TTrackBar
+        Left = 594
+        Top = 0
+        Width = 41
+        Height = 21
+        Hint = 'Display Size'
+        Margins.Left = 0
+        Margins.Top = 0
+        Margins.Right = 0
+        Margins.Bottom = 0
+        Anchors = [akTop, akRight]
+        LineSize = 5
+        Max = 100
+        Min = 20
+        ParentShowHint = False
+        PageSize = 5
+        Frequency = 20
+        Position = 50
+        ShowHint = True
+        TabOrder = 0
+        ThumbLength = 10
+        OnChange = tbSizeChange
+      end
+    end
   end
 end

@@ -34,9 +34,7 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB,
-  UfrmDownloadProgress, UfrmKeymanBase, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB;
+  Dialogs, UfrmWebContainer, UfrmDownloadProgress, UfrmKeymanBase;
 
 type
   TfrmInstallKeyboardFromWeb = class(TfrmWebContainer)
@@ -46,7 +44,6 @@ type
     FXML: WideString;
     FURL: WideString;
     FFileName: WideString;
-    FDownloadOnly: Boolean;
     procedure Download(params: TStringList);
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
 
@@ -57,7 +54,6 @@ type
 implementation
 
 uses
-  MSHTML_TLB,
   httpuploader,
   GlobalProxySettings,
   UfrmInstallKeyboard,
@@ -140,20 +136,7 @@ var
               end;
             end;
 
-            if FDownloadOnly then
-            begin
-              dlgSaveFile.DefaultExt := Copy(ExtractFileExt(FTempFileName), 2, 10);
-              dlgSaveFile.FileName := ExtractFileName(FTempFileName);
-              while dlgSaveFile.Execute do
-              begin
-                if not CopyFile(PChar(FTempFileName), PChar(dlgSaveFile.FileName), False) then
-                  ShowMessage('Unable to save to file '+dlgSaveFile.FileName+' - '+SysErrorMessage(GetLastError))
-                else
-                  Break;
-              end;
-            end
-            else
-              if InstallFile(Self, FTempFileName, False, False, '') then Result := True;   // I4414
+            if InstallFile(Self, FTempFileName, False, False, '') then Result := True;   // I4414
           finally
             if FileExists(FTempFileName) then
               DeleteFile(FTempFileName);
@@ -198,21 +181,9 @@ begin
 end;
 
 procedure TfrmInstallKeyboardFromWeb.Download(params: TStringList);
-var
-  doc: IHTMLDocument3;
-  elem: IHTMLElement;
 begin
   FURL := params.Values['url'];
   FFilename := params.Values['filename'];
-  FDownloadOnly := False;
-
-  if Assigned(web.Document) then
-  begin
-    doc := web.Document as IHTMLDocument3;
-    elem := doc.getElementById('chkDownloadOnly');
-    if Assigned(elem) then
-      FDownloadOnly := (elem as IHTMLInputElement).checked;
-  end;
 
   with TfrmDownloadProgress.Create(Self) do
   try
@@ -238,6 +209,8 @@ end;
 
 procedure TfrmInstallKeyboardFromWeb.TntFormShow(Sender: TObject);
 begin
+  // Ensures keyman.com hosted site opens locally
+  cef.ShouldOpenRemoteUrlsInBrowser := False;
   XMLRenderers.RenderTemplate := 'DownloadKeyboard.xsl';
   XMLRenderers.Add(TGenericXMLRenderer.Create(FXML + '<Version>'+GetVersionString+'</Version>'));  // I1366 - Add version info
   Content_Render;

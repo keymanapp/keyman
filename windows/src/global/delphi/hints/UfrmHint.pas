@@ -24,8 +24,7 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB, HintConsts,
-  SHDocVw_EWB, EwbCore, KeymanEmbeddedWB, UserMessages;
+  Dialogs, UfrmWebContainer, HintConsts, UserMessages;
 
 type
   TfrmHint = class(TfrmWebContainer)

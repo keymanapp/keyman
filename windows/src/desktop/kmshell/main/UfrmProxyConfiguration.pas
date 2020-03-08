@@ -24,8 +24,7 @@ interface
 uses
   System.Contnrs,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB, SHDocVw_EWB,
-  EwbCore, KeymanEmbeddedWB;
+  Dialogs, UfrmWebContainer;
 
 type
   TfrmProxyConfiguration = class(TfrmWebContainer)

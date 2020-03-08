@@ -52,6 +52,8 @@ const
 
   KMC_PROFILECHANGED = 18;  // 9.0.426.0   // I3933
 
+  KMC_HINTRESPONSE = 19;  // 14.0 HIWORD(wParam) = ModalResult, lParam = hint enum
+
   PC_UPDATE = 0;
   PC_UPDATE_LANGUAGESWITCH = 1;
   PC_HOTKEYCHANGE = 2;

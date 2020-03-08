@@ -29,6 +29,21 @@ type
     KH_OSKHINTBAR
     );
 
+  TKeymanHintData = record
+    IsQuestion: Boolean; // True = OK+Cancel buttons; False = OK button only
+  end;
+
+const
+  KeymanHintData: array[TKeymanHint] of TKeymanHintData = (
+    (IsQuestion: False),
+    (IsQuestion: False),
+    (IsQuestion: True),
+    (IsQuestion: False),
+    (IsQuestion: False),
+    (IsQuestion: False)
+  );
+
 implementation
+
 
 end.

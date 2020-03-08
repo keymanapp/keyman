@@ -1,18 +1,18 @@
 (*
   Name:             UfrmKeyman7Main
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Use TKeymanTrayIcon, rework for Keyman 7
                     14 Sep 2006 - mcdurdin - Remove debug controls
@@ -302,6 +302,7 @@ type
     procedure HotkeyWndProc(var Message: TMessage);
 
     procedure DoLanguageHotkey(Index: Integer);
+  protected
     procedure DoInterfaceHotkey(Target: Integer);
 
   protected
@@ -330,7 +331,6 @@ type
     procedure MnuVisualKeyboard(Sender: TObject);
     procedure MnuCharacterMap(Sender: TObject);
     procedure MnuFontHelper(Sender: TObject);
-    procedure MnuKeyboardUsage(Sender: TObject);
 
     procedure MnuRunProgram(Sender: TObject);
     procedure MnuSelectKeyboard(Sender: TObject);   // I4606
@@ -392,7 +392,6 @@ implementation
 
 uses
   DebugPaths,
-  UfrmHelp,
   UILanguages,
   UfrmOSKCharacterMap,
   utilstr,
@@ -693,10 +692,7 @@ begin
 
     FClosingApp := True;
     ReleaseMutex(hProgramMutex); // We are not controlling Keyman any more - another copy of Keyman.exe may start
-    if not (csDestroying in ComponentState) then
-    begin
-      Close;
-    end;
+    Close;
   end;
 end;
 
@@ -859,6 +855,12 @@ begin
         // Record the active profile
         ProcessProfileChange(LParam);
       end;
+    KMC_HINTRESPONSE:
+      begin
+        ResetHintState;
+        if (TKeymanHint(lParam) = KH_EXITPRODUCT) and (wParam = mrOk) then
+          UnloadProduct;
+      end;
 //TOUCH    KMC_CONTEXT:
 //TOUCH      begin
 //TOUCH        if LParam <> 0 then
@@ -894,7 +896,6 @@ begin
     khKeyboardMenu: ShowMenu(FRunningProduct.FTrayIcon, milLeft, True, Rect(0,0,0,0)); // I1377 - Show the menu down near the tray when hotkey is pressed   // I3990
     khVisualKeyboard: MnuVisualKeyboard(nil);
     khKeymanConfiguration: TKeymanDesktopShell.RunKeymanConfiguration('-c 0');
-    khKeyboardUsage: MnuKeyboardUsage(nil);
     khFontHelper: MnuFontHelper(nil);
     khCharacterMap: MnuCharacterMap(nil);
     khTextEditor: MnuOpenTextEditor(nil);
@@ -1133,7 +1134,7 @@ end;
 
 procedure TfrmKeyman7Main.MnuExitKeyman(Sender: TObject);
 begin
-  if ShowKeymanHintQuery(KH_EXITPRODUCT, mbOkCancel, mrOk) = mrCancel then Exit;
+  if not ShowKeymanHint(KH_EXITPRODUCT) then Exit;
 
   UnloadProduct;
 end;
@@ -1216,7 +1217,7 @@ end;
 function TfrmKeyman7Main.StartKeymanEngine: Boolean;  // I1951
 begin
   Result := True;
-  
+
   if Assigned(kmcom) then Exit;
 
   try
@@ -1542,19 +1543,7 @@ end;
 
 procedure TfrmKeyman7Main.MnuOpenProductHelp(Sender: TObject);
 begin
-  with TfrmHelp.Create(Self) do  // I1236 - Integrate keyboard help with Keyman help
-  try
-    HelpJump := 'context_traymenu';
-    ActiveKeyboard := Self.ActiveKeyboard;
-    ShowModal;
-    case HelpTarget of
-      htNone: ;
-      htProduct: OpenProductHelp;
-      htKeyboard: OpenKeyboardHelp;
-    end;
-  finally
-    Free;
-  end;
+  TKeymanDesktopShell.OpenHelpJump('context_traymenu', Self.ActiveKeyboard);
 end;
 
 procedure TfrmKeyman7Main.MnuRunProgram(Sender: TObject);   // I4606
@@ -1621,14 +1610,6 @@ begin
       then HideVisualKeyboard
       else ShowVisualKeyboard(apKeyboard);
 //TOUCH    end;
-end;
-
-procedure TfrmKeyman7Main.MnuKeyboardUsage(Sender: TObject);
-begin
-  SetLastFocus;     // I1289 - Focus not returned to active app when OSK opened
-  if VisualKeyboardVisible(apKeyboardUsage)
-    then HideVisualKeyboard
-    else ShowVisualKeyboard(apKeyboardUsage);
 end;
 
 procedure TfrmKeyman7Main.MnuFontHelper(Sender: TObject);

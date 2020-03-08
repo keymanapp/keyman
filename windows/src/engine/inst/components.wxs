@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Fragment>
     <ComponentGroup Id="KeymanEngineComponents" Directory="INSTALLDIR" Source="..\..\..\bin\engine\">
@@ -50,7 +50,7 @@
           </TypeLib>
         </File>
       </Component>
-      
+
       <Component Id="kmcomapi.x64.dll" Guid="{8AE57882-9901-4E53-B6B1-F78DD7707050}" SharedDllRefCount="yes" Win64="yes">
         <Condition>VersionNT64</Condition>
         <File Id="kmcomapi.x64.dll" Name="kmcomapi.x64.dll" KeyPath="yes">
@@ -99,7 +99,7 @@
           </TypeLib>
         </File>
       </Component>
-      
+
       <Component Guid="{9BBD330E-F0CE-44EB-8799-BF49CB670EFC}" SharedDllRefCount="yes">
         <File Id="keyman32.dll" Name="keyman32.dll" KeyPath="yes" />
       </Component>
@@ -143,16 +143,16 @@
         <File Id="si_processes_x64.xslt" Name='si_processes_x64.xslt' Source='..\..\engine\tsysinfo\si_processes_x64.xslt' />
         <File Id="si_startup.xslt" Name='si_startup.xslt'     Source='..\..\engine\tsysinfo\si_startup.xslt' />
       </Component>
-      
+
       <Component Id="kmtip.dll" Guid="{48060517-BD85-494C-B2FF-F9C4FFE1A987}" SharedDllRefCount="yes">
         <File Id="kmtip.dll" Name="kmtip.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtip.dll">
           <Class Id="FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7" Context="InprocServer32" ThreadingModel="apartment" Description="Keyman Engine Text Service" />
         </File>
-        
+
         <!-- The HKLM\Software\Microsoft\CTF\TIP key is shared with WOW64-so only need to write to the x86 version.
              http://msdn.microsoft.com/en-us/library/aa384253%28VS.85%29.aspx
-        --> 
-        
+        -->
+
         <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}">
           <RegistryValue Name="Enable" Type="string" Value="1" />
           <RegistryKey Key="Category">
@@ -169,10 +169,10 @@
           </RegistryKey>
         </RegistryKey>
       </Component>
-      
+
       <Component Guid="{238931D6-CC32-4C71-8455-887318F2A963}" Id="kmtip_reg_win8">
         <Condition>VersionNT &gt;= 602</Condition>
-        
+
         <RegistryValue KeyPath="yes" Id="registry_win8_keypath" Root="HKLM" Key="Software\Keyman\Keyman Engine" Name="win8 tip install" Value="installed" Type="string" />
 
         <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\CTF\TIP\{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}">
@@ -188,7 +188,7 @@
           </RegistryKey>
         </RegistryKey>
       </Component>
-       
+
       <Component Id="kmtip64.dll" Guid="{7511B389-24C5-4C79-9050-934791014682}" SharedDllRefCount="yes" Win64="yes">
         <Condition>VersionNT64</Condition>
         <File Id="kmtip64.dll" Name="kmtip64.dll" KeyPath="yes" Source="..\..\..\bin\engine\kmtip64.dll">
@@ -203,7 +203,7 @@
           <util:EventManifest MessageFile="[#keyman32.dll]" ResourceFile="[#keyman32.dll]" />
         </File>
       </Component>
-      
+
     </ComponentGroup>
   </Fragment>
 </Wix>

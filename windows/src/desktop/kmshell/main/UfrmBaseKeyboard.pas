@@ -5,8 +5,7 @@ interface
 uses
   System.Contnrs,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmWebContainer, Vcl.OleCtrls,
-  SHDocVw_EWB, EwbCore, EmbeddedWB, KeymanEmbeddedWB;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmWebContainer;
 
 type
   TfrmBaseKeyboard = class(TfrmWebContainer)

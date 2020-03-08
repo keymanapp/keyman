@@ -9,6 +9,11 @@ type
   EKeymanPath = class(Exception);
 
   TKeymanPaths = class
+  private
+    const S_CEF_DebugPath = 'Debug_CEFPath';
+    const S_CEF_EnvVar = 'KEYMAN_CEF4DELPHI_ROOT';
+    const S_CEF_SubFolder = 'cef\';
+    const S_CEF_SubProcess = 'kmbrowserhost.exe';
   public
     const S_KMShell = 'kmshell.exe';
     const S_Xml_LocaleDef = 'xml\localedef.dtd';
@@ -26,7 +31,12 @@ type
     class function KeymanEngineInstallDir: string; static;
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
+    class function CEFPath: string; static; // Chromium Embedded Framework
+    class function CEFDataPath(const mode: string): string; static;
+    class function CEFSubprocessPath: string; static;
   end;
+
+function GetFolderPath(csidl: Integer): string;
 
 implementation
 
@@ -205,6 +215,44 @@ begin
     raise EKeymanPath.Create('Unable to find the Keyman Engine directory.  You should reinstall the product.');
 
   Result := IncludeTrailingPathDelimiter(Result) + filename;
+end;
+
+class function TKeymanPaths.CEFPath: string;
+begin
+  Result := GetDebugPath(S_CEF_DebugPath, '');
+  if Result = '' then
+  begin
+    Result := GetEnvironmentVariable(S_CEF_EnvVar);
+    if Result = ''
+      then Result := KeymanDesktopInstallPath+S_CEF_SubFolder
+      else Result := IncludeTrailingPathDelimiter(Result);
+  end;
+end;
+
+class function TKeymanPaths.CEFSubprocessPath: string;
+begin
+  // Normal install location - in Keyman Desktop install folder
+  Result := KeymanDesktopInstallPath(S_CEF_SubProcess);
+  if FileExists(Result) then Exit;
+
+  // Same folder as executable
+  Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess;
+  if FileExists(Result) then Exit;
+
+  // Source repo, bin folder
+  Result := ExtractFilePath(ParamStr(0)) + '..\desktop\' + S_CEF_SubProcess;
+  if FileExists(Result) then Exit;
+
+  // Source repo, source folder
+  Result := ExtractFilePath(ParamStr(0)) + '..\..\desktop\kmbrowserhost\win32\debug\' + S_CEF_SubProcess;
+  if FileExists(Result) then Exit;
+
+  Result := ExtractFilePath(ParamStr(0)) + '..\..\desktop\kmbrowserhost\win32\release\' + S_CEF_SubProcess;
+end;
+
+class function TKeymanPaths.CEFDataPath(const mode: string): string;
+begin
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderCEFBrowserData + '\' + mode;
 end;
 
 class function TKeymanPaths.KeyboardsInstallDir: string;

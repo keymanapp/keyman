@@ -22,8 +22,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmWebContainer, Vcl.OleCtrls,
-  SHDocVw_EWB, EwbCore, EmbeddedWB, KeymanEmbeddedWB;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmWebContainer;
 
 type
   TfrmKeepInTouch = class(TfrmWebContainer)
@@ -49,7 +48,6 @@ uses
   ErrorControlledRegistry,
   OnlineConstants,
   RegistryKeys,
-  ShDocVw,
   Upload_Settings,
   UtilCheckOnline,
   UtilExecute;
@@ -92,11 +90,9 @@ procedure TfrmKeepInTouch.Content_Render(FRefreshKeyman: Boolean;
   const AdditionalData: WideString);
 var
   FPath: string;
-  v: OleVariant;
 begin
   FPath := MakeKeymanUrl(URLPath_KeepInTouch) + '?embed=1';
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  web.Navigate(FPath, v);   // I4181
+  cef.Navigate(FPath);   // I4181
 end;
 
 procedure TfrmKeepInTouch.FireCommand(const command: WideString;

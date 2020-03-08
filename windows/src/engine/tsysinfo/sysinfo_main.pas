@@ -20,11 +20,14 @@ unit sysinfo_main; // I3309
 
 interface
 
+{$MESSAGE HINT 'Hook up remainder of CEF'}
+
 uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, Contnrs, Menus, si_base, ExtCtrls,
-  EmbeddedWB, msxml;
+  Keyman.UI.UframeCEFHost,
+  msxml;
 
 type
   TfrmDiagnostics = class(TForm)
@@ -83,9 +86,7 @@ type
     procedure PrepareTabs; // I3556
     procedure ShowFiles; // I3556
     procedure LoadPage(FPageIndex: Integer); // I3556
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      // I3556
-      var URL: OleVariant);
+    procedure webLoadEnd(ASender: TObject);
     procedure WMUserLoad(var Message: TMessage); message WM_USER_Load;
     procedure SaveDiagnosticsAndExit(FileName: string);
     procedure LoadGlobalData;
@@ -433,21 +434,20 @@ end;
 procedure TfrmDiagnostics.PrepareTabs; // I3180   // I3542   // I3556
 var
   i: Integer;
-  web: TEmbeddedWB;
+  web: TframeCEFHost;
   si: TSI_Base;
 begin
   LoadGlobalData;
   for i := 0 to FSIList.Count - 1 do
   begin
     si := FSIList[i];
-    web := TEmbeddedWB.Create(si.Parent);
-    // web.Parent := si.Parent as TWinControl;
-    (si.Parent as TWinControl).InsertControl(web);
+    web := TframeCEFHost.Create(si.Parent);
+    web.Parent := si.Parent as TWinControl;
+    //(si.Parent as TWinControl).InsertControl(web);
     (si.Parent as TTabSheet).Caption := si.Caption;
     (si.Parent as TTabSheet).TabVisible := True;
     web.Align := alClient;
     web.Visible := True;
-    web.Loaded;
     LoadPage(i);
     // pages.Pages[i].TabVisible := (pages.Pages[i].ControlCount > 0) and pages.Pages[i].Controls[0].Visible;
   end;
@@ -474,8 +474,7 @@ begin
   PostMessage(Handle, WM_USER_Load, 0, FPageIndex);
 end;
 
-procedure TfrmDiagnostics.webDocumentComplete(ASender: TObject; // I3556
-  const pDisp: IDispatch; var URL: OleVariant);
+procedure TfrmDiagnostics.webLoadEnd(ASender: TObject); // I3556
 begin
   // Cleanup;
 end;
@@ -486,12 +485,12 @@ procedure TfrmDiagnostics.WMUserLoad(var Message: TMessage); // I3556
 var
   xml, xsl: IXMLDOMDocument;
   buf: WideString;
-  web: TEmbeddedWB;
+  web: TframeCEFHost;
   afilename: string;
 begin
   web := (FSIList[Message.LParam].Parent as TTabSheet).Controls[0]
-    as TEmbeddedWB;
-  web.OnDocumentComplete := webDocumentComplete;
+    as TframeCEFHost;
+  web.OnLoadEnd := webLoadEnd;
 
   if not mnuOptionsXMLView.Checked and FSIList[Message.LParam].HasXSLT then
   begin

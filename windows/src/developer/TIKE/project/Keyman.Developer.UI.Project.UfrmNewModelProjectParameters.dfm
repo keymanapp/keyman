@@ -264,12 +264,4 @@ inherited frmNewModelProjectParameters: TfrmNewModelProjectParameters
     ReadOnly = True
     TabOrder = 14
   end
-  object dlgBrowse: TBrowse4Folder
-    InitialDir = 'C:\Users\mcdurdin\Desktop\'
-    Options = [OnlySelectFileSysAncestors, ShowEditBox, UseNewDialogStyle]
-    Root = Desktop
-    Title = 'Select folder to save project to'
-    Left = 168
-    Top = 168
-  end
 end

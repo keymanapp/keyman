@@ -1,4 +1,4 @@
-(*
+(*  r
   Name:             UfrmTextEditor
   Copyright:        Copyright (C) SIL International.
   Documentation:    
@@ -24,7 +24,7 @@
                     28 Jun 2010 - mcdurdin - I2421 - Return additional information for font coverage
                     05 Nov 2010 - mcdurdin - I2482 - Tutorial interferes when not active (part 1 - when hidden)
                     10 Dec 2010 - mcdurdin - I2558 - LazyWrite performance
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     03 Feb 2011 - mcdurdin - I2260 - "Start Text Editor" should not start in "Tutorial" mode
                     03 Feb 2011 - mcdurdin - I2697 - Fix potential race condition on termination of check fonts thread
                     03 Feb 2011 - mcdurdin - I2698 - Font styling shortcuts for text editor
@@ -50,12 +50,11 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, ExtCtrls, OleCtrls, SHDocVw, ActiveX,
-  EmbeddedWB, ToolWin, Menus,
-  XMLRenderer, GenericXMLRenderer, ActnList, ImgList,
+  Dialogs, StdCtrls, ComCtrls, ExtCtrls, ActiveX,
+  ToolWin, Menus,
+  XMLRenderer, GenericXMLRenderer, ActnList, ImgList, Keyman.UI.UframeCEFHost,
   utilcheckfonts, AppEvnts, KeymanTextEditorRichEdit, TempFileManager,
-  UfrmKeymanBase, UserMessages, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB,
-  System.Actions, System.ImageList;
+  UfrmKeymanBase, UserMessages, System.Actions, System.ImageList;
 
 type
   TfrmTextEditor = class(TfrmKeymanBase)
@@ -99,7 +98,6 @@ type
     EditPasteCmd: TAction;
     New1: TMenuItem;
     panFonts: TPanel;
-    webFonts: TKeymanEmbeddedWB;
     panEditor: TPanel;
     splitFonts: TSplitter;
     Cut1: TMenuItem;
@@ -140,17 +138,12 @@ type
     procedure editorKeymanSelectLang(Sender: TObject);
     procedure editorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
-    procedure webBeforeNavigate2(ASender: TObject;
-      const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-      Headers: OleVariant; var Cancel: WordBool);
     procedure ApplicationEvents1Message(var Msg: tagMSG; var Handled: Boolean);
     procedure Help2Click(Sender: TObject);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
     procedure mnuViewFontHelperClick(Sender: TObject);
     procedure editorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
+    cefFonts: TframeCEFHost;
     wm_keyman_control, wm_keyman_refresh: UINT;
     FUpdating: Boolean;
     FCheckFontsThread: TCheckFontsThread;
@@ -161,7 +154,6 @@ type
 
     procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
-    procedure WMUserFireCommand(var Message: TMessage); message  WM_USER_FireCommand;
     procedure WMUserCheckFonts(var Message: TMessage); message WM_USER_CheckFonts;
     procedure PostKeymanControlMessage(msg, wParam: UINT; lParam: Cardinal);
     {function SendKeymanControlMessage(msg, wParam: UINT;
@@ -178,12 +170,14 @@ type
 
     procedure CheckKeyboardFonts(FSetFont: Boolean);
     procedure CheckFontsThreadComplete(Sender: TObject);
-    function LoadWebBox(web: TEmbeddedWB; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
+    function LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
 
     procedure HideFontsBox;
     procedure FireCommand(const command: WideString; params: TStringList);
     procedure ResetAutoKeyboard;
     procedure StartCheckFontsThread;
+    procedure cefCommand(Sender: TObject; const command: string;
+      params: TStringList);
   protected
     class function ShouldRegisterWindow: Boolean; override;  // I2720
   public
@@ -207,7 +201,6 @@ uses
   keymanapi_TLB,
   kmint,
   KMShellHints,
-  MSHTML_TLB,
   ErrorControlledRegistry,
   RegistryKeys,
   RichEdit,
@@ -265,6 +258,12 @@ begin
 
   StartCheckFontsThread;
   HideFontsBox;
+
+  cefFonts := TframeCEFHost.Create(Self);
+  cefFonts.Parent := Self;
+  cefFonts.Visible := True;
+  cefFonts.ShouldOpenRemoteUrlsInBrowser := True;
+  cefFonts.OnCommand := cefCommand;
 
   FormCreate_Editor;
 end;
@@ -364,11 +363,10 @@ begin
 end;}
 
 
-function TfrmTextEditor.LoadWebBox(web: TEmbeddedWB; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
+function TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
 var
   FXMLRenderers: TXMLRenderers;
   FXMLFileName: TTempFile;   // I4181
-  v: OleVariant;
 begin
   FXMLRenderers := TXMLRenderers.Create;
   try
@@ -379,8 +377,7 @@ begin
     FXMLRenderers.Free;
   end;
 
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  web.Navigate(FXMLFileName.Name, v);   // I4181
+  web.Navigate(FXMLFileName.Name);   // I4181
 
   Result := FXMLFileName;   // I4181
 end;
@@ -464,18 +461,6 @@ procedure TfrmTextEditor.WMUserCheckFonts(var Message: TMessage);
 begin
   if mnuViewFontHelper.Checked then
     CheckKeyboardFonts(True);
-end;
-
-procedure TfrmTextEditor.WMUserFireCommand(var Message: TMessage);
-var
-  command: WideString;
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  command := params[0];
-  params.Delete(0);
-  FireCommand(command, params);
-  params.Free;
 end;
 
 procedure TfrmTextEditor.WMUserFormShown(var Message: TMessage);
@@ -592,7 +577,7 @@ begin
   if (lang = nil) or (lang.KeymanKeyboardLanguage = nil) then
   begin
     FreeAndNil(FFontWebFileName);   // I4181
-    FFontWebFileName := LoadWebBox(webFonts, 'welcome_fonts', '<not_keyman />');   // I4181
+    FFontWebFileName := LoadWebBox(cefFonts, 'welcome_fonts', '<not_keyman />');   // I4181
     //HideFontsBox;
     Exit;
   end;
@@ -603,7 +588,7 @@ begin
     if not Assigned(FKeyboard) then
     begin
       FreeAndNil(FFontWebFileName);   // I4181
-      FFontWebFileName := LoadWebBox(webFonts, 'welcome_fonts', ''); // I1534 - show hint for non-Unicode keyboards   // I4181
+      FFontWebFileName := LoadWebBox(cefFonts, 'welcome_fonts', ''); // I1534 - show hint for non-Unicode keyboards   // I4181
       Exit;
     end;
 
@@ -626,7 +611,7 @@ begin
     FFontsData := FFontsData + '</Fonts>';
 
     FreeAndNil(FFontWebFileName);   // I4181
-    FFontWebFileName := LoadWebBox(webFonts, 'welcome_fonts', FFontsData);   // I4181
+    FFontWebFileName := LoadWebBox(cefFonts, 'welcome_fonts', FFontsData);   // I4181
 
     if (FKeyboard.Fonts.Count > 0) and FSetFont then
       CurrText.Name := FKeyboard.Fonts[0].FontName;
@@ -797,35 +782,9 @@ begin
   StatusBar.Panels[0].Text := Format(sColRowInfo, [CharPos.Y, CharPos.X]);
 end;
 
-procedure TfrmTextEditor.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-var
-  params: TStringList;
+procedure TfrmTextEditor.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
-  if GetParamsFromURL(URL, params) then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
-  end;
-end;
-
-procedure TfrmTextEditor.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-var
-  params: TStringList;
-begin
-  if GetParamsFromURL(bstrUrl, params) then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
-  end
-  else
-  begin
-    Cancel := True;
-    (ASender as TEmbeddedWB).Go(bstrUrl);
-  end;
+  FireCommand(command, params);
 end;
 
 procedure TfrmTextEditor.FormShow_Editor;
@@ -869,8 +828,7 @@ var
 begin
   if command = 'selectfont' then
   begin
-    webFonts.SetFocus;
-    webFonts.SetFocusToDoc;
+    cefFonts.SetFocus;
     if editor.CanFocus then // I1641
       editor.SetFocus;
     CurrText.Name := params.Values['font'];

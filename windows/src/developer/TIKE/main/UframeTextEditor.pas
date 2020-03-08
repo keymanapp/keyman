@@ -24,7 +24,7 @@ uses
   uCEFInterfaces,
   uCEFTypes,
 
-  Keyman.Developer.UI.UframeCEFHost,
+  Keyman.UI.UframeCEFHost,
   KMDActionInterfaces,
   MenuImgList,
   TextFileFormat,
@@ -75,7 +75,7 @@ type
     function GetCodeFont: TFont;
     procedure SetTextFileFormat(const Value: TTextFileFormat);
 
-    procedure cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+    procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
     procedure cefBeforeContextMenu(Sender: TObject;
       const browser: ICefBrowser; const frame: ICefFrame;
       const params: ICefContextMenuParams; const model: ICefMenuModel);
@@ -231,12 +231,11 @@ begin
   end;
 end;
 
-procedure TframeTextEditor.cefBeforeBrowse(Sender: TObject; const Url: string; params: TStringList; wasHandled: Boolean);
+procedure TframeTextEditor.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
   AssertVclThread;
-  if (params.Count > 0) and (params[0] = 'command') then
+  if command = 'command' then
   begin
-    params.Delete(0);
     FireCommand(params);
   end;
 end;
@@ -312,7 +311,7 @@ begin
   cef.ShouldShowContextMenu := True;
   cef.Parent := Self;
   cef.Visible := True;
-  cef.OnBeforeBrowse := cefBeforeBrowse;
+  cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
 
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;

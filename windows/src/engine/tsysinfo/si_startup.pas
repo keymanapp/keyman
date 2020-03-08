@@ -52,8 +52,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, si_base, StdCtrls, ErrorControlledRegistry, inifiles, msxml,
-  OleCtrls;
+  Dialogs, si_base, StdCtrls, ErrorControlledRegistry, inifiles, msxml;
 
 type
   TSI_Startup = class(TSI_Base)

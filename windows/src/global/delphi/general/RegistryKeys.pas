@@ -445,6 +445,7 @@ const
   SFolderKeymanRoot                 = 'Keyman';
   SFolderKeymanEngine               = SFolderKeymanRoot + '\Keyman Engine';
   SFolderKeymanKeyboard             = SFolderKeymanEngine + '\Keyboard';
+  SFolderCEFBrowserData             = SFolderKeymanEngine + '\CEF';
   SFolderShared                     = SFolderKeymanRoot + '\Shared Data';
   SFolderSharedDatabases            = SFolderShared + '\Databases';
   SFolderKeymanDeveloper            = SFolderKeymanRoot + '\Keyman Developer';

@@ -125,7 +125,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <Icon_MainIcon>tsysinfo_Icon1.ico</Icon_MainIcon>
-        <Debugger_RunParams>-c c:\temp\exception-10472-2017-03-20-19-47-10.log</Debugger_RunParams>
         <VerInfo_Keys>CompanyName=;FileVersion=5.0.0.26;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <BT_BuildType>Debug</BT_BuildType>
@@ -170,7 +169,6 @@
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\tlb\MSHTML_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
@@ -197,9 +195,16 @@
         <DCCReference Include="..\..\global\delphi\winapi\keyman_msctf.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Glossary.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
-        <DCCReference Include="..\..\global\delphi\vcl\SHDocVw.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\StockFileNames.pas"/>
         <DCCReference Include="..\..\global\delphi\general\kmxfileconsts.pas"/>
+        <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
+        <DCCReference Include="..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas">
+            <Form>frameCEFHost</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\ExternalExceptionHandler.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
