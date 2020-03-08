@@ -239,7 +239,8 @@
 # /test/wm_unichar/
 
 # VS Code
-.vscode
+.vscode/
+.vs/
 
 # IDE files
 **/.idea/**/*.xml

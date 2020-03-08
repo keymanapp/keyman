@@ -171,7 +171,7 @@ cd linux
 This creates a source package (`<packageName>_<version>-1.dsc`) and some `*.tar.?z` files in the
 `linux/<packageName>` subdirectory.
 
-**NOTE:** The subdirectory for `keyman-keyboardprocessor` is `common/engine/keyboardprocessor`, for
+**NOTE:** The subdirectory for `keyman-keyboardprocessor` is `common/core/desktop`, for
 all other packages `linux/<packageName>`.
 
 ci-builder-script's [`build-package`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package)
