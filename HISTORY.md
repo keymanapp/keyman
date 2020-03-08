@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.21 alpha 2020-03-08
+
+* fix(ci): builds were never triggered (#2790)
+
 ## 14.0.20 alpha 2020-03-08
 
 * feat(windows): Chromium replacement for embedded MSHTML in for Keyman Desktop (#1720)
