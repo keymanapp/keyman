@@ -1,6 +1,11 @@
 
 # Keyman for iPhone and iPad Version History
 
+## 2020-03-09 13.0.102 
+* Pre-emptively fixes issue with keyboard scaling for as-of-yet unreleased devices (#2704)
+* Fixes in-app Info help link (#2774)
+* Fixes issue with select keyboard rules causing loss of context when removing context up to a newline (#2776)
+
 ## 2020-02-19 13.0.100 stable
 * Release of Keyman 13 for iPhone and iPad
 * New Feature: QR Code support for sharing keyboards
