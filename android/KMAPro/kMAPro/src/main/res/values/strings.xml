@@ -3,20 +3,19 @@
 
   <string name="app_name" translatable="false">Keyman</string>
 
-  <string name="action_share" translatable="false">Share</string>
-  <string name="action_web" translatable="false">Web Browser</string>
-  <string name="action_file_browser" translatable="false">File Browser</string>
-  <string name="action_text_size" translatable="false">Text Size</string>
-  <string name="action_overflow" translatable="false">More</string>
-  <string name="action_clear_text" translatable="false">Clear Text</string>
-  <string name="action_info" translatable="false">Info</string>
-  <string name="action_settings" translatable="false">Settings</string>
-  <string name="action_install_updates" translatable="false">Install Updates</string>
+  <string name="action_share" comment="Send text content to another app">Share</string>
+  <string name="action_web" comment="Open Keyman browser">Web Browser</string>
+  <string name="action_text_size" comment="Adjust text size">Text Size</string>
+  <string name="action_overflow" comment="Additional menu items">More</string>
+  <string name="action_clear_text" comment="Erase text">Clear Text</string>
+  <string name="action_info" comment="Display Keyman help page">Info</string>
+  <string name="action_settings" comment="Open Settings menu">Settings</string>
+  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Install Updates</string>
 
   <string name="title_version">Version</string>
 
   <!-- &#8230; is the ellipsis character "..." -->
-  <string name="textview_hint" translatable="false">Start typing here&#8230;</string>
+  <string name="textview_hint">Start typing here&#8230;</string>
 
   <!-- Splash screen (version/copyright info currently disabled -->
   <string name="splash_blank" translatable="false"></string>
@@ -41,19 +40,19 @@
 
 
   <!-- Keyman Settings menu strings -->
-  <string name="keyman_settings" translatable="false">Settings</string>
+  <string name="keyman_settings"  comment="Settings menu title">Settings</string>
   <plurals name="installed_languages">
     <item quantity="zero">Installed languages</item>
     <item quantity="other">Installed languages (%1$d)</item>
   </plurals>
-  <string name="show_banner">Always show banner</string>
-  <string name="show_banner_on">To be implemented</string>
-  <string name="show_banner_off">When off, only shown when predictive text is enabled</string>
+  <string name="show_banner" comment="text suggestions banner">Always show banner</string>
+  <string name="show_banner_on" comment="Description when toggle is on">To be implemented</string>
+  <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
   <!-- reuse show_get_started -->
 
   <!-- Web Browser strings -->
   <string name="hint_text">Search or type URL</string>
-  <string name="title_bookmarks" translatable="false">Bookmarks</string>
+  <string name="title_bookmarks">Bookmarks</string>
   <string name="no_bookmarks">No Bookmarks</string>
   <string name="add_bookmark">Add Bookmark</string>
   <string name="hint_title">Title</string>
