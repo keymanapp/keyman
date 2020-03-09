@@ -206,7 +206,7 @@ class KeyboardScaleMap {
       return searchSet[0] // in case no matches can be found (like the screenSize == CGRect.zero case) - use smallest
     } else {
       // Use the largest potential device, which is the last one returned from the mapping (b/c we presorted the base array)
-      return searchSet.last!
+      return potentialMatches.last!
     }
   }
 
