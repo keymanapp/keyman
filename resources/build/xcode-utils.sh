@@ -54,7 +54,7 @@ function setSettingsBundleVersion() {
     # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    ."$KEYMAN_ROOT/resources/build/build-utils.sh"
+    . "$KEYMAN_ROOT/resources/build/build-utils.sh"
     echo "UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
