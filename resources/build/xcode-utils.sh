@@ -128,7 +128,7 @@ function phaseSentryDsymUpload() {
     export SENTRY_URL="https://sentry.keyman.com"
     export SENTRY_ORG=keyman
     export SENTRY_PROJECT="$SENTRY_PROJECT_TARGET"
-    export SENTRY_LOG_LEVEL=infoß
+    export SENTRY_LOG_LEVEL=info
     ERROR=$(sentry-cli upload-dif "$DWARF_DSYM_FOLDER_PATH" 2>&1 >/dev/null)
     if [ ! $? -eq 0 ]; then
       buildWarning "sentry-cli - $ERROR"
