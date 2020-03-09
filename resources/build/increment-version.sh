@@ -104,13 +104,13 @@ if [ "$action" == "commit" ]; then
   git push --tags origin "$branch"
   hub pull-request -f --no-edit -b $base -l auto
   git checkout $base
-  popd > /dev/null
 
   #
   # Tell Sentry about this (previous version)
   #
 
   makeSentryRelease
+  popd > /dev/null
 
   #
   # Trigger builds for the previous version on TeamCity and Jenkins
