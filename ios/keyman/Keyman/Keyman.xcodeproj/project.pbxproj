@@ -969,7 +969,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = ". $KEYMAN_ROOT/resources/build/xcode-utils.sh\n\n# Calls resource script to perform the dSYM upload\nphaseSentryDsymUpload \"keyman-ios\"\n";
+			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to perform the dSYM upload\nphaseSentryDsymUpload \"keyman-ios\"\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
