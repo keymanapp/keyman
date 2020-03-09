@@ -144,7 +144,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   
   // Might should add a "withNotification: Bool" option for clarity.
   public func canExecute(_ batch: DownloadBatch) -> Bool {
-    guard reachability?.connection != Reachability.Connection.unavailable else {
+    guard hasConnection() else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forBatch: batch, error: error)

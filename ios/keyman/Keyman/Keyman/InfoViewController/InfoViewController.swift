@@ -31,7 +31,7 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
         name: NSNotification.Name.reachabilityChanged, object: nil)
 
     do {
-      try networkReachable = Reachability(hostname: "www.keyman.com")
+      try networkReachable = Reachability(hostname: "keyman.com")
       try networkReachable?.startNotifier()
     } catch {
       log.error("error starting Reachability notifier: \(error)")
