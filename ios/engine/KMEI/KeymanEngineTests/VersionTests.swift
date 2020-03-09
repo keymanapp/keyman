@@ -11,14 +11,6 @@ import XCTest
 
 class VersionTests: XCTestCase {
 
-  override func setUp() {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
-  }
-
-  override func tearDown() {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-  }
-
   func testStringConstruction() {
     let simpleEarly = Version("11.0")
 
@@ -73,10 +65,15 @@ class VersionTests: XCTestCase {
   func testValidCurrentEngineVersion() {
     let version = Version.current
 
-    // Do not test on value; this may mismatch with the actual version, since the test host doesn't get
-    // version number updates from builds.
-    //
     // The key is that it always returns a version value; this is the most likely 'big break' we may see.
     XCTAssertNotNil(version, "Could not construct a valid version from value in bundle's plist file")
+
+    // Now that we update KeymanEngine's version too, we can rely on its versioning.
+    // This was implemented in very early 14.0 development.
+    //
+    // So long as we don't change the actual _project's_ version, this test proves that Versions
+    // are being updated correctly by the build process.
+    let minimumEngineVersion = Version("14.0")!
+    XCTAssertGreaterThan(version, minimumEngineVersion, "Build process did not properly update Engine version")
   }
 }

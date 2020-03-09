@@ -14,11 +14,7 @@ public struct Version: Comparable {
   public static let latestFeature = Version("13.0.65")!
 
   public static var current: Version {
-    // TODO:  actually update KMEI's version in the bundle during builds, not just the app's.
-    //let engineInfo = Bundle(for: Manager.self).infoDictionary
-
-    // For now, we just rely on the app's version instead.
-    let engineInfo = Bundle.main.infoDictionary
+    let engineInfo = Bundle(for: Manager.self).infoDictionary
     return Version(engineInfo!["CFBundleVersion"] as! String)!
   }
 
