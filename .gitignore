@@ -252,3 +252,6 @@
 
 # Atom/Nuclide
 compile_flags.txt
+
+# Auto-generated resource script
+resources/environment.sh

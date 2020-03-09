@@ -209,7 +209,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
     updateUserKeyboards(with: Defaults.keyboard)
 
-    reachability = Reachability(hostname: keymanHostName)
+    do {
+      try reachability = Reachability(hostname: keymanHostName)
+    } catch {
+      log.error("Could not start Reachability object: \(error)")
+    }
 
     if(!Util.isSystemKeyboard) {
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),

@@ -9,6 +9,7 @@
 import KeymanEngine
 import UIKit
 import WebKit
+import Sentry
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -47,6 +48,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+
+    // First things first:  enable Sentry for crash reporting.
+    do {
+      Sentry.Client.shared = try Sentry.Client(dsn: "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8")
+      try Sentry.Client.shared?.startCrashHandler()
+
+      #if NO_SENTRY
+        // If doing development debugging (and NOT for Sentry code), silence Sentry reporting.
+        Sentry.Client.shared?.enabled = false
+        log.debug("Sentry error logging disabled for development mode.")
+      #else
+        log.debug("Sentry error logging enabled.")
+      #endif
+    } catch let error {
+      // Does not throw error if 'net is unavailable.  It's for some sort of error within the Sentry system.
+      print("\(error)")
+    }
+
+    Sentry.Client.shared?.shouldSendEvent = { event in
+      #if NO_SENTRY
+        // Prevents Sentry from buffering the event.
+        return false
+      #else
+        return true
+      #endif
+    }
+
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       log.outputLevel = .debug
@@ -55,6 +83,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       KeymanEngine.log.outputLevel = .warning
       log.outputLevel = .warning
     #endif
+
     Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
 
