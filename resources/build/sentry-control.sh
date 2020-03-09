@@ -31,7 +31,7 @@ function isSentryCliAvailable() {
 function makeSentryRelease() {
   if isSentryConfigured; then
     if isSentryCliAvailable; then
-      local SENTRY_RELEASE_VERSION="keyman-$VERSION$VERSION_TAG"
+      local SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
       echo "Making a Sentry release for tag $SENTRY_RELEASE_VERSION"
       # sentry-cli releases new -p keyman-android -p keyman-developer -p keyman-ios -p keyman-linux -p keyman-mac -p keyman-web -p keyman-windows $SENTRY_RELEASE_VERSION
       sentry-cli releases new -p keyman-windows $SENTRY_RELEASE_VERSION
