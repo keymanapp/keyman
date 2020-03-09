@@ -21,6 +21,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
+. "$(dirname "$THIS_SCRIPT")/sentry-control.sh"
 
 gitbranch=`git branch --show-current`
 
@@ -104,6 +105,12 @@ if [ "$action" == "commit" ]; then
   hub pull-request -f --no-edit -b $base -l auto
   git checkout $base
   popd > /dev/null
+
+  #
+  # Tell Sentry about this (previous version)
+  #
+
+  makeSentryRelease
 
   #
   # Trigger builds for the previous version on TeamCity and Jenkins
