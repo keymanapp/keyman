@@ -147,7 +147,7 @@ if [ "$DEBUG_BUILD" = true ]; then
   TEST_FLAGS="testDebug"
   ARTIFACT="app-debug.aar"
 else
-  BUILD_FLAGS=aR lint
+  BUILD_FLAGS="aR lint"
   TEST_FLAGS="testRelease"
   ARTIFACT="app-release.aar"
 fi
