@@ -107,11 +107,6 @@ fi
 
 PLATFORM=`uname -s`
 
-if [ "$DO_TEST" = true ]; then
-    # Report JUnit test results to CI
-    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
-fi
-
 if [ "$DO_BUILD" = true ]; then
     echo "Building keyman web engine"
     cd $KMW_SOURCE
@@ -146,10 +141,18 @@ if [ "$DEBUG_BUILD" = true ]; then
   BUILD_FLAGS="assembleDebug lintDebug"
   TEST_FLAGS="testDebug"
   ARTIFACT="app-debug.aar"
+  if [ "$DO_TEST" = true ]; then
+    # Report JUnit test results to CI
+    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
+  fi
 else
   BUILD_FLAGS="aR lint"
   TEST_FLAGS="testRelease"
   ARTIFACT="app-release.aar"
+  if [ "$DO_TEST" = true ]; then
+    # Report JUnit test results to CI
+    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
+  fi
 fi
 
 echo "BUILD_FLAGS $BUILD_FLAGS"
