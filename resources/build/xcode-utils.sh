@@ -9,17 +9,17 @@
 # for its documentation in this matter.
 function phaseSetBundleVersions() {
   if [[ $# -gt 0 ]]; then
-    TAGGED=$1
+    TAGGED="$1" # Should be just `true`, unless someone gets 'creative' later.  But we compare against `true`.
   else
     TAGGED=false
   fi
 
   # For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.
-  if [ -z $VERSION ]; then
+  if [ -z "${VERSION:-}" ]; then
     # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    . $KEYMAN_ROOT/resources/build/build-utils.sh
+    . "$KEYMAN_ROOT/resources/build/build-utils.sh"
     echo "UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
@@ -50,11 +50,11 @@ function phaseSetBundleVersions() {
 # Used by Keyman for iOS to update the human-readable string for its Settings screen.
 function setSettingsBundleVersion() {
   # For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.
-  if [ -z $VERSION ]; then
+  if [ -z "${VERSION:-}" ]; then
     # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    . $KEYMAN_ROOT/resources/build/build-utils.sh
+    ."$KEYMAN_ROOT/resources/build/build-utils.sh"
     echo "UI build - fetching version from repository:"
     echo "  Plain:  $VERSION"
     echo "  Tagged: $VERSION_WITH_TAG"
@@ -62,7 +62,7 @@ function setSettingsBundleVersion() {
     echo "Command-line build - using provided version parameters"
   fi
 
-  SETTINGS_PLIST=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Settings.bundle/Root.plist
+  SETTINGS_PLIST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Settings.bundle/Root.plist"
   echo "Setting $VERSION_WITH_TAG for $SETTINGS_PLIST"
   # We assume that entry 0 = the version "preference" entry.
   /usr/libexec/PlistBuddy -c "Set :PreferenceSpecifiers:0:DefaultValue $VERSION_WITH_TAG" "$SETTINGS_PLIST"
