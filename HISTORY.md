@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.22 alpha 2020-03-09
+
+* fix(common): parameter order incorrect in git diff (#2787)
+* feat(ios): compilations within Xcode now properly set version (#2775)
+* fix(ios/engine): Fixes context bug for certain keyboard rules after newlines (#2770)
+* feat(android): Update additional main app strings for crowdin (#2793)
+* feat(ios): Start of Sentry-based crash reporting (#2771)
+* feat(ios): Improved Sentry integration (first pass) (#2782)
+
 ## 14.0.21 alpha 2020-03-08
 
 * fix(ci): builds were never triggered (#2790)
