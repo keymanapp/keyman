@@ -232,7 +232,7 @@ public extension UserDefaults {
     }
 
     set(version) {
-      set(version?.string, forKey: Key.engineVersion)
+      set(version?.plainString, forKey: Key.engineVersion)
     }
   }
   

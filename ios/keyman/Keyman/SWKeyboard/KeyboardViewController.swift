@@ -8,11 +8,20 @@
 
 import KeymanEngine
 import UIKit
+import Sentry
 
 class KeyboardViewController: InputViewController {
   var topBarImageSource: ImageBannerViewController!
 
+  // The entrypoint for the app-extension.
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    // Only true if it's the first init of the class under app-extension mode.
+    if !SentryManager.hasStarted {
+      // Sentry can send errors from app extensions when "Allow Full Access"
+      // is enabled.  They seem to get blocked otherwise, except in the Simulator.
+      SentryManager.start(sendingEnabled: true)
+    }
+
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       KeymanEngine.log.logAppDetails()

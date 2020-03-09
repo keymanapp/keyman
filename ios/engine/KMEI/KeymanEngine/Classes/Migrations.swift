@@ -383,7 +383,7 @@ public enum Migrations {
         continue
       }
       var urls = urlsForKeyboard[keyboard.id] ?? Set()
-      urls.insert(languageDir.appendingPathComponent("\(keyboard.id)-\(version.string).js"))
+      urls.insert(languageDir.appendingPathComponent("\(keyboard.id)-\(version.plainString).js"))
 
       let fontFiles = (keyboard.font?.source ?? []) + (keyboard.oskFont?.source ?? [])
       for file in fontFiles {
@@ -399,7 +399,7 @@ public enum Migrations {
         urls.insert(url)
       }
       urlsForKeyboard[keyboard.id] = urls
-      userKeyboards[i].version = version.string
+      userKeyboards[i].version = version.plainString
     }
 
     var successfulKeyboards: [String] = []
