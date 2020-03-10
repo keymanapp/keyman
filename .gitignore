@@ -255,3 +255,7 @@ compile_flags.txt
 
 # Auto-generated resource script
 resources/environment.sh
+
+# Keyman translations from https://crowdin.com/project/keyman
+Keyman.zip
+crowdin/
