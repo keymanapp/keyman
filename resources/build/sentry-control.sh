@@ -10,7 +10,7 @@
 
 
 function isSentryConfigured() {
-  if [ -z ${SENTRY_AUTH_TOKEN-} ] || [ -z ${SENTRY_ORG} ] || [ -z ${SENTRY_URL} ]; then
+  if [ -z "${SENTRY_AUTH_TOKEN-}" ] || [ -z "${SENTRY_ORG-}" ] || [ -z "${SENTRY_URL-}" ]; then
     echo "WARNING: Sentry environment variables SENTRY_AUTH_TOKEN, SENTRY_ORG and SENTRY_URL must be configured."
     return 1
   fi
