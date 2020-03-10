@@ -346,7 +346,7 @@ namespace com.keyman.osk {
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
         ks.left=this.objectGeometry(totalPercent+spec['padpc']);
-        if(false) {
+        if(!osk.isStatic) {
           ks.bottom=rowStyle.bottom;
         }
         ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
@@ -374,7 +374,7 @@ namespace com.keyman.osk {
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
-      if(!osk.device.touchable) {
+      if(!osk.isStatic && !osk.device.touchable) {
         // Highlight key while mouse down or if moving back over originally selected key
         btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
 
@@ -526,6 +526,7 @@ namespace com.keyman.osk {
     layerIndex: number;
 
     device: Device;
+    isStatic: boolean = false;
 
     // Stores the base element for this instance of the visual keyboard.
     // Formerly known as osk._DivVKbd
@@ -586,7 +587,7 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number, device?: Device) {
+    constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
       // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
       this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
       this.drawPreview = this.drawPreview || function(c,w,h,e) {};
@@ -599,6 +600,9 @@ namespace com.keyman.osk {
 
       let util = keyman.util;
       this.device = device = device || util.device;
+      if(isStatic) {
+        this.isStatic = isStatic;
+      }
 
       let layout=layout0;
       var Lkbd=util._CreateElement('div'), oskWidth;//s=Lkbd.style,
@@ -648,7 +652,12 @@ namespace com.keyman.osk {
       // Set base class - OS and keyboard added for Build 360
       this.kbdHelpDiv = this.kbdDiv = Lkbd;
 
-      Lkbd.className=device.formFactor+' kmw-osk-inner-frame';
+      if(this.isStatic) {
+        // The 'documentation' format uses the base element's child as the actual display base.
+        (Lkbd.childNodes[0] as HTMLDivElement).className = device.formFactor + '-static kmw-osk-inner-frame';
+      } else {
+        Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
+      }
     }
 
     /**
@@ -752,7 +761,7 @@ namespace com.keyman.osk {
         objectWidth = oskManager.getWidth();
       }
 
-      if(this.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
+      if(!this.isStatic && this.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
                                                                         // Not to mention, it's rather redundant.
         lDiv.addEventListener('touchstart', this.touch, true);
         // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
@@ -1917,7 +1926,7 @@ namespace com.keyman.osk {
         for(let nRow=0; nRow<nRows; nRow++) {
           let rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
           let bottom = (nRows-nRow-1)*rowHeight+1;
-          if(false) {
+          if(!this.isStatic) {
             rs.bottom=bottom+'px';
           }
           rs.maxHeight=rs.height=rowHeight+'px';
@@ -1953,14 +1962,14 @@ namespace com.keyman.osk {
 
         // Set the kmw-key-square position
         let ks=key.style;
-        if(false) {
+        if(!this.isStatic) {
           ks.bottom=(bottom-pad/2)+'px';
         }
         ks.height=ks.minHeight=(rowHeight)+'px';
 
         // Set the kmw-key position
         ks=(key.childNodes[j] as HTMLElement).style;
-        if(false) {
+        if(!this.isStatic) {
           ks.bottom=bottom+'px';
         }
         ks.height=ks.minHeight=(rowHeight-pad)+'px';
@@ -2165,9 +2174,8 @@ namespace com.keyman.osk {
         }        
       }
 
-      let kbdObj = new VisualKeyboard(PVK, null, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask(), device);
+      let kbdObj = new VisualKeyboard(PVK, null, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask(), device, true);
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
-      kbd.className=formFactor+'-static kmw-osk-inner-frame';
 
       // Select the layer to display, and adjust sizes
       if(layout != null) {
