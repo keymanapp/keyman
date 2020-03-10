@@ -76,7 +76,7 @@ android {
     }
 
     lintOptions {
-        disable 'MissingTranslation'
+        disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")
     }
 }
