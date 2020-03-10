@@ -12,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -50,6 +49,10 @@ import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.sentry.core.Breadcrumb;
+import io.sentry.core.Sentry;
+import io.sentry.core.SentryLevel;
+
 final class KMKeyboard extends WebView {
   private final Context context;
   private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
@@ -69,7 +72,6 @@ final class KMKeyboard extends WebView {
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
   private boolean ShouldShowHelpBubble = false;
   private boolean isChiral = false;
-  private static FirebaseAnalytics mFirebaseAnalytics;
 
   protected boolean keyboardSet = false;
   protected boolean keyboardPickerEnabled = true;
@@ -106,8 +108,6 @@ final class KMKeyboard extends WebView {
   @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   public void initKMKeyboard(final Context context) {
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-
     setFocusable(false);
     clearCache(true);
     getSettings().setJavaScriptEnabled(true);
@@ -139,7 +139,7 @@ final class KMKeyboard extends WebView {
           }
         }
 
-        // Send console errors to Firebase Analytics.
+        // Send console errors to Sentry.
         // (Ignoring spurious message "No keyboard stubs exist = ...")
         // TODO: Analyze if this error warrants reverting to default keyboard
         // TODO: Fix base error rather than trying to ignore it "No keyboard stubs exist"
@@ -634,27 +634,31 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
-    Bundle params = new Bundle();
-    // Error info
-    params.putInt("cm_lineNumber", lineNumber);
-    params.putString("cm_sourceID", sourceId);
-    params.putString("cm_message", message);
+    if (Sentry.isEnabled()) {
+      Breadcrumb breadcrumb = new Breadcrumb();
+      breadcrumb.setMessage("KMKeyboard.sendKMWError");
+      breadcrumb.setCategory("KMWError");
+      breadcrumb.setLevel(SentryLevel.ERROR);
+      // Error info
+      breadcrumb.setData("cm_lineNumber", lineNumber);
+      breadcrumb.setData("cm_sourceID", sourceId);
+      breadcrumb.setData("cm_message", message);
 
-    // Keyboard info
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      params.putString("keyboardType", "INAPP");
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      params.putString("keyboardType", "SYSTEM");
-    }  else {
-      params.putString("keyboardType", "UNDEFINED");
-    }
-    params.putString("packageID", this.packageID);
-    params.putString("keyboardID", this.keyboardID);
-    params.putString("keyboardName", this.keyboardName);
-    params.putString("keyboardVersion", this.keyboardVersion);
+      // Keyboard info
+      if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+        breadcrumb.setData("keyboardType", "INAPP");
+      } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+        breadcrumb.setData("keyboardType", "SYSTEM");
+      } else {
+        breadcrumb.setData("keyboardType", "UNDEFINED");
+      }
+      breadcrumb.setData("packageID", this.packageID);
+      breadcrumb.setData("keyboardID", this.keyboardID);
+      breadcrumb.setData("keyboardName", this.keyboardName);
+      breadcrumb.setData("keyboardVersion", this.keyboardVersion);
 
-    if(mFirebaseAnalytics != null) {
-      mFirebaseAnalytics.logEvent("kmw_console_error", params);
+      Sentry.addBreadcrumb(breadcrumb);
+      Sentry.captureMessage("sendKMWError", SentryLevel.ERROR);
     }
   }
 

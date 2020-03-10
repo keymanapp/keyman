@@ -18,6 +18,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.inputmethodservice.InputMethodService;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +30,16 @@ import android.view.inputmethod.InputConnection;
 
 import java.util.HashMap;
 
+import io.sentry.android.core.SentryAndroid;
+import io.sentry.core.Sentry;
+
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
   private static View inputView = null;
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
+
+  private static final String TAG = "SystemKeyboard";
 
   /**
    * Main initialization of the input method component. Be sure to call
@@ -42,6 +48,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onCreate() {
     super.onCreate();
+
+    if (!Sentry.isEnabled()) {
+      Log.d(TAG, "Initializing Sentry");
+      SentryAndroid.init(getApplicationContext());
+    }
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
     }

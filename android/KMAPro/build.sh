@@ -57,4 +57,3 @@ fi
 
 echo "BUILD_FLAGS $BUILD_FLAGS"
 ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
-

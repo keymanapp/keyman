@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'io.fabric'
+    id 'io.sentry.android.gradle'
     id 'com.github.triplet.play' version '2.5.0' apply false
 }
 
@@ -9,6 +9,11 @@ apply from: "$rootPath/version.gradle"
 
 android {
     compileSdkVersion 29
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
@@ -65,7 +70,17 @@ android {
 
     lintOptions {
         disable 'MissingTranslation'
+        lintConfig file("lint.xml")
     }
+}
+
+// how to configure the sentry android gradle plugin
+sentry {
+    // Disables or enables the automatic configuration of Native symbols
+    uploadNativeSymbols true
+
+    // Does or doesn't include the source code of native code for Sentry
+    includeNativeSources true
 }
 
 String env_keys_json_file = System.getenv("oem_firstvoices_keys_json_file")
@@ -98,9 +113,6 @@ repositories {
         dirs 'libs'
     }
     google()
-    maven {
-        url 'https://maven.fabric.io/public'
-    }
 }
 
 dependencies {
@@ -108,15 +120,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation "com.google.firebase:firebase-analytics:17.2.1"
-    implementation "com.google.firebase:firebase-messaging:20.0.1"
-    implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
+    implementation 'io.sentry:sentry-android:2.0.1'
     implementation 'androidx.preference:preference:1.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'

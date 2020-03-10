@@ -1,6 +1,6 @@
 plugins {
-    id 'name.remal.default-plugins'
     id 'com.android.library'
+    id 'name.remal.default-plugins'
 }
 
 ext.rootPath = '../../'
@@ -29,6 +29,7 @@ android {
     // TODO: Remove this when SDK > 17
     lintOptions {
         disable 'ResourceType'
+        lintConfig file("lint.xml")
     }
 
     testOptions {
@@ -63,18 +64,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'commons-io:commons-io:2.6'
+    implementation 'io.sentry:sentry-android:2.0.1'
 
     // Robolectric
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'androidx.test.ext:junit:1.1.1'
     testImplementation 'org.robolectric:robolectric:4.3.1'
-
-    /* We only want these Firebase Crashlytics dependencies for KMEA */
-    implementation 'com.google.firebase:firebase-analytics:17.2.1'
-    implementation 'com.google.firebase:firebase-crash:16.2.1'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
 
     // Generate QR Codes
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {

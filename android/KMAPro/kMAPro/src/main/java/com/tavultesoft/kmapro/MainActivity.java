@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
@@ -85,6 +84,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.sentry.android.core.SentryAndroid;
+import io.sentry.core.Sentry;
+
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   Uri data;
 
   private static final String TAG = "MainActivity";
-  private FirebaseAnalytics mFirebaseAnalytics;
 
   private KMTextView textView;
   private final int minTextSize = 16;
@@ -149,9 +150,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     context = this;
-    resultReceiver = new DownloadResultReceiver(new Handler());
 
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    SentryAndroid.init(context);
+
+    resultReceiver = new DownloadResultReceiver(new Handler());
 
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
@@ -477,6 +479,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         return true;
       case R.id.action_settings:
         showSettings();
+        return true;
+      case R.id.action_crash:
+        showCrash();
         return true;
       case R.id.action_update_keyboards:
         KMManager.getUpdateTool().executeOpenUpdates();
@@ -912,6 +917,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void showSettings() {
     Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
     startActivity(settingsIntent);
+  }
+
+  // Temporary menu item to intentionally generate crashes for Sentry
+  private void showCrash() {
+    throw new NullPointerException("MainActivity throwing null");
   }
 
   public static Drawable getActionBarDrawable(Context context) {
