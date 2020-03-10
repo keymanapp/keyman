@@ -182,6 +182,8 @@ XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 
 TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
+SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
+SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep
 
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 

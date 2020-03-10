@@ -6,8 +6,8 @@
 
 build: version.res dirs
     $(DCC32) insthelp.dpr
-    $(TDS2DBG) insthelp.exe 
-    $(MAKEJCLDBG) insthelp.map
+    $(TDS2DBG) insthelp.exe
+    $(SENTRYTOOL_DELPHIPREP) insthelp.exe
     $(COPY) insthelp.exe $(ROOT)\bin\desktop\insthelp.exe
 
 test-manifest:

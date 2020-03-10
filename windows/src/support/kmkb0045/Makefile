@@ -6,8 +6,8 @@
 
 build: version.res manifest.res
     $(DCC32) kmkb0045.dpr
-    $(TDS2DBG) kmkb0045.exe 
-    $(MAKEJCLDBG) kmkb0045.map
+    $(TDS2DBG) kmkb0045.exe
+    $(SENTRYTOOL_DELPHIPREP) kmkb0045.exe
     $(COPY) kmkb0045.exe $(PROGRAM)\support
 
 clean: def-clean

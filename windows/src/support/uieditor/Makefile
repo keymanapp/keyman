@@ -6,8 +6,8 @@
 
 build: version.res dirs
     $(DCC32) UIEditor.dpr
-    $(TDS2DBG) UIEditor.exe 
-    $(MAKEJCLDBG) UIEditor.map
+    $(TDS2DBG) UIEditor.exe
+    $(SENTRYTOOL_DELPHIPREP) UIEditor.exe
     $(COPY) UIEditor.exe $(PROGRAM)\support
 
 signcode:

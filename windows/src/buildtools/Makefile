@@ -21,8 +21,8 @@ build_standards_data:
     $(MAKE) $(TARGET)
 
 sentrytool:
-		cd $(ROOT)\src\buildtools\sentrytool
-		$(MAKE) $(TARGET)
+    cd $(ROOT)\src\buildtools\sentrytool
+    $(MAKE) $(TARGET)
 
 makejcldbg:
     cd $(ROOT)\src\ext\jedi

@@ -6,9 +6,9 @@
 
 build: version.res dirs
     $(DELPHI_MSBUILD) oskbulkrenderer.dproj /p:Platform=Win32
-    
+
     $(TDS2DBG) $(WIN32_TARGET_PATH)\oskbulkrenderer.exe
-    $(MAKEJCLDBG) $(WIN32_TARGET_PATH)\oskbulkrenderer.map
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\oskbulkrenderer.exe
     $(COPY) $(WIN32_TARGET_PATH)\oskbulkrenderer.exe $(PROGRAM)\support
     if exist $(WIN32_TARGET_PATH)\oskbulkrenderer.dbg $(COPY) $(WIN32_TARGET_PATH)\oskbulkrenderer.dbg $(DEBUGPATH)\support
 
