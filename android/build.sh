@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Build Keyman Engine Android and KMAPro
 
 ## START STANDARD BUILD SCRIPT INCLUDE

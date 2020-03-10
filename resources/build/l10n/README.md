@@ -7,6 +7,6 @@ In order to incorporate those files into the Keyman platforms:
 2. From git bash, run `./parse-crowdin.sh` with the specified platforms
 Platform options: `-all`, `-android`, `-common`, `-developer`, `-ios`, `-linux`, `-mac`, `-web`, `-windows`
 
-This will extract `Keyman.zip` into `/crowdin/` and copy files to the respective platforms.
+This will extract `/Keyman.zip` into `/crowdin/` and copy files to the respective platforms.
 
 TODO: Add parameter to select locales
