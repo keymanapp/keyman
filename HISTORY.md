@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.23 alpha 2020-03-10
+
+* fix(ios): fixes Carthage framework copy for Sentry (#2800)
+* feat(android): Start of Sentry-based crash reporting (#2778)
+
 ## 14.0.22 alpha 2020-03-09
 
 * fix(common): parameter order incorrect in git diff (#2787)
