@@ -46,27 +46,14 @@ function process_android() {
       echo "Found locale $locale"
       if [ -f "$CROWDIN_ROOT/$locale/android/KMEA/strings.xml" ]; then
         copy_file "$CROWDIN_ROOT/$locale/android/KMEA/strings.xml" "$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
-        #echo "Copying KMEA/strings.xml"
-        #LOCALE_DIR="$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
-        #if [ ! -d "$LOCALE_DIR" ]; then
-        #  echo "Creating $LOCALE_DIR"
-        #  mkdir "$LOCALE_DIR"
-        #fi  
-        #cp "$CROWDIN_ROOT/$locale/android/KMEA/strings.xml" "$LOCALE_DIR"
       fi
 
       if [ -f "$CROWDIN_ROOT/$locale/android/KMAPro/strings.xml" ]; then
         copy_file "$CROWDIN_ROOT/$locale/android/KMAPro/strings.xml" "$KMA_ROOT/KMAPro/kMAPro/src/main/res/values-$locale"
-        #echo "Copying KMAPro/strings.xml"
-        #LOCALE_DIR="$KMA_ROOT/KMAPro/kMAPro/src/main/res/values-$locale"
-        #if [ ! -d "$LOCALE_DIR" ]; then
-        #  echo "Creating $LOCALE_DIR"
-        #  mkdir "$LOCALE_DIR"
-        #fi  
-        #cp "$CROWDIN_ROOT/$locale/android/KMAPro/strings.xml" "$LOCALE_DIR"
       fi
     fi
 
+    # For now, only handle the first locale. Remove this when we're ready for everything
     exit
   done
 }
