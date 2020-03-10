@@ -334,11 +334,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   }
 
   private static void setSelection(int position) {
-    // Poison pill for Sentry integration. Do not leave for production
-    if (position == 2) {
-      throw new NullPointerException("null in keyboard picker");
-    }
-
     listView.setItemChecked(position, true);
     listView.setSelection(position);
     selectedIndex = position;

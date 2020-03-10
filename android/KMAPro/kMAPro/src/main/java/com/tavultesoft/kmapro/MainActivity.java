@@ -480,6 +480,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       case R.id.action_settings:
         showSettings();
         return true;
+      case R.id.action_crash:
+        showCrash();
+        return true;
       case R.id.action_update_keyboards:
         KMManager.getUpdateTool().executeOpenUpdates();
         return true;
@@ -914,6 +917,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void showSettings() {
     Intent settingsIntent = new Intent(this, KeymanSettingsActivity.class);
     startActivity(settingsIntent);
+  }
+
+  // Temporary menu item to intentionally generate crashes for Sentry
+  private void showCrash() {
+    throw new NullPointerException("MainActivity throwing null");
   }
 
   public static Drawable getActionBarDrawable(Context context) {
