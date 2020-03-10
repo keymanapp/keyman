@@ -1723,7 +1723,12 @@ namespace com.keyman.osk {
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = util.getFontSizeStyle(emSizeStr).val;
-        let emScale = util.getFontSizeStyle(keyman.osk._Box).val;
+        var emScale = 1;
+        if(!this.isStatic) {
+          // Reading this requires the OSK to be active, so we filter out
+          // BuildVisualKeyboard calls here.
+          emScale = util.getFontSizeStyle(keyman.osk._Box).val;
+        }
         return emSize * emScale;
       }
     }
