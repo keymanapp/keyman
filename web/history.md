@@ -1,6 +1,10 @@
 # KeymanWeb Version History
 
-## 2020-03-06 13.0.101
+## 2020-03-11 13.0.103 stable
+* Bug fix: updates BuildVisualKeyboard for generating help documentation (#2807)
+* Bug fix: fixes issue with addKeyboards Cloud API call (#2797)
+
+## 2020-03-06 13.0.101 stable
 * Bug fix: support .otf extension for web fonts (#2781)
 
 ## 2020-02-14 13.0.39 beta

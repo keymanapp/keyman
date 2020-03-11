@@ -596,11 +596,7 @@ namespace com.keyman {
      *  @return {Object}                          DIV object with filled keyboard layer content
      */
     ['BuildVisualKeyboard'](PInternalName, Pstatic, argFormFactor, argLayerId): HTMLElement {
-      if(this.osk.vkbd) {
-        return this.osk.vkbd.buildDocumentationKeyboard(PInternalName, Pstatic, argFormFactor, argLayerId);
-      } else {
-        return null;
-      }
+      return com.keyman.osk.VisualKeyboard.buildDocumentationKeyboard(PInternalName, Pstatic, argFormFactor, argLayerId);
     }
   }
 }
