@@ -634,6 +634,10 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
+    if (this.packageID == null || this.keyboardID == null || this.keyboardName == null || this.keyboardVersion == null) {
+      return;
+    }
+
     if (Sentry.isEnabled()) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMKeyboard.sendKMWError");
