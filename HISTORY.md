@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.24 alpha 2020-03-11
+
+* fix(linux): Fix CI dist path to common/core/desktop (#2795)
+* fix(web): fixes build number reference of API call (#2796)
+* fix(web): updating BuildVisualKeyboard (#2802)
+
 ## 14.0.23 alpha 2020-03-10
 
 * fix(ios): fixes Carthage framework copy for Sentry (#2800)
