@@ -1,5 +1,6 @@
 #!/bin/bash
-# Extract Keyman translations from https://crowdin.com/project/keyman
+# With the Keyman translations from https://crowdin.com/project/keyman
+# saved locally in /.crowdin-tmp/Keyman.zip, extract
 # into /crowdin/ and move files to corresponding projects.
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -7,6 +8,11 @@
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+#
+# Prevents 'clear' on exit of mingw64 bash shell
+#
+SHLVL=0
 
 display_usage() {
   echo "parse-crowdin [-all] [-android] [-common] [-developer] [-ios]"
@@ -26,49 +32,25 @@ display_usage() {
   exit 1
 }
 
+# Include scripts to process platforms
+. ./parse-crowdin-android.sh
+
+
 # Copy a file to a destination directory. If destination doesn't exist, create it
-# $1 is the file to copy
-# $2 is the destination directory
+# copy_file [source file] [destination directory]
 function copy_file() {
   if [ ! -d "$2" ]; then
-    echo "Creating $2"
-    mkdir "$2"
+    echo "Creating $2 directory"
+    mkdir -p "$2"
   fi
   echo "Copying $1"
-  cp "$1" "$2"  
+  cp "$1" "$2"
 }
 
-function process_android() {
-  cd "$CROWDIN_ROOT"
-  echo "Processing Android"
-  for crowd_locale in *; do
-    if [ -d ${crowd_locale} ]; then
-      echo "Found locale $crowd_locale"
 
-      # If crowdin locale contains region, we need to prefix with "r"
-      # See: https://developer.android.com/guide/topics/resources/providing-resources#AlternativeResources
-      locale=${crowd_locale/-/-r}
-
-      if [ -f "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" ]; then
-        copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" "$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
-      fi
-
-      if [ -f "$CROWDIN_ROOT/$crowd_locale/android/KMAPro/strings.xml" ]; then
-        copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMAPro/strings.xml" "$KMA_ROOT/KMAPro/kMAPro/src/main/res/values-$locale"
-      fi
-    fi
-
-    # For now, only handle the first locale. Remove this when we're ready for everything
-    #exit
-  done
-}
-
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
 
 # Path definitions
+KEYMAN_ZIP="$KEYMAN_ROOT/.crowdin-tmp/Keyman.zip"
 KMA_ROOT="$KEYMAN_ROOT/android"
 CROWDIN_ROOT="$KEYMAN_ROOT/crowdin"
 
@@ -142,22 +124,22 @@ echo "DO_WEB:       $DO_WEB"
 echo "DO_WINDOWS:   $DO_WINDOWS"
 echo
 
-# Clean /crowdin/ 
+# Clean /crowdin/
 if [ -d "$CROWDIN_ROOT" ]; then
   echo "Cleaning $CROWDIN_ROOT"
   rm -rf "$CROWDIN_ROOT"
 fi
 
-# Extract /Keyman.zip. This is the entire translation file from crowdin
-echo "Unzipping /Keyman.zip to $CROWDIN_ROOT"
-unzip "$KEYMAN_ROOT/Keyman.zip" -d "$CROWDIN_ROOT"
+# Extract Keyman.zip. This is the entire translation file from crowdin
+echo "Unzipping Keyman.zip to $CROWDIN_ROOT"
+unzip "$KEYMAN_ZIP" -d "$CROWDIN_ROOT"
 
 if [ $? -ne 0 ]; then
     die "ERROR: Unzip Keyman.zip failed"
 fi
 
 if [ "$DO_ANDROID" = true ]; then
-  process_android
+  processAndroid
 fi
 
 
