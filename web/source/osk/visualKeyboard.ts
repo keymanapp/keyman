@@ -69,15 +69,17 @@ namespace com.keyman.osk {
 
   export abstract class OSKKey {
     spec: OSKKeySpec;
+    formFactor: string;
 
     /**
      * The layer of the OSK on which the key is displayed.
      */
     readonly layer: string;
 
-    constructor(spec: OSKKeySpec, layer: string) {
+    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
       this.spec = spec;
       this.layer = layer;
+      this.formFactor = formFactor;
     }
 
     abstract getId(osk: VisualKeyboard): string;
@@ -144,7 +146,7 @@ namespace com.keyman.osk {
 
     objectUnits(): string {
       // Returns a unit string corresponding to how the width for each key is specified.
-      if((<KeymanBase>window['keyman']).util.device.formFactor == 'desktop') {
+      if(this.formFactor == 'desktop') {
         return '%';
       } else {
         return 'px';
@@ -257,8 +259,8 @@ namespace com.keyman.osk {
   }
 
   export class OSKBaseKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string) {
-      super(spec, layer);
+    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
+      super(spec, layer, formFactor);
     }
 
     getId(osk: VisualKeyboard): string {
@@ -322,9 +324,9 @@ namespace com.keyman.osk {
     }
 
     construct(osk: VisualKeyboard, layout: LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
-      let util = (<KeymanBase>window['keyman']).util;
+      let util = com.keyman.singleton.util;
       let spec = this.spec;
-      let isDesktop = util.device.formFactor == 'desktop'
+      let isDesktop = this.formFactor == "desktop"
 
       let kDiv=util._CreateElement('div');
       kDiv.className='kmw-key-square';
@@ -344,7 +346,9 @@ namespace com.keyman.osk {
       if(!isDesktop) {
         // Regularize interkey spacing by rounding key width and padding (Build 390)
         ks.left=this.objectGeometry(totalPercent+spec['padpc']);
-        ks.bottom=rowStyle.bottom;
+        if(!osk.isStatic) {
+          ks.bottom=rowStyle.bottom;
+        }
         ks.height=rowStyle.height;  //must be specified in px for rest of layout to work correctly
 
         // Set distinct phone and tablet button position properties
@@ -370,7 +374,7 @@ namespace com.keyman.osk {
 
       // Define callbacks to handle key touches: iOS and Android tablets and phones
       // TODO: replace inline function calls??
-      if(!util.device.touchable) {
+      if(!osk.isStatic && !osk.device.touchable) {
         // Highlight key while mouse down or if moving back over originally selected key
         btn.onmouseover=btn.onmousedown=osk.mouseOverMouseDownHandler; // Build 360
 
@@ -411,8 +415,8 @@ namespace com.keyman.osk {
   }
 
   export class OSKSubKey extends OSKKey {
-    constructor(spec: OSKKeySpec, layer: string) {
-      super(spec, layer);
+    constructor(spec: OSKKeySpec, layer: string, formFactor: string) {
+      super(spec, layer, formFactor);
     }
 
     getId(osk: VisualKeyboard): string {
@@ -521,6 +525,9 @@ namespace com.keyman.osk {
     layerId: string = "default";
     layerIndex: number;
 
+    device: Device;
+    isStatic: boolean = false;
+
     // Stores the base element for this instance of the visual keyboard.
     // Formerly known as osk._DivVKbd
     kbdDiv: HTMLDivElement;
@@ -580,7 +587,7 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number) {
+    constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
       // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
       this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
       this.drawPreview = this.drawPreview || function(c,w,h,e) {};
@@ -592,7 +599,10 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       let util = keyman.util;
-      let formFactor = util.device.formFactor;
+      this.device = device = device || util.device;
+      if(isStatic) {
+        this.isStatic = isStatic;
+      }
 
       let layout=layout0;
       var Lkbd=util._CreateElement('div'), oskWidth;//s=Lkbd.style,
@@ -610,11 +620,11 @@ namespace com.keyman.osk {
         } else {
           kbdDevVersion = new utils.Version(keyman['version']);
         }
-        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, formFactor);
+        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor);
       }
 
       // Create the collection of HTML elements from the device-dependent layout object
-      this.layout = ActiveLayout.polyfill(layout, formFactor);
+      this.layout = ActiveLayout.polyfill(layout, device.formFactor);
       this.layers=layout['layer'];
 
       // Override font if specified by keyboard
@@ -631,7 +641,7 @@ namespace com.keyman.osk {
         layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
       }
 
-      let divLayerContainer = this.deviceDependentLayout(layout, util.device.formFactor);
+      let divLayerContainer = this.deviceDependentLayout(layout, device.formFactor);
 
       this.ddOSK = true;
 
@@ -642,7 +652,12 @@ namespace com.keyman.osk {
       // Set base class - OS and keyboard added for Build 360
       this.kbdHelpDiv = this.kbdDiv = Lkbd;
 
-      Lkbd.className=util.device.formFactor+' kmw-osk-inner-frame';
+      if(this.isStatic) {
+        // The 'documentation' format uses the base element's child as the actual display base.
+        (Lkbd.childNodes[0] as HTMLDivElement).className = device.formFactor + '-static kmw-osk-inner-frame';
+      } else {
+        Lkbd.className = device.formFactor + ' kmw-osk-inner-frame';
+      }
     }
 
     /**
@@ -746,7 +761,7 @@ namespace com.keyman.osk {
         objectWidth = oskManager.getWidth();
       }
 
-      if(util.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
+      if(!this.isStatic && this.device.touchable) { //  /*&& ('ontouchstart' in window)*/ // Except Chrome emulation doesn't set this.
                                                                         // Not to mention, it's rather redundant.
         lDiv.addEventListener('touchstart', this.touch, true);
         // The listener below fails to capture when performing automated testing checks in Chrome emulation unless 'true'.
@@ -842,7 +857,7 @@ namespace com.keyman.osk {
           for(j=0; j<keys.length; j++) {
             key=keys[j];
 
-            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id']);
+            var keyGenerator = new OSKBaseKey(key as OSKKeySpec, layer['id'], formFactor);
             var keyTuple = keyGenerator.construct(this, layout, rs, totalPercent);
 
             rDiv.appendChild(keyTuple.element);
@@ -1115,7 +1130,7 @@ namespace com.keyman.osk {
       var sk=document.getElementById('kmw-popup-keys');
 
       // Use the popup duplicate of the base key if a phone with a visible popup array
-      if(sk && sk.style.visibility == 'visible' && util.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
+      if(sk && sk.style.visibility == 'visible' && this.device.formFactor == 'phone' && key1 == this.popupBaseKey) {
         key1 = <KeyElement> sk.childNodes[0].firstChild;
       }
 
@@ -1383,7 +1398,7 @@ namespace com.keyman.osk {
 
       // Apply an overriding class for 5-row layouts
       var nRows=layout['layer'][0]['row'].length;
-      if(nRows > 4 && keyman.util.device.formFactor == 'phone') {
+      if(nRows > 4 && this.device.formFactor == 'phone') {
         btn.className='kmw-key kmw-5rows kmw-key-'+keyTypes[n];
       } else {
         btn.className='kmw-key kmw-key-'+keyTypes[n];
@@ -1426,7 +1441,7 @@ namespace com.keyman.osk {
 
       let keyman = com.keyman.singleton;
       let util = keyman.util;
-      let device = util.device;
+      let device = this.device;
 
       // A tag we directly set on a key element during its construction.
       let subKeySpec: OSKKeySpec[] = e['subKeys'];
@@ -1476,7 +1491,7 @@ namespace com.keyman.osk {
           needsTopMargin = true;
         }
 
-        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer);
+        let keyGenerator = new com.keyman.osk.OSKSubKey(subKeySpec[i], e['key'].layer, device.formFactor);
         let kDiv = keyGenerator.construct(this, <HTMLDivElement> e, needsTopMargin);
 
         subKeys.appendChild(kDiv);
@@ -1647,7 +1662,7 @@ namespace com.keyman.osk {
       let util = keyman.util;
 
       var t = <HTMLElement> util.eventTarget(e);
-      if(t === null || util.device.formFactor != 'desktop') {
+      if(t === null || this.device.formFactor != 'desktop') {
         return;
       }
 
@@ -1676,7 +1691,7 @@ namespace com.keyman.osk {
       let util = keyman.util;
 
       var t=<HTMLElement> util.eventTarget(e);
-      if(t === null || util.device.formFactor != 'desktop') {
+      if(t === null || this.device.formFactor != 'desktop') {
         return;
       }
 
@@ -1701,14 +1716,19 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
-      if(util.device.formFactor == 'desktop') {
+      if(this.device.formFactor == 'desktop') {
         let kbdFontSize = this.getFontSizeFromCookie();
         let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
         return kbdFontSize * keySquareScale;
       } else {
         let emSizeStr = getComputedStyle(document.body).fontSize;
         let emSize = util.getFontSizeStyle(emSizeStr).val;
-        let emScale = util.getFontSizeStyle(keyman.osk._Box).val;
+        var emScale = 1;
+        if(!this.isStatic) {
+          // Reading this requires the OSK to be active, so we filter out
+          // BuildVisualKeyboard calls here.
+          emScale = util.getFontSizeStyle(keyman.osk._Box).val;
+        }
         return emSize * emScale;
       }
     }
@@ -1756,7 +1776,7 @@ namespace com.keyman.osk {
     }
 
     show() {
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
       var n,nLayer=-1, b = this.kbdDiv.childNodes[0].childNodes;
 
       for(n=0; n < b.length; n++) {
@@ -1804,7 +1824,7 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
 
       // Do not change layer unless needed (27/08/2015)
-      if(id == this.layerId && keyman.util.device.formFactor != 'desktop') {
+      if(id == this.layerId && this.device.formFactor != 'desktop') {
         // The layer's already shown, so report success.
         return true;
       }
@@ -1829,7 +1849,7 @@ namespace com.keyman.osk {
     adjustHeights() {
       let keyman = com.keyman.singleton;
       let _Box = keyman.osk._Box;
-      let device = keyman.util.device;
+      let device = this.device;
 
       if(!_Box || !this.kbdDiv || !this.kbdDiv.firstChild || !this.kbdDiv.firstChild.firstChild.childNodes) {
         return false;
@@ -1859,7 +1879,7 @@ namespace com.keyman.osk {
 
     private computedAdjustedOskHeight(): number {
       let oskManager = com.keyman.singleton.osk;
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
 
       var layers=this.kbdDiv.firstChild.childNodes;
       let kbdHeight = oskManager.getKeyboardHeight();
@@ -1889,7 +1909,7 @@ namespace com.keyman.osk {
 
     private adjustLayerHeights(oskHeight: number) {
       let oskManager = com.keyman.singleton.osk;
-      let device = com.keyman.singleton.util.device;
+      let device = this.device;
       let layers = this.kbdDiv.firstChild.childNodes;
 
       for(let nLayer=0;nLayer<layers.length; nLayer++) {
@@ -1911,7 +1931,9 @@ namespace com.keyman.osk {
         for(let nRow=0; nRow<nRows; nRow++) {
           let rs=(<HTMLElement> layers[nLayer].childNodes[nRow]).style;
           let bottom = (nRows-nRow-1)*rowHeight+1;
-          rs.bottom=bottom+'px';
+          if(!this.isStatic) {
+            rs.bottom=bottom+'px';
+          }
           rs.maxHeight=rs.height=rowHeight+'px';
 
           // Calculate the exact vertical coordinate of the row's center.
@@ -1925,7 +1947,7 @@ namespace com.keyman.osk {
 
     private adjustRowHeights(keys: NodeListOf<HTMLElement>, rowHeight: number, bottom: number, pad: number) {
       let util = com.keyman.singleton.util;
-      let device = util.device;
+      let device = this.device;
 
       let resizeLabels = (device.OS == 'iOS' && device.formFactor == 'phone' && util.landscapeView());
 
@@ -1945,12 +1967,16 @@ namespace com.keyman.osk {
 
         // Set the kmw-key-square position
         let ks=key.style;
-        ks.bottom=(bottom-pad/2)+'px';
+        if(!this.isStatic) {
+          ks.bottom=(bottom-pad/2)+'px';
+        }
         ks.height=ks.minHeight=(rowHeight)+'px';
 
         // Set the kmw-key position
         ks=(key.childNodes[j] as HTMLElement).style;
-        ks.bottom=bottom+'px';
+        if(!this.isStatic) {
+          ks.bottom=bottom+'px';
+        }
         ks.height=ks.minHeight=(rowHeight-pad)+'px';
 
         // Rescale keycap labels on iPhone (iOS 7)
@@ -2094,11 +2120,18 @@ namespace com.keyman.osk {
      *  @param  {(string|number)=}  argLayerId    name or index of layer to show, defaulting to 'default'
      *  @return {Object}                          DIV object with filled keyboard layer content
      */
-    buildDocumentationKeyboard(PInternalName,Pstatic,argFormFactor,argLayerId): HTMLElement { // I777
+    static buildDocumentationKeyboard(PInternalName,Pstatic,argFormFactor,argLayerId): HTMLElement { // I777
       let keymanweb = com.keyman.singleton;
       var PKbd=keymanweb.keyboardManager.activeKeyboard,Ln,
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
-          layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId);
+          layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId),
+          device = new Device();
+
+      // Device emulation for target documentation.
+      device.formFactor = formFactor;
+      if(formFactor != 'desktop') {
+        device.OS = 'iOS';
+      }
 
       var keyboardsList = keymanweb.keyboardManager.keyboards;
 
@@ -2146,30 +2179,14 @@ namespace com.keyman.osk {
         }        
       }
 
-      // TODO:  Fix this method's link!
-      let kbd=this.deviceDependentLayout(layout,formFactor);
-      kbd.className=formFactor+'-static kmw-osk-inner-frame';
+      let kbdObj = new VisualKeyboard(PVK, null, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask(), device, true);
+      let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes
       if(layout != null) {
-        var layer,row,key,Lr,Lk;
-        for(Ln=0; Ln<layout.layer.length; Ln++) {
-          layer=kbd.childNodes[Ln];
-          for(Lr=0; Lr<layer.childNodes.length; Lr++) {
-            row=layer.childNodes[Lr];
-            for(Lk=0; Lk<row.childNodes.length; Lk++) {
-              key=row.childNodes[Lk];
-              key.style.height='100%';
-            }
-          }
-          if(typeof(layerId) == 'number') {
-            layer.style.display=(Ln == layerId && layerId >= 0 ? 'block' : 'none');
-          } else if(typeof(layerId) == 'string') {
-            layer.style.display=(layout.layer[Ln].id == layerId ? 'block' : 'none');
-          } else {
-            layer.style.display=(Ln == 0 ? 'block' : 'none');
-          }
-        }
+        kbdObj.layerId = layerId;
+        kbdObj.show();
+        kbdObj.adjustHeights(); // Necessary for the row heights to be properly set!
       } else {
         kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd['KN']+".</p>";
       }
