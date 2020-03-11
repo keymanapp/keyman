@@ -103,8 +103,12 @@ minify ( ) {
         wrapper="%output%"
     fi
 
+    # --source_map_location_mapping - maps paths on INPUT source maps for consumption by Closure.
+    # ../../.. => keymanapp, ../.. => keymanapp/keyman.  We have TS root sources on 'keyman'.
     $minifycmd $defines --source_map_input "$INTERMEDIATE/$1|$INTERMEDIATE/$1.map" \
-        --create_source_map $2/$1.map --js $INTERMEDIATE/$1 --compilation_level $3 \
+        --create_source_map $2/$1.map --source_map_include_content \
+        --source_map_location_mapping "$INTERMEDIATE|../../.." \
+        --js $INTERMEDIATE/$1 --compilation_level $3 \
         --js_output_file $2/$1 --warning_level VERBOSE --output_wrapper "$wrapper
 //# sourceMappingURL=$1.map"
 }
