@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Copy extracted crowdin files to KMEA and KMAPro projects
 function processAndroid() {
   cd "$CROWDIN_ROOT"
@@ -8,7 +10,7 @@ function processAndroid() {
 
       # If crowdin locale contains region, we need to prefix with "r"
       # See: https://developer.android.com/guide/topics/resources/providing-resources#AlternativeResources
-      locale=${crowd_locale/-/-r}
+      local locale=${crowd_locale/-/-r}
 
       if [ -f "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" ]; then
         copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" "$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
