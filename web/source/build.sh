@@ -56,7 +56,7 @@ EMBED_TARGET=( "keyman.js" )
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
 
-: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
+: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler-java}
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
@@ -103,14 +103,35 @@ minify ( ) {
         wrapper="%output%"
     fi
 
+    OUTPUT="$2/$1"
+
     # --source_map_location_mapping - maps paths on INPUT source maps for consumption by Closure.
     # ../../.. => keymanapp, ../.. => keymanapp/keyman.  We have TS root sources on 'keyman'.
     $minifycmd $defines --source_map_input "$INTERMEDIATE/$1|$INTERMEDIATE/$1.map" \
-        --create_source_map $2/$1.map --source_map_include_content \
+        --create_source_map "$2/$1.map" --source_map_include_content \
         --source_map_location_mapping "$INTERMEDIATE|../../.." \
-        --js $INTERMEDIATE/$1 --compilation_level $3 \
-        --js_output_file $2/$1 --warning_level VERBOSE --output_wrapper "$wrapper
+        --js "$INTERMEDIATE/$1" --compilation_level $3 \
+        --js_output_file "$OUTPUT" --warning_level VERBOSE --output_wrapper "$wrapper
 //# sourceMappingURL=$1.map"
+
+    # Now to clean the source map.
+    OUTPUT_SOURCEMAP="$OUTPUT.map"
+    assert "$OUTPUT"
+    assert "$SOURCEMAP"
+
+    RELATIVE_ESCAPES="\.\.\/\.\.\/\.\.\/" #../../..
+    sed -i '' "s/$RELATIVE_ESCAPES//g" "$OUTPUT_SOURCEMAP"
+
+    PATH_PREFIX="\.\.\/release\/web\/"
+    sed -i '' "s/$PATH_PREFIX//g" "$OUTPUT_SOURCEMAP"
+
+    # Force our preferred source-map rooting scheme.  Does so kind of hackily, but it
+    # gets the job done.  The next best alternatives (npm install node-jq or jq.node)
+    # have age or auditing issues.
+    INSERTION_MATCH="^\"file\""
+    INSERTION_REPLACEMENT="\"sourceRoot\": \"\/keyman\/\",\"file\""
+    # Kinda hacky, but it gets the job done.
+    sed -i '' "s/$INSERTION_MATCH/$INSERTION_REPLACEMENT/g" "$OUTPUT_SOURCEMAP"
 }
 
 # $1 - target (WEB, EMBEDDED)

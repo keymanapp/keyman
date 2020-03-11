@@ -19,7 +19,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "google-closure-compiler": "^20171203.0.0",
+    "google-closure-compiler-java": "^20200224.0.0",
     "html2canvas": "^1.0.0-alpha.12",
     "karma": "^4.2.0",
     "karma-browserstack-launcher": "^1.5.1",
