@@ -634,10 +634,6 @@ final class KMKeyboard extends WebView {
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
-    if (this.packageID == null || this.keyboardID == null || this.keyboardName == null || this.keyboardVersion == null) {
-      return;
-    }
-
     if (Sentry.isEnabled()) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMKeyboard.sendKMWError");
@@ -656,11 +652,19 @@ final class KMKeyboard extends WebView {
       } else {
         breadcrumb.setData("keyboardType", "UNDEFINED");
       }
-      breadcrumb.setData("packageID", this.packageID);
-      breadcrumb.setData("keyboardID", this.keyboardID);
-      breadcrumb.setData("keyboardName", this.keyboardName);
-      breadcrumb.setData("keyboardVersion", this.keyboardVersion);
 
+      if (this.packageID != null) {
+        breadcrumb.setData("packageID", this.packageID);
+      }
+      if (this.keyboardID != null) {
+        breadcrumb.setData("keyboardID", this.keyboardID);
+      }
+      if (this.keyboardName != null) {
+        breadcrumb.setData("keyboardName", this.keyboardName);
+      }
+      if (this.keyboardVersion != null) {
+        breadcrumb.setData("keyboardVersion", this.keyboardVersion);
+      }
       Sentry.addBreadcrumb(breadcrumb);
       Sentry.captureMessage("sendKMWError", SentryLevel.ERROR);
     }
