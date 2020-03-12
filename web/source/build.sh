@@ -125,20 +125,6 @@ minify ( ) {
 
     # "Clean" the minified output sourcemaps.
     node $minified_sourcemap_cleaner "$INPUT_SOURCEMAP" "$OUTPUT_SOURCEMAP" $cleanerOptions
-
-    # RELATIVE_ESCAPES="\.\.\/\.\.\/\.\.\/" #../../..
-    # sed -i '' "s/$RELATIVE_ESCAPES//g" "$OUTPUT_SOURCEMAP"
-
-    # PATH_PREFIX="\.\.\/release\/web\/"
-    # sed -i '' "s/$PATH_PREFIX//g" "$OUTPUT_SOURCEMAP"
-
-    # # Force our preferred source-map rooting scheme.  Does so kind of hackily, but it
-    # # gets the job done.  The next best alternatives (npm install node-jq or jq.node)
-    # # have age or auditing issues.
-    # INSERTION_MATCH="^\"file\""
-    # INSERTION_REPLACEMENT="\"sourceRoot\": \"\/keyman\/\",\"file\""
-    # # Kinda hacky, but it gets the job done.
-    # sed -i '' "s/$INSERTION_MATCH/$INSERTION_REPLACEMENT/g" "$OUTPUT_SOURCEMAP"
 }
 
 # $1 - target (WEB, EMBEDDED)
