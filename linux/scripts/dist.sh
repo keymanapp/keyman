@@ -77,7 +77,7 @@ for proj in ${extra_projects}; do
     fi
     if [ "${proj}" == "keyboardprocessor" ]; then
         cd ../common/core
-        vers=`grep -Po "version: '(.*)'" desktop/meson.build|grep -Po "\d+(.\d+)*"`
+        vers=`cat ../../VERSION.md`
         kbpvers="keyman-keyboardprocessor-$vers"
         cp -a desktop $kbpvers
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
