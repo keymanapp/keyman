@@ -153,7 +153,7 @@ PHPEXE=$(PHPDIR)\php.exe
 
 BRCC32=rc.exe
 
-HHC=\progra~1\htmlhe~1\hhc
+HHC="C:\Program Files (x86)\HTML Help Workshop\hhc.exe"
 NMAKE=nmake.exe
 CL=cl.exe
 MSBUILD=msbuild.exe
@@ -173,8 +173,9 @@ VCBUILD=error
 
 COPY=copy
 ISXBUILD=C:\PROGRA~1\INSTALLSHIELD\Express\System\IsExpCmdBld
-WZZIP="C:\program files\7-zip\7z.exe" a
-WZUNZIP="C:\program files\7-zip\7z.exe" e
+WZZIPPATH="C:\program files\7-zip\7z.exe"
+WZZIP=$(WZZIPPATH) a
+WZUNZIP=$(WZZIPPATH) e
 
 XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 

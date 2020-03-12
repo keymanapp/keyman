@@ -6,24 +6,24 @@
 
 default:
     @echo The following make targets are available:
-    @echo     build                 builds everything except help files (-DBUILDHELP to build help)
-    @echo     install               installs packages into Delphi IDE (run after a build)
-    @echo     clean                 removes all temp files
-    @echo     release               make a release
-    @echo     web-install           sends the documentation to the website
-    @echo     test-certificate      create a test certificate + CA (and install test CA)
-    @echo     signcode              sign the build artifacts
+    @echo .   build                 builds everything except help files (-DBUILDHELP to build help)
+    @echo .   install               installs packages into Delphi IDE (run after a build)
+    @echo .   clean                 removes all temp files
+    @echo .   release               make a release
+    @echo .   web-install           sends the documentation to the website
+    @echo .   test-certificate      create a test certificate + CA (and install test CA)
+    @echo .   signcode              sign the build artifacts
     @echo.
-    @echo     Build flags:
-    @echo           DEBUG           Include debug information
-    @echo           SC_TIMESTAMP    Don't timestamp certificates (for internal releases only, offline)
-    @echo           BUILDHELP       Build the helpfiles (implicit when 'make release')
-    @echo           LINT            Turns on $MESSAGE hints and warnings and all extra string warnings
-    @echo           QUIET           Ignore hints and warnings
-    @echo           RELEASE_OEM     Build executables for third party products in oem folder (e.g. FirstVoices)
+    @echo .   Build flags:
+    @echo .         DEBUG           Include debug information
+    @echo .         SC_TIMESTAMP    Don't timestamp certificates (for internal releases only, offline)
+    @echo .         BUILDHELP       Build the helpfiles (implicit when 'make release')
+    @echo .         LINT            Turns on $MESSAGE hints and warnings and all extra string warnings
+    @echo .         QUIET           Ignore hints and warnings
+    @echo .         RELEASE_OEM     Build executables for third party products in oem folder (e.g. FirstVoices)
     @echo.
-    @echo     To view help on the build process, in /src/inst, run:
-    @echo           make help
+    @echo .   To view help on the build process, in /src/inst, run:
+    @echo .         make help
     @echo.
 
 # ----------------------------------------------------------------------
@@ -95,7 +95,7 @@ unit-tests:
 # release
 # ----------------------------------------------------------------------
 
-release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert clean
+release: clean-pathdefines test-release-cef-path test-releasebuildcheck test-uiaccess test-klog test-releaseexists test-cert test-hhc test-7zip test-wix clean
     cd $(ROOT)\src
     $(MAKE) global-versions
     $(MAKE) build-release-wrapper
@@ -120,6 +120,27 @@ test-release-cef-path:
 test-cert:
     copy $(SC_PFX_SHA1) $(ROOT)\src\pfx.tmp
     del $(ROOT)\src\pfx.tmp
+
+#
+# Test that hhc is installed
+#
+
+test-hhc:
+    if not exist $(HHC) exit 1
+
+#
+# Test that WiX is installed
+#
+
+test-wix:
+    if not exist $(WIXPATH)\candle.exe exit 1
+
+#
+# Test that 7-zip is installed
+#
+
+test-7zip:
+    if not exist $(WZZIPPATH) exit 1
 
 #
 # Test that klog is disabled
