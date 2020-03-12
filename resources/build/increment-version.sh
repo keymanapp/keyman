@@ -21,6 +21,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
+. "$(dirname "$THIS_SCRIPT")/sentry-control.sh"
 
 gitbranch=`git branch --show-current`
 
@@ -103,6 +104,12 @@ if [ "$action" == "commit" ]; then
   git push --tags origin "$branch"
   hub pull-request -f --no-edit -b $base -l auto
   git checkout $base
+
+  #
+  # Tell Sentry about this (previous version)
+  #
+
+  makeSentryRelease
   popd > /dev/null
 
   #
