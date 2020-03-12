@@ -28,7 +28,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="@dimen/close_button_margin"
-            android:layout_marginLeft="@dimen/close_button_margin"
             android:layout_weight="1"
             android:singleLine="true"
             android:text="@string/label_close_keyman" />

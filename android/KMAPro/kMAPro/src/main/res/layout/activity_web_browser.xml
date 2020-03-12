@@ -12,16 +12,15 @@
         android:id="@+id/browserWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_above="@+id/toolbar"
-        android:layout_below="@+id/web_browser_toolbar"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/web_browser_toolbar"/>
 
     <LinearLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:weightSum="5"
         android:orientation="horizontal" >
@@ -31,8 +30,8 @@
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_navigation_back" />
@@ -42,8 +41,7 @@
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_navigation_forward" />
@@ -53,8 +51,8 @@
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_action_bookmark" />
@@ -64,8 +62,8 @@
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_action_language" />
@@ -75,8 +73,8 @@
             style="?android:attr/actionButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="0dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="0dp"
             android:layout_weight="1"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_action_close" />
