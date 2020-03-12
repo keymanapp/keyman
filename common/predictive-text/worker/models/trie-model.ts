@@ -291,10 +291,14 @@
    * @param index The index in the prefix. Initially 0.
    */
   function findPrefix(node: Node, key: SearchKey, index: number = 0): Node | null {
-    if (node.type === 'leaf' || index === key.kmwLength()) {
+    // An important note - the Trie itself is built on a per-JS-character basis,
+    // not on a UTF-8 character-code basis.
+    if (node.type === 'leaf' || index === key.length) {
       return node;
     }
 
+    // So, for SMP models, we need to match each char of the supplementary pair
+    // in sequence.  Each has its own node in the Trie.
     let char = key[index];
     if (node.children[char]) {
       return findPrefix(node.children[char], key, index + 1);
