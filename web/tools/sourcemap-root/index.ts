@@ -1,15 +1,5 @@
 var fs = require("fs");
 
-// By default, any node-based process has two command-line args:
-// [0] - node installation root
-// [1] - path to the script being run.
-//
-// [2] - first actual argument provided (via CLI) to the script.
-
-// for(let i=0; i < process.argv.length; i++) {
-//   console.log(i + ' => ' + process.argv[i]);
-// }
-
 function displayHelp() {
   console.log("KeymanWeb's sourcemap-cleansing tool.  This tool is designed to produce clean filepaths");
   console.log("in the sourcemaps for ease of reference in browser and Sentry, copying the clean paths TS");
@@ -19,8 +9,12 @@ function displayHelp() {
   console.log("        -s|--suffix <path> Appends <path> to the input sourcemap's 'sourceRoot'.")
 }
 
+// By default, any node-based process has two command-line args:
+// [0] - node installation root
+// [1] - path to the script being run.
+
 // Basic help-request check
-if(process.argv.length < 4) {
+if(process.argv.length < 4) {  // [2] and [3] - <source.map> and <dest.map> respectively.
   displayHelp();
   process.exit(1);
 } else {
@@ -53,6 +47,7 @@ assert_is_map(destFile);
 // Now to process any additional flags.
 var sourceRootSuffix = "";
 
+// Starting at [5] - optional command-line arguments
 for(let procArgIndex = 4; procArgIndex < process.argv.length; procArgIndex++) {
   let flag = process.argv[procArgIndex];
   
@@ -97,8 +92,14 @@ let sourceSources = sourceJSON["sources"] as string[];
 let destSources = destJSON["sources"] as string[];
 let finalDestSources: string[] = [];
 
-// Closure's minification always uses the TS paths as a suffix, prepending relative minification-path info to reuse them.
-// So, if we can find the TS path complete within a path in the minified sourcemap, it's a match. 
+/**
+ * Closure's minification always uses the TS paths as a suffix, prepending relative minification-path info to reuse them.
+ * So, if we can find the TS path complete within a path in the minified sourcemap, it's a match.
+ *
+ * It's key that we preserve the original ordering of the source files from Closure's output sourcemaps, as is done here.
+ * Otherwise, browsers will incorrectly match the inlined source to any given file, causing a fair bit of confusion.  
+ * This is why we iterate over the destination's defined array; this way ensures identical ordering for the finalized version.
+ */
 for(let destPath of destSources) {
   let matched = false;
 
