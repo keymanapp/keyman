@@ -26,9 +26,9 @@ android {
         }
     }
 
-    // TODO: Remove this when SDK > 17
+    // TODO: Remove ResourceType when SDK > 17
     lintOptions {
-        disable 'ResourceType'
+        disable 'ImpliedQuantity', 'MissingQuantity', 'MissingTranslation', 'ResourceType'
         lintConfig file("lint.xml")
     }
 

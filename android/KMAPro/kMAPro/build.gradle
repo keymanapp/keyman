@@ -62,6 +62,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            pseudoLocalesEnabled true
             debuggable true
         }
         release {
@@ -76,7 +77,7 @@ android {
     }
 
     lintOptions {
-        disable 'MissingTranslation'
+        disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")
     }
 }
