@@ -34,13 +34,6 @@
         app:showAsAction="never"
         android:icon="@drawable/ic_settings" />
 
-      <!-- temp item to generate intentional crashes for Sentry -->
-      <item
-        android:id="@+id/action_crash"
-        android:title="Crash"
-        app:showAsAction="never"
-        android:icon="@drawable/ic_action_close" />
-
       <item
         android:id="@+id/action_update_keyboards"
         android:title="@string/action_install_updates"
