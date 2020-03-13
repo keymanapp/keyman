@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 14.0.25 alpha 2020-03-13
+
+* feat(common): sentry release control (#2794)
+* chore(windows): improve build script tests (#2680)
+* fix(web): enhanced sourcemaps + proper sourcemaps for minified KMW (#2809)
+* feat/common/parse-crowdin Add script to parse crowdin translation file (#2801)
+* fix(linux): Fix how keyboardprocessor version is set in dist.sh (#2814)
+* feat(android): Additional Sentry integration (#2810)
+* fix(web): applies base key layer property to unassigned subkeys (#2808)
+* feat(android): Start adding RTL to layouts (#2816)
+* fix(common/lmlayer): fixes word lookup from Tries for SMP script-based languages (#2815)
+* feat(common): add release finalization for Sentry (#2819)
+* fix(web): further fixes BuildVisualKeyboard.  Fixes #2818 (#2822)
+* fix(web): fixes internal reference for validation tool (#2824)
+
 ## 14.0.24 alpha 2020-03-11
 
 * fix(linux): Fix CI dist path to common/core/desktop (#2795)
