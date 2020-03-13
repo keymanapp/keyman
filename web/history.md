@@ -4,6 +4,7 @@
 * Bug fix: further updates BuildVisualKeyboard (#2823)
 * Bug fix: fixes word lookup for wordlist models for languages in the SMP Unicode planes (#2821)
 * Bug fix: fixes issue with touch-layout popup key modifier interpretation (#2820)
+* Bug fix: fixes issue with bulk-rendering OSK validation dev tool (#2823)
 
 ## 2020-03-11 13.0.103 stable
 * Bug fix: updates BuildVisualKeyboard for generating help documentation (#2807)
