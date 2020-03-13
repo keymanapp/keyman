@@ -10,10 +10,10 @@
         style="?android:attr/actionButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:contentDescription="@string/image_button"
         android:src="@drawable/ic_content_add"
         android:visibility="gone" />
@@ -22,9 +22,9 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/imageButton"
+        android:layout_toEndOf="@+id/imageButton"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
         android:orientation="vertical" >
 
         <TextView

@@ -8,7 +8,6 @@
            style="?android:attr/actionButtonStyle"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
-           android:layout_marginLeft="@dimen/checkbox_margin"
            android:layout_marginStart="@dimen/checkbox_margin"
            android:layout_centerVertical="true"
            android:contentDescription="@string/image_view" />
@@ -17,7 +16,6 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/left_icon"
         android:layout_toEndOf="@id/left_icon"
         android:layout_centerVertical="true"
         android:textSize="14sp"
