@@ -116,10 +116,14 @@ namespace com.keyman.renderer {
         let renderLayer = function(i: number) {
           return new Promise(function(resolve) {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
-            if(isMobile) {
-              keyman.osk.layerId = layers[i].id;
+            if(keyman.osk.vkbd) {
+              if(isMobile) {
+                keyman.osk.vkbd.layerId = layers[i].id;
+              } else {
+                keyman.osk.vkbd.layerId = Object.keys(layers)[i];
+              }
             } else {
-              keyman.osk.layerId = Object.keys(layers)[i];
+              console.error("Error - keyman.osk.vkbd is undefined!");
             }
             // Make sure the active element's still set!
             renderer.setActiveDummy();
