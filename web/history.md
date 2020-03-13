@@ -1,5 +1,10 @@
 # KeymanWeb Version History
 
+## 2020-03-13 13.0.104 stable
+* Bug fix: further updates BuildVisualKeyboard (#2823)
+* Bug fix: fixes word lookup for wordlist models for languages in the SMP Unicode planes (#2821)
+* Bug fix: fixes issue with touch-layout popup key modifier interpretation (#2820)
+
 ## 2020-03-11 13.0.103 stable
 * Bug fix: updates BuildVisualKeyboard for generating help documentation (#2807)
 * Bug fix: fixes issue with addKeyboards Cloud API call (#2797)
