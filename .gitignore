@@ -257,5 +257,5 @@ compile_flags.txt
 resources/environment.sh
 
 # Keyman translations from https://crowdin.com/project/keyman
-.crowdin-tmp/Keyman.zip
+.crowdin-tmp/
 crowdin/
