@@ -18,7 +18,7 @@ build: version.res manifest.res dirs
 
     $(DCC32) tsysinfo.dpr
     $(TDS2DBG) tsysinfo.exe
-    $(SENTRYTOOL_DELPHIPREP) tsysinfo.exe
+    $(SENTRYTOOL_DELPHIPREP) tsysinfo.exe -dpr tsysinfo.dpr
     $(COPY) tsysinfo.exe $(PROGRAM)\engine
     if exist tsysinfo.dbg $(COPY) tsysinfo.dbg $(DEBUGPATH)\engine
 

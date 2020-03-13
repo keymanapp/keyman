@@ -183,7 +183,7 @@ XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 
 TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
 SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
-SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep
+SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
 MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
 

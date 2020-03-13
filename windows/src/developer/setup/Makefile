@@ -7,7 +7,7 @@
 build: version.res manifest.res icons
     $(DCC32) setup.dpr
     $(TDS2DBG) setup.exe
-    $(SENTRYTOOL_DELPHIPREP) setup.exe
+    $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
     $(COPY) setup.exe $(PROGRAM)\developer
     if exist setup.dbg $(COPY) setup.dbg $(DEBUGPATH)\developer\devsetup.dbg
     -del devsetup.dbg

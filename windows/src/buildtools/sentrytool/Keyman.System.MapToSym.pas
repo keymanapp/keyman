@@ -10,7 +10,11 @@ uses
 
   JclDebug;
 
-function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string; guid: TGUID; age: Integer): Boolean;
+type
+  TMapToSymFindFileProc = function(const UnitName: string): string;
+
+function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string;
+  guid: TGUID; age: Integer; findFileProc: TMapToSymFindFileProc): Boolean;
 function GuidToDebugId(guid: TGUID; age: Integer): string;
 
 implementation
@@ -19,7 +23,9 @@ type
   TMapToSym = class(TJclMapScanner)
     function Write(const exeFile, symFile, codeId: string; guid: TGUID; age: Integer): Boolean;
   private
+    FFindFileProc: TMapToSymFindFileProc;
     function UnitIndexFromVA(va: DWORD): Integer;
+    property FindFileProc: TMapToSymFindFileProc read FFindFileProc write FFindFileProc;
   end;
 
   // Crack access to TJclMapScanner private symbols
@@ -63,7 +69,7 @@ var
   s: TJclMapScannerCracker;
   r: TStringList;
   i: Integer;
-  groupName, unitName: string;
+  fileName, groupName, unitName: string;
   procCount, lineCount: Integer;
   procLen, lineIndex, lineLen: Integer;
   procName: string;
@@ -86,9 +92,19 @@ begin
     for i := 0 to High(s.FSegments) do
     begin
       groupName := MapStringCacheToStr(s.FSegmentClasses[s.FSegments[i].Segment].GroupName);
-      unitName := MapStringCacheToStr(s.FSegments[i].UnitName);
       if groupName = 'ICODE' then
-        r.Add(Format('FILE %d %s.pas', [i+1, unitName])); // Note: occasional units may be .inc, .cpp
+      begin
+        unitName := MapStringCacheToStr(s.FSegments[i].UnitName);
+
+        if Assigned(FFindFileProc)
+          then fileName := FFindFileProc(unitName)
+          else fileName := '';
+
+        if fileName = '' then
+          fileName := unitName + '.pas';
+
+        r.Add(Format('FILE %d %s', [i+1, fileName])); // Note: occasional units may be .inc, .cpp
+      end;
     end;
 
     // Write out functions and line numbers
@@ -125,7 +141,7 @@ begin
   Result := True;
 end;
 
-function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string; guid: TGUID; age: Integer): Boolean;
+function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string; guid: TGUID; age: Integer; findFileProc: TMapToSymFindFileProc): Boolean;
 var
   p: TMapToSym;
 begin
@@ -137,6 +153,7 @@ begin
 
   p := TMapToSym.Create(mapFile, 0);
   try
+    p.FindFileProc := findFileProc;
     Result := p.Write(exeFile, symFile, codeId, guid, age);
   finally
     p.Free;

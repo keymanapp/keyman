@@ -7,7 +7,7 @@
 build: version.res dirs
     $(DCC32) UIEditor.dpr
     $(TDS2DBG) UIEditor.exe
-    $(SENTRYTOOL_DELPHIPREP) UIEditor.exe
+    $(SENTRYTOOL_DELPHIPREP) UIEditor.exe -dpr UIEditor.dpr
     $(COPY) UIEditor.exe $(PROGRAM)\support
 
 signcode:

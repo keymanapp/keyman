@@ -9,7 +9,7 @@ build: version.res manifest.res icons xml
     $(PROGRAM)\buildtools\mkver -v $(MKVER_VERSION_TXT)
     $(DCC32) kmshell.dpr
     $(TDS2DBG) kmshell.exe
-    $(SENTRYTOOL_DELPHIPREP) kmshell.exe
+    $(SENTRYTOOL_DELPHIPREP) kmshell.exe -dpr kmshell.dpr
     $(COPY) kmshell.exe $(PROGRAM)\desktop
     if exist kmshell.dbg $(COPY) kmshell.dbg $(DEBUGPATH)\desktop
 
