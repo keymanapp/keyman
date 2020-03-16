@@ -541,10 +541,12 @@ namespace com.keyman.text {
           }
         }
 
-        if(ruleBehavior.triggersChange) {
-          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-          //        The if-check below is clearly something to be handled by the DOM itself.
-          //        We may also be able to eliminate the `triggersChange` flag by instead inspecting the Transform.
+        // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
+        //
+        // TODO:  This check should be done IN a dom module, not here in web-core space.  This place is closer 
+        //        to that goal than it previously was, at least.
+        let ruleTransform = ruleBehavior.transcription.transform;
+        if(ruleTransform.insert != "" || ruleTransform.deleteLeft > 0 || ruleTransform.deleteRight > 0) {
           if(outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
             DOMEventHandlers.states.changed = true;
           }
