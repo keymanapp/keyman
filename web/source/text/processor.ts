@@ -382,10 +382,10 @@ namespace com.keyman.text {
             kbdInterface.output(0, outputTarget, ch);
           }
           matchBehavior = new RuleBehavior();
-          matchBehavior.transform = outputTarget.buildTransformFrom(preInput);
+          matchBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keyEvent);
         } else if(keyEvent.Lcode == 8) { // Backspace
           matchBehavior = new RuleBehavior();
-          matchBehavior.transform = outputTarget.buildTransformFrom(preInput);
+          matchBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keyEvent);
         }
       }
 
@@ -482,7 +482,7 @@ namespace com.keyman.text {
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
-      let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
+      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
@@ -490,7 +490,7 @@ namespace com.keyman.text {
       }
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-      if(LeventMatched) {
+      if(ruleBehavior != null) {
         let alternates: Alternate[];
 
         // Note - we don't yet do fat-fingering with longpress keys.
@@ -508,15 +508,37 @@ namespace com.keyman.text {
             }
 
             let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
-            if(this.processKeystroke(altEvent, mock, fromOSK, true)) {
-              alternates.push({sample: mock.buildTransformFrom(preInputMock), 'p': pair.p});
+            let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK, true);
+            if(alternateBehavior) {
+              alternates.push({sample: alternateBehavior.transcription.transform, 'p': pair.p});
             }
           }
         }
+
+        if(ruleBehavior.beep) {
+          // TODO:  Relocate beep code to here (for now).
+          //        Must be relocated further 'out' to complete the full, planned web-core refactor.
+        }
+
+        for(let storeID in ruleBehavior.setStore) {
+          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
+          
+          // How would this be handled in an eventual headless mode?
+          switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
+            case KeyboardInterface.TSS_LAYER:
+              keyman.osk.vkbd.showLayer(ruleBehavior.setStore[storeID]); //Build 350, osk reference now OK, so should work
+              break;
+            case KeyboardInterface.TSS_PLATFORM:
+              console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+              break;
+            default:
+              console.warn("Unknown store affected by keyboard rule: " + storeID);
+          }
+        }
         
-        // Notify the ModelManager of new input
-        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent, alternates);
-        keyman.modelManager.predict(transcription);
+        // Notify the ModelManager of new input - it's predictive text time!
+        ruleBehavior.transcription.alternates = alternates;
+        keyman.modelManager.predict(ruleBehavior.transcription);
 
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
         // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
@@ -545,7 +567,8 @@ namespace com.keyman.text {
         return false;
       }
 
-      return !LeventMatched;
+      // Only return true (for the eventual event handler's return value) if we didn't match a rule.
+      return ruleBehavior == null;
     }
 
     /**

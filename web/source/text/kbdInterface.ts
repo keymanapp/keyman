@@ -183,7 +183,7 @@ namespace com.keyman.text {
     /**
      * The before-and-after Transform from matching a keyboard rule.
      */
-    transform: Transform;
+    transcription: Transcription;
 
     /**
      * Indicates whether or not a BEEP command was issued by the matched keyboard rule.
@@ -203,8 +203,8 @@ namespace com.keyman.text {
     activeTargetOutput: OutputTarget;
     ruleBehavior: RuleBehavior;
 
-    TSS_LAYER:    number = 33;
-    TSS_PLATFORM: number = 31;
+    static TSS_LAYER:    number = 33;
+    static TSS_PLATFORM: number = 31;
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
     _BeepObjects: BeepData[] = [];  // BeepObjects - maintains a list of active 'beep' visual feedback elements
@@ -972,10 +972,10 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
 
       var result=true;
-      if(systemId == this.TSS_LAYER) {
+      if(systemId == KeyboardInterface.TSS_LAYER) {
         // How would this be handled in an eventual headless mode?
         result = (keyman.osk.vkbd.layerId === strValue);
-      } else if(systemId == this.TSS_PLATFORM) {
+      } else if(systemId == KeyboardInterface.TSS_PLATFORM) {
         var i,constraint,constraints=strValue.split(' ');
         for(i=0; i<constraints.length; i++) {
           constraint=constraints[i].toLowerCase();
@@ -1049,18 +1049,9 @@ namespace com.keyman.text {
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
-      if(systemId == this.TSS_LAYER) {
+      if(systemId == KeyboardInterface.TSS_LAYER) {
         // Denote the changed store as part of the matched rule's behavior.
         this.ruleBehavior.setStore[systemId] = strValue;
-        // TODO:  Relocate the showLayer call outside of KeyboardInterface by using the new RuleBehavior return.
-
-        // Do not trigger a layer change when operating on alternates - the use case of Mocks.
-        if(outputTarget instanceof Mock) {
-          return;
-        }
-
-        // How would this be handled in an eventual headless mode?
-        return keyman.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
       } else {
         return false;
       }
@@ -1182,7 +1173,7 @@ namespace com.keyman.text {
       }
 
       // Finalize the rule's results.
-      this.ruleBehavior.transform = outputTarget.buildTransformFrom(preInput);
+      this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke);
 
       // Clear our result-tracking variable to prevent any possible pollution for future processing.
       let behavior = this.ruleBehavior;
