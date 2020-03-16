@@ -402,6 +402,10 @@ namespace com.keyman.text {
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
 
+      // Determine the current target for text output and create a "mock" backup
+      // of its current, pre-input state.
+      let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
+
       let fromOSK = !!e; // If specified, it's from the OSK.
 
       // Enables embedded-path OSK sourcing detection.
@@ -439,7 +443,7 @@ namespace com.keyman.text {
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
-      if(!fromOSK && this.doModifierPress(keyEvent, !fromOSK)) {
+      if(!fromOSK && this.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
         return true;
       }
 
@@ -477,9 +481,6 @@ namespace com.keyman.text {
       }
       // // ...end I3363 (Build 301)
 
-      // Determine the current target for text output and create a "mock" backup
-      // of its current, pre-input state.
-      let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
       let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
@@ -1037,12 +1038,12 @@ namespace com.keyman.text {
 
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
     // in those cases.
-    private doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
+    private doModifierPress(Levent: KeyEvent, outputTarget: OutputTarget, isKeyDown: boolean): boolean {
       let keyman = com.keyman.singleton;
 
       switch(Levent.Lcode) {
         case 8: 
-          Processor.getOutputTarget(Levent.Ltarg).deadkeys().clear();
+          outputTarget.deadkeys().clear();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -1051,7 +1052,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          keyman['interface'].notifyKeyboard(Levent.Lcode, Levent.Ltarg, isKeyDown ? 1 : 0); 
+          keyman['interface'].notifyKeyboard(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -1060,7 +1061,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        keyman['interface'].notifyKeyboard(0, Levent.Ltarg, 1); 
+        keyman['interface'].notifyKeyboard(0, outputTarget, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 
@@ -1281,7 +1282,9 @@ namespace com.keyman.text {
         return true;
       }
 
-      return this.doModifierPress(Levent, false);
+      let outputTarget = Processor.getOutputTarget(Levent.Ltarg)
+
+      return this.doModifierPress(Levent, outputTarget, false);
     }
 
     keyPress(e: KeyboardEvent): boolean {
