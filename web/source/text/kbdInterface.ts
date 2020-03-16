@@ -180,6 +180,12 @@ namespace com.keyman.text {
      * A set of changed store values triggered by the matched keyboard rule.
      */
     setStore: {[id: number]: string} = {};
+
+    /**
+     * Indicates whether the rule's results would logically trigger a 'changed' event in the DOM
+     * due to manipulation of the OutputTarget.
+     */
+    triggersChange?: boolean
   }
 
   export class KeyboardInterface {
@@ -861,9 +867,9 @@ namespace com.keyman.text {
         keyman.refreshElementContent(outputTarget.getElement());
       }
 
-      if((dn >= 0 || s) && outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
+      if((dn >= 0 || s)) {
         // Record that we've made an edit.
-        DOMEventHandlers.states.changed = true;
+        this.ruleBehavior.triggersChange = true;
       }
     }
   

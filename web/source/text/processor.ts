@@ -540,6 +540,15 @@ namespace com.keyman.text {
               console.warn("Unknown store affected by keyboard rule: " + storeID);
           }
         }
+
+        if(ruleBehavior.triggersChange) {
+          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
+          //        The if-check below is clearly something to be handled by the DOM itself.
+          //        We may also be able to eliminate the `triggersChange` flag by instead inspecting the Transform.
+          if(outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
+            DOMEventHandlers.states.changed = true;
+          }
+        }
         
         // Notify the ModelManager of new input - it's predictive text time!
         ruleBehavior.transcription.alternates = alternates;
