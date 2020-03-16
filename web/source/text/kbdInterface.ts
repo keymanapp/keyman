@@ -176,11 +176,32 @@ namespace com.keyman.text {
 
   //#endregion
 
+  /**
+   * Represents the commands and state changes that result from a matched keyboard rule.
+   */
+  export class RuleBehavior {
+    /**
+     * The before-and-after Transform from matching a keyboard rule.
+     */
+    transform: Transform;
+
+    /**
+     * Indicates whether or not a BEEP command was issued by the matched keyboard rule.
+     */
+    beep?: boolean;
+
+    /**
+     * A set of changed store values triggered by the matched keyboard rule.
+     */
+    setStore: {[id: number]: string} = {};
+  }
+
   export class KeyboardInterface {
     cachedContext: CachedContext = new CachedContext();
     cachedContextEx: CachedContextEx = new CachedContextEx();
 
     activeTargetOutput: OutputTarget;
+    ruleBehavior: RuleBehavior;
 
     TSS_LAYER:    number = 33;
     TSS_PLATFORM: number = 31;
@@ -673,16 +694,22 @@ namespace com.keyman.text {
     beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
+      // Denote as part of the matched rule's behavior.
+      this.ruleBehavior.beep = true;
+      // TODO:  Relocate the actual Beep behavior code outside of KeyboardInterface by using the new RuleBehavior return.
+
       // Do not trigger a 'beep' when operating on alternates - the use case of Mocks.
       if(outputTarget instanceof Mock) {
         return;
       }
 
+      // Handles embedded-mode beeps.
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();
       }
       
+      // All code after this point is DOM-based, triggered by the beep.
       var Pelem: HTMLElement = outputTarget.getElement();
       if(outputTarget instanceof dom.DesignIFrame) {
         Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
@@ -1023,6 +1050,10 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == this.TSS_LAYER) {
+        // Denote the changed store as part of the matched rule's behavior.
+        this.ruleBehavior.setStore[systemId] = strValue;
+        // TODO:  Relocate the showLayer call outside of KeyboardInterface by using the new RuleBehavior return.
+
         // Do not trigger a layer change when operating on alternates - the use case of Mocks.
         if(outputTarget instanceof Mock) {
           return;
@@ -1118,7 +1149,7 @@ namespace com.keyman.text {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
+    processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
       let keyman = com.keyman.singleton;
 
       // Clear internal state tracking data from prior keystrokes.
@@ -1131,6 +1162,12 @@ namespace com.keyman.text {
       outputTarget.deadkeys().resetMatched();       // I3318    
       this.resetContextCache();
 
+      // Capture the initial state of the OutputTarget before any rules are matched.
+      let preInput = Mock.from(outputTarget);
+      
+      // Establishes the results object, allowing corresponding commands to set values here as appropriate.
+      this.ruleBehavior = new RuleBehavior();
+
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
       keyman.util.activeDevice = device;
@@ -1140,7 +1177,18 @@ namespace com.keyman.text {
       var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
-      return matched;
+      if(!matched) {
+        return null;
+      }
+
+      // Finalize the rule's results.
+      this.ruleBehavior.transform = outputTarget.buildTransformFrom(preInput);
+
+      // Clear our result-tracking variable to prevent any possible pollution for future processing.
+      let behavior = this.ruleBehavior;
+      this.ruleBehavior = null;
+
+      return behavior;
     }
     
     /**

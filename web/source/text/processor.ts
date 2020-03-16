@@ -359,7 +359,9 @@ namespace com.keyman.text {
 
       // Pass this key code and state to the keyboard program
       if(activeKeyboard && keyEvent.Lcode != 0) {
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+        if(!LeventMatched) {
+          LeventMatched = kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent) != null ? 1 : 0;
+        }
       }
 
       if(!LeventMatched) {
