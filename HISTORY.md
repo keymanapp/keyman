@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.26 alpha 2020-03-16
+
+* fix(oem): Disable monitoring of ANR for oem Android app (#2828)
+
 ## 14.0.25 alpha 2020-03-13
 
 * feat(common): sentry release control (#2794)
