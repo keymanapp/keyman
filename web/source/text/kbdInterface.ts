@@ -160,20 +160,6 @@ namespace com.keyman.text {
     }
   };
 
-  class BeepData {
-    e: HTMLElement;
-    c: string;
-
-    constructor(e: HTMLElement) {
-      this.e = e;
-      this.c = e.style.backgroundColor;
-    }
-
-    reset(): void {
-      this.e.style.backgroundColor = this.c;
-    }
-  }
-
   //#endregion
 
   /**
@@ -207,9 +193,6 @@ namespace com.keyman.text {
     static TSS_PLATFORM: number = 31;
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
-    _BeepObjects: BeepData[] = [];  // BeepObjects - maintains a list of active 'beep' visual feedback elements
-    _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
-                                    // Set to 1 if there is an active 'beep', otherwise leave as '0'.
 
     constructor() {
     }
@@ -668,22 +651,6 @@ namespace com.keyman.text {
     deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
       return outputTarget.hasDeadkeyMatch(n, d);
     }
-    
-    /**
-     * Function     beepReset   KBR      
-     * Scope        Public
-     * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
-     */    
-    beepReset(): void {
-      this.resetContextCache();
-
-      var Lbo;
-      this._BeepTimeout = 0;
-      for(Lbo=0;Lbo<this._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
-        this._BeepObjects[Lbo].reset();
-      }
-      this._BeepObjects = [];
-    }
       
     /**
      * Function     beep          KB      
@@ -696,46 +663,6 @@ namespace com.keyman.text {
 
       // Denote as part of the matched rule's behavior.
       this.ruleBehavior.beep = true;
-      // TODO:  Relocate the actual Beep behavior code outside of KeyboardInterface by using the new RuleBehavior return.
-
-      // Do not trigger a 'beep' when operating on alternates - the use case of Mocks.
-      if(outputTarget instanceof Mock) {
-        return;
-      }
-
-      // Handles embedded-mode beeps.
-      let keyman = com.keyman.singleton;
-      if ('beepKeyboard' in keyman) {
-        keyman['beepKeyboard']();
-      }
-      
-      // All code after this point is DOM-based, triggered by the beep.
-      var Pelem: HTMLElement = outputTarget.getElement();
-      if(outputTarget instanceof dom.DesignIFrame) {
-        Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
-      }
-
-      if(!Pelem) {
-        return; // There's no way to signal a 'beep' to null, so just cut everything short.
-      }
-      
-      if(!Pelem.style || typeof(Pelem.style.backgroundColor)=='undefined') {
-        return;
-      }
-
-      for(var Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
-                                                                  // I1511 - array prototype extended
-        if(this._BeepObjects[Lbo].e == Pelem) {
-          return;
-        }
-      }
-      
-      this._BeepObjects = keyman._push(this._BeepObjects, new BeepData(Pelem));
-      Pelem.style.backgroundColor = '#000000';
-      if(this._BeepTimeout == 0) {
-        this._BeepTimeout = 1;
-        window.setTimeout(this.beepReset.bind(this), 50);
-      }
     }
 
     _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {

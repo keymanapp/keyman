@@ -510,18 +510,23 @@ namespace com.keyman.text {
             let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
             let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK, true);
             if(alternateBehavior) {
+              // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
+              //       so a user should never have intended to type it.  Should probably renormalize 
+              //       the distribution afterward, though...
               alternates.push({sample: alternateBehavior.transcription.transform, 'p': pair.p});
             }
           }
         }
 
         if(ruleBehavior.beep) {
-          // TODO:  Relocate beep code to here (for now).
-          //        Must be relocated further 'out' to complete the full, planned web-core refactor.
+          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
+          //        We're still referencing the DOM, even if only the manager object.  (It's an improvement, at least.)
+          keyman.domManager.doBeep(outputTarget);
         }
 
         for(let storeID in ruleBehavior.setStore) {
           // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
+          //        `Processor` shouldn't be directly setting anything on the OSK when the refactor is complete.
           
           // How would this be handled in an eventual headless mode?
           switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
@@ -566,6 +571,12 @@ namespace com.keyman.text {
           keyEvent.Lcode == Codes.keyCodes["K_TABBACK"] || keyEvent.Lcode == Codes.keyCodes["K_TABFWD"])) {
         return false;
       }
+
+      // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
+      //        the ones that should worry about event handler returns, etc.  Not this one.
+      //
+      //        They should also be the ones to handle the TODOs seen earlier in this function -
+      //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
 
       // Only return true (for the eventual event handler's return value) if we didn't match a rule.
       return ruleBehavior == null;
