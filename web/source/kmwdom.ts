@@ -531,18 +531,23 @@ namespace com.keyman {
         if(Lelem) {
           if(Lelem.designMode.toLowerCase() == 'on') {
             // I2404 - Attach to IFRAMEs child objects, only editable IFRAMEs here
-            util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
-            util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+            if(util.device.browser == 'firefox') {
+              util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            } else { // Chrome
+              util.attachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.attachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
+            }
+            util.attachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
+            util.attachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.attachDOMEvent(Lelem.body,'keyup', this.getHandlers(Pelem)._KeyUp);
 
             // Set up a reference alias; the internal document will need the same attachment info!
             this.setupElementAttachment(Pelem);
             Lelem.body._kmwAttachment = Pelem._kmwAttachment;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
-            this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+            this._SetupDocument(Lelem.body);	   // I2404 - Manage IE events in IFRAMEs
           }
         }
       }
@@ -567,17 +572,22 @@ namespace com.keyman {
         if(Lelem) {
           if(Lelem.designMode.toLowerCase() == 'on') {
             // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-            util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
-            util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+            if(util.device.browser == 'firefox') {
+              util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            } else { // Chrome
+              util.detachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.detachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
+            }
+            util.detachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
+            util.detachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.detachDOMEvent(Lelem.body,'keyup', this.getHandlers(Pelem)._KeyUp);
 
             // Remove the reference to our prior attachment data!
             Lelem.body._kmwAttachment = null;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
-            this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+            this._ClearDocument(Lelem.body);	   // I2404 - Manage IE events in IFRAMEs
           }
         }
       }
@@ -594,10 +604,10 @@ namespace com.keyman {
      * @return      {Array<Element>}        A list of potentially-editable controls.  Further filtering [as with isKMWInput() and
      *                                      isKMWDisabled()] is required.
      */
-    _GetDocumentEditables(Pelem: HTMLElement|Document): (HTMLElement|Document)[] {
+    _GetDocumentEditables(Pelem: HTMLElement): (HTMLElement)[] {
       var util = this.keyman.util;
 
-      var possibleInputs: (HTMLElement|Document)[] = [];
+      var possibleInputs: (HTMLElement)[] = [];
 
       // Document.ownerDocument === null, so we better check that it's not null before proceeding.
       if(Pelem.ownerDocument && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLElement) {
@@ -645,7 +655,7 @@ namespace com.keyman {
      * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
      * Description  Used to automatically attach KMW to editable controls, regardless of control path.
      */
-    _SetupDocument(Pelem: HTMLElement|Document) { // I1961
+    _SetupDocument(Pelem: HTMLElement) { // I1961
       var possibleInputs = this._GetDocumentEditables(Pelem);
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
@@ -663,7 +673,7 @@ namespace com.keyman {
      * Description  Used to automatically detach KMW from editable controls, regardless of control path.
      *              Mostly used to clear out all controls of a detached IFrame.
      */
-    _ClearDocument(Pelem: HTMLElement|Document) { // I1961
+    _ClearDocument(Pelem: HTMLElement) { // I1961
       var possibleInputs = this._GetDocumentEditables(Pelem);
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
