@@ -339,7 +339,7 @@ namespace com.keyman.text {
       }
     }
 
-    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): boolean {
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
@@ -354,17 +354,15 @@ namespace com.keyman.text {
         }
       }
 
-      var LeventMatched = 0;
+      var matchBehavior: RuleBehavior;
       this.swallowKeypress = false;
 
       // Pass this key code and state to the keyboard program
       if(activeKeyboard && keyEvent.Lcode != 0) {
-        if(!LeventMatched) {
-          LeventMatched = kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent) != null ? 1 : 0;
-        }
+        matchBehavior = kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
 
-      if(!LeventMatched) {
+      if(!matchBehavior) {
         // Restore the virtual key code if a mnemonic keyboard is being used
         // If no vkCode value was stored, maintain the original Lcode value.
         keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
@@ -372,6 +370,8 @@ namespace com.keyman.text {
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
         kbdInterface.activeTargetOutput = outputTarget;
+        let preInput = Mock.from(outputTarget);
+
         var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
         kbdInterface.activeTargetOutput = null;
         if(ch) {
@@ -381,13 +381,15 @@ namespace com.keyman.text {
           } else {
             kbdInterface.output(0, outputTarget, ch);
           }
-          LeventMatched = 1;
+          matchBehavior = new RuleBehavior();
+          matchBehavior.transform = outputTarget.buildTransformFrom(preInput);
         } else if(keyEvent.Lcode == 8) { // Backspace
-          LeventMatched = 1;
+          matchBehavior = new RuleBehavior();
+          matchBehavior.transform = outputTarget.buildTransformFrom(preInput);
         }
       }
 
-      return LeventMatched == 1;
+      return matchBehavior;
     }
 
     /**
