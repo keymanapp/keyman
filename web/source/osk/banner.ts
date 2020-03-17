@@ -352,9 +352,12 @@ namespace com.keyman.osk {
     private manager: SuggestionManager;
 
     static readonly TOUCHED_CLASS: string = 'kmw-suggest-touched';
+    static readonly BANNER_CLASS: string = 'kmw-suggest-banner';
 
     constructor(height?: number) {
       super(height || Banner.DEFAULT_HEIGHT);
+
+      this.getDiv().className = this.getDiv().className + ' ' + SuggestionBanner.BANNER_CLASS;
 
       this.options = new Array();
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
