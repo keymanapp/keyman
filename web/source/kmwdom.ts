@@ -534,7 +534,7 @@ namespace com.keyman {
             if(util.device.browser == 'firefox') {
               util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
               util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            } else { // Chrome
+            } else { // Chrome, Safari
               util.attachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
               util.attachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
             }
@@ -573,9 +573,10 @@ namespace com.keyman {
           if(Lelem.designMode.toLowerCase() == 'on') {
             // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
             if(util.device.browser == 'firefox') {
+              // Firefox won't handle these events on Lelem.body - only directly on Lelem (the doc) instead.
               util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
               util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            } else { // Chrome
+            } else { // Chrome, Safari
               util.detachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
               util.detachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
             }
