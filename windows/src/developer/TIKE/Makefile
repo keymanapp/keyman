@@ -7,8 +7,8 @@
 build: version.res manifest.res icons dirs xml
     cd $(ROOT)\src\developer\tike
     $(DCC32) tike.dpr
-    $(TDS2DBG) tike.exe 
-    $(MAKEJCLDBG) tike.map
+    $(TDS2DBG) tike.exe
+    $(SENTRYTOOL_DELPHIPREP) tike.exe -dpr tike.dpr
     $(COPY) tike.exe $(PROGRAM)\developer
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer
@@ -21,7 +21,7 @@ xml: pull-keymanweb pull-npm
 
 pull-npm:
     #
-    # Grab the version of Monaco and any other node modules 
+    # Grab the version of Monaco and any other node modules
     # that we want to use in Keyman Developer, and copy into
     # lib folder for sane paths. If we use more npm modules in the
     # future, we may consolidate the paths at that time.
@@ -36,11 +36,11 @@ pull-keymanweb:
     #
     # Requires us to build KMW in order to get the output files
     # If GIT_BASH_FOR_KEYMAN variable is not defined, then will just throw up
-    # a new window to do the build. This means we lose logging and 
+    # a new window to do the build. This means we lose logging and
     # potentially exit values as well. So GIT_BASH should be set for
     # build agents, etc, to something like
     #
-    # GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l    
+    # GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
     #
     cd $(ROOT)\..\web\source
 
@@ -81,11 +81,11 @@ test-manifest:
 
 generate-app-wxs:
     @echo *******************************************************************************************
-    @echo The generated ..\inst\monaco_gen.wxs file will require manual merging with the existing 
-    @echo monaco.xws. Existing component GUIDs must be maintained per Windows Installer component 
+    @echo The generated ..\inst\monaco_gen.wxs file will require manual merging with the existing
+    @echo monaco.xws. Existing component GUIDs must be maintained per Windows Installer component
     @echo rules (a file at a single location should have a permanent GUID for reference counting).
     @echo *******************************************************************************************
     $(WIXPATH)\heat.exe dir xml\app\lib\monaco\min\vs -gg -o ..\inst\monaco_gen.wxs -cg MonacoFiles -var var.MonacoSourceDir -dr MonacoTargetDir
-    
+
 !include ..\..\Target.mak
 

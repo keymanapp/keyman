@@ -104,7 +104,8 @@
   background-color: #cfd3d9;
 }
 
-.kmw-embedded .ios .kmw-banner-bar {
+/*Only apply in embedded mode for the actual predictive banner, and no others.*/
+.kmw-embedded .ios .kmw-banner-bar.kmw-suggest-banner {
   top: 10px;
 }
 

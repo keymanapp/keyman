@@ -1915,7 +1915,7 @@ namespace com.keyman.osk {
       var b: HTMLElement = _Box, bs=b.style;
       bs.height=bs.maxHeight=oskHeight+'px';
 
-      b = this.kbdDiv;
+      b = this.kbdDiv.firstChild as HTMLElement;
       bs=b.style;
       // Sets the layer group to the correct height.
       bs.height=bs.maxHeight=oskHeight+'px';

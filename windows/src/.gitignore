@@ -34,3 +34,6 @@ support/version.txt
 # These are built from corresponding manifest.in and version.in
 **/manifest.xml
 **/version.rc
+
+# Breakpad files generated for Sentry
+**/*.sym

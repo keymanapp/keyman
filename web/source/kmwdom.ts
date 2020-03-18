@@ -11,6 +11,21 @@
 /// <reference path="dom/wrapElement.ts" />
 
 namespace com.keyman {
+  // Utility object used to handle beep (keyboard error response) operations.
+  class BeepData {
+    e: HTMLElement;
+    c: string;
+
+    constructor(e: HTMLElement) {
+      this.e = e;
+      this.c = e.style.backgroundColor;
+    }
+
+    reset(): void {
+      this.e.style.backgroundColor = this.c;
+    }
+  }
+
   /**
    * This class serves as the intermediary between KeymanWeb and any given web page's elements.
    */
@@ -49,6 +64,10 @@ namespace com.keyman {
      */
     sortedInputs: HTMLElement[] = [];   // List of all INPUT and TEXTAREA elements ordered top to bottom, left to right
 
+    _BeepObjects: BeepData[] = [];  // BeepObjects - maintains a list of active 'beep' visual feedback elements
+    _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
+                                    // Set to 1 if there is an active 'beep', otherwise leave as '0'.
+
     constructor(keyman: KeymanBase) {
       this.keyman = keyman;
       
@@ -80,6 +99,67 @@ namespace com.keyman {
         console.error("Error occurred during shutdown");
         console.error(e);
       }
+    }
+
+    /**
+     * Function     beep          KB      (DOM-side implementation)
+     * Scope        Public
+     * @param       {Object}      Pelem     element to flash
+     * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
+     */    
+    doBeep(outputTarget: text.OutputTarget) {
+      // Handles embedded-mode beeps.
+      let keyman = com.keyman.singleton;
+      if ('beepKeyboard' in keyman) {
+        keyman['beepKeyboard']();
+        return;
+      }
+
+      // All code after this point is DOM-based, triggered by the beep.
+      var Pelem: HTMLElement = outputTarget.getElement();
+      if(outputTarget instanceof dom.DesignIFrame) {
+        Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
+      }
+
+      if(!Pelem) {
+        return; // There's no way to signal a 'beep' to null, so just cut everything short.
+      }
+      
+      if(!Pelem.style || typeof(Pelem.style.backgroundColor)=='undefined') {
+        return;
+      }
+
+      for(var Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
+                                                                  // I1511 - array prototype extended
+        if(this._BeepObjects[Lbo].e == Pelem) {
+          return;
+        }
+      }
+      
+      this._BeepObjects = com.keyman.singleton._push(this._BeepObjects, new BeepData(Pelem));
+      // TODO:  This is probably a bad color choice if "dark mode" is enabled.  A proper implementation
+      //        would probably require some 'fun' CSS work, though.
+      Pelem.style.backgroundColor = '#000000';
+      if(this._BeepTimeout == 0) {
+        this._BeepTimeout = 1;
+        window.setTimeout(this.beepReset.bind(this), 50);
+      }
+    }
+
+    /**
+     * Function     beepReset      
+     * Scope        Public
+     * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
+     */    
+    beepReset(): void {
+      com.keyman.singleton.interface.resetContextCache();
+
+      var Lbo;
+      this._BeepTimeout = 0;
+      for(Lbo=0;Lbo<this._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
+        this._BeepObjects[Lbo].reset();
+      }
+      this._BeepObjects = [];
     }
 
     /**
@@ -531,18 +611,23 @@ namespace com.keyman {
         if(Lelem) {
           if(Lelem.designMode.toLowerCase() == 'on') {
             // I2404 - Attach to IFRAMEs child objects, only editable IFRAMEs here
-            util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.attachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
-            util.attachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.attachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+            if(util.device.browser == 'firefox') {
+              util.attachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.attachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            } else { // Chrome, Safari
+              util.attachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.attachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
+            }
+            util.attachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
+            util.attachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.attachDOMEvent(Lelem.body,'keyup', this.getHandlers(Pelem)._KeyUp);
 
             // Set up a reference alias; the internal document will need the same attachment info!
             this.setupElementAttachment(Pelem);
             Lelem.body._kmwAttachment = Pelem._kmwAttachment;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
-            this._SetupDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+            this._SetupDocument(Lelem.body);	   // I2404 - Manage IE events in IFRAMEs
           }
         }
       }
@@ -567,17 +652,23 @@ namespace com.keyman {
         if(Lelem) {
           if(Lelem.designMode.toLowerCase() == 'on') {
             // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
-            util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
-            util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
-            util.detachDOMEvent(Lelem,'keydown', this.getHandlers(Pelem)._KeyDown);
-            util.detachDOMEvent(Lelem,'keypress', this.getHandlers(Pelem)._KeyPress);
-            util.detachDOMEvent(Lelem,'keyup', this.getHandlers(Pelem)._KeyUp);
+            if(util.device.browser == 'firefox') {
+              // Firefox won't handle these events on Lelem.body - only directly on Lelem (the doc) instead.
+              util.detachDOMEvent(Lelem,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.detachDOMEvent(Lelem,'blur', this.getHandlers(Pelem)._ControlBlur);
+            } else { // Chrome, Safari
+              util.detachDOMEvent(Lelem.body,'focus', this.getHandlers(Pelem)._ControlFocus);
+              util.detachDOMEvent(Lelem.body,'blur', this.getHandlers(Pelem)._ControlBlur);
+            }
+            util.detachDOMEvent(Lelem.body,'keydown', this.getHandlers(Pelem)._KeyDown);
+            util.detachDOMEvent(Lelem.body,'keypress', this.getHandlers(Pelem)._KeyPress);
+            util.detachDOMEvent(Lelem.body,'keyup', this.getHandlers(Pelem)._KeyUp);
 
             // Remove the reference to our prior attachment data!
             Lelem.body._kmwAttachment = null;
           } else {
             // Lelem is the IFrame's internal document; set 'er up!
-            this._ClearDocument(Lelem);	   // I2404 - Manage IE events in IFRAMEs
+            this._ClearDocument(Lelem.body);	   // I2404 - Manage IE events in IFRAMEs
           }
         }
       }
@@ -594,10 +685,10 @@ namespace com.keyman {
      * @return      {Array<Element>}        A list of potentially-editable controls.  Further filtering [as with isKMWInput() and
      *                                      isKMWDisabled()] is required.
      */
-    _GetDocumentEditables(Pelem: HTMLElement|Document): (HTMLElement|Document)[] {
+    _GetDocumentEditables(Pelem: HTMLElement): (HTMLElement)[] {
       var util = this.keyman.util;
 
-      var possibleInputs: (HTMLElement|Document)[] = [];
+      var possibleInputs: (HTMLElement)[] = [];
 
       // Document.ownerDocument === null, so we better check that it's not null before proceeding.
       if(Pelem.ownerDocument && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLElement) {
@@ -645,7 +736,7 @@ namespace com.keyman {
      * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
      * Description  Used to automatically attach KMW to editable controls, regardless of control path.
      */
-    _SetupDocument(Pelem: HTMLElement|Document) { // I1961
+    _SetupDocument(Pelem: HTMLElement) { // I1961
       var possibleInputs = this._GetDocumentEditables(Pelem);
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {
@@ -663,7 +754,7 @@ namespace com.keyman {
      * Description  Used to automatically detach KMW from editable controls, regardless of control path.
      *              Mostly used to clear out all controls of a detached IFrame.
      */
-    _ClearDocument(Pelem: HTMLElement|Document) { // I1961
+    _ClearDocument(Pelem: HTMLElement) { // I1961
       var possibleInputs = this._GetDocumentEditables(Pelem);
 
       for(var Li = 0; Li < possibleInputs.length; Li++) {

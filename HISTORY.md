@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.27 alpha 2020-03-17
+
+* chore(deps-dev): bump minimist from 1.2.0 to 1.2.2 in /web/testing/regression-tests (#2829)
+
 ## 14.0.26 alpha 2020-03-16
 
 * fix(oem): Disable monitoring of ANR for oem Android app (#2828)

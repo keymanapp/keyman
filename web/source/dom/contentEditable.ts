@@ -198,6 +198,7 @@ namespace com.keyman.dom {
         range.setStart(start.node, start.offset);
         range.collapse(true);
         range.insertNode(n);
+        finalCaret.setStart(n, s.length);
       }
 
       finalCaret.collapse(true);

@@ -7,7 +7,7 @@
 build: version.res manifest.res icons
     $(DCC32) setup.dpr
     $(TDS2DBG) setup.exe
-    $(MAKEJCLDBG) setup.map
+    $(SENTRYTOOL_DELPHIPREP) setup.exe -dpr setup.dpr
     $(COPY) setup.exe $(PROGRAM)\desktop
 
 setup_dialog.res:

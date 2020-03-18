@@ -54,6 +54,7 @@ done
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         rm -rf keyboardprocessor
+        cp ../VERSION.md ../common/core/desktop/
         meson ../common/core/desktop keyboardprocessor
     fi
     if [ "${proj}" == "keyman-config" ]; then

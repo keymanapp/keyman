@@ -84,10 +84,11 @@ if(!window['keyman']['ui']['name']) {
     
       p = util['getAbsolute'](someElement); x = p['x']; y=p['y'];
 
-      if(someElement.defaultView && someElement.defaultView.frameElement)
+      var ownerDoc = someElement.ownerDocument;
+      if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement)
       { 
-        w = someElement.defaultView.frameElement.clientWidth;
-        h = someElement.defaultView.frameElement.clientHeight;
+        w = ownerDoc.defaultView.frameElement.clientWidth;
+        h = ownerDoc.defaultView.frameElement.clientHeight;
       }
       else
       {
