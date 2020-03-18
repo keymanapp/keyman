@@ -36,6 +36,10 @@ begin
     Delete(s,1,1);
   end;
 
+  if str[0].ToLower.Contains('sentry.dll') then
+    // We don't verify sentry.dll because it's not our file
+    Exit('');
+
   { Check each element of string }
   if str[1] <> 'Signed' then
   begin
