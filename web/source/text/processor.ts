@@ -42,7 +42,6 @@ namespace com.keyman.text {
       let keyName = Lkc.kName;
       let n = Lkc.Lcode;
       let outputTarget = Lkc.Ltarg;
-      let Lelem = outputTarget.getElement();
 
       let keyman = com.keyman.singleton;
       let domManager = keyman.domManager;
@@ -51,7 +50,6 @@ namespace com.keyman.text {
       let quiet = outputTarget instanceof Mock;
 
       var ch = '', checkCodes = false;
-      var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
         checkCodes = true;
@@ -75,6 +73,7 @@ namespace com.keyman.text {
         switch(code) {
           case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
             if(quiet) {
+              // TODO:  Remove need for this clause via refactoring.  It's currently needed for predictive text Mocks.
               return '\b'; // the escape sequence for backspace.
             } else {
               keyman.interface.defaultBackspace(outputTarget);
@@ -97,7 +96,7 @@ namespace com.keyman.text {
             break;
           case Codes.keyCodes['K_ENTER']:
             outputTarget.handleNewlineAtCaret();
-            break;
+            return '\n';  // We still return this, as it ensures we generate a rule-match.
           case Codes.keyCodes['K_SPACE']:
             return ' ';
           // break;
@@ -340,15 +339,13 @@ namespace com.keyman.text {
         kbdInterface.activeTargetOutput = outputTarget;
         let preInput = Mock.from(outputTarget);
 
-        // TODO:  That third parameter should be `fromOSK`, not always `true`.  Changing this breaks Mocks a bit, though,
-        //        and will likely have interactions with the '\b' check below.
-        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true);
+        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, fromOSK);
         kbdInterface.activeTargetOutput = null;
         if(ch) {
           if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
             // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
             kbdInterface.defaultBackspace(outputTarget);
-          } else {
+          } else if(ch != '\n') { // \n is handled automatically now.
             kbdInterface.output(0, outputTarget, ch);
           }
           matchBehavior = new RuleBehavior();
