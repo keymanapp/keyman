@@ -83,7 +83,7 @@ begin
     Result := '';
 
   TEAMCITY_VERSION := GetEnvironmentVariable('TEAMCITY_VERSION');
-  if TEAMCITY_VERSION <> '' then
+  if TEAMCITY_VERSION = '' then
   begin
     // Local dev machine, not TeamCity
     Result := Result + '-local';

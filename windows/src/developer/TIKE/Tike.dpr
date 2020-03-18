@@ -326,8 +326,6 @@ begin
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
         Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
         Application.Run;
-        FreeAndNil(frmKeymanDeveloper);
-        FreeAndNil(modWebHttpServer);
       end;
     finally
       FInitializeCEF.Free;
