@@ -511,7 +511,13 @@ namespace com.keyman.text {
               // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
               //       so a user should never have intended to type it.  Should probably renormalize 
               //       the distribution afterward, though...
-              alternates.push({sample: alternateBehavior.transcription.transform, 'p': pair.p});
+              
+              let transform: Transform = alternateBehavior.transcription.transform;
+              
+              // Ensure that the alternate's token id matches that of the current keystroke, as we only
+              // record the matched rule's context (since they match)
+              transform.id = ruleBehavior.transcription.token;
+              alternates.push({sample: transform, 'p': pair.p});
             }
           }
         }
