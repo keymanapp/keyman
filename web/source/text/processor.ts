@@ -2,6 +2,8 @@
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
 /// <reference path="keyEvent.ts" />
+// Defines default key handling behaviors.
+/// <reference path="defaultOutput.ts" />
 
 namespace com.keyman.text {
   export class LegacyKeyEvent {
@@ -65,81 +67,11 @@ namespace com.keyman.text {
       // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
       // that lacks default key processing behavior.
       if(usingOSK || outputTarget.isSynthetic) {
-        var code = Codes.keyCodes[keyName];
-        if(!code) {
-          code = n;
+        let result = DefaultOutput.commandEmulation(Lkc, keyShiftState);
+
+        if(result) {
+          return result;
         }
-
-        switch(code) {
-          case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            if(quiet) {
-              // TODO:  Remove need for this clause via refactoring.  It's currently needed for predictive text Mocks.
-              return '\b'; // the escape sequence for backspace.
-            } else {
-              keyman.interface.defaultBackspace(outputTarget);
-            }
-            return '';
-          case Codes.keyCodes['K_TAB']:
-            if(!quiet) {
-              domManager.moveToNext(keyShiftState);
-            }
-            break;
-          case Codes.keyCodes['K_TABBACK']:
-            if(!quiet) {
-              domManager.moveToNext(true);
-            }
-            break;
-          case Codes.keyCodes['K_TABFWD']:
-            if(!quiet) {
-              domManager.moveToNext(false);
-            }
-            break;
-          case Codes.keyCodes['K_ENTER']:
-            outputTarget.handleNewlineAtCaret();
-
-            return '\n';  // We still return this, as it ensures we generate a rule-match.
-          case Codes.keyCodes['K_SPACE']:
-            return ' ';
-          // break;
-          //
-          // // Problem:  clusters, and doing them right.
-          // // The commented-out code below should be a decent starting point, but clusters make it complex.
-          //
-          // case VisualKeyboard.keyCodes['K_LEFT']:
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos - 1 >= 0 ? caretPos - 1 : 0);
-          //   }
-          //   break;
-          // case VisualKeyboard.keyCodes['K_RIGHT']:
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-          //   }
-          //   if(code == VisualKeyboard.keyCodes['K_RIGHT']) {
-          //     break;
-          //   }
-          // // Should we include this?  It could be tricky to do correctly...
-          // case VisualKeyboard.keyCodes['K_DEL']:
-          //   // Move caret right one unit, then backspace.
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-          //     if(caretPos == keymanweb.getTextCaret(Lelem)) {
-          //       // Failed to move right - there's nothing to delete.
-          //       break;
-          //     }
-          //     kbdInterface.defaultBackspace();
-          //   }
-        }
-
-        // Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-        //
-        // Can easily occur from mnemonic keyboards, which create synthetic events without
-        // the appropriate kName value.
-        //
-        // Not strictly if `Lkc.vkCode` is properly maintained, but it's good to have an
-        // extra safety; this would have blocked the backspace bug as well.
       } else if(Lkc.Lcode == 8) {
         keyman.interface.defaultBackspace();
         return '';
