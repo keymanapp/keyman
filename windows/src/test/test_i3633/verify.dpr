@@ -85,9 +85,9 @@ begin
 
     if (ParamStr(1) = '-?') or (ParamCount < 1) then
     begin
-      writeln('verify [-d] version.txt: Verify the output of sigcheck to ensure all executables are signed and have proper version.');
+      writeln('verify [-d] VERSION.md: Verify the output of sigcheck to ensure all executables are signed and have proper version.');
       writeln('  -d: Check the timestamp on the signature is less than 2 days old.');
-      writeln('  version.txt: path to the version to verify against');
+      writeln('  VERSION.md: path to the version to verify against');
       Halt(2);
     end;
 
@@ -101,14 +101,7 @@ begin
     Readln(FVersionTextFile, FVersion);
     Close(FVersionTextFile);
 
-    FVersion := Trim(FVersion);
-    if Copy(FVersion, 1, Length('PRODUCTVERSION ')) <> 'PRODUCTVERSION ' then
-    begin
-      writeln('Invalid version.txt file format.  Expecting PRODUCTVERSION 1,2,3,4');
-      Halt(3);
-    end;
-    Delete(FVersion, 1, Length('PRODUCTVERSION '));
-    FVersion := StringReplace(FVersion, ',', '.', [rfReplaceAll]);
+    FVersion := Trim(FVersion) + '.0'; // Need to have the Windows version tag on the end
 
     { Process the sigcheck response }
 
