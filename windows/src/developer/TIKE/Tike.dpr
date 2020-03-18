@@ -1,11 +1,12 @@
 program Tike;
 
 uses
-  Forms,
-  Dialogs,
-  Windows,
-  ComObj,
-  ActiveX,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Winapi.Windows,
+  System.Win.ComObj,
+  Winapi.ActiveX,
+  System.SysUtils,
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   UfrmMDIChild in 'child\UfrmMDIChild.pas' {frmTikeChild},
   UfrmNew in 'dialogs\UfrmNew.pas' {frmNew},
@@ -165,7 +166,6 @@ uses
   WindowsLanguages in '..\..\global\delphi\general\WindowsLanguages.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   TextFileTemplates in 'main\TextFileTemplates.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UfrmFontHelper in 'dialogs\UfrmFontHelper.pas' {Form1},
@@ -227,7 +227,6 @@ uses
   utilcheckfontchars in '..\..\global\delphi\charmap\utilcheckfontchars.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  utiljclexception in '..\..\global\delphi\general\utiljclexception.pas',
   keymanapi_TLB in '..\..\engine\kmcomapi\keymanapi_TLB.pas',
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardExportXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas',
@@ -291,7 +290,11 @@ uses
   Keyman.Developer.System.LexicalModelParserTypes in 'main\Keyman.Developer.System.LexicalModelParserTypes.pas',
   Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
   Keyman.Developer.UI.dmActionsModelEditor in 'actions\Keyman.Developer.UI.dmActionsModelEditor.pas' {modActionsModelEditor: TDataModule},
-  UfrmMustIncludeDebug in 'dialogs\UfrmMustIncludeDebug.pas' {frmMustIncludeDebug};
+  UfrmMustIncludeDebug in 'dialogs\UfrmMustIncludeDebug.pas' {frmMustIncludeDebug},
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -303,26 +306,33 @@ uses
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
 begin
-  CoInitFlags := COINIT_APARTMENTTHREADED;
-
-  FInitializeCEF := TCEFManager.Create;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper);
   try
-    if FInitializeCEF.Start then
-    begin
-      InitThemeLibrary;
-      SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-      Application.MainFormOnTaskBar := True;
-      Application.Initialize;
-    //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
-      Application.Title := 'Keyman Developer';
-      //TBX.TBXSetTheme('OfficeXP2');
-      if TikeActive then Exit;
-      InitClasses;
-      Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  Application.Run;
+    CoInitFlags := COINIT_APARTMENTTHREADED;
+
+    FInitializeCEF := TCEFManager.Create;
+    try
+      if FInitializeCEF.Start then
+      begin
+        InitThemeLibrary;
+        SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+        Application.MainFormOnTaskBar := True;
+        Application.Initialize;
+      //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
+        Application.Title := 'Keyman Developer';
+        //TBX.TBXSetTheme('OfficeXP2');
+        if TikeActive then Exit;
+        InitClasses;
+        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+        Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+        Application.Run;
+        FreeAndNil(frmKeymanDeveloper);
+        FreeAndNil(modWebHttpServer);
+      end;
+    finally
+      FInitializeCEF.Free;
     end;
   finally
-    FInitializeCEF.Free;
+    TKeymanSentryClient.Stop;
   end;
 end.

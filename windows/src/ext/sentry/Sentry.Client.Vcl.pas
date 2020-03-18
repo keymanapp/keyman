@@ -25,7 +25,8 @@ uses
 constructor TSentryClientVcl.Create(AOptions: TSentryClientOptions;
   ACaptureExceptions: Boolean);
 begin
-  inherited;
+  inherited Create(AOptions, ACaptureExceptions);
+
   if ACaptureExceptions then
   begin
     Application.OnException := HandleApplicationException;
@@ -40,15 +41,9 @@ begin
     Application.OnException := nil;
 end;
 
-procedure TSentryClientVcl.HandleApplicationException(Sender: TObject;
-  E: Exception);
-const
-  Size = 1024;
-var
-  Buffer: array[0..Size-1] of Char;
+procedure TSentryClientVcl.HandleApplicationException(Sender: TObject; E: Exception);
 begin
-  if ExceptionErrorMessage(E, ExceptAddr, Buffer, Size) > 0 then
-    ExceptionEvent(E.ClassName, Buffer);
+  SentryHandleException(E);
 end;
 
 end.

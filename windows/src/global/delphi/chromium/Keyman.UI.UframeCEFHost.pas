@@ -201,7 +201,6 @@ uses
   Winapi.ShellApi,
 
   ErrorControlledRegistry,
-  ExternalExceptionHandler,
   utilhttp,
   uCEFApplication,
   uCEFConstants,

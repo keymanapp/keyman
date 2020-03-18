@@ -11,7 +11,9 @@ uses
   KeymanPaths in '..\..\..\global\delphi\general\KeymanPaths.pas',
   RegistryKeys in '..\..\..\global\delphi\general\RegistryKeys.pas',
   DebugPaths in '..\..\..\global\delphi\general\DebugPaths.pas',
-  ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas';
+  ErrorControlledRegistry in '..\..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
+  utilexecute in '..\..\..\global\delphi\general\utilexecute.pas',
+  Unicode in '..\..\..\global\delphi\general\Unicode.pas';
 
 {$R *.res}
 
@@ -21,7 +23,7 @@ begin
     Application.Initialize;
     Application.MainFormOnTaskbar := True;
     Application.CreateForm(TfrmSentryClientVclTestMain, frmSentryClientVclTestMain);
-    Application.Run;
+  Application.Run;
 
     // This should be done before shutting down the exception manager
     if Application.MainForm <> nil then

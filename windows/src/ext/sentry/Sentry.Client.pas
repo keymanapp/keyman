@@ -34,79 +34,68 @@ type
     SENTRY_LEVEL_FATAL = 3
   );
 
+  TSentryClientEventType = (scetException, scetMessage);
+  TSentryClientEventAction = (sceaContinue, sceaTerminate);
+  TSentryClientEvent = procedure(Sender: TObject; EventType: TSentryClientEventType;
+    const EventClassName, Message: string;
+    var EventAction: TSentryClientEventAction) of object;
+
   TSentryClient = class
   protected
   class var
     FInstance: TSentryClient;
   private
     options: psentry_options_t;
+    FOnBeforeEvent: TSentryClientEvent;
+    FOnAfterEvent: TSentryClientEvent;
+    procedure DoAfterEvent(const ExceptionClassName, Message: string;
+      EventType: TSentryClientEventType);
+    procedure DoBeforeEvent(const ExceptionClassName, Message: string;
+      EventType: TSentryClientEventType);
+    procedure DoTerminate;
 
   public
     constructor Create(AOptions: TSentryClientOptions; ACaptureExceptions: Boolean = True); virtual;
     destructor Destroy; override;
 
-    function MessageEvent(Level: TSentryLevel; const Logger, Message: string; IncludeStack: Boolean = True): TGUID;
-    function ExceptionEvent(const ExceptionClassName, Message: string): TGUID;
+    function MessageEvent(Level: TSentryLevel; const Logger, Message: string; IncludeStack: Boolean = False): TGUID;
+    function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
+
+    property OnBeforeEvent: TSentryClientEvent read FOnBeforeEvent write FOnBeforeEvent;
+    property OnAfterEvent: TSentryClientEvent read FOnAfterEvent write FOnAfterEvent;
   end;
 
   TSentryClientClass = class of TSentryClient;
 
-procedure SentryHandleException(E: Exception);
+procedure SentryHandleException(E: Exception; AExceptAddr: Pointer = nil);
 
 implementation
 
 { TSentryClient }
 
-(*
-type
-  PEXCEPTION_POINTERS = ^EXCEPTION_POINTERS;
-
-type
-  TUnhandledExceptionFilter = function(p: PEXCEPTION_POINTERS): LONG; stdcall;
-var
-  CrashpadFilter: TUnhandledExceptionFilter = nil;
-  FLastExceptionInfo: EXCEPTION_POINTERS;
-
-function AddVectoredExceptionHandler(first: ULONG; p: TUnhandledExceptionFilter): Pointer; stdcall; external 'kernel32.dll';
-*)
-
-procedure SentryHandleException(E: Exception);
+//
+// Handler for try/except blocks. Call SentryHandleException
+// on outer blocks to report any unhandled exceptions.
+//
+procedure SentryHandleException(E: Exception; AExceptAddr: Pointer);
 const
   Size = 1024;
 var
   Buffer: array[0..Size-1] of Char;
-//  crumb: sentry_value_t;
 begin
   if TSentryClient.FInstance <> nil then
   begin
-    if ExceptionErrorMessage(ExceptObject, ExceptAddr, Buffer, Size) > 0 then
+    if AExceptAddr = nil then
+      AExceptAddr := System.ExceptAddr;
+    if ExceptionErrorMessage(E, AExceptAddr, Buffer, Size) > 0 then
       TSentryClient.FInstance.ExceptionEvent(E.ClassName, Buffer);
-//    begin
-//      crumb := sentry_value_new_breadcrumb('default', PAnsiChar(UTF8Encode(Buffer)));
-//      sentry_value_set_by_key(crumb, 'category', sentry_value_new_string('Exception'));
-//      sentry_value_set_by_key(crumb, 'level', sentry_value_new_string('error'));
-//      sentry_add_breadcrumb(crumb);
-//    end;
-
-//    TSentryClient.FInstance.AddBreadcrumb('Exception', Buffer);
-//    TSentryClient.FInstance.AddBreadcrumb('ExceptionClass', ExceptObject.ClassName);
-
-//    if @CrashpadFilter <> nil then
-//      CrashpadFilter(@FLastExceptionInfo);
   end;
 end;
 
-(*
-const
-  EXCEPTION_CONTINUE_SEARCH = 0;
-
-function FirstHandler(ExceptionInfo: PEXCEPTION_POINTERS): LONG; stdcall;
-begin
-  FLastExceptionInfo := ExceptionInfo^;
-  Result := EXCEPTION_CONTINUE_SEARCH;
-end;
-*)
-
+//
+// Last-gasp exception handler assigned to ExceptProc.
+// Most processes drop their exceptions into SentryHandleException
+//
 procedure SentryExceptHandler(ExceptObject: TObject; ExceptAddr: Pointer);
 const
   Size = 1024;
@@ -116,34 +105,10 @@ begin
   if TSentryClient.FInstance <> nil then
   begin
     if ExceptionErrorMessage(ExceptObject, ExceptAddr, Buffer, Size) > 0 then
-//  try
-//      TSentryClient.FInstance.AddBreadcrumb('Exception', Buffer);
-//      TSentryClient.FInstance.AddBreadcrumb('ExceptionClass', ExceptObject.ClassName);
       TSentryClient.FInstance.ExceptionEvent(ExceptObject.ClassName, Buffer);
   end;
-//  except
-//
-//  end;
 end;
 
-(*
-function AnnotateExceptions(
-  event: sentry_value_t;
-  hint: Pointer;
-  closure: Pointer
-): sentry_value_t; cdecl;
-const
-  Size = 1024;
-var
-  Buffer: array[0..Size-1] of Char;
-begin
-  if ExceptObject <> nil then
-  begin
-    if ExceptionErrorMessage(ExceptObject, ExceptAddr, Buffer, Size) > 0 then
-      sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(AnsiString(Buffer))));
-  end;
-  Result := event;
-end;*)
 
 constructor TSentryClient.Create(AOptions: TSentryClientOptions; ACaptureExceptions: Boolean = True);
 begin
@@ -174,27 +139,12 @@ begin
   if AOptions.Debug then
     sentry_options_set_debug(options, 1);
 
-  (*
-  if AOptions.HandlerPath <> '' then
-    sentry_options_set_handler_pathw(options, PChar(AOptions.HandlerPath));
-
-  if AOptions.DatabasePath <> '' then
-    sentry_options_set_database_pathw(options, PChar(AOptions.DatabasePath));
-  *)
-
-//  sentry_options_set_before_send(options, AnnotateExceptions, nil);
-
   sentry_init(options);
 
 
   if ACaptureExceptions then
   begin
-//    AddVectoredExceptionHandler(1, FirstHandler);
-//    CrashPadFilter := SetUnhandledExceptionFilter(nil);
-//    SetUnhandledExceptionFilter(@CrashPadFilter);
     ExceptProc := @SentryExceptHandler;
-    // TODO: Application.OnException
-//    JITEnable := 2;
   end;
 end;
 
@@ -207,6 +157,11 @@ end;
 
 function RtlCaptureStackBackTrace(FramesToSkip, FramesToCapture: DWORD; BackTrace: Pointer; BackTraceHash: PDWORD): WORD; stdcall; external 'ntdll.dll';
 
+//
+// Capture a stack trace and include the offending crash address at the top of
+// the trace. Apart from skipping frames and the inclusion of TopAddr, this is
+// very similar to sentry_event_value_add_stacktrace.
+//
 function CaptureStackTrace(TopAddr: Pointer; FramesToSkip: DWORD): sentry_value_t;
 var
   walked_backtrace: array[0..255] of Pointer;
@@ -252,7 +207,45 @@ begin
   Result := threads;
 end;
 
-function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string): TGUID;
+//
+// Force the application to terminate abruptly, but give
+// time for Sentry to report outstanding events.
+//
+procedure TSentryClient.DoTerminate;
+begin
+  sentry_shutdown;
+  ExitProcess(1);
+end;
+
+procedure TSentryClient.DoBeforeEvent(const ExceptionClassName, Message: string;
+  EventType: TSentryClientEventType);
+var
+  EventAction: TSentryClientEventAction;
+begin
+  if Assigned(FOnBeforeEvent) then
+  begin
+    EventAction := sceaContinue;
+    FOnBeforeEvent(Self, EventType, ExceptionClassName, Message, EventAction);
+    if EventAction = sceaTerminate then
+      DoTerminate;
+  end;
+end;
+
+procedure TSentryClient.DoAfterEvent(const ExceptionClassName, Message: string;
+  EventType: TSentryClientEventType);
+var
+  EventAction: TSentryClientEventAction;
+begin
+  if Assigned(FOnAfterEvent) then
+  begin
+    EventAction := sceaContinue;
+    FOnAfterEvent(Self, EventType, ExceptionClassName, Message, EventAction);
+    if EventAction = sceaTerminate then
+      DoTerminate;
+  end;
+end;
+
+function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
 var
   event: sentry_value_t;
   uuid: sentry_uuid_t;
@@ -268,6 +261,7 @@ const
   //    A pseudo-frame is inserted at the top of the stack which points
   //    to the address of the code that caused the exception
 begin
+  DoBeforeEvent(ExceptionClassName, Message, scetException);
 
   event := sentry_value_new_event;
 
@@ -275,6 +269,8 @@ begin
   When we set exception information, the report is corrupted. Not sure why. So
   for now we won't create as an exception event. We still get all the information
   we want from this.
+
+  Investigating this further.
 
   exc := sentry_value_new_object;
   sentry_value_set_by_key(exc, 'type', sentry_value_new_string(PAnsiChar(UTF8Encode(ExceptionClassName))));
@@ -284,12 +280,16 @@ begin
 
   sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
 
-  threads := CaptureStackTrace(ExceptAddr, FRAMES_TO_SKIP);
+  if AExceptAddr = nil then
+    AExceptAddr := System.ExceptAddr;
+  threads := CaptureStackTrace(AExceptAddr, FRAMES_TO_SKIP);
   if threads <> 0 then
     sentry_value_set_by_key(event, 'threads', threads);
 
   uuid := sentry_capture_event(event);
   Result := uuid.native_uuid;
+
+  DoAfterEvent(ExceptionClassName, Message, scetException);
 end;
 
 function TSentryClient.MessageEvent(Level: TSentryLevel; const Logger,
@@ -299,10 +299,12 @@ var
   threads: sentry_value_t;
 const
   FRAMES_TO_SKIP = 2;
-  // We are not interested in just the first two frames:
+  // We are not interested in the first two frames:
   //    Sentry.Client.CaptureStackTrace,
   //    Sentry.Client.TSentryClient.MessageEvent
 begin
+  DoBeforeEvent(Logger, Message, scetMessage);
+
 	event := sentry_value_new_message_event(
 		{*   level *} sentry_level_t(Level),
 		{*  logger *} PAnsiChar(UTF8Encode(Logger)),
@@ -317,6 +319,8 @@ begin
   end;
 
   Result := sentry_capture_event(event).native_uuid;
+
+  DoAfterEvent(Logger, Message, scetMessage);
 end;
 
 end.
