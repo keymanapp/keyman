@@ -186,8 +186,6 @@ TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
 SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
 SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
-MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
-
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
 WIXCANDLE=$(WIXPATH)\candle.exe -wx -nologo
 
