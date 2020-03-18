@@ -30,8 +30,8 @@ build-jcldbg:
 
 build-jvcl-docking:
     cd $(EXT)\jedi\packages
-#    $(DCC32DPK) Jcl.dpk
-#    $(DCC32DPK) JclVcl.dpk
+    $(DCC32DPK) Jcl.dpk
+    $(DCC32DPK) JclVcl.dpk
     $(DCC32DPK) JvCore.dpk
     $(DCC32DPK) JvCoreDesign.dpk
     $(DCC32DPK) JvDocking.dpk
@@ -42,10 +42,10 @@ install: install-paths install-packages
 install-paths:
     $(DEVTOOLS) -ai $(EXT)\jedi
 
-#    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\common
-#    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\include
-#    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\vcl
-#    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\windows
+    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\common
+    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\include
+    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\vcl
+    $(DEVTOOLS) -ai $(EXT)\jedi\jcl\jcl\source\windows
 
     $(DEVTOOLS) -ai $(EXT)\jedi\jvcl\jvcl\common
     $(DEVTOOLS) -ai $(EXT)\jedi\jvcl\jvcl\resources
