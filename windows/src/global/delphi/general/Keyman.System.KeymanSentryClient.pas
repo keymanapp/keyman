@@ -117,8 +117,7 @@ begin
 
   {$MESSAGE HINT 'Support proxies'}
 
-  o.Release := 'keyman-14.0.22-alpha-local';
-  //o.Release := 'release-'+SKeymanVersionWithTag;
+  o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag;
 
   FClient := SentryClientClass.Create(o, kscfCaptureExceptions in FFlags);
   FClient.OnAfterEvent := ClientAfterEvent;

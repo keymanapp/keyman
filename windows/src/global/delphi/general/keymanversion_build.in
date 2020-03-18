@@ -3,3 +3,21 @@
   KeymanVersion_Major = $RELEASE_MAJOR;
   KeymanVersion_Minor = $RELEASE_MINOR;
 
+  // Keyman Version Information
+
+  KeymanVersionInfo: TKeymanVersionInfo = (
+    // These fields match fields in /resources/build/build-utils.sh
+    Version: '$Version';
+    VersionWin: '$VersionWin';
+    VersionRelease: '$VersionRelease';
+    VersionMajor: $VersionMajor;
+    VersionMinor: $VersionMinor;
+    VersionPatch: $VersionPatch;
+    Tier: '$Tier';
+    Tag: '$Tag';
+    VersionWithTag: '$VersionWithTag';
+
+    // These fields are useful only for Windows apps
+    VersionRc: '$VersionRc'
+  );
+

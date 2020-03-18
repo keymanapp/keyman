@@ -22,7 +22,11 @@ unit Main;  // I3308
 
 interface
 
-uses WinApi.Windows, System.Classes, System.SysUtils, TagFunctions;
+uses
+  WinApi.Windows,
+  System.Classes,
+  System.SysUtils,
+  TagFunctions;
 
 procedure Run;
 
@@ -30,22 +34,17 @@ implementation
 
 uses
   WinApi.ActiveX,
+  System.RegularExpressions,
   System.Win.ComObj,
   Xml.XMLIntf,
-  Xml.XMLDoc;
+  Xml.XMLDoc,
 
-// This is the default build number used when doing a build outside of CI, and is
-// appended to the release version found in resources/version.md
-const
-  S_DebugBuildVersion = '9999';
+  Keyman.System.KeymanVersionInfo;
+
+procedure WriteHelp; forward;
 
 type
-  TMKVerMode = (mmUnknown, mmSetRootVersionFromVersionMd, mmWriteVersionedFile, mmWriteManifestFile);
-var
-  FMode: TMKVerMode = mmUnknown;
-  BuildVersion, ResourceMdFilename: string;
-  RootTemplateFileName, TemplateFileName, ResourceFileName: string;
-  UpdateFiles: TStringList;
+  TMKVerMode = (mmUnknown, mmWriteVersionedFile, mmWriteManifestFile, mmWriteVersionRc);
 
 const
   TAG_FILEVERSION       = 1;
@@ -72,88 +71,113 @@ var
     ('"CompanyName",', '"FileDescription",', '"FileVersion",', '"InternalName",', '"LegalCopyright",',
      '"LegalTradmarks",', '"OriginalFilename",', '"ProductName",', '"ProductVersion",', '"Comments",');
 
-function Init: Boolean;
+function ConstructVersionTag(const tier: string): string;
+var
+  TEAMCITY_VERSION, TEAMCITY_PR_NUMBER: string;
+begin
+  // This matches the algorithm found in /resources/build/build-utils.sh
+
+  if (tier = 'alpha') or (tier = 'beta') then
+    Result := '-'+tier
+  else
+    Result := '';
+
+  TEAMCITY_VERSION := GetEnvironmentVariable('TEAMCITY_VERSION');
+  if TEAMCITY_VERSION <> '' then
+  begin
+    // Local dev machine, not TeamCity
+    Result := Result + '-local';
+  end
+  else
+  begin
+    // On TeamCity; are we running a pull request build or a master/beta/stable build?
+    TEAMCITY_PR_NUMBER := GetEnvironmentVariable('TEAMCITY_PR_NUMBER');
+    if TEAMCITY_PR_NUMBER <> '' then
+    begin
+      // Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
+      // This indicates we are running a Test build.
+      if TRegEx.IsMatch(TEAMCITY_PR_NUMBER, '^(master|beta|stable(-[0-9]+\.[0-9]+)?)$') then
+      begin
+        Result := Result + '-test';
+      end
+      else
+        Result := Result + '-test-'+TEAMCITY_PR_NUMBER;
+    end;
+  end;
+end;
+
+function Init(var FMode: TMKVerMode; var TemplateFileName: string; UpdateFiles: TStringList; var VersionInfo: TKeymanVersionInfo): Boolean;
 var
   s: string;
   n: Integer;
+  version, tier, tag: string;
 begin
-  Result := False;
-
   FMode := mmUnknown;
 
-  s := LowerCase(ParamStr(1));
-
-  if s = '-c' then
+  n := 1;
+  s := ParamStr(n);
+  while s <> '' do
   begin
-    RootTemplateFileName := ParamStr(2);
-    if SameText(ParamStr(3), '-r') then
+    if s = '-u' then
     begin
-      FMode := mmSetRootVersionFromVersionMd;
-      ResourceMdFilename := ParamStr(4);
+      FMode := mmWriteVersionedFile;
+      UpdateFiles.AddPair(ParamStr(n+1), ParamStr(n+2));
+      Inc(n,3);
+    end
+    else if s = '-v' then
+    begin
+      FMode := mmWriteVersionRc;
+      TemplateFileName := ParamStr(n+1);
+      UpdateFiles.AddPair(ParamStr(n+2), ParamStr(n+3));
+      Inc(n,4);
+    end
+    else if s = '-m' then
+    begin
+      FMode := mmWriteManifestFile;
+      UpdateFiles.AddPair(ParamStr(n+1), ParamStr(n+2));
+      Inc(n,3);
+    end
+    else if s = '-version' then
+    begin
+      version := ParamStr(n+1);
+      Inc(n,2);
+    end
+    else if s = '-tier' then
+    begin
+      tier := ParamStr(n+1);
+      Inc(n,2);
     end
     else
-      Exit;
-  end
-  else if s = '-v' then
-  begin
-    FMode := mmWriteVersionedFile;
-    n := 2;
-    while ParamStr(n) = '-u' do begin Inc(n); UpdateFiles.Add(ParamStr(n)+'='+ParamStr(n+1)); Inc(n,2); end;
-    TemplateFileName := ParamStr(n);
-    if TemplateFileName = '' then Exit;
-    ResourceFileName := ParamStr(n+1);
-    if ResourceFileName = '' then ResourceFileName := 'version.rc';
-  end
-  else if s = '-m' then
-  begin
-    n := 2;
-    FMode := mmWriteManifestFile;
-    TemplateFileName := ParamStr(n);
-    if TemplateFileName = '' then Exit;
-    ResourceFileName := 'manifest.xml';
-  end
-  else
-    Exit;
+      // Unrecognised parameter
+      Exit(False);
+
+    s := ParamStr(n);
+  end;
+
+  if FMode = mmUnknown then
+    Exit(False);
+
+  tag := ConstructVersionTag(tier);
+
+  VersionInfo := BuildKeymanVersionInfo(version, tier, tag);
 
   Result := True;
 end;
 
-function GetCommaValue(var t: string): Integer;
-var
-  n: Integer;
-begin
-  if t = '' then raise Exception.Create('Cannot find valid PRODUCTVERSION.');
-  n := Pos(',', t); if n = 0 then n := Length(t) + 1;
-  Result := StrToInt(Copy(t, 1, n-1));
-  Delete(t, 1, n);
-end;
-
-// Version number format:
-//
-//   5.1.22.0
-//     5  is major
-//     1  is minor
-//     22 is build
-//     0  is reserved for later use
-//
-
-procedure UpdateResource;
+procedure UpdateResource(const template, fin, fout: string; VersionInfo: TKeymanVersionInfo);
 var
   i: Integer;
-  ProductVersion, FileFlags, StringCompanyName: string;
+  StringCompanyName: string;
   StringLegalCopyright, StringLegalTrademarks: string;
-  StringProductName, StringProductVersion: string;
-  xml: IXMLDocument;
+  StringProductName: string;
 begin
   writeln('Updating file version');
 
   with TStringList.Create do
   try
-    LoadFromFile(TemplateFileName);
+    LoadFromFile(template);
     for i := 0 to Count - 1 do
       case GetTagValue(Strings[i], 1, PredefTags) of
-        TAG_PRODUCTVERSION: ProductVersion := GetTag(Strings[i], 2);
-        TAG_FILEFLAGS:      FileFlags      := GetTag(Strings[i], 2);
         TAG_VALUE:
           case GetTagValue(Strings[i], 2, StringTags) of
             TAG2_COMPANYNAME:      StringCompanyName := GetTag(Strings[i], 3);
@@ -175,95 +199,59 @@ begin
 
   // I'm free!!!  I'm free!!!  I'm finally free!!  Thank God almighty I'm free at last! (end).
 
-  StringProductVersion := ProductVersion;
-  for i := 1 to Length(StringProductVersion) do
-    if StringProductVersion[i] = ',' then StringProductVersion[i] := '.';
+  with TStringList.Create do
+  try
+    LoadFromFile(fin);
 
-  if ResourceFileName = 'manifest.xml' then
-  begin
-    xml := LoadXMLDocument(ChangeFileExt(ResourceFileName, '.in'));
-    xml.DocumentElement.ChildNodes['assemblyIdentity'].Attributes['version'] := StringProductVersion;
-    xml.SaveToFile(ResourceFileName);
-    xml := nil;
-  end
-  else
-  begin
-    StringProductVersion := '"' + StringProductVersion + '\0"';
-    with TStringList.Create do
-    try
-      LoadFromFile(ChangeFileExt(ResourceFileName, '.in'));
-
-      for i := 0 to Count - 1 do
-        case GetTagValue(Strings[i], 1, PredefTags) of
-          TAG_FILEVERSION:    Strings[i] := UpdateTag(Strings[i], 2, ProductVersion);
-          TAG_PRODUCTVERSION: Strings[i] := UpdateTag(Strings[i], 2, ProductVersion);
-          TAG_FILEFLAGS:      Strings[i] := UpdateTag(Strings[i], 2, FileFlags);
-          TAG_VALUE:
-            case GetTagValue(Strings[i], 2, StringTags) of
-              TAG2_COMPANYNAME:      Strings[i] := UpdateTag(Strings[i], 3, StringCompanyName);
-              TAG2_FILEDESCRIPTION:  ;
-              TAG2_FILEVERSION:      Strings[i] := UpdateTag(Strings[i], 3, StringProductVersion);
-              TAG2_INTERNALNAME:     ;
-              TAG2_LEGALCOPYRIGHT:   Strings[i] := UpdateTag(Strings[i], 3, StringLegalCopyright);
-              TAG2_LEGALTRADEMARKS:  Strings[i] := UpdateTag(Strings[i], 3, StringLegalTrademarks);
-              TAG2_ORIGINALFILENAME: ;
-              TAG2_PRODUCTNAME:      Strings[i] := UpdateTag(Strings[i], 3, StringProductName);
-              TAG2_PRODUCTVERSION:   Strings[i] := UpdateTag(Strings[i], 3, StringProductVersion);
-              TAG2_COMMENTS:         ;
-            end;
-        end;
-      SaveToFile(ResourceFileName);
-    finally
-      Free;
-    end;
+    for i := 0 to Count - 1 do
+      case GetTagValue(Strings[i], 1, PredefTags) of
+        TAG_FILEVERSION:    Strings[i] := UpdateTag(Strings[i], 2, VersionInfo.VersionRc);
+        TAG_PRODUCTVERSION: Strings[i] := UpdateTag(Strings[i], 2, VersionInfo.VersionRc);
+        TAG_VALUE:
+          case GetTagValue(Strings[i], 2, StringTags) of
+            TAG2_COMPANYNAME:      Strings[i] := UpdateTag(Strings[i], 3, StringCompanyName);
+            TAG2_FILEDESCRIPTION:  ;
+            TAG2_FILEVERSION:      Strings[i] := UpdateTag(Strings[i], 3, '"'+VersionInfo.VersionWin+'\0"');
+            TAG2_INTERNALNAME:     ;
+            TAG2_LEGALCOPYRIGHT:   Strings[i] := UpdateTag(Strings[i], 3, StringLegalCopyright);
+            TAG2_LEGALTRADEMARKS:  Strings[i] := UpdateTag(Strings[i], 3, StringLegalTrademarks);
+            TAG2_ORIGINALFILENAME: ;
+            TAG2_PRODUCTNAME:      Strings[i] := UpdateTag(Strings[i], 3, StringProductName);
+            TAG2_PRODUCTVERSION:   Strings[i] := UpdateTag(Strings[i], 3, '"'+VersionInfo.VersionWin+'\0"');
+            TAG2_COMMENTS:         ;
+          end;
+      end;
+    SaveToFile(fout);
+  finally
+    Free;
   end;
 end;
 
-procedure UpdateFile(const fin, fout: string);
+procedure UpdateManifest(const fin, fout: string; VersionInfo: TKeymanVersionInfo);
+var
+  xml: IXMLDocument;
+begin
+  xml := LoadXMLDocument(fin);
+  xml.DocumentElement.ChildNodes['assemblyIdentity'].Attributes['version'] := VersionInfo.VersionWin;
+  xml.SaveToFile(fout);
+  xml := nil;
+end;
+
+procedure UpdateFile(const fin, fout: string; VersionInfo: TKeymanVersionInfo);
 var
   tfi, tfo: TextFile;
-  ProductVersion, s: string;
-  ProductVersionNum, ProductVersionCvs: string;
   i, n: Integer;
   v: Integer;
+  s: string;
   FGUID: array[0..9] of string;
   g: TGUID;
-  ProductReleaseMajor, ProductReleaseMinor, ProductRelease: string;
 begin
   for i := 0 to 9 do
   begin
     CreateGUID(g);
     FGUID[i] := GUIDToString(g);
   end;
-  ProductVersion := '';
   writeln('Updating file version for '+fin);
-  with TStringList.Create do
-  try
-    LoadFromFile(TemplateFileName);
-    for i := 0 to Count - 1 do
-      case GetTagValue(Strings[i], 1, PredefTags) of
-        TAG_PRODUCTVERSION: ProductVersion := GetTag(Strings[i], 2);
-      end;
-  finally
-    Free;
-  end;
-
-  if ProductVersion = '' then Exit;
-  ProductVersionNum := ProductVersion;
-  ProductVersionCvs := ProductVersion;
-  for i := 1 to Length(ProductVersion) do
-  begin
-    if ProductVersion[i] = ',' then ProductVersion[i] := '.';
-    if ProductVersionCvs[i] = ',' then ProductVersionCvs[i] := '-';
-  end;
-
-  ProductRelease := ProductVersion;
-  i := Pos('.', ProductRelease, Pos('.', ProductRelease)+1);
-  if i > 0 then
-    Delete(ProductRelease, i, MaxInt);
-
-  ProductReleaseMajor := Copy(ProductRelease, 1, Pos('.', ProductRelease)-1);
-  ProductReleaseMinor := Copy(ProductRelease, Pos('.', ProductRelease)+1, MAXINT);
 
   AssignFile(tfi, fin);
   AssignFile(tfo, fout);
@@ -274,13 +262,27 @@ begin
   begin
     readln(tfi, s);
 
-    s := StringReplace(s, '$VERSIONNUM', ProductVersionNum, [rfReplaceAll]);
-    s := StringReplace(s, '$VERSIONCVS', ProductVersionCvs, [rfReplaceAll]);
-    s := StringReplace(s, '$VERSION', ProductVersion, [rfReplaceAll]);
+    // Current replacements
+    s := StringReplace(s, '$Version',        VersionInfo.Version,        [rfReplaceAll]);
+    s := StringReplace(s, '$VersionWin',     VersionInfo.VersionWin,     [rfReplaceAll]);
+    s := StringReplace(s, '$VersionRelease', VersionInfo.VersionRelease, [rfReplaceAll]);
+    s := StringReplace(s, '$VersionMajor',   IntToStr(VersionInfo.VersionMajor), [rfReplaceAll]);
+    s := StringReplace(s, '$VersionMinor',   IntToStr(VersionInfo.VersionMinor), [rfReplaceAll]);
+    s := StringReplace(s, '$VersionPatch',   IntToStr(VersionInfo.VersionPatch), [rfReplaceAll]);
+    s := StringReplace(s, '$Tier',           VersionInfo.Tier,           [rfReplaceAll]);
+    s := StringReplace(s, '$Tag',            VersionInfo.Tag,            [rfReplaceAll]);
+    s := StringReplace(s, '$VersionWithTag', VersionInfo.VersionWithTag, [rfReplaceAll]);
+    s := StringReplace(s, '$VersionRc',      VersionInfo.VersionRc,      [rfReplaceAll]);
 
-    s := StringReplace(s, '$RELEASE_MAJOR', ProductReleaseMajor, [rfReplaceAll]);
-    s := StringReplace(s, '$RELEASE_MINOR', ProductReleaseMinor, [rfReplaceAll]);
-    s := StringReplace(s, '$RELEASE', ProductRelease, [rfReplaceAll]);
+    // Legacy replacements
+    // TODO(lowpri): replace these with above and eliminate
+    s := StringReplace(s, '$VERSIONNUM', VersionInfo.VersionRc, [rfReplaceAll]);
+    s := StringReplace(s, '$VERSION', VersionInfo.VersionWin, [rfReplaceAll]);
+
+    s := StringReplace(s, '$RELEASE_MAJOR', IntToStr(VersionInfo.VersionMajor), [rfReplaceAll]);
+    s := StringReplace(s, '$RELEASE_MINOR', IntToStr(VersionInfo.VersionMinor), [rfReplaceAll]);
+    s := StringReplace(s, '$RELEASE', VersionInfo.VersionRelease, [rfReplaceAll]);
+
 
     n := Pos('$GUID', s);
     while n > 0 do
@@ -303,76 +305,86 @@ begin
   CloseFile(tfo);
 end;
 
-procedure WriteRootVersionTemplateFromVersionMd;
-begin
-  with TStringList.Create do
-  try
-    LoadFromFile(ResourceMdFilename);
-    BuildVersion := Strings[0];
-  finally
-    Free;
-  end;
-
-  // Transform the string from 1.2 to 1,2 to match version.txt/version.rc format
-  BuildVersion := StringReplace(BuildVersion, '.', ',', [rfReplaceAll]);
-
-  // VERSION.MD has only major.minor.patch, so append ,0 to satisfy Windows
-  // version patterns
-  BuildVersion := BuildVersion + ',0';
-
-  with TStringList.Create do
-  try
-    Add('PRODUCTVERSION '+BuildVersion);
-    SaveToFile(RootTemplateFileName);
-  finally
-    Free;
-  end;
-end;
-
 procedure Run;
 var
+  FMode: TMKVerMode;
+  TemplateFileName: string;
+  UpdateFiles: TStringList;
   i: Integer;
+  VersionInfo: TKeymanVersionInfo;
 begin
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
 
   writeln('KMVer: Keyman project version information increment');
+
+  FMode := mmUnknown;
   UpdateFiles := TStringList.Create;
-  if not Init then
-  begin
+  try
+    if not Init(FMode, TemplateFileName, UpdateFiles, VersionInfo) then
+    begin
+      WriteHelp;
+      ExitCode := 2;
+      Exit;
+    end;
+
+    case FMode of
+      mmWriteVersionedFile:
+        for i := 0 to UpdateFiles.Count - 1 do
+          UpdateFile(UpdateFiles.Names[i], UpdateFiles.ValueFromIndex[i], VersionInfo);
+
+      mmWriteManifestFile:
+        UpdateManifest(UpdateFiles.Names[0], UpdateFiles.ValueFromIndex[0], VersionInfo);
+      mmWriteVersionRc:
+        UpdateResource(TemplateFileName, UpdateFiles.Names[0], UpdateFiles.ValueFromIndex[0], VersionInfo);
+    end;
+
+
+  finally
     UpdateFiles.Free;
-    writeln(#13#10+'Usage: kmver -c <root-version.txt> -r <VERSION.md>');
-    writeln(' or    kmver -v [-u f.in f.out]* <template> [version.rc]');
-    writeln('   -c:         Sets the root template version');
-    writeln('       -r:     Use major.minor.patch version data from VERSION.md');
-    writeln('   -v:         Update the version.rc with the template information');
-    writeln('   -m:         Update manifest.xml with the template information');
-    writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
-    writeln('                          $VERSION     1.2.3.4');
-    writeln('                          $VERSIONNUM  9,0,700,0');
-    writeln('                          $VERSIONCVS  9-0-700-0');
-    writeln('                          $RELEASE     1.2');
-    writeln('                          $GUID#       GUID 0-9');
-    writeln('                          $DATE        1 March 2018');
-    writeln('   template:   The source template, usually \keyman\windows\src\<dir>\version.txt');
-    writeln('   root:       The source template, usually \keyman\windows\src\version.txt');
-    writeln('   version.rc: version.rc file to update');
-    ExitCode := 2;
-    Exit;
   end;
-
-  if FMode = mmSetRootVersionFromVersionMd then
-    WriteRootVersionTemplateFromVersionMd
-  else
-  begin
-    if UpdateFiles.Count = 0 then
-      UpdateResource;
-
-    for i := 0 to UpdateFiles.Count - 1 do
-      UpdateFile(UpdateFiles.Names[i], UpdateFiles.Values[UpdateFiles.Names[i]]);
-  end;
-
-  UpdateFiles.Free;
   CoUninitialize;
+end;
+
+procedure WriteHelp;
+begin
+  writeln;
+  writeln('Usage: kmver -u f.in f.out [-u f.in f.out...] <common_parameters>');
+  writeln(' or    kmver -v <project-version.in> <app-version.in> <version.rc> <common_parameters>');
+  writeln(' or    kmver -m <manifest.xml> <common_parameters>');
+  writeln('   -v:         Update the version.rc with the template information');
+  writeln('   -m:         Update manifest.xml with the template information');
+  writeln('   -u:         Update file f.in to f.out, replacing (multiple entries okay):');
+  writeln;
+  writeln('                   Legacy tags (case sensitive):');
+  writeln('                          $VERSION       14.0.2.0');
+  writeln('                          $VERSIONNUM    14,0,2,0');
+  writeln('                          $RELEASE_MAJOR 14');
+  writeln('                          $RELEASE_MINOR 0');
+  writeln('                          $RELEASE       14.0');
+  writeln('                          $GUID#         GUID 0-9');
+  writeln('                          $DATE          1 March 2018');
+  writeln;
+  writeln('                   Current tags (case sensitive):');
+  writeln('                          $Version         14.0.2');
+  writeln('                          $VersionWin      14.0.2.0');
+  writeln('                          $VersionRelease  14.0');
+  writeln('                          $VersionMajor    14');
+  writeln('                          $VersionMinor    0');
+  writeln('                          $VersionPatch    2');
+  writeln('                          $Tier            alpha');
+  writeln('                          $Tag             -alpha-test-1234');
+  writeln('                          $VersionWithTag  14.0.2-alpha-test-1234');
+  writeln('                          $VersionRc       14,0,2,0');
+  writeln;
+  writeln('   project-version.in: The project version template, usually \keyman\windows\src\<dir>\version.in');
+  writeln('   app-version.in: The app version template, usually \keyman\windows\src\<dir>\<app>\version.in');
+  writeln('   version.rc: version.rc file to write');
+  writeln;
+  writeln('Common Parameters:');
+  writeln('   -version <VERSION.md>  Path to VERSION.md (in root of repo)');
+  writeln('   -tier <TIER>           Current tier (alpha, beta or stable)');
+  writeln;
+  writeln('Note: tag is constructed from TEAMCITY_VERSION and TEAMCITY_PR_NUMBER environment variables');
 end;
 
 end.

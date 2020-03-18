@@ -248,7 +248,8 @@ SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_P
 PLATFORM=Win32
 
 #
-# mkver commands
+# mkver commands. mkver determines tag from the local build environment variables
+# in the same way as /resources/build/build-utils.sh.
 #
 
 MKVER_APP=$(PROGRAM)\buildtools\mkver
@@ -259,9 +260,15 @@ MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.txt
 MKVER_VERSION_TXT=..\version.txt
 !ENDIF
 
+MKVER_TIER_MD=$(KEYMAN_ROOT)\TIER.md
+MKVER_VERSION_MD=$(KEYMAN_ROOT)\VERSION.md
+MKVER_TAG
+
+MKVER_COMMON_PARAMS=-tier "$(MKVER_TIER_MD)" -version "$(MKVER_VERSION_MD)"
+
 # Update a version.rc file
-MKVER_V=$(MKVER_APP) -v $(MKVER_VERSION_TXT)
+MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in version.rc
 # Update a manifest.xml file
-MKVER_M=$(MKVER_APP) -m $(MKVER_VERSION_TXT)
-# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out> $(MKVER_VERSION_TXT)
-MKVER_U=$(MKVER_APP) -v -u
+MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
+# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
+MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u
