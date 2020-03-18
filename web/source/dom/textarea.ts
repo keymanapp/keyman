@@ -36,6 +36,10 @@ namespace com.keyman.dom {
       this._cachedSelectionStart = -1;
     }
 
+    get isSynthetic(): boolean {
+      return false;
+    }
+
     getElement(): HTMLTextAreaElement {
       return this.root;
     }

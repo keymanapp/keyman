@@ -64,8 +64,9 @@ namespace com.keyman.text {
         }
       }
 
-      // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
-      if(touchAlias || usingOSK) {
+      // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
+      // that lacks default key processing behavior.
+      if(usingOSK || outputTarget.isSynthetic) {
         var code = Codes.keyCodes[keyName];
         if(!code) {
           code = n;
@@ -164,12 +165,8 @@ namespace com.keyman.text {
         // Not strictly if `Lkc.vkCode` is properly maintained, but it's good to have an
         // extra safety; this would have blocked the backspace bug as well.
       } else if(Lkc.Lcode == 8) {
-        if(quiet) {
-          return '\b'; // the escape sequence for backspace.
-        } else {
-          keyman.interface.defaultBackspace();
-          return '';
-        }
+        keyman.interface.defaultBackspace();
+        return '';
       }
 
       // Translate numpad keystrokes into their non-numpad equivalents

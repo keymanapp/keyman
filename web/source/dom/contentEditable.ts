@@ -31,6 +31,10 @@ namespace com.keyman.dom {
       }
     }
 
+    get isSynthetic(): boolean {
+      return false;
+    }
+
     getElement(): HTMLElement {
       return this.root;
     }

@@ -59,6 +59,14 @@ namespace com.keyman.text {
       this._dks = new text.DeadkeyTracker();
     }
 
+    /**
+     * Signifies that this OutputTarget has no default key processing behaviors.  This should be false
+     * for OutputTargets backed by web elements like HTMLInputElement or HTMLTextAreaElement.
+     */
+    get isSynthetic(): boolean {
+      return true;
+    }
+
     deadkeys(): text.DeadkeyTracker {
       return this._dks;
     }

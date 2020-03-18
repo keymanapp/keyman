@@ -49,6 +49,10 @@ namespace com.keyman.dom {
       }
     }
 
+    get isSynthetic(): boolean {
+      return false;
+    }
+
     getElement(): HTMLIFrameElement {
       return this.root;
     }
