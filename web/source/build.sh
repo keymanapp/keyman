@@ -72,7 +72,7 @@ minifier="$CLOSURECOMPILERPATH/compiler.jar"
 #
 # `jsDocMissingType` prevents errors on type documentation Closure thinks is missing.  TypeScript may not
 # have the same requirements, and we trust TypeScript over Closure.
-minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode"
+minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode --jscomp_off=missingRequire --jscomp_off=strictMissingRequire"
 
 # We use these to prevent Closure from auto-inserting its own polyfills.  Turns out, they can break in the 
 # WebView used by Android API 19, which our app still supports.
