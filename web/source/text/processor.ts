@@ -78,15 +78,9 @@ namespace com.keyman.text {
       }
 
       // Translate numpad keystrokes into their non-numpad equivalents
-      if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {
-        // Number pad, numlock on
-        if(Lkc.Lcode < 106) {
-          var Lch = Lkc.Lcode-48;
-        } else {
-          Lch = Lkc.Lcode-64;
-        }
-        ch = String._kmwFromCharCode(Lch); //I3319
-        return ch;
+      let numpadMatch = DefaultOutput.forNumpadKeys(Lkc);
+      if(numpadMatch) {
+        return numpadMatch;
       }
 
       // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.

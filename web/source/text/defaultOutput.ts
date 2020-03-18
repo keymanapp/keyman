@@ -105,5 +105,23 @@ namespace com.keyman.text {
         //   }
       }
     }
+
+    public static forNumpadKeys(Lkc: KeyEvent) {
+      let activeKeyboard = com.keyman.singleton.keyboardManager.activeKeyboard;
+
+      // Translate numpad keystrokes into their non-numpad equivalents
+      if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {
+        // Number pad, numlock on
+        if(Lkc.Lcode < 106) {
+          var Lch = Lkc.Lcode-48;
+        } else {
+          Lch = Lkc.Lcode-64;
+        }
+        let ch = String._kmwFromCharCode(Lch); //I3319
+        return ch;
+      } else {
+        return '';
+      }
+    }
   }
 }
