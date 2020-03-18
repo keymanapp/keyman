@@ -79,6 +79,10 @@ namespace com.keyman {
       if (Ltarg == null) {
         return true;
       }
+
+      if(Ltarg['body']) {
+        Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+      }
     
       // Prevent any action if a protected input field
       if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
@@ -92,6 +96,8 @@ namespace com.keyman {
         if(!(et == 'text' || et == 'search')) {
           return true;
         }
+      } else if(Ltarg.ownerDocument && Ltarg.ownerDocument.designMode == 'on') {
+        // continue; don't block this one!
       } else if((device.touchable || !Ltarg.isContentEditable) 
           && !(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement)) {
         return true;
@@ -190,6 +196,10 @@ namespace com.keyman {
         return true;
       }
 
+      if(Ltarg['body']) {
+        Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+      }
+
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
         // Prevent triggering other blur-handling events (as possible)
         e.cancelBubble = true;
@@ -209,6 +219,7 @@ namespace com.keyman {
         Ltarg = Ltarg.parentNode as HTMLElement;
       }
 
+      // TODO:  Needs tidy-up.
       if(Ltarg.ownerDocument) {
         if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
           Ltarg=Ltarg.contentWindow.document;
