@@ -80,6 +80,7 @@ for proj in ${extra_projects}; do
         vers=`cat ../../VERSION.md`
         kbpvers="keyman-keyboardprocessor-$vers"
         cp -a desktop $kbpvers
+        cp ../../VERSION.md $kbpvers
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
         rm -rf $kbpvers
         cp $kbpvers.tar.gz ../../linux/dist
