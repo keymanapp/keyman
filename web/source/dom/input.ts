@@ -142,5 +142,19 @@ namespace com.keyman.dom {
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
     }
+
+    handleNewlineAtCaret(): void {
+      Input.newlineHandler(this.root);
+    }
+
+    static newlineHandler(inputEle: HTMLInputElement) {
+      // Can't occur for Mocks - just Input and TouchAlias types.
+      if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
+        inputEle.disabled=false;
+        inputEle.form.submit();
+      } else {
+        com.keyman.singleton.domManager.moveToNext(false);
+      }
+    }
   }
 }

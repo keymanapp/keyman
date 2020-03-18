@@ -149,5 +149,9 @@ namespace com.keyman.dom {
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
     }
+
+    handleNewlineAtCaret(): void {
+      this.insertTextBeforeCaret('\n');
+    }
   }
 }

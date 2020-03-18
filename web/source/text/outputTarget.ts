@@ -252,6 +252,13 @@ namespace com.keyman.text {
     abstract insertTextBeforeCaret(s: string): void;
 
     /**
+     * Allows element-specific handling for ENTER key inputs.  Conceptually, this should usually
+     * correspond to `insertTextBeforeCaret('\n'), but actual implementation will vary greatly among
+     * elements.
+     */
+    abstract handleNewlineAtCaret(): void;
+
+    /**
      * Saves element-specific state properties prone to mutation, enabling restoration after
      * text-output operations.
      */
@@ -348,6 +355,10 @@ namespace com.keyman.text {
     insertTextBeforeCaret(s: string): void {
       this.text = this.getTextBeforeCaret() + s + this.getTextAfterCaret();
       this.caretIndex += s.kmwLength();
+    }
+
+    handleNewlineAtCaret(): void {
+      this.insertTextBeforeCaret('\n');
     }
 
     protected setTextAfterCaret(s: string): void {

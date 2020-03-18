@@ -63,6 +63,20 @@ namespace com.keyman.dom {
       this.root.setTextBeforeCaret(this.root.getTextBeforeCaret() + s);
     }
 
+    handleNewlineAtCaret(): void {
+      // Insert new line in text area fields
+      if(this.root.base.nodeName == 'TEXTAREA') {
+        // As the TouchAliasElement was implemented long before OutputTargets, it already has
+        // built-in newline handling.
+        this.insertTextBeforeCaret('\n');
+      } else if(dom.Utils.instanceof(this.root.base, "HTMLInputElement")) {
+        // HTMLInputElements do not permit newlines; they instead have DOM-specific behaviors.
+        Input.newlineHandler(this.root.base as HTMLInputElement);
+      } else {
+        console.warn("TouchAlias OutputTarget cannot output newlines for unexpected base element types!");
+      }
+    }
+
     protected setTextAfterCaret(s: string) {
       this.root.setText(this.getTextBeforeCaret() + s, this.getTextBeforeCaret()._kmwLength());
     }

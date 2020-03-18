@@ -96,31 +96,7 @@ namespace com.keyman.text {
             }
             break;
           case Codes.keyCodes['K_ENTER']:
-            if(!Lelem) {
-              return '\n';
-            }
-            // Insert new line in text area fields
-            if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA')) {
-              return '\n';
-            // Or move to next field from TEXT fields
-            } else if(usingOSK) {
-              var inputEle: HTMLInputElement;
-              if(keyman.isEmbedded) { // In embedded mode, the OutputTarget may not meet other conditions.
-                return '\n';
-              } else if(dom.Utils.instanceof(Lelem, "HTMLInputElement")) {
-                inputEle = <HTMLInputElement> Lelem;
-              } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
-                inputEle = <HTMLInputElement> Lelem.base;
-              }
-              
-              // Can't occur for Mocks - just Input and TouchAlias types.
-              if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
-                inputEle.disabled=false;
-                inputEle.form.submit();
-              } else {
-                domManager.moveToNext(false);
-              }
-            }
+            outputTarget.handleNewlineAtCaret();
             break;
           case Codes.keyCodes['K_SPACE']:
             return ' ';
