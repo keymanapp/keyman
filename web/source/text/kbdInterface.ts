@@ -218,20 +218,13 @@ namespace com.keyman.text {
      * @param       {number}    _PData        1 or 0    
      * Description  Notifies keyboard of keystroke or other event
      */    
-    notifyKeyboard(_PCommand: number, _PTarget: OutputTarget|HTMLElement|Document, _PData: number) { // I2187
+    notifyKeyboard(_PCommand: number, _PTarget: OutputTarget, _PData: number) { // I2187
       let keyman = com.keyman.singleton;
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
 
-      var target: OutputTarget;
-      if(_PTarget instanceof text.OutputTarget) {
-        target = _PTarget;
-      } else {
-        target = text.Processor.getOutputTarget(_PTarget as HTMLElement);
-      }
-
       // Good example use case - the Japanese CJK-picker keyboard
       if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
-        activeKeyboard['KNS'](_PCommand, target, _PData);
+        activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
       }
     }
       
