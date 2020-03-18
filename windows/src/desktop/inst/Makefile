@@ -18,7 +18,7 @@ prereq: prereq-resources
     #
 
     cd $(ROOT)\src\desktop\inst
-    $(PROGRAM)\buildtools\mkver -v -u download.in download.mak $(ROOT)\src\desktop\version.txt
+    $(MKVER_U) download.in download.mak
 
 prereq-resources:
     #

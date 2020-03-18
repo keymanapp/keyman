@@ -15,7 +15,7 @@ setup:
     #
 
     cd $(ROOT)\src\developer\inst
-    $(PROGRAM)\buildtools\mkver -v -u copydev.in copydev.mak $(ROOT)\src\developer\version.txt
+    $(MKVER_U) copydev.in copydev.mak
 
     #
     # Build the installation archive
@@ -66,7 +66,7 @@ clean:
 
 test-releaseexists:
     cd $(ROOT)\src\developer\inst
-    $(PROGRAM)\buildtools\mkver -v -u copydev.in copydev.mak $(ROOT)\src\version.txt
+    $(MKVER_U) copydev.in copydev.mak
 
     $(MAKE) -fcopydev.mak test-releaseexists
 
