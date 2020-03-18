@@ -17,6 +17,11 @@ else
   PRNUM="$1"
 fi
 
+function debug_echo() {
+  #echo "DEBUG: $1"
+  true
+}
+
 #
 # This must be run under a TeamCity environment in order to receive all variables
 #
@@ -42,7 +47,7 @@ function triggerTestBuilds() {
   local force="${3:-false}"
 
   for platform in "${platforms[@]}"; do
-    echo "# $platform: changes detected"
+    echo "# $platform: checking for changes"
     eval test_builds='(${'bc_test_$platform'[@]})'
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
@@ -77,12 +82,18 @@ fi
 # targeted by the PR other than to ask GitHub, anyway.)
 #
 
+# For now, this script runs only on Windows agents. In the future we
+# may need to make this a little more platform-agnostic
+JQ="$(dirname "$THIS_SCRIPT")/jq-win64.exe"
+
 echo ". Get information about pull request #$PRNUM from GitHub"
 prinfo=`curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
-prbase=`echo ${prinfo} | sed -E 's/.+"base".+"ref":"([^"]+)".+/\1/'`
-prhead=`echo ${prinfo} | sed -E 's/.+"head".+"ref":"([^"]+)".+"base".+"ref":.+/\1/'`
+prbase=`echo ${prinfo} | "$JQ" -r '.base.ref'`
+prhead=`echo ${prinfo} | "$JQ" -r '.head.ref'`
 
-#debug: echo "Base of $PRNUM ($prhead) is $prbase"
+debug_echo "PRNUM: $PRNUM"
+debug_echo "BASE: $prbase"
+debug_echo "HEAD: $prhead"
 
 #
 # By default, TeamCity does not fetch any remote branch information
@@ -106,6 +117,8 @@ if [ "$prfiles" == "abort" ]; then
   echo "Remote branch origin/$prhead has gone away; probably an automatic pull request. Skipping build."
   exit 0
 fi
+
+debug_echo "Files found: ${prfiles[*]}"
 
 popd > /dev/null
 
@@ -132,6 +145,7 @@ while IFS= read -r line; do
   done
 done <<< "$prfiles"
 
+debug_echo "Build platforms: ${build_platforms[*]}"
 #
 # Start the test builds
 #

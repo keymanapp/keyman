@@ -1331,6 +1331,13 @@ namespace com.keyman.osk {
             Ls.top=this.y+'px';
           } else {
             var el=keymanweb.domManager.getActiveElement();
+
+            // Special case - design mode iframes.  Don't use the active element (inside the design-mode doc);
+            // use its containing iframe from the doc itself.
+            let ownerDoc = el.ownerDocument;
+            if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) { 
+              el = ownerDoc.defaultView.frameElement as HTMLElement;
+            }
             if(this.dfltX) {
               Ls.left=this.dfltX;
             } else if(typeof el != 'undefined' && el != null) {

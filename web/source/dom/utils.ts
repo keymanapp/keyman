@@ -78,7 +78,7 @@ namespace com.keyman.dom {
         var Ldoc=Lobj.ownerDocument;   // I2404 - Support for IFRAMEs
 
         if(Ldoc && Ldoc.defaultView && Ldoc.defaultView.frameElement) {
-          return Lcurtop + Utils.getAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement) - Ldoc.documentElement.scrollTop;
+          return Lcurtop + Utils.getAbsoluteY(<HTMLElement>Ldoc.defaultView.frameElement);
         }
       }
       return Lcurtop;
