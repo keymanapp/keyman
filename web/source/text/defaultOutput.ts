@@ -124,6 +124,8 @@ namespace com.keyman.text {
       }
     }
 
+    // Test for fall back to U_xxxxxx key id
+    // For this first test, we ignore the keyCode and use the keyName
     public static forUnicodeKeynames(Lkc: KeyEvent) {
       let quiet = Lkc.Ltarg instanceof Mock;
       let keyName = Lkc.kName;
@@ -147,6 +149,38 @@ namespace com.keyman.text {
         // Someday after upgrading to ES2015, can use String.fromCodePoint()
         return String.kmwFromCharCode(codePoint);
       }
+    }
+
+    // Test for otherwise unimplemented keys on the the base default & shift layers.
+    // Those keys must be blocked by keyboard rules if intentionally unimplemented; otherwise, this function will trigger.
+    public static forBaseKeys(Lkc: KeyEvent, keyShiftState: number) {
+      let n = Lkc.Lcode;
+      // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
+      if(keyShiftState != 0 && keyShiftState != 1) {
+        if(!(Lkc.Ltarg instanceof Mock)) {
+          console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
+        }
+      }
+
+      if(keyShiftState == 0 || keyShiftState == 1) { // keyShiftState can only be 0 or 1.  (1 being mapped from Codes.modifier['SHIFT'] by the caller.)
+        try {
+          if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
+            return Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
+          } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
+            return String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
+          } else if(n >= Codes.keyCodes['K_COLON'] && n <= Codes.keyCodes['K_BKQUOTE']) {
+            return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
+          } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
+            return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
+          }
+        } catch (e) {
+          if(!(Lkc.Ltarg instanceof Mock)) {
+            console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
+          }
+        }
+      }
+
+      return '';
     }
   }
 }

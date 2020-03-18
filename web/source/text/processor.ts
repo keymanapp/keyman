@@ -41,24 +41,13 @@ namespace com.keyman.text {
      * @return  {string}
      */
     defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
-      let n = Lkc.Lcode;
       let outputTarget = Lkc.Ltarg;
 
       let keyman = com.keyman.singleton;
 
-      let quiet = outputTarget instanceof Mock;
-
-      var ch = '', checkCodes = false;
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if(keyShiftState == 0) {
-        checkCodes = true;
-      } else if (keyShiftState == Codes.modifierCodes['SHIFT']) {
-        checkCodes = true; 
-        keyShiftState = 1; // It's used as an index.
-      } else {
-        if(!quiet) {
-          console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
-        }
+      if (keyShiftState == Codes.modifierCodes['SHIFT']) {
+        keyShiftState = 1; // It's used as an index in some called methods.
       }
 
       // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
@@ -80,32 +69,16 @@ namespace com.keyman.text {
         return numpadMatch;
       }
 
-      // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
-
       // Test for fall back to U_xxxxxx key id
-      // For this first test, we ignore the keyCode and use the keyName
       let unicodeMatch = DefaultOutput.forUnicodeKeynames(Lkc);
       if(unicodeMatch) {
         return unicodeMatch;
-        // Hereafter, we refer to keyCodes.
-      } else if(checkCodes) { // keyShiftState can only be '1' or '2'.
-        try {
-          if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
-            ch = Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
-          } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
-            ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
-          } else if(n >= Codes.keyCodes['K_COLON'] && n <= Codes.keyCodes['K_BKQUOTE']) {
-            ch = Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
-          } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
-            ch = Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
-          }
-        } catch (e) {
-          if(!quiet) {
-            console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
-          }
-        }
+      } 
+      
+      let baseKeyMatch = DefaultOutput.forBaseKeys(Lkc, keyShiftState);
+      if(baseKeyMatch) {
+        return baseKeyMatch;
       }
-      return ch;
     }
 
     static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
