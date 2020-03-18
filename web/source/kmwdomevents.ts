@@ -239,7 +239,7 @@ namespace com.keyman {
       
       var isActivating = this.keyman.uiManager.isActivating;
       if(!isActivating) {
-        this.keyman['interface'].notifyKeyboard(0, Ltarg, 0);  // I2187
+        this.keyman['interface'].notifyKeyboard(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
       //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
@@ -347,7 +347,7 @@ namespace com.keyman {
         if(target && text.Processor.getOutputTarget(target)) {
           text.Processor.getOutputTarget(target).deadkeys().clear();
         }
-        this.keyman['interface'].notifyKeyboard(0, target, 1);  // I2187
+        this.keyman['interface'].notifyKeyboard(0, text.Processor.getOutputTarget(target), 1);  // I2187
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
@@ -455,23 +455,23 @@ namespace com.keyman {
       if(Levent == null || !osk.ready) {
         return true;
       }
+      var inputEle = Levent.Ltarg.getElement();
 
       // Since this part concerns DOM element + browser interaction management, we preprocess it for
       // browser form commands before passing control to the Processor module.
       if(Levent.Lcode == 13) {
         var ignore = false;
-        if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(Levent.Ltarg instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
       
-        if(Levent.Ltarg.base && Levent.Ltarg.base instanceof Levent.Ltarg.base.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(inputEle.base && inputEle.base instanceof inputEle.base.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
 
         if(!ignore) {
           // For input fields, move to next input element
-          if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLInputElement) {
-            var inputEle = Levent.Ltarg;
+          if(inputEle instanceof inputEle.ownerDocument.defaultView.HTMLInputElement) {
             if(inputEle.type == 'search' || inputEle.type == 'submit') {
               inputEle.form.submit();
             } else {

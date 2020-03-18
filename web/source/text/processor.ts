@@ -43,7 +43,8 @@ namespace com.keyman.text {
 
       let keyName = Lkc.kName;
       let n = Lkc.Lcode;
-      let Lelem = Lkc.Ltarg;
+      let outputTarget = Lkc.Ltarg;
+      let Lelem = outputTarget.getElement();
 
       let keyman = com.keyman.singleton;
       let domManager = keyman.domManager;
@@ -77,13 +78,7 @@ namespace com.keyman.text {
             if(disableDOM) {
               return '\b'; // the escape sequence for backspace.
             } else {
-              // If we have an available target (via Lkc/Lelem), use that instead of 
-              // forcing defaultBackspace to search for it.
-              var target: OutputTarget;
-              if(Lelem && Lelem._kmwAttachment) {
-                target = Lelem._kmwAttachment.interface;
-              }
-              keyman.interface.defaultBackspace(target);
+              keyman.interface.defaultBackspace(outputTarget);
             }
             return '';
           case Codes.keyCodes['K_TAB']:
@@ -264,7 +259,7 @@ namespace com.keyman.text {
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: KeyEvent = {
-        Ltarg: Lelem,
+        Ltarg: Processor.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
@@ -372,6 +367,8 @@ namespace com.keyman.text {
         kbdInterface.activeTargetOutput = outputTarget;
         let preInput = Mock.from(outputTarget);
 
+        // TODO:  That third parameter should be `fromOSK`, not always `true`.  Changing this breaks Mocks a bit, though,
+        //        and will likely have interactions with the '\b' check below.
         var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
         kbdInterface.activeTargetOutput = null;
         if(ch) {
@@ -402,6 +399,10 @@ namespace com.keyman.text {
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
 
+      // Determine the current target for text output and create a "mock" backup
+      // of its current, pre-input state.
+      let outputTarget = keyEvent.Ltarg;
+
       let fromOSK = !!e; // If specified, it's from the OSK.
 
       // Enables embedded-path OSK sourcing detection.
@@ -415,7 +416,7 @@ namespace com.keyman.text {
       this.swallowKeypress = false;
 
       if(fromOSK && !keyman.isEmbedded) {
-        keyman.domManager.initActiveElement(keyEvent.Ltarg);
+        keyman.domManager.initActiveElement(keyEvent.Ltarg.getElement());
 
         // Turn off key highlighting (or preview)
         keyman['osk'].vkbd.highlightKey(e,false);
@@ -477,9 +478,6 @@ namespace com.keyman.text {
       }
       // // ...end I3363 (Build 301)
 
-      // Determine the current target for text output and create a "mock" backup
-      // of its current, pre-input state.
-      let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
       let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
@@ -507,7 +505,7 @@ namespace com.keyman.text {
               continue;
             }
 
-            let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
+            let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
             let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK, true);
             if(alternateBehavior) {
               // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
@@ -1045,10 +1043,11 @@ namespace com.keyman.text {
     // in those cases.
     private doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
       let keyman = com.keyman.singleton;
+      let outputTarget = Levent.Ltarg;
 
       switch(Levent.Lcode) {
         case 8: 
-          Processor.getOutputTarget(Levent.Ltarg).deadkeys().clear();
+          outputTarget.deadkeys().clear();
           break; // I3318 (always clear deadkeys after backspace) 
         case 16: //"K_SHIFT":16,"K_CONTROL":17,"K_ALT":18
         case 17: 
@@ -1057,7 +1056,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          keyman['interface'].notifyKeyboard(Levent.Lcode, Levent.Ltarg, isKeyDown ? 1 : 0); 
+          keyman['interface'].notifyKeyboard(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -1066,7 +1065,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        keyman['interface'].notifyKeyboard(0, Levent.Ltarg, 1); 
+        keyman['interface'].notifyKeyboard(0, outputTarget, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 
@@ -1096,12 +1095,13 @@ namespace com.keyman.text {
         return null; // I2457 - Facebook meta-event generation mess -- two events generated for a keydown in Facebook contentEditable divs
       }    
 
-      s.Ltarg = keyman.util.eventTarget(e) as HTMLElement;
-      if (s.Ltarg == null) {
+      let target = keyman.util.eventTarget(e) as HTMLElement;
+      if (target == null) {
         return null;
-      } else if (s.Ltarg.nodeType == 3) {// defeat Safari bug
-        s.Ltarg = s.Ltarg.parentNode as HTMLElement;
+      } else if (target.nodeType == 3) {// defeat Safari bug
+        target = target.parentNode as HTMLElement;
       }
+      s.Ltarg = Processor.getOutputTarget(target);
 
       s.Lcode = this._GetEventKeyCode(e);
       if (s.Lcode == null) {
@@ -1316,10 +1316,10 @@ namespace com.keyman.text {
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
-      let outputTarget = Processor.getOutputTarget(Levent.Ltarg);
+      let outputTarget = Levent.Ltarg;
       
       // Only reached if it's a mnemonic keyboard.
-      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, outputTarget, Levent)) {
+      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
         this.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();
