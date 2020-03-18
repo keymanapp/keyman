@@ -1,5 +1,9 @@
 # KeymanWeb Version History
 
+## 2020-03-18 13.0.105 stable
+* Fixes issue in OSK layer resizing that affected iOS app (#2841)
+* Fixes issue with text output to content-editable elements and design-mode iframes (#2839)
+
 ## 2020-03-13 13.0.104 stable
 * Bug fix: further updates BuildVisualKeyboard (#2823)
 * Bug fix: fixes word lookup for wordlist models for languages in the SMP Unicode planes (#2821)
