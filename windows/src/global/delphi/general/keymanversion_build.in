@@ -5,7 +5,7 @@
 
   // Keyman Version Information
 
-  KeymanVersionInfo: TKeymanVersionInfo = (
+  CKeymanVersionInfo: TKeymanVersionInfo = (
     // These fields match fields in /resources/build/build-utils.sh
     Version: '$Version';
     VersionWin: '$VersionWin';
