@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.28 alpha 2020-03-18
+
+* fix(web): fixes design mode and content editable issues (#2838)
+* fix(ios): corrects OSK height adjustment, banner display issues. (#2840)
+* feat(windows): add sentry tooling (#2806)
+* refactor(web/engine): new RuleBehavior return type from keyboard calls, utilization (#2830)
+* refactor(web/engine): KeyEvent object now refers to outputTarget over element (#2846)
+* fix(linux): Fix failing Linux package builds (#2843)
+* feat(linux): Add focal as platform to build packages for (#2842)
+
 ## 14.0.27 alpha 2020-03-17
 
 * chore(deps-dev): bump minimist from 1.2.0 to 1.2.2 in /web/testing/regression-tests (#2829)
