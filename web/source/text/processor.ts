@@ -95,7 +95,12 @@ namespace com.keyman.text {
             }
             break;
           case Codes.keyCodes['K_ENTER']:
+            // Ensure the newline is forwarded when in an embedded context!  It doesn't yet have its own specialized OutputTarget type.
+            if(keyman.isEmbedded && !quiet) { // Don't pass it along for Mocks, though.  They're (currently) only used in predictive text.
+              keyman['oninserttext'](0, '\n');
+            }
             outputTarget.handleNewlineAtCaret();
+
             return '\n';  // We still return this, as it ensures we generate a rule-match.
           case Codes.keyCodes['K_SPACE']:
             return ' ';

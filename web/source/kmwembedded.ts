@@ -433,7 +433,7 @@ namespace com.keyman.text {
       
       // Check the virtual key 
       Lkc = {
-        Ltarg: Lelem,
+        Ltarg: com.keyman.text.Processor.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
