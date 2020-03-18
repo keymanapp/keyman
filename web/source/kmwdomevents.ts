@@ -444,23 +444,23 @@ namespace com.keyman {
       if(Levent == null || !osk.ready) {
         return true;
       }
+      var inputEle = Levent.Ltarg.getElement();
 
       // Since this part concerns DOM element + browser interaction management, we preprocess it for
       // browser form commands before passing control to the Processor module.
       if(Levent.Lcode == 13) {
         var ignore = false;
-        if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(Levent.Ltarg instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
       
-        if(Levent.Ltarg.base && Levent.Ltarg.base instanceof Levent.Ltarg.base.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(inputEle.base && inputEle.base instanceof inputEle.base.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
 
         if(!ignore) {
           // For input fields, move to next input element
-          if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLInputElement) {
-            var inputEle = Levent.Ltarg;
+          if(inputEle instanceof inputEle.ownerDocument.defaultView.HTMLInputElement) {
             if(inputEle.type == 'search' || inputEle.type == 'submit') {
               inputEle.form.submit();
             } else {
