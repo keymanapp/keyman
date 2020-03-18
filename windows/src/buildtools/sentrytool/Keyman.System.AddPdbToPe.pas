@@ -16,6 +16,17 @@ var
 
 implementation
 
+procedure debug_writeln(s: string);
+begin
+  if AddPdbToPe_Debug then
+    writeln('DEBUG: '+s);
+end;
+
+procedure error_writeln(s: string);
+begin
+  writeln('ERROR: '+s);
+end;
+
 function RVA2Offset(nt: PImageNtHeaders; rva: DWORD): DWORD;
 var
   section: PImageSectionHeader;
@@ -41,6 +52,7 @@ begin
     Inc(section);
   end;
 
+  error_writeln(Format('unexpected RVA out of bounds: %x', [rva]));
   Result := 0;
 end;
 
@@ -63,17 +75,6 @@ type
   TCVInfoPdb70 = _CV_INFO_PDB70;
   PCVInfoPdb70 = ^TCVInfoPdb70;
 
-procedure debug_writeln(s: string);
-begin
-  if AddPdbToPe_Debug then
-    writeln('DEBUG: '+s);
-end;
-
-procedure error_writeln(s: string);
-begin
-  writeln('ERROR: '+s);
-end;
-
 function AddDebugID(s: TMemoryStream; guid: TGUID; var codeId: string): Boolean;
 var
   dh: PImageDosHeader;
@@ -92,6 +93,9 @@ var
   SectionRawSize: Cardinal;
   SectionVirtualSize: Cardinal;
 begin
+  //
+  // Parse the .exe file to find the appropriate sections
+  //
   dh := PImageDosHeader(s.Memory);
   if dh.e_magic <> IMAGE_DOS_SIGNATURE then
   begin
@@ -123,6 +127,7 @@ begin
     debug_writeln('Number of sections: '+IntToStr(nh.FileHeader.NumberOfSections));
   end;
 
+  // Check section list to find address of last section
   section := PImageSectionHeader(PByte(nh) + sizeof(IMAGE_NT_HEADERS));
   LastSection := section;
   FirstSection := section;
@@ -138,6 +143,10 @@ begin
 
   debug_writeln(Format('End of section table is at %8.8x', [Integer(section) - Integer(s.Memory)]));
   debug_writeln(Format('One more section takes us to %8.8x', [Integer(section) - Integer(s.Memory) + sizeof(_IMAGE_SECTION_HEADER)]));
+
+  //
+  // Check that we don't already have a debug directory entry
+  //
 
   if nh.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress <> 0 then
   begin
@@ -178,7 +187,10 @@ begin
     Exit(False);
   end;
 
+  //
   // Ensure we have space for an additional section header
+  //
+
   debug_writeln(Format('offset=%x', [DWORD(section) - DWORD(s.Memory)+sizeof(_IMAGE_SECTION_HEADER)]));
   debug_writeln(Format('first=%x', [FirstSection.PointerToRawData]));
   if DWORD(section) - DWORD(s.Memory) + sizeof(_IMAGE_SECTION_HEADER) > FirstSection.PointerToRawData then
@@ -187,7 +199,18 @@ begin
     Exit(False);
   end;
 
-  // Calculate some new constants
+  //
+  // Okay, everything looks good, so let's figure out where to put the new data.
+  // We want to write a section at the end of the file and then update the debug
+  // data directory entry to point to this new section.
+  //
+
+  // Calculate some new constants: SectionRawSize is never going to be smaller
+  // than the size of the debug data, which is:
+  // `sizeof(_CV_INFO_PDB70) - 2 + Length('null.pdb') + 1`, that is, 35 bytes.
+  // The minimum `FileAlignment` is:
+  // [512 bytes](https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#file-headers).
+
   SectionRawSize := nh.OptionalHeader.FileAlignment;
   SectionVirtualSize := nh.OptionalHeader.SectionAlignment;
   SectionOffset := s.Size;
