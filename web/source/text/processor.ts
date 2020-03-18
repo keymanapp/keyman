@@ -339,7 +339,7 @@ namespace com.keyman.text {
       }
     }
 
-    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): boolean {
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
@@ -354,15 +354,15 @@ namespace com.keyman.text {
         }
       }
 
-      var LeventMatched = 0;
+      var matchBehavior: RuleBehavior;
       this.swallowKeypress = false;
 
       // Pass this key code and state to the keyboard program
       if(activeKeyboard && keyEvent.Lcode != 0) {
-        LeventMatched = LeventMatched || kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+        matchBehavior = kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
 
-      if(!LeventMatched) {
+      if(!matchBehavior) {
         // Restore the virtual key code if a mnemonic keyboard is being used
         // If no vkCode value was stored, maintain the original Lcode value.
         keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
@@ -370,6 +370,8 @@ namespace com.keyman.text {
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
         kbdInterface.activeTargetOutput = outputTarget;
+        let preInput = Mock.from(outputTarget);
+
         var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
         kbdInterface.activeTargetOutput = null;
         if(ch) {
@@ -379,13 +381,15 @@ namespace com.keyman.text {
           } else {
             kbdInterface.output(0, outputTarget, ch);
           }
-          LeventMatched = 1;
+          matchBehavior = new RuleBehavior();
+          matchBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keyEvent);
         } else if(keyEvent.Lcode == 8) { // Backspace
-          LeventMatched = 1;
+          matchBehavior = new RuleBehavior();
+          matchBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keyEvent);
         }
       }
 
-      return LeventMatched == 1;
+      return matchBehavior;
     }
 
     /**
@@ -478,7 +482,7 @@ namespace com.keyman.text {
       let outputTarget = Processor.getOutputTarget(keyEvent.Ltarg);
       let preInputMock = Mock.from(outputTarget);
 
-      let LeventMatched = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
+      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
@@ -486,7 +490,7 @@ namespace com.keyman.text {
       }
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
-      if(LeventMatched) {
+      if(ruleBehavior != null) {
         let alternates: Alternate[];
 
         // Note - we don't yet do fat-fingering with longpress keys.
@@ -504,15 +508,59 @@ namespace com.keyman.text {
             }
 
             let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg);
-            if(this.processKeystroke(altEvent, mock, fromOSK, true)) {
-              alternates.push({sample: mock.buildTransformFrom(preInputMock), 'p': pair.p});
+            let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK, true);
+            if(alternateBehavior) {
+              // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
+              //       so a user should never have intended to type it.  Should probably renormalize 
+              //       the distribution afterward, though...
+              
+              let transform: Transform = alternateBehavior.transcription.transform;
+              
+              // Ensure that the alternate's token id matches that of the current keystroke, as we only
+              // record the matched rule's context (since they match)
+              transform.id = ruleBehavior.transcription.token;
+              alternates.push({sample: transform, 'p': pair.p});
             }
           }
         }
+
+        if(ruleBehavior.beep) {
+          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
+          //        We're still referencing the DOM, even if only the manager object.  (It's an improvement, at least.)
+          keyman.domManager.doBeep(outputTarget);
+        }
+
+        for(let storeID in ruleBehavior.setStore) {
+          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
+          //        `Processor` shouldn't be directly setting anything on the OSK when the refactor is complete.
+          
+          // How would this be handled in an eventual headless mode?
+          switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
+            case KeyboardInterface.TSS_LAYER:
+              keyman.osk.vkbd.showLayer(ruleBehavior.setStore[storeID]); //Build 350, osk reference now OK, so should work
+              break;
+            case KeyboardInterface.TSS_PLATFORM:
+              console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+              break;
+            default:
+              console.warn("Unknown store affected by keyboard rule: " + storeID);
+          }
+        }
+
+        // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
+        //
+        // TODO:  This check should be done IN a dom module, not here in web-core space.  This place is closer 
+        //        to that goal than it previously was, at least.
+        let ruleTransform = ruleBehavior.transcription.transform;
+        if(ruleTransform.insert != "" || ruleTransform.deleteLeft > 0 || ruleTransform.deleteRight > 0) {
+          if(outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
+            DOMEventHandlers.states.changed = true;
+          }
+        }
         
-        // Notify the ModelManager of new input
-        let transcription = outputTarget.buildTranscriptionFrom(preInputMock, keyEvent, alternates);
-        keyman.modelManager.predict(transcription);
+        // Notify the ModelManager of new input - it's predictive text time!
+        ruleBehavior.transcription.alternates = alternates;
+        keyman.modelManager.predict(ruleBehavior.transcription);
 
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
         // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
@@ -541,7 +589,14 @@ namespace com.keyman.text {
         return false;
       }
 
-      return !LeventMatched;
+      // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
+      //        the ones that should worry about event handler returns, etc.  Not this one.
+      //
+      //        They should also be the ones to handle the TODOs seen earlier in this function -
+      //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
+
+      // Only return true (for the eventual event handler's return value) if we didn't match a rule.
+      return ruleBehavior == null;
     }
 
     /**

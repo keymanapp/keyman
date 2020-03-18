@@ -160,35 +160,39 @@ namespace com.keyman.text {
     }
   };
 
-  class BeepData {
-    e: HTMLElement;
-    c: string;
-
-    constructor(e: HTMLElement) {
-      this.e = e;
-      this.c = e.style.backgroundColor;
-    }
-
-    reset(): void {
-      this.e.style.backgroundColor = this.c;
-    }
-  }
-
   //#endregion
+
+  /**
+   * Represents the commands and state changes that result from a matched keyboard rule.
+   */
+  export class RuleBehavior {
+    /**
+     * The before-and-after Transform from matching a keyboard rule.
+     */
+    transcription: Transcription;
+
+    /**
+     * Indicates whether or not a BEEP command was issued by the matched keyboard rule.
+     */
+    beep?: boolean;
+
+    /**
+     * A set of changed store values triggered by the matched keyboard rule.
+     */
+    setStore: {[id: number]: string} = {};
+  }
 
   export class KeyboardInterface {
     cachedContext: CachedContext = new CachedContext();
     cachedContextEx: CachedContextEx = new CachedContextEx();
 
     activeTargetOutput: OutputTarget;
+    ruleBehavior: RuleBehavior;
 
-    TSS_LAYER:    number = 33;
-    TSS_PLATFORM: number = 31;
+    static TSS_LAYER:    number = 33;
+    static TSS_PLATFORM: number = 31;
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
-    _BeepObjects: BeepData[] = [];  // BeepObjects - maintains a list of active 'beep' visual feedback elements
-    _BeepTimeout: number = 0;       // BeepTimeout - a flag indicating if there is an active 'beep'. 
-                                    // Set to 1 if there is an active 'beep', otherwise leave as '0'.
 
     constructor() {
     }
@@ -647,22 +651,6 @@ namespace com.keyman.text {
     deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
       return outputTarget.hasDeadkeyMatch(n, d);
     }
-    
-    /**
-     * Function     beepReset   KBR      
-     * Scope        Public
-     * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
-     */    
-    beepReset(): void {
-      this.resetContextCache();
-
-      var Lbo;
-      this._BeepTimeout = 0;
-      for(Lbo=0;Lbo<this._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
-        this._BeepObjects[Lbo].reset();
-      }
-      this._BeepObjects = [];
-    }
       
     /**
      * Function     beep          KB      
@@ -673,42 +661,8 @@ namespace com.keyman.text {
     beep(outputTarget: OutputTarget): void {
       this.resetContextCache();
 
-      // Do not trigger a 'beep' when operating on alternates - the use case of Mocks.
-      if(outputTarget instanceof Mock) {
-        return;
-      }
-
-      let keyman = com.keyman.singleton;
-      if ('beepKeyboard' in keyman) {
-        keyman['beepKeyboard']();
-      }
-      
-      var Pelem: HTMLElement = outputTarget.getElement();
-      if(outputTarget instanceof dom.DesignIFrame) {
-        Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
-      }
-
-      if(!Pelem) {
-        return; // There's no way to signal a 'beep' to null, so just cut everything short.
-      }
-      
-      if(!Pelem.style || typeof(Pelem.style.backgroundColor)=='undefined') {
-        return;
-      }
-
-      for(var Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
-                                                                  // I1511 - array prototype extended
-        if(this._BeepObjects[Lbo].e == Pelem) {
-          return;
-        }
-      }
-      
-      this._BeepObjects = keyman._push(this._BeepObjects, new BeepData(Pelem));
-      Pelem.style.backgroundColor = '#000000';
-      if(this._BeepTimeout == 0) {
-        this._BeepTimeout = 1;
-        window.setTimeout(this.beepReset.bind(this), 50);
-      }
+      // Denote as part of the matched rule's behavior.
+      this.ruleBehavior.beep = true;
     }
 
     _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
@@ -906,11 +860,6 @@ namespace com.keyman.text {
       if(typeof(keyman.refreshElementContent) == 'function') {
         keyman.refreshElementContent(outputTarget.getElement());
       }
-
-      if((dn >= 0 || s) && outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
-        // Record that we've made an edit.
-        DOMEventHandlers.states.changed = true;
-      }
     }
   
     
@@ -945,10 +894,10 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
 
       var result=true;
-      if(systemId == this.TSS_LAYER) {
+      if(systemId == KeyboardInterface.TSS_LAYER) {
         // How would this be handled in an eventual headless mode?
         result = (keyman.osk.vkbd.layerId === strValue);
-      } else if(systemId == this.TSS_PLATFORM) {
+      } else if(systemId == KeyboardInterface.TSS_PLATFORM) {
         var i,constraint,constraints=strValue.split(' ');
         for(i=0; i<constraints.length; i++) {
           constraint=constraints[i].toLowerCase();
@@ -1022,14 +971,9 @@ namespace com.keyman.text {
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
-      if(systemId == this.TSS_LAYER) {
-        // Do not trigger a layer change when operating on alternates - the use case of Mocks.
-        if(outputTarget instanceof Mock) {
-          return;
-        }
-
-        // How would this be handled in an eventual headless mode?
-        return keyman.osk.vkbd.showLayer(strValue);     //Buld 350, osk reference now OK, so should work
+      if(systemId == KeyboardInterface.TSS_LAYER) {
+        // Denote the changed store as part of the matched rule's behavior.
+        this.ruleBehavior.setStore[systemId] = strValue;
       } else {
         return false;
       }
@@ -1118,7 +1062,7 @@ namespace com.keyman.text {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent|com.keyman.text.LegacyKeyEvent) {
+    processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
       let keyman = com.keyman.singleton;
 
       // Clear internal state tracking data from prior keystrokes.
@@ -1131,6 +1075,12 @@ namespace com.keyman.text {
       outputTarget.deadkeys().resetMatched();       // I3318    
       this.resetContextCache();
 
+      // Capture the initial state of the OutputTarget before any rules are matched.
+      let preInput = Mock.from(outputTarget);
+      
+      // Establishes the results object, allowing corresponding commands to set values here as appropriate.
+      this.ruleBehavior = new RuleBehavior();
+
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
       keyman.util.activeDevice = device;
@@ -1140,7 +1090,18 @@ namespace com.keyman.text {
       var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
-      return matched;
+      if(!matched) {
+        return null;
+      }
+
+      // Finalize the rule's results.
+      this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke);
+
+      // Clear our result-tracking variable to prevent any possible pollution for future processing.
+      let behavior = this.ruleBehavior;
+      this.ruleBehavior = null;
+
+      return behavior;
     }
     
     /**
