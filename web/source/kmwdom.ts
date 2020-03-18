@@ -112,6 +112,7 @@ namespace com.keyman {
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();
+        return;
       }
 
       // All code after this point is DOM-based, triggered by the beep.
@@ -136,6 +137,8 @@ namespace com.keyman {
       }
       
       this._BeepObjects = com.keyman.singleton._push(this._BeepObjects, new BeepData(Pelem));
+      // TODO:  This is probably a bad color choice if "dark mode" is enabled.  A proper implementation
+      //        would probably require some 'fun' CSS work, though.
       Pelem.style.backgroundColor = '#000000';
       if(this._BeepTimeout == 0) {
         this._BeepTimeout = 1;
