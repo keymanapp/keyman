@@ -110,7 +110,7 @@ function Init(var FMode: TMKVerMode; var TemplateFileName: string; UpdateFiles: 
 var
   s: string;
   n: Integer;
-  version, tier, tag: string;
+  versionFile, tierFile, version, tier, tag: string;
 begin
   FMode := mmUnknown;
 
@@ -139,12 +139,12 @@ begin
     end
     else if s = '-version' then
     begin
-      version := ParamStr(n+1);
+      versionFile := ParamStr(n+1);
       Inc(n,2);
     end
     else if s = '-tier' then
     begin
-      tier := ParamStr(n+1);
+      tierFile := ParamStr(n+1);
       Inc(n,2);
     end
     else
@@ -156,6 +156,22 @@ begin
 
   if FMode = mmUnknown then
     Exit(False);
+
+  with TStringList.Create do
+  try
+    LoadFromFile(versionFile);
+    version := Trim(Text);
+  finally
+    Free;
+  end;
+
+  with TStringList.Create do
+  try
+    LoadFromFile(tierFile);
+    tier := Trim(Text);
+  finally
+    Free;
+  end;
 
   tag := ConstructVersionTag(tier);
 
@@ -263,7 +279,6 @@ begin
     readln(tfi, s);
 
     // Current replacements
-    s := StringReplace(s, '$Version',        VersionInfo.Version,        [rfReplaceAll]);
     s := StringReplace(s, '$VersionWin',     VersionInfo.VersionWin,     [rfReplaceAll]);
     s := StringReplace(s, '$VersionRelease', VersionInfo.VersionRelease, [rfReplaceAll]);
     s := StringReplace(s, '$VersionMajor',   IntToStr(VersionInfo.VersionMajor), [rfReplaceAll]);
@@ -273,6 +288,8 @@ begin
     s := StringReplace(s, '$Tag',            VersionInfo.Tag,            [rfReplaceAll]);
     s := StringReplace(s, '$VersionWithTag', VersionInfo.VersionWithTag, [rfReplaceAll]);
     s := StringReplace(s, '$VersionRc',      VersionInfo.VersionRc,      [rfReplaceAll]);
+    // Do this one last because it breaks the others otherwise...
+    s := StringReplace(s, '$Version',        VersionInfo.Version,        [rfReplaceAll]);
 
     // Legacy replacements
     // TODO(lowpri): replace these with above and eliminate

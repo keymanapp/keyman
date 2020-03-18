@@ -49,9 +49,7 @@ begin
   Result.VersionPatch := vpatch;
   Result.Tier := Tier;
   Result.Tag := Tag;
-  Result.VersionWithTag := Version;
-  if Tag <> '' then
-    Result.VersionWithTag := Result.VersionWithTag + '-' + Tag;
+  Result.VersionWithTag := Version + Tag;
   Result.VersionRc := Format(S_Format_Rc, [vmajor, vminor, vpatch]);
 end;
 
