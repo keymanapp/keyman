@@ -88,7 +88,11 @@ namespace com.keyman.text {
 
       if(!matched) {
         if(char = DefaultOutput.forAny(Lkc, keyShiftState)) {
-          keyman.interface.output(0, outputTarget, char);
+          if(char == '\b') { // physical keystrokes.
+            keyman.interface.defaultBackspace(outputTarget);
+          } else {
+            keyman.interface.output(0, outputTarget, char);
+          }
         } else {
           // No match, no default RuleBehavior.
           return null;
