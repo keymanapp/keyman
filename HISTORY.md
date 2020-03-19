@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.29 alpha 2020-03-19
+
+* feat(windows): Add Sentry reports to Delphi apps (#2848)
+
 ## 14.0.28 alpha 2020-03-18
 
 * fix(web): fixes design mode and content editable issues (#2838)
