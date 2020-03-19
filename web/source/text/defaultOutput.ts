@@ -14,10 +14,10 @@ namespace com.keyman.text {
     /**
      * This function is designed for future migration into a separate, explicitly-DOM-aware module.
      * It would then be assigned to this class via classic JS method extension practices as an 'override'
-     * of `commandEmulation`, reusing the base version of that name seen in this class, which is
+     * of `applyCommand`, reusing the base version of that name seen in this class, which is
      * designed for web-core.
      */
-    public static domCommandEmulation(outputTarget: OutputTarget, code: number, keyShiftState: number) {
+    public static applyDOMCommand(outputTarget: OutputTarget, code: number, keyShiftState: number) {
       let quiet = outputTarget instanceof Mock;
 
       let domManager = com.keyman.singleton.domManager;
@@ -41,7 +41,7 @@ namespace com.keyman.text {
       }
     }
 
-    public static commandEmulation(Lkc: KeyEvent, keyShiftState: number) {
+    public static applyCommand(Lkc: KeyEvent, keyShiftState: number) {
       let keyName = Lkc.kName;
       let n = Lkc.Lcode;
       let outputTarget = Lkc.Ltarg;
@@ -55,7 +55,7 @@ namespace com.keyman.text {
         code = n;
       }
 
-      DefaultOutput.domCommandEmulation(outputTarget, code, keyShiftState);
+      DefaultOutput.applyDOMCommand(outputTarget, code, keyShiftState);
 
       switch(code) {
         case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI

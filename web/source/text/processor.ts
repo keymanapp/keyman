@@ -53,7 +53,7 @@ namespace com.keyman.text {
       // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
       // that lacks default key processing behavior.
       if(usingOSK || outputTarget.isSynthetic) {
-        let result = DefaultOutput.commandEmulation(Lkc, keyShiftState);
+        let result = DefaultOutput.applyCommand(Lkc, keyShiftState);
 
         if(result) {
           return result;
@@ -63,21 +63,15 @@ namespace com.keyman.text {
         return '';
       }
 
-      // Translate numpad keystrokes into their non-numpad equivalents
-      let numpadMatch = DefaultOutput.forNumpadKeys(Lkc);
-      if(numpadMatch) {
-        return numpadMatch;
-      }
+      let code: string;
 
-      // Test for fall back to U_xxxxxx key id
-      let unicodeMatch = DefaultOutput.forUnicodeKeynames(Lkc);
-      if(unicodeMatch) {
-        return unicodeMatch;
-      } 
-      
-      let baseKeyMatch = DefaultOutput.forBaseKeys(Lkc, keyShiftState);
-      if(baseKeyMatch) {
-        return baseKeyMatch;
+      // Translate numpad keystrokes into their non-numpad equivalents
+      if(code = DefaultOutput.forNumpadKeys(Lkc)) {
+        return code;
+      } else if(code = DefaultOutput.forUnicodeKeynames(Lkc)) { // Test for fall back to U_xxxxxx key id
+        return code;
+      } else if(code = DefaultOutput.forBaseKeys(Lkc, keyShiftState)) {
+        return code;
       }
     }
 
