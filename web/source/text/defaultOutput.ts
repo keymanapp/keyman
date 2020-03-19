@@ -42,16 +42,18 @@ namespace com.keyman.text {
       } else if(char = DefaultOutput.forBaseKeys(Lkc, shiftState)) {
         return char;
       } else {
-        // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
-        // Not originally defined for text output within defaultKeyOutput.
-        switch(code) {
-          case Codes.keyCodes['K_TAB']:
-          case Codes.keyCodes['K_TABBACK']:
-          case Codes.keyCodes['K_TABFWD']:
-            return '\t';
-          default:
-            return '';
-        }
+        // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
+        // // Not originally defined for text output within defaultKeyOutput.
+        // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
+        // // than rely on the browser-default handling.
+        // switch(code) {
+        //   case Codes.keyCodes['K_TAB']:
+        //   case Codes.keyCodes['K_TABBACK']:
+        //   case Codes.keyCodes['K_TABFWD']:
+        //     return '\t';
+        //   default:
+        //     return '';
+        // }
       }
     }
 
