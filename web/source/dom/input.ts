@@ -153,7 +153,13 @@ namespace com.keyman.dom {
         inputEle.disabled=false;
         inputEle.form.submit();
       } else {
-        com.keyman.singleton.domManager.moveToNext(false);
+        // Allows compiling this separately from the main body of KMW.
+        // TODO:  rework class to accept a class-static 'callback' from the DOM module that this can call.
+        //        Would eliminate the need for this 'static' reference. 
+        //        Only strongly matters once we better modularize KMW, with web-dom vs web-dom-targets vs web-core, etc.
+        if(com.keyman["singleton"]) {
+          com.keyman["singleton"].domManager.moveToNext(false);
+        }
       }
     }
   }
