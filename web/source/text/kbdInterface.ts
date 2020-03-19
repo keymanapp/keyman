@@ -1,5 +1,6 @@
 /// <reference path="deadkeys.ts" />
 /// <reference path="../kmwbase.ts" />
+/// <reference path="ruleBehavior.ts" />
 
 /***
    KeymanWeb 11.0
@@ -161,41 +162,6 @@ namespace com.keyman.text {
   };
 
   //#endregion
-
-  /**
-   * Represents the commands and state changes that result from a matched keyboard rule.
-   */
-  export class RuleBehavior {
-    /**
-     * The before-and-after Transform from matching a keyboard rule.
-     */
-    transcription: Transcription;
-
-    /**
-     * Indicates whether or not a BEEP command was issued by the matched keyboard rule.
-     */
-    beep?: boolean;
-
-    /**
-     * A set of changed store values triggered by the matched keyboard rule.
-     */
-    setStore: {[id: number]: string} = {};
-
-    /**
-     * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
-     */
-    triggersDefaultCommand?: boolean;
-
-    /**
-     * Denotes error log messages generated when attempting to generate this behavior.
-     */
-    errorLog?: string;
-
-    /**
-     * Denotes warning log messages generated when attempting to generate this behavior.
-     */
-    warningLog?: string;
-  }
 
   export class KeyboardInterface {
     cachedContext: CachedContext = new CachedContext();
