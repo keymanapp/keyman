@@ -13,11 +13,6 @@
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Base)'=='true') or '$(Base_OSX64)'!=''">
-        <Base_OSX64>true</Base_OSX64>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
         <Base_Win32>true</Base_Win32>
         <CfgParent>Base</CfgParent>
@@ -61,13 +56,6 @@
         <DCC_UsePackage>RESTComponents;FireDAC;FireDACSqliteDriver;soaprtl;FireDACIBDriver;soapmidas;FireDACCommon;RESTBackendComponents;soapserver;CloudService;FireDACCommonDriver;inet;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <SanitizedProjectName>kmconvert</SanitizedProjectName>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_OSX64)'!=''">
-        <Base_OSX32>true</Base_OSX32>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-        <DCC_UsePackage>DBXSqliteDriver;bindcompdbx;IndyIPCommon;DBXInterBaseDriver;IndyIPServer;IndySystem;tethering;fmxFireDAC;bindcompfmx;FireDACPgDriver;inetdb;DbxCommonDriver;fmx;fmxdae;xmlrtl;fmxobj;rtl;DbxClientDriver;CustomIPTransport;dbexpress;IndyCore;bindcomp;dsnap;IndyIPClient;dbxcds;bindengine;DBXMySQLDriver;dsnapxml;FireDACMySQLDriver;dbrtl;inetdbxpress;IndyProtocols;FireDACCommonODBC;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;bindcompdbx;IndyIPCommon;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;mbColorLibD10;dsnapcon;FireDACADSDriver;scFontCombo;DCPdelphi2009;FireDACMSAccDriver;fmxFireDAC;vclimg;Jcl;vcltouch;JvCore;vcldb;bindcompfmx;svn;FireDACPgDriver;inetdb;CEF4Delphi;DbxCommonDriver;fmx;fmxdae;xmlrtl;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;IndyIPClient;bindcompvcl;EmbeddedWebBrowser_XE;VCLRESTComponents;dbxcds;VclSmp;JvDocking;adortl;JclVcl;vclie;bindengine;DBXMySQLDriver;dsnapxml;FireDACMySQLDriver;dbrtl;inetdbxpress;IndyProtocols;keyman_components;FireDACCommonODBC;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -195,7 +183,14 @@
         <DCCReference Include="..\..\global\delphi\general\CompileErrorCodes.pas"/>
         <DCCReference Include="Keyman.Developer.System.ModelProjectTemplate.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas">
+            <Form>$R icons.RES</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\ext\sentry\Sentry.Client.Console.pas"/>
+        <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -1120,7 +1115,6 @@
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
-                <Platform value="OSX64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>

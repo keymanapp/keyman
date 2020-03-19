@@ -223,16 +223,8 @@ global-versions: mkver-app
     # Build our root version.txt
     cd $(ROOT)\src
 
-    # We use the version from VERSION.md
-    $(MKVER_APP) -c $(ROOT)\src\version.txt -r $(KEYMAN_ROOT)\VERSION.md
-
-    $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h $(ROOT)\src\version.txt
-    $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc $(ROOT)\src\version.txt
-    $(MKVER_U) $(ROOT)\src\buildtools\version.in $(ROOT)\src\buildtools\version.txt $(ROOT)\src\version.txt
-    $(MKVER_U) $(ROOT)\src\developer\version.in $(ROOT)\src\developer\version.txt $(ROOT)\src\version.txt
-    $(MKVER_U) $(ROOT)\src\desktop\version.in $(ROOT)\src\desktop\version.txt $(ROOT)\src\version.txt
-    $(MKVER_U) $(ROOT)\src\engine\version.in $(ROOT)\src\engine\version.txt $(ROOT)\src\version.txt
-    $(MKVER_U) $(ROOT)\src\support\version.in $(ROOT)\src\support\version.txt $(ROOT)\src\version.txt
+    $(MKVER_U) $(ROOT)\src\global\inc\keymanversion_build.in $(ROOT)\src\global\inc\keymanversion_build.h
+    $(MKVER_U) $(ROOT)\src\global\delphi\general\keymanversion_build.in $(ROOT)\src\global\delphi\general\keymanversion_build.inc
 
 build-tools: global-versions
     cd $(ROOT)\src\buildtools\devtools

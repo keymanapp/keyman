@@ -1,18 +1,18 @@
 (*
   Name:             UfrmMain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    23 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework as HTML interface
                     30 Aug 2006 - mcdurdin - Use Unicode strings for command parameters
@@ -187,7 +187,6 @@ uses
   StrUtils,
   SupportXMLRenderer,
   UfrmChangeHotkey,
-  ExternalExceptionHandler,
   UfrmHTML,
   UfrmInstallKeyboard,
   UfrmInstallKeyboardFromWeb,

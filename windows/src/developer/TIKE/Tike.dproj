@@ -120,7 +120,6 @@
         </DCCReference>
         <DCCReference Include="dialogs\UfrmNew.pas">
             <Form>frmNew</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="dialogs\UfrmAboutTike.pas">
             <Form>frmAboutTike</Form>
@@ -346,7 +345,6 @@
         <DCCReference Include="..\..\global\delphi\general\WindowsLanguages.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="main\TextFileTemplates.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ExternalExceptionHandler.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="dialogs\UfrmFontHelper.pas">
@@ -460,7 +458,6 @@
         <DCCReference Include="..\..\global\delphi\charmap\utilcheckfontchars.pas"/>
         <DCCReference Include="..\..\global\delphi\general\findfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utiljclexception.pas"/>
         <DCCReference Include="..\..\engine\kmcomapi\keymanapi_TLB.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas"/>
@@ -520,12 +517,10 @@
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ProjectTemplate.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewModelProjectParameters.pas">
             <Form>frmNewModelProjectParameters</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
         <DCCReference Include="child\Keyman.Developer.UI.UframeWordlistEditor.pas">
             <Form>frameWordlistEditor</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas"/>
@@ -535,23 +530,23 @@
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.QRCode.pas"/>
         <DCCReference Include="child\Keyman.Developer.UI.UfrmModelEditor.pas">
             <Form>frmModelEditor</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.LexicalModelParser.pas"/>
         <DCCReference Include="main\Keyman.Developer.System.LexicalModelParserTypes.pas"/>
         <DCCReference Include="child\Keyman.Developer.UI.UfrmWordlistEditor.pas">
             <Form>frmWordlistEditor</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="actions\Keyman.Developer.UI.dmActionsModelEditor.pas">
             <Form>modActionsModelEditor</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="dialogs\UfrmMustIncludeDebug.pas">
             <Form>frmMustIncludeDebug</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
+        <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

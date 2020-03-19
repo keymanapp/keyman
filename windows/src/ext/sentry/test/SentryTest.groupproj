@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{52D94FCF-A4CF-47AB-B929-BB6C837804C2}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SentryClientTest.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SentryClientVclTest.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SentryClientTest">
+        <MSBuild Projects="SentryClientTest.dproj"/>
+    </Target>
+    <Target Name="SentryClientTest:Clean">
+        <MSBuild Projects="SentryClientTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SentryClientTest:Make">
+        <MSBuild Projects="SentryClientTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SentryClientVclTest">
+        <MSBuild Projects="SentryClientVclTest.dproj"/>
+    </Target>
+    <Target Name="SentryClientVclTest:Clean">
+        <MSBuild Projects="SentryClientVclTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SentryClientVclTest:Make">
+        <MSBuild Projects="SentryClientVclTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SentryClientTest;SentryClientVclTest"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SentryClientTest:Clean;SentryClientVclTest:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SentryClientTest:Make;SentryClientVclTest:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
