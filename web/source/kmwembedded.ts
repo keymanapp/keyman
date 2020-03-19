@@ -124,10 +124,10 @@ namespace com.keyman.osk {
 }
 
 namespace com.keyman.text {
-  let nativeDefaultKeyOutput = Processor.prototype.defaultKeyOutput;
+  let nativeForBaseKeys = DefaultOutput.forBaseKeys;
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
+  DefaultOutput.forBaseKeys = function(this: Processor, Lkc: KeyEvent, keyShiftState: number): string {
     let keyman = com.keyman.singleton;
 
     // Note:  this assumes Lelem is properly attached and has an element interface.
@@ -137,16 +137,7 @@ namespace com.keyman.text {
 
     // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
     // to the mobile apps to handle (insert characters or navigate forms).
-    if (code == Codes.keyCodes.K_SPACE) {
-      return ' ';
-    } else if (code == Codes.keyCodes.K_BKSP) {
-      if(!(Lkc.Ltarg instanceof Mock) ) {
-        keyman['interface'].defaultBackspace();
-        return '';
-      } else {
-        return '\b';
-      }
-    } else if (code == Codes.keyCodes.K_oE2) {
+    if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
       if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
         return '|';
@@ -156,7 +147,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, usingOSK);
+    return nativeForBaseKeys.call(this, Lkc, keyShiftState);
   }
 }
 
