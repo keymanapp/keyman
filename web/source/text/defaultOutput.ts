@@ -11,68 +11,112 @@ namespace com.keyman.text {
     private constructor() {
     }
 
-    /**
-     * This function is designed for future migration into a separate, explicitly-DOM-aware module.
-     * It would then be assigned to this class via classic JS method extension practices as an 'override'
-     * of `applyCommand`, reusing the base version of that name seen in this class, which is
-     * designed for web-core.
-     */
-    public static applyDOMCommand(outputTarget: OutputTarget, code: number, keyShiftState: number) {
-      let quiet = outputTarget instanceof Mock;
-
-      let domManager = com.keyman.singleton.domManager;
-
-      switch(code) {
-        case Codes.keyCodes['K_TAB']:
-          if(!quiet) {
-            domManager.moveToNext(keyShiftState);
-          }
-          break;
-        case Codes.keyCodes['K_TABBACK']:
-          if(!quiet) {
-            domManager.moveToNext(true);
-          }
-          break;
-        case Codes.keyCodes['K_TABFWD']:
-          if(!quiet) {
-            domManager.moveToNext(false);
-          }
-          break;
-      }
-    }
-
-    public static applyCommand(Lkc: KeyEvent, keyShiftState: number) {
+    static codeForEvent(Lkc: KeyEvent) {
       let keyName = Lkc.kName;
       let n = Lkc.Lcode;
-      let outputTarget = Lkc.Ltarg;
-
-      let keyman = com.keyman.singleton;
-
-      let quiet = outputTarget instanceof Mock;
 
       var code = Codes.keyCodes[keyName];
       if(!code) {
         code = n;
       }
 
-      DefaultOutput.applyDOMCommand(outputTarget, code, keyShiftState);
+      return code;
+    }
+
+    public static forAny(Lkc: KeyEvent, shiftState: number) {
+      var char = '';
+
+      let code = DefaultOutput.codeForEvent(Lkc);
+
+      // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
+      if(char = DefaultOutput.forSpecialEmulation(Lkc)) {
+        return char;
+      } else if(char = DefaultOutput.forNumpadKeys(Lkc)) {
+        return char;
+      } else if(char = DefaultOutput.forUnicodeKeynames(Lkc)) {
+        return char;
+      } else if(char = DefaultOutput.forBaseKeys(Lkc, shiftState)) {
+        return char;
+      } else {
+        // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
+        // Not originally defined for text output within defaultKeyOutput.
+        switch(code) {
+          case Codes.keyCodes['K_TAB']:
+          case Codes.keyCodes['K_TABBACK']:
+          case Codes.keyCodes['K_TABFWD']:
+            return '\t';
+          default:
+            return '';
+        }
+      }
+    }
+
+    public static isDOMCommand(Lkc: KeyEvent): boolean {
+      let code = DefaultOutput.codeForEvent(Lkc);
 
       switch(code) {
-        case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-          if(quiet) {
-            // TODO:  Remove need for this clause via refactoring.  It's currently needed for predictive text Mocks.
-            return '\b'; // the escape sequence for backspace.
-          } else {
-            keyman.interface.defaultBackspace(outputTarget);
-          }
-          return '';
-        case Codes.keyCodes['K_ENTER']:
-          outputTarget.handleNewlineAtCaret();
+        case Codes.keyCodes['K_TAB']:
+        case Codes.keyCodes['K_TABBACK']:
+        case Codes.keyCodes['K_TABFWD']:
+          return true;
+        default:
+          return false;
+      }
+    }
 
-          return '\n';  // We still return this, as it ensures we generate a rule-match.
-        case Codes.keyCodes['K_SPACE']:
-          return ' ';
-        //
+    /**
+     * forCommands - returns a boolean indicating if a non-text event should be triggered by the keystroke.
+     */
+    public static isCommand(Lkc: KeyEvent): boolean {
+      let code = DefaultOutput.codeForEvent(Lkc);
+
+      switch(code) {
+        // Should we ever implement them:
+        // case Codes.keyCodes['K_LEFT']:  // would not output text, but would alter the caret's position in the context.
+        // case Codes.keyCodes['K_RIGHT']:
+        //   return true;
+        default:
+          return this.isDOMCommand(Lkc);
+      }
+    }
+
+    /**
+     * This function is designed for future migration into a separate, explicitly-DOM-aware module.
+     * It would then be assigned to this class via classic JS method extension practices as an 'override'
+     * of `applyCommand`, reusing the base version of that name seen in this class, which is
+     * designed for web-core.
+     */
+    /**
+     * This function is designed for future migration into a separate, explicitly-DOM-aware module.
+     * It would then be assigned to this class via classic JS method extension practices as an 'override'
+     * of `applyCommand`, reusing the base version of that name seen in this class, which is
+     * designed for web-core.
+     * 
+     * for___Commands - returns boolean indicating if a non-text event should be triggered by the keystroke.
+     */
+    public static applyDOMCommand(Lkc: KeyEvent, keyShiftState: number) {
+      let code = DefaultOutput.codeForEvent(Lkc);
+      let domManager = com.keyman.singleton.domManager;
+
+      switch(code) {
+        case Codes.keyCodes['K_TAB']:
+          domManager.moveToNext(keyShiftState);
+          break;
+        case Codes.keyCodes['K_TABBACK']:
+          domManager.moveToNext(true);
+          break;
+        case Codes.keyCodes['K_TABFWD']:
+          domManager.moveToNext(false);
+          break;
+      }
+    }
+
+    public static applyCommand(Lkc: KeyEvent, keyShiftState: number) {
+      DefaultOutput.applyDOMCommand(Lkc, keyShiftState);
+
+      // Notes for potential default-handling extensions:
+      // 
+      // switch(code) {
         // // Problem:  clusters, and doing them right.
         // // The commented-out code below should be a decent starting point, but clusters make it complex.
         // // Mostly based on pre-12.0 code, but the general idea should be relatively clear.
@@ -91,18 +135,26 @@ namespace com.keyman.text {
         //   if(code == VisualKeyboard.keyCodes['K_RIGHT']) {
         //     break;
         //   }
-        // // Should we include this?  It could be tricky to do correctly...
+      // }
+      //
+      // Note that these would be useful even outside of a DOM context.
+    }
+
+    /**
+     * Codes matched here may need special handling to apply to an OutputTarget, but still produce output.
+     */
+    public static forSpecialEmulation(Lkc: KeyEvent): string {
+      let code = DefaultOutput.codeForEvent(Lkc);
+
+      switch(code) {
+        case Codes.keyCodes['K_BKSP']:
+          return '\b';
+        case Codes.keyCodes['K_ENTER']:
+          return '\n'; 
+        case Codes.keyCodes['K_SPACE']:
+          return ' ';
         // case Codes.keyCodes['K_DEL']:
-        //   // Move caret right one unit, then backspace.
-        //   if(touchAlias) {
-        //     var caretPos = keymanweb.getTextCaret(Lelem);
-        //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-        //     if(caretPos == keymanweb.getTextCaret(Lelem)) {
-        //       // Failed to move right - there's nothing to delete.
-        //       break;
-        //     }
-        //     kbdInterface.defaultBackspace();
-        //   }
+        //   return '\u007f'; // 127, ASCII / Unicode control code for DEL.
       }
     }
 
@@ -126,7 +178,7 @@ namespace com.keyman.text {
 
     // Test for fall back to U_xxxxxx key id
     // For this first test, we ignore the keyCode and use the keyName
-    public static forUnicodeKeynames(Lkc: KeyEvent) {
+    public static forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
       let quiet = Lkc.Ltarg instanceof Mock;
       let keyName = Lkc.kName;
 
@@ -140,8 +192,8 @@ namespace com.keyman.text {
       if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
         // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
         // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-        if(!quiet) {
-          console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+        if(ruleBehavior) {
+          ruleBehavior.errorLog = ("Suppressing Unicode control code: U_00" + codePoint.toString(16));
         }
         return '';
       } else {
@@ -153,12 +205,12 @@ namespace com.keyman.text {
 
     // Test for otherwise unimplemented keys on the the base default & shift layers.
     // Those keys must be blocked by keyboard rules if intentionally unimplemented; otherwise, this function will trigger.
-    public static forBaseKeys(Lkc: KeyEvent, keyShiftState: number) {
+    public static forBaseKeys(Lkc: KeyEvent, keyShiftState: number, ruleBehavior?: RuleBehavior) {
       let n = Lkc.Lcode;
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState != 0 && keyShiftState != 1) {
-        if(!(Lkc.Ltarg instanceof Mock)) {
-          console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
+        if(ruleBehavior) {
+          ruleBehavior.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
         }
       }
 
@@ -174,8 +226,8 @@ namespace com.keyman.text {
             return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
           }
         } catch (e) {
-          if(!(Lkc.Ltarg instanceof Mock)) {
-            console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
+          if(ruleBehavior) {
+            ruleBehavior.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
           }
         }
       }
