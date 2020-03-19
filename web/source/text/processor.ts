@@ -31,9 +31,8 @@ namespace com.keyman.text {
     swallowKeypress: boolean = false;
 
     /**
-     * Get the default RuleBehavior for the specified key, looking up keycodes as necessary.
-     * Performs similar lookups to defaultKeyOutput; it's designed for application to OutputTargets
-     * and ALSO for matching against cases that don't produce typical text output.
+     * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
+     * where and when appropriate.
      *
      * @param   {object}  Lkc  The pre-analyzed key event object
      * @param   {number}  keyShiftState
@@ -105,48 +104,6 @@ namespace com.keyman.text {
       ruleBehavior.transcription = transcription;
 
       return ruleBehavior;
-    }
-
-    /**
-     * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
-     * Otherwise, lookup the  virtual key code (physical keyboard mapping)
-     *
-     * @param   {object}  Lkc  The pre-analyzed key event object
-     * @param   {number}  keyShiftState
-     * @param   {boolean} usingOSK
-     * @return  {string}
-     */
-    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
-      let outputTarget = Lkc.Ltarg;
-
-      let keyman = com.keyman.singleton;
-
-      // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if (keyShiftState == Codes.modifierCodes['SHIFT']) {
-        keyShiftState = 1; // It's used as an index in some called methods.
-      }
-
-      // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
-      // that lacks default key processing behavior.
-      if(usingOSK || outputTarget.isSynthetic) {
-        DefaultOutput.applyCommand(Lkc, keyShiftState);
-      } else if(Lkc.Lcode == 8) {
-        keyman.interface.defaultBackspace();
-        return '';
-      }
-
-      let code: string;
-
-      // Translate numpad keystrokes into their non-numpad equivalents
-      if(code = DefaultOutput.forNumpadKeys(Lkc)) {
-        return code;
-      } else if(code = DefaultOutput.forUnicodeKeynames(Lkc)) { // Test for fall back to U_xxxxxx key id
-        return code;
-      } else if(code = DefaultOutput.forBaseKeys(Lkc, keyShiftState)) {
-        return code;
-      }
-
-      return '';
     }
 
     static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
@@ -593,7 +550,7 @@ namespace com.keyman.text {
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
-        var mappedChar: string = this.defaultKeyOutput(mappingEvent, (shifted ? 0x10 : 0), false);
+        var mappedChar: string = DefaultOutput.forAny(mappingEvent, (shifted ? 0x10 : 0));
         
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.

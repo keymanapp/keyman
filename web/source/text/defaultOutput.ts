@@ -23,6 +23,10 @@ namespace com.keyman.text {
       return code;
     }
 
+    /**
+     * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
+     * Also used by Processor.defaultRuleOutput to generate output after filtering for special cases.
+     */
     public static forAny(Lkc: KeyEvent, shiftState: number) {
       var char = '';
 
