@@ -127,7 +127,7 @@ namespace com.keyman.text {
   let nativeForBaseKeys = DefaultOutput.forBaseKeys; // a static method.
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  DefaultOutput.forBaseKeys = function(Lkc: KeyEvent, keyShiftState: number): string {
+  DefaultOutput.forBaseKeys = function(Lkc: KeyEvent): string {
     // Note:  this assumes Lelem is properly attached and has an element interface.
     // Currently true in the Android and iOS apps.
     let Codes = com.keyman.text.Codes;
@@ -145,7 +145,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeForBaseKeys(Lkc, keyShiftState); // is a static method, so no .call (which implies a need for `this`.)
+    return nativeForBaseKeys(Lkc); // is a static method, so no .call (which implies a need for `this`.)
   }
 }
 

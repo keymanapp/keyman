@@ -35,21 +35,15 @@ namespace com.keyman.text {
      * where and when appropriate.
      *
      * @param   {object}  Lkc  The pre-analyzed key event object
-     * @param   {number}  keyShiftState
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): RuleBehavior {
+    defaultRuleBehavior(Lkc: KeyEvent, usingOSK: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
 
       let outputTarget = Lkc.Ltarg;
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
-
-      // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if (keyShiftState == Codes.modifierCodes['SHIFT']) {
-        keyShiftState = 1; // It's used as an index in some called methods.
-      }
 
       let matched = false;
       var char = '';
@@ -87,7 +81,7 @@ namespace com.keyman.text {
       }
 
       if(!matched) {
-        if(char = DefaultOutput.forAny(Lkc, keyShiftState)) {
+        if(char = DefaultOutput.forAny(Lkc)) {
           if(char == '\b') { // physical keystrokes.
             keyman.interface.defaultBackspace(outputTarget);
           } else {
@@ -255,7 +249,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        matchBehavior = this.defaultRuleBehavior(keyEvent, keyEvent.Lmodifiers, fromOSK);
+        matchBehavior = this.defaultRuleBehavior(keyEvent, fromOSK);
 
         kbdInterface.activeTargetOutput = null;
       }
@@ -428,7 +422,7 @@ namespace com.keyman.text {
 
         if(ruleBehavior.triggersDefaultCommand) {
           let keyEvent = ruleBehavior.transcription.keystroke;
-          DefaultOutput.applyCommand(keyEvent, keyEvent.Lmodifiers);
+          DefaultOutput.applyCommand(keyEvent);
         }
 
         if(ruleBehavior.warningLog) {
@@ -554,7 +548,8 @@ namespace com.keyman.text {
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
-        var mappedChar: string = DefaultOutput.forAny(mappingEvent, (shifted ? 0x10 : 0));
+        mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
+        var mappedChar: string = DefaultOutput.forAny(mappingEvent);
         
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.
