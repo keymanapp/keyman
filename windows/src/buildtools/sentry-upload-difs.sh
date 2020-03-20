@@ -39,10 +39,10 @@ cd "$KEYMAN_ROOT/windows/src"
 #
 
 echo "Uploading symbols for desktop/"
-sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb desktop
+sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb desktop --include-sources
 
 echo "Uploading symbols for engine/"
-sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb engine
+sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb engine --include-sources
 
 echo "Uploading symbols for developer/"
-sentry-cli upload-dif -p keyman-developer -t breakpad -t pdb developer
+sentry-cli upload-dif -p keyman-developer -t breakpad -t pdb developer --include-sources
