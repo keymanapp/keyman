@@ -359,7 +359,7 @@ namespace com.keyman.text {
       let processor = (<KeymanBase> keymanweb).textProcessor;
 
       var origArg = keyName;
-      if(!keymanweb.keyboardManager.activeKeyboard || !osk.vkbd) {
+      if(!keymanweb.textProcessor.activeKeyboard || !osk.vkbd) {
         return false;
       }
 
