@@ -153,8 +153,6 @@ namespace com.keyman.text {
   // Declare KeymanWeb and related objects
   var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'],device=util.device;
   var dom = com.keyman.dom;
-  var Layouts = com.keyman.osk.Layouts;
-  var kbdInterface=keymanweb['interface'];
 
   // Allow definition of application name
   keymanweb.options['app']='';

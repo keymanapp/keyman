@@ -239,7 +239,7 @@ namespace com.keyman {
       
       var isActivating = this.keyman.uiManager.isActivating;
       if(!isActivating) {
-        this.keyman['interface'].notifyKeyboard(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
+        this.keyman.textProcessor.keyboardInterface.notifyKeyboard(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
       //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
@@ -251,7 +251,7 @@ namespace com.keyman {
       }
 
       this.doChangeEvent(Ltarg);
-      this.keyman.interface.resetContext();
+      this.keyman.textProcessor.keyboardInterface.resetContext();
 
       return true;
     }.bind(this);
@@ -347,7 +347,7 @@ namespace com.keyman {
         if(target && text.Processor.getOutputTarget(target)) {
           text.Processor.getOutputTarget(target).deadkeys().clear();
         }
-        this.keyman['interface'].notifyKeyboard(0, text.Processor.getOutputTarget(target), 1);  // I2187
+        this.keyman.textProcessor.keyboardInterface.notifyKeyboard(0, text.Processor.getOutputTarget(target), 1);  // I2187
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
@@ -697,7 +697,7 @@ namespace com.keyman {
     setBlur: (e: FocusEvent) => void = function(this: DOMTouchHandlers, e: FocusEvent) {
       // This works OK for iOS, but may need something else for other platforms
 
-      this.keyman.interface.resetContext();
+      this.keyman.textProcessor.keyboardInterface.resetContext();
 
       if(('relatedTarget' in e) && e.relatedTarget) {
         var elem: HTMLElement = e.relatedTarget as HTMLElement;

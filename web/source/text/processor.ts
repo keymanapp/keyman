@@ -30,6 +30,12 @@ namespace com.keyman.text {
     // Denotes whether or not KMW needs to 'swallow' the next keypress.
     swallowKeypress: boolean = false;
 
+    keyboardInterface: KeyboardInterface;
+
+    constructor() {
+      this.keyboardInterface = new KeyboardInterface();
+    }
+
     /**
      * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
      * where and when appropriate.
@@ -40,8 +46,6 @@ namespace com.keyman.text {
      * @return  {string}
      */
     defaultRuleBehavior(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): RuleBehavior {
-      let keyman = com.keyman.singleton;
-
       let outputTarget = Lkc.Ltarg;
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
@@ -66,13 +70,13 @@ namespace com.keyman.text {
         } else if(char = DefaultOutput.forSpecialEmulation(Lkc)) { 
           switch(char) {
             case '\b':
-              keyman.interface.defaultBackspace(outputTarget);
+              this.keyboardInterface.defaultBackspace(outputTarget);
               break;
             case '\n':
               outputTarget.handleNewlineAtCaret();
               break;
             case ' ':
-              keyman.interface.output(0, outputTarget, ' ');
+              this.keyboardInterface.output(0, outputTarget, ' ');
               break;
             // case '\u007f': // K_DEL
               // // For (possible) future implementation.
@@ -89,9 +93,9 @@ namespace com.keyman.text {
       if(!matched) {
         if(char = DefaultOutput.forAny(Lkc, keyShiftState)) {
           if(char == '\b') { // physical keystrokes.
-            keyman.interface.defaultBackspace(outputTarget);
+            this.keyboardInterface.defaultBackspace(outputTarget);
           } else {
-            keyman.interface.output(0, outputTarget, char);
+            this.keyboardInterface.output(0, outputTarget, char);
           }
         } else {
           // No match, no default RuleBehavior.
@@ -225,7 +229,6 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-      let kbdInterface = keyman.interface;
       let keyMapManager = keyman.keyMapManager;
 
       if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
@@ -241,7 +244,7 @@ namespace com.keyman.text {
 
       // Pass this key code and state to the keyboard program
       if(activeKeyboard && keyEvent.Lcode != 0) {
-        matchBehavior = kbdInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+        matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
 
       if(!matchBehavior) {
@@ -251,13 +254,13 @@ namespace com.keyman.text {
 
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
-        kbdInterface.activeTargetOutput = outputTarget;
+        this.keyboardInterface.activeTargetOutput = outputTarget;
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
         matchBehavior = this.defaultRuleBehavior(keyEvent, keyEvent.Lmodifiers, fromOSK);
 
-        kbdInterface.activeTargetOutput = null;
+        this.keyboardInterface.activeTargetOutput = null;
       }
 
       return matchBehavior;
@@ -959,7 +962,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          keyman['interface'].notifyKeyboard(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
+          this.keyboardInterface.notifyKeyboard(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -968,7 +971,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        keyman['interface'].notifyKeyboard(0, outputTarget, 1); 
+        this.keyboardInterface.notifyKeyboard(0, outputTarget, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 
@@ -1219,10 +1222,9 @@ namespace com.keyman.text {
         return false;
       }
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
-      let outputTarget = Levent.Ltarg;
       
       // Only reached if it's a mnemonic keyboard.
-      if(this.swallowKeypress || keyman['interface'].processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
+      if(this.swallowKeypress || this.keyboardInterface.processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
         this.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();

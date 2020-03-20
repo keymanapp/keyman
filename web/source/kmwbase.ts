@@ -68,7 +68,6 @@ namespace com.keyman {
     ['util']: Util;
     ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
-    ['interface']: text.KeyboardInterface;
     keyboardManager: KeyboardManager;
     domManager: DOMManager;
     hotkeyManager: HotkeyManager;
@@ -113,7 +112,6 @@ namespace com.keyman {
     constructor() {
       // Allow internal minification of the public modules.
       this.util = this['util'] = new Util(this);
-      window['KeymanWeb'] = this.interface = this['interface'] = new text.KeyboardInterface();
       this.ui = this['ui'] = {};
 
       this.keyboardManager = new KeyboardManager(this);
@@ -122,6 +120,8 @@ namespace com.keyman {
       this.uiManager = new UIManager(this);
       this.keyMapManager = new KeyMapManager();
       this.textProcessor = new text.Processor();
+      window['KeymanWeb'] = this.textProcessor.keyboardInterface;
+      
       this.modelManager = new text.prediction.ModelManager();
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();
 
@@ -427,7 +427,7 @@ namespace com.keyman {
      * Description  Revert OSK to default layer and clear any deadkeys and modifiers
      */
     ['resetContext']() {
-      this.interface.resetContext();
+      this.textProcessor.keyboardInterface.resetContext();
     };
 
     /**
@@ -436,7 +436,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.interface.setNumericLayer();
+      this.textProcessor.keyboardInterface.setNumericLayer();
     };
 
     /**
