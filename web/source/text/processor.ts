@@ -34,6 +34,16 @@ namespace com.keyman.text {
 
     constructor() {
       this.keyboardInterface = new KeyboardInterface();
+      this.installInterface();
+    }
+
+    private installInterface() {
+      // TODO:  replace 'window' with a (currently-unwritten) utility call that retrieves 
+      //        the global object (whether browser, Node, WebWorker).
+      //
+      //        We must ensure that the keyboard can find the API functions at the expected place.
+      let globalThis = window;
+      globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
     }
 
     /**
@@ -244,6 +254,7 @@ namespace com.keyman.text {
 
       // Pass this key code and state to the keyboard program
       if(activeKeyboard && keyEvent.Lcode != 0) {
+        this.installInterface();
         matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
 
@@ -469,7 +480,7 @@ namespace com.keyman.text {
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
         // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
         if(outputTarget.getElement()) {
-          keyman['interface'].doInputEvent(outputTarget.getElement());
+          this.keyboardInterface.doInputEvent(outputTarget.getElement());
         }
 
         this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);

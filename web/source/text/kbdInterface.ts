@@ -198,14 +198,16 @@ namespace com.keyman.text {
   }
 
   export class KeyboardInterface {
+    static readonly GLOBAL_NAME = 'KeymanWeb';
+
     cachedContext: CachedContext = new CachedContext();
     cachedContextEx: CachedContextEx = new CachedContextEx();
 
     activeTargetOutput: OutputTarget;
     ruleBehavior: RuleBehavior;
 
-    static TSS_LAYER:    number = 33;
-    static TSS_PLATFORM: number = 31;
+    static readonly TSS_LAYER:    number = 33;
+    static readonly TSS_PLATFORM: number = 31;
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
