@@ -31,6 +31,7 @@ namespace com.keyman.text {
     swallowKeypress: boolean = false;
 
     keyboardInterface: KeyboardInterface;
+    private keyboard: any; // We might can define a more precise def, though...
 
     constructor() {
       this.keyboardInterface = new KeyboardInterface();
@@ -44,6 +45,23 @@ namespace com.keyman.text {
       //        We must ensure that the keyboard can find the API functions at the expected place.
       let globalThis = window;
       globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
+
+      // Ensure that the active keyboard is set on the keyboard interface object.
+      if(this.activeKeyboard) {
+        this.keyboardInterface.activeKeyboard = this.activeKeyboard;
+      }
+    }
+
+    public get activeKeyboard(): any {
+      return this.keyboard;
+    }
+
+    public set activeKeyboard(keyboard: any) {
+      this.keyboard = keyboard;
+
+      // All old deadkeys and keyboard-specific cache should immediately be invalidated
+      // on a keyboard change.
+      this.keyboardInterface.resetContext();
     }
 
     /**
@@ -146,7 +164,7 @@ namespace com.keyman.text {
     _GetClickEventProperties(e: osk.ActiveKey, Lelem: HTMLElement): KeyEvent {
       let keyman = com.keyman.singleton;
 
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      var activeKeyboard = this.activeKeyboard;
       let formFactor = keyman.util.device.formFactor;
 
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
@@ -237,8 +255,6 @@ namespace com.keyman.text {
 
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
-
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
       let keyMapManager = keyman.keyMapManager;
 
       if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
@@ -253,7 +269,7 @@ namespace com.keyman.text {
       this.swallowKeypress = false;
 
       // Pass this key code and state to the keyboard program
-      if(activeKeyboard && keyEvent.Lcode != 0) {
+      if(this.activeKeyboard && keyEvent.Lcode != 0) {
         this.installInterface();
         matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
@@ -656,7 +672,7 @@ namespace com.keyman.text {
      */
     getVKDictionaryCode(keyName: string) {
       let keyman = com.keyman.singleton;
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      var activeKeyboard = this.activeKeyboard;
       if(!activeKeyboard['VKDictionary']) {
         var a=[];
         if(typeof activeKeyboard['KVKD'] == 'string') {
@@ -1123,7 +1139,7 @@ namespace com.keyman.text {
       }
 
       // Mnemonic handling.
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      var activeKeyboard = this.activeKeyboard;
 
       if(activeKeyboard && activeKeyboard['KM']) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,
@@ -1218,7 +1234,7 @@ namespace com.keyman.text {
       // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-      if(!keyman.keyboardManager.activeKeyboard['KM']) {
+      if(!this.activeKeyboard['KM']) {
         if(!this.swallowKeypress) {
           return true;
         }

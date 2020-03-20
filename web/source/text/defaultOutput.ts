@@ -165,7 +165,7 @@ namespace com.keyman.text {
     }
 
     public static forNumpadKeys(Lkc: KeyEvent) {
-      let activeKeyboard = com.keyman.singleton.keyboardManager.activeKeyboard;
+      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
 
       // Translate numpad keystrokes into their non-numpad equivalents
       if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {

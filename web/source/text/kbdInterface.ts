@@ -211,6 +211,9 @@ namespace com.keyman.text {
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
+    // Must be accessible to some of the keyboard API methods.
+    activeKeyboard: any;
+
     constructor() {
     }
 
@@ -236,12 +239,9 @@ namespace com.keyman.text {
      * Description  Notifies keyboard of keystroke or other event
      */    
     notifyKeyboard(_PCommand: number, _PTarget: OutputTarget, _PData: number) { // I2187
-      let keyman = com.keyman.singleton;
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-
       // Good example use case - the Japanese CJK-picker keyboard
-      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
-        activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+      if(this.activeKeyboard != null && typeof(this.activeKeyboard['KNS']) == 'function') {
+        this.activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
       }
     }
       
@@ -579,7 +579,7 @@ namespace com.keyman.text {
      */    
     isKeypress(e: KeyEvent):boolean {
       let keyman = com.keyman.singleton;
-      if(keyman.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
+      if(this.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
         return keyman.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
@@ -1013,7 +1013,7 @@ namespace com.keyman.text {
     saveStore(storeName:string, optValue:string): boolean {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var kbd=keyman.keyboardManager.activeKeyboard;
+      var kbd=this.activeKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
         return false;
       }
@@ -1070,6 +1070,8 @@ namespace com.keyman.text {
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
+      } else if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
       }
 
       outputTarget.invalidateSelection();
@@ -1089,7 +1091,7 @@ namespace com.keyman.text {
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
+      var matched = this.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       if(!matched) {

@@ -460,7 +460,7 @@ namespace com.keyman.text {
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
     let keyman = com.keyman.singleton;
-    if(!keyman.keyboardManager.activeKeyboard || code == 0) {
+    if(!keyman.textProcessor.activeKeyboard || code == 0) {
       return false;
     }
 

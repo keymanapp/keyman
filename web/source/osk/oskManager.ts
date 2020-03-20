@@ -146,7 +146,7 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
       let device = util.device;
 
-      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      var activeKeyboard = keymanweb.textProcessor.activeKeyboard;
 
       // If _Load called before OSK is ready, must wait and call again
       if(this._Box == null) {
@@ -374,8 +374,8 @@ namespace com.keyman.osk {
       bar.className='kmw-title-bar';
       bar.onmousedown=this._VMoveMouseDown;
 
-      if(keymanweb.keyboardManager.activeKeyboard) {
-        title=keymanweb.keyboardManager.activeKeyboard['KN'];
+      if(keymanweb.textProcessor.activeKeyboard) {
+        title=keymanweb.textProcessor.activeKeyboard['KN'];
       }
       var Ltitle=util._CreateElement('span');
       Ltitle.className='kmw-title-bar-caption';
@@ -1269,7 +1269,7 @@ namespace com.keyman.osk {
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if((!device.touchable) && (keymanweb.keyboardManager.activeKeyboard == null || !this._Enabled)) {
+      if((!device.touchable) && (keymanweb.textProcessor.activeKeyboard == null || !this._Enabled)) {
         return;
       }
 
