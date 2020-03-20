@@ -213,6 +213,7 @@ namespace com.keyman.text {
 
     // Must be accessible to some of the keyboard API methods.
     activeKeyboard: any;
+    activeDevice: com.keyman.Device;
 
     constructor() {
     }
@@ -909,7 +910,7 @@ namespace com.keyman.text {
           switch(constraint) {
             case 'touch':
             case 'hardware':
-              if(keyman.util.activeDevice.touchable != (constraint == 'touch')) {
+              if(this.activeDevice.touchable != (constraint == 'touch')) {
                 result=false;
               }
               break;
@@ -923,7 +924,7 @@ namespace com.keyman.text {
             case 'android':
             case 'ios':
             case 'linux':
-              if(keyman.util.activeDevice.OS.toLowerCase() != constraint) {
+              if(this.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
               }
               break;
@@ -1065,8 +1066,6 @@ namespace com.keyman.text {
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
     processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
-      let keyman = com.keyman.singleton;
-
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
@@ -1087,7 +1086,7 @@ namespace com.keyman.text {
 
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
-      keyman.util.activeDevice = device;
+      this.activeDevice = device;
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
