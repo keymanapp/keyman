@@ -284,7 +284,12 @@ namespace com.keyman.text {
      * @param elem 
      */
     protected dispatchInputEventOn(elem: HTMLElement) {
-      let event = new InputEvent('input', {"bubbles": true, "cancelable": false});
+      let event: InputEvent;
+
+      // `undefined` in Edge and IE.
+      if(InputEvent) {
+        event = new InputEvent('input', {"bubbles": true, "cancelable": false});
+      }
 
       if(elem && event) {
         elem.dispatchEvent(event);
