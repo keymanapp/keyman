@@ -118,8 +118,10 @@ namespace com.keyman.text {
         }
       }
 
+      let isMnemonic = this.activeKeyboard && !this.activeKeyboard['KM'];
+
       if(!matched) {
-        if(char = DefaultOutput.forAny(Lkc, keyShiftState)) {
+        if(char = DefaultOutput.forAny(Lkc, keyShiftState, isMnemonic)) {
           if(char == '\b') { // physical keystrokes.
             this.keyboardInterface.defaultBackspace(outputTarget);
           } else {
@@ -584,7 +586,7 @@ namespace com.keyman.text {
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
-        var mappedChar: string = DefaultOutput.forAny(mappingEvent, (shifted ? 0x10 : 0));
+        var mappedChar: string = DefaultOutput.forAny(mappingEvent, (shifted ? 0x10 : 0), false);
         
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.
