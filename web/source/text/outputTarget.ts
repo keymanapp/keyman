@@ -287,7 +287,7 @@ namespace com.keyman.text {
       let event: InputEvent;
 
       // `undefined` in Edge and IE.
-      if(InputEvent) {
+      if(window['InputEvent']) { // can't condition on the type directly; TS optimizes that out.
         event = new InputEvent('input', {"bubbles": true, "cancelable": false});
       }
 
