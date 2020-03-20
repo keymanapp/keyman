@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.31 alpha 2020-03-20
+
+* fix(android): Fix min SDK version for Sample and Test apps (#2860)
+
 ## 14.0.30 alpha 2020-03-19
 
 * docs(common): minor updates to readme (#2856)
