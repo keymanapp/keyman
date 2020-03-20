@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.32 alpha 2020-03-20
+
+* fix(windows): include sources for sentry (#2866)
+
 ## 14.0.31 alpha 2020-03-20
 
 * fix(android): Fix min SDK version for Sample and Test apps (#2860)
