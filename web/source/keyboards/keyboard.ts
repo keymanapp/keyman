@@ -95,6 +95,23 @@ namespace com.keyman.keyboards {
       return !!(this.modifierBitmask & text.Codes.modifierBitmasks['IS_CHIRAL']);
     }
 
+    get font(): string {
+      if(this.scriptObject['KV']) {
+        return this.scriptObject['KV']['F'];
+      } else {
+        return null;
+      }
+    }
+
+    usesDesktopLayoutOnDevice(device: Device) {
+      if(this.scriptObject['KVKL']) {
+        // A custom mobile layout is defined... but are we using it?
+        return device.formFactor == 'desktop';
+      } else {
+        return true;
+      }
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }

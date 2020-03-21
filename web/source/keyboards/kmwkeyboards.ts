@@ -810,35 +810,6 @@ namespace com.keyman.keyboards {
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
     }
 
-    getFont(k0?) {
-      let textProcessor = com.keyman.singleton.textProcessor
-      var k = k0;
-      if(!k && textProcessor.activeKeyboard) {
-        k = textProcessor.activeKeyboard.scriptObject;
-      }
-
-      if(k && k['KV']) {
-        return k['KV']['F'];
-      }
-      
-      return null;
-    }
-
-    layoutIsDesktopBased(k0?) {
-      let keyman = com.keyman.singleton;
-      var k = k0;
-      if(!k && keyman.textProcessor.activeKeyboard) {
-        k = keyman.textProcessor.activeKeyboard.scriptObject;
-      }
-
-      if(k && k['KVKL']) {
-        // A custom mobile layout is defined... but are we using it?
-        return keyman.util.device.formFactor == 'desktop';
-      } else {
-        return true;
-      }
-    }
-
     /**
      * Function     _getKeyboardByID
      * Scope        Private
