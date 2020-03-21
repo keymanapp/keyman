@@ -45,17 +45,17 @@ namespace com.keyman {
     }
   }
 
-  export class KeyMapManager {
-    browserMap: BrowserKeyMaps = new BrowserKeyMaps();
-    languageMap: LanguageKeyMaps = new LanguageKeyMaps();
+  export class KeyMapping {
+    static readonly browserMap: BrowserKeyMaps = new BrowserKeyMaps();
+    static readonly languageMap: LanguageKeyMaps = new LanguageKeyMaps();
 
-    _usCharCodes: KeyMap[];
+    private static _usCharCodes: KeyMap[];
 
-    constructor() {
-      this._usCodeInit();
+    private constructor() {
+      // Do not construct this class.
     }
 
-    _usCodeInit() {
+    private static _usCodeInit() {
       var s0=new KeyMap(),s1=new KeyMap();
 
       s0['k192'] = 96;
@@ -154,7 +154,7 @@ namespace com.keyman {
       s1['k190'] = 62;
       s1['k191'] = 63;
 
-      this._usCharCodes = [s0,s1];
+      KeyMapping._usCharCodes = [s0,s1];
     }
 
     /**
@@ -164,8 +164,16 @@ namespace com.keyman {
      * @return      {number}                Character code 
      * Description Translate keyboard codes to standard US layout codes
      */    
-    _USKeyCodeToCharCode(Levent: com.keyman.text.KeyEvent) {
-      return this._usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
+    static _USKeyCodeToCharCode(Levent: com.keyman.text.KeyEvent) {
+      return KeyMapping.usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
     };
+
+    public static get usCharCodes() {
+      if(!KeyMapping._usCharCodes) {
+        KeyMapping._usCodeInit();
+      }
+
+      return KeyMapping._usCharCodes;
+    }
   }
 }

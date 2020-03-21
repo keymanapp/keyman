@@ -16,8 +16,6 @@
 /// <reference path="text/kbdInterface.ts" />
 // Defines keyboard data & management classes.
 /// <reference path="keyboards/kmwkeyboards.ts" />
-// Defines built-in keymapping.
-/// <reference path="kmwkeymaps.ts" />
 // Defines KMW's hotkey management object.
 /// <reference path="kmwhotkeys.ts" />
 // Defines the ui management code that tracks UI activation and such.
@@ -72,7 +70,6 @@ namespace com.keyman {
     domManager: DOMManager;
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
-    keyMapManager: KeyMapManager;
     textProcessor: text.Processor;
     modelManager: text.prediction.ModelManager;
 
@@ -118,7 +115,6 @@ namespace com.keyman {
       this.domManager = new DOMManager(this);
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);
-      this.keyMapManager = new KeyMapManager();
       this.textProcessor = new text.Processor();
       // Used by the embedded apps.
       this['interface'] = this.textProcessor.keyboardInterface;

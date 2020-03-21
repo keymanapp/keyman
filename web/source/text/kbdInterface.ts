@@ -562,12 +562,11 @@ namespace com.keyman.text {
      * @return      {boolean}     true if keypress event
      * Description  Test if event as a keypress event
      */    
-    isKeypress(e: KeyEvent):boolean {
-      let keyman = com.keyman.singleton;
+    isKeypress(e: KeyEvent): boolean {
       if(this.activeKeyboard.isMnemonic) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
-        return keyman.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
+        return KeyMapping._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
       }
     }
     
