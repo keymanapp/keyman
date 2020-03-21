@@ -68,7 +68,7 @@ namespace com.keyman.renderer {
 
         eleDescription.appendChild(document.createTextNode('Name: ' + kbd['Name']));
         eleDescription.appendChild(document.createElement('br'));
-        eleDescription.appendChild(document.createTextNode('Font:  ' + window['keyman'].textProcessor.activeKeyboard.scriptObject.KV.F));
+        eleDescription.appendChild(document.createTextNode('Font:  ' + window['keyman'].textProcessor.activeKeyboard.legacyLayoutSpec.F));
 
       } else {
         eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
@@ -110,7 +110,7 @@ namespace com.keyman.renderer {
         } else {
           // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
           // We instead rely upon the KLS definition to ensure we keep the renders sparse.
-          layers = keyman.textProcessor.activeKeyboard.scriptObject.KV.KLS;
+          layers = keyman.textProcessor.activeKeyboard.legacyLayoutSpec.KLS;
         }
 
         let renderLayer = function(i: number) {
