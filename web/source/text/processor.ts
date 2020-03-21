@@ -495,6 +495,7 @@ namespace com.keyman.text {
         if(keyman.isEmbedded) {
           // A special embedded callback used to setup direct callbacks to app-native code.
           keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
+          keyman.refreshElementContent(outputTarget.getElement());
         }
 
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
@@ -675,7 +676,6 @@ namespace com.keyman.text {
      * @return      {number}                key code > 255 on success, or 0 if not found
      */
     getVKDictionaryCode(keyName: string) {
-      let keyman = com.keyman.singleton;
       var activeKeyboard = this.activeKeyboard;
       if(!activeKeyboard.scriptObject['VKDictionary']) {
         var a=[];
@@ -985,6 +985,10 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       let outputTarget = Levent.Ltarg;
 
+      if(!this.activeKeyboard) {
+        return false;
+      }
+
       switch(Levent.Lcode) {
         case 8: 
           outputTarget.deadkeys().clear();
@@ -996,7 +1000,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          this.keyboardInterface.notifyKeyboard(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
+          this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -1005,7 +1009,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        this.keyboardInterface.notifyKeyboard(0, outputTarget, 1); 
+        this.activeKeyboard.notify(0, outputTarget, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 

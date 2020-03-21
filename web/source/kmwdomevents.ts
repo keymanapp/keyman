@@ -238,8 +238,9 @@ namespace com.keyman {
       this.keyman.uiManager.justActivated = false;
       
       var isActivating = this.keyman.uiManager.isActivating;
-      if(!isActivating) {
-        this.keyman.textProcessor.keyboardInterface.notifyKeyboard(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
+      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
+      if(!isActivating && activeKeyboard) {
+        activeKeyboard.notify(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
       //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
@@ -343,11 +344,15 @@ namespace com.keyman {
       }
       DOMEventHandlers.states._DisableInput = false; 
 
+      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
       if(!uiManager.justActivated) {
         if(target && text.Processor.getOutputTarget(target)) {
           text.Processor.getOutputTarget(target).deadkeys().clear();
         }
-        this.keyman.textProcessor.keyboardInterface.notifyKeyboard(0, text.Processor.getOutputTarget(target), 1);  // I2187
+        
+        if(activeKeyboard) {
+          activeKeyboard.notify(0, text.Processor.getOutputTarget(target), 1);  // I2187
+        }
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {

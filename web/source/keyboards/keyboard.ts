@@ -112,6 +112,19 @@ namespace com.keyman.keyboards {
       }
     }
 
+    /**
+     * @param       {number}    _PCommand     event code (16,17,18) or 0
+     * @param       {Object}    _PTarget      target element
+     * @param       {number}    _PData        1 or 0    
+     * Notifies keyboard of keystroke or other event
+     */    
+    notify(_PCommand: number, _PTarget: text.OutputTarget, _PData: number) { // I2187
+      // Good example use case - the Japanese CJK-picker keyboard
+      if(typeof(this.scriptObject['KNS']) == 'function') {
+        this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
+      }
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }
