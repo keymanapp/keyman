@@ -580,7 +580,7 @@ namespace com.keyman.text {
      */    
     isKeypress(e: KeyEvent):boolean {
       let keyman = com.keyman.singleton;
-      if(this.activeKeyboard.scriptObject['KM']) {   // I1380 - support KIK for positional layouts
+      if(this.activeKeyboard.isMnemonic) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
         return keyman.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts

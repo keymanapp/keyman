@@ -32,7 +32,29 @@ namespace com.keyman.keyboards {
 
     // TODO:  Better typing.
     get legacyLayoutSpec(): any {
-      return this.scriptObject['KV'];
+      return this.scriptObject['KV'];  // used with buildDefaultLayout; layout must be constructed at runtime.
+    }
+
+    // TODO:  Better typing.
+    // May return null.
+    get layouts(): any {
+      return this.scriptObject['KVKL'];  // This one is compiled by Developer's visual keyboard layout editor.
+    }
+
+    get compilerVersion(): utils.Version {
+      return new utils.Version(this.scriptObject['KVER']);
+    }
+
+    get isMnemonic(): boolean {
+      return !!this.scriptObject['KM'];
+    }
+
+    get definesPositionalOrMnemonic(): boolean {
+      return typeof this.scriptObject['KM'] != 'undefined';
+    }
+
+    get oskStyling(): string {
+      return this.scriptObject['KCSS'];
     }
 
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of

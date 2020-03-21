@@ -621,7 +621,7 @@ namespace com.keyman.osk {
         // the OSK even without a backing keyboard on mobile, using the default
         // layout as the OSK's base.
         if(activeKeyboard) {
-          kbdDevVersion = new utils.Version(activeKeyboard.scriptObject['KVER']);
+          kbdDevVersion = activeKeyboard.compilerVersion;
         } else {
           kbdDevVersion = new utils.Version(keyman['version']);
         }
@@ -2094,8 +2094,8 @@ namespace com.keyman.osk {
       //       so must apply style before testing for font availability
       // Extended to allow keyboard-specific custom styles for Build 360
       var customStyle=this.addFontStyle(kfd,ofd);
-      if( activeKeyboard != null && typeof(activeKeyboard.scriptObject['KCSS']) == 'string')  // KMEW-129
-        customStyle=customStyle+activeKeyboard.scriptObject['KCSS'];
+      if( activeKeyboard != null && typeof(activeKeyboard.oskStyling) == 'string')  // KMEW-129
+        customStyle=customStyle+activeKeyboard.oskStyling;
 
       this.styleSheet = util.addStyleSheet(customStyle); //Build 360
 
@@ -2198,7 +2198,7 @@ namespace com.keyman.osk {
         return null;
       }
 
-      var layouts=PKbd.scriptObject['KVKL'], layout=null, PVK=PKbd.legacyLayoutSpec;
+      var layouts=PKbd.layouts, layout=null, PVK=PKbd.legacyLayoutSpec;
 
       // Get the layout defined in the keyboard, or its nearest equivalent
       if(typeof layouts == 'object') {
@@ -2215,7 +2215,7 @@ namespace com.keyman.osk {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
-        let kbdDevVersion = new utils.Version(PKbd.scriptObject['KVER']);
+        let kbdDevVersion = PKbd.compilerVersion;
         layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
       }
 

@@ -224,11 +224,11 @@ namespace com.keyman.osk {
         var Lviskbd=null,layouts=null,layout=null,Lhelp='';
         this._Box.className = "";
         if(activeKeyboard != null) {
-          Lviskbd=activeKeyboard.scriptObject['KV'];
+          Lviskbd=activeKeyboard.legacyLayoutSpec;
           Lhelp=activeKeyboard.scriptObject['KH'];
 
           // Check if dynamic layout is defined within keyboard
-          layouts=activeKeyboard.scriptObject['KVKL'];
+          layouts=activeKeyboard.layouts
 
           // If any keyboard layout file is provided, use that to override the generated layout
           if(typeof layouts != 'undefined' && layouts != null) {
