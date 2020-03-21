@@ -1090,7 +1090,7 @@ namespace com.keyman.text {
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = this.activeKeyboard.scriptObject['gs'](outputTarget, keystroke);
+      var matched = this.activeKeyboard.process(outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       if(!matched) {

@@ -17,6 +17,13 @@ namespace com.keyman.keyboards {
       this.scriptObject = keyboardScript;
     }
 
+    /**
+     * Calls the keyboard's `gs` function, which represents the keyboard source's group(main).
+     */
+    process(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
+      return this.scriptObject['gs'](outputTarget, keystroke);
+    }
+
     get id(): string {
       return this.scriptObject['KI'];
     }
