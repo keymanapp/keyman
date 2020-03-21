@@ -1,4 +1,4 @@
-/// <reference path="kmwbase.ts" />
+/// <reference path="../kmwbase.ts" />
 
 namespace com.keyman {
   class CloudRequestEntry {

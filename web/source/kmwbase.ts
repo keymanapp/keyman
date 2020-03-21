@@ -15,7 +15,7 @@
 // Defines the keyboard callback object.
 /// <reference path="text/kbdInterface.ts" />
 // Defines keyboard data & management classes.
-/// <reference path="kmwkeyboards.ts" />
+/// <reference path="keyboards/kmwkeyboards.ts" />
 // Defines built-in keymapping.
 /// <reference path="kmwkeymaps.ts" />
 // Defines KMW's hotkey management object.
