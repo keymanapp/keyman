@@ -101,12 +101,6 @@ namespace com.keyman.osk {
       'leftctrl-shift': '*LCtrlShift*',
       'rightctrl-shift': '*RCtrlShift*'
     };
-
-    static _BaseLayout: string = 'us';       // default BaseLayout
-    static _BaseLayoutEuro: {[code: string]: string} = {
-      'se': '\u00a71234567890+´~~~QWERTYUIOP\u00c5\u00a8\'~~~ASDFGHJKL\u00d6\u00c4~~~~~<ZXCVBNM,.-~~~~~ ',  // Swedish
-      'uk': '`1234567890-=~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ ' // UK
-    };     // I1299 (not currently exposed, but may need to be e.g. for external users)
     
     /**
     * Build a default layout for keyboards with no explicit layout

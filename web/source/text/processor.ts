@@ -35,9 +35,12 @@ namespace com.keyman.text {
     swallowKeypress: boolean = false;
 
     keyboardInterface: KeyboardInterface;
+
+    baseLayout: string;
     private keyboard: keyboards.Keyboard;
 
-    constructor() {
+    constructor(baseLayout?: string) {
+      this.baseLayout = baseLayout || 'us'; // default BaseLayout
       this.keyboardInterface = new KeyboardInterface();
       this.installInterface();
     }
@@ -1165,7 +1168,7 @@ namespace com.keyman.text {
         // Positional Layout
 
         /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-        var Lbase = KeyMapping.languageMap[com.keyman.osk.Layouts._BaseLayout];
+        var Lbase = KeyMapping.languageMap[this.baseLayout];
         if(Lbase && Lbase['k'+s.Lcode]) {
           s.Lcode=Lbase['k'+s.Lcode];
         }

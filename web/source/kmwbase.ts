@@ -53,7 +53,8 @@ namespace com.keyman {
 
     initialized: number;       // Signals the initialization state of the KeymanWeb system.
     isHeadless = false;        // Indicates that KMW lacks any access to the DOM.  Nothing yet implemented for '= true'.
-    'build' = 300;           // TS needs this to be defined within the class.
+    'build' = 300;             // TS needs this to be defined within the class.
+    _BrowserIsSafari: boolean; // A legacy browser-check variable.
 
     // Used as placeholders during initialization.
     // The corresponding class properties should be dropped after a refactor;
@@ -115,7 +116,17 @@ namespace com.keyman {
       this.domManager = new DOMManager(this);
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);
-      this.textProcessor = new text.Processor();
+
+      // I732 START - Support for European underlying keyboards #1
+      var baseLayout: string;
+      if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+        baseLayout = window['KeymanWeb_BaseLayout'];
+      } else {
+        baseLayout = 'us';
+      }
+      this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
+
+      this.textProcessor = new text.Processor(baseLayout);
       // Used by the embedded apps.
       this['interface'] = this.textProcessor.keyboardInterface;
       
