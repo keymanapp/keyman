@@ -271,7 +271,7 @@ namespace com.keyman.osk {
             Lviskbd={'F':'Tahoma', 'BK': Layouts.dfltText}; //DDOSK
           }
 
-          this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask());
+          this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, activeKeyboard.modifierBitmask);
         } else { //The following code applies only to preformatted 'help' such as European Latin
           //osk.ddOSK = false;
           Ldiv=util._CreateElement('div');
@@ -779,7 +779,7 @@ namespace com.keyman.osk {
       this._VMoveX = Lposx - this._Box.offsetLeft;
       this._VMoveY = Lposy - this._Box.offsetTop;
 
-      if(keymanweb.keyboardManager.isCJK()) {
+      if(keymanweb.isCJK()) {
         this.pinImg.style.left='15px';
       }
 
@@ -1402,7 +1402,7 @@ namespace com.keyman.osk {
 
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
-        this._Enabled = ((keymanweb.keyboardManager.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
+        this._Enabled = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
         this.saveCookie();  // Save current OSK state, size and position (desktop only)
       } else if(device.formFactor == 'desktop') {
         //Allow desktop OSK to remain visible on blur if body class set

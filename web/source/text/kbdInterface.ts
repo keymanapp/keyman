@@ -600,8 +600,7 @@ namespace com.keyman.text {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-      let keyman = com.keyman.singleton;
-      let bitmask = keyman.keyboardManager.getKeyboardModifierBitmask();
+      let bitmask = this.activeKeyboard.modifierBitmask;
       let Codes = com.keyman.text.Codes;
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];

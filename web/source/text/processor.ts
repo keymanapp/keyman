@@ -712,13 +712,17 @@ namespace com.keyman.text {
       var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
       var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
 
+      if(!this.activeKeyboard) {
+        return true;
+      }
+
       if(e) {
         // read shift states from Pevent
         keyShiftState = e.Lmodifiers;
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(keyman.keyboardManager.isChiral() && osk.Layouts.emulatesAltGr() && 
+        if(this.activeKeyboard.isChiral && osk.Layouts.emulatesAltGr() && 
             (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~Codes.modifierCodes['RALT'];
@@ -774,8 +778,7 @@ namespace com.keyman.text {
      */
     selectLayer(keyName: string, nextLayerIn?: number | string): boolean {
       var nextLayer = arguments.length < 2 ? null : nextLayerIn;
-      let keyman = com.keyman.singleton;
-      var isChiral = keyman.keyboardManager.isChiral();
+      var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
       // Layer must be identified by name, not number (27/08/2015)
       if(typeof nextLayer == 'number') {
@@ -1125,7 +1128,8 @@ namespace com.keyman.text {
 
       let modifierBitmasks = Codes.modifierBitmasks;
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
-      if(keyman.keyboardManager.isChiral()) {
+      var activeKeyboard = this.activeKeyboard;
+      if(activeKeyboard && activeKeyboard.isChiral) {
         s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
@@ -1143,8 +1147,6 @@ namespace com.keyman.text {
       }
 
       // Mnemonic handling.
-      var activeKeyboard = this.activeKeyboard;
-
       if(activeKeyboard && activeKeyboard.isMnemonic) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,
         // which may change the value of Lcode, here.

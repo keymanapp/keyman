@@ -210,7 +210,7 @@ namespace com.keyman.osk {
         ts.fontSize=spec['fontsize'];
       }
 
-      let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
+      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
 
       // For some reason, fonts will sometimes 'bug out' for the embedded iOS page if we
       // instead assign fontFamily to the existing style 'ts'.  (Occurs in iOS 12.)
@@ -228,7 +228,7 @@ namespace com.keyman.osk {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
         keyText = '\u25cc' + keyText;
 
-        if(keyboardManager.isRTL()) {
+        if(activeKeyboard && activeKeyboard.isRTL) {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
@@ -2216,7 +2216,7 @@ namespace com.keyman.osk {
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
         let kbdDevVersion = PKbd.compilerVersion;
-        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
+        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, PKbd.modifierBitmask, formFactor);
       }
 
       // Cannot create an OSK if no layout defined, just return empty DIV
@@ -2228,7 +2228,7 @@ namespace com.keyman.osk {
         }        
       }
 
-      let kbdObj = new VisualKeyboard(PVK, null, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask(), device, true);
+      let kbdObj = new VisualKeyboard(PVK, null, layout, PKbd.modifierBitmask, device, true);
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes

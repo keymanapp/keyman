@@ -154,7 +154,7 @@ namespace com.keyman {
       } else {
         // Conditionally show the OSK when control receives the focus
         if(osk.ready) {
-          if(this.keyman.keyboardManager.isCJK()) {
+          if(this.keyman.isCJK()) {
             osk._Enabled = true;
           }
           if(osk._Enabled) {

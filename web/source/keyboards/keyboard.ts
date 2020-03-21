@@ -64,6 +64,37 @@ namespace com.keyman.keyboards {
       return this.scriptObject['KCSS'];
     }
 
+    /**
+     * true if this keyboard uses a (legacy) pick list (Chinese, Japanese, Korean, etc.)
+     */    
+    get isCJK(): boolean { // I3363 (Build 301)
+      var lg: string;
+      if(typeof(this.scriptObject['KLC']) != 'undefined') {
+        lg = this.scriptObject['KLC'];
+      } else if(typeof(this.scriptObject['LanguageCode']) != 'undefined') {
+        lg = this.scriptObject['LanguageCode'];
+      }
+      
+      // While some of these aren't proper BCP-47 language codes, the CJK keyboards predate our use of BCP-47.
+      // So, we preserve the old ISO 639-3 codes, as that's what the keyboards are matching against.
+      return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
+    }
+
+    get isRTL(): boolean {
+      return !!this.scriptObject['KRTL'];
+    }
+
+    /**
+     * Obtains the currently-active modifier bitmask for the active keyboard.
+     */
+    get modifierBitmask(): number {
+      return this.scriptObject['KMBM'] || text.Codes.modifierBitmasks['NON_CHIRAL'];
+    }
+
+    get isChiral(): boolean {
+      return !!(this.modifierBitmask & text.Codes.modifierBitmasks['IS_CHIRAL']);
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }
