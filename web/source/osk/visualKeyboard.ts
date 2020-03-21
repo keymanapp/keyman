@@ -2198,7 +2198,7 @@ namespace com.keyman.osk {
         return null;
       }
 
-      var layouts=PKbd.scriptObject['KVKL'], layout=null, PVK=PKbd.scriptObject['KV'];
+      var layouts=PKbd.scriptObject['KVKL'], layout=null, PVK=PKbd.legacyLayoutSpec;
 
       // Get the layout defined in the keyboard, or its nearest equivalent
       if(typeof layouts == 'object') {

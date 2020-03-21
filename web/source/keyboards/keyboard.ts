@@ -30,6 +30,11 @@ namespace com.keyman.keyboards {
       return !!this.scriptObject['KDU'];
     }
 
+    // TODO:  Better typing.
+    get legacyLayoutSpec(): any {
+      return this.scriptObject['KV'];
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }
