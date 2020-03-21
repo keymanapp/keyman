@@ -643,7 +643,7 @@ namespace com.keyman.osk {
       if(typeof layout['displayUnderlying'] != 'undefined') {
         layout.keyLabels = layout['displayUnderlying'] == true; // force bool
       } else {
-        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard.scriptObject['KDU']) != 'undefined') && activeKeyboard.scriptObject['KDU']);
+        layout.keyLabels = activeKeyboard && activeKeyboard.displaysUnderlyingKeys;
       }
 
       let divLayerContainer = this.deviceDependentLayout(layout, device.formFactor);
@@ -2224,7 +2224,7 @@ namespace com.keyman.osk {
         if(typeof layout['displayUnderlying'] != 'undefined') {
           layout.keyLabels = layout['displayUnderlying'] == true; // force bool
         } else {
-          layout.keyLabels = typeof(PKbd.scriptObject['KDU']) != 'undefined' && PKbd.scriptObject['KDU'];
+          layout.keyLabels = PKbd.displaysUnderlyingKeys;
         }        
       }
 
@@ -2239,7 +2239,7 @@ namespace com.keyman.osk {
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {
-        kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.scriptObject['KN']+".</p>";
+        kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.name+".</p>";
       }
       // Add a faint border
       kbd.style.border='1px solid #ccc';

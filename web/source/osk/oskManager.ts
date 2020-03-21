@@ -292,7 +292,7 @@ namespace com.keyman.osk {
         if(keymanweb._TitleElement)
         {
           keymanweb._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + activeKeyboard.scriptObject['KN'] + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
+            + activeKeyboard.name + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
           keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
         }
       }
@@ -375,7 +375,7 @@ namespace com.keyman.osk {
       bar.onmousedown=this._VMoveMouseDown;
 
       if(keymanweb.textProcessor.activeKeyboard) {
-        title=keymanweb.textProcessor.activeKeyboard.scriptObject['KN'];
+        title=keymanweb.textProcessor.activeKeyboard.name;
       }
       var Ltitle=util._CreateElement('span');
       Ltitle.className='kmw-title-bar-caption';

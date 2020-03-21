@@ -21,6 +21,15 @@ namespace com.keyman.keyboards {
       return this.scriptObject['KI'];
     }
 
+    get name(): string {
+      return this.scriptObject['KN'];
+    }
+
+    get displaysUnderlyingKeys(): boolean {
+      // Returns false if undefined or false-like (including 0), true otherwise.
+      return !!this.scriptObject['KDU'];
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }
