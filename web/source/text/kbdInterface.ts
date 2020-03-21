@@ -1015,11 +1015,11 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       var kbd=this.activeKeyboard;
-      if(!kbd || typeof kbd.scriptObject['KI'] == 'undefined' || kbd.scriptObject['KI'] == '') {
+      if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
         return false;
       }
       
-      var cName='KeymanWeb_'+kbd.scriptObject['KI']+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
+      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
 
       keyman.util.saveCookie(cName,cValue);
       return true;

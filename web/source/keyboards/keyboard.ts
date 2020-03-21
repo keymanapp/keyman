@@ -17,6 +17,10 @@ namespace com.keyman.keyboards {
       this.scriptObject = keyboardScript;
     }
 
+    get id(): string {
+      return this.scriptObject['KI'];
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }

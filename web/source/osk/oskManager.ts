@@ -299,7 +299,7 @@ namespace com.keyman.osk {
 
       // Correct the classname for the (inner) OSK frame (Build 360)
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.scriptObject['KI'].replace('Keyboard_','') : '');
+        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') {
         // Desktop order is title_bar, banner_container, inner-frame
         innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;

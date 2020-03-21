@@ -111,7 +111,7 @@ namespace com.keyman.keyboards {
 
     getActiveKeyboardName(): string {
       let textProcessor = com.keyman.singleton.textProcessor;
-      return textProcessor.activeKeyboard ? textProcessor.activeKeyboard.scriptObject['KI'] : '';
+      return textProcessor.activeKeyboard ? textProcessor.activeKeyboard.id : '';
     }
 
     getActiveKeyboardTag(): KeyboardTag {
@@ -443,13 +443,13 @@ namespace com.keyman.keyboards {
       }
 
       // Check if requested keyboard and stub are currently active
-      if(this.activeStub && activeKeyboard && activeKeyboard.scriptObject['KI'] == PInternalName 
+      if(this.activeStub && activeKeyboard && activeKeyboard.id == PInternalName 
         && this.activeStub['KI'] == PInternalName     //this part of test should not be necessary, but keep anyway
         && this.activeStub['KLC'] == PLgCode && !this.keymanweb.mustReloadKeyboard                                 
         ) return Promise.resolve();   
 
       // Check if current keyboard matches requested keyboard, but not stub
-      if(activeKeyboard && (activeKeyboard.scriptObject['KI'] == PInternalName)) {
+      if(activeKeyboard && (activeKeyboard.id == PInternalName)) {
         // If so, simply update the active stub
         for(Ln=0; Ln<this.keyboardStubs.length; Ln++) {
           if((this.keyboardStubs[Ln]['KI'] == PInternalName) 
