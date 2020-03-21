@@ -148,7 +148,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    onKeyboardChange(kbdInfo?: KeyboardChangeData | string) {
+    onKeyboardChange(kbdInfo?: keyboards.KeyboardChangeData | string) {
       let keyman = com.keyman.singleton;
       let mm: ModelManager = this;
 

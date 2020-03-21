@@ -241,8 +241,8 @@ namespace com.keyman.text {
      */    
     notifyKeyboard(_PCommand: number, _PTarget: OutputTarget, _PData: number) { // I2187
       // Good example use case - the Japanese CJK-picker keyboard
-      if(this.activeKeyboard != null && typeof(this.activeKeyboard['KNS']) == 'function') {
-        this.activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+      if(this.activeKeyboard != null && typeof(this.activeKeyboard.scriptObject['KNS']) == 'function') {
+        this.activeKeyboard.scriptObject['KNS'](_PCommand, _PTarget, _PData);
       }
     }
       
@@ -580,7 +580,7 @@ namespace com.keyman.text {
      */    
     isKeypress(e: KeyEvent):boolean {
       let keyman = com.keyman.singleton;
-      if(this.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
+      if(this.activeKeyboard.scriptObject['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
         return keyman.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
@@ -1015,11 +1015,11 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
       var kbd=this.activeKeyboard;
-      if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
+      if(!kbd || typeof kbd.scriptObject['KI'] == 'undefined' || kbd.scriptObject['KI'] == '') {
         return false;
       }
       
-      var cName='KeymanWeb_'+kbd['KI']+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
+      var cName='KeymanWeb_'+kbd.scriptObject['KI']+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
 
       keyman.util.saveCookie(cName,cValue);
       return true;
@@ -1090,7 +1090,7 @@ namespace com.keyman.text {
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = this.activeKeyboard['gs'](outputTarget, keystroke);
+      var matched = this.activeKeyboard.scriptObject['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       if(!matched) {

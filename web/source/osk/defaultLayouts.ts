@@ -374,11 +374,11 @@ namespace com.keyman.osk {
 
       if(!keyLabels) {
         var activeKeyboard = keyman.textProcessor.activeKeyboard;
-        if(activeKeyboard == null || activeKeyboard['KV'] == null) {
+        if(activeKeyboard == null || activeKeyboard.scriptObject['KV'] == null) {
           return false;
         }
         
-        layers = activeKeyboard['KV']['KLS'];
+        layers = activeKeyboard.scriptObject['KV']['KLS'];
       } else {
         layers = keyLabels;
       }

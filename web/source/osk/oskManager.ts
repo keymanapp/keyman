@@ -224,11 +224,11 @@ namespace com.keyman.osk {
         var Lviskbd=null,layouts=null,layout=null,Lhelp='';
         this._Box.className = "";
         if(activeKeyboard != null) {
-          Lviskbd=activeKeyboard['KV'];
-          Lhelp=activeKeyboard['KH'];
+          Lviskbd=activeKeyboard.scriptObject['KV'];
+          Lhelp=activeKeyboard.scriptObject['KH'];
 
           // Check if dynamic layout is defined within keyboard
-          layouts=activeKeyboard['KVKL'];
+          layouts=activeKeyboard.scriptObject['KVKL'];
 
           // If any keyboard layout file is provided, use that to override the generated layout
           if(typeof layouts != 'undefined' && layouts != null) {
@@ -285,21 +285,21 @@ namespace com.keyman.osk {
           Ldiv.className='kmw-osk-static';
           Ldiv.innerHTML = Lhelp;
           this._Box.appendChild(Ldiv);
-          if(activeKeyboard['KHF']) {
-            activeKeyboard['KHF'](this._Box);
+          if(activeKeyboard.scriptObject['KHF']) {
+            activeKeyboard.scriptObject['KHF'](this._Box);
           }
         }
         if(keymanweb._TitleElement)
         {
           keymanweb._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + activeKeyboard['KN'] + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
+            + activeKeyboard.scriptObject['KN'] + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
           keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
         }
       }
 
       // Correct the classname for the (inner) OSK frame (Build 360)
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
+        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.scriptObject['KI'].replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') {
         // Desktop order is title_bar, banner_container, inner-frame
         innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
@@ -375,7 +375,7 @@ namespace com.keyman.osk {
       bar.onmousedown=this._VMoveMouseDown;
 
       if(keymanweb.textProcessor.activeKeyboard) {
-        title=keymanweb.textProcessor.activeKeyboard['KN'];
+        title=keymanweb.textProcessor.activeKeyboard.scriptObject['KN'];
       }
       var Ltitle=util._CreateElement('span');
       Ltitle.className='kmw-title-bar-caption';

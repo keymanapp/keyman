@@ -4,6 +4,8 @@
 /// <reference path="keyEvent.ts" />
 // Defines default key handling behaviors.
 /// <reference path="defaultOutput.ts" />
+// Defines the keyboard wrapper object.
+/// <reference path="../keyboards/keyboard.ts" />
 
 namespace com.keyman.text {
   export class LegacyKeyEvent {
@@ -31,7 +33,7 @@ namespace com.keyman.text {
     swallowKeypress: boolean = false;
 
     keyboardInterface: KeyboardInterface;
-    private keyboard: any; // We might can define a more precise def, though...
+    private keyboard: keyboards.Keyboard;
 
     constructor() {
       this.keyboardInterface = new KeyboardInterface();
@@ -52,11 +54,11 @@ namespace com.keyman.text {
       }
     }
 
-    public get activeKeyboard(): any {
+    public get activeKeyboard(): keyboards.Keyboard {
       return this.keyboard;
     }
 
-    public set activeKeyboard(keyboard: any) {
+    public set activeKeyboard(keyboard: keyboards.Keyboard) {
       this.keyboard = keyboard;
 
       // All old deadkeys and keyboard-specific cache should immediately be invalidated
@@ -118,7 +120,7 @@ namespace com.keyman.text {
         }
       }
 
-      let isMnemonic = this.activeKeyboard && !this.activeKeyboard['KM'];
+      let isMnemonic = this.activeKeyboard && !this.activeKeyboard.scriptObject['KM'];
 
       if(!matched) {
         if(char = DefaultOutput.forAny(Lkc, keyShiftState, isMnemonic)) {
@@ -207,7 +209,7 @@ namespace com.keyman.text {
 
       // Include *limited* support for mnemonic keyboards (Sept 2012)
       // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-      if(activeKeyboard && activeKeyboard['KM'] && !(activeKeyboard['KVKL'] && formFactor != 'desktop')) {
+      if(activeKeyboard && activeKeyboard.scriptObject['KM'] && !(activeKeyboard.scriptObject['KVKL'] && formFactor != 'desktop')) {
         if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) { // exception required, March 2013
           // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
           Lkc.vkCode = Lkc.Lcode;
@@ -218,7 +220,7 @@ namespace com.keyman.text {
       }
 
       // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      if(typeof activeKeyboard['KM'] == 'undefined') {
+      if(typeof activeKeyboard.scriptObject['KM'] == 'undefined') {
         Lkc.Lcode=keyman.keyMapManager._USKeyCodeToCharCode(Lkc);
         Lkc.LisVirtualKey=false;
       }
@@ -675,22 +677,22 @@ namespace com.keyman.text {
     getVKDictionaryCode(keyName: string) {
       let keyman = com.keyman.singleton;
       var activeKeyboard = this.activeKeyboard;
-      if(!activeKeyboard['VKDictionary']) {
+      if(!activeKeyboard.scriptObject['VKDictionary']) {
         var a=[];
-        if(typeof activeKeyboard['KVKD'] == 'string') {
+        if(typeof activeKeyboard.scriptObject['KVKD'] == 'string') {
           // Build the VK dictionary
           // TODO: Move the dictionary build into the compiler -- so compiler generates code such as following.  
           // Makes the VKDictionary member unnecessary.
           //       this.KVKD={"K_ABC":256,"K_DEF":257,...};
-          var s=activeKeyboard['KVKD'].split(' ');
+          var s=activeKeyboard.scriptObject['KVKD'].split(' ');
           for(var i=0; i<s.length; i++) {
             a[s[i].toUpperCase()]=i+256; // We force upper-case since virtual keys should be case-insensitive.
           }
         }
-        activeKeyboard['VKDictionary']=a;
+        activeKeyboard.scriptObject['VKDictionary']=a;
       }
 
-      var res=activeKeyboard['VKDictionary'][keyName.toUpperCase()];
+      var res=activeKeyboard.scriptObject['VKDictionary'][keyName.toUpperCase()];
       return res ? res : 0;
     }
 
@@ -1143,7 +1145,7 @@ namespace com.keyman.text {
       // Mnemonic handling.
       var activeKeyboard = this.activeKeyboard;
 
-      if(activeKeyboard && activeKeyboard['KM']) {
+      if(activeKeyboard && activeKeyboard.scriptObject['KM']) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,
         // which may change the value of Lcode, here.
         this.setMnemonicCode(s, e.getModifierState("Shift"), e.getModifierState("CapsLock"));
@@ -1166,7 +1168,7 @@ namespace com.keyman.text {
         }
         /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
         
-        if(typeof(activeKeyboard['KM'])=='undefined'  &&  !(s.Lmodifiers & 0x60)) {
+        if(typeof(activeKeyboard.scriptObject['KM'])=='undefined'  &&  !(s.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           s = {
             Lcode: keyMapManager._USKeyCodeToCharCode(s),
@@ -1236,7 +1238,7 @@ namespace com.keyman.text {
       // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-      if(!this.activeKeyboard['KM']) {
+      if(!this.activeKeyboard.scriptObject['KM']) {
         if(!this.swallowKeypress) {
           return true;
         }
