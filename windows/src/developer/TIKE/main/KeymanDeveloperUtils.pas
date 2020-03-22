@@ -48,12 +48,14 @@ interface
 
 uses
   System.UITypes,
-  Windows,
-  Messages,
-  ComObj,
-  Graphics,
+  System.Win.ComObj,
+  Vcl.Graphics,
+  Winapi.Messages,
+  Winapi.Windows,
+
   KeymanPaths,
   keymanapi_TLB,
+  Sentry.Client,
   UserMessages;
 
 const
@@ -83,6 +85,8 @@ procedure RemoveOldestTikeTestFonts(FMaxLessOne: Boolean);
 function GetCurrentDateTime: string;
 function GetKMShellPath(var ps: string): Boolean;   // I3655
 function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean): Cardinal;   // I3655
+
+procedure TestSentry;
 
 var
   kmcom: IKeyman = nil;
@@ -662,6 +666,11 @@ begin
   end
   else
     ShowMessage(SysErrorMessage(GetLastError));
+end;
+
+procedure TestSentry;
+begin
+  raise ESentryTest.Create('Just testing Sentry integration');
 end;
 
 end.

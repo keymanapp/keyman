@@ -67,6 +67,11 @@ type
 
   TSentryClientClass = class of TSentryClient;
 
+  // When testing Sentry integration, ESentryTest is an appropriate exception to
+  // raise.
+  ESentryTest = class(Exception)
+  end;
+
 procedure SentryHandleException(E: Exception; AExceptAddr: Pointer = nil);
 
 implementation

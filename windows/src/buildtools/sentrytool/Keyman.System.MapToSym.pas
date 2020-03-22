@@ -116,16 +116,28 @@ begin
 
       if i < procCount - 1
         then procLen := s.FProcNames[i+1].VA - s.FProcNames[i].VA
-        else procLen := 0;
+        else procLen := 0; // TODO: look at module size for maximum here?
 
       procName := MapStringCacheToStr(s.FProcNames[i].ProcName);
       r.Add(Format('FUNC %x %x 0 %s', [s.FProcNames[i].VA + $1000 {constant entry point}, procLen, procName]));
+
+      if (lineIndex >= lineCount) or (s.FLineNumbers[lineIndex].VA >= s.FProcNames[i].VA + Cardinal(procLen)) then
+      begin
+        // No line numbers, let's add an artificial line, otherwise Sentry does
+        // not use it for symbolication
+        r.Add(Format('%x %x %d %d', [s.FProcNames[i].VA + $1000, procLen, 1, UnitIndexFromVA(s.FProcNames[i].VA)+1]));
+      end;
 
       while (lineIndex < lineCount) and (s.FLineNumbers[lineIndex].VA < s.FProcNames[i].VA + Cardinal(procLen)) do
       begin
         if lineIndex < lineCount - 1
           then lineLen := s.FLineNumbers[lineIndex+1].VA - s.FLineNumbers[lineIndex].VA
-          else lineLen := 0;
+          else lineLen := 0;  // TODO: look at module size for maximum here?
+
+        // We never want the range to go outside the bounds of the function -- if there are no
+        // line numbers for the next function, then we ensure we end at the function boundary
+        if s.FLineNumbers[lineIndex].VA + Cardinal(lineLen) > s.FProcNames[i].VA + Cardinal(procLen) then
+          lineLen := s.FProcNames[i].VA + Cardinal(procLen) - s.FLineNumbers[lineIndex].VA;
 
         r.Add(Format('%x %x %d %d', [s.FLineNumbers[lineIndex].VA + $1000 {constant entry point},
           lineLen, s.FLineNumbers[lineIndex].LineNumber, UnitIndexFromVA(s.FLineNumbers[lineIndex].VA)+1]));
