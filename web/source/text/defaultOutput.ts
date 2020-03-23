@@ -12,15 +12,7 @@ namespace com.keyman.text {
     }
 
     static codeForEvent(Lkc: KeyEvent) {
-      let keyName = Lkc.kName;
-      let n = Lkc.Lcode;
-
-      var code = Codes.keyCodes[keyName];
-      if(!code) {
-        code = n;
-      }
-
-      return code;
+      return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;;
     }
 
     /**
@@ -46,14 +38,14 @@ namespace com.keyman.text {
         // // Not originally defined for text output within defaultKeyOutput.
         // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
         // // than rely on the browser-default handling.
-        // switch(code) {
+        switch(code) {
         //   case Codes.keyCodes['K_TAB']:
         //   case Codes.keyCodes['K_TABBACK']:
         //   case Codes.keyCodes['K_TABFWD']:
         //     return '\t';
-        //   default:
-        //     return '';
-        // }
+          default:
+           return '';
+        }
       }
     }
 
@@ -71,7 +63,7 @@ namespace com.keyman.text {
     }
 
     /**
-     * forCommands - returns a boolean indicating if a non-text event should be triggered by the keystroke.
+     * isCommand - returns a boolean indicating if a non-text event should be triggered by the keystroke.
      */
     public static isCommand(Lkc: KeyEvent): boolean {
       let code = DefaultOutput.codeForEvent(Lkc);
@@ -91,16 +83,10 @@ namespace com.keyman.text {
      * It would then be assigned to this class via classic JS method extension practices as an 'override'
      * of `applyCommand`, reusing the base version of that name seen in this class, which is
      * designed for web-core.
-     */
-    /**
-     * This function is designed for future migration into a separate, explicitly-DOM-aware module.
-     * It would then be assigned to this class via classic JS method extension practices as an 'override'
-     * of `applyCommand`, reusing the base version of that name seen in this class, which is
-     * designed for web-core.
      * 
-     * for___Commands - returns boolean indicating if a non-text event should be triggered by the keystroke.
+     * apply___Command - used when a RuleBehavior represents a non-text "command" within the Engine.
      */
-    public static applyDOMCommand(Lkc: KeyEvent, keyShiftState: number) {
+    public static applyDOMCommand(Lkc: KeyEvent, keyShiftState: number): void {
       let code = DefaultOutput.codeForEvent(Lkc);
       let domManager = com.keyman.singleton.domManager;
 
@@ -117,7 +103,12 @@ namespace com.keyman.text {
       }
     }
 
-    public static applyCommand(Lkc: KeyEvent, keyShiftState: number) {
+    /**
+     * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally 
+     * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
+     * the caret is in.  However, we let those events perform the actual context reset.
+     */
+    public static applyCommand(Lkc: KeyEvent, keyShiftState: number): void {
       DefaultOutput.applyDOMCommand(Lkc, keyShiftState);
 
       // Notes for potential default-handling extensions:
@@ -147,7 +138,8 @@ namespace com.keyman.text {
     }
 
     /**
-     * Codes matched here may need special handling to apply to an OutputTarget, but still produce output.
+     * Codes matched here generally have default implementations when in a browser but require emulation
+     * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
      */
     public static forSpecialEmulation(Lkc: KeyEvent): string {
       let code = DefaultOutput.codeForEvent(Lkc);
@@ -214,6 +206,7 @@ namespace com.keyman.text {
     public static forBaseKeys(Lkc: KeyEvent, keyShiftState: number, ruleBehavior?: RuleBehavior) {
       let n = Lkc.Lcode;
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
+      // TODO:  Extend to allow AltGr as well - better mnemonic support.
       if(keyShiftState != 0 && keyShiftState != 1) {
         if(ruleBehavior) {
           ruleBehavior.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
