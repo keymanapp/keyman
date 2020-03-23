@@ -38,22 +38,18 @@ namespace com.keyman.text {
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
-      var Lkc: KeyEvent;
-
+    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
       let keyName = Lkc.kName;
       let n = Lkc.Lcode;
       let outputTarget = Lkc.Ltarg;
-      let Lelem = outputTarget.getElement();
 
       let keyman = com.keyman.singleton;
       let domManager = keyman.domManager;
       let activeKeyboard = keyman.keyboardManager.activeKeyboard;
 
-      let quiet = keyman.interface.activeTargetOutput instanceof Mock;
+      let quiet = outputTarget instanceof Mock;
 
       var ch = '', checkCodes = false;
-      var touchAlias = (Lelem && typeof(Lelem.base) != 'undefined');
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
       if(keyShiftState == 0) {
         checkCodes = true;
@@ -66,8 +62,9 @@ namespace com.keyman.text {
         }
       }
 
-      // If this was triggered by the OSK -or- if it was triggered within a touch-aliased DIV element.
-      if(touchAlias || usingOSK) {
+      // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
+      // that lacks default key processing behavior.
+      if(usingOSK || outputTarget.isSynthetic) {
         var code = Codes.keyCodes[keyName];
         if(!code) {
           code = n;
@@ -75,51 +72,36 @@ namespace com.keyman.text {
 
         switch(code) {
           case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            if(disableDOM) {
+            if(quiet) {
+              // TODO:  Remove need for this clause via refactoring.  It's currently needed for predictive text Mocks.
               return '\b'; // the escape sequence for backspace.
             } else {
               keyman.interface.defaultBackspace(outputTarget);
             }
             return '';
           case Codes.keyCodes['K_TAB']:
-            if(!disableDOM) {
+            if(!quiet) {
               domManager.moveToNext(keyShiftState);
             }
             break;
           case Codes.keyCodes['K_TABBACK']:
-            if(!disableDOM) {
+            if(!quiet) {
               domManager.moveToNext(true);
             }
             break;
           case Codes.keyCodes['K_TABFWD']:
-            if(!disableDOM) {
+            if(!quiet) {
               domManager.moveToNext(false);
             }
             break;
           case Codes.keyCodes['K_ENTER']:
-            // Insert new line in text area fields
-            if(Lelem.nodeName == 'TEXTAREA' || (typeof Lelem.base != 'undefined' && Lelem.base.nodeName == 'TEXTAREA')) {
-              return '\n';
-            // Or move to next field from TEXT fields
-            } else if(usingOSK) {
-              var inputEle: HTMLInputElement;
-              if(keyman.isEmbedded) { // In embedded mode, the OutputTarget may not meet other conditions.
-                return '\n';
-              } else if(dom.Utils.instanceof(Lelem, "HTMLInputElement")) {
-                inputEle = <HTMLInputElement> Lelem;
-              } else if(typeof(Lelem.base) != 'undefined' && dom.Utils.instanceof(Lelem.base, "HTMLInputElement")) {
-                inputEle = <HTMLInputElement> Lelem.base;
-              }
-              if(!disableDOM) {
-                if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
-                  inputEle.disabled=false;
-                  inputEle.form.submit();
-                } else {
-                  domManager.moveToNext(false);
-                }
-              }
+            // Ensure the newline is forwarded when in an embedded context!  It doesn't yet have its own specialized OutputTarget type.
+            if(keyman.isEmbedded && !quiet) { // Don't pass it along for Mocks, though.  They're (currently) only used in predictive text.
+              keyman['oninserttext'](0, '\n');
             }
-            break;
+            outputTarget.handleNewlineAtCaret();
+
+            return '\n';  // We still return this, as it ensures we generate a rule-match.
           case Codes.keyCodes['K_SPACE']:
             return ' ';
           // break;
@@ -163,16 +145,11 @@ namespace com.keyman.text {
         // Not strictly if `Lkc.vkCode` is properly maintained, but it's good to have an
         // extra safety; this would have blocked the backspace bug as well.
       } else if(Lkc.Lcode == 8) {
-        if(disableDOM) {
-          return '\b'; // the escape sequence for backspace.
-        } else {
-          keyman.interface.defaultBackspace();
-          return '';
-        }
+        keyman.interface.defaultBackspace();
+        return '';
       }
 
       // Translate numpad keystrokes into their non-numpad equivalents
-      // TODO:  Make part of 'defaultKeyOutput'.
       if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {
         // Number pad, numlock on
         if(Lkc.Lcode < 106) {
@@ -334,7 +311,7 @@ namespace com.keyman.text {
       }
     }
 
-    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean, disableDOM: boolean): RuleBehavior {
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
 
       var activeKeyboard = keyman.keyboardManager.activeKeyboard;
@@ -367,15 +344,13 @@ namespace com.keyman.text {
         kbdInterface.activeTargetOutput = outputTarget;
         let preInput = Mock.from(outputTarget);
 
-        // TODO:  That third parameter should be `fromOSK`, not always `true`.  Changing this breaks Mocks a bit, though,
-        //        and will likely have interactions with the '\b' check below.
-        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, true, disableDOM);
+        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, fromOSK);
         kbdInterface.activeTargetOutput = null;
         if(ch) {
           if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
             // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
             kbdInterface.defaultBackspace(outputTarget);
-          } else {
+          } else if(ch != '\n') { // \n is handled automatically now.
             kbdInterface.output(0, outputTarget, ch);
           }
           matchBehavior = new RuleBehavior();
@@ -480,7 +455,7 @@ namespace com.keyman.text {
 
       let preInputMock = Mock.from(outputTarget);
 
-      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK, false);
+      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
@@ -506,7 +481,8 @@ namespace com.keyman.text {
             }
 
             let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
-            let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK, true);
+            altEvent.Ltarg = mock;
+            let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK);
             if(alternateBehavior) {
               // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
               //       so a user should never have intended to type it.  Should probably renormalize 
@@ -650,8 +626,8 @@ namespace com.keyman.text {
         // To facilitate storing relevant commands, we should probably reverse-lookup
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
-        mappingEvent.Ltarg = null;
-        var mappedChar: string = this.defaultKeyOutput(mappingEvent, (shifted ? 0x10 : 0), false, true);
+        mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
+        var mappedChar: string = this.defaultKeyOutput(mappingEvent, (shifted ? 0x10 : 0), false);
         
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.

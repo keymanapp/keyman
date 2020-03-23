@@ -36,6 +36,10 @@ namespace com.keyman.dom {
       this._cachedSelectionStart = -1;
     }
 
+    get isSynthetic(): boolean {
+      return false;
+    }
+
     getElement(): HTMLTextAreaElement {
       return this.root;
     }
@@ -144,6 +148,10 @@ namespace com.keyman.dom {
       this.adjustDeadkeys(s._kmwLength());
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
+    }
+
+    handleNewlineAtCaret(): void {
+      this.insertTextBeforeCaret('\n');
     }
   }
 }

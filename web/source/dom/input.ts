@@ -29,6 +29,10 @@ namespace com.keyman.dom {
       this._cachedSelectionStart = -1;
     }
 
+    get isSynthetic(): boolean {
+      return false;
+    }
+
     getElement(): HTMLInputElement {
       return this.root;
     }
@@ -137,6 +141,26 @@ namespace com.keyman.dom {
       this.adjustDeadkeys(s._kmwLength());
       this.root.value = front + s + back;
       this.setCaret(caret + s._kmwLength());
+    }
+
+    handleNewlineAtCaret(): void {
+      Input.newlineHandler(this.root);
+    }
+
+    static newlineHandler(inputEle: HTMLInputElement) {
+      // Can't occur for Mocks - just Input and TouchAlias types.
+      if (inputEle && (inputEle.type == 'search' || inputEle.type == 'submit')) {
+        inputEle.disabled=false;
+        inputEle.form.submit();
+      } else {
+        // Allows compiling this separately from the main body of KMW.
+        // TODO:  rework class to accept a class-static 'callback' from the DOM module that this can call.
+        //        Would eliminate the need for this 'static' reference. 
+        //        Only strongly matters once we better modularize KMW, with web-dom vs web-dom-targets vs web-core, etc.
+        if(com.keyman["singleton"]) {
+          com.keyman["singleton"].domManager.moveToNext(false);
+        }
+      }
     }
   }
 }

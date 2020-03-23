@@ -49,6 +49,10 @@ namespace com.keyman.dom {
       }
     }
 
+    get isSynthetic(): boolean {
+      return false;
+    }
+
     getElement(): HTMLIFrameElement {
       return this.root;
     }
@@ -218,6 +222,20 @@ namespace com.keyman.dom {
         Lsel.addRange(finalCaret);
       }
       Lsel.collapseToEnd();
+    }
+
+    handleNewlineAtCaret(): void {
+      // TODO:  Implement.
+      //
+      // As it turns out, we never had an implementation for handling newline inputs from the OSK for this element type.
+      // At least this way, it's more explicit.
+      //
+      // Note:  consult "// Create a new text node - empty control" case in insertTextBeforeCaret - 
+      // this helps to handle the browser-default implementation of newline handling.  In particular,
+      // entry of the first character after a newline.
+      //
+      // If raw newlines are entered into the HTML, but as with usual HTML, they're interpreted as excess whitespace and
+      // have no effect.  We need to add DOM elements for a functional newline.
     }
 
     protected setTextAfterCaret(s: string) {
