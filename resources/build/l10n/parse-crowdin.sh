@@ -16,7 +16,7 @@ SHLVL=0
 
 display_usage() {
   echo "parse-crowdin [-all] [-android] [-common] [-developer] [-ios]"
-  echo "                     [-linux] [-mac] [-web] [-windows]"
+  echo "                     [-linux] [-mac] [-web] [-windows] [-no-extract]"
   echo
   echo "Extract Keyman.zip at root of the repo and then copy files to given platforms"
   echo "Options:"
@@ -29,6 +29,8 @@ display_usage() {
   echo "  -mac            Copy localization files for mac"
   echo "  -web            Copy localization files for web"
   echo "  -windows        Copy localization files for windows"
+  echo
+  echo "  -no-extract     Skip clean and unzipping Keyman.zip"
   exit 1
 }
 
@@ -37,15 +39,18 @@ display_usage() {
 . ./parse-crowdin-ios.sh
 
 
-# Copy a file to a destination directory. If destination doesn't exist, create it
+# If a source file $1 exists, copy it to a destination directory $2.
+# If destination doesn't exist, create it
 # copy_file [source file] [destination directory]
 function copy_file() {
-  if [ ! -d "$2" ]; then
-    echo "Creating $2 directory"
-    mkdir -p "$2"
+  if [ -f "$1" ]; then
+    if [ ! -d "$2" ]; then
+      echo "Creating $2 directory"
+      mkdir -p "$2"
+    fi
+    echo "Copying $1"
+    cp "$1" "$2"
   fi
-  echo "Copying $1"
-  cp "$1" "$2"
 }
 
 
@@ -59,6 +64,8 @@ CROWDIN_ROOT="$KEYMAN_ROOT/crowdin"
 if [[ $# -eq 0 ]] ; then
   display_usage
 fi
+
+DO_EXTRACT=true
 
 # Default is to not copy to any platform
 DO_ANDROID=false
@@ -105,6 +112,9 @@ while [[ $# -gt 0 ]] ; do
         -mac)
             DO_MAC=true
             ;;
+        -no-extract)
+            DO_EXTRACT=false
+            ;;
         -web)
             DO_WEB=true
             ;;
@@ -116,6 +126,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 echo
+echo "DO_EXTRACT:   $DO_EXTRACT"
 echo "DO_ANDROID:   $DO_ANDROID"
 echo "DO_COMMON:    $DO_COMMON"
 echo "DO_DEVELOPER: $DO_DEVELOPER"
@@ -126,18 +137,20 @@ echo "DO_WEB:       $DO_WEB"
 echo "DO_WINDOWS:   $DO_WINDOWS"
 echo
 
-# Clean /crowdin/
-if [ -d "$CROWDIN_ROOT" ]; then
-  echo "Cleaning $CROWDIN_ROOT"
-  rm -rf "$CROWDIN_ROOT"
-fi
+if [ "$DO_EXTRACT" = true ]; then
+  # Clean /crowdin/
+  if [ -d "$CROWDIN_ROOT" ]; then
+    echo "Cleaning $CROWDIN_ROOT"
+    rm -rf "$CROWDIN_ROOT"
+  fi
 
-# Extract Keyman.zip. This is the entire translation file from crowdin
-echo "Unzipping Keyman.zip to $CROWDIN_ROOT"
-unzip "$KEYMAN_ZIP" -d "$CROWDIN_ROOT"
+  # Extract Keyman.zip. This is the entire translation file from crowdin
+  echo "Unzipping Keyman.zip to $CROWDIN_ROOT"
+  unzip "$KEYMAN_ZIP" -d "$CROWDIN_ROOT"
 
-if [ $? -ne 0 ]; then
-    die "ERROR: Unzip Keyman.zip failed"
+  if [ $? -ne 0 ]; then
+      die "ERROR: Unzip Keyman.zip failed"
+  fi
 fi
 
 if [ "$DO_ANDROID" = true ]; then
