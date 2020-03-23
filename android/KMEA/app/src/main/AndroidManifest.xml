@@ -8,6 +8,10 @@
 
     <application
         android:theme="@style/AppTheme" >
+
+        <!-- Have application handle initializing Sentry -->
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
+
         <activity
             android:name="com.tavultesoft.kmea.KeyboardPickerActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"

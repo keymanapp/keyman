@@ -1,11 +1,12 @@
 program Tike;
 
 uses
-  Forms,
-  Dialogs,
-  Windows,
-  ComObj,
-  ActiveX,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Winapi.Windows,
+  System.Win.ComObj,
+  Winapi.ActiveX,
+  System.SysUtils,
   kmxfile in '..\..\global\delphi\general\kmxfile.pas',
   UfrmMDIChild in 'child\UfrmMDIChild.pas' {frmTikeChild},
   UfrmNew in 'dialogs\UfrmNew.pas' {frmNew},
@@ -75,7 +76,6 @@ uses
   VisualKeyboardImportXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardImportXML.pas',
   UfrmVisualKeyboardImportKMX in 'dialogs\UfrmVisualKeyboardImportKMX.pas' {frmVisualKeyboardImportKMX},
   PanelOverlapped in '..\..\global\delphi\comp\PanelOverlapped.pas',
-  SHDocVw_TLB in '..\..\global\delphi\comp\SHDocVw_TLB.pas',
   ScanCodeMap in '..\..\global\delphi\general\ScanCodeMap.pas',
   UfrmRegressionTestFailure in 'dialogs\UfrmRegressionTestFailure.pas' {frmRegressionTestFailure},
   XString in '..\..\global\delphi\general\XString.pas',
@@ -85,7 +85,7 @@ uses
   MessageIdentifiers in 'main\MessageIdentifiers.pas',
   exceptionw in '..\..\global\delphi\general\exceptionw.pas',
   kpsfile in '..\..\global\delphi\general\kpsfile.pas',
-  Keyman.Developer.UI.UframeCEFHost in 'main\Keyman.Developer.UI.UframeCEFHost.pas' {frameCEFHost},
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UnitDrawArrow in '..\..\global\delphi\general\UnitDrawArrow.pas',
   StockObjects in 'kct\StockObjects.pas',
   CustomisationStorage in '..\..\global\delphi\cust\CustomisationStorage.pas',
@@ -126,7 +126,6 @@ uses
   ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
   CleartypeDrawCharacter in '..\..\global\delphi\general\CleartypeDrawCharacter.pas',
   CharMapDropTool in 'main\CharMapDropTool.pas',
-  CharMapDropTool_EmbeddedWB in 'main\CharMapDropTool_EmbeddedWB.pas',
   UfrmBitmapEditorText in 'dialogs\UfrmBitmapEditorText.pas' {frmBitmapEditorText},
   UFixFontDialogBold in '..\..\global\delphi\general\UFixFontDialogBold.pas',
   UnicodeData in '..\..\global\delphi\charmap\UnicodeData.pas',
@@ -167,11 +166,9 @@ uses
   WindowsLanguages in '..\..\global\delphi\general\WindowsLanguages.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   TextFileTemplates in 'main\TextFileTemplates.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UfrmFontHelper in 'dialogs\UfrmFontHelper.pas' {Form1},
-  WebSoundControl in '..\..\global\delphi\general\WebSoundControl.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
@@ -214,7 +211,6 @@ uses
   UfrmKeyboardFonts in 'dialogs\UfrmKeyboardFonts.pas' {frmKeyboardFonts},
   CompileErrorCodes in '..\..\global\delphi\general\CompileErrorCodes.pas',
   KeyboardFonts in '..\..\global\delphi\general\KeyboardFonts.pas',
-  SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
   TikeUnicodeData in 'main\TikeUnicodeData.pas',
@@ -231,7 +227,6 @@ uses
   utilcheckfontchars in '..\..\global\delphi\charmap\utilcheckfontchars.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  utiljclexception in '..\..\global\delphi\general\utiljclexception.pas',
   keymanapi_TLB in '..\..\engine\kmcomapi\keymanapi_TLB.pas',
   VisualKeyboardLoaderXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderXML.pas',
   VisualKeyboardExportXML in '..\..\global\delphi\visualkeyboard\VisualKeyboardExportXML.pas',
@@ -257,7 +252,7 @@ uses
   Keyman.System.Standards.BCP47SuppressScriptRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas',
   Keyman.System.Standards.NRSIAllTagsRegistry in '..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
-  Keyman.Developer.System.CEFManager in 'main\Keyman.Developer.System.CEFManager.pas',
+  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
   Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
@@ -287,6 +282,7 @@ uses
   Keyman.System.WordlistTsvFile in '..\..\global\delphi\lexicalmodels\Keyman.System.WordlistTsvFile.pas',
   Keyman.Developer.UI.Project.wordlistTsvProjectFileUI in 'project\Keyman.Developer.UI.Project.wordlistTsvProjectFileUI.pas',
   Keyman.Developer.System.Project.WelcomeRenderer in 'project\Keyman.Developer.System.Project.WelcomeRenderer.pas',
+  Browse4Folder in '..\..\ext\browse4folder\Browse4Folder.pas',
   DelphiZXIngQRCode in '..\..\ext\zxingqrcode\Source\DelphiZXIngQRCode.pas',
   Keyman.System.QRCode in '..\..\global\delphi\general\Keyman.System.QRCode.pas',
   Keyman.Developer.UI.UfrmModelEditor in 'child\Keyman.Developer.UI.UfrmModelEditor.pas' {frmModelEditor},
@@ -294,7 +290,11 @@ uses
   Keyman.Developer.System.LexicalModelParserTypes in 'main\Keyman.Developer.System.LexicalModelParserTypes.pas',
   Keyman.Developer.UI.UfrmWordlistEditor in 'child\Keyman.Developer.UI.UfrmWordlistEditor.pas' {frmWordlistEditor},
   Keyman.Developer.UI.dmActionsModelEditor in 'actions\Keyman.Developer.UI.dmActionsModelEditor.pas' {modActionsModelEditor: TDataModule},
-  UfrmMustIncludeDebug in 'dialogs\UfrmMustIncludeDebug.pas' {frmMustIncludeDebug};
+  UfrmMustIncludeDebug in 'dialogs\UfrmMustIncludeDebug.pas' {frmMustIncludeDebug},
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -306,26 +306,31 @@ uses
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
 begin
-  CoInitFlags := COINIT_APARTMENTTHREADED;
-
-  FInitializeCEF := TCEFManager.Create;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper);
   try
-    if FInitializeCEF.Start then
-    begin
-      InitThemeLibrary;
-      SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-      Application.MainFormOnTaskBar := True;
-      Application.Initialize;
-    //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
-      Application.Title := 'Keyman Developer';
-      //TBX.TBXSetTheme('OfficeXP2');
-      if TikeActive then Exit;
-      InitClasses;
-      Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-  Application.Run;
+    CoInitFlags := COINIT_APARTMENTTHREADED;
+
+    FInitializeCEF := TCEFManager.Create;
+    try
+      if FInitializeCEF.Start then
+      begin
+        InitThemeLibrary;
+        SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+        Application.MainFormOnTaskBar := True;
+        Application.Initialize;
+      //  TStyleManager.TrySetStyle(FKeymanDeveloperOptions.DisplayTheme);
+        Application.Title := 'Keyman Developer';
+        //TBX.TBXSetTheme('OfficeXP2');
+        if TikeActive then Exit;
+        InitClasses;
+        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+        Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+        Application.Run;
+      end;
+    finally
+      FInitializeCEF.Free;
     end;
   finally
-    FInitializeCEF.Free;
+    TKeymanSentryClient.Stop;
   end;
 end.

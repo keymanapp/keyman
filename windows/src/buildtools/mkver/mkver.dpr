@@ -3,7 +3,9 @@ program mkver;
 uses
   System.SysUtils,
   Main in 'Main.pas',
-  TagFunctions in 'TagFunctions.pas';
+  TagFunctions in 'TagFunctions.pas',
+  Keyman.System.KeymanVersionInfo in '..\..\global\delphi\general\Keyman.System.KeymanVersionInfo.pas';
+
 //  KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas';
 
 {$R *.RES}

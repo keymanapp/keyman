@@ -76,10 +76,11 @@ for proj in ${extra_projects}; do
         cp dist/*.tar.gz ../dist
     fi
     if [ "${proj}" == "keyboardprocessor" ]; then
-        cd ../common/engine
-        vers=`grep -Po "version: '(.*)'" keyboardprocessor/meson.build|grep -Po "\d+(.\d+)*"`
+        cd ../common/core
+        vers=`cat ../../VERSION.md`
         kbpvers="keyman-keyboardprocessor-$vers"
-        cp -a keyboardprocessor $kbpvers
+        cp -a desktop $kbpvers
+        cp ../../VERSION.md $kbpvers
         tar cvzf $kbpvers.tar.gz --exclude=debian --exclude=build --exclude=.gitignore $kbpvers
         rm -rf $kbpvers
         cp $kbpvers.tar.gz ../../linux/dist

@@ -153,7 +153,7 @@ PHPEXE=$(PHPDIR)\php.exe
 
 BRCC32=rc.exe
 
-HHC=\progra~1\htmlhe~1\hhc
+HHC="C:\Program Files (x86)\HTML Help Workshop\hhc.exe"
 NMAKE=nmake.exe
 CL=cl.exe
 MSBUILD=msbuild.exe
@@ -173,8 +173,9 @@ VCBUILD=error
 
 COPY=copy
 ISXBUILD=C:\PROGRA~1\INSTALLSHIELD\Express\System\IsExpCmdBld
-WZZIP="C:\program files\7-zip\7z.exe" a
-WZUNZIP="C:\program files\7-zip\7z.exe" e
+WZZIPPATH="C:\program files\7-zip\7z.exe"
+WZZIP=$(WZZIPPATH) a
+WZUNZIP=$(WZZIPPATH) e
 
 XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 
@@ -182,8 +183,8 @@ XSLTPROC=$(ROOT)\src\ext\libxslt\xsltproc.exe
 # TDSPACKCOMPRESS=error! $(ROOT)\src\buildtools\tdspack\tdspack -o
 
 TDS2DBG=$(ROOT)\bin\buildtools\tds2dbg
-
-MAKEJCLDBG=$(ROOT)\bin\buildtools\makejcldbg.exe -E
+SENTRYTOOL=$(ROOT)\bin\buildtools\sentrytool
+SENTRYTOOL_DELPHIPREP=$(SENTRYTOOL) delphiprep -r $(KEYMAN_ROOT) -i $(DELPHIINCLUDES)
 
 WIXPATH="c:\program files (x86)\WiX Toolset v3.11\bin"
 WIXCANDLE=$(WIXPATH)\candle.exe -wx -nologo
@@ -245,20 +246,26 @@ SIGNCODE=@$(ROOT)\src\buildtools\signtime.bat signtool.exe $(SC_PFX_SHA1) $(SC_P
 PLATFORM=Win32
 
 #
-# mkver commands
+# mkver commands. mkver determines tag from the local build environment variables
+# in the same way as /resources/build/build-utils.sh.
 #
 
 MKVER_APP=$(PROGRAM)\buildtools\mkver
 
 !IFDEF VERSION_TXT_PATH
-MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.txt
+MKVER_VERSION_TXT=$(VERSION_TXT_PATH)\version.in
 !ELSE
-MKVER_VERSION_TXT=..\version.txt
+MKVER_VERSION_TXT=..\version.in
 !ENDIF
 
+MKVER_TIER_MD=$(KEYMAN_ROOT)\TIER.md
+MKVER_VERSION_MD=$(KEYMAN_ROOT)\VERSION.md
+
+MKVER_COMMON_PARAMS=-tier "$(MKVER_TIER_MD)" -version "$(MKVER_VERSION_MD)"
+
 # Update a version.rc file
-MKVER_V=$(MKVER_APP) -v $(MKVER_VERSION_TXT)
+MKVER_V=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -v $(MKVER_VERSION_TXT) version.in version.rc
 # Update a manifest.xml file
-MKVER_M=$(MKVER_APP) -m $(MKVER_VERSION_TXT)
-# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out> $(MKVER_VERSION_TXT)
-MKVER_U=$(MKVER_APP) -v -u
+MKVER_M=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -m manifest.in manifest.xml
+# Token replacement for all other file types; pattern: $(MKVER_U) <f.in> <f.out>
+MKVER_U=$(MKVER_APP) $(MKVER_COMMON_PARAMS) -u

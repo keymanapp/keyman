@@ -3,70 +3,73 @@
 
   <string name="app_name" translatable="false">Keyman</string>
 
-  <string name="action_share" translatable="false">Share</string>
-  <string name="action_web" translatable="false">Web Browser</string>
-  <string name="action_file_browser" translatable="false">File Browser</string>
-  <string name="action_text_size" translatable="false">Text Size</string>
-  <string name="action_overflow" translatable="false">More</string>
-  <string name="action_clear_text" translatable="false">Clear Text</string>
-  <string name="action_info" translatable="false">Info</string>
-  <string name="action_settings" translatable="false">Settings</string>
-  <string name="action_install_updates" translatable="false">Install Updates</string>
-  <string name="title_version" translatable="false">Version</string>
+  <string name="action_share" comment="Send text content to another app">Share</string>
+  <string name="action_web" comment="Open Keyman browser">Web Browser</string>
+  <string name="action_text_size" comment="Adjust text size">Text Size</string>
+  <string name="action_overflow" comment="Additional menu items">More</string>
+  <string name="action_clear_text" comment="Erase text">Clear Text</string>
+  <string name="action_info" comment="Display Keyman help page">Info</string>
+  <string name="action_settings" comment="Open Settings menu">Settings</string>
+  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Install Updates</string>
+
+  <string name="title_version">Version</string>
+
   <!-- &#8230; is the ellipsis character "..." -->
-  <string name="textview_hint" translatable="false">Start typing here&#8230;</string>
+  <string name="textview_hint">Start typing here&#8230;</string>
 
   <!-- Splash screen (version/copyright info currently disabled -->
   <string name="splash_blank" translatable="false"></string>
   <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
 
   <!-- Text Size dialog -->
-  <string name="ic_text_size_up" translatable="false">Text size up</string>
-  <string name="ic_text_size_down" translatable="false">Text size down</string>
+  <string name="ic_text_size_up" comment="Make text bigger">Text size up</string>
+  <string name="ic_text_size_down" comment="Make text smaller">Text size down</string>
 
   <!-- Clear Text dialog -->
-  <string name="all_text_will_be_cleared" translatable="false">All text will be cleared</string>
+  <string name="all_text_will_be_cleared" comment="Erase all the text">All text will be cleared</string>
 
   <!-- Info screen reuses title_version -->
 
   <!-- Get Started menu strings -->
-  <string name="get_started" translatable="false">Get Started</string>
-  <string name="add_a_keyboard" translatable="false">Add a keyboard for your language</string>
-  <string name="enable_system_keyboard" translatable="false">Enable Keyman as system-wide keyboard</string>
-  <string name="set_keyman_as_default" translatable="false">Set Keyman as default keyboard</string>
-  <string name="more_info" translatable="false">More info</string>
-  <string name="show_get_started" translatable="false">Show \"Get Started\" on startup</string>
+  <string name="get_started">Get Started</string>
+  <string name="add_a_keyboard">Add a keyboard for your language</string>
+  <string name="enable_system_keyboard">Enable Keyman as system-wide keyboard</string>
+  <string name="set_keyman_as_default">Set Keyman as default keyboard</string>
+  <string name="more_info" comment="Open the help page">More info</string>
+  <string name="show_get_started">Show this menu on startup</string>
 
 
   <!-- Keyman Settings menu strings -->
-  <string name="keyman_settings" translatable="false">Settings</string>
-  <string name="installed_languages_empty" translatable="false">Installed languages</string>
-  <string name="installed_languages" translatable="false">Installed languages (%d)</string>
-  <string name="show_banner" translatable="false">Always show banner</string>
-  <string name="show_banner_on" translatable="false">To be implemented</string>
-  <string name="show_banner_off" translatable="false">When off, only shown when predictive text is enabled</string>
+  <string name="keyman_settings"  comment="Settings menu title">Settings</string>
+  <plurals name="installed_languages">
+    <item quantity="zero">Installed languages</item>
+    <item quantity="other">Installed languages (%1$d)</item>
+  </plurals>
+  <string name="show_banner" comment="text suggestions banner">Always show banner</string>
+  <string name="show_banner_on" comment="Description when toggle is on">To be implemented</string>
+  <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
   <!-- reuse show_get_started -->
 
   <!-- Web Browser strings -->
-  <string name="hint_text" translatable="false">Search or type URL</string>
-  <string name="title_bookmarks" translatable="false">Bookmarks</string>
-  <string name="no_bookmarks" translatable="false">No Bookmarks</string>
-  <string name="add_bookmark" translatable="false">Add Bookmark</string>
-  <string name="hint_title" translatable="false">Title</string>
-  <string name="hint_url" translatable="false">Url</string>
+  <string name="hint_text">Search or type URL</string>
+  <string name="title_bookmarks">Bookmarks</string>
+  <string name="no_bookmarks">No Bookmarks</string>
+  <string name="add_bookmark">Add Bookmark</string>
+  <string name="hint_title">Title</string>
+  <string name="hint_url">Url</string>
 
   <!-- KMP Package strings -->
-  <string name="title_package" translatable="false">Package</string>
-  <string name="title_failed_to_install" translatable="false">failed to install</string>
-  <string name="downloading_keyboard_package" translatable="false">Downloading keyboard package</string>
-  <string name="failed_to_extract" translatable="false">Failed to extract</string>
-  <string name="install_keyboard_package" translatable="false">Install Keyboard Package</string>
-  <string name="install_predictive_text_package" translatable="false">Install Predictive Text Package</string>
-  <string name="no_new_touch_keyboards_to_install" translatable="false">No new touch-optimized keyboards to install</string>
-  <string name="no_new_predictive_text_to_install" translatable="false">No new predictive text to install</string>
-  <string name="no_valid_touch_keyboards_to_install" translatable="false">No valid touch-optimized keyboards to install</string>
-  <string name="no_targets_to_install" translatable="false">No keyboards or predictive text to install</string>
-  <string name="missing_metadata" translatable="false">kmp.json does not exist</string>
-  <string name="invalid_metadata" translatable="false">Invalid metadata in package</string>
+  <string name="title_package">Package</string>
+  <string name="title_failed_to_install">failed to install</string>
+  <string name="downloading_keyboard_package">Downloading keyboard package</string>
+  <string name="failed_to_extract" comment="Keyboard package failed to unzip">Failed to extract</string>
+  <string name="install_keyboard_package">Install Keyboard Package</string>
+  <string name="install_predictive_text_package">Install Predictive Text Package</string>
+  <string name="no_new_touch_keyboards_to_install">No new touch-optimized keyboards to install</string>
+  <string name="no_new_predictive_text_to_install">No new predictive text to install</string>
+  <string name="no_valid_touch_keyboards_to_install">No valid touch-optimized keyboards to install</string>
+  <string name="no_targets_to_install">No keyboards or predictive text to install</string>
+  <string name="missing_metadata" comment="kmp.json file is missing from the keyboard package">kmp.json does not exist</string>
+  <string name="invalid_metadata">Invalid metadata in package</string>
 
 </resources>

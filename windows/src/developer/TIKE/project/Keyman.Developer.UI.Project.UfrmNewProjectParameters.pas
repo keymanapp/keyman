@@ -47,7 +47,6 @@ type
     cmdKeyboardEditLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
     lblKeyboardLanguages: TLabel;
-    dlgBrowse: TBrowse4Folder;
     lblProjectFilename: TLabel;
     editProjectFilename: TEdit;
     procedure cmdOKClick(Sender: TObject);
@@ -67,6 +66,7 @@ type
     procedure editKeyboardIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
   private
+    dlgBrowse: TBrowse4Folder;
     pack: TKPSFile; // Used temporarily for storing language list
     FSetup: Integer;
     function GetAuthor: string;
@@ -177,6 +177,11 @@ var
 begin
   inherited;
   editPath.Text := FKeymanDeveloperOptions.DefaultProjectPath;
+
+  dlgBrowse.InitialDir := editPath.Text;
+  dlgBrowse.Options := [OnlySelectFileSysDir, ShowEditBox, UseNewDialogStyle];
+  dlgBrowse.Root := Desktop;
+  dlgBrowse.Title := 'Select folder to save project to';
 
   pack := TKPSFile.Create;
   pack.Keyboards.Add(TPackageKeyboard.Create(pack));

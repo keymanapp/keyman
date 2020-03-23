@@ -4,7 +4,7 @@
 
 NOTARGET_SIGNCODE=yes
 
-TARGETS=devtools makejcldbg tds2dbg genkmnp getfilelocks isadmin mkver stockeditor \
+TARGETS=devtools sentrytool tds2dbg genkmnp getfilelocks isadmin mkver stockeditor \
   xslt buildunidata build_standards_data buildpkg test-klog delphiprojectmanager #help
 CLEANS=inst clean-buildtools
 
@@ -20,8 +20,8 @@ build_standards_data:
     cd $(ROOT)\src\buildtools\build_standards_data
     $(MAKE) $(TARGET)
 
-makejcldbg:
-    cd $(ROOT)\src\ext\jedi
+sentrytool:
+    cd $(ROOT)\src\buildtools\sentrytool
     $(MAKE) $(TARGET)
 
 buildunidata:

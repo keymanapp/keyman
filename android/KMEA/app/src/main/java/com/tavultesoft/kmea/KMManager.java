@@ -51,7 +51,10 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
+import io.sentry.core.Breadcrumb;
+import io.sentry.core.Sentry;
+import io.sentry.core.SentryLevel;
+
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -72,7 +75,6 @@ public final class KMManager {
 
   private static final String TAG = "KMManager";
 
-  private static FirebaseAnalytics mFirebaseAnalytics;
   private static ResourcesUpdateTool updateTool;
 
   // Keyboard types
@@ -252,8 +254,6 @@ public final class KMManager {
 
   public static void initialize(final Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
-
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
     if (!didCopyAssets || isTestMode()) {
       copyAssets(appContext);
@@ -907,15 +907,27 @@ public final class KMManager {
   }
 
   public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    // Log Firebase analytic event.
-    Bundle params = new Bundle();
-    params.putString("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
-    params.putString("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
-    params.putString("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
-    params.putString("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
+    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
+    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
 
-    if(mFirebaseAnalytics != null) {
-      mFirebaseAnalytics.logEvent("km_add_keyboard", params);
+    // Log Sentry analytic event, ignoring default keyboard
+    if (Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) &&
+      keyboardID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID))) {
+      Breadcrumb breadcrumb = new Breadcrumb();
+      breadcrumb.setMessage("KMManager.addKeyboard");
+      breadcrumb.setCategory("addKeyboard");
+      breadcrumb.setLevel(SentryLevel.INFO);
+      breadcrumb.setData("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
+      breadcrumb.setData("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
+      breadcrumb.setData("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
+      breadcrumb.setData("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
+      breadcrumb.setData("languageID", keyboardInfo.get(KMManager.KMKey_LanguageID));
+      breadcrumb.setData("languageName", keyboardInfo.get(KMManager.KMKey_LanguageName));
+
+      Sentry.addBreadcrumb(breadcrumb);
+
+      // For now, not sending a Sentry.captureMessage()
+      // This means the breadcrumb won't get sent until a crash happens.
     }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);

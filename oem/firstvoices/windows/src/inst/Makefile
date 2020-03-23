@@ -26,8 +26,8 @@ prereq:
     #
 
     cd $(FVROOT)\src\inst
-    $(PROGRAM)\buildtools\mkver -v -u download.in download.mak $(ROOT)\src\desktop\version.txt
-    $(PROGRAM)\buildtools\mkver -v -u ..\localedef.dtd.in ..\xml\localedef.dtd $(ROOT)\src\desktop\version.txt
+    $(MKVER_U) download.in download.mak
+    $(MKVER_U) ..\localedef.dtd.in ..\xml\localedef.dtd
 
     #
     # Build FirstVoices keyboards fv_all.kmp

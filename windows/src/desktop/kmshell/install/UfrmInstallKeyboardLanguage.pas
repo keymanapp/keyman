@@ -25,7 +25,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmKeymanBase, Vcl.OleCtrls,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UfrmKeymanBase,
   keymanapi_TLB,
   Vcl.StdCtrls, System.Generics.Collections, System.Generics.Defaults, Vcl.Grids;
 

@@ -239,7 +239,8 @@
 # /test/wm_unichar/
 
 # VS Code
-.vscode
+.vscode/
+.vs/
 
 # IDE files
 **/.idea/**/*.xml
@@ -251,3 +252,12 @@
 
 # Atom/Nuclide
 compile_flags.txt
+
+# Auto-generated resource script
+resources/environment.sh
+
+# Keyman translations from https://crowdin.com/project/keyman
+.crowdin-tmp/
+crowdin/
+
+/common/core/desktop/VERSION.md

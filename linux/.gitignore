@@ -32,7 +32,7 @@ keyman-config/make_deb
 tmp/
 dist/
 *~
-# keyboardprocessor build artifacts
+# keyboardprocessor build artifacts (Keyman Core desktop)
 keyboardprocessor/
 # IDE config files
 **/.idea/

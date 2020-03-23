@@ -34,37 +34,34 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="15dp"
         android:text="@string/label_ok"
         android:textColor="@color/keyman_blue"
         android:elevation="1dp"
-        android:singleLine="true"
-        android:layout_marginStart="10dp" android:layout_marginEnd="15dp" />
+        android:singleLine="true"/>
 
         <Button
             android:id="@+id/cancelButton"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="15dp"
             android:text="@string/label_cancel"
             android:textColor="@color/keyman_blue"
             android:elevation="1dp"
-            android:singleLine="true"
-            android:layout_marginStart="10dp" android:layout_marginEnd="15dp" />
+            android:singleLine="true"/>
 
         <Button
             android:id="@+id/installButton"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="15dp"
             android:text="@string/label_install"
-            android:textColor="@color/keyman_blue"
-            android:layout_marginStart="10dp" android:layout_marginEnd="15dp" >
+            android:textColor="@color/keyman_blue">
             <requestFocus/>
         </Button>
 

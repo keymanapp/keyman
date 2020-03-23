@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj
+DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj cef.wixobj
 
 manual-setup: check setup
 
@@ -18,7 +18,7 @@ prereq: prereq-resources
     #
 
     cd $(ROOT)\src\desktop\inst
-    $(PROGRAM)\buildtools\mkver -v -u download.in download.mak $(ROOT)\src\desktop\version.txt
+    $(MKVER_U) download.in download.mak
 
 prereq-resources:
     #
@@ -29,8 +29,8 @@ prereq-resources:
     $(SIGNCODE) /d "Keyman Desktop Resources" desktop_resources.dll
 
 desktop: prereq
-    $(MAKE) -fdownload.mak candle-desktop
-    $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES) 
+    $(MAKE) -fdownload.mak candle
+    $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.msi
     $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.exe
@@ -49,6 +49,7 @@ clean:
     -del /Q desktop_resources.dll
     -del /Q desktop_resources.res
     -del /Q desktopui.wxs
+    -del /Q cef.wxs
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine
@@ -70,4 +71,3 @@ check-unicodedata:
 # ----------------------------------------------------------------------
 # EOF
 # ----------------------------------------------------------------------
-	

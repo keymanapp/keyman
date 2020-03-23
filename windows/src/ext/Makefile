@@ -4,7 +4,7 @@
 
 NOTARGET_SIGNCODE=yes
 
-TARGETS=dcpcrypt embeddedwb jedi mbcolor regexpr scfontcombobox cef4delphi
+TARGETS=dcpcrypt jedi mbcolor regexpr scfontcombobox cef4delphi
 
 # jedi, regexpr have no packages
 
@@ -20,10 +20,6 @@ cef4delphi:
     
 dcpcrypt:
     cd $(ROOT)\src\ext\dcpcrypt
-    $(MAKE) $(TARGET)
-
-embeddedwb:
-    cd $(ROOT)\src\ext\embeddedwb
     $(MAKE) $(TARGET)
 
 jedi:

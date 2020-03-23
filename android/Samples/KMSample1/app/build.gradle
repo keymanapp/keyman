@@ -6,6 +6,11 @@ apply from: "$rootPath/version.gradle"
 android {
     compileSdkVersion 29
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.keyman.kmsample1"
         minSdkVersion 16
@@ -36,9 +41,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
     implementation 'com.google.android.material:material:1.0.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation "com.google.firebase:firebase-core:17.2.1"
-    implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
+    implementation 'io.sentry:sentry-android:2.0.1'
 }

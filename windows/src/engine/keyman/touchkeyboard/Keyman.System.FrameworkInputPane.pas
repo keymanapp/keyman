@@ -1,3 +1,18 @@
+{
+  Copyright (C) 2019-2020 SIL International
+
+  Checks for visibility of Windows touch keyboard
+  "framework input pane" to control whether or not
+  Keyman's serialized input pathway is enabled.
+
+  When Keyman's serialized input pathway is enabled, the
+  first keystroke causes the touch panel to be dismissed,
+  as the touch panel sees the re-injection of the keystroke
+  as coming from hardware.
+
+  So we don't serialize input while the touch panel is
+  visible.
+}
 unit Keyman.System.FrameworkInputPane;
 
 interface

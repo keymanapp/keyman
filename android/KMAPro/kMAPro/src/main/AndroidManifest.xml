@@ -14,12 +14,23 @@
     android:icon="@drawable/ic_launcher"
     android:label="@string/app_name"
     android:roundIcon="@drawable/ic_launcher_round"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme"
+    android:supportsRtl="true">
     <receiver android:name=".NetworkStateReceiver">
       <intent-filter>
         <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
       </intent-filter>
     </receiver>
+
+    <!--    see the events from this app in sentry.keyman.com dashboard -->
+    <meta-data
+      android:name="io.sentry.dsn" android:value="https://2f067e5571a74974b9e210ca76ca9607@sentry.keyman.com/7" />
+    <!--    how to enable Sentry's debug mode-->
+    <meta-data
+      android:name="io.sentry.debug" android:value="true" />
+    <!-- Disable monitoring "Application Not Responding" (ANR).  Too many reports at the default 4000 ms -->
+    <meta-data
+      android:name="io.sentry.anr.enable" android:value="false" />
 
     <service
       android:name="com.keyman.android.SystemKeyboard"
@@ -161,6 +172,17 @@
           android:host="*"
           android:pathPattern=".*\\.kmp"
           android:scheme="https" />
+      </intent-filter>
+
+      <intent-filter>
+        <!-- deep linking to keyman.com/keyboards -->
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:scheme="keyman" />
       </intent-filter>
     </activity>
     <activity

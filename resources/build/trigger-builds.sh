@@ -15,9 +15,11 @@ function triggerBuilds() {
       if [[ $build == "" ]]; then continue; fi
       if [ "${build:(-8)}" == "_Jenkins" ]; then
         local job=${build%_Jenkins}
-        echo triggerJenkinsBuild "$job" "$base" "true"
+        echo Triggering Jenkins build "$job" "$base" "true"
+        triggerJenkinsBuild "$job" "$base" "true"
       else
-        echo triggerTeamCityBuild $build $TEAMCITY_VCS_ID
+        echo Triggering TeamCity build $build $TEAMCITY_VCS_ID
+        triggerTeamCityBuild $build $TEAMCITY_VCS_ID
       fi
     done
   done

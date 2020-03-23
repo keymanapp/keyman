@@ -59,9 +59,8 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, keymanapi_TLB, ExtCtrls, Menus, UfrmKeymanBase, UfrmWebContainer,
-  OleCtrls, SHDocVw, EmbeddedWB,
-  WideStrings, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB;
+  StdCtrls, keymanapi_TLB, Menus, UfrmKeymanBase, UfrmWebContainer,
+  WideStrings;
 
 
 type

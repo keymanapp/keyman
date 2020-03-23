@@ -29,8 +29,9 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
     webView?.delegate = self
     NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
         name: NSNotification.Name.reachabilityChanged, object: nil)
-    networkReachable = Reachability(hostname: "www.keyman.com")
+
     do {
+      try networkReachable = Reachability(hostname: "keyman.com")
       try networkReachable?.startNotifier()
     } catch {
       log.error("error starting Reachability notifier: \(error)")
@@ -61,8 +62,8 @@ class InfoViewController: UIViewController, UIWebViewDelegate {
   }
 
   private func loadFromServer() {
-    let appVersion = Version.current
-    let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.string)/?embed=ios"
+    let appVersion = Version.current.majorMinor
+    let url = "https://help.keyman.com/products/iphone-and-ipad/\(appVersion.plainString)/?embed=ios"
     webView.loadRequest(URLRequest(url: URL(string: url)!))
     log.debug("Info page URL: \(url)")
   }

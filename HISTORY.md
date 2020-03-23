@@ -1,5 +1,87 @@
 # Keyman Version History
 
+## 14.0.30 alpha 2020-03-19
+
+* docs(common): minor updates to readme (#2856)
+
+## 14.0.29 alpha 2020-03-19
+
+* feat(windows): Add Sentry reports to Delphi apps (#2848)
+
+## 14.0.28 alpha 2020-03-18
+
+* fix(web): fixes design mode and content editable issues (#2838)
+* fix(ios): corrects OSK height adjustment, banner display issues. (#2840)
+* feat(windows): add sentry tooling (#2806)
+* refactor(web/engine): new RuleBehavior return type from keyboard calls, utilization (#2830)
+* refactor(web/engine): KeyEvent object now refers to outputTarget over element (#2846)
+* fix(linux): Fix failing Linux package builds (#2843)
+* feat(linux): Add focal as platform to build packages for (#2842)
+
+## 14.0.27 alpha 2020-03-17
+
+* chore(deps-dev): bump minimist from 1.2.0 to 1.2.2 in /web/testing/regression-tests (#2829)
+
+## 14.0.26 alpha 2020-03-16
+
+* fix(oem): Disable monitoring of ANR for oem Android app (#2828)
+
+## 14.0.25 alpha 2020-03-13
+
+* feat(common): sentry release control (#2794)
+* chore(windows): improve build script tests (#2680)
+* fix(web): enhanced sourcemaps + proper sourcemaps for minified KMW (#2809)
+* feat/common/parse-crowdin Add script to parse crowdin translation file (#2801)
+* fix(linux): Fix how keyboardprocessor version is set in dist.sh (#2814)
+* feat(android): Additional Sentry integration (#2810)
+* fix(web): applies base key layer property to unassigned subkeys (#2808)
+* feat(android): Start adding RTL to layouts (#2816)
+* fix(common/lmlayer): fixes word lookup from Tries for SMP script-based languages (#2815)
+* feat(common): add release finalization for Sentry (#2819)
+* fix(web): further fixes BuildVisualKeyboard.  Fixes #2818 (#2822)
+* fix(web): fixes internal reference for validation tool (#2824)
+
+## 14.0.24 alpha 2020-03-11
+
+* fix(linux): Fix CI dist path to common/core/desktop (#2795)
+* fix(web): fixes build number reference of API call (#2796)
+* fix(web): updating BuildVisualKeyboard (#2802)
+
+## 14.0.23 alpha 2020-03-10
+
+* fix(ios): fixes Carthage framework copy for Sentry (#2800)
+* feat(android): Start of Sentry-based crash reporting (#2778)
+
+## 14.0.22 alpha 2020-03-09
+
+* fix(common): parameter order incorrect in git diff (#2787)
+* feat(ios): compilations within Xcode now properly set version (#2775)
+* fix(ios/engine): Fixes context bug for certain keyboard rules after newlines (#2770)
+* feat(android): Update additional main app strings for crowdin (#2793)
+* feat(ios): Start of Sentry-based crash reporting (#2771)
+* feat(ios): Improved Sentry integration (first pass) (#2782)
+
+## 14.0.21 alpha 2020-03-08
+
+* fix(ci): builds were never triggered (#2790)
+
+## 14.0.20 alpha 2020-03-08
+
+* feat(windows): Chromium replacement for embedded MSHTML in for Keyman Desktop (#1720)
+* Refactor/common/rename core (#2735)
+
+## 14.0.19 alpha 2020-03-06
+
+* fix(web): support otf extension for truetype fonts (#2780)
+
+## 14.0.18 alpha 2020-03-04
+
+* feat(windows): etl2log support tool (#2758)
+* feat(developer): allow use of ISO9995 in key ids (#2741)
+* Feature: Android - Handle keyman:// protocol to download kmp keyboard (#2734)
+* change(android): Cleanup UI strings (#2751)
+* fix(ios): fixes broken online-help versioned link (#2773)
+
 ## 14.0.17 alpha 2020-02-26
 
 * fix(android) Fix crash on kbdMapList (#2719)

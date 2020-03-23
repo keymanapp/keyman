@@ -18,7 +18,7 @@
                     29 Mar 2010 - mcdurdin - I2199 - Shift+click
                     24 Jun 2010 - mcdurdin - I2421 - Start work on font helper showing additional detail
                     26 Jul 2010 - mcdurdin - Code tidy - remove old commented-out code
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     18 Feb 2011 - mcdurdin - I2712 - SMP support for font helper
                     18 Mar 2011 - mcdurdin - I1698, I2120, I2323, I2565 - Font helper crash when searching
@@ -37,12 +37,27 @@ unit UfrmOSKFontHelper;  // I3306
 interface
 
 uses
+  System.Classes,
   System.Contnrs,
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UfrmOSKPlugInBase, OleCtrls, SHDocVw, EmbeddedWB,
-  keymanapi_TLB, xmlrenderer, UfrmKeymanBase, utilcheckfonts,
-  UserMessages, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB,
-  TempFileManager;
+  System.SysUtils,
+  System.Types,
+  System.Variants,
+  Vcl.ComCtrls,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.Grids,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  ClearTypeDrawCharacter,
+  keymanapi_TLB,
+  UfrmKeymanBase,
+  UfrmOSKPlugInBase,
+  UserMessages,
+  utilcheckfonts;
 
 type
   TKeyboardProps = record
@@ -53,50 +68,44 @@ type
   end;
 
   TfrmOSKFontHelper = class(TfrmOSKPlugInBase)
-    web: TKeymanEmbeddedWB; // I2721
-    procedure webShowContextMenu(Sender: TCustomEmbeddedWB;
-      const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-      const Context: IDispatch; var Result: HRESULT);
-    procedure webKeyDown(Sender: TObject; var Key: Word; ScanCode: Word;
-      Shift: TShiftState);
-    procedure webScriptError(Sender: TObject; ErrorLine, ErrorCharacter,
-      ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
-    procedure webDocumentComplete(ASender: TObject; const pDisp: IDispatch;
-      var URL: OleVariant);
-    procedure webBeforeNavigate2(ASender: TObject; const pDisp: IDispatch;
-      var URL, Flags, TargetFrameName, PostData, Headers: OleVariant;
-      var Cancel: WordBool);
+    panNoKeyboard: TPanel;
+    panFonts: TPanel;
+    grid: TDrawGrid;
+    panControls: TPanel;
+    tbSize: TTrackBar; // I2721
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure webNewWindow3(ASender: TObject; var ppDisp: IDispatch;
-      var Cancel: WordBool; dwFlags: Cardinal; const bstrUrlContext,
-      bstrUrl: WideString);
-    function webShowHelpRequest1(Sender: TObject; HWND: NativeUInt;
-      pszHelpFile: PWideChar; uCommand, dwData: Integer; ptMouse: TPoint;
-      var pDispatchObjectHit: IDispatch): HRESULT;
+    procedure gridDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure tbSizeChange(Sender: TObject);
+    procedure gridKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure gridMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure gridMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure gridDblClick(Sender: TObject);
   private
-    FXML: string;   // I4181
-    FXMLFileName: TTempFile;   // I4181
-    FXMLRenderers: TXMLRenderers;
-    FDialogName: WideString;
+    FChars: array of Cardinal; // UTF-32 codepoints
+    FDrawChar: TCleartypeDrawCharacter;
+    FDrawCellBitmap: Vcl.Graphics.TBitmap;
+
+    FSelectedKeyboard: TCheckFontKeyboard;
     FCheckFontsThread: TCheckFontsThread;
     FCheckFontKeyboards: TCheckFontKeyboards;
     FLastSelectedKeyboardID: WideString;
     FLastSelectedKeymanID: Integer;
-    FLastSelectedKeyboardName: WideString;
 
-    procedure Content_Render;
-    procedure WMUser_FireCommand(var Message: TMessage); message WM_USER_FireCommand;
-    procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure WMUser_FontChange(var Message: TMessage); message WM_USER_FontChange;  // I3390   // I3519
 
     procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
-    procedure FireCommand(const command: WideString; params: TStringList);
     procedure CheckFontsThreadComplete(Sender: TObject);
     procedure DisplayKeyboardFonts;
     procedure StartCheckingFonts(Keyboard: IKeymanKeyboardInstalled);
-    procedure Do_Content_Render(const AXML: WideString);
-    { Private declarations }
+    procedure SetDisplay(const msg: string);
+    procedure FormatGrid;
+    function GetFontSize: Integer;
+    procedure InsertCharacter;
   public
     { Public declarations }
     procedure SelectKeyboard(KeymanID: Integer);
@@ -105,20 +114,14 @@ type
 implementation
 
 uses
+  System.Math,
+
   findfonts,
-  KLog,
   kmint,
-  MSHTML_TLB,
-  custinterfaces,
   UfrmKeyman7Main,
   UfrmVisualKeyboard,
   Unicode,
-  USendInputString,
-  utilexecute,
-  utilhttp,
-  utilsystem,
-  utilxml,
-  WideStringClass;
+  USendInputString;
 
 {$R *.dfm}
 
@@ -129,6 +132,8 @@ var
   i: Integer;
   kbds: IKeymanKeyboardsInstalled;
 begin
+  FSelectedKeyboard := nil;
+
   if KeymanID <> -1 then
   begin
     kbds := kmcom.Keyboards;
@@ -142,186 +147,17 @@ begin
       end;
   end;
 
-  FLastSelectedKeyboardName := '';
   FLastSelectedKeyboardID := '';
   FLastSelectedKeymanID := -1;
   DisplayKeyboardFonts; // Displays default details
-end;
-
-procedure TfrmOSKFontHelper.webBeforeNavigate2(ASender: TObject;
-  const pDisp: IDispatch; var URL, Flags, TargetFrameName, PostData,
-  Headers: OleVariant; var Cancel: WordBool);
-var
-  params: TStringList;
-begin
-  if GetParamsFromURL(URL, params) then
-  begin
-    PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params));
-    Cancel := True;
-  end;
-end;
-
-procedure TfrmOSKFontHelper.webDocumentComplete(ASender: TObject;
-  const pDisp: IDispatch; var URL: OleVariant);
-var
-  doc3: IHTMLDocument3;
-  elem: IHTMLElement;
-begin
-  try
-    if Assigned(web.Document) then
-    begin
-      doc3 := (web.Document as IHTMLDocument3);
-
-      elem := doc3.documentElement;
-      if Assigned(elem) then
-        elem.insertAdjacentHTML('afterBegin', '&#xa0;<SCRIPT For="window" Event="onerror">var noOp = null;</SCRIPT>');
-    	// NOTE: The &nbsp, or some other visible HTML, is required. Internet Explorer will not
-    	// parse and recognize the script block without some visual HTML to
-    	// accompany it.
-    end;
-    FreeAndNil(FXMLFileName);   // I4181
-  except
-    Exit;
-  end;
-end;
-
-procedure TfrmOSKFontHelper.webNewWindow3(ASender: TObject;
-  var ppDisp: IDispatch; var Cancel: WordBool; dwFlags: Cardinal;
-  const bstrUrlContext, bstrUrl: WideString);
-var
-  params: TStringList;
-begin
-  Cancel := True;
-  if GetParamsFromURL(bstrURL, params)
-    then PostMessage(Handle, WM_USER_FireCommand, 0, Integer(params))
-    else web.Go(bstrURL);
-end;
-
-procedure TfrmOSKFontHelper.webKeyDown(Sender: TObject; var Key: Word;
-  ScanCode: Word; Shift: TShiftState);
-begin
-  if (Key = VK_F5) and (ssCtrl in Shift) then
-  begin
-    Key := 0;
-    PostMessage(Handle, WM_USER_ContentRender, 0, 0);
-  end;
-end;
-
-procedure TfrmOSKFontHelper.webScriptError(Sender: TObject; ErrorLine,
-  ErrorCharacter, ErrorCode, ErrorMessage, ErrorUrl: string; var ScriptErrorAction: TScriptErrorAction);
-begin
-  ScriptErrorAction := eaCancel;
-  //TODO: Log message to event log
-end;
-
-procedure TfrmOSKFontHelper.webShowContextMenu(Sender: TCustomEmbeddedWB;
-  const dwID: Cardinal; const ppt: PPoint; const CommandTarget: IInterface;
-  const Context: IDispatch; var Result: HRESULT);
-begin
-  PostMessage(Handle, WM_CONTEXTMENU, web.Handle, MAKELONG(ppt.X, ppt.Y));
-  Result := S_OK;
-//Result := S_FALSE;
-end;
-
-function TfrmOSKFontHelper.webShowHelpRequest1(Sender: TObject;
-  HWND: NativeUInt; pszHelpFile: PWideChar; uCommand, dwData: Integer;
-  ptMouse: TPoint; var pDispatchObjectHit: IDispatch): HRESULT;
-begin
-  Application.HelpJump('context_'+lowercase(FDialogName));
-  Result := S_OK;
-end;
-
-procedure TfrmOSKFontHelper.WMUser_ContentRender(var Message: TMessage);
-begin
-  DisplayKeyboardFonts;  // I3216   // I3520
-end;
-
-procedure TfrmOSKFontHelper.WMUser_FireCommand(var Message: TMessage);
-var
-  command: WideString;
-  params: TStringList;
-begin
-  params := TStringList(Message.LParam);
-  command := params[0];
-  params.Delete(0);
-  FireCommand(command, params);
-  params.Free;
-end;
-
-procedure TfrmOSKFontHelper.Content_Render;
-var
-  AdditionalData: WideString;
-begin
-  AdditionalData := FXML;
-
-  FreeAndNil(FXMLFileName);   // I4181
-
-  if not FileExists(GetXMLTemplatePath(FXMLRenderers.RenderTemplate)+FXMLRenderers.RenderTemplate) then
-    Exit;
-
-  FXMLFileName := FXMLRenderers.RenderToFile(False, AdditionalData);
-
-  FDialogName := ChangeFileExt(ExtractFileName(FXMLRenderers.RenderTemplate), '');
-  //HelpType := htKeyword;
-  //HelpKeyword := FDialogName;
-end;
-
-procedure TfrmOSKFontHelper.FireCommand(const command: WideString; params: TStringList);
-var
-  hwnd: THandle;
-  text: string;
-  ch: WideString;
-  n: Integer;
-  s: WideString;
-  v: Integer;
-begin
-  if command = 'link' then TUtilExecute.URL(params.Values['url'])  // I3349
-  else if command = 'tutorial' then //(ActiveProduct as IKeymanProduct2).OpenTutorial
-  else if command = 'osk' then frmKeyman7Main.frmVisualKeyboard.ActivePage := apKeyboard
-  else if command = 'welcome' then frmKeyman7Main.MnuOpenKeyboardHelp(nil)
-  else if command = 'help' then frmKeyman7Main. MnuOpenProductHelp(frmKeyman7Main.frmVisualKeyboard)
-  else if command = '' then
-       
-  else if command = 'insertchars' then
-  begin
-    hwnd := kmcom.Control.LastFocusWindow;
-
-    ch := Trim(params.Values['chars']);
-
-    // I1429 - fix U+xxxx in insertchars URL
-    
-    n := Pos(' ', ch); if n = 0 then n := Length(ch)+1;
-
-    while ch <> '' do
-    begin
-      s := Copy(ch, 1, n-1); if s = '' then Break;
-
-      if Copy(s,1,2) = 'U+' then v := StrToIntDef('$'+Copy(s,3,6),0)
-      else if s[1] = 'x' then v := StrToIntDef('$'+Copy(s,2,6),0)
-      else if s[1] = 'd' then v := StrToIntDef(Copy(s,2,7), 0)
-      else v := 0;
-
-      if (v > 32) and (v <= $10FFFF) then
-      begin
-        if Uni_IsSurrogate(v)
-          then text := text + Uni_UTF32ToSurrogate1(v) + Uni_UTF32ToSurrogate2(v)
-          else text := text + Char(v);
-      end;
-
-      Delete(ch, 1, n); ch := Trim(ch);
-      n := Pos(' ', ch);
-      if n = 0 then n := Length(ch)+1;
-    end;
-
-    if text <> '' then
-      SendInputString(hwnd, text);   // I4412
-  end;
 end;
 
 procedure TfrmOSKFontHelper.FormCreate(Sender: TObject);
 begin
   inherited;
   FCheckFontKeyboards := TCheckFontKeyboards.Create;
+  FDrawCellBitmap := Vcl.Graphics.TBitmap.Create;
+  FDrawChar := TCleartypeDrawCharacter.Create;
 end;
 
 procedure TfrmOSKFontHelper.FormDestroy(Sender: TObject);
@@ -334,8 +170,177 @@ begin
     FCheckFontsThread := nil;
   end;
 
-  FreeAndNil(FXMLFileName);   // I4181
   FreeAndNil(FCheckFontKeyboards);
+  FreeAndNil(FDrawCellBitmap);
+  FreeAndNil(FDrawChar);
+end;
+
+procedure TfrmOSKFontHelper.gridDblClick(Sender: TObject);
+begin
+  InsertCharacter;
+end;
+
+procedure TfrmOSKFontHelper.gridDrawCell(Sender: TObject; ACol,
+  ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+  FFontInfo: TFindFontResult;
+  RectBmp: TRect;
+  uc: Integer;
+  ch: string;
+begin
+  if not Assigned(FSelectedKeyboard) or (FSelectedKeyboard.Fonts.Count <= ARow) then
+    Exit;
+
+  FFontInfo := FSelectedKeyboard.Fonts[ARow];
+
+  if ACol = 0 then
+  begin
+    // Font name
+    grid.Canvas.Font := grid.Font;
+    grid.Canvas.TextRect(Rect, Rect.Left, (Rect.Bottom + Rect.Top - grid.Canvas.TextHeight('A')) div 2, FFontInfo.FontName)
+  end
+  else if ACol = 1 then
+  begin
+    // % Coverage
+    grid.Canvas.Font := grid.Font;
+    grid.Canvas.TextRect(Rect, Rect.Left, (Rect.Bottom + Rect.Top - grid.Canvas.TextHeight('A')) div 2, Format('%d%%', [FFontInfo.Coverage]))
+  end
+  else
+  begin
+//    grid.Canvas.Font.Name := FFontInfo.FontName;
+//    grid.Canvas.TextRect(Rect, Rect.Left, Rect.Top, FCharsData[ACol-2]);
+      { Draw a character cell }
+
+    RectBmp := System.Types.Rect(0, 0, Rect.Right-Rect.Left, Rect.Bottom-Rect.Top);
+    with FDrawCellBitmap.Canvas do
+    begin
+      { Draw a character cell }
+      if gdSelected in State then
+      begin
+        if gdFocused in State then
+        begin
+          Font.Color := clHighlightText;
+          Brush.Color := clHighlight;
+        end
+        else
+        begin
+          Font.Color := clHighlightText;
+          Brush.Color := clGray;
+        end;
+      end
+      else
+      begin
+        Font.Color := clWindowText;
+        Brush.Color := clWindow;
+      end;
+      FillRect(RectBmp);
+
+      { Retrieve character }
+
+      uc := FChars[ACol-2];
+
+      if uc = 0 then
+      begin
+        grid.Canvas.Brush.Color := clWindow;
+        grid.Canvas.FillRect(Rect);
+        Exit;
+      end;
+
+      ch := Uni_UTF32CharToUTF16(uc);
+
+      FDrawChar.SetFontDetails(FFontInfo.FontName, GetFontSize);   // I4807
+      FDrawChar.Color := Font.Color;
+//      case DisplayQuality of
+//        NONANTIALIASED_QUALITY: FDrawChar.DisplayQuality := ctPlain;
+//        ANTIALIASED_QUALITY: FDrawChar.DisplayQuality := ctAntialias;
+//        else
+        FDrawChar.DisplayQuality := ctCleartype;
+//      end;
+      FDrawChar.DrawText(Handle, TA_CENTER or TA_TOP, RectBmp.Right div 2, 0, RectBmp, ch);
+
+      { Draw U+nnnn }
+
+      if grid.DefaultColWidth > 35 then
+      begin
+        Font.Size := 7;
+        Font.Name := 'Arial';
+        SetTextAlign(Handle, TA_CENTER or TA_TOP);
+        TextOut(RectBmp.Right div 2, RectBmp.Bottom - TextHeight('a'), 'U+'+IntToHex(uc,4));
+      end;
+
+      { Draw grid }
+
+      Pen.Color := $c0c0c0;
+      MoveTo(RectBmp.Right-1, 0);
+      LineTo(RectBmp.Right-1, RectBmp.Bottom);
+      MoveTo(0, RectBmp.Bottom-1);
+      LineTo(RectBmp.Right, RectBmp.Bottom-1);
+    end;
+
+    grid.Canvas.Draw(Rect.Left, Rect.Top, FDrawCellBitmap);
+  end;
+end;
+
+procedure TfrmOSKFontHelper.gridKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 107 { Numpad + } then
+  begin
+    if tbSize.Position < tbSize.Max then
+      tbSize.Position := tbSize.Position + tbSize.PageSize;
+  end
+  else if Key = 109 { Numpad - } then
+  begin
+    if tbSize.Position > tbSize.Min then
+      tbSize.Position := tbSize.Position - tbSize.PageSize;
+  end
+  else if Key = VK_RETURN then
+    InsertCharacter
+  else
+    Exit;
+  Key := 0;
+end;
+
+procedure TfrmOSKFontHelper.InsertCharacter;
+var
+  ch: string;
+  hwnd: THandle;
+begin
+  if grid.Col < 2 then
+    Exit;
+
+  if not Assigned(FSelectedKeyboard) then
+    Exit;
+
+  if grid.Col - 2 >= Length(FChars) then
+    Exit;
+
+  ch := Uni_UTF32CharToUTF16(FChars[grid.Col-2]);
+
+  hwnd := kmcom.Control.LastFocusWindow;
+  SendInputString(hwnd, ch);   // I4412
+end;
+
+procedure TfrmOSKFontHelper.gridMouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if ssCtrl in Shift then
+  begin
+    Handled := True;
+    if tbSize.Position < tbSize.Max then
+      tbSize.Position := tbSize.Position + tbSize.PageSize;
+  end;
+end;
+
+procedure TfrmOSKFontHelper.gridMouseWheelUp(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if ssCtrl in Shift then
+  begin
+    Handled := True;
+    if tbSize.Position > tbSize.Min then
+      tbSize.Position := tbSize.Position - tbSize.PageSize;
+  end;
 end;
 
 procedure TfrmOSKFontHelper.CheckFontsThreadComplete(Sender: TObject);
@@ -363,6 +368,7 @@ end;
 
 procedure TfrmOSKFontHelper.WMUser_FontChange(var Message: TMessage);  // I3390   // I3519
 begin
+  FSelectedKeyboard := nil;
   FCheckFontKeyboards.Clear;
   SelectKeyboard(FLastSelectedKeymanID);
 end;
@@ -370,7 +376,6 @@ end;
 procedure TfrmOSKFontHelper.StartCheckingFonts(Keyboard: IKeymanKeyboardInstalled);
 begin
   FLastSelectedKeyboardID := Keyboard.ID;
-  FLastSelectedKeyboardName := Keyboard.Name;
   FLastSelectedKeymanID := Keyboard.KeymanID;
 
   if FCheckFontKeyboards.Keyboards[FLastSelectedKeyboardID] <> nil then
@@ -383,12 +388,11 @@ begin
 
   if Keyboard.Encodings = keANSI then
   begin
-    // I1533 - hint for non-Unicode keyboard.
-    Do_Content_Render('<Keyboard Name="'+XmlEncode(FLastSelectedKeyboardName)+'" />');
+    SetDisplay('The selected keyboard is not a Unicode keyboard');
   end
   else
   begin
-    Do_Content_Render('<Searching /><Keyboard Name="'+XmlEncode(FLastSelectedKeyboardName)+'" />');
+    SetDisplay('Please wait while searching for related fonts for keyboard '+Keyboard.Name);
 
     FCheckFontsThread := TCheckFontsThread.Create;
     FCheckFontsThread.FreeOnTerminate := True;
@@ -398,101 +402,113 @@ begin
   end;
 end;
 
+procedure TfrmOSKFontHelper.tbSizeChange(Sender: TObject);
+begin
+  FormatGrid;
+end;
+
+procedure TfrmOSKFontHelper.FormatGrid;
+var
+  i: Integer;
+  m: Integer;
+begin
+  grid.DefaultColWidth := tbSize.Position;
+  grid.DefaultRowHeight := tbSize.Position;
+
+  Canvas.Font := grid.Font;
+
+  m := 64;
+
+  if Assigned(FSelectedKeyboard) then
+    for i := 0 to grid.RowCount - 1 do
+      m := System.Math.Max(m, Canvas.TextWidth(FSelectedKeyboard.Fonts[i].FontName) + 6);
+
+  grid.ColWidths[0] := m;
+  grid.ColWidths[1] := Canvas.TextWidth('100%') + 6;
+
+  for i := 2 to grid.ColCount - 1 do
+    grid.ColWidths[i] := tbSize.Position;
+  grid.Invalidate;
+
+  FDrawCellBitmap.Width := grid.DefaultColWidth;
+  FDrawCellBitmap.Height := grid.DefaultRowHeight;
+end;
+
 procedure TfrmOSKFontHelper.DisplayKeyboardFonts;
 var
   FKeyboard: TCheckFontKeyboard;
   J: Integer;
-
-  function CharCode(ch: WideChar): WideString;
-  begin
-    Result := IntToHex(Ord(ch), 4);
-  end;
-
 var
-  FFontsData: WideString;
   i: Integer;
   ch,ch2: WideChar;
 begin
-  FFontsData := '';
-
+  FSelectedKeyboard := nil;
   FKeyboard := FCheckFontKeyboards.Keyboards[FLastSelectedKeyboardID];
   if (FLastSelectedKeyboardID <> '') and Assigned(FKeyboard) then
   begin
-    FFontsData := '<Chars>';
-
+    SetLength(FChars, Length(FKeyboard.Chars));
+    J := 0;
     I := 1;
     while I <= Length(FKeyboard.Chars) do  // I2712
     begin
       ch := FKeyboard.Chars[I];
-      if Uni_IsSurrogate1(ch) and (I < Length(FKeyboard.Chars)) then
+      if Uni_IsSurrogate1(ch) and (I < Length(FKeyboard.Chars)) and Uni_IsSurrogate2(FKeyboard.Chars[I+1]) then
       begin
         ch2 := FKeyboard.Chars[I+1];
-        FFontsData := FFontsData + '<Ch CharCode="'+IntToHex(Uni_SurrogateToUTF32(ch,ch2),5)+'">'+XmlEncode(ch+ch2)+'</Ch>';
+        FChars[J] := Uni_SurrogateToUTF32(ch, ch2);
         Inc(I);
       end
       else
-        FFontsData := FFontsData + '<Ch CharCode="'+CharCode(ch)+'">'+XmlEncode(ch)+'</Ch>';
+        FChars[J] := Ord(ch);
       Inc(I);
+      Inc(J);
     end;
 
-    FFontsData := FFontsData + '</Chars>';
+    SetLength(FChars, J);
 
-    FFontsData := FFontsData + '<Fonts>';
+    grid.ColCount := Length(FChars) + 2;
+    grid.RowCount := FKeyboard.Fonts.Count;
 
-    for I := 0 to FKeyboard.Fonts.Count - 1 do
-    begin
-      FFontsData := FFontsData + '<Font '+
-        'Index="'+IntToStr(I)+'" '+
-        'Name="'+XmlEncode(FKeyboard.Fonts[I].FontName)+'" '+
-        'Coverage="'+IntToStr(FKeyboard.Fonts[i].Coverage)+'">'; //<IncludedChars>';
-
-      FFontsData := FFontsData + '<ExcludedChars>';
-      J := 1;
-      while J <= Length(FKeyboard.Fonts[I].ExcludedChars) do  // I2712
+    for i := 0 to FKeyboard.Fonts.Count - 1 do
+      if FKeyboard.Fonts[i].Coverage < 50 then
       begin
-        ch := FKeyboard.Fonts[I].ExcludedChars[J];
-        if Uni_IsSurrogate1(ch) and (J < Length(FKeyboard.Fonts[I].ExcludedChars)) then
-        begin
-          ch2 := FKeyboard.Fonts[I].ExcludedChars[J+1];
-          FFontsData := FFontsData + '<Ch CharCode="'+IntToHex(Uni_SurrogateToUTF32(ch,ch2),5)+'" />';
-          Inc(J);
-        end
-        else
-          FFontsData := FFontsData + '<Ch CharCode="'+CharCode(ch)+'" />';
-        Inc(J);
+        grid.RowCount := i;
+        Break;
       end;
-      FFontsData := FFontsData + '</ExcludedChars>';
-      FFontsData := FFontsData + '</Font>';
-    end;
 
-    FFontsData := FFontsData + '</Fonts><Keyboard Name="'+XmlEncode(FLastSelectedKeyboardName)+'" />';
-    {finally
-      FFonts.Free;
-    end;}
+    FSelectedKeyboard := FKeyboard;
+    FormatGrid;
+    SetDisplay('');
   end
   else
   begin
     if kmcom.Keyboards.Count = 0 then
-      FFontsData := '<NoKeyboards />';
+      SetDisplay('No keyboards are installed')
+    else
+      SetDisplay('Please select a Keyman keyboard to find related fonts');
   end;
-
-  Do_Content_Render(FFontsData);
 end;
 
-procedure TfrmOSKFontHelper.Do_Content_Render(const AXML: WideString);
-var
-  v: OleVariant;
+procedure TfrmOSKFontHelper.SetDisplay(const msg: string);
 begin
-  FXMLRenderers := TXMLRenderers.Create;
-  FXMLRenderers.RenderTemplate := 'FontHelper.xsl';
+  if msg = '' then
+  begin
+    panFonts.Visible := True;
+    panNoKeyboard.Visible := False;
+  end
+  else
+  begin
+    panNoKeyboard.Caption := msg;
+    panNoKeyboard.Visible := True;
+    panFonts.Visible := False;
+  end;
+end;
 
-  FXML := AXML;
-  Content_Render;
-  FreeAndNil(FXMLRenderers);
-
-  v := navNoHistory or navNoReadFromCache or navNoWriteToCache;
-  if Assigned(FXMLFileName) and FileExists(FXMLFileName.Name) then   // I4181
-    web.Navigate(FXMLFileName.Name, v);   // I4181
+function TfrmOSKFontHelper.GetFontSize: Integer;   // I4807
+begin
+  if grid.DefaultColWidth < 36
+    then Result := grid.DefaultRowHeight
+    else Result := grid.DefaultRowHeight - 12;
 end;
 
 end.

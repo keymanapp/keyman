@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F3011059-70EF-4D98-A54B-664547F6C41F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="sentrytool.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\sentrytoolTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="sentrytool">
+        <MSBuild Projects="sentrytool.dproj"/>
+    </Target>
+    <Target Name="sentrytool:Clean">
+        <MSBuild Projects="sentrytool.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="sentrytool:Make">
+        <MSBuild Projects="sentrytool.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="sentrytoolTests">
+        <MSBuild Projects="Test\sentrytoolTests.dproj"/>
+    </Target>
+    <Target Name="sentrytoolTests:Clean">
+        <MSBuild Projects="Test\sentrytoolTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="sentrytoolTests:Make">
+        <MSBuild Projects="Test\sentrytoolTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="sentrytool;sentrytoolTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="sentrytool:Clean;sentrytoolTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="sentrytool:Make;sentrytoolTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

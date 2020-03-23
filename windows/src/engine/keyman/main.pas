@@ -59,13 +59,23 @@ begin
   end;
 end;
 
+procedure RunProgram; forward;
+
 procedure Run;
+begin
+  RunProgram;
+  frmKeyman7Main.Free;
+end;
+
+procedure RunProgram;
 var
   FCommand: Integer;
   Finished: Boolean;
   Count: Integer;
   hMutex: Cardinal;
 begin
+
+
   if not ValidateParameters(FCommand) then Exit;
 
   hProgramMutex := CreateMutex(nil, False, 'KeymanEXE70');

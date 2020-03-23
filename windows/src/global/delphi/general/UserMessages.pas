@@ -69,9 +69,6 @@ const
   WM_USER_FontChange = WM_USER + 150;  // I3390   // I3519
 
 const
-  WM_USER_ResetWebFocus = WM_USER + 160;
-
-const
   // UframeTextEditor
   WM_USER_TextEditor_Command = WM_USER + 170;
 

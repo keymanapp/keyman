@@ -79,7 +79,6 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_Define>$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -88,7 +87,6 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_Define>$(DCC_Define)</DCC_Define>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -100,7 +98,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="comp\WebBrowserFocusMonitor.dcr"/>
         <DCCReference Include="designide.dcp"/>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="vcl.dcp"/>
@@ -112,7 +109,6 @@
         <DCCReference Include="dclact.dcp"/>
         <DCCReference Include="dclstd.dcp"/>
         <DCCReference Include="xmlrtl.dcp"/>
-        <DCCReference Include="EmbeddedWebBrowser_XE.dcp"/>
         <DCCReference Include="comp\extshiftstate.pas"/>
         <DCCReference Include="general\scancodemap.pas"/>
         <DCCReference Include="general\unicode.pas"/>
@@ -129,10 +125,8 @@
         <DCCReference Include="comp\PanelOverlapped.pas"/>
         <DCCReference Include="comp\StringGridEditControlled.pas"/>
         <DCCReference Include="comp\BitmapEditor.pas"/>
-        <DCCReference Include="tlb\MSHTML_TLB.pas"/>
         <DCCReference Include="comp\FixedTrackbar.pas"/>
         <DCCReference Include="comp\KMDActions.pas"/>
-        <DCCReference Include="comp\WebBrowserFocusMonitor.pas"/>
         <DCCReference Include="general\CleartypeDrawCharacter.pas"/>
         <DCCReference Include="comp\OnScreenKeyboard.pas"/>
         <DCCReference Include="..\..\developer\TIKE\actions\KMDActionInterfaces.pas"/>
@@ -140,7 +134,6 @@
         <DCCReference Include="comp\exImageList.pas"/>
         <DCCReference Include="comp\KeymanTextEditorRichEdit.pas"/>
         <DCCReference Include="general\usp10.pas"/>
-        <DCCReference Include="comp\KeymanEmbeddedWB.pas"/>
         <DCCReference Include="vcl\ErrorControlledRegistry.pas"/>
         <DCCReference Include="comp\CaptionPanel.pas"/>
         <DCCReference Include="visualkeyboard\OnScreenKeyboardData.pas"/>

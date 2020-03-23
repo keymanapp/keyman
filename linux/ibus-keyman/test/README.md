@@ -11,7 +11,7 @@ You need pynput to generate keypresses
 These tests assume that the test kmx and kmn are located in
 `~/.local/share/keyman/test_kmx`
 
-You may like to link `common/engine/keyboardprocessor/tests/unit/kmx` to that location
+You may like to link `common/core/desktop/tests/unit/kmx` to that location
 
 
 Running tests

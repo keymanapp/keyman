@@ -28,8 +28,7 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ShellAPI, UfrmWebContainer, OleCtrls, SHDocVw, EmbeddedWB,
-  OnlineUpdateCheck, SHDocVw_EWB, EwbCore, KeymanEmbeddedWB;
+  ShellAPI, UfrmWebContainer, OnlineUpdateCheck;
 
 type
   TfrmOnlineUpdateNewVersion = class(TfrmWebContainer)

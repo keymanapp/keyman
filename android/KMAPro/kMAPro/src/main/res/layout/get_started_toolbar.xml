@@ -17,8 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:contentDescription="@string/image_view"
-            android:paddingLeft="0dp"
-            android:layout_marginLeft="@dimen/checkbox_margin"
+            android:paddingStart="0dp"
+            android:layout_marginStart="@dimen/checkbox_margin"
             android:src="@drawable/ic_action_get_started" />
 
         <TextView
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_gravity="right"
+            android:layout_gravity="end"
             android:contentDescription="@string/image_button"
             android:src="@drawable/ic_action_close" />
 

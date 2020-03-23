@@ -304,6 +304,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       self.swallowBackspaceTextChange = false
       return
     }
+
+    // What the actual heck, Apple.  Apparently, in system-keyboard mode, this is also self-triggered if we erase back to a newline.
+    // Refer to https://github.com/keymanapp/keyman/pull/2770 for context.
+    if self.swallowBackspaceTextChange && Manager.shared.isSystemKeyboard && textDocumentProxy.documentContextBeforeInput == "\n" {
+      self.swallowBackspaceTextChange = false
+      return
+    }
     
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let contextAfterInput = textDocumentProxy.documentContextAfterInput ?? ""
@@ -352,8 +359,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
         }
       }
-      
-      if textDocumentProxy.documentContextBeforeInput == nil {
+
+      // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.
+      if textDocumentProxy.documentContextBeforeInput == nil ||
+         (textDocumentProxy.documentContextBeforeInput == "\n" && Manager.shared.isSystemKeyboard) {
         if(self.swallowBackspaceTextChange) {
           // A single keyboard processing command should never trigger two of these in a row;
           // only one output function will perform deletions.

@@ -1,7 +1,6 @@
 package keyman_components;
 
 {$R *.res}
-{$R 'comp\WebBrowserFocusMonitor.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -39,8 +38,7 @@ requires
   dbrtl,
   dclact,
   dclstd,
-  xmlrtl,
-  EmbeddedWebBrowser_XE;
+  xmlrtl;
 
 contains
   extshiftstate in 'comp\extshiftstate.pas',
@@ -59,10 +57,8 @@ contains
   PanelOverlapped in 'comp\PanelOverlapped.pas',
   StringGridEditControlled in 'comp\StringGridEditControlled.pas',
   BitmapEditor in 'comp\BitmapEditor.pas',
-  MSHTML_TLB in 'tlb\MSHTML_TLB.pas',
   FixedTrackbar in 'comp\FixedTrackbar.pas',
   KMDActions in 'comp\KMDActions.pas',
-  WebBrowserFocusMonitor in 'comp\WebBrowserFocusMonitor.pas',
   CleartypeDrawCharacter in 'general\CleartypeDrawCharacter.pas',
   OnScreenKeyboard in 'comp\OnScreenKeyboard.pas',
   KMDActionInterfaces in '..\..\developer\TIKE\actions\KMDActionInterfaces.pas',
@@ -70,7 +66,6 @@ contains
   exImageList in 'comp\exImageList.pas',
   KeymanTextEditorRichEdit in 'comp\KeymanTextEditorRichEdit.pas',
   usp10 in 'general\usp10.pas',
-  KeymanEmbeddedWB in 'comp\KeymanEmbeddedWB.pas',
   ErrorControlledRegistry in 'vcl\ErrorControlledRegistry.pas',
   CaptionPanel in 'comp\CaptionPanel.pas',
   OnScreenKeyboardData in 'visualkeyboard\OnScreenKeyboardData.pas',

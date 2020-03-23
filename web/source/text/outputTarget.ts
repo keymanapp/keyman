@@ -26,12 +26,12 @@ namespace com.keyman.text {
     readonly token: number;
     readonly keystroke: KeyEvent;
     readonly transform: Transform;
-    readonly alternates: Alternate[];
+    alternates: Alternate[]; // constructed after the rest of the transcription.
     readonly preInput: Mock;
 
     private static tokenSeed: number = 0;
 
-    constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
+    constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
       let token = this.token = Transcription.tokenSeed++;
 
       this.keystroke = keystroke;

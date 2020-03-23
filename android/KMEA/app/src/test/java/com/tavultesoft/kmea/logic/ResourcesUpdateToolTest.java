@@ -53,7 +53,7 @@ public class ResourcesUpdateToolTest {
   @Test
   public void shouldUpdateTrueCallTest() {
     Calendar _cal = GregorianCalendar.getInstance();
-    _cal.add(Calendar.DAY_OF_MONTH,-1);
+    _cal.add(Calendar.DAY_OF_MONTH,-2);
     _cal.add(Calendar.MINUTE,-1);
     setLastUpdatePref(_cal);
 

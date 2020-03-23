@@ -79,6 +79,10 @@ namespace com.keyman {
       if (Ltarg == null) {
         return true;
       }
+
+      if(Ltarg['body']) {
+        Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+      }
     
       // Prevent any action if a protected input field
       if(device.touchable && (Ltarg.className == null || Ltarg.className.indexOf('keymanweb-input') < 0)) {
@@ -92,6 +96,8 @@ namespace com.keyman {
         if(!(et == 'text' || et == 'search')) {
           return true;
         }
+      } else if(Ltarg.ownerDocument && Ltarg.ownerDocument.designMode == 'on') {
+        // continue; don't block this one!
       } else if((device.touchable || !Ltarg.isContentEditable) 
           && !(Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLTextAreaElement)) {
         return true;
@@ -190,6 +196,10 @@ namespace com.keyman {
         return true;
       }
 
+      if(Ltarg['body']) {
+        Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
+      }
+
       if(DOMEventHandlers.states._IgnoreBlurFocus) {
         // Prevent triggering other blur-handling events (as possible)
         e.cancelBubble = true;
@@ -209,6 +219,7 @@ namespace com.keyman {
         Ltarg = Ltarg.parentNode as HTMLElement;
       }
 
+      // TODO:  Needs tidy-up.
       if(Ltarg.ownerDocument) {
         if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
           Ltarg=Ltarg.contentWindow.document;
@@ -228,7 +239,7 @@ namespace com.keyman {
       
       var isActivating = this.keyman.uiManager.isActivating;
       if(!isActivating) {
-        this.keyman['interface'].notifyKeyboard(0, Ltarg, 0);  // I2187
+        this.keyman['interface'].notifyKeyboard(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
 
       //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
@@ -336,7 +347,7 @@ namespace com.keyman {
         if(target && text.Processor.getOutputTarget(target)) {
           text.Processor.getOutputTarget(target).deadkeys().clear();
         }
-        this.keyman['interface'].notifyKeyboard(0, target, 1);  // I2187
+        this.keyman['interface'].notifyKeyboard(0, text.Processor.getOutputTarget(target), 1);  // I2187
       }
     
       if(!uiManager.justActivated && DOMEventHandlers.states._SelectionControl != target) {
@@ -444,23 +455,23 @@ namespace com.keyman {
       if(Levent == null || !osk.ready) {
         return true;
       }
+      var inputEle = Levent.Ltarg.getElement();
 
       // Since this part concerns DOM element + browser interaction management, we preprocess it for
       // browser form commands before passing control to the Processor module.
       if(Levent.Lcode == 13) {
         var ignore = false;
-        if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(Levent.Ltarg instanceof inputEle.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
       
-        if(Levent.Ltarg.base && Levent.Ltarg.base instanceof Levent.Ltarg.base.ownerDocument.defaultView.HTMLTextAreaElement) {
+        if(inputEle.base && inputEle.base instanceof inputEle.base.ownerDocument.defaultView.HTMLTextAreaElement) {
           ignore = true;
         }
 
         if(!ignore) {
           // For input fields, move to next input element
-          if(Levent.Ltarg instanceof Levent.Ltarg.ownerDocument.defaultView.HTMLInputElement) {
-            var inputEle = Levent.Ltarg;
+          if(inputEle instanceof inputEle.ownerDocument.defaultView.HTMLInputElement) {
             if(inputEle.type == 'search' || inputEle.type == 'submit') {
               inputEle.form.submit();
             } else {

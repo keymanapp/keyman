@@ -122,10 +122,6 @@
             <Form>frmInstallOptions</Form>
         </DCCReference>
         <DCCReference Include="RunTools.pas"/>
-        <DCCReference Include="UfrmHTML.pas">
-            <Form>frmHTML</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\global\delphi\comp\KeymanEmbeddedWB.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="..\..\global\delphi\general\ShellUserRegistry.pas"/>
         <DCCReference Include="RegistryHelpers.pas"/>

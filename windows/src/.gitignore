@@ -23,14 +23,9 @@ engine/keyman64/Keyman64.res
 engine/keymanx64/keymanx64.res
 engine/mcompile/Release/
 
-# Version metadata
-version.txt
-buildtools/version.txt
-desktop/version.txt
-developer/version.txt
-engine/version.txt
-support/version.txt
-
 # These are built from corresponding manifest.in and version.in
 **/manifest.xml
 **/version.rc
+
+# Breakpad files generated for Sentry
+**/*.sym

@@ -159,7 +159,7 @@ public enum Migrations {
 
   static func updateResources(storage: Storage) {
     var lastVersion = engineVersion
-    if (lastVersion ?? Version.fallback) >= Version.current {
+    if (lastVersion ?? Version.fallback) >= Version.latestFeature {
       // We're either current or have just been downgraded; no need to do modify resources.
       // If it's a downgrade, it's near-certainly a testing environment.
       return
@@ -267,7 +267,7 @@ public enum Migrations {
     }
 
     // Store the version we just upgraded to.
-    storage.userDefaults.lastEngineVersion = Version.current
+    storage.userDefaults.lastEngineVersion = Version.latestFeature
   }
 
   static func migrateUserDefaultsToStructs(storage: Storage) {
@@ -383,7 +383,7 @@ public enum Migrations {
         continue
       }
       var urls = urlsForKeyboard[keyboard.id] ?? Set()
-      urls.insert(languageDir.appendingPathComponent("\(keyboard.id)-\(version.string).js"))
+      urls.insert(languageDir.appendingPathComponent("\(keyboard.id)-\(version.plainString).js"))
 
       let fontFiles = (keyboard.font?.source ?? []) + (keyboard.oskFont?.source ?? [])
       for file in fontFiles {
@@ -399,7 +399,7 @@ public enum Migrations {
         urls.insert(url)
       }
       urlsForKeyboard[keyboard.id] = urls
-      userKeyboards[i].version = version.string
+      userKeyboards[i].version = version.plainString
     }
 
     var successfulKeyboards: [String] = []

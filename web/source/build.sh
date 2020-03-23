@@ -56,7 +56,7 @@ EMBED_TARGET=( "keyman.js" )
 PREDICTIVE_TEXT_SOURCE="../../common/predictive-text/unit_tests/in_browser/resources/models/simple-trie.js"
 PREDICTIVE_TEXT_OUTPUT="../testing/prediction-ui/simple-en-trie.js"
 
-: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler}
+: ${CLOSURECOMPILERPATH:=../node_modules/google-closure-compiler-java}
 : ${JAVA:=java}
 
 minifier="$CLOSURECOMPILERPATH/compiler.jar"
@@ -72,7 +72,7 @@ minifier="$CLOSURECOMPILERPATH/compiler.jar"
 #
 # `jsDocMissingType` prevents errors on type documentation Closure thinks is missing.  TypeScript may not
 # have the same requirements, and we trust TypeScript over Closure.
-minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode"
+minifier_warnings="--jscomp_error=* --jscomp_off=lintChecks --jscomp_off=unusedLocalVariables --jscomp_off=globalThis --jscomp_off=checkTypes --jscomp_off=checkVars --jscomp_off=jsdocMissingType --jscomp_off=uselessCode --jscomp_off=missingRequire --jscomp_off=strictMissingRequire"
 
 # We use these to prevent Closure from auto-inserting its own polyfills.  Turns out, they can break in the 
 # WebView used by Android API 19, which our app still supports.
@@ -85,16 +85,18 @@ minifycmd="$JAVA -jar $minifier --compilation_level WHITESPACE_ONLY $minifier_wa
 readonly minifier
 readonly minifycmd
 
+minified_sourcemap_cleaner="../tools/sourcemap-root"
+
 # $1 - base file name
 # $2 - output path
 # $3 - optimization level
-# $4 - defines
+# $4 - extra path info to add to minified sourcemap "sourceRoot" property.
 # $5 - additional output wrapper
 minify ( ) {
     if [ "$4" ]; then
-        defines="--define $4"
+        cleanerOptions="--suffix $4"
     else
-        defines=
+        cleanerOptions=
     fi
 
     if [ "$5" ]; then
@@ -103,10 +105,26 @@ minify ( ) {
         wrapper="%output%"
     fi
 
-    $minifycmd $defines --source_map_input "$INTERMEDIATE/$1|$INTERMEDIATE/$1.map" \
-        --create_source_map $2/$1.map --js $INTERMEDIATE/$1 --compilation_level $3 \
-        --js_output_file $2/$1 --warning_level VERBOSE --output_wrapper "$wrapper
+    INPUT="$INTERMEDIATE/$1"
+    INPUT_SOURCEMAP="$INPUT.map"
+    OUTPUT="$2/$1"
+    OUTPUT_SOURCEMAP="$OUTPUT.map"
+
+    # --source_map_location_mapping - maps paths on INPUT source maps for consumption by Closure.
+    # ../../.. => keymanapp, ../.. => keymanapp/keyman.  We have TS root sources on 'keyman'.
+    $minifycmd --source_map_input "$INPUT|$INPUT_SOURCEMAP" \
+        --create_source_map "$OUTPUT_SOURCEMAP" --source_map_include_content \
+        --source_map_location_mapping "$INTERMEDIATE|../../.." \
+        --js "$INPUT" --compilation_level $3 \
+        --js_output_file "$OUTPUT" --warning_level VERBOSE --output_wrapper "$wrapper
 //# sourceMappingURL=$1.map"
+
+    # Now to clean the source map.
+    assert "$OUTPUT"
+    assert "$SOURCEMAP"
+
+    # "Clean" the minified output sourcemaps.
+    node $minified_sourcemap_cleaner "$INPUT_SOURCEMAP" "$OUTPUT_SOURCEMAP" $cleanerOptions
 }
 
 # $1 - target (WEB, EMBEDDED)
@@ -292,11 +310,18 @@ if [ $? -ne 0 ]; then
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 fi
 
-# NPM install is required for the file to be present.
-if ! [ -f $minifier ];
-then
-    echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
-    exit 1
+if [ $DO_MINIFY = true ]; then
+    # NPM install is required for the file to be present.
+    if ! [ -f $minifier ];
+    then
+        echo File $minifier does not exist:  have you set the environment variable \$CLOSURECOMPILERPATH?
+        exit 1
+    fi
+
+    # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
+    echo "Compiling build tools for minified build products"
+    $compiler --build "source/$minified_sourcemap_cleaner/tsconfig.json"
+    assert "$minified_sourcemap_cleaner/index.js"
 fi
 
 generate_environment_ts_file ( ) {
@@ -419,22 +444,22 @@ if [ $BUILD_UI = true ]; then
     if [ $DO_MINIFY = true ]; then
         echo Minify ToolBar UI
         del $WEB_OUTPUT/kmuitoolbar.js 2>/dev/null
-        minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
+        minify kmwuitoolbar.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuitoolbar.js
 
         echo Minify Toggle UI
         del $WEB_OUTPUT/kmuitoggle.js 2>/dev/null
-        minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
+        minify kmwuitoggle.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuitoggle.js
 
         echo Minify Float UI
         del $WEB_OUTPUT/kmuifloat.js 2>/dev/null
-        minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "" "(function() {%output%}());"
+        minify kmwuifloat.js $WEB_OUTPUT ADVANCED_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuifloat.js
 
         echo Minify Button UI
         del $WEB_OUTPUT/kmuibutton.js 2>/dev/null
-        minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "" "(function() {%output%}());"
+        minify kmwuibutton.js $WEB_OUTPUT SIMPLE_OPTIMIZATIONS "web/source/" "(function() {%output%}());"
         assert $WEB_OUTPUT/kmwuibutton.js
 
         echo "User interface modules compiled and saved under $WEB_OUTPUT"

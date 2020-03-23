@@ -124,23 +124,27 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   private var queueStack: [DownloadQueueFrame]
   
   private var downloader: HTTPDownloader?
-  private var reachability: Reachability!
+  private var reachability: Reachability?
   private let keymanHostName = "api.keyman.com"
   
   public init() {
-    reachability = Reachability(hostname: keymanHostName)
+    do {
+      try reachability = Reachability(hostname: keymanHostName)
+    } catch {
+      log.error("Could not start Reachability object: \(error)")
+    }
     
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
   }
   
   public func hasConnection() -> Bool {
-    return reachability.connection != Reachability.Connection.none
+    return reachability?.connection != Reachability.Connection.unavailable
   }
   
   // Might should add a "withNotification: Bool" option for clarity.
   public func canExecute(_ batch: DownloadBatch) -> Bool {
-    guard reachability.connection != Reachability.Connection.none else {
+    guard hasConnection() else {
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       downloadFailed(forBatch: batch, error: error)

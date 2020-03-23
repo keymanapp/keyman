@@ -488,7 +488,7 @@ namespace com.keyman.text {
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
-      Ltarg: keyman.domManager.getActiveElement(),
+      Ltarg: com.keyman.text.Processor.getOutputTarget(keyman.domManager.getActiveElement()),
       Lmodifiers: shift,
       vkCode: code,
       Lcode: code,

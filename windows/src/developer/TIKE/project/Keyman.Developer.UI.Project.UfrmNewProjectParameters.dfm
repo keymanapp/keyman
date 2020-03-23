@@ -225,11 +225,4 @@ inherited frmNewProjectParameters: TfrmNewProjectParameters
     TabOrder = 12
     OnChange = editKeyboardIDChange
   end
-  object dlgBrowse: TBrowse4Folder
-    Options = [OnlySelectFileSysDir, ShowEditBox, UseNewDialogStyle]
-    Root = Desktop
-    Title = 'Select folder to save project to'
-    Left = 56
-    Top = 168
-  end
 end

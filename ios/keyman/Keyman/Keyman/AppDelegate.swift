@@ -9,6 +9,7 @@
 import KeymanEngine
 import UIKit
 import WebKit
+import Sentry
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -47,6 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    SentryManager.start()
+
     #if DEBUG
       KeymanEngine.log.outputLevel = .debug
       log.outputLevel = .debug
@@ -55,6 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       KeymanEngine.log.outputLevel = .warning
       log.outputLevel = .warning
     #endif
+
     Manager.applicationGroupIdentifier = "group.KM4I"
     Manager.shared.openURL = UIApplication.shared.openURL
 

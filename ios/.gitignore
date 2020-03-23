@@ -15,3 +15,7 @@ engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/kmwosk.css
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman.js.map
 Keyman 2*
 Carthage
+
+# Explicitly ignores just the SWKeyboard scheme; testing against different
+# targets makes a lot of noise.
+**/SWKeyboard.scheme

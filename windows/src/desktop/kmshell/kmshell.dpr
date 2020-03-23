@@ -70,14 +70,12 @@ uses
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   UImportOlderVersionKeyboards in 'main\UImportOlderVersionKeyboards.pas',
   UImportOlderKeyboardUtils in 'main\UImportOlderKeyboardUtils.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
   DownloadLocale in 'install\DownloadLocale.pas',
-  WebSoundControl in '..\..\global\delphi\general\WebSoundControl.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UILanguages in 'util\UILanguages.pas',
   utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',
@@ -85,7 +83,6 @@ uses
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
   UImportOlderVersionKeyboards10 in 'main\UImportOlderVersionKeyboards10.pas',
-  MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   FixupLocaleDoctype in '..\..\global\delphi\general\FixupLocaleDoctype.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
@@ -96,7 +93,6 @@ uses
   MSXML2_TLB in '..\..\global\delphi\tlb\MSXML2_TLB.pas',
   VKeys in '..\..\global\delphi\general\VKeys.pas',
   ExtShiftState in '..\..\global\delphi\comp\ExtShiftState.pas',
-  KeymanEmbeddedWB in '..\..\global\delphi\comp\KeymanEmbeddedWB.pas',
   UImportOlderVersionSettings in 'main\UImportOlderVersionSettings.pas',
   KeymanMutex in '..\..\global\delphi\general\KeymanMutex.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
@@ -111,8 +107,6 @@ uses
   UfrmBaseKeyboard in 'main\UfrmBaseKeyboard.pas' {frmBaseKeyboard},
   UnicodeBlocks in '..\..\global\delphi\general\UnicodeBlocks.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
-  SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
-  EmbeddedWB in '..\..\ext\embeddedwb\Source\EmbeddedWB.pas',
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
   utilolepicture in '..\..\engine\kmcomapi\util\utilolepicture.pas',
@@ -135,7 +129,6 @@ uses
   utilfocusappwnd in 'util\utilfocusappwnd.pas',
   UImportOlderVersionKeyboards8 in 'main\UImportOlderVersionKeyboards8.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  utiljclexception in '..\..\global\delphi\general\utiljclexception.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   KeymanOptionNames in '..\..\global\delphi\general\KeymanOptionNames.pas',
@@ -158,18 +151,37 @@ uses
   UImportOlderVersionKeyboards9 in 'main\UImportOlderVersionKeyboards9.pas',
   Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
   UImportOlderVersionKeyboards9Plus in 'main\UImportOlderVersionKeyboards9Plus.pas',
-  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas';
+  Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas',
+  Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
+  Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas',
+  UfrmHelp in 'help\UfrmHelp.pas' {frmHelp},
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
 
 begin
-  CoInitFlags := COINIT_APARTMENTTHREADED;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
   try
-    Application.Initialize;
-    Run;
-  except
-    on E:Exception do KeymanHandleException(E);
+    CoInitFlags := COINIT_APARTMENTTHREADED;
+    FInitializeCEF := TCEFManager.Create;
+    try
+      if FInitializeCEF.Start then
+      try
+        Application.Initialize;
+        Run;
+      except
+        on E:Exception do
+          SentryHandleException(E);
+      end;
+    finally
+      FInitializeCEF.Free;
+    end;
+  finally
+    TKeymanSentryClient.Stop;
   end;
 end.
 

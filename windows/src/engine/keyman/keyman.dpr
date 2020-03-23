@@ -61,9 +61,7 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   VisualKeyboardParameters in '..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   utilxml in '..\..\global\delphi\general\utilxml.pas',
-  MSHTML_TLB in '..\..\global\delphi\tlb\MSHTML_TLB.pas',
   MSXML2_TLB in '..\..\global\delphi\tlb\MSXML2_TLB.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas',
   DCPcrypt2 in '..\..\global\delphi\crypt\DCPcrypt2.pas',
   DCPbase64 in '..\..\global\delphi\crypt\DCPbase64.pas',
   DCPconst in '..\..\global\delphi\crypt\DCPconst.pas',
@@ -73,21 +71,13 @@ uses
   HintConsts in '..\..\global\delphi\hints\HintConsts.pas',
   KeymanHints in 'KeymanHints.pas',
   UfrmKeymanBase in '..\..\global\delphi\ui\UfrmKeymanBase.pas' {frmKeymanBase: TTntForm},
-  UfrmWebContainer in '..\..\global\delphi\ui\UfrmWebContainer.pas' {frmWebContainer: TTntForm},
-  XMLRenderer in '..\..\global\delphi\ui\XMLRenderer.pas',
-  UfrmHint in '..\..\global\delphi\hints\UfrmHint.pas' {frmHint},
-  GenericXMLRenderer in '..\..\global\delphi\ui\GenericXMLRenderer.pas',
   Hints in '..\..\global\delphi\hints\Hints.pas',
-  UfrmHelp in 'UfrmHelp.pas' {frmHelp: TTntForm},
-  UfrmOSKKeyboardUsage in 'viskbd\UfrmOSKKeyboardUsage.pas' {frmOSKKeyboardUsage},
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   WideStringClass in '..\..\global\delphi\general\WideStringClass.pas',
-  WebBrowserManager in '..\..\global\delphi\comp\WebBrowserManager.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
-  WebSoundControl in '..\..\global\delphi\general\WebSoundControl.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
@@ -100,17 +90,14 @@ uses
   OnlineConstants in '..\..\global\delphi\productactivation\OnlineConstants.pas',
   LayeredFormUtils in '..\..\global\delphi\general\LayeredFormUtils.pas',
   UfrmOSKOnScreenKeyboard in 'viskbd\UfrmOSKOnScreenKeyboard.pas' {frmOSKOnScreenKeyboard},
-  KeymanEmbeddedWB in '..\..\global\delphi\comp\KeymanEmbeddedWB.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   UfrmVisualKeyboard in 'viskbd\UfrmVisualKeyboard.pas' {frmVisualKeyboard},
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
   MSXMLDomCreate in '..\..\global\delphi\general\MSXMLDomCreate.pas',
-  UfrmScriptError in '..\..\global\delphi\general\UfrmScriptError.pas' {frmScriptError},
   OnScreenKeyboardData in '..\..\global\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   Keyman.System.Util.RenderLanguageIcon in '..\..\global\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
-  SHDocVw in '..\..\global\delphi\vcl\SHDocVw.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
   GlobalKeyboardChangeManager in 'GlobalKeyboardChangeManager.pas',
   utilwow64 in '..\..\global\delphi\general\utilwow64.pas',
@@ -119,7 +106,6 @@ uses
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   KeymanDesktopShell in 'KeymanDesktopShell.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  utiljclexception in '..\..\global\delphi\general\utiljclexception.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   VisualKeyboardLoaderBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
@@ -141,7 +127,11 @@ uses
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas';
+  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas',
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
@@ -153,7 +143,10 @@ uses
 {$SETPEOPTFLAGS $140}
 
 begin
-  //InitTntEnvironment;
-  //ShowMessage('Start');
-  Run;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  try
+    Run;
+  finally
+    TKeymanSentryClient.Stop;
+  end;
 end.

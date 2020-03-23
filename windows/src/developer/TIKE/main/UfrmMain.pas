@@ -422,7 +422,7 @@ uses
   System.Win.ComObj,
   Vcl.Themes,
 
-  Keyman.Developer.System.CEFManager,
+  Keyman.System.CEFManager,
 
   CharMapDropTool,
   HTMLHelpViewer,

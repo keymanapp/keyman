@@ -9,9 +9,19 @@
 import Foundation
 
 /// Dotted-decimal version.
-public struct Version: Comparable {
+public class Version: NSObject, Comparable {
   public static let fallback = Version("1.0")!
-  public static let current = Version("13.0.65")!
+  public static let latestFeature = Version("13.0.65")!
+
+  public static var current: Version {
+    let engineInfo = Bundle(for: Manager.self).infoDictionary
+    return Version(engineInfo!["CFBundleVersion"] as! String)!
+  }
+
+  public static var currentTagged: Version {
+    let engineInfo = Bundle(for: Manager.self).infoDictionary
+    return Version(engineInfo!["KeymanVersionWithTag"] as! String)!
+  }
 
   // The Engine first started tracking the 'last loaded version' in 12.0.
   public static let freshInstall = Version("0.0")!
@@ -24,10 +34,16 @@ public struct Version: Comparable {
   public static let defaultsNeedBackup = Version("13.0.65")!
 
   private let components: [Int]
-  public let string: String
+  public let plainString: String
+  public let fullString: String
+  public let tier: String?
 
   public init?(_ string: String) {
-    let stringComponents = string.components(separatedBy: ".")
+    let tagComponents = string.components(separatedBy: "-")
+
+    plainString = tagComponents[0]
+    let stringComponents = tagComponents[0].components(separatedBy: ".")
+
     var components: [Int] = []
     for s in stringComponents {
       guard let i = Int(s), i >= 0 else {
@@ -36,8 +52,51 @@ public struct Version: Comparable {
       components.append(i)
     }
 
-    self.string = string
+    if tagComponents.count > 1 {
+      switch tagComponents[1] {
+        case "alpha":
+          fallthrough
+        case "beta":
+          fallthrough
+        case "stable":
+          tier = tagComponents[1]
+        default:
+          tier = nil
+      }
+    } else {
+      tier = nil
+    }
+
+    self.fullString = string
     self.components = components
+  }
+
+  public init?(_ components: [Int], tier: String? = nil) {
+    if components.count == 0 {
+      return nil
+    }
+
+    var string = ""
+
+    for i in components {
+      guard i >= 0 else {
+        return nil
+      }
+
+      let dot = (string == "" ? "" : ".")
+      string = "\(string)\(dot)\(i)"
+    }
+
+    self.plainString = string
+
+    if let tier = tier {
+      fullString = "\(plainString)-\(tier)"
+    } else {
+      fullString = plainString
+    }
+
+    self.components = components  // Swift arrays are value types, not reference types!
+    self.tier = tier
   }
 
   public static func <(lhs: Version, rhs: Version) -> Bool {
@@ -55,12 +114,26 @@ public struct Version: Comparable {
     return false
   }
 
+  /**
+   * Checks for version equality, disregarding any metadata tagging.
+   *
+   * (For example, 12.3.45 beta is considered equal to 12.3.45 stable.)
+   */
   public static func ==(lhs: Version, rhs: Version) -> Bool {
     return lhs.components == rhs.components
   }
 
-  // For nice logging output.
-  public var description: String {
-    return self.string
+  // For nice logging output & debugger visibility.
+  public override var description: String {
+    return self.fullString
+  }
+
+  public var majorMinor: Version {
+    if(self.components.count >= 2) {
+      return Version([self.components[0], self.components[1]], tier: tier)!
+    } else {
+      // If we somehow have just a major version, append a simple '0'.
+      return Version([self.components[0], 0], tier: tier)!
+    }
   }
 }

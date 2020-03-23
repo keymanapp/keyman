@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
+import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,16 +21,27 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 
+import io.sentry.android.core.SentryAndroid;
+import io.sentry.core.Sentry;
+
 public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
 
     private View inputView = null;
     private KMHardwareKeyboardInterpreter interpreter = null;
+
+    private static final String TAG = "SystemKeyboard";
 
     /** Main initialization of the input method component. Be sure to call
      * to super class. */
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (!Sentry.isEnabled()) {
+            Log.d(TAG, "Initializing Sentry");
+            SentryAndroid.init(getApplicationContext());
+        }
+
         KMManager.setDebugMode(false); // *** TO DO: Disable/delete before publishing a new release ***
         KMManager.addKeyboardEventListener(this);
         KMManager.setCanAddNewKeyboard(false);

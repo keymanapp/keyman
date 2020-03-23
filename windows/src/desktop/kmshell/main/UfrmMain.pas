@@ -1,18 +1,18 @@
 (*
   Name:             UfrmMain
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    23 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Rework as HTML interface
                     30 Aug 2006 - mcdurdin - Use Unicode strings for command parameters
@@ -21,7 +21,7 @@
                     06 Oct 2006 - mcdurdin - Refactor web browser into parent class
                     06 Oct 2006 - mcdurdin - Save activate page state and reload
                     06 Oct 2006 - mcdurdin - Add download keyboard
-                    04 Dec 2006 - mcdurdin - Use TfrmWebContainer;
+                    04 Dec 2006 - mcdurdin - Use T-frmWebContainer;
                     04 Dec 2006 - mcdurdin - Add keyboard_download, package_welcome, footer_buy, select_uilanguage
                     05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
                     05 Dec 2006 - mcdurdin - Localize additional messages
@@ -48,7 +48,7 @@
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
                     22 Oct 2010 - mcdurdin - Integrate purchase wizard into main form
                     05 Nov 2010 - mcdurdin - I2530 - Getting Started link in Configuration is broken
-                    17 Dec 2010 - mcdurdin - I2570 - Upgrade EmbeddedWB (also I2393)
+                    17 Dec 2010 - mcdurdin - I2570 - Upgrade E-mbeddedWB (also I2393)
                     18 Feb 2011 - mcdurdin - I2721 - Override Javascript-disabled security for web controls
                     28 Feb 2011 - mcdurdin - I2720 - Prevent multiple instances of Keyman Configuration
                     28 Feb 2011 - mcdurdin - I2539 - After activation, Keyman Configuration does not refresh its buttons
@@ -74,10 +74,9 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
-  keymanapi_TLB, UfrmKeymanBase, OleCtrls, SHDocVw, EmbeddedWB,
-  MSHTML_TLB, UfrmWebContainer,
-  XMLRenderer, SHDocVw_EWB, EwbCore,
-  KeymanEmbeddedWB;
+  keymanapi_TLB, UfrmKeymanBase,
+  UfrmWebContainer,
+  XMLRenderer;
 
 type
   TfrmMain = class(TfrmWebContainer)
@@ -188,7 +187,6 @@ uses
   StrUtils,
   SupportXMLRenderer,
   UfrmChangeHotkey,
-  ExternalExceptionHandler,
   UfrmHTML,
   UfrmInstallKeyboard,
   UfrmInstallKeyboardFromWeb,
@@ -218,8 +216,10 @@ procedure TfrmMain.TntFormCreate(Sender: TObject);
 begin
   inherited;
 
+  // Prevents keep-in-touch opening in browser
+  cef.ShouldOpenRemoteUrlsInBrowser := False;
+
   kmcom.AutoApply := False;
-  web.UserInterfaceOptions := web.UserInterfaceOptions + [EnableThemes];
 
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -867,10 +867,9 @@ begin
 end;
 
 procedure TfrmMain.SaveState;
-var
-  elem: IHTMLElement;
 begin
-  try
+{$MESSAGE HINT 'TODO: Save state support'}
+  {try  TODO: save state
     if Assigned(web.Document) then
     begin
       elem:= (web.Document as IHTMLDocument3).getElementById('state');
@@ -880,7 +879,7 @@ begin
     end;
   except
     FState := '';
-  end;
+  end;}
 end;
 
 class function TfrmMain.ShouldRegisterWindow: Boolean; // I2720
