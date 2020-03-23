@@ -5,8 +5,7 @@
 !include ..\..\Defines.mak
 
 build: version.res manifest.res icons xml
-    $(MKVER_U) localedef.dtd.in xml\localedef.dtd $(MKVER_VERSION_TXT)
-    $(PROGRAM)\buildtools\mkver -v $(MKVER_VERSION_TXT)
+    $(MKVER_U) localedef.dtd.in xml\localedef.dtd
     $(DCC32) kmshell.dpr
     $(TDS2DBG) kmshell.exe
     $(SENTRYTOOL_DELPHIPREP) kmshell.exe -dpr kmshell.dpr

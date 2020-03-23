@@ -1,6 +1,3 @@
-PRODUCTVERSION	$VERSIONNUM
-FILEFLAGS		0x0L
-
 VALUE "CompanyName", "SIL International\0"
 VALUE "LegalCopyright", "© SIL International\0"
 VALUE "LegalTrademarks", "Keyman is a registered trademark of SIL International\0"

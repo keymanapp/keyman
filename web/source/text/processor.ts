@@ -2,6 +2,8 @@
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
 /// <reference path="keyEvent.ts" />
+// Defines the RuleBehavior keyboard-processing return object.
+/// <reference path="ruleBehavior.ts" />
 // Defines default key handling behaviors.
 /// <reference path="defaultOutput.ts" />
 
@@ -69,22 +71,17 @@ namespace com.keyman.text {
      * where and when appropriate.
      *
      * @param   {object}  Lkc  The pre-analyzed key event object
-     * @param   {number}  keyShiftState
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): RuleBehavior {
+    defaultRuleBehavior(Lkc: KeyEvent, usingOSK: boolean): RuleBehavior {
       let outputTarget = Lkc.Ltarg;
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
 
-      // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if (keyShiftState == Codes.modifierCodes['SHIFT']) {
-        keyShiftState = 1; // It's used as an index in some called methods.
-      }
-
       let matched = false;
       var char = '';
+      var special: EmulationKeystrokes;
       if(usingOSK || outputTarget.isSynthetic) {
         matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                          // if no match occurs.
@@ -95,22 +92,23 @@ namespace com.keyman.text {
 
           // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
           // to emulate default behavior here.
-        } else if(char = DefaultOutput.forSpecialEmulation(Lkc)) { 
-          switch(char) {
-            case '\b':
+        } else if(special = DefaultOutput.forSpecialEmulation(Lkc)) { 
+          switch(special) {
+            case EmulationKeystrokes.Backspace:
               this.keyboardInterface.defaultBackspace(outputTarget);
               break;
-            case '\n':
+            case EmulationKeystrokes.Enter:
               outputTarget.handleNewlineAtCaret();
               break;
-            case ' ':
+            case EmulationKeystrokes.Space:
               this.keyboardInterface.output(0, outputTarget, ' ');
               break;
             // case '\u007f': // K_DEL
               // // For (possible) future implementation.
               // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
             default:
-              ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + char.kmwCharCodeAt(0).toString(16) + ") went unhandled!";
+              // In case we extend the allowed set, but forget to implement its handling case above.
+              ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
           } 
         } else {
           // Back to the standard default, pending normal matching.
@@ -121,9 +119,15 @@ namespace com.keyman.text {
       let isMnemonic = this.activeKeyboard && this.activeKeyboard['KM'];
 
       if(!matched) {
-        if(char = DefaultOutput.forAny(Lkc, keyShiftState, isMnemonic)) {
-          if(char == '\b') { // physical keystrokes.
-            this.keyboardInterface.defaultBackspace(outputTarget);
+        if(char = DefaultOutput.forAny(Lkc, isMnemonic)) {
+          special = DefaultOutput.forSpecialEmulation(Lkc)
+          if(special == EmulationKeystrokes.Backspace) {
+            // A browser's default backspace may fail to delete both parts of an SMP character.
+            this.keyboardInterface.defaultBackspace();
+          } else if(special) {
+            // We only do the "for special emulation" cases under the condition above... aside from backspace
+            // Let the browser handle those.
+            return null;
           } else {
             this.keyboardInterface.output(0, outputTarget, char);
           }
@@ -272,6 +276,14 @@ namespace com.keyman.text {
 
       // Pass this key code and state to the keyboard program
       if(this.activeKeyboard && keyEvent.Lcode != 0) {
+        /*
+         * The `this.installInterface()` call is insurance against something I've seen in unit tests when things break a bit.
+         *
+         * Currently, when a KMW shutdown doesn't go through properly or completely, sometimes we end up with parallel
+         * versions of KMW running, and an old, partially-shutdown one will "snipe" a command meant for the most-recent 
+         * one's test. So, installing here ensures that the active Processor has its matching KeyboardInterface ready, 
+         * even should that occur.
+         */
         this.installInterface();
         matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
@@ -287,7 +299,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        matchBehavior = this.defaultRuleBehavior(keyEvent, keyEvent.Lmodifiers, fromOSK);
+        matchBehavior = this.defaultRuleBehavior(keyEvent, fromOSK);
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -433,43 +445,9 @@ namespace com.keyman.text {
           }
         }
 
-        // - start:  application of 'delayed' effects specified by RuleBehaviors -
-
-        if(ruleBehavior.beep) {
-          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-          //        We're still referencing the DOM, even if only the manager object.  (It's an improvement, at least.)
-          keyman.domManager.doBeep(outputTarget);
-        }
-
-        for(let storeID in ruleBehavior.setStore) {
-          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-          //        `Processor` shouldn't be directly setting anything on the OSK when the refactor is complete.
-          
-          // How would this be handled in an eventual headless mode?
-          switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
-            case KeyboardInterface.TSS_LAYER:
-              keyman.osk.vkbd.showLayer(ruleBehavior.setStore[storeID]); //Build 350, osk reference now OK, so should work
-              break;
-            case KeyboardInterface.TSS_PLATFORM:
-              console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
-              break;
-            default:
-              console.warn("Unknown store affected by keyboard rule: " + storeID);
-          }
-        }
-
-        if(ruleBehavior.triggersDefaultCommand) {
-          let keyEvent = ruleBehavior.transcription.keystroke;
-          DefaultOutput.applyCommand(keyEvent, keyEvent.Lmodifiers);
-        }
-
-        if(ruleBehavior.warningLog) {
-          console.warn(ruleBehavior.warningLog);
-        } else if(ruleBehavior.errorLog) {
-          console.error(ruleBehavior.errorLog);
-        }
-
-        // - end section
+        // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
+        // by the actual keystroke occur.
+        ruleBehavior.finalize();
 
         // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
         //
@@ -495,10 +473,10 @@ namespace com.keyman.text {
           keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
         }
 
-        // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
-        // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
-        if(outputTarget.getElement()) {
-          this.keyboardInterface.doInputEvent(outputTarget.getElement());
+        // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
+        if(!ruleBehavior.triggersDefaultCommand) {
+          // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
+          outputTarget.doInputEvent();
         }
 
         this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
@@ -586,7 +564,8 @@ namespace com.keyman.text {
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
-        var mappedChar: string = DefaultOutput.forAny(mappingEvent, (shifted ? 0x10 : 0), false);
+        mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
+        var mappedChar: string = DefaultOutput.forAny(mappingEvent, true);
         
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.

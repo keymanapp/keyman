@@ -153,5 +153,9 @@ namespace com.keyman.dom {
     handleNewlineAtCaret(): void {
       this.insertTextBeforeCaret('\n');
     }
+
+    doInputEvent() {
+      this.dispatchInputEventOn(this.root);
+    }
   }
 }

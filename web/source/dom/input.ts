@@ -162,5 +162,9 @@ namespace com.keyman.dom {
         }
       }
     }
+
+    doInputEvent() {
+      this.dispatchInputEventOn(this.root);
+    }
   }
 }

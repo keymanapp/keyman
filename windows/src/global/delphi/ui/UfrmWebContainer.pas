@@ -112,7 +112,6 @@ uses
 
   custinterfaces,
   ErrorControlledRegistry,
-  ExternalExceptionHandler,
   kmint,
   UILanguages,
   UfrmScriptError,
