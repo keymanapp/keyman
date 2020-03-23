@@ -254,6 +254,14 @@ namespace com.keyman.text {
 
       // Pass this key code and state to the keyboard program
       if(activeKeyboard && keyEvent.Lcode != 0) {
+        /*
+         * The `this.installInterface()` call is insurance against something I've seen in unit tests when things break a bit.
+         *
+         * Currently, when a KMW shutdown doesn't go through properly or completely, sometimes we end up with parallel
+         * versions of KMW running, and an old, partially-shutdown one will "snipe" a command meant for the most-recent 
+         * one's test. So, installing here ensures that the active Processor has its matching KeyboardInterface ready, 
+         * even should that occur.
+         */
         this.installInterface();
         matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
       }
