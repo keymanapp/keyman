@@ -20,8 +20,7 @@ if(!window['keyman']['initialized']) {
   {
 
     // Declare KeymanWeb, OnScreen Keyboard and Util object variables
-    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'], device=util.device;
-    var kbdInterface=keymanweb['interface'];
+    var keymanweb=window['keyman'],util=keymanweb['util'];
 
     /**
      * Function     debug
@@ -130,7 +129,7 @@ if(!window['keyman']['initialized']) {
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);  
 
     // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    keymanweb['pageFocusHandler'] = keymanweb.interface.resetVKShift.bind(keymanweb.interface);
+    keymanweb['pageFocusHandler'] = keymanweb.textProcessor.keyboardInterface.resetVKShift.bind(keymanweb.textProcessor.keyboardInterface);
     util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
     

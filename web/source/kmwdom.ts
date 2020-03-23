@@ -152,7 +152,7 @@ namespace com.keyman {
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
     beepReset(): void {
-      com.keyman.singleton.interface.resetContextCache();
+      com.keyman.singleton.textProcessor.keyboardInterface.resetContextCache();
 
       var Lbo;
       this._BeepTimeout = 0;
@@ -1272,7 +1272,7 @@ namespace com.keyman {
 
       // No need to reset context if we stay within the same element.
       if(DOMEventHandlers.states.activeElement != e) {
-        this.keyman.interface.resetContext();
+        this.keyman.textProcessor.keyboardInterface.resetContext();
       }
 
       DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
