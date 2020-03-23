@@ -2,6 +2,8 @@
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
 /// <reference path="keyEvent.ts" />
+// Defines default key handling behaviors.
+/// <reference path="defaultOutput.ts" />
 
 namespace com.keyman.text {
   export class LegacyKeyEvent {
@@ -28,172 +30,92 @@ namespace com.keyman.text {
     // Denotes whether or not KMW needs to 'swallow' the next keypress.
     swallowKeypress: boolean = false;
 
-
     /**
-     * Get the default key string. If keyName is U_xxxxxx, use that Unicode codepoint.
-     * Otherwise, lookup the  virtual key code (physical keyboard mapping)
+     * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
+     * where and when appropriate.
      *
      * @param   {object}  Lkc  The pre-analyzed key event object
      * @param   {number}  keyShiftState
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultKeyOutput(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): string {
-      let keyName = Lkc.kName;
-      let n = Lkc.Lcode;
-      let outputTarget = Lkc.Ltarg;
-
+    defaultRuleBehavior(Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
-      let domManager = keyman.domManager;
-      let activeKeyboard = keyman.keyboardManager.activeKeyboard;
 
-      let quiet = outputTarget instanceof Mock;
+      let outputTarget = Lkc.Ltarg;
+      let preInput = Mock.from(outputTarget);
+      let ruleBehavior = new RuleBehavior();
 
-      var ch = '', checkCodes = false;
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if(keyShiftState == 0) {
-        checkCodes = true;
-      } else if (keyShiftState == Codes.modifierCodes['SHIFT']) {
-        checkCodes = true; 
-        keyShiftState = 1; // It's used as an index.
-      } else {
-        if(!quiet) {
-          console.warn("KMW only defines default key output for the 'default' and 'shift' layers!");
-        }
+      if (keyShiftState == Codes.modifierCodes['SHIFT']) {
+        keyShiftState = 1; // It's used as an index in some called methods.
       }
 
-      // If this was triggered by the OSK -or- if it was triggered by a 'synthetic' OutputTarget (TouchAlias, Mock)
-      // that lacks default key processing behavior.
+      let matched = false;
+      var char = '';
+      var special: EmulationKeystrokes;
       if(usingOSK || outputTarget.isSynthetic) {
-        var code = Codes.keyCodes[keyName];
-        if(!code) {
-          code = n;
-        }
+        matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
+                         // if no match occurs.
 
-        switch(code) {
-          case Codes.keyCodes['K_BKSP']:  //Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-            if(quiet) {
-              // TODO:  Remove need for this clause via refactoring.  It's currently needed for predictive text Mocks.
-              return '\b'; // the escape sequence for backspace.
-            } else {
+        if(DefaultOutput.isCommand(Lkc)) {
+          // Note this in the rule behavior, return successfully.  We'll consider applying it later.
+          ruleBehavior.triggersDefaultCommand = true;
+
+          // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
+          // to emulate default behavior here.
+        } else if(special = DefaultOutput.forSpecialEmulation(Lkc)) { 
+          switch(special) {
+            case EmulationKeystrokes.Backspace:
               keyman.interface.defaultBackspace(outputTarget);
-            }
-            return '';
-          case Codes.keyCodes['K_TAB']:
-            if(!quiet) {
-              domManager.moveToNext(keyShiftState);
-            }
-            break;
-          case Codes.keyCodes['K_TABBACK']:
-            if(!quiet) {
-              domManager.moveToNext(true);
-            }
-            break;
-          case Codes.keyCodes['K_TABFWD']:
-            if(!quiet) {
-              domManager.moveToNext(false);
-            }
-            break;
-          case Codes.keyCodes['K_ENTER']:
-            outputTarget.handleNewlineAtCaret();
-
-            return '\n';  // We still return this, as it ensures we generate a rule-match.
-          case Codes.keyCodes['K_SPACE']:
-            return ' ';
-          // break;
-          //
-          // // Problem:  clusters, and doing them right.
-          // // The commented-out code below should be a decent starting point, but clusters make it complex.
-          //
-          // case VisualKeyboard.keyCodes['K_LEFT']:
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos - 1 >= 0 ? caretPos - 1 : 0);
-          //   }
-          //   break;
-          // case VisualKeyboard.keyCodes['K_RIGHT']:
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-          //   }
-          //   if(code == VisualKeyboard.keyCodes['K_RIGHT']) {
-          //     break;
-          //   }
-          // // Should we include this?  It could be tricky to do correctly...
-          // case VisualKeyboard.keyCodes['K_DEL']:
-          //   // Move caret right one unit, then backspace.
-          //   if(touchAlias) {
-          //     var caretPos = keymanweb.getTextCaret(Lelem);
-          //     keymanweb.setTextCaret(Lelem, caretPos + 1);
-          //     if(caretPos == keymanweb.getTextCaret(Lelem)) {
-          //       // Failed to move right - there's nothing to delete.
-          //       break;
-          //     }
-          //     kbdInterface.defaultBackspace();
-          //   }
-        }
-
-        // Only desktop UI, not touch devices. TODO: add repeat while mouse down for desktop UI
-        //
-        // Can easily occur from mnemonic keyboards, which create synthetic events without
-        // the appropriate kName value.
-        //
-        // Not strictly if `Lkc.vkCode` is properly maintained, but it's good to have an
-        // extra safety; this would have blocked the backspace bug as well.
-      } else if(Lkc.Lcode == 8) {
-        keyman.interface.defaultBackspace();
-        return '';
-      }
-
-      // Translate numpad keystrokes into their non-numpad equivalents
-      if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {
-        // Number pad, numlock on
-        if(Lkc.Lcode < 106) {
-          var Lch = Lkc.Lcode-48;
+              break;
+            case EmulationKeystrokes.Enter:
+              outputTarget.handleNewlineAtCaret();
+              break;
+            case EmulationKeystrokes.Space:
+              keyman.interface.output(0, outputTarget, ' ');
+              break;
+            // case '\u007f': // K_DEL
+              // // For (possible) future implementation.
+              // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
+            default:
+              // In case we extend the allowed set, but forget to implement its handling case above.
+              ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
+          } 
         } else {
-          Lch = Lkc.Lcode-64;
+          // Back to the standard default, pending normal matching.
+          matched = false;
         }
-        ch = String._kmwFromCharCode(Lch); //I3319
-        return ch;
       }
 
-      // TODO:  Refactor the overloading of the 'n' parameter here into separate methods.
-
-      // Test for fall back to U_xxxxxx key id
-      // For this first test, we ignore the keyCode and use the keyName
-      if(keyName && keyName.substr(0,2) == 'U_') {
-        var codePoint = parseInt(keyName.substr(2,6), 16);
-        if (((0x0 <= codePoint) && (codePoint <= 0x1F)) || ((0x80 <= codePoint) && (codePoint <= 0x9F))) {
-          // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
-          // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
-          if(!quiet) {
-            console.log("Suppressing Unicode control code: U_00" + codePoint.toString(16));
+      if(!matched) {
+        if(char = DefaultOutput.forAny(Lkc, keyShiftState)) {
+          special = DefaultOutput.forSpecialEmulation(Lkc)
+          if(special == EmulationKeystrokes.Backspace) {
+            // A browser's default backspace may fail to delete both parts of an SMP character.
+            keyman.interface.defaultBackspace();
+          } else {
+            // We only do the "for special emulation" cases under the condition above... aside from backspace
+            // Let the browser handle those.
+            return null;
           }
-          return ch;
+
+          keyman.interface.output(0, outputTarget, char);
         } else {
-          // String.fromCharCode() is inadequate to handle the entire range of Unicode
-          // Someday after upgrading to ES2015, can use String.fromCodePoint()
-          ch=String.kmwFromCharCode(codePoint);
-        }
-        // Hereafter, we refer to keyCodes.
-      } else if(checkCodes) { // keyShiftState can only be '1' or '2'.
-        try {
-          if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
-            ch = Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
-          } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
-            ch = String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
-          } else if(n >= Codes.keyCodes['K_COLON'] && n <= Codes.keyCodes['K_BKQUOTE']) {
-            ch = Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
-          } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
-            ch = Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
-          }
-        } catch (e) {
-          if(!quiet) {
-            console.error("Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default'));
-          }
+          // No match, no default RuleBehavior.
+          return null;
         }
       }
-      return ch;
+
+      // Shortcut things immediately if there were issues generating this rule behavior.
+      if(ruleBehavior.errorLog) {
+        return ruleBehavior;
+      }
+
+      let transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc);
+      ruleBehavior.transcription = transcription;
+
+      return ruleBehavior;
     }
 
     static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
@@ -338,23 +260,12 @@ namespace com.keyman.text {
         // Handle unmapped keys, including special keys
         // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
         kbdInterface.activeTargetOutput = outputTarget;
-        let preInput = Mock.from(outputTarget);
 
-        var ch = this.defaultKeyOutput(keyEvent, keyEvent.Lmodifiers, fromOSK);
+        // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
+        // Many keyboards rely upon these 'implied rules'.
+        matchBehavior = this.defaultRuleBehavior(keyEvent, keyEvent.Lmodifiers, fromOSK);
+
         kbdInterface.activeTargetOutput = null;
-        if(ch) {
-          if(ch == '\b') { // Is only returned when disableDOM is true, which prevents automatic default backspace application.
-            // defaultKeyOutput can't always find the outputTarget if we're working with alternates!
-            kbdInterface.defaultBackspace(outputTarget);
-          } else if(ch != '\n') { // \n is handled automatically now.
-            kbdInterface.output(0, outputTarget, ch);
-          }
-          matchBehavior = new RuleBehavior();
-          matchBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keyEvent);
-        } else if(keyEvent.Lcode == 8) { // Backspace
-          matchBehavior = new RuleBehavior();
-          matchBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keyEvent);
-        }
       }
 
       return matchBehavior;
@@ -462,37 +373,43 @@ namespace com.keyman.text {
       if(ruleBehavior != null) {
         let alternates: Alternate[];
 
-        // Note - we don't yet do fat-fingering with longpress keys.
-        if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
-          let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
-          alternates = [];
-  
-          for(let pair of keyEvent.keyDistribution) {
-            let mock = Mock.from(preInputMock);
-            
-            let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
-            if(!altKey) {
-              console.warn("Potential fat-finger key could not be found in layer!");
-              continue;
-            }
+        // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
+        // Also, don't do fat-finger stuff if predictive text isn't enabled.
+        if(keyman.modelManager.enabled && !ruleBehavior.triggersDefaultCommand) {
+          // Note - we don't yet do fat-fingering with longpress keys.
+          if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
+            let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
+            alternates = [];
+    
+            for(let pair of keyEvent.keyDistribution) {
+              let mock = Mock.from(preInputMock);
+              
+              let altKey = activeLayout.getLayer(keyEvent.kbdLayer).getKey(pair.keyId);
+              if(!altKey) {
+                console.warn("Potential fat-finger key could not be found in layer!");
+                continue;
+              }
 
-            let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
-            altEvent.Ltarg = mock;
-            let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK);
-            if(alternateBehavior) {
-              // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
-              //       so a user should never have intended to type it.  Should probably renormalize 
-              //       the distribution afterward, though...
-              
-              let transform: Transform = alternateBehavior.transcription.transform;
-              
-              // Ensure that the alternate's token id matches that of the current keystroke, as we only
-              // record the matched rule's context (since they match)
-              transform.id = ruleBehavior.transcription.token;
-              alternates.push({sample: transform, 'p': pair.p});
+              let altEvent = this._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
+              altEvent.Ltarg = mock;
+              let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK);
+              if(alternateBehavior) {
+                // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
+                //       so a user should never have intended to type it.  Should probably renormalize 
+                //       the distribution afterward, though...
+                
+                let transform: Transform = alternateBehavior.transcription.transform;
+                
+                // Ensure that the alternate's token id matches that of the current keystroke, as we only
+                // record the matched rule's context (since they match)
+                transform.id = ruleBehavior.transcription.token;
+                alternates.push({sample: transform, 'p': pair.p});
+              }
             }
           }
         }
+
+        // - start:  application of 'delayed' effects specified by RuleBehaviors -
 
         if(ruleBehavior.beep) {
           // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
@@ -517,6 +434,19 @@ namespace com.keyman.text {
           }
         }
 
+        if(ruleBehavior.triggersDefaultCommand) {
+          let keyEvent = ruleBehavior.transcription.keystroke;
+          DefaultOutput.applyCommand(keyEvent, keyEvent.Lmodifiers);
+        }
+
+        if(ruleBehavior.warningLog) {
+          console.warn(ruleBehavior.warningLog);
+        } else if(ruleBehavior.errorLog) {
+          console.error(ruleBehavior.errorLog);
+        }
+
+        // - end section
+
         // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
         //
         // TODO:  This check should be done IN a dom module, not here in web-core space.  This place is closer 
@@ -532,6 +462,7 @@ namespace com.keyman.text {
         
         // Notify the ModelManager of new input - it's predictive text time!
         ruleBehavior.transcription.alternates = alternates;
+        // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
         keyman.modelManager.predict(ruleBehavior.transcription);
 
         // KMEA and KMEI (embedded mode) use direct insertion of the character string
@@ -631,7 +562,7 @@ namespace com.keyman.text {
         // the actual keyname instead.
         mappingEvent.kName = 'K_xxxx';
         mappingEvent.Ltarg = new Mock(); // helps prevent breakage for mnemonics.
-        var mappedChar: string = this.defaultKeyOutput(mappingEvent, (shifted ? 0x10 : 0), false);
+        var mappedChar: string = DefaultOutput.forAny(mappingEvent, (shifted ? 0x10 : 0));
         
         /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
          * rules, but allows us to replicate/emulate commands after rule processing if needed.
