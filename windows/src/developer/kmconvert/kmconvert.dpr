@@ -83,17 +83,27 @@ uses
   CompileErrorCodes in '..\..\global\delphi\general\CompileErrorCodes.pas',
   Keyman.Developer.System.ModelProjectTemplate in 'Keyman.Developer.System.ModelProjectTemplate.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
-  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas';
+  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Console in '..\..\ext\sentry\Sentry.Client.Console.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';
 
 {$R icons.RES}
 {$R version.res}
 {$R manifest.res}
 
 begin
+  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper);
   try
-    Run;
-  except
-    on E: Exception do
-      Writeln(E.ClassName, ': ', E.Message);
+    try
+      Run;
+    except
+      on E: Exception do
+        SentryHandleException(E);
+    end;
+  finally
+    TKeymanSentryClient.Stop;
   end;
 end.

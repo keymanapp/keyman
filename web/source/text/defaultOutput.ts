@@ -4,6 +4,12 @@
 /// <reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
+  export enum EmulationKeystrokes {
+    Space = ' ',
+    Enter = '\n',
+    Backspace = '\b'
+  }
+
   /**
    * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
    */
@@ -12,22 +18,14 @@ namespace com.keyman.text {
     }
 
     static codeForEvent(Lkc: KeyEvent) {
-      let keyName = Lkc.kName;
-      let n = Lkc.Lcode;
-
-      var code = Codes.keyCodes[keyName];
-      if(!code) {
-        code = n;
-      }
-
-      return code;
+      return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;;
     }
 
     /**
      * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
      * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
      */
-    public static forAny(Lkc: KeyEvent, shiftState: number) {
+    public static forAny(Lkc: KeyEvent) {
       var char = '';
 
       let code = DefaultOutput.codeForEvent(Lkc);
@@ -39,21 +37,21 @@ namespace com.keyman.text {
         return char;
       } else if(char = DefaultOutput.forUnicodeKeynames(Lkc)) {
         return char;
-      } else if(char = DefaultOutput.forBaseKeys(Lkc, shiftState)) {
+      } else if(char = DefaultOutput.forBaseKeys(Lkc)) {
         return char;
       } else {
         // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
         // // Not originally defined for text output within defaultKeyOutput.
         // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
         // // than rely on the browser-default handling.
-        // switch(code) {
+        switch(code) {
         //   case Codes.keyCodes['K_TAB']:
         //   case Codes.keyCodes['K_TABBACK']:
         //   case Codes.keyCodes['K_TABFWD']:
         //     return '\t';
-        //   default:
-        //     return '';
-        // }
+          default:
+           return '';
+        }
       }
     }
 
@@ -71,7 +69,7 @@ namespace com.keyman.text {
     }
 
     /**
-     * forCommands - returns a boolean indicating if a non-text event should be triggered by the keystroke.
+     * isCommand - returns a boolean indicating if a non-text event should be triggered by the keystroke.
      */
     public static isCommand(Lkc: KeyEvent): boolean {
       let code = DefaultOutput.codeForEvent(Lkc);
@@ -91,22 +89,16 @@ namespace com.keyman.text {
      * It would then be assigned to this class via classic JS method extension practices as an 'override'
      * of `applyCommand`, reusing the base version of that name seen in this class, which is
      * designed for web-core.
-     */
-    /**
-     * This function is designed for future migration into a separate, explicitly-DOM-aware module.
-     * It would then be assigned to this class via classic JS method extension practices as an 'override'
-     * of `applyCommand`, reusing the base version of that name seen in this class, which is
-     * designed for web-core.
      * 
-     * for___Commands - returns boolean indicating if a non-text event should be triggered by the keystroke.
+     * apply___Command - used when a RuleBehavior represents a non-text "command" within the Engine.
      */
-    public static applyDOMCommand(Lkc: KeyEvent, keyShiftState: number) {
+    public static applyDOMCommand(Lkc: KeyEvent): void {
       let code = DefaultOutput.codeForEvent(Lkc);
       let domManager = com.keyman.singleton.domManager;
 
       switch(code) {
         case Codes.keyCodes['K_TAB']:
-          domManager.moveToNext(keyShiftState);
+          domManager.moveToNext((Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0);
           break;
         case Codes.keyCodes['K_TABBACK']:
           domManager.moveToNext(true);
@@ -117,8 +109,13 @@ namespace com.keyman.text {
       }
     }
 
-    public static applyCommand(Lkc: KeyEvent, keyShiftState: number) {
-      DefaultOutput.applyDOMCommand(Lkc, keyShiftState);
+    /**
+     * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally 
+     * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
+     * the caret is in.  However, we let those events perform the actual context reset.
+     */
+    public static applyCommand(Lkc: KeyEvent): void {
+      DefaultOutput.applyDOMCommand(Lkc);
 
       // Notes for potential default-handling extensions:
       // 
@@ -147,20 +144,24 @@ namespace com.keyman.text {
     }
 
     /**
-     * Codes matched here may need special handling to apply to an OutputTarget, but still produce output.
+     * Codes matched here generally have default implementations when in a browser but require emulation
+     * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
      */
-    public static forSpecialEmulation(Lkc: KeyEvent): string {
+    public static forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
       let code = DefaultOutput.codeForEvent(Lkc);
 
       switch(code) {
         case Codes.keyCodes['K_BKSP']:
-          return '\b';
+          return EmulationKeystrokes.Backspace;
         case Codes.keyCodes['K_ENTER']:
-          return '\n'; 
+          return EmulationKeystrokes.Enter;
+        // (Probably) only here for legacy reasons; it's always been handled alongside the other two.
         case Codes.keyCodes['K_SPACE']:
-          return ' ';
+          return EmulationKeystrokes.Space;
         // case Codes.keyCodes['K_DEL']:
         //   return '\u007f'; // 127, ASCII / Unicode control code for DEL.
+        default:
+          return null;
       }
     }
 
@@ -211,30 +212,35 @@ namespace com.keyman.text {
 
     // Test for otherwise unimplemented keys on the the base default & shift layers.
     // Those keys must be blocked by keyboard rules if intentionally unimplemented; otherwise, this function will trigger.
-    public static forBaseKeys(Lkc: KeyEvent, keyShiftState: number, ruleBehavior?: RuleBehavior) {
+    public static forBaseKeys(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
       let n = Lkc.Lcode;
+      let keyShiftState = Lkc.Lmodifiers;
+
       // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
-      if(keyShiftState != 0 && keyShiftState != 1) {
+      // TODO:  Extend to allow AltGr as well - better mnemonic support.
+      if(keyShiftState == Codes.modifierCodes['SHIFT']) {
+        keyShiftState = 1;
+      } else if(keyShiftState != 0) {
         if(ruleBehavior) {
           ruleBehavior.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
         }
+        return '';
       }
 
-      if(keyShiftState == 0 || keyShiftState == 1) { // keyShiftState can only be 0 or 1.  (1 being mapped from Codes.modifier['SHIFT'] by the caller.)
-        try {
-          if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
-            return Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
-          } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
-            return String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
-          } else if(n >= Codes.keyCodes['K_COLON'] && n <= Codes.keyCodes['K_BKQUOTE']) {
-            return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
-          } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
-            return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
-          }
-        } catch (e) {
-          if(ruleBehavior) {
-            ruleBehavior.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
-          }
+      // Now that keyShiftState is either 0 or 1, we can use the following structure to determine the default output.
+      try {
+        if(n >= Codes.keyCodes['K_0'] && n <= Codes.keyCodes['K_9']) { // The number keys.
+          return Codes.codesUS[keyShiftState][0][n-Codes.keyCodes['K_0']];
+        } else if(n >= Codes.keyCodes['K_A'] && n <= Codes.keyCodes['K_Z']) { // The base letter keys
+          return String.fromCharCode(n+(keyShiftState?0:32));  // 32 is the offset from uppercase to lowercase.
+        } else if(n >= Codes.keyCodes['K_COLON'] && n <= Codes.keyCodes['K_BKQUOTE']) {
+          return Codes.codesUS[keyShiftState][1][n-Codes.keyCodes['K_COLON']];
+        } else if(n >= Codes.keyCodes['K_LBRKT'] && n <= Codes.keyCodes['K_QUOTE']) {
+          return Codes.codesUS[keyShiftState][2][n-Codes.keyCodes['K_LBRKT']];
+        }
+      } catch (e) {
+        if(ruleBehavior) {
+          ruleBehavior.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
         }
       }
 

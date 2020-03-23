@@ -1,21 +1,25 @@
 ![Keyman](https://keyman.com/cdn/dev/img/logo2.png)
 
-[Keyman](https://keyman.com) makes it possible for you to type in any language on Windows, macOS, Linux, iPhone, iPad, Android tablets and phones, and even instantly in your web browser. Create keyboard layouts with Keyman Developer and share them with the community in the [keyboards repository](https://github.com/keymanapp/keyboards). The [Keyman Developer Community](https://community.software.sil.org/c/keyman) have already contributed keyboard layouts for over 1,500 languages!
+[Keyman](https://keyman.com) makes it possible for you to type in any language on Windows, macOS, Linux, iPhone, iPad, Android tablets and phones, and even instantly in your web browser. Create keyboard layouts with Keyman Developer and share them with the community in the [keyboards repository](https://github.com/keymanapp/keyboards). The [Keyman Community](https://community.software.sil.org/c/keyman) have already contributed keyboard layouts for over 1,500 languages!
 
 Keyman is an open source project distributed under the MIT license.
+
+# Get Involved
+
+[Get involved](https://keyman.com/about/get-involved)
 
 [comment]: # (CI Build statuses)
 
 Development Status on [status.keyman.com](https://status.keyman.com)
 
-| Platform  | Master | Nightly | Beta | Stable |
-| --------  | :----: | :-----: | :--: | :----: |
-| Windows   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_Build)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Beta)/statusIcon)| ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Stable),branch:(default:false)/statusIcon) |
-| macOS    | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Master)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Beta)/statusIcon)| ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Stable),branch:(default:false)/statusIcon) |
-| Web       | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Build)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Beta)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Stable),branch:(default:false)/statusIcon)|
-| Android   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Build)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_NightlyAlpha)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Beta)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Stable),branch:(default:false)/statusIcon) |
-| iOS   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Master)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Beta)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Stable),branch:(default:false)/statusIcon) |
-| Linux   | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Master)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Nightly)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Beta)/statusIcon) | ![Build Status](https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Stable),branch:(default:false)/statusIcon) |
+| Platform  | Alpha | Beta | Stable |
+| --------  | :---: | :--: | :----: |
+| Windows   | ![Alpha][win-master] | ![Beta][win-beta]| ![Stable][win-stable] |
+| macOS     | ![Alpha][mac-master] | ![Beta][mac-beta]| ![Stable][mac-stable] |
+| Web       | ![Alpha][web-master] | ![Beta][web-beta]| ![Stable][web-stable] |
+| Android   | ![Alpha][android-master] | ![Beta][android-beta]| ![Stable][android-stable] |
+| iOS       | ![Alpha][ios-master] | ![Beta][ios-beta]| ![Stable][ios-stable] |
+| Linux     | ![Alpha][linux-master] | ![Beta][linux-beta]| ![Stable][linux-stable] |
 
 # Getting Started
 
@@ -33,9 +37,9 @@ Development Status on [status.keyman.com](https://status.keyman.com)
 
 Each platform maintains multiple types of releases:
 
-* Stable: A released version.
-* Beta: A version that is nearing full "stable" release.
-* Nightly: Contains the very latest code. These versions are published daily whenever the code changes.
+* Stable: A released version. On a `stable` or `stable-<version>` branch.
+* Beta: A version that is nearing full "stable" release. On the `beta` branch.
+* Alpha: Contains the very latest code. These versions are published daily whenever the code changes. On `master` branch.
 
 # License
 
@@ -45,3 +49,23 @@ Licensed under the [MIT](./windows/src/LICENSE.md) License.
 
 [Keyman for Linux](./linux) is licensed under the [MIT](./windows/src/LICENSE.md) License apart from [ibus-kmfl](./linux/ibus-kmfl) which is licensed under the GNU General Public License as published by the Free Software Foundation; either [version 2](./linux/ibus-kmfl/COPYING) of the License, or (at your option) any later version.
 
+[comment]: # (CI Build status links)
+
+  [win-master]:https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_Build)/statusIcon
+  [win-beta]:https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Beta)/statusIcon
+  [win-stable]:https://build.palaso.org/app/rest/builds/buildType:(id:KeymanDesktop_Stable),branch:(default:false)/statusIcon
+  [mac-master]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Master)/statusIcon
+  [mac-beta]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Beta)/statusIcon
+  [mac-stable]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanMac_Stable),branch:(default:false)/statusIcon
+  [web-master]: https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Build)/statusIcon
+  [web-beta]: https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Beta)/statusIcon
+  [web-stable]: https://build.palaso.org/app/rest/builds/buildType:(id:Keymanweb_Stable),branch:(default:false)/statusIcon
+  [android-master]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Build)/statusIcon
+  [android-beta]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Beta)/statusIcon
+  [android-stable]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanAndroid_Stable),branch:(default:false)/statusIcon
+  [ios-master]: https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Master)/statusIcon
+  [ios-beta]: https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Beta)/statusIcon
+  [ios-stable]: https://build.palaso.org/app/rest/builds/buildType:(id:Keyman_iOS_Stable),branch:(default:false)/statusIcon
+  [linux-master]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Master)/statusIcon
+  [linux-beta]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Beta)/statusIcon
+  [linux-stable]: https://build.palaso.org/app/rest/builds/buildType:(id:KeymanLinux_Stable),branch:(default:false)/statusIcon

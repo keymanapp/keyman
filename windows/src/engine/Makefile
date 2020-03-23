@@ -12,7 +12,7 @@ CLEANS=clean-engine
 
 # ----------------------------------------------------------------------
 
-keyman:
+keyman: redist
     cd $(ROOT)\src\engine\keyman
     $(MAKE) $(TARGET)
 
@@ -50,7 +50,12 @@ kmtip:
 
 # ----------------------------------------------------------------------
 
-inst:
+redist:
+    copy $(ROOT)\src\ext\sentry\sentry.dll $(ROOT)\bin\engine
+
+# ----------------------------------------------------------------------
+
+inst: redist
     cd $(ROOT)\src\engine\inst
     $(MAKE) $(TARGET)
 

@@ -115,7 +115,6 @@ uses
   KMShellHints,
   KeymanMutex,
   OnlineUpdateCheck,
-  ExternalExceptionHandler,
   RegistryKeys,
   UfrmBaseKeyboard,
   UfrmKeymanBase,

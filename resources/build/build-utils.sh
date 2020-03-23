@@ -21,6 +21,9 @@
 #    . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 #    # END STANDARD BUILD SCRIPT INCLUDE
 #
+# Note: keep changes to version, tier and tag determination in sync with mkver (windows/src/buildutils/mkver)
+#
+
 
 function die () {
     # TODO: consolidate this with fail() from shellHelperFunctions.sh
@@ -48,7 +51,7 @@ function findVersion() {
         VERSION_MINOR="${BASH_REMATCH[2]}"
         VERSION_PATCH="${BASH_REMATCH[3]}"
         VERSION_RELEASE="$VERSION_MAJOR.$VERSION_MINOR"
-    } || { 
+    } || {
         echo "Invalid VERSION.md file: expected major.minor.patch";
         exit 1;
     }
@@ -58,7 +61,7 @@ function findVersion() {
 
     #
     # Build a tag to append to the version string. This is not assigned
-    # to the version number used in the projects but may be used as a 
+    # to the version number used in the projects but may be used as a
     # display string and in TeamCity configuration
     #
 
@@ -66,7 +69,7 @@ function findVersion() {
         VERSION_TAG="-$TIER"
     else
         VERSION_TAG=
-    fi 
+    fi
 
     if [ -z "${TEAMCITY_VERSION-}" ]; then
         # Local dev machine, not TeamCity
@@ -112,7 +115,7 @@ function printBuildNumberForTeamCity() {
         else
             # For alpha/beta builds, for now we don't append the
             # version tag as buildNumber is used in the delivery
-            # of the build version. We may improve this in the 
+            # of the build version. We may improve this in the
             # future.
             echo "##teamcity[buildNumber '$VERSION']"
         fi
@@ -166,7 +169,7 @@ function exportEnvironmentDefinitionScript() {
 }
 
 # Detect if this script is running from within Xcode.  Obviously, this assumes we don't have other definitions
-# for these variables... but they're set within Xcode during its runs.  As a result, they're not the wisest thing for 
+# for these variables... but they're set within Xcode during its runs.  As a result, they're not the wisest thing for
 # someone else to intentionally use, so this check seems reasonable.
 #
 # https://gist.github.com/gdavis/6670468 has a representative copy of a standard Xcode environment variable setup.

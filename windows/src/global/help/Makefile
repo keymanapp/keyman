@@ -5,7 +5,7 @@
 
 build: mkver-app
   cd $(ROOT)\src\global\help
-  $(PROGRAM)\buildtools\mkver -v -u version.in version.out $(ROOT)\src\developer\version.txt
+  $(MKVER_U) version.in version.out
 
 clean:
   -del version.out
