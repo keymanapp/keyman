@@ -1,27 +1,36 @@
 #!/bin/bash
 
-# Copy extracted crowdin files to KMEA and KMAPro projects
+# Copy extracted crowdin files to KMEI and Keyman app projects
 function processiOS() {
   cd "$CROWDIN_ROOT"
   echo "Processing iOS"
   for crowd_locale in *; do
     if [ -d ${crowd_locale} ]; then
+
+      # For now, only handle km locale
+      if [ ${crowd_locale} != "km" ]; then
+        continue
+      fi  
+
       echo "Found locale $crowd_locale"
 
-      # If crowdin locale contains region, we need to prefix with "r"
-      # See: https://developer.android.com/guide/topics/resources/providing-resources#AlternativeResources
-      #local locale=${crowd_locale/-/-r}
+      # KMEI strings
+      if [ -f "$CROWDIN_ROOT/$crowd_locale/ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings" ]; then
+        copy_file "$CROWDIN_ROOT/$crowd_locale/ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings" \
+            "$KMI_ROOT/engine/KMEI/KeymanEngine/Classes/LanguagePicker/${crowd_locale}.lproj/"
+      fi
 
-      #if [ -f "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" ]; then
-      #  copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" "$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
-      #fi
+      if [ -f "$CROWDIN_ROOT/$crowd_locale/ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings" ]; then
+        copy_file "$CROWDIN_ROOT/$crowd_locale/ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings" \
+            "$KMI_ROOT/engine/KMEI/KeymanEngine/${crowd_locale}.lproj/"
+      fi
 
-      #if [ -f "$CROWDIN_ROOT/$crowd_locale/android/KMAPro/strings.xml" ]; then
-      #  copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMAPro/strings.xml" "$KMA_ROOT/KMAPro/kMAPro/src/main/res/values-$locale"
-      #fi
+      # Keyman app strings
+      if [ -f "$CROWDIN_ROOT/$crowd_locale/ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings" ]; then
+        copy_file "$CROWDIN_ROOT/$crowd_locale/ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings" \
+            "$KMI_ROOT/keyman/Keyman/Keyman/${crowd_locale}.lproj/"
+      fi
     fi
 
-    # For now, only handle the first locale. Remove this when we're ready for everything
-    #exit
   done
 }
