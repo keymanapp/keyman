@@ -48,6 +48,10 @@
 
       /** Mobile, Tablet **/
 
+      body.emulated-touch-device::-webkit-scrollbar {
+        display: none;
+      }
+
       .install-link .ios,
       .install-link .android {
         display: none;
@@ -130,6 +134,23 @@
       }
     </style>
 
+  <script>
+    if(location.search.match(/emulation=phone/)) {
+      window.ontouchstart = function() {};
+      var emulatedTouchDevice = {
+        detected: true,
+        touchable: true,
+        OS: "iOS",
+        formFactor: "phone",
+        dyPortrait: 25,
+        dyLandscape: 25,
+        version: "0",
+        orientation: 0,
+        browser: "safari",
+        colorScheme: "light",
+      };
+    }
+  </script>
   <script src="resource/keymanweb.js"></script>
   <script src="resource/kmwuibutton.js"></script>
 
@@ -182,6 +203,111 @@
 
     </div>
     <script>
+      if(typeof emulatedTouchDevice != 'undefined') {
+        // Fake out KeymanWeb's touch handling
+        keyman.util.activeDevice = keyman.util.device = emulatedTouchDevice;
+        emulatedTouchDevice.styles = new com.keyman.utils.StyleConstants(this);
+        keyman.domManager.touchHandlers = new com.keyman.DOMTouchHandlers(keyman);
+        keyman.util.getViewportScale = function() { return 4; }
+        document.body.className += ' emulated-touch-device ';
+
+        var mouseMoveEmulation = null;
+
+        // Fake touch events
+        window.addEventListener('mousedown', function(ev) {
+          ev.stopPropagation();
+          ev.preventDefault();
+
+          var touchesDown = [];
+          touch = {};
+          touch.x = ev.x;
+          touch.y = ev.y;
+          touch.pageX = ev.pageX;
+          touch.pageY = ev.pageY;
+          touch.screenX = ev.x;
+          touch.screenY = ev.y;
+          touch.clientX = ev.x;
+          touch.clientY = ev.y;
+
+          /* retrieve touched element */
+          touch.target = document.elementFromPoint(touch.x, touch.y);
+
+          touchesDown.push(touch);
+
+          var evt = document.createEvent("Event");
+          evt.initEvent("touchstart", true, true);
+          evt.touches = touchesDown;
+          evt.changedTouches = touchesDown;
+          evt.touch = touchesDown[0];
+          (touch.target ? touch.target : document).dispatchEvent(evt);
+
+
+          // Fake touch events
+          mouseMoveEmulation = window.addEventListener('mousemove', function(ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            var touchesDown = [];
+            touch = {};
+            touch.x = ev.x;
+            touch.y = ev.y;
+            touch.pageX = ev.pageX;
+            touch.pageY = ev.pageY;
+            touch.screenX = ev.x;
+            touch.screenY = ev.y;
+            touch.clientX = ev.x;
+            touch.clientY = ev.y;
+
+            /* retrieve touched element */
+            touch.target = document.elementFromPoint(touch.x, touch.y);
+
+            touchesDown.push(touch);
+
+            var evt = document.createEvent("Event");
+            evt.initEvent("touchmove", true, true);
+            evt.touches = touchesDown;
+            evt.changedTouches = touchesDown;
+            evt.touch = touchesDown[0];
+            (touch.target ? touch.target : document).dispatchEvent(evt);
+          });
+        });
+
+        // Fake touch events
+        window.addEventListener('mouseup', function(ev) {
+          ev.stopPropagation();
+          ev.preventDefault();
+
+          var touchesDown = [];
+          touch = {};
+          touch.x = ev.x;
+          touch.y = ev.y;
+          touch.pageX = ev.pageX;
+          touch.pageY = ev.pageY;
+          touch.screenX = ev.x;
+          touch.screenY = ev.y;
+          touch.clientX = ev.x;
+          touch.clientY = ev.y;
+
+          /* retrieve touched element */
+          touch.target = document.elementFromPoint(touch.x, touch.y);
+
+          touchesDown.push(touch);
+
+          var evt = document.createEvent("Event");
+          evt.initEvent("touchend", true, true);
+          evt.touches = touchesDown;
+          evt.changedTouches = touchesDown;
+          evt.touch = touchesDown[0];
+          (touch.target ? touch.target : document).dispatchEvent(evt);
+
+          if(mouseMoveEmulation) {
+            window.removeEventListener('mousemove', mouseMoveEmulation);
+            mouseMoveEmulation = null;
+          }
+        });
+
+      }
+
       keyman.init({
         ui:'button',
         resources:'/resource/',

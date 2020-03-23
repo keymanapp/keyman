@@ -134,6 +134,7 @@ uses
   KeyboardParser, TextFileFormat, dmActionsKeyboardEditor,
   VisualKeyboard, UframeOnScreenKeyboardEditor,
   KeymanDeveloperUtils,
+  Keyman.UI.UframeCEFHost,
   OnScreenKeyboard, KMDActionInterfaces,
 
 
@@ -267,6 +268,9 @@ type
     lblLanguageKeyman10Note: TLabel;
     lblLanguageKeyman10Title: TLabel;
     imgQRCode: TImage;
+    TabSheet1: TTabSheet;
+    panWebTestContainer: TPanel;
+    panWebTest: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editCopyrightChange(Sender: TObject);
@@ -332,6 +336,7 @@ type
     procedure pagesTouchLayoutChanging(Sender: TObject;
       var AllowChange: Boolean);
     procedure lbDebugHostsClick(Sender: TObject);
+    procedure TabSheet1Resize(Sender: TObject);
   private
     frameSource: TframeTextEditor;
 
@@ -362,6 +367,7 @@ type
     FKeyChanging: Boolean;
     FLayoutSetup: Boolean;
     FCheckboxGridHelper: TCheckboxGridHelper;
+    frameWebTest: TframeCEFHost;
 
     function GetCurrentRule: TKeyboardParser_LayoutRule;
 
@@ -438,6 +444,9 @@ type
     procedure SaveTouchLayout;
     procedure TouchLayoutModified(Sender: TObject);
     procedure FocusTabTouchLayout;
+
+    procedure InitTabWebTest;
+    procedure FocusTabWebTest;
 
     procedure EditorBreakpointClicked(Sender: TObject; ALine: Integer);
 
@@ -652,6 +661,7 @@ begin
   InitTabTouchLayout;   // I3885
   InitTabBitmap;
   InitTabFinish;
+  InitTabWebTest;
 
   inherited;
 
@@ -755,7 +765,9 @@ begin
   else if pages.ActivePage = pageTouchLayout then
     FocusTabTouchLayout // I3885
   else if pages.ActivePage = pageCompile then
-    FocusTabFinish;
+    FocusTabFinish
+  else if pages.ActivePage = TabSheet1 then
+    FocusTabWebTest;
 end;
 
 procedure TfrmKeymanWizard.FocusTabOnScreenKeyboard;
@@ -767,6 +779,36 @@ begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutDesign
     then DoFocus(frameTouchLayout)
     else DoFocus(frameTouchLayoutSource);
+end;
+
+{-----------------------------------------------------------------------------}
+{ Web Test Page                                                               }
+{-----------------------------------------------------------------------------}
+
+procedure TfrmKeymanWizard.InitTabWebTest;
+begin
+  panWebTestContainer.Width := 320 + 2;
+  panWebTestContainer.Height := 568 + 2;
+  TabSheet1Resize(Self);
+
+  frameWebTest := TframeCEFHost.Create(Self);
+  frameWebTest.ShouldShowContextMenu := True;
+  frameWebTest.Parent := panWebTest;
+  frameWebTest.Visible := True;
+//  cef.OnCommand := cefCommand;
+//  cef.OnLoadEnd := cefLoadEnd;
+end;
+
+procedure TfrmKeymanWizard.FocusTabWebTest;   // I3885
+begin
+  DoFocus(frameWebTest);
+  frameWebTest.Navigate('http://localhost:8008/?emulation=phone');
+end;
+
+procedure TfrmKeymanWizard.TabSheet1Resize(Sender: TObject);
+begin
+  panWebTestContainer.Left := (TabSheet1.ClientWidth - panWebTestContainer.Width) div 2;
+  panWebTestContainer.Top := (TabSheet1.ClientHeight - panWebTestContainer.Height) div 2;
 end;
 
 {-----------------------------------------------------------------------------}
