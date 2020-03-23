@@ -832,11 +832,6 @@ namespace com.keyman.text {
     output(dn: number, outputTarget: OutputTarget, s:string): void {
       this.resetContextCache();
       let keyman = com.keyman.singleton;
-      
-      // KeymanTouch for Android uses direct insertion of the character string
-      if('oninserttext' in keyman && !(outputTarget instanceof Mock)) {
-        keyman['oninserttext'](dn,s);
-      }
 
       outputTarget.saveProperties();
       outputTarget.clearSelection();
@@ -1041,9 +1036,6 @@ namespace com.keyman.text {
       }
 
       this.output(1, outputTarget, "");
-      if(outputTarget.getElement()) {
-        this.doInputEvent(outputTarget.getElement());
-      }
     }
 
     /**

@@ -95,10 +95,6 @@ namespace com.keyman.text {
             }
             break;
           case Codes.keyCodes['K_ENTER']:
-            // Ensure the newline is forwarded when in an embedded context!  It doesn't yet have its own specialized OutputTarget type.
-            if(keyman.isEmbedded && !quiet) { // Don't pass it along for Mocks, though.  They're (currently) only used in predictive text.
-              keyman['oninserttext'](0, '\n');
-            }
             outputTarget.handleNewlineAtCaret();
 
             return '\n';  // We still return this, as it ensures we generate a rule-match.
@@ -531,10 +527,18 @@ namespace com.keyman.text {
             DOMEventHandlers.states.changed = true;
           }
         }
+
+        // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
         
         // Notify the ModelManager of new input - it's predictive text time!
         ruleBehavior.transcription.alternates = alternates;
         keyman.modelManager.predict(ruleBehavior.transcription);
+
+        // KMEA and KMEI (embedded mode) use direct insertion of the character string
+        if(keyman.isEmbedded) {
+          // A special embedded callback used to setup direct callbacks to app-native code.
+          keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
+        }
 
         // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
         // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
