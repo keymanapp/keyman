@@ -34,6 +34,7 @@ display_usage() {
 
 # Include scripts to process platforms
 . ./parse-crowdin-android.sh
+. ./parse-crowdin-ios.sh
 
 
 # Copy a file to a destination directory. If destination doesn't exist, create it
@@ -52,6 +53,7 @@ function copy_file() {
 # Path definitions
 KEYMAN_ZIP="$KEYMAN_ROOT/.crowdin-tmp/Keyman.zip"
 KMA_ROOT="$KEYMAN_ROOT/android"
+KMI_ROOT="$KEYMAN_ROOT/ios"
 CROWDIN_ROOT="$KEYMAN_ROOT/crowdin"
 
 if [[ $# -eq 0 ]] ; then
@@ -142,4 +144,6 @@ if [ "$DO_ANDROID" = true ]; then
   processAndroid
 fi
 
-
+if [ "$DO_IOS" = true ]; then
+  processiOS
+fi
