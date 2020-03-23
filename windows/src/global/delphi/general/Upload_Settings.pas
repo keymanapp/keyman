@@ -41,7 +41,6 @@ const
   // https://www.keyman.com/ - web pages
   URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
   URLPath_CreateTranslation = '/go/desktop/'+SKeymanVersion+'/create-locale';
-  URLPath_KeymanException = '/go/desktop/'+SKeymanVersion+'/view-exception?id=%s';
   URLPath_KeepInTouch = '/go/desktop/'+SKeymanVersion+'/keep-in-touch';
   URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
 
@@ -50,6 +49,7 @@ const
   URLPath_ArchivedDownloads = '/go/desktop/'+SKeymanVersion+'/archived-downloads';
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
+  URLPath_Community = '/go/'+SKeymanVersion+'/community';
 
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';

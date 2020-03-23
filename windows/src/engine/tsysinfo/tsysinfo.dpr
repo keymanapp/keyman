@@ -68,6 +68,9 @@ uses
 begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, [kscfCaptureExceptions]); // no ui for exceptions, no termination
   try
+    if RunCrashReportHandler then
+      Exit;
+
     FInitializeCEF := TCEFManager.Create;
     try
       try

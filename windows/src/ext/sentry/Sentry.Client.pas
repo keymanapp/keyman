@@ -37,7 +37,7 @@ type
   TSentryClientEventType = (scetException, scetMessage);
   TSentryClientEventAction = (sceaContinue, sceaTerminate);
   TSentryClientEvent = procedure(Sender: TObject; EventType: TSentryClientEventType;
-    const EventClassName, Message: string;
+    const EventID, EventClassName, Message: string;
     var EventAction: TSentryClientEventAction) of object;
 
   TSentryClient = class
@@ -48,12 +48,12 @@ type
     options: psentry_options_t;
     FOnBeforeEvent: TSentryClientEvent;
     FOnAfterEvent: TSentryClientEvent;
-    procedure DoAfterEvent(const ExceptionClassName, Message: string;
+    procedure DoAfterEvent(const EventID, ExceptionClassName, Message: string;
       EventType: TSentryClientEventType);
-    procedure DoBeforeEvent(const ExceptionClassName, Message: string;
+    procedure DoBeforeEvent(const EventID, ExceptionClassName, Message: string;
       EventType: TSentryClientEventType);
     procedure DoTerminate;
-
+    function EventIDToString(Guid: TGUID): string;
   public
     constructor Create(AOptions: TSentryClientOptions; ACaptureExceptions: Boolean = True); virtual;
     destructor Destroy; override;
@@ -222,7 +222,7 @@ begin
   ExitProcess(1);
 end;
 
-procedure TSentryClient.DoBeforeEvent(const ExceptionClassName, Message: string;
+procedure TSentryClient.DoBeforeEvent(const EventID, ExceptionClassName, Message: string;
   EventType: TSentryClientEventType);
 var
   EventAction: TSentryClientEventAction;
@@ -230,13 +230,13 @@ begin
   if Assigned(FOnBeforeEvent) then
   begin
     EventAction := sceaContinue;
-    FOnBeforeEvent(Self, EventType, ExceptionClassName, Message, EventAction);
+    FOnBeforeEvent(Self, EventType, EventID, ExceptionClassName, Message, EventAction);
     if EventAction = sceaTerminate then
       DoTerminate;
   end;
 end;
 
-procedure TSentryClient.DoAfterEvent(const ExceptionClassName, Message: string;
+procedure TSentryClient.DoAfterEvent(const EventID, ExceptionClassName, Message: string;
   EventType: TSentryClientEventType);
 var
   EventAction: TSentryClientEventAction;
@@ -244,10 +244,19 @@ begin
   if Assigned(FOnAfterEvent) then
   begin
     EventAction := sceaContinue;
-    FOnAfterEvent(Self, EventType, ExceptionClassName, Message, EventAction);
+    FOnAfterEvent(Self, EventType, EventID, ExceptionClassName, Message, EventAction);
     if EventAction = sceaTerminate then
       DoTerminate;
   end;
+end;
+
+function TSentryClient.EventIDToString(Guid: TGUID): string;
+begin
+  // Copied from System.SysUtils.GuidToString and cleaned up for use with Sentry
+  SetLength(Result, 32);
+  StrLFmt(PChar(Result), 38,'%.8X%.4X%.4X%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X',   // do not localize
+    [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+    Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
 end;
 
 function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
@@ -266,7 +275,7 @@ const
   //    A pseudo-frame is inserted at the top of the stack which points
   //    to the address of the code that caused the exception
 begin
-  DoBeforeEvent(ExceptionClassName, Message, scetException);
+  DoBeforeEvent('', ExceptionClassName, Message, scetException);
 
   event := sentry_value_new_event;
 
@@ -294,7 +303,7 @@ begin
   uuid := sentry_capture_event(event);
   Result := uuid.native_uuid;
 
-  DoAfterEvent(ExceptionClassName, Message, scetException);
+  DoAfterEvent(EventIDToString(Result), ExceptionClassName, Message, scetException);
 end;
 
 function TSentryClient.MessageEvent(Level: TSentryLevel; const Logger,
@@ -308,7 +317,7 @@ const
   //    Sentry.Client.CaptureStackTrace,
   //    Sentry.Client.TSentryClient.MessageEvent
 begin
-  DoBeforeEvent(Logger, Message, scetMessage);
+  DoBeforeEvent('', Logger, Message, scetMessage);
 
 	event := sentry_value_new_message_event(
 		{*   level *} sentry_level_t(Level),
@@ -325,7 +334,7 @@ begin
 
   Result := sentry_capture_event(event).native_uuid;
 
-  DoAfterEvent(Logger, Message, scetMessage);
+  DoAfterEvent(EventIDToString(Result), Logger, Message, scetMessage);
 end;
 
 end.

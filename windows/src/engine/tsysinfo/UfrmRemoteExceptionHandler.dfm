@@ -1,9 +1,11 @@
 object frmExceptionHandler: TfrmExceptionHandler
   Left = 0
   Top = 0
-  ActiveControl = editEmail
+  ActiveControl = cmdAbort
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = 'Exception in ...'
-  ClientHeight = 474
+  ClientHeight = 257
   ClientWidth = 497
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,12 +17,8 @@ object frmExceptionHandler: TfrmExceptionHandler
   KeyPreview = True
   OldCreateOrder = False
   Position = poScreenCenter
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
-  DesignSize = (
-    497
-    474)
   PixelsPerInch = 96
   TextHeight = 13
   object bevelTitle: TBevel
@@ -49,66 +47,37 @@ object frmExceptionHandler: TfrmExceptionHandler
     Height = 26
     AutoSize = False
     Caption = 
-      'An error report has been created that you can send to Keyman Sup' +
-      'port. We will treat this report as confidential.'
+      'An error report has been automatically sent to the Keyman suppor' +
+      't team. We will use the technical information inside this report' +
+      ' to correct the issue in a future version.'
     WordWrap = True
   end
-  object lblText3: TLabel
+  object lblNoPersonal: TLabel
     Left = 12
     Top = 128
     Width = 473
-    Height = 26
+    Height = 17
     AutoSize = False
-    Caption = 
-      'Please tell us what you were doing when the problem occurred, so' +
-      ' that we can identify and address the problem you experienced.'
+    Caption = 'No personal details are included in the error report.'
     WordWrap = True
   end
-  object lblPrivacy: TLabel
-    Left = 344
-    Top = 442
-    Width = 140
-    Height = 13
-    Cursor = crHandPoint
-    Caption = 'View our privacy policy online'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlue
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = [fsUnderline]
-    ParentFont = False
-    OnClick = lblPrivacyClick
-  end
-  object Label1: TLabel
-    Left = 12
-    Top = 162
-    Width = 473
-    Height = 26
-    AutoSize = False
-    Caption = 
-      'We ask for your email address so that we can contact you if we n' +
-      'eed more information about this error. However, we cannot guaran' +
-      'tee a response to every error report submitted.'
-    WordWrap = True
-  end
-  object cmdSend: TButton
-    Left = 12
-    Top = 437
-    Width = 141
+  object cmdAsk: TButton
+    Left = 8
+    Top = 224
+    Width = 209
     Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = '&Send to Keyman Support'
-    Default = True
+    Caption = '&Ask about this in Keyman Community'
     TabOrder = 2
-    OnClick = cmdSendClick
+    OnClick = cmdAskClick
   end
   object cmdAbort: TButton
-    Left = 167
-    Top = 437
-    Width = 85
+    Left = 384
+    Top = 224
+    Width = 105
     Height = 25
-    Anchors = [akLeft, akBottom]
-    Caption = 'E&xit Application'
+    Caption = 'OK'
+    Default = True
+    ModalResult = 3
     TabOrder = 3
     OnClick = cmdAbortClick
   end
@@ -137,121 +106,155 @@ object frmExceptionHandler: TfrmExceptionHandler
       WordWrap = True
     end
     object imgIcon: TImage
-      Left = 452
-      Top = 8
-      Width = 32
-      Height = 32
+      Left = 422
+      Top = 10
+      Width = 61
+      Height = 34
+      AutoSize = True
+      Picture.Data = {
+        0954506E67496D61676589504E470D0A1A0A0000000D494844520000003D0000
+        00220806000000ECE2D1A70000000473424954080808087C0864880000000970
+        4859730000079800000798016220AA930000001974455874536F667477617265
+        007777772E696E6B73636170652E6F72679BEE3C1A00000BA14944415478DAD5
+        590B5494551EBFF77BCC370F6680E10D0A2A0AA8A98920A086986BA5D669DDB2
+        4EEABEDAD356AEF9AA4E5B665299D5A695A96B56EE6EA7CD4ED6E96599AF5614
+        10145F088230C343986160066798F7F7CDF7B87B670C04611084DAED9EF39DB9
+        8FFFFDDFFBBBFFE7BD03C1FFA0A0136F2A7802FC1102F8086E4EC49F0D02F025
+        0FA9D715594F34FCD4EBC39F15ECB9B7C204965F2E3415DD4684258F224213D3
+        AEDB0E2BB9CC9B5C459BB646E403C72F1A342ADA162F50C21A5C7D147F6AC96D
+        6EE24E6E6701CD38E4396B5320A5D074D2B2256F164BEEB63404C0669FE0DB1E
+        9D0F5CBF28D0DC89CD6924493E8901FC1620C0F438088175B1A56F5701CE9140
+        4FB8BF858A4BCFE41B0B8A79FD811C3C4CFC48668110BCEEE2B99DF1F9C0F37F
+        0D9A2F792B0FC37A1240B8A01B80DE052189D7ED2B140CA7E34048549BE43066
+        30E3179DE775074290E09DD48DB2157FAFBA05EE83E1003F6CA0D1E95DB428BA
+        172304D7E2E6B4C1CE175BCBCF40557438A18E1BC39ED85C2279DA73FA203363
+        C96F66B1E487A2F643068DFE3D5F238CBDE3CF58855762662387E300BD475FA8
+        41A22FB51F927604D0169EF6ED887A06387F36D00801E8DCC43C0543E296CAB3
+        564D190EB001BE8EE65AEFA91DE306B63768C3BE623B14E97734F9CEF69F1C74
+        C746E6313C79279D3CAF901E3DF7B6E102CD9D79EF9868AB9F3DC8696EFCBD2F
+        08C496887CAFE127036D7F59F6117654CB98898B0BC8B86979C305DA5BF4FA49
+        C4DAB26E72BA0F03FA17A9E2F2556B8069D841776C943D8733AA57985BFF5040
+        46A60D0934E2DD6721A51C890F31CA5BF4DA29C4764C1F0A3F0CCA88489017FA
+        2CA71F56D0F697145980904AA166845E317DC568DC45DE3C6A64C75BC1670834
+        82E1E449DFA52F6F56D2D758E2E426EC79EEE961058DF602D251CBF89D479822
+        77FD592853A5F749882331409200083A1C4022B64F5EDE2B2550AE1D8371C7F8
+        DBDE136F9422CF956C44ABBC70D4EF1440B773D0DB8308FC5AB39EFB665841FB
+        0B76665F60068B8032B25991F1B8E53AE0486CAF3AC6957F948B2549405A6553
+        E4AEF362E0F1BD77813A90DB7211883C225431B1C8E7517B8A364580E8B99272
+        F23C99BBF06D00B9D6816C49C212FE1A02E26FA1CF7B4BBB0F1C0013B5F8E4D1
+        DDA0C23624D0F68DCC72FCB3A3B34D44A45430A9773B102409BEF65BA568A9EE
+        11CA88B0A41A45FA230A4450894145C4DA4AA13C2CCB73643D0FE217C8941366
+        0077F529008D5F04DD070214F0D1B776B8BD1907ADE7BC2DEDFB0B474092548D
+        58F190B579EBC7333085FFA0E55769C18E2181766C625290046A06338720190F
+        93BDB21C2A227282D188F6E646AE6CC72840A981326F1DF034D603A07FAF3758
+        A8022C3D0BB0B23C20111AEC1079BDF56859ABF5706936963945A9E436C1CD86
+        5F37CD7B53A0571EAA1A07217A192FBB30C6A393CD36EE96DD623D3C7006A4DC
+        A5CCDB20621B0EED6BD8535D6C05C67DDA0069463E108CA701347D7BED508818
+        E095CD011C8DFD1D9475F573AD9662C38EBD9394E3126B5DE5B5194156B70F0A
+        F49AC31726899058899DC4EF7193EE3E36DE5600EEAD7F092805FB807831396B
+        8A4955CCCCBEC644A70B702737F6EAE7A9342CD539C047F9DF1D025B17029E1F
+        C208D1E139DBF8C63FC74A1E563326FFF1B3C6DD5FA9B966D3B8DEDC617D60E6
+        AA23150F02096EC6FA5E4A40508C25A89308602345E0C33A1487EB53FC52C513
+        B2FB03A2F1B581C5FA7520C979EEC6A0272F2920A327E7F535C6B5B500B1E29D
+        40DD6FAF1C9D0958660E9670420F3A24888D966F8EB586CF9A227A1A4D82F9D3
+        83814C6EE4EA258558E2998817E4BD2003547615F47FCA5381489EF2EFBBAF4D
+        6022941EAB39DEE460352E7CB3F70A52D0384A0009E419DE07B9C60F02F5A074
+        724D1B337D95B1AF50E76DB804C486CF31D8D958B2B76179A883F27197D71498
+        3EFA2E77CCC6155586ED9FA8E8686D47DCD205E1751B7646485EAED74404E1C1
+        2EF55E75A43213F77C87BBA3FA624E93D0862F192DA3C3E4769DD53BE346921C
+        E53803EEAF5B87A56FE95FE2D7A5B1BC8700AE1608DC5768BC1DFA46CB600517
+        EBF5EBB62560A933F18FDC770C605575965D5439CF5607B169B8A7874DAF3D52
+        9D2202F120D6A9519D7D1441540A92740B266C4AD028F4312A3AE68CC9E1372A
+        615AACA6D6C6FAAC6247630262EDA34DB224C013D7344AC97780450DF920D556
+        D8EFBE65698B0AC4F099690E832C96B50F3EB133BCBDA7D6DB6C4AA1C3D526DE
+        E68CEB8F16A77DDB7B39B215872EC59350F81E57278FD32A4E246994332A2CAE
+        02B39B4BCE880DF3E86D6E839D174648121A3742232F4CD5AA72E18F5E457234
+        834A93059899A46E8B209063DA03E6356F0324E2AF5F8EF3E7768DFB234BB990
+        B94B2317E6A661A7A41D246674F9D57F187CEDB681DDE5217CB14FEFBDFAE8B9
+        301564DEA12918971E1D968BB362998890978450D14963E704BDC1C535A56995
+        D9048094A5AE488A884C9093A149A0BAA60C18E5637BF04C705D040FE89F05E1
+        9CD1DF6CC3BAFB2E24E96D95CF857A9CB4FA2256CB91B10FDC59ACCE9CD875AD
+        94BCEC85D6BD87C4D8650B230992BC1E948855FBB2EDF869236BB4A85CE76BFA
+        4E837BA35E193464EDD7E9188FA07CF74C9B3D5923A3456CD3484E41C62FF94E
+        1A372F36EAAD9E462BCBC76B7D2DDA54A52F9249980AC4F65A50E4D400A15B0C
+        F51799E811A799BFDAFD60FDA655301FB0FEBE03B2F12FE110B8DE5F0F9F9371
+        22F2EED901FEDE7AC371E3AECFB3FCB61A969B5E1275EF9CAE64A6A3A0EC3860
+        64C8F2F991C1DEBBFD925ED66F9CCEC739F3E4DA96572ACDEE9C2BACCFFF5040
+        84D05451767CE80CACB781073F1E21DB79B3B382F076C44C0D43A938D5C4A193
+        07F6BA22709A9A1C6CE59D764AB976C95D0B46E28CAE0277045E4A09A5DC91FC
+        F2725AE28486BA75DBC66346B0B33F69CDB22A4A1B1A0899EE0BBA82D63D07B2
+        24DE17D03CF9E8846AB6C1387E209831A4F9034A4EF6D5B6AE6A65B9A517DB5C
+        2908A0D0C450C5F14435932AA7C8986BCC9028FA5C1CC5A895381F04AE8653D2
+        0510EFF1109A90206C2FCC5AF98C5DA3AFEFF1EA92F8D7874BB05A0B86AD7B7A
+        F4332362F489AB96A80041F81D95A7EED9AD40F2094AFF58C29F7E53D0F2E1D7
+        397EADB811160910D3079C91EDD399EEC771FA895AAB7B964A4696442B652039
+        4C3933183D2F20BBD1E5ADBCEC6443717D3441C0360921BF5D76C52185D90272
+        1F5D0D48CED7354F919C50A5CE9864307F76F0767FFEDCD94F4785372953125B
+        345993043A54A36A7871D7642489E4D50389AD91476B6DF6B355FD264FFE2212
+        E4D841A5A15B4A75D92637FF668C92F67158E453A242F2BA0DE384AEF755D5C3
+        8B2DE566575D825A46B57979DECDF1D18204BAFECE99B9F21910AAAFEF318789
+        8FAEE34C96319DEA0D2194004D73B18B7F75B2EDB343D39180984EC058E55B24
+        9C79452D9C79CAFCE9E13BB0C6057F67C745C633E183BE70ACFEBE7A14A2C4AF
+        290290792323C677DAF60D8AAFACC55E6CF709D819C10E7C3E81C784F0AA4B20
+        E7E90DB829F53B195F137D23962F2E9578497294946B9CE5573D35A9515D89BC
+        67768565EFE1E923D72C3D7FF98D0F733A0F2A48E1EFE0AB999BBA652D3F7A31
+        244E466D5250D494509A542A19D28DC31619222367F537CFE0644B2E5D71FB55
+        102ADBCC20E7C9E70163B50D684D75C684326D5EA6DB79FE126DFBE1548E766E
+        D609EDFC19933CB54DE7B097CF1BE0D60BEFE4AB736FFA3E9D9F8F08EBAC8B4F
+        65C7853DCC8A92A9C6EA4E498F565F56D2A45F0A411D8AC9C596D1BACBA4F689
+        7553E556EBC0D727097EECABAB5B2D5FFCD0E2AED6278F7EE1B1487FF795FD85
+        459CA95D2D589D1A79528CD97EB232D8BDC02641296FBEAFE6C290FFE1F84A67
+        9A808D6B3B0E5DD1854DD6B17312B52E6C831141C8B1C7425BBC3E5B7EF8D4FB
+        52254464627F4AF54D0A5538D7EF11E8A317DDEE50DF9A26AFDBF07759F2C6BF
+        F0242D234CBBBFE41499E385F64F0EC42202CAE21EBACBD6FAF1FEAEAC0E5B8E
+        0B7BFC4B84CF7B781EA80FDC7B87EDBFAC7DBA96F46306FB3D58DA491A199985
+        BD9A5F127EF0D886810E7F07699EDA75D78428D3D0561A7AF92FA98112134E9E
+        7B0D0000000049454E44AE426082}
+      OnDblClick = imgIconDblClick
     end
   end
-  object pages: TPageControl
-    Left = 12
-    Top = 200
-    Width = 473
-    Height = 229
-    ActivePage = tabInfo
-    Anchors = [akLeft, akTop, akRight, akBottom]
+  object panelDetails: TPanel
+    Left = 8
+    Top = 151
+    Width = 481
+    Height = 58
     TabOrder = 1
-    object tabInfo: TTabSheet
-      Caption = 'Comments'
-      DesignSize = (
-        465
-        201)
-      object lblEmail: TLabel
-        Left = 4
-        Top = 8
-        Width = 139
-        Height = 13
-        Caption = 'Your email address (optional)'
-      end
-      object lblComments: TLabel
-        Left = 4
-        Top = 56
-        Width = 291
-        Height = 13
-        Caption = 'What were you doing when the problem occurred? (optional)'
-      end
-      object editEmail: TEdit
-        Left = 4
-        Top = 24
-        Width = 233
-        Height = 21
-        TabOrder = 0
-      end
-      object memoComments: TMemo
-        Left = 4
-        Top = 72
-        Width = 453
-        Height = 81
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        TabOrder = 1
-      end
-      object chkViewTechnicalReport: TCheckBox
-        Left = 4
-        Top = 180
-        Width = 125
-        Height = 17
-        Anchors = [akLeft, akBottom]
-        Caption = '&View Technical Report'
-        TabOrder = 2
-        OnClick = chkViewTechnicalReportClick
-      end
-      object chkSendDiagnostics: TCheckBox
-        Left = 3
-        Top = 159
-        Width = 210
-        Height = 17
-        Anchors = [akLeft, akBottom]
-        Caption = 'Send &diagnostic report (recommended)'
-        Checked = True
-        State = cbChecked
-        TabOrder = 3
-      end
+    object lblAppIDCaption: TLabel
+      Left = 15
+      Top = 12
+      Width = 103
+      Height = 13
+      Caption = 'Application Identifier:'
     end
-    object tabDetails: TTabSheet
-      Caption = 'Technical Report'
-      TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      DesignSize = (
-        465
-        201)
-      object lblStatus: TLabel
-        Left = 4
-        Top = 184
-        Width = 3
-        Height = 13
-      end
-      object memoCrashText: TMemo
-        Left = 4
-        Top = 4
-        Width = 457
-        Height = 57
-        Anchors = [akLeft, akTop, akRight]
-        Lines.Strings = (
-          'memoCrashText')
-        ParentColor = True
-        ReadOnly = True
-        ScrollBars = ssVertical
-        TabOrder = 0
-      end
-      object memoDetails: TMemo
-        Left = 4
-        Top = 64
-        Width = 457
-        Height = 117
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        Lines.Strings = (
-          'memoDetails')
-        ParentColor = True
-        ReadOnly = True
-        ScrollBars = ssBoth
-        TabOrder = 1
-        WordWrap = False
-        OnClick = memoDetailsClick
-        OnKeyUp = memoDetailsKeyUp
-      end
+    object lblAppID: TLabel
+      Left = 124
+      Top = 12
+      Width = 42
+      Height = 13
+      Caption = '<appid>'
+    end
+    object lblCrashID: TLabel
+      Left = 124
+      Top = 31
+      Width = 50
+      Height = 13
+      Caption = '<crashid>'
+    end
+    object lblCrashIDCaption: TLabel
+      Left = 15
+      Top = 31
+      Width = 75
+      Height = 13
+      Caption = 'Error Identifier:'
+    end
+    object cmdCopyToClipboard: TButton
+      Left = 361
+      Top = 17
+      Width = 107
+      Height = 25
+      Caption = '&Copy to Clipboard'
+      TabOrder = 0
+      OnClick = cmdCopyToClipboardClick
     end
   end
 end

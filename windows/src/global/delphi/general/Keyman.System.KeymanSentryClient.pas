@@ -14,8 +14,9 @@ type
     class var FClient: TSentryClient;
   private
     FFlags: TKeymanSentryClientFlags;
+    FProject: TKeymanSentryClientProject;
     procedure ClientAfterEvent(Sender: TObject; EventType: TSentryClientEventType;
-      const EventClassName, Message: string;
+      const EventID, EventClassName, Message: string;
       var EventAction: TSentryClientEventAction);
     constructor Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
   public
@@ -33,6 +34,9 @@ uses
   sentry,
 
   System.SysUtils,
+{$IF NOT DEFINED(CONSOLE)}
+  Vcl.Forms,
+{$ENDIF}
 
   KeymanPaths,
   KeymanVersion,
@@ -41,6 +45,10 @@ uses
 const
   SENTRY_DSN_DESKTOP = 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5';
   SENTRY_DSN_DEVELOPER = 'https://39b25a09410349a58fe12aaf721565af@sentry.keyman.com/6';
+
+  SENTRY_PROJECT_NAME_DESKTOP = 'keyman-desktop';
+  SENTRY_PROJECT_NAME_DEVELOPER = 'keyman-developer';
+
   //SENTRY_DSN = 'https://7b1ff1dae2c8495b84f90dadcf512b84@sentry.io/4853461'; <-- this is a testing-only host
 
   // Settings valid on development machines only:
@@ -66,8 +74,12 @@ begin
 end;
 
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
-  EventType: TSentryClientEventType; const EventClassName, Message: string;
+  EventType: TSentryClientEventType; const EventID, EventClassName, Message: string;
   var EventAction: TSentryClientEventAction);
+{$IF NOT DEFINED(CONSOLE)}
+var
+  AppID, ApplicationTitle, CommandLine, ProjectName: string;
+{$ENDIF}
 begin
   if EventType = scetException then
   begin
@@ -78,9 +90,29 @@ begin
       writeln('Fatal error '+EventClassName+': '+Message);
       writeln;
 {$ELSE}
-      // Launch external gui exception handler
+      // Launch external gui exception handler.
+      // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
+      AppID := LowerCase(ChangeFileExt(ExtractFileName(ParamStr(0)), ''))+'-'+CKeymanVersionInfo.VersionWithTag;
+      if Assigned(Application)
+        then ApplicationTitle := Application.Title
+        else ApplicationTitle := AppID;
+
+      if FProject = kscpDesktop
+        then ProjectName := SENTRY_PROJECT_NAME_DESKTOP
+        else ProjectName := SENTRY_PROJECT_NAME_DEVELOPER;
+
+
+      CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s"', [
+        EventID,
+        ApplicationTitle,
+        AppID,
+        ProjectName,
+        EventClassName,
+        StringReplace(Message, '"', '""', [rfReplaceAll])
+      ]);
+
       if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
-          TKeymanPaths.KeymanEngineInstallPath(''), '-c') then
+          TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
       begin
         {$MESSAGE HINT 'Show a message before aborting here?'}
         {MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered starting the exception manager ('+SysErrorMessage(GetLastError)+').  '+
@@ -105,6 +137,7 @@ begin
   Assert(not Assigned(FInstance));
 
   FInstance := Self;
+  FProject := AProject;
   FFlags := AFlags;
 
   sentry_set_library_path(FindSentryDLL);
