@@ -309,7 +309,7 @@
       var kmw=window['keyman'];
       //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        if (!kmw['executeHardwareKeystroke'](code, shift, lstates)) {
+        if (kmw['executeHardwareKeystroke'](code, shift, lstates)) { // false if matched, true if not
           // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
           window.jsInterface.dispatchKey(code, eventModifiers);
         }

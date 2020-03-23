@@ -180,6 +180,21 @@ namespace com.keyman.text {
      * A set of changed store values triggered by the matched keyboard rule.
      */
     setStore: {[id: number]: string} = {};
+
+    /**
+     * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
+     */
+    triggersDefaultCommand?: boolean;
+
+    /**
+     * Denotes error log messages generated when attempting to generate this behavior.
+     */
+    errorLog?: string;
+
+    /**
+     * Denotes warning log messages generated when attempting to generate this behavior.
+     */
+    warningLog?: string;
   }
 
   export class KeyboardInterface {
