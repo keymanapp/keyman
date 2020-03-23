@@ -127,7 +127,7 @@ namespace com.keyman.text {
   let nativeForBaseKeys = DefaultOutput.forBaseKeys;
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  DefaultOutput.forBaseKeys = function(Lkc: KeyEvent, keyShiftState: number): string {
+  DefaultOutput.forBaseKeys = function(Lkc: KeyEvent): string {
     let Codes = com.keyman.text.Codes;
     let code = Lkc.Lcode;
 
@@ -143,7 +143,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeForBaseKeys(Lkc, keyShiftState);
+    return nativeForBaseKeys(Lkc);
   }
 }
 
