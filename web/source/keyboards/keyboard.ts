@@ -66,6 +66,9 @@ namespace com.keyman.keyboards {
 
     /**
      * true if this keyboard uses a (legacy) pick list (Chinese, Japanese, Korean, etc.)
+     * 
+     * TODO:  Make a property on keyboards (say, `isPickList` / `KPL`) to signal this when we
+     *        get around to better, generalized picker-list support.
      */    
     get isCJK(): boolean { // I3363 (Build 301)
       var lg: string;
@@ -88,6 +91,8 @@ namespace com.keyman.keyboards {
      * Obtains the currently-active modifier bitmask for the active keyboard.
      */
     get modifierBitmask(): number {
+      // NON_CHIRAL is the default bitmask if KMBM is not defined.
+      // We always need a bitmask to compare against, as seen in `isChiral`.
       return this.scriptObject['KMBM'] || text.Codes.modifierBitmasks['NON_CHIRAL'];
     }
 
@@ -95,7 +100,7 @@ namespace com.keyman.keyboards {
       return !!(this.modifierBitmask & text.Codes.modifierBitmasks['IS_CHIRAL']);
     }
 
-    get font(): string {
+    get desktopFont(): string {
       if(this.scriptObject['KV']) {
         return this.scriptObject['KV']['F'];
       } else {

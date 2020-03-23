@@ -350,7 +350,7 @@ namespace com.keyman {
     ['isCJK'](k0?) { 
       var kbd: keyboards.Keyboard;
       if(k0) {
-        kbd = new keyboards.Keyboard(kbd);
+        kbd = new keyboards.Keyboard(k0);
       } else {
         kbd = this.textProcessor.activeKeyboard;
       }
