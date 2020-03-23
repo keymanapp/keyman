@@ -444,6 +444,7 @@ uses
   RedistFiles,
   ErrorControlledRegistry,
   RegistryKeys,
+  Sentry.Client,
   TikeUnicodeData,
   UfrmCharacterMapDock,
   UfrmMessages,
@@ -1413,11 +1414,8 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.crash1Click(Sender: TObject);
-var
-  p: PChar;
 begin
-  p := nil;
-  p^ := #0;
+  raise ESentryTest.Create('Just testing Sentry');
 end;
 
 procedure TfrmKeymanDeveloper.SetActiveChild(const Value: TfrmTikeChild);
