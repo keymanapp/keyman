@@ -329,5 +329,10 @@ namespace com.keyman.dom {
         }
       }
     }
+
+    doInputEvent() {
+      // Root = the iframe, the outermost component and the one we were originally told to attach to.
+      this.dispatchInputEventOn(this.root);
+    }
   }
 }

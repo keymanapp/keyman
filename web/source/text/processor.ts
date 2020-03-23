@@ -433,10 +433,10 @@ namespace com.keyman.text {
           keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
         }
 
-        // Since this method now performs changes for 'default' keystrokes, synthetic 'change' event generation
-        // belongs here, rather than only in interface.processKeystroke() as in versions pre-12.
-        if(outputTarget.getElement()) {
-          keyman['interface'].doInputEvent(outputTarget.getElement());
+        // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
+        if(!ruleBehavior.triggersDefaultCommand) {
+          // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
+          outputTarget.doInputEvent();
         }
 
         this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);

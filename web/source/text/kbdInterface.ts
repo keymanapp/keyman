@@ -993,23 +993,6 @@ namespace com.keyman.text {
       this.cachedContextEx.reset();
     }
 
-    doInputEvent(_target: HTMLElement|Document) {
-      var event: Event;
-      // TypeScript doesn't yet recognize InputEvent as a type!
-      if(typeof window['InputEvent'] == 'function') {
-        event = new window['InputEvent']('input', {"bubbles": true, "cancelable": false});
-      } // No else - there is no supported version in some browsers.
-
-      // Ensure that touch-aliased elements fire as if from the aliased element.
-      if(_target['base'] && _target['base']['kmw_ip']) {
-        _target = _target['base'];
-      }
-
-      if(_target && event) {
-        _target.dispatchEvent(event);
-      }
-    }
-
     defaultBackspace(outputTarget?: OutputTarget) {
       if(!outputTarget) {
         // Find the correct output target to manipulate.
