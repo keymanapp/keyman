@@ -15,7 +15,7 @@ from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from keyman_config.install_window import InstallKmpWindow
 from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.get_info import GetInfo
-from keyman_config import __majorversion__
+from keyman_config import __releaseversion__
 
 class DownloadKmpWindow(Gtk.Window):
 
@@ -31,7 +31,7 @@ class DownloadKmpWindow(Gtk.Window):
         s = Gtk.ScrolledWindow()
         webview = WebKit2.WebView()
         webview.connect("decide-policy", self.keyman_policy)
-        webview.load_uri("https://keyman.com/go/linux/"+__majorversion__+"/download-keyboards")
+        webview.load_uri("https://keyman.com/go/linux/"+__releaseversion__+"/download-keyboards")
         s.add(webview)
         vbox.pack_start(s, True, True, 0)
 
