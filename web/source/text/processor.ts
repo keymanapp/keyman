@@ -2,6 +2,8 @@
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
 /// <reference path="keyEvent.ts" />
+// Defines the RuleBehavior keyboard-processing return object.
+/// <reference path="ruleBehavior.ts" />
 // Defines default key handling behaviors.
 /// <reference path="defaultOutput.ts" />
 
@@ -403,43 +405,9 @@ namespace com.keyman.text {
           }
         }
 
-        // - start:  application of 'delayed' effects specified by RuleBehaviors -
-
-        if(ruleBehavior.beep) {
-          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-          //        We're still referencing the DOM, even if only the manager object.  (It's an improvement, at least.)
-          keyman.domManager.doBeep(outputTarget);
-        }
-
-        for(let storeID in ruleBehavior.setStore) {
-          // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-          //        `Processor` shouldn't be directly setting anything on the OSK when the refactor is complete.
-          
-          // How would this be handled in an eventual headless mode?
-          switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
-            case KeyboardInterface.TSS_LAYER:
-              keyman.osk.vkbd.showLayer(ruleBehavior.setStore[storeID]); //Build 350, osk reference now OK, so should work
-              break;
-            case KeyboardInterface.TSS_PLATFORM:
-              console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
-              break;
-            default:
-              console.warn("Unknown store affected by keyboard rule: " + storeID);
-          }
-        }
-
-        if(ruleBehavior.triggersDefaultCommand) {
-          let keyEvent = ruleBehavior.transcription.keystroke;
-          DefaultOutput.applyCommand(keyEvent);
-        }
-
-        if(ruleBehavior.warningLog) {
-          console.warn(ruleBehavior.warningLog);
-        } else if(ruleBehavior.errorLog) {
-          console.error(ruleBehavior.errorLog);
-        }
-
-        // - end section
+        // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
+        // by the actual keystroke occur.
+        ruleBehavior.finalize();
 
         // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
         //
