@@ -27,15 +27,15 @@ namespace com.keyman.text {
      * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
      * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
      */
-    public static forAny(Lkc: KeyEvent, shiftState: number, isMnenomic: boolean) {
+    public static forAny(Lkc: KeyEvent, shiftState: number, isMnemonic: boolean) {
       var char = '';
 
       // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
       if(char = DefaultOutput.forSpecialEmulation(Lkc)) {
         return char;
-      } else if(char = DefaultOutput.forNumpadKeys(Lkc)) {
+      } else if(!isMnemonic && (char = DefaultOutput.forNumpadKeys(Lkc))) {
         return char;
-      } else if(!isMnenomic && (char = DefaultOutput.forUnicodeKeynames(Lkc))) {
+      } else if(char = DefaultOutput.forUnicodeKeynames(Lkc)) {
         return char;
       } else if(char = DefaultOutput.forBaseKeys(Lkc, shiftState)) {
         return char;

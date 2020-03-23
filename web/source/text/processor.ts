@@ -118,7 +118,7 @@ namespace com.keyman.text {
         }
       }
 
-      let isMnemonic = this.activeKeyboard && !this.activeKeyboard['KM'];
+      let isMnemonic = this.activeKeyboard && this.activeKeyboard['KM'];
 
       if(!matched) {
         if(char = DefaultOutput.forAny(Lkc, keyShiftState, isMnemonic)) {
