@@ -90,11 +90,17 @@ namespace com.keyman.text {
 
       if(!matched) {
         if(char = DefaultOutput.forAny(Lkc, keyShiftState)) {
-          if(char == '\b') { // physical keystrokes.
-            keyman.interface.defaultBackspace(outputTarget);
+          special = DefaultOutput.forSpecialEmulation(Lkc)
+          if(special == EmulationKeystrokes.Backspace) {
+            // A browser's default backspace may fail to delete both parts of an SMP character.
+            keyman.interface.defaultBackspace();
           } else {
-            keyman.interface.output(0, outputTarget, char);
+            // We only do the "for special emulation" cases under the condition above... aside from backspace
+            // Let the browser handle those.
+            return null;
           }
+
+          keyman.interface.output(0, outputTarget, char);
         } else {
           // No match, no default RuleBehavior.
           return null;
