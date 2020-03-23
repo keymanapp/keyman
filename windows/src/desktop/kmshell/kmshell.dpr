@@ -70,7 +70,6 @@ uses
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas',
   ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   UImportOlderVersionKeyboards in 'main\UImportOlderVersionKeyboards.pas',
@@ -130,7 +129,6 @@ uses
   utilfocusappwnd in 'util\utilfocusappwnd.pas',
   UImportOlderVersionKeyboards8 in 'main\UImportOlderVersionKeyboards8.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  utiljclexception in '..\..\global\delphi\general\utiljclexception.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   KeymanOptionNames in '..\..\global\delphi\general\KeymanOptionNames.pas',
@@ -156,25 +154,34 @@ uses
   Keyman.Configuration.UI.MitigationForWin10_1803 in 'install\Keyman.Configuration.UI.MitigationForWin10_1803.pas',
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas',
-  UfrmHelp in 'help\UfrmHelp.pas' {frmHelp};
+  UfrmHelp in 'help\UfrmHelp.pas' {frmHelp},
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
 
 begin
-  CoInitFlags := COINIT_APARTMENTTHREADED;
-
-  FInitializeCEF := TCEFManager.Create;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
   try
-    if FInitializeCEF.Start then
+    CoInitFlags := COINIT_APARTMENTTHREADED;
+    FInitializeCEF := TCEFManager.Create;
     try
-      Application.Initialize;
-      Run;
-    except
-      on E:Exception do KeymanHandleException(E);
+      if FInitializeCEF.Start then
+      try
+        Application.Initialize;
+        Run;
+      except
+        on E:Exception do
+          SentryHandleException(E);
+      end;
+    finally
+      FInitializeCEF.Free;
     end;
   finally
-    FInitializeCEF.Free;
+    TKeymanSentryClient.Stop;
   end;
 end.
 

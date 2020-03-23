@@ -116,7 +116,6 @@ uses
   typinfo,
   ErrorControlledRegistry,
   UfrmEditor,
-  ExternalExceptionHandler,
   UfrmMain,
   UfrmMessages,
   UfrmNewFileDetails,

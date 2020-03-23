@@ -47,6 +47,7 @@ namespace com.keyman.text {
 
       let matched = false;
       var char = '';
+      var special: EmulationKeystrokes;
       if(usingOSK || outputTarget.isSynthetic) {
         matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                          // if no match occurs.
@@ -57,22 +58,23 @@ namespace com.keyman.text {
 
           // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
           // to emulate default behavior here.
-        } else if(char = DefaultOutput.forSpecialEmulation(Lkc)) { 
-          switch(char) {
-            case '\b':
+        } else if(special = DefaultOutput.forSpecialEmulation(Lkc)) { 
+          switch(special) {
+            case EmulationKeystrokes.Backspace:
               keyman.interface.defaultBackspace(outputTarget);
               break;
-            case '\n':
+            case EmulationKeystrokes.Enter:
               outputTarget.handleNewlineAtCaret();
               break;
-            case ' ':
+            case EmulationKeystrokes.Space:
               keyman.interface.output(0, outputTarget, ' ');
               break;
             // case '\u007f': // K_DEL
               // // For (possible) future implementation.
               // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
             default:
-              ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + char.kmwCharCodeAt(0).toString(16) + ") went unhandled!";
+              // In case we extend the allowed set, but forget to implement its handling case above.
+              ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
           } 
         } else {
           // Back to the standard default, pending normal matching.
@@ -82,11 +84,17 @@ namespace com.keyman.text {
 
       if(!matched) {
         if(char = DefaultOutput.forAny(Lkc)) {
-          if(char == '\b') { // physical keystrokes.
-            keyman.interface.defaultBackspace(outputTarget);
+          special = DefaultOutput.forSpecialEmulation(Lkc)
+          if(special == EmulationKeystrokes.Backspace) {
+            // A browser's default backspace may fail to delete both parts of an SMP character.
+            keyman.interface.defaultBackspace();
           } else {
-            keyman.interface.output(0, outputTarget, char);
+            // We only do the "for special emulation" cases under the condition above... aside from backspace
+            // Let the browser handle those.
+            return null;
           }
+
+          keyman.interface.output(0, outputTarget, char);
         } else {
           // No match, no default RuleBehavior.
           return null;

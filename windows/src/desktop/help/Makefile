@@ -112,7 +112,7 @@ bightml_images: dirs
 
 install:
   cd $(ROOT)\src\desktop\help
-  $(PROGRAM)\buildtools\mkver -v -u install.in install.mak $(ROOT)\src\desktop\version.txt
+  $(MKVER_U) install.in install.mak
   $(MAKE) -finstall.mak install
   -del /Q install.mak
 

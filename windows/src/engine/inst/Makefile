@@ -27,7 +27,7 @@ msm:
     # Copy files for installation
     #
 
-    $(PROGRAM)\buildtools\mkver -v -u download.in download.mak $(ROOT)\src\developer\version.txt
+    $(MKVER_U) download.in download.mak
 
     #
     # Make the installation archive

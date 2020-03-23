@@ -22,6 +22,8 @@ interface
 // We should not need to add to these hard-coded version numbers for future versions, unless
 // we have a back-compat need to refer to a specific version.
 
+{$I KeymanVersionInfo.inc}
+
 const
   SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';

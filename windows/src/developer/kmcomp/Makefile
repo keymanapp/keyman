@@ -9,21 +9,20 @@ TARGET_EXT=exe
 TARGET_GROUP=developer
 
 build: version.res manifest.res dirs icons
-    $(DELPHI_MSBUILD) $(TARGET_BASE).dproj /p:Platform=Win32
+    $(DELPHI_MSBUILD) kmcomp.dproj /p:Platform=Win32
 
-    $(TDS2DBG) $(WIN32_TARGET_PATH)\$(TARGET_BASE).$(TARGET_EXT)
-    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\$(TARGET_BASE).$(TARGET_EXT) -dpr $(TARGET_BASE).dpr
-    $(COPY) $(WIN32_TARGET_PATH)\$(TARGET_BASE).$(TARGET_EXT) $(PROGRAM)\$(TARGET_GROUP)
-    if exist $(WIN32_TARGET_PATH)\$(TARGET_BASE).dbg $(COPY) $(WIN32_TARGET_PATH)\$(TARGET_BASE).dbg $(DEBUGPATH)\$(TARGET_GROUP)
+    $(TDS2DBG) $(WIN32_TARGET_PATH)\kmcomp.exe
+    $(SENTRYTOOL_DELPHIPREP) $(WIN32_TARGET_PATH)\kmcomp.exe -dpr kmcomp.dpr
+    $(COPY) $(WIN32_TARGET_PATH)\kmcomp.exe $(PROGRAM)\developer
+    if exist $(WIN32_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN32_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer
 
-    $(DELPHI_MSBUILD) $(TARGET_BASE).dproj /p:Platform=Win64
+    $(DELPHI_MSBUILD) kmcomp.dproj /p:Platform=Win64
 
-    if exist $(WIN64_TARGET_PATH)\$(TARGET_BASE).x64.$(TARGET_EXT) del $(WIN64_TARGET_PATH)\$(TARGET_BASE).x64.$(TARGET_EXT)
-    $(MAKEJCLDBG) $(WIN64_TARGET_PATH)\$(TARGET_BASE).map
+    if exist $(WIN64_TARGET_PATH)\kmcomp.x64.exe del $(WIN64_TARGET_PATH)\kmcomp.x64.exe
     # Delphi does not allow us to build to a different target filename so we rename after build
-    ren $(WIN64_TARGET_PATH)\$(TARGET_BASE).$(TARGET_EXT) $(TARGET_BASE).x64.$(TARGET_EXT)
-    $(COPY) $(WIN64_TARGET_PATH)\$(TARGET_BASE).x64.$(TARGET_EXT) $(PROGRAM)\$(TARGET_GROUP)\$(TARGET_BASE).x64.$(TARGET_EXT)
-    if exist $(WIN64_TARGET_PATH)\$(TARGET_BASE).dbg $(COPY) $(WIN64_TARGET_PATH)\$(TARGET_BASE).dbg $(DEBUGPATH)\$(TARGET_GROUP)\$(TARGET_BASE).x64.dbg
+    ren $(WIN64_TARGET_PATH)\kmcomp.exe kmcomp.x64.exe
+    $(COPY) $(WIN64_TARGET_PATH)\kmcomp.x64.exe $(PROGRAM)\developer\kmcomp.x64.exe
+    if exist $(WIN64_TARGET_PATH)\kmcomp.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomp.dbg $(DEBUGPATH)\developer\kmcomp.x64.dbg
 
 icons:
     rc icons.rc

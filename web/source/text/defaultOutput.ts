@@ -4,6 +4,12 @@
 /// <reference path="keyEvent.ts" />
 
 namespace com.keyman.text {
+  export enum EmulationKeystrokes {
+    Space = ' ',
+    Enter = '\n',
+    Backspace = '\b'
+  }
+
   /**
    * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
    */
@@ -141,18 +147,21 @@ namespace com.keyman.text {
      * Codes matched here generally have default implementations when in a browser but require emulation
      * for 'synthetic' `OutputTarget`s like `Mock`s, which have no default text handling.
      */
-    public static forSpecialEmulation(Lkc: KeyEvent): string {
+    public static forSpecialEmulation(Lkc: KeyEvent): EmulationKeystrokes {
       let code = DefaultOutput.codeForEvent(Lkc);
 
       switch(code) {
         case Codes.keyCodes['K_BKSP']:
-          return '\b';
+          return EmulationKeystrokes.Backspace;
         case Codes.keyCodes['K_ENTER']:
-          return '\n'; 
+          return EmulationKeystrokes.Enter;
+        // (Probably) only here for legacy reasons; it's always been handled alongside the other two.
         case Codes.keyCodes['K_SPACE']:
-          return ' ';
+          return EmulationKeystrokes.Space;
         // case Codes.keyCodes['K_DEL']:
         //   return '\u007f'; // 127, ASCII / Unicode control code for DEL.
+        default:
+          return null;
       }
     }
 

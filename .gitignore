@@ -259,3 +259,5 @@ resources/environment.sh
 # Keyman translations from https://crowdin.com/project/keyman
 .crowdin-tmp/
 crowdin/
+
+/common/core/desktop/VERSION.md
