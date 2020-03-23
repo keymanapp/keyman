@@ -221,8 +221,8 @@ namespace com.keyman.text {
       } else if(keyShiftState != 0) {
         if(ruleBehavior) {
           ruleBehavior.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
-          return '';
         }
+        return '';
       }
 
       // Now that keyShiftState is either 0 or 1, we can use the following structure to determine the default output.
