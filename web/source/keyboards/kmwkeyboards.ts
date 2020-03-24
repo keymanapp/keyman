@@ -1181,7 +1181,7 @@ namespace com.keyman.keyboards {
      * @param {string} x keyboard name string
      * 
      */  
-    removeKeyboards(x: string) {
+    removeKeyboards(x: string, force?: boolean) {
       if(arguments.length == 0) {
         return false;
       }
@@ -1205,7 +1205,16 @@ namespace com.keyman.keyboards {
         if(j < 0) {
           success = false;
         }
-      } 
+      }
+
+      for(i=0; i<arguments.length; i++) {
+        for(j=this.keyboards.length-1; j>=0; j--) {
+          if('Keyboard_'+arguments[i] == this.keyboards[j]['KI']) {
+            this.keyboards.splice(j, 1);
+            break;
+          }
+        }
+      }
 
       if(activeRemoved) {
         if(this.keyboardStubs.length > 0) {
