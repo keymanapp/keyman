@@ -1,7 +1,7 @@
 #!/bin/bash
 # Process the the Keyman translations from https://crowdin.com/project/keyman
 # Normal steps:
-# 1. Save the Keyman.zip file to /.crowdin-tmp
+# 1. Download/Save the Keyman.zip file to /.crowdin-tmp/
 # 2. Extract /.crowdin-tmp/Keyman.zip into /crowdin/
 # 3. Copy files to corresponding projects.
 
@@ -17,7 +17,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 SHLVL=0
 
 display_usage() {
-  echo "parse-crowdin [-all] [-android] [-common] [-developer] [-ios]"
+  echo "download-crowdin [-all] [-android] [-common] [-developer] [-ios]"
   echo "                     [-linux] [-mac] [-web] [-windows]"
   echo "              [-no-download] [-no-extract]"
   echo
@@ -39,8 +39,8 @@ display_usage() {
 }
 
 # Include scripts to process platforms
-. ./parse-crowdin-android.sh
-. ./parse-crowdin-ios.sh
+. ./download-crowdin-android.sh
+. ./download-crowdin-ios.sh
 
 
 # If a source file $1 exists, copy it to a destination directory $2.
@@ -156,7 +156,7 @@ if [ "$DO_DOWNLOAD_ZIP" = true ]; then
     die "ERROR: Set KEYMAN_CROWDIN_TOKEN to download translation from crowdin.com"
   fi  
 
-  wget "https://api.crowdin.com/api/project/keyman/download/all.zip?key=${KEYMAN_CROWDIN_TOKEN}" "-O ${KEYMAN_ZIP}"
+  wget "https://api.crowdin.com/api/project/keyman/download/all.zip?key=${KEYMAN_CROWDIN_TOKEN}" "-O${KEYMAN_ZIP}"
 fi
 
 if [ "$DO_EXTRACT" = true ]; then
