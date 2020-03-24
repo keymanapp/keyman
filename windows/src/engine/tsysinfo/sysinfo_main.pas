@@ -81,7 +81,6 @@ type
     { Private declarations }
     procedure SINewParent(Sender: TSIList; const Caption: string;
       var Parent: TWinControl);
-    procedure RunCrashReportAndExit;
     procedure GetDiagFiles;
     procedure PrepareTabs; // I3556
     procedure ShowFiles; // I3556
@@ -108,7 +107,7 @@ uses
   // keymanstrings,
   ErrLogPath, ActiveX, ComObj,
   ErrorControlledRegistry, RegistryKeys,
-  shlobj, UfrmRemoteExceptionHandler,
+  shlobj,
   UframeAttachedFiles,
   VersionInfo, UfrmEmail, sysinfo_Util, utilexecute;
 
@@ -142,12 +141,6 @@ begin
   FSIList := TSIList.Create(Self);
   FSIList.OnNewParent := SINewParent;
 
-  if (ParamStr(1) = '-c') and (ParamCount = 2) then
-  begin
-    RunCrashReportAndExit;
-    Exit;
-  end;
-
   if (ParamStr(1) = '-d') and (ParamCount = 2) then
   begin
     SaveDiagnosticsAndExit(ParamStr(2));
@@ -173,23 +166,6 @@ begin
     panIssuesFound.Visible := False; // lbIssues.Items.Count > 0;
     panNoIssuesFound.Visible := False; // lbIssues.Items.Count = 0;
   end;
-end;
-
-procedure TfrmDiagnostics.RunCrashReportAndExit;
-var
-  CrashLog: string;
-begin
-  CrashLog := ParamStr(2);
-
-  try
-    ShowRemoteException(Self, CrashLog); // I3694   // I3671
-  finally
-    // DeleteFile(ffilename);
-    // DeleteFile(CrashLog);
-  end;
-
-  Application.ShowMainForm := False;
-  Application.Terminate;
 end;
 
 procedure TfrmDiagnostics.SaveDiagnosticsAndExit(FileName: string);

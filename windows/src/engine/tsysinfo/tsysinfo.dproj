@@ -128,6 +128,7 @@
         <VerInfo_Keys>CompanyName=;FileVersion=5.0.0.26;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <BT_BuildType>Debug</BT_BuildType>
+        <Debugger_RunParams>-c &quot;C652180A07DD4C0CB7811A63E26BC1F7&quot; &quot;Keyman Developer&quot; &quot;tike-14.0.29-alpha-local&quot; &quot;keyman-developer&quot; &quot;ESentryTest&quot; &quot;Exception ESentryTest in module Tike.exe at 009B18A6. Just testing Sentry.&quot;</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
@@ -206,6 +207,7 @@
             <Form>$R *.res</Form>
         </DCCReference>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
+        <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <BuildConfiguration Include="Debug">
