@@ -56,27 +56,35 @@ uses
   Keyman.UI.UframeCEFHost in '..\..\global\delphi\chromium\Keyman.UI.UframeCEFHost.pas' {frameCEFHost},
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas';
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R *.res}
 {$R manifest.res}
 {$R version.res}
 
 begin
-  FInitializeCEF := TCEFManager.Create;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, [kscfCaptureExceptions]); // no ui for exceptions, no termination
   try
+    FInitializeCEF := TCEFManager.Create;
     try
-      if FInitializeCEF.Start then
-      begin
-        Application.Title := 'Keyman Desktop System Information';
-        Application.Initialize;
-        Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
-        Application.Run;
+      try
+        if FInitializeCEF.Start then
+        begin
+          Application.Title := 'Keyman Desktop System Information';
+          Application.Initialize;
+          Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
+          Application.Run;
+        end;
+      finally
+        frmDiagnostics.Free;
       end;
     finally
-      frmDiagnostics.Free;
+      FInitializeCEF.Free;
     end;
   finally
-    FInitializeCEF.Free;
+    TKeymanSentryClient.Stop;
   end;
 end.

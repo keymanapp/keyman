@@ -2,11 +2,11 @@
 # imsample Makefile
 #
 
+VERSION_TXT_PATH=..\..
+
 !include ..\..\..\Defines.mak
 
-build: dirs
-    # version.res target assumes version.txt in parent folder so use this line below instead
-    $(ROOT)\bin\buildtools\mkver -v ..\..\version.txt
+build: dirs version.res
     $(MSBUILD) imsample.sln $(MSBUILD_BUILD)
     $(COPY) imsample.dll $(PROGRAM)\developer
 

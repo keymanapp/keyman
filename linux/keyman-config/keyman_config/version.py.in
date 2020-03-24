@@ -6,3 +6,4 @@
 # 3) we can import it into your module module
 __version__ = "_VERSION_"
 __majorversion__ = "_MAJORVERSION_"
+__releaseversion__ = "_RELEASEVERSION_"

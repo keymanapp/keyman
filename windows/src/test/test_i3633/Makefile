@@ -5,7 +5,7 @@
 !include ..\..\Defines.mak
 
 SIGCHECK=-$(ROOT)\src\test\test_i3633\sigcheck -q -s -e -v -accepteula
-VERIFY=.\verify -d $(ROOT)\src\version.txt
+VERIFY=.\verify -d $(KEYMAN_ROOT)\VERSION.md
 
 test: test-bin
 
@@ -17,7 +17,7 @@ test-bin: prereq
   $(VERIFY) < sig1
 
 test-install: prereq
-  
+
 
 prereq:
   $(DCC32) verify.dpr

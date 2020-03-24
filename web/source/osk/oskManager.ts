@@ -225,10 +225,10 @@ namespace com.keyman.osk {
         this._Box.className = "";
         if(activeKeyboard != null) {
           Lviskbd=activeKeyboard.legacyLayoutSpec;
-          Lhelp=activeKeyboard.scriptObject['KH'];
+          Lhelp=activeKeyboard.helpText;
 
           // Check if dynamic layout is defined within keyboard
-          layouts=activeKeyboard.layouts
+          layouts=activeKeyboard.layouts;
 
           // If any keyboard layout file is provided, use that to override the generated layout
           if(typeof layouts != 'undefined' && layouts != null) {
@@ -285,8 +285,8 @@ namespace com.keyman.osk {
           Ldiv.className='kmw-osk-static';
           Ldiv.innerHTML = Lhelp;
           this._Box.appendChild(Ldiv);
-          if(activeKeyboard.scriptObject['KHF']) {
-            activeKeyboard.scriptObject['KHF'](this._Box);
+          if(activeKeyboard.hasHelpHTML) {
+            activeKeyboard.insertHelpHTML(this._Box);
           }
         }
         if(keymanweb._TitleElement)

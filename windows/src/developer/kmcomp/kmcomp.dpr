@@ -1,6 +1,9 @@
 program kmcomp;
 
+{$APPTYPE CONSOLE}
+
 uses
+  System.SysUtils,
   main in 'main.pas',
   compile in '..\..\global\delphi\general\compile.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
@@ -110,12 +113,27 @@ uses
   Keyman.Developer.System.Project.modelTsProjectFileAction in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFileAction.pas',
   Keyman.Developer.System.LexicalModelCompile in '..\..\global\delphi\lexicalmodels\Keyman.Developer.System.LexicalModelCompile.pas',
   Keyman.System.LexicalModelUtils in '..\..\global\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
-  Keyman.Developer.System.Project.ProjectLogConsole in 'Keyman.Developer.System.Project.ProjectLogConsole.pas';
+  Keyman.Developer.System.Project.ProjectLogConsole in 'Keyman.Developer.System.Project.ProjectLogConsole.pas' {$R icons.RES},
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Console in '..\..\ext\sentry\Sentry.Client.Console.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas';
 
 {$R icons.RES}
 {$R version.res}
 {$R manifest.res}
 
 begin
-  Run;
+  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper);
+  try
+    try
+      Run;
+    except
+      on E: Exception do
+        SentryHandleException(E);
+    end;
+  finally
+    TKeymanSentryClient.Stop;
+  end;
 end.

@@ -80,5 +80,10 @@ namespace com.keyman.dom {
     protected setTextAfterCaret(s: string) {
       this.root.setText(this.getTextBeforeCaret() + s, this.getTextBeforeCaret()._kmwLength());
     }
+
+    doInputEvent() {
+      // Dispatch the event on the aliased element, not the TouchAliasElement itself.
+      this.dispatchInputEventOn(this.root.base);
+    }
   }
 }

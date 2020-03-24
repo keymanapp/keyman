@@ -50,7 +50,7 @@ uses
   Winapi.ShlObj,
   Winapi.Windows,
 
-  ExternalExceptionHandler,
+//  ExternalExceptionHandler,
   KeymanPaths,
   KeymanVersion,
 //  RedistFiles,
@@ -242,8 +242,10 @@ begin
   end;
 
   CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'Error '+id+', '+e.Message+' in '+frame.Url);
-  LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(e.LineNumber)+' of '+e.ScriptResourceName,
-    e.Message, log);
+
+  {$MESSAGE HINT 'TODO: support exceptions in js windows'}
+  //LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(e.LineNumber)+' of '+e.ScriptResourceName,
+  //  e.Message, log);
 end;
 
 end.
