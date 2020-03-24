@@ -14,9 +14,6 @@ KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
-
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 BASE_EXPORT_FOLDER="build/localizations"
@@ -28,7 +25,8 @@ readonly START_DIRECTORY
 readonly ARCHIVE_NAME
 
 function exportFile() {
-  BASE_EXPORT_FOLDER="build/localizations"
+  # appending "ios" to the base name to match the root in crowdin
+  BASE_EXPORT_FOLDER="build/localizations/ios"
 
   if ! [ -d "$BASE_EXPORT_FOLDER" ]; then
       mkdir -p "$BASE_EXPORT_FOLDER"
@@ -41,7 +39,6 @@ function exportFile() {
 
   echo "Exporting $LPROJ_SITE"
 
-  rm -rf "$EXPORT_SITE" > /dev/null 2> /dev/null
   mkdir -p "$EXPORT_SITE"
   cp -r "$LPROJ_SITE" "$EXPORT_SITE"
 }
@@ -60,8 +57,11 @@ find . -type d -name \en.lproj ! -path "./build/*" -exec bash -c 'exportFile "$0
 cd $BASE_EXPORT_FOLDER
 
 rm $ARCHIVE_NAME > /dev/null 2> /dev/null
-zip -q -r $ARCHIVE_NAME . -x "**/.*" -x "__MACOSX"
-
+if [[ -n "$WINDIR" ]]; then
+  7z a "$ARCHIVE_NAME" -r ./
+else
+  zip -q -r $ARCHIVE_NAME . -x "**/.*" -x "__MACOSX"
+fi
 mv "$ARCHIVE_NAME" "../$ARCHIVE_NAME"
 
 cd ..
