@@ -901,7 +901,29 @@ describe('Engine', function() {
         }, kmwconfig.timeouts.scriptLoad);
       });
     });
-  })
+
+    it("Multiple-sequence check", function(done) {
+      this.timeout(kmwconfig.timeouts.standard + kmwconfig.timeouts.scriptLoad * 3);
+      var keyboardID = "options_with_save";
+      var storeName = "foo";
+
+      keyman.setActiveKeyboard(keyboardID, 'en').then(function() {
+        KeymanWeb.saveStore(storeName, 1);
+        keyman.removeKeyboards(keyboardID);
+
+        var finalCheck = function() {
+          // Reset the keyboard... again.
+          keyman.removeKeyboards(keyboardID);
+
+          // Second test:  expects option to still be "off" b/c cookies.
+          runKeyboardTestFromJSON('/engine_tests/options_with_save_2.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+        };
+
+        // First test:  expects option to be "on" from cookie-init setting, emitting "foo.", then turning option "off".
+        runKeyboardTestFromJSON('/engine_tests/options_with_save_1.json', {usingOSK: false}, finalCheck, assert.equal, kmwconfig.timeouts.scriptLoad);
+      });
+    });
+  });
 
   // Performs basic processing system checks/tests to ensure the sequence testing
   // is based on correct assumptions about the code.
