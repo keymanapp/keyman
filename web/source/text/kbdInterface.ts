@@ -936,7 +936,8 @@ namespace com.keyman.text {
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=keyman.util.loadCookie(cName);
+      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName;
+      var cValue=keyman.util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
         return decodeURIComponent(cValue[storeName]);
       } else {
@@ -959,9 +960,14 @@ namespace com.keyman.text {
         return false;
       }
       
-      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
+      // The cookie entry includes the store name...
+      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName;
+      var cValue=encodeURIComponent(optValue);
 
-      keyman.util.saveCookie(cName,cValue);
+      // And the lookup under that entry looks for the value under the store name, again.
+      let valueObj = {};
+      valueObj[storeName] = cValue;
+      keyman.util.saveCookie(cName, valueObj);
       return true;
     }
 
