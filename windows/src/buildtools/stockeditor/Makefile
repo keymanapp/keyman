@@ -1,5 +1,5 @@
 #
-# Mkver Makefile
+# Stockeditor Makefile
 #
 
 !include ..\..\Defines.mak

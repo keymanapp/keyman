@@ -261,5 +261,9 @@ namespace com.keyman.dom {
         range.insertNode(n);
       }
     }
+
+    doInputEvent() {
+      this.dispatchInputEventOn(this.root);
+    }
   }
 }

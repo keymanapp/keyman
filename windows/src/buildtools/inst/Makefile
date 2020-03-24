@@ -9,7 +9,6 @@ build: copydebug
 clean:
     cd $(ROOT)\src\buildtools\inst
     -del copydebug.mak
-    -del copytointernalftp.mak
     -del srcbackup.mak
 
 copydebug:
@@ -22,22 +21,17 @@ copydebug:
     -del $(ROOT)\src\tds_file.txt
 
     cd $(ROOT)\src\buildtools\inst
-    $(PROGRAM)\buildtools\mkver -v -u copydebug.in copydebug.mak $(ROOT)\src\developer\version.txt
+    $(MKVER_U) copydebug.in copydebug.mak
     $(MAKE) -fcopydebug.mak
 
 uploadsymbols:
     cd $(ROOT)\src\buildtools\inst
-    $(PROGRAM)\buildtools\mkver -v -u copydebug.in copydebug.mak $(ROOT)\src\developer\version.txt
+    $(MKVER_U) copydebug.in copydebug.mak
     $(MAKE) -fcopydebug.mak uploadsymbols
 
 srcbackup:
     cd $(ROOT)\src\buildtools\inst
-    $(PROGRAM)\buildtools\mkver -v -u $(ROOT)\src\buildtools\inst\srcbackup.in srcbackup.mak $(ROOT)\src\developer\version.txt
+    $(MKVER_U) $(ROOT)\src\buildtools\inst\srcbackup.in srcbackup.mak
     make -fsrcbackup.mak
-
-copytointernalftp:
-    cd $(ROOT)\src\buildtools\inst
-    $(PROGRAM)\buildtools\mkver -v -u $(ROOT)\src\buildtools\inst\copytointernalftp.in copytointernalftp.mak $(ROOT)\src\developer\version.txt
-    make -fcopytointernalftp.mak
 
 !include ..\..\Target.mak

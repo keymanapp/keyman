@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.keyman.android.tests.keyboardHarness"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
 
         // VERSION_CODE and VERSION_NAME from version.gradle

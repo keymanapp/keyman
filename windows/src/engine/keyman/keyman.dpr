@@ -62,7 +62,6 @@ uses
   VisualKeyboardParameters in '..\..\global\delphi\visualkeyboard\VisualKeyboardParameters.pas',
   utilxml in '..\..\global\delphi\general\utilxml.pas',
   MSXML2_TLB in '..\..\global\delphi\tlb\MSXML2_TLB.pas',
-  ExternalExceptionHandler in '..\..\global\delphi\general\ExternalExceptionHandler.pas',
   DCPcrypt2 in '..\..\global\delphi\crypt\DCPcrypt2.pas',
   DCPbase64 in '..\..\global\delphi\crypt\DCPbase64.pas',
   DCPconst in '..\..\global\delphi\crypt\DCPconst.pas',
@@ -107,7 +106,6 @@ uses
   keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas',
   KeymanDesktopShell in 'KeymanDesktopShell.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
-  utiljclexception in '..\..\global\delphi\general\utiljclexception.pas',
   StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
   KeymanEngineControl in '..\..\global\delphi\general\KeymanEngineControl.pas',
   VisualKeyboardLoaderBinary in '..\..\global\delphi\visualkeyboard\VisualKeyboardLoaderBinary.pas',
@@ -129,7 +127,11 @@ uses
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas';
+  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas',
+  Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
+  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
+  sentry in '..\..\ext\sentry\sentry.pas',
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
@@ -141,7 +143,10 @@ uses
 {$SETPEOPTFLAGS $140}
 
 begin
-  //InitTntEnvironment;
-  //ShowMessage('Start');
-  Run;
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  try
+    Run;
+  finally
+    TKeymanSentryClient.Stop;
+  end;
 end.
