@@ -29,7 +29,7 @@ namespace com.keyman.text {
       var char = '';
 
       // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
-      if(char = DefaultOutput.forSpecialEmulation(Lkc)) {
+      if((char = DefaultOutput.forSpecialEmulation(Lkc)) !== '') {
         return char;
       } else if(!isMnemonic && (char = DefaultOutput.forNumpadKeys(Lkc))) {
         return char;
