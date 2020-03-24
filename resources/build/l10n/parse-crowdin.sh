@@ -1,7 +1,9 @@
 #!/bin/bash
-# With the Keyman translations from https://crowdin.com/project/keyman
-# saved locally in /.crowdin-tmp/Keyman.zip, extract
-# into /crowdin/ and move files to corresponding projects.
+# Process the the Keyman translations from https://crowdin.com/project/keyman
+# Normal steps:
+# 1. Save the Keyman.zip file to /.crowdin-tmp
+# 2. Extract /.crowdin-tmp/Keyman.zip into /crowdin/
+# 3. Copy files to corresponding projects.
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -16,7 +18,8 @@ SHLVL=0
 
 display_usage() {
   echo "parse-crowdin [-all] [-android] [-common] [-developer] [-ios]"
-  echo "                     [-linux] [-mac] [-web] [-windows] [-no-extract]"
+  echo "                     [-linux] [-mac] [-web] [-windows]"
+  echo "              [-no-download] [-no-extract]"
   echo
   echo "Extract Keyman.zip at root of the repo and then copy files to given platforms"
   echo "Options:"
@@ -30,6 +33,7 @@ display_usage() {
   echo "  -web            Copy localization files for web"
   echo "  -windows        Copy localization files for windows"
   echo
+  echo "  -no-download    Skip downloading Keyman.zip from crowdin.com"
   echo "  -no-extract     Skip clean and unzipping Keyman.zip"
   exit 1
 }
@@ -56,15 +60,17 @@ function copy_file() {
 
 
 # Path definitions
-KEYMAN_ZIP="$KEYMAN_ROOT/.crowdin-tmp/Keyman.zip"
 KMA_ROOT="$KEYMAN_ROOT/android"
 KMI_ROOT="$KEYMAN_ROOT/ios"
+CROWDIN_TMP_ROOT="$KEYMAN_ROOT/.crowdin-tmp"
 CROWDIN_ROOT="$KEYMAN_ROOT/crowdin"
+KEYMAN_ZIP="$CROWDIN_TMP_ROOT/Keyman.zip"
 
 if [[ $# -eq 0 ]] ; then
   display_usage
 fi
 
+DO_DOWNLOAD_ZIP=true
 DO_EXTRACT=true
 
 # Default is to not copy to any platform
@@ -112,6 +118,9 @@ while [[ $# -gt 0 ]] ; do
         -mac)
             DO_MAC=true
             ;;
+        -no-download)
+            DO_DOWNLOAD_ZIP=false
+            ;;
         -no-extract)
             DO_EXTRACT=false
             ;;
@@ -126,7 +135,9 @@ while [[ $# -gt 0 ]] ; do
 done
 
 echo
-echo "DO_EXTRACT:   $DO_EXTRACT"
+echo "DO_DOWNLOAD_ZIP:  $DO_DOWNLOAD_ZIP"
+echo "DO_EXTRACT:       $DO_EXTRACT"
+echo
 echo "DO_ANDROID:   $DO_ANDROID"
 echo "DO_COMMON:    $DO_COMMON"
 echo "DO_DEVELOPER: $DO_DEVELOPER"
@@ -136,6 +147,17 @@ echo "DO_MAC:       $DO_MAC"
 echo "DO_WEB:       $DO_WEB"
 echo "DO_WINDOWS:   $DO_WINDOWS"
 echo
+
+# Download all the translations from crowdin.com.
+# https://support.crowdin.com/api/download/
+# If we only want a locale, replace "all.zip"
+if [ "$DO_DOWNLOAD_ZIP" = true ]; then
+  if [ -z "${KEYMAN_CROWDIN_TOKEN}" ]; then
+    die "ERROR: Set KEYMAN_CROWDIN_TOKEN to download translation from crowdin.com"
+  fi  
+
+  wget "https://api.crowdin.com/api/project/keyman/download/all.zip?key=${KEYMAN_CROWDIN_TOKEN}" "-O ${KEYMAN_ZIP}"
+fi
 
 if [ "$DO_EXTRACT" = true ]; then
   # Clean /crowdin/
