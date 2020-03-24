@@ -1178,7 +1178,8 @@ namespace com.keyman.keyboards {
     /**
      * Build 362: removeKeyboards() remove keyboard from list of available keyboards
      * 
-     * @param {string} x keyboard name string
+     * @param {string}  x      keyboard name string
+     * @param {boolean} force  When true, also drops the cached keyboard object
      * 
      */  
     removeKeyboards(x: string, force?: boolean) {
