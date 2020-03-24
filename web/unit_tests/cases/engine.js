@@ -882,7 +882,7 @@ describe('Engine', function() {
         assert.equal(value, 1, "loadStore did not see the value saved to initialize the test before resetting keyboard");
 
         // Reload the keyboard so that we can test its loaded value.
-        keyman.removeKeyboards(keyboardID);
+        keyman.removeKeyboards(keyboardID, true);
 
         // Now we can reload the keyboard and run the test.
         var remainderOfTest = function() {
@@ -909,11 +909,11 @@ describe('Engine', function() {
 
       keyman.setActiveKeyboard(keyboardID, 'en').then(function() {
         KeymanWeb.saveStore(storeName, 1);
-        keyman.removeKeyboards(keyboardID);
+        keyman.removeKeyboards(keyboardID, true);
 
         var finalCheck = function() {
           // Reset the keyboard... again.
-          keyman.removeKeyboards(keyboardID);
+          keyman.removeKeyboards(keyboardID, true);
 
           // Second test:  expects option to still be "off" b/c cookies.
           runKeyboardTestFromJSON('/engine_tests/options_with_save_2.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
