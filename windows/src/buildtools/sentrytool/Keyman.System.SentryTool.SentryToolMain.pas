@@ -93,7 +93,7 @@ begin
     else Result := FDelphiSearchFile.FindFile(UnitName);
 
   if Result <> '' then
-    Result := ExtractRelativePath(FRootPath, Result);
+    Result := ExpandFileName(Result); // ExtractRelativePath(FRootPath, Result);
 end;
 
 function main: Integer;

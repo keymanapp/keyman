@@ -60,6 +60,30 @@ namespace com.keyman.keyboards {
       return typeof this.scriptObject['KM'] != 'undefined';
     }
 
+    /**
+     * HTML help text which is a one liner intended for the status bar of the desktop OSK originally.
+     * 
+     * Reference: https://help.keyman.com/developer/language/reference/kmw_helptext
+     */
+    get helpText(): string {
+      return this.scriptObject['KH'];
+    }
+
+    get hasHelpHTML(): boolean {
+      return !!this.scriptObject['KHF'];
+    }
+
+    /**
+     * Replaces the OSK with custom HTML, which may be interactive (like with sil_euro_latin).
+     * 
+     * Reference: https://help.keyman.com/developer/language/reference/kmw_helpfile
+     */
+    insertHelpHTML(e: any) {
+      // e:  Expects the OSKManager's _Box element.  We don't add type info here b/c it would
+      //     reference the DOM.
+      this.scriptObject['KHF'](e);
+    }
+
     get oskStyling(): string {
       return this.scriptObject['KCSS'];
     }

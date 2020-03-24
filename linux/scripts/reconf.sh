@@ -54,13 +54,14 @@ done
 for proj in ${extra_projects}; do
     if [ "${proj}" == "keyboardprocessor" ]; then
         rm -rf keyboardprocessor
+        cp ../VERSION.md ../common/core/desktop/
         meson ../common/core/desktop keyboardprocessor
     fi
     if [ "${proj}" == "keyman-config" ]; then
         cd keyman-config
         make clean
         cd keyman_config
-        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" version.py.in > version.py
+        sed -e "s/_VERSION_/${newvers}/g" -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" version.py.in > version.py
     fi
     cd $BASEDIR
 done

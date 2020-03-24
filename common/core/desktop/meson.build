@@ -1,4 +1,4 @@
-# Copyright:    © 2018 SIL International.
+# Copyright:    © 2018-2020 SIL International.
 # Description:  Cross platform build script to compile libkmnkbp, documentation
 #               and tests.
 # Create Date:  2 Oct 2018
@@ -6,10 +6,10 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        # Get version number from file.
+        # Get version number from file (VERSION.md is in this directory for source package)
         # Fallback to "more" for Windows compatbility
         version: run_command(find_program('cat', 'more'),
-                 files('../../../VERSION.md')).stdout().strip(),
+                 files('VERSION.md')).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14'])

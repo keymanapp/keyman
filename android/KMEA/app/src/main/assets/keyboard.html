@@ -118,7 +118,7 @@
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont, package) {
       var kmw=window['keyman'];
-      var kbdInterface=kmw['interface'];
+      var kbdInterface=window.KeymanWeb;
 
       // Defaults for missing arguments
       switch (arguments.length) {

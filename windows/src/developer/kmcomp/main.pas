@@ -275,7 +275,8 @@ begin
     CoUninitialize();
   end;
 
-  if FError then Halt(1);
+  if FError then
+    ExitCode := 1;
 end;
 
 function CompileKeyboard(FInFile, FOutFile: string; FDebug, FWarnAsError: Boolean): Boolean;   // I4706
