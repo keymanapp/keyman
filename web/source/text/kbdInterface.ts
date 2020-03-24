@@ -914,6 +914,9 @@ namespace com.keyman.text {
      * @param       {Object}      Pelem       Currently active element (may be needed in future tests)     
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
+     * 
+     * Note that option/variable stores are instead set within keyboard script code, as they only
+     * affect keyboard behavior.
      */    
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       this.resetContextCache();
@@ -932,6 +935,9 @@ namespace com.keyman.text {
      * @param       {string}      storeName   store (option) name, embedded in cookie name
      * @param       {string}      dfltValue   default value
      * @return      {string}                  current or default option value   
+     * 
+     * This will only ever be called when the keyboard is loaded, as it is used by keyboards
+     * to initialize a store value on the keyboard's script object.
      */    
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
       let keyman = com.keyman.singleton;
@@ -951,6 +957,10 @@ namespace com.keyman.text {
      * @param       {string}      storeName   store (option) name, embedded in cookie name
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
+     * 
+     * Note that a keyboard will freely manipulate the value of its variable stores on the
+     * script object within its own code.  This function's use is merely to _persist_ that
+     * value across sessions, providing a custom user default for later uses of the keyboard.
      */    
     saveStore(storeName:string, optValue:string): boolean {
       let keyman = com.keyman.singleton;
