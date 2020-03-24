@@ -1000,7 +1000,7 @@ namespace com.keyman.osk {
       // Clear repeated backspace if active, preventing 'sticky' behavior.
       this.cancelDelete();
 
-      if((sk && sk.style.visibility == 'visible') || this.popupVisible) {
+      if((sk && sk.style.visibility == 'visible')) {
         // Ignore release if a multiple touch
         if(e.touches.length > 0) {
           return;
@@ -1013,6 +1013,15 @@ namespace com.keyman.osk {
           this.keyPending = null;
           this.touchPending = null;
         }
+      }
+
+      // Only set when embedded in our Android/iOS app.  Signals that the device is handling 
+      // subkeys, so we shouldn't allow output for the base key.
+      //
+      // Note that on iOS (at least), this.release() will trigger before kmwembedded.ts's
+      // executePopupKey() function.
+      if(this.popupVisible) {
+        return;
       }
 
       // Handle menu key release event
