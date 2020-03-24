@@ -71,6 +71,10 @@ namespace com.keyman.text {
       // All old deadkeys and keyboard-specific cache should immediately be invalidated
       // on a keyboard change.
       this.keyboardInterface.resetContext();
+
+      // Ensure that the setting propagates immediately to the keyboard interface object.
+      // Matters for some unit tests.
+      this.keyboardInterface.activeKeyboard = keyboard;
     }
 
     /**
