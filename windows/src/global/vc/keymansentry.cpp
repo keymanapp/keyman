@@ -101,6 +101,8 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
   }
 
   sentry_capture_event(event);
+
+  perror(message);
 }
 
 void keyman_sentry_report_message(keyman_sentry_level_t level, const char *logger, const char *message, bool includeStack) {
