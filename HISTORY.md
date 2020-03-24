@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 14.0.33 alpha 2020-03-23
+
+* fix(android): Update min SDK versions for sample apps (#2872)
+* refactor(web/engine): extended abstraction with OutputTarget (#2849)
+* refactor(web/engine): reworks use of embedded's keyman['oninserttext'] (#2850)
+* refactor(web/engine): reworks default output handling to return RuleBehaviors (#2854)
+* refactor(web/engine): removes shiftState parameter (#2859)
+* refactor(web/engine): moves new RuleBehavior type & behaviors to own file (#2861)
+* refactor(web/engine): doInputEvent moved to OutputTarget (#2862)
+* refactor(web/engine): KeyboardInterface now property of Processor (#2863)
+* fix(windows): some sentry symbolication was not working (#2871)
+* fix(linux): Use __release_version__ for downloadkeyboard window (#2877)
+
 ## 14.0.32 alpha 2020-03-20
 
 * fix(windows): include sources for sentry (#2866)

@@ -115,7 +115,7 @@ begin
     then o.DSN := SENTRY_DSN_DESKTOP
     else o.DSN := SENTRY_DSN_DEVELOPER;
 
-  {$MESSAGE HINT 'Support proxies'}
+  // Note: system proxy is used automatically if no proxy is defined
 
   o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag;
 
