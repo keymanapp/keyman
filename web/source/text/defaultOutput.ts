@@ -29,13 +29,13 @@ namespace com.keyman.text {
       var char = '';
 
       // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
-      if((char = DefaultOutput.forSpecialEmulation(Lkc)) !== '') {
+      if((char = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
         return char;
-      } else if(!isMnemonic && (char = DefaultOutput.forNumpadKeys(Lkc))) {
+      } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc)) != null)) {
         return char;
-      } else if(char = DefaultOutput.forUnicodeKeynames(Lkc)) {
+      } else if((char = DefaultOutput.forUnicodeKeynames(Lkc)) != null) {
         return char;
-      } else if(char = DefaultOutput.forBaseKeys(Lkc)) {
+      } else if((char = DefaultOutput.forBaseKeys(Lkc)) != null) {
         return char;
       } else {
         // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.

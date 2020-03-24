@@ -92,7 +92,7 @@ namespace com.keyman.text {
 
           // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
           // to emulate default behavior here.
-        } else if(special = DefaultOutput.forSpecialEmulation(Lkc)) { 
+        } else if((special = DefaultOutput.forSpecialEmulation(Lkc)) != null) { 
           switch(special) {
             case EmulationKeystrokes.Backspace:
               this.keyboardInterface.defaultBackspace(outputTarget);
@@ -119,7 +119,7 @@ namespace com.keyman.text {
       let isMnemonic = this.activeKeyboard && this.activeKeyboard['KM'];
 
       if(!matched) {
-        if(char = DefaultOutput.forAny(Lkc, isMnemonic)) {
+        if((char = DefaultOutput.forAny(Lkc, isMnemonic)) != null) {
           special = DefaultOutput.forSpecialEmulation(Lkc)
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
