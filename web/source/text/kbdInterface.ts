@@ -626,12 +626,11 @@ namespace com.keyman.text {
 
     _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
       if(typeof(store) == 'string') {
-        let keyman = com.keyman.singleton;
-        var kbdTag = keyman.keyboardManager.getActiveKeyboardTag();
+        let cachedStores = this.activeKeyboard.explodedStores;
 
         // Is the result cached?
-        if(kbdTag.stores[store]) {
-          return kbdTag.stores[store];
+        if(cachedStores[store]) {
+          return cachedStores[store];
         }
 
         // Nope, so let's build its cache.
@@ -641,7 +640,7 @@ namespace com.keyman.text {
         }
 
         // Cache the result for later!
-        kbdTag.stores[store] = result;
+        cachedStores[store] = result;
         return result;
       } else {
         return store;
