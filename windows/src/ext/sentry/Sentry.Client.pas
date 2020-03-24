@@ -239,7 +239,7 @@ end;
 procedure TSentryClient.DoAfterEvent(const EventID, ExceptionClassName, Message: string;
   EventType: TSentryClientEventType);
 var
-  EventAction: TSentryClientEventAction;
+  EventAction: TSentryClientEventAction;
 begin
   if Assigned(FOnAfterEvent) then
   begin
