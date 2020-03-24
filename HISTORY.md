@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.34 alpha 2020-03-24
+
+* fix(web): fixes embedded kbd initialization (#2879)
+* fix(ios): popup keys over base keys no longer emit base char. (#2881)
+
 ## 14.0.33 alpha 2020-03-23
 
 * fix(android): Update min SDK versions for sample apps (#2872)
