@@ -114,7 +114,7 @@
             function setKeymanLanguage(stub) {
                 var kmw = window.keyman;
 
-                kmw.interface.registerStub(stub);
+                KeymanWeb.registerStub(stub);
                 kmw.setActiveKeyboard(stub.KI, stub.KLC);
                 kmw.osk.show(true);
             }
