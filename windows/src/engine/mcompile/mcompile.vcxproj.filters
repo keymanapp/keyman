@@ -74,6 +74,9 @@
     <ClCompile Include="mc_unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\global\vc\keymansentry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="mcompile.rc">
