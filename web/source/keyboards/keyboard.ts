@@ -1,5 +1,16 @@
 namespace com.keyman.keyboards {
   /**
+   * Stores preprocessed properties of a keyboard for quick retrieval later.
+   */
+  class CacheTag {
+    stores: {[storeName: string]: text.ComplexKeyboardStore};
+
+    constructor() {
+      this.stores = {};
+    }
+  }
+
+  /**
    * Acts as a wrapper class for Keyman keyboards compiled to JS, providing type information
    * and keyboard-centered functionality in an object-oriented way without modifying the 
    * wrapped keyboard itself.
@@ -132,6 +143,21 @@ namespace com.keyman.keyboards {
       }
     }
 
+    private get cacheTag(): CacheTag {
+      let tag = this.scriptObject['_kmw'];
+
+      if(!tag) {
+        tag = new CacheTag();
+        this.scriptObject['_kmw'] = tag;
+      }
+
+      return tag; 
+    }
+
+    get explodedStores(): {[storeName: string]: text.ComplexKeyboardStore} {
+      return this.cacheTag.stores;
+    }
+
     usesDesktopLayoutOnDevice(device: Device) {
       if(this.scriptObject['KVKL']) {
         // A custom mobile layout is defined... but are we using it?
@@ -153,8 +179,5 @@ namespace com.keyman.keyboards {
         this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
       }
     }
-
-    // TODO:  Provide public property-retrieving methods on this class, rather than as part of
-    //        the KeyboardManager object.
   }
 }

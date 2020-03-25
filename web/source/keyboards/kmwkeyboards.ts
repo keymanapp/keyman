@@ -114,11 +114,6 @@ namespace com.keyman.keyboards {
       return textProcessor.activeKeyboard ? textProcessor.activeKeyboard.id : '';
     }
 
-    getActiveKeyboardTag(): KeyboardTag {
-      let textProcessor = com.keyman.singleton.textProcessor;
-      return textProcessor.activeKeyboard ? textProcessor.activeKeyboard.scriptObject['_kmw'] : null;
-    }
-
     getActiveLanguage(fullName?: boolean): string {
       if(this.activeStub == null) {
         return '';
