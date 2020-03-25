@@ -343,11 +343,19 @@ namespace com.keyman {
      * Scope       Public
      * @param      {Object=}  k0 
      * @return     {boolean}
-     * Description Tests if active keyboard (or optional argument) uses a pick list (Chinese, Japanese, Korean, etc.)
+     * Description Tests if active keyboard (or specified keyboard script object, as optional argument) 
+     *             uses a pick list (Chinese, Japanese, Korean, etc.)
      *             (This function accepts either keyboard structure.)   
      */    
-    ['isCJK'](k0) { 
-      return this.keyboardManager.isCJK(k0);
+    ['isCJK'](k0?) { 
+      var kbd: keyboards.Keyboard;
+      if(k0) {
+        kbd = new keyboards.Keyboard(k0);
+      } else {
+        kbd = this.textProcessor.activeKeyboard;
+      }
+
+      return kbd && kbd.isCJK;
     }
 
     /**
@@ -358,7 +366,13 @@ namespace com.keyman {
      * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
      */
     ['isChiral'](k0?) {
-      return this.keyboardManager.isChiral(k0);
+      var kbd: keyboards.Keyboard;
+      if(k0) {
+        kbd = new keyboards.Keyboard(k0);
+      } else {
+        kbd = this.textProcessor.activeKeyboard;
+      }
+      return kbd.isChiral;
     }
 
     /**

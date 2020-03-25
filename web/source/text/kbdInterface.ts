@@ -195,22 +195,6 @@ namespace com.keyman.text {
         DOMEventHandlers.states._IgnoreNextSelChange = 1;
       }
     }
-
-            
-    /**
-     * Function     _NotifyKeyboard
-     * Scope        Private
-     * @param       {number}    _PCommand     event code (16,17,18) or 0
-     * @param       {Object}    _PTarget      target element
-     * @param       {number}    _PData        1 or 0    
-     * Description  Notifies keyboard of keystroke or other event
-     */    
-    notifyKeyboard(_PCommand: number, _PTarget: OutputTarget, _PData: number) { // I2187
-      // Good example use case - the Japanese CJK-picker keyboard
-      if(this.activeKeyboard != null && typeof(this.activeKeyboard.scriptObject['KNS']) == 'function') {
-        this.activeKeyboard.scriptObject['KNS'](_PCommand, _PTarget, _PData);
-      }
-    }
       
     /**
      * Function     KT
@@ -566,8 +550,7 @@ namespace com.keyman.text {
       var retVal = false; // I3318
       var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-      let keyman = com.keyman.singleton;
-      let bitmask = keyman.keyboardManager.getKeyboardModifierBitmask();
+      let bitmask = this.activeKeyboard.modifierBitmask;
       let Codes = com.keyman.text.Codes;
       var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
       var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
@@ -815,7 +798,6 @@ namespace com.keyman.text {
      */
     output(dn: number, outputTarget: OutputTarget, s:string): void {
       this.resetContextCache();
-      let keyman = com.keyman.singleton;
 
       outputTarget.saveProperties();
       outputTarget.clearSelection();
@@ -827,11 +809,6 @@ namespace com.keyman.text {
       // Automatically manages affected deadkey positions.
       outputTarget.insertTextBeforeCaret(s);
       outputTarget.restoreProperties();
-
-      // Refresh element content after change (if needed)
-      if(typeof(keyman.refreshElementContent) == 'function') {
-        keyman.refreshElementContent(outputTarget.getElement());
-      }
     }
   
     
@@ -941,7 +918,6 @@ namespace com.keyman.text {
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
      */    
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
-      let keyman = com.keyman.singleton;
       this.resetContextCache();
       if(systemId == KeyboardInterface.TSS_LAYER) {
         // Denote the changed store as part of the matched rule's behavior.

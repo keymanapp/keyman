@@ -365,16 +365,21 @@ namespace com.keyman.osk {
     static emulatesAltGr(keyLabels?: KLS): boolean { // TODO:  typing for keyLabels (corresponds to KLS)
       var layers;
       let keyman = <KeymanBase> window['keyman'];
+      var activeKeyboard = keyman.textProcessor.activeKeyboard;
       let modifierCodes = Codes.modifierCodes;
 
+      if(!activeKeyboard) {
+        // No Alt-Gr emulation if there's not actually a keyboard loaded.
+        return false;
+      }
+
       // If we're not chiral, we're not emulating.
-      if(!keyman.keyboardManager.isChiral()) {
+      if(!activeKeyboard.isChiral) {
         return false;
       }
 
       if(!keyLabels) {
-        var activeKeyboard = keyman.textProcessor.activeKeyboard;
-        if(activeKeyboard == null || activeKeyboard.legacyLayoutSpec == null) {
+        if(activeKeyboard.legacyLayoutSpec == null) {
           return false;
         }
         
@@ -402,7 +407,7 @@ namespace com.keyman.osk {
 
       // It's technically possible for the OSK to not specify anything while allowing chiral input.  A last-ditch catch:
 
-      var bitmask = keyman.keyboardManager.getKeyboardModifierBitmask();
+      var bitmask = activeKeyboard.modifierBitmask;
       if((bitmask & emulationMask) != emulationMask) {
         // At least one of the emulation modifiers is never used by the keyboard!  We can confirm everything's safe.
         return true;

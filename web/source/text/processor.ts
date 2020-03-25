@@ -350,7 +350,7 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if((formFactor == 'desktop' || keyman.keyboardManager.layoutIsDesktopBased()) && fromOSK) {
+      if((formFactor == 'desktop' || this.activeKeyboard.usesDesktopLayoutOnDevice(keyman.util.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
@@ -473,6 +473,7 @@ namespace com.keyman.text {
         if(keyman.isEmbedded) {
           // A special embedded callback used to setup direct callbacks to app-native code.
           keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
+          keyman.refreshElementContent(outputTarget.getElement());
         }
 
         // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
@@ -654,7 +655,6 @@ namespace com.keyman.text {
      * @return      {number}                key code > 255 on success, or 0 if not found
      */
     getVKDictionaryCode(keyName: string) {
-      let keyman = com.keyman.singleton;
       var activeKeyboard = this.activeKeyboard;
       if(!activeKeyboard.scriptObject['VKDictionary']) {
         var a=[];
@@ -691,13 +691,17 @@ namespace com.keyman.text {
       var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
       var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
 
+      if(!this.activeKeyboard) {
+        return true;
+      }
+
       if(e) {
         // read shift states from Pevent
         keyShiftState = e.Lmodifiers;
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(keyman.keyboardManager.isChiral() && osk.Layouts.emulatesAltGr() && 
+        if(this.activeKeyboard.isChiral && osk.Layouts.emulatesAltGr() && 
             (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~Codes.modifierCodes['RALT'];
@@ -753,8 +757,7 @@ namespace com.keyman.text {
      */
     selectLayer(keyName: string, nextLayerIn?: number | string): boolean {
       var nextLayer = arguments.length < 2 ? null : nextLayerIn;
-      let keyman = com.keyman.singleton;
-      var isChiral = keyman.keyboardManager.isChiral();
+      var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
       // Layer must be identified by name, not number (27/08/2015)
       if(typeof nextLayer == 'number') {
@@ -961,6 +964,10 @@ namespace com.keyman.text {
       let keyman = com.keyman.singleton;
       let outputTarget = Levent.Ltarg;
 
+      if(!this.activeKeyboard) {
+        return false;
+      }
+
       switch(Levent.Lcode) {
         case 8: 
           outputTarget.deadkeys().clear();
@@ -972,7 +979,7 @@ namespace com.keyman.text {
         case 144:
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-          this.keyboardInterface.notifyKeyboard(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
+          this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
           if(!keyman.util.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
@@ -981,7 +988,7 @@ namespace com.keyman.text {
       }
 
       if(Levent.LmodifierChange) {
-        this.keyboardInterface.notifyKeyboard(0, outputTarget, 1); 
+        this.activeKeyboard.notify(0, outputTarget, 1); 
         this._UpdateVKShift(Levent, 0, 1);
       }
 
@@ -1104,7 +1111,8 @@ namespace com.keyman.text {
 
       let modifierBitmasks = Codes.modifierBitmasks;
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
-      if(keyman.keyboardManager.isChiral()) {
+      var activeKeyboard = this.activeKeyboard;
+      if(activeKeyboard && activeKeyboard.isChiral) {
         s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
@@ -1122,8 +1130,6 @@ namespace com.keyman.text {
       }
 
       // Mnemonic handling.
-      var activeKeyboard = this.activeKeyboard;
-
       if(activeKeyboard && activeKeyboard.isMnemonic) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,
         // which may change the value of Lcode, here.

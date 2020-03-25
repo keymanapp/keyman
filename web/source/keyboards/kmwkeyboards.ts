@@ -796,112 +796,18 @@ namespace com.keyman.keyboards {
      * Scope       Public
      * @param      {Object=}  k0 
      * @return     {boolean}
-     * Description Tests if active keyboard (or optional argument) uses a pick list (Chinese, Japanese, Korean, etc.)
+     * Description Tests if the keyboard stub uses a pick list (Chinese, Japanese, Korean, etc.)
      *             (This function accepts either keyboard structure.)   
      */    
-    isCJK(k0?: any|KeyboardStub) { // I3363 (Build 301)
-      let textProcessor = com.keyman.singleton.textProcessor;
-      var k;
-      if(textProcessor.activeKeyboard) {
-        k = textProcessor.activeKeyboard.scriptObject;
-      }
-      var lg=''; 
-
-      if(arguments.length > 0) {
-        k = k0;
-      }
-      
-      if(k) {
-        if(typeof(k['KLC']) != 'undefined') {
-          lg = k['KLC'];
-        } else if(typeof(k['LanguageCode']) != 'undefined') {
-          lg = k['LanguageCode'];
-        }
+    isCJK(k: KeyboardStub) { // I3363 (Build 301)
+      var lg: string;
+      if(typeof(k['KLC']) != 'undefined') {
+        lg = k['KLC'];
+      } else if(typeof(k['LanguageCode']) != 'undefined') {
+        lg = k['LanguageCode'];
       }
       
       return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
-    }
-
-    isRTL(k0?): boolean {
-      let textProcessor = com.keyman.singleton.textProcessor
-      var k = k0;
-      if(!k && textProcessor.activeKeyboard) {
-        k = textProcessor.activeKeyboard.scriptObject;
-      }
-      return (k != null) && (k['KRTL']);
-    }
-
-    /**
-     * Function     isChiral
-     * Scope        Public
-     * @param       {string|Object=}   k0
-     * @return      {boolean}
-     * Description  Tests if the active keyboard (or optional argument) uses chiral modifiers.
-     */
-    isChiral(k0?) {
-      if(typeof(k0) == "string") {
-        k0 = this.getKeyboardByID(k0);
-      }
-
-      return !!(this.getKeyboardModifierBitmask(k0) & text.Codes.modifierBitmasks.IS_CHIRAL);
-    }
-
-    /**
-     * Function     getKeyboardModifierBitmask
-     * Scope        Private
-     * @param       {Object=}   k0
-     * @return      {number}
-     * Description  Obtains the currently-active modifier bitmask for the active keyboard.
-     */
-    getKeyboardModifierBitmask(k0?) {
-      let textProcessor = com.keyman.singleton.textProcessor
-      var k=textProcessor.activeKeyboard;
-      if(k) {
-        k = k.scriptObject;
-      }
-      
-      if(arguments.length > 0 && typeof k0 != 'undefined') {
-        k = k0;
-      }
-
-      if(!k) {
-        return 0x0000;
-      }
-
-      if(k['KMBM']) {
-        return k['KMBM'];
-      }
-
-      return text.Codes.modifierBitmasks['NON_CHIRAL'];
-    }
-
-    getFont(k0?) {
-      let textProcessor = com.keyman.singleton.textProcessor
-      var k = k0;
-      if(!k && textProcessor.activeKeyboard) {
-        k = textProcessor.activeKeyboard.scriptObject;
-      }
-
-      if(k && k['KV']) {
-        return k['KV']['F'];
-      }
-      
-      return null;
-    }
-
-    layoutIsDesktopBased(k0?) {
-      let keyman = com.keyman.singleton;
-      var k = k0;
-      if(!k && keyman.textProcessor.activeKeyboard) {
-        k = keyman.textProcessor.activeKeyboard.scriptObject;
-      }
-
-      if(k && k['KVKL']) {
-        // A custom mobile layout is defined... but are we using it?
-        return keyman.util.device.formFactor == 'desktop';
-      } else {
-        return true;
-      }
     }
 
     /**

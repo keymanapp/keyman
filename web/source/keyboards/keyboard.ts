@@ -88,6 +88,72 @@ namespace com.keyman.keyboards {
       return this.scriptObject['KCSS'];
     }
 
+    /**
+     * true if this keyboard uses a (legacy) pick list (Chinese, Japanese, Korean, etc.)
+     * 
+     * TODO:  Make a property on keyboards (say, `isPickList` / `KPL`) to signal this when we
+     *        get around to better, generalized picker-list support.
+     */    
+    get isCJK(): boolean { // I3363 (Build 301)
+      var lg: string;
+      if(typeof(this.scriptObject['KLC']) != 'undefined') {
+        lg = this.scriptObject['KLC'];
+      } else if(typeof(this.scriptObject['LanguageCode']) != 'undefined') {
+        lg = this.scriptObject['LanguageCode'];
+      }
+      
+      // While some of these aren't proper BCP-47 language codes, the CJK keyboards predate our use of BCP-47.
+      // So, we preserve the old ISO 639-3 codes, as that's what the keyboards are matching against.
+      return ((lg == 'cmn') || (lg == 'jpn') || (lg == 'kor'));
+    }
+
+    get isRTL(): boolean {
+      return !!this.scriptObject['KRTL'];
+    }
+
+    /**
+     * Obtains the currently-active modifier bitmask for the active keyboard.
+     */
+    get modifierBitmask(): number {
+      // NON_CHIRAL is the default bitmask if KMBM is not defined.
+      // We always need a bitmask to compare against, as seen in `isChiral`.
+      return this.scriptObject['KMBM'] || text.Codes.modifierBitmasks['NON_CHIRAL'];
+    }
+
+    get isChiral(): boolean {
+      return !!(this.modifierBitmask & text.Codes.modifierBitmasks['IS_CHIRAL']);
+    }
+
+    get desktopFont(): string {
+      if(this.scriptObject['KV']) {
+        return this.scriptObject['KV']['F'];
+      } else {
+        return null;
+      }
+    }
+
+    usesDesktopLayoutOnDevice(device: Device) {
+      if(this.scriptObject['KVKL']) {
+        // A custom mobile layout is defined... but are we using it?
+        return device.formFactor == 'desktop';
+      } else {
+        return true;
+      }
+    }
+
+    /**
+     * @param       {number}    _PCommand     event code (16,17,18) or 0
+     * @param       {Object}    _PTarget      target element
+     * @param       {number}    _PData        1 or 0    
+     * Notifies keyboard of keystroke or other event
+     */    
+    notify(_PCommand: number, _PTarget: text.OutputTarget, _PData: number) { // I2187
+      // Good example use case - the Japanese CJK-picker keyboard
+      if(typeof(this.scriptObject['KNS']) == 'function') {
+        this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
+      }
+    }
+
     // TODO:  Provide public property-retrieving methods on this class, rather than as part of
     //        the KeyboardManager object.
   }
