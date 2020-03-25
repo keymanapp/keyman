@@ -860,6 +860,76 @@ describe('Engine', function() {
     // TODO:  add a 'resetContext' test!
   })
 
+  describe('Variable Stores', function() {
+    this.timeout(kmwconfig.timeouts.scriptLoad + kmwconfig.timeouts.standard);
+
+    beforeEach(function(done) {
+      loadKeyboardFromJSON("/keyboards/options_with_save.json", done, kmwconfig.timeouts.scriptLoad);
+    });
+
+    after(function() {
+      keyman.removeKeyboards('options_with_save');
+      fixture.cleanup();
+    });
+
+    it('Backing up and restoring (loadStore/saveStore)', function(done) {
+      // Keyboard's default value is 0, corresponding to "no foo."
+      var keyboardID = "options_with_save";
+      var prefixedKeyboardID = "Keyboard_" + keyboardID;
+      var storeName = "foo";
+
+      keyman.setActiveKeyboard(keyboardID, 'en').then(function() {
+        // Alas, saveStore itself requires the keyboard to be active!
+        KeymanWeb.saveStore(storeName, 1);
+
+        // First, ensure that we get the same thing if we load the value immediately.
+        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, 0);
+        assert.equal(value, 1, "loadStore did not see the value saved to initialize the test before resetting keyboard");
+
+        // Reload the keyboard so that we can test its loaded value.
+        keyman.removeKeyboards(keyboardID, true);
+
+        // Now we can reload the keyboard and run the test.
+        var remainderOfTest = function() {
+          // This requires proper storage to a cookie, as we'll be on a new instance of the same keyboard.
+          var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, 0);
+          assert.equal(value, 1, "Did not properly save and reload variable store setting");
+
+          KeymanWeb.saveStore(storeName, 0);
+          
+
+          done();
+        }
+
+        loadKeyboardFromJSON("/keyboards/options_with_save.json", function() {
+          keyman.setActiveKeyboard(keyboardID, 'en').then(remainderOfTest);
+        }, kmwconfig.timeouts.scriptLoad);
+      });
+    });
+
+    it("Multiple-sequence check", function(done) {
+      this.timeout(kmwconfig.timeouts.standard + kmwconfig.timeouts.scriptLoad * 3);
+      var keyboardID = "options_with_save";
+      var storeName = "foo";
+
+      keyman.setActiveKeyboard(keyboardID, 'en').then(function() {
+        KeymanWeb.saveStore(storeName, 1);
+        keyman.removeKeyboards(keyboardID, true);
+
+        var finalCheck = function() {
+          // Reset the keyboard... again.
+          keyman.removeKeyboards(keyboardID, true);
+
+          // Second test:  expects option to still be "off" b/c cookies.
+          runKeyboardTestFromJSON('/engine_tests/options_with_save_2.json', {usingOSK: false}, done, assert.equal, kmwconfig.timeouts.scriptLoad);
+        };
+
+        // First test:  expects option to be "on" from cookie-init setting, emitting "foo.", then turning option "off".
+        runKeyboardTestFromJSON('/engine_tests/options_with_save_1.json', {usingOSK: false}, finalCheck, assert.equal, kmwconfig.timeouts.scriptLoad);
+      });
+    });
+  });
+
   // Performs basic processing system checks/tests to ensure the sequence testing
   // is based on correct assumptions about the code.
   describe('Simulation Checks', function() {

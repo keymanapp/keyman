@@ -914,6 +914,9 @@ namespace com.keyman.text {
      * @param       {Object}      Pelem       Currently active element (may be needed in future tests)     
      * @return      {boolean}                 True if command succeeds
      *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
+     * 
+     * Note that option/variable stores are instead set within keyboard script code, as they only
+     * affect keyboard behavior.
      */    
     setStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
       this.resetContextCache();
@@ -932,11 +935,15 @@ namespace com.keyman.text {
      * @param       {string}      storeName   store (option) name, embedded in cookie name
      * @param       {string}      dfltValue   default value
      * @return      {string}                  current or default option value   
+     * 
+     * This will only ever be called when the keyboard is loaded, as it is used by keyboards
+     * to initialize a store value on the keyboard's script object.
      */    
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName,cValue=keyman.util.loadCookie(cName);
+      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName;
+      var cValue=keyman.util.loadCookie(cName);
       if(typeof cValue[storeName] != 'undefined') {
         return decodeURIComponent(cValue[storeName]);
       } else {
@@ -950,6 +957,10 @@ namespace com.keyman.text {
      * @param       {string}      storeName   store (option) name, embedded in cookie name
      * @param       {string}      optValue    option value to save
      * @return      {boolean}                 true if save successful
+     * 
+     * Note that a keyboard will freely manipulate the value of its variable stores on the
+     * script object within its own code.  This function's use is merely to _persist_ that
+     * value across sessions, providing a custom user default for later uses of the keyboard.
      */    
     saveStore(storeName:string, optValue:string): boolean {
       let keyman = com.keyman.singleton;
@@ -959,9 +970,14 @@ namespace com.keyman.text {
         return false;
       }
       
-      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName, cValue=encodeURIComponent(optValue);
+      // The cookie entry includes the store name...
+      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName;
+      var cValue=encodeURIComponent(optValue);
 
-      keyman.util.saveCookie(cName,cValue);
+      // And the lookup under that entry looks for the value under the store name, again.
+      let valueObj = {};
+      valueObj[storeName] = cValue;
+      keyman.util.saveCookie(cName, valueObj);
       return true;
     }
 

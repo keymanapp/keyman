@@ -5,6 +5,7 @@ function loadKeyboards() {
   var preloadFiles = [
     filePrefix + "khmer_angkor.json",
     filePrefix + "lao_2008_basic.json",
+    filePrefix + "options_with_save.json",
     filePrefix + "test_deadkeys.json",
     filePrefix + "test_chirality.json"
   ];
