@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.35 alpha 2020-03-25
+
+* feat(windows): new error notification dialog (#2875)
+* feat(windows): sentry c++ wrappers (#2886)
+* refactor(web/engine): activeKeyboard now tracked on Processor (#2864)
+* refactor(web/engine): Initial definition of typed Keyboard wrapper (#2868)
+* refactor(web/engine): More Keyboard wrapper properties (#2869)
+* refactor(web/engine): headless-friendly keymapping (#2870)
+* refactor(web/engine): relocates keyboard tag code, adds typing (#2883)
+* fix(web): fixes variable stores (#2884)
+
 ## 14.0.34 alpha 2020-03-24
 
 * fix(web): fixes embedded kbd initialization (#2879)
