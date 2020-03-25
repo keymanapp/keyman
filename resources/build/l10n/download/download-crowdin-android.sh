@@ -18,10 +18,12 @@ function processAndroid() {
       local locale=${crowd_locale/-/-r}
 
       # KMEA strings
-      copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMEA/strings.xml" "$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
+      copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMEA/app/src/main/res/values/strings.xml" \
+          "$KMA_ROOT/KMEA/app/src/main/res/values-$locale"
 
       # KMAPro strings
-      copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMAPro/strings.xml" "$KMA_ROOT/KMAPro/kMAPro/src/main/res/values-$locale"
+      copy_file "$CROWDIN_ROOT/$crowd_locale/android/KMAPro/kMAPro/src/main/res/values/strings.xml" \
+          "$KMA_ROOT/KMAPro/kMAPro/src/main/res/values-$locale"
     fi
 
   done
