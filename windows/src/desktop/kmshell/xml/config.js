@@ -129,7 +129,6 @@ document.addEventListener("DOMContentLoaded", windowResize);
       }
       break;
     case 37:    // left
-      undefinedFunction();
     case 109:   // minus
       var k = document.getElementById('list_detail_'+n);
       if( !k ) break;
