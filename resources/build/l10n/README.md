@@ -13,10 +13,10 @@ export KEYMAN_CROWDIN_TOKEN=[project API key here]
 
 Otherwise, manually download the translations to `/.crowdin-tmp/Keyman.zip`
 
-## download-crowdin
+## Downloading from crowdin
 In order to incorporate the crowdin translation files into the Keyman platforms:
 1. Do the setup from above
-2. From git bash in this directory, run `./download-crowdin.sh [platform options]
+2. From git bash in the `download/` directory, run `./download-crowdin.sh [platform options]
  [-no-download] [-no-extract]` with the specified platforms
 
     Platform options: `-all`, `-android`, `-common`, `-developer`, `-ios`, `-linux`, `-mac`, `-web`, `-windows`

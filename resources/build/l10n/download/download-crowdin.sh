@@ -39,7 +39,7 @@ display_usage() {
 }
 
 # Include common paths and utilities
-. ./crowdin-utils.sh
+. ../crowdin-utils.sh
 
 # Include scripts to process platforms
 . ./download-crowdin-android.sh
