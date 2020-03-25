@@ -16,5 +16,6 @@
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
+#include <keymansentry.h>
 #include "keyman64.h"
 #endif //PCH_H

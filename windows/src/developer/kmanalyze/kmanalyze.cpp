@@ -39,12 +39,18 @@ struct GROUPTREE {
 };
 
 TESTS *DoGroupAnalysis(LPKEYBOARD kbd, LPGROUP gp, std::vector<LPGROUP> & tree, TEST *test);
+int run(int argc, char *argv[]);
 
 wchar_t VKToChar[256][2];
 UINT CharToVK[256];
 UINT CharToShift[256];
 
 int main(int argc, char *argv[])
+{
+  return keyman_sentry_main(TRUE, argc, argv, run);
+}
+
+int run(int argc, char *argv[])
 {
   LPKEYBOARD kbd;
   char buf[_MAX_PATH], drive[_MAX_DRIVE], dir[_MAX_DIR], filename[_MAX_FNAME], ext[_MAX_EXT], jsfilename[_MAX_PATH];

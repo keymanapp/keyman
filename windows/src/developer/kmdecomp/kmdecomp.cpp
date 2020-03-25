@@ -20,6 +20,7 @@
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
+#include <keymansentry.h>
 
 #define _KEYMAN64_LIGHT
 #include "keyman64.h"
@@ -29,6 +30,7 @@ BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWOR
 extern BOOL VerifyChecksum(LPBYTE buf, LPDWORD CheckSum, DWORD sz);
 void Err(char *p);
 int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *filename, char *bmpfile);
+int run(int argc, char *argv[]);
 
 /*
  * Keyman
@@ -40,6 +42,11 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char *fi
  */
 
 int main(int argc, char *argv[])
+{
+  return keyman_sentry_main(TRUE, argc, argv, run);
+}
+
+int run(int argc, char *argv[])
 {
 	LPKEYBOARD kbd;
 	LPBYTE lpBitmap;
