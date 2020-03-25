@@ -867,6 +867,11 @@ describe('Engine', function() {
       loadKeyboardFromJSON("/keyboards/options_with_save.json", done, kmwconfig.timeouts.scriptLoad);
     });
 
+    after(function() {
+      keyman.removeKeyboards('options_with_save');
+      fixture.cleanup();
+    });
+
     it('Backing up and restoring (loadStore/saveStore)', function(done) {
       // Keyboard's default value is 0, corresponding to "no foo."
       var keyboardID = "options_with_save";
