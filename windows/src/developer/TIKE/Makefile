@@ -13,7 +13,7 @@ build: version.res manifest.res icons dirs xml
     $(COPY) kmlmc.cmd $(PROGRAM)\developer
     if exist tike.dbg $(COPY) tike.dbg $(DEBUGPATH)\developer
 
-xml: pull-keymanweb pull-npm sentry.init.js
+xml: pull-keymanweb pull-npm sentry-init.js
     cd $(ROOT)\src\developer\tike\xml
     -del /q $(ROOT)\bin\developer\xml\*
     xcopy /s /y * $(ROOT)\bin\developer\xml
