@@ -8,6 +8,8 @@
 /// <reference path="defaultOutput.ts" />
 // Defines the keyboard wrapper object.
 /// <reference path="../keyboards/keyboard.ts" />
+// Defines built-in keymapping.
+/// <reference path="keyMapping.ts" />
 
 namespace com.keyman.text {
   export class LegacyKeyEvent {
@@ -35,9 +37,12 @@ namespace com.keyman.text {
     swallowKeypress: boolean = false;
 
     keyboardInterface: KeyboardInterface;
+
+    baseLayout: string;
     private keyboard: keyboards.Keyboard;
 
-    constructor() {
+    constructor(baseLayout?: string) {
+      this.baseLayout = baseLayout || 'us'; // default BaseLayout
       this.keyboardInterface = new KeyboardInterface();
       this.installInterface();
     }
@@ -225,7 +230,7 @@ namespace com.keyman.text {
 
       // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
       if(!activeKeyboard.definesPositionalOrMnemonic) {
-        Lkc.Lcode=keyman.keyMapManager._USKeyCodeToCharCode(Lkc);
+        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(Lkc);
         Lkc.LisVirtualKey=false;
       }
 
@@ -263,13 +268,12 @@ namespace com.keyman.text {
 
     processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): RuleBehavior {
       let keyman = com.keyman.singleton;
-      let keyMapManager = keyman.keyMapManager;
 
       if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
-        if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
-          keyEvent.Lcode=keyMapManager.browserMap.FF['k'+keyEvent.Lcode];
+        if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
+          keyEvent.Lcode=KeyMapping.browserMap.FF['k'+keyEvent.Lcode];
         }
       }
 
@@ -318,6 +322,7 @@ namespace com.keyman.text {
      */
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
+      let formFactor = keyman.util.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
@@ -329,9 +334,6 @@ namespace com.keyman.text {
       if(typeof e == 'boolean') {
         e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
       }
-
-      let formFactor = keyman.util.device.formFactor;
-      let keyMapManager = keyman.keyMapManager;
 
       this.swallowKeypress = false;
 
@@ -367,8 +369,8 @@ namespace com.keyman.text {
       if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
-        if(keyMapManager.browserMap.FF['k'+keyEvent.Lcode]) {
-          keyEvent.Lcode=keyMapManager.browserMap.FF['k'+keyEvent.Lcode];
+        if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
+          keyEvent.Lcode = KeyMapping.browserMap.FF['k'+keyEvent.Lcode];
         }
       } //else 
       //{
@@ -1140,14 +1142,12 @@ namespace com.keyman.text {
       var LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
-      let keyMapManager = keyman.keyMapManager;
-
       // Other minor physical-keyboard adjustments
       if(activeKeyboard && !activeKeyboard.isMnemonic) {
         // Positional Layout
 
         /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-        var Lbase=keyMapManager.languageMap[com.keyman.osk.Layouts._BaseLayout];
+        var Lbase = KeyMapping.languageMap[this.baseLayout];
         if(Lbase && Lbase['k'+s.Lcode]) {
           s.Lcode=Lbase['k'+s.Lcode];
         }
@@ -1156,7 +1156,7 @@ namespace com.keyman.text {
         if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60)) {
           // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
           s = {
-            Lcode: keyMapManager._USKeyCodeToCharCode(s),
+            Lcode: KeyMapping._USKeyCodeToCharCode(s),
             Ltarg: s.Ltarg,
             Lmodifiers: 0,
             LisVirtualKey: false,

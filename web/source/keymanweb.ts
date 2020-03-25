@@ -107,15 +107,6 @@ if(!window['keyman']['initialized']) {
         
     keymanweb.delayedInit();
 
-    // I732 START - Support for European underlying keyboards #1
-    if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 
-      com.keyman.osk.Layouts._BaseLayout = window['KeymanWeb_BaseLayout'];
-    else
-      com.keyman.osk.Layouts._BaseLayout = 'us';    
-    
-    
-    keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
-
   //TODO: find all references to next three routines and disambiguate!!
     
     // Complete page initialization only after the page is fully loaded, including any embedded fonts

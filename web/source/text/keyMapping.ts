@@ -24,6 +24,11 @@ namespace com.keyman {
   class LanguageKeyMaps {
     [languageCode: string]: KeyMap;
 
+    // // Here are some old legacy definitions that were no longer referenced but are likely related:
+    // static _BaseLayoutEuro: {[code: string]: string} = {
+    //   'se': '\u00a71234567890+´~~~QWERTYUIOP\u00c5\u00a8\'~~~ASDFGHJKL\u00d6\u00c4~~~~~<ZXCVBNM,.-~~~~~ ',  // Swedish
+    //   'uk': '`1234567890-=~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ ' // UK
+
     constructor() {
       /* I732 START - 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard #2 */
       // Swedish key map
@@ -45,17 +50,17 @@ namespace com.keyman {
     }
   }
 
-  export class KeyMapManager {
-    browserMap: BrowserKeyMaps = new BrowserKeyMaps();
-    languageMap: LanguageKeyMaps = new LanguageKeyMaps();
+  export class KeyMapping {
+    static readonly browserMap: BrowserKeyMaps = new BrowserKeyMaps();
+    static readonly languageMap: LanguageKeyMaps = new LanguageKeyMaps();
 
-    _usCharCodes: KeyMap[];
+    private static _usCharCodes: KeyMap[];
 
-    constructor() {
-      this._usCodeInit();
+    private constructor() {
+      // Do not construct this class.
     }
 
-    _usCodeInit() {
+    private static _usCodeInit() {
       var s0=new KeyMap(),s1=new KeyMap();
 
       s0['k192'] = 96;
@@ -154,7 +159,7 @@ namespace com.keyman {
       s1['k190'] = 62;
       s1['k191'] = 63;
 
-      this._usCharCodes = [s0,s1];
+      KeyMapping._usCharCodes = [s0,s1];
     }
 
     /**
@@ -164,8 +169,16 @@ namespace com.keyman {
      * @return      {number}                Character code 
      * Description Translate keyboard codes to standard US layout codes
      */    
-    _USKeyCodeToCharCode(Levent: com.keyman.text.KeyEvent) {
-      return this._usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
+    static _USKeyCodeToCharCode(Levent: com.keyman.text.KeyEvent) {
+      return KeyMapping.usCharCodes[Levent.Lmodifiers & 0x10 ? 1 : 0]['k'+Levent.Lcode];
     };
+
+    public static get usCharCodes() {
+      if(!KeyMapping._usCharCodes) {
+        KeyMapping._usCodeInit();
+      }
+
+      return KeyMapping._usCharCodes;
+    }
   }
 }
