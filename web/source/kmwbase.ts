@@ -15,7 +15,7 @@
 // Defines the keyboard callback object.
 /// <reference path="text/kbdInterface.ts" />
 // Defines keyboard data & management classes.
-/// <reference path="kmwkeyboards.ts" />
+/// <reference path="keyboards/kmwkeyboards.ts" />
 // Defines built-in keymapping.
 /// <reference path="kmwkeymaps.ts" />
 // Defines KMW's hotkey management object.
@@ -68,7 +68,7 @@ namespace com.keyman {
     ['util']: Util;
     ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
-    keyboardManager: KeyboardManager;
+    keyboardManager: keyboards.KeyboardManager;
     domManager: DOMManager;
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
@@ -114,7 +114,7 @@ namespace com.keyman {
       this.util = this['util'] = new Util(this);
       this.ui = this['ui'] = {};
 
-      this.keyboardManager = new KeyboardManager(this);
+      this.keyboardManager = new keyboards.KeyboardManager(this);
       this.domManager = new DOMManager(this);
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);

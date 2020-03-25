@@ -621,7 +621,7 @@ namespace com.keyman.osk {
         // the OSK even without a backing keyboard on mobile, using the default
         // layout as the OSK's base.
         if(activeKeyboard) {
-          kbdDevVersion = new utils.Version(activeKeyboard['KVER']);
+          kbdDevVersion = activeKeyboard.compilerVersion;
         } else {
           kbdDevVersion = new utils.Version(keyman['version']);
         }
@@ -643,7 +643,7 @@ namespace com.keyman.osk {
       if(typeof layout['displayUnderlying'] != 'undefined') {
         layout.keyLabels = layout['displayUnderlying'] == true; // force bool
       } else {
-        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
+        layout.keyLabels = activeKeyboard && activeKeyboard.displaysUnderlyingKeys;
       }
 
       let divLayerContainer = this.deviceDependentLayout(layout, device.formFactor);
@@ -2077,7 +2077,7 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
 
       var activeKeyboard = keymanweb.textProcessor.activeKeyboard;
-      var activeStub: com.keyman.KeyboardStub = keymanweb.keyboardManager.activeStub;
+      var activeStub: com.keyman.keyboards.KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
       if(activeStub == null) {
@@ -2103,8 +2103,8 @@ namespace com.keyman.osk {
       //       so must apply style before testing for font availability
       // Extended to allow keyboard-specific custom styles for Build 360
       var customStyle=this.addFontStyle(kfd,ofd);
-      if( activeKeyboard != null && typeof(activeKeyboard['KCSS']) == 'string')  // KMEW-129
-        customStyle=customStyle+activeKeyboard['KCSS'];
+      if( activeKeyboard != null && typeof(activeKeyboard.oskStyling) == 'string')  // KMEW-129
+        customStyle=customStyle+activeKeyboard.oskStyling;
 
       this.styleSheet = util.addStyleSheet(customStyle); //Build 360
 
@@ -2207,7 +2207,7 @@ namespace com.keyman.osk {
         return null;
       }
 
-      var layouts=PKbd['KVKL'], layout=null, PVK=PKbd['KV'];
+      var layouts=PKbd.layouts, layout=null, PVK=PKbd.legacyLayoutSpec;
 
       // Get the layout defined in the keyboard, or its nearest equivalent
       if(typeof layouts == 'object') {
@@ -2224,7 +2224,7 @@ namespace com.keyman.osk {
 
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
-        let kbdDevVersion = new utils.Version(PKbd['KVER']);
+        let kbdDevVersion = PKbd.compilerVersion;
         layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
       }
 
@@ -2233,7 +2233,7 @@ namespace com.keyman.osk {
         if(typeof layout['displayUnderlying'] != 'undefined') {
           layout.keyLabels = layout['displayUnderlying'] == true; // force bool
         } else {
-          layout.keyLabels = typeof(PKbd['KDU']) != 'undefined' && PKbd['KDU'];
+          layout.keyLabels = PKbd.displaysUnderlyingKeys;
         }        
       }
 
@@ -2248,7 +2248,7 @@ namespace com.keyman.osk {
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {
-        kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd['KN']+".</p>";
+        kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.name+".</p>";
       }
       // Add a faint border
       kbd.style.border='1px solid #ccc';

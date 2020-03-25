@@ -280,7 +280,7 @@ namespace com.keyman {
      *                      whenever a KMW-enabled page element loses control.
      */
     _BlurKeyboardSettings(PInternalName?: string, PLgCode?: string) {
-      var keyboardID = this.keyman.textProcessor.activeKeyboard ? this.keyman.textProcessor.activeKeyboard['KI'] : '';
+      var keyboardID = this.keyman.textProcessor.activeKeyboard ? this.keyman.textProcessor.activeKeyboard.id : '';
       var langCode = this.keyman.keyboardManager.getActiveLanguage();
       
       if(PInternalName !== undefined && PLgCode !== undefined) {

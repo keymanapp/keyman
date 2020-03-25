@@ -3,7 +3,7 @@
 // Defines the LMLayer's outer shell
 ///<reference path="../../includes/lmlayer.ts" />
 // Defines the ModelManager and its related types.
-///<reference path="../../kmwkeyboards.ts" />
+///<reference path="../../keyboards/kmwkeyboards.ts" />
 
 namespace com.keyman.text.prediction {
   export interface ModelSpec {
@@ -148,7 +148,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    onKeyboardChange(kbdInfo?: KeyboardChangeData | string) {
+    onKeyboardChange(kbdInfo?: keyboards.KeyboardChangeData | string) {
       let keyman = com.keyman.singleton;
       let mm: ModelManager = this;
 
