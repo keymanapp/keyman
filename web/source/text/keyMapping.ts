@@ -24,6 +24,11 @@ namespace com.keyman {
   class LanguageKeyMaps {
     [languageCode: string]: KeyMap;
 
+    // // Here are some old legacy definitions that were no longer referenced but are likely related:
+    // static _BaseLayoutEuro: {[code: string]: string} = {
+    //   'se': '\u00a71234567890+´~~~QWERTYUIOP\u00c5\u00a8\'~~~ASDFGHJKL\u00d6\u00c4~~~~~<ZXCVBNM,.-~~~~~ ',  // Swedish
+    //   'uk': '`1234567890-=~~~QWERTYUIOP[]#~~~ASDFGHJKL;\'~~~~~\\ZXCVBNM,./~~~~~ ' // UK
+
     constructor() {
       /* I732 START - 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard #2 */
       // Swedish key map
