@@ -96,7 +96,6 @@ namespace com.keyman {
     // See setDefaultKeyboard() below.
     dfltStub = null;           // First keyboard stub loaded - default for touch-screen devices, ignored on desktops
 
-    activeKeyboard: any; // We might can define a more precise def, though...
     keyboards: any[] = [];
 
     
@@ -110,11 +109,13 @@ namespace com.keyman {
     }
 
     getActiveKeyboardName(): string {
-      return this.activeKeyboard ? this.activeKeyboard['KI'] : '';
+      let textProcessor = com.keyman.singleton.textProcessor;
+      return textProcessor.activeKeyboard ? textProcessor.activeKeyboard['KI'] : '';
     }
 
     getActiveKeyboardTag(): KeyboardTag {
-      return this.activeKeyboard ? this.activeKeyboard['_kmw'] : null;
+      let textProcessor = com.keyman.singleton.textProcessor;
+      return textProcessor.activeKeyboard ? textProcessor.activeKeyboard['_kmw'] : null;
     }
 
     getActiveLanguage(fullName?: boolean): string {
@@ -408,8 +409,12 @@ namespace com.keyman {
     _SetActiveKeyboard(PInternalName: string, PLgCode?: string, saveCookie?: boolean): Promise<void> {
       var n, Ln;
 
-      var util = this.keymanweb.util;
-      var osk = this.keymanweb.osk;
+      let keyman = com.keyman.singleton;
+
+      var util = keyman.util;
+      var osk = keyman.osk;
+
+      let activeKeyboard = keyman.textProcessor.activeKeyboard;
 
       // Set default language code
       if(arguments.length < 2 || (!PLgCode)) {
@@ -437,13 +442,13 @@ namespace com.keyman {
       }
 
       // Check if requested keyboard and stub are currently active
-      if(this.activeStub && this.activeKeyboard && this.activeKeyboard['KI'] == PInternalName 
+      if(this.activeStub && activeKeyboard && activeKeyboard['KI'] == PInternalName 
         && this.activeStub['KI'] == PInternalName     //this part of test should not be necessary, but keep anyway
         && this.activeStub['KLC'] == PLgCode && !this.keymanweb.mustReloadKeyboard                                 
         ) return Promise.resolve();   
 
       // Check if current keyboard matches requested keyboard, but not stub
-      if(this.activeKeyboard && (this.activeKeyboard['KI'] == PInternalName)) {
+      if(activeKeyboard && (activeKeyboard['KI'] == PInternalName)) {
         // If so, simply update the active stub
         for(Ln=0; Ln<this.keyboardStubs.length; Ln++) {
           if((this.keyboardStubs[Ln]['KI'] == PInternalName) 
@@ -463,7 +468,7 @@ namespace com.keyman {
         }
       }
 
-      this.activeKeyboard = null;
+      keyman.textProcessor.activeKeyboard = null;
       this.activeStub = null;
 
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
@@ -480,7 +485,7 @@ namespace com.keyman {
       // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
       for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
         if(this.keyboards[Ln]['KI'] == PInternalName) {
-          this.activeKeyboard = this.keyboards[Ln];
+          keyman.textProcessor.activeKeyboard = this.keyboards[Ln];
           this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
         
           // and update the active stub
@@ -495,7 +500,7 @@ namespace com.keyman {
         }
       }
 
-      if(this.activeKeyboard == null) {
+      if(keyman.textProcessor.activeKeyboard == null) {
         for(Ln=0; Ln<this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
           if((this.keyboardStubs[Ln]['KI'] == PInternalName) 
             && ((this.keyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---'))) {
@@ -575,7 +580,7 @@ namespace com.keyman {
         this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
       }
 
-      var Pk=this.activeKeyboard;  // I3319
+      var Pk=keyman.textProcessor.activeKeyboard;  // I3319
       if(Pk !== null)  // I3363 (Build 301)
         String.kmwEnableSupplementaryPlane(Pk && ((Pk['KS'] && (Pk['KS'] == 1)) || (Pk['KN'] == 'Hieroglyphic'))); // I3319
       
@@ -609,6 +614,7 @@ namespace com.keyman {
       var kbdName = kbdStub['KN'];
 
       var manager = this;
+      let textProcessor = com.keyman.singleton.textProcessor;
 
       // Add a handler for cases where the new <script> block fails to load.
       Lscript.addEventListener('error', function() {
@@ -642,7 +648,7 @@ namespace com.keyman {
           //Activate keyboard, if it's still the active stub.
           if(kbdStub == manager.activeStub) {
             manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
-            manager.activeKeyboard=kbd;
+            textProcessor.activeKeyboard=kbd;
 
             if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
@@ -714,6 +720,7 @@ namespace com.keyman {
      */    
     restoreCurrentKeyboard() {
       var stubs = this.keyboardStubs, i, n=stubs.length;
+      let textProcessor = com.keyman.singleton.textProcessor;
 
       // Do nothing if no stubs loaded
       if(stubs.length < 1) return;
@@ -735,7 +742,7 @@ namespace com.keyman {
     
       // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
       // if((i < n) || (device.touchable && (this.activeKeyboard == null)))
-      if((i < n) || (this.activeKeyboard == null))
+      if((i < n) || (textProcessor.activeKeyboard == null))
       {
         this._SetActiveKeyboard(t[0],t[1],false);
         this.keymanweb.globalKeyboard = t[0];
@@ -791,7 +798,8 @@ namespace com.keyman {
      *             (This function accepts either keyboard structure.)   
      */    
     isCJK(k0?: any|KeyboardStub) { // I3363 (Build 301)
-      var k = this.activeKeyboard, lg=''; 
+      let textProcessor = com.keyman.singleton.textProcessor;
+      var k = textProcessor.activeKeyboard, lg=''; 
 
       if(arguments.length > 0) {
         k = k0;
@@ -809,7 +817,8 @@ namespace com.keyman {
     }
 
     isRTL(k0?): boolean {
-      var k = k0 || this.activeKeyboard;
+      let textProcessor = com.keyman.singleton.textProcessor
+      var k = k0 || textProcessor.activeKeyboard;
       return (k != null) && (k['KRTL']);
     }
 
@@ -836,7 +845,8 @@ namespace com.keyman {
      * Description  Obtains the currently-active modifier bitmask for the active keyboard.
      */
     getKeyboardModifierBitmask(k0?) {
-      var k=this.activeKeyboard;
+      let textProcessor = com.keyman.singleton.textProcessor
+      var k=textProcessor.activeKeyboard;
       
       if(arguments.length > 0 && typeof k0 != 'undefined') {
         k = k0;
@@ -854,7 +864,8 @@ namespace com.keyman {
     }
 
     getFont(k0?) {
-      var k = k0 || this.activeKeyboard;
+      let textProcessor = com.keyman.singleton.textProcessor
+      var k = k0 || textProcessor.activeKeyboard;
 
       if(k && k['KV']) {
         return k['KV']['F'];
@@ -865,7 +876,7 @@ namespace com.keyman {
 
     layoutIsDesktopBased(k0?) {
       let keyman = com.keyman.singleton;
-      var k = k0 || this.activeKeyboard;
+      var k = k0 || keyman.textProcessor.activeKeyboard;
 
       if(k && k['KVKL']) {
         // A custom mobile layout is defined... but are we using it?

@@ -25,25 +25,24 @@ namespace com.keyman.text {
      * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
      * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
      */
-    public static forAny(Lkc: KeyEvent) {
+    public static forAny(Lkc: KeyEvent, isMnemonic: boolean) {
       var char = '';
 
-      let code = DefaultOutput.codeForEvent(Lkc);
-
       // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
-      if(char = DefaultOutput.forSpecialEmulation(Lkc)) {
+      if((char = DefaultOutput.forSpecialEmulation(Lkc)) != null) {
         return char;
-      } else if(char = DefaultOutput.forNumpadKeys(Lkc)) {
+      } else if(!isMnemonic && ((char = DefaultOutput.forNumpadKeys(Lkc)) != null)) {
         return char;
-      } else if(char = DefaultOutput.forUnicodeKeynames(Lkc)) {
+      } else if((char = DefaultOutput.forUnicodeKeynames(Lkc)) != null) {
         return char;
-      } else if(char = DefaultOutput.forBaseKeys(Lkc)) {
+      } else if((char = DefaultOutput.forBaseKeys(Lkc)) != null) {
         return char;
       } else {
         // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
         // // Not originally defined for text output within defaultKeyOutput.
         // // We can't enable it yet, as it'll cause hardware keystrokes in the DOM to output '\t' rather
         // // than rely on the browser-default handling.
+        let code = DefaultOutput.codeForEvent(Lkc);
         switch(code) {
         //   case Codes.keyCodes['K_TAB']:
         //   case Codes.keyCodes['K_TABBACK']:
@@ -165,11 +164,10 @@ namespace com.keyman.text {
       }
     }
 
+    // Should not be used for mnenomic keyboards.  forAny()'s use of this method checks first.
     public static forNumpadKeys(Lkc: KeyEvent) {
-      let activeKeyboard = com.keyman.singleton.keyboardManager.activeKeyboard;
-
       // Translate numpad keystrokes into their non-numpad equivalents
-      if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"] && activeKeyboard && !activeKeyboard['KM']) {
+      if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
         // Number pad, numlock on
         if(Lkc.Lcode < 106) {
           var Lch = Lkc.Lcode-48;
@@ -186,7 +184,6 @@ namespace com.keyman.text {
     // Test for fall back to U_xxxxxx key id
     // For this first test, we ignore the keyCode and use the keyName
     public static forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
-      let quiet = Lkc.Ltarg instanceof Mock;
       let keyName = Lkc.kName;
 
       // Test for fall back to U_xxxxxx key id

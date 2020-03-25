@@ -120,6 +120,8 @@ namespace com.keyman {
       this.uiManager = new UIManager(this);
       this.keyMapManager = new KeyMapManager();
       this.textProcessor = new text.Processor();
+      // Used by the embedded apps.
+      this['interface'] = this.textProcessor.keyboardInterface;
       
       this.modelManager = new text.prediction.ModelManager();
       this.osk = this['osk'] = new com.keyman.osk.OSKManager();

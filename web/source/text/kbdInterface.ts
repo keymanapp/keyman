@@ -177,6 +177,10 @@ namespace com.keyman.text {
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
+    // Must be accessible to some of the keyboard API methods.
+    activeKeyboard: any;
+    activeDevice: com.keyman.Device;
+
     constructor() {
     }
 
@@ -202,12 +206,9 @@ namespace com.keyman.text {
      * Description  Notifies keyboard of keystroke or other event
      */    
     notifyKeyboard(_PCommand: number, _PTarget: OutputTarget, _PData: number) { // I2187
-      let keyman = com.keyman.singleton;
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-
       // Good example use case - the Japanese CJK-picker keyboard
-      if(activeKeyboard != null && typeof(activeKeyboard['KNS']) == 'function') {
-        activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
+      if(this.activeKeyboard != null && typeof(this.activeKeyboard['KNS']) == 'function') {
+        this.activeKeyboard['KNS'](_PCommand, _PTarget, _PData);
       }
     }
       
@@ -545,7 +546,7 @@ namespace com.keyman.text {
      */    
     isKeypress(e: KeyEvent):boolean {
       let keyman = com.keyman.singleton;
-      if(keyman.keyboardManager.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
+      if(this.activeKeyboard['KM']) {   // I1380 - support KIK for positional layouts
         return !e.LisVirtualKey;             // will now return true for U_xxxx keys, but not for T_xxxx keys
       } else {
         return keyman.keyMapManager._USKeyCodeToCharCode(e) ? true : false; // I1380 - support KIK for positional layouts
@@ -875,7 +876,7 @@ namespace com.keyman.text {
           switch(constraint) {
             case 'touch':
             case 'hardware':
-              if(keyman.util.activeDevice.touchable != (constraint == 'touch')) {
+              if(this.activeDevice.touchable != (constraint == 'touch')) {
                 result=false;
               }
               break;
@@ -889,7 +890,7 @@ namespace com.keyman.text {
             case 'android':
             case 'ios':
             case 'linux':
-              if(keyman.util.activeDevice.OS.toLowerCase() != constraint) {
+              if(this.activeDevice.OS.toLowerCase() != constraint) {
                 result=false;
               }
               break;
@@ -979,7 +980,7 @@ namespace com.keyman.text {
     saveStore(storeName:string, optValue:string): boolean {
       let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var kbd=keyman.keyboardManager.activeKeyboard;
+      var kbd=this.activeKeyboard;
       if(!kbd || typeof kbd['KI'] == 'undefined' || kbd['KI'] == '') {
         return false;
       }
@@ -1014,11 +1015,11 @@ namespace com.keyman.text {
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
     processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
-      let keyman = com.keyman.singleton;
-
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
+      } else if(!this.activeKeyboard) {
+        throw "No active keyboard for keystroke processing!";
       }
 
       outputTarget.invalidateSelection();
@@ -1034,11 +1035,11 @@ namespace com.keyman.text {
 
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
-      keyman.util.activeDevice = device;
+      this.activeDevice = device;
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
-      var matched = keyman.keyboardManager.activeKeyboard['gs'](outputTarget, keystroke);
+      var matched = this.activeKeyboard['gs'](outputTarget, keystroke);
       this.activeTargetOutput = null;
 
       if(!matched) {

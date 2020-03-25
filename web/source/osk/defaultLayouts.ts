@@ -373,7 +373,7 @@ namespace com.keyman.osk {
       }
 
       if(!keyLabels) {
-        var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+        var activeKeyboard = keyman.textProcessor.activeKeyboard;
         if(activeKeyboard == null || activeKeyboard['KV'] == null) {
           return false;
         }

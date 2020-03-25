@@ -611,7 +611,7 @@ namespace com.keyman.osk {
 
       let layout=layout0;
       var Lkbd=util._CreateElement('div'), oskWidth;//s=Lkbd.style,
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
+      var activeKeyboard = keyman.textProcessor.activeKeyboard;
 
       // Build a layout using the default for the device
       if(typeof layout != 'object' || layout == null) {
@@ -1887,7 +1887,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      if(keyman.keyboardManager.activeKeyboard) {
+      if(keyman.textProcessor.activeKeyboard) {
         for(var i=0; i<this.layers.length; i++) {
           if(this.layers[i].id == id) {
             this.layerId=id;
@@ -2076,7 +2076,7 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      var activeKeyboard = keymanweb.textProcessor.activeKeyboard;
       var activeStub: com.keyman.KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
@@ -2180,7 +2180,7 @@ namespace com.keyman.osk {
      */
     static buildDocumentationKeyboard(PInternalName,Pstatic,argFormFactor,argLayerId): HTMLElement { // I777
       let keymanweb = com.keyman.singleton;
-      var PKbd=keymanweb.keyboardManager.activeKeyboard,Ln,
+      var PKbd=keymanweb.textProcessor.activeKeyboard,Ln,
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
           layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId),
           device = new Device();

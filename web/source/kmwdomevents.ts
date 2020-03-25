@@ -280,7 +280,7 @@ namespace com.keyman {
      *                      whenever a KMW-enabled page element loses control.
      */
     _BlurKeyboardSettings(PInternalName?: string, PLgCode?: string) {
-      var keyboardID = this.keyman.keyboardManager.activeKeyboard ? this.keyman.keyboardManager.activeKeyboard['KI'] : '';
+      var keyboardID = this.keyman.textProcessor.activeKeyboard ? this.keyman.textProcessor.activeKeyboard['KI'] : '';
       var langCode = this.keyman.keyboardManager.getActiveLanguage();
       
       if(PInternalName !== undefined && PLgCode !== undefined) {
@@ -382,7 +382,7 @@ namespace com.keyman {
      * not affected.
      */ 
     _KeyDown: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-      var activeKeyboard = this.keyman.keyboardManager.activeKeyboard;
+      var activeKeyboard = this.keyman.textProcessor.activeKeyboard;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
 
@@ -434,7 +434,7 @@ namespace com.keyman {
      * Description Processes keypress event (does not pass data to keyboard)
      */       
     _KeyPress: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-      if(DOMEventHandlers.states._DisableInput || this.keyman.keyboardManager.activeKeyboard == null) {
+      if(DOMEventHandlers.states._DisableInput || this.keyman.textProcessor.activeKeyboard == null) {
         return true;
       }
 
