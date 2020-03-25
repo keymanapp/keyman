@@ -13,12 +13,13 @@
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
 				<title><xsl:value-of select="$locale/String[@Id=$HintTitle]" /></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>hint.css</xsl:attribute></link>
 				<style type="text/css">
-					* { 
+					* {
             font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
           }
 					#container {
@@ -66,10 +67,10 @@
 					<div id="hint">
 						<xsl:apply-templates select="/Keyman/Hint" />
 					</div>
-					
+
 					<div id="footer">
 						<div id="checkbox">
-							<input type="checkbox" onclick='javascript:if(this.checked) location.href="keyman:dontshowhint"; else location.href="keyman:showhint";' 
+							<input type="checkbox" onclick='javascript:if(this.checked) location.href="keyman:dontshowhint"; else location.href="keyman:showhint";'
 										 style="vertical-align: middle;" id="chkWelcome" />&#160;<label for="chkWelcome"><xsl:value-of select="$locale/String[@Id='S_HintDialog_DontShowHintAgain']"/></label>
 						</div>
 
@@ -89,7 +90,7 @@
 							</xsl:if>
 						</div>
 					</div>
-				</div>							 
+				</div>
 			</body>
 
 		</html>
@@ -101,7 +102,7 @@
 
 <!--
   Example of how to do a custom hint
-	
+
 	<xsl:template match="Hint[@ID='KH_EXITPRODUCT']">
 		<img id="exiticon" alt="icon">
 			<xsl:attribute name="src">
@@ -111,5 +112,5 @@
 		<xsl:value-of select="$locale/String[@Id=$Hint]" />
 	</xsl:template>
 -->
-	
+
 </xsl:stylesheet>

@@ -19,9 +19,10 @@
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<style> *{font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <style> *{font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
         <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
