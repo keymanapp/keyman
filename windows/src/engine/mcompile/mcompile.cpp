@@ -44,8 +44,6 @@ int run(int argc, wchar_t * argv[]);
 
 std::vector<DeadkeyMapping> FDeadkeys;   // I4353
 
-int run(int argc, wchar_t * argv[]);
-
 int wmain(int argc, wchar_t * argv[])
 {
   return keyman_sentry_wmain(false, argc, argv, run);

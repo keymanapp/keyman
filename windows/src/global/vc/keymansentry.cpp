@@ -140,7 +140,7 @@ LONG WINAPI FilterExceptions(_In_ struct _EXCEPTION_POINTERS *ExceptionInfo) {
 
 
 int keyman_sentry_main(bool is_keyman_developer, int argc, char *argv[], int (*run)(int, char**)) {
-  keyman_sentry_init(TRUE);
+  keyman_sentry_init(is_keyman_developer);
   LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
 
   int res = run(argc, argv);
@@ -151,7 +151,7 @@ int keyman_sentry_main(bool is_keyman_developer, int argc, char *argv[], int (*r
 }
 
 int keyman_sentry_wmain(bool is_keyman_developer, int argc, wchar_t *argv[], int(*run)(int, wchar_t**)) {
-  keyman_sentry_init(TRUE);
+  keyman_sentry_init(is_keyman_developer);
   LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
 
   int res = run(argc, argv);
