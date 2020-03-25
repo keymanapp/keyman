@@ -26,7 +26,7 @@ xml: sentry-init.js
 
 sentry-init.js:
     cd $(ROOT)\src\desktop\kmshell\xml
-    $(MKVER_U) init.js.in init.js
+    $(MKVER_U) sentry.init.js.in sentry.init.js
 
 clean: def-clean
     if exist MessageIdentifiers.pas del MessageIdentifiers.pas
