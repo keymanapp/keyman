@@ -10,6 +10,8 @@
 /// <reference path="../keyboards/keyboard.ts" />
 // Defines built-in keymapping.
 /// <reference path="keyMapping.ts" />
+// Defines a headless-compatible 'Device' analogue for use in keyEvent processing
+/// <reference path="engineDeviceSpec.ts" />
 
 namespace com.keyman.text {
   export class LegacyKeyEvent {
@@ -85,7 +87,7 @@ namespace com.keyman.text {
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent, usingOSK: boolean): RuleBehavior {
+    defaultRuleBehavior(Lkc: KeyEvent): RuleBehavior {
       let outputTarget = Lkc.Ltarg;
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
@@ -93,7 +95,7 @@ namespace com.keyman.text {
       let matched = false;
       var char = '';
       var special: EmulationKeystrokes;
-      if(usingOSK || outputTarget.isSynthetic) {
+      if(Lkc.isSynthetic || outputTarget.isSynthetic) {
         matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                          // if no match occurs.
 
@@ -207,17 +209,7 @@ namespace com.keyman.text {
       }
     }
 
-    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): RuleBehavior {
-      let keyman = com.keyman.singleton;
-
-      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
-          keyEvent.Lcode=KeyMapping.browserMap.FF['k'+keyEvent.Lcode];
-        }
-      }
-
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       var matchBehavior: RuleBehavior;
 
       // Pass this key code and state to the keyboard program
@@ -231,7 +223,7 @@ namespace com.keyman.text {
          * even should that occur.
          */
         this.installInterface();
-        matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+        matchBehavior = this.keyboardInterface.processKeystroke(outputTarget, keyEvent);
       }
 
       if(!matchBehavior) {
@@ -245,7 +237,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        matchBehavior = this.defaultRuleBehavior(keyEvent, fromOSK);
+        matchBehavior = this.defaultRuleBehavior(keyEvent);
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -268,7 +260,7 @@ namespace com.keyman.text {
       // of its current, pre-input state.
       let outputTarget = keyEvent.Ltarg;
 
-      let fromOSK = !!e; // If specified, it's from the OSK.
+      let fromOSK = keyEvent.isSynthetic;
 
       // Enables embedded-path OSK sourcing detection.
       if(typeof e == 'boolean') {
@@ -306,7 +298,8 @@ namespace com.keyman.text {
         return true;
       }
 
-      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
+      // TODO: This keymapping should be relocated outside of this method.
+      if(!keyman.isEmbedded && !fromOSK && keyEvent.device.browser == 'firefox') {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
@@ -342,7 +335,7 @@ namespace com.keyman.text {
 
       let preInputMock = Mock.from(outputTarget);
 
-      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK);
+      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
@@ -372,7 +365,7 @@ namespace com.keyman.text {
 
               let altEvent = osk.PreProcessor._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
               altEvent.Ltarg = mock;
-              let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK);
+              let alternateBehavior = this.processKeystroke(altEvent, mock);
               if(alternateBehavior) {
                 // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
                 //       so a user should never have intended to type it.  Should probably renormalize 

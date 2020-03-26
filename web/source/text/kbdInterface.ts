@@ -179,7 +179,7 @@ namespace com.keyman.text {
 
     // Must be accessible to some of the keyboard API methods.
     activeKeyboard: any;
-    activeDevice: com.keyman.Device;
+    activeDevice: EngineDeviceSpec;
 
     constructor() {
     }
@@ -873,13 +873,13 @@ namespace com.keyman.text {
             case 'tablet':
             case 'phone':
             case 'desktop':
-              if(keyman.util.device.formFactor != constraint) {
+              if(this.activeDevice.formFactor != constraint) {
                 result=false;
               }
               break;
 
             case 'web':
-              if(keyman.util.device.browser == 'native') {
+              if(this.activeDevice.browser == 'native') {
                 result=false; // web matches anything other than 'native'
               }
               break;
@@ -892,7 +892,7 @@ namespace com.keyman.text {
             case 'safari':
             case 'edge':
             case 'opera':
-              if(keyman.util.device.browser != constraint) {
+              if(this.activeDevice.browser != constraint) {
                 result=false;
               }
               break;
@@ -998,13 +998,12 @@ namespace com.keyman.text {
     /**
      * Function     processKeystroke
      * Scope        Private
-     * @param       {Object}        device      The device object properties to be utilized for this keystroke.
      * @param       {Object}        element     The page element receiving input
      * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(device: Device, outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
+    processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";
@@ -1025,7 +1024,7 @@ namespace com.keyman.text {
 
       // Ensure the settings are in place so that KIFS/ifState activates and deactivates
       // the appropriate rule(s) for the modeled device.
-      this.activeDevice = device;
+      this.activeDevice = keystroke.device;
 
       // Calls the start-group of the active keyboard.
       this.activeTargetOutput = outputTarget;
