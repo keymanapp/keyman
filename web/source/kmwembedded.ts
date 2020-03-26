@@ -448,7 +448,15 @@ namespace com.keyman.text {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      return com.keyman.osk.PreProcessor.processClick(Lkc, null);
+      let retVal = com.keyman.osk.PreProcessor.processClick(Lkc, null);
+
+      // Special case for embedded to pass K_TAB back to device to process
+      if(Lkc.Lcode == Codes.keyCodes["K_TAB"] || Lkc.Lcode == Codes.keyCodes["K_TABBACK"] 
+          || Lkc.Lcode == Codes.keyCodes["K_TABFWD"]) {
+        return false;
+      }
+
+      return retVal;
   };
 
   /**

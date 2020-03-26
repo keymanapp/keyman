@@ -106,7 +106,11 @@ namespace com.keyman.osk {
           com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
 
-        return PreProcessor.processClick(Lkc, e);
+        let retVal = PreProcessor.processClick(Lkc, e);
+
+        // Now that processing is done, we can do a bit of post-processing, too.
+        keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+        return retVal;
       } else {
         return true;
       }

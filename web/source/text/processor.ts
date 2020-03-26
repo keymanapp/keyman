@@ -259,7 +259,6 @@ namespace com.keyman.text {
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
       let outputTarget = keyEvent.Ltarg;
-
       let fromOSK = keyEvent.isSynthetic;
 
       // Enables embedded-path OSK sourcing detection.
@@ -395,16 +394,6 @@ namespace com.keyman.text {
       }
 
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-      
-      if(fromOSK && !keyman.isEmbedded) {
-        keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-      }
-
-      // Special case for embedded to pass K_TAB back to device to process
-      if(keyman.isEmbedded && (keyEvent.Lcode == Codes.keyCodes["K_TAB"] ||
-          keyEvent.Lcode == Codes.keyCodes["K_TABBACK"] || keyEvent.Lcode == Codes.keyCodes["K_TABFWD"])) {
-        return false;
-      }
 
       // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
       //        the ones that should worry about event handler returns, etc.  Not this one.
