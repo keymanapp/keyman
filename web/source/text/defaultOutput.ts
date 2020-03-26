@@ -177,7 +177,7 @@ namespace com.keyman.text {
         let ch = String._kmwFromCharCode(Lch); //I3319
         return ch;
       } else {
-        return '';
+        return null;
       }
     }
 
@@ -189,7 +189,7 @@ namespace com.keyman.text {
       // Test for fall back to U_xxxxxx key id
       // For this first test, we ignore the keyCode and use the keyName
       if(!keyName || keyName.substr(0,2) != 'U_') {
-        return '';
+        return null;
       }
     
       var codePoint = parseInt(keyName.substr(2,6), 16);
@@ -199,7 +199,7 @@ namespace com.keyman.text {
         if(ruleBehavior) {
           ruleBehavior.errorLog = ("Suppressing Unicode control code: U_00" + codePoint.toString(16));
         }
-        return '';
+        return null;
       } else {
         // String.fromCharCode() is inadequate to handle the entire range of Unicode
         // Someday after upgrading to ES2015, can use String.fromCodePoint()
@@ -221,7 +221,7 @@ namespace com.keyman.text {
         if(ruleBehavior) {
           ruleBehavior.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
         }
-        return '';
+        return null;
       }
 
       // Now that keyShiftState is either 0 or 1, we can use the following structure to determine the default output.
@@ -241,7 +241,7 @@ namespace com.keyman.text {
         }
       }
 
-      return '';
+      return null;
     }
   }
 }
