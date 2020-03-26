@@ -9,7 +9,7 @@
 // Defines the core text processor.
 /// <reference path="text/processor.ts" />
 // Defines the web-page interface object.
-/// <reference path="dom/kmwdom.ts" />
+/// <reference path="dom/domManager.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
 // Defines the keyboard callback object.

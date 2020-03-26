@@ -3,7 +3,7 @@
 // References the base KMW object.
 /// <reference path="../kmwbase.ts" />
 // References DOM event handling interfaces and classes.
-/// <reference path="kmwdomevents.ts" />
+/// <reference path="domEventHandlers.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="../text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
