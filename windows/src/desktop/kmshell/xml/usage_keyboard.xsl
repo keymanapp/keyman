@@ -10,7 +10,8 @@
 
 		<html>
 			<head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
 				<title>
 					<xsl:value-of select="$locale/String[@Id='Usage_Title']" />
 				</title>

@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  
+
   <xsl:include href="elements.xsl" />
 
   <xsl:variable name="locale_installkeyboard" select="$locale/Dialog[@Id='InstallKeyboard'][1]" />
-  
+
   <xsl:template match="/">
     <html>
       <head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
         <title><xsl:value-of select="$locale/String[@Id='S_InstallKeyboard_Title']"/></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>installkeyboard.css</xsl:attribute></link>
         <style type="text/css">
-          * { 
-            font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; 
+          * {
+            font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
           }
 
-          #background { 
-            width: <xsl:value-of select="$locale_installkeyboard/@Width" />px; 
+          #background {
+            width: <xsl:value-of select="$locale_installkeyboard/@Width" />px;
             height: <xsl:value-of select="$locale_installkeyboard/@Height" />px;
           }
-          #foreground { 
-            width: <xsl:value-of select="$locale_installkeyboard/@Width" />px; 
+          #foreground {
+            width: <xsl:value-of select="$locale_installkeyboard/@Width" />px;
             height: <xsl:value-of select="$locale_installkeyboard/@Height" />px;
           }
 
           #frame {
             width: <xsl:value-of select="$locale_installkeyboard/@Width - 20" />px;
           }
-         
+
           #footer {
-            width: <xsl:value-of select="$locale_installkeyboard/@Width - 16" />px; 
+            width: <xsl:value-of select="$locale_installkeyboard/@Width - 16" />px;
           }
         </style>
         <script type="text/javascript"><xsl:attribute name='src'><xsl:value-of select="/Keyman/templatepath"/>installkeyboard.js</xsl:attribute></script>
@@ -73,7 +74,7 @@
                   <xsl:attribute name="src"><xsl:value-of select="/Keyman/KeymanPackageFile/readme" /></xsl:attribute>
                 </iframe>
               </div>
-            </xsl:if>              
+            </xsl:if>
             <div class="content" id="details">
               <div style="display:block;position:static;margin:0;padding:0;background:blue;overflow:hidden;">
               <table style="width: 100%;background:white;">
@@ -129,7 +130,7 @@
       </body>
     </html>
   </xsl:template>
-  
+
   <xsl:template match="/Keyman/KeymanPackageFile/KeymanPackageContentKeyboardsFile/KeymanKeyboardFile/name">
     <xsl:value-of select="."/><br />
   </xsl:template>
@@ -137,7 +138,7 @@
   <xsl:template match="/Keyman/KeymanPackageFile/Fonts/Font/name">
     <xsl:value-of select="."/><br />
   </xsl:template>
-  
+
   <xsl:template match="/Keyman/KeymanKeyboardFile">
     <tr>
       <td class="detailheader"><xsl:value-of select="$locale/String[@Id='S_Caption_Filename']"/></td>
@@ -160,7 +161,7 @@
         <td class="otherdetails"><xsl:value-of select="copyright" /></td>
       </tr>
     </xsl:if>
-    
+
     <xsl:if test="message">
       <tr>
         <td class="detailheader"><xsl:value-of select="$locale/String[@Id='S_Caption_Message']"/></td>
@@ -168,27 +169,27 @@
       </tr>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match="/Keyman/KeymanPackageFile">
     <tr>
       <td class="detailheader"><xsl:value-of select="$locale/String[@Id='S_Caption_Keyboards']"/></td>
       <td class="otherdetails"><xsl:apply-templates select="KeymanPackageContentKeyboardsFile/KeymanKeyboardFile/name" /></td>
     </tr>
-    
+
     <xsl:if test="Fonts/Font">
       <tr>
         <td class="detailheader"><xsl:value-of select="$locale/String[@Id='S_Caption_Fonts']"/></td>
         <td class="otherdetails"><xsl:apply-templates select="Fonts/Font/name" /></td>
       </tr>
     </xsl:if>
-    
+
     <xsl:apply-templates select="detail[@name='version']"><xsl:with-param name="header"><xsl:value-of select="$locale/String[@Id='S_Caption_Version']"/></xsl:with-param></xsl:apply-templates>
     <xsl:apply-templates select="detail[@name='author']"><xsl:with-param name="header"><xsl:value-of select="$locale/String[@Id='S_Caption_Author']"/></xsl:with-param></xsl:apply-templates>
     <xsl:apply-templates select="detail[@name='website']"><xsl:with-param name="header"><xsl:value-of select="$locale/String[@Id='S_Caption_Website']"/></xsl:with-param></xsl:apply-templates>
     <xsl:apply-templates select="detail[@name='copyright']"><xsl:with-param name="header"><xsl:value-of select="$locale/String[@Id='S_Caption_Copyright']"/></xsl:with-param></xsl:apply-templates>
-    
+
   </xsl:template>
-  
+
   <xsl:template match="detail">
     <xsl:param name="header" />
     <tr>
@@ -207,7 +208,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </td>
-    </tr>    
+    </tr>
   </xsl:template>
 
 </xsl:stylesheet>

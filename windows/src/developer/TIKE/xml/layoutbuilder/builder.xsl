@@ -9,7 +9,8 @@
         <html>
             <head>
                 <meta charset="UTF-8" />
-                <meta http-equiv="x-ua-compatible" content="IE=edge" />
+                <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
+                <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
                 <title>On Screen Keyboard Builder</title>
                 <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui.css</xsl:attribute></link>
                 <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.css</xsl:attribute></link>
@@ -24,7 +25,7 @@
               <div id="wedgeAddKeyLeft" class="kcontrol wedge-vert"><span>+</span></div>
               <div id="wedgeAddKeyRight" class="kcontrol wedge-vert"><span>+</span></div>
               <div id="btnDelKey">x</div>
-              
+
               <div id='toolbar'>
                     <div id='controlToolbar'>
                         <button id='btnTemplate'>Template...</button>
@@ -72,7 +73,7 @@
                 <button id='btnDelSubKeyArray'>Remove longpress popup</button>
                 <br class='clear' />
               </div>
-              
+
               <div id="wedgeAddSubKeyLeft" class="skcontrol wedge-vert"><span>+</span></div>
               <div id="wedgeAddSubKeyRight" class="skcontrol wedge-vert"><span>+</span></div>
               <div id="btnDelSubKey">x</div>

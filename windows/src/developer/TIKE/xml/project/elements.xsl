@@ -4,6 +4,9 @@
 
 <xsl:template name="head">
   <head>
+    <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
+    <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
+
     <link rel='stylesheet' type='text/css' href='res/project.css' />
     <script src='res/common.js'><xsl:text> </xsl:text></script>
     <script src='res/project.js'><xsl:text> </xsl:text></script>

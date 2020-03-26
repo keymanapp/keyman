@@ -50,7 +50,8 @@ uses
   Winapi.ShlObj,
   Winapi.Windows,
 
-//  ExternalExceptionHandler,
+  Sentry.Client,
+
   KeymanPaths,
   KeymanVersion,
 //  RedistFiles,
@@ -68,12 +69,6 @@ procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
                                                     sourceProcess : TCefProcessId;
                                               const message       : ICefProcessMessage;
                                               var   aHandled      : boolean); forward;
-
-procedure GlobalCEFApp_UncaughtException(const browser    : ICefBrowser;
-                                         const frame      : ICefFrame;
-                                         const context    : ICefv8Context;
-                                         const e          : ICefV8Exception;
-                                         const stackTrace : ICefV8StackTrace); forward;
 { TInitializeCEF }
 
 procedure TCEFManager.CompletionHandler(Sender: IKeymanCEFHost);
@@ -118,8 +113,6 @@ begin
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
 
   GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
-  GlobalCEFApp.OnUncaughtException := GlobalCEFApp_UncaughtException;
-  GlobalCEFApp.UncaughtExceptionStackSize := 64;
 end;
 
 destructor TCEFManager.Destroy;
@@ -218,34 +211,6 @@ begin
       aHandled := True;
     end;
   end;
-end;
-
-
-procedure GlobalCEFApp_UncaughtException(const browser    : ICefBrowser;
-                                         const frame      : ICefFrame;
-                                         const context    : ICefv8Context;
-                                         const e          : ICefV8Exception;
-                                         const stackTrace : ICefV8StackTrace);
-var
-  log, id: string;
-  I: Integer;
-begin
-  id := LowerCase(ExtractFileName(ParamStr(0)))+'_'+GetVersionString+'_script_unknown';
-  I := string(frame.Url).LastDelimiter('/');
-  id := id + '_' + string(frame.Url).SubString(I + 1) + '_' + IntToStr(e.LineNumber);
-
-  log := 'Stack Trace:'#13#10;
-
-  for i := 0 to stackTrace.FrameCount - 1 do
-  begin
-    log := log + '  ' + stackTrace.Frame[i].FunctionName + ' ('+stackTrace.Frame[i].ScriptNameOrSourceUrl+':'+IntToStr(stackTrace.Frame[i].LineNumber)+')'#13#10;
-  end;
-
-  CefLog('CEFManager', 1, CEF_LOG_SEVERITY_ERROR, 'Error '+id+', '+e.Message+' in '+frame.Url);
-
-  {$MESSAGE HINT 'TODO: support exceptions in js windows'}
-  //LogExceptionToExternalHandler(id, 'Error occurred at line '+IntToStr(e.LineNumber)+' of '+e.ScriptResourceName,
-  //  e.Message, log);
 end;
 
 end.
