@@ -122,7 +122,6 @@ begin
       on E:Exception do
       begin
         LogException('TKeyman', E, ExceptAddr);
-        SysUtils.ShowException(ExceptObject, ExceptAddr);
         FInitialized := False;
       end;
     end;
@@ -245,6 +244,7 @@ end;
 
 function TKeyman.Get_AutoApply: WordBool;
 begin
+  if not FInitialized then raise Exception.Create(SErrorUninitialised);
   Result := FControl.AutoApply;
 end;
 
@@ -252,6 +252,7 @@ procedure TKeyman.Apply;
 var
   AutoApply: Boolean;
 begin
+  if not FInitialized then raise Exception.Create(SErrorUninitialised);
   AutoApply := FControl.AutoApply;
   FControl.AutoApply := False;
   try
@@ -267,6 +268,7 @@ end;
 
 procedure TKeyman.Set_AutoApply(Value: WordBool);
 begin
+  if not FInitialized then raise Exception.Create(SErrorUninitialised);
   FControl.AutoApply := Value;
 end;
 

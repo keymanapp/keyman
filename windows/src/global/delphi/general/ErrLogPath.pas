@@ -42,7 +42,7 @@ end;
 
 function GetErrLogFileName(app: string): string;  // I2824
 begin
-  Result := GetErrLogPath + app + '-' + IntToStr(GetCurrentProcessId) + '-' + FormatDateTime('yyyy-mm-dd-hh-nn-ss', Now) + '.log';
+  Result := GetErrLogPath + app + '-' + IntToStr(GetCurrentProcessId) + '.log';
 end;
 
 end.
