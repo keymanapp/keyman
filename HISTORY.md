@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.36 alpha 2020-03-26
+
+* fix(web/engine): Fixes default key lookup returns (#2890)
+
 ## 14.0.35 alpha 2020-03-25
 
 * feat(windows): new error notification dialog (#2875)
