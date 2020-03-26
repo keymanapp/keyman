@@ -24,10 +24,18 @@ files:
   - source: /KMEA/app/src/main/res/values/strings.xml
     dest: /android/KMEA/app/src/main/res/values/strings.xml
     translation: /KMEA/app/src/main/res/values-%android_code%/%original_file_name%
+    languages_mapping:
+      # Prevent invalid region pap-rPAP
+      android_code:
+        pap: pap
 
   - source: /KMAPro/kMAPro/src/main/res/values/strings.xml
     dest: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
     translation: /KMAPro/kMAPro/src/main/res/values-%android_code%/%original_file_name%
+    languages_mapping:
+      # Prevent invalid region pap-rPAP
+      android_code:
+        pap: pap
 
   # crowdin parameters descriptions:
 
