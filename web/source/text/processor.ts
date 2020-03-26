@@ -298,18 +298,6 @@ namespace com.keyman.text {
         return true;
       }
 
-      // TODO: This keymapping should be relocated outside of this method.
-      if(!keyman.isEmbedded && !fromOSK && keyEvent.device.browser == Browser.Firefox) {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
-          keyEvent.Lcode = KeyMapping.browserMap.FF['k'+keyEvent.Lcode];
-        }
-      } //else 
-      //{
-      // Safari, IE, Opera?
-      //}
-
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
       // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
       // We check the first condition here, while the prediction UI handles the second through the try__() methods below.

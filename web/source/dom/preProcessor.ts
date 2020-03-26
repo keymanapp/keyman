@@ -193,6 +193,15 @@ namespace com.keyman.dom {
           };
         }
       }
+
+      // Check for any browser-based keymapping before returning the object.
+      if(!keyman.isEmbedded && s.device.browser == text.Browser.Firefox) {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(KeyMapping.browserMap.FF['k'+s.Lcode]) {
+          s.Lcode = KeyMapping.browserMap.FF['k'+s.Lcode];
+        }
+      }
       
       return s;
     }
@@ -270,16 +279,6 @@ namespace com.keyman.dom {
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
       // Only reached if it's a mnemonic keyboard.
-      
-      // This pathway won't have .processKeyEvent's FF keycode check, so we must do it here on
-      // .processKeystroke's behalf.
-      if(!keyman.isEmbedded && keyman.util.device.browser == 'firefox') {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+Levent.Lcode]) {
-          Levent.Lcode=KeyMapping.browserMap.FF['k'+Levent.Lcode];
-        }
-      }
       if(processor.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
         processor.swallowKeypress = false;
         if(e && e.preventDefault) {
