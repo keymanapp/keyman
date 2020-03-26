@@ -266,8 +266,6 @@ namespace com.keyman.text {
         e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
       }
 
-      this.swallowKeypress = false;
-
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
       if((formFactor == FormFactor.Desktop || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
@@ -383,14 +381,6 @@ namespace com.keyman.text {
           // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
           outputTarget.doInputEvent();
         }
-
-        this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
-        if(keyEvent.Lcode == 8) {
-          this.swallowKeypress = false;
-        }
-        return false;
-      } else {
-        this.swallowKeypress = false;
       }
 
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */

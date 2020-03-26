@@ -232,6 +232,13 @@ namespace com.keyman.dom {
           e.preventDefault();
           e.stopPropagation();
         }
+
+        processor.swallowKeypress = (Levent.Lcode != 8 ? Levent.Lcode != 0 : false);
+        if(Levent.Lcode == 8) {
+          processor.swallowKeypress = false;
+        }
+      } else {
+        processor.swallowKeypress = false;
       }
 
       return !LeventMatched;

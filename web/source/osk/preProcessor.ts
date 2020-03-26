@@ -106,7 +106,7 @@ namespace com.keyman.osk {
           com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
 
-        let retVal = PreProcessor.processClick(Lkc, e);
+        let retVal = PreProcessor.handleClick(Lkc, e);
 
         // Now that processing is done, we can do a bit of post-processing, too.
         keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
@@ -119,7 +119,7 @@ namespace com.keyman.osk {
     // Created during refactoring for web-core.  Mostly serves to hold DOM-dependent
     // code that affects both 'native' and 'embedded' mode OSK use after the KeyEvent
     // object has been properly instantiated.
-    static processClick(Lkc: text.KeyEvent, e: KeyElement) {
+    static handleClick(Lkc: text.KeyEvent, e: KeyElement) {
       let keyman = com.keyman.singleton;
         // Exclude menu and OSK hide keys from normal click processing
       if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {
