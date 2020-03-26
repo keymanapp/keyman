@@ -475,7 +475,7 @@ namespace com.keyman.osk {
         if(languageMenu.scrolling) {
           this.className=this.className.replace(/\s*selected/,'');
         } else {
-          com.keyman.DOMEventHandlers.states.setFocusTimer();
+          com.keyman.dom.DOMEventHandlers.states.setFocusTimer();
 
           languageMenu.lgList.style.display='none'; //still allows blank menu momentarily on selection
           languageMenu.keyman.keyboardManager._SetActiveKeyboard(this.kn,this.kc,true);

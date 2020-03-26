@@ -9,7 +9,7 @@
 // Defines the core text processor.
 /// <reference path="text/processor.ts" />
 // Defines the web-page interface object.
-/// <reference path="kmwdom.ts" />
+/// <reference path="dom/kmwdom.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
 // Defines the keyboard callback object.
@@ -68,13 +68,13 @@ namespace com.keyman {
     ['osk']: com.keyman.osk.OSKManager;
     ['ui']: any;
     keyboardManager: keyboards.KeyboardManager;
-    domManager: DOMManager;
+    domManager: dom.DOMManager;
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
     textProcessor: text.Processor;
     modelManager: text.prediction.ModelManager;
 
-    touchAliasing: DOMEventHandlers;
+    touchAliasing: dom.DOMEventHandlers;
 
     // Defines option-tracking object as a string map.
     options: { [name: string]: string; } = {
@@ -113,7 +113,7 @@ namespace com.keyman {
       this.ui = this['ui'] = {};
 
       this.keyboardManager = new keyboards.KeyboardManager(this);
-      this.domManager = new DOMManager(this);
+      this.domManager = new dom.DOMManager(this);
       this.hotkeyManager = new HotkeyManager(this);
       this.uiManager = new UIManager(this);
 
@@ -172,7 +172,7 @@ namespace com.keyman {
         this.ui.shutdown();
       }
 
-      DOMEventHandlers.states = new CommonDOMStates();
+      dom.DOMEventHandlers.states = new dom.CommonDOMStates();
     }
 
     /**

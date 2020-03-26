@@ -95,8 +95,8 @@ setTestDefinition = function(testDef) {
 // Time for the 'magic'.  Yay, JavaScript method extension strategies...
 var _kd = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
 keyman.touchAliasing._KeyDown = function(e) {
-  if(com.keyman.DOMEventHandlers.states.activeElement != in_output &&
-    com.keyman.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
+  if(com.keyman.dom.DOMEventHandlers.states.activeElement != in_output &&
+    com.keyman.dom.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
     return _kd(e);
   }
 
@@ -129,8 +129,8 @@ copyTestDefinition = function() {
 
 var _ock = com.keyman.text.Processor.prototype.clickKey; //.bind(keyman.osk);
 com.keyman.text.Processor.prototype.clickKey = function(e) {
-  if(com.keyman.DOMEventHandlers.states.activeElement != in_output &&
-    com.keyman.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
+  if(com.keyman.dom.DOMEventHandlers.states.activeElement != in_output &&
+    com.keyman.dom.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
     return _ock.call(com.keyman.singleton.textProcessor, e);
   }
 
@@ -177,8 +177,8 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
 
   // What's the active stub immediately after our _SetActiveKeyboard call?
   var internalStub = keyman.keyboardManager.activeStub;
-  if(internalStub && (com.keyman.DOMEventHandlers.states.activeElement == in_output 
-    || com.keyman.DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
+  if(internalStub && (com.keyman.dom.DOMEventHandlers.states.activeElement == in_output 
+    || com.keyman.dom.DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
     var kbdRecord = new KMWRecorder.KeyboardStub(internalStub);
     kbdRecord.setBasePath('resources/keyboards');
     var ta_activeStub = document.getElementById('activeStub');

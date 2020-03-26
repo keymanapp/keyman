@@ -1,17 +1,17 @@
 // Includes KMW-added property declaration extensions for HTML elements.
-/// <reference path="kmwexthtml.ts" />
+/// <reference path="../kmwexthtml.ts" />
 // References the base KMW object.
-/// <reference path="kmwbase.ts" />
+/// <reference path="../kmwbase.ts" />
 // References DOM event handling interfaces and classes.
 /// <reference path="kmwdomevents.ts" />
 // Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
+/// <reference path="../text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
-/// <reference path="dom/touchAliasElement.ts" />
+/// <reference path="touchAliasElement.ts" />
 // Defines per-element-type OutputTarget element wrapping.
-/// <reference path="dom/targets/wrapElement.ts" />
+/// <reference path="targets/wrapElement.ts" />
 
-namespace com.keyman {
+namespace com.keyman.dom {
   // Utility object used to handle beep (keyboard error response) operations.
   class BeepData {
     e: HTMLElement;

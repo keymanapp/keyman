@@ -1,4 +1,6 @@
-namespace com.keyman {
+/// <reference path="touchAliasElement.ts" />
+
+namespace com.keyman.dom {
   /*
   * Note that for many of the actual events represented by methods in this file, `this` is replaced 
   * automatically by JavaScript's event handling system.  As such, many 'wrapper' variants of the events

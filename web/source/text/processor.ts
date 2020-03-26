@@ -398,9 +398,9 @@ namespace com.keyman.text {
 
       if(fromOSK && !keyman.isEmbedded) {
         keyman.uiManager.setActivatingUI(true);
-        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 100;
+        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
         keyman.domManager.focusLastActiveElement();
-        com.keyman.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
       }
       // // ...end I3363 (Build 301)
 
@@ -463,8 +463,8 @@ namespace com.keyman.text {
         //        to that goal than it previously was, at least.
         let ruleTransform = ruleBehavior.transcription.transform;
         if(ruleTransform.insert != "" || ruleTransform.deleteLeft > 0 || ruleTransform.deleteRight > 0) {
-          if(outputTarget.getElement() == DOMEventHandlers.states.activeElement) {
-            DOMEventHandlers.states.changed = true;
+          if(outputTarget.getElement() == dom.DOMEventHandlers.states.activeElement) {
+            dom.DOMEventHandlers.states.changed = true;
           }
         }
 
