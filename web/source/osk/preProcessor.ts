@@ -127,7 +127,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      let retVal = keyman.textProcessor.processKeyEvent(Lkc, e);
+      let retVal = keyman.textProcessor.processKeyEvent(Lkc);
 
       return retVal;
     }

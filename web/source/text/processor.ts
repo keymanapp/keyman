@@ -252,7 +252,7 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
      */
-    processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
+    processKeyEvent(keyEvent: KeyEvent): boolean {
       let keyman = com.keyman.singleton;
       let formFactor = keyEvent.device.formFactor;
 
@@ -260,11 +260,6 @@ namespace com.keyman.text {
       // of its current, pre-input state.
       let outputTarget = keyEvent.Ltarg;
       let fromOSK = keyEvent.isSynthetic;
-
-      // Enables embedded-path OSK sourcing detection.
-      if(typeof e == 'boolean') {
-        e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
-      }
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
