@@ -106,10 +106,26 @@ namespace com.keyman.osk {
           com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
 
-        return keyman.textProcessor.processKeyEvent(Lkc, e);
+        return PreProcessor.processClick(Lkc, e);
       } else {
         return true;
       }
+    }
+
+    // Created during refactoring for web-core.  Mostly serves to hold DOM-dependent
+    // code that affects both 'native' and 'embedded' mode OSK use after the KeyEvent
+    // object has been properly instantiated.
+    static processClick(Lkc: text.KeyEvent, e: KeyElement) {
+      let keyman = com.keyman.singleton;
+        // Exclude menu and OSK hide keys from normal click processing
+      if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {
+        keyman['osk'].vkbd.optionKey(e, Lkc.kName, true);
+        return true;
+      }
+
+      let retVal = keyman.textProcessor.processKeyEvent(Lkc, e);
+
+      return retVal;
     }
   }
 }

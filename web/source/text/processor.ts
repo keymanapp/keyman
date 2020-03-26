@@ -269,19 +269,6 @@ namespace com.keyman.text {
 
       this.swallowKeypress = false;
 
-      if(fromOSK && !keyman.isEmbedded) {
-        keyman.domManager.initActiveElement(keyEvent.Ltarg.getElement());
-
-        // Turn off key highlighting (or preview)
-        keyman['osk'].vkbd.highlightKey(e,false);
-      }
-
-      // Exclude menu and OSK hide keys from normal click processing
-      if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
-        keyman['osk'].vkbd.optionKey(e, keyEvent.kName, true);
-        return true;
-      }
-
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
       if((formFactor == FormFactor.Desktop || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {

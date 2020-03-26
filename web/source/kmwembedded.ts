@@ -448,7 +448,7 @@ namespace com.keyman.text {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      return processor.processKeyEvent(Lkc, true);
+      return com.keyman.osk.PreProcessor.processClick(Lkc, null);
   };
 
   /**
