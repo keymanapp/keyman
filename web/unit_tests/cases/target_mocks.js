@@ -26,7 +26,7 @@ if(typeof MockTests == 'undefined') {
     MockTests.initBase = function() {
       var id = DynamicElements.addInput();
       var elem = document.getElementById(id);
-      var wrapper = new com.keyman.dom.Input(elem);
+      var wrapper = new com.keyman.dom.targets.Input(elem);
 
       return wrapper;
     }
