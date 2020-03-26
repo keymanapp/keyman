@@ -98,6 +98,14 @@ namespace com.keyman.osk {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;
         }
+
+        if(!keyman.isEmbedded) {
+          keyman.uiManager.setActivatingUI(true);
+          com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
+          keyman.domManager.focusLastActiveElement();
+          com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+        }
+
         return keyman.textProcessor.processKeyEvent(Lkc, e);
       } else {
         return true;

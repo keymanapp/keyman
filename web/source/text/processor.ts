@@ -313,16 +313,9 @@ namespace com.keyman.text {
         }
       }
 
-      if(fromOSK && !keyman.isEmbedded) {
-        keyman.uiManager.setActivatingUI(true);
-        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        keyman.domManager.focusLastActiveElement();
-        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-      }
       // // ...end I3363 (Build 301)
 
       let preInputMock = Mock.from(outputTarget);
-
       let ruleBehavior = this.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
