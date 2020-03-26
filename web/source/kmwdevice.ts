@@ -1,6 +1,7 @@
 // Includes version-related functionality
 ///<reference path="utils/version.ts"/>
 ///<reference path="utils/styleConstants.ts" />
+///<reference path="text/engineDeviceSpec.ts" />
 
 // The Device object definition -------------------------------------------------
 
@@ -248,6 +249,10 @@ namespace com.keyman {
       }
 
       return this._styles;
+    }
+
+    public get headlessSpec(): text.EngineDeviceSpec {
+      return new text.EngineDeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
     }
   }
 }
