@@ -1,6 +1,6 @@
-/// <reference path="../text/outputTarget.ts" />
+/// <reference path="../../text/outputTarget.ts" />
 
-namespace com.keyman.dom {
+namespace com.keyman.dom.targets {
 
   export class Input extends text.OutputTarget {
     root: HTMLInputElement;
@@ -83,7 +83,7 @@ namespace com.keyman.dom {
       this.processedSelectionStart = start;
       this.processedSelectionEnd = end;
 
-      Utils.forceScroll(this.root);
+      keyman.dom.Utils.forceScroll(this.root);
     }
 
     getTextBeforeCaret(): string {

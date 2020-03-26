@@ -1,4 +1,4 @@
-namespace com.keyman.dom {
+namespace com.keyman.dom.targets {
   class SelectionCaret {
     node: Node;
     offset: number;

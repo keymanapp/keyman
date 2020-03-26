@@ -1,4 +1,4 @@
-/// <reference path="../text/outputTarget.ts" />
+/// <reference path="../../text/outputTarget.ts" />
 // Defines a basic HTMLInputElement wrapper.
 ///<reference path="input.ts" />
 // Defines a basic HTMLTextAreaElement wrapper.
@@ -10,10 +10,9 @@
 // Defines a basic touch-alias element wrapper.
 ///<reference path="touchAlias.ts" />
 
-namespace com.keyman.dom {
+namespace com.keyman.dom.targets {
   export function wrapElement(e: HTMLElement): text.OutputTarget {
     // Complex type scoping is implemented here so that kmwutils.ts is not a dependency for test compilations.
-    // TODO:  Use dom.Utils.instanceof instead of the current mild code replication done here.
 
     if(Utils.instanceof(e, "HTMLInputElement")) {
       return new Input(<HTMLInputElement> e);
