@@ -429,7 +429,7 @@ namespace com.keyman.text {
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
       // we can handle many other pre-processing steps the same way with this common method.
-      processor.commonClickEventPreprocessing(Lkc);
+      processor.setSyntheticEventDefaults(Lkc);
 
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
