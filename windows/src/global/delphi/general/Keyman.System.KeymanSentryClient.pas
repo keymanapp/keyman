@@ -35,6 +35,7 @@ uses
 
   System.SysUtils,
 {$IF NOT DEFINED(CONSOLE)}
+  Vcl.Dialogs,
   Vcl.Forms,
 {$ENDIF}
 
@@ -114,13 +115,9 @@ begin
       if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
           TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
       begin
-        {$MESSAGE HINT 'Show a message before aborting here?'}
-        {MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered starting the exception manager ('+SysErrorMessage(GetLastError)+').  '+
-          #13#10'Error log is stored in '#13#10#13#10+'  '+FLogFile+#13#10#13#10+
-          message+#13#10+
-          detail+#13#10+
-          'Please send this information to Keyman Support',
-          mtError, [mbOK], 0);}
+        MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered '+
+          'starting the exception manager ('+SysErrorMessage(GetLastError)+'). '+
+          'This error has been automatically reported to the Keyman team.', mtError, [mbOK], 0);
       end;
 {$ENDIF}
     end;
