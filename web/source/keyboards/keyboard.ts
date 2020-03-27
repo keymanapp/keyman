@@ -158,10 +158,10 @@ namespace com.keyman.keyboards {
       return this.cacheTag.stores;
     }
 
-    usesDesktopLayoutOnDevice(device: Device) {
+    usesDesktopLayoutOnDevice(device: text.EngineDeviceSpec) {
       if(this.scriptObject['KVKL']) {
         // A custom mobile layout is defined... but are we using it?
-        return device.formFactor == 'desktop';
+        return device.formFactor == text.FormFactor.Desktop;
       } else {
         return true;
       }

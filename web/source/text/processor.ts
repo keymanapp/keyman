@@ -254,7 +254,7 @@ namespace com.keyman.text {
      */
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
-      let formFactor = keyman.util.device.formFactor;
+      let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
@@ -284,7 +284,7 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if((formFactor == 'desktop' || this.activeKeyboard.usesDesktopLayoutOnDevice(keyman.util.device)) && fromOSK) {
+      if((formFactor == 'desktop' || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
