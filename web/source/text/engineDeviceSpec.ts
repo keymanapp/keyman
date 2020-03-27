@@ -43,7 +43,7 @@ namespace com.keyman.text {
         case Browser.Native:
         case Browser.Opera:
         case Browser.Safari:
-          this.browser = browser as Browser;
+          this.browser = browser.toLowerCase() as Browser;
           break;
         default:
           this.browser = Browser.Other;
@@ -53,10 +53,10 @@ namespace com.keyman.text {
         case FormFactor.Desktop:
         case FormFactor.Phone:
         case FormFactor.Tablet:
-          this.formFactor = formFactor as FormFactor;
+          this.formFactor = formFactor.toLowerCase() as FormFactor;
           break;
         default:
-          throw ("Invalid form factor specified for device!");
+          throw ("Invalid form factor specified for device: " + formFactor);
       }
 
       switch(OS.toLowerCase()) {
@@ -65,7 +65,7 @@ namespace com.keyman.text {
         case OperatingSystem.Linux.toLowerCase():
         case OperatingSystem.Android.toLowerCase():
         case OperatingSystem.iOS.toLowerCase():
-          this.OS = OS as OperatingSystem;
+          this.OS = OS.toLowerCase() as OperatingSystem;
           break;
         default:
           this.OS = OperatingSystem.Other;

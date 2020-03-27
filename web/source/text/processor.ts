@@ -10,7 +10,7 @@
 /// <reference path="../keyboards/keyboard.ts" />
 // Defines built-in keymapping.
 /// <reference path="keyMapping.ts" />
-// Defines a headless-compatible 'Device' analogue for use in keyEvent processing
+// Defines a core-compatible 'Device' analogue for use in keyEvent processing
 /// <reference path="engineDeviceSpec.ts" />
 
 namespace com.keyman.text {
