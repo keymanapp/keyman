@@ -35,8 +35,6 @@ namespace com.keyman.text {
     // in keyboard state not otherwise captured by the hosting page in the browser.
     // Needed for AltGr simulation.
     modStateFlags: number = 0;
-    // Denotes whether or not KMW needs to 'swallow' the next keypress.
-    swallowKeypress: boolean = false;
 
     keyboardInterface: KeyboardInterface;
 

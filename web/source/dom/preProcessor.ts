@@ -217,7 +217,7 @@ namespace com.keyman.dom {
      */ 
     static keyDown(e: KeyboardEvent): boolean {
       let processor = com.keyman.singleton.textProcessor;
-      processor.swallowKeypress = false;
+      DOMEventHandlers.states.swallowKeypress = false;
 
       // Get event properties  
       var Levent = this._GetKeyEventProperties(e, true);
@@ -233,12 +233,12 @@ namespace com.keyman.dom {
           e.stopPropagation();
         }
 
-        processor.swallowKeypress = (Levent.Lcode != 8 ? Levent.Lcode != 0 : false);
+        DOMEventHandlers.states.swallowKeypress = (Levent.Lcode != 8 ? Levent.Lcode != 0 : false);
         if(Levent.Lcode == 8) {
-          processor.swallowKeypress = false;
+          DOMEventHandlers.states.swallowKeypress = false;
         }
       } else {
-        processor.swallowKeypress = false;
+        DOMEventHandlers.states.swallowKeypress = false;
       }
 
       return !LeventMatched;
@@ -270,7 +270,7 @@ namespace com.keyman.dom {
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
       if(!processor.activeKeyboard.isMnemonic) {
-        if(!processor.swallowKeypress) {
+        if(!DOMEventHandlers.states.swallowKeypress) {
           return true;
         }
         if(Levent.Lcode < 0x20 || ((<any>keyman)._BrowserIsSafari  &&  (Levent.Lcode > 0xF700  &&  Levent.Lcode < 0xF900))) {
@@ -286,8 +286,8 @@ namespace com.keyman.dom {
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
       // Only reached if it's a mnemonic keyboard.
-      if(processor.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
-        processor.swallowKeypress = false;
+      if(DOMEventHandlers.states.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
+        DOMEventHandlers.states.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
@@ -295,7 +295,7 @@ namespace com.keyman.dom {
         return false;
       }
 
-      processor.swallowKeypress = false;
+      DOMEventHandlers.states.swallowKeypress = false;
       return true;
     }
   }
