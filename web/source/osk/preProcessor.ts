@@ -28,7 +28,7 @@ namespace com.keyman.osk {
         kLayer: layer,
         kbdLayer: e.displayLayer,
         kNextLayer: e.nextlayer,
-        device: keyman.util.device.headlessSpec,  // The OSK's events always use the 'true' device.
+        device: keyman.util.device.coreSpec,  // The OSK's events always use the 'true' device.
         isSynthetic: true
       };
 

@@ -480,7 +480,7 @@ namespace com.keyman.text {
       Lstates: lstates,
       LisVirtualKey: true,
       kName: '',
-      device: keyman.util.physicalDevice.headlessSpec, // As we're executing a hardware keystroke.
+      device: keyman.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
       isSynthetic: false
     }; 
 

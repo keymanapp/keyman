@@ -162,7 +162,7 @@ namespace com.keyman.dom {
       s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
       // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
-      s.device = keyman.util.physicalDevice.headlessSpec;
+      s.device = keyman.util.physicalDevice.coreSpec;
 
       // This is based on a KeyboardEvent, so it's not considered 'synthetic' within web-core.
       s.isSynthetic = false;
@@ -188,7 +188,7 @@ namespace com.keyman.dom {
             vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
             Lstates: s.Lstates,
             kName: '',
-            device: keyman.util.physicalDevice.headlessSpec,
+            device: keyman.util.physicalDevice.coreSpec,
             isSynthetic: false
           };
         }

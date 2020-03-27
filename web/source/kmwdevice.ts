@@ -251,7 +251,7 @@ namespace com.keyman {
       return this._styles;
     }
 
-    public get headlessSpec(): text.EngineDeviceSpec {
+    public get coreSpec(): text.EngineDeviceSpec {
       return new text.EngineDeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
     }
   }

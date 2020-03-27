@@ -25,8 +25,9 @@ namespace com.keyman.text {
   }
 
   /**
-   * This class provides an abstract version of com.keyman.Device that is headless-friendly, 
-   * containing only the information needed by web-core for text processing use.
+   * This class provides an abstract version of com.keyman.Device that is core-friendly, 
+   * containing only the information needed by web-core for text processing use, devoid
+   * of any direct references to the DOM.
    */
   export class EngineDeviceSpec {
     readonly browser: Browser;
