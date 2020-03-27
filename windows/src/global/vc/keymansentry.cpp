@@ -86,7 +86,7 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
   for now we won't create as an exception event. We still get all the information
   we want from this.
 
-  Investigating this further.
+  Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
 
   sentry_value_t exc = sentry_value_new_object();
   sentry_value_set_by_key(exc, "type", sentry_value_new_string("Exception"));

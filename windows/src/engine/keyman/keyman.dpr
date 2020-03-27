@@ -75,7 +75,6 @@ uses
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   findfonts in '..\..\global\delphi\general\findfonts.pas',
   WideStringClass in '..\..\global\delphi\general\WideStringClass.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',

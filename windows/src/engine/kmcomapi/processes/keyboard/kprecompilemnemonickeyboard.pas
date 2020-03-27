@@ -41,7 +41,6 @@ uses
   System.Win.Registry,
   Winapi.Windows,
 
-  errlogpath,
   errorcontrolledregistry,
   keymancontext,
   keymanerrorcodes,
@@ -106,7 +105,7 @@ begin
 
   with TStringStream.Create(FLogText, TEncoding.UTF8) do   // I4174
   try
-    SaveToFile(GetErrLogFileName('mcompile-'+ChangeFileExt(ExtractFileName(FileName),'')));
+    SaveToFile(TKeymanPaths.ErrorLogPath('mcompile-'+ChangeFileExt(ExtractFileName(FileName),'')));
   finally
     Free;
   end;
@@ -125,7 +124,7 @@ begin
 
   with TStringStream.Create(FLogText, TEncoding.UTF8) do   // I4174
   try
-    SaveToFile(GetErrLogFileName('mcompile-d-'+ChangeFileExt(ExtractFileName(FileName),'')));
+    SaveToFile(TKeymanPaths.ErrorLogPath('mcompile-d-'+ChangeFileExt(ExtractFileName(FileName),'')));
   finally
     Free;
   end;

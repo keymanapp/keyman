@@ -167,7 +167,6 @@ uses
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   TextFileTemplates in 'main\TextFileTemplates.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UfrmFontHelper in 'dialogs\UfrmFontHelper.pas' {Form1},
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',

@@ -19,6 +19,7 @@ type
       const EventID, EventClassName, Message: string;
       var EventAction: TSentryClientEventAction);
     constructor Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
+    procedure ReportRemoteErrors(const childEventID: string);
   public
     destructor Destroy; override;
     class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
@@ -31,12 +32,17 @@ type
 implementation
 
 uses
-  sentry,
-
+  System.Classes,
+  System.Generics.Collections,
+  System.JSON,
   System.SysUtils,
 {$IF NOT DEFINED(CONSOLE)}
+  System.UITypes,
+  Vcl.Dialogs,
   Vcl.Forms,
 {$ENDIF}
+
+  sentry,
 
   KeymanPaths,
   KeymanVersion,
@@ -83,14 +89,18 @@ var
 begin
   if EventType = scetException then
   begin
+    // We need to look for a kmcomapi errlog and report that
+    ReportRemoteErrors(EventID);
+
     if kscfShowUI in FFlags then
     begin
 {$IF DEFINED(CONSOLE)}
       // Write to console
-      writeln('Fatal error '+EventClassName+': '+Message);
-      writeln;
+      writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
+      writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
+      writeln(ErrOutput);
 {$ELSE}
-      // Launch external gui exception handler.
+      // Launch external gui exception dialog app.
       // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
       AppID := LowerCase(ChangeFileExt(ExtractFileName(ParamStr(0)), ''))+'-'+CKeymanVersionInfo.VersionWithTag;
       if Assigned(Application)
@@ -114,19 +124,87 @@ begin
       if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
           TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
       begin
-        {$MESSAGE HINT 'Show a message before aborting here?'}
-        {MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered starting the exception manager ('+SysErrorMessage(GetLastError)+').  '+
-          #13#10'Error log is stored in '#13#10#13#10+'  '+FLogFile+#13#10#13#10+
-          message+#13#10+
-          detail+#13#10+
-          'Please send this information to Keyman Support',
-          mtError, [mbOK], 0);}
+        MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered '+
+          'starting the exception manager ('+SysErrorMessage(GetLastError)+'). '+
+          'This error has been automatically reported to the Keyman team.', mtError, [mbOK], 0);
       end;
 {$ENDIF}
     end;
     // Abort process: we'll get TSentryClient to clean up and crash
     if kscfTerminate in FFlags then
       EventAction := sceaTerminate;
+  end;
+end;
+
+procedure TKeymanSentryClient.ReportRemoteErrors(const childEventID: string);
+var
+  errlogfile: string;
+  o: TJSONObject;
+  event: sentry_value_t;
+  stack: TJSONArray;
+  i: Integer;
+  frames: sentry_value_t;
+  stacktrace: sentry_value_t;
+  threads: sentry_value_t;
+  thread: sentry_value_t;
+  frame: sentry_value_t;
+begin
+  errlogfile := TKeymanPaths.ErrorLogPath('kmcomapi');  // I2824
+  if FileExists(errlogfile) then
+  begin
+    // We'll use the Sentry API directly here to construct a crash report from
+    // kmcomapi.
+    with TStringStream.Create('', TEncoding.UTF8) do
+    try
+      LoadFromFile(errlogfile);
+      o := TJSONObject.ParseJSONValue(DataString) as TJSONObject;
+    finally
+      Free;
+    end;
+
+    DeleteFile(errlogfile);
+
+(*
+  When we set exception information, the report is corrupted. Not sure why. So
+  for now we won't create as an exception event. We still get all the information
+  we want from this.
+
+  Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
+
+  exc := sentry_value_new_object;
+  sentry_value_set_by_key(exc, 'type', sentry_value_new_string(PAnsiChar(UTF8Encode(ExceptionClassName))));
+  sentry_value_set_by_key(exc, 'value', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
+  sentry_value_set_by_key(event, 'exception', exc);
+*)
+
+    event := sentry_value_new_event;
+    sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(o.Values['message'].Value))));
+    // Construct the stack trace
+
+    stack := o.Values['stack'] as TJSONArray;
+
+    frames := sentry_value_new_list;
+
+    for i := 0 to stack.Count - 1 do
+    begin
+      frame := sentry_value_new_object;
+      sentry_value_set_by_key(frame, 'instruction_addr', sentry_value_new_string(PAnsiChar(AnsiString(stack.Items[i].Value))));
+      sentry_value_append(frames, frame);
+    end;
+
+    stacktrace := sentry_value_new_object;
+    sentry_value_set_by_key(stacktrace, 'frames', frames);
+
+    threads := sentry_value_new_list;
+    thread := sentry_value_new_object;
+    sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
+    sentry_value_append(threads, thread);
+
+    sentry_value_set_by_key(event, 'threads', threads);
+
+    sentry_set_extra('child_event', sentry_value_new_string(PAnsiChar(AnsiString(childEventID))));
+
+    sentry_capture_event(event);
   end;
 end;
 

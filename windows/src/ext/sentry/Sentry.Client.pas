@@ -36,7 +36,13 @@ type
 
   TSentryClientEventType = (scetException, scetMessage);
   TSentryClientEventAction = (sceaContinue, sceaTerminate);
-  TSentryClientEvent = procedure(Sender: TObject; EventType: TSentryClientEventType;
+
+  TSentryClientBeforeEvent = procedure(Sender: TObject; EventType: TSentryClientEventType;
+    event: sentry_value_t;
+    const EventClassName, Message: string;
+    var EventAction: TSentryClientEventAction) of object;
+
+  TSentryClientAfterEvent = procedure(Sender: TObject; EventType: TSentryClientEventType;
     const EventID, EventClassName, Message: string;
     var EventAction: TSentryClientEventAction) of object;
 
@@ -46,11 +52,12 @@ type
     FInstance: TSentryClient;
   private
     options: psentry_options_t;
-    FOnBeforeEvent: TSentryClientEvent;
-    FOnAfterEvent: TSentryClientEvent;
+    FOnBeforeEvent: TSentryClientBeforeEvent;
+    FOnAfterEvent: TSentryClientAfterEvent;
     procedure DoAfterEvent(const EventID, ExceptionClassName, Message: string;
       EventType: TSentryClientEventType);
-    procedure DoBeforeEvent(const EventID, ExceptionClassName, Message: string;
+    procedure DoBeforeEvent(event: sentry_value_t;
+      const ExceptionClassName, Message: string;
       EventType: TSentryClientEventType);
     procedure DoTerminate;
     function EventIDToString(Guid: TGUID): string;
@@ -61,8 +68,8 @@ type
     function MessageEvent(Level: TSentryLevel; const Logger, Message: string; IncludeStack: Boolean = False): TGUID;
     function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
 
-    property OnBeforeEvent: TSentryClientEvent read FOnBeforeEvent write FOnBeforeEvent;
-    property OnAfterEvent: TSentryClientEvent read FOnAfterEvent write FOnAfterEvent;
+    property OnBeforeEvent: TSentryClientBeforeEvent read FOnBeforeEvent write FOnBeforeEvent;
+    property OnAfterEvent: TSentryClientAfterEvent read FOnAfterEvent write FOnAfterEvent;
   end;
 
   TSentryClientClass = class of TSentryClient;
@@ -222,7 +229,8 @@ begin
   ExitProcess(1);
 end;
 
-procedure TSentryClient.DoBeforeEvent(const EventID, ExceptionClassName, Message: string;
+procedure TSentryClient.DoBeforeEvent(event: sentry_value_t;
+  const ExceptionClassName, Message: string;
   EventType: TSentryClientEventType);
 var
   EventAction: TSentryClientEventAction;
@@ -230,7 +238,7 @@ begin
   if Assigned(FOnBeforeEvent) then
   begin
     EventAction := sceaContinue;
-    FOnBeforeEvent(Self, EventType, EventID, ExceptionClassName, Message, EventAction);
+    FOnBeforeEvent(Self, EventType, event, ExceptionClassName, Message, EventAction);
     if EventAction = sceaTerminate then
       DoTerminate;
   end;
@@ -275,16 +283,16 @@ const
   //    A pseudo-frame is inserted at the top of the stack which points
   //    to the address of the code that caused the exception
 begin
-  DoBeforeEvent('', ExceptionClassName, Message, scetException);
-
   event := sentry_value_new_event;
+
+  DoBeforeEvent(event, ExceptionClassName, Message, scetException);
 
 (*
   When we set exception information, the report is corrupted. Not sure why. So
   for now we won't create as an exception event. We still get all the information
   we want from this.
 
-  Investigating this further.
+  Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
 
   exc := sentry_value_new_object;
   sentry_value_set_by_key(exc, 'type', sentry_value_new_string(PAnsiChar(UTF8Encode(ExceptionClassName))));
@@ -317,13 +325,13 @@ const
   //    Sentry.Client.CaptureStackTrace,
   //    Sentry.Client.TSentryClient.MessageEvent
 begin
-  DoBeforeEvent('', Logger, Message, scetMessage);
-
 	event := sentry_value_new_message_event(
 		{*   level *} sentry_level_t(Level),
 		{*  logger *} PAnsiChar(UTF8Encode(Logger)),
 		{* message *} PAnsiChar(UTF8Encode(Message))
 	);
+
+  DoBeforeEvent(event, Logger, Message, scetMessage);
 
   if IncludeStack then
   begin
