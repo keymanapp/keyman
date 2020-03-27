@@ -158,6 +158,68 @@ namespace com.keyman.keyboards {
       return this.cacheTag.stores;
     }
 
+    /**
+     * Signifies whether or not a layout or OSK should include AltGr / Right-alt emulation for this keyboard.
+     * @param   {Object=}   keyLabels
+     * @return  {boolean}
+     */
+    get emulatesAltGr(): boolean {
+      let modifierCodes = text.Codes.modifierCodes;
+
+      // If we're not chiral, we're not emulating.
+      if(!this.isChiral) {
+        return false;
+      }
+
+      if(this.legacyLayoutSpec == null) {
+        return false;
+      }
+      
+      // Only exists in KMW 10.0+, but before that Web had no chirality support, so... return false.
+      let layers = this.legacyLayoutSpec['KLS'];
+      if(!layers) {
+        return false;
+      }
+
+      var emulationMask = modifierCodes['LCTRL'] | modifierCodes['LALT'];
+      var unshiftedEmulationLayer = layers[Layouts.getLayerId(emulationMask)];
+      var shiftedEmulationLayer = layers[Layouts.getLayerId(modifierCodes['SHIFT'] | emulationMask)];
+      
+      // buildDefaultLayout ensures that these are aliased to the original modifier set being emulated.
+      // As a result, we can directly test for reference equality.
+      //
+      // This allows us to still return `true` after creating the layers for emulation; during keyboard
+      // construction, the two layers should be null for AltGr emulation to succeed.
+      if(unshiftedEmulationLayer != null && 
+          unshiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'])]) {
+        return false;
+      }
+
+      if(shiftedEmulationLayer != null && 
+          shiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'] | modifierCodes['SHIFT'])]) {
+        return false;
+      }
+
+      // It's technically possible for the OSK to not specify anything while allowing chiral input.  A last-ditch catch:
+      var bitmask = this.modifierBitmask;
+      if((bitmask & emulationMask) != emulationMask) {
+        // At least one of the emulation modifiers is never used by the keyboard!  We can confirm everything's safe.
+        return true;
+      }
+
+      if(unshiftedEmulationLayer == null && shiftedEmulationLayer == null) {
+        // We've run out of things to go on; we can't detect if chiral AltGr emulation is intended or not.
+        // TODO:  handle this again!
+        // if(!osk.altGrWarning) {
+        //   console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
+        //   // Avoid spamming the console with warnings on every call of the method.
+        //   osk.altGrWarning = true;
+        // }
+        return true;
+      }
+      return true;
+    }
+
     usesDesktopLayoutOnDevice(device: text.EngineDeviceSpec) {
       if(this.scriptObject['KVKL']) {
         // A custom mobile layout is defined... but are we using it?

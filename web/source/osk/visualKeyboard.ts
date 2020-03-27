@@ -626,7 +626,7 @@ namespace com.keyman.osk {
         } else {
           kbdDevVersion = new utils.Version(keyman['version']);
         }
-        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor);
+        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor, activeKeyboard);
       }
 
       // Create the collection of HTML elements from the device-dependent layout object
@@ -2224,7 +2224,7 @@ namespace com.keyman.osk {
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
         let kbdDevVersion = PKbd.compilerVersion;
-        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, PKbd.modifierBitmask, formFactor);
+        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, PKbd.modifierBitmask, formFactor, PKbd);
       }
 
       // Cannot create an OSK if no layout defined, just return empty DIV

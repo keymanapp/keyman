@@ -202,7 +202,7 @@ namespace com.keyman.text {
       }
 
       // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-      if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && keyboards.Layouts.emulatesAltGr()) {
+      if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && this.activeKeyboard.emulatesAltGr) {
         Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
         Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
       }
@@ -539,7 +539,7 @@ namespace com.keyman.text {
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(this.activeKeyboard.isChiral && keyboards.Layouts.emulatesAltGr() && 
+        if(this.activeKeyboard.isChiral && (this.activeKeyboard.emulatesAltGr) && 
             (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~Codes.modifierCodes['RALT'];
