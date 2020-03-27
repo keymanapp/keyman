@@ -865,7 +865,7 @@ namespace com.keyman.text {
             case 'android':
             case 'ios':
             case 'linux':
-              if(this.activeDevice.OS.toLowerCase() != constraint) {
+              if(this.activeDevice.OS != constraint) {
                 result=false;
               }
               break;

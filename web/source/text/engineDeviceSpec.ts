@@ -10,11 +10,11 @@ namespace com.keyman.text {
   }
 
   export enum OperatingSystem {
-    Windows = 'Windows',
-    macOS = 'MacOSX',
-    Linux = 'Linux',
-    Android = 'Android',
-    iOS = 'iOS',
+    Windows = 'windows',
+    macOS = 'macosx',
+    Linux = 'linux',
+    Android = 'android',
+    iOS = 'ios',
     Other = 'other'
   }
 

@@ -284,7 +284,7 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if((formFactor == 'desktop' || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
+      if((formFactor == FormFactor.Desktop || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
@@ -299,7 +299,7 @@ namespace com.keyman.text {
       }
 
       // TODO: This keymapping should be relocated outside of this method.
-      if(!keyman.isEmbedded && !fromOSK && keyEvent.device.browser == 'firefox') {
+      if(!keyman.isEmbedded && !fromOSK && keyEvent.device.browser == Browser.Firefox) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
@@ -747,14 +747,14 @@ namespace com.keyman.text {
       var s = activeLayer;
 
       // Do not change layer unless needed (27/08/2015)
-      if(id == activeLayer && keyman.util.device.formFactor != 'desktop') {
+      if(id == activeLayer && keyman.util.device.formFactor != FormFactor.Desktop) {
         return false;
       }
 
       var idx=id;
       var i;
 
-      if(keyman.util.device.formFactor == 'desktop') {
+      if(keyman.util.device.formFactor == FormFactor.Desktop) {
         // Need to test if target layer is a standard layer (based on the plain 'default')
         var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
