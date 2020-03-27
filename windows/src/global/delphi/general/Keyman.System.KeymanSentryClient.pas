@@ -59,7 +59,12 @@ const
 
   // Settings valid on development machines only:
   KEYMAN_ROOT = 'KEYMAN_ROOT'; // environment variable
+
+{$IFDEF WIN64}
+  DEV_SENTRY_PATH = 'windows\src\ext\sentry\sentry.x64.dll';
+{$ELSE WIN64}
   DEV_SENTRY_PATH = 'windows\src\ext\sentry\sentry.dll';
+{$ENDIF}
 
 { TKeymanSentryClient }
 
