@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.37 alpha 2020-03-27
+
+* feat(windows): crash reports in CEF (#2887)
+* feat(common): Use Crowdin CLI (v3) for handling l10n files (#2895)
+* fix(windows): show error if tsysinfo fails to start; kmcomapi reporting (#2897)
+
 ## 14.0.36 alpha 2020-03-26
 
 * fix(web/engine): Fixes default key lookup returns (#2890)
