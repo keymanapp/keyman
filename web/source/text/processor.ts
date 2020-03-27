@@ -287,7 +287,7 @@ namespace com.keyman.text {
       if((formFactor == FormFactor.Desktop || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
-        if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
+        if(this.selectLayer(keyEvent)) {
           return true;
         }
       }
@@ -339,7 +339,7 @@ namespace com.keyman.text {
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
-        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
+        this.selectLayer(keyEvent);
       }
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
@@ -652,8 +652,9 @@ namespace com.keyman.text {
      *  @param  {number|string|undefined}   nextLayerIn optional next layer identifier
      *  @return {boolean}                               return true if keyboard layer changed
      */
-    selectLayer(keyName: string, nextLayerIn?: number | string): boolean {
-      var nextLayer = arguments.length < 2 ? null : nextLayerIn;
+    selectLayer(keyEvent: KeyEvent, fromNameOnly: boolean = false): boolean {
+      let keyName = keyEvent.kName;
+      var nextLayer = fromNameOnly ? null : keyEvent.kNextLayer;
       var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
       // Layer must be identified by name, not number (27/08/2015)
@@ -723,7 +724,7 @@ namespace com.keyman.text {
       }
 
       // Change layer and refresh OSK
-      this.updateLayer(nextLayer);
+      this.updateLayer(keyEvent, nextLayer);
       com.keyman.singleton.osk._Show();
 
       return true;
@@ -735,7 +736,7 @@ namespace com.keyman.text {
      *
      * @param       {string}      id      layer id (e.g. ctrlshift)
      */
-    updateLayer(id: string) {
+    updateLayer(keyEvent: KeyEvent, id: string) {
       let keyman = com.keyman.singleton;
       let vkbd = keyman['osk'].vkbd;
 
@@ -747,14 +748,14 @@ namespace com.keyman.text {
       var s = activeLayer;
 
       // Do not change layer unless needed (27/08/2015)
-      if(id == activeLayer && keyman.util.device.formFactor != FormFactor.Desktop) {
+      if(id == activeLayer && keyEvent.device.formFactor != FormFactor.Desktop) {
         return false;
       }
 
       var idx=id;
       var i;
 
-      if(keyman.util.device.formFactor == FormFactor.Desktop) {
+      if(keyEvent.device.formFactor == FormFactor.Desktop) {
         // Need to test if target layer is a standard layer (based on the plain 'default')
         var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
@@ -842,7 +843,6 @@ namespace com.keyman.text {
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
     // in those cases.
     doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
-      let keyman = com.keyman.singleton;
       let outputTarget = Levent.Ltarg;
 
       if(!this.activeKeyboard) {
@@ -861,7 +861,7 @@ namespace com.keyman.text {
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
           this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
-          if(!keyman.util.device.touchable) {
+          if(!Levent.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
             return true;

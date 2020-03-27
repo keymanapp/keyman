@@ -408,11 +408,6 @@ namespace com.keyman.text {
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
-      
-      // Process modifier key action
-      if(processor.selectLayer(keyName)) {
-        return true;      
-      }
 
       let Codes = com.keyman.text.Codes;
       
@@ -430,6 +425,11 @@ namespace com.keyman.text {
         device: keymanweb.util.device.coreSpec
       };
 
+      // Process modifier key action
+      if(processor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
+        return true;      
+      }
+
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
       // we can handle many other pre-processing steps the same way with this common method.
       processor.setSyntheticEventDefaults(Lkc);
@@ -439,7 +439,7 @@ namespace com.keyman.text {
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          processor.selectLayer(keyName, nextLayer);
+          processor.selectLayer(Lkc);
         }
         return false;
       }
