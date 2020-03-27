@@ -251,6 +251,9 @@ namespace com.keyman {
       return this._styles;
     }
 
+    /**
+     * Returns a slimmer, web-core compatible version of this object.
+     */
     public get coreSpec(): text.EngineDeviceSpec {
       return new text.EngineDeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
     }

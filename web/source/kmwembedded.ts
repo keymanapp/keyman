@@ -374,7 +374,7 @@ namespace com.keyman.text {
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=processor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=processor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -417,14 +417,17 @@ namespace com.keyman.text {
       let Codes = com.keyman.text.Codes;
       
       // Check the virtual key 
-      Lkc = {
+      let Lkc: com.keyman.text.KeyEvent = {
         Ltarg: com.keyman.text.Processor.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
         kName: keyName,
-        kNextLayer: nextLayer
+        kNextLayer: nextLayer,
+        vkCode: null, // was originally undefined
+        isSynthetic: true,
+        device: keymanweb.util.device.coreSpec
       };
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
