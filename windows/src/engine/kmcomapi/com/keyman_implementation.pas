@@ -90,7 +90,6 @@ implementation
 uses
   Classes,
   ComServ,
-  errlogpath,
   sysutils,
   klog,
   utilhandleexception;
@@ -102,9 +101,6 @@ procedure TKeyman.Initialize;
 begin
   KL.MethodEnter(Self, 'Initialize', []);
   try
-    // I1642 move GetErrLogPath out of DllMain - causes memory issues later due to COM calls
-    ForceDirectories(GetErrLogPath);
-
     inherited;
 
     try

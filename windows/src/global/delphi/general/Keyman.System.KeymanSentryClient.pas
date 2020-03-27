@@ -44,7 +44,6 @@ uses
 
   sentry,
 
-  ErrLogPath, // TODO: merge with KeymanPaths
   KeymanPaths,
   KeymanVersion,
   utilexecute;
@@ -97,9 +96,9 @@ begin
     begin
 {$IF DEFINED(CONSOLE)}
       // Write to console
-      writeln(stderr, 'Fatal error '+EventClassName+': '+Message);
-      writeln(stderr, 'This error has been automatically reported to the Keyman team.');
-      writeln(stderr);
+      writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
+      writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
+      writeln(ErrOutput);
 {$ELSE}
       // Launch external gui exception dialog app.
       // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
@@ -150,7 +149,7 @@ var
   thread: sentry_value_t;
   frame: sentry_value_t;
 begin
-  errlogfile := GetErrLogFileName('kmcomapi');  // I2824
+  errlogfile := TKeymanPaths.ErrorLogPath('kmcomapi');  // I2824
   if FileExists(errlogfile) then
   begin
     // We'll use the Sentry API directly here to construct a crash report from

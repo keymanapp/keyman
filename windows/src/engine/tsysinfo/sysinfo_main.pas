@@ -105,7 +105,7 @@ implementation
 
 uses
   // keymanstrings,
-  ErrLogPath, ActiveX, ComObj,
+  KeymanPaths, ActiveX, ComObj,
   ErrorControlledRegistry, RegistryKeys,
   shlobj,
   UframeAttachedFiles,
@@ -234,7 +234,7 @@ var
   m: Integer;
 begin
   FSIList.Files.Clear;
-  FPath := GetErrLogPath;
+  FPath := TKeymanPaths.ErrorLogPath;
   if FindFirst(FPath + '*', 0, f) = 0 then
   begin
     i := 0;

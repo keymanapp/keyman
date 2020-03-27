@@ -25,6 +25,7 @@ type
     const S_FallbackKeyboardPath = 'Keyboards\';
     const S__Package = '_Package\';
     const S_MCompileExe = 'mcompile.exe';
+    class function ErrorLogPath(const app: string = ''): string; static;
     class function KeymanDesktopInstallPath(const filename: string = ''): string; static;
     class function KeymanEngineInstallPath(const filename: string = ''): string; static;
     class function KeymanDesktopInstallDir: string; static;
@@ -288,6 +289,14 @@ begin
     raise EKeymanPath.Create('Unable to find the Keyboards directory.  You should reinstall the product.');
 
   Result := Result + Filename;
+end;
+
+class function TKeymanPaths.ErrorLogPath(const app: string): string;
+begin
+  Result := GetFolderPath(CSIDL_LOCAL_APPDATA) + SFolderKeymanEngineDiag + '\';
+  ForceDirectories(Result);  // I2768
+  if app <> '' then
+    Result := Result + app + '-' + IntToStr(GetCurrentProcessId) + '.log';
 end;
 
 end.

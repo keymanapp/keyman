@@ -136,7 +136,6 @@ uses
   jwawintype,
 
   bootstrapmain,
-  errlogpath,
   GetOsVersion,
   HTTPUploader,
   Keyman.System.UpgradeRegistryKeys,
@@ -288,7 +287,7 @@ begin
     ShowMessageW(msg);
   if not Assigned(FErrorLog) then
   begin
-    path := GetErrLogPath + 'setup.log'; // I2314
+    path := TKeymanPaths.ErrorLogPath + 'setup.log'; // I2314
 
     if SysUtils.FileExists(path) then
     begin
@@ -636,7 +635,7 @@ begin
 
     { Log the install to the diag folder }
 
-    FLogFileName := GetErrLogFileName(ChangeFileExt(ExtractFileName(FInstallInfo.MSIFileName), ''));  // I1610 // I2755 // I2792
+    FLogFileName := TKeymanPaths.ErrorLogPath(ChangeFileExt(ExtractFileName(FInstallInfo.MSIFileName), ''));  // I1610 // I2755 // I2792
     //ForceDirectories(GetErrLogPath);  // I2768
 
     MsiEnableLogW(INSTALLLOGMODE_VERBOSE, PWideChar(FLogFileName), 0);

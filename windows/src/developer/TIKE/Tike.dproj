@@ -348,7 +348,6 @@
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="main\TextFileTemplates.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="dialogs\UfrmFontHelper.pas">
             <Form>Form1</Form>
         </DCCReference>

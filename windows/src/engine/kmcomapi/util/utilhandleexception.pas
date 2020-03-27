@@ -35,7 +35,7 @@ uses
   System.JSON,
   Winapi.Windows,
 
-  ErrLogPath,
+  KeymanPaths,
   JsonUtil,
   KLog,
   utildir,
@@ -82,7 +82,7 @@ begin
 
   errlog := TStringList.Create;
   try
-    errlogfile := GetErrLogFileName('kmcomapi');  // I2824
+    errlogfile := TKeymanPaths.ErrorLogPath('kmcomapi');  // I2824
 
     o := TJSONObject.Create;
     o.AddPair('sourceClassName', SourceClassName);
