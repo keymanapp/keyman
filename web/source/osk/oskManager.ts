@@ -230,8 +230,10 @@ namespace com.keyman.osk {
 
         // Generate a visual keyboard from the layout (or layout default)
         // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(activeKeyboard.layout(device.formFactor as text.FormFactor)) {
+        if(activeKeyboard && activeKeyboard.layout(device.formFactor as text.FormFactor)) {
           this._GenerateVisualKeyboard(activeKeyboard);
+        } else if(!activeKeyboard) {
+          this._GenerateVisualKeyboard(null);
         } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
           Ldiv=util._CreateElement('div');

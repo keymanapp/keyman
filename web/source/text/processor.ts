@@ -66,6 +66,10 @@ namespace com.keyman.text {
     }
 
     public set activeKeyboard(keyboard: keyboards.Keyboard) {
+      if(!keyboard) {
+        // This approach is needed to back an OSK on touch devices when no actual keyboard is active.
+        keyboard = new keyboards.Keyboard(null);
+      }
       this.keyboard = keyboard;
 
       // All old deadkeys and keyboard-specific cache should immediately be invalidated

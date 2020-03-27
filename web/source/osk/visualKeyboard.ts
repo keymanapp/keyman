@@ -611,8 +611,16 @@ namespace com.keyman.osk {
       }
 
       // Create the collection of HTML elements from the device-dependent layout object
-      var Lkbd=util._CreateElement('div'), oskWidth;
-      let layout = this.layout = keyboard.layout(device.formFactor as text.FormFactor);
+      var Lkbd=util._CreateElement('div');
+      let layout: keyboards.ActiveLayout;
+      if(keyboard) {
+        layout = this.layout = keyboard.layout(device.formFactor as text.FormFactor);
+      } else {
+        // This CAN be called with no backing keyboard; KMW will try to force-show the OSK even without 
+        // a backing keyboard on mobile, using the most generic default layout as the OSK's base.
+        let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
+        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, device.formFactor);
+      }
       this.layers=layout['layer'];
 
       // Override font if specified by keyboard

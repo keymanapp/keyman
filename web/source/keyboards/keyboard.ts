@@ -1,3 +1,5 @@
+/// <reference path="defaultLayouts.ts" />
+
 namespace com.keyman.keyboards {
   /**
    * Stores preprocessed properties of a keyboard for quick retrieval later.
@@ -16,6 +18,14 @@ namespace com.keyman.keyboards {
    * wrapped keyboard itself.
    */
   export class Keyboard {
+    public static DEFAULT_SCRIPT_OBJECT = {
+      'gs': function(outputTarget, keystroke) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
+      'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
+      'KN': '',
+      'KV': Layouts.DEFAULT_RAW_SPEC,
+      'KM': 1
+    }
+
     /**
      * This is the object provided to KeyboardInterface.registerKeyboard - that is, the keyboard
      * being wrapped.
@@ -25,7 +35,11 @@ namespace com.keyman.keyboards {
     public readonly scriptObject: any;
 
     constructor(keyboardScript: any) {
-      this.scriptObject = keyboardScript;
+      if(keyboardScript) {
+        this.scriptObject = keyboardScript;
+      } else {
+        this.scriptObject = Keyboard.DEFAULT_SCRIPT_OBJECT;
+      }
     }
 
     /**
@@ -33,6 +47,10 @@ namespace com.keyman.keyboards {
      */
     process(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
       return this.scriptObject['gs'](outputTarget, keystroke);
+    }
+
+    get isHollow(): boolean {
+      return this.scriptObject == Keyboard.DEFAULT_SCRIPT_OBJECT;
     }
 
     get id(): string {
@@ -283,7 +301,7 @@ namespace com.keyman.keyboards {
           this._layouts = {};
         }
         // Now to generate a layout from our raw specifications.
-        let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this.compilerVersion, this.modifierBitmask, formFactor, this);
+        let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
         layout.isDefault = true;
         return layout;
       } else {

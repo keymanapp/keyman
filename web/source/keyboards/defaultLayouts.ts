@@ -69,6 +69,8 @@ namespace com.keyman.keyboards {
     static dfltText='`1234567890-=\xA7~~qwertyuiop[]\\~~~asdfghjkl;\'~~~~~?zxcvbnm,./~~~~~ '
       +'~!@#$%^&*()_+\xA7~~QWERTYUIOP{}\\~~~ASDFGHJKL:"~~~~~?ZXCVBNM<>?~~~~~ ';
 
+    static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText};
+
     // Cross-reference with the ids in osk.setButtonClass.
     static buttonClasses: {[name: string]: ButtonClass} = {
       'DEFAULT':'0',
@@ -112,7 +114,7 @@ namespace com.keyman.keyboards {
     * @param   {string}  formFactor
     * @return  {Object}
     */
-    static buildDefaultLayout(PVK, kbdDevVersion: utils.Version, kbdBitmask: number, formFactor: string, keyboard: Keyboard): LayoutFormFactor {
+    static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
       // TODO:  Only here because of util.deepCopy.  Start a web-core utils so that it's accessible in headless.
       let util = com.keyman.singleton.util;
 
@@ -121,6 +123,18 @@ namespace com.keyman.keyboards {
 
       if(typeof Layouts.dfltLayout[layoutType] != 'object') {
         layoutType = 'desktop';
+      }
+
+      let kbdBitmask = Codes.modifierBitmasks['NON_CHIRAL'];
+      // An unfortunate dependency there.  Should probably also set a version within web-core for use.
+      let kbdDevVersion = new utils.Version(com.keyman.singleton['version']);
+      if(keyboard) {
+        kbdBitmask = keyboard.modifierBitmask;
+        kbdDevVersion = keyboard.compilerVersion;
+      }
+
+      if(!PVK) {
+        PVK = this.DEFAULT_RAW_SPEC;
       }
 
       // Clone the default layout object for this device
@@ -148,7 +162,7 @@ namespace com.keyman.keyboards {
       validIdList = [ 'default' ].concat(validIdList);
 
       // Automatic AltGr emulation if the 'leftctrl-leftalt' layer is otherwise undefined.
-      if(keyboard.emulatesAltGr) {
+      if(keyboard && keyboard.emulatesAltGr) {
         // We insert only the layers that need to be emulated.
         if((validIdList.indexOf('leftctrl-leftalt') == -1) && validIdList.indexOf('rightalt') != -1) {
           validIdList.push('leftctrl-leftalt');
