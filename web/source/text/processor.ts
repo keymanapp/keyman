@@ -202,7 +202,7 @@ namespace com.keyman.text {
       }
 
       // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
-      if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && osk.Layouts.emulatesAltGr()) {
+      if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && keyboards.Layouts.emulatesAltGr()) {
         Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
         Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
       }
@@ -310,7 +310,7 @@ namespace com.keyman.text {
         if(keyman.modelManager.enabled && !ruleBehavior.triggersDefaultCommand) {
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
-            let activeLayout = keyman['osk'].vkbd.layout as osk.ActiveLayout;
+            let activeLayout = keyman['osk'].vkbd.layout as keyboards.ActiveLayout;
             alternates = [];
     
             for(let pair of keyEvent.keyDistribution) {
@@ -539,7 +539,7 @@ namespace com.keyman.text {
         lockStates = e.Lstates;
 
         // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-        if(this.activeKeyboard.isChiral && osk.Layouts.emulatesAltGr() && 
+        if(this.activeKeyboard.isChiral && keyboards.Layouts.emulatesAltGr() && 
             (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
           keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
           keyShiftState &= ~Codes.modifierCodes['RALT'];
@@ -582,7 +582,7 @@ namespace com.keyman.text {
     }
 
     getLayerId(modifier: number): string {
-      return osk.Layouts.getLayerId(modifier);
+      return keyboards.Layouts.getLayerId(modifier);
     }
 
     /**

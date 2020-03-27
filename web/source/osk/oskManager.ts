@@ -2,7 +2,7 @@
 // Includes KMW string extension declarations.
 /// <reference path="../text/kmwstring.ts" /> 
 // Includes the default layout specification.
-/// <reference path="defaultLayouts.ts" /> 
+/// <reference path="../keyboards/defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
 // Includes the banner
@@ -268,7 +268,7 @@ namespace com.keyman.osk {
         if(Lviskbd != null || Lhelp == '' || device.touchable) { // I3363 (Build 301)
           // TODO: May want to define a default BK array here as well
           if(Lviskbd == null) {
-            Lviskbd={'F':'Tahoma', 'BK': Layouts.dfltText}; //DDOSK
+            Lviskbd={'F':'Tahoma', 'BK': keyboards.Layouts.dfltText}; //DDOSK
           }
 
           this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, activeKeyboard.modifierBitmask);

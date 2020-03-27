@@ -1,4 +1,4 @@
-namespace com.keyman.osk {
+namespace com.keyman.keyboards {
   type KeyDistribution = text.KeyDistribution;
 
 

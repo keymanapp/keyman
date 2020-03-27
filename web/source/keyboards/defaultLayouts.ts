@@ -5,7 +5,7 @@
 
 ///<reference path="../utils/version.ts"/>
 
-namespace com.keyman.osk {
+namespace com.keyman.keyboards {
   let Codes = com.keyman.text.Codes;
 
   export type KLS = {[layerName: string]: string[]};
@@ -203,7 +203,7 @@ namespace com.keyman.osk {
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
             var specialChar = Layouts.modifierSpecials[layerID]; 
-            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+            shiftKey['sk'].push(new osk.OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
           }
         } else {
           // Seriously, this should never happen.  It's here for the debugging log only.

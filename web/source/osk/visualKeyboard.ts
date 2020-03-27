@@ -1,4 +1,4 @@
-/// <reference path="activeLayout.ts" />
+/// <reference path="../keyboards/activeLayout.ts" />
 /// <reference path="../utils/version.ts" />
 /// <reference path="preProcessor.ts" />
 
@@ -46,10 +46,10 @@ namespace com.keyman.osk {
   //#endregion
 
   //#region OSK key objects and construction
-  export class OSKKeySpec implements LayoutKey {
+  export class OSKKeySpec implements keyboards.LayoutKey {
     id: string;
     text?: string;
-    sp?: number | ButtonClass;
+    sp?: number | keyboards.ButtonClass;
     width: string;
     layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
     nextlayer?: string;
@@ -58,7 +58,7 @@ namespace com.keyman.osk {
     padpc?: number; // Added during OSK construction.
     sk?: OSKKeySpec[];
 
-    constructor(id: string, text?: string, width?: string, sp?: number | ButtonClass, nextlayer?: string, pad?: string) {
+    constructor(id: string, text?: string, width?: string, sp?: number | keyboards.ButtonClass, nextlayer?: string, pad?: string) {
       this.id = id;
       this.text = text;
       this.width = width ? width : "50";
@@ -329,7 +329,7 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, layout: LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let util = com.keyman.singleton.util;
       let spec = this.spec;
       let isDesktop = this.formFactor == "desktop"
@@ -526,8 +526,8 @@ namespace com.keyman.osk {
      * so that its geometry may be updated on rotations and keyboard resize events, as
      * said geometry needs to be accurate for fat-finger probability calculations.
      */
-    layout: ActiveLayout;
-    layers: LayoutLayer[];
+    layout: keyboards.ActiveLayout;
+    layers: keyboards.LayoutLayer[];
     layerId: string = "default";
     layerIndex: number;
 
@@ -593,7 +593,7 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
+    constructor(PVK, Lhelp, layout0: keyboards.LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
       // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
       this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
       this.drawPreview = this.drawPreview || function(c,w,h,e) {};
@@ -626,11 +626,11 @@ namespace com.keyman.osk {
         } else {
           kbdDevVersion = new utils.Version(keyman['version']);
         }
-        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor);
+        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor);
       }
 
       // Create the collection of HTML elements from the device-dependent layout object
-      this.layout = ActiveLayout.polyfill(layout, device.formFactor);
+      this.layout = keyboards.ActiveLayout.polyfill(layout, device.formFactor);
       this.layers=layout['layer'];
 
       // Override font if specified by keyboard
@@ -673,7 +673,8 @@ namespace com.keyman.osk {
      * @return    {Object}    An object that contains default key properties
      */
     getDefaultKeyObject(): OSKKeySpec {
-      return new OSKKeySpec(undefined, '', ActiveKey.DEFAULT_KEY.width, ActiveKey.DEFAULT_KEY.sp as ButtonClass, null, ActiveKey.DEFAULT_KEY.pad);
+      return new OSKKeySpec(undefined, '', keyboards.ActiveKey.DEFAULT_KEY.width, keyboards.ActiveKey.DEFAULT_KEY.sp as keyboards.ButtonClass,
+          null, keyboards.ActiveKey.DEFAULT_KEY.pad);
     };
 
     /**
@@ -683,7 +684,7 @@ namespace com.keyman.osk {
      * @param       {string}              formFactor  layout form factor
      * @return      {Object}                          fully formatted OSK object
      */
-    deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
+    deviceDependentLayout(layout: keyboards.LayoutFormFactor, formFactor: string): HTMLDivElement {
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
       let rowsPercent = 100;
@@ -720,9 +721,9 @@ namespace com.keyman.osk {
 
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number, i: number, j: number;
-      var layers: LayoutLayer[], gDiv: HTMLDivElement;
+      var layers: keyboards.LayoutLayer[], gDiv: HTMLDivElement;
       var rowHeight: number, rDiv: HTMLDivElement;
-      var keys: LayoutKey[], key: LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
+      var keys: keyboards.LayoutKey[], key: keyboards.LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
 
       layers=layout['layer'];
 
@@ -777,7 +778,7 @@ namespace com.keyman.osk {
       }
 
       for(n=0; n<layers.length; n++) {
-        let layer=layers[n] as ActiveLayer;
+        let layer=layers[n] as keyboards.ActiveLayer;
         gDiv=util._CreateElement('div'), gs=gDiv.style;
         gDiv.className='kmw-key-layer';
 
@@ -826,14 +827,14 @@ namespace com.keyman.osk {
             keys[j]['padpc']=padPercent;
 
             // Recompute center's x-coord with exact, in-browser values.
-            (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
-            (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+            (<keyboards.ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
+            (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
 
             totalPercent += padPercent+keyPercent;
           }
 
           // Allow for right OSK margin (15 layout units)
-          let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
+          let rightMargin = keyboards.ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
           totalPercent += rightMargin;
 
           // If a single key, and padding is negative, add padding to right align the key
@@ -844,8 +845,8 @@ namespace com.keyman.osk {
             keys[0]['padpc']=(objectWidth-totalPercent);
 
             // Recompute center's x-coord with exact, in-browser values.
-            (<ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
-            (<ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
+            (<keyboards.ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
+            (<keyboards.ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
           } else if(keys.length > 0) {
             j=keys.length-1;
             padPercent = keys[j]['padpc'] * objectWidth;
@@ -854,8 +855,8 @@ namespace com.keyman.osk {
             keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
 
             // Recompute center's x-coord with exact, in-browser values.
-            (<ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
-            (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+            (<keyboards.ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
+            (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
           }
 
           //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
@@ -1410,7 +1411,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = Processor.stateKeys[states[i]] ? Layouts.buttonClasses['SHIFT-ON'] : Layouts.buttonClasses['SHIFT'];
+        keys[i]['sp'] = Processor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
         let keyId = layerId+'-'+states[i]
         var btn = document.getElementById(keyId);
 
@@ -2223,7 +2224,7 @@ namespace com.keyman.osk {
       // Else get a default layout for the device for this keyboard
       if(layout == null && PVK != null) {
         let kbdDevVersion = PKbd.compilerVersion;
-        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, PKbd.modifierBitmask, formFactor);
+        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, PKbd.modifierBitmask, formFactor);
       }
 
       // Cannot create an OSK if no layout defined, just return empty DIV

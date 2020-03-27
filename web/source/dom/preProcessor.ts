@@ -138,7 +138,7 @@ namespace com.keyman.dom {
 
         // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
         // AltGr / Right-alt simulation.
-        if(osk.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
+        if(keyboards.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
           s.Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
           s.Lmodifiers |= modifierCodes['RALT'];
         }
