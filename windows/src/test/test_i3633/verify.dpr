@@ -36,8 +36,8 @@ begin
     Delete(s,1,1);
   end;
 
-  if str[0].ToLower.Contains('sentry.dll') then
-    // We don't verify sentry.dll because it's not our file
+  if str[0].ToLower.Contains('sentry.') then
+    // We don't verify sentry.dll or sentry.x64.dll because it's not our file
     Exit('');
 
   { Check each element of string }
