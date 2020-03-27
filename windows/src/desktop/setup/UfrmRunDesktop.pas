@@ -91,6 +91,7 @@ type
     FCheckForUpdatesInstall: Boolean;
     FStartAfterInstall: Boolean;
     FStartWithWindows: Boolean;
+    FAutomaticallyReportUsage: Boolean;
     FDisableUpgradeFrom6Or7Or8: Boolean;  // I2847   // I4293
     procedure SetOfflineByRequest(const Value: Boolean);
     procedure Rewrap;
@@ -494,7 +495,7 @@ begin
     SetupMSI; // I2644
 
     if GetRunTools.DoInstall(Handle, PackagesOnly, FCheckForUpdatesInstall, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
-      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration) then
+      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FAutomaticallyReportUsage) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
         ShowMessage(FInstallInfo.Text(ssInstallSuccess));
@@ -518,6 +519,8 @@ var
   i: Integer;
   oldHeight: Integer;
 begin
+
+  FAutomaticallyReportUsage := True;
 
   Application.Title := FInstallInfo.Text(ssApplicationTitle);
   Caption := FInstallInfo.Text(ssTitle);
@@ -599,6 +602,7 @@ procedure TfrmRunDesktop.lblOptionsClick(Sender: TObject);
 begin
   with TfrmInstallOptions.Create(Self) do
   try
+    AutomaticallyReportUsage := FAutomaticallyReportUsage;
     StartWithWindows := FStartWithWindows;
     StartAfterInstall := FStartAfterInstall;
     CheckForUpdates := FCheckForUpdates;

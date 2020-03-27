@@ -20,7 +20,9 @@ type
     koAutoOpenOSK,          // I1288
     koAutoSwitchOSKPages,  // I1375
     koUseTouchLayout,
-    koBaseLayout
+    koBaseLayout,
+    koAutomaticallyReportErrors,
+    koAutomaticallyReportUsage
     );
 
 function KeymanOptionName(Option: TUtilKeymanOption): string;

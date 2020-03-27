@@ -430,6 +430,7 @@ uses
   keymanapi_TLB,
   KeymanVersion,
   OnlineConstants,
+  Keyman.System.KeymanSentryClient,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   GlobalProxySettings,
   Keyman.Developer.System.Project.ProjectFile,
@@ -480,6 +481,8 @@ var
   FActiveProject: string;
 begin
   inherited;
+
+  TKeymanSentryClient.Client.MessageEvent(SENTRY_LEVEL_INFO, TKeymanSentryClient.LOGGER_DEVELOPER_IDE, 'Started Keyman Developer');
 
   if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
   begin

@@ -62,6 +62,8 @@ type
     FDebuggerAutoResetBeforeCompiling: Boolean;
     FAutoSaveBeforeCompiling: Boolean;
     FOSKAutoSaveBeforeImporting: Boolean;
+    FReportErrors: Boolean;
+    FReportUsage: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -94,6 +96,9 @@ type
     property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
     property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
     property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
+
+    property ReportErrors: Boolean read FReportErrors write FReportErrors;
+    property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
 
@@ -213,6 +218,9 @@ begin
     FFix183_LadderLength := regReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
 
     FDefaultProjectPath := IncludeTrailingPathDelimiter(regReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
+
+    FReportErrors := regReadBool(SRegValue_AutomaticallyReportErrors, True);
+    FReportUsage := regReadBool(SRegValue_AutomaticallyReportUsage, True);
   finally
     CloseRegistry;
   end;
@@ -257,6 +265,9 @@ begin
     regWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
 
     regWriteString(SRegValue_IDEOpt_DefaultProjectPath, FDefaultProjectPath);
+
+    regWriteBool(SRegValue_AutomaticallyReportErrors, FReportErrors);
+    regWriteBool(SRegValue_AutomaticallyReportUsage, FReportUsage);
   finally
     CloseRegistry;
   end;

@@ -91,7 +91,9 @@ type
       InstallSuccess: Boolean);
     procedure CheckInstalledVersion;
     function InstallMSI: Boolean;
-    procedure InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration: Boolean);
+    procedure InstallPackages(StartKeyman,StartWithWindows,
+      CheckForUpdates,StartDisabled,StartWithConfiguration,
+      AutomaticallyReportUsage: Boolean);
     procedure PrepareForReboot(res: Cardinal);
     function RestartWindows: Boolean;
     procedure RunVersion6Upgrade(const kmshellpath: WideString);
@@ -106,7 +108,9 @@ type
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
     function DownloadFile(ADownloadURL, ADownloadFilename: WideString): Boolean;
-    function DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled, StartWithConfiguration: Boolean): Boolean;
+    function DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall,
+      StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
+      StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
     property Silent: Boolean read FSilent write FSilent;
     property PromptForReboot: Boolean read FPromptForReboot write FPromptForReboot;  // I3355   // I3500
@@ -183,7 +187,9 @@ begin
   inherited;
 end;
 
-function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled, StartWithConfiguration: Boolean): Boolean;
+function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall,
+  StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
+  StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
 begin
   Result := False;
 
@@ -211,14 +217,17 @@ begin
 
     if InstallMSI then
     begin
-      InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration);
+      InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
+        StartDisabled,StartWithConfiguration,AutomaticallyReportUsage);
       Result := True;
     end
   end
   else
   begin
     CheckInstalledVersion;
-    InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration);
+    InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
+      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration,
+      AutomaticallyReportUsage);
     Result := True;
   end;
 end;
@@ -686,7 +695,8 @@ begin
   end;
 end;
 
-procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration: Boolean);
+procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,
+  StartDisabled,StartWithConfiguration,AutomaticallyReportUsage: Boolean);
 var
   i: Integer;
   s: WideString;
@@ -715,6 +725,8 @@ begin
 
     if StartWithWindows then s := s + 'StartWithWindows,';
     if CheckForUpdates then s := s + 'CheckForUpdates,';
+    if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
+
 
     if (FInstalledVersion.Version = '') or (FInstalledVersion.ProductCode <> FInstallerVersion.ProductCode) then s := s + 'InstallDefaults,';  // I2651
 
