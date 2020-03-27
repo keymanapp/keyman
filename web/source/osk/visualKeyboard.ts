@@ -616,8 +616,11 @@ namespace com.keyman.osk {
       if(keyboard) {
         layout = this.layout = keyboard.layout(device.formFactor as text.FormFactor);
       } else {
-        // This CAN be called with no backing keyboard; KMW will try to force-show the OSK even without 
+        // This COULD be called with no backing keyboard; KMW will try to force-show the OSK even without 
         // a backing keyboard on mobile, using the most generic default layout as the OSK's base.
+        //
+        // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
+        // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
         layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, device.formFactor);
       }

@@ -23,7 +23,7 @@ namespace com.keyman.keyboards {
       'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
       'KN': '',
       'KV': Layouts.DEFAULT_RAW_SPEC,
-      'KM': 1
+      'KM': 0 // May not be the best default, but this matches current behavior when there is no activeKeyboard.
     }
 
     /**
