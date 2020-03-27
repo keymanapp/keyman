@@ -634,7 +634,7 @@ namespace com.keyman.osk {
       }
 
       // Set flag to add default (US English) key label if specified by keyboard
-      layout.keyLabels = keyboard.displaysUnderlyingKeys;
+      layout.keyLabels = keyboard && keyboard.displaysUnderlyingKeys;
 
       let divLayerContainer = this.deviceDependentLayout(layout, device.formFactor);
 
