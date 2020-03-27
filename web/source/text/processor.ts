@@ -159,6 +159,7 @@ namespace com.keyman.text {
       return ruleBehavior;
     }
 
+    // TODO:  Right about ready to move this to DOM-aware space!
     static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
       let keyman = com.keyman.singleton;
 
@@ -817,15 +818,12 @@ namespace com.keyman.text {
       return false;
     }
 
-    resetContext(outputTarget?: OutputTarget) {
+    resetContext() {
       let keyman = com.keyman.singleton;
       if(!keyman.isHeadless && keyman.osk.vkbd) {
         keyman.osk.vkbd.layerId = 'default';
       }
 
-      if(outputTarget) { // should only be called with null from inside this class.
-        outputTarget.deadkeys().clear();
-      }
       this.keyboardInterface.resetContextCache();
       this.resetVKShift();
       

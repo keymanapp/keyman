@@ -451,7 +451,11 @@ namespace com.keyman {
      */
     ['resetContext']() {
       let elem = dom.DOMEventHandlers.states.activeElement;
-      this.textProcessor.resetContext(text.Processor.getOutputTarget(elem));
+      let outputTarget = text.Processor.getOutputTarget(elem);
+      if(outputTarget) {
+        outputTarget.resetContext();
+      }
+      this.textProcessor.resetContext();
     };
 
     /**

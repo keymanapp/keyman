@@ -1274,7 +1274,15 @@ namespace com.keyman.dom {
 
       // No need to reset context if we stay within the same element.
       if(DOMEventHandlers.states.activeElement != e) {
-        this.keyman.textProcessor.resetContext(text.Processor.getOutputTarget(DOMEventHandlers.states.activeElement));
+        let outputTarget1 = text.Processor.getOutputTarget(DOMEventHandlers.states.activeElement);
+        let outputTarget2 = text.Processor.getOutputTarget(e as HTMLElement);
+        if(outputTarget1) {
+          outputTarget1.resetContext();
+        }
+        if(outputTarget2) {
+          outputTarget2.resetContext();
+        }
+        this.keyman.textProcessor.resetContext();
       }
 
       DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;

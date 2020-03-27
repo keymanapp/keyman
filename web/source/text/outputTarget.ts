@@ -67,6 +67,10 @@ namespace com.keyman.text {
       return true;
     }
 
+    resetContext(): void {
+      this.deadkeys().clear();
+    }
+
     deadkeys(): text.DeadkeyTracker {
       return this._dks;
     }
