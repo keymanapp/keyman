@@ -112,8 +112,8 @@ namespace com.keyman.keyboards {
     * @return  {Object}
     */
     static buildDefaultLayout(PVK, kbdDevVersion: utils.Version, kbdBitmask: number, formFactor: string): LayoutFormFactor {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
+      // TODO:  Only here because of util.deepCopy.  Start a web-core utils so that it's accessible in headless.
+      let util = com.keyman.singleton.util;
 
       // Build a layout using the default for the device
       var layoutType=formFactor;
@@ -203,7 +203,13 @@ namespace com.keyman.keyboards {
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
             var specialChar = Layouts.modifierSpecials[layerID]; 
-            shiftKey['sk'].push(new osk.OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+            let subkey: LayoutKey = {
+              id: "K_" + specialChar,
+              text: specialChar,
+              sp: "1",
+              nextlayer: layerID
+            }
+            shiftKey['sk'].push(subkey);
           }
         } else {
           // Seriously, this should never happen.  It's here for the debugging log only.
