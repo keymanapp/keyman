@@ -593,7 +593,7 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(PVK, Lhelp, layout0: keyboards.LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
+    constructor(keyboard: keyboards.Keyboard, device?: Device, isStatic?: boolean) {
       // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
       this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
       this.drawPreview = this.drawPreview || function(c,w,h,e) {};
@@ -610,27 +610,9 @@ namespace com.keyman.osk {
         this.isStatic = isStatic;
       }
 
-      let layout=layout0;
-      var Lkbd=util._CreateElement('div'), oskWidth;//s=Lkbd.style,
-      var activeKeyboard = keyman.textProcessor.activeKeyboard;
-
-      // Build a layout using the default for the device
-      if(typeof layout != 'object' || layout == null) {
-        var kbdDevVersion: utils.Version;
-
-        // This CAN be called with no backing keyboard; KMW will try to force-show
-        // the OSK even without a backing keyboard on mobile, using the default
-        // layout as the OSK's base.
-        if(activeKeyboard) {
-          kbdDevVersion = activeKeyboard.compilerVersion;
-        } else {
-          kbdDevVersion = new utils.Version(keyman['version']);
-        }
-        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor, activeKeyboard);
-      }
-
       // Create the collection of HTML elements from the device-dependent layout object
-      this.layout = keyboards.ActiveLayout.polyfill(layout, device.formFactor);
+      var Lkbd=util._CreateElement('div'), oskWidth;
+      let layout = this.layout = keyboard.layout(device.formFactor as text.FormFactor);
       this.layers=layout['layer'];
 
       // Override font if specified by keyboard
@@ -641,11 +623,7 @@ namespace com.keyman.osk {
       }
 
       // Set flag to add default (US English) key label if specified by keyboard
-      if(typeof layout['displayUnderlying'] != 'undefined') {
-        layout.keyLabels = layout['displayUnderlying'] == true; // force bool
-      } else {
-        layout.keyLabels = activeKeyboard && activeKeyboard.displaysUnderlyingKeys;
-      }
+      layout.keyLabels = keyboard.displaysUnderlyingKeys;
 
       let divLayerContainer = this.deviceDependentLayout(layout, device.formFactor);
 
@@ -2206,37 +2184,9 @@ namespace com.keyman.osk {
         return null;
       }
 
-      var layouts=PKbd.layouts, layout=null, PVK=PKbd.legacyLayoutSpec;
+      let layout = PKbd.layout(formFactor);
 
-      // Get the layout defined in the keyboard, or its nearest equivalent
-      if(typeof layouts == 'object') {
-        if(typeof(layouts[formFactor]) == 'object' && layouts[formFactor] != null) {
-          layout=layouts[formFactor];
-        } else if(formFactor == 'phone' && typeof(layouts['tablet']) == 'object' && layouts['tablet'] != null) {
-          layout=layouts['tablet'];
-        } else if(formFactor == 'tablet' && typeof(layouts['phone']) == 'object' && layouts['phone'] != null) {
-          layout=layouts['phone'];
-        } else if(typeof(layouts['desktop']) == 'object' && layouts['desktop'] != null) {
-          layout=layouts['desktop'];
-        }
-      }
-
-      // Else get a default layout for the device for this keyboard
-      if(layout == null && PVK != null) {
-        let kbdDevVersion = PKbd.compilerVersion;
-        layout=keyboards.Layouts.buildDefaultLayout(PVK, kbdDevVersion, PKbd.modifierBitmask, formFactor, PKbd);
-      }
-
-      // Cannot create an OSK if no layout defined, just return empty DIV
-      if(layout != null) {
-        if(typeof layout['displayUnderlying'] != 'undefined') {
-          layout.keyLabels = layout['displayUnderlying'] == true; // force bool
-        } else {
-          layout.keyLabels = PKbd.displaysUnderlyingKeys;
-        }        
-      }
-
-      let kbdObj = new VisualKeyboard(PVK, null, layout, PKbd.modifierBitmask, device, true);
+      let kbdObj = new VisualKeyboard(PKbd, device, true);
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes

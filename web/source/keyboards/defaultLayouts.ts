@@ -44,7 +44,8 @@ namespace com.keyman.keyboards {
   export type LayoutFormFactor = {
     "font": string,
     "layer": LayoutLayer[],
-    keyLabels?: boolean
+    keyLabels?: boolean,
+    isDefault?: boolean;
   }
 
   export type LayoutSpec = {

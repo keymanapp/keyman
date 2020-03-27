@@ -47,7 +47,7 @@ namespace com.keyman.osk {
 
       // Include *limited* support for mnemonic keyboards (Sept 2012)
       // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-      if(activeKeyboard && activeKeyboard.isMnemonic && !(activeKeyboard.layouts && formFactor != 'desktop')) {
+      if(activeKeyboard && activeKeyboard.isMnemonic && !(activeKeyboard.layout(formFactor as text.FormFactor).isDefault && formFactor != 'desktop')) {
         if(Lkc.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
           // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
           Lkc.vkCode = Lkc.Lcode;

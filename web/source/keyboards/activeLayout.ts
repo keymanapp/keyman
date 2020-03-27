@@ -377,6 +377,8 @@ namespace com.keyman.keyboards {
   export class ActiveLayout implements LayoutFormFactor{
     layer: ActiveLayer[];
     font: string;
+    keyLabels: boolean;
+    isDefault?: boolean;
 
     /**
      * Facilitates mapping layer id strings to their specification objects.
