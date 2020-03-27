@@ -987,12 +987,7 @@ namespace com.keyman.text {
       this.cachedContextEx.reset();
     }
 
-    defaultBackspace(outputTarget?: OutputTarget) {
-      if(!outputTarget) {
-        // Find the correct output target to manipulate.
-        outputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
-      }
-
+    defaultBackspace(outputTarget: OutputTarget) {
       this.output(1, outputTarget, "");
     }
 
