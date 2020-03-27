@@ -450,7 +450,8 @@ namespace com.keyman {
      * Description  Revert OSK to default layer and clear any deadkeys and modifiers
      */
     ['resetContext']() {
-      this.textProcessor.keyboardInterface.resetContext();
+      let elem = dom.DOMEventHandlers.states.activeElement;
+      this.textProcessor.resetContext(text.Processor.getOutputTarget(elem));
     };
 
     /**
@@ -459,7 +460,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.textProcessor.keyboardInterface.setNumericLayer();
+      this.textProcessor.setNumericLayer();
     };
 
     /**

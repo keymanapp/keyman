@@ -1274,7 +1274,7 @@ namespace com.keyman.dom {
 
       // No need to reset context if we stay within the same element.
       if(DOMEventHandlers.states.activeElement != e) {
-        this.keyman.textProcessor.keyboardInterface.resetContext();
+        this.keyman.textProcessor.resetContext(text.Processor.getOutputTarget(DOMEventHandlers.states.activeElement));
       }
 
       DOMEventHandlers.states.activeElement = DOMEventHandlers.states.lastActiveElement=e;
