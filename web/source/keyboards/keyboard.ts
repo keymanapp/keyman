@@ -55,7 +55,7 @@ namespace com.keyman.keyboards {
 
     // TODO:  Better typing.
     // May return null.
-    get layouts(): any {
+    get layouts(): LayoutFormFactor[] {
       return this.scriptObject['KVKL'];  // This one is compiled by Developer's visual keyboard layout editor.
     }
 
@@ -239,6 +239,61 @@ namespace com.keyman.keyboards {
       // Good example use case - the Japanese CJK-picker keyboard
       if(typeof(this.scriptObject['KNS']) == 'function') {
         this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
+      }
+    }
+
+    private findOrConstructLayout(formFactor: text.FormFactor): LayoutFormFactor {
+      if(this.layouts) {
+        if(this.layouts[formFactor]) {
+          return this.layouts[formFactor];
+        } else if(formFactor == text.FormFactor.Phone && this.layouts[text.FormFactor.Tablet]) {
+          return this.layouts[text.FormFactor.Phone] = this.layouts[text.FormFactor.Tablet];
+        } else if(formFactor == text.FormFactor.Tablet && this.layouts[text.FormFactor.Phone]) {
+          return this.layouts[text.FormFactor.Tablet] = this.layouts[text.FormFactor.Phone];
+        }
+      }
+
+      // No pre-built layout available; time to start constructing it via defaults.
+      // First, if we have non-default keys specified by the ['BK'] array, we've got
+      // enough to work with to build a default layout.
+      let rawSpecifications: any = null;  // TODO:  better typing, same type as this.legacyLayoutSpec.
+      if(this.legacyLayoutSpec != null && this.legacyLayoutSpec['BK'] != null) {
+        var keyCaps=this.legacyLayoutSpec['BK'];
+        for(var i=0; i<keyCaps.length; i++) {
+          if(keyCaps[i].length > 0) {
+            rawSpecifications = this.legacyLayoutSpec;
+            break;
+          }
+        }
+      }
+
+      // If we don't have key definitions to use for a layout but also lack help text or are a touch-based layout,
+      // we make a default layout anyway.  We have to show display something usable.
+      if(!rawSpecifications && (this.helpText == '' || formFactor != text.FormFactor.Desktop)) {
+        rawSpecifications = {'F':'Tahoma', 'BK': Layouts.dfltText};
+      }
+
+      // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
+      if(rawSpecifications) {
+        if(!this.layouts) {
+          // Initialize the field that backs the property; may as well cache the default layout we just built.
+          this.scriptObject['KVKL'] = {};
+        }
+        // Now to generate a layout from our raw specifications.
+        return this.layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this.compilerVersion, this.modifierBitmask, formFactor, this);
+      } else {
+        // The fact that it doesn't exist will indicate that help text/HTML should be inserted instead.
+        return null;
+      }
+    }
+
+    public layout(formFactor: text.FormFactor) {
+      let rawLayout = this.findOrConstructLayout(formFactor);
+      
+      if(rawLayout) {
+        return ActiveLayout.polyfill(rawLayout, formFactor);
+      } else {
+        return null;
       }
     }
   }
