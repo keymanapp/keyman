@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.38 alpha 2020-03-28
+
+* feat(ios): Add Crowdin CLI for iOS strings (#2905)
+
 ## 14.0.37 alpha 2020-03-27
 
 * feat(windows): crash reports in CEF (#2887)
