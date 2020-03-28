@@ -20,22 +20,18 @@ files:
   # dest: crowdin path in https://crowdin.com/project/keyman
   # translation: local path where downloaded translations from crowdin go
 
-  # Android files
-  - source: /KMEA/app/src/main/res/values/strings.xml
-    dest: /android/KMEA/strings.xml
-    translation: /KMEA/app/src/main/res/values-%android_code%/strings.xml
-    languages_mapping:
-      # Prevent invalid region pap-rPAP
-      android_code:
-        pap: pap
+  # iOS files
+  - source: /engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings
+    dest: /ios/KMEI/LanguagePicker/ResourceInfoView.strings
+    translation: /engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
 
-  - source: /KMAPro/kMAPro/src/main/res/values/strings.xml
-    dest: /android/KMAPro/strings.xml
-    translation: /KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml
-    languages_mapping:
-      # Prevent invalid region pap-rPAP
-      android_code:
-        pap: pap
+  - source: /engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
+    dest: /ios/KMEI/Localizable.strings
+    translation: /engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
+
+  - source: /keyman/Keyman/Keyman/en.lproj/Localizable.strings
+    dest: /ios/keyman/Localizable.strings
+    translation: /keyman/Keyman/Keyman/%osx_code%/%original_file_name%
 
   # crowdin parameters descriptions:
 
