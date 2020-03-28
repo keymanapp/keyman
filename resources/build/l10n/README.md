@@ -5,6 +5,17 @@ between Keyman and Crowdin. The configuration file for each platform is a YAML f
 
 On Windows, use `crowdin.bat` instead of `crowdin` for all the syntax below.
 
+When adding new files to https://crowdin.com/project/keyman/settings#files
+also go to the file "Settings" and edit **Resulting file after translations export:**. The downloaded translations from Crowdin (Keyman.zip) will have this folder structure:
+```
+{locale} / {Resulting file after translation export}
+```
+
+For example, a KMEA string uses
+```
+/KMEA/app/src/main/res/values-%android_code%/%original_file_name%
+```
+
 ## Setup
 Install the [Crowdin CLI (v3)](https://support.crowdin.com/cli-tool-v3/) for your OS. 
 Note, it has a prerequisite on Java 8.
@@ -22,7 +33,7 @@ To check your CLI setup,
 crowdin list project
 ```
 
-You should see the CLI fetching project info and generating a list of files associated with the project.
+You should see the CLI fetching project info and generating a list of files associated with the project. If you get Java ConnectionExceptions, try connecting VPN.
 
 ## Downloading from Crowdin
 

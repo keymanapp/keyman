@@ -22,16 +22,16 @@ files:
 
   # Android files
   - source: /KMEA/app/src/main/res/values/strings.xml
-    dest: /android/KMEA/app/src/main/res/values/strings.xml
-    translation: /KMEA/app/src/main/res/values-%android_code%/%original_file_name%
+    dest: /android/KMEA/strings.xml
+    translation: /KMEA/app/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
         pap: pap
 
   - source: /KMAPro/kMAPro/src/main/res/values/strings.xml
-    dest: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
-    translation: /KMAPro/kMAPro/src/main/res/values-%android_code%/%original_file_name%
+    dest: /android/KMAPro/strings.xml
+    translation: /KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
