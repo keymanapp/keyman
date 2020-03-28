@@ -5,15 +5,13 @@ between Keyman and Crowdin. The configuration file for each platform is a YAML f
 
 On Windows, use `crowdin.bat` instead of `crowdin` for all the syntax below.
 
+## Add File
 When adding new files to https://crowdin.com/project/keyman/settings#files
-also go to the file "Settings" and edit **Resulting file after translations export:**. The downloaded translations from Crowdin (Keyman.zip) will have this folder structure:
-```
-{locale} / {Resulting file after translation export}
-```
+also go to the file "Settings" and edit **Resulting file after translations export:**. This is where the translated files will appear in the Crowdin download (Keyman.zip) which also determines where the translated files get extracted locally into the Keyman project.
 
-For example, a KMEA string uses
+For example, `android/KMEA/strings.xml` string uses
 ```
-/KMEA/app/src/main/res/values-%android_code%/%original_file_name%
+/KMEA/app/src/main/res/values-%android_code%/strings.xml
 ```
 
 ## Setup
