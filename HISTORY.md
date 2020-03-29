@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.39 alpha 2020-03-29
+
+* feat(windows): user control for upload to sentry (#2900)
+
 ## 14.0.38 alpha 2020-03-28
 
 * feat(ios): Add Crowdin CLI for iOS strings (#2905)
