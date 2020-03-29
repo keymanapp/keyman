@@ -233,7 +233,8 @@ namespace com.keyman.dom {
           e.stopPropagation();
         }
 
-        DOMEventHandlers.states.swallowKeypress = (Levent.Lcode != 8 ? Levent.Lcode != 0 : false);
+        DOMEventHandlers.states.swallowKeypress = !!Levent.Lcode;
+        // Don't swallow backspaces on keypresses; this allows physical BKSP presses to repeat.
         if(Levent.Lcode == 8) {
           DOMEventHandlers.states.swallowKeypress = false;
         }

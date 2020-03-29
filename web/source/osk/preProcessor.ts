@@ -116,9 +116,10 @@ namespace com.keyman.osk {
       }
     }
 
-    // Created during refactoring for web-core.  Mostly serves to hold DOM-dependent
-    // code that affects both 'native' and 'embedded' mode OSK use after the KeyEvent
-    // object has been properly instantiated.
+    // Serves to hold DOM-dependent code that affects both 'native' and 'embedded' mode OSK use 
+    // after the KeyEvent object has been properly instantiated.  This should help catch any 
+    // mutual last-minute DOM-side interactions before passing control to the processor... such as
+    // the UI-control command keys as seen below.
     static handleClick(Lkc: text.KeyEvent, e: KeyElement) {
       let keyman = com.keyman.singleton;
         // Exclude menu and OSK hide keys from normal click processing
