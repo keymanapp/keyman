@@ -37,6 +37,7 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.JSON,
+  System.StrUtils,
   System.SysUtils,
   System.Win.Registry,
 {$IF NOT DEFINED(CONSOLE)}
@@ -124,7 +125,7 @@ begin
 
 
       CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s"', [
-        EventID,
+        IfThen(EventID = '', '_', EventID),
         ApplicationTitle,
         AppID,
         ProjectName,
