@@ -4,7 +4,7 @@ object frmInstallOptions: TfrmInstallOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'ssOptionsTitle'
-  ClientHeight = 213
+  ClientHeight = 222
   ClientWidth = 505
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -59,7 +59,7 @@ object frmInstallOptions: TfrmInstallOptions
   end
   object cmdOK: TButton
     Left = 172
-    Top = 172
+    Top = 183
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -69,12 +69,20 @@ object frmInstallOptions: TfrmInstallOptions
   end
   object cmdCancel: TButton
     Left = 260
-    Top = 172
+    Top = 183
     Width = 73
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 6
+  end
+  object chkAutomaticallyReportUsage: TCheckBox
+    Left = 16
+    Top = 153
+    Width = 473
+    Height = 17
+    Caption = 'ssOptionsAutomaticallyReportUsage'
+    TabOrder = 7
   end
 end

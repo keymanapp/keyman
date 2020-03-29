@@ -32,6 +32,7 @@ type
     chkUpgradeKeyman7: TCheckBox;
     cmdOK: TButton;
     cmdCancel: TButton;
+    chkAutomaticallyReportUsage: TCheckBox;
     procedure FormCreate(Sender: TObject);
   private
     function GetCanUpgradeKeyman7: Boolean;
@@ -46,6 +47,8 @@ type
     procedure SetStartAfterInstall(const Value: Boolean);
     procedure SetStartWithWindows(const Value: Boolean);
     procedure SetUpgradeKeyman7(const Value: Boolean);
+    function GetAutomaticallyReportUsage: Boolean;
+    procedure SetAutomaticallyReportUsage(const Value: Boolean);
     { Private declarations }
   public
     { Public declarations }
@@ -55,6 +58,7 @@ type
     property CheckForUpdatesInstall: Boolean read GetCheckForUpdatesInstall write SetCheckForUpdatesInstall;
     property UpgradeKeyman: Boolean read GetUpgradeKeyman7 write SetUpgradeKeyman7;
     property CanUpgradeKeyman: Boolean read GetCanUpgradeKeyman7 write SetCanUpgradeKeyman7;
+    property AutomaticallyReportUsage: Boolean read GetAutomaticallyReportUsage write SetAutomaticallyReportUsage;
   end;
 
 implementation
@@ -76,6 +80,12 @@ begin
   chkCheckForUpdatesInstall.Caption := FInstallInfo.Text(ssOptionsCheckForUpdatesBeforeInstall);
   // Keyman 11 and later version keyboards will always automatically update
   chkUpgradeKeyman7.Caption := FInstallInfo.Text(ssOptionsUpgradeKeyboards);
+  chkAutomaticallyReportUsage.Caption := FInstallInfo.Text(ssOptionsAutomaticallyReportUsage);
+end;
+
+function TfrmInstallOptions.GetAutomaticallyReportUsage: Boolean;
+begin
+  Result := chkAutomaticallyReportUsage.Checked;
 end;
 
 function TfrmInstallOptions.GetCanUpgradeKeyman7: Boolean;
@@ -106,6 +116,11 @@ end;
 function TfrmInstallOptions.GetUpgradeKeyman7: Boolean;
 begin
   Result := chkUpgradeKeyman7.Checked;
+end;
+
+procedure TfrmInstallOptions.SetAutomaticallyReportUsage(const Value: Boolean);
+begin
+  chkAutomaticallyReportUsage.Checked := Value;
 end;
 
 procedure TfrmInstallOptions.SetCanUpgradeKeyman7(const Value: Boolean);

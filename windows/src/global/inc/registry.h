@@ -126,6 +126,13 @@
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
 
+/* Privacy settings - all DWORD 0/1 */
+
+#define REGSZ_IDEOptions_CU   ( REGSZ_KeymanDeveloperCU "\\IDE\\Options" )
+
+#define REGSZ_AutomaticallyReportErrors "automatically report errors"              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
+#define REGSZ_AutomaticallyReportUsage  "automatically report usage"               // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
+
 /* Splitting Registry into ReadOnly and FullAccess makes it much easier to ensure that we are using the registry 
    correctly -- readonly wherever possible. */
 

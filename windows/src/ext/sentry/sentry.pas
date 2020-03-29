@@ -34,7 +34,11 @@ uses
 {$ENDIF}
 
 const
+{$IFDEF WIN64}
+  sentry_dll = 'sentry.x64.dll';
+{$ELSE}
   sentry_dll = 'sentry.dll';
+{$ENDIF}
 
 type
   size_t = NativeUInt;

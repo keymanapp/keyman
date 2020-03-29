@@ -26,6 +26,8 @@ type
     class procedure Stop;
     class property Client: TSentryClient read FClient;
     class property Instance: TKeymanSentryClient read FInstance;
+  public
+    const LOGGER_DEVELOPER_IDE = 'KeymanDeveloper.IDE';
   end;
 
 
@@ -36,6 +38,7 @@ uses
   System.Generics.Collections,
   System.JSON,
   System.SysUtils,
+  System.Win.Registry,
 {$IF NOT DEFINED(CONSOLE)}
   System.UITypes,
   Vcl.Dialogs,
@@ -46,6 +49,7 @@ uses
 
   KeymanPaths,
   KeymanVersion,
+  RegistryKeys,
   utilexecute;
 
 const
@@ -59,7 +63,12 @@ const
 
   // Settings valid on development machines only:
   KEYMAN_ROOT = 'KEYMAN_ROOT'; // environment variable
+
+{$IFDEF WIN64}
+  DEV_SENTRY_PATH = 'windows\src\ext\sentry\sentry.x64.dll';
+{$ELSE WIN64}
   DEV_SENTRY_PATH = 'windows\src\ext\sentry\sentry.dll';
+{$ENDIF}
 
 { TKeymanSentryClient }
 
@@ -90,14 +99,16 @@ begin
   if EventType = scetException then
   begin
     // We need to look for a kmcomapi errlog and report that
-    ReportRemoteErrors(EventID);
+    if FClient.ReportExceptions then
+      ReportRemoteErrors(EventID);
 
     if kscfShowUI in FFlags then
     begin
 {$IF DEFINED(CONSOLE)}
       // Write to console
       writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
-      writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
+      if FClient.ReportExceptions then
+        writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
       writeln(ErrOutput);
 {$ELSE}
       // Launch external gui exception dialog app.
@@ -210,7 +221,10 @@ end;
 
 constructor TKeymanSentryClient.Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
 var
+  reg: TRegistry;
   o: TSentryClientOptions;
+  f: TSentryClientFlags;
+  RegKey: string;
 begin
   Assert(not Assigned(FInstance));
 
@@ -230,7 +244,37 @@ begin
 
   o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag;
 
-  FClient := SentryClientClass.Create(o, kscfCaptureExceptions in FFlags);
+  if kscfCaptureExceptions in FFlags
+    then f := [scfCaptureExceptions]
+    else f := [];
+
+  // Load the registry settings for privacy settings
+
+  if AProject = kscpDesktop
+    then RegKey := SRegKey_KeymanEngine_CU
+    else RegKey := SRegKey_IDEOptions_CU;
+
+  reg := TRegistry.Create;
+  try
+    if reg.OpenKeyReadOnly(RegKey) then
+    begin
+      if not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
+          reg.ReadBool(SRegValue_AutomaticallyReportErrors) then
+        Include(f, scfReportExceptions);
+      if not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
+          reg.ReadBool(SRegValue_AutomaticallyReportUsage) then
+        Include(f, scfReportMessages);
+    end
+    else
+    begin
+      Include(f, scfReportExceptions);
+      Include(f, scfReportMessages);
+    end;
+  finally
+    reg.Free;
+  end;
+
+  FClient := SentryClientClass.Create(o, f);
   FClient.OnAfterEvent := ClientAfterEvent;
 end;
 
