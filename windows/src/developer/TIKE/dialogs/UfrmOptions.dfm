@@ -130,6 +130,30 @@ inherited frmOptions: TfrmOptions
         Caption = '&Automatically save before importing OSK'
         TabOrder = 8
       end
+      object gbPrivacy: TGroupBox
+        Left = 8
+        Top = 280
+        Width = 401
+        Height = 73
+        Caption = 'Privacy'
+        TabOrder = 9
+        object chkReportUsage: TCheckBox
+          Left = 8
+          Top = 44
+          Width = 311
+          Height = 17
+          Caption = '&Share anonymous usage statistics with keyman.com'
+          TabOrder = 0
+        end
+        object chkReportErrors: TCheckBox
+          Left = 8
+          Top = 21
+          Width = 311
+          Height = 17
+          Caption = 'Automatically report &errors to keyman.com'
+          TabOrder = 1
+        end
+      end
     end
     object tabEditor: TTabSheet
       Caption = 'Editor'

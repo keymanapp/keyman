@@ -92,9 +92,11 @@ function RunCrashReportHandler: Boolean;
 implementation
 
 uses
+  System.Win.Registry,
   Vcl.Clipbrd,
 
   Keyman.System.KeymanSentryClient,
+  RegistryKeys,
   Upload_Settings,
   utilexecute;
 
@@ -118,10 +120,16 @@ const
   S_Sentry_ViewEvent_URL = // Do not localize
     'https://sentry.keyman.com/organizations/keyman/projects/%0:s/events/%1:s/';
 
+  SENTRY_PROJECT_NAME_DESKTOP = 'keyman-desktop';
+  SENTRY_PROJECT_NAME_DEVELOPER = 'keyman-developer';
+
 function RunCrashReportHandler: Boolean;
 var
   frm: TfrmExceptionHandler;
   crashID, applicationName, applicationID, projectName, eventClassName, eventMessage: string;
+  reg: TRegistry;
+  RegKey: string;
+  reportExceptions: Boolean;
 begin
   if ParamStr(1) <> '-c' then
     Exit(False);
@@ -141,6 +149,27 @@ begin
   frm.ProjectName := projectName;
   frm.EventClassName := eventClassName;
   frm.EventMessage := eventMessage;
+
+  // Load the registry settings for privacy settings
+
+  if projectName = SENTRY_PROJECT_NAME_DESKTOP
+    then RegKey := SRegKey_KeymanEngine_CU
+    else RegKey := SRegKey_IDEOptions_CU;
+
+  reg := TRegistry.Create;
+  try
+    reportExceptions :=
+      not reg.OpenKeyReadOnly(RegKey) or
+      not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
+      reg.ReadBool(SRegValue_AutomaticallyReportErrors);
+  finally
+    reg.Free;
+  end;
+
+  frm.lblText2.Visible := reportExceptions;
+  frm.lblNoPersonal.Visible := reportExceptions;
+  //? frm.lblNotReported.Visible := not reportExceptions;
+
   frm.lblTitle.Caption := Format(S_Title_Message, [applicationName]);
   Application.Run;
 

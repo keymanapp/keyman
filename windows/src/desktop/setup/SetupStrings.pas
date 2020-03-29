@@ -84,7 +84,8 @@ type
     ssOptionsStartAfterInstall,
     ssOptionsCheckForUpdates,
     ssOptionsCheckForUpdatesBeforeInstall,
-    ssOptionsUpgradeKeyboards
+    ssOptionsUpgradeKeyboards,
+    ssOptionsAutomaticallyReportUsage
   );
 
 const
@@ -155,7 +156,8 @@ const
   {ssOptionsStartAfterInstall}                'Start $APPNAME when installation completes',
   {ssOptionsCheckForUpdates}                  'Check for updates online periodically',
   {ssOptionsCheckForUpdatesBeforeInstall}     'Check for updates before installing',
-  {ssOptionsUpgradeKeyboards}                 'Upgrade keyboards installed with older versions to version $VERSION'
+  {ssOptionsUpgradeKeyboards}                 'Upgrade keyboards installed with older versions to version $VERSION',
+  {ssOptionsAutomaticallyReportUsage}         'Share anonymous usage statistics with keyman.com'
 );
 
 implementation

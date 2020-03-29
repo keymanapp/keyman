@@ -546,7 +546,8 @@ begin
       Pos('installdefaults', FQuery) > 0,
       Pos('startwithwindows', FQuery) > 0,
       Pos('checkforupdates', FQuery) > 0,
-      FDisablePackages);  // I2651, I2753
+      FDisablePackages,
+      Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753
   end;
 
   UpdateAllLocaleDoctypes; // I2605
