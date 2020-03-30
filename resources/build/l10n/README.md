@@ -31,7 +31,7 @@ To check your CLI setup,
 crowdin list project
 ```
 
-You should see the CLI fetching project info and generating a list of files associated with the project. If you get Java ConnectionExceptions, try connecting VPN.
+You should see the CLI fetching project info and generating a list of files associated with the project. 
 
 ## Downloading from Crowdin
 
