@@ -298,12 +298,14 @@ namespace com.keyman.keyboards {
         rawSpecifications = {'F':'Tahoma', 'BK': Layouts.dfltText};
       }
 
+      // Regardless of success, we'll want to initialize the field that backs the property; 
+      // may as well cache the default layout we just built, or a 'null' if it shouldn't exist..
+      if(!this._layouts) {
+        this._layouts = {};
+      }
+
       // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
       if(rawSpecifications) {
-        if(!this._layouts) {
-          // Initialize the field that backs the property; may as well cache the default layout we just built.
-          this._layouts = {};
-        }
         // Now to generate a layout from our raw specifications.
         let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
         layout.isDefault = true;
