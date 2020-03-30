@@ -1,18 +1,18 @@
 (*
   Name:             TikeOptions
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     04 Dec 2006 - mcdurdin - Add AllowMultipleInstances
                     23 Aug 2007 - mcdurdin - Remove unused options; I927 - add external editor
@@ -136,7 +136,9 @@ const
 implementation
 
 uses
+  System.Math,
   Winapi.ShlObj,
+
   utilsystem,
   OnlineConstants,
   GetOSVersion;
@@ -219,8 +221,13 @@ begin
 
     FDefaultProjectPath := IncludeTrailingPathDelimiter(regReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
 
-    FReportErrors := regReadBool(SRegValue_AutomaticallyReportErrors, True);
-    FReportUsage := regReadBool(SRegValue_AutomaticallyReportUsage, True);
+    // for consistency with Keyman.System.KeymanSentryClient, we need to use
+    // reg.ReadInteger, as regReadInt, which in the dim dark past started
+    // to read integers as a REG_SZ type and that's far too messy to change now.
+    FReportErrors := not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
+      (reg.ReadInteger(SRegValue_AutomaticallyReportErrors) <> 0);
+    FReportUsage := not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
+      (reg.ReadInteger(SRegValue_AutomaticallyReportUsage) <> 0);
   finally
     CloseRegistry;
   end;
@@ -266,8 +273,11 @@ begin
 
     regWriteString(SRegValue_IDEOpt_DefaultProjectPath, FDefaultProjectPath);
 
-    regWriteBool(SRegValue_AutomaticallyReportErrors, FReportErrors);
-    regWriteBool(SRegValue_AutomaticallyReportUsage, FReportUsage);
+    // for consistency with Keyman.System.KeymanSentryClient, we need to use
+    // reg.WriteInteger, as regWriteInt, which in the dim dark past started
+    // to write integers as a REG_SZ type and that's far too messy to change now.
+    reg.WriteInteger(SRegValue_AutomaticallyReportErrors, IfThen(FReportErrors, 1, 0));
+    reg.WriteInteger(SRegValue_AutomaticallyReportUsage, IfThen(FReportUsage, 1, 0));
   finally
     CloseRegistry;
   end;
