@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{19632FCC-D250-4449-9596-B948B7CC92DC}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="keyman\keyman.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmcomapi\kmcomapi.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="tsysinfo\tsysinfo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="tsysinfox64\tsysinfox64.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="keyman">
+        <MSBuild Projects="keyman\keyman.dproj"/>
+    </Target>
+    <Target Name="keyman:Clean">
+        <MSBuild Projects="keyman\keyman.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="keyman:Make">
+        <MSBuild Projects="keyman\keyman.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="kmcomapi">
+        <MSBuild Projects="kmcomapi\kmcomapi.dproj"/>
+    </Target>
+    <Target Name="kmcomapi:Clean">
+        <MSBuild Projects="kmcomapi\kmcomapi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmcomapi:Make">
+        <MSBuild Projects="kmcomapi\kmcomapi.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="tsysinfo">
+        <MSBuild Projects="tsysinfo\tsysinfo.dproj"/>
+    </Target>
+    <Target Name="tsysinfo:Clean">
+        <MSBuild Projects="tsysinfo\tsysinfo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="tsysinfo:Make">
+        <MSBuild Projects="tsysinfo\tsysinfo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="tsysinfox64">
+        <MSBuild Projects="tsysinfox64\tsysinfox64.dproj"/>
+    </Target>
+    <Target Name="tsysinfox64:Clean">
+        <MSBuild Projects="tsysinfox64\tsysinfox64.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="tsysinfox64:Make">
+        <MSBuild Projects="tsysinfox64\tsysinfox64.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="keyman;kmcomapi;tsysinfo;tsysinfox64"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="keyman:Clean;kmcomapi:Clean;tsysinfo:Clean;tsysinfox64:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="keyman:Make;kmcomapi:Make;tsysinfo:Make;tsysinfox64:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
