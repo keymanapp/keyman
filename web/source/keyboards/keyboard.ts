@@ -12,6 +12,12 @@ namespace com.keyman.keyboards {
     }
   }
 
+  export enum LayoutState {
+    NOT_LOADED = undefined,
+    POLYFILLED = 1,
+    CALIBRATED = 2
+  }
+
   /**
    * Acts as a wrapper class for Keyman keyboards compiled to JS, providing type information
    * and keyboard-centered functionality in an object-oriented way without modifying the 
@@ -33,7 +39,7 @@ namespace com.keyman.keyboards {
      * TODO:  Make this private instead.  But there are a LOT of references that must be rooted out first.
      */
     public readonly scriptObject: any;
-    private layoutPolyfilled: {[layout: string]: boolean};
+    private layoutStates: {[layout: string]: LayoutState};
 
     constructor(keyboardScript: any) {
       if(keyboardScript) {
@@ -41,7 +47,7 @@ namespace com.keyman.keyboards {
       } else {
         this.scriptObject = Keyboard.DEFAULT_SCRIPT_OBJECT;
       }
-      this.layoutPolyfilled = {};
+      this.layoutStates = {};
     }
 
     /**
@@ -328,15 +334,25 @@ namespace com.keyman.keyboards {
 
       if(rawLayout) {
         // Prevents accidentally reprocessing layouts; it's a simple enough check.
-        if(!this.layoutPolyfilled[formFactor]) {
+        if(this.layoutStates[formFactor] == LayoutState.NOT_LOADED) {
           rawLayout = ActiveLayout.polyfill(rawLayout, formFactor);
-          this.layoutPolyfilled[formFactor] = true;
+          this.layoutStates[formFactor] = LayoutState.POLYFILLED;
         }
 
         return rawLayout as ActiveLayout;
       } else {
         return null;
       }
+    }
+
+    public markLayoutCalibrated(formFactor: text.FormFactor) {
+      if(this.layoutStates[formFactor] != LayoutState.NOT_LOADED) {
+        this.layoutStates[formFactor] = LayoutState.CALIBRATED;
+      }
+    }
+
+    public getLayoutState(formFactor: text.FormFactor) {
+      return this.layoutStates[formFactor];
     }
   }
 }
