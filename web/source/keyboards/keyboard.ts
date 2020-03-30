@@ -33,6 +33,7 @@ namespace com.keyman.keyboards {
      * TODO:  Make this private instead.  But there are a LOT of references that must be rooted out first.
      */
     public readonly scriptObject: any;
+    private layoutPolyfilled: {[layout: string]: boolean};
 
     constructor(keyboardScript: any) {
       if(keyboardScript) {
@@ -40,6 +41,7 @@ namespace com.keyman.keyboards {
       } else {
         this.scriptObject = Keyboard.DEFAULT_SCRIPT_OBJECT;
       }
+      this.layoutPolyfilled = {};
     }
 
     /**
@@ -265,7 +267,9 @@ namespace com.keyman.keyboards {
 
     private findOrConstructLayout(formFactor: text.FormFactor): LayoutFormFactor {
       if(this._layouts) {
-        if(this._layouts[formFactor]) {
+        // Search for viable layouts.  `null` is allowed for desktop form factors when help text is available,
+        // so we check explicitly against `undefined`.
+        if(this._layouts[formFactor] !== undefined) {
           return this._layouts[formFactor];
         } else if(formFactor == text.FormFactor.Phone && this._layouts[text.FormFactor.Tablet]) {
           return this._layouts[text.FormFactor.Phone] = this._layouts[text.FormFactor.Tablet];
@@ -306,6 +310,7 @@ namespace com.keyman.keyboards {
         return layout;
       } else {
         // The fact that it doesn't exist will indicate that help text/HTML should be inserted instead.
+        this._layouts[formFactor] = null; // provides a cached value for the check at the top of this method.
         return null;
       }
     }
@@ -320,8 +325,13 @@ namespace com.keyman.keyboards {
       let rawLayout = this.findOrConstructLayout(formFactor);
 
       if(rawLayout) {
-        // The method will not reimplement properties/methods already on the LayoutFormFactor if it has already been 'polyfilled' once.
-        return ActiveLayout.polyfill(rawLayout, formFactor);
+        // Prevents accidentally reprocessing layouts; it's a simple enough check.
+        if(!this.layoutPolyfilled[formFactor]) {
+          rawLayout = ActiveLayout.polyfill(rawLayout, formFactor);
+          this.layoutPolyfilled[formFactor] = true;
+        }
+
+        return rawLayout as ActiveLayout;
       } else {
         return null;
       }
