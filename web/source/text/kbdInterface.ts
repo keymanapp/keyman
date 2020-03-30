@@ -195,44 +195,9 @@ namespace com.keyman.text {
         dom.DOMEventHandlers.states._IgnoreNextSelChange = 1;
       }
     }
-      
-    /**
-     * Function     KT
-     * Scope        Public
-     * @param       {string}      Ptext     Text to insert
-     * @param       {?number}     PdeadKey  Dead key number, if any (???)
-     * @return      {boolean}               true if inserted
-     * Description  Insert text into active control
-     */    
-    insertText(Ptext: string, PdeadKey:number): boolean {
-      let keyman = com.keyman.singleton;
-      this.resetContextCache();
 
-      // Find the correct output target to manipulate.
-      let outputTarget: OutputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
-
-      if(outputTarget != null) {
-        // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-        if(!keyman.isHeadless) {
-          keyman.uiManager.setActivatingUI(true);
-          dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-          keyman.domManager.focusLastActiveElement();
-          dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-        }
-
-        if(Ptext!=null) {
-          this.output(0, outputTarget, Ptext);
-        }
-
-        if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
-          this.deadkeyOutput(0, outputTarget, PdeadKey);
-        }
-
-        outputTarget.invalidateSelection();
-        return true;
-      }
-      return false;
-    }
+    // Is DOM only, but TypeScript prefers having the type declarations exist on the class itself.
+    insertText?: (Ptext: string, PdeadKey: number) => boolean;
     
     /**
      * Function     registerKeyboard  KR                    
@@ -1040,49 +1005,5 @@ namespace com.keyman.text {
 
       return behavior;
     }
-    
-    /**
-     * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
-     */
-    ['getLastActiveElement'](): OutputTarget {
-      return text.Processor.getOutputTarget();
-    }
-
-    ['focusLastActiveElement'](): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.domManager.focusLastActiveElement(); 
-      }
-    }
-
-    //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
-    ['hideHelp'](): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.osk._Hide(true);
-      }
-    }
-
-    ['showHelp'](Px: number, Py: number): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.osk._Show(Px,Py);
-      }
-    }
-
-    ['showPinnedHelp'](): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.osk.userPositioned=true; 
-        keyman.osk._Show(-1,-1);
-      }
-    }
-
-    // Also needed for some legacy CJK keyboards.
-    ['GetLastActiveElement'] = this['getLastActiveElement'];
-    ['FocusLastActiveElement'] = this['focusLastActiveElement'];
-    ['HideHelp'] = this['hideHelp'];
-    ['ShowHelp'] = this['showHelp'];
-    ['ShowPinnedHelp'] = this['showPinnedHelp'];
   }
 }
