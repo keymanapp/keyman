@@ -10,6 +10,8 @@
 /// <reference path="../keyboards/keyboard.ts" />
 // Defines built-in keymapping.
 /// <reference path="keyMapping.ts" />
+// Defines a core-compatible 'Device' analogue for use in keyEvent processing
+/// <reference path="engineDeviceSpec.ts" />
 
 namespace com.keyman.text {
   export class LegacyKeyEvent {
@@ -85,7 +87,7 @@ namespace com.keyman.text {
      * @param   {boolean} usingOSK
      * @return  {string}
      */
-    defaultRuleBehavior(Lkc: KeyEvent, usingOSK: boolean): RuleBehavior {
+    defaultRuleBehavior(Lkc: KeyEvent): RuleBehavior {
       let outputTarget = Lkc.Ltarg;
       let preInput = Mock.from(outputTarget);
       let ruleBehavior = new RuleBehavior();
@@ -93,7 +95,7 @@ namespace com.keyman.text {
       let matched = false;
       var char = '';
       var special: EmulationKeystrokes;
-      if(usingOSK || outputTarget.isSynthetic) {
+      if(Lkc.isSynthetic || outputTarget.isSynthetic) {
         matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                          // if no match occurs.
 
@@ -207,17 +209,7 @@ namespace com.keyman.text {
       }
     }
 
-    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget, fromOSK: boolean): RuleBehavior {
-      let keyman = com.keyman.singleton;
-
-      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
-          keyEvent.Lcode=KeyMapping.browserMap.FF['k'+keyEvent.Lcode];
-        }
-      }
-
+    processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
       var matchBehavior: RuleBehavior;
 
       // Pass this key code and state to the keyboard program
@@ -231,7 +223,7 @@ namespace com.keyman.text {
          * even should that occur.
          */
         this.installInterface();
-        matchBehavior = this.keyboardInterface.processKeystroke(fromOSK ? keyman.util.device : keyman.util.physicalDevice, outputTarget, keyEvent);
+        matchBehavior = this.keyboardInterface.processKeystroke(outputTarget, keyEvent);
       }
 
       if(!matchBehavior) {
@@ -245,7 +237,7 @@ namespace com.keyman.text {
 
         // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
         // Many keyboards rely upon these 'implied rules'.
-        matchBehavior = this.defaultRuleBehavior(keyEvent, fromOSK);
+        matchBehavior = this.defaultRuleBehavior(keyEvent);
 
         this.keyboardInterface.activeTargetOutput = null;
       }
@@ -262,13 +254,13 @@ namespace com.keyman.text {
      */
     processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
       let keyman = com.keyman.singleton;
-      let formFactor = keyman.util.device.formFactor;
+      let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
       let outputTarget = keyEvent.Ltarg;
 
-      let fromOSK = !!e; // If specified, it's from the OSK.
+      let fromOSK = keyEvent.isSynthetic;
 
       // Enables embedded-path OSK sourcing detection.
       if(typeof e == 'boolean') {
@@ -292,10 +284,10 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if((formFactor == 'desktop' || this.activeKeyboard.usesDesktopLayoutOnDevice(keyman.util.device)) && fromOSK) {
+      if((formFactor == FormFactor.Desktop || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
-        if(this.selectLayer(keyEvent.kName, keyEvent.kNextLayer)) {
+        if(this.selectLayer(keyEvent)) {
           return true;
         }
       }
@@ -306,7 +298,8 @@ namespace com.keyman.text {
         return true;
       }
 
-      if(!keyman.isEmbedded && !fromOSK && keyman.util.device.browser == 'firefox') {
+      // TODO: This keymapping should be relocated outside of this method.
+      if(!keyman.isEmbedded && !fromOSK && keyEvent.device.browser == Browser.Firefox) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
@@ -342,11 +335,11 @@ namespace com.keyman.text {
 
       let preInputMock = Mock.from(outputTarget);
 
-      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget, fromOSK);
+      let ruleBehavior = this.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
-        this.selectLayer(keyEvent.kName, keyEvent.kNextLayer);
+        this.selectLayer(keyEvent);
       }
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
@@ -372,7 +365,7 @@ namespace com.keyman.text {
 
               let altEvent = osk.PreProcessor._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
               altEvent.Ltarg = mock;
-              let alternateBehavior = this.processKeystroke(altEvent, mock, fromOSK);
+              let alternateBehavior = this.processKeystroke(altEvent, mock);
               if(alternateBehavior) {
                 // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
                 //       so a user should never have intended to type it.  Should probably renormalize 
@@ -659,8 +652,9 @@ namespace com.keyman.text {
      *  @param  {number|string|undefined}   nextLayerIn optional next layer identifier
      *  @return {boolean}                               return true if keyboard layer changed
      */
-    selectLayer(keyName: string, nextLayerIn?: number | string): boolean {
-      var nextLayer = arguments.length < 2 ? null : nextLayerIn;
+    selectLayer(keyEvent: KeyEvent, fromNameOnly: boolean = false): boolean {
+      let keyName = keyEvent.kName;
+      var nextLayer = fromNameOnly ? null : keyEvent.kNextLayer;
       var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
       // Layer must be identified by name, not number (27/08/2015)
@@ -730,7 +724,7 @@ namespace com.keyman.text {
       }
 
       // Change layer and refresh OSK
-      this.updateLayer(nextLayer);
+      this.updateLayer(keyEvent, nextLayer);
       com.keyman.singleton.osk._Show();
 
       return true;
@@ -742,7 +736,7 @@ namespace com.keyman.text {
      *
      * @param       {string}      id      layer id (e.g. ctrlshift)
      */
-    updateLayer(id: string) {
+    updateLayer(keyEvent: KeyEvent, id: string) {
       let keyman = com.keyman.singleton;
       let vkbd = keyman['osk'].vkbd;
 
@@ -754,14 +748,14 @@ namespace com.keyman.text {
       var s = activeLayer;
 
       // Do not change layer unless needed (27/08/2015)
-      if(id == activeLayer && keyman.util.device.formFactor != 'desktop') {
+      if(id == activeLayer && keyEvent.device.formFactor != FormFactor.Desktop) {
         return false;
       }
 
       var idx=id;
       var i;
 
-      if(keyman.util.device.formFactor == 'desktop') {
+      if(keyEvent.device.formFactor == FormFactor.Desktop) {
         // Need to test if target layer is a standard layer (based on the plain 'default')
         var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
@@ -849,7 +843,6 @@ namespace com.keyman.text {
     // Returns true if the key event is a modifier press, allowing keyPress to return selectively
     // in those cases.
     doModifierPress(Levent: KeyEvent, isKeyDown: boolean): boolean {
-      let keyman = com.keyman.singleton;
       let outputTarget = Levent.Ltarg;
 
       if(!this.activeKeyboard) {
@@ -868,7 +861,7 @@ namespace com.keyman.text {
         case 145:
           // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
           this.activeKeyboard.notify(Levent.Lcode, outputTarget, isKeyDown ? 1 : 0); 
-          if(!keyman.util.device.touchable) {
+          if(!Levent.device.touchable) {
             return this._UpdateVKShift(Levent, Levent.Lcode-15, 1); // I2187
           } else {
             return true;

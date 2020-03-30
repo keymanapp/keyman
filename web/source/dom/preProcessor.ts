@@ -161,6 +161,12 @@ namespace com.keyman.dom {
       var LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (s.Lmodifiers & 0x6F) != 0));
       s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
+      // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
+      s.device = keyman.util.physicalDevice.coreSpec;
+
+      // This is based on a KeyboardEvent, so it's not considered 'synthetic' within web-core.
+      s.isSynthetic = false;
+
       // Other minor physical-keyboard adjustments
       if(activeKeyboard && !activeKeyboard.isMnemonic) {
         // Positional Layout
@@ -181,7 +187,9 @@ namespace com.keyman.dom {
             LisVirtualKey: false,
             vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
             Lstates: s.Lstates,
-            kName: ''
+            kName: '',
+            device: keyman.util.physicalDevice.coreSpec,
+            isSynthetic: false
           };
         }
       }
@@ -262,7 +270,17 @@ namespace com.keyman.dom {
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
       // Only reached if it's a mnemonic keyboard.
-      if(processor.swallowKeypress || processor.keyboardInterface.processKeystroke(keyman.util.physicalDevice, Levent.Ltarg, Levent)) {
+      
+      // This pathway won't have .processKeyEvent's FF keycode check, so we must do it here on
+      // .processKeystroke's behalf.
+      if(!keyman.isEmbedded && keyman.util.device.browser == 'firefox') {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(KeyMapping.browserMap.FF['k'+Levent.Lcode]) {
+          Levent.Lcode=KeyMapping.browserMap.FF['k'+Levent.Lcode];
+        }
+      }
+      if(processor.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
         processor.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();

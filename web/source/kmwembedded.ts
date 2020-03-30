@@ -374,7 +374,7 @@ namespace com.keyman.text {
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=processor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=processor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -408,24 +408,27 @@ namespace com.keyman.text {
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
-      
-      // Process modifier key action
-      if(processor.selectLayer(keyName)) {
-        return true;      
-      }
 
       let Codes = com.keyman.text.Codes;
       
       // Check the virtual key 
-      Lkc = {
+      let Lkc: com.keyman.text.KeyEvent = {
         Ltarg: com.keyman.text.Processor.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
         kName: keyName,
-        kNextLayer: nextLayer
+        kNextLayer: nextLayer,
+        vkCode: null, // was originally undefined
+        isSynthetic: true,
+        device: keymanweb.util.device.coreSpec
       };
+
+      // Process modifier key action
+      if(processor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
+        return true;      
+      }
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
       // we can handle many other pre-processing steps the same way with this common method.
@@ -436,7 +439,7 @@ namespace com.keyman.text {
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          processor.selectLayer(keyName, nextLayer);
+          processor.selectLayer(Lkc);
         }
         return false;
       }
@@ -479,7 +482,9 @@ namespace com.keyman.text {
       Lcode: code,
       Lstates: lstates,
       LisVirtualKey: true,
-      kName: ''
+      kName: '',
+      device: keyman.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
+      isSynthetic: false
     }; 
 
     try {

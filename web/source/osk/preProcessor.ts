@@ -27,7 +27,9 @@ namespace com.keyman.osk {
         kName: keyName,
         kLayer: layer,
         kbdLayer: e.displayLayer,
-        kNextLayer: e.nextlayer
+        kNextLayer: e.nextlayer,
+        device: keyman.util.device.coreSpec,  // The OSK's events always use the 'true' device.
+        isSynthetic: true
       };
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
