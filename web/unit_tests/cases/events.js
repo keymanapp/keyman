@@ -42,8 +42,8 @@ describe('Event Management', function() {
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
-    com.keyman['DOMEventHandlers'].states.lastActiveElement = ele;
-    com.keyman['DOMEventHandlers'].states.activeElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states.lastActiveElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states.activeElement = ele;
 
     event.simulateEventOn(ele);
 
@@ -78,8 +78,8 @@ describe('Event Management', function() {
     }
 
     // A bit of a force-hack to ensure the element is seen as active for the tests.
-    com.keyman['DOMEventHandlers'].states.lastActiveElement = ele;
-    com.keyman['DOMEventHandlers'].states.activeElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states.lastActiveElement = ele;
+    com.keyman.dom['DOMEventHandlers'].states.activeElement = ele;
 
     event.simulateEventOn(ele);
 

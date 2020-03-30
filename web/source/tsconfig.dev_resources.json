@@ -9,6 +9,6 @@
 	},
   "files": [
     "text/outputTarget.ts",
-    "dom/wrapElement.ts"
+    "dom/targets/wrapElement.ts"
   ]
 }

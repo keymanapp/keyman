@@ -1,16 +1,17 @@
 // Includes KMW-added property declaration extensions for HTML elements.
-/// <reference path="kmwexthtml.ts" />
+/// <reference path="../kmwexthtml.ts" />
 // References the base KMW object.
-/// <reference path="kmwbase.ts" />
+/// <reference path="../kmwbase.ts" />
 // References DOM event handling interfaces and classes.
-/// <reference path="kmwdomevents.ts" />
+/// <reference path="domEventHandlers.ts" />
 // Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
+/// <reference path="../text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
-/// <reference path="dom/touchAliasElement.ts" />
-/// <reference path="dom/wrapElement.ts" />
+/// <reference path="touchAliasElement.ts" />
+// Defines per-element-type OutputTarget element wrapping.
+/// <reference path="targets/wrapElement.ts" />
 
-namespace com.keyman {
+namespace com.keyman.dom {
   // Utility object used to handle beep (keyboard error response) operations.
   class BeepData {
     e: HTMLElement;
@@ -117,7 +118,7 @@ namespace com.keyman {
 
       // All code after this point is DOM-based, triggered by the beep.
       var Pelem: HTMLElement = outputTarget.getElement();
-      if(outputTarget instanceof dom.DesignIFrame) {
+      if(outputTarget instanceof dom.targets.DesignIFrame) {
         Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
       }
 
@@ -233,7 +234,7 @@ namespace com.keyman {
       // The simulated touch element doesn't already exist?  Time to initialize it.
       let x=dom.constructTouchAlias(Pelem);
       if(this.isAttached(x)) {
-        x._kmwAttachment.interface = dom.wrapElement(x);
+        x._kmwAttachment.interface = dom.targets.wrapElement(x);
       } else {
         this.setupElementAttachment(x); // The touch-alias should have its own wrapper.
       }
@@ -305,7 +306,7 @@ namespace com.keyman {
 
         // Disable touch-related handling code.
         this.disableInputElement(Pelem['kmw_ip']);
-        Pelem._kmwAttachment.interface = dom.wrapElement(Pelem);
+        Pelem._kmwAttachment.interface = dom.targets.wrapElement(Pelem);
         
         // We get weird repositioning errors if we don't remove our simulated input element - and permanently.
         if(Pelem.parentNode) {
@@ -574,7 +575,7 @@ namespace com.keyman {
         // The elements in the contained document get separately wrapped, so this doesn't need a proper wrapper.
         //
         // Its attachment process might need some work.
-        let eleInterface = dom.wrapElement(x);
+        let eleInterface = dom.targets.wrapElement(x);
         // May should filter better for IFrames.
         if(!(eleInterface || dom.Utils.instanceof(x, "HTMLIFrameElement"))) {
           console.warn("Could not create processing interface for newly-attached element!");

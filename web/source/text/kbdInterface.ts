@@ -192,7 +192,7 @@ namespace com.keyman.text {
     saveFocus(): void {
       let keyman = com.keyman.singleton;
       if(!keyman.isHeadless) {
-        DOMEventHandlers.states._IgnoreNextSelChange = 1;
+        dom.DOMEventHandlers.states._IgnoreNextSelChange = 1;
       }
     }
       
@@ -214,9 +214,9 @@ namespace com.keyman.text {
       if(outputTarget != null) {
         if(!keyman.isHeadless) {
           keyman.uiManager.setActivatingUI(true);
-          DOMEventHandlers.states._IgnoreNextSelChange = 100;
+          dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
           keyman.domManager.focusLastActiveElement();
-          DOMEventHandlers.states._IgnoreNextSelChange = 0;
+          dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
         }
 
         if(Ptext!=null) {
