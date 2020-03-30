@@ -85,7 +85,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <Debugger_RunParams>import-windows -klid 00000409</Debugger_RunParams>
+        <Debugger_RunParams>-sentry-client-test-exception</Debugger_RunParams>
         <Debugger_CWD>c:\temp\ikp</Debugger_CWD>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_MapFile>3</DCC_MapFile>

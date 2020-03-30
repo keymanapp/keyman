@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{3794F00C-901D-4D12-B785-1FEF49456489}</ProjectGuid>
+        <ProjectGuid>{7205C254-6B8A-4F72-9B7F-08216A8798CF}</ProjectGuid>
         <MainSource>tsysinfox64.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
