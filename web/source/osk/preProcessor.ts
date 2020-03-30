@@ -98,10 +98,39 @@ namespace com.keyman.osk {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;
         }
-        return keyman.textProcessor.processKeyEvent(Lkc, e);
+
+        if(!keyman.isEmbedded) {
+          keyman.uiManager.setActivatingUI(true);
+          com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
+          keyman.domManager.focusLastActiveElement();
+          com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
+        }
+
+        let retVal = PreProcessor.handleClick(Lkc, e);
+
+        // Now that processing is done, we can do a bit of post-processing, too.
+        keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
+        return retVal;
       } else {
         return true;
       }
+    }
+
+    // Serves to hold DOM-dependent code that affects both 'native' and 'embedded' mode OSK use 
+    // after the KeyEvent object has been properly instantiated.  This should help catch any 
+    // mutual last-minute DOM-side interactions before passing control to the processor... such as
+    // the UI-control command keys as seen below.
+    static handleClick(Lkc: text.KeyEvent, e: KeyElement) {
+      let keyman = com.keyman.singleton;
+        // Exclude menu and OSK hide keys from normal click processing
+      if(Lkc.kName == 'K_LOPT' || Lkc.kName == 'K_ROPT') {
+        keyman['osk'].vkbd.optionKey(e, Lkc.kName, true);
+        return true;
+      }
+
+      let retVal = keyman.textProcessor.processKeyEvent(Lkc);
+
+      return retVal;
     }
   }
 }

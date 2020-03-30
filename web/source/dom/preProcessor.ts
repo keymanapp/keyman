@@ -193,6 +193,15 @@ namespace com.keyman.dom {
           };
         }
       }
+
+      // Check for any browser-based keymapping before returning the object.
+      if(!keyman.isEmbedded && s.device.browser == text.Browser.Firefox) {
+        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
+        // FireFox, Mozilla Suite
+        if(KeyMapping.browserMap.FF['k'+s.Lcode]) {
+          s.Lcode = KeyMapping.browserMap.FF['k'+s.Lcode];
+        }
+      }
       
       return s;
     }
@@ -208,7 +217,7 @@ namespace com.keyman.dom {
      */ 
     static keyDown(e: KeyboardEvent): boolean {
       let processor = com.keyman.singleton.textProcessor;
-      processor.swallowKeypress = false;
+      DOMEventHandlers.states.swallowKeypress = false;
 
       // Get event properties  
       var Levent = this._GetKeyEventProperties(e, true);
@@ -223,6 +232,14 @@ namespace com.keyman.dom {
           e.preventDefault();
           e.stopPropagation();
         }
+
+        DOMEventHandlers.states.swallowKeypress = !!Levent.Lcode;
+        // Don't swallow backspaces on keypresses; this allows physical BKSP presses to repeat.
+        if(Levent.Lcode == 8) {
+          DOMEventHandlers.states.swallowKeypress = false;
+        }
+      } else {
+        DOMEventHandlers.states.swallowKeypress = false;
       }
 
       return !LeventMatched;
@@ -254,7 +271,7 @@ namespace com.keyman.dom {
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
       if(!processor.activeKeyboard.isMnemonic) {
-        if(!processor.swallowKeypress) {
+        if(!DOMEventHandlers.states.swallowKeypress) {
           return true;
         }
         if(Levent.Lcode < 0x20 || ((<any>keyman)._BrowserIsSafari  &&  (Levent.Lcode > 0xF700  &&  Levent.Lcode < 0xF900))) {
@@ -270,18 +287,8 @@ namespace com.keyman.dom {
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
       // Only reached if it's a mnemonic keyboard.
-      
-      // This pathway won't have .processKeyEvent's FF keycode check, so we must do it here on
-      // .processKeystroke's behalf.
-      if(!keyman.isEmbedded && keyman.util.device.browser == 'firefox') {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+Levent.Lcode]) {
-          Levent.Lcode=KeyMapping.browserMap.FF['k'+Levent.Lcode];
-        }
-      }
-      if(processor.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
-        processor.swallowKeypress = false;
+      if(DOMEventHandlers.states.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
+        DOMEventHandlers.states.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();
           e.stopPropagation();
@@ -289,7 +296,7 @@ namespace com.keyman.dom {
         return false;
       }
 
-      processor.swallowKeypress = false;
+      DOMEventHandlers.states.swallowKeypress = false;
       return true;
     }
   }

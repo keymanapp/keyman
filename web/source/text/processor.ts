@@ -35,8 +35,6 @@ namespace com.keyman.text {
     // in keyboard state not otherwise captured by the hosting page in the browser.
     // Needed for AltGr simulation.
     modStateFlags: number = 0;
-    // Denotes whether or not KMW needs to 'swallow' the next keypress.
-    swallowKeypress: boolean = false;
 
     keyboardInterface: KeyboardInterface;
 
@@ -252,35 +250,14 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
      */
-    processKeyEvent(keyEvent: KeyEvent, e?: osk.KeyElement | boolean): boolean {
+    processKeyEvent(keyEvent: KeyEvent): boolean {
       let keyman = com.keyman.singleton;
       let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.
       let outputTarget = keyEvent.Ltarg;
-
       let fromOSK = keyEvent.isSynthetic;
-
-      // Enables embedded-path OSK sourcing detection.
-      if(typeof e == 'boolean') {
-        e = null as osk.KeyElement; // Cast is necessary for TS type-checking later in the method.
-      }
-
-      this.swallowKeypress = false;
-
-      if(fromOSK && !keyman.isEmbedded) {
-        keyman.domManager.initActiveElement(keyEvent.Ltarg.getElement());
-
-        // Turn off key highlighting (or preview)
-        keyman['osk'].vkbd.highlightKey(e,false);
-      }
-
-      // Exclude menu and OSK hide keys from normal click processing
-      if(keyEvent.kName == 'K_LOPT' || keyEvent.kName == 'K_ROPT') {
-        keyman['osk'].vkbd.optionKey(e, keyEvent.kName, true);
-        return true;
-      }
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
@@ -298,18 +275,6 @@ namespace com.keyman.text {
         return true;
       }
 
-      // TODO: This keymapping should be relocated outside of this method.
-      if(!keyman.isEmbedded && !fromOSK && keyEvent.device.browser == Browser.Firefox) {
-        // I1466 - Convert the - keycode on mnemonic as well as positional layouts
-        // FireFox, Mozilla Suite
-        if(KeyMapping.browserMap.FF['k'+keyEvent.Lcode]) {
-          keyEvent.Lcode = KeyMapping.browserMap.FF['k'+keyEvent.Lcode];
-        }
-      } //else 
-      //{
-      // Safari, IE, Opera?
-      //}
-
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
       // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
       // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
@@ -325,16 +290,9 @@ namespace com.keyman.text {
         }
       }
 
-      if(fromOSK && !keyman.isEmbedded) {
-        keyman.uiManager.setActivatingUI(true);
-        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        keyman.domManager.focusLastActiveElement();
-        com.keyman.dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-      }
       // // ...end I3363 (Build 301)
 
       let preInputMock = Mock.from(outputTarget);
-
       let ruleBehavior = this.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
@@ -416,27 +374,9 @@ namespace com.keyman.text {
           // For DOM-aware targets, this will trigger a DOM event page designers may listen for.
           outputTarget.doInputEvent();
         }
-
-        this.swallowKeypress = (e && keyEvent.Lcode != 8 ? keyEvent.Lcode != 0 : false);
-        if(keyEvent.Lcode == 8) {
-          this.swallowKeypress = false;
-        }
-        return false;
-      } else {
-        this.swallowKeypress = false;
       }
 
       /* I732 END - 13/03/2007 MCD: End Positional Layout support in OSK */
-      
-      if(fromOSK && !keyman.isEmbedded) {
-        keyman.uiManager.setActivatingUI(false);	// I2498 - KeymanWeb OSK does not accept clicks in FF when using automatic UI
-      }
-
-      // Special case for embedded to pass K_TAB back to device to process
-      if(keyman.isEmbedded && (keyEvent.Lcode == Codes.keyCodes["K_TAB"] ||
-          keyEvent.Lcode == Codes.keyCodes["K_TABBACK"] || keyEvent.Lcode == Codes.keyCodes["K_TABFWD"])) {
-        return false;
-      }
 
       // TODO:  rework the return value to be `ruleBehavior` instead.  Functions that call this one are
       //        the ones that should worry about event handler returns, etc.  Not this one.

@@ -23,6 +23,7 @@ namespace com.keyman.dom {
     focusTimer: number;
 
     changed: boolean;         // Tracks if the element has been edited since gaining focus.
+    swallowKeypress: boolean; // Notes if a keypress should be swallowed; used when handing mnemonics.
 
     /* ----------------------- Static event-related methods ------------------------ */
 

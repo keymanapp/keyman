@@ -212,6 +212,7 @@ namespace com.keyman.text {
       let outputTarget: OutputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
 
       if(outputTarget != null) {
+        // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
         if(!keyman.isHeadless) {
           keyman.uiManager.setActivatingUI(true);
           dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
