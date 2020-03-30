@@ -127,15 +127,15 @@ copyTestDefinition = function() {
   alert("Unable to copy successfully.");
 }
 
-var _ock = com.keyman.text.Processor.prototype.clickKey; //.bind(keyman.osk);
-com.keyman.text.Processor.prototype.clickKey = function(e) {
+var _ock = com.keyman.osk.PreProcessor.clickKey; //.bind(keyman.osk);
+com.keyman.osk.PreProcessor.clickKey = function(e) {
   if(com.keyman.dom.DOMEventHandlers.states.activeElement != in_output &&
     com.keyman.dom.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
-    return _ock.call(com.keyman.singleton.textProcessor, e);
+    return _ock(e);
   }
 
   var event = new KMWRecorder.OSKInputEvent(e);
-  var retVal = _ock.call(com.keyman.singleton.textProcessor, e);
+  var retVal = _ock(e);
 
   // Record the click/touch as part of a test sequence!
   addInputRecord(event);
