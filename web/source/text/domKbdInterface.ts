@@ -6,6 +6,32 @@
  */
 namespace com.keyman.text {
   /**
+   * Function     registerKeyboard  KR                    
+   * Scope        Public
+   * @param       {Object}      Pk      Keyboard  object
+   * Description  Register and load the keyboard.  This implementation overwrites web-core's intentionally,
+   *              as web-core lacks access to the `KeyboardManager` object and class.
+   */    
+  KeyboardInterface.prototype.registerKeyboard = function(Pk): void {
+    let keyman = com.keyman.singleton;
+    keyman.keyboardManager._registerKeyboard(Pk);
+  }
+
+  /**
+   * Add the basic keyboard parameters (keyboard stub) to the array of keyboard stubs
+   * If no language code is specified in a keyboard it cannot be registered, 
+   * and a keyboard stub must be registered before the keyboard is loaded 
+   * for the keyboard to be usable.
+   * 
+   * @param       {Object}      Pstub     Keyboard stub object
+   * @return      {?number}               1 if already registered, else null
+   */    
+  KeyboardInterface.prototype.registerStub = function(Pstub): number {
+    let keyman = com.keyman.singleton;
+    return keyman.keyboardManager._registerStub(Pstub);
+  }
+
+  /**
    * Function     KT
    * Scope        Public
    * @param       {string}      Ptext     Text to insert
@@ -23,12 +49,10 @@ namespace com.keyman.text {
 
     if(outputTarget != null) {
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-      if(!keyman.isHeadless) {
-        keyman.uiManager.setActivatingUI(true);
-        dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-        keyman.domManager.focusLastActiveElement();
-        dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-      }
+      keyman.uiManager.setActivatingUI(true);
+      dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
+      keyman.domManager.focusLastActiveElement();
+      dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
 
       if(Ptext!=null) {
         this.output(0, outputTarget, Ptext);
@@ -42,6 +66,15 @@ namespace com.keyman.text {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Function     KSF
+   * Scope        Public
+   * Description  Save keyboard focus
+   */    
+  KeyboardInterface.prototype.saveFocus = function(): void {
+    dom.DOMEventHandlers.states._IgnoreNextSelChange = 1;
   }
   
   /**

@@ -1,5 +1,4 @@
 /// <reference path="deadkeys.ts" />
-/// <reference path="../kmwbase.ts" />
 /// <reference path="ruleBehavior.ts" />
 
 /***
@@ -187,42 +186,40 @@ namespace com.keyman.text {
     /**
      * Function     KSF
      * Scope        Public
-     * Description  Save keyboard focus
+     * 
+     * Saves the document's current focus settings on behalf of the keyboard.  Often paired with insertText.
      */    
-    saveFocus(): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        dom.DOMEventHandlers.states._IgnoreNextSelChange = 1;
-      }
-    }
+    saveFocus(): void { }
 
-    // Is DOM only, but TypeScript prefers having the type declarations exist on the class itself.
+    /**
+     * A text-insertion method used by custom OSKs for helpHTML interaction, like with sil_euro_latin.
+     * 
+     * This function currently bypasses web-core's standard text handling control path and all predictive text processing.
+     * It also has DOM-dependencies that help ensure KMW's active OutputTarget retains focus during use.
+     */
     insertText?: (Ptext: string, PdeadKey: number) => boolean;
     
     /**
      * Function     registerKeyboard  KR                    
      * Scope        Public
      * @param       {Object}      Pk      Keyboard  object
-     * Description  Register and load the keyboard
+     * Description  Registers a keyboard with KeymanWeb once its script has fully loaded.
+     * 
+     *              In web-core, this also activates the keyboard; in other modules, this method
+     *              may be replaced with other implementations.
      */    
     registerKeyboard(Pk): void {
-      let keyman = com.keyman.singleton;
-      keyman.keyboardManager._registerKeyboard(Pk);
+      // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale, 
+      //        by DOM-aware code.
+      let keyboard = new keyboards.Keyboard(Pk);
+      this.activeKeyboard = keyboard;
     }
 
     /**
-     * Add the basic keyboard parameters (keyboard stub) to the array of keyboard stubs
-     * If no language code is specified in a keyboard it cannot be registered, 
-     * and a keyboard stub must be registered before the keyboard is loaded 
-     * for the keyboard to be usable.
-     * 
-     * @param       {Object}      Pstub     Keyboard stub object
-     * @return      {?number}               1 if already registered, else null
+     * Used by DOM-aware KeymanWeb to add keyboard stubs, used by the `KeyboardManager` type 
+     * to optimize resource use.
      */    
-    registerStub(Pstub): number {
-      let keyman = com.keyman.singleton;
-      return keyman.keyboardManager._registerStub(Pstub);
-    }
+    registerStub?: (Pstub) => number;
 
     /**
      * Get *cached or uncached* keyboard context for a specified range, relative to caret
