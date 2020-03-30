@@ -149,7 +149,7 @@ final class KMKeyboard extends WebView {
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
             ". Loading default keyboard", Toast.LENGTH_LONG).show();
 
-          setKeyboard(KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID,
+          setKeyboard(KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
             KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
             KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
         }
@@ -372,6 +372,7 @@ final class KMKeyboard extends WebView {
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
       Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
         languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      packageID = KMManager.KMDefault_PackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       retVal = false;
@@ -473,6 +474,7 @@ final class KMKeyboard extends WebView {
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
       Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
         languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      packageID = KMManager.KMDefault_PackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       retVal = false;
@@ -506,7 +508,7 @@ final class KMKeyboard extends WebView {
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
       Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
         languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
-      packageID = KMManager.KMDefault_UndefinedPackageID;
+      packageID = KMManager.KMDefault_PackageID;
       keyboardID = KMManager.KMDefault_KeyboardID;
       languageID = KMManager.KMDefault_LanguageID;
       keyboardName = KMManager.KMDefault_KeyboardName;

@@ -48,7 +48,7 @@ class FunctionalTestHelper {
    */
   static void setInitialKeyboard()
   {
-    KMManager.setKeyboard(KMManager.KMDefault_UndefinedPackageID,
+    KMManager.setKeyboard(KMManager.KMDefault_PackageID,
       KMManager.KMDefault_KeyboardID,
       KMManager.KMDefault_LanguageID,
       KMManager.KMDefault_KeyboardName,

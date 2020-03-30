@@ -414,6 +414,11 @@ public final class FileUtils {
     return f.endsWith(LEXICALMODEL);
   }
 
+  public static boolean hasLexicalModelPackageExtension(String filename) {
+    String f = filename.toLowerCase();
+    return f.endsWith(MODELPACKAGE);
+  }
+
   public static boolean hasKeymanPackageExtension(String filename) {
     String f = filename.toLowerCase();
     return f.endsWith(KEYMANPACKAGE);
