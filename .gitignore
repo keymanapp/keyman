@@ -256,8 +256,5 @@ compile_flags.txt
 # Auto-generated resource script
 resources/environment.sh
 
-# Keyman translations from https://crowdin.com/project/keyman
-.crowdin-tmp/
-crowdin/
-
+# Copy of the master VERSION.md used for Linux packaging
 /common/core/desktop/VERSION.md
