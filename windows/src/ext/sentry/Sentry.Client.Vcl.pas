@@ -11,7 +11,7 @@ type
   private
     procedure HandleApplicationException(Sender: TObject; E: Exception);
   public
-    constructor Create(AOptions: TSentryClientOptions; AFlags: TSentryClientFlags); override;
+    constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); override;
     destructor Destroy; override;
   end;
 
@@ -23,9 +23,9 @@ uses
 { TSentryClientVcl }
 
 constructor TSentryClientVcl.Create(AOptions: TSentryClientOptions;
-  AFlags: TSentryClientFlags);
+  const ALogger: string; AFlags: TSentryClientFlags);
 begin
-  inherited Create(AOptions, AFlags);
+  inherited Create(AOptions, ALogger, AFlags);
 
   if scfCaptureExceptions in AFlags then
   begin

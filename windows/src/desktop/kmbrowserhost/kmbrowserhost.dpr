@@ -23,8 +23,11 @@ uses
 {$R version.res}
 {$R manifest.res}
 
+const
+  LOGGER_DESKTOP_KMBROWSERHOST = TKeymanSentryClient.LOGGER_DESKTOP + '.kmbrowserhost';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, [kscfCaptureExceptions, kscfTerminate]); // no ui wanted
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop,
+    LOGGER_DESKTOP_KMBROWSERHOST, [kscfCaptureExceptions, kscfTerminate]); // no ui wanted
   try
     FInitializeCEF := TCEFManager.Create;
     try

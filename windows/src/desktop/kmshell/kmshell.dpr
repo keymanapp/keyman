@@ -162,8 +162,10 @@ uses
 {$R VERSION.RES}
 {$R manifest.res}
 
+const
+  LOGGER_DESKTOP_KMSHELL = TKeymanSentryClient.LOGGER_DESKTOP + '.kmshell';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
     FInitializeCEF := TCEFManager.Create;

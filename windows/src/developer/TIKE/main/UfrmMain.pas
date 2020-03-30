@@ -281,7 +281,6 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure mnuProjectClick(Sender: TObject);
     procedure crash1Click(Sender: TObject);
-    procedure cmdCrashTestClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure cbTextFileFormatItemClick(Sender: TObject);
     procedure cbDebugSystemKeyboard_DropDown(Sender: TObject);
@@ -481,8 +480,6 @@ var
   FActiveProject: string;
 begin
   inherited;
-
-  TKeymanSentryClient.Client.MessageEvent(SENTRY_LEVEL_INFO, TKeymanSentryClient.LOGGER_DEVELOPER_IDE, 'Started Keyman Developer');
 
   if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
   begin
@@ -1034,16 +1031,6 @@ begin
   //modActionsKeyboardEditor.SetupDebugSystemKeyboard(cbDebugSystemKeyboard.Strings);
 end;
 
-procedure TfrmKeymanDeveloper.cmdCrashTestClick(Sender: TObject);
-var
-  p: PChar;
-  c: Char;
-begin
-  p := nil;
-  c := p^;
-  if c <> #0 then ShowMessage('Why didn''t it crash?');
-end;
-
 {-------------------------------------------------------------------------------
  - Utility functions                                                           -
  -------------------------------------------------------------------------------}
@@ -1418,7 +1405,7 @@ end;
 
 procedure TfrmKeymanDeveloper.crash1Click(Sender: TObject);
 begin
-  raise ESentryTest.Create('Just testing Sentry');
+  TKeymanSentryClient.Validate(True);
 end;
 
 procedure TfrmKeymanDeveloper.SetActiveChild(const Value: TfrmTikeChild);

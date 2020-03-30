@@ -94,10 +94,13 @@ uses
 {$R version.res}
 {$R manifest.res}
 
+const
+  LOGGER_DEVELOPER_TOOLS_KMCONVERT = TKeymanSentryClient.LOGGER_DEVELOPER_TOOLS + '.kmconvert';
 begin
-  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper);
+  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper, LOGGER_DEVELOPER_TOOLS_KMCONVERT);
   try
     try
+      TKeymanSentryClient.Validate;
       Run;
     except
       on E: Exception do

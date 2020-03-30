@@ -44,9 +44,11 @@ int run(int argc, wchar_t * argv[]);
 
 std::vector<DeadkeyMapping> FDeadkeys;   // I4353
 
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_MCOMPILE KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".mcompile"
+
 int wmain(int argc, wchar_t * argv[])
 {
-  return keyman_sentry_wmain(false, argc, argv, run);
+  return keyman_sentry_wmain(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_MCOMPILE, argc, argv, run);
 }
 
 int run(int argc, wchar_t * argv[])

@@ -55,6 +55,7 @@ type
     FInstance: TSentryClient;
   private
     options: psentry_options_t;
+    FLogger: string;
     FOnBeforeEvent: TSentryClientBeforeEvent;
     FOnAfterEvent: TSentryClientAfterEvent;
     FReportExceptions: Boolean;
@@ -67,10 +68,10 @@ type
     procedure DoTerminate;
     function EventIDToString(Guid: TGUID): string;
   public
-    constructor Create(AOptions: TSentryClientOptions; AFlags: TSentryClientFlags); virtual;
+    constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
 
-    function MessageEvent(Level: TSentryLevel; const Logger, Message: string; IncludeStack: Boolean = False): TGUID;
+    function MessageEvent(Level: TSentryLevel; const Message: string; IncludeStack: Boolean = False): TGUID;
     function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
 
     property OnBeforeEvent: TSentryClientBeforeEvent read FOnBeforeEvent write FOnBeforeEvent;
@@ -130,10 +131,11 @@ begin
 end;
 
 
-constructor TSentryClient.Create(AOptions: TSentryClientOptions; AFlags: TSentryClientFlags);
+constructor TSentryClient.Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags);
 begin
   Assert(not Assigned(FInstance));
   FInstance := Self;
+  FLogger := ALogger;
   FReportExceptions := scfReportExceptions in AFlags;
   FReportMessages := scfReportMessages in AFlags;
 
@@ -312,6 +314,7 @@ begin
   *)
 
     sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
+    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
     if AExceptAddr = nil then
       AExceptAddr := System.ExceptAddr;
@@ -331,8 +334,8 @@ begin
   end;
 end;
 
-function TSentryClient.MessageEvent(Level: TSentryLevel; const Logger,
-  Message: string; IncludeStack: Boolean): TGUID;
+function TSentryClient.MessageEvent(Level: TSentryLevel; const Message: string;
+  IncludeStack: Boolean): TGUID;
 var
   event: sentry_value_t;
   threads: sentry_value_t;
@@ -346,11 +349,11 @@ begin
   begin
     event := sentry_value_new_message_event(
       {*   level *} sentry_level_t(Level),
-      {*  logger *} PAnsiChar(UTF8Encode(Logger)),
+      {*  logger *} PAnsiChar(UTF8Encode(FLogger)),
       {* message *} PAnsiChar(UTF8Encode(Message))
     );
 
-    DoBeforeEvent(event, Logger, Message, scetMessage);
+    DoBeforeEvent(event, FLogger, Message, scetMessage);
 
     if IncludeStack then
     begin
@@ -361,12 +364,12 @@ begin
 
     Result := sentry_capture_event(event).native_uuid;
 
-    DoAfterEvent(EventIDToString(Result), Logger, Message, scetMessage);
+    DoAfterEvent(EventIDToString(Result), FLogger, Message, scetMessage);
   end
   else
   begin
-    DoBeforeEvent(0, Logger, Message, scetMessage);
-    DoAfterEvent('', Logger, Message, scetMessage);
+    DoBeforeEvent(0, FLogger, Message, scetMessage);
+    DoAfterEvent('', FLogger, Message, scetMessage);
   end;
 end;
 
