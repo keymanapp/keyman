@@ -72,7 +72,7 @@ namespace com.keyman {
         e = window.event as KeyboardEvent;
       }
 
-      var _Lcode = this.keyman.textProcessor._GetEventKeyCode(e);
+      var _Lcode = dom.PreProcessor._GetEventKeyCode(e);
       if(_Lcode == null) {
         return false;
       }

@@ -1,4 +1,5 @@
 /// <reference path="touchAliasElement.ts" />
+/// <reference path="preProcessor.ts" />
 
 namespace com.keyman.dom {
   /*
@@ -211,7 +212,7 @@ namespace com.keyman.dom {
 
       // Hide the touch device input caret, if applicable  I3363 (Build 301)
       if(dom.Utils.instanceof(DOMEventHandlers.states.activeElement, "TouchAliasElement")) {
-        let lastAlias = <dom.TouchAliasElement> DOMEventHandlers.states.activeElement;
+        let lastAlias = <TouchAliasElement> DOMEventHandlers.states.activeElement;
         lastAlias.hideCaret();
       }
 
@@ -412,7 +413,7 @@ namespace com.keyman.dom {
         return true;
       }
       
-      return this.keyman.textProcessor.keyDown(e);
+      return PreProcessor.keyDown(e);
     }.bind(this);
 
     doChangeEvent(_target: HTMLElement|Document) {
@@ -445,7 +446,7 @@ namespace com.keyman.dom {
         return true;
       }
 
-      return this.keyman.textProcessor.keyPress(e);
+      return PreProcessor.keyPress(e);
     }.bind(this);
 
     /**
@@ -454,11 +455,9 @@ namespace com.keyman.dom {
      * Description Processes keyup event and passes event data to keyboard
      */       
     _KeyUp: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-      var keyboardManager = this.keyman.keyboardManager;
-      let processor = this.keyman.textProcessor;
       var osk = this.keyman.osk;
 
-      var Levent = processor._GetKeyEventProperties(e, false);
+      var Levent = PreProcessor._GetKeyEventProperties(e, false);
       if(Levent == null || !osk.ready) {
         return true;
       }
@@ -489,7 +488,7 @@ namespace com.keyman.dom {
         }
       }      
                   
-      return processor.keyUp(e);
+      return PreProcessor.keyUp(e);
     }.bind(this);
   }
 
@@ -555,12 +554,12 @@ namespace com.keyman.dom {
       }
 
       // And the actual target element        
-      var target=scroller.parentNode as dom.TouchAliasElement;
+      var target=scroller.parentNode as TouchAliasElement;
 
       // Move the caret and refocus if necessary     
       if(DOMEventHandlers.states.activeElement != target) {
         // Hide the KMW caret
-        let prevTarget = <dom.TouchAliasElement> DOMEventHandlers.states.activeElement;
+        let prevTarget = <TouchAliasElement> DOMEventHandlers.states.activeElement;
         if(prevTarget) {
           prevTarget.hideCaret();
         }
