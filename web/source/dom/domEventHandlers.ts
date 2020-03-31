@@ -16,8 +16,8 @@ namespace com.keyman.dom {
     _Selection = null;
     _SelectionControl: any = null;   // Type behavior is as with activeElement and the like.
     
-    activeElement: any;       // TODO:  Add type and fix resulting bugs!
-    lastActiveElement: any;   // TODO:  Add type and fix resulting bugs!
+    activeElement: HTMLElement;
+    lastActiveElement: HTMLElement;
 
     focusing: boolean;
     focusTimer: number;
@@ -192,7 +192,7 @@ namespace com.keyman.dom {
      * Respond to KMW losing focus on event
      */    
     _ControlBlur: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement | Document;  
+      var Ltarg: HTMLElement;  
 
       e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
@@ -223,10 +223,9 @@ namespace com.keyman.dom {
         Ltarg = Ltarg.parentNode as HTMLElement;
       }
 
-      // TODO:  Needs tidy-up.
       if(Ltarg.ownerDocument) {
         if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
-          Ltarg=Ltarg.contentWindow.document;
+          Ltarg=Ltarg.contentWindow.frameElement as HTMLElement;
         }
       }
       
@@ -244,7 +243,7 @@ namespace com.keyman.dom {
       var isActivating = this.keyman.uiManager.isActivating;
       let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
       if(!isActivating && activeKeyboard) {
-        activeKeyboard.notify(0, text.Processor.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
+        activeKeyboard.notify(0, text.Processor.getOutputTarget(Ltarg), 0);  // I2187
       }
 
       //e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs  //TODO: is this really needed again????
@@ -690,9 +689,9 @@ namespace com.keyman.dom {
     /**
      * Close OSK and remove simulated caret on losing focus
      */          
-    cancelInput(): void { 
-      if(DOMEventHandlers.states.activeElement && DOMEventHandlers.states.activeElement.hideCaret) {
-        DOMEventHandlers.states.activeElement.hideCaret();
+    cancelInput(): void {
+      if(DOMEventHandlers.states.activeElement && Utils.instanceof(DOMEventHandlers.states.activeElement, "TouchAliasElement")) {
+        (DOMEventHandlers.states.activeElement as TouchAliasElement).hideCaret();
       }
       DOMEventHandlers.states.activeElement=null; 
       this.keyman.osk.hideNow();
