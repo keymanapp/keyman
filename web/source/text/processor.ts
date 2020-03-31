@@ -154,26 +154,6 @@ namespace com.keyman.text {
       return ruleBehavior;
     }
 
-    // TODO:  Right about ready to move this to DOM-aware space!
-    static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
-      let keyman = com.keyman.singleton;
-
-      if(!Lelem && !keyman.isHeadless) {
-        Lelem = keyman.domManager.getLastActiveElement();
-        if(!Lelem) {
-          // If we're trying to find an active target but one doesn't exist, just return null.
-          return null;
-        }
-      }
-
-      // If we were provided an element or found an active element but it's improperly attached, that should cause an error.
-      if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
-        return Lelem._kmwAttachment.interface;
-      } else {
-        throw new Error("OSK could not find element output target data!");
-      }
-    }
-
     setSyntheticEventDefaults(Lkc: text.KeyEvent) {
       // Set the flags for the state keys.
       Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];

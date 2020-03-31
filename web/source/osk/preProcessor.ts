@@ -18,7 +18,7 @@ namespace com.keyman.osk {
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: text.KeyEvent = {
-        Ltarg: text.Processor.getOutputTarget(Lelem),
+        Ltarg: dom.Utils.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: text.Codes.keyCodes[keyName],
@@ -81,7 +81,7 @@ namespace com.keyman.osk {
 
       if(Lelem != null) {
         // Handle any DOM state management related to click inputs.
-        let outputTarget = text.Processor.getOutputTarget(Lelem);
+        let outputTarget = dom.Utils.getOutputTarget(Lelem);
         keyman.domManager.initActiveElement(Lelem);
   
         // Turn off key highlighting (or preview)

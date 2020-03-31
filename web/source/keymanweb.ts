@@ -124,7 +124,7 @@ if(!window['keyman']['initialized']) {
      **/    
     function resetVKShift() {
       let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless && !keyman.uiManager.isActivating && keyman.osk.vkbd) {
+      if(!keyman.uiManager.isActivating && keyman.osk.vkbd) {
         keyman.textProcessor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
       }
     }

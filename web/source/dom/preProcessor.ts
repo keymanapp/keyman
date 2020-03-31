@@ -45,7 +45,7 @@ namespace com.keyman.dom {
       } else if (target.nodeType == 3) {// defeat Safari bug
         target = target.parentNode as HTMLElement;
       }
-      s.Ltarg = text.Processor.getOutputTarget(target);
+      s.Ltarg = Utils.getOutputTarget(target);
 
       s.Lcode = this._GetEventKeyCode(e);
       if (s.Lcode == null) {
