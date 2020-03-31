@@ -221,58 +221,20 @@ namespace com.keyman.osk {
         Ldiv.className='kmw-osk-none';
         this._Box.appendChild(Ldiv);
       } else {
-        var Lviskbd=null,layouts=null,layout=null,Lhelp='';
+        var Lhelp='';
         this._Box.className = "";
         if(activeKeyboard != null) {
-          Lviskbd=activeKeyboard.legacyLayoutSpec;
+          // Note:  must exist in order for insertHelpHTML to be used!
           Lhelp=activeKeyboard.helpText;
-
-          // Check if dynamic layout is defined within keyboard
-          layouts=activeKeyboard.layouts;
-
-          // If any keyboard layout file is provided, use that to override the generated layout
-          if(typeof layouts != 'undefined' && layouts != null) {
-            layout=layouts[device.formFactor];
-
-            // Use the layout for the device, if defined, otherwise use the desktop (default) layout
-            if(typeof layout == 'undefined' || layout == null) {
-              if(device.formFactor == 'phone') {
-                layout=layouts['tablet'];
-              } else if(device.formFactor == 'tablet') {
-                layout=layouts['phone'];
-              }
-
-              if(typeof layout == 'undefined' || layout == null) {
-                layout=layouts['desktop'];
-              }
-            }
-          }
-        }
-
-        // Test if Visual keyboard is simply a place holder, set to null if so
-        if(Lviskbd != null && Lviskbd['BK'] != null) {
-          var keyCaps=Lviskbd['BK'], noKeyCaps=true;
-          for(var i=0; i<keyCaps.length; i++) {
-            if(keyCaps[i].length > 0) {
-              noKeyCaps = false;
-              break;
-            }
-          }
-          if(noKeyCaps) {
-            Lviskbd=null;
-          }
         }
 
         // Generate a visual keyboard from the layout (or layout default)
-        // TODO: this should probably be unconditional now
-        if(Lviskbd != null || Lhelp == '' || device.touchable) { // I3363 (Build 301)
-          // TODO: May want to define a default BK array here as well
-          if(Lviskbd == null) {
-            Lviskbd={'F':'Tahoma', 'BK': keyboards.Layouts.dfltText}; //DDOSK
-          }
-
-          this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, activeKeyboard.modifierBitmask);
-        } else { //The following code applies only to preformatted 'help' such as European Latin
+        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
+        if(activeKeyboard && activeKeyboard.layout(device.formFactor as text.FormFactor)) {
+          this._GenerateVisualKeyboard(activeKeyboard);
+        } else if(!activeKeyboard) {
+          this._GenerateVisualKeyboard(null);
+        } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
           Ldiv=util._CreateElement('div');
           Ldiv.className = "kmw-title-bar";
@@ -333,8 +295,8 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
-    private _GenerateVisualKeyboard(PVK, Lhelp, layout0, kbdBitmask) {
-      this.vkbd = new com.keyman.osk.VisualKeyboard(PVK, Lhelp, layout0, kbdBitmask);
+    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard) {
+      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
       let util = com.keyman.singleton.util;
 
       // Set box class - OS and keyboard added for Build 360

@@ -1,3 +1,5 @@
+/// <reference path="defaultLayouts.ts" />
+
 namespace com.keyman.keyboards {
   /**
    * Stores preprocessed properties of a keyboard for quick retrieval later.
@@ -10,12 +12,26 @@ namespace com.keyman.keyboards {
     }
   }
 
+  export enum LayoutState {
+    NOT_LOADED = undefined,
+    POLYFILLED = 1,
+    CALIBRATED = 2
+  }
+
   /**
    * Acts as a wrapper class for Keyman keyboards compiled to JS, providing type information
    * and keyboard-centered functionality in an object-oriented way without modifying the 
    * wrapped keyboard itself.
    */
   export class Keyboard {
+    public static DEFAULT_SCRIPT_OBJECT = {
+      'gs': function(outputTarget, keystroke) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
+      'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
+      'KN': '',
+      'KV': Layouts.DEFAULT_RAW_SPEC,
+      'KM': 0 // May not be the best default, but this matches current behavior when there is no activeKeyboard.
+    }
+
     /**
      * This is the object provided to KeyboardInterface.registerKeyboard - that is, the keyboard
      * being wrapped.
@@ -23,9 +39,15 @@ namespace com.keyman.keyboards {
      * TODO:  Make this private instead.  But there are a LOT of references that must be rooted out first.
      */
     public readonly scriptObject: any;
+    private layoutStates: {[layout: string]: LayoutState};
 
     constructor(keyboardScript: any) {
-      this.scriptObject = keyboardScript;
+      if(keyboardScript) {
+        this.scriptObject = keyboardScript;
+      } else {
+        this.scriptObject = Keyboard.DEFAULT_SCRIPT_OBJECT;
+      }
+      this.layoutStates = {};
     }
 
     /**
@@ -33,6 +55,10 @@ namespace com.keyman.keyboards {
      */
     process(outputTarget: text.OutputTarget, keystroke: text.KeyEvent): boolean {
       return this.scriptObject['gs'](outputTarget, keystroke);
+    }
+
+    get isHollow(): boolean {
+      return this.scriptObject == Keyboard.DEFAULT_SCRIPT_OBJECT;
     }
 
     get id(): string {
@@ -49,14 +75,17 @@ namespace com.keyman.keyboards {
     }
 
     // TODO:  Better typing.
-    get legacyLayoutSpec(): any {
+    private get _legacyLayoutSpec(): any {
       return this.scriptObject['KV'];  // used with buildDefaultLayout; layout must be constructed at runtime.
     }
 
-    // TODO:  Better typing.
-    // May return null.
-    get layouts(): any {
+    // May return null if no layouts exist or have been initialized.
+    private get _layouts(): {[formFactor: string]: LayoutFormFactor} {
       return this.scriptObject['KVKL'];  // This one is compiled by Developer's visual keyboard layout editor.
+    }
+
+    private set _layouts(value) {
+      this.scriptObject['KVKL'] = value;
     }
 
     get compilerVersion(): utils.Version {
@@ -171,12 +200,12 @@ namespace com.keyman.keyboards {
         return false;
       }
 
-      if(this.legacyLayoutSpec == null) {
+      if(this._legacyLayoutSpec == null) {
         return false;
       }
       
       // Only exists in KMW 10.0+, but before that Web had no chirality support, so... return false.
-      let layers = this.legacyLayoutSpec['KLS'];
+      let layers = this._legacyLayoutSpec['KLS'];
       if(!layers) {
         return false;
       }
@@ -240,6 +269,90 @@ namespace com.keyman.keyboards {
       if(typeof(this.scriptObject['KNS']) == 'function') {
         this.scriptObject['KNS'](_PCommand, _PTarget, _PData);
       }
+    }
+
+    private findOrConstructLayout(formFactor: text.FormFactor): LayoutFormFactor {
+      if(this._layouts) {
+        // Search for viable layouts.  `null` is allowed for desktop form factors when help text is available,
+        // so we check explicitly against `undefined`.
+        if(this._layouts[formFactor] !== undefined) {
+          return this._layouts[formFactor];
+        } else if(formFactor == text.FormFactor.Phone && this._layouts[text.FormFactor.Tablet]) {
+          return this._layouts[text.FormFactor.Phone] = this._layouts[text.FormFactor.Tablet];
+        } else if(formFactor == text.FormFactor.Tablet && this._layouts[text.FormFactor.Phone]) {
+          return this._layouts[text.FormFactor.Tablet] = this._layouts[text.FormFactor.Phone];
+        }
+      }
+
+      // No pre-built layout available; time to start constructing it via defaults.
+      // First, if we have non-default keys specified by the ['BK'] array, we've got
+      // enough to work with to build a default layout.
+      let rawSpecifications: any = null;  // TODO:  better typing, same type as this.legacyLayoutSpec.
+      if(this._legacyLayoutSpec != null && this._legacyLayoutSpec['BK'] != null) {
+        var keyCaps=this._legacyLayoutSpec['BK'];
+        for(var i=0; i<keyCaps.length; i++) {
+          if(keyCaps[i].length > 0) {
+            rawSpecifications = this._legacyLayoutSpec;
+            break;
+          }
+        }
+      }
+
+      // If we don't have key definitions to use for a layout but also lack help text or are a touch-based layout,
+      // we make a default layout anyway.  We have to show display something usable.
+      if(!rawSpecifications && (this.helpText == '' || formFactor != text.FormFactor.Desktop)) {
+        rawSpecifications = {'F':'Tahoma', 'BK': Layouts.dfltText};
+      }
+
+      // Regardless of success, we'll want to initialize the field that backs the property; 
+      // may as well cache the default layout we just built, or a 'null' if it shouldn't exist..
+      if(!this._layouts) {
+        this._layouts = {};
+      }
+
+      // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
+      if(rawSpecifications) {
+        // Now to generate a layout from our raw specifications.
+        let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
+        layout.isDefault = true;
+        return layout;
+      } else {
+        // The fact that it doesn't exist will indicate that help text/HTML should be inserted instead.
+        this._layouts[formFactor] = null; // provides a cached value for the check at the top of this method.
+        return null;
+      }
+    }
+
+    /**
+     * Returns an ActiveLayout object representing the keyboard's layout for this form factor.  May return null if a custom desktop "help" OSK is defined, as with sil_euro_latin.
+     * 
+     * In such cases, please use either `helpText` or `insertHelpHTML` instead.
+     * @param formFactor {string} The desired form factor for the layout.
+     */
+    public layout(formFactor: text.FormFactor): ActiveLayout {
+      let rawLayout = this.findOrConstructLayout(formFactor);
+
+      if(rawLayout) {
+        // Prevents accidentally reprocessing layouts; it's a simple enough check.
+        if(this.layoutStates[formFactor] == LayoutState.NOT_LOADED) {
+          rawLayout = ActiveLayout.polyfill(rawLayout, formFactor);
+          this.layoutStates[formFactor] = LayoutState.POLYFILLED;
+        }
+
+        return rawLayout as ActiveLayout;
+      } else {
+        return null;
+      }
+    }
+
+    public markLayoutCalibrated(formFactor: text.FormFactor) {
+      if(this.layoutStates[formFactor] != LayoutState.NOT_LOADED) {
+        this.layoutStates[formFactor] = LayoutState.CALIBRATED;
+      }
+    }
+
+    public getLayoutState(formFactor: text.FormFactor) {
+      return this.layoutStates[formFactor];
     }
   }
 }
