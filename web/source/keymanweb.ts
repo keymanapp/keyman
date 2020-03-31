@@ -120,7 +120,7 @@ if(!window['keyman']['initialized']) {
     util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);  
 
     // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    keymanweb['pageFocusHandler'] = keymanweb.textProcessor.keyboardInterface.resetVKShift.bind(keymanweb.textProcessor.keyboardInterface);
+    keymanweb['pageFocusHandler'] = keymanweb.textProcessor.resetVKShift.bind(keymanweb.textProcessor);
     util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
     

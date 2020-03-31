@@ -256,7 +256,7 @@ namespace com.keyman.dom {
       }
 
       this.doChangeEvent(Ltarg);
-      this.keyman.textProcessor.keyboardInterface.resetContext();
+      this.keyman['resetContext']();
 
       return true;
     }.bind(this);
@@ -703,11 +703,15 @@ namespace com.keyman.dom {
      */
     setBlur: (e: FocusEvent) => void = function(this: DOMTouchHandlers, e: FocusEvent) {
       // This works OK for iOS, but may need something else for other platforms
-
-      this.keyman.textProcessor.keyboardInterface.resetContext();
+      var elem: HTMLElement;
 
       if(('relatedTarget' in e) && e.relatedTarget) {
-        var elem: HTMLElement = e.relatedTarget as HTMLElement;
+        elem = e.relatedTarget as HTMLElement;
+      }
+
+      this.keyman['resetContext']();
+
+      if(elem) {
         this.doChangeEvent(elem);
         if(elem.nodeName != 'DIV' || elem.className.indexOf('keymanweb-input') == -1) {
           this.cancelInput(); 

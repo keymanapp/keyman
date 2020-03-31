@@ -447,10 +447,20 @@ namespace com.keyman {
     /**
      * Function     resetContext
      * Scope        Public
-     * Description  Revert OSK to default layer and clear any deadkeys and modifiers
+     * @param       {Object} e      The element whose context should be cleared.  If null, the currently-active element will be chosen.
+     * Description  Reverts the OSK to the default layer, clears any processing caches and modifier states, 
+     *              and clears deadkeys and prediction-processing states on the active element (if it exists)
      */
-    ['resetContext']() {
-      this.textProcessor.keyboardInterface.resetContext();
+    ['resetContext'](e?: HTMLElement) {
+      let elem = e;
+      if(!elem) {
+        elem = dom.DOMEventHandlers.states.activeElement;
+      }
+      let outputTarget = text.Processor.getOutputTarget(elem);
+      if(outputTarget) {
+        outputTarget.resetContext();
+      }
+      this.textProcessor.resetContext();
     };
 
     /**
@@ -459,7 +469,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.textProcessor.keyboardInterface.setNumericLayer();
+      this.textProcessor.setNumericLayer();
     };
 
     /**

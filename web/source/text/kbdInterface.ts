@@ -987,12 +987,7 @@ namespace com.keyman.text {
       this.cachedContextEx.reset();
     }
 
-    defaultBackspace(outputTarget?: OutputTarget) {
-      if(!outputTarget) {
-        // Find the correct output target to manipulate.
-        outputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
-      }
-
+    defaultBackspace(outputTarget: OutputTarget) {
       this.output(1, outputTarget, "");
     }
 
@@ -1089,55 +1084,5 @@ namespace com.keyman.text {
     ['HideHelp'] = this['hideHelp'];
     ['ShowHelp'] = this['showHelp'];
     ['ShowPinnedHelp'] = this['showPinnedHelp'];
-
-    resetContext() {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless && keyman.osk.vkbd) {
-        keyman.osk.vkbd.layerId = 'default';
-      }
-
-      // Find the correct output target to manipulate.
-      let outputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
-      if(outputTarget) {
-        outputTarget.deadkeys().clear();
-      }
-      this.resetContextCache();
-      this.resetVKShift();
-      
-      if(keyman.modelManager) {
-        keyman.modelManager.invalidateContext();
-      }
-
-      if(!keyman.isHeadless) {
-        keyman.osk._Show();
-      }
-    };
-
-    setNumericLayer() {
-      let keyman = com.keyman.singleton;
-      var i;
-      if(!keyman.isHeadless) {
-        let osk = keyman.osk.vkbd;
-        for(i=0; i<osk.layers.length; i++) {
-          if (osk.layers[i].id == 'numeric') {
-            osk.layerId = 'numeric';
-            keyman.osk._Show();
-          }
-        }
-      }
-    };
-
-    /**
-     * Reset OSK shift states when entering or exiting the active element
-     **/    
-    resetVKShift() {
-      let keyman = com.keyman.singleton;
-      let processor = com.keyman.singleton.textProcessor;
-      if(!keyman.isHeadless && !keyman.uiManager.isActivating && keyman.osk.vkbd) {
-        if(processor._UpdateVKShift) {
-          processor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
-        }
-      }
-    }
   }
 }

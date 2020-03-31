@@ -70,7 +70,7 @@ namespace com.keyman.text {
 
       // All old deadkeys and keyboard-specific cache should immediately be invalidated
       // on a keyboard change.
-      this.keyboardInterface.resetContext();
+      this.resetContext();
 
       // Ensure that the setting propagates immediately to the keyboard interface object.
       // Matters for some unit tests.
@@ -134,7 +134,7 @@ namespace com.keyman.text {
           special = DefaultOutput.forSpecialEmulation(Lkc)
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
-            this.keyboardInterface.defaultBackspace();
+            this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
           } else if(special) {
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
@@ -159,6 +159,7 @@ namespace com.keyman.text {
       return ruleBehavior;
     }
 
+    // TODO:  Right about ready to move this to DOM-aware space!
     static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
       let keyman = com.keyman.singleton;
 
@@ -815,6 +816,48 @@ namespace com.keyman.text {
 
       // No modifier keypresses detected.
       return false;
+    }
+
+    resetContext() {
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless && keyman.osk.vkbd) {
+        keyman.osk.vkbd.layerId = 'default';
+      }
+
+      this.keyboardInterface.resetContextCache();
+      this.resetVKShift();
+      
+      if(keyman.modelManager) {
+        keyman.modelManager.invalidateContext();
+      }
+
+      if(!keyman.isHeadless) {
+        keyman.osk._Show();
+      }
+    };
+
+    setNumericLayer() {
+      let keyman = com.keyman.singleton;
+      var i;
+      if(!keyman.isHeadless) {
+        let osk = keyman.osk.vkbd;
+        for(i=0; i<osk.layers.length; i++) {
+          if (osk.layers[i].id == 'numeric') {
+            osk.layerId = 'numeric';
+            keyman.osk._Show();
+          }
+        }
+      }
+    };
+
+    /**
+     * Reset OSK shift states when entering or exiting the active element
+     **/    
+    resetVKShift() {
+      let keyman = com.keyman.singleton;
+      if(!keyman.isHeadless && !keyman.uiManager.isActivating && keyman.osk.vkbd) {
+        this._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
+      }
     }
   }
 }
