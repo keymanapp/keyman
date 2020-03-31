@@ -897,9 +897,12 @@ namespace com.keyman.text {
      */    
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
       this.resetContextCache();
-      let cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
-
-      return cValue[storeName] || dfltValue;
+      if(this.variableStoreSerializer) {
+        let cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+        return cValue[storeName] || dfltValue;
+      } else {
+        return dfltValue;
+      }
     }
 
     /**

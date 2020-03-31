@@ -60,8 +60,10 @@ namespace com.keyman.text {
         }
       }
 
-      for(let storeID in this.saveStore) {
-        processor.keyboardInterface.variableStoreSerializer.saveStore(processor.activeKeyboard.id, storeID, this.saveStore[storeID]);
+      if(processor.keyboardInterface.variableStoreSerializer) {
+        for(let storeID in this.saveStore) {
+          processor.keyboardInterface.variableStoreSerializer.saveStore(processor.activeKeyboard.id, storeID, this.saveStore[storeID]);
+        }
       }
 
       if(this.triggersDefaultCommand) {
