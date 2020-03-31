@@ -58,7 +58,7 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     return false;
   }
 
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
 
     String modelId = jsonEntry.getString("id");
@@ -103,6 +103,6 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
    * @throws JSONException
    */
   public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
-    return super.processKMP(path, tempPath, key);
+    return super.processKMP(path, tempPath, key, null);
   }
 }
