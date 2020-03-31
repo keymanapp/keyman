@@ -3089,7 +3089,7 @@ DWORD ReadLine(HANDLE hInfile, PWSTR wstr, BOOL PreProcess)
 	BOOL LineCarry = FALSE, InComment = FALSE;
 	DWORD n;
 	WCHAR currentQuotes = 0;
-    WCHAR str[LINESIZE + 3];
+  WCHAR str[LINESIZE + 3];
 
 	if(!ReadFile(hInfile, str, LINESIZE*2, &len, NULL)) return CERR_CannotReadInfile;
 	len /= 2;
@@ -3498,8 +3498,8 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 	return hOutfile;
 }
 
-extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
+extern "C" void __declspec(dllexport) WINAPI Keyman_Diagnostic(int mode) {
   if (mode == 0) {
-    RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
+    RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }
 }
