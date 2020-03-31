@@ -65,7 +65,7 @@ public class LexicalModelPackageProcessorTest {
     Assert.assertNotNull(json);
     String pkgVersion = lmPP.getPackageVersion(json);
 
-    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion);
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion, "en");
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
     en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");
