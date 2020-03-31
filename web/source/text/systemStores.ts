@@ -19,6 +19,42 @@ namespace com.keyman.text {
   }
 
   /**
+   * A handler designed to receive feedback whenever a system store's value is changed.
+   * @param source    The system store being mutated, before the value change occurs.
+   * @param newValue  The new value being set
+   * @returns         `false` / `undefined` to allow the change, `true` to block the change.
+   */
+  export type SystemStoreChangedHandler = (source: MutableSystemStore, newValue: string) => boolean;
+
+  export class MutableSystemStore extends SystemStore {
+    private _value: string;
+    handler?: SystemStoreChangedHandler = null;
+
+    constructor(id: number, defaultValue: string) {
+      super(id);
+      this._value = defaultValue;
+    }
+
+    get value() {
+      return this._value;
+    }
+
+    matches(value: string) {
+      return this._value == value;
+    }
+
+    set(value: string) {
+      if(this.handler) {
+        if(this.handler(this, value)) {
+          return;
+        }
+      }
+
+      this._value = value;
+    }
+  }
+
+  /**
    * Handles checks against the current platform.
    */
   export class PlatformSystemStore extends SystemStore {
