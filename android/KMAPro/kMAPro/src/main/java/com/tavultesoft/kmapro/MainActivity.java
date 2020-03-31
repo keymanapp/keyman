@@ -196,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       lexicalModelInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, KMManager.KMDefault_DictionaryModelID);
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, KMManager.KMDefault_DictionaryModelName);
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, "0.1.4"); // TODO: Make utility to determine this
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion,
+        KMManager.getLexicalModelPackageVersion(context, KMManager.KMDefault_DictionaryPackageID));
       /*
       // If welcome.htm exists, add custom help link
       welcomeFile = new File(KMManager.getLexicalModelsDir(), KMManager.KMDefault_DictionaryPackageID + File.separator + FileUtils.WELCOME_HTM);

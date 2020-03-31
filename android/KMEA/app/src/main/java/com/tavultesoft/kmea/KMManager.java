@@ -1263,6 +1263,29 @@ public final class KMManager {
     return kbFileVersion;
   }
 
+  /**
+   * Determine the latest version number for an installed lexical model by parsing kmp.json.
+   * @param context
+   * @param packageID
+   * @return String.
+   */
+  public static String getLexicalModelPackageVersion(Context context, final String packageID) {
+    String path = getLexicalModelsDir() + packageID + File.separator + PackageProcessor.PP_DEFAULT_METADATA;
+
+    try {
+      File kmpJSONFile = new File(path);
+      if (!kmpJSONFile.exists()) {
+        return null;
+      }
+      JSONParser jsonParser = new JSONParser();
+      JSONObject kmpObject = jsonParser.getJSONObjectFromFile(kmpJSONFile);
+
+      return LexicalModelPackageProcessor.getPackageVersion(kmpObject);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
   public static void addKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(listener);
   }
