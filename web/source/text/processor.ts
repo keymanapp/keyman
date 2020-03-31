@@ -820,7 +820,7 @@ namespace com.keyman.text {
       }
 
       this.keyboardInterface.resetContextCache();
-      this.resetVKShift();
+      this._UpdateVKShift(null, 15, 0);
       
       if(keyman.modelManager) {
         keyman.modelManager.invalidateContext();
@@ -844,15 +844,5 @@ namespace com.keyman.text {
         }
       }
     };
-
-    /**
-     * Reset OSK shift states when entering or exiting the active element
-     **/    
-    resetVKShift() {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless && !keyman.uiManager.isActivating && keyman.osk.vkbd) {
-        this._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
-      }
-    }
   }
 }
