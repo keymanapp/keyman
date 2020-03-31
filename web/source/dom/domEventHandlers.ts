@@ -269,7 +269,7 @@ namespace com.keyman.dom {
      * @return      {boolean}      
      * Description  Execute external (UI) code needed on blur
      */       
-    doControlBlurred(_target: HTMLElement|Document, _event: Event, _isActivating: boolean|number): boolean {
+    doControlBlurred(_target: HTMLElement, _event: Event, _isActivating: boolean|number): boolean {
       var p={};
       p['target']=_target;
       p['event']=_event;
@@ -416,7 +416,7 @@ namespace com.keyman.dom {
       return PreProcessor.keyDown(e);
     }.bind(this);
 
-    doChangeEvent(_target: HTMLElement|Document) {
+    doChangeEvent(_target: HTMLElement) {
       if(DOMEventHandlers.states.changed) {
         var event: Event;
         if(typeof Event == 'function') {

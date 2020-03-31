@@ -210,12 +210,12 @@ namespace com.keyman {
       if (!e) {
         e = window.event as E;
         if(!e) {
-          var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
+          var elem: HTMLElement = this.domManager.getLastActiveElement();
           if(elem) {
-            elem = elem.ownerDocument;
+            let doc = elem.ownerDocument;
             var win: Window;
-            if(elem) {
-              win = elem.defaultView;
+            if(doc) {
+              win = doc.defaultView;
             }
             if(!win) {
               return null;
