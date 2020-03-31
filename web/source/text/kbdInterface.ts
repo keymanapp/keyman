@@ -923,7 +923,7 @@ namespace com.keyman.text {
       // And the lookup under that entry looks for the value under the store name, again.
       let valueObj: VariableStore = {};
       valueObj[storeName] = optValue;
-      this.variableStoreSerializer.saveStore(kbd.id, storeName, valueObj);
+      this.ruleBehavior.saveStore[storeName] = valueObj;
       return true;
     }
 
