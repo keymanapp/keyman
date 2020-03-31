@@ -5,7 +5,7 @@
 
 ///<reference path="../utils/version.ts"/>
 
-namespace com.keyman.osk {
+namespace com.keyman.keyboards {
   let Codes = com.keyman.text.Codes;
 
   export type KLS = {[layerName: string]: string[]};
@@ -111,9 +111,9 @@ namespace com.keyman.osk {
     * @param   {string}  formFactor
     * @return  {Object}
     */
-    static buildDefaultLayout(PVK, kbdDevVersion: utils.Version, kbdBitmask: number, formFactor: string): LayoutFormFactor {
-      let keyman = com.keyman.singleton;
-      let util = keyman.util;
+    static buildDefaultLayout(PVK, kbdDevVersion: utils.Version, kbdBitmask: number, formFactor: string, keyboard: Keyboard): LayoutFormFactor {
+      // TODO:  Only here because of util.deepCopy.  Start a web-core utils so that it's accessible in headless.
+      let util = com.keyman.singleton.util;
 
       // Build a layout using the default for the device
       var layoutType=formFactor;
@@ -147,7 +147,7 @@ namespace com.keyman.osk {
       validIdList = [ 'default' ].concat(validIdList);
 
       // Automatic AltGr emulation if the 'leftctrl-leftalt' layer is otherwise undefined.
-      if(Layouts.emulatesAltGr(keyLabels)) {
+      if(keyboard.emulatesAltGr) {
         // We insert only the layers that need to be emulated.
         if((validIdList.indexOf('leftctrl-leftalt') == -1) && validIdList.indexOf('rightalt') != -1) {
           validIdList.push('leftctrl-leftalt');
@@ -203,7 +203,13 @@ namespace com.keyman.osk {
 
             // Create a new subkey for the specified layer so that it will be accessible via OSK.
             var specialChar = Layouts.modifierSpecials[layerID]; 
-            shiftKey['sk'].push(new OSKKeySpec("K_" + specialChar, specialChar, null, "1", layerID));
+            let subkey: LayoutKey = {
+              id: "K_" + specialChar,
+              text: specialChar,
+              sp: "1",
+              nextlayer: layerID
+            }
+            shiftKey['sk'].push(subkey);
           }
         } else {
           // Seriously, this should never happen.  It's here for the debugging log only.
@@ -349,75 +355,6 @@ namespace com.keyman.osk {
         }
         return s;
       }
-    }
-
-    /**
-     * Signifies whether or not the OSK facilitates AltGr / Right-alt emulation for this keyboard.
-     * @param   {Object=}   keyLabels
-     * @return  {boolean}
-     */
-    static emulatesAltGr(keyLabels?: KLS): boolean { // TODO:  typing for keyLabels (corresponds to KLS)
-      var layers;
-      let keyman = <KeymanBase> window['keyman'];
-      var activeKeyboard = keyman.textProcessor.activeKeyboard;
-      let modifierCodes = Codes.modifierCodes;
-
-      if(!activeKeyboard) {
-        // No Alt-Gr emulation if there's not actually a keyboard loaded.
-        return false;
-      }
-
-      // If we're not chiral, we're not emulating.
-      if(!activeKeyboard.isChiral) {
-        return false;
-      }
-
-      if(!keyLabels) {
-        if(activeKeyboard.legacyLayoutSpec == null) {
-          return false;
-        }
-        
-        layers = activeKeyboard.legacyLayoutSpec['KLS'];
-      } else {
-        layers = keyLabels;
-      }
-
-      var emulationMask = modifierCodes['LCTRL'] | modifierCodes['LALT'];
-
-      var unshiftedEmulationLayer = layers[Layouts.getLayerId(emulationMask)];
-      var shiftedEmulationLayer = layers[Layouts.getLayerId(modifierCodes['SHIFT'] | emulationMask)];
-      
-      // buildDefaultLayout ensures that these are aliased to the original modifier set being emulated.
-      // As a result, we can directly test for reference equality.
-      if(unshiftedEmulationLayer != null && 
-          unshiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'])]) {
-        return false;
-      }
-
-      if(shiftedEmulationLayer != null && 
-          shiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'] | modifierCodes['SHIFT'])]) {
-        return false;
-      }
-
-      // It's technically possible for the OSK to not specify anything while allowing chiral input.  A last-ditch catch:
-
-      var bitmask = activeKeyboard.modifierBitmask;
-      if((bitmask & emulationMask) != emulationMask) {
-        // At least one of the emulation modifiers is never used by the keyboard!  We can confirm everything's safe.
-        return true;
-      }
-
-      if(unshiftedEmulationLayer == null && shiftedEmulationLayer == null) {
-        // We've run out of things to go on; we can't detect if chiral AltGr emulation is intended or not.
-        // TODO:  handle this again!
-        // if(!osk.altGrWarning) {
-        //   console.warn("Could not detect if AltGr emulation is safe, but defaulting to active emulation!")
-        //   // Avoid spamming the console with warnings on every call of the method.
-        //   osk.altGrWarning = true;
-        // }
-        return true;
-      }
-      return true;
     }
 
     /**

@@ -136,9 +136,8 @@ namespace com.keyman.dom {
       if(activeKeyboard && activeKeyboard.isChiral) {
         s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
 
-        // Note for future - embedding a kill switch here or in keymanweb.osk.emulatesAltGr would facilitate disabling
-        // AltGr / Right-alt simulation.
-        if(osk.Layouts.emulatesAltGr() && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
+        // Note for future - embedding a kill switch here would facilitate disabling AltGr / Right-alt simulation.
+        if(activeKeyboard.emulatesAltGr && (s.Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
           s.Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
           s.Lmodifiers |= modifierCodes['RALT'];
         }
