@@ -3497,3 +3497,9 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 	SetFilePointer(hOutfile, 2, NULL, FILE_BEGIN);
 	return hOutfile;
 }
+
+extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
+  if (mode == 0) {
+    RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
+  }
+}

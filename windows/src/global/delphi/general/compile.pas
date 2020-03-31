@@ -147,6 +147,7 @@ const
 
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
+procedure Compiler_Diagnostic(mode: Integer);
 
 //
 // For unit tests, point to a known-current version of kmcmpdll.dll
@@ -263,6 +264,44 @@ begin
   end;
 
   Result := ckf(PAnsiChar(AnsiString(kmnFile)), buf, CompilerWarningsAsErrors, WarnDeprecatedCode, Callback, Target);  // I3310   // I4865   // I4866
+end;
+
+type
+  TKeyman_Diagnostic = procedure(mode: Integer); stdcall;
+
+procedure Compiler_Diagnostic(mode: Integer);
+var
+  s: string;
+  keyman_diagnostic: TKeyman_Diagnostic;
+begin
+  // Template copy verbatim from Compile functions; this needs refactoring
+  if HKMCmpDll = 0 then
+  begin
+    s := FUnitTestKMCmpDllPath;
+    if s = '' then
+    begin
+      s := GetDebugKMCmpDllPath;
+      if (s <> '') and not FileExists(s + kmcmpdll_lib) then   // I4770
+        s := '';
+      if s = '' then
+      begin
+        try
+          s := GetDeveloperRootPath;
+        except
+          s := '';
+        end;
+        if s = '' then s := ExtractFilePath(ParamStr(0));
+      end;
+    end;
+
+    HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
+    if HKMCmpDll = 0 then
+      Exit;
+  end;
+
+  @keyman_diagnostic := GetProcAddress(HKMCmpDll, 'Keyman_Diagnostic');
+  if Assigned(@keyman_diagnostic) then
+    keyman_diagnostic(0);
 end;
 
 initialization

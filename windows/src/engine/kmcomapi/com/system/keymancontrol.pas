@@ -147,6 +147,8 @@ type
     procedure EnableUserInterface; safecall;
     procedure UpdateTouchPanelVisibility(Value: Boolean); safecall;
 
+    procedure DiagnosticTestException; safecall;
+
     { IIntKeymanControl }
     procedure AutoApplyKeyman;
     procedure ApplyKeyman;
@@ -440,6 +442,11 @@ procedure TKeymanControl.RefreshWndProc(var Message: TMessage);
 begin
   with Message do
     Result := DefWindowProc(RefreshHandle, Msg, WParam, LParam);
+end;
+
+procedure TKeymanControl.DiagnosticTestException;
+begin
+  raise Exception.Create('Testing safecall wrappering of exception for Sentry');
 end;
 
 procedure TKeymanControl.DisableUserInterface;

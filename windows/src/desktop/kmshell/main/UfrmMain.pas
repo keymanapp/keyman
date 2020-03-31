@@ -168,6 +168,7 @@ uses
   KeyboardListXMLRenderer,
   Imm,
   initprog,
+  Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
   KeyNames,
   LanguagesXMLRenderer,
@@ -805,7 +806,10 @@ end;
 
 procedure TfrmMain.Support_Diagnostics;
 begin
-  kmcom.Control.OpenDiagnostics;
+  // Show the internal debug diagnostic tests form if Ctrl+Shift is down
+  if(GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0)
+    then TfrmDiagnosticTests.Run
+    else kmcom.Control.OpenDiagnostics;
 end;
 
 procedure TfrmMain.Support_Online;

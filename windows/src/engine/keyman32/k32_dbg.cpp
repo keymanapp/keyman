@@ -313,3 +313,9 @@ void _OutputThreadDebugString(char *s) {
   OutputDebugString(buf);
 }
 #endif
+
+void WINAPI Keyman_Diagnostic(int mode) {
+  if (mode == 0) {
+    RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
+  }
+}

@@ -203,6 +203,7 @@ object frmDiagnostics: TfrmDiagnostics
     end
     object mnuOptions: TMenuItem
       Caption = '&Options'
+      OnClick = mnuOptionsClick
       object mnuOptionsAdvancedView: TMenuItem
         Caption = '&Advanced View'
         OnClick = mnuOptionsAdvancedViewClick
@@ -215,6 +216,13 @@ object frmDiagnostics: TfrmDiagnostics
       object Reloadpage1: TMenuItem
         Caption = 'Reload page'
         ShortCut = 16466
+      end
+      object mnuOptionsDebugTests: TMenuItem
+        Caption = 'Debug Tests'
+        object mnuOptionsSentryExceptionTest: TMenuItem
+          Caption = 'Sentry Exception Test'
+          OnClick = mnuOptionsSentryExceptionTestClick
+        end
       end
     end
     object mnuHelp: TMenuItem

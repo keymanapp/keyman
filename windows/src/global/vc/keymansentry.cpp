@@ -223,5 +223,5 @@ int keyman_sentry_wmain(bool is_keyman_developer, const char *logger, int argc, 
 
 void keyman_sentry_test_crash() {
   fputs("Testing exception reporting:\n", stderr);
-  RaiseException(0x00000001, EXCEPTION_NONCONTINUABLE, 0, NULL);
+  RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
 }

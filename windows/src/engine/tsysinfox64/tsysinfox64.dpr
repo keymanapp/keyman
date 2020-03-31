@@ -28,6 +28,7 @@ begin
   TKeymanSentryClient.Start(TSentryClient, kscpDesktop, LOGGER_DESKTOP_ENGINE_TSYSINFOX64);
   try
     try
+      TKeymanSentryClient.Validate;
       Run;
     except
       on E: Exception do
