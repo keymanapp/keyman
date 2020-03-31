@@ -1469,11 +1469,16 @@ namespace com.keyman.dom {
      * @param       {Object}  arg     object array of user-defined properties
      * Description  KMW window initialization  
      */    
-    init: (arg:any) => Promise<any> = function(arg): Promise<any> { 
+    init: (arg:any) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
       var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
       var device = util.device;
+
+      // Set callbacks for proper feedback from web-core.
+      this.keyman.textProcessor.beepHandler = this.doBeep.bind(this);
+      this.keyman.textProcessor.warningLogger = console.warn.bind(console);
+      this.keyman.textProcessor.errorLogger = console.error.bind(console);
 
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 
@@ -1671,7 +1676,7 @@ namespace com.keyman.dom {
         } else {
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
-            if((<any>keyman).hideOnRelease && !osk.lgList) osk.hideNow();
+            if((<any>keyman).hideOnRelease && !osk['lgList']) osk.hideNow();
             (<any>keyman).hideOnRelease=false;
           };
           (<any>this.keyman).hideOskIfOnBody = function(e) {

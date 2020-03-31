@@ -14,6 +14,9 @@
 /// <reference path="engineDeviceSpec.ts" />
 
 namespace com.keyman.text {
+  export type BeepHandler = (outputTarget: OutputTarget) => void;
+  export type LogMessageHandler = (str: string) => void;
+
   export class LegacyKeyEvent {
     Ltarg: HTMLElement;
     Lcode: number;
@@ -40,6 +43,11 @@ namespace com.keyman.text {
 
     baseLayout: string;
     private keyboard: keyboards.Keyboard;
+
+    // Callbacks for various feedback types
+    beepHandler?: BeepHandler;
+    warningLogger?: LogMessageHandler;
+    errorLogger?: LogMessageHandler;
 
     constructor(baseLayout?: string) {
       this.baseLayout = baseLayout || 'us'; // default BaseLayout
@@ -356,7 +364,7 @@ namespace com.keyman.text {
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
-        ruleBehavior.finalize();
+        ruleBehavior.finalize(this);
 
         // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
         //

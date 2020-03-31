@@ -33,28 +33,25 @@ namespace com.keyman.text {
      */
     warningLog?: string;
 
-    finalize() {
-      // TODO:  Rework logging and references to be fully headless-compatible.  
-      //        We'll probably need warning/error callbacks on Processor to facilitate that.
-      let keyman = com.keyman.singleton;
+    finalize(processor: Processor) {
       let outputTarget = this.transcription.keystroke.Ltarg;
 
-      if(this.beep) {
-        // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-        //        We're still referencing the DOM, even if only the manager object.  (It's an improvement, at least.)
-        keyman.domManager.doBeep(outputTarget);
+      if(processor.beepHandler && this.beep) {
+        processor.beepHandler(outputTarget);
       }
 
       for(let storeID in this.setStore) {
-        let sysStore = keyman.textProcessor.keyboardInterface.systemStores[storeID];
+        let sysStore = processor.keyboardInterface.systemStores[storeID];
         if(sysStore) {
           try {
             sysStore.set(this.setStore[storeID]);
           } catch (error) {
-            console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+            if(processor.errorLogger) {
+              processor.errorLogger("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+            }
           }
-        } else {
-          console.warn("Unknown store affected by keyboard rule: " + storeID);
+        } else if(processor.warningLogger) {
+          processor.warningLogger("Unknown store affected by keyboard rule: " + storeID);
         }
       }
 
@@ -65,11 +62,10 @@ namespace com.keyman.text {
         DefaultOutput.applyCommand(keyEvent);
       }
 
-      // Safe both in browser and Node contexts.
-      if(this.warningLog) {
-        console.warn(this.warningLog);
-      } else if(this.errorLog) {
-        console.error(this.errorLog);
+      if(processor.warningLogger && this.warningLog) {
+        processor.warningLogger(this.warningLog);
+      } else if(processor.errorLogger && this.errorLog) {
+        processor.errorLogger(this.errorLog);
       }
     }
   }
