@@ -469,7 +469,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.textProcessor.setNumericLayer();
+      this.textProcessor.setNumericLayer(this.util.device.coreSpec);
     };
 
     /**

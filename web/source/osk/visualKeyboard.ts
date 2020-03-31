@@ -427,12 +427,13 @@ namespace com.keyman.osk {
 
     getId(osk: VisualKeyboard): string {
       let spec = this.spec;
+      let processor = com.keyman.singleton.textProcessor;
       // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
       if(typeof(this.layer) == 'string' && this.layer != '') {
         return 'popup-'+this.layer+'-'+spec['id'];
       } else {
         // We only create subkeys when they're needed - the currently-active layer should be fine.
-        return 'popup-' + osk.layerId + '-'+spec['id'];
+        return 'popup-' + processor.layerId + '-'+spec['id'];
       }
     }
 
@@ -528,7 +529,7 @@ namespace com.keyman.osk {
      */
     layout: keyboards.ActiveLayout;
     layers: keyboards.LayoutLayer[];
-    layerId: string = "default";
+    private layerId: string = "default";
     layerIndex: number;
 
     device: Device;
@@ -603,6 +604,8 @@ namespace com.keyman.osk {
       // Do normal constructor stuff.
 
       let keyman = com.keyman.singleton;
+      // Ensure the OSK's current layer is kept up to date.
+      keyman.textProcessor.layerStore.handler = this.layerChangeHandler;
 
       let util = keyman.util;
       this.device = device = device || util.device;
@@ -876,6 +879,16 @@ namespace com.keyman.osk {
       return lDiv;
     }
     //#endregion
+
+    layerChangeHandler: text.SystemStoreMutationHandler = function(this: VisualKeyboard,
+                                                                   source: text.MutableSystemStore,
+                                                                   newValue: string) {
+      if(source.value != newValue) {
+        this.layerId = newValue;
+        let keyman = com.keyman.singleton;
+        keyman.osk._Show();
+      }
+    }.bind(this);
 
     //#region OSK touch handlers
     getTouchCoordinatesOnKeyboard(touch: Touch) {
@@ -1865,35 +1878,6 @@ namespace com.keyman.osk {
 
       // Define for both desktop and touchable OSK
       this.spaceBar=this.getSpecialKey(nLayer,'K_SPACE'); //TODO: should be saved with layer
-    }
-
-    /**
-     * Function     showLayer
-     * Scope        Private
-     * @param       {string}      id      ID of the layer to show
-     * @return      {boolean}             true if the layer is shown, or false if it cannot be found
-     * Description  Shows the layer identified by 'id' in the on screen keyboard
-     */
-    showLayer(id: string): boolean {
-      let keyman = com.keyman.singleton;
-
-      // Do not change layer unless needed (27/08/2015)
-      if(id == this.layerId && this.device.formFactor != 'desktop') {
-        // The layer's already shown, so report success.
-        return true;
-      }
-
-      if(keyman.textProcessor.activeKeyboard) {
-        for(var i=0; i<this.layers.length; i++) {
-          if(this.layers[i].id == id) {
-            this.layerId=id;
-            keyman.osk._Show();
-            return true;
-          }
-        }
-      }
-
-      return false;
     }
 
     /**

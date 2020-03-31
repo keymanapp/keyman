@@ -53,7 +53,7 @@ namespace com.keyman.text {
         // How would this be handled in an eventual headless mode?
         switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
           case KeyboardInterface.TSS_LAYER:
-            keyman.osk.vkbd.showLayer(this.setStore[storeID]); //Build 350, osk reference now OK, so should work
+            keyman.textProcessor.layerId = this.setStore[storeID];
             break;
           case KeyboardInterface.TSS_PLATFORM:
             console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");

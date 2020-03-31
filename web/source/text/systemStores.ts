@@ -24,11 +24,11 @@ namespace com.keyman.text {
    * @param newValue  The new value being set
    * @returns         `false` / `undefined` to allow the change, `true` to block the change.
    */
-  export type SystemStoreChangedHandler = (source: MutableSystemStore, newValue: string) => boolean;
+  export type SystemStoreMutationHandler = (source: MutableSystemStore, newValue: string) => boolean;
 
   export class MutableSystemStore extends SystemStore {
     private _value: string;
-    handler?: SystemStoreChangedHandler = null;
+    handler?: SystemStoreMutationHandler = null;
 
     constructor(id: number, defaultValue: string) {
       super(id);
