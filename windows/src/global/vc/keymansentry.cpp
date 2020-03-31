@@ -3,17 +3,41 @@
 #include <keymansentry.h>
 #include <keymanversion.h>
 #include <sentry.h>
+#include <registry.h>
 
 #define SENTRY_DSN_DESKTOP   "https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5"
 #define SENTRY_DSN_DEVELOPER "https://39b25a09410349a58fe12aaf721565af@sentry.keyman.com/6"
 
+bool g_report_exceptions, g_report_messages;
+
 int keyman_sentry_init(bool is_keyman_developer) {
   sentry_options_t *options = sentry_options_new();
+  const char *key;
 
   if (is_keyman_developer) {
     sentry_options_set_dsn(options, SENTRY_DSN_DEVELOPER);
+    key = REGSZ_IDEOptions_CU;
   } else {
     sentry_options_set_dsn(options, SENTRY_DSN_DESKTOP);
+    key = REGSZ_KeymanCU;
+  }
+
+  HKEY hkey;
+  if (RegOpenKeyExA(HKEY_CURRENT_USER, key, 0, KEY_READ, &hkey) == ERROR_SUCCESS) {
+    DWORD dwType, dwValue, dwValueSize = 4;
+
+    g_report_exceptions = 
+      RegQueryValueExA(hkey, REGSZ_AutomaticallyReportErrors, NULL, &dwType, (LPBYTE)&dwValue, &dwValueSize) != ERROR_SUCCESS || dwType != REG_DWORD || dwValue != 0;
+
+    dwValueSize = 4;
+    g_report_messages =
+      RegQueryValueExA(hkey, REGSZ_AutomaticallyReportUsage, NULL, &dwType, (LPBYTE)&dwValue, &dwValueSize) != ERROR_SUCCESS || dwType != REG_DWORD || dwValue != 0;
+
+    RegCloseKey(hkey);
+  }
+  else {
+    g_report_exceptions = true;
+    g_report_messages = true;
   }
 
   sentry_options_set_release(options, KEYMAN_VersionWithTag);
@@ -76,56 +100,60 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
   sentry_value_t event;
   const int FRAMES_TO_SKIP = 0;
 
-  event = sentry_value_new_event();
+  if (g_report_exceptions) {
+    event = sentry_value_new_event();
 
-  char message[64];
-  wsprintfA(message, "Exception %x at %p", ExceptionCode, ExceptionAddress);
+    char message[64];
+    wsprintfA(message, "Exception %x at %p", ExceptionCode, ExceptionAddress);
 
-  /*
-  When we set exception information, the report is corrupted. Not sure why. So
-  for now we won't create as an exception event. We still get all the information
-  we want from this.
+    /*
+    When we set exception information, the report is corrupted. Not sure why. So
+    for now we won't create as an exception event. We still get all the information
+    we want from this.
 
-  Investigating this further.
+    Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
 
-  sentry_value_t exc = sentry_value_new_object();
-  sentry_value_set_by_key(exc, "type", sentry_value_new_string("Exception"));
-  sentry_value_set_by_key(exc, "value", sentry_value_new_string(message));
-  sentry_value_set_by_key(event, "exception", exc);*/
-  sentry_value_set_by_key(event, "message", sentry_value_new_string(message));
+    sentry_value_t exc = sentry_value_new_object();
+    sentry_value_set_by_key(exc, "type", sentry_value_new_string("Exception"));
+    sentry_value_set_by_key(exc, "value", sentry_value_new_string(message));
+    sentry_value_set_by_key(event, "exception", exc);*/
+    sentry_value_set_by_key(event, "message", sentry_value_new_string(message));
 
-  //sentry_event_value_add_stacktrace(event, &ExceptionAddress, 64);
-  sentry_value_t threads = CaptureStackTrace(ExceptionAddress, FRAMES_TO_SKIP);
-  if (threads._bits != 0) {
-    sentry_value_set_by_key(event, "threads", threads);
+    //sentry_event_value_add_stacktrace(event, &ExceptionAddress, 64);
+    sentry_value_t threads = CaptureStackTrace(ExceptionAddress, FRAMES_TO_SKIP);
+    if (threads._bits != 0) {
+      sentry_value_set_by_key(event, "threads", threads);
+    }
+
+    sentry_capture_event(event);
+
+    perror(message);
   }
-
-  sentry_capture_event(event);
-
-  perror(message);
 }
 
 void keyman_sentry_report_message(keyman_sentry_level_t level, const char *logger, const char *message, bool includeStack) {
   const int FRAMES_TO_SKIP = 0;
 
-  sentry_value_t event;
+  if ((g_report_exceptions && (level == SENTRY_LEVEL_ERROR || level == SENTRY_LEVEL_DEBUG)) || g_report_messages) {
+    sentry_value_t event;
 
-  event = sentry_value_new_event();
+    event = sentry_value_new_event();
 
-  event = sentry_value_new_message_event(
-    /*level  */ sentry_level_t(level),
-    /*logger */ logger,
-    /*message*/ message
-  );
+    event = sentry_value_new_message_event(
+      /*level  */ sentry_level_t(level),
+      /*logger */ logger,
+      /*message*/ message
+    );
 
-  if (includeStack) {
-    sentry_value_t threads = CaptureStackTrace(NULL, FRAMES_TO_SKIP);
-    if (threads._bits != 0) {
-      sentry_value_set_by_key(event, "threads", threads);
+    if (includeStack) {
+      sentry_value_t threads = CaptureStackTrace(NULL, FRAMES_TO_SKIP);
+      if (threads._bits != 0) {
+        sentry_value_set_by_key(event, "threads", threads);
+      }
     }
-  }
 
-  sentry_capture_event(event);
+    sentry_capture_event(event);
+  }
 }
 
 /* Wrappers for main, wmain */
@@ -138,10 +166,13 @@ LONG WINAPI FilterExceptions(_In_ struct _EXCEPTION_POINTERS *ExceptionInfo) {
   return EXCEPTION_EXECUTE_HANDLER;
 }
 
+void keyman_sentry_setexceptionfilter() {
+  LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
+}
 
 int keyman_sentry_main(bool is_keyman_developer, int argc, char *argv[], int (*run)(int, char**)) {
   keyman_sentry_init(is_keyman_developer);
-  LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
+  keyman_sentry_setexceptionfilter();
 
   int res = run(argc, argv);
 
@@ -152,7 +183,7 @@ int keyman_sentry_main(bool is_keyman_developer, int argc, char *argv[], int (*r
 
 int keyman_sentry_wmain(bool is_keyman_developer, int argc, wchar_t *argv[], int(*run)(int, wchar_t**)) {
   keyman_sentry_init(is_keyman_developer);
-  LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
+  keyman_sentry_setexceptionfilter();
 
   int res = run(argc, argv);
 

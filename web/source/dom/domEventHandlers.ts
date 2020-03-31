@@ -256,11 +256,7 @@ namespace com.keyman.dom {
       }
 
       this.doChangeEvent(Ltarg);
-      let outputTarget = text.Processor.getOutputTarget(Ltarg as HTMLElement);
-      if(outputTarget) {
-        outputTarget.resetContext();
-      }
-      this.keyman.textProcessor.resetContext();
+      this.keyman['resetContext']();
 
       return true;
     }.bind(this);
@@ -713,11 +709,7 @@ namespace com.keyman.dom {
         elem = e.relatedTarget as HTMLElement;
       }
 
-      let outputTarget = text.Processor.getOutputTarget(elem);
-      if(outputTarget) {
-        outputTarget.resetContext();
-      }
-      this.keyman.textProcessor.resetContext();
+      this.keyman['resetContext']();
 
       if(elem) {
         this.doChangeEvent(elem);

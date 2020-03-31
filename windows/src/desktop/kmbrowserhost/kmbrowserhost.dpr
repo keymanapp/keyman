@@ -8,7 +8,6 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',

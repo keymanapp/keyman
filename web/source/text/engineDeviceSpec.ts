@@ -36,7 +36,7 @@ namespace com.keyman.text {
     readonly touchable: boolean;
 
     constructor(browser: string, formFactor: string, OS: string, touchable: boolean) {
-      switch(browser as Browser) {
+      switch(browser.toLowerCase() as Browser) {
         case Browser.Chrome:
         case Browser.Edge:
         case Browser.Firefox:
@@ -49,7 +49,7 @@ namespace com.keyman.text {
           this.browser = Browser.Other;
       }
 
-      switch(formFactor.toLowerCase()) {
+      switch(formFactor.toLowerCase() as FormFactor) {
         case FormFactor.Desktop:
         case FormFactor.Phone:
         case FormFactor.Tablet:
@@ -59,7 +59,7 @@ namespace com.keyman.text {
           throw ("Invalid form factor specified for device: " + formFactor);
       }
 
-      switch(OS.toLowerCase()) {
+      switch(OS.toLowerCase() as OperatingSystem) {
         case OperatingSystem.Windows.toLowerCase():
         case OperatingSystem.macOS.toLowerCase():
         case OperatingSystem.Linux.toLowerCase():

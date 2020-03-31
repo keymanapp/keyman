@@ -26,7 +26,6 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',

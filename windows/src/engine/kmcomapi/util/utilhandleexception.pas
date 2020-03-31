@@ -32,79 +32,78 @@ implementation
 
 uses
   System.Classes,
+  System.JSON,
   Winapi.Windows,
 
-  ErrLogPath,
+  KeymanPaths,
+  JsonUtil,
   KLog,
   utildir,
   VersionInfo;
 
-function ConvertedExceptAddr(ExceptAddr: Pointer): Pointer;
+function RtlCaptureStackBackTrace(FramesToSkip, FramesToCapture: DWORD; BackTrace: Pointer; BackTraceHash: PDWORD): WORD; stdcall; external 'ntdll.dll';
 
-  function GetLogicalAddr( Address: Pointer ): Pointer;
-  const
-    CODE_OFFSET = $1000;
-  begin
-  {
-    hard-coded $1000 instead of more correct FPImgHdr^.OptionalHeader.BaseOfCode
-    because there are problems with corrupted header in packed EXEs
-    BTW Inprise linkers always set code base = $1000 :)
-  }
-    if Address <> nil then Result := Pointer(Cardinal(Address)-CODE_OFFSET)
-                      else Result := nil;
-  end;
-
+//
+// Capture a stack trace and include the offending crash address at the top of
+// the trace. Apart from skipping frames and the inclusion of TopAddr, this is
+// very similar to sentry_event_value_add_stacktrace.
+//
+function CaptureStackTrace(TopAddr: Pointer; FramesToSkip: DWORD): TJSONArray;
 var
-  Info: TMemoryBasicInformation;
+  walked_backtrace: array[0..255] of Pointer;
+  frameCount: Word;
+  i: Integer;
 begin
-  VirtualQuery(ExceptAddr, Info, sizeof(Info));
-  if Info.State <> MEM_COMMIT then
-    Result := GetLogicalAddr(ExceptAddr)
-  else
-    Result := GetLogicalAddr( Pointer(Integer(ExceptAddr)-Integer(Info.AllocationBase)) );
+  Result := TJSONArray.Create;
+
+  frameCount := RtlCaptureStackBackTrace(FramesToSkip, 256, @walked_backtrace[0], nil);
+  if frameCount = 0 then
+    Exit;
+
+  for i := Integer(frameCount) - 1 downto 0 do
+    Result.Add(Format('0x%x', [NativeUInt(walked_backtrace[i])]));
+
+  // Insert the except address at the top of the stack
+  if TopAddr <> nil then
+    Result.Add(Format('0x%x', [NativeUInt(TopAddr)]));
 end;
 
 procedure LogException(const SourceClassName: string; E: Exception; ExceptAddr: Pointer);
-{$IFDEF CPUX64}
+const
+  Size = 1024;
 var
-  msg, errlogfile: string;
   errlog: TStringList;
+  errlogfile: string;
+  stack: TJSONArray;
+  o: TJSONObject;
+  Buffer: array[0..Size-1] of Char;
 begin
+  stack := CaptureStackTrace(ExceptAddr, 0);
+
+  errlog := TStringList.Create;
   try
-    if E = nil
-      then msg := Format('Exception in %s at %p', [SourceClassName, ConvertedExceptAddr(ExceptAddr)])
-      else msg := Format('Exception in %s at %p (%s): %s', [SourceClassName, ConvertedExceptAddr(ExceptAddr), E.ClassName, (E as Exception).Message]);
-    KL.LogError(msg);
+    errlogfile := TKeymanPaths.ErrorLogPath('kmcomapi');  // I2824
 
-    errlog := TStringList.Create;
+    o := TJSONObject.Create;
+    o.AddPair('sourceClassName', SourceClassName);
+    o.AddPair('exception', E.ClassName);
+
+    if ExceptionErrorMessage(E, ExceptAddr, Buffer, Size) > 0
+      then o.AddPair('message', Buffer)
+      else o.AddPair('message', E.Message);
+    o.AddPair('stack', stack);
+    PrettyPrintJSON(o, errlog, 2);
+
+    with TStringStream.Create(errlog.Text, TEncoding.UTF8) do
     try
-      errlogfile := GetErrLogFileName('kmcomapi');  // I2824
-
-      errlog.Text :=
-        'Crash Identifier: kmcomapi.dll_'+GetVersionString+'_'+IntToHex(Integer(ExceptAddr),8)+#13#10#13#10+
-        'KMCOMAPI EXCEPTION AT '+FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + #13#10 +
-        'kmcomapi.dll version ' + GetVersionString + #13#10 +
-        msg + #13#10#13#10;
-
-      if FileExists(errlogfile) then
-        with TStringList.Create do
-        try
-          LoadFromFile(errlogfile);  // use prolog encoding
-          errlog.Text := Text + errlog.Text;
-        finally
-          Free;
-        end;
-      errlog.SaveToFile(errlogfile, TEncoding.UTF8);  // I3337
+      // Use TStringStream to avoid BOM from TStringList
+      SaveToFile(errlogfile);
     finally
-      errlog.Free;
+      Free;
     end;
-  except
-    ;
+  finally
+    errlog.Free;
   end;
-{$ELSE}
-begin
-  {$MESSAGE HINT 'TODO: Write a raw call stack to diag folder which can then be sucked in by client app and reported'}
-{$ENDIF}
 end;
 
 procedure LogException(E: Exception);

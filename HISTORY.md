@@ -1,5 +1,34 @@
 # Keyman Version History
 
+## 14.0.40 alpha 2020-03-30
+
+* fix(developer): use correct registry types for sentry options (#2912)
+* fix(windows): replaces empty eventid with underscore when autoreport errors off (#2913)
+* refactor(web): namespacing DOM-focused management (#2891)
+* refactor(web/engine): starts DOM pre-processor (#2892)
+* refactor(web): starts OSK preprocessor (#2893)
+* refactor(web): headless device representation (#2894)
+* refactor(web): cleanup for Processor.processKeyEvent (#2899)
+* chore(common): Cleanup unused folders and update README (#2916)
+
+## 14.0.39 alpha 2020-03-29
+
+* feat(windows): user control for upload to sentry (#2900)
+
+## 14.0.38 alpha 2020-03-28
+
+* feat(ios): Add Crowdin CLI for iOS strings (#2905)
+
+## 14.0.37 alpha 2020-03-27
+
+* feat(windows): crash reports in CEF (#2887)
+* feat(common): Use Crowdin CLI (v3) for handling l10n files (#2895)
+* fix(windows): show error if tsysinfo fails to start; kmcomapi reporting (#2897)
+
+## 14.0.36 alpha 2020-03-26
+
+* fix(web/engine): Fixes default key lookup returns (#2890)
+
 ## 14.0.35 alpha 2020-03-25
 
 * feat(windows): new error notification dialog (#2875)

@@ -25,7 +25,6 @@ uses
   UfrmRunDesktop in 'UfrmRunDesktop.pas' {frmRunDesktop},
   UfrmInstallOptions in 'UfrmInstallOptions.pas' {frmInstallOptions},
   RunTools in 'RunTools.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   ShellUserRegistry in '..\..\global\delphi\general\ShellUserRegistry.pas',
   RegistryHelpers in 'RegistryHelpers.pas',
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',

@@ -66,7 +66,6 @@ type
 implementation
 
 uses
-  ErrLogPath,
   GlobalProxySettings,
   Math,
   UfrmProgress,

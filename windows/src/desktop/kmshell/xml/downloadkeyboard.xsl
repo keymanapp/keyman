@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
-  
+
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:include href="elements.xsl"/>
 
   <xsl:variable name="locale_downloadkeyboard" select="$locale/Dialog[@Id='DownloadKeyboard'][1]" />
-  
+
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
         <title><xsl:value-of select="$locale/String[@Id='S_DownloadKeyboard_Title']"/></title>
-        
+
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <style type="text/css">
             * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; }
-            
-            body { 
-              padding: 0px; margin: 0px; overflow: hidden; 
-              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px; 
+
+            body {
+              padding: 0px; margin: 0px; overflow: hidden;
+              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px;
               height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
             }
             html { width: 100%; padding: 0px; margin: 0px; overflow: hidden }
-            
+
             #size {
               position: absolute;
-              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px; 
+              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px;
               height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
             }
 
@@ -58,7 +59,7 @@
 		event.cancelBubble = true; event.returnValue = false;
   }
 ]]></script>
-				
+
       </head>
       <body>
         <div id="size"></div>

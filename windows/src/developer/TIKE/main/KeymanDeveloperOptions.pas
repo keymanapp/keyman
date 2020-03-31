@@ -1,18 +1,18 @@
 (*
   Name:             TikeOptions
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     04 Dec 2006 - mcdurdin - Add AllowMultipleInstances
                     23 Aug 2007 - mcdurdin - Remove unused options; I927 - add external editor
@@ -62,6 +62,8 @@ type
     FDebuggerAutoResetBeforeCompiling: Boolean;
     FAutoSaveBeforeCompiling: Boolean;
     FOSKAutoSaveBeforeImporting: Boolean;
+    FReportErrors: Boolean;
+    FReportUsage: Boolean;
     procedure CloseRegistry;
     procedure OpenRegistry;
     function regReadString(const nm, def: string): string;
@@ -94,6 +96,9 @@ type
     property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
     property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
     property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
+
+    property ReportErrors: Boolean read FReportErrors write FReportErrors;
+    property ReportUsage: Boolean read FReportUsage write FReportUsage;
 
     property WebHostDefaultPort: Integer read FWebHostDefaultPort write FWebHostDefaultPort;   // I4021
 
@@ -131,7 +136,9 @@ const
 implementation
 
 uses
+  System.Math,
   Winapi.ShlObj,
+
   utilsystem,
   OnlineConstants,
   GetOSVersion;
@@ -213,6 +220,14 @@ begin
     FFix183_LadderLength := regReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
 
     FDefaultProjectPath := IncludeTrailingPathDelimiter(regReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
+
+    // for consistency with Keyman.System.KeymanSentryClient, we need to use
+    // reg.ReadInteger, as regReadInt, which in the dim dark past started
+    // to read integers as a REG_SZ type and that's far too messy to change now.
+    FReportErrors := not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
+      (reg.ReadInteger(SRegValue_AutomaticallyReportErrors) <> 0);
+    FReportUsage := not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
+      (reg.ReadInteger(SRegValue_AutomaticallyReportUsage) <> 0);
   finally
     CloseRegistry;
   end;
@@ -257,6 +272,12 @@ begin
     regWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
 
     regWriteString(SRegValue_IDEOpt_DefaultProjectPath, FDefaultProjectPath);
+
+    // for consistency with Keyman.System.KeymanSentryClient, we need to use
+    // reg.WriteInteger, as regWriteInt, which in the dim dark past started
+    // to write integers as a REG_SZ type and that's far too messy to change now.
+    reg.WriteInteger(SRegValue_AutomaticallyReportErrors, IfThen(FReportErrors, 1, 0));
+    reg.WriteInteger(SRegValue_AutomaticallyReportUsage, IfThen(FReportUsage, 1, 0));
   finally
     CloseRegistry;
   end;

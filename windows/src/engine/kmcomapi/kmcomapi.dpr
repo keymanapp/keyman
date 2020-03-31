@@ -112,7 +112,6 @@ uses
   UnicodeBlocks in '..\..\global\delphi\general\UnicodeBlocks.pas' { UnicodeBlock: CoClass},
   IntegerArray in '..\..\global\delphi\general\IntegerArray.pas',
   KeymanControlMessages in '..\..\global\delphi\general\KeymanControlMessages.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   internalinterfaces in 'util\internalinterfaces.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',

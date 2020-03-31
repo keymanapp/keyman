@@ -18,4 +18,5 @@ void keyman_sentry_shutdown();
 int keyman_sentry_main(bool is_keyman_developer, int argc, char *argv[], int(*run)(int, char**));
 int keyman_sentry_wmain(bool is_keyman_developer, int argc, wchar_t *argv[], int(*run)(int, wchar_t**));
 
+void keyman_sentry_setexceptionfilter();
 void keyman_sentry_report_message(keyman_sentry_level_t level, const char *logger, const char *message, bool includeStack = false);

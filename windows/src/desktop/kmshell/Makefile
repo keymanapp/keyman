@@ -15,7 +15,7 @@ build: version.res manifest.res icons xml
 icons:
     rc icons.rc
 
-xml:
+xml: sentry-init.js
     cd $(ROOT)\src\desktop\kmshell\xml
     -del /q $(ROOT)\bin\desktop\xml\*
     copy * $(ROOT)\bin\desktop\xml\   #
@@ -23,6 +23,10 @@ xml:
     -rmdir /S /Q $(ROOT)\bin\desktop\locale
     mkdir $(ROOT)\bin\desktop\locale
     xcopy /S /I $(ROOT)\src\desktop\kmshell\locale $(ROOT)\bin\desktop\locale\
+
+sentry-init.js:
+    cd $(ROOT)\src\desktop\kmshell\xml
+    $(MKVER_U) sentry.init.js.in sentry.init.js
 
 clean: def-clean
     if exist MessageIdentifiers.pas del MessageIdentifiers.pas

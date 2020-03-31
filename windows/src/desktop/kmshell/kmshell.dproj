@@ -197,7 +197,6 @@
         <DCCReference Include="..\..\global\delphi\general\utilcheckfonts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\wininet5.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GlobalProxySettings.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\ErrLogPath.pas"/>
         <DCCReference Include="..\..\global\delphi\ui\UFixupMissingFile.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards.pas"/>
         <DCCReference Include="main\UImportOlderKeyboardUtils.pas"/>
@@ -395,15 +394,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
