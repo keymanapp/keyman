@@ -1,7 +1,7 @@
 namespace com.keyman.dom {
   export class VariableStoreCookieSerializer implements text.VariableStoreSerializer {
-    loadStore(kbdName: string, storeName: string): text.VariableStore {
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName;
+    loadStore(keyboardID: string, storeName: string): text.VariableStore {
+      var cName='KeymanWeb_'+keyboardID+'_Option_'+storeName;
       let map = com.keyman.singleton.util.loadCookie(cName) as text.VariableStore;
 
       if(typeof map[storeName] != 'undefined') {
@@ -12,9 +12,9 @@ namespace com.keyman.dom {
       return map || {};
     }
     
-    saveStore(kbdName: string, storeName: string, storeMap: text.VariableStore) {
+    saveStore(keyboardID: string, storeName: string, storeMap: text.VariableStore) {
       // The cookie entry includes the store name...
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName;
+      var cName='KeymanWeb_'+keyboardID+'_Option_'+storeName;
       storeMap[storeName] = encodeURIComponent(storeMap[storeName]);
 
       // And the lookup under that entry looks for the value under the store name, again.

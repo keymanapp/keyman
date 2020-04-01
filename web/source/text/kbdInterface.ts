@@ -926,7 +926,15 @@ namespace com.keyman.text {
       // And the lookup under that entry looks for the value under the store name, again.
       let valueObj: VariableStore = {};
       valueObj[storeName] = optValue;
-      this.ruleBehavior.saveStore[storeName] = valueObj;
+
+      // Null-check in case of invocation during unit-test
+      if(this.ruleBehavior) {
+        this.ruleBehavior.saveStore[storeName] = valueObj;
+      } else {
+        // We're in a unit-test environment, directly invoking this method from outside of a keyboard.
+        // In this case, we should immediately commit the change.
+        this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, this.saveStore[storeName]);
+      }
       return true;
     }
 

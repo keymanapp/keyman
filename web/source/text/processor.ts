@@ -18,8 +18,8 @@ namespace com.keyman.text {
   export type LogMessageHandler = (str: string) => void;
 
   export interface VariableStoreSerializer {
-    loadStore(kbdName: string, storeName: string): VariableStore;
-    saveStore(kbdName: string, storeName: string, storeMap: VariableStore);
+    loadStore(keyboardID: string, storeName: string): VariableStore;
+    saveStore(keyboardID: string, storeName: string, storeMap: VariableStore);
   }
 
   export interface ProcessorInitOptions {
