@@ -1269,6 +1269,7 @@ public final class KMManager {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       Intent i = new Intent(context, KeyboardPickerActivity.class);
       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+      i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       i.putExtra(KMKey_DisplayKeyboardSwitcher, false);
       context.startActivity(i);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
