@@ -933,7 +933,7 @@ namespace com.keyman.text {
       } else {
         // We're in a unit-test environment, directly invoking this method from outside of a keyboard.
         // In this case, we should immediately commit the change.
-        this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, this.saveStore[storeName]);
+        this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, valueObj);
       }
       return true;
     }
