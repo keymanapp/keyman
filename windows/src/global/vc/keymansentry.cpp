@@ -39,7 +39,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
     *p = 0;
   }
 
-  strcat(szPath, "keyman-sentry-db");
+  strcat_s(szPath, "keyman-sentry-db");
   sentry_options_set_database_path(options, szPath);
 
   // We don't currently need to set this, because it will be same path
