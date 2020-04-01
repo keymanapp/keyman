@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.42 alpha 2020-04-01
+
+* fix(android): Fix globe button crash on 3rd party apps (#2930)
+* modify(android) Install default asset kmp's (#2928)
+
 ## 14.0.41 alpha 2020-03-31
 
 * refactor(web/engine): KeyboardInterface/Processor cleanup and prep (#2901)
