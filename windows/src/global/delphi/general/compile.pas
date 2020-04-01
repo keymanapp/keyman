@@ -175,13 +175,10 @@ type
     CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL;   // I4865   // I4866
     CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;         // TODO: K9: Convert to Unicode
 
-function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer;   // I4865   // I4866
+function LoadCompiler(CallBack: TCompilerCallback = nil): Boolean;
 var
-  ckf: TCompileKeyboardFile;
   s: string;
 begin
-  //Result := 0;
-
   if HKMCmpDll = 0 then
   begin
     s := FUnitTestKMCmpDllPath;
@@ -204,13 +201,23 @@ begin
     HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
     if HKMCmpDll = 0 then
     begin
-      Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+kmcmpdll_lib+'.  '+   // I4706
-        'Check that '+kmcmpdll_lib+' is in the program directory '+
-        'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-      Result := -1;
-      Exit;
+      if Assigned(Callback) then
+        Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+kmcmpdll_lib+'.  '+   // I4706
+          'Check that '+kmcmpdll_lib+' is in the program directory '+
+          'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
+      Exit(False);
     end;
   end;
+  Result := True;
+end;
+
+function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer;   // I4865   // I4866
+var
+  ckf: TCompileKeyboardFile;
+begin
+  //Result := 0;
+
+  if not LoadCompiler(Callback) then Exit(-1);
 
   @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFile');
   if not Assigned(@ckf) then
@@ -227,33 +234,10 @@ end;
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer;   // I4865   // I4866
 var
   ckf: TCompileKeyboardFileToBuffer;
-  s: string;
 begin
   //Result := 0;
 
-  if HKMCmpDll = 0 then
-  begin
-    s := GetDebugKMCmpDllPath;
-    if s = '' then
-    begin
-      try
-        s := GetDeveloperRootPath;
-      except
-        s := '';
-      end;
-      if s = '' then s := ExtractFilePath(ParamStr(0));
-    end;
-
-    HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
-    if HKMCmpDll = 0 then
-    begin
-      Callback(0, $8000, PAnsiChar(AnsiString('Could not load the compiler library '+s+kmcmpdll_lib+'.  '+   // I4706
-        'Check that '+kmcmpdll_lib+' is in the program directory '+
-        'and that it is not corrupt.'#13#10+'Windows error message: '+SysErrorMessage(GetLastError))));
-      Result := -1;
-      Exit;
-    end;
-  end;
+  if not LoadCompiler(Callback) then Exit(-1);
 
   @ckf := GetProcAddress(HKMCmpDll, 'CompileKeyboardFileToBuffer');
   if not Assigned(@ckf) then
@@ -272,33 +256,9 @@ type
 
 function Compiler_Diagnostic(mode: Integer): Integer;
 var
-  s: string;
   keyman_diagnostic: TKeyman_Diagnostic;
 begin
-  // Template copy verbatim from Compile functions; this needs refactoring
-  if HKMCmpDll = 0 then
-  begin
-    s := FUnitTestKMCmpDllPath;
-    if s = '' then
-    begin
-      s := GetDebugKMCmpDllPath;
-      if (s <> '') and not FileExists(s + kmcmpdll_lib) then   // I4770
-        s := '';
-      if s = '' then
-      begin
-        try
-          s := GetDeveloperRootPath;
-        except
-          s := '';
-        end;
-        if s = '' then s := ExtractFilePath(ParamStr(0));
-      end;
-    end;
-
-    HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
-    if HKMCmpDll = 0 then
-      Exit(1);
-  end;
+  if not LoadCompiler then Exit(-1);
 
   @keyman_diagnostic := GetProcAddress(HKMCmpDll, 'Keyman_Diagnostic');
   if Assigned(@keyman_diagnostic) then
@@ -321,6 +281,9 @@ begin
 end;
 
 initialization
+  // We want to early load the compiler because we need it loaded for
+  // sentry symbolication: https://github.com/getsentry/sentry-native/issues/213
+  LoadCompiler;
 
 finalization
   if HKMCmpDll > 0 then
