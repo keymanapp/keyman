@@ -1,6 +1,6 @@
 {$D-} // Don't include debug information
 // Delphi translation of sentry.h
-// Sentry Native API 0.2.2
+// Sentry Native API 0.2.2 @ eb73904a8700fcf67e632a8c7d71174d214a344c
 // https://github.com/getsentry/sentry-native
 unit sentry;
 
@@ -383,6 +383,7 @@ type
 {$IF DEFINED(MSWINDOWS)}
     exception_ptrs: EXCEPTION_POINTERS;
 {$ELSE}
+    signum: Integer;
     siginfo: siginfo_t;
     user_context: ucontext_t;
 {$ENDIF}
@@ -846,6 +847,15 @@ function sentry_user_consent_get: sentry_user_consent_t; external sentry_dll  de
 function sentry_capture_event(
   event: sentry_value_t
 ): sentry_uuid_t; cdecl; external sentry_dll  delayed;
+
+//
+// Captures an exception to be handled by the backend.
+//
+// This is safe to be called from a crashing thread and may not return.
+//
+procedure sentry_handle_exception(
+  uctx: psentry_ucontext_t
+); cdecl; external sentry_dll  delayed;
 
 //
 // Adds the breadcrumb to be sent in case of an event.
