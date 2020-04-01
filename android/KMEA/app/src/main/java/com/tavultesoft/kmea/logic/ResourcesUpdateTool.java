@@ -49,7 +49,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * Force resource update.
    * Only for testing, should be false for merging
    */
-  public static final boolean FORCE_RESOURCE_UPDATE = false;
+  public static final boolean FORCE_RESOURCE_UPDATE = true;
 
   /**
    * Send update notifications.
@@ -150,6 +150,13 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       // or other notification behaviors after this
       NotificationManager notificationManager = aContext.getSystemService(NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
+    }
+  }
+
+  public static void destroyNotificationChannel(Context aContext) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && aContext != null) {
+      NotificationManager notificationManager = (NotificationManager) aContext.getSystemService(Context.NOTIFICATION_SERVICE);
+      notificationManager.deleteNotificationChannel(ResourcesUpdateTool.class.getName());
     }
   }
 
@@ -330,6 +337,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
    * @param id : keyboard or lexical model ID to ignore for MONTHS_TO_IGNORE_NOTIFICATION months
    */
   private void setPrefKeyIgnoreNotifications(String id) {
+    if (currentContext == null) {
+      return;
+    }
     SharedPreferences prefs = currentContext.getSharedPreferences(
       currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
