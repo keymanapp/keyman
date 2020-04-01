@@ -104,7 +104,7 @@ begin
       Run;
     except
       on E: Exception do
-        SentryHandleException(E);
+        if not SentryHandleException(E) then raise;
     end;
   finally
     TKeymanSentryClient.Stop;

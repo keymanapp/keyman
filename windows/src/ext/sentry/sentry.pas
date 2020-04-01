@@ -1,6 +1,6 @@
 {$D-} // Don't include debug information
 // Delphi translation of sentry.h
-// Sentry Native API 0.1.4
+// Sentry Native API 0.2.2
 // https://github.com/getsentry/sentry-native
 unit sentry;
 
@@ -40,6 +40,17 @@ const
   sentry_dll = 'sentry.dll';
 {$ENDIF}
 
+const
+  SENTRY_SDK_NAME = 'sentry.native';
+  SENTRY_SDK_VERSION = '0.2.2';
+  SENTRY_SDK_USER_AGENT = SENTRY_SDK_NAME + '/' + SENTRY_SDK_VERSION;
+
+{$IF DEFINED(MSWINDOWS)}
+{$DEFINE SENTRY_PLATFORM_WINDOWS}
+{$ELSE}
+{$MESSAGE ERROR 'Unsupported platform'}
+{$ENDIF}
+
 type
   size_t = NativeUInt;
 
@@ -58,11 +69,26 @@ type
     SENTRY_VALUE_TYPE_OBJECT
   );
 
+// the library internally uses the system malloc and free functions to manage
+// memory.  It does not use realloc.  The reason for this is that on unix
+// platforms we fall back to a simplistic page allocator once we have
+// encountered a SIGSEGV or other terminating signal as malloc is no longer
+// safe to use.  Since we cannot portably reallocate allocations made on the
+// pre-existing allocator we're instead not using realloc.
 //
-// releases an allocated string from some functions
-// returning freshly allocated strings.
+// Note also that after SIGSEGV sentry_free() becomes a noop.
+
 //
-procedure sentry_string_free(str: PAnsiChar); cdecl; external sentry_dll delayed;
+// allocates memory with the underlying allocator
+//
+function sentry_malloc(size: size_t): Pointer; cdecl; external sentry_dll delayed;
+
+//
+// releases memory allocated from the underlying allocator
+procedure sentry_free(ptr: Pointer); cdecl; external sentry_dll delayed;
+
+// legacy function.  Alias for `sentry_free`.
+procedure sentry_string_free(str: PAnsiChar); cdecl;
 
 // -- Protocol Value API --
 
@@ -102,6 +128,11 @@ procedure sentry_value_incref(
 procedure sentry_value_decref(
   value: sentry_value_t
 ); cdecl; external sentry_dll  delayed;
+
+// returns the refcount of a value.
+function sentry_value_refcount(
+  value: sentry_value_t
+): size_t; cdecl; external sentry_dll  delayed;
 
 // freezes a value
 procedure sentry_value_freeze(
@@ -285,6 +316,15 @@ type sentry_level_e = (
 sentry_level_t = sentry_level_e;
 
 //
+// The state of user consent.
+//
+type sentry_user_consent_t = (
+    SENTRY_USER_CONSENT_UNKNOWN = -1,
+    SENTRY_USER_CONSENT_GIVEN = 1,
+    SENTRY_USER_CONSENT_REVOKED = 0
+);
+
+//
 // creates a new empty event value.
 //
 function sentry_value_new_event: sentry_value_t; cdecl; external sentry_dll  delayed;
@@ -384,13 +424,7 @@ function sentry_unwind_stack_from_ucontext(
 //
 type
   sentry_uuid_s = record
-{$IF DEFINED(SENTRY_UUID_WINDOWS)}
-    native_uuid: TGUID;
-{$ELSEIF DEFINED(SENTRY_UUID_ANDROID)}
-    native_uuid: array[0..15] of AnsiChar;
-{$ELSEIF DEFINED(SENTRY_UUID_LIBUUID)}
-    native_uuid: uuid_t;
-{$ENDIF}
+    bytes: array[0..15] of Byte;
   end;
 
   sentry_uuid_t = sentry_uuid_s;
@@ -452,6 +486,11 @@ type
   sentry_envelope_t = sentry_envelope_s;
   psentry_envelope_t = Pointer;
 
+// frees an envelope
+procedure sentry_envelope_free(
+  envelope: sentry_envelope_t
+); cdecl; external sentry_dll  delayed;
+
 // given an envelope returns the embedded event if there is one.
 //
 // This returns a borrowed value to the event in the envelope.
@@ -486,6 +525,45 @@ type
     data: Pointer
   ); cdecl;
 
+type
+  psentry_transport_s = ^sentry_transport_s;
+
+  _sentry_transport_send_envelope_func = procedure(t: psentry_transport_s; e: psentry_envelope_t); cdecl;
+  _sentry_transport_func = procedure(s: psentry_transport_s); cdecl;
+
+  sentry_transport_s = record
+    send_envelope_func: _sentry_transport_send_envelope_func;
+    startup_func: _sentry_transport_func;
+    shutdown_func: _sentry_transport_func;
+    free_func: _sentry_transport_func;
+    data: Pointer;
+  end;
+
+  sentry_transport_t = sentry_transport_s;
+  psentry_transport_t = ^sentry_transport_t;
+
+  sentry_backend_s = record end;
+  sentry_backend_t = sentry_backend_s;
+  psentry_backend_t = ^sentry_backend_t;
+
+  _sentry_transport_new_func = procedure(e: psentry_envelope_t; data: Pointer); cdecl;
+
+function sentry_new_function_transport(
+  func: _sentry_transport_new_func;
+  data: Pointer
+): psentry_transport_t; cdecl; external sentry_dll  delayed;
+
+// generic way to free a transport
+procedure sentry_transport_free(
+  transport: psentry_transport_t
+); cdecl; external sentry_dll  delayed;
+
+// generic way to free a backend
+procedure sentry_backend_free(
+  backend: psentry_backend_t
+); cdecl; external sentry_dll  delayed;
+
+type
 // type of the callback for modifying events
   sentry_event_function_t = function(
     event: sentry_value_t;
@@ -499,12 +577,18 @@ type
 function sentry_options_new: psentry_options_t; cdecl; external sentry_dll  delayed;
 
 //
+// deallocates previously allocated sentry options
+//
+procedure sentry_options_free(
+  opts: psentry_options_t
+); cdecl; external sentry_dll  delayed;
+
+//
 // sets a new transport function
 //
 procedure sentry_options_set_transport(
   opts: psentry_options_t;
-  func: sentry_transport_function_t;
-  data: Pointer
+  func: sentry_transport_function_t
 ); cdecl; external sentry_dll  delayed;
 
 //
@@ -513,14 +597,7 @@ procedure sentry_options_set_transport(
 procedure sentry_options_set_before_send(
   opts: psentry_options_t;
   func: sentry_event_function_t;
-  closure: Pointer
-); cdecl; external sentry_dll  delayed;
-
-//
-// deallocates previously allocated sentry options
-//
-procedure sentry_options_free(
-  opts: psentry_options_t
+  data: Pointer
 ); cdecl; external sentry_dll  delayed;
 
 //
@@ -537,6 +614,23 @@ procedure sentry_options_set_dsn(
 function sentry_options_get_dsn(
   const opts: psentry_options_t
 ): PAnsiChar; cdecl; external sentry_dll  delayed;
+
+//
+// Sets the sample rate, which should be a double between `0.0` and `1.0`.
+// Sentry will randomly discard any event that is captured using
+// `sentry_capture_event` when a sample rate < 1 is set.
+//
+procedure sentry_options_set_sample_rate(
+    opts: psentry_options_t;
+    sample_rate: double
+); cdecl; external sentry_dll  delayed;
+
+//
+// Gets the sample rate
+//
+function sentry_options_get_sample_rate(
+  const opts: psentry_options_t
+): double; cdecl; external sentry_dll  delayed;
 
 //
 // sets the release
@@ -609,7 +703,9 @@ procedure sentry_options_set_ca_certs(
 //
 // returns the configured path for ca certificates.
 //
-function sentry_options_get_ca_certs: PAnsiChar; cdecl; external sentry_dll  delayed;
+function sentry_options_get_ca_certs(
+  opts: psentry_options_t
+): PAnsiChar; cdecl; external sentry_dll  delayed;
 
 //
 // enables or disables debug printing mode
@@ -625,6 +721,25 @@ procedure sentry_options_set_debug(
 function sentry_options_get_debug(
   const opts: psentry_options_t
 ): Integer; cdecl; external sentry_dll  delayed;
+
+//
+// Enables or disabled user consent requirements for uploads.
+//
+// This disables uploads until the user has given the consent to the SDK.
+// Consent itself is given with `sentry_user_consent_give` and
+// `sentry_user_consent_revoke`.
+//
+procedure sentry_options_set_require_user_consent(
+    opts: psentry_options_t;
+    val: Integer); cdecl; external sentry_dll  delayed;
+
+//
+// returns true if user consent is required.
+//
+function sentry_options_get_require_user_consent(
+    const opts: psentry_options_t
+): Integer; cdecl; external sentry_dll  delayed;
+
 
 //
 // adds a new attachment to be sent along
@@ -651,7 +766,7 @@ procedure sentry_options_set_database_path(
   const path: PAnsiChar
 ); cdecl; external sentry_dll  delayed;
 
-{$IF DEFINED(MSWINDOWS)}
+{$IF DEFINED(SENTRY_PLATFORM_WINDOWS)}
 // wide char version of `sentry_options_add_attachment`
 procedure sentry_options_add_attachmentw(
   opts: psentry_options_t;
@@ -704,6 +819,26 @@ procedure sentry_shutdown; cdecl; external sentry_dll  delayed;
 // Returns the client options.
 //
 function sentry_get_options: psentry_options_t; cdecl; external sentry_dll  delayed;
+
+//
+// Gives user consent
+//
+procedure sentry_user_consent_give; external sentry_dll  delayed;
+
+//
+// Revokes user consent
+//
+procedure sentry_user_consent_revoke; external sentry_dll  delayed;
+
+//
+// Resets the user consent (back to unknown)
+//
+procedure sentry_user_consent_reset; external sentry_dll  delayed;
+
+//
+// Checks the current state of user consent.
+//
+function sentry_user_consent_get: sentry_user_consent_t; external sentry_dll  delayed;
 
 //
 // Sends a sentry event.
@@ -773,8 +908,7 @@ procedure sentry_set_context(
 // Removes the context object with the specified key.
 //
 procedure sentry_remove_context(
-  const key: PAnsiChar;
-  value: sentry_value_t
+  const key: PAnsiChar
 ); cdecl; external sentry_dll  delayed;
 
 //
@@ -810,6 +944,16 @@ procedure sentry_set_level(
 ); cdecl; external sentry_dll  delayed;
 
 //
+// Starts a new session.
+//
+procedure sentry_start_session; cdecl; external sentry_dll  delayed;
+
+//
+// Ends a session
+//
+procedure sentry_end_session; cdecl; external sentry_dll  delayed;
+
+//
 // Sets the path to sentry.dll; this must
 // be called before any other sentry apis
 //
@@ -824,6 +968,11 @@ procedure sentry_set_library_path(const path: string);
 begin
   if LoadLibrary(PChar(path)) = 0 then
     RaiseLastOSError;
+end;
+
+procedure sentry_string_free(str: PAnsiChar); cdecl;
+begin
+  sentry_free(str);
 end;
 
 end.

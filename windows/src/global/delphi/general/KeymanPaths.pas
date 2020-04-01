@@ -57,20 +57,13 @@ function GetFolderPath(csidl: Integer): string;
 var
   buf: array[0..260] of Char;
   idl: PItemIDList;
-  mm: IMalloc;
 begin
   Result := '';
-  if SHGetMalloc(mm) = NOERROR then
+  if SUCCEEDED(SHGetFolderLocation(0, csidl, 0, 0, idl)) then
   begin
-    if SHGetSpecialFolderLocation(0, csidl, idl) = NOERROR then
-    begin
-      if SHGetPathFromIDList(idl, buf) then
-      begin
-        Result := Buf;
-      end;
-      mm.Free(idl);
-    end;
-    mm._Release;
+    if SHGetPathFromIDList(idl, buf) then
+    Result := buf;
+    ILFree(idl);
   end;
 
   if (Result = '') and (csidl = CSIDL_PROGRAM_FILES) then

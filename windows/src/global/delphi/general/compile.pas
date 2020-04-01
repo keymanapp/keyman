@@ -147,7 +147,8 @@ const
 
 function CompileKeyboardFile(kmnFile, kmxFile: PChar; FSaveDebug, CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback): Integer; cdecl;   // I4865   // I4866
 function CompileKeyboardFileToBuffer(kmnFile: PChar; buf: PFILE_KEYBOARD; CompilerWarningsAsErrors, WarnDeprecatedCode: BOOL; CallBack: TCompilerCallback; Target: Integer): Integer; cdecl;   // I4865   // I4866
-procedure Compiler_Diagnostic(mode: Integer);
+function Compiler_Diagnostic(mode: Integer): Integer;
+procedure Compiler_Diagnostic_Console(mode: Integer);
 
 //
 // For unit tests, point to a known-current version of kmcmpdll.dll
@@ -267,9 +268,9 @@ begin
 end;
 
 type
-  TKeyman_Diagnostic = procedure(mode: Integer); stdcall;
+  TKeyman_Diagnostic = procedure(mode: Integer); cdecl;
 
-procedure Compiler_Diagnostic(mode: Integer);
+function Compiler_Diagnostic(mode: Integer): Integer;
 var
   s: string;
   keyman_diagnostic: TKeyman_Diagnostic;
@@ -296,12 +297,27 @@ begin
 
     HKMCmpDll := LoadLibrary(PChar(s+kmcmpdll_lib));
     if HKMCmpDll = 0 then
-      Exit;
+      Exit(1);
   end;
 
   @keyman_diagnostic := GetProcAddress(HKMCmpDll, 'Keyman_Diagnostic');
   if Assigned(@keyman_diagnostic) then
-    keyman_diagnostic(0);
+  begin
+    keyman_diagnostic(mode);
+    Exit(0);
+  end;
+
+  Result := 2;
+end;
+
+procedure Compiler_Diagnostic_Console(mode: Integer);
+begin
+  case compile.Compiler_Diagnostic(0) of
+    0: writeln('Should not have got here');
+    1: writeln('Test failed: could not find kmcmpdll.dll');
+    2: writeln('Test failed: could not find keyman_diagnostic in kmcmpdll.dll');
+    else writeln('This should not be possible');
+  end;
 end;
 
 initialization
