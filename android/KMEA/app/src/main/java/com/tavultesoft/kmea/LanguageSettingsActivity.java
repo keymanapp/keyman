@@ -130,7 +130,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     lgCode = bundle.getString(KMManager.KMKey_LanguageID);
     lgName = bundle.getString(KMManager.KMKey_LanguageName);
-    customHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
+    customHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink, "");
 
     // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
     String title = String.format(getString(R.string.title_language_settings), lgName);

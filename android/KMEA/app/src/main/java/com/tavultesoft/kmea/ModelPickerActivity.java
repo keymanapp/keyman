@@ -64,7 +64,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
     Bundle bundle = getIntent().getExtras();
     String newLanguageID = bundle.getString(KMManager.KMKey_LanguageID);
-    String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
+    String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink, "");
 
     // Sometimes we need to re-initialize the list of models that are displayed in the ListView
     languageID = newLanguageID;

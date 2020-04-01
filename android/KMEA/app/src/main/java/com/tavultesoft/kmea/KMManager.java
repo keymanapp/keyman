@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +65,7 @@ import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -178,17 +181,19 @@ public final class KMManager {
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
 
-  // Default Asset Paths
+  // Default Legacy Asset Paths
   // Previous keyboards installed from the cloud  went to /languages/ and /fonts/
-  // Keyboards now get installed into /packages/packageID/
-  // Keyboards that have an undefined packageID are installed into /cloud/
+  // Keyboards that have an undefined packageID were installed into /cloud/
   public static final String KMDefault_LegacyAssetLanguages = "languages";
   public static final String KMDefault_LegacyAssetFonts = "fonts";
   public static final String KMDefault_UndefinedPackageID = "cloud";
+
+  // Keyboards now get installed into /packages/packageID/
   public static final String KMDefault_AssetPackages = "packages";
   public static final String KMDefault_LexicalModelPackages = "models";
 
   // Default Keyboard Info
+  public static final String KMDefault_PackageID = "sil_euro_latin";
   public static final String KMDefault_KeyboardID = "sil_euro_latin";
   public static final String KMDefault_LanguageID = "en";
   public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
@@ -198,6 +203,7 @@ public final class KMManager {
   // Default Dictionary Info
   public static final String KMDefault_DictionaryPackageID = "nrc.en.mtnt";
   public static final String KMDefault_DictionaryModelID = "nrc.en.mtnt";
+  public static final String KMDefault_DictionaryModelName = "English dictionary (MTNT)";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
   // Keyman files
@@ -256,7 +262,9 @@ public final class KMManager {
     appContext = context.getApplicationContext();
 
     if (!didCopyAssets || isTestMode()) {
+      // Copy and install assets
       copyAssets(appContext);
+
       migrateOldKeyboardFiles(appContext);
       updateOldKeyboardsList(appContext);
       didCopyAssets = true;
@@ -464,8 +472,7 @@ public final class KMManager {
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
     try {
-      // Copy main files
-      copyAsset(context, KMDefault_DictionaryKMP, "", true);
+      // Copy KMW files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
       copyAsset(context, KMFilename_JSEngine, "", true);
       if(KMManager.isDebugMode()) {
@@ -481,7 +488,10 @@ public final class KMManager {
         packagesDir.mkdir();
       }
 
-      // Copy default cloud keyboard
+      /*
+      // default cloud keyboard
+      // Intend to deprecate cloud/keyboards in Keyman 15.0
+      */
       File cloudDir = new File(getCloudDir());
       if (!cloudDir.exists()) {
         cloudDir.mkdir();
@@ -496,6 +506,7 @@ public final class KMManager {
       if (!lexicalModelsDir.exists()) {
         lexicalModelsDir.mkdir();
       }
+
       String[] modelNames = assetManager.list(KMDefault_LexicalModelPackages);
       for (String modelName : modelNames) {
         File lexicalModelDir = new File(lexicalModelsDir, modelName);
@@ -505,6 +516,31 @@ public final class KMManager {
         String[] modelFiles = assetManager.list(KMDefault_LexicalModelPackages + File.separator + modelName);
         for (String modelFile : modelFiles) {
           copyAsset(context, modelFile, KMDefault_LexicalModelPackages + File.separator + modelName, true);
+        }
+      }
+
+      // Copy and install all KMP files (Issue for FV app?)
+      File resourceRoot = new File(getResourceRoot());
+      PackageProcessor kmpProcessor = new PackageProcessor(resourceRoot);
+      LexicalModelPackageProcessor lmkmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+      String assetFiles[] = assetManager.list("");
+      for (String assetFile : assetFiles) {
+        File kmpFile, tempPackagePath;
+        boolean installAsset = FileUtils.hasKeymanPackageExtension(assetFile) ||
+          FileUtils.hasLexicalModelPackageExtension(assetFile);
+
+        if (installAsset) {
+          copyAsset(context, assetFile, "", true);
+          kmpFile = new File(getResourceRoot(), assetFile);
+          tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
+
+          if (FileUtils.hasLexicalModelPackageExtension(assetFile)) {
+            lmkmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+          } else {
+            // Not using the list of entries returned from processKMP()
+            // because the main App will add the keyboard/lexical model info
+            kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+          }
         }
       }
     } catch (Exception e) {
@@ -555,6 +591,9 @@ public final class KMManager {
    *
    * Fonts used in legacy keyboards are also migrated from /fonts/ to /cloud/
    *
+   * At some point, we might migrate /cloud/ keyboards into packages
+   * 5) For now, delete cloud/sil_euro_latin*.js
+   * 
    * Assumption: No legacy keyboards exist in /packages/*.js
    * @param context
    */
@@ -563,26 +602,28 @@ public final class KMManager {
     String legacyFontsPath = getResourceRoot() + KMDefault_LegacyAssetFonts + File.separator;
     File legacyLanguagesDir = new File(legacyLanguagesPath);
     File legacyFontsDir = new File(legacyFontsPath);
-    if (!legacyLanguagesDir.exists() && !legacyFontsDir.exists()) {
+    File migratedDir = new File(getCloudDir());
+    if (!legacyLanguagesDir.exists() && !legacyFontsDir.exists() && !migratedDir.exists()) {
       return;
     }
 
-    File migratedDir = new File(getCloudDir());
     if (!migratedDir.exists()) {
       migratedDir.mkdir();
     }
 
+    FileFilter keyboardFilter = new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        if (pathname.isFile() && FileUtils.hasJavaScriptExtension(pathname.getName())) {
+          return true;
+        }
+        return false;
+      }
+    };
+
     try {
       if (legacyLanguagesDir.exists()) {
-        FileFilter keyboardFilter = new FileFilter() {
-          @Override
-          public boolean accept(File pathname) {
-            if (pathname.isFile() && FileUtils.hasJavaScriptExtension(pathname.getName())) {
-              return true;
-            }
-            return false;
-          }
-        };
+
 
         File[] files = legacyLanguagesDir.listFiles(keyboardFilter);
         for (File file : files) {
@@ -630,6 +671,18 @@ public final class KMManager {
         FileUtils.copyDirectory(legacyFontsDir, migratedDir);
         FileUtils.deleteDirectory(legacyFontsDir);
       }
+
+      // TODO: Investigate how to migrate cloud/ keyboards to packages/ ?
+      // Would need to query what associated files get moved
+      // For now, can delete sil_euro_latin because it will be in packages/
+      File[] files = migratedDir.listFiles(keyboardFilter);
+      for (File file: files) {
+        String filename = file.getName();
+        if (filename.startsWith(KMDefault_KeyboardID)) {
+          file.delete();
+        }
+      }
+
     } catch (IOException e) {
       Log.e(TAG, "Failed to migrate assets. Error: " + e);
     }
@@ -641,16 +694,18 @@ public final class KMManager {
       boolean shouldUpdateList = false;
       boolean shouldClearCache = false;
       HashMap<String, String> kbInfo = kbList.get(0);
+      String pkgID = kbInfo.get(KMKey_PackageID);
       String kbID = kbInfo.get(KMKey_KeyboardID);
-      if (kbID.equals("us") || (kbID.equals("european2"))) {
+      if ( kbID.equals("us") || kbID.equals("european2") ||
+        (pkgID.equals(KMDefault_UndefinedPackageID) && kbID.equals(KMDefault_KeyboardID)) ) {
         HashMap<String, String> newKbInfo = new HashMap<String, String>();
-        newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+        newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
         newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
         newKbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
         newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
         newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
         newKbInfo.put(KMManager.KMKey_KeyboardVersion,
-          getLatestKeyboardFileVersion(context, KMManager.KMDefault_UndefinedPackageID,
+          getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID,
             KMManager.KMDefault_KeyboardID));
         newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
@@ -665,7 +720,7 @@ public final class KMManager {
         kbInfo = kbList.get(i);
 
         kbID = kbInfo.get(KMKey_KeyboardID);
-        String pkgID = kbInfo.get(KMKey_PackageID);
+        pkgID = kbInfo.get(KMKey_PackageID);
         if (pkgID == null || pkgID.isEmpty()) {
           pkgID = KMDefault_UndefinedPackageID;
           kbInfo.put(KMManager.KMKey_PackageID, pkgID);
@@ -911,7 +966,7 @@ public final class KMManager {
     String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
 
     // Log Sentry analytic event, ignoring default keyboard
-    if (Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) &&
+    if (Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_PackageID) &&
       keyboardID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID))) {
       Breadcrumb breadcrumb = new Breadcrumb();
       breadcrumb.setMessage("KMManager.addKeyboard");
@@ -1208,6 +1263,29 @@ public final class KMManager {
     return kbFileVersion;
   }
 
+  /**
+   * Determine the latest version number for an installed lexical model by parsing kmp.json.
+   * @param context
+   * @param packageID
+   * @return String.
+   */
+  public static String getLexicalModelPackageVersion(Context context, final String packageID) {
+    String path = getLexicalModelsDir() + packageID + File.separator + PackageProcessor.PP_DEFAULT_METADATA;
+
+    try {
+      File kmpJSONFile = new File(path);
+      if (!kmpJSONFile.exists()) {
+        return null;
+      }
+      JSONParser jsonParser = new JSONParser();
+      JSONObject kmpObject = jsonParser.getJSONObjectFromFile(kmpJSONFile);
+
+      return LexicalModelPackageProcessor.getPackageVersion(kmpObject);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
   public static void addKeyboardDownloadEventListener(OnKeyboardDownloadEventListener listener) {
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(listener);
   }
@@ -1256,7 +1334,7 @@ public final class KMManager {
   public static void setShouldAllowSetKeyboard(boolean value) {
     shouldAllowSetKeyboard = value;
     if (shouldAllowSetKeyboard == false) {
-      setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
+      setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID,
         KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
     }
   }
@@ -1529,7 +1607,7 @@ public final class KMManager {
             String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
             InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
-            InAppKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
+            InAppKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID,
               KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
 
