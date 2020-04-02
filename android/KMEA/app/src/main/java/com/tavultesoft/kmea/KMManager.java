@@ -431,6 +431,7 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.onDestroy();
     }
+    updateTool.destroyNotificationChannel(appContext);
     CloudDownloadMgr.getInstance().shutdown(appContext);
   }
 
