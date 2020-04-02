@@ -323,7 +323,7 @@ namespace com.keyman.text {
         if(keyman.modelManager.enabled && !ruleBehavior.triggersDefaultCommand) {
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
-            let activeLayout = keyman['osk'].vkbd.layout as keyboards.ActiveLayout;
+            let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
     
             for(let pair of keyEvent.keyDistribution) {
