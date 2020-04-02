@@ -29,6 +29,7 @@ begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop,
     LOGGER_DESKTOP_KMBROWSERHOST, [kscfCaptureExceptions, kscfTerminate]); // no ui wanted
   try
+    TKeymanSentryClient.Validate;
     FInitializeCEF := TCEFManager.Create;
     try
       FInitializeCEF.StartSubProcess;
