@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.43 alpha 2020-04-02
+
+* fix(web/engine): default layout fix for chiral keyboards (#2936)
+* fix(android): Fix exception in ResourcesUpdateTool (#2933)
+* modify(android): Update sample and test projects to install asset kmp's (#2935)
+
 ## 14.0.42 alpha 2020-04-01
 
 * fix(android): Fix globe button crash on 3rd party apps (#2930)
