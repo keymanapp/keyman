@@ -288,7 +288,9 @@ namespace com.keyman.keyboards {
       // First, if we have non-default keys specified by the ['BK'] array, we've got
       // enough to work with to build a default layout.
       let rawSpecifications: any = null;  // TODO:  better typing, same type as this.legacyLayoutSpec.
-      if(this._legacyLayoutSpec != null && this._legacyLayoutSpec['BK'] != null) {
+      if(this._legacyLayoutSpec['KLS']) { // KLS is only specified whenever there are non-default keys.
+        rawSpecifications = this._legacyLayoutSpec;
+      } else if(this._legacyLayoutSpec != null && this._legacyLayoutSpec['BK'] != null) {
         var keyCaps=this._legacyLayoutSpec['BK'];
         for(var i=0; i<keyCaps.length; i++) {
           if(keyCaps[i].length > 0) {
