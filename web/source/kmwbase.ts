@@ -7,7 +7,7 @@
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
-/// <reference path="text/processor.ts" />
+/// <reference path="text/inputProcessor.ts" />
 // Extends KeyboardInterface with DOM-oriented offerings.
 /// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.
@@ -71,7 +71,7 @@ namespace com.keyman {
     domManager: dom.DOMManager;
     hotkeyManager: HotkeyManager;
     uiManager: UIManager;
-    textProcessor: text.Processor;
+    textProcessor: text.InputProcessor;
     modelManager: text.prediction.ModelManager;
 
     touchAliasing: dom.DOMEventHandlers;
@@ -126,7 +126,7 @@ namespace com.keyman {
       }
       this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
 
-      this.textProcessor = new text.Processor({
+      this.textProcessor = new text.InputProcessor({
         baseLayout: baseLayout,
         variableStoreSerializer: new dom.VariableStoreCookieSerializer()
       });
@@ -473,7 +473,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.textProcessor.setNumericLayer(this.util.device.coreSpec);
+      this.textProcessor.core.setNumericLayer(this.util.device.coreSpec);
     };
 
     /**

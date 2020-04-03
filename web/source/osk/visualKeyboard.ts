@@ -433,7 +433,7 @@ namespace com.keyman.osk {
         return 'popup-'+this.layer+'-'+spec['id'];
       } else {
         // We only create subkeys when they're needed - the currently-active layer should be fine.
-        return 'popup-' + processor.layerId + '-'+spec['id'];
+        return 'popup-' + processor.core.layerId + '-'+spec['id'];
       }
     }
 
@@ -605,7 +605,7 @@ namespace com.keyman.osk {
 
       let keyman = com.keyman.singleton;
       // Ensure the OSK's current layer is kept up to date.
-      keyman.textProcessor.layerStore.handler = this.layerChangeHandler;
+      keyman.textProcessor.core.layerStore.handler = this.layerChangeHandler;
 
       let util = keyman.util;
       this.device = device = device || util.device;
@@ -1421,7 +1421,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = Processor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
+        keys[i]['sp'] = Processor.core.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
         let keyId = layerId+'-'+states[i]
         var btn = document.getElementById(keyId);
 

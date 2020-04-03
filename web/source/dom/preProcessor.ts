@@ -53,7 +53,7 @@ namespace com.keyman.dom {
       }
 
       // Stage 1 - track the true state of the keyboard's modifiers.
-      var prevModState = processor.modStateFlags, curModState = 0x0000;
+      var prevModState = processor.core.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
       let keyCodes = text.Codes.keyCodes;
@@ -116,8 +116,8 @@ namespace com.keyman.dom {
       curModState |= s.Lstates;
 
       // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
-      s.LmodifierChange = processor.modStateFlags != curModState;
-      processor.modStateFlags = curModState;
+      s.LmodifierChange = processor.core.modStateFlags != curModState;
+      processor.core.modStateFlags = curModState;
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
       var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
@@ -153,7 +153,7 @@ namespace com.keyman.dom {
       if(activeKeyboard && activeKeyboard.isMnemonic) {
         // The following will never set a code corresponding to a modifier key, so it's fine to do this,
         // which may change the value of Lcode, here.
-        text.Processor.setMnemonicCode(s, e.getModifierState("Shift"), e.getModifierState("CapsLock"));
+        text.KeyboardProcessor.setMnemonicCode(s, e.getModifierState("Shift"), e.getModifierState("CapsLock"));
       }
 
       // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
@@ -171,7 +171,7 @@ namespace com.keyman.dom {
         // Positional Layout
 
         /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-        var Lbase = KeyMapping.languageMap[processor.baseLayout];
+        var Lbase = KeyMapping.languageMap[processor.core.baseLayout];
         if(Lbase && Lbase['k'+s.Lcode]) {
           s.Lcode=Lbase['k'+s.Lcode];
         }
@@ -254,7 +254,7 @@ namespace com.keyman.dom {
         return true;
       }
 
-      return processor.doModifierPress(Levent, false);
+      return processor.core.doModifierPress(Levent, false);
     }
 
     static keyPress(e: KeyboardEvent): boolean {

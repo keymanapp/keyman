@@ -917,7 +917,7 @@ namespace com.keyman.text {
      * Description  Encapsulates calls to keyboard input processing.
      * @returns     {number}        0 if no match is made, otherwise 1.
      */
-    processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent/*|com.keyman.text.LegacyKeyEvent*/): RuleBehavior {
+    processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
       // Clear internal state tracking data from prior keystrokes.
       if(!outputTarget) {
         throw "No target specified for keyboard output!";

@@ -1484,9 +1484,9 @@ namespace com.keyman.dom {
       var device = util.device;
 
       // Set callbacks for proper feedback from web-core.
-      this.keyman.textProcessor.beepHandler = this.doBeep.bind(this);
-      this.keyman.textProcessor.warningLogger = console.warn.bind(console);
-      this.keyman.textProcessor.errorLogger = console.error.bind(console);
+      this.keyman.textProcessor.core.beepHandler = this.doBeep.bind(this);
+      this.keyman.textProcessor.core.warningLogger = console.warn.bind(console);
+      this.keyman.textProcessor.core.errorLogger = console.error.bind(console);
 
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 

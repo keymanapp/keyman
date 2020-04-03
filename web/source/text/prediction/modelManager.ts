@@ -1,5 +1,5 @@
 // Defines the text processing KMW core.
-///<reference path="../processor.ts" />
+///<reference path="../keyboardProcessor.ts" />
 // Defines the LMLayer's outer shell
 ///<reference path="../../includes/lmlayer.ts" />
 // Defines the ModelManager and its related types.

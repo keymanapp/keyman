@@ -367,15 +367,15 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues      
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
       
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:processor.layerId);
+      var t=keyName.split('-'),layer=(t.length>1?t[0]:processor.core.layerId);
       keyName=t[t.length-1];
       if(layer == 'undefined') {
-        layer=processor.layerId;
+        layer=processor.core.layerId;
       }
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=processor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=processor.core.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -427,20 +427,20 @@ namespace com.keyman.text {
       };
 
       // Process modifier key action
-      if(processor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
+      if(processor.core.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
         return true;      
       }
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
       // we can handle many other pre-processing steps the same way with this common method.
-      processor.setSyntheticEventDefaults(Lkc);
+      processor.core.setSyntheticEventDefaults(Lkc);
 
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          processor.selectLayer(Lkc);
+          processor.core.selectLayer(Lkc);
         }
         return false;
       }

@@ -1,4 +1,5 @@
 /// <reference path="engineDeviceSpec.ts" />
+/// <reference path="outputTarget.ts" />
 
 namespace com.keyman.text {
   // Represents a probability distribution over a keyboard's keys.

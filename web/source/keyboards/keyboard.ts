@@ -1,4 +1,6 @@
 /// <reference path="defaultLayouts.ts" />
+/// <reference path="activeLayout.ts" />
+/// <reference path="../text/kbdInterface.ts" />
 
 namespace com.keyman.keyboards {
   /**
