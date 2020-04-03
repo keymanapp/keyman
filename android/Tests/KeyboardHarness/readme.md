@@ -10,6 +10,19 @@ and consists of these engineering keyboards:
 * web/testing/chirality/chirality.js
 * web/testing/platform/platformtest.js
 
+### Compiling From Command Line
+1. Launch a command prompt to the `android/` folder
+2. Compile KMEA. This will build and copy `keyman-engine.aar` to the Samples and Test projects
+    ```
+    cd KMEA
+    ./build.sh
+    ```
+3. Compile KeyboardHarness
+    ```
+    cd ../Tests/KeyboardHarness
+    ./build.sh
+    ```
+
 ## Version History ##
 
 ## 2017-09-26 1.0
