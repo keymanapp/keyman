@@ -1,6 +1,9 @@
 /// <reference path="deadkeys.ts" />
 /// <reference path="ruleBehavior.ts" />
 
+// Defines classes for handling system stores
+/// <reference path="systemStores.ts" />
+
 /***
    KeymanWeb 11.0
    Copyright 2019 SIL International
@@ -173,6 +176,8 @@ namespace com.keyman.text {
 
     static readonly TSS_LAYER:    number = 33;
     static readonly TSS_PLATFORM: number = 31;
+
+    platformSystemStore = new PlatformSystemStore(this);
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
@@ -808,63 +813,7 @@ namespace com.keyman.text {
         // How would this be handled in an eventual headless mode?
         result = (keyman.osk.vkbd.layerId === strValue);
       } else if(systemId == KeyboardInterface.TSS_PLATFORM) {
-        var i,constraint,constraints=strValue.split(' ');
-        for(i=0; i<constraints.length; i++) {
-          constraint=constraints[i].toLowerCase();
-          switch(constraint) {
-            case 'touch':
-            case 'hardware':
-              if(this.activeDevice.touchable != (constraint == 'touch')) {
-                result=false;
-              }
-              break;
-
-            case 'macos':
-            case 'mac':
-              constraint = 'macosx';
-              // fall through
-            case 'macosx':
-            case 'windows':
-            case 'android':
-            case 'ios':
-            case 'linux':
-              if(this.activeDevice.OS != constraint) {
-                result=false;
-              }
-              break;
-          
-            case 'tablet':
-            case 'phone':
-            case 'desktop':
-              if(this.activeDevice.formFactor != constraint) {
-                result=false;
-              }
-              break;
-
-            case 'web':
-              if(this.activeDevice.browser == 'native') {
-                result=false; // web matches anything other than 'native'
-              }
-              break;
-              
-            case 'native':
-              // This will return true for embedded KeymanWeb
-            case 'ie':
-            case 'chrome':
-            case 'firefox':
-            case 'safari':
-            case 'edge':
-            case 'opera':
-              if(this.activeDevice.browser != constraint) {
-                result=false;
-              }
-              break;
-              
-            default:
-              result=false;
-          }
-          
-        }
+        result = this.platformSystemStore.matches(strValue);
       }
       return result; //Moved from previous line, now supports layer selection, Build 350 
     }
