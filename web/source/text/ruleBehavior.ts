@@ -19,6 +19,11 @@ namespace com.keyman.text {
     setStore: {[id: number]: string} = {};
 
     /**
+     * A set of variable stores with save requests triggered by the matched keyboard rule
+     */
+    saveStore: {[name: string]: VariableStore} = {};
+
+    /**
      * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
      */
     triggersDefaultCommand?: boolean;
@@ -33,33 +38,31 @@ namespace com.keyman.text {
      */
     warningLog?: string;
 
-    finalize() {
-      let keyman = com.keyman.singleton;
+    finalize(processor: Processor) {
       let outputTarget = this.transcription.keystroke.Ltarg;
 
-      if(this.beep) {
-        // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-        //        We're still referencing the DOM, even if only the manager object.  (It's an improvement, at least.)
-        keyman.domManager.doBeep(outputTarget);
+      if(processor.beepHandler && this.beep) {
+        processor.beepHandler(outputTarget);
       }
 
       for(let storeID in this.setStore) {
-        // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-        //        `Processor` shouldn't be directly setting anything on the OSK when the refactor is complete.
-        //
-        //        There's also the issue of Stores in general, which rely on cookies...
-        //        Gotta handle variable stores as well, which we currently do nothing for!
-        
-        // How would this be handled in an eventual headless mode?
-        switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
-          case KeyboardInterface.TSS_LAYER:
-            keyman.osk.vkbd.showLayer(this.setStore[storeID]); //Build 350, osk reference now OK, so should work
-            break;
-          case KeyboardInterface.TSS_PLATFORM:
-            console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
-            break;
-          default:
-            console.warn("Unknown store affected by keyboard rule: " + storeID);
+        let sysStore = processor.keyboardInterface.systemStores[storeID];
+        if(sysStore) {
+          try {
+            sysStore.set(this.setStore[storeID]);
+          } catch (error) {
+            if(processor.errorLogger) {
+              processor.errorLogger("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+            }
+          }
+        } else if(processor.warningLogger) {
+          processor.warningLogger("Unknown store affected by keyboard rule: " + storeID);
+        }
+      }
+
+      if(processor.keyboardInterface.variableStoreSerializer) {
+        for(let storeID in this.saveStore) {
+          processor.keyboardInterface.variableStoreSerializer.saveStore(processor.activeKeyboard.id, storeID, this.saveStore[storeID]);
         }
       }
 
@@ -68,11 +71,10 @@ namespace com.keyman.text {
         DefaultOutput.applyCommand(keyEvent);
       }
 
-      // Safe both in browser and Node contexts.
-      if(this.warningLog) {
-        console.warn(this.warningLog);
-      } else if(this.errorLog) {
-        console.error(this.errorLog);
+      if(processor.warningLogger && this.warningLog) {
+        processor.warningLogger(this.warningLog);
+      } else if(processor.errorLogger && this.errorLog) {
+        processor.errorLogger(this.errorLog);
       }
     }
   }

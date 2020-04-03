@@ -367,10 +367,11 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues      
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
       
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.vkbd.layerId);
+      var t=keyName.split('-'),layer=(t.length>1?t[0]:processor.layerId);
       keyName=t[t.length-1];
-      if(layer == 'undefined') layer=osk.vkbd.layerId;
-      
+      if(layer == 'undefined') {
+        layer=processor.layerId;
+      }
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.

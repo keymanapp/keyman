@@ -14,14 +14,23 @@
 /// <reference path="engineDeviceSpec.ts" />
 
 namespace com.keyman.text {
-  export class LegacyKeyEvent {
-    Ltarg: HTMLElement;
-    Lcode: number;
-    Lmodifiers: number;
-    LisVirtualKey: number;
+  export type BeepHandler = (outputTarget: OutputTarget) => void;
+  export type LogMessageHandler = (str: string) => void;
+
+  export interface VariableStoreSerializer {
+    loadStore(keyboardID: string, storeName: string): VariableStore;
+    saveStore(keyboardID: string, storeName: string, storeMap: VariableStore);
+  }
+
+  export interface ProcessorInitOptions {
+    baseLayout?: string;
+    variableStoreSerializer?: VariableStoreSerializer;
   }
 
   export class Processor {
+    public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
+      baseLayout: 'us'
+    }
 
     // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
     // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
@@ -40,9 +49,18 @@ namespace com.keyman.text {
 
     baseLayout: string;
 
-    constructor(baseLayout?: string) {
-      this.baseLayout = baseLayout || 'us'; // default BaseLayout
-      this.keyboardInterface = new KeyboardInterface();
+    // Callbacks for various feedback types
+    beepHandler?: BeepHandler;
+    warningLogger?: LogMessageHandler;
+    errorLogger?: LogMessageHandler;
+
+    constructor(options?: ProcessorInitOptions) {
+      if(!options) {
+        options = Processor.DEFAULT_OPTIONS;
+      }
+
+      this.baseLayout = options.baseLayout || 'us'; // default BaseLayout
+      this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
       this.installInterface();
     }
 
@@ -70,6 +88,19 @@ namespace com.keyman.text {
       // All old deadkeys and keyboard-specific cache should immediately be invalidated
       // on a keyboard change.
       this.resetContext();
+    }
+
+    get layerStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYER] as MutableSystemStore;
+    }
+
+    public get layerId(): string {
+      return this.layerStore.value;
+    }
+
+    // Note:  will trigger an 'event' callback designed to notify the OSK of layer changes.
+    public set layerId(value: string) {
+      this.layerStore.set(value);
     }
 
     /**
@@ -285,7 +316,7 @@ namespace com.keyman.text {
         if(keyman.modelManager.enabled && !ruleBehavior.triggersDefaultCommand) {
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
-            let activeLayout = keyman['osk'].vkbd.layout as keyboards.ActiveLayout;
+            let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
     
             for(let pair of keyEvent.keyDistribution) {
@@ -318,7 +349,7 @@ namespace com.keyman.text {
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
-        ruleBehavior.finalize();
+        ruleBehavior.finalize(this);
 
         // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
         //
@@ -499,7 +530,6 @@ namespace com.keyman.text {
      */
     _UpdateVKShift(e: KeyEvent, v: number, d: boolean|number): boolean {
       var keyShiftState=0, lockStates=0, i;
-      let keyman = com.keyman.singleton;
 
       var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
       var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
@@ -543,16 +573,7 @@ namespace com.keyman.text {
         }
       }
 
-      // Find and display the selected OSK layer
-      if(keyman['osk'].vkbd) {
-        keyman['osk'].vkbd.showLayer(this.getLayerId(keyShiftState));
-      }
-
-      // osk._UpdateVKShiftStyle will be called automatically upon the next _Show.
-      if(keyman.osk._Visible) {
-        keyman.osk._Show();
-      }
-
+      this.layerId = this.getLayerId(keyShiftState);
       return true;
     }
 
@@ -653,14 +674,7 @@ namespace com.keyman.text {
      * @param       {string}      id      layer id (e.g. ctrlshift)
      */
     updateLayer(keyEvent: KeyEvent, id: string) {
-      let keyman = com.keyman.singleton;
-      let vkbd = keyman['osk'].vkbd;
-
-      if(!vkbd) {
-        return;
-      }
-
-      let activeLayer = vkbd.layerId;
+      let activeLayer = this.layerId;
       var s = activeLayer;
 
       // Do not change layer unless needed (27/08/2015)
@@ -748,11 +762,11 @@ namespace com.keyman.text {
         s = id;
       }
 
-      // Actually set the new layer id.
-      if(vkbd) {
-        if(!vkbd.showLayer(s)) {
-          vkbd.showLayer('default');
-        }
+      let layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
+      if(layout.getLayer(s)) {
+        this.layerId = s;
+      } else {
+        this.layerId = 'default';
       }
     }
 
@@ -795,9 +809,7 @@ namespace com.keyman.text {
 
     resetContext() {
       let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless && keyman.osk.vkbd) {
-        keyman.osk.vkbd.layerId = 'default';
-      }
+      this.layerId = 'default';
 
       this.keyboardInterface.resetContextCache();
       this._UpdateVKShift(null, 15, 0);
@@ -805,23 +817,12 @@ namespace com.keyman.text {
       if(keyman.modelManager) {
         keyman.modelManager.invalidateContext();
       }
-
-      if(!keyman.isHeadless) {
-        keyman.osk._Show();
-      }
     };
 
-    setNumericLayer() {
-      let keyman = com.keyman.singleton;
-      var i;
-      if(!keyman.isHeadless) {
-        let osk = keyman.osk.vkbd;
-        for(i=0; i<osk.layers.length; i++) {
-          if (osk.layers[i].id == 'numeric') {
-            osk.layerId = 'numeric';
-            keyman.osk._Show();
-          }
-        }
+    setNumericLayer(device: EngineDeviceSpec) {
+      let layout = this.activeKeyboard.layout(device.formFactor);
+      if(layout.getLayer('numeric')) {
+        this.layerId = 'numeric';
       }
     };
   }

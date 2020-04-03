@@ -10,6 +10,8 @@
 /// <reference path="touchAliasElement.ts" />
 // Defines per-element-type OutputTarget element wrapping.
 /// <reference path="targets/wrapElement.ts" />
+// Defines cookie-based variable store serialization
+/// <reference path="variableStoreCookieSerializer.ts" />
 
 namespace com.keyman.dom {
   // Utility object used to handle beep (keyboard error response) operations.
@@ -1247,8 +1249,8 @@ namespace com.keyman.dom {
      *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
      **/
     setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
-      if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
-        e=document.getElementById(e);
+      if(typeof e == "string") { // Can't instanceof string, and String is a different type.
+        e = document.getElementById(e);
       }
 
       if(this.keyman.isEmbedded) {
@@ -1264,7 +1266,7 @@ namespace com.keyman.dom {
 
       // As this is an API function, someone may pass in the base of a touch element.
       // We need to respond appropriately.
-      e = e['kmw_ip'] ? e['kmw_ip'] : e;
+      e = (e['kmw_ip'] ? e['kmw_ip'] : e) as HTMLElement;
 
       // If we're changing controls, don't forget to properly manage the keyboard settings!
       // It's only an issue on 'native' (non-embedded) code paths.
@@ -1469,11 +1471,16 @@ namespace com.keyman.dom {
      * @param       {Object}  arg     object array of user-defined properties
      * Description  KMW window initialization  
      */    
-    init: (arg:any) => Promise<any> = function(arg): Promise<any> { 
+    init: (arg:any) => Promise<any> = function(this: DOMManager, arg): Promise<any> { 
       var i,j,c,e,p,eTextArea,eInput,opt,dTrailer,ds;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
       var device = util.device;
+
+      // Set callbacks for proper feedback from web-core.
+      this.keyman.textProcessor.beepHandler = this.doBeep.bind(this);
+      this.keyman.textProcessor.warningLogger = console.warn.bind(console);
+      this.keyman.textProcessor.errorLogger = console.error.bind(console);
 
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 
@@ -1671,7 +1678,7 @@ namespace com.keyman.dom {
         } else {
           (<any>this.keyman).conditionallyHideOsk = function() {
             // Should not hide OSK if simply closing the language menu (30/4/15)
-            if((<any>keyman).hideOnRelease && !osk.lgList) osk.hideNow();
+            if((<any>keyman).hideOnRelease && !osk['lgList']) osk.hideNow();
             (<any>keyman).hideOnRelease=false;
           };
           (<any>this.keyman).hideOskIfOnBody = function(e) {

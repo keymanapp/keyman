@@ -126,7 +126,11 @@ namespace com.keyman {
       }
       this._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
 
-      this.textProcessor = new text.Processor(baseLayout);
+      this.textProcessor = new text.Processor({
+        baseLayout: baseLayout,
+        variableStoreSerializer: new dom.VariableStoreCookieSerializer()
+      });
+
       // Used by the embedded apps.
       this['interface'] = this.textProcessor.keyboardInterface;
       
@@ -210,12 +214,12 @@ namespace com.keyman {
       if (!e) {
         e = window.event as E;
         if(!e) {
-          var elem: HTMLElement|Document = this.domManager.getLastActiveElement();
+          var elem: HTMLElement = this.domManager.getLastActiveElement();
           if(elem) {
-            elem = elem.ownerDocument;
+            let doc = elem.ownerDocument;
             var win: Window;
-            if(elem) {
-              win = elem.defaultView;
+            if(doc) {
+              win = doc.defaultView;
             }
             if(!win) {
               return null;
@@ -469,7 +473,7 @@ namespace com.keyman {
      * Description  Set OSK to numeric layer if it exists
      */
     ['setNumericLayer']() {
-      this.textProcessor.setNumericLayer();
+      this.textProcessor.setNumericLayer(this.util.device.coreSpec);
     };
 
     /**

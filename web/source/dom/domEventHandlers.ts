@@ -16,8 +16,8 @@ namespace com.keyman.dom {
     _Selection = null;
     _SelectionControl: any = null;   // Type behavior is as with activeElement and the like.
     
-    activeElement: any;       // TODO:  Add type and fix resulting bugs!
-    lastActiveElement: any;   // TODO:  Add type and fix resulting bugs!
+    activeElement: HTMLElement;
+    lastActiveElement: HTMLElement;
 
     focusing: boolean;
     focusTimer: number;
@@ -192,7 +192,7 @@ namespace com.keyman.dom {
      * Respond to KMW losing focus on event
      */    
     _ControlBlur: (e: FocusEvent) => boolean = function(this: DOMEventHandlers, e: FocusEvent): boolean {
-      var Ltarg: HTMLElement | Document;  
+      var Ltarg: HTMLElement;  
 
       e = this.keyman._GetEventObject<FocusEvent>(e);   // I2404 - Manage IE events in IFRAMEs
       Ltarg = this.keyman.util.eventTarget(e) as HTMLElement;
@@ -223,10 +223,9 @@ namespace com.keyman.dom {
         Ltarg = Ltarg.parentNode as HTMLElement;
       }
 
-      // TODO:  Needs tidy-up.
       if(Ltarg.ownerDocument) {
         if(Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLIFrameElement) {
-          Ltarg=Ltarg.contentWindow.document;
+          Ltarg=Ltarg.contentWindow.frameElement as HTMLElement;
         }
       }
       
@@ -270,7 +269,7 @@ namespace com.keyman.dom {
      * @return      {boolean}      
      * Description  Execute external (UI) code needed on blur
      */       
-    doControlBlurred(_target: HTMLElement|Document, _event: Event, _isActivating: boolean|number): boolean {
+    doControlBlurred(_target: HTMLElement, _event: Event, _isActivating: boolean|number): boolean {
       var p={};
       p['target']=_target;
       p['event']=_event;
@@ -417,7 +416,7 @@ namespace com.keyman.dom {
       return PreProcessor.keyDown(e);
     }.bind(this);
 
-    doChangeEvent(_target: HTMLElement|Document) {
+    doChangeEvent(_target: HTMLElement) {
       if(DOMEventHandlers.states.changed) {
         var event: Event;
         if(typeof Event == 'function') {
@@ -690,9 +689,9 @@ namespace com.keyman.dom {
     /**
      * Close OSK and remove simulated caret on losing focus
      */          
-    cancelInput(): void { 
-      if(DOMEventHandlers.states.activeElement && DOMEventHandlers.states.activeElement.hideCaret) {
-        DOMEventHandlers.states.activeElement.hideCaret();
+    cancelInput(): void {
+      if(DOMEventHandlers.states.activeElement && Utils.instanceof(DOMEventHandlers.states.activeElement, "TouchAliasElement")) {
+        (DOMEventHandlers.states.activeElement as TouchAliasElement).hideCaret();
       }
       DOMEventHandlers.states.activeElement=null; 
       this.keyman.osk.hideNow();

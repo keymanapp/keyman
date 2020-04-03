@@ -1,6 +1,9 @@
 /// <reference path="deadkeys.ts" />
 /// <reference path="ruleBehavior.ts" />
 
+// Defines classes for handling system stores
+/// <reference path="systemStores.ts" />
+
 /***
    KeymanWeb 11.0
    Copyright 2019 SIL International
@@ -26,6 +29,8 @@ namespace com.keyman.text {
   export type ComplexKeyboardStore = KeyboardStoreElement[]; 
 
   type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
+
+  export type VariableStore = {[name: string]: string};
 
   type RuleChar = string;
 
@@ -174,13 +179,23 @@ namespace com.keyman.text {
     static readonly TSS_LAYER:    number = 33;
     static readonly TSS_PLATFORM: number = 31;
 
+    systemStores: {[storeID: number]: SystemStore};
+
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
     // Must be accessible to some of the keyboard API methods.
     activeKeyboard: any;
     activeDevice: EngineDeviceSpec;
 
-    constructor() {
+    variableStoreSerializer?: VariableStoreSerializer;
+
+    constructor(variableStoreSerializer: VariableStoreSerializer = null) {
+      this.systemStores = {};
+      
+      this.systemStores[KeyboardInterface.TSS_PLATFORM] = new PlatformSystemStore(this);
+      this.systemStores[KeyboardInterface.TSS_LAYER] = new MutableSystemStore(KeyboardInterface.TSS_LAYER, 'default');
+
+      this.variableStoreSerializer = variableStoreSerializer;
     }
 
     /**
@@ -801,70 +816,10 @@ namespace com.keyman.text {
      * @return      {boolean}                 True if the test succeeds 
      */       
     ifStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
-      let keyman = com.keyman.singleton;
-
       var result=true;
-      if(systemId == KeyboardInterface.TSS_LAYER) {
-        // How would this be handled in an eventual headless mode?
-        result = (keyman.osk.vkbd.layerId === strValue);
-      } else if(systemId == KeyboardInterface.TSS_PLATFORM) {
-        var i,constraint,constraints=strValue.split(' ');
-        for(i=0; i<constraints.length; i++) {
-          constraint=constraints[i].toLowerCase();
-          switch(constraint) {
-            case 'touch':
-            case 'hardware':
-              if(this.activeDevice.touchable != (constraint == 'touch')) {
-                result=false;
-              }
-              break;
-
-            case 'macos':
-            case 'mac':
-              constraint = 'macosx';
-              // fall through
-            case 'macosx':
-            case 'windows':
-            case 'android':
-            case 'ios':
-            case 'linux':
-              if(this.activeDevice.OS != constraint) {
-                result=false;
-              }
-              break;
-          
-            case 'tablet':
-            case 'phone':
-            case 'desktop':
-              if(this.activeDevice.formFactor != constraint) {
-                result=false;
-              }
-              break;
-
-            case 'web':
-              if(this.activeDevice.browser == 'native') {
-                result=false; // web matches anything other than 'native'
-              }
-              break;
-              
-            case 'native':
-              // This will return true for embedded KeymanWeb
-            case 'ie':
-            case 'chrome':
-            case 'firefox':
-            case 'safari':
-            case 'edge':
-            case 'opera':
-              if(this.activeDevice.browser != constraint) {
-                result=false;
-              }
-              break;
-              
-            default:
-              result=false;
-          }
-          
-        }
+      let store = this.systemStores[systemId];
+      if(store) {
+        result = store.matches(strValue);
       }
       return result; //Moved from previous line, now supports layer selection, Build 350 
     }
@@ -903,12 +858,10 @@ namespace com.keyman.text {
      * to initialize a store value on the keyboard's script object.
      */    
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
-      let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName;
-      var cValue=keyman.util.loadCookie(cName);
-      if(typeof cValue[storeName] != 'undefined') {
-        return decodeURIComponent(cValue[storeName]);
+      if(this.variableStoreSerializer) {
+        let cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+        return cValue[storeName] || dfltValue;
       } else {
         return dfltValue;
       }
@@ -926,21 +879,24 @@ namespace com.keyman.text {
      * value across sessions, providing a custom user default for later uses of the keyboard.
      */    
     saveStore(storeName:string, optValue:string): boolean {
-      let keyman = com.keyman.singleton;
       this.resetContextCache();
       var kbd=this.activeKeyboard;
       if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
         return false;
       }
-      
-      // The cookie entry includes the store name...
-      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName;
-      var cValue=encodeURIComponent(optValue);
 
       // And the lookup under that entry looks for the value under the store name, again.
-      let valueObj = {};
-      valueObj[storeName] = cValue;
-      keyman.util.saveCookie(cName, valueObj);
+      let valueObj: VariableStore = {};
+      valueObj[storeName] = optValue;
+
+      // Null-check in case of invocation during unit-test
+      if(this.ruleBehavior) {
+        this.ruleBehavior.saveStore[storeName] = valueObj;
+      } else {
+        // We're in a unit-test environment, directly invoking this method from outside of a keyboard.
+        // In this case, we should immediately commit the change.
+        this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, valueObj);
+      }
       return true;
     }
 
