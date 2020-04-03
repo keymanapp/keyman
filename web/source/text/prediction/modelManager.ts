@@ -322,7 +322,7 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
 
       if(!transcription) {
-        let t = text.Processor.getOutputTarget();
+        let t = dom.Utils.getOutputTarget();
         if(t) {
           transcription = t.buildTranscriptionFrom(t, null);
         } else {

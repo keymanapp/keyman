@@ -45,7 +45,7 @@ namespace com.keyman.text {
     this.resetContextCache();
 
     // Find the correct output target to manipulate.
-    let outputTarget: OutputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
+    let outputTarget: OutputTarget = this.activeTargetOutput ? this.activeTargetOutput : dom.Utils.getOutputTarget();
 
     if(outputTarget != null) {
       // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
@@ -81,7 +81,7 @@ namespace com.keyman.text {
    * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
    */
   KeyboardInterface.prototype['getLastActiveElement'] = function(): OutputTarget {
-    return text.Processor.getOutputTarget();
+    return dom.Utils.getOutputTarget();
   }
 
   KeyboardInterface.prototype['focusLastActiveElement'] = function(): void {

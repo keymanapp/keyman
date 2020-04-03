@@ -414,7 +414,7 @@ namespace com.keyman.text {
       
       // Check the virtual key 
       let Lkc: com.keyman.text.KeyEvent = {
-        Ltarg: com.keyman.text.Processor.getOutputTarget(Lelem),
+        Ltarg: com.keyman.dom.Utils.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
@@ -485,7 +485,7 @@ namespace com.keyman.text {
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
-      Ltarg: com.keyman.text.Processor.getOutputTarget(keyman.domManager.getActiveElement()),
+      Ltarg: com.keyman.dom.Utils.getOutputTarget(keyman.domManager.getActiveElement()),
       Lmodifiers: shift,
       vkCode: code,
       Lcode: code,

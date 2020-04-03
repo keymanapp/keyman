@@ -185,26 +185,6 @@ namespace com.keyman.text {
       return ruleBehavior;
     }
 
-    // TODO:  Right about ready to move this to DOM-aware space!
-    static getOutputTarget(Lelem?: HTMLElement): OutputTarget {
-      let keyman = com.keyman.singleton;
-
-      if(!Lelem && !keyman.isHeadless) {
-        Lelem = keyman.domManager.getLastActiveElement();
-        if(!Lelem) {
-          // If we're trying to find an active target but one doesn't exist, just return null.
-          return null;
-        }
-      }
-
-      // If we were provided an element or found an active element but it's improperly attached, that should cause an error.
-      if(Lelem._kmwAttachment && Lelem._kmwAttachment.interface) {
-        return Lelem._kmwAttachment.interface;
-      } else {
-        throw new Error("OSK could not find element output target data!");
-      }
-    }
-
     setSyntheticEventDefaults(Lkc: text.KeyEvent) {
       // Set the flags for the state keys.
       Lkc.Lstates |= this.stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
@@ -832,7 +812,7 @@ namespace com.keyman.text {
       this.layerId = 'default';
 
       this.keyboardInterface.resetContextCache();
-      this.resetVKShift();
+      this._UpdateVKShift(null, 15, 0);
       
       if(keyman.modelManager) {
         keyman.modelManager.invalidateContext();
@@ -845,15 +825,5 @@ namespace com.keyman.text {
         this.layerId = 'numeric';
       }
     };
-
-    /**
-     * Reset OSK shift states when entering or exiting the active element
-     **/    
-    resetVKShift() {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless && !keyman.uiManager.isActivating && keyman.osk.vkbd) {
-        this._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
-      }
-    }
   }
 }

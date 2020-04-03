@@ -267,7 +267,7 @@ namespace com.keyman.osk {
            * everything if/when the active `OutputTarget` changes, though we haven't gotten that 
            * far in implementation yet.
            */
-          target = text.Processor.getOutputTarget();
+          target = dom.Utils.getOutputTarget();
         }
 
         // Apply the Suggestion!
@@ -624,7 +624,7 @@ namespace com.keyman.osk {
     private _applyReversion: () => void = function(this: SuggestionManager): void {
       let keyman = com.keyman.singleton;
 
-      let current = text.Processor.getOutputTarget();
+      let current = dom.Utils.getOutputTarget();
       let priorState = this.preAccept;
 
       // Step 1:  construct the reverted state.

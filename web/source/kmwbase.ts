@@ -460,7 +460,7 @@ namespace com.keyman {
       if(!elem) {
         elem = dom.DOMEventHandlers.states.activeElement;
       }
-      let outputTarget = text.Processor.getOutputTarget(elem);
+      let outputTarget = dom.Utils.getOutputTarget(elem);
       if(outputTarget) {
         outputTarget.resetContext();
       }
@@ -669,6 +669,6 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
      * We only recreate the 'keyman' object if it's not been loaded.
      * As this is the base object, not creating it prevents a KMW system reset.
      */
-    window['keyman'] = com.keyman.singleton = new KeymanBase();
+    window['keyman'] = com.keyman['singleton'] = com.keyman.singleton = new KeymanBase();
   })();
 }
