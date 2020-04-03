@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.44 alpha 2020-04-03
+
+* refactor(web/engine): begins formally removing DOM-aware keyboard API functions from web-core KeyboardInterface (#2915)
+* refactor(web/engine): start of system store abstraction (#2919)
+* refactor(web/engine): Processor now manages current layer; OSK listens via callback (#2920)
+* refactor(web/engine):  RuleBehavior now headless (#2925)
+* refactor(web/engine): variable store storage abstraction (#2926)
+* fix(web): fixes activeElement typing (#2927)
+* refactor(web/engine): relocates DOM-only parts of Processor  (#2938)
+* fix(android): Change KeyboardHarness/build.sh to not rebuild KMEA (#2943)
+* feat(android): Propagate languageID when downloading kmp (#2944)
+
 ## 14.0.43 alpha 2020-04-02
 
 * fix(web/engine): default layout fix for chiral keyboards (#2936)
