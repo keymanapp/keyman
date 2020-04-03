@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.42 alpha 2020-04-01
+
+* fix(android): Fix globe button crash on 3rd party apps (#2930)
+* modify(android) Install default asset kmp's (#2928)
+
+## 14.0.41 alpha 2020-03-31
+
+* refactor(web/engine): KeyboardInterface/Processor cleanup and prep (#2901)
+* refactor(web/engine): Preps keyboard layouts definitions for web-core (#2902)
+* refactor(web/engine): layouts now full property of Keyboard wrapper (#2903)
+* feat(android): Specify optional language ID for installing kmp (#2921)
+
 ## 14.0.40 alpha 2020-03-30
 
 * fix(developer): use correct registry types for sentry options (#2912)

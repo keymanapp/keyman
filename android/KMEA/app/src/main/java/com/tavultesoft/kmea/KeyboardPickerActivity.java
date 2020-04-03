@@ -110,13 +110,13 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     if (keyboardsList == null) {
       keyboardsList = new ArrayList<HashMap<String, String>>();
       HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
       kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
       kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
       kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
       kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
       kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
-        context, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
+        context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
       kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);

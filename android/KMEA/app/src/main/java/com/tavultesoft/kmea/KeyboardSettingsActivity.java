@@ -128,7 +128,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     infoList.add(hashMap);
 
     // Display uninstall keyboard
-    if (!packageID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID) ||
+    if (!packageID.equalsIgnoreCase(KMManager.KMDefault_PackageID) ||
         !kbID.equalsIgnoreCase(KMManager.KMDefault_KeyboardID)) {
       hashMap = new HashMap<>();
       hashMap.put(titleKey, getString(R.string.uninstall_keyboard));
