@@ -285,7 +285,7 @@ var testRunner = {
         e.LisVirtualKey = true;
         e.vkCode = test.key;
         // Keyman 12 changes the processKeystroke interface
-        keyman.textProcessor.keyboardInterface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.text.Processor.getOutputTarget(receiver) : receiver, e);
+        keyman.textProcessor.keyboardInterface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
         console.warn(err.toString());
