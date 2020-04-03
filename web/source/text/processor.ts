@@ -165,7 +165,7 @@ namespace com.keyman.text {
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
             return null;
-          } else if(char != '') {
+          } else {
             this.keyboardInterface.output(0, outputTarget, char);
           }
         } else {
