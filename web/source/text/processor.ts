@@ -72,6 +72,19 @@ namespace com.keyman.text {
       this.resetContext();
     }
 
+    get layerStore(): MutableSystemStore {
+      return this.keyboardInterface.systemStores[KeyboardInterface.TSS_LAYER] as MutableSystemStore;
+    }
+
+    public get layerId(): string {
+      return this.layerStore.value;
+    }
+
+    // Note:  will trigger an 'event' callback designed to notify the OSK of layer changes.
+    public set layerId(value: string) {
+      this.layerStore.set(value);
+    }
+
     /**
      * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults 
      * where and when appropriate.
@@ -305,7 +318,7 @@ namespace com.keyman.text {
         if(keyman.modelManager.enabled && !ruleBehavior.triggersDefaultCommand) {
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
-            let activeLayout = keyman['osk'].vkbd.layout as keyboards.ActiveLayout;
+            let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
             alternates = [];
     
             for(let pair of keyEvent.keyDistribution) {
@@ -519,7 +532,6 @@ namespace com.keyman.text {
      */
     _UpdateVKShift(e: KeyEvent, v: number, d: boolean|number): boolean {
       var keyShiftState=0, lockStates=0, i;
-      let keyman = com.keyman.singleton;
 
       var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
       var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
@@ -563,16 +575,7 @@ namespace com.keyman.text {
         }
       }
 
-      // Find and display the selected OSK layer
-      if(keyman['osk'].vkbd) {
-        keyman['osk'].vkbd.showLayer(this.getLayerId(keyShiftState));
-      }
-
-      // osk._UpdateVKShiftStyle will be called automatically upon the next _Show.
-      if(keyman.osk._Visible) {
-        keyman.osk._Show();
-      }
-
+      this.layerId = this.getLayerId(keyShiftState);
       return true;
     }
 
@@ -673,14 +676,7 @@ namespace com.keyman.text {
      * @param       {string}      id      layer id (e.g. ctrlshift)
      */
     updateLayer(keyEvent: KeyEvent, id: string) {
-      let keyman = com.keyman.singleton;
-      let vkbd = keyman['osk'].vkbd;
-
-      if(!vkbd) {
-        return;
-      }
-
-      let activeLayer = vkbd.layerId;
+      let activeLayer = this.layerId;
       var s = activeLayer;
 
       // Do not change layer unless needed (27/08/2015)
@@ -768,11 +764,11 @@ namespace com.keyman.text {
         s = id;
       }
 
-      // Actually set the new layer id.
-      if(vkbd) {
-        if(!vkbd.showLayer(s)) {
-          vkbd.showLayer('default');
-        }
+      let layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
+      if(layout.getLayer(s)) {
+        this.layerId = s;
+      } else {
+        this.layerId = 'default';
       }
     }
 
@@ -815,9 +811,7 @@ namespace com.keyman.text {
 
     resetContext() {
       let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless && keyman.osk.vkbd) {
-        keyman.osk.vkbd.layerId = 'default';
-      }
+      this.layerId = 'default';
 
       this.keyboardInterface.resetContextCache();
       this.resetVKShift();
@@ -825,23 +819,12 @@ namespace com.keyman.text {
       if(keyman.modelManager) {
         keyman.modelManager.invalidateContext();
       }
-
-      if(!keyman.isHeadless) {
-        keyman.osk._Show();
-      }
     };
 
-    setNumericLayer() {
-      let keyman = com.keyman.singleton;
-      var i;
-      if(!keyman.isHeadless) {
-        let osk = keyman.osk.vkbd;
-        for(i=0; i<osk.layers.length; i++) {
-          if (osk.layers[i].id == 'numeric') {
-            osk.layerId = 'numeric';
-            keyman.osk._Show();
-          }
-        }
+    setNumericLayer(device: EngineDeviceSpec) {
+      let layout = this.activeKeyboard.layout(device.formFactor);
+      if(layout.getLayer('numeric')) {
+        this.layerId = 'numeric';
       }
     };
 

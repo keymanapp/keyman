@@ -118,9 +118,9 @@ namespace com.keyman.renderer {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
             if(keyman.osk.vkbd) {
               if(isMobile) {
-                keyman.osk.vkbd.layerId = layers[i].id;
+                keyman.textProcessor.layerId = layers[i].id;
               } else {
-                keyman.osk.vkbd.layerId = Object.keys(layers)[i];
+                keyman.textProcessor.layerId = Object.keys(layers)[i];
               }
             } else {
               console.error("Error - keyman.osk.vkbd is undefined!");

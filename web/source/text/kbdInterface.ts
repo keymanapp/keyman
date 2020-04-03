@@ -177,7 +177,7 @@ namespace com.keyman.text {
     static readonly TSS_LAYER:    number = 33;
     static readonly TSS_PLATFORM: number = 31;
 
-    platformSystemStore = new PlatformSystemStore(this);
+    systemStores: {[storeID: number]: SystemStore};
 
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
@@ -186,6 +186,10 @@ namespace com.keyman.text {
     activeDevice: EngineDeviceSpec;
 
     constructor() {
+      this.systemStores = {};
+      
+      this.systemStores[KeyboardInterface.TSS_PLATFORM] = new PlatformSystemStore(this);
+      this.systemStores[KeyboardInterface.TSS_LAYER] = new MutableSystemStore(KeyboardInterface.TSS_LAYER, 'default');
     }
 
     /**
@@ -806,14 +810,10 @@ namespace com.keyman.text {
      * @return      {boolean}                 True if the test succeeds 
      */       
     ifStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
-      let keyman = com.keyman.singleton;
-
       var result=true;
-      if(systemId == KeyboardInterface.TSS_LAYER) {
-        // How would this be handled in an eventual headless mode?
-        result = (keyman.osk.vkbd.layerId === strValue);
-      } else if(systemId == KeyboardInterface.TSS_PLATFORM) {
-        result = this.platformSystemStore.matches(strValue);
+      let store = this.systemStores[systemId];
+      if(store) {
+        result = store.matches(strValue);
       }
       return result; //Moved from previous line, now supports layer selection, Build 350 
     }

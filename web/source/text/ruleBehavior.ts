@@ -34,6 +34,8 @@ namespace com.keyman.text {
     warningLog?: string;
 
     finalize() {
+      // TODO:  Rework logging and references to be fully headless-compatible.  
+      //        We'll probably need warning/error callbacks on Processor to facilitate that.
       let keyman = com.keyman.singleton;
       let outputTarget = this.transcription.keystroke.Ltarg;
 
@@ -44,24 +46,19 @@ namespace com.keyman.text {
       }
 
       for(let storeID in this.setStore) {
-        // TODO:  Must be relocated further 'out' to complete the full, planned web-core refactor.
-        //        `Processor` shouldn't be directly setting anything on the OSK when the refactor is complete.
-        //
-        //        There's also the issue of Stores in general, which rely on cookies...
-        //        Gotta handle variable stores as well, which we currently do nothing for!
-        
-        // How would this be handled in an eventual headless mode?
-        switch(Number.parseInt(storeID)) { // Because the number was converted into a String for 'dictionary' use.
-          case KeyboardInterface.TSS_LAYER:
-            keyman.osk.vkbd.showLayer(this.setStore[storeID]); //Build 350, osk reference now OK, so should work
-            break;
-          case KeyboardInterface.TSS_PLATFORM:
+        let sysStore = keyman.textProcessor.keyboardInterface.systemStores[storeID];
+        if(sysStore) {
+          try {
+            sysStore.set(this.setStore[storeID]);
+          } catch (error) {
             console.error("Rule attempted to perform illegal operation - 'platform' may not be changed.");
-            break;
-          default:
-            console.warn("Unknown store affected by keyboard rule: " + storeID);
+          }
+        } else {
+          console.warn("Unknown store affected by keyboard rule: " + storeID);
         }
       }
+
+      // TODO: Gotta handle variable store save commands, which currently rely on cookies.
 
       if(this.triggersDefaultCommand) {
         let keyEvent = this.transcription.keystroke;
