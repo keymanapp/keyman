@@ -18,13 +18,6 @@ echo Build KeyboardHarness test app
 #
 SHLVL=0
 
-echo Build KMEA first
-cd ../../KMEA
-./build.sh
-cd ../Tests/KeyboardHarness
-cp ../keyman-engine.aar app/libs/
-
-
 NO_DAEMON=false
 ONLY_DEBUG=false
 
