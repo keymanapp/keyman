@@ -1,9 +1,14 @@
+// Defines build-environment variables, as used for versioning.
+/// <reference path="../environment.inc.ts" />
+
 // Ensure that this class contains no reference into core KMW code - it is referenced
 // by components intended to be modular and possible to separate from core KMW.
 
 namespace com.keyman.utils {
   // Dotted-decimal version
   export class Version {
+    public static readonly CURRENT = new Version(com.keyman.environment.VERSION);
+
     // Represents a default version value for keyboards compiled before this was compiled into keyboards.
     // The exact version is unknown at this point, but the value is "good enough" for what we need.
     public static readonly DEVELOPER_VERSION_FALLBACK = new Version([9, 0, 0]);
