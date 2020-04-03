@@ -19,6 +19,11 @@ namespace com.keyman.text {
     setStore: {[id: number]: string} = {};
 
     /**
+     * A set of variable stores with save requests triggered by the matched keyboard rule
+     */
+    saveStore: {[name: string]: VariableStore} = {};
+
+    /**
      * Denotes a non-output default behavior; this should be evaluated later, against the true keystroke.
      */
     triggersDefaultCommand?: boolean;
@@ -55,7 +60,11 @@ namespace com.keyman.text {
         }
       }
 
-      // TODO: Gotta handle variable store save commands, which currently rely on cookies.
+      if(processor.keyboardInterface.variableStoreSerializer) {
+        for(let storeID in this.saveStore) {
+          processor.keyboardInterface.variableStoreSerializer.saveStore(processor.activeKeyboard.id, storeID, this.saveStore[storeID]);
+        }
+      }
 
       if(this.triggersDefaultCommand) {
         let keyEvent = this.transcription.keystroke;

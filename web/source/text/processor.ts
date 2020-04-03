@@ -17,14 +17,20 @@ namespace com.keyman.text {
   export type BeepHandler = (outputTarget: OutputTarget) => void;
   export type LogMessageHandler = (str: string) => void;
 
-  export class LegacyKeyEvent {
-    Ltarg: HTMLElement;
-    Lcode: number;
-    Lmodifiers: number;
-    LisVirtualKey: number;
+  export interface VariableStoreSerializer {
+    loadStore(keyboardID: string, storeName: string): VariableStore;
+    saveStore(keyboardID: string, storeName: string, storeMap: VariableStore);
+  }
+
+  export interface ProcessorInitOptions {
+    baseLayout?: string;
+    variableStoreSerializer?: VariableStoreSerializer;
   }
 
   export class Processor {
+    public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
+      baseLayout: 'us'
+    }
 
     // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
     // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
@@ -48,9 +54,13 @@ namespace com.keyman.text {
     warningLogger?: LogMessageHandler;
     errorLogger?: LogMessageHandler;
 
-    constructor(baseLayout?: string) {
-      this.baseLayout = baseLayout || 'us'; // default BaseLayout
-      this.keyboardInterface = new KeyboardInterface();
+    constructor(options?: ProcessorInitOptions) {
+      if(!options) {
+        options = Processor.DEFAULT_OPTIONS;
+      }
+
+      this.baseLayout = options.baseLayout || 'us'; // default BaseLayout
+      this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
       this.installInterface();
     }
 

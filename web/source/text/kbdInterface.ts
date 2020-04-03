@@ -30,6 +30,8 @@ namespace com.keyman.text {
 
   type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 
+  export type VariableStore = {[name: string]: string};
+
   type RuleChar = string;
 
   class RuleDeadkey {
@@ -185,11 +187,15 @@ namespace com.keyman.text {
     activeKeyboard: any;
     activeDevice: EngineDeviceSpec;
 
-    constructor() {
+    variableStoreSerializer?: VariableStoreSerializer;
+
+    constructor(variableStoreSerializer: VariableStoreSerializer = null) {
       this.systemStores = {};
       
       this.systemStores[KeyboardInterface.TSS_PLATFORM] = new PlatformSystemStore(this);
       this.systemStores[KeyboardInterface.TSS_LAYER] = new MutableSystemStore(KeyboardInterface.TSS_LAYER, 'default');
+
+      this.variableStoreSerializer = variableStoreSerializer;
     }
 
     /**
@@ -852,12 +858,10 @@ namespace com.keyman.text {
      * to initialize a store value on the keyboard's script object.
      */    
     loadStore(kbdName: string, storeName:string, dfltValue:string): string {
-      let keyman = com.keyman.singleton;
       this.resetContextCache();
-      var cName='KeymanWeb_'+kbdName+'_Option_'+storeName;
-      var cValue=keyman.util.loadCookie(cName);
-      if(typeof cValue[storeName] != 'undefined') {
-        return decodeURIComponent(cValue[storeName]);
+      if(this.variableStoreSerializer) {
+        let cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+        return cValue[storeName] || dfltValue;
       } else {
         return dfltValue;
       }
@@ -875,21 +879,24 @@ namespace com.keyman.text {
      * value across sessions, providing a custom user default for later uses of the keyboard.
      */    
     saveStore(storeName:string, optValue:string): boolean {
-      let keyman = com.keyman.singleton;
       this.resetContextCache();
       var kbd=this.activeKeyboard;
       if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
         return false;
       }
-      
-      // The cookie entry includes the store name...
-      var cName='KeymanWeb_'+kbd.id+'_Option_'+storeName;
-      var cValue=encodeURIComponent(optValue);
 
       // And the lookup under that entry looks for the value under the store name, again.
-      let valueObj = {};
-      valueObj[storeName] = cValue;
-      keyman.util.saveCookie(cName, valueObj);
+      let valueObj: VariableStore = {};
+      valueObj[storeName] = optValue;
+
+      // Null-check in case of invocation during unit-test
+      if(this.ruleBehavior) {
+        this.ruleBehavior.saveStore[storeName] = valueObj;
+      } else {
+        // We're in a unit-test environment, directly invoking this method from outside of a keyboard.
+        // In this case, we should immediately commit the change.
+        this.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeName, valueObj);
+      }
       return true;
     }
 

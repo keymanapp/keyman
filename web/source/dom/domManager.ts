@@ -10,6 +10,8 @@
 /// <reference path="touchAliasElement.ts" />
 // Defines per-element-type OutputTarget element wrapping.
 /// <reference path="targets/wrapElement.ts" />
+// Defines cookie-based variable store serialization
+/// <reference path="variableStoreCookieSerializer.ts" />
 
 namespace com.keyman.dom {
   // Utility object used to handle beep (keyboard error response) operations.
