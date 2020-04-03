@@ -39,7 +39,6 @@ namespace com.keyman.text {
     keyboardInterface: KeyboardInterface;
 
     baseLayout: string;
-    private keyboard: keyboards.Keyboard;
 
     constructor(baseLayout?: string) {
       this.baseLayout = baseLayout || 'us'; // default BaseLayout
@@ -62,19 +61,15 @@ namespace com.keyman.text {
     }
 
     public get activeKeyboard(): keyboards.Keyboard {
-      return this.keyboard;
+      return this.keyboardInterface.activeKeyboard;
     }
 
     public set activeKeyboard(keyboard: keyboards.Keyboard) {
-      this.keyboard = keyboard;
+      this.keyboardInterface.activeKeyboard = keyboard;
 
       // All old deadkeys and keyboard-specific cache should immediately be invalidated
       // on a keyboard change.
       this.resetContext();
-
-      // Ensure that the setting propagates immediately to the keyboard interface object.
-      // Matters for some unit tests.
-      this.keyboardInterface.activeKeyboard = keyboard;
     }
 
     /**

@@ -8,13 +8,13 @@
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
 /// <reference path="text/processor.ts" />
+// Extends KeyboardInterface with DOM-oriented offerings.
+/// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.
 /// <reference path="dom/domManager.ts" />
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwutils.ts" />
-// Defines the keyboard callback object.
-/// <reference path="text/kbdInterface.ts" />
-// Defines keyboard data & management classes.
+// Defines keyboard management classes.
 /// <reference path="keyboards/kmwkeyboards.ts" />
 // Defines KMW's hotkey management object.
 /// <reference path="kmwhotkeys.ts" />

@@ -1,5 +1,4 @@
 /// <reference path="deadkeys.ts" />
-/// <reference path="../kmwbase.ts" />
 /// <reference path="ruleBehavior.ts" />
 
 /***
@@ -187,77 +186,40 @@ namespace com.keyman.text {
     /**
      * Function     KSF
      * Scope        Public
-     * Description  Save keyboard focus
+     * 
+     * Saves the document's current focus settings on behalf of the keyboard.  Often paired with insertText.
      */    
-    saveFocus(): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        dom.DOMEventHandlers.states._IgnoreNextSelChange = 1;
-      }
-    }
-      
+    saveFocus(): void { }
+
     /**
-     * Function     KT
-     * Scope        Public
-     * @param       {string}      Ptext     Text to insert
-     * @param       {?number}     PdeadKey  Dead key number, if any (???)
-     * @return      {boolean}               true if inserted
-     * Description  Insert text into active control
-     */    
-    insertText(Ptext: string, PdeadKey:number): boolean {
-      let keyman = com.keyman.singleton;
-      this.resetContextCache();
-
-      // Find the correct output target to manipulate.
-      let outputTarget: OutputTarget = this.activeTargetOutput ? this.activeTargetOutput : text.Processor.getOutputTarget();
-
-      if(outputTarget != null) {
-        // Required for the `sil_euro_latin` keyboard's desktop OSK/table to function properly.
-        if(!keyman.isHeadless) {
-          keyman.uiManager.setActivatingUI(true);
-          dom.DOMEventHandlers.states._IgnoreNextSelChange = 100;
-          keyman.domManager.focusLastActiveElement();
-          dom.DOMEventHandlers.states._IgnoreNextSelChange = 0;
-        }
-
-        if(Ptext!=null) {
-          this.output(0, outputTarget, Ptext);
-        }
-
-        if((typeof(PdeadKey)!=='undefined') && (PdeadKey !== null)) {
-          this.deadkeyOutput(0, outputTarget, PdeadKey);
-        }
-
-        outputTarget.invalidateSelection();
-        return true;
-      }
-      return false;
-    }
+     * A text-insertion method used by custom OSKs for helpHTML interaction, like with sil_euro_latin.
+     * 
+     * This function currently bypasses web-core's standard text handling control path and all predictive text processing.
+     * It also has DOM-dependencies that help ensure KMW's active OutputTarget retains focus during use.
+     */
+    insertText?: (Ptext: string, PdeadKey: number) => boolean;
     
     /**
      * Function     registerKeyboard  KR                    
      * Scope        Public
      * @param       {Object}      Pk      Keyboard  object
-     * Description  Register and load the keyboard
+     * Description  Registers a keyboard with KeymanWeb once its script has fully loaded.
+     * 
+     *              In web-core, this also activates the keyboard; in other modules, this method
+     *              may be replaced with other implementations.
      */    
     registerKeyboard(Pk): void {
-      let keyman = com.keyman.singleton;
-      keyman.keyboardManager._registerKeyboard(Pk);
+      // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale, 
+      //        by DOM-aware code.
+      let keyboard = new keyboards.Keyboard(Pk);
+      this.activeKeyboard = keyboard;
     }
 
     /**
-     * Add the basic keyboard parameters (keyboard stub) to the array of keyboard stubs
-     * If no language code is specified in a keyboard it cannot be registered, 
-     * and a keyboard stub must be registered before the keyboard is loaded 
-     * for the keyboard to be usable.
-     * 
-     * @param       {Object}      Pstub     Keyboard stub object
-     * @return      {?number}               1 if already registered, else null
+     * Used by DOM-aware KeymanWeb to add keyboard stubs, used by the `KeyboardManager` type 
+     * to optimize resource use.
      */    
-    registerStub(Pstub): number {
-      let keyman = com.keyman.singleton;
-      return keyman.keyboardManager._registerStub(Pstub);
-    }
+    registerStub?: (Pstub) => number;
 
     /**
      * Get *cached or uncached* keyboard context for a specified range, relative to caret
@@ -1040,49 +1002,5 @@ namespace com.keyman.text {
 
       return behavior;
     }
-    
-    /**
-     * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
-     */
-    ['getLastActiveElement'](): OutputTarget {
-      return text.Processor.getOutputTarget();
-    }
-
-    ['focusLastActiveElement'](): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.domManager.focusLastActiveElement(); 
-      }
-    }
-
-    //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
-    ['hideHelp'](): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.osk._Hide(true);
-      }
-    }
-
-    ['showHelp'](Px: number, Py: number): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.osk._Show(Px,Py);
-      }
-    }
-
-    ['showPinnedHelp'](): void {
-      let keyman = com.keyman.singleton;
-      if(!keyman.isHeadless) {
-        keyman.osk.userPositioned=true; 
-        keyman.osk._Show(-1,-1);
-      }
-    }
-
-    // Also needed for some legacy CJK keyboards.
-    ['GetLastActiveElement'] = this['getLastActiveElement'];
-    ['FocusLastActiveElement'] = this['focusLastActiveElement'];
-    ['HideHelp'] = this['hideHelp'];
-    ['ShowHelp'] = this['showHelp'];
-    ['ShowPinnedHelp'] = this['showPinnedHelp'];
   }
 }
