@@ -567,6 +567,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           }
         }
 
+        // Append to "url" as needed to satisfy the keyboard download endpoint
+        // Usage: download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
         String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language);
         String languageStr = (languageID != null) ? String.format("&language=%s", languageID) : "";
         url = String.format("%s%s", url, languageStr);
