@@ -12,6 +12,8 @@
 /// <reference path="keyMapping.ts" />
 // Defines a core-compatible 'Device' analogue for use in keyEvent processing
 /// <reference path="engineDeviceSpec.ts" />
+// Defines the getGlobalObject() utility method.
+/// <reference path="../utils/globalObject.ts" />
 
 namespace com.keyman.text {
   export type BeepHandler = (outputTarget: OutputTarget) => void;
@@ -69,7 +71,7 @@ namespace com.keyman.text {
       //        the global object (whether browser, Node, WebWorker).
       //
       //        We must ensure that the keyboard can find the API functions at the expected place.
-      let globalThis = window;
+      let globalThis = utils.getGlobalObject();
       globalThis[KeyboardInterface.GLOBAL_NAME] = this.keyboardInterface;
 
       // Ensure that the active keyboard is set on the keyboard interface object.
