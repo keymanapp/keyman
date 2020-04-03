@@ -4,6 +4,8 @@
 /// <reference path="../kmwbase.ts" />
 // References DOM event handling interfaces and classes.
 /// <reference path="domEventHandlers.ts" />
+// References DOM-specific output handling.
+/// <reference path="domDefaultOutput.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="../text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.

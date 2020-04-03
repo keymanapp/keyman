@@ -161,11 +161,11 @@ namespace com.keyman.text {
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
             this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
-          } else if(special) {
+          } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
             return null;
-          } else {
+          } else if(char != '') {
             this.keyboardInterface.output(0, outputTarget, char);
           }
         } else {

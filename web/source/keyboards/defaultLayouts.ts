@@ -4,6 +4,7 @@
 ***/
 
 ///<reference path="../utils/version.ts"/>
+///<reference path="../utils/deepCopy.ts"/>
 
 namespace com.keyman.keyboards {
   let Codes = com.keyman.text.Codes;
@@ -115,9 +116,6 @@ namespace com.keyman.keyboards {
     * @return  {Object}
     */
     static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
-      // TODO:  Only here because of util.deepCopy.  Start a web-core utils so that it's accessible in headless.
-      let util = com.keyman.singleton.util;
-
       // Build a layout using the default for the device
       var layoutType=formFactor;
 
@@ -138,7 +136,7 @@ namespace com.keyman.keyboards {
       }
 
       // Clone the default layout object for this device
-      var layout: LayoutFormFactor = util.deepCopy(Layouts.dfltLayout[layoutType]);
+      var layout: LayoutFormFactor = utils.deepCopy(Layouts.dfltLayout[layoutType]);
 
       var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
       var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
@@ -235,7 +233,7 @@ namespace com.keyman.keyboards {
       for(n=0; n<idList.length; n++) {
         // Populate non-default (shifted) keygroups
         if(n > 0) {
-          layers[n]=util.deepCopy(layers[0]);
+          layers[n]=utils.deepCopy(layers[0]);
         }
         layers[n]['id']=idList[n];
         layers[n]['nextlayer']=idList[n]; // This would only be different for a dynamic keyboard
