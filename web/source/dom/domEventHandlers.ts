@@ -461,7 +461,7 @@ namespace com.keyman.dom {
       if(Levent == null || !osk.ready) {
         return true;
       }
-      var inputEle = Levent.Ltarg.getElement();
+      var inputEle = (Levent.Ltarg as targets.OutputTarget).getElement();
 
       // Since this part concerns DOM element + browser interaction management, we preprocess it for
       // browser form commands before passing control to the Processor module.

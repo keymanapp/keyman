@@ -112,11 +112,15 @@ namespace com.keyman.dom {
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
      */    
-    doBeep(outputTarget: text.OutputTarget) {
+    doBeep(outputTarget: targets.OutputTarget) {
       // Handles embedded-mode beeps.
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();
+        return;
+      }
+
+      if(!(outputTarget instanceof targets.OutputTarget)) {
         return;
       }
 

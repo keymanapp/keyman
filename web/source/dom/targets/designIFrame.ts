@@ -30,7 +30,7 @@ namespace com.keyman.dom.targets {
     }
   }
 
-  export class DesignIFrame extends text.OutputTarget {
+  export class DesignIFrame extends OutputTarget {
     root: HTMLIFrameElement;
     doc: Document;
     docRoot: HTMLElement;

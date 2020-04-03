@@ -4,7 +4,7 @@
 /// <reference path="../../text/outputTarget.ts" />
 
 namespace com.keyman.dom.targets {
-  export class TouchAlias extends text.OutputTarget {
+  export class TouchAlias extends OutputTarget {
     root: TouchAliasElement;
 
     constructor(e: TouchAliasElement) {

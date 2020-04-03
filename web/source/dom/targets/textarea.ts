@@ -1,5 +1,5 @@
 namespace com.keyman.dom.targets {
-  export class TextArea extends text.OutputTarget {
+  export class TextArea extends OutputTarget {
     root: HTMLTextAreaElement;
 
     /**
