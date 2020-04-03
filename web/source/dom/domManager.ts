@@ -1249,8 +1249,8 @@ namespace com.keyman.dom {
      *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123) 
      **/
     setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
-      if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
-        e=document.getElementById(e);
+      if(typeof e == "string") { // Can't instanceof string, and String is a different type.
+        e = document.getElementById(e);
       }
 
       if(this.keyman.isEmbedded) {
@@ -1266,7 +1266,7 @@ namespace com.keyman.dom {
 
       // As this is an API function, someone may pass in the base of a touch element.
       // We need to respond appropriately.
-      e = e['kmw_ip'] ? e['kmw_ip'] : e;
+      e = (e['kmw_ip'] ? e['kmw_ip'] : e) as HTMLElement;
 
       // If we're changing controls, don't forget to properly manage the keyboard settings!
       // It's only an issue on 'native' (non-embedded) code paths.
