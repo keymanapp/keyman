@@ -239,6 +239,9 @@ public class CloudDownloadMgr{
   private CloudApiTypes.SingleCloudDownload createRequest(Context aContext, int aNo, CloudApiTypes.CloudApiParam aParam)
   {
 
+    // From DownloadManager documentation:
+    // https://developer.android.com/reference/android/app/DownloadManager.Request#setDestinationUri(android.net.Uri)
+    // Must be a file to a path on external storage, and the calling app must have the WRITE_EXTERNAL_STORAGE permission
     File _file=new File(aContext.getExternalFilesDir(null),"download_"+System.currentTimeMillis()+"_"+aNo);
        /*
        Create a DownloadManager.Request with all the information necessary to start the download
