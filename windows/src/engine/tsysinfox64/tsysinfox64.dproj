@@ -3,7 +3,7 @@
         <ProjectGuid>{7205C254-6B8A-4F72-9B7F-08216A8798CF}</ProjectGuid>
         <MainSource>tsysinfox64.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>2</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
@@ -100,12 +100,13 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <Debugger_RunParams>c:\temp\blah.xml</Debugger_RunParams>
+        <Debugger_RunParams>-sentry-client-test-exception</Debugger_RunParams>
         <DCC_DebugInformation>1</DCC_DebugInformation>
         <VerInfo_Keys>CompanyName=;FileVersion=5.0.0.26;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_UseMSBuildExternally>true</DCC_UseMSBuildExternally>
         <BT_BuildType>Debug</BT_BuildType>
+        <DCC_DebugInfoInExe>false</DCC_DebugInfoInExe>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Icon_MainIcon>tsysinfo_Icon.ico</Icon_MainIcon>

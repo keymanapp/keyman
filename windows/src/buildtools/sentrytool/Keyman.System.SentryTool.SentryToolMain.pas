@@ -101,6 +101,7 @@ var
   ms: TMemoryStream;
   guid: TGUID;
   codeId: string;
+  isAmd64: Boolean;
 begin
   if not ParseParams then
   begin
@@ -121,7 +122,7 @@ begin
       Exit(1);
     end;
 
-    if not AddDebugId(ms, guid, codeId) then
+    if not AddDebugId(ms, guid, codeId, isAmd64) then
       Exit(1);
 
     ms.SaveToFile(FOutfile);
@@ -135,7 +136,7 @@ begin
         FOutfile,
         ChangeFileExt(FInfile, '.map'),
         ChangeFileExt(FOutfile, '.sym'),
-        codeId, guid, 1,
+        codeId, isAmd64, guid, 1,
         FindFilePath) then
       Exit(1);
   finally

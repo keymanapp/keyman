@@ -181,6 +181,11 @@ end;
 function SentryVectoredHandler(ExceptionInfo: PEXCEPTION_POINTERS): DWORD; stdcall;
 const
   cDelphiException    = $0EEDFADE;  // From System.pas
+{$IFDEF WIN64}
+  DELPHI_FRAMES_TO_SKIP = 3;  // Delphi x64 exceptions have RaiseException, System.@RaseAtExcept, System.@RaiseExcept frames
+{$ELSE}
+  DELPHI_FRAMES_TO_SKIP = 1;  // Delphi x86 exceptions have RaiseException frame
+{$ENDIF}
 var
   Skip: Integer;
   LastMask: TArithmeticExceptionMask;
@@ -192,7 +197,7 @@ begin
     LastMask := System.Math.SetExceptionMask([]);
 
     if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
-      then Skip := 1  // Delphi exceptions will have a RaiseException nested call
+      then Skip := DELPHI_FRAMES_TO_SKIP
       else Skip := 0;
     CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
@@ -234,6 +239,12 @@ begin
 
   if AOptions.Debug then
     sentry_options_set_debug(options, 1);
+
+  if AOptions.DatabasePath <> '' then
+    sentry_options_set_database_pathw(options, PWideChar(AOptions.DatabasePath));
+
+  if AOptions.HandlerPath <> '' then
+    sentry_options_set_handler_pathw(options, PWideChar(AOptions.HandlerPath));
 
   sentry_init(options);
 
@@ -489,7 +500,7 @@ begin
   frame.AddrStack.Offset := c.Esp;
   frame.AddrStack.Mode := AddrModeFlat;
 {$ENDIF}
-  while (n < MAX_FRAMES) and StackWalk64(image, GetCurrentProcess, GetCurrentThread, frame, nil, nil, SymFunctionTableAccess64, SymGetModuleBase64, nil) do
+  while (n < MAX_FRAMES) and StackWalk64(image, GetCurrentProcess, GetCurrentThread, frame, @c, nil, SymFunctionTableAccess64, SymGetModuleBase64, nil) do
   begin
     if frame.AddrFrame.Offset = 0 then
       // End of stack or broken stack
