@@ -482,7 +482,7 @@ var
 begin
   inherited;
 
-  TKeymanSentryClient.Client.MessageEvent(SENTRY_LEVEL_INFO, TKeymanSentryClient.LOGGER_DEVELOPER_IDE, 'Started Keyman Developer');
+  //KEYMAN-SENTRY:UNDO: TKeymanSentryClient.Client.MessageEvent(SENTRY_LEVEL_INFO, TKeymanSentryClient.LOGGER_DEVELOPER_IDE, 'Started Keyman Developer');
 
   if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
   begin

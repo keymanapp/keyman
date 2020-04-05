@@ -289,7 +289,7 @@ end;
 
 class procedure TKeymanSentryClient.Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
 begin
-  TKeymanSentryClient.Create(SentryClientClass, AProject, AFlags);
+  //KEYMAN-SENTRY:UNDO: TKeymanSentryClient.Create(SentryClientClass, AProject, AFlags);
 end;
 
 class procedure TKeymanSentryClient.Stop;

@@ -222,7 +222,7 @@ begin
     FDefaultProjectPath := IncludeTrailingPathDelimiter(regReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
 
     // for consistency with Keyman.System.KeymanSentryClient, we need to use
-    // reg.ReadInteger, as regReadInt, which in the dim dark past started
+    // reg.ReadInteger, as regReadInt in the dim dark past started
     // to read integers as a REG_SZ type and that's far too messy to change now.
     FReportErrors := not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
       (reg.ReadInteger(SRegValue_AutomaticallyReportErrors) <> 0);

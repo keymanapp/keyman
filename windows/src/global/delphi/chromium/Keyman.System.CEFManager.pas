@@ -50,8 +50,6 @@ uses
   Winapi.ShlObj,
   Winapi.Windows,
 
-  Sentry.Client,
-
   KeymanPaths,
   KeymanVersion,
 //  RedistFiles,
