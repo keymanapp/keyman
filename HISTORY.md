@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.45 alpha 2020-04-05
+
+* chore(deps-dev): bump minimist from 1.2.2 to 1.2.3 in /web/testing/regression-tests (#2947)
+
 ## 14.0.44 alpha 2020-04-03
 
 * refactor(web/engine): begins formally removing DOM-aware keyboard API functions from web-core KeyboardInterface (#2915)
