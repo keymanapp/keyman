@@ -11,6 +11,7 @@
 bool g_report_exceptions, g_report_messages;
 
 int keyman_sentry_init(bool is_keyman_developer) {
+#if 0
   sentry_options_t *options = sentry_options_new();
   const char *key;
 
@@ -26,7 +27,7 @@ int keyman_sentry_init(bool is_keyman_developer) {
   if (RegOpenKeyExA(HKEY_CURRENT_USER, key, 0, KEY_READ, &hkey) == ERROR_SUCCESS) {
     DWORD dwType, dwValue, dwValueSize = 4;
 
-    g_report_exceptions = 
+    g_report_exceptions =
       RegQueryValueExA(hkey, REGSZ_AutomaticallyReportErrors, NULL, &dwType, (LPBYTE)&dwValue, &dwValueSize) != ERROR_SUCCESS || dwType != REG_DWORD || dwValue != 0;
 
     dwValueSize = 4;
@@ -47,10 +48,15 @@ int keyman_sentry_init(bool is_keyman_developer) {
   //sentry_options_set_debug(options, 1);
 
   return sentry_init(options);
+#else
+  return 0;
+#endif
 }
 
 void keyman_sentry_shutdown() {
+#if 0
   sentry_shutdown();
+#endif
 }
 
 //
@@ -97,6 +103,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
 }
 
 void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress) {
+#if 0
   sentry_value_t event;
   const int FRAMES_TO_SKIP = 0;
 
@@ -129,9 +136,11 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
 
     perror(message);
   }
+#endif
 }
 
 void keyman_sentry_report_message(keyman_sentry_level_t level, const char *logger, const char *message, bool includeStack) {
+#if 0
   const int FRAMES_TO_SKIP = 0;
 
   if ((g_report_exceptions && (level == SENTRY_LEVEL_ERROR || level == SENTRY_LEVEL_DEBUG)) || g_report_messages) {
@@ -154,6 +163,7 @@ void keyman_sentry_report_message(keyman_sentry_level_t level, const char *logge
 
     sentry_capture_event(event);
   }
+#endif
 }
 
 /* Wrappers for main, wmain */
@@ -167,7 +177,9 @@ LONG WINAPI FilterExceptions(_In_ struct _EXCEPTION_POINTERS *ExceptionInfo) {
 }
 
 void keyman_sentry_setexceptionfilter() {
+#if 0
   LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
+#endif
 }
 
 int keyman_sentry_main(bool is_keyman_developer, int argc, char *argv[], int (*run)(int, char**)) {
