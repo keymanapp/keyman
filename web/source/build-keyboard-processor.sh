@@ -1,6 +1,6 @@
 #! /bin/bash
 # 
-# Compile keymanweb and copy compiled javascript and resources to output/embedded folder
+# Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
 #
 
 ## START STANDARD BUILD SCRIPT INCLUDE
