@@ -354,10 +354,10 @@ namespace com.keyman.text {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
-      let processor = (<KeymanBase> keymanweb).textProcessor;
+      let core = (<KeymanBase> keymanweb).core;
 
       var origArg = keyName;
-      if(!keymanweb.textProcessor.activeKeyboard || !osk.vkbd) {
+      if(!keymanweb.core.activeKeyboard || !osk.vkbd) {
         return false;
       }
 
@@ -367,15 +367,15 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues      
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
       
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:processor.core.layerId);
+      var t=keyName.split('-'),layer=(t.length>1?t[0]:core.keyboardProcessor.layerId);
       keyName=t[t.length-1];
       if(layer == 'undefined') {
-        layer=processor.core.layerId;
+        layer=core.keyboardProcessor.layerId;
       }
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=processor.core.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=core.keyboardProcessor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -427,20 +427,20 @@ namespace com.keyman.text {
       };
 
       // Process modifier key action
-      if(processor.core.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
+      if(core.keyboardProcessor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
         return true;      
       }
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
       // we can handle many other pre-processing steps the same way with this common method.
-      processor.core.setSyntheticEventDefaults(Lkc);
+      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
 
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          processor.core.selectLayer(Lkc);
+          core.keyboardProcessor.selectLayer(Lkc);
         }
         return false;
       }
@@ -470,7 +470,7 @@ namespace com.keyman.text {
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
     let keyman = com.keyman.singleton;
-    if(!keyman.textProcessor.activeKeyboard || code == 0) {
+    if(!keyman.core.activeKeyboard || code == 0) {
       return false;
     }
 
@@ -499,7 +499,7 @@ namespace com.keyman.text {
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return keyman.textProcessor.processKeyEvent(Lkc); // Lack of second argument -> `usingOSK == false`
+      return keyman.core.processKeyEvent(Lkc); // Lack of second argument -> `usingOSK == false`
     } catch (err) {
       console.error(err.message, err);
       return false;

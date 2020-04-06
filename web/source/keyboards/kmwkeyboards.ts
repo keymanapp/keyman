@@ -110,8 +110,8 @@ namespace com.keyman.keyboards {
     }
 
     getActiveKeyboardName(): string {
-      let textProcessor = com.keyman.singleton.textProcessor;
-      return textProcessor.activeKeyboard ? textProcessor.activeKeyboard.id : '';
+      let core = com.keyman.singleton.core;
+      return core.activeKeyboard ? core.activeKeyboard.id : '';
     }
 
     getActiveLanguage(fullName?: boolean): string {
@@ -410,7 +410,7 @@ namespace com.keyman.keyboards {
       var util = keyman.util;
       var osk = keyman.osk;
 
-      let activeKeyboard = keyman.textProcessor.activeKeyboard;
+      let activeKeyboard = keyman.core.activeKeyboard;
 
       // Set default language code
       if(arguments.length < 2 || (!PLgCode)) {
@@ -464,7 +464,7 @@ namespace com.keyman.keyboards {
         }
       }
 
-      keyman.textProcessor.activeKeyboard = null;
+      keyman.core.activeKeyboard = null;
       this.activeStub = null;
 
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops)
@@ -481,7 +481,7 @@ namespace com.keyman.keyboards {
       // Determine if the keyboard was previously loaded but is not active and use the prior load if so.
       for(Ln=0; Ln<this.keyboards.length; Ln++) { // I1511 - array prototype extended
         if(this.keyboards[Ln]['KI'] == PInternalName) {
-          keyman.textProcessor.activeKeyboard = new Keyboard(this.keyboards[Ln]);
+          keyman.core.activeKeyboard = new Keyboard(this.keyboards[Ln]);
           this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
         
           // and update the active stub
@@ -496,7 +496,7 @@ namespace com.keyman.keyboards {
         }
       }
 
-      if(keyman.textProcessor.activeKeyboard == null) {
+      if(keyman.core.activeKeyboard == null) {
         for(Ln=0; Ln<this.keyboardStubs.length; Ln++) { // I1511 - array prototype extended
           if((this.keyboardStubs[Ln]['KI'] == PInternalName) 
             && ((this.keyboardStubs[Ln]['KLC'] == PLgCode) || (PLgCode == '---'))) {
@@ -576,7 +576,7 @@ namespace com.keyman.keyboards {
         this.keymanweb.domManager._SetTargDir(this.keymanweb.domManager.getLastActiveElement());  // I2077 - LTR/RTL timing
       }
 
-      var Pk=keyman.textProcessor.activeKeyboard;  // I3319
+      var Pk=keyman.core.activeKeyboard;  // I3319
       if(Pk !== null)  // I3363 (Build 301)
         Pk = Pk.scriptObject;
         String.kmwEnableSupplementaryPlane(Pk && ((Pk['KS'] && (Pk['KS'] == 1)) || (Pk['KN'] == 'Hieroglyphic'))); // I3319
@@ -611,7 +611,7 @@ namespace com.keyman.keyboards {
       var kbdName = kbdStub['KN'];
 
       var manager = this;
-      let textProcessor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
 
       // Add a handler for cases where the new <script> block fails to load.
       Lscript.addEventListener('error', function() {
@@ -645,7 +645,7 @@ namespace com.keyman.keyboards {
           //Activate keyboard, if it's still the active stub.
           if(kbdStub == manager.activeStub) {
             manager.doBeforeKeyboardChange(kbd['KI'],kbdStub['KLC']);
-            textProcessor.activeKeyboard=new Keyboard(kbd);
+            core.activeKeyboard=new Keyboard(kbd);
 
             if(manager.keymanweb.domManager.getLastActiveElement() != null) { // TODO:  Resolve without need for the cast.
               manager.keymanweb.uiManager.justActivated = true; // TODO:  Resolve without need for the cast.
@@ -717,7 +717,7 @@ namespace com.keyman.keyboards {
      */    
     restoreCurrentKeyboard() {
       var stubs = this.keyboardStubs, i, n=stubs.length;
-      let textProcessor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
 
       // Do nothing if no stubs loaded
       if(stubs.length < 1) return;
@@ -739,7 +739,7 @@ namespace com.keyman.keyboards {
     
       // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
       // if((i < n) || (device.touchable && (this.activeKeyboard == null)))
-      if((i < n) || (textProcessor.activeKeyboard == null))
+      if((i < n) || (core.activeKeyboard == null))
       {
         this._SetActiveKeyboard(t[0],t[1],false);
         this.keymanweb.globalKeyboard = t[0];

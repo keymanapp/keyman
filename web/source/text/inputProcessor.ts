@@ -16,12 +16,12 @@ namespace com.keyman.text {
       this.kbdProcessor = new KeyboardProcessor(options);
     }
 
-    public get core(): KeyboardProcessor {
+    public get keyboardProcessor(): KeyboardProcessor {
       return this.kbdProcessor;
     }
 
     public get keyboardInterface(): text.KeyboardInterface {
-      return this.core.keyboardInterface;
+      return this.keyboardProcessor.keyboardInterface;
     }
 
     public get activeKeyboard(): keyboards.Keyboard {
@@ -57,14 +57,14 @@ namespace com.keyman.text {
       if((formFactor == FormFactor.Desktop || !this.activeKeyboard || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
-        if(this.core.selectLayer(keyEvent)) {
+        if(this.keyboardProcessor.selectLayer(keyEvent)) {
           return true;
         }
       }
 
       // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
       // of state management.
-      if(!fromOSK && this.core.doModifierPress(keyEvent, !fromOSK)) {
+      if(!fromOSK && this.keyboardProcessor.doModifierPress(keyEvent, !fromOSK)) {
         return true;
       }
 
@@ -86,11 +86,11 @@ namespace com.keyman.text {
       // // ...end I3363 (Build 301)
 
       let preInputMock = Mock.from(outputTarget);
-      let ruleBehavior = this.core.processKeystroke(keyEvent, outputTarget);
+      let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
 
       // Swap layer as appropriate.
       if(keyEvent.kNextLayer) {
-        this.core.selectLayer(keyEvent);
+        this.keyboardProcessor.selectLayer(keyEvent);
       }
       
       // Should we swallow any further processing of keystroke events for this keydown-keypress sequence?
@@ -116,7 +116,7 @@ namespace com.keyman.text {
 
               let altEvent = osk.PreProcessor._GetClickEventProperties(altKey, outputTarget.getElement());
               altEvent.Ltarg = mock;
-              let alternateBehavior = this.core.processKeystroke(altEvent, mock);
+              let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
               if(alternateBehavior) {
                 // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
                 //       so a user should never have intended to type it.  Should probably renormalize 
@@ -135,7 +135,7 @@ namespace com.keyman.text {
 
         // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
         // by the actual keystroke occur.
-        ruleBehavior.finalize(this.core);
+        ruleBehavior.finalize(this.keyboardProcessor);
 
         // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
         //
@@ -183,7 +183,7 @@ namespace com.keyman.text {
 
     public resetContext() {
       let keyman = com.keyman.singleton;
-      this.core.resetContext();
+      this.keyboardProcessor.resetContext();
 
       if(keyman.modelManager) {
         keyman.modelManager.invalidateContext();

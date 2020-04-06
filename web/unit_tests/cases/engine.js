@@ -26,7 +26,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       ruleSeq.simulateSequenceOn(inputElem);
 
       // Now for the real test!
-      var res = keyman.textProcessor.keyboardInterface.fullContextMatch(ruleDef.n, inputElem._kmwAttachment.interface, ruleDef.rule);
+      var res = keyman.core.keyboardInterface.fullContextMatch(ruleDef.n, inputElem._kmwAttachment.interface, ruleDef.rule);
 
       var msg = matchTest.msg;
       if(!msg) {
@@ -806,7 +806,7 @@ describe('Engine', function() {
         var s = STORES[i];
 
         String.kmwEnableSupplementaryPlane(s.smp);
-        var result = keyman.textProcessor.keyboardInterface._ExplodeStore(s.in);
+        var result = keyman.core.keyboardInterface._ExplodeStore(s.in);
         assert.sameOrderedMembers(result, s.out, "Failure exploding " + (s.smp ? "SMP" : "non-SMP") + " string value \"" + s.in + "\"");
       }
       String.kmwEnableSupplementaryPlane(false);
@@ -828,7 +828,7 @@ describe('Engine', function() {
         ruleSeq.simulateSequenceOn(inputElem);
 
         // Now for the real test!
-        var res = keyman.textProcessor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem._kmwAttachment.interface);
+        var res = keyman.core.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem._kmwAttachment.interface);
 
         assert.sameOrderedMembers(res.valContext, ruleDef.contextCache);
 
