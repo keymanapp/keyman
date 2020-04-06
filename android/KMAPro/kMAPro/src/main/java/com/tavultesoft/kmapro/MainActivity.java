@@ -36,6 +36,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.Uri.Builder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -318,8 +319,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     data = intent.getData();
 
     if (data != null) {
-
-      switch (data.getScheme().toLowerCase()) {
+      String scheme = data.getScheme().toLowerCase();
+      switch (scheme) {
         // content:// Android DownloadManager
         // file:// Chrome downloads and Filebrowsers
         case "content":
@@ -328,13 +329,20 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           break;
         case "http" :
         case "https" :
-          downloadKMP();
+          downloadKMP(scheme);
           break;
         case "keyman" :
-          downloadKMP();
+          // Convert opaque URI to hierarchical URI so the query parameters can be parsed
+          Builder builder = new Uri.Builder();
+          builder.scheme("https")
+            .authority("keyman.com")
+            .appendPath("keyboards")
+            .encodedQuery(data.getEncodedQuery());
+          data = Uri.parse(builder.build().toString());
+          downloadKMP(scheme);
           break;
         default :
-          Log.e(TAG, "Unrecognized protocol " + data.getScheme());
+          Log.e(TAG, "Unrecognized scheme: " + scheme);
       }
     }
     intent.setData(null);
@@ -549,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
    * Parse the URI data to determine the URL for the .kmp keyboard package.
    *
    */
-  private void downloadKMP() {
+  private void downloadKMP(String scheme) {
     Intent downloadIntent;
     try {
       String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
@@ -568,18 +576,16 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           }
         }
 
-        // Append to "url" as needed to satisfy the keyboard download endpoint
-        // Usage: download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
-        String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language);
-        String languageStr = (languageID != null) ? String.format("&language=%s", languageID) : "";
-        url = String.format("%s%s", url, languageStr);
+        // Parse the url for the BCP 47 language ID
+        Uri uri = Uri.parse(url);
+        String languageID = uri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
 
-        String platform = data.getQueryParameter("platform");
-        String platformStr = (platform != null) ? String.format("&platform=%s", platform) : "";
-        url = String.format("%s%s", url, platformStr);
+        // Keyboard download endpoint:
+        // download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
+        url = url.toLowerCase();
 
         // Only handle ad-hoc kmp packages or from keyman.com
-        if (FileUtils.hasKeymanPackageExtension(url) || data.getScheme().toLowerCase().equals("keyman")) {
+        if (FileUtils.hasKeymanPackageExtension(url) || scheme.equals("keyman")) {
           try {
             // Download the KMP to app cache
             downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
@@ -610,7 +616,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             Toast.LENGTH_SHORT).show();
         }
       }
-    } catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException | NullPointerException e) {
       String message = "Download failed. Invalid URL.";
       Toast.makeText(getApplicationContext(), message,
         Toast.LENGTH_SHORT).show();
