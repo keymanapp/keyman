@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.46 alpha 2020-04-06
+
+* fix(android): Add check for WRITE_EXTERNAL_STORAGE permission (#2946)
+
 ## 14.0.45 alpha 2020-04-05
 
 * chore(deps-dev): bump minimist from 1.2.2 to 1.2.3 in /web/testing/regression-tests (#2947)
