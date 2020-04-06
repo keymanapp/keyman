@@ -122,7 +122,7 @@ var testRunner = {
       })
       .then(function() {
         console.log('Starting test for '+id);
-        keyman.textProcessor.keyboardInterface.registerStub({
+        keyman.core.keyboardInterface.registerStub({
           'KN': 'Stub',
           'KI': 'Keyboard_'+id,
           'KL': 'en',
@@ -272,7 +272,7 @@ var testRunner = {
     if(test !== undefined) {
       //console.log('Running test '+id+':'+index);
       try {
-        keyman.textProcessor.keyboardInterface.resetContext();
+        keyman.core.keyboardInterface.resetContext();
         receiver.value = test.context || '';
         // Keyman 12 now uses com.keyman.text.KeyEvent
         let e = com.keyman.KeyEvent ? new com.keyman.KeyEvent() : new com.keyman.text.KeyEvent();
@@ -285,7 +285,7 @@ var testRunner = {
         e.LisVirtualKey = true;
         e.vkCode = test.key;
         // Keyman 12 changes the processKeystroke interface
-        keyman.textProcessor.keyboardInterface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
+        keyman.core.keyboardInterface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
         console.warn(err.toString());

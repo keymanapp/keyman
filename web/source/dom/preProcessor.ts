@@ -31,7 +31,7 @@ namespace com.keyman.dom {
      */    
     static _GetKeyEventProperties(e: KeyboardEvent, keyState?: boolean): text.KeyEvent {
       let keyman = com.keyman.singleton;
-      let processor = keyman.textProcessor;
+      let core = keyman.core;
       var s = new text.KeyEvent();
 
       e = keyman._GetEventObject(e);   // I2404 - Manage IE events in IFRAMEs
@@ -53,7 +53,7 @@ namespace com.keyman.dom {
       }
 
       // Stage 1 - track the true state of the keyboard's modifiers.
-      var prevModState = processor.core.modStateFlags, curModState = 0x0000;
+      var prevModState = core.keyboardProcessor.modStateFlags, curModState = 0x0000;
       var ctrlEvent = false, altEvent = false;
       
       let keyCodes = text.Codes.keyCodes;
@@ -116,8 +116,8 @@ namespace com.keyman.dom {
       curModState |= s.Lstates;
 
       // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
-      s.LmodifierChange = processor.core.modStateFlags != curModState;
-      processor.core.modStateFlags = curModState;
+      s.LmodifierChange = core.keyboardProcessor.modStateFlags != curModState;
+      core.keyboardProcessor.modStateFlags = curModState;
 
       // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
       var altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
@@ -132,7 +132,7 @@ namespace com.keyman.dom {
 
       let modifierBitmasks = text.Codes.modifierBitmasks;
       // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
-      var activeKeyboard = processor.activeKeyboard;
+      var activeKeyboard = core.activeKeyboard;
       if(activeKeyboard && activeKeyboard.isChiral) {
         s.Lmodifiers = curModState & modifierBitmasks.CHIRAL;
 
@@ -171,7 +171,7 @@ namespace com.keyman.dom {
         // Positional Layout
 
         /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-        var Lbase = KeyMapping.languageMap[processor.core.baseLayout];
+        var Lbase = KeyMapping.languageMap[core.keyboardProcessor.baseLayout];
         if(Lbase && Lbase['k'+s.Lcode]) {
           s.Lcode=Lbase['k'+s.Lcode];
         }
@@ -215,7 +215,7 @@ namespace com.keyman.dom {
      * not affected.
      */ 
     static keyDown(e: KeyboardEvent): boolean {
-      let processor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
       DOMEventHandlers.states.swallowKeypress = false;
 
       // Get event properties  
@@ -224,7 +224,7 @@ namespace com.keyman.dom {
         return true;
       }
 
-      var LeventMatched = !processor.processKeyEvent(Levent);
+      var LeventMatched = !core.processKeyEvent(Levent);
 
       if(LeventMatched) {
         if(e  &&  e.preventDefault) {
@@ -248,18 +248,18 @@ namespace com.keyman.dom {
     // 1)  To detect browser form submissions (handled in kmwdomevents.ts)
     // 2)  To detect modifier state changes.
     static keyUp(e: KeyboardEvent): boolean {
-      let processor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
       var Levent = this._GetKeyEventProperties(e, false);
       if(Levent == null) {
         return true;
       }
 
-      return processor.core.doModifierPress(Levent, false);
+      return core.keyboardProcessor.doModifierPress(Levent, false);
     }
 
     static keyPress(e: KeyboardEvent): boolean {
       let keyman = com.keyman.singleton;
-      let processor = keyman.textProcessor;
+      let core = keyman.core;
 
       var Levent = this._GetKeyEventProperties(e);
       if(Levent == null || Levent.LisVirtualKey) {
@@ -269,7 +269,7 @@ namespace com.keyman.dom {
       // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
       /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-      if(!processor.activeKeyboard.isMnemonic) {
+      if(!core.activeKeyboard.isMnemonic) {
         if(!DOMEventHandlers.states.swallowKeypress) {
           return true;
         }
@@ -286,7 +286,7 @@ namespace com.keyman.dom {
       /* I732 END - 13/03/2007 MCD: Swedish: End positional keyboard layout code */
       
       // Only reached if it's a mnemonic keyboard.
-      if(DOMEventHandlers.states.swallowKeypress || processor.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
+      if(DOMEventHandlers.states.swallowKeypress || core.keyboardInterface.processKeystroke(Levent.Ltarg, Levent)) {
         DOMEventHandlers.states.swallowKeypress = false;
         if(e && e.preventDefault) {
           e.preventDefault();

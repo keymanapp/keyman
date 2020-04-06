@@ -161,7 +161,7 @@ namespace com.keyman.dom {
      * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
      */    
     beepReset(): void {
-      com.keyman.singleton.textProcessor.keyboardInterface.resetContextCache();
+      com.keyman.singleton.core.keyboardInterface.resetContextCache();
 
       var Lbo;
       this._BeepTimeout = 0;
@@ -784,7 +784,7 @@ namespace com.keyman.dom {
      * @param       {Object}      Ptarg      Target element
      */    
     _SetTargDir(Ptarg: HTMLElement) {
-      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
+      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
       var elDir=(activeKeyboard && activeKeyboard.isRTL) ? 'rtl' : 'ltr';
 
       if(Ptarg) {
@@ -1484,9 +1484,9 @@ namespace com.keyman.dom {
       var device = util.device;
 
       // Set callbacks for proper feedback from web-core.
-      this.keyman.textProcessor.core.beepHandler = this.doBeep.bind(this);
-      this.keyman.textProcessor.core.warningLogger = console.warn.bind(console);
-      this.keyman.textProcessor.core.errorLogger = console.error.bind(console);
+      this.keyman.core.keyboardProcessor.beepHandler = this.doBeep.bind(this);
+      this.keyman.core.keyboardProcessor.warningLogger = console.warn.bind(console);
+      this.keyman.core.keyboardProcessor.errorLogger = console.error.bind(console);
 
       // Local function to convert relative to absolute URLs
       // with respect to the source path, server root and protocol 

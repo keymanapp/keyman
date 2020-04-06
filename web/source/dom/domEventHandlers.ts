@@ -241,7 +241,7 @@ namespace com.keyman.dom {
       this.keyman.uiManager.justActivated = false;
       
       var isActivating = this.keyman.uiManager.isActivating;
-      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
+      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
       if(!isActivating && activeKeyboard) {
         activeKeyboard.notify(0, Utils.getOutputTarget(Ltarg as HTMLElement), 0);  // I2187
       }
@@ -284,7 +284,7 @@ namespace com.keyman.dom {
      *                      whenever a KMW-enabled page element loses control.
      */
     _BlurKeyboardSettings(PInternalName?: string, PLgCode?: string) {
-      var keyboardID = this.keyman.textProcessor.activeKeyboard ? this.keyman.textProcessor.activeKeyboard.id : '';
+      var keyboardID = this.keyman.core.activeKeyboard ? this.keyman.core.activeKeyboard.id : '';
       var langCode = this.keyman.keyboardManager.getActiveLanguage();
       
       if(PInternalName !== undefined && PLgCode !== undefined) {
@@ -347,7 +347,7 @@ namespace com.keyman.dom {
       }
       DOMEventHandlers.states._DisableInput = false; 
 
-      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
+      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
       if(!uiManager.justActivated) {
         if(target && Utils.getOutputTarget(target)) {
           Utils.getOutputTarget(target).deadkeys().clear();
@@ -390,7 +390,7 @@ namespace com.keyman.dom {
      * not affected.
      */ 
     _KeyDown: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-      var activeKeyboard = this.keyman.textProcessor.activeKeyboard;
+      var activeKeyboard = this.keyman.core.activeKeyboard;
       var osk = this.keyman.osk;
       var util = this.keyman.util;
 
@@ -442,7 +442,7 @@ namespace com.keyman.dom {
      * Description Processes keypress event (does not pass data to keyboard)
      */       
     _KeyPress: (e: KeyboardEvent) => boolean = function(this: DOMEventHandlers, e: KeyboardEvent): boolean {
-      if(DOMEventHandlers.states._DisableInput || this.keyman.textProcessor.activeKeyboard == null) {
+      if(DOMEventHandlers.states._DisableInput || this.keyman.core.activeKeyboard == null) {
         return true;
       }
 

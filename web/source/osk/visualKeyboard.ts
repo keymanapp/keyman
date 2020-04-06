@@ -211,7 +211,7 @@ namespace com.keyman.osk {
         ts.fontSize=spec['fontsize'];
       }
 
-      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
+      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
 
       // For some reason, fonts will sometimes 'bug out' for the embedded iOS page if we
       // instead assign fontFamily to the existing style 'ts'.  (Occurs in iOS 12.)
@@ -427,13 +427,13 @@ namespace com.keyman.osk {
 
     getId(osk: VisualKeyboard): string {
       let spec = this.spec;
-      let processor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
       // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
       if(typeof(this.layer) == 'string' && this.layer != '') {
         return 'popup-'+this.layer+'-'+spec['id'];
       } else {
         // We only create subkeys when they're needed - the currently-active layer should be fine.
-        return 'popup-' + processor.core.layerId + '-'+spec['id'];
+        return 'popup-' + core.keyboardProcessor.layerId + '-'+spec['id'];
       }
     }
 
@@ -605,7 +605,7 @@ namespace com.keyman.osk {
 
       let keyman = com.keyman.singleton;
       // Ensure the OSK's current layer is kept up to date.
-      keyman.textProcessor.core.layerStore.handler = this.layerChangeHandler;
+      keyman.core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
       let util = keyman.util;
       this.device = device = device || util.device;
@@ -1003,8 +1003,6 @@ namespace com.keyman.osk {
      *
      **/
     release: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      let Processor = com.keyman.singleton.textProcessor;
-
       // Prevent incorrect multi-touch behaviour if native or device popup visible
       var sk = document.getElementById('kmw-popup-keys'), t = this.currentTarget;
 
@@ -1394,7 +1392,7 @@ namespace com.keyman.osk {
      */
     _UpdateVKShiftStyle(layerId?: string) {
       var i, n, layer=null, layerElement=null;
-      let Processor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
 
       if(layerId) {
         for(n=0; n<this.layers.length; n++) {
@@ -1421,7 +1419,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = Processor.core.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
+        keys[i]['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
         let keyId = layerId+'-'+states[i]
         var btn = document.getElementById(keyId);
 
@@ -2056,7 +2054,7 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      var activeKeyboard = keymanweb.textProcessor.activeKeyboard;
+      var activeKeyboard = keymanweb.core.activeKeyboard;
       var activeStub: com.keyman.keyboards.KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
@@ -2160,7 +2158,7 @@ namespace com.keyman.osk {
      */
     static buildDocumentationKeyboard(PInternalName,Pstatic,argFormFactor,argLayerId): HTMLElement { // I777
       let keymanweb = com.keyman.singleton;
-      var PKbd=keymanweb.textProcessor.activeKeyboard,Ln,
+      var PKbd=keymanweb.core.activeKeyboard,Ln,
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
           layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId),
           device = new Device();
