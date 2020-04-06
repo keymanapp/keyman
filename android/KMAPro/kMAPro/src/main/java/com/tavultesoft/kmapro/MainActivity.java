@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   // Fields used for installing kmp packages
   private static final int PERMISSION_REQUEST_STORAGE = 0;
   public static final int READ_REQUEST_CODE = 42;
-  Uri data;
 
   private static final String TAG = "MainActivity";
 
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
-
+  private Uri data;
 
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
@@ -554,11 +553,18 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   /**
-   * Parse the URI data to determine the URL for the .kmp keyboard package.
+   * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
+   * If URL is valid, download the kmp.
+   * @param scheme String of the URI's scheme.
    *
    */
   private void downloadKMP(String scheme) {
-    Intent downloadIntent;
+    if (data == null) {
+      String message = "Download failed. Invalid URL.";
+      Toast.makeText(getApplicationContext(), message,
+        Toast.LENGTH_SHORT).show();
+      return;
+    }
     try {
       String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url == null) {
@@ -570,10 +576,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
         String filename = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Filename);
         if (filename == null) {
-          int index = url.lastIndexOf("/") + 1;
-          if (index >= 0 && index <= url.length()) {
-            filename = url.substring(index);
-          }
+          FileUtils.getFilename(url);
         }
 
         // Parse the url for the BCP 47 language ID
@@ -588,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         if (FileUtils.hasKeymanPackageExtension(url) || scheme.equals("keyman")) {
           try {
             // Download the KMP to app cache
-            downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
+            Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
             downloadIntent.putExtra("url", url);
             downloadIntent.putExtra("filename", filename);
             downloadIntent.putExtra("language", languageID);
@@ -616,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             Toast.LENGTH_SHORT).show();
         }
       }
-    } catch (UnsupportedOperationException | NullPointerException e) {
+    } catch (UnsupportedOperationException e) {
       String message = "Download failed. Invalid URL.";
       Toast.makeText(getApplicationContext(), message,
         Toast.LENGTH_SHORT).show();
@@ -866,7 +869,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     } else {
-      // Request the permission. The result will be received in onRequestPermissionResult().
+      // Request the permission. The result will be received in onRequestPermissionsResult().
       ActivityCompat.requestPermissions(this,
         new String[]{
           Manifest.permission.READ_EXTERNAL_STORAGE,
