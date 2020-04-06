@@ -67,7 +67,9 @@ describe('LMLayer using the trie model', function () {
         return lmLayer.predict(type('ï'), atEndOfBuffer('na'));
       }).then(function (rawSuggestions) {
         // Discard the keep suggestion
-        var suggestions = rawSuggestions.filter(s => s.tag != 'keep')
+        var suggestions = rawSuggestions.filter(function skimKeepSuggestions(s) {
+          return s.tag !== 'keep'
+        })
         assert.isAtLeast(suggestions.length, 1)
 
         // We SHOULD get 'naïve' suggested
