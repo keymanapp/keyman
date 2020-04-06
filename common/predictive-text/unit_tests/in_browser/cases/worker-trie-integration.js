@@ -50,7 +50,7 @@ describe('LMLayer using the trie model', function () {
     // search key is 'naive' accordingly (default searchTermToKey transforms
     // to NFD and removes common diacritics).
     //
-    // The lookup should also do the same!
+    // The lookup should also do the same to the input!
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
@@ -62,8 +62,9 @@ describe('LMLayer using the trie model', function () {
       ).then(function (_actualConfiguration) {
         return Promise.resolve();
       }).then(function () {
-        // Pretend we are typing 'na|i'
-        return lmLayer.predict(type('i'), atEndOfBuffer('na'));
+        // Pretend we are typing 'na|ï'
+        // Notice that we are typing the diacritic!
+        return lmLayer.predict(type('ï'), atEndOfBuffer('na'));
       }).then(function (rawSuggestions) {
         // Discard the keep suggestion
         let suggestions = rawSuggestions.filter(s => s.tag != 'keep')
