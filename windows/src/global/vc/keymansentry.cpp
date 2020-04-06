@@ -49,6 +49,7 @@ int keyman_sentry_init(bool is_keyman_developer) {
 
   return sentry_init(options);
 #else
+  UNREFERENCED_PARAMETER(is_keyman_developer);
   return 0;
 #endif
 }
@@ -136,6 +137,9 @@ void keyman_sentry_report_exception(DWORD ExceptionCode, PVOID ExceptionAddress)
 
     perror(message);
   }
+#else
+  UNREFERENCED_PARAMETER(ExceptionCode);
+  UNREFERENCED_PARAMETER(ExceptionAddress);
 #endif
 }
 
@@ -163,6 +167,11 @@ void keyman_sentry_report_message(keyman_sentry_level_t level, const char *logge
 
     sentry_capture_event(event);
   }
+#else
+  UNREFERENCED_PARAMETER(level);
+  UNREFERENCED_PARAMETER(logger);
+  UNREFERENCED_PARAMETER(message);
+  UNREFERENCED_PARAMETER(includeStack);
 #endif
 }
 
