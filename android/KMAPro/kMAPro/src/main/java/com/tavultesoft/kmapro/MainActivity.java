@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
     SentryAndroid.init(context);
 
+    checkStoragePermission(null);
     resultReceiver = new DownloadResultReceiver(new Handler());
 
     if (BuildConfig.DEBUG) {
@@ -812,7 +813,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
-      if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+      if (grantResults.length ==2 &&
+          grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+          grantResults[1] == PackageManager.PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
         useLocalKMP(context, data);
       } else {
@@ -827,8 +830,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private void checkStoragePermission(Uri data) {
     // Check if the Storage permission has been granted
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
-        PackageManager.PERMISSION_GRANTED) {
+      if ((checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
+          (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
         useLocalKMP(context, data);
       } else {
         // Permission is missing and must be requested
@@ -841,27 +844,36 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   /**
-   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} permission
+   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} and
+   *              {@link android.Manifest.permission#WRITE_EXTERNAL_STORAGE} permissions
    */
   private void requestStoragePermission() {
-    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
+        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
       // Provide additional rationale to the user if the permission was not granted
-      String message = "To install keyboard package, allow Keyman permission to read storage.";
+      String message = "To install keyboard packages, allow Keyman permission to read/write storage.";
       Toast.makeText(getApplicationContext(), message ,
         Toast.LENGTH_LONG).show();
-      ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+      ActivityCompat.requestPermissions(this,
+        new String[]{
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     } else {
       // Request the permission. The result will be received in onRequestPermissionResult().
-      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+      ActivityCompat.requestPermissions(this,
+        new String[]{
+          Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     }
   }
 
   // TODO: Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
-    useLocalKMP(context, data, false);
+    if (data != null) {
+      useLocalKMP(context, data, false);
+    }
   }
 
   public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
