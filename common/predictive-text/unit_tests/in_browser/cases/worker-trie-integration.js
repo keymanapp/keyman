@@ -42,6 +42,41 @@ describe('LMLayer using the trie model', function () {
     });
   });
 
+  describe('Regression tests', function () {
+    // Building the model with the default searchTermToKey implementation
+    // should also use the default implementation in the frontend.
+    //
+    // I've compiled a model with the defaults for the word 'naïve', and its
+    // search key is 'naive' accordingly (default searchTermToKey transforms
+    // to NFD and removes common diacritics).
+    //
+    // The lookup should also do the same!
+    //
+    // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
+    it('should use the default searchTermToKey()', function () {
+      var lmLayer = new LMLayer(helpers.defaultCapabilities);
+
+      return lmLayer.loadModel(
+        // We need to provide an absolute path since the worker is based within a blob.
+        document.location.protocol + '//' + document.location.host + "/resources/models/naive-trie.js"
+      ).then(function (_actualConfiguration) {
+        return Promise.resolve();
+      }).then(function () {
+        // Pretend we are typing 'na|i'
+        return lmLayer.predict(type('i'), atEndOfBuffer('na'));
+      }).then(function (rawSuggestions) {
+        // Discard the keep suggestion
+        let suggestions = rawSuggestions.filter(s => s.tag != 'keep')
+        assert.isAtLeast(suggestions.length, 1)
+
+        // We SHOULD get 'naïve' suggested, despite never typing a diaeresis.
+        let topSuggestion = suggestions[0];
+        assert.equal(topSuggestion.displayAs, "naïve")
+        assert.include(topSuggestion.transform.insert, "ïve")
+      });
+    });
+  });
+
   /**
    * Type some text (as a transform).
    * @param  {string} text to type
@@ -53,7 +88,7 @@ describe('LMLayer using the trie model', function () {
 
   /**
    * Create a context at the end of the buffer with the given text.
-   * @param {string} buffer 
+   * @param {string} buffer
    * @return {Context}
    */
   function atEndOfBuffer(buffer) {
