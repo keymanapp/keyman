@@ -67,11 +67,11 @@ describe('LMLayer using the trie model', function () {
         return lmLayer.predict(type('ï'), atEndOfBuffer('na'));
       }).then(function (rawSuggestions) {
         // Discard the keep suggestion
-        let suggestions = rawSuggestions.filter(s => s.tag != 'keep')
+        var suggestions = rawSuggestions.filter(s => s.tag != 'keep')
         assert.isAtLeast(suggestions.length, 1)
 
-        // We SHOULD get 'naïve' suggested, despite never typing a diaeresis.
-        let topSuggestion = suggestions[0];
+        // We SHOULD get 'naïve' suggested
+        var topSuggestion = suggestions[0];
         assert.equal(topSuggestion.displayAs, "naïve")
         assert.include(topSuggestion.transform.insert, "ïve")
       });
