@@ -9,7 +9,7 @@
   "target": "es5",
   "types": ["node"],
   "lib": ["es6"],
-  "outFile": "../intermediate/keyman-inner-core.js"
+  "outFile": "../intermediate/keyboard-processor/index.js"
   },
   "files": [
 		"text/keyboardProcessor.ts"

@@ -15,5 +15,5 @@ cd "$(dirname "$THIS_SCRIPT")"
 # Generates a linkable TS file; defined in resources/build-utils.sh.
 exportEnvironmentDefinitionTS
 
-# Compile web-inner-core.
-npm run tsc -- -p source/inner-core.tsconfig.json
+# Compile web's `keyboard-processor` module.
+npm run tsc -- -p source/keyboard-processor.tsconfig.json
