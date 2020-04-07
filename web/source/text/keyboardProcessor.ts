@@ -303,7 +303,7 @@ namespace com.keyman.text {
      * @param       {string}      layerId       layer id (e.g. ctrlshift)
      * @return      {number}                    modifier key state (desktop keyboards)
      */
-    getModifierState(layerId: string): number {
+    getModifierState(layerId: string): number { // TODO:  make static.
       var modifier=0;
       if(layerId.indexOf('shift') >= 0) {
         modifier |= Codes.modifierCodes['SHIFT'];

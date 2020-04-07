@@ -4,38 +4,20 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let core = keyman.core;
 
-      var activeKeyboard = core.activeKeyboard;
-      let formFactor = keyman.util.device.formFactor;
-
-      // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
-      // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer = e.layer || e.displayLayer || '';
-
       // Start:  mirrors _GetKeyEventProperties
 
       // First check the virtual key, and process shift, control, alt or function keys
       let Lkc = e.constructKeyEvent(dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
 
+      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
+      switch(Lkc.kName) {
+        case 'K_CAPS':
+        case 'K_NUMLOCK':
+        case 'K_SCROLL':
+          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
+      }
+
       // End - mirrors _GetKeyEventProperties
-
-      // Include *limited* support for mnemonic keyboards (Sept 2012)
-      // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-      if(activeKeyboard && activeKeyboard.isMnemonic && !(activeKeyboard.layout(formFactor as text.FormFactor).isDefault && formFactor != 'desktop')) {
-        if(Lkc.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
-          // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
-          Lkc.vkCode = Lkc.Lcode;
-          text.KeyboardProcessor.setMnemonicCode(Lkc, layer.indexOf('shift') != -1, core.keyboardProcessor.stateKeys['K_CAPS']);
-        }
-      } else {
-        Lkc.vkCode=Lkc.Lcode;
-      }
-
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      if(!activeKeyboard.definesPositionalOrMnemonic) {
-        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(Lkc);
-        Lkc.LisVirtualKey=false;
-      }
-
       return Lkc;
     }
 
