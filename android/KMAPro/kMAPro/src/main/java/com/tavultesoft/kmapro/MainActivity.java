@@ -21,7 +21,6 @@ import java.util.Map;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KMPBrowserActivity;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -660,8 +659,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   private void showWebBrowser() {
-    //Intent i = new Intent(this, WebBrowserActivity.class);
-    Intent i = new Intent(this, KMPBrowserActivity.class);
+    Intent i = new Intent(this, WebBrowserActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
     overridePendingTransition(android.R.anim.fade_in, R.anim.hold);

@@ -114,8 +114,8 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
         // 2. local kmp.json files in packages/
         if (KMManager.hasConnection(context) || KeyboardPickerActivity.hasKeyboardFromPackage()){
           Intent i = new Intent(context, KMPBrowserActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           context.startActivity(i);
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);

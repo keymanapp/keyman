@@ -242,9 +242,10 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         // 1. connection to keyman.com
         // 2. local kmp.json files in packages/
         if (KMManager.hasConnection(context) || KeyboardPickerActivity.hasKeyboardFromPackage()){
+          // Pass the BCP47 language code to the KMPBrowserActivity
           Intent i = new Intent(context, KMPBrowserActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           i.putExtra("languageCode", lgCode);
           i.putExtra("languageName", lgName);
           context.startActivity(i);

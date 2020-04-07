@@ -25,9 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 public class KMPBrowserActivity extends AppCompatActivity {
 
   private WebView webView;
-  private static final String fontBaseUri = "https://s.keyman.com/font/deploy/";
-  private String loadedFont;
-  private static final String KMP_SEARCH_BASE_URL = "https://keyman.com/keyboards?embed=linux&version="; // TODO: Update to Android
+  private static final String KMP_SEARCH_BASE_URL = "https://keyman.com/keyboards";
+  private static final String KMP_LANGUAGE = "/languages/";
+  private static final String KMP_QUERY = "?embed=linux&version="; // TODO: Update to Android
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
@@ -50,7 +50,6 @@ public class KMPBrowserActivity extends AppCompatActivity {
 
     webView.setWebChromeClient(new WebChromeClient() {
       public void onProgressChanged(WebView view, int progress) {
-        //progressBar.setProgress(100 - progress);
       }
     });
     webView.setWebViewClient(new WebViewClient() {
@@ -84,13 +83,14 @@ public class KMPBrowserActivity extends AppCompatActivity {
       public void onPageFinished(WebView view, String url) {
         didFinishLoading = true;
         isLoading = false;
-
-        loadFont();
       }
     });
 
+    // If language ID is provided, include it in the keyboard search
+    String languageID = getIntent().getStringExtra("languageCode");
+    String languageStr = (languageID != null) ? String.format("%s%s", KMP_LANGUAGE, languageID) : "";
     String appVersion = KMManager.getVersion();
-    String kmpSearchUrl = String.format("%s%s", KMP_SEARCH_BASE_URL, appVersion);
+    String kmpSearchUrl = String.format("%s%s%s%s", KMP_SEARCH_BASE_URL, languageStr, KMP_QUERY, appVersion);
     webView.loadUrl(kmpSearchUrl);
   }
 
@@ -140,46 +140,4 @@ public class KMPBrowserActivity extends AppCompatActivity {
     }
   }
 
-  private void loadFont() {
-    String font = KMManager.getKeyboardTextFontFilename();
-    if (!font.isEmpty()) {
-      loadedFont = font;
-      String fontUrl = String.format("%s%s", fontBaseUri, font);
-      String jsStr = String.format(
-        "var style = document.createElement('style');" +
-          "style.type = 'text/css';" +
-          "style.innerHTML = '@font-face{font-family:\"KMCustomFont\";src:url(\"%s\");} " +
-          "*{font-family:\"KMCustomFont\" !important;}';" +
-          "document.getElementsByTagName('head')[0].appendChild(style);", fontUrl);
-      webView.loadUrl(String.format("javascript:%s", jsStr));
-    } else {
-      loadedFont = "sans-serif";
-      String jsStr = "var style = document.createElement('style');" +
-        "style.type = 'text/css';" +
-        "style.innerHTML = '*{font-family:\"sans-serif\" !important;}';" +
-        "document.getElementsByTagName('head')[0].appendChild(style);";
-      webView.loadUrl(String.format("javascript:%s", jsStr));
-    }
-  }
-
-  private void setImageButtonEnabled(ImageButton imgButton, int resId, boolean enabled) {
-    imgButton.setEnabled(enabled);
-    Drawable originalIcon;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      originalIcon = getResources().getDrawable(resId, getTheme());
-    } else {
-      originalIcon = getResources().getDrawable(resId);
-    }
-    Drawable icon = enabled ? originalIcon : convertDrawableToGrayScale(originalIcon);
-    imgButton.setImageDrawable(icon);
-  }
-
-  private static Drawable convertDrawableToGrayScale(Drawable drawable) {
-    if (drawable == null)
-      return null;
-
-    Drawable drw = drawable.mutate();
-    drw.setColorFilter(Color.LTGRAY, Mode.SRC_IN);
-    return drw;
-  }
 }
