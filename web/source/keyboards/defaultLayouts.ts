@@ -125,7 +125,7 @@ namespace com.keyman.keyboards {
 
       let kbdBitmask = Codes.modifierBitmasks['NON_CHIRAL'];
       // An unfortunate dependency there.  Should probably also set a version within web-core for use.
-      let kbdDevVersion = new utils.Version(com.keyman.singleton['version']);
+      let kbdDevVersion = utils.Version.CURRENT;
       if(keyboard) {
         kbdBitmask = keyboard.modifierBitmask;
         kbdDevVersion = keyboard.compilerVersion;
