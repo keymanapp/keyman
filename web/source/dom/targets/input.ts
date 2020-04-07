@@ -1,8 +1,6 @@
-/// <reference path="../../text/outputTarget.ts" />
-
 namespace com.keyman.dom.targets {
 
-  export class Input extends text.OutputTarget {
+  export class Input extends OutputTarget {
     root: HTMLInputElement;
 
     /**

@@ -196,11 +196,6 @@ namespace com.keyman.text {
     protected abstract setTextAfterCaret(s: string): void;
 
     /**
-     * Returns the underlying element / document modeled by the wrapper.
-     */
-    abstract getElement(): HTMLElement;
-
-    /**
      * Clears any selected text within the wrapper's element(s).
      * Silently does nothing if no such text exists.
      */
@@ -282,23 +277,6 @@ namespace com.keyman.text {
      * Generates a synthetic event on the underlying element, signalling that its value has changed.
      */
     abstract doInputEvent(): void;
-
-    /**
-     * A helper method for doInputEvent; creates a simple common event and default dispatching.
-     * @param elem 
-     */
-    protected dispatchInputEventOn(elem: HTMLElement) {
-      let event: InputEvent;
-
-      // `undefined` in Edge and IE.
-      if(window['InputEvent']) { // can't condition on the type directly; TS optimizes that out.
-        event = new InputEvent('input', {"bubbles": true, "cancelable": false});
-      }
-
-      if(elem && event) {
-        elem.dispatchEvent(event);
-      }
-    }
   }
 
   // Due to some interesting requirements on compile ordering in TS,
@@ -327,10 +305,6 @@ namespace com.keyman.text {
       clone.setDeadkeys(outputTarget.deadkeys());
 
       return clone;
-    }
-
-    getElement(): HTMLElement {
-      return null;
     }
     
     clearSelection(): void {

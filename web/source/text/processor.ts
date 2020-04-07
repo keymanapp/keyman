@@ -161,7 +161,7 @@ namespace com.keyman.text {
           if(special == EmulationKeystrokes.Backspace) {
             // A browser's default backspace may fail to delete both parts of an SMP character.
             this.keyboardInterface.defaultBackspace(Lkc.Ltarg);
-          } else if(special) {
+          } else if(special || DefaultOutput.isCommand(Lkc)) { // Filters out 'commands' like TAB.
             // We only do the "for special emulation" cases under the condition above... aside from backspace
             // Let the browser handle those.
             return null;
@@ -262,8 +262,8 @@ namespace com.keyman.text {
       let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
-      // of its current, pre-input state.
-      let outputTarget = keyEvent.Ltarg;
+      // of its current, pre-input state.  Current, long-existing assumption - it's DOM-backed.
+      let outputTarget = keyEvent.Ltarg as dom.targets.OutputTarget;
       let fromOSK = keyEvent.isSynthetic;
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
@@ -328,7 +328,7 @@ namespace com.keyman.text {
                 continue;
               }
 
-              let altEvent = osk.PreProcessor._GetClickEventProperties(altKey, keyEvent.Ltarg.getElement());
+              let altEvent = osk.PreProcessor._GetClickEventProperties(altKey, outputTarget.getElement());
               altEvent.Ltarg = mock;
               let alternateBehavior = this.processKeystroke(altEvent, mock);
               if(alternateBehavior) {

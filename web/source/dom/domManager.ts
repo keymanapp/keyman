@@ -4,6 +4,8 @@
 /// <reference path="../kmwbase.ts" />
 // References DOM event handling interfaces and classes.
 /// <reference path="domEventHandlers.ts" />
+// References DOM-specific output handling.
+/// <reference path="domDefaultOutput.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="../text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.
@@ -110,11 +112,15 @@ namespace com.keyman.dom {
      * @param       {Object}      Pelem     element to flash
      * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
      */    
-    doBeep(outputTarget: text.OutputTarget) {
+    doBeep(outputTarget: targets.OutputTarget) {
       // Handles embedded-mode beeps.
       let keyman = com.keyman.singleton;
       if ('beepKeyboard' in keyman) {
         keyman['beepKeyboard']();
+        return;
+      }
+
+      if(!(outputTarget instanceof targets.OutputTarget)) {
         return;
       }
 

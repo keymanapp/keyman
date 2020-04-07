@@ -54,19 +54,6 @@ namespace com.keyman.text {
       }
     }
 
-    public static isDOMCommand(Lkc: KeyEvent): boolean {
-      let code = DefaultOutput.codeForEvent(Lkc);
-
-      switch(code) {
-        case Codes.keyCodes['K_TAB']:
-        case Codes.keyCodes['K_TABBACK']:
-        case Codes.keyCodes['K_TABFWD']:
-          return true;
-        default:
-          return false;
-      }
-    }
-
     /**
      * isCommand - returns a boolean indicating if a non-text event should be triggered by the keystroke.
      */
@@ -79,32 +66,7 @@ namespace com.keyman.text {
         // case Codes.keyCodes['K_RIGHT']:
         //   return true;
         default:
-          return this.isDOMCommand(Lkc);
-      }
-    }
-
-    /**
-     * This function is designed for future migration into a separate, explicitly-DOM-aware module.
-     * It would then be assigned to this class via classic JS method extension practices as an 'override'
-     * of `applyCommand`, reusing the base version of that name seen in this class, which is
-     * designed for web-core.
-     * 
-     * apply___Command - used when a RuleBehavior represents a non-text "command" within the Engine.
-     */
-    public static applyDOMCommand(Lkc: KeyEvent): void {
-      let code = DefaultOutput.codeForEvent(Lkc);
-      let domManager = com.keyman.singleton.domManager;
-
-      switch(code) {
-        case Codes.keyCodes['K_TAB']:
-          domManager.moveToNext((Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0);
-          break;
-        case Codes.keyCodes['K_TABBACK']:
-          domManager.moveToNext(true);
-          break;
-        case Codes.keyCodes['K_TABFWD']:
-          domManager.moveToNext(false);
-          break;
+          return false;
       }
     }
 
@@ -112,10 +74,10 @@ namespace com.keyman.text {
      * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally 
      * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
      * the caret is in.  However, we let those events perform the actual context reset.
+     * 
+     * Note:  is extended by DOM-aware KeymanWeb code.
      */
     public static applyCommand(Lkc: KeyEvent): void {
-      DefaultOutput.applyDOMCommand(Lkc);
-
       // Notes for potential default-handling extensions:
       // 
       // switch(code) {
