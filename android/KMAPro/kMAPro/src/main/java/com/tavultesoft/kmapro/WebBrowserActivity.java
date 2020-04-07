@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -256,9 +257,16 @@ public class WebBrowserActivity extends AppCompatActivity {
 
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        if (!url.toLowerCase().equals("about:blank"))
-          view.loadUrl(url);
-
+        if (!url.toLowerCase().equals("about:blank")) {
+          if (url.startsWith("keyman:download")) {
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setData(Uri.parse(url));
+            startActivityForResult(intent, 1);
+          } else {
+            view.loadUrl(url);
+          }
+        }
         return true;
       }
 
