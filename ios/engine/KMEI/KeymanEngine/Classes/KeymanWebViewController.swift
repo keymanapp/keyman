@@ -449,9 +449,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
 
       self.touchHoldBegan()
     } else if fragment.hasPrefix("#menuKeyDown-") {
+      perform(#selector(self.menuKeyHeld), with: self, afterDelay: 0.5)
       menuKeyDown(self)
       delegate?.menuKeyDown(self)
     } else if fragment.hasPrefix("#menuKeyUp-") {
+      // Blocks summoning the globe-key menu for quick taps.  (Hence the 0.5 delay.)
+      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.menuKeyHeld), object: self)
       menuKeyUp(self)
       delegate?.menuKeyUp(self)
     } else if fragment.hasPrefix("#hideKeyboard-") {
@@ -832,6 +835,10 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
     hold.delegate = self
     subKeysView!.addGestureRecognizer(hold)
     setPopupVisible(true)
+  }
+
+  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
+    self.delegate?.menuKeyHeld(self)
   }
 
   @objc func subKeyButtonClick(_ sender: UIButton) {
