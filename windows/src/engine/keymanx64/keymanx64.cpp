@@ -85,6 +85,8 @@ const PWSTR
 
 //const char *szGPA_ChangeWindowMessageFilter = "ChangeWindowMessageFilter"; // Do not localize
 
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64 KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".keymanx64"
+
 //
 //   FUNCTION: _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int
 //
@@ -100,10 +102,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
 
-  keyman_sentry_init(false);
+  keyman_sentry_init(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
   keyman_sentry_setexceptionfilter();
+
+  keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, "Started " KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+
+  if (!wcscmp(lpCmdLine, L"-sentry-client-test-exception")) {
+    keyman_sentry_test_crash();
+  }
 
 	MSG msg;
 
@@ -213,7 +220,7 @@ BOOL Fail(HWND hwnd, PWSTR msg)
 
   if (WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, buffer, (int) sz, NULL, NULL) != 0) {
     buffer[sz - 1] = 0;
-    keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, "Fail()", buffer, true);
+    keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
   }
 
   free(buffer);

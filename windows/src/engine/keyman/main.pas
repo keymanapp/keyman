@@ -160,6 +160,7 @@ var
   sCommand: string;
 begin
   Result := False;
+
   if LowerCase(ParamStr(1)) <> '-kmc' then Exit;
 
   sCommand := LowerCase(ParamStr(2));
@@ -173,6 +174,9 @@ begin
   else if sCommand = 'hidevisualkeyboard' then
     FCommand := KMC_HideVisualKeyboard
   else Exit;
+
+  FEnableCrashTest := ParamStr(3) = '-sentry-client-test-exception';
+
 
   Result := True;
 end;

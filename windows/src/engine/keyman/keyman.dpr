@@ -140,9 +140,10 @@ uses
 // PEOPTFLAGS $140 turns on Data Execution Prevention
 //
 {$SETPEOPTFLAGS $140}
-
+const
+  LOGGER_DESKTOP_ENGINE_KEYMAN = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.keyman';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_KEYMAN);
   try
     Run;
   finally

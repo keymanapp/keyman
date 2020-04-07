@@ -18,16 +18,26 @@ type
     procedure ClientAfterEvent(Sender: TObject; EventType: TSentryClientEventType;
       const EventID, EventClassName, Message: string;
       var EventAction: TSentryClientEventAction);
-    constructor Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
+    constructor Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
     procedure ReportRemoteErrors(const childEventID: string);
+    procedure NestedValidate(Force: Boolean);
+    procedure NestedValidateAccessViolation;
+    procedure NestedValidateDelphiException;
+    procedure NestedValidateFloatingPointException;
   public
     destructor Destroy; override;
-    class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
+
+    class procedure Validate(Force: Boolean = False);
+
+    class procedure Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags = [kscfCaptureExceptions, kscfShowUI, kscfTerminate]);
     class procedure Stop;
     class property Client: TSentryClient read FClient;
     class property Instance: TKeymanSentryClient read FInstance;
   public
     const LOGGER_DEVELOPER_IDE = 'KeymanDeveloper.IDE';
+    const LOGGER_DEVELOPER_TOOLS = 'KeymanDeveloper.Tools';
+    const LOGGER_DESKTOP = 'KeymanDesktop';
+    const LOGGER_DESKTOP_ENGINE = 'KeymanDesktop.Engine';
   end;
 
 
@@ -220,7 +230,7 @@ begin
   end;
 end;
 
-constructor TKeymanSentryClient.Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
+constructor TKeymanSentryClient.Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
 var
   reg: TRegistry;
   o: TSentryClientOptions;
@@ -275,8 +285,12 @@ begin
     reg.Free;
   end;
 
-  FClient := SentryClientClass.Create(o, f);
+  o.HandlerPath := ExtractFilePath(FindSentryDLL) + 'crashpad_handler.exe';
+  o.DatabasePath := TKeymanPaths.ErrorLogPath('sentry-db');
+
+  FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;
+  FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
 end;
 
 destructor TKeymanSentryClient.Destroy;
@@ -287,14 +301,72 @@ begin
   inherited Destroy;
 end;
 
-class procedure TKeymanSentryClient.Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; AFlags: TKeymanSentryClientFlags);
+class procedure TKeymanSentryClient.Start(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
 begin
-  TKeymanSentryClient.Create(SentryClientClass, AProject, AFlags);
+  TKeymanSentryClient.Create(SentryClientClass, AProject, ALogger, AFlags);
 end;
 
 class procedure TKeymanSentryClient.Stop;
 begin
   FreeAndNil(FInstance);
 end;
+
+//
+// With this function, we throw a test crash event to make sure that:
+// a) exception hooking is in place
+// b) events are correctly sent through
+// c) symbolication is working
+// d) privacy options are correctly checked
+//
+// We nest some function calls for a more expressive stack
+//
+class procedure TKeymanSentryClient.Validate(Force: Boolean);
+begin
+  TKeymanSentryClient.Instance.NestedValidate(Force);
+end;
+
+procedure TKeymanSentryClient.NestedValidate(Force: Boolean);
+begin
+  if Force then
+    NestedValidateDelphiException
+  else if ParamStr(1) = '-sentry-client-test-exception' then
+  begin
+    // Undocumented test parameter
+    if ParamStr(2) = '' then
+      NestedValidateDelphiException
+    else if ParamStr(2) = 'av' then
+      NestedValidateAccessViolation
+    else if ParamStr(2) = 'fp' then
+      NestedValidateFloatingPointException;
+  end;
+end;
+
+procedure TKeymanSentryClient.NestedValidateDelphiException;
+begin
+  raise ESentryTest.Create('Just testing Sentry');
+end;
+
+procedure TKeymanSentryClient.NestedValidateAccessViolation;
+var
+  p: PByte;
+begin
+  // Force an Access Violation
+  p := nil;
+  p^ := 0;
+end;
+
+procedure TKeymanSentryClient.NestedValidateFloatingPointException;
+var
+  n: Double;
+begin
+  // Force a floating point exception
+{$IF DEFINED(CONSOLE)}
+  writeln('Attempting FP Exception');
+{$ENDIF}
+  n := 0;
+  n := 1 / n;
+  writeln(n); // We'll never get here, but this stops a compiler warning
+end;
+
 
 end.

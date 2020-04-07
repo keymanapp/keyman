@@ -157,13 +157,16 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests};
 
 {$R VERSION.RES}
 {$R manifest.res}
 
+const
+  LOGGER_DESKTOP_KMSHELL = TKeymanSentryClient.LOGGER_DESKTOP + '.kmshell';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
     FInitializeCEF := TCEFManager.Create;

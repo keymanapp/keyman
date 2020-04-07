@@ -64,6 +64,8 @@ type
     Label3: TLabel;
     mnuOptionsXMLView: TMenuItem;
     Reloadpage1: TMenuItem;
+    mnuOptionsDebugTests: TMenuItem;
+    mnuOptionsSentryExceptionTest: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure mnuFileOpenClick(Sender: TObject);
@@ -74,6 +76,8 @@ type
     procedure mnuOptionsAdvancedViewClick(Sender: TObject);
     procedure mnuHelpAboutClick(Sender: TObject);
     procedure mnuOptionsXMLViewClick(Sender: TObject);
+    procedure mnuOptionsSentryExceptionTestClick(Sender: TObject);
+    procedure mnuOptionsClick(Sender: TObject);
   private
     FSIList: TSIList;
     FGlobalXMLDocument: IXMLDOMDocument;
@@ -104,12 +108,19 @@ procedure KeymanDiag;
 implementation
 
 uses
-  // keymanstrings,
-  KeymanPaths, ActiveX, ComObj,
-  ErrorControlledRegistry, RegistryKeys,
-  shlobj,
+  System.Win.ComObj,
+  Winapi.ActiveX,
+  Winapi.shlobj,
+
+  ErrorControlledRegistry,
+  Keyman.System.KeymanSentryClient,
+  KeymanPaths,
+  RegistryKeys,
+  sysinfo_Util,
   UframeAttachedFiles,
-  VersionInfo, UfrmEmail, sysinfo_Util, utilexecute;
+  UfrmEmail,
+  utilexecute,
+  VersionInfo;
 
 {$R *.dfm}
 
@@ -123,6 +134,11 @@ begin
   Application.Title := SCaption;
   Application.CreateForm(TfrmDiagnostics, frmDiagnostics);
   Application.Run;
+end;
+
+procedure TfrmDiagnostics.mnuOptionsSentryExceptionTestClick(Sender: TObject);
+begin
+  TKeymanSentryClient.Validate(True);
 end;
 
 function TfrmDiagnostics.CollectDiagnostics: string;
@@ -434,6 +450,11 @@ begin
   mnuOptionsAdvancedView.Checked := not mnuOptionsAdvancedView.Checked;
   panSimple.Visible := not mnuOptionsAdvancedView.Checked;
   pages.Visible := mnuOptionsAdvancedView.Checked;
+end;
+
+procedure TfrmDiagnostics.mnuOptionsClick(Sender: TObject);
+begin
+  mnuOptionsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
 end;
 
 procedure TfrmDiagnostics.mnuOptionsXMLViewClick(Sender: TObject); // I3766

@@ -5,9 +5,12 @@ interface
 
 uses
   System.AnsiStrings,
+  System.Math,
   System.SysUtils,
   Winapi.ImageHlp,
   Winapi.Windows,
+
+  jwaimagehlp,
 
   sentry;
 
@@ -55,6 +58,9 @@ type
     FInstance: TSentryClient;
   private
     options: psentry_options_t;
+    FVectoredExceptionHandler: PVOID;
+
+    FLogger: string;
     FOnBeforeEvent: TSentryClientBeforeEvent;
     FOnAfterEvent: TSentryClientAfterEvent;
     FReportExceptions: Boolean;
@@ -65,13 +71,14 @@ type
       const ExceptionClassName, Message: string;
       EventType: TSentryClientEventType);
     procedure DoTerminate;
-    function EventIDToString(Guid: TGUID): string;
+    function EventIDToString(AGuid: PByte): String;
+    function ConvertRawStackToSentryStack: sentry_value_t;
   public
-    constructor Create(AOptions: TSentryClientOptions; AFlags: TSentryClientFlags); virtual;
+    constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
 
-    function MessageEvent(Level: TSentryLevel; const Logger, Message: string; IncludeStack: Boolean = False): TGUID;
-    function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
+    function MessageEvent(Level: TSentryLevel; const Message: string; IncludeStack: Boolean = False): string;
+    function ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): string;
 
     property OnBeforeEvent: TSentryClientBeforeEvent read FOnBeforeEvent write FOnBeforeEvent;
     property OnAfterEvent: TSentryClientAfterEvent read FOnAfterEvent write FOnAfterEvent;
@@ -87,53 +94,125 @@ type
   ESentryTest = class(Exception)
   end;
 
-procedure SentryHandleException(E: Exception; AExceptAddr: Pointer = nil);
+function SentryHandleException(E: Exception; AExceptAddr: Pointer = nil): Boolean;
 
 implementation
 
+const
+  MAX_FRAMES = 64;
+
+threadvar
+  raw_frames: array[0..MAX_FRAMES-1] of NativeUInt;
+  raw_frame_count: Integer;
+
+type
+  PEXCEPTION_POINTERS = ^EXCEPTION_POINTERS;
+
+type
+  PVECTORED_EXCEPTION_HANDLER = function(ExceptionInfo: PEXCEPTION_POINTERS): DWORD; stdcall;
+
+  TAddVectoredExceptionHandler = function(FirstHandler: ULONG; VectoredHandler: PVECTORED_EXCEPTION_HANDLER): PVOID; stdcall;
+  TRemoveVectoredExceptionHandler = function(VectoredHandlerHandle: PVOID): ULONG; stdcall;
+  TStackWalk64 = function(MachineType: DWORD; hProcess: THANDLE; hThread: THANDLE; var StackFrame: STACKFRAME64;
+    ContextRecord: PVOID; ReadMemoryRoutine: PREAD_PROCESS_MEMORY_ROUTINE64; FunctionTableAccessRoutine: PFUNCTION_TABLE_ACCESS_ROUTINE64;
+    GetModuleBaseRoutine: PGET_MODULE_BASE_ROUTINE64; TranslateAddress: PTRANSLATE_ADDRESS_ROUTINE64): BOOL; stdcall;
+  TSymFunctionTableAccess64 = function(hProcess: THANDLE; AddrBase: Int64): PVOID; stdcall;
+  TSymGetModuleBase64 = function(hProcess: THANDLE; qwAddr: Int64): Int64; stdcall;
+  TSymInitialize = function(hProcess: THANDLE; UserSearchPath: PCHAR; fInvadeProcess: BOOL): BOOL; stdcall;
+
+var
+  AddVectoredExceptionHandler: TAddVectoredExceptionHandler = nil;
+  RemoveVectoredExceptionHandler: TRemoveVectoredExceptionHandler = nil;
+  StackWalk64: TStackWalk64 = nil;
+  SymFunctionTableAccess64: TSymFunctionTableAccess64 = nil;
+  SymGetModuleBase64: TSymGetModuleBase64 = nil;
+  SymInitialize: TSymInitialize = nil;
+
+procedure CaptureStackTrace(TopAddr: Pointer; FramesToSkip: Integer); forward;
+procedure CaptureStackTraceForException(TopAddr: Pointer; EP: PEXCEPTION_POINTERS; FramesToSkip: Integer); forward;
+
+function RtlCaptureStackBackTrace(FramesToSkip, FramesToCapture: DWORD; BackTrace: Pointer; BackTraceHash: PDWORD): WORD; stdcall; external 'ntdll.dll';
+
 { TSentryClient }
 
-//
-// Handler for try/except blocks. Call SentryHandleException
-// on outer blocks to report any unhandled exceptions.
-//
-procedure SentryHandleException(E: Exception; AExceptAddr: Pointer);
+///
+/// Handler for try/except blocks. Call SentryHandleException
+/// on outer blocks to report any unhandled exceptions.
+///
+function SentryHandleException(E: Exception; AExceptAddr: Pointer): Boolean;
 const
-  Size = 1024;
+  BufferSize = 1024;
+
+  // We are not interested in the first two frames:
+  //    Sentry.Client.CaptureStackTrace,
+  //    SentryHandleException
+  FRAMES_TO_SKIP = 2;
 var
-  Buffer: array[0..Size-1] of Char;
+  Buffer: array[0..BufferSize-1] of Char;
 begin
-  if TSentryClient.FInstance <> nil then
+  if TSentryClient.FInstance = nil then
   begin
-    if AExceptAddr = nil then
-      AExceptAddr := System.ExceptAddr;
-    if ExceptionErrorMessage(E, AExceptAddr, Buffer, Size) > 0 then
-      TSentryClient.FInstance.ExceptionEvent(E.ClassName, Buffer);
+    Exit(False);
   end;
+
+  if AExceptAddr = nil then
+    AExceptAddr := System.ExceptAddr;
+  if ExceptionErrorMessage(E, AExceptAddr, Buffer, BufferSize) = 0 then
+    StrCopy(Buffer, 'Unknown exception');
+
+  if raw_frame_count = 0 then
+  begin
+    // If we get here, this is most likely an exception that was
+    // never raised, as otherwise our vectored handler should have
+    // already captured a more accurate stack for us. Let's get something
+    // from this
+    CaptureStackTrace(AExceptAddr, FRAMES_TO_SKIP);
+  end;
+
+  TSentryClient.FInstance.ExceptionEvent(E.ClassName, Buffer);
+
+  Result := True;
 end;
 
-//
-// Last-gasp exception handler assigned to ExceptProc.
-// Most processes drop their exceptions into SentryHandleException
-//
-procedure SentryExceptHandler(ExceptObject: TObject; ExceptAddr: Pointer);
+///
+/// First chance exception handler. We just want to take a copy of the raw
+/// stack here.
+///
+function SentryVectoredHandler(ExceptionInfo: PEXCEPTION_POINTERS): DWORD; stdcall;
 const
-  Size = 1024;
+  cDelphiException    = $0EEDFADE;  // From System.pas
+{$IFDEF WIN64}
+  DELPHI_FRAMES_TO_SKIP = 3;  // Delphi x64 exceptions have RaiseException, System.@RaseAtExcept, System.@RaiseExcept frames
+{$ELSE}
+  DELPHI_FRAMES_TO_SKIP = 1;  // Delphi x86 exceptions have RaiseException frame
+{$ENDIF}
 var
-  Buffer: array[0..Size-1] of Char;
+  Skip: Integer;
+  LastMask: TArithmeticExceptionMask;
 begin
-  if TSentryClient.FInstance <> nil then
+  if raw_frame_count = 0 then
   begin
-    if ExceptionErrorMessage(ExceptObject, ExceptAddr, Buffer, Size) > 0 then
-      TSentryClient.FInstance.ExceptionEvent(ExceptObject.ClassName, Buffer);
+    // Floating point state may be broken here, so let's mask it out and continue
+    // We'll restore state afterwards
+    LastMask := System.Math.SetExceptionMask([]);
+
+    if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
+      then Skip := DELPHI_FRAMES_TO_SKIP
+      else Skip := 0;
+    CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
+
+    // Restore FP state
+    System.Math.SetExceptionMask(LastMask);
   end;
+
+  Result := 0; //EXCEPTION_CONTINUE_SEARCH;
 end;
 
-
-constructor TSentryClient.Create(AOptions: TSentryClientOptions; AFlags: TSentryClientFlags);
+constructor TSentryClient.Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags);
 begin
   Assert(not Assigned(FInstance));
   FInstance := Self;
+  FLogger := ALogger;
   FReportExceptions := scfReportExceptions in AFlags;
   FReportMessages := scfReportMessages in AFlags;
 
@@ -161,11 +240,20 @@ begin
   if AOptions.Debug then
     sentry_options_set_debug(options, 1);
 
+  if AOptions.DatabasePath <> '' then
+    sentry_options_set_database_pathw(options, PWideChar(AOptions.DatabasePath));
+
+  if AOptions.HandlerPath <> '' then
+    sentry_options_set_handler_pathw(options, PWideChar(AOptions.HandlerPath));
+
   sentry_init(options);
 
   if scfCaptureExceptions in AFlags then
   begin
-    ExceptProc := @SentryExceptHandler;
+    // This allows us to capture call stacks from the original exception context
+    if Assigned(AddVectoredExceptionHandler) then
+      // 1 = Register as first handler
+      FVectoredExceptionHandler := AddVectoredExceptionHandler(1, @SentryVectoredHandler);
   end;
 end;
 
@@ -173,71 +261,22 @@ destructor TSentryClient.Destroy;
 begin
   FInstance := nil;
   sentry_shutdown;
+  if FVectoredExceptionHandler <> nil then
+    RemoveVectoredExceptionHandler(FVectoredExceptionHandler);
   inherited Destroy;
 end;
 
-function RtlCaptureStackBackTrace(FramesToSkip, FramesToCapture: DWORD; BackTrace: Pointer; BackTraceHash: PDWORD): WORD; stdcall; external 'ntdll.dll';
-
-//
-// Capture a stack trace and include the offending crash address at the top of
-// the trace. Apart from skipping frames and the inclusion of TopAddr, this is
-// very similar to sentry_event_value_add_stacktrace.
-//
-function CaptureStackTrace(TopAddr: Pointer; FramesToSkip: DWORD): sentry_value_t;
-var
-  walked_backtrace: array[0..255] of Pointer;
-  s: Ansistring;
-  frameCount: Word;
-  frame, frames: sentry_value_t;
-  stacktrace: sentry_value_t;
-  i: Integer;
-  threads: sentry_value_t;
-  thread: sentry_value_t;
-begin
-  frameCount := RtlCaptureStackBackTrace(FramesToSkip, 256, @walked_backtrace[0], nil);
-  if frameCount = 0 then
-    Exit(0);
-
-  frames := sentry_value_new_list;
-
-  for i := frameCount - 1 downto 0 do
-  begin
-    frame := sentry_value_new_object;
-    s := System.AnsiStrings.Format('0x%x', [NativeUInt(walked_backtrace[i])]);
-    sentry_value_set_by_key(frame, 'instruction_addr', sentry_value_new_string(PAnsiChar(s)));
-    sentry_value_append(frames, frame);
-  end;
-
-  // Insert the except address at the top of the stack
-  if TopAddr <> nil then
-  begin
-    frame := sentry_value_new_object;
-    s := System.AnsiStrings.Format('0x%x', [NativeUInt(TopAddr)]);
-    sentry_value_set_by_key(frame, 'instruction_addr', sentry_value_new_string(PAnsiChar(s)));
-    sentry_value_append(frames, frame);
-  end;
-
-  stacktrace := sentry_value_new_object;
-  sentry_value_set_by_key(stacktrace, 'frames', frames);
-
-  threads := sentry_value_new_list;
-  thread := sentry_value_new_object;
-  sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
-  sentry_value_append(threads, thread);
-
-  Result := threads;
-end;
-
-//
-// Force the application to terminate abruptly, but give
-// time for Sentry to report outstanding events.
-//
+///
+/// Force the application to terminate abruptly, but give
+/// time for Sentry to report outstanding events.
+///
 procedure TSentryClient.DoTerminate;
 begin
   sentry_shutdown;
   ExitProcess(1);
 end;
 
+/// Call registered OnBeforeEvent handler
 procedure TSentryClient.DoBeforeEvent(event: sentry_value_t;
   const ExceptionClassName, Message: string;
   EventType: TSentryClientEventType);
@@ -253,6 +292,7 @@ begin
   end;
 end;
 
+/// Call registered OnAfterEvent handler
 procedure TSentryClient.DoAfterEvent(const EventID, ExceptionClassName, Message: string;
   EventType: TSentryClientEventType);
 var
@@ -267,30 +307,51 @@ begin
   end;
 end;
 
-function TSentryClient.EventIDToString(Guid: TGUID): string;
+function TSentryClient.EventIDToString(AGuid: PByte): String;
+var
+  Guid: PGUID;
 begin
+  Guid := PGUID(@AGuid[0]);
   // Copied from System.SysUtils.GuidToString and cleaned up for use with Sentry
   SetLength(Result, 32);
-  StrLFmt(PChar(Result), 38,'%.8X%.4X%.4X%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X',   // do not localize
+  StrLFmt(PChar(Result), 32, '%.8X%.4X%.4X%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X',   // do not localize
     [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
     Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
 end;
 
-function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): TGUID;
+function TSentryClient.ConvertRawStackToSentryStack: sentry_value_t;
+var
+  frames, s_frame, stacktrace, thread, threads: sentry_value_t;
+  s: AnsiString;
+  n: Integer;
+begin
+  frames := sentry_value_new_list;
+  n := raw_frame_count;
+  while n > 0 do
+  begin
+    s_frame := sentry_value_new_object;
+    s := System.AnsiStrings.Format('0x%x', [NativeUInt(raw_frames[n-1])]);
+    sentry_value_set_by_key(s_frame, 'instruction_addr', sentry_value_new_string(PAnsiChar(s)));
+    sentry_value_append(frames, s_frame);
+    Dec(n);
+  end;
+
+  stacktrace := sentry_value_new_object;
+  sentry_value_set_by_key(stacktrace, 'frames', frames);
+
+  threads := sentry_value_new_list;
+  thread := sentry_value_new_object;
+  sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
+  sentry_value_append(threads, thread);
+
+  Result := threads;
+end;
+
+function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): String;
 var
   event: sentry_value_t;
   uuid: sentry_uuid_t;
   threads: sentry_value_t;
-const
-  FRAMES_TO_SKIP = 4;
-  // We are not interested in the first three frames:
-  //    Sentry.Client.CaptureStackTrace,
-  //    Sentry.Client.TSentryClient.ExceptionEvent
-  //    Sentry.Client.SentryHandleException
-  //    exception handler that captured the event
-  //    Note: there may be additional frames we can't deal with
-  //    A pseudo-frame is inserted at the top of the stack which points
-  //    to the address of the code that caused the exception
 begin
   if FReportExceptions then
   begin
@@ -312,30 +373,37 @@ begin
   *)
 
     sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
+    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
-    if AExceptAddr = nil then
-      AExceptAddr := System.ExceptAddr;
-    threads := CaptureStackTrace(AExceptAddr, FRAMES_TO_SKIP);
-    if threads <> 0 then
-      sentry_value_set_by_key(event, 'threads', threads);
+    if raw_frame_count > 0 then
+    begin
+      threads := ConvertRawStackToSentryStack;
+      if threads <> 0 then
+        sentry_value_set_by_key(event, 'threads', threads);
+      raw_frame_count := 0;
+    end;
 
     uuid := sentry_capture_event(event);
-    Result := uuid.native_uuid;
+    Result := EventIDToString(@uuid.bytes[0]);
 
-    DoAfterEvent(EventIDToString(Result), ExceptionClassName, Message, scetException);
+    DoAfterEvent(Result, ExceptionClassName, Message, scetException);
   end
   else
   begin
+    // We still call the event handlers, in case they want to do something ...
+    // as normally DoAfterEvent will be terminating the process on an unhandled
+    // exception
     DoBeforeEvent(0, ExceptionClassName, Message, scetException);
     DoAfterEvent('', ExceptionClassName, Message, scetException);
   end;
 end;
 
-function TSentryClient.MessageEvent(Level: TSentryLevel; const Logger,
-  Message: string; IncludeStack: Boolean): TGUID;
+function TSentryClient.MessageEvent(Level: TSentryLevel; const Message: string;
+  IncludeStack: Boolean): string;
 var
   event: sentry_value_t;
   threads: sentry_value_t;
+  uuid: sentry_uuid_t;
 const
   FRAMES_TO_SKIP = 2;
   // We are not interested in the first two frames:
@@ -346,28 +414,132 @@ begin
   begin
     event := sentry_value_new_message_event(
       {*   level *} sentry_level_t(Level),
-      {*  logger *} PAnsiChar(UTF8Encode(Logger)),
+      {*  logger *} PAnsiChar(UTF8Encode(FLogger)),
       {* message *} PAnsiChar(UTF8Encode(Message))
     );
 
-    DoBeforeEvent(event, Logger, Message, scetMessage);
+    DoBeforeEvent(event, FLogger, Message, scetMessage);
 
     if IncludeStack then
     begin
-      threads := CaptureStackTrace(nil, FRAMES_TO_SKIP);
-      if threads <> 0 then
-        sentry_value_set_by_key(event, 'threads', threads);
+      CaptureStackTrace(nil, FRAMES_TO_SKIP);
+      if raw_frame_count <> 0 then
+      begin
+        threads := ConvertRawStackToSentryStack;
+        if threads <> 0 then
+          sentry_value_set_by_key(event, 'threads', threads);
+        raw_frame_count := 0;
+      end;
     end;
 
-    Result := sentry_capture_event(event).native_uuid;
+    uuid := sentry_capture_event(event);
+    Result := EventIDToString(@uuid.bytes[0]);
 
-    DoAfterEvent(EventIDToString(Result), Logger, Message, scetMessage);
+    DoAfterEvent(Result, FLogger, Message, scetMessage);
   end
   else
   begin
-    DoBeforeEvent(0, Logger, Message, scetMessage);
-    DoAfterEvent('', Logger, Message, scetMessage);
+    DoBeforeEvent(0, FLogger, Message, scetMessage);
+    DoAfterEvent('', FLogger, Message, scetMessage);
   end;
 end;
 
+///
+/// Capture a stack trace and include the offending crash address at the top of
+/// the trace, storing in the global threadvar raw_frames. It'd be possible to
+/// replace this with CaptureStackTraceForException if we constructed our own
+/// CONTEXT record.
+///
+procedure CaptureStackTrace(TopAddr: Pointer; FramesToSkip: Integer);
+var
+  p: PNativeUInt;
+begin
+  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, @raw_frames[0], nil);
+
+  p := @raw_frames[raw_frame_count];
+  if TopAddr <> nil then
+  begin
+    p^ := NativeUInt(TopAddr);
+    Inc(raw_frame_count);
+  end;
+end;
+
+///
+/// Capture a stack trace, storing in the global threadvar raw_frames. This
+/// function uses StackWalk64, because we have a good entry CONTEXT.
+///
+procedure CaptureStackTraceForException(TopAddr: Pointer; EP: PEXCEPTION_POINTERS; FramesToSkip: Integer);
+var
+  c: TContext;
+  frame: TStackFrame64;
+  image: DWORD;
+  n: Integer;
+begin
+  n := 0;
+  c := EP.ContextRecord^;
+
+  ZeroMemory(@frame, sizeof(TStackFrame64));
+{$IFDEF WIN64}
+  image := IMAGE_FILE_MACHINE_AMD64;
+  frame.AddrPC.Offset := c.Rip;
+  frame.AddrPC.Mode := AddrModeFlat;
+
+  frame.AddrFrame.Offset := c.Rbp;
+  frame.AddrFrame.Mode := AddrModeFlat;
+
+  frame.AddrStack.Offset := c.Rsp;
+  frame.AddrStack.Mode := AddrModeFlat;
+{$ELSE}
+  image := IMAGE_FILE_MACHINE_I386;
+  frame.AddrPC.Offset := c.Eip;
+  frame.AddrPC.Mode := AddrModeFlat;
+
+  frame.AddrFrame.Offset := c.Ebp;
+  frame.AddrFrame.Mode := AddrModeFlat;
+
+  frame.AddrStack.Offset := c.Esp;
+  frame.AddrStack.Mode := AddrModeFlat;
+{$ENDIF}
+  while (n < MAX_FRAMES) and StackWalk64(image, GetCurrentProcess, GetCurrentThread, frame, @c, nil, SymFunctionTableAccess64, SymGetModuleBase64, nil) do
+  begin
+    if frame.AddrFrame.Offset = 0 then
+      // End of stack or broken stack
+      Break;
+
+    if (frame.AddrPC.Offset = 0) then
+      // Empty stack frame
+      Continue;
+
+    if (frame.AddrPC.Offset = frame.AddrReturn.Offset) then
+      // Recursive stack frame
+      Continue;
+
+    if FramesToSkip > 0 then
+    begin
+      Dec(FramesToSkip);
+      Continue;
+    end;
+
+    raw_frames[n] := frame.AddrPC.Offset;
+    Inc(n);
+  end;
+
+  raw_frame_count := n;
+end;
+
+var
+  hKernel32, hDbgHelp: THandle;
+initialization
+  hKernel32 := LoadLibrary('kernel32.dll');
+  AddVectoredExceptionHandler := GetProcAddress(hKernel32, 'AddVectoredExceptionHandler');
+  RemoveVectoredExceptionHandler := GetProcAddress(hKernel32, 'RemoveVectoredExceptionHandler');
+
+  hDbgHelp := LoadLibrary('Dbghelp.dll');
+  StackWalk64 := GetProcAddress(hDbgHelp, 'StackWalk64');
+  SymFunctionTableAccess64 := GetProcAddress(hDbgHelp, 'SymFunctionTableAccess64');
+  SymGetModuleBase64 := GetProcAddress(hDbgHelp, 'SymGetModuleBase64');
+  SymInitialize := GetProcAddress(hDbgHelp, 'SymInitialize');
+
+  if Assigned(SymInitialize) then
+    SymInitialize(GetCurrentProcess, nil, True);
 end.

@@ -52,6 +52,7 @@ setup:
 redist:
     copy $(ROOT)\src\ext\sentry\sentry.dll $(ROOT)\bin\developer
     copy $(ROOT)\src\ext\sentry\sentry.x64.dll $(ROOT)\bin\developer
+    copy $(ROOT)\src\ext\sentry\crashpad_handler.exe $(ROOT)\bin\developer
 
 # ----------------------------------------------------------------------
 

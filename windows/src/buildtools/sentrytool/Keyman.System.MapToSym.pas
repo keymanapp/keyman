@@ -14,14 +14,14 @@ type
   TMapToSymFindFileProc = function(const UnitName: string): string;
 
 function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string;
-  guid: TGUID; age: Integer; findFileProc: TMapToSymFindFileProc): Boolean;
+  isAmd64: Boolean; guid: TGUID; age: Integer; findFileProc: TMapToSymFindFileProc): Boolean;
 function GuidToDebugId(guid: TGUID; age: Integer): string;
 
 implementation
 
 type
   TMapToSym = class(TJclMapScanner)
-    function Write(const exeFile, symFile, codeId: string; guid: TGUID; age: Integer): Boolean;
+    function Write(const exeFile, symFile, codeId: string; isAmd64: Boolean; guid: TGUID; age: Integer): Boolean;
   private
     FFindFileProc: TMapToSymFindFileProc;
     function UnitIndexFromVA(va: DWORD): Integer;
@@ -64,7 +64,7 @@ begin
   Result := -1;
 end;
 
-function TMapToSym.Write(const exeFile, symFile, codeId: string; guid: TGUID; age: Integer): Boolean;
+function TMapToSym.Write(const exeFile, symFile, codeId: string; isAmd64: Boolean; guid: TGUID; age: Integer): Boolean;
 var
   s: TJclMapScannerCracker;
   r: TStringList;
@@ -73,6 +73,7 @@ var
   procCount, lineCount: Integer;
   procLen, lineIndex, lineLen: Integer;
   procName: string;
+  FTextSegment, FITextSegment: Word;
 begin
   r := TStringList.Create;
   try
@@ -85,14 +86,27 @@ begin
     lineCount := Length(s.FLineNumbers) div 2 - 1;
 
     // Header information
-    r.Add(Format('MODULE windows x86 %s %s', [GuidToDebugId(guid, age), ExtractFileName(exeFile)]));
+    r.Add(Format('MODULE windows %s %s %s', [IfThen(isAmd64, 'x86_64', 'x86'), GuidToDebugId(guid, age), ExtractFileName(exeFile)]));
     r.Add(Format('INFO CODE_ID %s %s', [codeId, ExtractFileName(exeFile)]));
+
+    FTextSegment := $FFFF;
+    FITextSegment := $FFFF; // only for x86
+    for i := 0 to High(s.FSegmentClasses) do
+    begin
+      if MapStringCacheToStr(s.FSegmentClasses[i].GroupName) = 'CODE' then
+        FTextSegment := s.FSegmentClasses[i].Segment
+      else if MapStringCacheToStr(s.FSegmentClasses[i].GroupName) = 'ICODE' then
+        FITextSegment := s.FSegmentClasses[i].Segment;
+    end;
 
     // Find unit names;
     for i := 0 to High(s.FSegments) do
     begin
-      groupName := MapStringCacheToStr(s.FSegmentClasses[s.FSegments[i].Segment].GroupName);
-      if groupName = 'ICODE' then
+      if s.FSegments[i].Segment = FTextSegment then
+//        (s.FSegments[i].FProcNames[i].Segment <> FITextSegment) then Continue;
+
+//      groupName := MapStringCacheToStr(s.FSegmentClasses[s.FSegments[i].Segment].GroupName);
+//      if groupName = 'CODE' then
       begin
         unitName := MapStringCacheToStr(s.FSegments[i].UnitName);
 
@@ -117,6 +131,9 @@ begin
       if i < procCount - 1
         then procLen := s.FProcNames[i+1].VA - s.FProcNames[i].VA
         else procLen := 0; // TODO: look at module size for maximum here?
+
+      if (s.FProcNames[i].Segment <> FTextSegment) and
+        (s.FProcNames[i].Segment <> FITextSegment) then Continue;
 
       procName := MapStringCacheToStr(s.FProcNames[i].ProcName);
       r.Add(Format('FUNC %x %x 0 %s', [s.FProcNames[i].VA + $1000 {constant entry point}, procLen, procName]));
@@ -153,7 +170,7 @@ begin
   Result := True;
 end;
 
-function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string; guid: TGUID; age: Integer; findFileProc: TMapToSymFindFileProc): Boolean;
+function CreateSymFromMap(const exeFile, mapFile, symFile, codeId: string; isAmd64: Boolean; guid: TGUID; age: Integer; findFileProc: TMapToSymFindFileProc): Boolean;
 var
   p: TMapToSym;
 begin
@@ -166,7 +183,7 @@ begin
   p := TMapToSym.Create(mapFile, 0);
   try
     p.FindFileProc := findFileProc;
-    Result := p.Write(exeFile, symFile, codeId, guid, age);
+    Result := p.Write(exeFile, symFile, codeId, isAmd64, guid, age);
   finally
     p.Free;
   end;

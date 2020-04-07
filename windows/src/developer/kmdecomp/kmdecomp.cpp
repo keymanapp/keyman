@@ -41,9 +41,11 @@ int run(int argc, char *argv[]);
  *
  */
 
+#define KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS_KMDECOMP KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS ".kmdecomp"
+
 int main(int argc, char *argv[])
 {
-  return keyman_sentry_main(TRUE, argc, argv, run);
+  return keyman_sentry_main(TRUE, KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS_KMDECOMP, argc, argv, run);
 }
 
 int run(int argc, char *argv[])

@@ -53,6 +53,7 @@ kmtip:
 redist:
     copy $(ROOT)\src\ext\sentry\sentry.dll $(ROOT)\bin\engine
     copy $(ROOT)\src\ext\sentry\sentry.x64.dll $(ROOT)\bin\engine
+    copy $(ROOT)\src\ext\sentry\crashpad_handler.exe $(ROOT)\bin\engine
 
 # ----------------------------------------------------------------------
 

@@ -12,15 +12,28 @@ Sentry.init({
   release: 'release-$VersionWithTag'
 });
 
-/* // Test sentry here:
-function foobar() {
-  fbb();
+function keymanEnableDiagnostics() {
+  var e = document.createElement('button');
+  e.style.zIndex = '1000';
+  e.style.position = 'fixed';
+  e.style.right = '10px';
+  e.style.top = '10px';
+  e.style.height = '24px';
+  e.innerText = 'Test Exception';
+  e.onclick = function() {
+    var boo = null.boo();
+  }
+  document.body.appendChild(e);
+
+  e = document.createElement('button');
+  e.style.zIndex = '1000';
+  e.style.position = 'fixed';
+  e.style.right = '10px';
+  e.style.top = '38px';
+  e.style.height = '24px';
+  e.innerText = 'Test Event';
+  e.onclick = function() {
+    Sentry.captureMessage('Test Event');
+  }
+  document.body.appendChild(e);
 }
-
-function fbb() {
-
-  Sentry.captureException(new Error("Something broke again"));
-}
-
-foobar();
-*/

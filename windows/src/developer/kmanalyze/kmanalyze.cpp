@@ -45,9 +45,11 @@ wchar_t VKToChar[256][2];
 UINT CharToVK[256];
 UINT CharToShift[256];
 
+#define KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS_KMANALYZE KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS ".kmanalyze"
+
 int main(int argc, char *argv[])
 {
-  return keyman_sentry_main(TRUE, argc, argv, run);
+  return keyman_sentry_main(TRUE, KEYMAN_SENTRY_LOGGER_DEVELOPER_TOOLS_KMANALYZE, argc, argv, run);
 }
 
 int run(int argc, char *argv[])

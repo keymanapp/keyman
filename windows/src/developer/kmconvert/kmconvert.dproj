@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>kmconvert.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
@@ -85,7 +85,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <Debugger_RunParams>import-windows -klid 00000409</Debugger_RunParams>
+        <Debugger_RunParams>-sentry-client-test-exception</Debugger_RunParams>
         <Debugger_CWD>c:\temp\ikp</Debugger_CWD>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_MapFile>3</DCC_MapFile>
@@ -99,6 +99,12 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <DCC_MapFile>3</DCC_MapFile>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_DebugInformation>2</DCC_DebugInformation>
+        <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
+        <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <Debugger_RunParams>-sentry-client-test-exception fp</Debugger_RunParams>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

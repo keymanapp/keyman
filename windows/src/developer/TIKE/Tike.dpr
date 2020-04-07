@@ -304,8 +304,10 @@ uses
 // If you don't add this flag the rederer process will crash when you try to load large images.
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
+const
+  LOGGER_DEVELOPER_IDE_TIKE = TKeymanSentryClient.LOGGER_DEVELOPER_IDE + '.tike';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
 
