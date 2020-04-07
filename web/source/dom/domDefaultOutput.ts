@@ -1,4 +1,10 @@
-namespace com.keyman.text {
+namespace com.keyman.dom {
+  // Basically, these are shorthand imports, only viewable within this file.
+  let DefaultOutput = text.DefaultOutput;
+  let Codes = text.Codes;
+  type KeyEvent = text.KeyEvent;
+
+  // Now for some classic JS method "extension".
   let coreIsCommand = DefaultOutput.isCommand;
   let coreApplyCommand = DefaultOutput.applyCommand;
 
