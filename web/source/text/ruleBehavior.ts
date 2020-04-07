@@ -38,7 +38,7 @@ namespace com.keyman.text {
      */
     warningLog?: string;
 
-    finalize(processor: Processor) {
+    finalize(processor: KeyboardProcessor) {
       let outputTarget = this.transcription.keystroke.Ltarg;
 
       if(processor.beepHandler && this.beep) {

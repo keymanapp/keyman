@@ -2,9 +2,9 @@ namespace com.keyman.osk {
   export class PreProcessor {
     static _GetClickEventProperties(e: keyboards.ActiveKey, Lelem: HTMLElement): text.KeyEvent {
       let keyman = com.keyman.singleton;
-      let processor = keyman.textProcessor;
+      let core = keyman.core;
 
-      var activeKeyboard = processor.activeKeyboard;
+      var activeKeyboard = core.activeKeyboard;
       let formFactor = keyman.util.device.formFactor;
 
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
@@ -14,7 +14,7 @@ namespace com.keyman.osk {
       // Start:  mirrors _GetKeyEventProperties
 
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      var keyShiftState = processor.getModifierState(layer);
+      var keyShiftState = core.keyboardProcessor.getModifierState(layer);
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: text.KeyEvent = {
@@ -37,11 +37,11 @@ namespace com.keyman.osk {
         case 'K_CAPS':
         case 'K_NUMLOCK':
         case 'K_SCROLL':
-          processor.stateKeys[keyName] = ! processor.stateKeys[keyName];
+          core.keyboardProcessor.stateKeys[keyName] = ! core.keyboardProcessor.stateKeys[keyName];
       }
 
       // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
-      processor.setSyntheticEventDefaults(Lkc);
+      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
 
       // End - mirrors _GetKeyEventProperties
 
@@ -51,7 +51,7 @@ namespace com.keyman.osk {
         if(Lkc.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
           // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
           Lkc.vkCode = Lkc.Lcode;
-          text.Processor.setMnemonicCode(Lkc, layer.indexOf('shift') != -1, processor.stateKeys['K_CAPS']);
+          text.KeyboardProcessor.setMnemonicCode(Lkc, layer.indexOf('shift') != -1, core.keyboardProcessor.stateKeys['K_CAPS']);
         }
       } else {
         Lkc.vkCode=Lkc.Lcode;
@@ -128,7 +128,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      let retVal = keyman.textProcessor.processKeyEvent(Lkc);
+      let retVal = keyman.core.processKeyEvent(Lkc);
 
       return retVal;
     }

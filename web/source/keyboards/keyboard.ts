@@ -1,4 +1,6 @@
 /// <reference path="defaultLayouts.ts" />
+/// <reference path="activeLayout.ts" />
+/// <reference path="../text/kbdInterface.ts" />
 
 namespace com.keyman.keyboards {
   /**
@@ -287,7 +289,7 @@ namespace com.keyman.keyboards {
       // No pre-built layout available; time to start constructing it via defaults.
       // First, if we have non-default keys specified by the ['BK'] array, we've got
       // enough to work with to build a default layout.
-      let rawSpecifications: any = null;  // TODO:  better typing, same type as this.legacyLayoutSpec.
+      let rawSpecifications: any = null;  // TODO:  better typing, same type as this._legacyLayoutSpec.
       if(this._legacyLayoutSpec != null && this._legacyLayoutSpec['KLS']) { // KLS is only specified whenever there are non-default keys.
         rawSpecifications = this._legacyLayoutSpec;
       } else if(this._legacyLayoutSpec != null && this._legacyLayoutSpec['BK'] != null) {

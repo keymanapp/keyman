@@ -324,7 +324,7 @@ namespace com.keyman.osk {
         suggestionText = '\xa0';  // default:  nbsp.
       } else {
         // Default the LTR ordering to match that of the active keyboard.
-        let activeKeyboard = keyman.textProcessor.activeKeyboard;
+        let activeKeyboard = keyman.core.activeKeyboard;
         let rtl = activeKeyboard && activeKeyboard.isRTL;
         let orderCode = rtl ? 0x202e /* RTL */ : 0x202d /* LTR */;
         suggestionText = String.fromCharCode(orderCode) + suggestion.displayAs;
@@ -373,7 +373,7 @@ namespace com.keyman.osk {
        * the elements are inserted for RTL.  This allows the banner to be RTL
        * for visuals/UI while still being internally LTR.
        */
-      let activeKeyboard = com.keyman.singleton.textProcessor.activeKeyboard;
+      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
       let rtl = activeKeyboard && activeKeyboard.isRTL;
       for (var i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
         let indexToInsert = rtl ? SuggestionBanner.SUGGESTION_LIMIT - i -1 : i;
