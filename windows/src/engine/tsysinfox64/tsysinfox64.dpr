@@ -23,7 +23,7 @@ uses
 {$R version.res}
 
 const
-  LOGGER_DESKTOP_ENGINE_TSYSINFOX64 = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + 'tsysinfox64';
+  LOGGER_DESKTOP_ENGINE_TSYSINFOX64 = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.tsysinfox64';
 begin
   TKeymanSentryClient.Start(TSentryClient, kscpDesktop, LOGGER_DESKTOP_ENGINE_TSYSINFOX64);
   try

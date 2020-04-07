@@ -3498,7 +3498,7 @@ HANDLE UTF16TempFromUTF8(HANDLE hInfile, BOOL hasPreamble)
 	return hOutfile;
 }
 
-extern "C" void __declspec(dllexport) WINAPI Keyman_Diagnostic(int mode) {
+extern "C" void __declspec(dllexport) Keyman_Diagnostic(int mode) {
   if (mode == 0) {
     RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }

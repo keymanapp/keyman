@@ -5,9 +5,12 @@
 #include <sentry.h>
 #include <registry.h>
 #include <stdio.h>
+#include <shlobj.h>
+#include <KnownFolders.h>
 
 #define SENTRY_DSN_DESKTOP   "https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5"
 #define SENTRY_DSN_DEVELOPER "https://39b25a09410349a58fe12aaf721565af@sentry.keyman.com/6"
+//#define SENTRY_DSN_DEVELOPER "https://7b1ff1dae2c8495b84f90dadcf512b84@sentry.io/4853461" // testing only
 
 bool g_report_exceptions, g_report_messages;
 char *g_logger;
@@ -25,6 +28,23 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
     sentry_options_set_dsn(options, SENTRY_DSN_DESKTOP);
     key = REGSZ_KeymanCU;
   }
+
+  // Set the sentry-db-directory to a writeable location
+
+  char szPath[MAX_PATH + 17]; // length(keyman-sentry-db)+1
+  GetTempPathA(MAX_PATH, szPath);
+  char *p = strchr(szPath, 0);
+  if (p > szPath && *(p - 1) != '\\') {
+    *p++ = '\\';
+    *p = 0;
+  }
+
+  strcat_s(szPath, "keyman-sentry-db");
+  sentry_options_set_database_path(options, szPath);
+
+  // We don't currently need to set this, because it will be same path
+  // as all our c++ executables.
+  //sentry_options_set_handler_path(options, "path/to/crashpad_handler");
 
   HKEY hkey;
   if (RegOpenKeyExA(HKEY_CURRENT_USER, key, 0, KEY_READ, &hkey) == ERROR_SUCCESS) {
@@ -169,6 +189,7 @@ void keyman_sentry_report_message(keyman_sentry_level_t level, const char *messa
 
 /* Wrappers for main, wmain */
 
+#ifdef SENTRY_USE_LOCAL_FILTER
 LPTOP_LEVEL_EXCEPTION_FILTER LastFilter;
 
 LONG WINAPI FilterExceptions(_In_ struct _EXCEPTION_POINTERS *ExceptionInfo) {
@@ -180,6 +201,10 @@ LONG WINAPI FilterExceptions(_In_ struct _EXCEPTION_POINTERS *ExceptionInfo) {
 void keyman_sentry_setexceptionfilter() {
   LastFilter = SetUnhandledExceptionFilter(FilterExceptions);
 }
+#else
+void keyman_sentry_setexceptionfilter() {
+}
+#endif
 
 void keyman_sentry_report_start() {
   char buf[256];
@@ -223,5 +248,5 @@ int keyman_sentry_wmain(bool is_keyman_developer, const char *logger, int argc, 
 
 void keyman_sentry_test_crash() {
   fputs("Testing exception reporting:\n", stderr);
-  RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
+  RaiseException(0x0EA0BEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
 }

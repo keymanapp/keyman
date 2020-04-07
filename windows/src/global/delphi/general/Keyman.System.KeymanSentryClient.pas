@@ -20,6 +20,10 @@ type
       var EventAction: TSentryClientEventAction);
     constructor Create(SentryClientClass: TSentryClientClass; AProject: TKeymanSentryClientProject; const ALogger: string; AFlags: TKeymanSentryClientFlags);
     procedure ReportRemoteErrors(const childEventID: string);
+    procedure NestedValidate(Force: Boolean);
+    procedure NestedValidateAccessViolation;
+    procedure NestedValidateDelphiException;
+    procedure NestedValidateFloatingPointException;
   public
     destructor Destroy; override;
 
@@ -280,9 +284,11 @@ begin
     reg.Free;
   end;
 
+  o.HandlerPath := ExtractFilePath(FindSentryDLL) + 'crashpad_handler.exe';
+  o.DatabasePath := TKeymanPaths.ErrorLogPath('sentry-db');
+
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;
-
   FClient.MessageEvent(Sentry.Client.SENTRY_LEVEL_INFO, 'Started '+ALogger);
 end;
 
@@ -311,11 +317,55 @@ end;
 // c) symbolication is working
 // d) privacy options are correctly checked
 //
+// We nest some function calls for a more expressive stack
+//
 class procedure TKeymanSentryClient.Validate(Force: Boolean);
 begin
-  if Force or (ParamStr(1) = '-sentry-client-test-exception') then
-    // Undocumented test parameter
-    raise ESentryTest.Create('Just testing Sentry');
+  TKeymanSentryClient.Instance.NestedValidate(Force);
 end;
+
+procedure TKeymanSentryClient.NestedValidate(Force: Boolean);
+begin
+  if Force then
+    NestedValidateDelphiException
+  else if ParamStr(1) = '-sentry-client-test-exception' then
+  begin
+    // Undocumented test parameter
+    if ParamStr(2) = '' then
+      NestedValidateDelphiException
+    else if ParamStr(2) = 'av' then
+      NestedValidateAccessViolation
+    else if ParamStr(2) = 'fp' then
+      NestedValidateFloatingPointException;
+  end;
+end;
+
+procedure TKeymanSentryClient.NestedValidateDelphiException;
+begin
+  raise ESentryTest.Create('Just testing Sentry');
+end;
+
+procedure TKeymanSentryClient.NestedValidateAccessViolation;
+var
+  p: PByte;
+begin
+  // Force an Access Violation
+  p := nil;
+  p^ := 0;
+end;
+
+procedure TKeymanSentryClient.NestedValidateFloatingPointException;
+var
+  n: Double;
+begin
+  // Force a floating point exception
+{$IF DEFINED(CONSOLE)}
+  writeln('Attempting FP Exception');
+{$ENDIF}
+  n := 0;
+  n := 1 / n;
+  writeln(n); // We'll never get here, but this stops a compiler warning
+end;
+
 
 end.
