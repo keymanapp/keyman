@@ -239,13 +239,11 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // Check that available keyboard information can be obtained via:
-        // 1. connection to cloud catalog
-        // 2. cached file
-        // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || CloudRepository.shared.hasCache(context) ||
-          KeyboardPickerActivity.hasKeyboardFromPackage()){
-          // Rework to use languuage-specific (KeyboardList) picker!
-          Intent i = new Intent(context, KeyboardListActivity.class);
+        // 1. connection to keyman.com
+        // 2. local kmp.json files in packages/
+        if (KMManager.hasConnection(context) || KeyboardPickerActivity.hasKeyboardFromPackage()){
+          Intent i = new Intent(context, KMPBrowserActivity.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
           i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
           i.putExtra("languageCode", lgCode);
           i.putExtra("languageName", lgName);

@@ -53,6 +53,9 @@
     <string name="keyboard_qr_code" comment="QR Code description">
       Scan this code to load this\nkeyboard on another device</string>
 
+    <!-- Keyboard Search strings -->
+    <string name="keyboard_search">Keyboard Search</string>
+
     <!-- Model Updates -->
     <string name="confirm_download_model">Would you like to download the latest version of this dictionary?</string>
     <string name="catalog_unavailable">The resource catalog is unavailable</string>
