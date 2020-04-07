@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.48 alpha 2020-04-07
+
+* feat(windows): use crashpad and better call stacks (#2931)
+
 ## 14.0.47 alpha 2020-04-07
 
 * fix(common/lmlayer): use searchTermToKey() on input (#2954)
