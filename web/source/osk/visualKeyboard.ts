@@ -625,7 +625,7 @@ namespace com.keyman.osk {
         // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
         // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
-        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, device.formFactor);
+        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, keyboard, device.formFactor);
       }
       this.layers=layout['layer'];
 

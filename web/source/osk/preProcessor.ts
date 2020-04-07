@@ -9,39 +9,12 @@ namespace com.keyman.osk {
 
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
       // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer = e.layer || e.displayLayer || '', keyName=e.id.toUpperCase();
+      var layer = e.layer || e.displayLayer || '';
 
       // Start:  mirrors _GetKeyEventProperties
 
-      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      var keyShiftState = core.keyboardProcessor.getModifierState(layer);
-
       // First check the virtual key, and process shift, control, alt or function keys
-      var Lkc: text.KeyEvent = {
-        Ltarg: dom.Utils.getOutputTarget(Lelem),
-        Lmodifiers: keyShiftState,
-        Lstates: 0,
-        Lcode: text.Codes.keyCodes[keyName],
-        LisVirtualKey: true,
-        vkCode: 0,
-        kName: keyName,
-        kLayer: layer,
-        kbdLayer: e.displayLayer,
-        kNextLayer: e.nextlayer,
-        device: keyman.util.device.coreSpec,  // The OSK's events always use the 'true' device.
-        isSynthetic: true
-      };
-
-      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(keyName) {
-        case 'K_CAPS':
-        case 'K_NUMLOCK':
-        case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[keyName] = ! core.keyboardProcessor.stateKeys[keyName];
-      }
-
-      // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
-      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
+      let Lkc = e.constructKeyEvent(dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
 
       // End - mirrors _GetKeyEventProperties
 

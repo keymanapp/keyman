@@ -39,6 +39,49 @@ namespace com.keyman.keyboards {
       aKey.displayLayer = displayLayer;
       aKey.layer = aKey.layer || displayLayer;
     }
+
+    constructKeyEvent(target: text.OutputTarget, device: text.EngineDeviceSpec): text.KeyEvent {
+      let keyman = com.keyman.singleton;
+      let core = keyman.core;
+
+      // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
+      // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
+      var layer = this.layer || this.displayLayer || '', keyName=this.id.toUpperCase();
+
+      // Start:  mirrors _GetKeyEventProperties
+
+      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
+      var keyShiftState = core.keyboardProcessor.getModifierState(layer);
+
+      // First check the virtual key, and process shift, control, alt or function keys
+      var Lkc: text.KeyEvent = {
+        Ltarg: target,
+        Lmodifiers: keyShiftState,
+        Lstates: 0,
+        Lcode: text.Codes.keyCodes[keyName],
+        LisVirtualKey: true,
+        vkCode: 0,
+        kName: keyName,
+        kLayer: layer,
+        kbdLayer: this.displayLayer,
+        kNextLayer: this.nextlayer,
+        device: device,  // The OSK's events always use the 'true' device.
+        isSynthetic: true
+      };
+
+      // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
+      switch(keyName) {
+        case 'K_CAPS':
+        case 'K_NUMLOCK':
+        case 'K_SCROLL':
+          core.keyboardProcessor.stateKeys[keyName] = ! core.keyboardProcessor.stateKeys[keyName];
+      }
+
+      // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
+      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
+
+      return Lkc;
+    }
   }
 
   class ActiveRow implements LayoutRow {
@@ -379,6 +422,7 @@ namespace com.keyman.keyboards {
     font: string;
     keyLabels: boolean;
     isDefault?: boolean;
+    keyboard: Keyboard;
 
     /**
      * Facilitates mapping layer id strings to their specification objects.
@@ -398,7 +442,7 @@ namespace com.keyman.keyboards {
      * @param layout
      * @param formFactor
      */
-    static polyfill(layout: LayoutFormFactor, formFactor: string): ActiveLayout {
+    static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: string): ActiveLayout {
       if(layout == null) {
         throw new Error("Cannot build an ActiveLayout for a null specification.");
       }
