@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.47 alpha 2020-04-07
+
+* fix(common/lmlayer): use searchTermToKey() on input (#2954)
+* refactor(web/engine): proper split-off of DOM-reliant code (#2939)
+* refactor(web/engine): InputProcessor/KeyboardProcessor split (#2940)
+* fix(ios): prevents in-app keyboard resets (#2951)
+* refactor(web/engine): headless KeyboardProcessor (#2941)
+
 ## 14.0.46 alpha 2020-04-06
 
 * fix(android): Add check for WRITE_EXTERNAL_STORAGE permission (#2946)
