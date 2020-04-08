@@ -80,9 +80,7 @@ export default class LexicalModelCompiler {
         if (wordBreakerSourceCode) {
           func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
         }
-        if (modelSource.searchTermToKey) {
-          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
-        }
+        func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;
         }
