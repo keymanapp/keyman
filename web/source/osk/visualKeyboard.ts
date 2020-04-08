@@ -2382,7 +2382,22 @@ namespace com.keyman.osk {
         xLeft -= xOverflow;
       }
 
-      this.drawPreview(canvas, xWidth, xHeight, edge);
+      // For now, should only be true (in production) when keyman.isEmbedded == true.
+      let constrainPopup = keyman.isEmbedded;
+
+      let cs = getComputedStyle(tip.element);
+      let oskHeight = keyman.osk.getHeight();
+      let bottomY = parseInt(cs.bottom, 10);
+      let tipHeight = parseInt(cs.height, 10);
+
+      let delta = 0;
+      if(tipHeight + bottomY > oskHeight && constrainPopup) {
+        delta = tipHeight + bottomY - oskHeight;
+        canvas.height = canvas.height - delta;
+        kts.height = canvas.height + 'px';
+      }
+
+      this.drawPreview(canvas, xWidth, xHeight, edge, delta);
                 
       kts.left=(xLeft - xOverflow) + 'px';
       kts.display = 'block';
@@ -2402,13 +2417,20 @@ namespace com.keyman.osk {
    *  @param  {number}  h height of touched key, px      
    *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
    */
-  drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number) {
+  drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number, delta?: number) {
     let util = com.keyman.singleton.util;
     let device = util.device;
 
-    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height,
+    delta = delta || 0;
+
+    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height + delta,
         w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
         h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
+
+    let hBoundedMax = canvas.height;
+
+    h2 = h2 > hBoundedMax ? hBoundedMax : h2;
+    h3 = hMax > hBoundedMax ? hBoundedMax : h3;
     
     if(device.OS == 'Android') {
       r = 3;
@@ -2446,14 +2468,17 @@ namespace com.keyman.osk {
     if(device.OS == 'Android') {    
       ctx.arcTo(w3,h1,w2,h2,r);
       ctx.arcTo(w2,h2,w1,h2,r);
-      ctx.arcTo(w1,h2,w0,h1-r,r);
     } else {
+      let lowerR = 0;
+      if(h3 > h2) {
+        lowerR = h3-h2 > r ? r : h3-h2;
+      }
       ctx.arcTo(w3,h1,w2,h2,r);
-      ctx.arcTo(w2,h2,w2-r,h3,r);
-      ctx.arcTo(w2,h3,w1,h3,r);
-      ctx.arcTo(w1,h3,w1,h2-r,r);
-      ctx.arcTo(w1,h2,w0,h1-r,r);
+      ctx.arcTo(w2,h2,w2-lowerR,h3,lowerR);
+      ctx.arcTo(w2,h3,w1,h3,lowerR);
+      ctx.arcTo(w1,h3,w1,h2-lowerR,lowerR);
     }
+    ctx.arcTo(w1,h2,w0,h1-r,r);
     ctx.arcTo(w0,h1,w0,r,r);
     ctx.arcTo(w0,0,w0+r,0,r);
     ctx.fill();
