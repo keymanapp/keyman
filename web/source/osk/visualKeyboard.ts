@@ -1569,6 +1569,19 @@ namespace com.keyman.osk {
       // Make the popup keys visible
       ss.visibility='visible';
 
+      // For now, should only be true (in production) when keyman.isEmbedded == true.
+      let constrainPopup = true;
+
+      let cs = getComputedStyle(subKeys);
+      let oskHeight = keyman.osk.getHeight();
+      let bottomY = parseInt(cs.bottom, 10);
+      let popupHeight = parseInt(cs.height, 10);
+
+      if(popupHeight + bottomY > oskHeight && constrainPopup) {
+        let delta = popupHeight + bottomY - oskHeight;
+        ss.bottom = (bottomY - delta) + 'px';
+      }
+
       // And add a filter to fade main keyboard
       subKeys.shim = document.createElement('DIV');
       subKeys.shim.id = 'kmw-popup-shim';
