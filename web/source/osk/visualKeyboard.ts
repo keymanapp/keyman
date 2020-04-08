@@ -1549,9 +1549,6 @@ namespace com.keyman.osk {
       }
       ss.left=x+'px';
 
-      // Add the callout
-      this.popupCallout = this.addCallout(e);
-
       // Make the popup keys visible
       ss.visibility='visible';
 
@@ -1563,10 +1560,14 @@ namespace com.keyman.osk {
       let bottomY = parseInt(cs.bottom, 10);
       let popupHeight = parseInt(cs.height, 10);
 
+      let delta = 0;
       if(popupHeight + bottomY > oskHeight && constrainPopup) {
-        let delta = popupHeight + bottomY - oskHeight;
+        delta = popupHeight + bottomY - oskHeight;
         ss.bottom = (bottomY - delta) + 'px';
       }
+
+      // Add the callout
+      this.popupCallout = this.addCallout(e, delta);
 
       // And add a filter to fade main keyboard
       subKeys.shim = document.createElement('DIV');
@@ -2539,30 +2540,38 @@ namespace com.keyman.osk {
      * @param   {Object}  key   HTML key element
      * @return  {Object}        callout object   
      */              
-    addCallout(key: KeyElement): HTMLDivElement {   
+    addCallout(key: KeyElement, delta?: number): HTMLDivElement {   
       let keyman = com.keyman.singleton;
       let util = keyman.util;
 
       if(util.device.formFactor != 'phone' || util.device.OS != 'iOS') {
         return null;
       }
-        
-      var cc = util._CreateElement('div'), ccs = cc.style;
-      cc.id = 'kmw-popup-callout';
-      keyman.osk._Box.appendChild(cc);
-      
-      // Create the callout
-      var xLeft = key.offsetLeft,
-          xTop = key.offsetTop,
-          xWidth = key.offsetWidth,
-          xHeight = key.offsetHeight;
 
-      // Set position and style 
-      ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
-      ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
-      
-      // Return callout element, to allow removal later
-      return cc;  
+      delta = delta || 0;
+
+      let calloutHeight = key.offsetHeight - delta;
+
+      if(calloutHeight > 0) {  
+        var cc = util._CreateElement('div'), ccs = cc.style;
+        cc.id = 'kmw-popup-callout';
+        keyman.osk._Box.appendChild(cc);
+        
+        // Create the callout
+        var xLeft = key.offsetLeft,
+            xTop = key.offsetTop + delta,
+            xWidth = key.offsetWidth,
+            xHeight = calloutHeight;
+
+        // Set position and style 
+        ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
+        ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+        
+        // Return callout element, to allow removal later
+        return cc;
+      } else {
+        return null;
+      }
     }
 
     /**
