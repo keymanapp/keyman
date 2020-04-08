@@ -21,11 +21,9 @@ namespace com.keyman.keyboards {
     pad?: string;
     layer: string;
     displayLayer: string;
-    nextlayer: "string";
+    nextlayer: string;
 
-    Lcode: number;
-    vkCode: number = 0; // default value; may be changed for mnemonic keyboards.
-    isVirtualKey: boolean = true; // default value; may be changed for KMW-1.0 keyboards.
+    private baseKeyEvent: text.KeyEvent;
     isMnemonic: boolean = false;
 
     proportionalX: number;
@@ -51,63 +49,72 @@ namespace com.keyman.keyboards {
       aKey.displayLayer = displayLayer;
       aKey.layer = aKey.layer || displayLayer;
 
-      if(key.id) {
-        aKey.Lcode = text.Codes.keyCodes[key.id.toUpperCase()];
+      // Compute the key's base KeyEvent properties for use in future event generation
+      aKey.constructBaseKeyEvent(layout, displayLayer);
+    }
 
-        if(layout.keyboard) {
-          let keyboard = layout.keyboard;
+    constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
+      // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
+      // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
+      let layer = this.layer || displayLayer || '';
+      let keyName= this.id ? this.id.toUpperCase() : null;
 
-          // Include *limited* support for mnemonic keyboards (Sept 2012)
-          // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-          if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
-            if(aKey.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
-              // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
-              aKey.vkCode = aKey.Lcode;
-              aKey.isMnemonic = true;
-            }
-          } else {
-            aKey.vkCode=aKey.Lcode;
+      // Start:  mirrors _GetKeyEventProperties
+
+      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
+      let keyShiftState = text.KeyboardProcessor.getModifierState(layer); // TODO:  should be a static method, so 'core' could be dropped.
+
+      // First check the virtual key, and process shift, control, alt or function keys
+      var Lkc: text.KeyEvent = {
+        Ltarg: null, // set later, in constructKeyEvent.
+        Lmodifiers: keyShiftState,
+        Lstates: 0,
+        Lcode: keyName ? text.Codes.keyCodes[keyName] : 0,
+        LisVirtualKey: true,
+        vkCode: 0,
+        kName: keyName,
+        kLayer: layer,
+        kbdLayer: displayLayer,
+        kNextLayer: this.nextlayer,
+        device: null,
+        isSynthetic: true
+      };
+
+      if(layout.keyboard) {
+        let keyboard = layout.keyboard;
+
+        // Include *limited* support for mnemonic keyboards (Sept 2012)
+        // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
+        if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
+          if(Lkc.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
+            // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
+            Lkc.vkCode = Lkc.Lcode;
+            this.isMnemonic = true;
           }
+        } else {
+          Lkc.vkCode=Lkc.Lcode;
+        }
 
-          // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-          if(!keyboard.definesPositionalOrMnemonic) {
-            // Not the best pattern, but currently safe - we don't look up any properties of either
-            // argument in this use case, and the object's scope is extremely limited.
-            aKey.Lcode = KeyMapping._USKeyCodeToCharCode(aKey.constructKeyEvent(null, null));
-            aKey.isVirtualKey=false;
-          }
+        // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+        if(!keyboard.definesPositionalOrMnemonic) {
+          // Not the best pattern, but currently safe - we don't look up any properties of either
+          // argument in this use case, and the object's scope is extremely limited.
+          Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null));
+          Lkc.LisVirtualKey=false;
         }
       }
+
+      this.baseKeyEvent = Lkc;
     }
 
     constructKeyEvent(target: text.OutputTarget, device: text.EngineDeviceSpec): text.KeyEvent {
       let keyman = com.keyman.singleton;
       let core = keyman.core;
 
-      // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
-      // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer = this.layer || this.displayLayer || '', keyName=this.id.toUpperCase();
-
-      // Start:  mirrors _GetKeyEventProperties
-
-      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      var keyShiftState = core.keyboardProcessor.getModifierState(layer); // TODO:  should be a static method, so 'core' could be dropped.
-
-      // First check the virtual key, and process shift, control, alt or function keys
-      var Lkc: text.KeyEvent = {
-        Ltarg: target,
-        Lmodifiers: keyShiftState,
-        Lstates: 0,
-        Lcode: this.Lcode,
-        LisVirtualKey: this.isVirtualKey,
-        vkCode: this.vkCode,
-        kName: keyName,
-        kLayer: layer,
-        kbdLayer: this.displayLayer,
-        kNextLayer: this.nextlayer,
-        device: device,  // The OSK's events always use the 'true' device.
-        isSynthetic: true
-      };
+      // Make a deep copy of our preconstructed key event, filling it out from there.
+      let Lkc = utils.deepCopy(this.baseKeyEvent);
+      Lkc.Ltarg = target;
+      Lkc.device = device;
 
       if(this.isMnemonic) {
         text.KeyboardProcessor.setMnemonicCode(Lkc, this.layer.indexOf('shift') != -1, core.keyboardProcessor.stateKeys['K_CAPS']);
