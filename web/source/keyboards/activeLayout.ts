@@ -53,7 +53,7 @@ namespace com.keyman.keyboards {
       aKey.constructBaseKeyEvent(layout, displayLayer);
     }
 
-    constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
+    private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
       // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
       // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
       let layer = this.layer || displayLayer || '';
@@ -62,7 +62,7 @@ namespace com.keyman.keyboards {
       // Start:  mirrors _GetKeyEventProperties
 
       // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      let keyShiftState = text.KeyboardProcessor.getModifierState(layer); // TODO:  should be a static method, so 'core' could be dropped.
+      let keyShiftState = text.KeyboardProcessor.getModifierState(layer);
 
       // First check the virtual key, and process shift, control, alt or function keys
       var Lkc: text.KeyEvent = {
