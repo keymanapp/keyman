@@ -7,7 +7,7 @@ namespace com.keyman.osk {
       // Start:  mirrors _GetKeyEventProperties
 
       // First check the virtual key, and process shift, control, alt or function keys
-      let Lkc = e.constructKeyEvent(dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
+      let Lkc = e.constructKeyEvent(core.keyboardProcessor, dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
       switch(Lkc.kName) {

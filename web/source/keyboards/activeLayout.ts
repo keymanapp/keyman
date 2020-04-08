@@ -97,9 +97,9 @@ namespace com.keyman.keyboards {
 
         // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
         if(!keyboard.definesPositionalOrMnemonic) {
-          // Not the best pattern, but currently safe - we don't look up any properties of either
-          // argument in this use case, and the object's scope is extremely limited.
-          Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null));
+          // Not the best pattern, but currently safe - we don't look up any properties of any of the
+          // arguments in this use case, and the object's scope is extremely limited.
+          Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null, null));
           Lkc.LisVirtualKey=false;
         }
       }
@@ -107,22 +107,21 @@ namespace com.keyman.keyboards {
       this.baseKeyEvent = Lkc;
     }
 
-    constructKeyEvent(target: text.OutputTarget, device: text.EngineDeviceSpec): text.KeyEvent {
-      let keyman = com.keyman.singleton;
-      let core = keyman.core;
-
+    constructKeyEvent(keyboardProcessor: text.KeyboardProcessor, target: text.OutputTarget, device: text.EngineDeviceSpec): text.KeyEvent {
       // Make a deep copy of our preconstructed key event, filling it out from there.
       let Lkc = utils.deepCopy(this.baseKeyEvent);
       Lkc.Ltarg = target;
       Lkc.device = device;
 
       if(this.isMnemonic) {
-        text.KeyboardProcessor.setMnemonicCode(Lkc, this.layer.indexOf('shift') != -1, core.keyboardProcessor.stateKeys['K_CAPS']);
+        text.KeyboardProcessor.setMnemonicCode(Lkc, this.layer.indexOf('shift') != -1, keyboardProcessor ? keyboardProcessor.stateKeys['K_CAPS'] : false);
       }
 
       // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
       // This part depends on the keyboard processor's active state.
-      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
+      if(keyboardProcessor) {
+        keyboardProcessor.setSyntheticEventDefaults(Lkc);
+      }
 
       return Lkc;
     }
