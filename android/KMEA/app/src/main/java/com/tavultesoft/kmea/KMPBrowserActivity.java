@@ -23,6 +23,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tavultesoft.kmea.util.FileUtils;
+
 public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
   private WebView webView;
@@ -63,16 +65,17 @@ public class KMPBrowserActivity extends AppCompatActivity {
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
         String lowerURL = url.toLowerCase();
         if (!lowerURL.equals("about:blank")) {
-          if (lowerURL.startsWith("keyman:")) {
-            if (lowerURL.startsWith("keyman:download")) {
-              // KMAPro main activity will handle this intent
-              Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(lowerURL));
-              startActivityForResult(intent, 1);
-            } else {
+          if (FileUtils.isKeymanLink(lowerURL)) {
+            // KMAPro main activity will handle this intent
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(lowerURL));
+            startActivityForResult(intent, 1);
+          } else {
+            if (lowerURL.startsWith("keyman:")) {
+              // Warn for unsupported keyman schemes
               Log.d(TAG, "Scheme for " + lowerURL + " not handled");
               return true;
             }
-          } else {
+            // Display URL
             return false;
           }
         }

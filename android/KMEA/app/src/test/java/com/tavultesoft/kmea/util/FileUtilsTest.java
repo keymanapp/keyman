@@ -54,6 +54,30 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void test_isKeymanLink() {
+    Assert.assertFalse(FileUtils.isKeymanLink(null));
+    Assert.assertFalse(FileUtils.isKeymanLink(""));
+
+    // Valid Keyman links
+    Assert.assertTrue(FileUtils.isKeymanLink("keyman://keyboard"));
+    Assert.assertTrue(FileUtils.isKeymanLink("Keyman://keyboard"));
+    Assert.assertTrue(FileUtils.isKeymanLink("keyman:download?keyboard"));
+    Assert.assertTrue(FileUtils.isKeymanLink("Keyman:Download?keyboard"));
+    Assert.assertTrue(FileUtils.isKeymanLink("keyman:download//keyboard"));
+    Assert.assertTrue(FileUtils.isKeymanLink("keyman://download/keyboard"));
+
+    // links missing query
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman://"));
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman:download?"));
+
+    // Other methods not supported
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman:method//keyboard"));
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman:method?keyboard"));
+
+    Assert.assertFalse(FileUtils.isKeymanLink("example:keyman//"));
+  }
+
+  @Test
   public void test_compareVersions() {
     Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions(null, "1.0"));
     Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("" , "1.0"));
