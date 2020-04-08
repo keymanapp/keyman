@@ -104,6 +104,22 @@ describe('LexicalModelCompiler', function () {
     // total weight of 27,596!
     assert.match(code, /\btotalWeight\b["']?:\s*27596\b/);
   });
+
+  it('should include the source code of its search term to key function', function () {
+    const MODEL_ID = 'example.qaa.trivial';
+    const PATH = makePathToFixture(MODEL_ID);
+    let compiler = new LexicalModelCompiler;
+    let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      format: 'trie-1.0',
+      sources: ['wordlist.tsv']
+      // NOTE: we intentionally OMIT the searchTermToKey function
+      // so that the default can be provided.
+    }, PATH) as string;
+
+    assert.match(code, /(["']|)searchTermToKey\1:\s*function\b/,
+      'expected to find searchTermToKey specified as a function'
+    );
+  });
 });
 
 describe('createTrieDataStructure()', function () {
