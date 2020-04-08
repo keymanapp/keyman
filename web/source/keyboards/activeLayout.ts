@@ -40,33 +40,42 @@ namespace com.keyman.keyboards {
         }
       }
 
+      // Ensure subkeys are also properly extended.
+      if(key.sk) {
+        for(let subkey of key.sk) {
+          ActiveKey.polyfill(subkey, layout, displayLayer);
+        }
+      }
+
       let aKey = key as ActiveKey;
       aKey.displayLayer = displayLayer;
       aKey.layer = aKey.layer || displayLayer;
 
-      aKey.Lcode = text.Codes.keyCodes[key.id.toUpperCase()];
+      if(key.id) {
+        aKey.Lcode = text.Codes.keyCodes[key.id.toUpperCase()];
 
-      if(layout.keyboard) {
-        let keyboard = layout.keyboard;
+        if(layout.keyboard) {
+          let keyboard = layout.keyboard;
 
-        // Include *limited* support for mnemonic keyboards (Sept 2012)
-        // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-        if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
-          if(aKey.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
-            // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
-            aKey.vkCode = aKey.Lcode;
-            aKey.isMnemonic = true;
+          // Include *limited* support for mnemonic keyboards (Sept 2012)
+          // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
+          if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
+            if(aKey.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
+              // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
+              aKey.vkCode = aKey.Lcode;
+              aKey.isMnemonic = true;
+            }
+          } else {
+            aKey.vkCode=aKey.Lcode;
           }
-        } else {
-          aKey.vkCode=aKey.Lcode;
-        }
 
-        // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-        if(!keyboard.definesPositionalOrMnemonic) {
-          // Not the best pattern, but currently safe - we don't look up any properties of either
-          // argument in this use case, and the object's scope is extremely limited.
-          aKey.Lcode = KeyMapping._USKeyCodeToCharCode(aKey.constructKeyEvent(null, null));
-          aKey.isVirtualKey=false;
+          // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+          if(!keyboard.definesPositionalOrMnemonic) {
+            // Not the best pattern, but currently safe - we don't look up any properties of either
+            // argument in this use case, and the object's scope is extremely limited.
+            aKey.Lcode = KeyMapping._USKeyCodeToCharCode(aKey.constructKeyEvent(null, null));
+            aKey.isVirtualKey=false;
+          }
         }
       }
     }
