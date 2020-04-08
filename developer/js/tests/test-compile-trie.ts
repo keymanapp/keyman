@@ -108,9 +108,25 @@ describe('LexicalModelCompiler', function () {
 
 describe('createTrieDataStructure()', function () {
   const WORDLIST_FILENAME = makePathToFixture('example.qaa.trivial', 'wordlist.tsv');
-  it('should cannot be called with one argument', function () {
+
+  it('must be given an explicit searchTermToKey function', function () {
     assert.throws(function () {
       createTrieDataStructure([WORDLIST_FILENAME]);
     }, TypeError)
   });
+
+  it('uses the provided searchTermToKey function', function () {
+    // check if the expected key is in the resultant data structure.
+    // N.B., we assume the wordlist contains the wordform "turtles"
+    let lowercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
+      return wf.toLowerCase()
+    })
+    assert.include(lowercaseSourceCode, 'turtles');
+    assert.notInclude(lowercaseSourceCode, 'TURTLES');
+
+    let uppercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
+      return wf.toUpperCase()
+    })
+    assert.include(uppercaseSourceCode, 'TURTLES');
+  })
 });
