@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.webkit.WebChromeClient;
@@ -23,11 +24,10 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class KMPBrowserActivity extends AppCompatActivity {
-
+  private static final String TAG = "KMPBrowserActivity";
   private WebView webView;
-  private static final String KMP_SEARCH_BASE_URL = "https://keyman.com/keyboards";
-  private static final String KMP_LANGUAGE = "/languages/";
-  private static final String KMP_QUERY = "?embed=linux&version="; // TODO: Update to Android
+  private static final String KMP_SEARCH_URL_FORMATSTR = "https://keyman.com/keyboards%s?embed=linux&version=%s"; // TODO: Update to Android
+  private static final String KMP_LANGUAGE_FORMATSTR = "/languages/%s";
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
@@ -61,13 +61,19 @@ public class KMPBrowserActivity extends AppCompatActivity {
 
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        if (!url.toLowerCase().equals("about:blank")) {
-          if (url.startsWith("keyman:download")) {
-            // KMAPro main activity will handle this intent
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivityForResult(intent, 1);
+        String lowerURL = url.toLowerCase();
+        if (!lowerURL.equals("about:blank")) {
+          if (lowerURL.startsWith("keyman:")) {
+            if (lowerURL.startsWith("keyman:download")) {
+              // KMAPro main activity will handle this intent
+              Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(lowerURL));
+              startActivityForResult(intent, 1);
+            } else {
+              Log.d(TAG, "Scheme for " + lowerURL + " not handled");
+              return true;
+            }
           } else {
-            view.loadUrl(url);
+            return false;
           }
         }
         return true;
@@ -88,9 +94,9 @@ public class KMPBrowserActivity extends AppCompatActivity {
 
     // If language ID is provided, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
-    String languageStr = (languageID != null) ? String.format("%s%s", KMP_LANGUAGE, languageID) : "";
+    String languageStr = (languageID != null) ? String.format(KMP_LANGUAGE_FORMATSTR, languageID) : "";
     String appVersion = KMManager.getVersion();
-    String kmpSearchUrl = String.format("%s%s%s%s", KMP_SEARCH_BASE_URL, languageStr, KMP_QUERY, appVersion);
+    String kmpSearchUrl = String.format(KMP_SEARCH_URL_FORMATSTR, languageStr, appVersion);
     webView.loadUrl(kmpSearchUrl);
   }
 
