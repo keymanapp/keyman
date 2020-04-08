@@ -3,6 +3,7 @@ import {assert} from 'chai';
 import 'mocha';
 
 import {makePathToFixture, compileModelSourceCode} from './helpers';
+import { createTrieDataStructure } from '../dist/lexical-model-compiler/build-trie';
 
 describe('LexicalModelCompiler', function () {
   describe('#generateLexicalModelCode', function () {
@@ -105,3 +106,11 @@ describe('LexicalModelCompiler', function () {
   });
 });
 
+describe('createTrieDataStructure()', function () {
+  const WORDLIST_FILENAME = makePathToFixture('example.qaa.trivial', 'wordlist.tsv');
+  it('should cannot be called with one argument', function () {
+    assert.throws(function () {
+      createTrieDataStructure([WORDLIST_FILENAME]);
+    }, TypeError)
+  });
+});
