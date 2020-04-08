@@ -1567,7 +1567,7 @@ namespace com.keyman.osk {
       ss.visibility='visible';
 
       // For now, should only be true (in production) when keyman.isEmbedded == true.
-      let constrainPopup = true;
+      let constrainPopup = keyman.isEmbedded;
 
       let cs = getComputedStyle(subKeys);
       let oskHeight = keyman.osk.getHeight();
