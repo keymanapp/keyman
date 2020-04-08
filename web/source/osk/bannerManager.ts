@@ -143,10 +143,10 @@ namespace com.keyman.osk {
             this.alwaysShow = optionSpec[key];
             break;
           case 'mayPredict':
-            keyman.modelManager.mayPredict = optionSpec[key]
+            keyman.core.languageProcessor.mayPredict = optionSpec[key]
             break;
           case 'mayCorrect':
-            keyman.modelManager.mayCorrect = optionSpec[key];
+            keyman.core.languageProcessor.mayCorrect = optionSpec[key];
             break;
           case 'imagePath':
             // Determines the image file to use for ImageBanners.
@@ -215,7 +215,7 @@ namespace com.keyman.osk {
       // language has an active predictive model.
       // ModelManager will never have an active model 
       // when predictions are disabled.
-      if(keyman.modelManager.activeModel) {
+      if(keyman.core.activeModel) {
         this.setBanner('suggestion');
       } else if(this.alwaysShow) {
         this.setBanner('image');

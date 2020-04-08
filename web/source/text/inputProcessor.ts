@@ -1,4 +1,5 @@
 /// <reference path="keyboardProcessor.ts" />
+/// <reference path="prediction/languageProcessor.ts" />
 
 namespace com.keyman.text {
   export class InputProcessor {
@@ -6,7 +7,8 @@ namespace com.keyman.text {
       baseLayout: 'us'
     }
 
-    kbdProcessor: KeyboardProcessor;
+    private kbdProcessor: KeyboardProcessor;
+    private lngProcessor: prediction.LanguageProcessor;
 
     constructor(options?: ProcessorInitOptions) {
       if(!options) {
@@ -14,6 +16,11 @@ namespace com.keyman.text {
       }
 
       this.kbdProcessor = new KeyboardProcessor(options);
+      this.lngProcessor = new prediction.LanguageProcessor();
+    }
+
+    public get languageProcessor(): prediction.LanguageProcessor {
+      return this.lngProcessor;
     }
 
     public get keyboardProcessor(): KeyboardProcessor {
@@ -34,6 +41,10 @@ namespace com.keyman.text {
       // All old deadkeys and keyboard-specific cache should immediately be invalidated
       // on a keyboard change.
       this.resetContext();
+    }
+
+    public get activeModel(): prediction.ModelSpec {
+      return this.languageProcessor.activeModel;
     }
 
         /**
@@ -71,14 +82,14 @@ namespace com.keyman.text {
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
       // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
       // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
-      if(keyman.modelManager.enabled) {
+      if(this.languageProcessor.enabled) {
         // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
 
         // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
-        if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && keyman.modelManager.tryRevertSuggestion()) {
+        if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
           return;
           // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
-        } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && keyman.modelManager.tryAcceptSuggestion('space')) {
+        } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
           return;
         }
       }
@@ -99,7 +110,7 @@ namespace com.keyman.text {
 
         // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
         // Also, don't do fat-finger stuff if predictive text isn't enabled.
-        if(keyman.modelManager.enabled && !ruleBehavior.triggersDefaultCommand) {
+        if(this.languageProcessor.enabled && !ruleBehavior.triggersDefaultCommand) {
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);
@@ -152,7 +163,7 @@ namespace com.keyman.text {
         // Notify the ModelManager of new input - it's predictive text time!
         ruleBehavior.transcription.alternates = alternates;
         // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
-        keyman.modelManager.predict(ruleBehavior.transcription);
+        this.languageProcessor.predict(ruleBehavior.transcription);
 
         // KMEA and KMEI (embedded mode) use direct insertion of the character string
         if(keyman.isEmbedded) {
@@ -185,7 +196,7 @@ namespace com.keyman.text {
       this.keyboardProcessor.resetContext();
 
       if(keyman.modelManager) {
-        keyman.modelManager.invalidateContext();
+        this.languageProcessor.invalidateContext();
       }
     }
   }

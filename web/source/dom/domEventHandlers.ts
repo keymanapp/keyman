@@ -322,7 +322,7 @@ namespace com.keyman.dom {
 
        // Now that we've fully entered the new context, invalidate the context so we can generate initial predictions from it.
       if(this.keyman.modelManager) {
-        this.keyman.modelManager.invalidateContext();
+        this.keyman.core.languageProcessor.invalidateContext();
       }
     }
 
