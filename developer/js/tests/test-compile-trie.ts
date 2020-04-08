@@ -121,12 +121,13 @@ describe('createTrieDataStructure()', function () {
     let lowercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
       return wf.toLowerCase()
     })
-    assert.include(lowercaseSourceCode, 'turtles');
-    assert.notInclude(lowercaseSourceCode, 'TURTLES');
+    assert.match(lowercaseSourceCode, /"key":\s*"turtles"/);
+    assert.notMatch(lowercaseSourceCode, /"key":\s*"TURTLES"/);
 
     let uppercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
       return wf.toUpperCase()
     })
-    assert.include(uppercaseSourceCode, 'TURTLES');
+    assert.match(uppercaseSourceCode, /"key":\s*"TURTLES"/);
+    assert.notMatch(uppercaseSourceCode, /"key":\s*"turtles"/);
   })
 });
