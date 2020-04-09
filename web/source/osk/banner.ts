@@ -423,10 +423,10 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let manager = this.manager;
 
-      keyman.modelManager['addEventListener']('invalidatesuggestions', manager.invalidateSuggestions);
-      keyman.modelManager['addEventListener']('suggestionsready', manager.updateSuggestions);
-      keyman.modelManager['addEventListener']('tryaccept', manager.tryAccept);
-      keyman.modelManager['addEventListener']('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.on('invalidatesuggestions', manager.invalidateSuggestions);
+      keyman.core.languageProcessor.on('suggestionsready', manager.updateSuggestions);
+      keyman.core.languageProcessor.on('tryaccept', manager.tryAccept);
+      keyman.core.languageProcessor.on('tryrevert', manager.tryRevert);
 
       // Trigger a null-based initial prediction to kick things off.
       keyman.core.languageProcessor.predict();
@@ -436,10 +436,10 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let manager = this.manager;
 
-      keyman.modelManager['removeEventListener']('invalidatesuggestions', manager.invalidateSuggestions);
-      keyman.modelManager['removeEventListener']('suggestionsready', manager.updateSuggestions);
-      keyman.modelManager['removeEventListener']('tryaccept', manager.tryAccept);
-      keyman.modelManager['removeEventListener']('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.on('invalidatesuggestions', manager.invalidateSuggestions);
+      keyman.core.languageProcessor.on('suggestionsready', manager.updateSuggestions);
+      keyman.core.languageProcessor.on('tryaccept', manager.tryAccept);
+      keyman.core.languageProcessor.on('tryrevert', manager.tryRevert);
     }
 
     rotateSuggestions() {
