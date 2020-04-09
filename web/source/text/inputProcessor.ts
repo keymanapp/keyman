@@ -54,7 +54,7 @@ namespace com.keyman.text {
      * 
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
      */
-    processKeyEvent(keyEvent: KeyEvent): boolean {
+    processKeyEvent(keyEvent: KeyEvent) {
       let keyman = com.keyman.singleton;
       let formFactor = keyEvent.device.formFactor;
 
@@ -163,7 +163,7 @@ namespace com.keyman.text {
         // Notify the ModelManager of new input - it's predictive text time!
         ruleBehavior.transcription.alternates = alternates;
         // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
-        this.languageProcessor.predict(ruleBehavior.transcription);
+        ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription);
 
         // KMEA and KMEI (embedded mode) use direct insertion of the character string
         if(keyman.isEmbedded) {
@@ -188,7 +188,7 @@ namespace com.keyman.text {
       //        once THOSE are properly relocated.  (They're too DOM-heavy to remain in web-core.)
 
       // Only return true (for the eventual event handler's return value) if we didn't match a rule.
-      return ruleBehavior == null;
+      return ruleBehavior;
     }
 
     public resetContext() {

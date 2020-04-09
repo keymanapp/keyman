@@ -111,9 +111,9 @@ namespace com.keyman.text.prediction {
       return this.lmEngine.wordbreak(context);
     }
 
-    public predict(transcription?: Transcription) {
+    public predict(transcription?: Transcription): Promise<Suggestion[]> {
       if(!this.isActive) {
-        return;
+        return null;
       }
 
       let keyman = com.keyman.singleton;
@@ -121,14 +121,14 @@ namespace com.keyman.text.prediction {
       // If there's no active model, there can be no predictions.
       // We'll also be missing important data needed to even properly REQUEST the predictions.
       if(!this.currentModel || !this.configuration) {
-        return;
+        return null;
       }
             
       // We've already invalidated any suggestions resulting from any previously-existing Promise -
       // may as well officially invalidate them via event.
       keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'new');
 
-      this.predict_internal(transcription);
+      return this.predict_internal(transcription);
     }
 
     /**
@@ -136,7 +136,7 @@ namespace com.keyman.text.prediction {
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription?: Transcription) {
+    private predict_internal(transcription?: Transcription): Promise<Suggestion[]> {
       let keyman = com.keyman.singleton;
 
       if(!transcription) {
@@ -144,7 +144,7 @@ namespace com.keyman.text.prediction {
         if(t) {
           transcription = t.buildTranscriptionFrom(t, null);
         } else {
-          return;
+          return null;
         }
       }
 
@@ -155,12 +155,14 @@ namespace com.keyman.text.prediction {
       var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
 
       let mm = this;
-      promise.then(function(suggestions: Suggestion[]) {
+      return promise.then(function(suggestions: Suggestion[]) {
         if(promise == mm.currentPromise) {
           let result = new ReadySuggestions(suggestions, transform.id);
           keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", result);
           mm.currentPromise = null;
         }
+
+        return suggestions;
       })
     }
 
