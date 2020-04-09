@@ -1,4 +1,27 @@
 namespace com.keyman.text.prediction {
+  /**
+   * Corresponds to the 'suggestionsready' LanguageProcessor event.
+   */
+  export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
+
+  export type StateChangeEnum = 'active'|'inactive';
+  /**
+   * Corresponds to the 'statechange' LanguageProcessor event.
+   */
+  export type StateChangeHandler = (state: StateChangeEnum) => boolean;
+
+  /**
+   * Covers both 'tryaccept' and 'tryrevert' events.
+   */
+  export type TryUIHandler = (source: string) => boolean;
+
+  export type InvalidateSourceEnum = 'new'|'context';
+
+  /**
+   * Corresponds to the 'invalidatesuggestions' LanguageProcessor event.
+   */
+  export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
+
   export class LanguageProcessor {
     private lmEngine: LMLayer;
     private currentModel?: ModelSpec;
@@ -38,7 +61,7 @@ namespace com.keyman.text.prediction {
       delete this.configuration;
 
       let keyman = com.keyman.singleton;
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', 'inactive');
     }
 
     loadModel(model: ModelSpec): Promise<void> {
@@ -56,7 +79,7 @@ namespace com.keyman.text.prediction {
 
         try {
           let keyman = com.keyman.singleton;
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', 'active');
         } catch (err) {
           // Does this provide enough logging information?
           console.error("Could not load model '" + model.id + "': " + (err as Error).message);
@@ -193,10 +216,9 @@ namespace com.keyman.text.prediction {
       let oldVal = this._mayPredict;
       this._mayPredict = flag;
 
-      // 'modelchange' always did signify more of a 'is active' flag.
       if(oldVal != flag) {
         let keyman = com.keyman.singleton;
-        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', flag ? 'loaded' : 'unloaded');
+        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', flag ? 'active' : 'inactive');
       }
     }
 

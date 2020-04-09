@@ -47,12 +47,8 @@ namespace com.keyman.text.prediction {
     }
   }
 
-  export type InvalidateSourceEnum = 'new'|'context';
-
-  /**
-   * Corresponds to the 'invalidatesuggestions' ModelManager event.
-   */
-  export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
+  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "statechange" | "tryaccept" | "tryrevert";
+  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | StateChangeHandler | TryUIHandler;
 
   export class ReadySuggestions {
     suggestions: Suggestion[];
@@ -63,25 +59,6 @@ namespace com.keyman.text.prediction {
       this.transcriptionID = id;
     }
   }
-
-  /**
-   * Corresponds to the 'suggestionsready' ModelManager event.
-   */
-  export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
-
-  export type ModelChangeEnum = 'loaded'|'unloaded';
-  /**
-   * Corresponds to the 'modelchange' ModelManager event.
-   */
-  export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
-
-  /**
-   * Covers both 'tryaccept' and 'tryrevert' events.
-   */
-  export type TryUIHandler = (source: string) => boolean;
-
-  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange" | "tryaccept" | "tryrevert";
-  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler | TryUIHandler;
 
   export class ModelManager {
     // Tracks registered models by ID.

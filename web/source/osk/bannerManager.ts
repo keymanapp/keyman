@@ -75,7 +75,7 @@ namespace com.keyman.osk {
 
       // Register a listener for model change events so that we can hot-swap the banner as needed.
       let keyman = com.keyman.singleton;
-      keyman.modelManager['addEventListener']('modelchange', this.selectBanner.bind(this));
+      keyman.modelManager['addEventListener']('statechange', this.selectBanner.bind(this));
     }
 
     /**
@@ -204,11 +204,11 @@ namespace com.keyman.osk {
     }
 
     /**
-     * Handles `ModelManager`'s `'modelchange'` events, 
+     * Handles `LanguageProcessor`'s `'statechange'` events, 
      * allowing logic to automatically hot-swap `Banner`s as needed.
      * @param state 
      */
-    private selectBanner(state?: text.prediction.ModelChangeEnum) {
+    private selectBanner(state?: text.prediction.StateChangeEnum) {
       let keyman = com.keyman.singleton;
 
       // Only display a SuggestionBanner when LanguageProcessor states it is active.s
