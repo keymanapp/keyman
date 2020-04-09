@@ -211,11 +211,8 @@ namespace com.keyman.osk {
     private selectBanner(state?: text.prediction.ModelChangeEnum) {
       let keyman = com.keyman.singleton;
 
-      // Only display a SuggestionBanner when the current 
-      // language has an active predictive model.
-      // ModelManager will never have an active model 
-      // when predictions are disabled.
-      if(keyman.core.activeModel) {
+      // Only display a SuggestionBanner when LanguageProcessor states it is active.s
+      if(keyman.core.languageProcessor.isActive) {
         this.setBanner('suggestion');
       } else if(this.alwaysShow) {
         this.setBanner('image');

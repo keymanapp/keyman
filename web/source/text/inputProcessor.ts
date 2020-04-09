@@ -82,7 +82,7 @@ namespace com.keyman.text {
       // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
       // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
       // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
-      if(this.languageProcessor.enabled) {
+      if(this.languageProcessor.isActive) {
         // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
 
         // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
@@ -110,7 +110,7 @@ namespace com.keyman.text {
 
         // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
         // Also, don't do fat-finger stuff if predictive text isn't enabled.
-        if(this.languageProcessor.enabled && !ruleBehavior.triggersDefaultCommand) {
+        if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
           // Note - we don't yet do fat-fingering with longpress keys.
           if(keyEvent.keyDistribution && keyEvent.kbdLayer) {
             let activeLayout = this.activeKeyboard.layout(keyEvent.device.formFactor);

@@ -36,6 +36,9 @@ namespace com.keyman.text.prediction {
       this.lmEngine.unloadModel();
       delete this.currentModel;
       delete this.configuration;
+
+      let keyman = com.keyman.singleton;
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
     }
 
     loadModel(model: ModelSpec): Promise<void> {
@@ -50,6 +53,14 @@ namespace com.keyman.text.prediction {
       return this.lmEngine.loadModel(file).then(function(config: Configuration) { 
         mm.currentModel = model;
         mm.configuration = config;
+
+        try {
+          let keyman = com.keyman.singleton;
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
+        } catch (err) {
+          // Does this provide enough logging information?
+          console.error("Could not load model '" + model.id + "': " + (err as Error).message);
+        }
       });
     }
 
@@ -69,7 +80,7 @@ namespace com.keyman.text.prediction {
     }
 
     public wordbreak(target: OutputTarget): Promise<string> {
-      if(!this.enabled) {
+      if(!this.isActive) {
         return null;
       }
 
@@ -78,7 +89,7 @@ namespace com.keyman.text.prediction {
     }
 
     public predict(transcription?: Transcription) {
-      if(!this.enabled) {
+      if(!this.isActive) {
         return;
       }
 
@@ -157,7 +168,11 @@ namespace com.keyman.text.prediction {
       this.lmEngine.shutdown();
     }
 
-    public get enabled(): boolean {
+    public get isActive(): boolean {
+      if(!this.canEnable()) {
+        this._mayPredict = false;
+        return false;
+      }
       return this.activeModel && this._mayPredict;
     }
 
@@ -171,15 +186,17 @@ namespace com.keyman.text.prediction {
     }
 
     public set mayPredict(flag: boolean) {
-      let enabled = this.enabled;
-
       if(!this.canEnable()) {
         return;
       }
 
+      let oldVal = this._mayPredict;
       this._mayPredict = flag;
-      if(enabled != this.enabled || flag) {
-        com.keyman.singleton.modelManager.doEnable(flag);
+
+      // 'modelchange' always did signify more of a 'is active' flag.
+      if(oldVal != flag) {
+        let keyman = com.keyman.singleton;
+        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', flag ? 'loaded' : 'unloaded');
       }
     }
 
