@@ -429,7 +429,7 @@ namespace com.keyman.osk {
       keyman.core.languageProcessor.on('tryrevert', manager.tryRevert);
 
       // Trigger a null-based initial prediction to kick things off.
-      keyman.core.languageProcessor.predict();
+      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
     }
 
     deactivate() {
@@ -607,7 +607,7 @@ namespace com.keyman.osk {
       // Request a 'new' prediction based on current context with a nil Transform.
       let keyman = com.keyman.singleton;
       this.swallowPrediction = true;
-      keyman.core.languageProcessor.predict();
+      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
     }
 
     private showRevert() {

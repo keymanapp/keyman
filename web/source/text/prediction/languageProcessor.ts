@@ -16,7 +16,7 @@ namespace com.keyman.text.prediction {
      */
     path: string;
   }
-  
+
   /**
    * Corresponds to the 'suggestionsready' LanguageProcessor event.
    */
@@ -139,7 +139,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    public invalidateContext() {
+    public invalidateContext(outputTarget?: OutputTarget) {
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       this.emit('invalidatesuggestions', 'context');
 
@@ -149,7 +149,9 @@ namespace com.keyman.text.prediction {
         return;
       }
       
-      this.predict_internal();
+      if(outputTarget) {
+        this.predict_internal(outputTarget.buildTranscriptionFrom(outputTarget, null));
+      }
     }
 
     public wordbreak(target: OutputTarget): Promise<string> {
@@ -161,7 +163,7 @@ namespace com.keyman.text.prediction {
       return this.lmEngine.wordbreak(context);
     }
 
-    public predict(transcription?: Transcription): Promise<Suggestion[]> {
+    public predict(transcription: Transcription): Promise<Suggestion[]> {
       if(!this.isActive) {
         return null;
       }
@@ -179,19 +181,23 @@ namespace com.keyman.text.prediction {
       return this.predict_internal(transcription);
     }
 
+    public predictFromTarget(outputTarget: OutputTarget): Promise<Suggestion[]> {
+      if(!outputTarget) {
+        return null;
+      }
+
+      let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+      return this.predict(transcription);
+    }
+
     /**
      * Called internally to do actual predictions after any relevant "invalidatesuggestions" events
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription?: Transcription): Promise<Suggestion[]> {
+    private predict_internal(transcription: Transcription): Promise<Suggestion[]> {
       if(!transcription) {
-        let t = dom.Utils.getOutputTarget();
-        if(t) {
-          transcription = t.buildTranscriptionFrom(t, null);
-        } else {
-          return null;
-        }
+        return null;
       }
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
