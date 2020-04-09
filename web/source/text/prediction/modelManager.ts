@@ -6,60 +6,6 @@
 ///<reference path="../../keyboards/kmwkeyboards.ts" />
 
 namespace com.keyman.text.prediction {
-  export interface ModelSpec {
-    /**
-     * The model's unique identifier.
-     */
-    id: string;
-
-    /**
-     * The list of supported BCP-47 language codes.  Only one language should be supported,
-     * although multiple variants based on region code (at min) may be specified.
-     */
-    languages: string[];
-
-    /**
-     * The path/URL to the file that defines the model.
-     */
-    path: string;
-  }
-
-  export class TranscriptionContext implements Context {
-    left: string;
-    right?: string;
-
-    startOfBuffer: boolean;
-    endOfBuffer: boolean;
-
-    constructor(mock: Mock, config: Configuration) {
-      this.left = mock.getTextBeforeCaret();
-      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodePoints;
-      if(!this.startOfBuffer) {
-        // Our custom substring version will return the last n characters if param #1 is given -n.
-        this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
-      }
-
-      this.right = mock.getTextAfterCaret();
-      this.endOfBuffer = this.right._kmwLength() > config.leftContextCodePoints;
-      if(!this.endOfBuffer) {
-        this.right = this.right._kmwSubstr(0, config.leftContextCodePoints);
-      }
-    }
-  }
-
-  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "statechange" | "tryaccept" | "tryrevert";
-  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | StateChangeHandler | TryUIHandler;
-
-  export class ReadySuggestions {
-    suggestions: Suggestion[];
-    transcriptionID: number;
-
-    constructor(suggestions: Suggestion[], id: number) {
-      this.suggestions = suggestions;
-      this.transcriptionID = id;
-    }
-  }
-
   export class ModelManager {
     // Tracks registered models by ID.
     private registeredModels: {[id: string]: ModelSpec} = {};
