@@ -69,11 +69,19 @@ namespace com.keyman.text.prediction {
     }
 
     public wordbreak(target: OutputTarget): Promise<string> {
+      if(!this.enabled) {
+        return null;
+      }
+
       let context = new TranscriptionContext(Mock.from(target), this.configuration);
       return this.lmEngine.wordbreak(context);
     }
 
     public predict(transcription?: Transcription) {
+      if(!this.enabled) {
+        return;
+      }
+
       let keyman = com.keyman.singleton;
 
       // If there's no active model, there can be no predictions.
@@ -153,17 +161,8 @@ namespace com.keyman.text.prediction {
       return this.activeModel && this._mayPredict;
     }
 
-    private canEnable(): boolean {
-      let keyman = com.keyman.singleton;
-
-      if(keyman.util.getIEVersion() == 10) {
-        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.");
-        return false;
-      } else if(keyman.util.getIEVersion() < 10) {
-        console.warn("WebWorkers are not supported in this version of IE.");
-        return false;
-      }
-
+    public canEnable(): boolean {
+      // Is overridden for dom-aware KMW in case of old IE versions.
       return true;
     }
 
