@@ -62,13 +62,18 @@ module.exports = function(config) {
     files: [
       // Test framework
       { pattern: path.join(keyman_basename, test_relative_path, 'test.html'), nocache: true },
+      
+      // KeymanWeb should come before the tests are loaded - test-runner.js in particular
+      // requires the `keyman` object.  At this point, we only include the main script itself.
+      { pattern: path.join(keyman_basename, test_relative_path, 'web', 'unminified', 'keymanweb.js'), watched: false, included: true, nocache: true },
+      
       { pattern: path.join(keyman_basename, test_relative_path, 'tests-generated.js'), nocache: true },
 
       // The test-runner is shared with the Node application for generating base tests manually
       { pattern: path.join(keyman_basename, test_relative_path, 'src', 'test-runner.js'), nocache: true }, 
       { pattern: path.join(keyman_basename, test_relative_path, 'src', 'known-failures.js'), nocache: true }, 
 
-      // KeymanWeb and keyboards
+      // KeymanWeb resources, source, and Keyboards
       //{ pattern: path.join(keyman_basename, KEYMANWEB_RELATIVE_PATH, '**'), watched: false, included: false, nocache: true },
       { pattern: path.join(keyman_basename, test_relative_path, 'web', 'unminified', '**'), watched: false, included: false, nocache: true },
       { pattern: path.join(KEYBOARDS_REPO_BASENAME, 'release', '**'), watched: false, included: false, nocache: true },
@@ -138,7 +143,7 @@ module.exports = function(config) {
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     //TODO disable singleRun for interactive tests? - split into separate conf file?
-    singleRun: true,
+    singleRun: false,
 
     // Concurrency level
     // how many browser should be started simultaneous

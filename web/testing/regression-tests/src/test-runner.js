@@ -122,12 +122,14 @@ var testRunner = {
       })
       .then(function() {
         console.log('Starting test for '+id);
-        keyman.core.keyboardInterface.registerStub({
+        let stub = {
           'KN': 'Stub',
           'KI': 'Keyboard_'+id,
           'KL': 'en',
           'KLC': 'en'
-        });
+        };
+        // The KeymanWeb global will always exist, even when we otherwise change API.
+        KeymanWeb.registerStub(stub);
         let k = testRunner.keyboards[id]; 
         keyman.setKeyboardForControl(receiver, id, k.keyboard.languages[0].id);
         document.body.focus();
@@ -272,7 +274,12 @@ var testRunner = {
     if(test !== undefined) {
       //console.log('Running test '+id+':'+index);
       try {
-        keyman.core.resetContext();
+        if(keyman.core) {
+          keyman.core.resetContext();
+        } else {
+          // KMW 12, 13.
+          keyman.interface.resetContext();
+        }
         receiver.value = test.context || '';
         // Keyman 12 now uses com.keyman.text.KeyEvent
         let e = com.keyman.KeyEvent ? new com.keyman.KeyEvent() : new com.keyman.text.KeyEvent();
@@ -287,7 +294,11 @@ var testRunner = {
         
         // Keyman 14 changes the processKeystroke interface
         e.device = keyman.util.device.coreSpec;
-        keyman.core.keyboardInterface.processKeystroke(com.keyman.dom ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
+        if(keyman.core) {
+          keyman.core.keyboardInterface.processKeystroke(com.keyman.dom ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
+        } else {
+          keyman.interface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.text.Processor.getOutputTarget(receiver) : receiver, e)
+        }
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
         console.warn(err.toString());
