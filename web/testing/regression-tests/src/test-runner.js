@@ -272,7 +272,7 @@ var testRunner = {
     if(test !== undefined) {
       //console.log('Running test '+id+':'+index);
       try {
-        keyman.core.keyboardInterface.resetContext();
+        keyman.core.resetContext();
         receiver.value = test.context || '';
         // Keyman 12 now uses com.keyman.text.KeyEvent
         let e = com.keyman.KeyEvent ? new com.keyman.KeyEvent() : new com.keyman.text.KeyEvent();
@@ -284,8 +284,10 @@ var testRunner = {
         e.LisVirtualKeyCode = true;
         e.LisVirtualKey = true;
         e.vkCode = test.key;
-        // Keyman 12 changes the processKeystroke interface
-        keyman.core.keyboardInterface.processKeystroke(keyman.util.physicalDevice, com.keyman.text ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
+        
+        // Keyman 14 changes the processKeystroke interface
+        e.device = keyman.util.device.coreSpec;
+        keyman.core.keyboardInterface.processKeystroke(com.keyman.dom ? com.keyman.dom.Utils.getOutputTarget(receiver) : receiver, e);
         this.keyboards[keyboardId].results[testId] = receiver.value;
       } catch(err) {
         console.warn(err.toString());
