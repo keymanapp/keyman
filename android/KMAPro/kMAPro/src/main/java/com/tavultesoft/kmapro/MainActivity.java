@@ -331,14 +331,18 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadKMP(scheme);
           break;
         case "keyman" :
-          // Convert opaque URI to hierarchical URI so the query parameters can be parsed
-          Builder builder = new Uri.Builder();
-          builder.scheme("https")
-            .authority("keyman.com")
-            .appendPath("keyboards")
-            .encodedQuery(data.getEncodedQuery());
-          data = Uri.parse(builder.build().toString());
-          downloadKMP(scheme);
+          if (FileUtils.isKeymanLink(data.toString())) {
+            // Convert opaque URI to hierarchical URI so the query parameters can be parsed
+            Builder builder = new Uri.Builder();
+            builder.scheme("https")
+              .authority("keyman.com")
+              .appendPath("keyboards")
+              .encodedQuery(data.getEncodedQuery());
+            data = Uri.parse(builder.build().toString());
+            downloadKMP(scheme);
+          } else {
+            Log.e(TAG, "Unrecognized scheme: " + scheme);
+          }
           break;
         default :
           Log.e(TAG, "Unrecognized scheme: " + scheme);

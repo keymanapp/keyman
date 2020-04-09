@@ -59,22 +59,23 @@ public class FileUtilsTest {
     Assert.assertFalse(FileUtils.isKeymanLink(""));
 
     // Valid Keyman links
-    Assert.assertTrue(FileUtils.isKeymanLink("keyman://keyboard"));
-    Assert.assertTrue(FileUtils.isKeymanLink("Keyman://keyboard"));
     Assert.assertTrue(FileUtils.isKeymanLink("keyman:download?keyboard"));
     Assert.assertTrue(FileUtils.isKeymanLink("Keyman:Download?keyboard"));
-    Assert.assertTrue(FileUtils.isKeymanLink("keyman:download//keyboard"));
-    Assert.assertTrue(FileUtils.isKeymanLink("keyman://download/keyboard"));
 
-    // links missing query
-    Assert.assertFalse(FileUtils.isKeymanLink("keyman://"));
+    // keyman:// invalid
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman://keyboard"));
+    Assert.assertFalse(FileUtils.isKeymanLink("Keyman://keyboard"));
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman:download//keyboard"));
+    Assert.assertFalse(FileUtils.isKeymanLink("keyman://download/keyboard"));
+
+    // link missing query
     Assert.assertFalse(FileUtils.isKeymanLink("keyman:download?"));
 
     // Other methods not supported
     Assert.assertFalse(FileUtils.isKeymanLink("keyman:method//keyboard"));
     Assert.assertFalse(FileUtils.isKeymanLink("keyman:method?keyboard"));
 
-    Assert.assertFalse(FileUtils.isKeymanLink("example:keyman//"));
+    Assert.assertFalse(FileUtils.isKeymanLink("example:keyman?"));
   }
 
   @Test

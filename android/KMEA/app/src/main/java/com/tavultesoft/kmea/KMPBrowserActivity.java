@@ -64,22 +64,23 @@ public class KMPBrowserActivity extends AppCompatActivity {
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
         String lowerURL = url.toLowerCase();
-        if (!lowerURL.equals("about:blank")) {
-          if (FileUtils.isKeymanLink(lowerURL)) {
-            // KMAPro main activity will handle this intent
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(lowerURL));
-            startActivityForResult(intent, 1);
-          } else {
-            if (lowerURL.startsWith("keyman:")) {
-              // Warn for unsupported keyman schemes
-              Log.d(TAG, "Scheme for " + lowerURL + " not handled");
-              return true;
-            }
-            // Display URL
-            return false;
-          }
+        if (lowerURL.equals("about:blank")) {
+          return true; // never load a blank page, e.g. when the component initializes
         }
-        return true;
+        if (FileUtils.isKeymanLink(lowerURL)) {
+          // KMAPro main activity will handle this intent
+          // Pass original url because path and query are case-sensitive
+          Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+          startActivityForResult(intent, 1);
+        }
+        if (lowerURL.startsWith("keyman:")) {
+          // Warn for unsupported keyman schemes
+          Log.d(TAG, "Scheme for " + url + " not handled");
+          return true;
+        }
+
+        // Display URL
+        return false;
       }
 
       @Override
