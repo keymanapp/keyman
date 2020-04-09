@@ -59,12 +59,11 @@ namespace com.keyman.text {
      * @param       {Object}      e      The abstracted KeyEvent to use for keystroke processing
      */
     processKeyEvent(keyEvent: KeyEvent) {
-      let keyman = com.keyman.singleton;
       let formFactor = keyEvent.device.formFactor;
 
       // Determine the current target for text output and create a "mock" backup
       // of its current, pre-input state.  Current, long-existing assumption - it's DOM-backed.
-      let outputTarget = keyEvent.Ltarg as dom.targets.OutputTarget;
+      let outputTarget = keyEvent.Ltarg;
       let fromOSK = keyEvent.isSynthetic;
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
@@ -151,30 +150,12 @@ namespace com.keyman.text {
         // by the actual keystroke occur.
         ruleBehavior.finalize(this.keyboardProcessor);
 
-        // If the transform isn't empty, we've changed text - which should produce a 'changed' event in the DOM.
-        //
-        // TODO:  This check should be done IN a dom module, not here in web-core space.  This place is closer 
-        //        to that goal than it previously was, at least.
-        let ruleTransform = ruleBehavior.transcription.transform;
-        if(ruleTransform.insert != "" || ruleTransform.deleteLeft > 0 || ruleTransform.deleteRight > 0) {
-          if(outputTarget.getElement() == dom.DOMEventHandlers.states.activeElement) {
-            dom.DOMEventHandlers.states.changed = true;
-          }
-        }
-
         // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
         
         // Notify the ModelManager of new input - it's predictive text time!
         ruleBehavior.transcription.alternates = alternates;
         // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
         ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription);
-
-        // KMEA and KMEI (embedded mode) use direct insertion of the character string
-        if(keyman.isEmbedded) {
-          // A special embedded callback used to setup direct callbacks to app-native code.
-          keyman['oninserttext'](ruleTransform.deleteLeft, ruleTransform.insert, ruleTransform.deleteRight);
-          keyman.refreshElementContent(outputTarget.getElement());
-        }
 
         // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
         if(!ruleBehavior.triggersDefaultCommand) {
@@ -196,12 +177,8 @@ namespace com.keyman.text {
     }
 
     public resetContext() {
-      let keyman = com.keyman.singleton;
       this.keyboardProcessor.resetContext();
-
-      if(keyman.modelManager) {
-        this.languageProcessor.invalidateContext();
-      }
+      this.languageProcessor.invalidateContext();
     }
   }
 }
