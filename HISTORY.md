@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.49 alpha 2020-04-11
+
+* chore(common/lmlayer): do not run tests in IE11 in Windows (#2978)
+
 ## 14.0.48 alpha 2020-04-07
 
 * feat(windows): use crashpad and better call stacks (#2931)
