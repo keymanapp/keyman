@@ -1,5 +1,3 @@
-/// <reference path="workerFactory.ts" />
-
 namespace com.keyman.text.prediction {
   export class WebWorkerFactory implements WorkerFactory {
     constructInstance(): Worker {

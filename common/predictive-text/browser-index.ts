@@ -23,8 +23,7 @@
 /// <reference path="node_modules/es6-shim/es6-shim.min.js" />
 /// <reference path="promise-store.ts" />
 /// <reference path="lmlayer-interface.ts" />
-
-import { HeadlessWorkerFactory } from "./headless-workerFactory";
+/// <reference path="web-workerFactory.ts" />
 
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
@@ -46,15 +45,17 @@ import { HeadlessWorkerFactory } from "./headless-workerFactory";
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
 
-export class LMLayer extends com.keyman.text.prediction.LMLayerBase {
-  /**
-   * Construct the top-level LMLayer interface. This also starts the underlying Worker.
-   * 
-   * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
-   *            or file: URI. If uri is not provided, this will start the default Worker.
-   */
-  constructor(capabilities: Capabilities) {
-    super(capabilities, new HeadlessWorkerFactory());
+namespace com.keyman.text.prediction {
+  export class LMLayer extends LMLayerBase {
+    /**
+     * Construct the top-level LMLayer interface. This also starts the underlying Worker.
+     * 
+     * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
+     *            or file: URI. If uri is not provided, this will start the default Worker.
+     */
+    constructor(capabilities: Capabilities) {
+      super(capabilities, new WebWorkerFactory());
+    }
   }
 }
 
@@ -63,7 +64,7 @@ export class LMLayer extends com.keyman.text.prediction.LMLayerBase {
 
   // Let LMLayer be available both in the browser and in Node.
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = LMLayer;
+    module.exports = ns.LMLayer;
     //@ts-ignore
     ns.LMLayer.PromiseStore = ns.PromiseStore;
     //@ts-ignore

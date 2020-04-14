@@ -1,6 +1,8 @@
-///<reference path="workerFactory.ts" />
-
 namespace com.keyman.text.prediction {
+  export interface WorkerFactory {
+    constructInstance(): Worker;
+  }
+
   export abstract class LMLayerBase {
     /**
      * The underlying worker instance. By default, this is the LMLayerWorker. 

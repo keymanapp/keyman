@@ -1,19 +1,21 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "outDir": "build/headless",
-    "module": "commonJS",
+    "module": "none",
+    "outFile": "./build/index.js",
     "inlineSources": true,
     "sourceMap": true,
     "target": "es5",
-    "lib": ["es6"]
+    "lib": ["es6", "dom"]
   },
   "include" : [
     "./*.ts"
   ],
   "exclude" : [
-    "web-workerFactory.ts",
-    "browser-index.ts",
+    "index.ts",
+    "headless-workerFactory.ts",
+    "index.d.ts",
+    "worker-interface.d.ts",
     "node_modules",
     "testing"
   ]
