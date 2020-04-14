@@ -4,8 +4,8 @@
     "declaration": true,
     "module": "none",
     "outFile": "../build/intermediate/index.js",
+    "inlineSourceMap": true,
     "inlineSources": true,
-    "sourceMap": true,
     "lib": ["webworker", "es6"],
     "target": "es5"
   }
