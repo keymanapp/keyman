@@ -2,20 +2,21 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 
 let LMLayer = require('../../build');
+let LMLayerBase = LMLayer.LMLayerBase;
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
     it('should accept a Worker to instantiate', function () {
-      new LMLayer(capabilities(), createFakeWorker());
+      new LMLayerBase(capabilities(), createFakeWorkerFactory());
     });
 
     it('should send the `config` message to the LMLayer', async function () {
-      let fakeWorker = createFakeWorker(fakePostMessage);
-      let lmLayer = new LMLayer(capabilities(), fakeWorker);
+      let fakeWorker = createFakeWorkerFactory(fakePostMessage);
+      let lmLayer = new LMLayerBase(capabilities(), fakeWorker);
 
-      assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
+      assert.propertyVal(fakeWorker.instance.postMessage, 'callCount', 1);
       // In the "Worker", assert the message looks right
       function fakePostMessage(data) {
         assert.propertyVal(data, 'message', 'config');
@@ -26,20 +27,20 @@ describe('LMLayer', function() {
 
   describe('#loadModel()', function () {
     it('should accept capabilities and model description', function () {
-      let fakeWorker = createFakeWorker();
+      let fakeWorker = createFakeWorkerFactory();
 
-      let lmLayer = new LMLayer(capabilities(), fakeWorker);
+      let lmLayer = new LMLayerBase(capabilities(), fakeWorker);
       lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
-      assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
+      assert.isFunction(fakeWorker.instance.onmessage, 'LMLayer failed to set a callback!');
     });
 
     it('should send the `load` message to the LMLayer', async function () {
-      let fakeWorker = createFakeWorker(fakePostMessage);
-      let lmLayer = new LMLayer(capabilities(), fakeWorker);
+      let fakeWorker = createFakeWorkerFactory(fakePostMessage);
+      let lmLayer = new LMLayerBase(capabilities(), fakeWorker);
       let configuration = await lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
-      assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
+      assert.propertyVal(fakeWorker.instance.postMessage, 'callCount', 2);
       // In the "Worker", assert the message looks right and
       // ASYNCHRONOUSLY reply with ready message.
       function fakePostMessage(data) {
@@ -51,7 +52,7 @@ describe('LMLayer', function() {
         assert.propertyVal(data, 'message', 'load');
         assert.isString(data.model);
       
-        callAsynchronously(() => fakeWorker.onmessage({
+        callAsynchronously(() => fakeWorker.instance.onmessage({
           data: {
             message: 'ready',
             configuration: {}
@@ -66,8 +67,8 @@ describe('LMLayer', function() {
         rightContextCodeUnits: 0,
       }
 
-      let fakeWorker = createFakeWorker(function fakePostMessage(_data) {
-        callAsynchronously(() => fakeWorker.onmessage({
+      let fakeWorker = createFakeWorkerFactory(function fakePostMessage(_data) {
+        callAsynchronously(() => fakeWorker.instance.onmessage({
           data: {
             message: 'ready',
             configuration: expectedConfiguration
@@ -75,7 +76,7 @@ describe('LMLayer', function() {
         }));
       });
 
-      let lmLayer = new LMLayer(capabilities, fakeWorker);
+      let lmLayer = new LMLayerBase(capabilities, fakeWorker);
       let actualConfiguration = await lmLayer.loadModel(
         {
           maxLeftContextCodeUnits: 32,
@@ -106,17 +107,24 @@ describe('LMLayer', function() {
   });
 
   /**
-   * Returns an object implementing *enough* of the Worker
-   * interface to fool the LMLayer into thinking it's
-   * communicating with a bona fide Web Worker.
+   * Returns a factory producing an object implementing *enough* of the Worker interface 
+   * to fool the LMLayer into thinking it's communicating with a bona fide Web Worker.
    * 
-   * @returns {Worker} an object with sinon.fake() instances.
+   * Also stores the produced instance for use in assertions.
+   * 
+   * @returns {WorkerFactory} a 'factory' class returning a Worker object with sinon.fake() instances.
    */
-  function createFakeWorker(postMessage) {
-    return {
+  function createFakeWorkerFactory(postMessage) {
+    let FakeFactory = function() {}; // barebones JS class definition - requires function as core, constructor.
+    FakeFactory.prototype.constructInstance = function() {
+      this.instance = {
         postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
         onmessage: null
       };
+
+      return this.instance;
+    };
+    return new FakeFactory();
   }
 
   /**
