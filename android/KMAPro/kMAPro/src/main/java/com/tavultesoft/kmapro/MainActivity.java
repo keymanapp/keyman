@@ -24,6 +24,7 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
@@ -90,6 +91,8 @@ import android.widget.Toast;
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
+import static com.tavultesoft.kmea.KMKeyboardDownloaderActivity.kKeymanApiModelURL;
+
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
@@ -145,6 +148,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
+
+          // Determine if associated lexical model should be downloaded
+          if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
+              && (languageID != null) && !languageID.isEmpty()) {
+            String keyboardID = kmpFilename.substring(0, kmpFilename.lastIndexOf(FileUtils.KEYMANPACKAGE));
+            ArrayList<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
+            String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, languageID);
+            cloudQueries.add(new CloudApiTypes.CloudApiParam(
+              CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
+              .setType(CloudApiTypes.JSONType.Array));
+            // Keyboard package already downloaded, so this will just download associated lexical model.
+            // Can't call downloadLexicalModel() because it needs to already know the model ID
+            KMKeyboardDownloaderActivity.downloadKeyboard(context, languageID, keyboardID, cloudQueries);
+          }
+
           break;
       }
       super.onReceiveResult(resultCode, resultData);
@@ -331,14 +349,18 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadKMP(scheme);
           break;
         case "keyman" :
-          // Convert opaque URI to hierarchical URI so the query parameters can be parsed
-          Builder builder = new Uri.Builder();
-          builder.scheme("https")
-            .authority("keyman.com")
-            .appendPath("keyboards")
-            .encodedQuery(data.getEncodedQuery());
-          data = Uri.parse(builder.build().toString());
-          downloadKMP(scheme);
+          if (FileUtils.isKeymanLink(data.toString())) {
+            // Convert opaque URI to hierarchical URI so the query parameters can be parsed
+            Builder builder = new Uri.Builder();
+            builder.scheme("https")
+              .authority("keyman.com")
+              .appendPath("keyboards")
+              .encodedQuery(data.getEncodedQuery());
+            data = Uri.parse(builder.build().toString());
+            downloadKMP(scheme);
+          } else {
+            Log.e(TAG, "Unrecognized scheme: " + scheme);
+          }
           break;
         default :
           Log.e(TAG, "Unrecognized scheme: " + scheme);
