@@ -220,6 +220,15 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+      switch (keyCode) {
+        case KeyEvent.KEYCODE_BACK:
+          // Dismiss the keyboard
+          KMManager.hideSystemKeyboard();
+          return true;
+      }
+    }
+
     return interpreter.onKeyDown(keyCode, event);  // if false, will revert to default handling.
   }
 
