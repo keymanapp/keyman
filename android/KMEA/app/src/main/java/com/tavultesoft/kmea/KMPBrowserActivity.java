@@ -72,6 +72,9 @@ public class KMPBrowserActivity extends AppCompatActivity {
           // Pass original url because path and query are case-sensitive
           Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
           startActivityForResult(intent, 1);
+
+          // Finish activity
+          finish();
         }
         if (lowerURL.startsWith("keyman:")) {
           // Warn for unsupported keyman schemes
