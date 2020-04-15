@@ -15,6 +15,22 @@ private let keyboardChangeHelpText = "Tap here to change keyboard"
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted
 
+// We subclass for one critical reason - by default, WebViews may become first responder...
+// a detail that is really, REALLY bad for a WebView in a keyboard.
+//
+// Minor reference here: https://stackoverflow.com/questions/39829863/can-a-uiwebview-handle-user-interaction-without-becoming-first-responder
+//
+// Confirmed issue existed within app during workaround for https://github.com/keymanapp/keyman/issues/2716
+class KeymanWebView: WKWebView {
+  override public var canBecomeFirstResponder: Bool {
+    return false;
+  }
+
+  override public func becomeFirstResponder() -> Bool {
+    return false;
+  }
+}
+
 // MARK: - UIViewController
 class KeymanWebViewController: UIViewController {
   let storage: Storage
@@ -22,7 +38,7 @@ class KeymanWebViewController: UIViewController {
   private var useSpecialFont = false
 
   // Views
-  var webView: WKWebView?
+  var webView: KeymanWebView?
   var activeModel: Bool = false
   private var helpBubbleView: PopoverView?
   private var keyPreviewView: KeyPreviewView?
@@ -101,7 +117,7 @@ class KeymanWebViewController: UIViewController {
     userContentController.add(self, name: "keyman")
     config.userContentController = userContentController
 
-    webView = WKWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
+    webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView!.isOpaque = false
     webView!.translatesAutoresizingMaskIntoConstraints = false
     webView!.backgroundColor = UIColor.clear
