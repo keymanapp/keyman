@@ -23,17 +23,38 @@ namespace com.keyman.osk {
   VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
     let util = com.keyman.singleton.util;
     if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
       var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv)*/ /*+ bannerHeight*/;
+          yBase = dom.Utils.getAbsoluteY(key);
       
       if(util.device.formFactor == 'phone') {
         this.prependBaseKey(key);
       }
 
-      this.popupBaseKey = key;
-      this.popupPending=true;
-      window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+      let vkbd = this;
+      let execute = function() {
+        vkbd.popupBaseKey = key;
+        vkbd.popupPending=true;
+        window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+      }
+
+      if(util.device.OS == 'iOS') {
+        // Because of an iOS 13.4 bug, iOS relies on Web for longpress detection for now.
+        // Lifted near-straight from kmwnative.ts.
+        if(this.subkeyDelayTimer) {
+          window.clearTimeout(this.subkeyDelayTimer);
+          this.subkeyDelayTimer = null;
+        }
+
+        if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
+          this.subkeyDelayTimer = window.setTimeout(
+            function(this: VisualKeyboard) {
+              execute();
+            }.bind(this), this.popupDelay);
+        }
+      } else {
+        // Android takes this immediately, without delay.  Longpresses are implemented natively.
+        execute();
+      }
     }
   };
 
