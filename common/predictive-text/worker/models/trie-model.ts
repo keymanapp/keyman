@@ -429,7 +429,10 @@
    */
   function defaultWordform2Key(wordform: string): SearchKey {
     return wordform
-      .replace(/[\u0100-\u2200]/g, function (c) {
+      // remove all combining diacritics (if input is in NFD)
+      .replace(/[\u0300-\u036f]/g, '')
+      // remove all composed diacritics (if input is in NFC) LATIN-ONLY!
+      .replace(/[\u00C0-\u212A]/g, function (c) {
         if (c in PARTIAL_NFD_LOOKUP) {
           return PARTIAL_NFD_LOOKUP[c];
         }

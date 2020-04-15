@@ -1,5 +1,9 @@
 # KeymanWeb Version History
 
+## 2020-04-15 13.0.106 stable
+* Fixes issues with matching input against possible predictions (#2957)
+* Adds support for use of web popup keys in embedded mode (#2970)
+
 ## 2020-03-18 13.0.105 stable
 * Fixes issue in OSK layer resizing that affected iOS app (#2841)
 * Fixes issue with text output to content-editable elements and design-mode iframes (#2839)
