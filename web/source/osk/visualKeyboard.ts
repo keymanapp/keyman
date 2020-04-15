@@ -573,16 +573,6 @@ namespace com.keyman.osk {
     keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
     popupCallout: HTMLDivElement;
 
-    // Function fields (fleshed out by kmwnative.ts and/or kmwembedded.ts)
-    touchHold: (key: KeyElement) => void;
-    optionKey: (e: KeyElement, keyName: string, keyDown: boolean) => void;
-    highlightSubKeys: (key: KeyElement, x: number, y: number) => void;
-    showKeyTip: (key: KeyElement, on: boolean) => void;
-    drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void;
-    createKeyTip: () => void;
-    addCallout: (key: KeyElement) => HTMLDivElement;
-    waitForFonts: (kfd,ofd) => boolean;
-
     //#region OSK constructor and helpers
 
     /**
@@ -593,12 +583,6 @@ namespace com.keyman.osk {
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
     constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
-      // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
-      this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
-      this.drawPreview = this.drawPreview || function(c,w,h,e) {};
-      this.addCallout = this.addCallout || function(key) {return null};
-      this.waitForFonts = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
-      
       // Do normal constructor stuff.
 
       let keyman = com.keyman.singleton;
@@ -1574,11 +1558,25 @@ namespace com.keyman.osk {
       }
       ss.left=x+'px';
 
-      // Add the callout
-      this.popupCallout = this.addCallout(e);
-
       // Make the popup keys visible
       ss.visibility='visible';
+
+      // For now, should only be true (in production) when keyman.isEmbedded == true.
+      let constrainPopup = keyman.isEmbedded;
+
+      let cs = getComputedStyle(subKeys);
+      let oskHeight = keyman.osk.getHeight();
+      let bottomY = parseInt(cs.bottom, 10);
+      let popupHeight = parseInt(cs.height, 10);
+
+      let delta = 0;
+      if(popupHeight + bottomY > oskHeight && constrainPopup) {
+        delta = popupHeight + bottomY - oskHeight;
+        ss.bottom = (bottomY - delta) + 'px';
+      }
+
+      // Add the callout
+      this.popupCallout = this.addCallout(e, delta);
 
       // And add a filter to fade main keyboard
       subKeys.shim = document.createElement('DIV');
@@ -2261,5 +2259,399 @@ namespace com.keyman.osk {
         this.highlightKey(this.hkKey,false);
       }
     }
+
+    /**
+   * Touch hold key display management
+   * 
+   * @param   {Object}  key   base key object
+   */
+  touchHold(key: KeyElement) {
+    // Clear and restart the popup timer
+    if(this.subkeyDelayTimer) {
+      window.clearTimeout(this.subkeyDelayTimer);
+      this.subkeyDelayTimer = null;
+    }
+
+    if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
+      this.subkeyDelayTimer = window.setTimeout(
+        function(this: VisualKeyboard) {
+          this.clearPopup();
+          this.showSubKeys(key);
+        }.bind(this), this.popupDelay);
+    }
+  };
+
+  optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
+    let keyman = com.keyman.singleton;
+    let oskManager = keyman.osk;
+    if(keyDown) {
+      if(keyName.indexOf('K_LOPT') >= 0) {
+        oskManager.showLanguageMenu();
+      } else if(keyName.indexOf('K_ROPT') >= 0) {
+        keyman.uiManager.setActivatingUI(false);
+        oskManager._Hide(true); 
+        let active = keyman.domManager.getActiveElement();
+        if(dom.Utils.instanceof(active, "TouchAliasElement")) {
+          (active as dom.TouchAliasElement).hideCaret();
+        }
+        keyman.domManager.clearLastActiveElement();
+      }
+    }
+  };
+
+  // Manage popup key highlighting
+  highlightSubKeys(k: KeyElement, x: number, y: number) {
+    let util = com.keyman.singleton.util;
+
+    // Test for subkey array, return if none
+    // (JH 2/4/19) So, if a subkey is passed in, we return immediately?
+    if(k == null || k['subKeys'] == null) {
+      return;
+    }
+
+    // Highlight key at touch position (and clear other highlighting)
+    var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
+
+    //#region This section fills a different role than the method name would suggest.
+    // Might correspond better to a 'checkInstantSubkeys' or something.
+
+    // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+    if((this.touchY-y > 5) && skBox == null) {
+      if(this.subkeyDelayTimer) {
+        window.clearTimeout(this.subkeyDelayTimer);
+      }
+      this.showSubKeys(k);
+      skBox=document.getElementById('kmw-popup-keys');
+    } 
+    //#endregion
+    
+    /* (JH 2/4/19) Because of that earlier note, in KMW 12 alpha (and probably 11),
+     * the following code is effectively impotent and could be deleted with no effect.
+     * Note that this probably results from VisualKeyboard.keyTarget finding the 
+     * subkey first... which is necessary anyway to support subkey output.
+     */
+    for(i=0; i < k['subKeys'].length; i++) {
+      try {
+        sk=<HTMLElement> skBox.childNodes[i].firstChild;
+        x0=dom.Utils.getAbsoluteX(sk); y0=dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
+        x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
+        onKey=(x > x0 && x < x1 && y > y0 && y < y1);
+        this.highlightKey(sk, onKey);
+        if(onKey) {
+          this.highlightKey(k, false);
+        }
+      } catch(ex){}           
+    }    
+  };
+
+  /**
+   * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
+   * 
+   * @param   {Object}  key   HTML key element
+   * @param   {boolean} on    show or hide
+   */              
+  showKeyTip(key: KeyElement, on: boolean) {
+    let keyman = com.keyman.singleton;
+    let util = keyman.util;
+    let oskManager = keyman.osk;
+
+    var tip=this.keytip;
+
+    // Do not change the key preview unless key or state has changed
+    if(tip == null || (key == tip.key && on == tip.state)) {
+      return;
+    }
+
+    var sk=document.getElementById('kmw-popup-keys'),
+        popup = (sk && sk.style.visibility == 'visible')
+
+    // Create and display the preview
+    if(on && !popup) {                                                       
+      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
+          h0 = oskManager._Box.offsetHeight,  
+          xLeft = dom.Utils.getAbsoluteX(key),
+          xTop = dom.Utils.getAbsoluteY(key),
+          xWidth = key.offsetWidth,
+          xHeight = key.offsetHeight,
+          kc = <HTMLElement> key.firstChild,
+          kcs = kc.style, 
+          kts = tip.element.style, 
+          ktLabel = <HTMLElement> tip.element.childNodes[1],
+          ktls = ktLabel.style,
+          edge = 0,
+          canvas = <HTMLCanvasElement> tip.element.firstChild, 
+          previewFontScale = 1.8;
+          
+      // Find key text element
+      for(var i=0; i<key.childNodes.length; i++) {
+        kc = <HTMLElement> key.childNodes[i];
+        if(util.hasClass(kc,'kmw-key-text')) {
+          break;
+        }
+      }
+      
+      // Canvas dimensions must be set explicitly to prevent clipping
+      canvas.width = 1.6 * xWidth;
+      canvas.height = 2.3 * xHeight;
+
+      kts.top = 'auto';
+      kts.bottom = (y0 + h0 - xTop - xHeight)+'px';
+      kts.textAlign = 'center';   kts.overflow = 'visible';
+      kts.fontFamily = util.getStyleValue(kc,'font-family');
+      kts.width = canvas.width+'px';
+      kts.height = canvas.height+'px';
+
+      var px=util.getStyleInt(kc, 'font-size');
+      if(px != 0) {
+        let popupFS = previewFontScale * px;
+        kts.fontSize = popupFS + 'px';
+
+        let textWidth = com.keyman.osk.OSKKey.getTextWidth(this, ktLabel.textContent, kts);
+        // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
+        let proportion = canvas.width * 0.9 / (textWidth);
+
+        // Prevent the preview from overrunning its display area.
+        if(proportion < 1) {
+          kts.fontSize = (popupFS * proportion) + 'px';
+        }
+      }
+      
+      ktLabel.textContent = kc.textContent;
+      ktls.display = 'block';
+      ktls.position = 'absolute';
+      ktls.textAlign = 'center';
+      ktls.width='100%';
+      ktls.top = '2%';
+      ktls.bottom = 'auto';
+      
+      // Adjust canvas shape if at edges
+      var xOverflow = (canvas.width - xWidth) / 2;
+      if(xLeft < xOverflow) {
+        edge = -1;
+        xLeft += xOverflow;
+      } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
+        edge = 1;
+        xLeft -= xOverflow;
+      }
+
+      // For now, should only be true (in production) when keyman.isEmbedded == true.
+      let constrainPopup = keyman.isEmbedded;
+
+      let cs = getComputedStyle(tip.element);
+      let oskHeight = keyman.osk.getHeight();
+      let bottomY = parseInt(cs.bottom, 10);
+      let tipHeight = parseInt(cs.height, 10);
+
+      let delta = 0;
+      if(tipHeight + bottomY > oskHeight && constrainPopup) {
+        delta = tipHeight + bottomY - oskHeight;
+        canvas.height = canvas.height - delta;
+        kts.height = canvas.height + 'px';
+      }
+
+      this.drawPreview(canvas, xWidth, xHeight, edge, delta);
+                
+      kts.left=(xLeft - xOverflow) + 'px';
+      kts.display = 'block';
+    } else { // Hide the key preview
+      tip.element.style.display = 'none';
+    }
+    
+    // Save the key preview state
+    tip.key = key;
+    tip.state = on;
+  };
+
+  /**
+   * Draw key preview in element using CANVAS
+   *  @param  {Object}  canvas CANVAS element 
+   *  @param  {number}  w width of touched key, px
+   *  @param  {number}  h height of touched key, px      
+   *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
+   */
+  drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number, delta?: number) {
+    let util = com.keyman.singleton.util;
+    let device = util.device;
+
+    delta = delta || 0;
+
+    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height + delta,
+        w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
+        h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
+
+    let hBoundedMax = canvas.height;
+
+    h2 = h2 > hBoundedMax ? hBoundedMax : h2;
+    h3 = hMax > hBoundedMax ? hBoundedMax : h3;
+    
+    if(device.OS == 'Android') {
+      r = 3;
+    }
+    
+    // Adjust the preview shape at the edge of the keyboard
+    switch(edge) {
+      case -1:
+        w1 -= dx;
+        w2 -= dx;
+        break;
+      case 1:
+        w1 += dx;
+        w2 += dx;
+        break;
+    }
+    
+    // Clear the canvas
+    ctx.clearRect(0,0,canvas.width,canvas.height);     
+
+    // Define appearance of preview (cannot be done directly in CSS)
+    if(device.OS == 'Android') {
+      var wx=(w1+w2)/2; 
+      w1 = w2 = wx;
+    }
+    ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#cccccc';
+
+    // Draw outline
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(w0+r,0);
+    ctx.arcTo(w3,0,w3,r,r);
+    if(device.OS == 'Android') {    
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w1,h2,r);
+    } else {
+      let lowerR = 0;
+      if(h3 > h2) {
+        lowerR = h3-h2 > r ? r : h3-h2;
+      }
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w2-lowerR,h3,lowerR);
+      ctx.arcTo(w2,h3,w1,h3,lowerR);
+      ctx.arcTo(w1,h3,w1,h2-lowerR,lowerR);
+    }
+    ctx.arcTo(w1,h2,w0,h1-r,r);
+    ctx.arcTo(w0,h1,w0,r,r);
+    ctx.arcTo(w0,0,w0+r,0,r);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();  
+  };
+
+    /** 
+     *  Create a key preview element for phone devices
+     */    
+    createKeyTip() {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      if(keyman.util.device.formFactor == 'phone') {
+        if(this.keytip == null) {
+          this.keytip = {
+            key: null,
+            state: false
+          }
+          let tipElement = this.keytip.element=util._CreateElement('div');
+          tipElement.className='kmw-keytip';
+          tipElement.id = 'kmw-keytip';
+          
+          // The following style is critical, so do not rely on external CSS
+          tipElement.style.pointerEvents='none';
+          
+          // Add CANVAS element for outline and SPAN for key label
+          tipElement.appendChild(util._CreateElement('canvas'));
+          tipElement.appendChild(util._CreateElement('span')); 
+        }
+        
+        // Always append to _Box (since cleared during OSK Load) 
+        keyman.osk._Box.appendChild(this.keytip.element);
+      }
+    };
+
+    /**
+     * Add a callout for popup keys (if KeymanWeb on a phone device)
+     * 
+     * @param   {Object}  key   HTML key element
+     * @return  {Object}        callout object   
+     */              
+    addCallout(key: KeyElement, delta?: number): HTMLDivElement {   
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      if(util.device.formFactor != 'phone' || util.device.OS != 'iOS') {
+        return null;
+      }
+
+      delta = delta || 0;
+
+      let calloutHeight = key.offsetHeight - delta;
+
+      if(calloutHeight > 0) {  
+        var cc = util._CreateElement('div'), ccs = cc.style;
+        cc.id = 'kmw-popup-callout';
+        keyman.osk._Box.appendChild(cc);
+        
+        // Create the callout
+        var xLeft = key.offsetLeft,
+            xTop = key.offsetTop + delta,
+            xWidth = key.offsetWidth,
+            xHeight = calloutHeight;
+
+        // Set position and style 
+        ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
+        ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+        
+        // Return callout element, to allow removal later
+        return cc;
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Wait until font is loaded before applying stylesheet - test each 100 ms
+     * @param   {Object}  kfd   main font descriptor
+     * @param   {Object}  ofd   secondary font descriptor (OSK only)
+     * @return  {boolean}
+     */       
+    waitForFonts(kfd, ofd) {
+      let keymanweb = com.keyman.singleton;
+      let util = keymanweb.util;
+
+      if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') {
+        return true;
+      }
+      
+      if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') {
+        return true;
+      }
+
+      var kReady=util.checkFontDescriptor(kfd), oReady=util.checkFontDescriptor(ofd); 
+      if(kReady && oReady) {
+        return true;
+      }
+
+      keymanweb.fontCheckTimer=window.setInterval(function() {        
+        if(util.checkFontDescriptor(kfd) && util.checkFontDescriptor(ofd)) {
+          window.clearInterval(keymanweb.fontCheckTimer);
+          keymanweb.fontCheckTimer=null;
+          keymanweb.alignInputs();    
+        }    
+      }, 100);
+      
+      // Align anyway as best as can if font appears to remain uninstalled after 5 seconds   
+      window.setTimeout(function() {
+        if(keymanweb.fontCheckTimer)
+        {
+          window.clearInterval(keymanweb.fontCheckTimer);
+          keymanweb.fontCheckTimer=null;
+          keymanweb.alignInputs();
+          // Don't notify - this is a management issue, not anything the user needs to deal with
+          // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
+          //util.alert('Unable to download the font normally used with '+ks['KN']+'.');
+        }
+      }, 5000);
+      return false;
+    };
   }
 }
