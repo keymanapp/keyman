@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "outDir": "build/headless",
-    "module": "commonJS",
+    "outFile": "build/headless.js",
+    "module": "none",
     "inlineSources": true,
     "sourceMap": true,
     "target": "es5",
