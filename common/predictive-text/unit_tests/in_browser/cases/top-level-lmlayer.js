@@ -1,5 +1,6 @@
 var assert = chai.assert;
 var LMLayer = com.keyman.text.prediction.LMLayer;
+var WebWorkerFactory = com.keyman.text.prediction.WebWorkerFactory;
 
 describe('LMLayer', function () {
   this.timeout(config.timeouts.standard);
@@ -15,7 +16,7 @@ describe('LMLayer', function () {
   describe('#asBlobURI()', function () {
     // #asBlobURI() requires browser APIs, hence why it cannot be tested headless in Node.
     it('should take a function and convert it into a blob function', function (done) {
-      let uri = LMLayer.asBlobURI(function dummyHandler() {
+      let uri = WebWorkerFactory.asBlobURI(function dummyHandler() {
         // Post something weird, so we can be reasonably certain the Web Worker is...
         // well, working.
         // WARNING: Do NOT refactor this string as a variable. It **MUST** remain a string

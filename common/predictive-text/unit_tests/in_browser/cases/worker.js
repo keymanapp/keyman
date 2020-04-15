@@ -1,5 +1,6 @@
 var assert = chai.assert;
 var LMLayer = com.keyman.text.prediction.LMLayer;
+var WebWorkerFactory = com.keyman.text.prediction.WebWorkerFactory;
 
 describe('LMLayerWorker', function () {
   // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
@@ -15,7 +16,7 @@ describe('LMLayerWorker', function () {
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let uri = LMLayer.asBlobURI(LMLayerWorkerCode);
+      let uri = WebWorkerFactory.asBlobURI(LMLayerWorkerCode);
       let worker = new Worker(uri);
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
