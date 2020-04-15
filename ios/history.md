@@ -1,7 +1,9 @@
 
 # Keyman for iPhone and iPad Version History
 
-## 2020-03-24 13.0.106 stable
+## 2020-04-15 13.0.106 stable
+* Adds workaround for iOS 13.4 bug that breaks longpresses (#2960, #2970)
+* Mitigates bug where in-app keyboard would reset inappropriately (#2952)
 * Fixes issue where base key could output at same time a popup key was selected (#2882)
 
 ## 2020-03-17 13.0.105 stable
