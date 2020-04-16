@@ -13,7 +13,7 @@
   ],
   "exclude" : [
     "index.ts",
-    "headless-workerFactory.ts",
+    "virtualized-workerFactory.ts",
     "index.d.ts",
     "worker-interface.d.ts",
     "node_modules",
