@@ -21,37 +21,3 @@
   publishAPI("_GetAbsolute", "getAbsolute");
   publishAPI("toNzString", "nzString");
 }());
-
-// Keyboard callbacks
-(function() {
-  let prototype = com.keyman.text.KeyboardInterface.prototype;
-
-  var exportKBCallback = function(miniName: string, longName: string) {
-    prototype[miniName] = prototype[longName];
-  }
-
-  exportKBCallback('KSF', 'saveFocus');
-  exportKBCallback('KBR', 'beepReset');
-  exportKBCallback('KT', 'insertText');
-  exportKBCallback('KR', 'registerKeyboard');
-  exportKBCallback('KRS', 'registerStub');
-  exportKBCallback('KC', 'context');
-  exportKBCallback('KN', 'nul');
-  exportKBCallback('KCM', 'contextMatch');
-  exportKBCallback('KFCM', 'fullContextMatch');
-  exportKBCallback('KIK', 'isKeypress');
-  exportKBCallback('KKM', 'keyMatch');
-  exportKBCallback('KSM', 'stateMatch');
-  exportKBCallback('KKI', 'keyInformation');
-  exportKBCallback('KDM', 'deadkeyMatch');
-  exportKBCallback('KB', 'beep');
-  exportKBCallback('KA', 'any');
-  exportKBCallback('KDC', 'deleteContext');
-  exportKBCallback('KO', 'output');
-  exportKBCallback('KDO', 'deadkeyOutput');
-  exportKBCallback('KIO', 'indexOutput');
-  exportKBCallback('KIFS', 'ifStore');
-  exportKBCallback('KSETS', 'setStore');
-  exportKBCallback('KLOAD', 'loadStore');
-  exportKBCallback('KSAVE', 'saveStore');
-}());

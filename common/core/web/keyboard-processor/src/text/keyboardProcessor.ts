@@ -1,3 +1,5 @@
+// Includes KMW string extension declarations.
+/// <reference path="kmwstring.ts" />
 // Establishes key-code definitions.
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
@@ -61,7 +63,7 @@ namespace com.keyman.text {
         options = KeyboardProcessor.DEFAULT_OPTIONS;
       }
 
-      this.baseLayout = options.baseLayout || 'us'; // default BaseLayout
+      this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
       this.keyboardInterface = new KeyboardInterface(options.variableStoreSerializer);
       this.installInterface();
     }
@@ -678,3 +680,14 @@ namespace com.keyman.text {
     };
   }
 }
+
+(function () {
+  let ns = com.keyman.text;
+
+  // Let LMLayer be available both in the browser and in Node.
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = ns.KeyboardProcessor;
+    //@ts-ignore
+    ns.KeyboardProcessor.com = com; // Export the root namespace, while we're at it - just in case.
+  }
+}());

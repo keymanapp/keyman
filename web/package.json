@@ -36,6 +36,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^5.2.0",
+    "mocha-teamcity-reporter": "^3.0.0",
     "modernizr": "^3.7.1",
     "typescript": "^3.7.2"
   },
@@ -44,6 +45,7 @@
     "test": "bash ./unit_tests/test.sh",
     "karma": "karma",
     "lerna": "cd ../ && npm run lerna --",
+    "mocha": "mocha",
     "modernizr": "modernizr"
   },
   "dependencies": {
