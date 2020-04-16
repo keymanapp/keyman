@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.51 alpha 2020-04-16
+
+* modify(android): Update minimum SDK to 21 (#2993)
+
 ## 14.0.50 alpha 2020-04-15
 
 * fix(android): Handle default font DejaVuSans.ttf (#2981)
