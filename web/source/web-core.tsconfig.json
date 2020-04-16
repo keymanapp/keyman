@@ -12,6 +12,7 @@
   "outFile": "../intermediate/web-core/index.js"
   },
   "files": [
+		"includes/node-lmlayer.ts",
 		"text/inputProcessor.ts"
   ]
 }
