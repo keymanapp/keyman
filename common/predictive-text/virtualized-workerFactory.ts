@@ -72,7 +72,18 @@ namespace com.keyman.text.prediction {
     postMessage(message: any, transfer: any[]): void;
     postMessage(message: any, options?: PostMessageOptions): void;
     postMessage(message: any, options?: any) {
-      this._worker.onMessage({data: message} as any as MessageEvent);
+      let msgObj = {data: message};
+      let msgJSON = JSON.stringify(msgObj);
+
+      /* 
+       * Execute the command within the virtualized worker's scope.  The worker's returned 
+       * `postMessage` calls will still reach outside, as they have a reference to `this` via
+       * `postMessage` (which we've set to a bound `this.workerPostMessage`).
+       * 
+       * Among other things, this will allow the worker to use its internal namespaces without issue.
+       */
+      let msgCommand = "onmessage(" + msgJSON + ")";
+      this._workerContext.__importScriptString(msgCommand);
     }
 
     terminate(): void {
