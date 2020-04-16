@@ -12,7 +12,8 @@ global.keyman = {}; // So that keyboard-based checks against the global `keyman`
 // Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);    
 
-// Test basic KeyboardProcessor functionality.
+// Test the top-level LMLayer interface.
+// Note: these tests can only be run after BOTH stages of compilation are completed.
 describe('KeyboardProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
@@ -58,13 +59,21 @@ describe('KeyboardProcessor', function() {
       let keyS = defaultLayer.getKey('K_S');
       assert.isNotNull(keyS);
 
-      // Get the default synthetic key event for said key.
-      // let keyEvent = keyS.constructKeyEvent(kp, 
-      //                                       new com.keyman.text.Mock(), 
-      //                                       new com.keyman.text.EngineDeviceSpec('chrome', 'desktop', 'windows', false)
-      // );
+      //Get the default synthetic key event for said key.
+      let mock = new com.keyman.text.Mock();
+      let keyEvent = keyS.constructKeyEvent(kp, mock, 
+                                            new com.keyman.text.EngineDeviceSpec('chrome', 'desktop', 'windows', false)
+      );
 
-      // assert.isNotNull(keyEvent);
+      assert.isNotNull(keyEvent);
+
+      let ruleBehavior = kp.processKeystroke(keyEvent, mock);
+      assert.isNotNull(ruleBehavior);
+      assert.isNotNull(ruleBehavior.transcription);
+      assert.equal(mock.getText(), 'ស', 'Unexpected output from key event');
+
+      let transform = ruleBehavior.transcription.transform;
+      assert.isNotNull(transform);
     })
   });
 });
