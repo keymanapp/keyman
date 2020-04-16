@@ -48,7 +48,7 @@
   "dependencies": {
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
-    "events": "^3.1.0",
+    "eventemitter3": "^4.0.0",
     "ts-node": "^8.0.2"
   }
 }
