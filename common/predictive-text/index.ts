@@ -23,7 +23,7 @@
 /// <reference path="node_modules/es6-shim/es6-shim.min.js" />
 /// <reference path="promise-store.ts" />
 /// <reference path="lmlayer-interface.ts" />
-/// <reference path="headless-workerFactory.ts" />
+/// <reference path="virtualized-workerFactory.ts" />
 
 namespace com.keyman.text.prediction {
   /**
@@ -54,7 +54,7 @@ namespace com.keyman.text.prediction {
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
     constructor(capabilities: Capabilities) {
-      super(capabilities, new HeadlessWorkerFactory());
+      super(capabilities, new VirtualizedWorkerFactory());
     }
   }
 }
