@@ -339,7 +339,7 @@ namespace com.keyman.keyboards {
       if(rawLayout) {
         // Prevents accidentally reprocessing layouts; it's a simple enough check.
         if(this.layoutStates[formFactor] == LayoutState.NOT_LOADED) {
-          rawLayout = ActiveLayout.polyfill(rawLayout, formFactor);
+          rawLayout = ActiveLayout.polyfill(rawLayout, this, formFactor);
           this.layoutStates[formFactor] = LayoutState.POLYFILLED;
         }
 

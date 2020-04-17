@@ -170,7 +170,7 @@ namespace com.keyman {
       this.osk.shutdown();
       this.util.shutdown();
       this.keyboardManager.shutdown();
-      this.modelManager.shutdown();
+      this.core.languageProcessor.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();
@@ -670,5 +670,8 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
      * As this is the base object, not creating it prevents a KMW system reset.
      */
     window['keyman'] = com.keyman['singleton'] = com.keyman.singleton = new KeymanBase();
+
+    // TODO:  Eliminate the need for this.  Will require more refactoring & redesign to drop.
+    window['keyman'].core.languageProcessor.init();
   })();
 }

@@ -239,10 +239,43 @@ public final class FileUtils {
     if (u == null) {
       return ret;
     }
+    String lowerU = u.toLowerCase();
     Pattern pattern = Pattern.compile("^http(s)?://(.+\\.)?keyman.com/.*");
-    Matcher matcher = pattern.matcher(u);
+    Matcher matcher = pattern.matcher(lowerU);
     if (matcher.matches()) {
       ret = false;
+    }
+    return ret;
+  }
+
+  /**
+   * Utility to parse a URL and determine if it's a valid keyman:<method>
+   * Currently, only "keyman" scheme with "download" path and query is supported.
+   * Legacy keyman:// protocol is deprecated and not supported.
+   * @param u String of the URL
+   * @return boolean true if URL is a supported Keyman link
+   */
+  public static boolean isKeymanLink(String u) {
+    boolean ret = false;
+    if (u == null) {
+      return ret;
+    }
+    String lowerU = u.toLowerCase();
+    Pattern pattern = Pattern.compile("^keyman:(\\w+)\\?(.+)");
+    Matcher matcher = pattern.matcher(lowerU);
+    // Check URL starts with "keyman"
+    if (matcher.matches() && (matcher.group(1) != null)) {
+      // For now, only handle "download"
+      switch (matcher.group(1).toLowerCase()) {
+        case "download":
+          if (matcher.group(2) != null) {
+            // Contains query
+            ret = true;
+          }
+          break;
+        default:
+          ret = false;
+      }
     }
     return ret;
   }

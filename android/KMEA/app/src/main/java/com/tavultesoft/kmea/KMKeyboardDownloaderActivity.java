@@ -50,6 +50,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String KMKey_URL = "url";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_LanguageKeyboards = "keyboards";
+  public static final String KMKey_BCP47 = "bcp47";
   public static final String KMKey_Options = "options";
   public static final String KMKey_Language = "language";
   public static final String KMKey_Languages = "languages";

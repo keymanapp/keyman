@@ -176,14 +176,17 @@
       </intent-filter>
 
       <intent-filter>
-        <!-- deep linking to keyman.com/keyboards -->
+        <!-- keyman:download deep linking to https://keyman.com/keyboards/ -->
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
         <data
-          android:scheme="keyman" />
+          android:host="*"
+          android:scheme="keyman"
+          android:sspPrefix="download" />
+
       </intent-filter>
     </activity>
     <activity

@@ -198,7 +198,7 @@ public final class KMManager {
   public static final String KMDefault_LanguageID = "en";
   public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
-  public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+  public static final String KMDefault_KeyboardFont = "DejaVuSans.ttf";
 
   // Default Dictionary Info
   public static final String KMDefault_DictionaryPackageID = "nrc.en.mtnt";
@@ -482,6 +482,9 @@ public final class KMManager {
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
+
+      // Copy default keyboard font
+      copyAsset(context, KMDefault_KeyboardFont, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());

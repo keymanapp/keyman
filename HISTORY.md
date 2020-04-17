@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 14.0.51 alpha 2020-04-16
+
+* modify(android): Update minimum SDK to 21 (#2993)
+
+## 14.0.50 alpha 2020-04-15
+
+* fix(android): Handle default font DejaVuSans.ttf (#2981)
+* feat(android): Download cloud keyboards from https://keyman.com/keyboards (#2953)
+* fix(ios): iOS 13.4 subkey menu workaround (#2959)
+* change(ios): Web-based popup key longpresses (#2968)
+* fix(web):  repairs Web regression test suite (#2973)
+* feat(android): Dismiss system keyboard on Back press (#2984)
+
+## 14.0.49 alpha 2020-04-11
+
+* chore(common/lmlayer): do not run tests in IE11 in Windows (#2978)
+
 ## 14.0.48 alpha 2020-04-07
 
 * feat(windows): use crashpad and better call stacks (#2931)
