@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.52 alpha 2020-04-17
+
+* refactor(web/engine): precomputation for OSK key events, headless production thereof (#2969)
+* refactor(web/engine): initial ModelManager split (#2974)
+* refactor(web/engine): lm-layer enablement state management rework (#2975)
+* refactor(web/engine): predictive data routing, LanguageProcessor as EventEmitter (#2976)
+* refactor(web/engine): web-core build prep (#2982)
+
 ## 14.0.51 alpha 2020-04-16
 
 * modify(android): Update minimum SDK to 21 (#2993)
