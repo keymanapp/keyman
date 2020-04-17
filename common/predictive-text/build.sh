@@ -157,7 +157,7 @@ wrap-worker-code ( ) {
 ################################ Main script ################################
 
 run_tests=0
-fetch_deps=1
+fetch_deps=true
 unit_tests_only=0
 
 # Process command-line arguments
@@ -176,7 +176,7 @@ while [[ $# -gt 0 ]] ; do
       ;;
     -tdd)
       run_tests=1
-      fetch_deps=0
+      fetch_deps=false
       unit_tests_only=1
       ;;
     *)
@@ -188,7 +188,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Check if Node.JS/npm is installed.
-verify_npm_setup
+verify_npm_setup $fetch_deps
 
 build || fail "Browser-oriented compilation failed."
 build_headless || fail "Headless compilation failed."

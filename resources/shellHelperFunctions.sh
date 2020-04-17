@@ -258,12 +258,20 @@ set_npm_version () {
   npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
 }
 
+# Accepts an optional parameter.
+# #1 - when set to 'false', only ensures that `npm` and `node` are accessible; does not install dependencies.
 verify_npm_setup () {
+  if [ $# != 0 ]; then
+    fetch_deps=$1
+  else
+    fetch_deps=true
+  fi
+
   # Check if Node.JS/npm is installed.
   type npm >/dev/null ||\
       fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
-  if (( fetch_deps )); then
+  if [ $fetch_deps = true ]; then
     type lerna >/dev/null ||\
         fail "Build environment setup error detected!  Please run \`npm install -g lerna\` to install lerna"
 
