@@ -14,29 +14,6 @@
 /*****************************************/
 
 namespace com.keyman.osk {
-  // Send the subkey array to iOS, with centre,top of base key position
-  /**
-   * Create a popup key array natively 
-   * 
-   * @param {Object}  key   base key element
-   */            
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
-    let util = com.keyman.singleton.util;
-    if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
-      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv)*/ /*+ bannerHeight*/;
-      
-      if(util.device.formFactor == 'phone') {
-        this.prependBaseKey(key);
-      }
-
-      this.popupBaseKey = key;
-      this.popupPending=true;
-      window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
-    }
-  };
-
   VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
 
@@ -65,50 +42,96 @@ namespace com.keyman.osk {
     }
   };
 
-  // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
-  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
-    let util = com.keyman.singleton.util;
-    var tip = this.keytip,
-        showPreview = window['oskCreateKeyPreview'],
-        clearPreview = window['oskClearKeyPreview'];
+  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targetted
+  // methods when embedding in Android.
+  let device = com.keyman.singleton.util.device;
 
-    if(tip == null || (key == tip.key && on == tip.state)) {
-      return;
-    }
+  if(device.OS == 'Android') { // assumption - if this file is being loaded, keyman.isEmbedded == true.
+    // Send the subkey array to iOS, with centre,top of base key position
+    /**
+     * Create a popup key array natively 
+     * 
+     * @param {Object}  key   base key element
+     */            
+    VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
+      let util = com.keyman.singleton.util;
+      if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
+        var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+            yBase = dom.Utils.getAbsoluteY(key);
+        
+        if(util.device.formFactor == 'phone') {
+          this.prependBaseKey(key);
+        }
 
-    if(on && (typeof showPreview == 'function')) {
-      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
-      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
-          kc;
+        this.popupBaseKey = key;
+        this.popupPending=true;
+        window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+      }
+    };
 
-      // Find key text element
-      for(var i=0; i<key.childNodes.length; i++) {
-        kc = key.childNodes[i];
-        if(util.hasClass(kc,'kmw-key-text')) {
-          break;
+    // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
+    VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
+      let util = com.keyman.singleton.util;
+      var tip = this.keytip,
+          showPreview = window['oskCreateKeyPreview'],
+          clearPreview = window['oskClearKeyPreview'];
+
+      if(tip == null || (key == tip.key && on == tip.state)) {
+        return;
+      }
+
+      if(on && (typeof showPreview == 'function')) {
+        let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+        var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+            yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
+            kc;
+
+        // Find key text element
+        for(var i=0; i<key.childNodes.length; i++) {
+          kc = key.childNodes[i];
+          if(util.hasClass(kc,'kmw-key-text')) {
+            break;
+          }
+        }
+          
+        if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
+          showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
+        }
+      } else if(!on && (typeof clearPreview == 'function')) {
+        if(this.touchCount == 0 || key == null) {
+          clearPreview();
         }
       }
-        
-      if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
-        showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
+
+      tip.key = key;
+      tip.state = on;
+    };
+
+    // Create a keytip (dummy call - actual keytip handled by native code)
+    VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
+      if(com.keyman.singleton.util.device.formFactor == 'phone') {
+        this.keytip = {key:null, state:false};
       }
-    } else if(!on && (typeof clearPreview == 'function')) {
-      if(this.touchCount == 0 || key == null) {
-        clearPreview();
-      }
+    };
+
+    VisualKeyboard.prototype.highlightSubKeys = function(this: VisualKeyboard, k, x, y) {
+      // a dummy function; it's only really used for 'native' KMW.
     }
 
-    tip.key = key;
-    tip.state = on;
-  };
-
-  // Create a keytip (dummy call - actual keytip handled by native code)
-  VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
-    if(com.keyman.singleton.util.device.formFactor == 'phone') {
-      this.keytip = {key:null, state:false};
+    VisualKeyboard.prototype.drawPreview = function(this: VisualKeyboard, w, h, edge) {
+      // a dummy function; it's only really used for 'native' KMW.
     }
-  };
+
+    VisualKeyboard.prototype.addCallout = function(this: VisualKeyboard, key) {
+      // a dummy function; it's only really used for 'native' KMW.
+      return null;
+    }
+
+    VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
+      // a dummy function; it's only really used for 'native' KMW.
+      return true;
+    }
+  }
 
   SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
     // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
@@ -375,7 +398,7 @@ namespace com.keyman.text {
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=core.keyboardProcessor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -499,7 +522,7 @@ namespace com.keyman.text {
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return keyman.core.processKeyEvent(Lkc); // Lack of second argument -> `usingOSK == false`
+      return keyman.core.processKeyEvent(Lkc) != null;
     } catch (err) {
       console.error(err.message, err);
       return false;

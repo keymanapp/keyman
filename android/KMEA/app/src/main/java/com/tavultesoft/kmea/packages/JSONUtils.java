@@ -139,7 +139,7 @@ public class JSONUtils {
     try {
       for (int i=0; i < a.length(); i++) {
         JSONObject o = a.getJSONObject(i);
-        if (o.getString("id").equals(id)) {
+        if (o.getString("id").toLowerCase().equals(id.toLowerCase())) {
           return i;
         }
       }

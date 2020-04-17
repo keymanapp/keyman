@@ -303,7 +303,7 @@ namespace com.keyman.text {
      * @param       {string}      layerId       layer id (e.g. ctrlshift)
      * @return      {number}                    modifier key state (desktop keyboards)
      */
-    getModifierState(layerId: string): number {
+    static getModifierState(layerId: string): number {
       var modifier=0;
       if(layerId.indexOf('shift') >= 0) {
         modifier |= Codes.modifierCodes['SHIFT'];
@@ -563,7 +563,7 @@ namespace com.keyman.text {
         // if(idx == '') with accompanying if-else structural shift would be a far better test here.
         else {
           // Save our current modifier state.
-          var modifier=this.getModifierState(s);
+          var modifier=KeyboardProcessor.getModifierState(s);
 
           // Strip down to the base modifiable layer.
           for(i=0; i < replacements.length; i++) {

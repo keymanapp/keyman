@@ -322,7 +322,7 @@ namespace com.keyman.dom {
 
        // Now that we've fully entered the new context, invalidate the context so we can generate initial predictions from it.
       if(this.keyman.modelManager) {
-        this.keyman.modelManager.invalidateContext();
+        this.keyman.core.languageProcessor.invalidateContext();
       }
     }
 
@@ -335,6 +335,7 @@ namespace com.keyman.dom {
      *                      should be terminated immediately after the call.
      */
     _CommonFocusHelper(target: HTMLElement): boolean {
+      let keyman = com.keyman.singleton;
       var uiManager = this.keyman.uiManager;
       //TODO: the logic of the following line doesn't look right!!  Both variables are true, but that doesn't make sense!
       //_Debug(keymanweb._IsIEEditableIframe(Ltarg,1) + '...' +keymanweb._IsMozillaEditableIframe(Ltarg,1));
@@ -347,7 +348,7 @@ namespace com.keyman.dom {
       }
       DOMEventHandlers.states._DisableInput = false; 
 
-      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
+      let activeKeyboard = keyman.core.activeKeyboard;
       if(!uiManager.justActivated) {
         if(target && Utils.getOutputTarget(target)) {
           Utils.getOutputTarget(target).deadkeys().clear();
@@ -364,6 +365,10 @@ namespace com.keyman.dom {
       uiManager.justActivated = false;
 
       DOMEventHandlers.states._SelectionControl = target;
+
+      if(keyman.core.languageProcessor.isActive) {
+        keyman.core.languageProcessor.predictFromTarget(Utils.getOutputTarget(target));
+      }
       return false;
     }
 

@@ -1,7 +1,7 @@
 namespace com.keyman.text.prediction {
-  export class WebWorkerFactory implements WorkerFactory {
-    constructInstance(): Worker {
-      return new Worker(WebWorkerFactory.asBlobURI(LMLayerWorkerCode));
+  export class DefaultWorker {
+    static constructInstance(): Worker {
+      return new Worker(this.asBlobURI(LMLayerWorkerCode));
     }
     
     /**
