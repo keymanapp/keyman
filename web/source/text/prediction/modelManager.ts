@@ -66,8 +66,6 @@ namespace com.keyman.text.prediction {
 
     // Allows for easy model lookup by language code; useful when switching keyboards.
     languageModelMap: {[language:string]: ModelSpec} = {};
-
-    static EVENT_PREFIX: string = "kmw.mm.";
     
     init() {
       let keyman = com.keyman.singleton;
@@ -152,32 +150,6 @@ namespace com.keyman.text.prediction {
 
     isRegistered(model: ModelSpec): boolean {
       return !! this.registeredModels[model.id];
-    }
-
-    /**
-     * Function     addEventListener
-     * Scope        Public
-     * @param       {string}            event     event to handle
-     * @param       {function(Event)}   func      event handler function
-     * @return      {boolean}                     value returned by util.addEventListener
-     * Description  Wrapper function to add and identify handlers for ModelManager events
-     */       
-    ['addEventListener'](event: SupportedEventNames, func: SupportedEventHandler): boolean {
-      let keyman = com.keyman.singleton;
-      return keyman.util.addEventListener(ModelManager.EVENT_PREFIX + event, func);
-    }
-
-    /**
-     * Function     removeEventListener
-     * Scope        Public
-     * @param       {string}            event     event to handle
-     * @param       {function(Event)}   func      event handler function
-     * @return      {boolean}                     value returned by util.addEventListener
-     * Description  Wrapper function to remove previously-added handlers for ModelManager events
-     */       
-    ['removeEventListener'](event: SupportedEventNames, func: SupportedEventHandler): boolean {
-      let keyman = com.keyman.singleton;
-      return keyman.util.removeEventListener(ModelManager.EVENT_PREFIX + event, func);
     }
   }
 }

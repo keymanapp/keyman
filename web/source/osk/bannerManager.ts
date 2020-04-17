@@ -75,7 +75,7 @@ namespace com.keyman.osk {
 
       // Register a listener for model change events so that we can hot-swap the banner as needed.
       let keyman = com.keyman.singleton;
-      keyman.modelManager['addEventListener']('statechange', this.selectBanner.bind(this));
+      keyman.core.languageProcessor.on('statechange', this.selectBanner.bind(this));
     }
 
     /**

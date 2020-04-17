@@ -22,7 +22,7 @@ namespace com.keyman.text.prediction {
    */
   export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
 
-  export class LanguageProcessor {
+  export class LanguageProcessor extends EventEmitter {
     private lmEngine: LMLayer;
     private currentModel?: ModelSpec;
     private configuration?: Configuration;
@@ -60,8 +60,7 @@ namespace com.keyman.text.prediction {
       delete this.currentModel;
       delete this.configuration;
 
-      let keyman = com.keyman.singleton;
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', 'inactive');
+      this.emit('statechange', 'inactive');
     }
 
     loadModel(model: ModelSpec): Promise<void> {
@@ -70,16 +69,15 @@ namespace com.keyman.text.prediction {
       }
 
       let file = model.path;
-      let mm = this;
+      let lp = this;
 
       // We should wait until the model is successfully loaded before setting our state values.
       return this.lmEngine.loadModel(file).then(function(config: Configuration) { 
-        mm.currentModel = model;
-        mm.configuration = config;
+        lp.currentModel = model;
+        lp.configuration = config;
 
         try {
-          let keyman = com.keyman.singleton;
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', 'active');
+          lp.emit('statechange', 'active');
         } catch (err) {
           // Does this provide enough logging information?
           console.error("Could not load model '" + model.id + "': " + (err as Error).message);
@@ -88,10 +86,8 @@ namespace com.keyman.text.prediction {
     }
 
     public invalidateContext() {
-      let keyman = com.keyman.singleton;
-
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'context');
+      this.emit('invalidatesuggestions', 'context');
 
       // If there's no active model, there can be no predictions.
       // We'll also be missing important data needed to even properly REQUEST the predictions.
@@ -111,24 +107,22 @@ namespace com.keyman.text.prediction {
       return this.lmEngine.wordbreak(context);
     }
 
-    public predict(transcription?: Transcription) {
+    public predict(transcription?: Transcription): Promise<Suggestion[]> {
       if(!this.isActive) {
-        return;
+        return null;
       }
-
-      let keyman = com.keyman.singleton;
 
       // If there's no active model, there can be no predictions.
       // We'll also be missing important data needed to even properly REQUEST the predictions.
       if(!this.currentModel || !this.configuration) {
-        return;
+        return null;
       }
             
       // We've already invalidated any suggestions resulting from any previously-existing Promise -
       // may as well officially invalidate them via event.
-      keyman.util.callEvent(ModelManager.EVENT_PREFIX + "invalidatesuggestions", 'new');
+      this.emit("invalidatesuggestions", 'new');
 
-      this.predict_internal(transcription);
+      return this.predict_internal(transcription);
     }
 
     /**
@@ -136,15 +130,13 @@ namespace com.keyman.text.prediction {
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription?: Transcription) {
-      let keyman = com.keyman.singleton;
-
+    private predict_internal(transcription?: Transcription): Promise<Suggestion[]> {
       if(!transcription) {
         let t = dom.Utils.getOutputTarget();
         if(t) {
           transcription = t.buildTranscriptionFrom(t, null);
         } else {
-          return;
+          return null;
         }
       }
 
@@ -154,13 +146,15 @@ namespace com.keyman.text.prediction {
       let transform = transcription.transform;
       var promise = this.currentPromise = this.lmEngine.predict(transcription.alternates || transcription.transform, context);
 
-      let mm = this;
-      promise.then(function(suggestions: Suggestion[]) {
-        if(promise == mm.currentPromise) {
+      let lp = this;
+      return promise.then(function(suggestions: Suggestion[]) {
+        if(promise == lp.currentPromise) {
           let result = new ReadySuggestions(suggestions, transform.id);
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + "suggestionsready", result);
-          mm.currentPromise = null;
+          lp.emit("suggestionsready", result);
+          lp.currentPromise = null;
         }
+
+        return suggestions;
       })
     }
 
@@ -217,8 +211,7 @@ namespace com.keyman.text.prediction {
       this._mayPredict = flag;
 
       if(oldVal != flag) {
-        let keyman = com.keyman.singleton;
-        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', flag ? 'active' : 'inactive');
+        this.emit('statechange', flag ? 'active' : 'inactive');
       }
     }
 
@@ -231,17 +224,13 @@ namespace com.keyman.text.prediction {
     }
 
     public tryAcceptSuggestion(source: string): boolean {
-      let keyman = com.keyman.singleton;
-      
       // Handlers of this event should return 'false' when the 'try' is successful.
-      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryaccept', source);
+      return !this.emit('tryaccept', source);
     }
 
     public tryRevertSuggestion(): boolean {
-      let keyman = com.keyman.singleton;
-      
       // Handlers of this event should return 'false' when the 'try' is successful.
-      return !keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'tryrevert', null);
+      return !this.emit('tryrevert', null);
     }
   }
 }
