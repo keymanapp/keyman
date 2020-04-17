@@ -19,7 +19,7 @@ namespace com.keyman.text.prediction {
      *    }));
      */
     static asBlobURI(fn: Function): string {
-      let code = LMLayerBase.unwrap(fn);
+      let code = LMLayer.unwrap(fn);
       let blob = new Blob([code], { type: 'text/javascript' });
       return URL.createObjectURL(blob);
     }

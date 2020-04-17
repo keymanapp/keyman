@@ -12,8 +12,8 @@
     "./*.ts"
   ],
   "exclude" : [
-    "index.ts",
-    "virtualized-workerFactory.ts",
+    "node-defaultWorker.ts",
+    "virtualizedWorker.ts",
     "index.d.ts",
     "worker-interface.d.ts",
     "node_modules",

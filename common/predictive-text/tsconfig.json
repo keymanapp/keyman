@@ -12,8 +12,7 @@
     "./*.ts"
   ],
   "exclude" : [
-    "web-workerFactory.ts",
-    "browser-index.ts",
+    "web-defaultWorker.ts",
     "node_modules",
     "testing"
   ]
