@@ -114,8 +114,7 @@ namespace com.keyman.text {
                 continue;
               }
 
-              let altEvent = osk.PreProcessor._GetClickEventProperties(altKey, outputTarget.getElement());
-              altEvent.Ltarg = mock;
+              let altEvent = altKey.constructKeyEvent(this.keyboardProcessor, mock, keyEvent.device);
               let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
               if(alternateBehavior) {
                 // TODO: if alternateBehavior.beep == true, set 'p' to 0.  It's a disallowed key sequence,
