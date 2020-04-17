@@ -7,8 +7,7 @@
     "karma": "karma",
     "mocha": "mocha",
     "test": "bash ./unit_tests/test.sh",
-    "tsc": "tsc",
-    "install": "npm link @keymanapp/lexical-model-types"
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
