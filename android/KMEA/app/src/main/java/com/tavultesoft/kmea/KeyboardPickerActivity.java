@@ -273,10 +273,12 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return pos;
   }
 
+  // Previously, keyboard from package = custom keyboard
+  // Now, keyboard from package has a package ID != "cloud"
   protected static boolean hasKeyboardFromPackage() {
     for(HashMap<String, String> kbInfo: keyboardsList) {
-      String customKeyboard = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N");
-      if (customKeyboard.equalsIgnoreCase("Y")) {
+      String pkgID = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      if (!pkgID.equalsIgnoreCase(KMManager.KMDefault_UndefinedPackageID)) {
         return true;
       }
     }

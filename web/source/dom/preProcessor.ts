@@ -224,7 +224,7 @@ namespace com.keyman.dom {
         return true;
       }
 
-      var LeventMatched = !core.processKeyEvent(Levent);
+      var LeventMatched = (core.processKeyEvent(Levent) != null);
 
       if(LeventMatched) {
         if(e  &&  e.preventDefault) {

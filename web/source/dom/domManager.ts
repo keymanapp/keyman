@@ -6,6 +6,8 @@
 /// <reference path="domEventHandlers.ts" />
 // References DOM-specific output handling.
 /// <reference path="domDefaultOutput.ts" />
+// References other DOM-specific web-core overrides.
+/// <reference path="domOverrides.ts" />
 // Includes KMW string extension declarations.
 /// <reference path="../text/kmwstring.ts" />
 // Defines the touch-alias element structure used for mobile devices.

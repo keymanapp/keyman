@@ -24,6 +24,7 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
@@ -31,11 +32,13 @@ import com.tavultesoft.kmea.util.DownloadIntentService;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.Uri.Builder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -89,6 +92,8 @@ import android.widget.Toast;
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
+import static com.tavultesoft.kmea.KMKeyboardDownloaderActivity.kKeymanApiModelURL;
+
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
@@ -96,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   // Fields used for installing kmp packages
   private static final int PERMISSION_REQUEST_STORAGE = 0;
   public static final int READ_REQUEST_CODE = 42;
-  Uri data;
 
   private static final String TAG = "MainActivity";
 
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
-
+  private Uri data;
 
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
@@ -145,6 +149,21 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
+
+          // Determine if associated lexical model should be downloaded
+          if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
+              && (languageID != null) && !languageID.isEmpty()) {
+            String keyboardID = kmpFilename.substring(0, kmpFilename.lastIndexOf(FileUtils.KEYMANPACKAGE));
+            ArrayList<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
+            String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, languageID);
+            cloudQueries.add(new CloudApiTypes.CloudApiParam(
+              CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
+              .setType(CloudApiTypes.JSONType.Array));
+            // Keyboard package already downloaded, so this will just download associated lexical model.
+            // Can't call downloadLexicalModel() because it needs to already know the model ID
+            KMKeyboardDownloaderActivity.downloadKeyboard(context, languageID, keyboardID, cloudQueries);
+          }
+
           break;
       }
       super.onReceiveResult(resultCode, resultData);
@@ -314,12 +333,19 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
+    // Get calling activity
+    ComponentName component = this.getCallingActivity();
+    String caller = null;
+    if (component != null) {
+      caller = component.getClassName();
+    }
+
     Intent intent = getIntent();
     data = intent.getData();
 
     if (data != null) {
-
-      switch (data.getScheme().toLowerCase()) {
+      String scheme = data.getScheme().toLowerCase();
+      switch (scheme) {
         // content:// Android DownloadManager
         // file:// Chrome downloads and Filebrowsers
         case "content":
@@ -328,13 +354,28 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           break;
         case "http" :
         case "https" :
-          downloadKMP();
+          downloadKMP(scheme);
           break;
         case "keyman" :
-          downloadKMP();
+          // Only accept download links from Keyman browser activities
+          if (FileUtils.isKeymanLink(data.toString()) && caller != null &&
+            (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
+             caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
+
+            // Convert opaque URI to hierarchical URI so the query parameters can be parsed
+            Builder builder = new Uri.Builder();
+            builder.scheme("https")
+              .authority("keyman.com")
+              .appendPath("keyboards")
+              .encodedQuery(data.getEncodedQuery());
+            data = Uri.parse(builder.build().toString());
+            downloadKMP(scheme);
+          } else {
+            Log.e(TAG, "Unrecognized scheme: " + scheme);
+          }
           break;
         default :
-          Log.e(TAG, "Unrecognized protocol " + data.getScheme());
+          Log.e(TAG, "Unrecognized scheme: " + scheme);
       }
     }
     intent.setData(null);
@@ -546,11 +587,18 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   }
 
   /**
-   * Parse the URI data to determine the URL for the .kmp keyboard package.
+   * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
+   * If URL is valid, download the kmp.
+   * @param scheme String of the URI's scheme.
    *
    */
-  private void downloadKMP() {
-    Intent downloadIntent;
+  private void downloadKMP(String scheme) {
+    if (data == null) {
+      String message = "Download failed. Invalid URL.";
+      Toast.makeText(getApplicationContext(), message,
+        Toast.LENGTH_SHORT).show();
+      return;
+    }
     try {
       String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url == null) {
@@ -562,27 +610,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
         String filename = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Filename);
         if (filename == null) {
-          int index = url.lastIndexOf("/") + 1;
-          if (index >= 0 && index <= url.length()) {
-            filename = url.substring(index);
-          }
+          FileUtils.getFilename(url);
         }
 
-        // Append to "url" as needed to satisfy the keyboard download endpoint
-        // Usage: download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
-        String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Language);
-        String languageStr = (languageID != null) ? String.format("&language=%s", languageID) : "";
-        url = String.format("%s%s", url, languageStr);
+        // Parse the url for the BCP 47 language ID
+        Uri uri = Uri.parse(url);
+        String languageID = uri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
 
-        String platform = data.getQueryParameter("platform");
-        String platformStr = (platform != null) ? String.format("&platform=%s", platform) : "";
-        url = String.format("%s%s", url, platformStr);
+        // Keyboard download endpoint:
+        // download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
+        url = url.toLowerCase();
 
         // Only handle ad-hoc kmp packages or from keyman.com
-        if (FileUtils.hasKeymanPackageExtension(url) || data.getScheme().toLowerCase().equals("keyman")) {
+        if (FileUtils.hasKeymanPackageExtension(url) || scheme.equals("keyman")) {
           try {
             // Download the KMP to app cache
-            downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
+            Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
             downloadIntent.putExtra("url", url);
             downloadIntent.putExtra("filename", filename);
             downloadIntent.putExtra("language", languageID);
@@ -860,7 +903,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           Manifest.permission.WRITE_EXTERNAL_STORAGE},
         PERMISSION_REQUEST_STORAGE);
     } else {
-      // Request the permission. The result will be received in onRequestPermissionResult().
+      // Request the permission. The result will be received in onRequestPermissionsResult().
       ActivityCompat.requestPermissions(this,
         new String[]{
           Manifest.permission.READ_EXTERNAL_STORAGE,

@@ -11,7 +11,7 @@ namespace com.keyman.utils {
   export function deepCopy<T>(p:T, c0?): T {
     var c = c0 || {};
     for (var i in p) {
-      if(typeof p[i] === 'object') {
+      if(typeof p[i] === 'object' && p[i] != null) {
         c[i] = (p[i].constructor === Array ) ? [] : {};
         deepCopy(p[i],c[i]);
       }

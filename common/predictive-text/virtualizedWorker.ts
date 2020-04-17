@@ -1,4 +1,3 @@
-/// <reference path="lmlayer-interface.ts" />
 /// <reference path="embedded_worker.d.ts" />
 /// <reference path="worker-interface.d.ts" />
 
@@ -10,11 +9,11 @@ namespace com.keyman.text.prediction {
   var vm = require("vm");
 
   class VirtualizedWorkerContext {
-    // The LMLayerWorker assigns itself to 'window', so we provide an alias.
-    window: any;
+    // The LMLayerWorker installs itself to 'self', the expected Worker global, so we provide an alias.
+    self: VirtualizedWorkerContext;
 
     constructor() {
-      this.window = this;
+      this.self = this;
     }
 
     postMessage: (message: any, options: PostMessageOptions) => void;
@@ -43,21 +42,15 @@ namespace com.keyman.text.prediction {
    *        In the future, it might be nice to use Node's Worker Threads implementation.
    */
   export class VirtualizedWorker implements Worker {
-    private _worker: any;  // Really, the LMLayerWorker... but some of its types are problematic for headless.
     private _workerContext: VirtualizedWorkerContext;
 
-    constructor() {
+    constructor(scriptStr: string) {
       this._workerContext = new VirtualizedWorkerContext();
       // Needs to exist before setting up the worker; must exist by `.install()`.
       this._workerContext.postMessage = this.workerPostMessage.bind(this);
 
       // Initialize the "worker".
-      let script = LMLayerBase.unwrap(LMLayerWorkerCode);
-      this._workerContext.__importScriptString(script);
-      this._workerContext['LMLayerWorker'].install(this._workerContext);
-
-      // Establish the bridge between worker and outer layer.
-      this._worker = this._workerContext['LMLayerWorker'];
+      this._workerContext.__importScriptString(scriptStr);
     }
 
     // Sends the worker's postMessage messages to the appropriate `onmessage` handler.
@@ -88,12 +81,6 @@ namespace com.keyman.text.prediction {
 
     terminate(): void {
       this._workerContext = null;
-    }
-  }
-
-  export class VirtualizedWorkerFactory implements com.keyman.text.prediction.WorkerFactory {
-    constructInstance(): Worker {
-      return new VirtualizedWorker();
     }
   }
 }
