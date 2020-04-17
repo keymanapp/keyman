@@ -1,11 +1,13 @@
+# Build products
+src/environment.inc.ts
+
 # Legacy build folders.
 output/
 build/
 embedded/
 
-# Current build folders.
-intermediate/
-release/
+# Current build output folder (matches standard node publish location).
+dist/
 
 # Other local files.
 node_modules/

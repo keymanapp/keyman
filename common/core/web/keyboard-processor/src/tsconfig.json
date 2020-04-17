@@ -2,14 +2,14 @@
   "compilerOptions": {
 	"allowJs": true,
 	"module": "none",
-	"outDir": "../intermediate/",
+	"outDir": "../dist/",
 	"inlineSources": true,
   "sourceMap": true,
   "sourceRoot": "/keyman/",
   "target": "es5",
   "types": ["node"],
   "lib": ["es6"],
-  "outFile": "../intermediate/keyboard-processor/index.js"
+  "outFile": "../dist/index.js"
   },
   "files": [
     "../node_modules/@keymanapp/lexical-model-types/index.d.ts",
