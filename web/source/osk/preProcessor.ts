@@ -49,7 +49,7 @@ namespace com.keyman.osk {
         outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
   
         let Lkc = PreProcessor._GetClickEventProperties(e['key'].spec as keyboards.ActiveKey, Lelem);
-        if(keyman.modelManager.enabled) {
+        if(keyman.core.languageProcessor.enabled) {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;
         }
