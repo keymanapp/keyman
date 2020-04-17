@@ -66,8 +66,6 @@ namespace com.keyman.text.prediction {
 
     // Allows for easy model lookup by language code; useful when switching keyboards.
     languageModelMap: {[language:string]: ModelSpec} = {};
-
-    static EVENT_PREFIX: string = "kmw.mm.";
     
     init() {
       let keyman = com.keyman.singleton;
