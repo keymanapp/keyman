@@ -2,19 +2,18 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 
 let LMLayer = require('../../build');
-let LMLayerBase = LMLayer.LMLayerBase;
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
 describe('LMLayer', function() {
   describe('[[constructor]]', function () {
     it('should accept a Worker to instantiate', function () {
-      new LMLayerBase(capabilities(), createFakeWorker());
+      new LMLayer(capabilities(), createFakeWorker());
     });
 
     it('should send the `config` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
-      let lmLayer = new LMLayerBase(capabilities(), fakeWorker);
+      let lmLayer = new LMLayer(capabilities(), fakeWorker);
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 1);
       // In the "Worker", assert the message looks right
@@ -29,7 +28,7 @@ describe('LMLayer', function() {
     it('should accept capabilities and model description', function () {
       let fakeWorker = createFakeWorker();
 
-      let lmLayer = new LMLayerBase(capabilities(), fakeWorker);
+      let lmLayer = new LMLayer(capabilities(), fakeWorker);
       lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
@@ -37,7 +36,7 @@ describe('LMLayer', function() {
 
     it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
-      let lmLayer = new LMLayerBase(capabilities(), fakeWorker);
+      let lmLayer = new LMLayer(capabilities(), fakeWorker);
       let configuration = await lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
@@ -76,7 +75,7 @@ describe('LMLayer', function() {
         }));
       });
 
-      let lmLayer = new LMLayerBase(capabilities, fakeWorker);
+      let lmLayer = new LMLayer(capabilities, fakeWorker);
       let actualConfiguration = await lmLayer.loadModel(
         {
           maxLeftContextCodeUnits: 32,
