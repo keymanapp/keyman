@@ -1,5 +1,3 @@
-///<reference path="workerFactory.ts" />
-
 namespace com.keyman.text.prediction {
   export abstract class LMLayerBase {
     /**
@@ -19,9 +17,9 @@ namespace com.keyman.text.prediction {
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(capabilities: Capabilities, workerFactory: WorkerFactory) {
+    constructor(capabilities: Capabilities, worker: Worker) {
       // Either use the given worker, or instantiate the default worker.
-      this._worker = workerFactory.constructInstance();
+      this._worker = worker;
       this._worker.onmessage = this.onMessage.bind(this)
       this._declareLMLayerReady = null;
       this._predictPromises = new PromiseStore;

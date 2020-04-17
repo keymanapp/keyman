@@ -23,7 +23,6 @@
 /// <reference path="node_modules/es6-shim/es6-shim.min.js" />
 /// <reference path="promise-store.ts" />
 /// <reference path="lmlayer-interface.ts" />
-/// <reference path="web-workerFactory.ts" />
 
 /**
  * Top-level interface to the Language Modelling layer, or "LMLayer" for short.
@@ -53,8 +52,9 @@ namespace com.keyman.text.prediction {
      * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
      *            or file: URI. If uri is not provided, this will start the default Worker.
      */
-    constructor(capabilities: Capabilities) {
-      super(capabilities, new WebWorkerFactory());
+    constructor(capabilities: Capabilities, worker?: Worker) {
+      worker = worker || DefaultWorker.constructInstance();
+      super(capabilities, worker);
     }
   }
 }
