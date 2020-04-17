@@ -1,4 +1,22 @@
 namespace com.keyman.text.prediction {
+  export interface ModelSpec {
+    /**
+     * The model's unique identifier.
+     */
+    id: string;
+
+    /**
+     * The list of supported BCP-47 language codes.  Only one language should be supported,
+     * although multiple variants based on region code (at min) may be specified.
+     */
+    languages: string[];
+
+    /**
+     * The path/URL to the file that defines the model.
+     */
+    path: string;
+  }
+
   /**
    * Corresponds to the 'suggestionsready' LanguageProcessor event.
    */
@@ -21,6 +39,42 @@ namespace com.keyman.text.prediction {
    * Corresponds to the 'invalidatesuggestions' LanguageProcessor event.
    */
   export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
+
+  export class TranscriptionContext implements Context {
+    left: string;
+    right?: string;
+
+    startOfBuffer: boolean;
+    endOfBuffer: boolean;
+
+    constructor(mock: Mock, config: Configuration) {
+      this.left = mock.getTextBeforeCaret();
+      this.startOfBuffer = this.left._kmwLength() > config.leftContextCodePoints;
+      if(!this.startOfBuffer) {
+        // Our custom substring version will return the last n characters if param #1 is given -n.
+        this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
+      }
+
+      this.right = mock.getTextAfterCaret();
+      this.endOfBuffer = this.right._kmwLength() > config.leftContextCodePoints;
+      if(!this.endOfBuffer) {
+        this.right = this.right._kmwSubstr(0, config.leftContextCodePoints);
+      }
+    }
+  }
+
+  export class ReadySuggestions {
+    suggestions: Suggestion[];
+    transcriptionID: number;
+
+    constructor(suggestions: Suggestion[], id: number) {
+      this.suggestions = suggestions;
+      this.transcriptionID = id;
+    }
+  }
+
+  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "statechange" | "tryaccept" | "tryrevert";
+  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | StateChangeHandler | TryUIHandler;
 
   export class LanguageProcessor extends EventEmitter {
     private lmEngine: LMLayer;
@@ -85,7 +139,7 @@ namespace com.keyman.text.prediction {
       });
     }
 
-    public invalidateContext() {
+    public invalidateContext(outputTarget?: OutputTarget) {
       // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
       this.emit('invalidatesuggestions', 'context');
 
@@ -95,7 +149,9 @@ namespace com.keyman.text.prediction {
         return;
       }
       
-      this.predict_internal();
+      if(outputTarget) {
+        this.predict_internal(outputTarget.buildTranscriptionFrom(outputTarget, null));
+      }
     }
 
     public wordbreak(target: OutputTarget): Promise<string> {
@@ -107,7 +163,7 @@ namespace com.keyman.text.prediction {
       return this.lmEngine.wordbreak(context);
     }
 
-    public predict(transcription?: Transcription): Promise<Suggestion[]> {
+    public predict(transcription: Transcription): Promise<Suggestion[]> {
       if(!this.isActive) {
         return null;
       }
@@ -125,19 +181,23 @@ namespace com.keyman.text.prediction {
       return this.predict_internal(transcription);
     }
 
+    public predictFromTarget(outputTarget: OutputTarget): Promise<Suggestion[]> {
+      if(!outputTarget) {
+        return null;
+      }
+
+      let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null);
+      return this.predict(transcription);
+    }
+
     /**
      * Called internally to do actual predictions after any relevant "invalidatesuggestions" events
      * have been raised.
      * @param transcription The triggering transcription (if it exists)
      */
-    private predict_internal(transcription?: Transcription): Promise<Suggestion[]> {
+    private predict_internal(transcription: Transcription): Promise<Suggestion[]> {
       if(!transcription) {
-        let t = dom.Utils.getOutputTarget();
-        if(t) {
-          transcription = t.buildTranscriptionFrom(t, null);
-        } else {
-          return null;
-        }
+        return null;
       }
 
       let context = new TranscriptionContext(transcription.preInput, this.configuration);
