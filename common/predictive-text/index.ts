@@ -193,8 +193,6 @@ namespace com.keyman.text.prediction {
     module.exports = ns.LMLayer;
     //@ts-ignore
     ns.LMLayer.PromiseStore = ns.PromiseStore;
-    //@ts-ignore
-    ns.LMLayer.LMLayerBase = ns.LMLayerBase;
   } else {
     //@ts-ignore
     window.LMLayer = ns.LMLayer;
