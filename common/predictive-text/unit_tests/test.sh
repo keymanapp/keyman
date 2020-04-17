@@ -21,7 +21,7 @@ display_usage ( ) {
 
 init_dependencies ( ) {
   # Ensure all testing dependencies are in place.
-  npm install
+  verify_npm_setup
 }
 
 test-headless ( ) {
