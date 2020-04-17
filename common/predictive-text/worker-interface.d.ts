@@ -1,4 +1,5 @@
-// Necessary for headless compilation.  All contents were copied from the definitions in lib.dom.d.ts.
+// Necessary for headless compilation.  All contents were copied from the definitions in lib.dom.d.ts and trimmed for
+// relevance.
 
 /** A message received by a target object. */
 interface MessageEvent extends Event {
@@ -6,22 +7,8 @@ interface MessageEvent extends Event {
    * Returns the data of the message.
    */
   readonly data: any;
-  /**
-   * Returns the last event ID string, for server-sent events.
-   */
-  readonly lastEventId: string;
-  /**
-   * Returns the origin of the message, for server-sent events and cross-document messaging.
-   */
-  readonly origin: string;
-  /**
-   * Returns the MessagePort array sent with the message, for cross-document messaging and channel messaging.
-   */
-  readonly ports: ReadonlyArray<MessagePort>;
-  /**
-   * Returns the WindowProxy of the source window, for cross-document messaging, and the MessagePort being attached, in the connect event fired at SharedWorkerGlobalScope objects.
-   */
-  readonly source: MessageEventSource | null;
+  
+  // Other properties exist; we just don't use them yet.
 }
 
 interface PostMessageOptions {
@@ -34,8 +21,6 @@ interface Worker {
   postMessage(message: any, transfer: Transferable[]): void;
   postMessage(message: any, options?: PostMessageOptions): void;
   terminate(): void;
-  addEventListener<K extends keyof WorkerEventMap>(type: K, listener: (this: Worker, ev: WorkerEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-  addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener<K extends keyof WorkerEventMap>(type: K, listener: (this: Worker, ev: WorkerEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-  removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+  
+  // addEventListener and removeEventListener also exist, but we don't utilize them.
 }
