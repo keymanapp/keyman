@@ -1,4 +1,27 @@
 namespace com.keyman.text.prediction {
+  /**
+   * Corresponds to the 'suggestionsready' LanguageProcessor event.
+   */
+  export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
+
+  export type StateChangeEnum = 'active'|'inactive';
+  /**
+   * Corresponds to the 'statechange' LanguageProcessor event.
+   */
+  export type StateChangeHandler = (state: StateChangeEnum) => boolean;
+
+  /**
+   * Covers both 'tryaccept' and 'tryrevert' events.
+   */
+  export type TryUIHandler = (source: string) => boolean;
+
+  export type InvalidateSourceEnum = 'new'|'context';
+
+  /**
+   * Corresponds to the 'invalidatesuggestions' LanguageProcessor event.
+   */
+  export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
+
   export class LanguageProcessor {
     private lmEngine: LMLayer;
     private currentModel?: ModelSpec;
@@ -36,6 +59,9 @@ namespace com.keyman.text.prediction {
       this.lmEngine.unloadModel();
       delete this.currentModel;
       delete this.configuration;
+
+      let keyman = com.keyman.singleton;
+      keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', 'inactive');
     }
 
     loadModel(model: ModelSpec): Promise<void> {
@@ -50,6 +76,14 @@ namespace com.keyman.text.prediction {
       return this.lmEngine.loadModel(file).then(function(config: Configuration) { 
         mm.currentModel = model;
         mm.configuration = config;
+
+        try {
+          let keyman = com.keyman.singleton;
+          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', 'active');
+        } catch (err) {
+          // Does this provide enough logging information?
+          console.error("Could not load model '" + model.id + "': " + (err as Error).message);
+        }
       });
     }
 
@@ -69,11 +103,19 @@ namespace com.keyman.text.prediction {
     }
 
     public wordbreak(target: OutputTarget): Promise<string> {
+      if(!this.isActive) {
+        return null;
+      }
+
       let context = new TranscriptionContext(Mock.from(target), this.configuration);
       return this.lmEngine.wordbreak(context);
     }
 
     public predict(transcription?: Transcription) {
+      if(!this.isActive) {
+        return;
+      }
+
       let keyman = com.keyman.singleton;
 
       // If there's no active model, there can be no predictions.
@@ -149,21 +191,16 @@ namespace com.keyman.text.prediction {
       this.lmEngine.shutdown();
     }
 
-    public get enabled(): boolean {
+    public get isActive(): boolean {
+      if(!this.canEnable()) {
+        this._mayPredict = false;
+        return false;
+      }
       return this.activeModel && this._mayPredict;
     }
 
-    private canEnable(): boolean {
-      let keyman = com.keyman.singleton;
-
-      if(keyman.util.getIEVersion() == 10) {
-        console.warn("KeymanWeb cannot properly initialize its WebWorker in this version of IE.");
-        return false;
-      } else if(keyman.util.getIEVersion() < 10) {
-        console.warn("WebWorkers are not supported in this version of IE.");
-        return false;
-      }
-
+    public canEnable(): boolean {
+      // Is overridden for dom-aware KMW in case of old IE versions.
       return true;
     }
 
@@ -172,15 +209,16 @@ namespace com.keyman.text.prediction {
     }
 
     public set mayPredict(flag: boolean) {
-      let enabled = this.enabled;
-
       if(!this.canEnable()) {
         return;
       }
 
+      let oldVal = this._mayPredict;
       this._mayPredict = flag;
-      if(enabled != this.enabled || flag) {
-        com.keyman.singleton.modelManager.doEnable(flag);
+
+      if(oldVal != flag) {
+        let keyman = com.keyman.singleton;
+        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'statechange', flag ? 'active' : 'inactive');
       }
     }
 

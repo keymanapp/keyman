@@ -47,12 +47,8 @@ namespace com.keyman.text.prediction {
     }
   }
 
-  export type InvalidateSourceEnum = 'new'|'context';
-
-  /**
-   * Corresponds to the 'invalidatesuggestions' ModelManager event.
-   */
-  export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
+  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "statechange" | "tryaccept" | "tryrevert";
+  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | StateChangeHandler | TryUIHandler;
 
   export class ReadySuggestions {
     suggestions: Suggestion[];
@@ -63,25 +59,6 @@ namespace com.keyman.text.prediction {
       this.transcriptionID = id;
     }
   }
-
-  /**
-   * Corresponds to the 'suggestionsready' ModelManager event.
-   */
-  export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
-
-  export type ModelChangeEnum = 'loaded'|'unloaded';
-  /**
-   * Corresponds to the 'modelchange' ModelManager event.
-   */
-  export type ModelChangeHandler = (state: ModelChangeEnum) => boolean;
-
-  /**
-   * Covers both 'tryaccept' and 'tryrevert' events.
-   */
-  export type TryUIHandler = (source: string) => boolean;
-
-  type SupportedEventNames = "suggestionsready" | "invalidatesuggestions" | "modelchange" | "tryaccept" | "tryrevert";
-  type SupportedEventHandler = InvalidateSuggestionsHandler | ReadySuggestionsHandler | ModelChangeHandler | TryUIHandler;
 
   export class ModelManager {
     // Tracks registered models by ID.
@@ -103,10 +80,6 @@ namespace com.keyman.text.prediction {
       let keyman = com.keyman.singleton;
       let core = keyman.core;
 
-      if(!core.languageProcessor.mayPredict) {
-        return Promise.resolve();
-      }
-
       if(typeof kbdInfo == 'string') {  // This case refers to the active language code.
         kbdInfo = {
           ['internalName']: keyman.keyboardManager.getActiveKeyboardName(),
@@ -122,29 +95,10 @@ namespace com.keyman.text.prediction {
       if(core.activeModel !== model) {
         if(core.activeModel) {
           core.languageProcessor.unloadModel();
-          keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
         }
 
         if(model) {
           loadPromise = core.languageProcessor.loadModel(model);
-        }
-
-        // If we're loading a model, we need to defer until its completion before we report a change of state.
-        if(loadPromise) {
-          let mm = this;
-          loadPromise.then(function() {
-            // Because this is executed from a Promise, it's possible to have a race condition
-            // where the 'loaded' event triggers after an 'unloaded' event meant to disable the model.
-            // (Especially in the embedded apps.)  This will catch these cases.
-            if(core.languageProcessor.mayPredict) {
-              keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'loaded');
-            } else {
-              core.languageProcessor.unloadModel();
-            }
-          }).catch(function(failReason: any) {
-            // Does this provide enough logging information?
-            console.error("Could not load model '" + model.id + "': " + failReason);
-          });
         }
       }
     }
@@ -185,7 +139,6 @@ namespace com.keyman.text.prediction {
       // Is it the active model?
       if(core.activeModel && core.activeModel.id == modelId) {
         core.languageProcessor.unloadModel();
-        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
       }
 
       // Ensure the model is deregistered for each targeted language code variant.
@@ -199,25 +152,6 @@ namespace com.keyman.text.prediction {
 
     isRegistered(model: ModelSpec): boolean {
       return !! this.registeredModels[model.id];
-    }
-
-    doEnable(flag: boolean) {
-      let keyman = com.keyman.singleton;
-
-      if(flag) {
-        let lgCode = keyman.keyboardManager.getActiveLanguage();
-        if(keyman.modelManager.languageModelMap[lgCode]) {
-          // Just reuse the existing model-change trigger code.
-          keyman.modelManager.onKeyboardChange(lgCode);
-        }
-      } else {
-        if(keyman.core.activeModel) { // We only need to unload a model when one is actually loaded.
-          keyman.core.languageProcessor.unloadModel();
-        }
-
-        // Ensure that the banner is unloaded.
-        keyman.util.callEvent(ModelManager.EVENT_PREFIX + 'modelchange', 'unloaded');
-      }
     }
 
     /**
