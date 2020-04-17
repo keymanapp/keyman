@@ -188,16 +188,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Check if Node.JS/npm is installed.
-type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-
-if (( fetch_deps )); then
-  # Before installing, ensure that the local npm package we need can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
-
-  echo "Dependencies check"
-  npm install --no-optional
-fi
+verify_npm_setup
 
 build || fail "Browser-oriented compilation failed."
 build_headless || fail "Headless compilation failed."

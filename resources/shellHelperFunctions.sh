@@ -257,3 +257,24 @@ set_npm_version () {
   # individual build systems don't take too much ownership of git tagging. :)
   npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
 }
+
+verify_npm_setup () {
+  # Check if Node.JS/npm is installed.
+  type npm >/dev/null ||\
+      fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+
+  if (( fetch_deps )); then
+    type lerna >/dev/null ||\
+        fail "Build environment setup error detected!  Please run \`npm install -g lerna\` to install lerna"
+
+    # Before installing, use lerna to ensure repo-internal dependencies are all properly linked
+    lerna bootstrap
+
+    echo "Dependencies check"
+    npm install --no-optional
+
+    if [ $? -ne 0 ]; then
+      fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    fi
+  fi
+}
