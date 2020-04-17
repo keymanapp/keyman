@@ -106,18 +106,17 @@ describe('LMLayer', function() {
   });
 
   /**
-   * Returns a factory producing an object implementing *enough* of the Worker interface 
-   * to fool the LMLayer into thinking it's communicating with a bona fide Web Worker.
+   * Returns an object implementing *enough* of the Worker
+   * interface to fool the LMLayer into thinking it's
+   * communicating with a bona fide Web Worker.
    * 
-   * Also stores the produced instance for use in assertions.
-   * 
-   * @returns {WorkerFactory} a 'factory' class returning a Worker object with sinon.fake() instances.
+   * @returns {Worker} an object with sinon.fake() instances.
    */
   function createFakeWorker(postMessage) {
     return {
-      postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
-      onmessage: null
-    };
+        postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
+        onmessage: null
+      };
   }
 
   /**
