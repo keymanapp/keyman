@@ -12,8 +12,7 @@ global.keyman = {}; // So that keyboard-based checks against the global `keyman`
 // Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);    
 
-// Test the top-level LMLayer interface.
-// Note: these tests can only be run after BOTH stages of compilation are completed.
+// Test the KeyboardProcessor interface.
 describe('KeyboardProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {

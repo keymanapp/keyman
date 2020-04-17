@@ -21,3 +21,8 @@
   publishAPI("_GetAbsolute", "getAbsolute");
   publishAPI("toNzString", "nzString");
 }());
+
+(function() {
+  // DOM-aware KeymanWeb overwrites some of the API functions.
+  com.keyman.text.KeyboardInterface.__publishShorthandAPI();
+}());
