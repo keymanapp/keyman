@@ -1,5 +1,5 @@
 // References the KMW string extensions.
-/// <reference path="../text/kmwstring.ts" />
+/// <reference path="../../node_modules/keyman-keyboard-processor/src/text/kmwstring.ts" />
 // References extra HTML definitions not included by default in TS.
 /// <reference path="../kmwexthtml.ts" />
 // References device-specific code checks (separable module from KMW)

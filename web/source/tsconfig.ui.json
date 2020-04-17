@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [
+    "../node_modules/@keymanapp/lexical-model-types/index.d.ts",
+    "../node_modules/keyman-keyboard-processor/src/text/outputTarget.ts",
 		"kmwuibutton.ts",
 		"kmwuifloat.ts",
 		"kmwuitoggle.ts", 

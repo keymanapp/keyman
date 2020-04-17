@@ -1,5 +1,5 @@
 // Defines the text processing KMW core.
-///<reference path="../keyboardProcessor.ts" />
+/// <reference path="../../../node_modules/keyman-keyboard-processor/src/text/keyboardProcessor.ts" />
 // Defines the KeyboardManager and its related types.
 ///<reference path="../../keyboards/kmwkeyboards.ts" />
 

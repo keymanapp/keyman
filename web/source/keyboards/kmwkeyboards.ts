@@ -1,5 +1,4 @@
 /// <reference path="../kmwbase.ts" />
-/// <reference path="keyboard.ts" />
 
 namespace com.keyman.keyboards {
   class CloudRequestEntry {

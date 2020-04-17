@@ -1,5 +1,6 @@
 {
   "packages": [
+    "common/core/web/keyboard-processor",
     "common/predictive-text",
     "common/lexical-model-types",
     "web"

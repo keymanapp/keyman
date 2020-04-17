@@ -1,5 +1,4 @@
-/// <reference path="../keyboards/activeLayout.ts" />
-/// <reference path="../utils/version.ts" />
+/// <reference path="../../node_modules/keyman-keyboard-processor/src/keyboards/activeLayout.ts" />
 /// <reference path="preProcessor.ts" />
 
 namespace com.keyman.osk {

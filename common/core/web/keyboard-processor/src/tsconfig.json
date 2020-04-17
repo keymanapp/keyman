@@ -12,6 +12,7 @@
   "outFile": "../intermediate/keyboard-processor/index.js"
   },
   "files": [
+    "../node_modules/@keymanapp/lexical-model-types/index.d.ts",
 		"text/keyboardProcessor.ts"
   ]
 }

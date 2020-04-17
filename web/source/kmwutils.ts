@@ -5,7 +5,7 @@
 // Includes the DOM utils, since our UI modules need access to certain methods here.
 /// <reference path="dom/utils.ts" />
 // Include other important utils
-/// <reference path="utils/deepCopy.ts" />
+/// <reference path="../node_modules/keyman-keyboard-processor/src/utils/deepCopy.ts" />
 
 namespace com.keyman {
   class DOMEventTracking {

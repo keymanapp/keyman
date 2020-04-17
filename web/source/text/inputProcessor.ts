@@ -1,7 +1,7 @@
 // Defines a 'polyfill' of sorts for NPM's events module
 /// <reference path="../includes/events.ts" />
 /// <reference path="../includes/lmMsgs.d.ts" />
-/// <reference path="keyboardProcessor.ts" />
+/// <reference path="../../node_modules/keyman-keyboard-processor/src/text/keyboardProcessor.ts" />
 /// <reference path="prediction/languageProcessor.ts" />
 
 namespace com.keyman.text {
