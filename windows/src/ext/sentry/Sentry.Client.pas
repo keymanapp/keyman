@@ -389,6 +389,11 @@ begin
       raw_frame_count := 0;
     end;
 
+    // We will rebuild the module list at time of event in order to ensure we
+    // don't lose dynamically loaded modules, as far as possible. This is
+    // potentially slow, but this is probably a fatal code path anyway ...
+    sentry_clear_modulecache;
+
     uuid := sentry_capture_event(event);
     Result := EventIDToString(@uuid.bytes[0]);
 
