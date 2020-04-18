@@ -312,14 +312,17 @@ end;
 
 function TSentryClient.EventIDToString(AGuid: PByte): String;
 var
-  Guid: PGUID;
+  i: Integer;
+  p: PChar;
 begin
-  Guid := PGUID(@AGuid[0]);
-  // Copied from System.SysUtils.GuidToString and cleaned up for use with Sentry
   SetLength(Result, 32);
-  StrLFmt(PChar(Result), 32, '%.8X%.4X%.4X%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X',   // do not localize
-    [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
-    Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+  p := PChar(Result);
+  for i := 0 to 15 do
+  begin
+    StrLFmt(p, 2, '%.2X', [AGuid^]);
+    Inc(p, 2);
+    Inc(AGuid);
+  end;
 end;
 
 function TSentryClient.ConvertRawStackToSentryStack: sentry_value_t;
