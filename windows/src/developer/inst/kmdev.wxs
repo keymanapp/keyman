@@ -187,6 +187,10 @@
       </Component>
 
       <Component>
+        <File Name="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
       </Component>
 
