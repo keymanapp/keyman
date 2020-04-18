@@ -38,6 +38,7 @@ type
     const LOGGER_DEVELOPER_TOOLS = 'KeymanDeveloper.Tools';
     const LOGGER_DESKTOP = 'KeymanDesktop';
     const LOGGER_DESKTOP_ENGINE = 'KeymanDesktop.Engine';
+    const S_Sentry_ViewEvent_URL = 'https://sentry.keyman.com/organizations/keyman/projects/%0:s/events/%1:s/'; // Do not localize
   end;
 
 
@@ -102,9 +103,10 @@ end;
 procedure TKeymanSentryClient.ClientAfterEvent(Sender: TObject;
   EventType: TSentryClientEventType; const EventID, EventClassName, Message: string;
   var EventAction: TSentryClientEventAction);
-{$IF NOT DEFINED(CONSOLE)}
 var
-  AppID, ApplicationTitle, CommandLine, ProjectName: string;
+  AppID, ProjectName: string;
+{$IF NOT DEFINED(CONSOLE)}
+  ApplicationTitle, CommandLine: string;
 {$ENDIF}
 begin
   if EventType = scetException then
@@ -115,24 +117,29 @@ begin
 
     if kscfShowUI in FFlags then
     begin
-{$IF DEFINED(CONSOLE)}
-      // Write to console
-      writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
-      if FClient.ReportExceptions then
-        writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
-      writeln(ErrOutput);
-{$ELSE}
-      // Launch external gui exception dialog app.
-      // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
       AppID := LowerCase(ChangeFileExt(ExtractFileName(ParamStr(0)), ''))+'-'+CKeymanVersionInfo.VersionWithTag;
-      if Assigned(Application)
-        then ApplicationTitle := Application.Title
-        else ApplicationTitle := AppID;
 
       if FProject = kscpDesktop
         then ProjectName := SENTRY_PROJECT_NAME_DESKTOP
         else ProjectName := SENTRY_PROJECT_NAME_DEVELOPER;
 
+{$IF DEFINED(CONSOLE)}
+      // Write to console
+      writeln(ErrOutput, 'Fatal error '+EventClassName+': '+Message);
+      if FClient.ReportExceptions then
+      begin
+        writeln(ErrOutput, 'This error has been automatically reported to the Keyman team.');
+        writeln(ErrOutput, '  Identifier:  '+EventID);
+        writeln(ErrOutput, '  Application: '+AppID);
+        writeln(ErrOutput, '  Reported at: '+Format(S_Sentry_ViewEvent_URL, [ProjectName, EventID]));
+      end;
+      writeln(ErrOutput);
+{$ELSE}
+      // Launch external gui exception dialog app.
+      // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
+      if Assigned(Application)
+        then ApplicationTitle := Application.Title
+        else ApplicationTitle := AppID;
 
       CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s"', [
         IfThen(EventID = '', '_', EventID),
