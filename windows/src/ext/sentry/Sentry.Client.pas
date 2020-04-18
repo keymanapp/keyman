@@ -104,6 +104,7 @@ const
 threadvar
   raw_frames: array[0..MAX_FRAMES-1] of NativeUInt;
   raw_frame_count: Integer;
+  raw_except_addr: Pointer;
 
 type
   PEXCEPTION_POINTERS = ^EXCEPTION_POINTERS;
@@ -160,12 +161,13 @@ begin
   if ExceptionErrorMessage(E, AExceptAddr, Buffer, BufferSize) = 0 then
     StrCopy(Buffer, 'Unknown exception');
 
-  if raw_frame_count = 0 then
+  if (raw_frame_count = 0) or (raw_except_addr <> AExceptAddr) then
   begin
     // If we get here, this is most likely an exception that was
     // never raised, as otherwise our vectored handler should have
     // already captured a more accurate stack for us. Let's get something
     // from this
+    raw_except_addr := AExceptAddr;
     CaptureStackTrace(AExceptAddr, FRAMES_TO_SKIP);
   end;
 
@@ -190,7 +192,7 @@ var
   Skip: Integer;
   LastMask: TArithmeticExceptionMask;
 begin
-  if raw_frame_count = 0 then
+  if (raw_frame_count = 0) or (raw_except_addr <> ExceptionInfo.ExceptionRecord.ExceptionAddress) then
   begin
     // Floating point state may be broken here, so let's mask it out and continue
     // We'll restore state afterwards
@@ -200,6 +202,7 @@ begin
       then Skip := DELPHI_FRAMES_TO_SKIP
       else Skip := 0;
     CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
+    raw_except_addr := ExceptionInfo.ExceptionRecord.ExceptionAddress;
 
     // Restore FP state
     System.Math.SetExceptionMask(LastMask);
@@ -423,7 +426,7 @@ begin
     if IncludeStack then
     begin
       CaptureStackTrace(nil, FRAMES_TO_SKIP);
-      if raw_frame_count <> 0 then
+      if raw_frame_count > 0 then
       begin
         threads := ConvertRawStackToSentryStack;
         if threads <> 0 then
