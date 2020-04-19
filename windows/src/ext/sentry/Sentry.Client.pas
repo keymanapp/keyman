@@ -104,7 +104,6 @@ const
 threadvar
   raw_frames: array[0..MAX_FRAMES-1] of NativeUInt;
   raw_frame_count: Integer;
-  raw_except_addr: Pointer;
 
 type
   PEXCEPTION_POINTERS = ^EXCEPTION_POINTERS;
@@ -161,13 +160,12 @@ begin
   if ExceptionErrorMessage(E, AExceptAddr, Buffer, BufferSize) = 0 then
     StrCopy(Buffer, 'Unknown exception');
 
-  if (raw_frame_count = 0) or (raw_except_addr <> AExceptAddr) then
+  if (raw_frame_count = 0) or (raw_frames[0] <> NativeUInt(AExceptAddr)) then
   begin
     // If we get here, this is most likely an exception that was
     // never raised, as otherwise our vectored handler should have
     // already captured a more accurate stack for us. Let's get something
     // from this
-    raw_except_addr := AExceptAddr;
     CaptureStackTrace(AExceptAddr, FRAMES_TO_SKIP);
   end;
 
@@ -192,21 +190,17 @@ var
   Skip: Integer;
   LastMask: TArithmeticExceptionMask;
 begin
-  if (raw_frame_count = 0) or (raw_except_addr <> ExceptionInfo.ExceptionRecord.ExceptionAddress) then
-  begin
-    // Floating point state may be broken here, so let's mask it out and continue
-    // We'll restore state afterwards
-    LastMask := System.Math.SetExceptionMask([]);
+  // Floating point state may be broken here, so let's mask it out and continue
+  // We'll restore state afterwards
+  LastMask := System.Math.SetExceptionMask([]);
 
-    if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
-      then Skip := DELPHI_FRAMES_TO_SKIP
-      else Skip := 0;
-    CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
-    raw_except_addr := ExceptionInfo.ExceptionRecord.ExceptionAddress;
+  if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
+    then Skip := DELPHI_FRAMES_TO_SKIP
+    else Skip := 0;
+  CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
-    // Restore FP state
-    System.Math.SetExceptionMask(LastMask);
-  end;
+  // Restore FP state
+  System.Math.SetExceptionMask(LastMask);
 
   Result := 0; //EXCEPTION_CONTINUE_SEARCH;
 end;
@@ -465,14 +459,17 @@ procedure CaptureStackTrace(TopAddr: Pointer; FramesToSkip: Integer);
 var
   p: PNativeUInt;
 begin
-  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, @raw_frames[0], nil);
-
-  p := @raw_frames[raw_frame_count];
+  p := @raw_frames[0];
   if TopAddr <> nil then
   begin
     p^ := NativeUInt(TopAddr);
-    Inc(raw_frame_count);
+    Inc(p);
   end;
+
+  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, p, nil);
+
+  if TopAddr <> nil then
+    Inc(raw_frame_count);
 end;
 
 ///
