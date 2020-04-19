@@ -68,7 +68,7 @@ const
   SENTRY_DSN_DESKTOP = 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5';
   SENTRY_DSN_DEVELOPER = 'https://39b25a09410349a58fe12aaf721565af@sentry.keyman.com/6';
 
-  SENTRY_PROJECT_NAME_DESKTOP = 'keyman-desktop';
+  SENTRY_PROJECT_NAME_DESKTOP = 'keyman-windows';
   SENTRY_PROJECT_NAME_DEVELOPER = 'keyman-developer';
 
   //SENTRY_DSN = 'https://7b1ff1dae2c8495b84f90dadcf512b84@sentry.io/4853461'; <-- this is a testing-only host
