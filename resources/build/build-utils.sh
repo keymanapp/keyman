@@ -11,6 +11,7 @@
 #   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
 #   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
+#   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
@@ -74,9 +75,11 @@ function findVersion() {
     if [ -z "${TEAMCITY_VERSION-}" ]; then
         # Local dev machine, not TeamCity
         VERSION_TAG="$VERSION_TAG-local"
+        VERSION_ENVIRONMENT=local
     else
         # On TeamCity; are we running a pull request build or a master/beta/stable build?
         if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+            VERSION_ENVIRONMENT=test
             # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
             # This indicates we are running a Test build.
             if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
@@ -84,6 +87,8 @@ function findVersion() {
             else
                 VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
             fi
+        else
+            VERSION_ENVIRONMENT="$TIER"
         fi
     fi
 
@@ -97,6 +102,7 @@ function findVersion() {
     readonly VERSION_WIN
     readonly VERSION_TAG
     readonly VERSION_WITH_TAG
+    readonly VERSION_ENVIRONMENT
 }
 
 function findTier() {
@@ -189,6 +195,6 @@ exportEnvironmentDefinitionTS ( ) {
 namespace com.keyman.environment {
   export var VERSION = \"$VERSION_RELEASE\";
   export var BUILD = $VERSION_PATCH;
-}  
+}
 " >> $ENVIRONMENT_TS
 }

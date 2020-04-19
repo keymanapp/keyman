@@ -4,7 +4,7 @@ interface
 
 {$I keymanversioninfo.inc}
 
-function BuildKeymanVersionInfo(const Version, Tier, Tag: string): TKeymanVersionInfo;
+function BuildKeymanVersionInfo(const Version, Tier, Tag, Environment: string): TKeymanVersionInfo;
 
 implementation
 
@@ -15,7 +15,7 @@ uses
 type
   EKeymanVersionInfo = class(Exception);
 
-function BuildKeymanVersionInfo(const Version, Tier, Tag: string): TKeymanVersionInfo;
+function BuildKeymanVersionInfo(const Version, Tier, Tag, Environment: string): TKeymanVersionInfo;
 const
   S_Regex_Version = '^(\d+)\.(\d+)\.(\d+)$';
   S_E_InvalidVersion = 'Invalid version tag %0:s (Tier=%1:s, Tag=%2:s)';
@@ -51,6 +51,7 @@ begin
   Result.Tag := Tag;
   Result.VersionWithTag := Version + Tag;
   Result.VersionRc := Format(S_Format_Rc, [vmajor, vminor, vpatch]);
+  Result.Environment := Environment;
 end;
 
 end.

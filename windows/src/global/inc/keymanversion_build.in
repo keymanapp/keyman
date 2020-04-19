@@ -31,3 +31,6 @@
 
 #define KEYMAN_VersionRc          "$VersionRc"
 #define KEYMAN_VersionRc_W        L"$VersionRc"
+
+#define KEYMAN_Environment        "$Environment"
+#define KEYMAN_Environment_W      L"$Environment"

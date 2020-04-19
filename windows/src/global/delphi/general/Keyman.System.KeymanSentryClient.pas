@@ -260,7 +260,8 @@ begin
 
   // Note: system proxy is used automatically if no proxy is defined
 
-  o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag;
+  o.Release := 'release-'+CKeymanVersionInfo.VersionWithTag; // matches git tag
+  o.Environment := CKeymanVersionInfo.Environment; // stable, beta, alpha, test, local
 
   if kscfCaptureExceptions in FFlags
     then f := [scfCaptureExceptions]
