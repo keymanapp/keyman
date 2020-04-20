@@ -1,4 +1,5 @@
 ///<reference path="../../../node_modules/keyman-lmlayer/embedded_worker.d.ts" />
+///<reference path="../../../node_modules/keyman-lmlayer/message.d.ts" />
 ///<reference path="../../../node_modules/keyman-lmlayer/index.ts" />
 ///<reference path="../../includes/events.ts" />
 

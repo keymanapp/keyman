@@ -7,7 +7,7 @@
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
-/// <reference path="text/inputProcessor.ts" />
+/// <reference path="../node_modules/keyman-input-processor/src/text/inputProcessor.ts" />
 // Extends KeyboardInterface with DOM-oriented offerings.
 /// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.

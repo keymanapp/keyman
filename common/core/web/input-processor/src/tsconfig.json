@@ -12,7 +12,6 @@
   "outFile": "../dist/index.js"
   },
   "files": [
-    "../node_modules/keyman-lmlayer/message.d.ts",
     "../node_modules/keyman-lmlayer/node-defaultWorker.ts",
 		"text/inputProcessor.ts"
   ]
