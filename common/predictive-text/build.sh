@@ -33,7 +33,7 @@ LEXICAL_MODELS_TYPES=../lexical-model-types
 
 
 # Build the worker and the main script for browser-based use.
-build ( ) {
+build-browser ( ) {
   # Ensure that the build-product destination for any generated include .d.ts files exists.
   if ! [ -d $INCLUDES_OUTPUT ]; then
     mkdir -p "$INCLUDES_OUTPUT"
@@ -46,14 +46,11 @@ build ( ) {
 }
 
 # Build the worker and the main script for headless use.
-build_headless ( ) {
+build-headless ( ) {
   # Ensure that the build-product destination for any generated include .d.ts files exists.
   if ! [ -d $INCLUDES_OUTPUT ]; then
     mkdir -p "$INCLUDES_OUTPUT"
   fi
-
-  # Build worker first; the main file depends on it.
-  # Then wrap the worker; Then build the main file.
 
   # build-worker && wrap-worker - already built.
   build-main-headless
@@ -61,14 +58,14 @@ build_headless ( ) {
 
 # Builds the top-level JavaScript file (the second stage of compilation)
 build-main () {
-  npm run tsc -- -p ./browser.tsconfig.json || fail "Could not build top-level JavaScript file."
+  npm run tsc -- -p ./browser.tsconfig.json || fail "Could not build top-level browser-targeted JavaScript file."
   cp ./index.d.ts $INCLUDES_OUTPUT/LMLayer.d.ts
   cp ./message.d.ts $INCLUDES_OUTPUT/message.d.ts
 }
 
 # Builds the top-level JavaScript file (the second stage of compilation)
 build-main-headless () {
-  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level JavaScript file."
+  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level node-targeted JavaScript file."
 }
 
 # Builds the inner JavaScript worker (the first stage of compilation).
@@ -199,8 +196,8 @@ if (( fetch_deps )); then
   npm install --no-optional
 fi
 
-build || fail "Browser-oriented compilation failed."
-build_headless || fail "Headless compilation failed."
+build-browser || fail "Browser-oriented compilation failed."
+build-headless || fail "Headless compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then

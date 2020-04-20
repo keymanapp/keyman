@@ -18,13 +18,13 @@ namespace com.keyman.text.prediction {
 
     postMessage: (message: any, options: PostMessageOptions) => void;
 
-    importScripts() {
+    importScripts(...scriptNames: string[]) {
       /* Use of vm.createContext and script.runInContext allow us to avoid
         * polluting the global scope with imports.  When we throw away the
         * context object, imported scripts will be automatically GC'd.
         */
-      for(var i=0; i < arguments.length; i++) {
-        this.__importScriptString(fs.readFileSync(arguments[i]) as any as string);
+      for(let script of scriptNames) {
+        this.__importScriptString(fs.readFileSync(script, "UTF-8"));
       }
     }
 
@@ -54,17 +54,19 @@ namespace com.keyman.text.prediction {
     }
 
     // Sends the worker's postMessage messages to the appropriate `onmessage` handler.
-    private workerPostMessage(message: any, options: any) {
+    private workerPostMessage(message: unknown) {
       if(this.onmessage) {
         this.onmessage({data: message} as any as MessageEvent);
       }
     }
 
+    /**
+     * Accepts a callback function that will receive messages sent from the `VirtualizedWorker`'s `postMessage` function,
+     * much like the standard `Worker.onmessage`.
+     */
     onmessage: (this: Worker, ev: MessageEvent) => any;
 
-    postMessage(message: any, transfer: any[]): void;
-    postMessage(message: any, options?: PostMessageOptions): void;
-    postMessage(message: any, options?: any) {
+    postMessage(message: any) {
       let msgObj = {data: message};
       let msgJSON = JSON.stringify(msgObj);
 
