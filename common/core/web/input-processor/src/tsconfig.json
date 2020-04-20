@@ -2,17 +2,18 @@
   "compilerOptions": {
 	"allowJs": true,
 	"module": "none",
-	"outDir": "../intermediate/",
+	"outDir": "../dist/",
 	"inlineSources": true,
   "sourceMap": true,
   "sourceRoot": "/keyman/",
   "target": "es5",
   "types": ["node"],
   "lib": ["es6"],
-  "outFile": "../intermediate/web-core/index.js"
+  "outFile": "../dist/index.js"
   },
   "files": [
-		"includes/node-lmlayer.ts",
+    "../node_modules/keyman-lmlayer/message.d.ts",
+    "../node_modules/keyman-lmlayer/node-defaultWorker.ts",
 		"text/inputProcessor.ts"
   ]
 }

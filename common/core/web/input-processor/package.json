@@ -1,0 +1,37 @@
+{
+  "name": "@keymanapp/input-processor",
+  "version": "14.0.0",
+  "description": "The core text and prediction processing engine for KeymanWeb",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "keywords": [
+    "input",
+    "languages",
+    "keyboards"
+  ],
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "typescript": "^3.7.2"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "test": "bash ./unit_tests/test.sh"
+  },
+  "dependencies": {
+		"@keymanapp/keyboard-processor": "^14.0.0",
+    "@keymanapp/language-modeling-layer": "^14.0.0",
+    "@keymanapp/lexical-model-types": "^0.0.0",
+    "@types/node": "^11.9.4",
+    "eventemitter3": "^4.0.0",
+    "ts-node": "^8.0.2"
+  }
+}
