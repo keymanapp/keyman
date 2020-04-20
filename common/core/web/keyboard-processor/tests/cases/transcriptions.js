@@ -1,13 +1,13 @@
-var assert = chai.assert;
+var assert = require('chai').assert;
+
+let KeyboardProcessor = require('../../dist');
+
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
+
+String.kmwEnableSupplementaryPlane(false);
 
 describe("Transcriptions and Transforms", function() {
-  this.timeout(kmwconfig.timeouts.standard);
-
-  before(function() {
-    // Make sure the basic SMP extension hooks exist to prevent errors later.
-    String.kmwEnableSupplementaryPlane(false);
-  });
-
   it("does not store an alias for related OutputTargets", function() {
     var Mock = com.keyman.text.Mock;
 
