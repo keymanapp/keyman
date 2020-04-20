@@ -1,5 +1,6 @@
 #! /bin/bash
 
+WORKING_DIRECTORY=`pwd`
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
@@ -60,6 +61,7 @@ get_browser_set_for_OS
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
+HEADLESS_FLAGS=-no-lerna
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -67,6 +69,7 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -CI)
             CONFIG=CI.conf.js
+            HEADLESS_FLAGS="$HEADLESS_FLAGS -CI"
             ;;
         -log-level)
             shift
@@ -105,10 +108,23 @@ if [ $CONFIG = CI.conf.js ]; then
 fi
 
 BASE_PATH=`dirname $BASH_SOURCE`
+echo "$BASE_PATH"
 cd $BASE_PATH/../source
 
 ./build_dev_resources.sh
 
+# Run our headless tests first.
+# Since we're using `lerna`, this actually puts us within the projects when run in-repo!
+
+# First:  Keyboard Processor tests.
+echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
+cd $WORKING_DIRECTORY/node_modules/keyman-keyboard-processor
+./test.sh $HEADLESS_FLAGS
+
+# Once done, now we run the integrated (KeymanWeb) tests.
+cd $WORKING_DIRECTORY
+
+echo "${TERM_HEADING}Running KeymanWeb integration test suite${NORMAL}"
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js
 npm --no-color run karma -- start $FLAGS $BROWSERS unit_tests/$CONFIG
 
