@@ -8,7 +8,9 @@
 	"target": "es5"
 	},
   "files": [
-    "text/outputTarget.ts",
+		"../node_modules/keyman-keyboard-processor/src/text/outputTarget.ts",
+		"../node_modules/keyman-keyboard-processor/src/utils/version.ts",
+		"../node_modules/keyman-lmlayer/message.d.ts",
     "dom/targets/wrapElement.ts"
   ]
 }

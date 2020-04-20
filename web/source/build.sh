@@ -11,6 +11,8 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../.."
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+WORKING_DIRECTORY=`pwd`
+
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
@@ -219,6 +221,7 @@ compilecmd="$compiler"
 # Establish default build parameters
 set_default_vars ( ) {
     BUILD_LMLAYER=true
+    BUILD_CORE=true
     BUILD_UI=true
     BUILD_EMBED=true
     BUILD_FULLWEB=true
@@ -320,6 +323,17 @@ if [ $BUILD_LMLAYER = true ]; then
     echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
     cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
     echo "Language Modeling layer compilation successful."
+    echo ""
+fi
+
+if [ $BUILD_CORE = true ]; then
+    # Ensure that the KeyboardProcessor module compiles properly.
+    cd ../../common/core/web/keyboard-processor/src
+    echo ""
+    echo "Compiling KMW's Keyboard Processor module..."
+    ./build.sh || fail "Failed to compile the core/web/keyboard-processor module."
+    cd $WORKING_DIRECTORY
+    echo "Keyboard Processor module compilation successful."
     echo ""
 fi
 
