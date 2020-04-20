@@ -1,7 +1,7 @@
 {
   "name": "keyman-keyboard-processor",
   "version": "14.0.0",
-  "description": "Facilitates text input in any language.",
+  "description": "Core module for Keyman keyboard support in KeymanWeb.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
@@ -24,14 +24,11 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "test": "bash ./unit_tests/test.sh",
-    "karma": "karma",
-    "modernizr": "modernizr"
+    "test": "bash ./unit_tests/test.sh"
   },
   "dependencies": {
     "@keymanapp/lexical-model-types": "^0.0.0",
     "@types/node": "^11.9.4",
-    "eventemitter3": "^4.0.0",
     "ts-node": "^8.0.2"
   }
 }
