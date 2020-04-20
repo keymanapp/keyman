@@ -302,6 +302,9 @@ readonly DO_MINIFY
 if [ $FETCH_DEPS = true ]; then
     # Ensure the dependencies are downloaded.
     verify_npm_setup
+
+    echo "Copying testing resource ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
 fi
 
 if [ $DO_MINIFY = true ]; then

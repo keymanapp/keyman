@@ -60,7 +60,7 @@ fi
 
 if [ $BUILD_LMLAYER = true ]; then
     FLAGS="-no-lerna"
-    
+
     # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
     cd ../../../../predictive-text/
     echo ""
@@ -68,8 +68,6 @@ if [ $BUILD_LMLAYER = true ]; then
     ./build.sh $FLAGS || fail "Failed to compile the language modeling layer module."
     cd ../core/web/input-processor/src
     # TODO:  Move this back to KMW's main build script.  Consider it part of the dependency update.
-    #echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-    #cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
     echo "Language Modeling layer compilation successful."
     echo ""
 fi
