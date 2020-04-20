@@ -14,7 +14,38 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../.."
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-verify_npm_setup
+display_usage ( ) {
+    echo "build.sh [-no-lerna | -test"
+    echo
+    echo "  -no-lerna         skips the `lerna bootstrap` dependency check."
+    echo "                    Intended for use when this script is called by another build script."
+    echo ""
+    echo "  If more than one target is specified, the last one will take precedence."
+    exit 1
+}
+
+# Establish default build parameters
+set_default_vars ( ) {
+    FETCH_DEPS=true
+}
+
+set_default_vars
+
+# Parse args
+while [[ $# -gt 0 ]] ; do
+    key="$1"
+    case $key in
+        -no-lerna)
+            set_default_vars
+            FETCH_DEPS=false
+            ;;
+    esac
+    shift # past argument
+done
+
+if [ $FETCH_DEPS = true ]; then
+    verify_npm_setup
+fi
 
 # Generates a linkable TS file; defined in resources/build-utils.sh.
 exportEnvironmentDefinitionTS

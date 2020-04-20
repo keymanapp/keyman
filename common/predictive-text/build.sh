@@ -107,11 +107,12 @@ clean ( ) {
 }
 
 display_usage ( ) {
-  echo "Usage: $0 [-clean] [-test | -tdd]"
+  echo "Usage: $0 [-clean] [-no-lerna] [-test | -tdd]"
   echo "       $0 -help"
   echo
   echo "  -clean              to erase pre-existing build products before a re-build"
   echo "  -help               displays this screen and exits"
+  echo "  -no-lerna           skips dependency updates"
   echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
   echo "  -test               runs unit and integration tests after building"
 }
@@ -170,6 +171,9 @@ while [[ $# -gt 0 ]] ; do
     -help|-h)
       display_usage
       exit
+      ;;
+    -no-lerna)
+      fetch_deps=false
       ;;
     -test)
       run_tests=1
