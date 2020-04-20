@@ -1,5 +1,4 @@
 var assert = require('chai').assert;
-
 let KeyboardProcessor = require('../../dist');
 
 // Required initialization setup.
