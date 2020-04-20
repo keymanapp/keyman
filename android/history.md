@@ -1,5 +1,12 @@
 # Keyman for Android Version History
 
+## 2020-04-20 13.0.6209 stable
+* Bug fix:
+  * Fix crash involving system keyboard update notifications (#3007)
+
+## 2020-04-15 13.0.6208 stable
+* no change to Keyman for Android (updated Keyman Web Engine #2957)
+
 ## 2020-04-01 13.0.6207 stable
 * Bug fix:
   * Fix crash involving globe button with 3rd party apps (#2932)
