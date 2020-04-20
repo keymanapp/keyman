@@ -16,7 +16,7 @@ namespace com.keyman.text.prediction {
       this.self = this;
     }
 
-    postMessage: (message: any, options: PostMessageOptions) => void;
+    postMessage: (message: any) => void;
 
     importScripts(...scriptNames: string[]) {
       /* Use of vm.createContext and script.runInContext allow us to avoid
