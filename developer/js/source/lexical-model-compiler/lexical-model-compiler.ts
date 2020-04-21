@@ -8,7 +8,7 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure, defaultWordform2Key } from "./build-trie";
+import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
 
 export default class LexicalModelCompiler {
 
@@ -72,7 +72,7 @@ export default class LexicalModelCompiler {
         let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
 
         // Use the default search term to key function, if left unspecified.
-        let searchTermToKey = modelSource.searchTermToKey || defaultWordform2Key;
+        let searchTermToKey = modelSource.searchTermToKey || defaultSearchTermToKey;
 
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(filenames, searchTermToKey)

@@ -405,7 +405,7 @@ namespace Trie {
  * model, you SHOULD write/generate your own key function, tailored to your
  * language.
  */
-export function defaultWordform2Key(wordform: string): string {
+export function defaultSearchTermToKey(wordform: string): string {
   return wordform
     .toLowerCase()
     .normalize('NFD')
