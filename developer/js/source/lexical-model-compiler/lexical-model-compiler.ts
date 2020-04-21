@@ -29,21 +29,7 @@ export default class LexicalModelCompiler {
 
     // Figure out what word breaker the model is using, if any.
     let wordBreakerSpec = getWordBreakerSpec();
-    let wordBreakerSourceCode: string;
-    if (wordBreakerSpec) {
-      if (typeof wordBreakerSpec === "string") {
-        // It must be a builtin word breaker, so just instantiate it.
-        wordBreakerSourceCode = `wordBreakers['${wordBreakerSpec}']`;
-      } else if (typeof wordBreakerSpec === "function") {
-        // The word breaker was passed as a literal function; use its source code.
-        wordBreakerSourceCode = wordBreakerSpec.toString()
-        // Note: the .toString() might just be the property name, but we want a
-        // plain function:
-          .replace(/^wordBreak(ing|er)\b/, 'function');
-      }
-    } else {
-      wordBreakerSourceCode = `wordBreakers['default']`;
-    }
+    let wordBreakerSourceCode = compileWordBreaker(wordBreakerSpec);
 
     function getWordBreakerSpec() {
       if (modelSource.wordBreaker) {
@@ -111,4 +97,25 @@ export default class LexicalModelCompiler {
 };
 
 export class ModelSourceError extends Error {
+}
+
+/**
+ * Returns a JavaScript expression (as a string) that can serve as a word
+ * breaking function.
+ */
+function compileWordBreaker(wordBreakerSpec: string | WordBreakingFunction | undefined) {
+  if (wordBreakerSpec) {
+    if (typeof wordBreakerSpec === "string") {
+      // It must be a builtin word breaker, so just instantiate it.
+      return `wordBreakers['${wordBreakerSpec}']`;
+    } else {
+      // The word breaker was passed as a literal function; use its source code.
+      return wordBreakerSpec.toString()
+        // Note: the .toString() might just be the property name, but we want a
+        // plain function:
+        .replace(/^wordBreak(ing|er)\b/, 'function');
+    }
+  } else {
+    return `wordBreakers['default']`;
+  }
 }
