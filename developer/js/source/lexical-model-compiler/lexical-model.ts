@@ -9,6 +9,8 @@ interface LexicalModelDeclaration {
   //... metadata ...
 }
 
+type WordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
+
 interface LexicalModelSource extends LexicalModelDeclaration {
   readonly sources: Array<string>;
   /**
@@ -25,7 +27,7 @@ interface LexicalModelSource extends LexicalModelDeclaration {
    *  - word breaking function -- provide your own function that breaks words.
    *  - class-based word-breaker - may be supported in the future.
    */
-  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
+  readonly wordBreaker?: WordBreakerSpec;
 
   /**
    * How to simplify words, to convert them into simplifired search keys
