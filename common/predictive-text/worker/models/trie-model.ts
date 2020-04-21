@@ -419,7 +419,7 @@
    * the result to lowercase.
    *
    * This is a very naïve implementation, that I only think will work on
-   * some language that use the Latin script. As of 2020-04-08, only
+   * some languages that use the Latin script. As of 2020-04-08, only
    * 4 out of 11 (36%) of published language models use the Latin script,
    * so this might not actually be a great default.
    *
