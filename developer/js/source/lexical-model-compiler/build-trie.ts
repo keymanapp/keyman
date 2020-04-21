@@ -22,7 +22,7 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
   let wordlist = filenames
     .map(parseWordListFromFilename)
     .reduce((bigWordlist, current) => bigWordlist.concat(current), []);
-  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.Wordform2Key);
+  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
   return JSON.stringify(trie);
 }
 
@@ -114,7 +114,7 @@ namespace Trie {
    * A function that converts a string (word form or query) into a search key
    * (secretly, this is also a string).
    */
-  export interface Wordform2Key {
+  export interface SearchTermToKey {
     (wordform: string): SearchKey;
   }
 
@@ -204,7 +204,7 @@ namespace Trie {
    * @param keyFunction Function that converts word forms into indexed search keys
    * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
-  export function buildTrie(wordlist: WordList, keyFunction: Wordform2Key): object {
+  export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
     let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
     return {
       totalWeight: sumWeights(root),
@@ -217,8 +217,8 @@ namespace Trie {
    */
   class Trie {
     readonly root = createRootNode();
-    toKey: Wordform2Key;
-    constructor(wordform2key: Wordform2Key) {
+    toKey: SearchTermToKey;
+    constructor(wordform2key: SearchTermToKey) {
       this.toKey = wordform2key;
     }
 
