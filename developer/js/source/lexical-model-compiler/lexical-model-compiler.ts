@@ -29,7 +29,7 @@ export default class LexicalModelCompiler {
 
     // Figure out what word breaker the model is using, if any.
     let wordBreakerSpec = getWordBreakerSpec();
-    let wordBreakerSourceCode: string = null;
+    let wordBreakerSourceCode: string;
     if (wordBreakerSpec) {
       if (typeof wordBreakerSpec === "string") {
         // It must be a builtin word breaker, so just instantiate it.
@@ -41,6 +41,8 @@ export default class LexicalModelCompiler {
         // plain function:
           .replace(/^wordBreak(ing|er)\b/, 'function');
       }
+    } else {
+      wordBreakerSourceCode = `wordBreakers['default']`;
     }
 
     function getWordBreakerSpec() {
@@ -74,9 +76,7 @@ export default class LexicalModelCompiler {
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(filenames, modelSource.searchTermToKey)
         }, {\n`;
-        if (wordBreakerSourceCode) {
-          func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
-        }
+        func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
         if (modelSource.searchTermToKey) {
           func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
         }
