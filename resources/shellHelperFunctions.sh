@@ -258,6 +258,22 @@ set_npm_version () {
   npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
 }
 
+init_lerna() {
+  WORKING_DIRECTORY=`pwd`
+
+  if [ "${KEYMAN_ROOT}" = "" ]; then
+    fail "KEYMAN_ROOT not defined; cannot bootstrap repo's dependencies"
+  fi
+
+  # At its base, lerna does use an npm-friendly package.json.  Installing that allows the base lerna install to work.
+  cd "$KEYMAN_ROOT"
+  npm install --no-optional
+
+  # Now that it exists, we can run the following command locally.  (Otherwise, npx will temporarily download everything again, each time!)
+  npx lerna bootstrap
+  cd "$WORKING_DIRECTORY"
+}
+
 # Accepts an optional parameter.
 # #1 - when set to 'false', only ensures that `npm` and `node` are accessible; does not install dependencies.
 verify_npm_setup () {
@@ -272,11 +288,13 @@ verify_npm_setup () {
       fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
   if [ $fetch_deps = true ]; then
-    type lerna >/dev/null ||\
-        fail "Build environment setup error detected!  Please run \`npm install -g lerna\` to install lerna"
+    # Is lerna locally installed?  If not, initialize it at the repo's base locally.
+    npm list lerna >/dev/null || init_lerna
 
-    # Use lerna to ensure repo-internal dependencies are all properly linked while also installing external dependencies
-    lerna bootstrap -- --no-optional
+    # Use lerna to ensure repo-internal dependencies are all properly linked 
+    # while also installing external dependencies.  Also propagates lerna into
+    # each project that can use it (once added as a dev-dependency there)
+    npx lerna bootstrap -- --no-optional
 
     if [ $? -ne 0 ]; then
       fail "Build environment setup error detected!  Please ensure Node.js is installed!"

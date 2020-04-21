@@ -28,7 +28,7 @@ fail() {
 }
 
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-verify_npm_install
+verify_npm_setup
 
 # Definition of global compile constants
 COMPILED_FILE="bulk_render.js"
