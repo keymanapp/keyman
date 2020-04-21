@@ -436,7 +436,7 @@
   function defaultWordform2Key(wordform: string): SearchKey {
     /**
      * N.B.: this is (slightly) DIFFERENT than the version in
-     * @keymanapp/lexical-model-compiler/build-trie
+     * keymanapp/lexical-model-compiler/build-trie
      * as this is for compatibility for models built
      * BEFORE the searchTermToKey function was bundled with
      * all models.
