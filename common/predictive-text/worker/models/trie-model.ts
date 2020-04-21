@@ -83,7 +83,7 @@
       this._trie = new Trie(
         trieData['root'],
         trieData['totalWeight'],
-        options.searchTermToKey as Wordform2Key || defaultWordform2Key
+        options.searchTermToKey as Wordform2Key || defaultSearchTermToKey
       );
       this.breakWords = options.wordBreaker || wordBreakers['default'];
       this.punctuation = options.punctuation;
@@ -433,7 +433,7 @@
    * model, you SHOULD write/generate your own key function, tailored to your
    * language.
    */
-  function defaultWordform2Key(wordform: string): SearchKey {
+  function defaultSearchTermToKey(wordform: string): SearchKey {
     /**
      * N.B.: this is (slightly) DIFFERENT than the version in
      * keymanapp/lexical-model-compiler/build-trie
