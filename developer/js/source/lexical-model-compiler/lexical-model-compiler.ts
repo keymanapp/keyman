@@ -103,19 +103,19 @@ export class ModelSourceError extends Error {
  * Returns a JavaScript expression (as a string) that can serve as a word
  * breaking function.
  */
-function compileWordBreaker(wordBreakerSpec: string | WordBreakingFunction | undefined) {
-  if (wordBreakerSpec) {
-    if (typeof wordBreakerSpec === "string") {
-      // It must be a builtin word breaker, so just instantiate it.
-      return `wordBreakers['${wordBreakerSpec}']`;
-    } else {
-      // The word breaker was passed as a literal function; use its source code.
-      return wordBreakerSpec.toString()
-        // Note: the .toString() might just be the property name, but we want a
-        // plain function:
-        .replace(/^wordBreak(ing|er)\b/, 'function');
-    }
+function compileWordBreaker(wordBreakerSpec: WordBreakerSpec) {
+  if (!wordBreakerSpec) {
+    wordBreakerSpec = 'default';
+  }
+
+  if (typeof wordBreakerSpec === "string") {
+    // It must be a builtin word breaker, so just instantiate it.
+    return `wordBreakers['${wordBreakerSpec}']`;
   } else {
-    return `wordBreakers['default']`;
+    // The word breaker was passed as a literal function; use its source code.
+    return wordBreakerSpec.toString()
+      // Note: the .toString() might just be the property name, but we want a
+      // plain function:
+      .replace(/^wordBreak(ing|er)\b/, 'function');
   }
 }
