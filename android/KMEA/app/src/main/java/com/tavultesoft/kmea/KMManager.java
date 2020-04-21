@@ -1753,7 +1753,7 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ?
+        currentBanner = (change.equals("active")) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
@@ -1989,7 +1989,7 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
+        currentBanner = (change.equals("active")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
