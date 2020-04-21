@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.53 alpha 2020-04-21
+
+* refactor(common/lmlayer): Abstracted connection between LMLayer and Worker initialization (#2986)
+* refactor(common/lmlayer): starts a formal 'headless' mode (#2987)
+* fix(android): predictive banner display bugfix (#3010)
+* fix(android): Fix system keyboard alignment (#3009)
+
 ## 14.0.52 alpha 2020-04-17
 
 * refactor(web/engine): precomputation for OSK key events, headless production thereof (#2969)
