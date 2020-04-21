@@ -1753,7 +1753,13 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("active")) ?
+        boolean isModelActive = change.equals("active");
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean modelPredictionPref = false;
+        if(currentLexicalModel != null) {
+          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+        }
+        currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         InAppKeyboard.setLayoutParams(params);
@@ -1989,7 +1995,14 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("active")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
+        boolean isModelActive = change.equals("active");
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean modelPredictionPref = false;
+        if(currentLexicalModel != null) {
+          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+        }
+        currentBanner = (isModelActive && modelPredictionPref) ?
+          KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
         RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
