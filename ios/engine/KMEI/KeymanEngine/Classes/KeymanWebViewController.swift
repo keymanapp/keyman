@@ -127,10 +127,10 @@ class KeymanWebViewController: UIViewController {
     view = webView
 
     // Set UILongPressGestureRecognizer to show sub keys
-    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
-    hold.minimumPressDuration = 0.5
-    hold.delegate = self
-    view.addGestureRecognizer(hold)
+//    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
+//    hold.minimumPressDuration = 0.5
+//    hold.delegate = self
+//    view.addGestureRecognizer(hold)
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
                                            name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -446,10 +446,15 @@ extension KeymanWebViewController: WKScriptMessageHandler {
                             subkeyIDs: subkeyIDs,
                             subkeyTexts: subkeyTexts,
                             useSpecialFont: useSpecialFont)
+
+      self.touchHoldBegan()
     } else if fragment.hasPrefix("#menuKeyDown-") {
+      perform(#selector(self.menuKeyHeld), with: self, afterDelay: 0.5)
       menuKeyDown(self)
       delegate?.menuKeyDown(self)
     } else if fragment.hasPrefix("#menuKeyUp-") {
+      // Blocks summoning the globe-key menu for quick taps.  (Hence the 0.5 delay.)
+      NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.menuKeyHeld), object: self)
       menuKeyUp(self)
       delegate?.menuKeyUp(self)
     } else if fragment.hasPrefix("#hideKeyboard-") {
@@ -672,6 +677,40 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
     return true
   }
 
+  // An adaptation of holdAction, just for direct taps.
+  @objc func tapAction(_ sender: UITapGestureRecognizer) {
+    switch sender.state {
+    case .ended:
+      // Touch Ended
+      guard let subKeysView = subKeysView else {
+        return
+      }
+
+      let touchPoint = sender.location(in: subKeysView.containerView)
+      var buttonClicked = false
+      for button in subKeys {
+        if button.frame.contains(touchPoint) {
+          button.isEnabled = true
+          button.isHighlighted = true
+          button.backgroundColor = subKeyColorHighlighted
+          button.sendActions(for: .touchUpInside)
+
+          buttonClicked = true
+        } else {
+          button.isHighlighted = false
+          button.isEnabled = false
+          button.backgroundColor = subKeyColor
+        }
+      }
+
+      if !buttonClicked {
+        clearSubKeyArrays()
+      }
+    default:
+      return
+    }
+  }
+
   @objc func holdAction(_ sender: UILongPressGestureRecognizer) {
     switch sender.state {
     case .ended:
@@ -695,16 +734,17 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
         clearSubKeyArrays()
       }
     case .began:
-      // Touch & Hold Began
-      let touchPoint = sender.location(in: sender.view)
-      // Check if touch was for language menu button
-      languageMenuPosition { keyFrame in
-        if keyFrame.contains(touchPoint) {
-          self.delegate?.menuKeyHeld(self)
-          return
-        }
-        self.touchHoldBegan()
-      }
+//      // Touch & Hold Began
+//      let touchPoint = sender.location(in: sender.view)
+//      // Check if touch was for language menu button
+//      languageMenuPosition { keyFrame in
+//        if keyFrame.contains(touchPoint) {
+//          self.delegate?.menuKeyHeld(self)
+//          return
+//        }
+//        self.touchHoldBegan()
+//      }
+      return
     default:
       // Hold & Move
       guard let subKeysView = subKeysView else {
@@ -786,7 +826,19 @@ extension KeymanWebViewController: UIGestureRecognizerDelegate {
     dismissKeyPreview()
     subKeysView = SubKeysView(keyFrame: subKeyAnchor, subKeys: subKeys)
     view.addSubview(subKeysView!)
+
+    let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapAction))
+    subKeysView!.addGestureRecognizer(tap)
+
+    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
+    hold.minimumPressDuration = 0.01
+    hold.delegate = self
+    subKeysView!.addGestureRecognizer(hold)
     setPopupVisible(true)
+  }
+
+  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
+    self.delegate?.menuKeyHeld(self)
   }
 
   @objc func subKeyButtonClick(_ sender: UIButton) {

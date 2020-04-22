@@ -30,26 +30,23 @@ NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
 LEXICAL_MODELS_TYPES=../lexical-model-types
 
+# Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
+build-browser () {
+  npm run tsc -- -p ./browser.tsconfig.json || fail "Could not build top-level browser-targeted JavaScript file."
+  cp ./index.d.ts $INCLUDES_OUTPUT/LMLayer.d.ts
+  cp ./message.d.ts $INCLUDES_OUTPUT/message.d.ts
+}
 
+# Builds the top-level JavaScript file for use on Node (the second stage of compilation)
+build-headless () {
+  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level node-targeted JavaScript file."
+}
 
-# Build the worker and the main script.
-build ( ) {
-  # Ensure that the build-product destination for any generated include .d.ts files exists.
-  if ! [ -d $INCLUDES_OUTPUT ]; then
-    mkdir -p "$INCLUDES_OUTPUT"
-  fi
-
+build-wrapped-worker () {
   # Build worker first; the main file depends on it.
   # Then wrap the worker; Then build the main file.
 
-  build-worker && wrap-worker && build-main
-}
-
-# Builds the top-level JavaScript file (the second stage of compilation)
-build-main () {
-  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level JavaScript file."
-  cp ./index.d.ts $INCLUDES_OUTPUT/LMLayer.d.ts
-  cp ./message.d.ts $INCLUDES_OUTPUT/message.d.ts
+  build-worker && wrap-worker || fail "Could not build inner-level JavaScript file for use in the Worker."
 }
 
 # Builds the inner JavaScript worker (the first stage of compilation).
@@ -180,7 +177,15 @@ if (( fetch_deps )); then
   npm install --no-optional
 fi
 
-build || fail "Compilation failed."
+
+# Ensure that the build-product destination for any generated include .d.ts files exists.
+if ! [ -d $INCLUDES_OUTPUT ]; then
+  mkdir -p "$INCLUDES_OUTPUT"
+fi
+
+build-wrapped-worker || fail "LMLayer worker compilation failed."
+build-browser || fail "Browser-oriented compilation failed."
+build-headless || fail "Headless compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then

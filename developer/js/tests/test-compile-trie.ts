@@ -25,6 +25,9 @@ describe('LexicalModelCompiler', function () {
       // Sanity check: the word list has three total unweighted words, with a
       // total weight of 3!
       assert.match(code, /\btotalWeight\b["']?:\s*3\b/);
+
+      // Sanity check: the word breaker is a property of the object.
+      assert.match(code, /\bwordBreaker\b["']?:\s*wordBreakers\b/);
     });
 
     it('should compile a word list exported by Microsoft Excel', function () {

@@ -4,65 +4,20 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let core = keyman.core;
 
-      var activeKeyboard = core.activeKeyboard;
-      let formFactor = keyman.util.device.formFactor;
-
-      // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
-      // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-      var layer = e.layer || e.displayLayer || '', keyName=e.id.toUpperCase();
-
       // Start:  mirrors _GetKeyEventProperties
 
-      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      var keyShiftState = core.keyboardProcessor.getModifierState(layer);
-
       // First check the virtual key, and process shift, control, alt or function keys
-      var Lkc: text.KeyEvent = {
-        Ltarg: dom.Utils.getOutputTarget(Lelem),
-        Lmodifiers: keyShiftState,
-        Lstates: 0,
-        Lcode: text.Codes.keyCodes[keyName],
-        LisVirtualKey: true,
-        vkCode: 0,
-        kName: keyName,
-        kLayer: layer,
-        kbdLayer: e.displayLayer,
-        kNextLayer: e.nextlayer,
-        device: keyman.util.device.coreSpec,  // The OSK's events always use the 'true' device.
-        isSynthetic: true
-      };
+      let Lkc = e.constructKeyEvent(core.keyboardProcessor, dom.Utils.getOutputTarget(Lelem), keyman.util.device.coreSpec);
 
       // If it's actually a state key modifier, trigger its effects immediately, as KeyboardEvents would do the same.
-      switch(keyName) {
+      switch(Lkc.kName) {
         case 'K_CAPS':
         case 'K_NUMLOCK':
         case 'K_SCROLL':
-          core.keyboardProcessor.stateKeys[keyName] = ! core.keyboardProcessor.stateKeys[keyName];
+          core.keyboardProcessor.stateKeys[Lkc.kName] = ! core.keyboardProcessor.stateKeys[Lkc.kName];
       }
-
-      // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
-      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
 
       // End - mirrors _GetKeyEventProperties
-
-      // Include *limited* support for mnemonic keyboards (Sept 2012)
-      // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-      if(activeKeyboard && activeKeyboard.isMnemonic && !(activeKeyboard.layout(formFactor as text.FormFactor).isDefault && formFactor != 'desktop')) {
-        if(Lkc.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
-          // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
-          Lkc.vkCode = Lkc.Lcode;
-          text.KeyboardProcessor.setMnemonicCode(Lkc, layer.indexOf('shift') != -1, core.keyboardProcessor.stateKeys['K_CAPS']);
-        }
-      } else {
-        Lkc.vkCode=Lkc.Lcode;
-      }
-
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      if(!activeKeyboard.definesPositionalOrMnemonic) {
-        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(Lkc);
-        Lkc.LisVirtualKey=false;
-      }
-
       return Lkc;
     }
 
@@ -94,7 +49,7 @@ namespace com.keyman.osk {
         outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
   
         let Lkc = PreProcessor._GetClickEventProperties(e['key'].spec as keyboards.ActiveKey, Lelem);
-        if(keyman.modelManager.enabled) {
+        if(keyman.core.languageProcessor.isActive) {
           Lkc.source = touch;
           Lkc.keyDistribution = keyDistribution;
         }
@@ -128,7 +83,7 @@ namespace com.keyman.osk {
         return true;
       }
 
-      let retVal = keyman.core.processKeyEvent(Lkc);
+      let retVal = (keyman.core.processKeyEvent(Lkc) != null);
 
       return retVal;
     }

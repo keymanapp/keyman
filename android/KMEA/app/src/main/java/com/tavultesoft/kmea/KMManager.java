@@ -198,7 +198,7 @@ public final class KMManager {
   public static final String KMDefault_LanguageID = "en";
   public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
-  public static final String KMDefault_KeyboardFont = "{\"family\":\"LatinWeb\",\"source\":[\"DejaVuSans.ttf\"]}";
+  public static final String KMDefault_KeyboardFont = "DejaVuSans.ttf";
 
   // Default Dictionary Info
   public static final String KMDefault_DictionaryPackageID = "nrc.en.mtnt";
@@ -329,21 +329,24 @@ public final class KMManager {
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
+   * @param keyboard KeyboardType
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+  private static RelativeLayout.LayoutParams getKeyboardLayoutParams(KeyboardType keyboard) {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
-    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+    }
    return params;
   }
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -356,7 +359,7 @@ public final class KMManager {
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
@@ -438,12 +441,12 @@ public final class KMManager {
   public static void onConfigurationChanged(Configuration newConfig) {
     // KMKeyboard
     if (InAppKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
@@ -482,6 +485,9 @@ public final class KMManager {
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
       copyAsset(context, KMFilename_Osk_Woff_Font, "", true);
+
+      // Copy default keyboard font
+      copyAsset(context, KMDefault_KeyboardFont, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -878,12 +884,14 @@ public final class KMManager {
       prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 
-    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    RelativeLayout.LayoutParams params;
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
@@ -1037,9 +1045,9 @@ public final class KMManager {
         currentBanner = KMManager.KM_BANNER_STATE_BLANK;
 
       if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP));
       if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM));
     }
 
     registerAssociatedLexicalModel(languageID);
@@ -1750,9 +1758,15 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ?
+        boolean isModelActive = change.equals("active");
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean modelPredictionPref = false;
+        if(currentLexicalModel != null) {
+          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+        }
+        currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace
@@ -1986,8 +2000,15 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        boolean isModelActive = change.equals("active");
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean modelPredictionPref = false;
+        if(currentLexicalModel != null) {
+          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+        }
+        currentBanner = (isModelActive && modelPredictionPref) ?
+          KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace

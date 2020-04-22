@@ -157,7 +157,7 @@ public class PackageProcessorTest {
     Assert.assertEquals(amharic, keyboards[0]);
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
-    languageID = "gez";
+    languageID = "GEZ";
     keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
 
     HashMap<String, String> geez = new HashMap<String, String>();

@@ -21,12 +21,15 @@ namespace com.keyman.keyboards {
     pad?: string;
     layer: string;
     displayLayer: string;
-    nextlayer: "string";
+    nextlayer: string;
+
+    private baseKeyEvent: text.KeyEvent;
+    isMnemonic: boolean = false;
 
     proportionalX: number;
     proportionalWidth: number;
 
-    static polyfill(key: LayoutKey, displayLayer: string) {
+    static polyfill(key: LayoutKey, layout: ActiveLayout, displayLayer: string) {
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveKey();
       for(let prop in dummy) {
@@ -35,9 +38,92 @@ namespace com.keyman.keyboards {
         }
       }
 
+      // Ensure subkeys are also properly extended.
+      if(key.sk) {
+        for(let subkey of key.sk) {
+          ActiveKey.polyfill(subkey, layout, displayLayer);
+        }
+      }
+
       let aKey = key as ActiveKey;
       aKey.displayLayer = displayLayer;
       aKey.layer = aKey.layer || displayLayer;
+
+      // Compute the key's base KeyEvent properties for use in future event generation
+      aKey.constructBaseKeyEvent(layout, displayLayer);
+    }
+
+    private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
+      // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
+      // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
+      let layer = this.layer || displayLayer || '';
+      let keyName= this.id ? this.id.toUpperCase() : null;
+
+      // Start:  mirrors _GetKeyEventProperties
+
+      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
+      let keyShiftState = text.KeyboardProcessor.getModifierState(layer);
+
+      // First check the virtual key, and process shift, control, alt or function keys
+      var Lkc: text.KeyEvent = {
+        Ltarg: null, // set later, in constructKeyEvent.
+        Lmodifiers: keyShiftState,
+        Lstates: 0,
+        Lcode: keyName ? text.Codes.keyCodes[keyName] : 0,
+        LisVirtualKey: true,
+        vkCode: 0,
+        kName: keyName,
+        kLayer: layer,
+        kbdLayer: displayLayer,
+        kNextLayer: this.nextlayer,
+        device: null,
+        isSynthetic: true
+      };
+
+      if(layout.keyboard) {
+        let keyboard = layout.keyboard;
+
+        // Include *limited* support for mnemonic keyboards (Sept 2012)
+        // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
+        if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
+          if(Lkc.Lcode != text.Codes.keyCodes['K_SPACE']) { // exception required, March 2013
+            // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
+            Lkc.vkCode = Lkc.Lcode;
+            this.isMnemonic = true;
+          }
+        } else {
+          Lkc.vkCode=Lkc.Lcode;
+        }
+
+        // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+        if(!keyboard.definesPositionalOrMnemonic) {
+          // Not the best pattern, but currently safe - we don't look up any properties of any of the
+          // arguments in this use case, and the object's scope is extremely limited.
+          Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(this.constructKeyEvent(null, null, null));
+          Lkc.LisVirtualKey=false;
+        }
+      }
+
+      this.baseKeyEvent = Lkc;
+    }
+
+    constructKeyEvent(keyboardProcessor: text.KeyboardProcessor, target: text.OutputTarget, device: text.EngineDeviceSpec): text.KeyEvent {
+      // Make a deep copy of our preconstructed key event, filling it out from there.
+      let Lkc = utils.deepCopy(this.baseKeyEvent);
+      Lkc.Ltarg = target;
+      Lkc.device = device;
+
+      if(this.isMnemonic) {
+        text.KeyboardProcessor.setMnemonicCode(Lkc, this.layer.indexOf('shift') != -1, keyboardProcessor ? keyboardProcessor.stateKeys['K_CAPS'] : false);
+      }
+
+      // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.
+      // This part depends on the keyboard processor's active state.
+      if(keyboardProcessor) {
+        keyboardProcessor.setSyntheticEventDefaults(Lkc);
+      }
+
+      return Lkc;
     }
   }
 
@@ -57,7 +143,7 @@ namespace com.keyman.keyboards {
 
     }
 
-    static polyfill(row: LayoutRow, displayLayer: string, totalWidth: number, proportionalY: number) {
+    static polyfill(row: LayoutRow, layout: ActiveLayout, displayLayer: string, totalWidth: number, proportionalY: number) {
       // Apply defaults, setting the width and other undefined properties for each key
       let keys=row['key'];
       for(let j=0; j<keys.length; j++) {
@@ -84,7 +170,7 @@ namespace com.keyman.keyboards {
             break;
         }
 
-        ActiveKey.polyfill(key, displayLayer);
+        ActiveKey.polyfill(key, layout, displayLayer);
       }
 
       /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -176,7 +262,7 @@ namespace com.keyman.keyboards {
 
     }
 
-    static polyfill(layer: LayoutLayer, formFactor: string) {
+    static polyfill(layer: LayoutLayer, layout: ActiveLayout) {
       layer.aligned=false;
 
       // Create a DIV for each row of the group
@@ -213,7 +299,7 @@ namespace com.keyman.keyboards {
       }
 
       // Add default right margin
-      if(formFactor == 'desktop') {
+      if(layout.formFactor == 'desktop') {
         totalWidth += 5; // TODO: resolve difference between touch and desktop; why don't we use ActiveKey.DEFAULT_RIGHT_MARGIN?
       } else {
         totalWidth += ActiveKey.DEFAULT_RIGHT_MARGIN;
@@ -223,7 +309,7 @@ namespace com.keyman.keyboards {
       for(let i=0; i<rowCount; i++) {
         // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
         let rowProportionalY = (i + 0.5) / rowCount;
-        ActiveRow.polyfill(layer.row[i], layer.id, totalWidth, rowProportionalY);
+        ActiveRow.polyfill(layer.row[i], layout, layer.id, totalWidth, rowProportionalY);
       }
 
       // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
@@ -379,6 +465,8 @@ namespace com.keyman.keyboards {
     font: string;
     keyLabels: boolean;
     isDefault?: boolean;
+    keyboard: Keyboard;
+    formFactor: text.FormFactor;
 
     /**
      * Facilitates mapping layer id strings to their specification objects.
@@ -398,7 +486,7 @@ namespace com.keyman.keyboards {
      * @param layout
      * @param formFactor
      */
-    static polyfill(layout: LayoutFormFactor, formFactor: string): ActiveLayout {
+    static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: text.FormFactor): ActiveLayout {
       if(layout == null) {
         throw new Error("Cannot build an ActiveLayout for a null specification.");
       }
@@ -426,11 +514,6 @@ namespace com.keyman.keyboards {
       }
       // ...remove to here when compiler bug fixed ***
 
-      for(n=0; n<layers.length; n++) {
-        ActiveLayer.polyfill(layers[n], formFactor);
-        layerMap[layers[n].id] = layers[n] as ActiveLayer;
-      }
-
       // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
       let dummy = new ActiveLayout();
       for(let key in dummy) {
@@ -440,6 +523,14 @@ namespace com.keyman.keyboards {
       }
 
       let aLayout = layout as ActiveLayout;
+      aLayout.keyboard = keyboard;
+      aLayout.formFactor = formFactor;
+
+      for(n=0; n<layers.length; n++) {
+        ActiveLayer.polyfill(layers[n], aLayout);
+        layerMap[layers[n].id] = layers[n] as ActiveLayer;
+      }
+
       aLayout.layerMap = layerMap;
 
       return aLayout;

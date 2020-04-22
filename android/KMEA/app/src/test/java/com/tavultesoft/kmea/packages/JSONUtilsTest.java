@@ -69,6 +69,7 @@ public class JSONUtilsTest {
 
       // Verify first and last language for sil_cameroon_qwerty
       Assert.assertEquals(0, JSONUtils.findID(languagesArray, "aal-Latn"));
+      Assert.assertEquals(0, JSONUtils.findID(languagesArray, "aal-latn"));
       Assert.assertEquals(EXPECTED_NUM_LANGUAGES-1, JSONUtils.findID(languagesArray, "zuy-Latn"));
 
     } catch (JSONException e) {

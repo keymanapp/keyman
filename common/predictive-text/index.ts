@@ -64,7 +64,7 @@ namespace com.keyman.text.prediction {
      */
     constructor(capabilities: Capabilities, worker?: Worker) {
       // Either use the given worker, or instantiate the default worker.
-      this._worker = worker || new Worker(LMLayer.asBlobURI(LMLayerWorkerCode));
+      this._worker = worker || DefaultWorker.constructInstance();
       this._worker.onmessage = this.onMessage.bind(this)
       this._declareLMLayerReady = null;
       this._predictPromises = new PromiseStore;
@@ -181,26 +181,6 @@ namespace com.keyman.text.prediction {
       let wrapper = fn.toString();
       let match = wrapper.match(/function[^{]+{((?:.|\r|\n)+)}[^}]*$/);
       return match[1];
-    }
-
-    /**
-     * Converts the INSIDE of a function into a blob URI that can
-     * be passed as a valid URI for a Worker.
-     * @param fn Function whose body will be referenced by a URI.
-     * 
-     * This function makes the following possible:
-     * 
-     *    let worker = new Worker(LMLayer.asBlobURI(function myWorkerCode () {
-     *      postMessage('inside Web Worker')
-     *      function onmessage(event) {
-     *        // handle message inside Web Worker.
-     *      }
-     *    }));
-     */
-    static asBlobURI(fn: Function): string {
-      let code = LMLayer.unwrap(fn);
-      let blob = new Blob([code], { type: 'text/javascript' });
-      return URL.createObjectURL(blob);
     }
   }
 }

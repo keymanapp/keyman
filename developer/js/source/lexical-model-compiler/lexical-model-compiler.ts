@@ -27,30 +27,6 @@ export default class LexicalModelCompiler {
     const fileSuffix: string = `})();`;
     let func = filePrefix;
 
-    // Figure out what word breaker the model is using, if any.
-    let wordBreakerSpec = getWordBreakerSpec();
-    let wordBreakerSourceCode: string = null;
-    if (wordBreakerSpec) {
-      if (typeof wordBreakerSpec === "string") {
-        // It must be a builtin word breaker, so just instantiate it.
-        wordBreakerSourceCode = `wordBreakers['${wordBreakerSpec}']`;
-      } else if (typeof wordBreakerSpec === "function") {
-        // The word breaker was passed as a literal function; use its source code.
-        wordBreakerSourceCode = wordBreakerSpec.toString()
-        // Note: the .toString() might just be the property name, but we want a
-        // plain function:
-          .replace(/^wordBreak(ing|er)\b/, 'function');
-      }
-    }
-
-    function getWordBreakerSpec() {
-      if (modelSource.wordBreaker) {
-        return modelSource.wordBreaker;
-      } else {
-        return null;
-      }
-    }
-
     //
     // Emit the model as code and data
     //
@@ -77,10 +53,13 @@ export default class LexicalModelCompiler {
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
           createTrieDataStructure(filenames, searchTermToKey)
         }, {\n`;
-        if (wordBreakerSourceCode) {
-          func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
-        }
+
+
+        let wordBreakerSourceCode = compileWordBreaker(modelSource.wordBreaker);
+        func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
+
         func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
+
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;
         }
@@ -112,4 +91,26 @@ export default class LexicalModelCompiler {
 };
 
 export class ModelSourceError extends Error {
+}
+
+/**
+ * Returns a JavaScript expression (as a string) that can serve as a word
+ * breaking function.
+ */
+function compileWordBreaker(wordBreakerSpec: WordBreakerSpec) {
+  // Use the default word breaker when it's unspecified
+  if (!wordBreakerSpec) {
+    wordBreakerSpec = 'default';
+  }
+
+  if (typeof wordBreakerSpec === "string") {
+    // It must be a builtin word breaker, so just instantiate it.
+    return `wordBreakers['${wordBreakerSpec}']`;
+  } else {
+    // The word breaker was passed as a literal function; use its source code.
+    return wordBreakerSpec.toString()
+      // Note: the .toString() might just be the property name, but we want a
+      // plain function:
+      .replace(/^wordBreak(ing|er)\b/, 'function');
+  }
 }
