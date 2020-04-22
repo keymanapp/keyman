@@ -395,7 +395,7 @@ final class KMKeyboard extends WebView {
 
     String tFont = "''";
     String oFont = null;
-    HashMap<String, HashMap<String, String>> kbsInfo = LanguageListActivity.getKeyboardsInfo(context);
+    HashMap<String, HashMap<String, String>> kbsInfo = LanguageListUtil.getKeyboardsInfo(context);
     if (kbsInfo != null) {
       HashMap<String, String> kbInfo = kbsInfo.get(kbKey);
       if (kbInfo != null) {

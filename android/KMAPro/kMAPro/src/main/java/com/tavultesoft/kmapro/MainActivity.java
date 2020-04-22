@@ -1067,7 +1067,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         KMManager.addKeyboard(this, keyboardInfo);
       }
     } else {
-      // Error notifications handled in LanguageListActivity
+      // Error notifications previously handled in LanguageListActivity
     }
   }
 

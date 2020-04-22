@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMPBrowserActivity;
 
 import android.os.Bundle;
 import android.provider.Settings;
@@ -111,7 +112,13 @@ public class GetStartedActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 0) {
-          KMManager.showLanguageList(context);
+          if (KMManager.hasConnection(context)) {
+            // Scenario 1: Connection to keyman.com catalog
+            Intent i = new Intent(context, KMPBrowserActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            context.startActivity(i);
+          }
         } else if (position == 1) {
           startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         } else if (position == 2) {
