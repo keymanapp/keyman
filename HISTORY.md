@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.54 alpha 2020-04-22
+
+* refactor(common/lmlayer): word breaker compilation (#3016)
+
 ## 14.0.53 alpha 2020-04-21
 
 * refactor(common/lmlayer): Abstracted connection between LMLayer and Worker initialization (#2986)
