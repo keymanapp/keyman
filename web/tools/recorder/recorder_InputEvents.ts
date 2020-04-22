@@ -1,6 +1,6 @@
 // Includes KeymanWeb's Device class, as it's quite useful for ensuring that we target our tests correctly
 // to each device.
-/// <reference path="kmwdevice.ts" />
+/// <reference path="../../source/kmwdevice.ts" />
 
 namespace KMWRecorder {
   import Device = com.keyman.Device;

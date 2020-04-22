@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"inlineSources": true,
+	"module": "none",
+	"outFile": "build/recorder_InputEvents.js",
+	"sourceMap": true,
+	"target": "es5"
+	},
+  "files": [
+		"../../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts",
+		"../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts",
+		"../../node_modules/@keymanapp/lexical-model-layer/message.d.ts",
+		"recorder_InputEvents.ts"
+  ]
+}
