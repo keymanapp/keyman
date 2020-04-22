@@ -23,9 +23,9 @@ assert ( ) {
 verify_npm_setup
 
 # Definition of global compile constants
-SCRIPT_TAGS=( "recorder"                "dev_resources" )
-PRODUCTS=(    "recorder_InputEvents.js" "dev_resources.js")
-FOLDERS=(     "recorder"                "dev_resources")
+SCRIPT_TAGS=( "dev_resources" )
+PRODUCTS=(    "dev_resources.js")
+FOLDERS=(     "dev_resources")
 OUTPUT_BASE="../release"
 PRODUCT_COUNT=${#PRODUCTS[@]}
 
@@ -47,9 +47,7 @@ PATH="../../node_modules/.bin:$PATH"
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-# This change is intended and temporary; the next PR will create a build script for use with the module
-# still processed within this loop and will convert this loop to use the build scripts instead.
-for (( n=1; n<$PRODUCT_COUNT; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
+for (( n=0; n<$PRODUCT_COUNT; n++ ))  # Apparently, args ends up zero-based, meaning $2 => n=1.
 do
   $compilecmd -p $NODE_SOURCE/tsconfig.${SCRIPT_TAGS[$n]}.json
   if [ $? -ne 0 ]; then
@@ -64,7 +62,3 @@ do
 #   cp -f $INTERMEDIATE/$target $dest/$target
 #   cp -f $INTERMEDIATE/$target.map $dest/$target.map
 done
-
-# Builds the recorder module.
-cd ../tools/recorder
-./build.sh

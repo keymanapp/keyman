@@ -119,6 +119,8 @@ BASE_PATH=`dirname $BASH_SOURCE`
 cd $BASE_PATH/../source
 
 ./build_dev_resources.sh
+cd ../tools/recorder
+./build.sh
 
 # Run our headless tests first.
 # Since we're using `lerna`, this actually puts us within the projects when run in-repo!
