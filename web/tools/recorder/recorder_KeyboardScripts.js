@@ -1,5 +1,5 @@
 function loadKeyboards() { 
-  var filePrefix = "../unit_tests/json/keyboards/";
+  var filePrefix = "../../unit_tests/json/keyboards/";
 
   // Existing unit_test stubs at the time of writing:
   var preloadFiles = [
@@ -32,7 +32,7 @@ function addKeyboard(n) {
     case 4:
       sKbd=document.getElementById('kbd_stub_add').value;
       var stub = new KMWRecorder.KeyboardStub(JSON.parse(sKbd));
-      stub.setBasePath("../unit_tests/resources/keyboards", false);
+      stub.setBasePath("../../unit_tests/resources/keyboards", false);
       keyman.addKeyboards(stub);
 
       // We actually know the exact details for this one easily, so set it as active!

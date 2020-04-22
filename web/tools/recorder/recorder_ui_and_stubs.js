@@ -1,4 +1,4 @@
-var UNIT_TEST_FOLDER_RELATIVE_PATH = "../unit_tests";
+var UNIT_TEST_FOLDER_RELATIVE_PATH = "../../unit_tests";
 var inputJSON = new KMWRecorder.InputTestSequence();
 var testDefinition = new KMWRecorder.KeyboardTest();
 
