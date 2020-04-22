@@ -830,19 +830,9 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return null;
   }
 
+  // This is deprecated in Keyman 14.0
   protected static void showLanguageList(Context context) {
-    if (KMManager.hasConnection(context) || CloudDataJsonUtil.getKeyboardCacheFile(context).exists()) {
-      Intent i = new Intent(context, LanguageListActivity.class);
-      i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-      context.startActivity(i);
-    } else {
-      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-      dialogBuilder.setTitle(context.getString(R.string.title_add_keyboard));
-      dialogBuilder.setMessage(String.format("\n%s\n", context.getString(R.string.cannot_connect)));
-      dialogBuilder.setPositiveButton(context.getString(R.string.label_ok), null);
-      AlertDialog dialog = dialogBuilder.create();
-      dialog.show();
-    }
+    return;
   }
 
   public static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {

@@ -787,7 +787,7 @@ public final class KMManager {
 
   private static String isCustomKeyboard(Context context, String keyboardKey) {
     String isCustom = "U";
-    HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListActivity.getKeyboardsInfo(context);
+    HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
     if (keyboardsInfo != null) {
       HashMap<String, String> kbInfo = keyboardsInfo.get(keyboardKey);
       if (kbInfo != null) {
@@ -1181,7 +1181,7 @@ public final class KMManager {
     } else {
       kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
 
-      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListActivity.getKeyboardsInfo(context);
+      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
       if (keyboardsInfo != null) {
         // Check version
         String kbKey = String.format("%s_%s", languageID, keyboardID);
@@ -1374,8 +1374,9 @@ public final class KMManager {
     KeyboardPickerActivity.listFont = typeface;
   }
 
+  // This API is deprecated in Keyman 14.0
   public static void showLanguageList(Context context) {
-    KeyboardPickerActivity.showLanguageList(context);
+    return;
   }
 
   public static void setNumericLayer(KeyboardType kbType) {
