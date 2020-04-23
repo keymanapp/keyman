@@ -21,7 +21,7 @@ describe('The default searchTermToKey() function', function () {
     // starts with an 's' and ends with an 's'
     // which are DIFFERENT CHARACTERS in lowercased Greek!
     ['σκύλος', 'σκυλος'],
-    ['ΣΚΥΛΟΣ', 'σκυλος'],
+    ['ΣΚΥΛΟΣ', 'σκυλοσ'],
 
     // full-width romaji is compatibility-canonical with ASCII characters:
     ['ａｅｓｔｈｅｔｉｃ', 'aesthetic'],
