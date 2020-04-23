@@ -10,7 +10,7 @@ interface LexicalModelDeclaration {
 }
 
 /**
- * Keyman 13.0+ word breaker specification:
+ * Keyman 14.0+ word breaker specification:
  *
  * Can support all old word breaking specification,
  * but can also be extended with options.
