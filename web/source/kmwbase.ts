@@ -22,8 +22,6 @@
 /// <reference path="kmwuimanager.ts" />
 // Defines OSK management code.
 /// <reference path="osk/oskManager.ts" />
-// Defines the language modeling layer (for use in autocorrect and text prediction)
-/// <reference path="includes/lmlayer.ts" />
 // Defines the model manager.
 /// <reference path="text/prediction/modelManager.ts" />
 

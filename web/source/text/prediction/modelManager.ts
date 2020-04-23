@@ -1,8 +1,6 @@
 // Defines the text processing KMW core.
 ///<reference path="../keyboardProcessor.ts" />
-// Defines the LMLayer's outer shell
-///<reference path="../../includes/lmlayer.ts" />
-// Defines the ModelManager and its related types.
+// Defines the KeyboardManager and its related types.
 ///<reference path="../../keyboards/kmwkeyboards.ts" />
 
 namespace com.keyman.text.prediction {
