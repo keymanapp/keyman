@@ -414,14 +414,24 @@
   }
 
   /**
-   * Converts word forms in into an indexable form. It does this by converting
-   * the string to uppercase and trying to remove diacritical marks.
+   * Converts wordforms into an indexable form. It does this by
+   * normalizing the letter case of Latin characters and removing
+   * common diacritical marks.
    *
-   * This is a very naïve implementation, that I've only though to work on
-   * languages that use the Latin script. Even then, some Latin-based
-   * orthographies use code points that, under NFD normalization, do NOT
-   * decompose into an ASCII letter and a combining diacritical mark (e.g.,
-   * SENĆOŦEN).
+   * This is a very naïve implementation, that I only think will work on
+   * some languages that use the Latin script. As of 2020-04-08, only
+   * 4 out of 11 (36%) of published language models use the Latin script,
+   * so this might not actually be a great default.
+   *
+   * Since String.prototype.normalize() is unavailable in IE11, this does
+   * NOT normalize into NFD, even though that's an easy way to separate
+   * a Latin character away from its diacritics; instead we use a hard-coded
+   * lookup table. This table also includes Greek, but I have no idea how
+   * useful that is.
+   *
+   * Even then, some Latin-based orthographies use code points that,
+   * under NFD normalization, do NOT decompose into an ASCII letter and a
+   * combining diacritical mark (e.g., SENĆOŦEN).
    *
    * Use this only in early iterations of the model. For a production lexical
    * model, you SHOULD write/generate your own key function, tailored to your
@@ -446,7 +456,7 @@
    * 11 *cough cough*). We want to use NFD to take off diacritical marks from
    * characters so that they are not used in key searches.
    *
-   * This table is of all characters in the range of U+0100 to U+2200 that
+   * This table is of all characters in the range of U+00C0 to U+212A that
    * have a canonical decomposition in NFD form. For some characters, this
    * translates them into their canonical characters (e.g., K -> K). For
    * characters with combining diacritical marks, this leaves behind the base

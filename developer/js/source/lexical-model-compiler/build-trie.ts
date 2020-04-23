@@ -15,11 +15,14 @@ type WordList = [string, number][];
  * @param sourceFiles an array of source files that will be read to generate the trie.
  */
 export function createTrieDataStructure(filenames: string[], searchTermToKey?: (wf: string) => string): string {
+  if (typeof searchTermToKey !== "function") {
+    throw new TypeError("searchTermToKey must be explicitly specified")
+  }
   // Make one big word list out of all of the filenames provided.
   let wordlist = filenames
     .map(parseWordListFromFilename)
     .reduce((bigWordlist, current) => bigWordlist.concat(current), []);
-  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.Wordform2Key);
+  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
   return JSON.stringify(trie);
 }
 
@@ -111,7 +114,7 @@ namespace Trie {
    * A function that converts a string (word form or query) into a search key
    * (secretly, this is also a string).
    */
-  export interface Wordform2Key {
+  export interface SearchTermToKey {
     (wordform: string): SearchKey;
   }
 
@@ -201,7 +204,7 @@ namespace Trie {
    * @param keyFunction Function that converts word forms into indexed search keys
    * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
-  export function buildTrie(wordlist: WordList, keyFunction: Wordform2Key = defaultWordform2Key): object {
+  export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
     let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
     return {
       totalWeight: sumWeights(root),
@@ -214,8 +217,8 @@ namespace Trie {
    */
   class Trie {
     readonly root = createRootNode();
-    toKey: Wordform2Key;
-    constructor(wordform2key: Wordform2Key) {
+    toKey: SearchTermToKey;
+    constructor(wordform2key: SearchTermToKey) {
       this.toKey = wordform2key;
     }
 
@@ -380,31 +383,35 @@ namespace Trie {
         .reduce((acc, count) => acc + count, 0);
     }
   }
+}
 
-  /**
-   * Converts word forms in into an indexable form. It does this by converting
-   * the string to uppercase and trying to remove diacritical marks.
-   *
-   * This is a very naïve implementation, that I've only though to work on
-   * languages that use the Latin script. Even then, some Latin-based
-   * orthographies use code points that, under NFD normalization, do NOT
-   * decompose into an ASCII letter and a combining diacritical mark (e.g.,
-   * SENĆOŦEN).
-   *
-   * Use this only in early iterations of the model. For a production lexical
-   * model, you SHOULD write/generate your own key function, tailored to your
-   * language.
-   */
-  function defaultWordform2Key(wordform: string): SearchKey {
-    // Use this pattern to remove common diacritical marks.
-    // See: https://www.compart.com/en/unicode/block/U+0300
-    const COMBINING_DIACRITICAL_MARKS = /[\u0300-\u036f]/g;
-    return wordform
-      .normalize('NFD')
-      .toLowerCase()
-      // remove diacritical marks.
-      .replace(COMBINING_DIACRITICAL_MARKS, '') as SearchKey;
-  }
+/**
+ * Converts wordforms into an indexable form. It does this by
+ * normalizing the letter case of Latin characters and removing
+ * common diacritical marks.
+ *
+ * This is a very naïve implementation, that I only think will work on
+ * some languages that use the Latin script. As of 2020-04-08, only
+ * 4 out of 11 (36%) of published language models use the Latin script,
+ * so this might not actually be a great default.
+ *
+ * This uses String.prototype.normalize() to convert normalize into NFD.
+ * NFD is an easy way to separate a Latin character from its diacritics;
+ * Even then, some Latin-based orthographies use code points that,
+ * under NFD normalization, do NOT decompose into an ASCII letter and a
+ * combining diacritical mark (e.g., SENĆOŦEN).
+ *
+ * Use this only in early iterations of the model. For a production lexical
+ * model, you SHOULD write/generate your own key function, tailored to your
+ * language.
+ */
+export function defaultSearchTermToKey(wordform: string): string {
+  return wordform
+    .toLowerCase()
+    .normalize('NFD')
+    // Remove all combining diacritics (if input is in NFD)
+    // common to Latin-orthographies.
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
 
