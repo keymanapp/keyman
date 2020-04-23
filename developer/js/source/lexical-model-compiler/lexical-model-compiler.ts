@@ -97,7 +97,7 @@ export class ModelSourceError extends Error {
  * Returns a JavaScript expression (as a string) that can serve as a word
  * breaking function.
  */
-function compileWordBreaker(wordBreakerSpec: WordBreakerSpec) {
+function compileWordBreaker(wordBreakerSpec: SimpleWordBreakerSpec) {
   // Use the default word breaker when it's unspecified
   if (!wordBreakerSpec) {
     wordBreakerSpec = 'default';
