@@ -10,14 +10,17 @@ interface LexicalModelDeclaration {
 }
 
 /**
- * How to specify a word breaker.
+ * Keyman 13.0+ word breaker specification:
+ *
+ * Can support all old word breaking specification,
+ * but can also be extended with options.
  */
 interface WordBreakerSpec {
   readonly use: SimpleWordBreakerSpec;
 }
 
 /**
- * Keyman 11.0 word breaker specification:
+ * Keyman 11.0+ word breaker specification:
  */
 type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 

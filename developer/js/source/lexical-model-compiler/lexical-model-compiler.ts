@@ -54,7 +54,6 @@ export default class LexicalModelCompiler {
           createTrieDataStructure(filenames, searchTermToKey)
         }, {\n`;
 
-
         let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
 
@@ -68,10 +67,6 @@ export default class LexicalModelCompiler {
       default:
         throw new ModelSourceError(`Unknown model format: ${modelSource.format}`);
     }
-
-    //
-    // TODO: Load custom wordbreak source files
-    //
 
     func += fileSuffix;
 
