@@ -1,11 +1,11 @@
 var assert = require('chai').assert;
 
 var defaultWordBreaker = require('../../build/intermediate').wordBreakers['default'];
-var joinWordBreaker = require('../../build/intermediate').wordBreakers['--join-word'];
+var decorateWithJoin = require('../../build/intermediate').wordBreakers['join_'];
 
 describe('The join word breaker decorator', function () {
   it('should decorate an existing word breaker', function () {
-    let breakWords = joinWordBreaker(defaultWordBreaker);
+    let breakWords = decorateWithJoin(defaultWordBreaker, ['-']);
     assert.isFunction(breakWords);
   });
 });
