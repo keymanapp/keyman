@@ -1,10 +1,6 @@
-// Includes KeymanWeb's Device class, as it's quite useful for ensuring that we target our tests correctly
-// to each device.
-/// <reference path="../../source/kmwdevice.ts" />
+/// <reference path="../../node_modules/keyman-keyboard-processor/src/text/engineDeviceSpec.ts" />
 
 namespace KMWRecorder {
-  import Device = com.keyman.Device;
-  
   type AssertCallback = (s1: any, s2: any, msg?: string) => void;
 
   export abstract class InputEvent {
@@ -419,7 +415,7 @@ namespace KMWRecorder {
       }
     }
 
-    matchesClient(device: Device, usingOSK?: boolean) {
+    matchesClient(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
       // #1:  Platform check.
       if(usingOSK === true) {
         if(this.target != device.formFactor) {
@@ -525,10 +521,7 @@ namespace KMWRecorder {
     }
 
     // Used to determine if the current InputTestSet is applicable to be run on a device.
-    isValidForCurrentClient(usingOSK?: boolean) {
-      var device: Device = new Device();
-      device.detect();
-
+    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
       return this.constraint.matchesClient(device, usingOSK);
     }
   }
@@ -585,7 +578,7 @@ namespace KMWRecorder {
       newSet.addTest(seq);      
     }
 
-    run(ele: HTMLElement, usingOSK?: boolean, assertCallback?: AssertCallback) {
+    run(ele: HTMLElement, device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean, assertCallback?: AssertCallback) {
       var setHasRun = false;
       var failures: TestFailure[] = [];
 
@@ -594,7 +587,7 @@ namespace KMWRecorder {
       for(var i = 0; i < this.inputTestSets.length; i++) {
         var testSet = this.inputTestSets[i];
 
-        if(testSet.isValidForCurrentClient(usingOSK)) {
+        if(testSet.isValidForDevice(device, usingOSK)) {
           var testFailures = testSet.run(ele, assertCallback);
           if(testFailures) {
             failures = failures.concat(testFailures);
