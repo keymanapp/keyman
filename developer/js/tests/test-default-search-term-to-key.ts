@@ -22,6 +22,11 @@ describe('The default searchTermToKey() function', function () {
     // which are DIFFERENT CHARACTERS in lowercased Greek!
     ['σκύλος', 'σκυλος'],
     ['ΣΚΥΛΟΣ', 'σκυλος'],
+
+    // full-width romaji is compatibility-canonical with ASCII characters:
+    ['ａｅｓｔｈｅｔｉｃ', 'aesthetic']
+
+    // TODO: test angstrom, greek semicolon, and other dumb stuff
   ];
 
   for (let [input, expected] of testCases) {
