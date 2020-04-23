@@ -99,19 +99,7 @@ export class ModelSourceError extends Error {
  */
 function compileWordBreaker(wordBreakerSpec: WordBreakerSpec | SimpleWordBreakerSpec) {
   // Use the default word breaker when it's unspecified
-  let spec_: WordBreakerSpec;
-  if (!wordBreakerSpec) {
-    spec_ = { use: 'default' };
-  } else if (wordBreakerSpec === "default" || wordBreakerSpec === 'ascii') {
-    spec_ = { use: wordBreakerSpec };
-  } else if (typeof wordBreakerSpec === "function") {
-    // The word breaker was passed as a literal function; use its source code.
-    spec_ = { use: wordBreakerSpec };
-  } else if (wordBreakerSpec.use) {
-    spec_ = wordBreakerSpec;
-  } else {
-    throw new Error(`Unknown word breaker: ${wordBreakerSpec}`)
-  }
+  let spec_ = normalizeWordBreakerSpec(wordBreakerSpec);
 
   if (typeof spec_.use === "string") {
     // It must be a builtin word breaker, so just instantiate it.
@@ -123,3 +111,18 @@ function compileWordBreaker(wordBreakerSpec: WordBreakerSpec | SimpleWordBreaker
       .replace(/^wordBreak(ing|er)\b/, 'function');
   }
 }
+function normalizeWordBreakerSpec(wordBreakerSpec: WordBreakerSpec | SimpleWordBreakerSpec): WordBreakerSpec {
+  if (!wordBreakerSpec) {
+    return { use: 'default' };
+  } else if (wordBreakerSpec === "default" || wordBreakerSpec === 'ascii') {
+    return { use: wordBreakerSpec };
+  } else if (typeof wordBreakerSpec === "function") {
+    // The word breaker was passed as a literal function; use its source code.
+    return { use: wordBreakerSpec };
+  } else if (wordBreakerSpec.use) {
+    return wordBreakerSpec;
+  } else {
+    throw new Error(`Unknown word breaker: ${wordBreakerSpec}`);
+  }
+}
+
