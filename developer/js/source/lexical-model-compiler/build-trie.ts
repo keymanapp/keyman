@@ -392,7 +392,7 @@ namespace Trie {
  * and removing common diacritical marks.
  *
  * This is a very speculative implementation, that might work with
- * your language. We don't guarentee that this will be perfect for your
+ * your language. We don't guarantee that this will be perfect for your
  * language, but it's a start.
  *
  * This uses String.prototype.normalize() to convert normalize into NFKD.

@@ -42,7 +42,11 @@ describe('The default searchTermToKey() function', function () {
     // U+FEEC ARABIC LETTER HEH MEDIAL FORM -> U+0647 ARABIC LETTER HEH
     // U+FEEE ARABIC LETTER WAW FINAL FORM -> U+0648 ARABIC LETTER WAW
     // U+FE93 ARABIC LETTER TEH MARBUTA ISOLATED FORM -> U+0629 ARABIC LETTER TEH MARBUTA
-    ['\uFE8D\uFEDF\uFED8\uFEEC\uFEEE\uFE93', '\u0627\u0644\u0642\u0647\u0648\u0629']
+    ['\uFE8D\uFEDF\uFED8\uFEEC\uFEEE\uFE93', '\u0627\u0644\u0642\u0647\u0648\u0629'],
+
+    // Combine both NFKD **AND** knocking off diacritics:
+    // U+01C4 Ǆ -> U+0044 U+005A DZ
+    ['\u01C4', 'dz'],
   ];
 
   for (let [input, expected] of testCases) {
