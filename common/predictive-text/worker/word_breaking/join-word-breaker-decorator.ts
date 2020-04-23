@@ -56,6 +56,10 @@ namespace wordBreakers {
     }
 
     function concatenateSpans(former: Span, latter: Span) {
+      if (latter.start !== former.end) {
+        throw new Error(`Cannot concatenate non-contiguous spans: ${former}/${latter}`);
+      }
+
       return {
         start: former.start,
         end: latter.end,
