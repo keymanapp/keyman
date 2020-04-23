@@ -5,21 +5,28 @@ import { defaultSearchTermToKey } from '../dist/lexical-model-compiler/build-tri
 
 
 describe('The default searchTermToKey() function', function () {
-  it('should lowercase and THEN normalize', function() {
+  const testCases: [string, string][] = [
     // "İstanbul" has a U+0130 LATIN CAPITAL LETTER I WITH DOT ABOVE.
     // This should be lowercased.
-    assert.equal(defaultSearchTermToKey('İstanbul'), 'istanbul');
+    ['İstanbul', 'istanbul'],
+
     // The DEFAULT function is NOT responsible for understanding the Turkish
     // case regarding the lowercasing of:
     // 'I' U+0048 LATIN CAPITAL LETTER I to 'ı' U+0131 LATIN SMALL LETTER DOTLESS I
     // For Turkic languages, the recommendation is to make a
     // custom searchTermToKey function:
-    assert.equal(defaultSearchTermToKey('DİYARBAKIR'), 'diyarbakir');
+    ['DİYARBAKIR', 'diyarbakir'],
 
     // "skýlos" is Greek for dog 🇬🇷🐶
     // starts with an 's' and ends with an 's'
     // which are DIFFERENT CHARACTERS in lowercased Greek!
-    assert.equal(defaultSearchTermToKey('σκύλος'), 'σκυλος');
-    assert.equal(defaultSearchTermToKey('ΣΚΥΛΟΣ'), 'σκυλος');
-  });
+    ['σκύλος', 'σκυλος'],
+    ['ΣΚΥΛΟΣ', 'σκυλος'],
+  ];
+
+  for (let [input, expected] of testCases) {
+    it(`should normalize '${input}' to '${expected}'`, function() {
+      assert.equal(defaultSearchTermToKey(input), expected);
+    });
+  }
 });
