@@ -4,8 +4,7 @@ namespace KMWRecorder {
   type AssertCallback = (s1: any, s2: any, msg?: string) => void;
 
   export abstract class InputEvent {
-    abstract simulateEventOn(ele: HTMLElement): void;
-
+    type: "key" | "osk";
     static fromJSONObject(obj: any): InputEvent {
       if(obj && obj.type) {
         if(obj.type == "key") {
@@ -26,9 +25,6 @@ namespace KMWRecorder {
   }
 
   export class PhysicalInputEvent extends InputEvent {
-    static readonly eventClass: string = "KeyboardEvent";
-    static readonly eventType: string = "keydown";
-
     static readonly modifierCodes: { [mod:string]: number } = {
       "Shift":0x0001,
       "Control":0x0002,
@@ -40,7 +36,7 @@ namespace KMWRecorder {
     };
 
     // KeyboardEvent properties
-    type: string = "key";
+    type: "key" = "key";
     key: string;
     code: string;
     keyCode: number;
@@ -82,7 +78,7 @@ namespace KMWRecorder {
       return (PhysicalInputEvent.modifierCodes[key] & this.modifierSet) != 0;
     }
 
-    private generateModifierString(): string {
+    generateModifierString(): string {
       var list: string = "";
 
       for(var key in PhysicalInputEvent.modifierCodes) {
@@ -93,39 +89,10 @@ namespace KMWRecorder {
 
       return list;
     }
-
-    simulateEventOn(ele: HTMLElement) {
-      var event: Event;
-
-      // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-      var downEvent;
-      if(typeof Event == 'function') {
-        event = new Event(PhysicalInputEvent.eventType);
-        event['key'] = this.key;
-        event['code'] = this.code;
-        event['keyCode'] = this.keyCode;
-        event['location'] = this.location;
-        event['getModifierState'] = this.getModifierState.bind(this);
-      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
-        event = document.createEvent(PhysicalInputEvent.eventClass);
-        // An override to ensure that IE's method gets called.
-        // Many thanks to https://gist.github.com/termi/4654819, line 142 at the time of writing this.
-        var success = (<any>event).initKeyboardEvent(PhysicalInputEvent.eventType, false, true, null, this.key, /*this.code,*/ this.location, 
-          this.generateModifierString(), 0, 0);
-      }
-
-      ele.dispatchEvent(event);
-    }
   }
 
   export class OSKInputEvent extends InputEvent {
-    static readonly eventClass: string = "MouseEvent";
-    static readonly downMouseType: string = "mousedown";
-    static readonly upMouseType: string = "mouseup";
-    static readonly downTouchType: string = "touchstart";
-    static readonly upTouchType: string = "touchend";
-
-    type: string = "osk";
+    type: "osk" = "osk";
     keyID: string;
 
     // osk.clickKey receives the element clicked or touched in OSK interactions.
@@ -136,50 +103,6 @@ namespace KMWRecorder {
       } else {
         this.keyID = ele.keyID;
       }
-    }
-
-    simulateEventOn(target: HTMLElement) {
-      var oskKeyElement = document.getElementById(this.keyID);
-
-      if(!oskKeyElement) {
-        console.error('Could not find OSK key "' + this.keyID + '"!');
-        // The following lines will throw an appropriate-enough error.
-        return;
-      }
-
-      // To be safe, we replicate the MouseEvent similarly to the keystroke event.
-      var downEvent;
-      var upEvent;
-      if(typeof Event == 'function') {
-        if(target['base'] && target instanceof HTMLDivElement) {
-          downEvent = new Event(OSKInputEvent.downTouchType);
-          upEvent = new Event(OSKInputEvent.upTouchType);
-          downEvent['touches'] = [{"target": oskKeyElement}];
-          upEvent['touches'] = [{"target": oskKeyElement}];
-          downEvent['changedTouches'] = [{"target": oskKeyElement}];
-          upEvent['changedTouches'] = [{"target": oskKeyElement}];
-        } else {
-          downEvent = new Event(OSKInputEvent.downMouseType);
-          upEvent = new Event(OSKInputEvent.upMouseType);
-          downEvent['relatedTarget'] = target;
-          upEvent['relatedTarget'] = target;
-        }
-      } else { // Yeah, so IE can't use the above at all, and requires its own trick.
-        downEvent = document.createEvent(OSKInputEvent.eventClass);
-        downEvent.initMouseEvent(OSKInputEvent.downMouseType, false, true, null,
-          null, 0, 0, 0, 0,
-          false, false, false, false,
-          0, oskKeyElement);
-
-        upEvent = document.createEvent(OSKInputEvent.eventClass);
-        upEvent.initMouseEvent(OSKInputEvent.upMouseType, false, true, null,
-          null, 0, 0, 0, 0,
-          false, false, false, false,
-          0, oskKeyElement);
-      }
-
-      oskKeyElement.dispatchEvent(downEvent);
-      oskKeyElement.dispatchEvent(upEvent);
     }
   }
 
@@ -239,9 +162,10 @@ namespace KMWRecorder {
 
     simulateSequenceOn(ele: HTMLElement, assertCallback?: AssertCallback): {success: boolean, result: string} {
       resetElement(ele);
+      let driver = new BrowserDriver(ele);
 
       for(var i=0; i < this.inputs.length; i++) {
-        this.inputs[i].simulateEventOn(ele);
+        driver.simulateEvent(this.inputs[i]);
       }
 
       var result;
