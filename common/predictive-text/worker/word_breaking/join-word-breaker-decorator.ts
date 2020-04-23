@@ -20,12 +20,7 @@ namespace wordBreakers {
 
       for (let current of originalResults) {
         if (shouldJoinNextSpan) {
-          previous = {
-            start: previous.start,
-            end: current.end,
-            length: previous.length + current.length,
-            text: previous.text + current.text
-          }
+          previous = concatenateSpans(previous, current);
           shouldJoinNextSpan = false;
           continue;
         }
@@ -46,13 +41,9 @@ namespace wordBreakers {
           continue;
         }
 
-        // LET'S JOIN THE TWO SPANS!
-        previous = {
-          start: previous.start,
-          end: current.end,
-          length: previous.length + current.length,
-          text: previous.text + current.text
-        };
+        // The delimiter indicates we should join this,
+        // the previous span, and the next span!
+        previous = concatenateSpans(previous, current);
         shouldJoinNextSpan = true;
       }
 
@@ -62,6 +53,15 @@ namespace wordBreakers {
       }
 
       return results;
+    }
+
+    function concatenateSpans(former: Span, latter: Span) {
+      return {
+        start: former.start,
+        end: latter.end,
+        length: former.length + latter.length,
+        text: former.text + latter.text
+      };
     }
 
     /**
