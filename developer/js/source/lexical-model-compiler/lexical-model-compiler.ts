@@ -109,7 +109,11 @@ function compileWordBreaker(spec: WordBreakerSpec): string {
   }
 }
 
-function normalizeWordBreakerSpec(wordBreakerSpec: WordBreakerSpec | SimpleWordBreakerSpec): WordBreakerSpec {
+/**
+ * Given a word breaker specification in any of the messy ways,
+ * normalizes it to a common form that the compiler can deal with.
+ */
+function normalizeWordBreakerSpec(wordBreakerSpec: LexicalModelSource["wordBreaker"]): WordBreakerSpec {
   if (!wordBreakerSpec) {
     // Use the default word breaker when it's unspecified
     return { use: 'default' };
