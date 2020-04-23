@@ -122,28 +122,10 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
 
   @Override
   public void onClick(View v) {
-    @SuppressWarnings("unchecked")
     Keyboard kbInfo = (Keyboard) v.getTag();
     Intent i = new Intent(this.getContext(), KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-    String packageID = kbInfo.getPackage();
-    String keyboardID = kbInfo.getResourceId();
-    if (packageID == null || packageID.isEmpty()) {
-      packageID = KMManager.KMDefault_UndefinedPackageID;
-    }
-    i.putExtra(KMManager.KMKey_PackageID, packageID);
-    i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
-    i.putExtra(KMManager.KMKey_LanguageID, kbInfo.getLanguageCode());
-    i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.getResourceName());
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID);
-    i.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
-    i.putExtra(KMManager.KMKey_CustomKeyboard, kbInfo.isCustomKeyboard());
-    String helpLink = kbInfo.getCustomHelpLink();
-    if (FileUtils.isWelcomeFile(helpLink)) {
-      i.putExtra(KMManager.KMKey_CustomHelpLink, helpLink);
-    } else {
-      i.putExtra(KMManager.KMKey_HelpLink, helpLink);
-    }
+    i.putExtra(KMManager.KMKey_Keyboard, kbInfo);
     KeyboardInfoActivity.titleFont = listFont;
     this.getContext().startActivity(i);
   }
