@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.55 alpha 2020-04-23
+
+* modify(android): Convert LanguageListActivity to utility (#3018)
+* refactor(web/engine): successful web-core compilation (#2992)
+* change(common/lmlayer): always bundle searchTermToKey() with model (#2971)
+* change(common/lmlayer): remove NFD table (#3014)
+
 ## 14.0.54 alpha 2020-04-22
 
 * refactor(common/lmlayer): word breaker compilation (#3016)
