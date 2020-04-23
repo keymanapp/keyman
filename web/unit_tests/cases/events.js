@@ -45,7 +45,8 @@ describe('Event Management', function() {
     com.keyman.dom['DOMEventHandlers'].states.lastActiveElement = ele;
     com.keyman.dom['DOMEventHandlers'].states.activeElement = ele;
 
-    event.simulateEventOn(ele);
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
 
     var focusEvent;
 
@@ -81,7 +82,8 @@ describe('Event Management', function() {
     com.keyman.dom['DOMEventHandlers'].states.lastActiveElement = ele;
     com.keyman.dom['DOMEventHandlers'].states.activeElement = ele;
 
-    event.simulateEventOn(ele);
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
 
     var focusEvent;
 
@@ -125,9 +127,10 @@ describe('Event Management', function() {
       aliasing = true;
     }
 
-    event.simulateEventOn(ele);
-    event.simulateEventOn(ele);
-    event.simulateEventOn(ele);
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
   });
 
   it('OSK-based onInput event generation', function(done) {
@@ -159,8 +162,9 @@ describe('Event Management', function() {
       aliasing = true;
     }
 
-    event.simulateEventOn(ele);
-    event.simulateEventOn(ele);
-    event.simulateEventOn(ele);
+    let eventDriver = new KMWRecorder.BrowserDriver(ele);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
+    eventDriver.simulateEvent(event);
   });
 });

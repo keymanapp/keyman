@@ -960,7 +960,8 @@ describe('Engine', function() {
       var lao_s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
       var lao_s_event = new KMWRecorder.PhysicalInputEvent(lao_s_key_json);
 
-      lao_s_event.simulateEventOn(inputElem);
+      let eventDriver = new KMWRecorder.BrowserDriver(inputElem);
+      eventDriver.simulateEvent(lao_s_event);
 
       if(inputElem['base']) {
         inputElem = inputElem['base'];
@@ -977,7 +978,8 @@ describe('Engine', function() {
       var lao_s_osk_json = {"type": "osk", "keyID": 'shift-K_S'};
       var lao_s_event = new KMWRecorder.OSKInputEvent(lao_s_osk_json);
 
-      lao_s_event.simulateEventOn(inputElem);
+      let eventDriver = new KMWRecorder.BrowserDriver(inputElem);
+      eventDriver.simulateEvent(lao_s_event);
 
       if(inputElem['base']) {
         inputElem = inputElem['base'];

@@ -246,13 +246,13 @@ var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
   loadKeyboardStub(stub, callback, timeout);
 }
 
-function runLoadedKeyboardTest(testDef, usingOSK, assertCallback) {
+function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
   var inputElem = document.getElementById('singleton');
     if(inputElem['kmw_ip']) {
       inputElem = inputElem['kmw_ip'];
     }
 
-    testDef.run(inputElem, usingOSK, assertCallback);
+    testDef.run(inputElem, device, usingOSK, assertCallback);
 }
 
 function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, timeout) {
