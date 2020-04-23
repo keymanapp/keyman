@@ -387,27 +387,29 @@ namespace Trie {
 
 /**
  * Converts wordforms into an indexable form. It does this by
- * normalizing the letter case of Latin characters and removing
- * common diacritical marks.
+ * normalizing the letter case of characters INDIVIDUALLY (to disregard
+ * context-sensitive case transformations), normalizing to NFKD form,
+ * and removing common diacritical marks.
  *
- * This is a very naïve implementation, that I only think will work on
- * some languages that use the Latin script. As of 2020-04-08, only
- * 4 out of 11 (36%) of published language models use the Latin script,
- * so this might not actually be a great default.
+ * This is a very speculative implementation, that might work with
+ * your language. We don't guarentee that this will be perfect for your
+ * language, but it's a start.
  *
- * This uses String.prototype.normalize() to convert normalize into NFD.
- * NFD is an easy way to separate a Latin character from its diacritics;
- * Even then, some Latin-based orthographies use code points that,
- * under NFD normalization, do NOT decompose into an ASCII letter and a
- * combining diacritical mark (e.g., SENĆOŦEN).
+ * This uses String.prototype.normalize() to convert normalize into NFKD.
+ * NFKD neutralizes some funky distinctions, e.g., ꬲ, ｅ, e should all be the
+ * same character; plus, it's an easy way to separate a Latin character from
+ * its diacritics; Even then, orthographies regularly use code points
+ * that, under NFKD normalization, do NOT decompose appropriately for your 
+ * language (e.g., SENĆOŦEN, Plains Cree in syllabics).
  *
- * Use this only in early iterations of the model. For a production lexical
- * model, you SHOULD write/generate your own key function, tailored to your
- * language.
+ * Use this in early iterations of the model. For a production lexical model,
+ * you will probably write/generate your own key function, tailored to your
+ * language. There is a chance the default will work properly out of the box.
  */
 export function defaultSearchTermToKey(wordform: string): string {
-  return wordform
-    .toLowerCase()
+  return Array.from(wordform)
+    .map(c => c.toLowerCase())
+    .join('')
     .normalize('NFKD')
     // Remove all combining diacritics (if input is in NFD)
     // common to Latin-orthographies.
