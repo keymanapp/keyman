@@ -23,6 +23,8 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, Void> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
@@ -48,7 +50,25 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
         List<Keyboard> kbdList = new ArrayList<>(kbdMapList.size());
 
         for(HashMap<String, String> kbdMap: kbdMapList) {
-          kbdList.add(new Keyboard(kbdMap));
+          boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
+            kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
+          boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
+            kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
+
+          Keyboard k = new Keyboard(
+            kbdMap.get(KMManager.KMKey_PackageID),
+            kbdMap.get(KMManager.KMKey_KeyboardID),
+            kbdMap.get(KMManager.KMKey_KeyboardName),
+            kbdMap.get(KMManager.KMKey_LanguageID),
+            kbdMap.get(KMManager.KMKey_LanguageName),
+            isCustom,
+            isNewKeyboard,
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
+          );
+          kbdList.add(k);
         }
 
         return kbdList;
@@ -103,31 +123,26 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
   @Override
   public void onClick(View v) {
     @SuppressWarnings("unchecked")
-    Map<String, String> kbInfo = ((Keyboard) v.getTag()).map;
+    Keyboard kbInfo = (Keyboard) v.getTag();
     Intent i = new Intent(this.getContext(), KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-    String packageID = kbInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
+    String packageID = kbInfo.getPackage();
+    String keyboardID = kbInfo.getResourceId();
     if (packageID == null || packageID.isEmpty()) {
       packageID = KMManager.KMDefault_UndefinedPackageID;
     }
     i.putExtra(KMManager.KMKey_PackageID, packageID);
     i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
-    i.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
-    i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
+    i.putExtra(KMManager.KMKey_LanguageID, kbInfo.getLanguageCode());
+    i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.getResourceName());
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID);
     i.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
-    boolean isCustom = false;
-    if (kbInfo.get(KMManager.KMKey_CustomKeyboard) != null || kbInfo.containsKey(KMManager.KMKey_CustomKeyboard)) {
-      isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
-    }
-    i.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
-    String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
-    if (customHelpLink != null) {
-      i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
+    i.putExtra(KMManager.KMKey_CustomKeyboard, kbInfo.isCustomKeyboard());
+    String helpLink = kbInfo.getCustomHelpLink();
+    if (FileUtils.isWelcomeFile(helpLink)) {
+      i.putExtra(KMManager.KMKey_CustomHelpLink, helpLink);
     } else {
-      i.putExtra(KMManager.KMKey_HelpLink,
-        String.format("https://help.keyman.com/keyboard/%s/%s/", keyboardID, keyboardVersion));
+      i.putExtra(KMManager.KMKey_HelpLink, helpLink);
     }
     KeyboardInfoActivity.titleFont = listFont;
     this.getContext().startActivity(i);

@@ -64,38 +64,18 @@ public class CloudDataJsonUtil {
       return keyboardsList;
     }
 
-    String isCustom = fromKMP ? "Y" : "N";
-
     try {
       // Thank you, Cloud API format.
       JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
       for (int i = 0; i < languages.length(); i++) {
-        JSONObject language = languages.getJSONObject(i);
+        JSONObject languageJSON = languages.getJSONObject(i);
+        JSONArray langKeyboards = languageJSON.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
 
-        String langID = language.getString(KMManager.KMKey_ID);
-        String langName = language.getString(KMManager.KMKey_Name);
-
-        JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-
+        // Can't foreach a JSONArray
         int kbLength = langKeyboards.length();
         for (int j = 0; j < kbLength; j++) {
           JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
-          String pkgID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-          String kbID = keyboardJSON.getString(KMManager.KMKey_ID);
-          String kbName = keyboardJSON.getString(KMManager.KMKey_Name);
-          String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-          String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
-          String customHelpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink, null);
-
-          //String kbKey = String.format("%s_%s", langID, kbID);
-          HashMap<String, String> hashMap = createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null, customHelpLink);
-
-
-//          if (keyboardModifiedDates.get(kbID) == null) {
-//            keyboardModifiedDates.put(kbID, keyboardJSON.getString(KMManager.KMKey_KeyboardModified));
-//          }
-
-          keyboardsList.add(new Keyboard(hashMap));
+          keyboardsList.add(new Keyboard(languageJSON, keyboardJSON));
         }
       }
     } catch (JSONException | NullPointerException e) {

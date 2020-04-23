@@ -578,14 +578,32 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       return storageDataset;
     }
 
-    List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
+    List<HashMap<String, String>> kbdMapList = getKeyboardsList(context);
     if (kbdMapList == null) {
       kbdMapList = new ArrayList<>(0);
     }
     List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
 
-    for(Map<String, String> map: kbdMapList) {
-      kbdsList.add(new Keyboard(map));
+    for(HashMap<String, String> kbdMap: kbdMapList) {
+      boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
+        kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
+      boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
+        kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
+
+      Keyboard k = new Keyboard(
+        kbdMap.get(KMManager.KMKey_PackageID),
+        kbdMap.get(KMManager.KMKey_KeyboardID),
+        kbdMap.get(KMManager.KMKey_KeyboardName),
+        kbdMap.get(KMManager.KMKey_LanguageID),
+        kbdMap.get(KMManager.KMKey_LanguageName),
+        isCustom,
+        isNewKeyboard,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
+      );
+      kbdsList.add(k);
     }
 
     List<? extends Map<String, String>> lexMapList = getLexicalModelsList(context);
@@ -612,10 +630,28 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     storage.keyboards.setNotifyOnChange(false);
     storage.keyboards.clear();
 
-    List<? extends Map<String, String>> mapList = getKeyboardsList(context);
+    List<HashMap<String, String>> mapList = getKeyboardsList(context);
     List<Keyboard> kbdList = new ArrayList<>(mapList.size());
-    for(Map<String, String> map: mapList) {
-      kbdList.add(new Keyboard(map));
+    for(HashMap<String, String> kbdMap: mapList) {
+      boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
+        kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
+      boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
+        kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
+
+      Keyboard k = new Keyboard(
+        kbdMap.get(KMManager.KMKey_PackageID),
+        kbdMap.get(KMManager.KMKey_KeyboardID),
+        kbdMap.get(KMManager.KMKey_KeyboardName),
+        kbdMap.get(KMManager.KMKey_LanguageID),
+        kbdMap.get(KMManager.KMKey_LanguageName),
+        isCustom,
+        isNewKeyboard,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
+      );
+      kbdList.add(k);
     }
     storage.keyboards.addAll(kbdList);
     storage.keyboards.notifyDataSetChanged();
