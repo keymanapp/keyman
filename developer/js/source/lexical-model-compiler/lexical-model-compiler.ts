@@ -55,7 +55,7 @@ export default class LexicalModelCompiler {
         }, {\n`;
 
 
-        let wordBreakerSourceCode = compileWordBreaker(modelSource.wordBreaker);
+        let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
 
         func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
@@ -97,22 +97,21 @@ export class ModelSourceError extends Error {
  * Returns a JavaScript expression (as a string) that can serve as a word
  * breaking function.
  */
-function compileWordBreaker(wordBreakerSpec: WordBreakerSpec | SimpleWordBreakerSpec) {
-  // Use the default word breaker when it's unspecified
-  let spec_ = normalizeWordBreakerSpec(wordBreakerSpec);
-
-  if (typeof spec_.use === "string") {
+function compileWordBreaker(spec: WordBreakerSpec): string {
+  if (typeof spec.use === "string") {
     // It must be a builtin word breaker, so just instantiate it.
-    return `wordBreakers['${wordBreakerSpec}']`;
+    return `wordBreakers['${spec.use}']`;
   } else {
-    return wordBreakerSpec.toString()
+    return spec.use.toString()
       // Note: the .toString() might just be the property name, but we want a
       // plain function:
       .replace(/^wordBreak(ing|er)\b/, 'function');
   }
 }
+
 function normalizeWordBreakerSpec(wordBreakerSpec: WordBreakerSpec | SimpleWordBreakerSpec): WordBreakerSpec {
   if (!wordBreakerSpec) {
+    // Use the default word breaker when it's unspecified
     return { use: 'default' };
   } else if (wordBreakerSpec === "default" || wordBreakerSpec === 'ascii') {
     return { use: wordBreakerSpec };
