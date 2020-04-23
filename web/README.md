@@ -16,9 +16,6 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install nodejs
 ```
 
-* A globally-installed `lerna` package (`npm install -g lerna`)
-  * Builds will call `lerna bootstrap` to setup and manage all needed `npm link`s for within-repo dependencies.
-
 **********************************************************************
 
 The following folders contain the distribution for KeymanWeb:
