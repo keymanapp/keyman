@@ -12,54 +12,53 @@ namespace wordBreakers {
     const delimiters = joiners.concat();
 
     return function (input: string): Span[] {
-      let joinCandidate: Span | undefined;
-      let shouldJoinNext = false;
+      let previous: Span | undefined;
+      let shouldJoinNextSpan = false;
 
       let originalResults = breaker(input);
       let results: Span[] = [];
 
-      for (let span of originalResults) {
-        // We should join these spans!
-        if (shouldJoinNext) {
-          joinCandidate = {
-            start: joinCandidate.start,
-            end: span.end,
-            length: joinCandidate.length + span.length,
-            text: joinCandidate.text + span.text
+      for (let current of originalResults) {
+        if (shouldJoinNextSpan) {
+          previous = {
+            start: previous.start,
+            end: current.end,
+            length: previous.length + current.length,
+            text: previous.text + current.text
           }
-          shouldJoinNext = false;
+          shouldJoinNextSpan = false;
           continue;
         }
 
         // No join candidate? Now it is!
-        if (!joinCandidate) {
-          joinCandidate = span;
-          shouldJoinNext = false;
+        if (!previous) {
+          previous = current;
+          shouldJoinNextSpan = false;
           continue;
         }
 
         // Should we bother joining these spans?
-        if (!includes(delimiters, span.text)) {
+        if (!includes(delimiters, current.text)) {
           // We can't join them
-          results.push(joinCandidate);
-          joinCandidate = span;
-          shouldJoinNext = false;
+          results.push(previous);
+          previous = current;
+          shouldJoinNextSpan = false;
           continue;
         }
 
         // LET'S JOIN THE TWO SPANS!
-        joinCandidate = {
-          start: joinCandidate.start,
-          end: span.end,
-          length: joinCandidate.length + span.length,
-          text: joinCandidate.text + span.text
+        previous = {
+          start: previous.start,
+          end: current.end,
+          length: previous.length + current.length,
+          text: previous.text + current.text
         };
-        shouldJoinNext = true;
+        shouldJoinNextSpan = true;
       }
 
       // Add the leftover span.
-      if (joinCandidate) {
-        results.push(joinCandidate);
+      if (previous) {
+        results.push(previous);
       }
 
       return results;
