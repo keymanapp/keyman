@@ -408,7 +408,7 @@ namespace Trie {
 export function defaultSearchTermToKey(wordform: string): string {
   return wordform
     .toLowerCase()
-    .normalize('NFD')
+    .normalize('NFKD')
     // Remove all combining diacritics (if input is in NFD)
     // common to Latin-orthographies.
     .replace(/[\u0300-\u036f]/g, '');
