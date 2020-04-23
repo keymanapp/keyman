@@ -114,12 +114,10 @@ function compileWordBreaker(spec: WordBreakerSpec): string {
  * normalizes it to a common form that the compiler can deal with.
  */
 function normalizeWordBreakerSpec(wordBreakerSpec: LexicalModelSource["wordBreaker"]): WordBreakerSpec {
-  if (!wordBreakerSpec) {
+  if (wordBreakerSpec == undefined) {
     // Use the default word breaker when it's unspecified
     return { use: 'default' };
-  } else if (wordBreakerSpec === "default" || wordBreakerSpec === 'ascii') {
-    return { use: wordBreakerSpec };
-  } else if (typeof wordBreakerSpec === "function") {
+  } else if (isSimpleWordBreaker(wordBreakerSpec)) {
     // The word breaker was passed as a literal function; use its source code.
     return { use: wordBreakerSpec };
   } else if (wordBreakerSpec.use) {
@@ -129,3 +127,6 @@ function normalizeWordBreakerSpec(wordBreakerSpec: LexicalModelSource["wordBreak
   }
 }
 
+function isSimpleWordBreaker(spec: WordBreakerSpec | SimpleWordBreakerSpec): spec is SimpleWordBreakerSpec  {
+  return typeof spec === "function" || spec === "default" || spec === "ascii";
+}
