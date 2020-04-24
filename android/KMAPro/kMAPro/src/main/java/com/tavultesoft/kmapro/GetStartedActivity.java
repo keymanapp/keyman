@@ -70,6 +70,7 @@ public class GetStartedActivity extends AppCompatActivity {
     });
 
     final TextView getStartedText = findViewById(R.id.getStartedText);
+    getStartedText.setText(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
     getStartedText.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
