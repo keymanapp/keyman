@@ -248,6 +248,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
+            BUILD_CORE=false
             ;;
         -test)
             set_default_vars
