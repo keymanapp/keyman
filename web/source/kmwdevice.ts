@@ -1,7 +1,5 @@
 // Includes version-related functionality
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/outputTarget.ts" />
 ///<reference path="utils/styleConstants.ts" />
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
 
 // The Device object definition -------------------------------------------------
 

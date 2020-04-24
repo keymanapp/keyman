@@ -1,7 +1,5 @@
 // Defines the TouchAliasElement merged type.
 /// <reference path="../touchAliasElement.ts" />
-// Defines the OutputTarget interface.
-/// <reference path="../../../node_modules/@keymanapp/keyboard-processor/src/text/outputTarget.ts" />
 
 namespace com.keyman.dom.targets {
   export class TouchAlias extends OutputTarget {
