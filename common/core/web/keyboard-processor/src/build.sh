@@ -51,4 +51,4 @@ fi
 exportEnvironmentDefinitionTS
 
 # Compile web's `keyboard-processor` module.
-npm run tsc -- -p src/tsconfig.json
+npm run tsc -- -p src/tsconfig.json || fail "Failed to compile the core/web/keyboard-processor module."

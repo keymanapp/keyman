@@ -79,7 +79,7 @@ if [ $BUILD_CORE = true ]; then
     cd ../../keyboard-processor/src
     echo ""
     echo "Compiling Keyboard Processor module..."
-    ./build.sh $FLAGS || fail "Failed to compile the core/web/keyboard-processor module."
+    ./build.sh $FLAGS || fail "Dependency build failed; aborting"
     cd ../../input-processor/src
     echo "Keyboard Processor module compilation successful."
     echo ""
@@ -87,6 +87,6 @@ fi
 
 # Compile web's `keyboard-processor` module.
 echo "Compiling Input Processor module..."
-npm run tsc -- -p src/tsconfig.json
+npm run tsc -- -p src/tsconfig.json || fail "Failed to compile the core/web/input-processor module."
 echo "Input Processor module compilation successful."
 echo ""
