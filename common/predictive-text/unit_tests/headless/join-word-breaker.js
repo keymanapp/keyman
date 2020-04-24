@@ -33,6 +33,9 @@ describe('The join word breaker decorator', function () {
       ["-", "yâhk", "ê", "-", "nitawi", "-", "kotiskâwêyâhk", "ni", "-"],
       ["-yâhk", "ê-nitawi-kotiskâwêyâhk", "ni-"]
     ],
+
+    // Do not perform any joins:
+    ["hello world", "-", ["hello", "world"], ["hello", "world"]],
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
