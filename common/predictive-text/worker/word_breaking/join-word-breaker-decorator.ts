@@ -58,8 +58,24 @@ namespace wordBreakers {
         }
       }
       
-      // TODO: place empty ranges in between.
-      let contiguousRanges: number[][] = joinRanges.concat();
+      let contiguousRanges: number[][] = [];
+      let insideRange = false;
+      let currentJoin = joinRanges.shift();
+      originalResults.forEach((_, index) => {
+        if (insideRange) {
+          if (index === lastFrom(currentJoin)) {
+            insideRange = false;
+            currentJoin = joinRanges.shift();
+          }
+        } else {
+          if (currentJoin && index === currentJoin[0]) {
+            insideRange = true;
+            contiguousRanges.push(currentJoin);
+          } else {
+            contiguousRanges.push([index]);
+          }
+        }
+      })
 
       return contiguousRanges.map(range => {
         if (range.length === 1) {
@@ -100,7 +116,10 @@ namespace wordBreakers {
       return false;
     }
 
-    function lastFrom<T>(array: T[]): T {
+    /**
+     * Get the last element from the array.
+     */
+    function lastFrom<T>(array: T[]): T | undefined {
       return array[array.length - 1];
     }
   }
