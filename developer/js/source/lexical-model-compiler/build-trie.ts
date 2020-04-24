@@ -411,9 +411,8 @@ export function defaultSearchTermToKey(wordform: string): string {
     .map(c => c.toLowerCase())
     .join('')
     .normalize('NFKD')
-    // Remove all combining diacritics (if input is in NFD)
-    // common to Latin-orthographies.
-    .replace(/[\u0300-\u036f]/g, '');
+    // Remove any combining diacritics (if input is in NFKD)
+    .replace(/[\u0300-\u036F]/g, '');
 }
 
 
