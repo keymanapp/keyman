@@ -35,29 +35,8 @@ namespace wordBreakers {
         }
       }
 
-      // Join together ranges.
-      let lastRange: number[] | undefined;
-      let joinRanges: number[][] = []
-      for (let range of messyJoinRanges) {
-        if (lastRange == undefined) {
-          lastRange = range;
-          joinRanges.push(range);
-          continue;
-        }
+      let joinRanges = mergeOverlappingRanges(messyJoinRanges);
 
-        let last = lastFrom(lastRange);
-        if (last === range[0]) {
-          // exclude the first element:
-          range.shift();
-          for (let v of range) {
-            lastRange.push(v);
-          }
-        } else {
-          lastRange = range;
-          joinRanges.push(range);
-        }
-      }
-      
       let contiguousRanges: number[][] = [];
       let insideRange = false;
       let currentJoin = joinRanges.shift();
@@ -103,6 +82,40 @@ namespace wordBreakers {
         length: former.length + latter.length,
         text: former.text + latter.text
       };
+    }
+
+    /**
+     * Given ranges like this that may overlap:
+     * 
+     *  [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
+     * 
+     * Returns this:
+     * 
+     *  [[1, 2, 3, 4, 5], [6, 7, 8]]
+     */
+    function mergeOverlappingRanges(messyRanges: number[][]): number[][] {
+      let lastRange: number[] | undefined;
+      let ranges: number[][] = [];
+      for (let range of messyRanges) {
+        if (lastRange == undefined) {
+          lastRange = range;
+          ranges.push(range);
+          continue;
+        }
+
+        let last = lastFrom(lastRange);
+        if (last === range[0]) {
+          // exclude the first element:
+          range.shift();
+          for (let v of range) {
+            lastRange.push(v);
+          }
+        } else {
+          lastRange = range;
+          ranges.push(range);
+        }
+      }
+      return ranges;
     }
 
     /**
