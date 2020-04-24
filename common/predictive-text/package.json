@@ -1,5 +1,5 @@
 {
-  "name": "keyman-lmlayer",
+  "name": "@keymanapp/language-modeling-layer",
   "version": "14.0.0",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eddieantonio/keyman-lmlayer-prototype.git"
+    "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "author": "Eddie Antonio Santos <easantos@ualberta.ca> (http://eddieantonio.ca/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eddieantonio/keyman-lmlayer-prototype/issues"
+    "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/eddieantonio/keyman-lmlayer-prototype#readme",
+  "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@types/node": "^10.12.11",
     "chai": "^4.2.0",
