@@ -9,15 +9,21 @@ describe('The join word breaker decorator', function () {
     assert.isFunction(breakWords);
   });
 
-  it('should join spans at the given delimiter', function () {
-    let phrase = 'khui-chhùi';
-    let breakWords = decorateWithJoin(defaultWordBreaker, ['-']);
+  const TEST_CASES = [
+    /* input,      joiners,  default breaks,        breaks with joins */
+    // Original test case from https://github.com/keymanapp/keyman/issues/2753
+    ['khui-chhùi', ['-'],   ["khui", "-", "chhùi"], ["khui-chhùi"]], 
+  ]
 
-    let undecoratedResult = defaultWordBreaker(phrase).map(onlyText);
-    let actualResult = breakWords(phrase).map(onlyText);
-    assert.deepEqual(undecoratedResult, ["khui", "-", "chhùi"]);
-    assert.deepEqual(actualResult, ["khui-chhùi"]);
-  });
+  for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
+    it(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
+      let breakWords = decorateWithJoin(defaultWordBreaker, joiners);
+      let unjoinedResult = defaultWordBreaker(phrase).map(onlyText);
+      let actualResult = breakWords(phrase).map(onlyText);
+      assert.deepEqual(unjoinedResult, unjoined);
+      assert.deepEqual(actualResult, expected);
+    });
+  }
 
   /**
    * Get just the text from a span.
