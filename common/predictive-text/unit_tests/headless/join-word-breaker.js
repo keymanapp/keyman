@@ -13,6 +13,18 @@ describe('The join word breaker decorator', function () {
     /* input,      joiners,  default breaks,        breaks with joins */
     // Original test case from https://github.com/keymanapp/keyman/issues/2753
     ['khui-chhùi', ['-'],   ["khui", "-", "chhùi"], ["khui-chhùi"]], 
+
+    // Plains Cree SRO: 
+    ['ê-kotiskâwêyâhk', ['-'], ['ê', '-', 'kotiskâwêyâhk'], ['ê-kotiskâwêyâhk']],
+
+    // Edge cases:
+
+    // Joiner alone:
+    ['-', ['-'], ['-'], ['-']],
+    // Joiner at the end: 
+    ['ni-', ['-'], ['ni', '-'], ['ni-']],
+    // Joiner at the end: 
+    ['-ân', ['-'], ['-', 'ân'], ['-ân']],
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
