@@ -16,50 +16,50 @@ namespace wordBreakers {
 
       // Stores indices of spans that should be concatenated.
       // Contiguous indices in will be joined.
-      let joinIndices: number[] = [];
+      let joinRanges: number[][] = [];
+
       // Figure out where there are spans to join.
       originalResults.forEach((span, index) => {
         if (includes(delimiters, span.text)) {
-          joinIndices.push(index - 1);
-          joinIndices.push(index);
-          joinIndices.push(index + 1);
+          joinRanges.push([index - 1, index, index + 1]);
         }
       });
 
-      // Clean up any invalid indices
-      if (joinIndices[0] < 0) {
-        joinIndices.shift();
-      }
-      if (joinIndices[joinIndices.length - 1] >= joinIndices.length) {
-        joinIndices.pop();
-      }
-
-      // Deduplicated join indices
-      joinIndices = joinIndices.reduce((arr, value) => {
-        if (value !== arr[arr.length - 1]) {
-          arr.push(value)
+      // Clean up any invalid indices pushed above.
+      if (joinRanges.length > 0) {
+        if (joinRanges[0][0] < 0) {
+          joinRanges[0].shift();
         }
-        return arr;
-      }, []);
+        if (lastFrom(lastFrom(joinRanges)) >= originalResults.length) {
+          lastFrom(joinRanges).pop();
+        }
+      }
 
-      // Now let's find contiguous ranges
-      let contiguousRanges: number[][] = []
-      let currentContiguousRange: number[] | undefined;
-      let nextJoin: number | undefined = joinIndices.shift();
-      originalResults.forEach((_, index) => {
-        if (index === nextJoin) {
-          if (currentContiguousRange === undefined) {
-            currentContiguousRange = [];
-            contiguousRanges.push(currentContiguousRange);
+      // Join together ranges.
+      let lastRange: number[] | undefined;
+      let betterRanges: number[][] = []
+      for (let range of joinRanges) {
+        if (lastRange == undefined) {
+          lastRange = range;
+          betterRanges.push(range);
+          continue;
+        }
+
+        let last = lastFrom(lastRange);
+        if (last === range[0]) {
+          // exclude the first element:
+          range.shift();
+          for (let v of range) {
+            lastRange.push(v);
           }
-          currentContiguousRange.push(index);
-          nextJoin = joinIndices.shift();
         } else {
-          // A non-contiguous range
-          contiguousRanges.push([index]);
-          currentContiguousRange = undefined;
+          lastRange = range;
+          betterRanges.push(range);
         }
-      });
+      }
+      
+      // TODO: place empty ranges in between.
+      let contiguousRanges: number[][] = betterRanges.concat();
 
       return contiguousRanges.map(range => {
         if (range.length === 1) {
@@ -73,12 +73,12 @@ namespace wordBreakers {
           }
           return currentSpan;
         }
-      })
+      });
     }
 
     function concatenateSpans(former: Span, latter: Span) {
       if (latter.start !== former.end) {
-        throw new Error(`Cannot concatenate non-contiguous spans: ${former}/${latter}`);
+        throw new Error(`Cannot concatenate non-contiguous spans: ${JSON.stringify(former)}/${JSON.stringify(latter)}`);
       }
 
       return {
@@ -98,6 +98,10 @@ namespace wordBreakers {
           return true;
       }
       return false;
+    }
+
+    function lastFrom<T>(array: T[]): T {
+      return array[array.length - 1];
     }
   }
 }

@@ -25,14 +25,22 @@ describe('The join word breaker decorator', function () {
     ['ni-', ['-'], ['ni', '-'], ['ni-']],
     // Joiner at the end: 
     ['-ân', ['-'], ['-', 'ân'], ['-ân']],
+
+    // This was my guiding test case:
+    [
+      "-yâhk ê-nitawi-kotiskâwêyâhk ni-",
+      ["-"],
+      ["-", "yâhk", "ê", "-", "nitawi", "-", "kotiskâwêyâhk", "ni", "-"],
+      ["-yâhk", "ê-nitawi-kotiskâwêyâhk", "ni-"]
+    ],
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
     it(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
       let breakWords = decorateWithJoin(defaultWordBreaker, joiners);
       let unjoinedResult = defaultWordBreaker(phrase).map(onlyText);
-      let actualResult = breakWords(phrase).map(onlyText);
       assert.deepEqual(unjoinedResult, unjoined);
+      let actualResult = breakWords(phrase).map(onlyText);
       assert.deepEqual(actualResult, expected);
     });
   }
