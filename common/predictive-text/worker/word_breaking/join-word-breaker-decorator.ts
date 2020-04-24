@@ -12,47 +12,68 @@ namespace wordBreakers {
     const delimiters = joiners.concat();
 
     return function (input: string): Span[] {
-      let previous: Span | undefined;
-      let shouldJoinNextSpan = false;
-
       let originalResults = breaker(input);
-      let results: Span[] = [];
 
-      for (let current of originalResults) {
-        if (shouldJoinNextSpan) {
-          previous = concatenateSpans(previous, current);
-          shouldJoinNextSpan = false;
-          continue;
+      // Stores indices of spans that should be concatenated.
+      // Contiguous indices in will be joined.
+      let joinIndices: number[] = [];
+      // Figure out where there are spans to join.
+      originalResults.forEach((span, index) => {
+        if (includes(delimiters, span.text)) {
+          joinIndices.push(index - 1);
+          joinIndices.push(index);
+          joinIndices.push(index + 1);
         }
+      });
 
-        // No join candidate? Now it is!
-        if (!previous) {
-          previous = current;
-          shouldJoinNextSpan = false;
-          continue;
-        }
-
-        // Should we bother joining these spans?
-        if (!includes(delimiters, current.text)) {
-          // We can't join them
-          results.push(previous);
-          previous = current;
-          shouldJoinNextSpan = false;
-          continue;
-        }
-
-        // The delimiter indicates we should join this,
-        // the previous span, and the next span!
-        previous = concatenateSpans(previous, current);
-        shouldJoinNextSpan = true;
+      // Clean up any invalid indices
+      if (joinIndices[0] < 0) {
+        joinIndices.shift();
+      }
+      if (joinIndices[joinIndices.length - 1] >= joinIndices.length) {
+        joinIndices.pop();
       }
 
-      // Add the leftover span.
-      if (previous) {
-        results.push(previous);
-      }
+      // Deduplicated join indices
+      joinIndices = joinIndices.reduce((arr, value) => {
+        if (value !== arr[arr.length - 1]) {
+          arr.push(value)
+        }
+        return arr;
+      }, []);
 
-      return results;
+      // Now let's find contiguous ranges
+      let contiguousRanges: number[][] = []
+      let currentContiguousRange: number[] | undefined;
+      let nextJoin: number | undefined = joinIndices.shift();
+      originalResults.forEach((_, index) => {
+        if (index === nextJoin) {
+          if (currentContiguousRange === undefined) {
+            currentContiguousRange = [];
+            contiguousRanges.push(currentContiguousRange);
+          }
+          currentContiguousRange.push(index);
+          nextJoin = joinIndices.shift();
+        } else {
+          // A non-contiguous range
+          contiguousRanges.push([index]);
+          currentContiguousRange = undefined;
+        }
+      });
+
+      return contiguousRanges.map(range => {
+        if (range.length === 1) {
+          return originalResults[range[0]]
+        } else {
+          let spansToJoin = range.map(i => originalResults[i]);
+          let currentSpan = spansToJoin.shift();
+          while (spansToJoin.length > 0) {
+            let nextSpan = spansToJoin.shift();
+            currentSpan = concatenateSpans(currentSpan, nextSpan)
+          }
+          return currentSpan;
+        }
+      })
     }
 
     function concatenateSpans(former: Span, latter: Span) {
