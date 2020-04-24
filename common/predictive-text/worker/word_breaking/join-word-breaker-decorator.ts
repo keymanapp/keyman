@@ -14,27 +14,8 @@ namespace wordBreakers {
     return function (input: string): Span[] {
       let originalResults = breaker(input);
 
-      // Stores indices of spans that should be concatenated.
-      // Contiguous indices in will be joined.
-      let messyJoinRanges: number[][] = [];
-
-      // Figure out where there are spans to join.
-      originalResults.forEach((span, index) => {
-        if (includes(delimiters, span.text)) {
-          messyJoinRanges.push([index - 1, index, index + 1]);
-        }
-      });
-
-      // Clean up any invalid indices pushed above.
-      if (messyJoinRanges.length > 0) {
-        if (messyJoinRanges[0][0] < 0) {
-          messyJoinRanges[0].shift();
-        }
-        if (lastFrom(lastFrom(messyJoinRanges)) >= originalResults.length) {
-          lastFrom(messyJoinRanges).pop();
-        }
-      }
-
+      // Stores ranges of indices of spans that should be concatenated.
+      let messyJoinRanges: number[][] = createMessyJoinRanges(originalResults);
       let joinRanges = mergeOverlappingRanges(messyJoinRanges);
 
       let contiguousRanges: number[][] = [];
@@ -69,6 +50,34 @@ namespace wordBreakers {
           return currentSpan;
         }
       });
+    }
+
+    /**
+     * Returns ranges of indices of results that should be merged.
+     * Note! These WILL be overlapping! 
+     */
+    function createMessyJoinRanges(results: Span[]): number[][] {
+      let messyJoinRanges: number[][] = [];
+
+      // Figure out where there are spans to join.
+      results.forEach((span, index) => {
+        if (includes(delimiters, span.text)) {
+          messyJoinRanges.push([index - 1, index, index + 1]);
+        }
+      });
+
+      // Some indices push above are out of range.
+      // Get rid of them!
+      if (messyJoinRanges.length > 0) {
+        if (messyJoinRanges[0][0] < 0) {
+          messyJoinRanges[0].shift();
+        }
+        if (lastFrom(lastFrom(messyJoinRanges)) >= results.length) {
+          lastFrom(messyJoinRanges).pop();
+        }
+      }
+
+      return messyJoinRanges;
     }
 
     function concatenateSpans(former: Span, latter: Span) {
