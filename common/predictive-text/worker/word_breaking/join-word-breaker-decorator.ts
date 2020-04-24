@@ -13,24 +13,9 @@ namespace wordBreakers {
 
     return function (input: string): Span[] {
       let originalResults = breaker(input);
-
-      // Stores ranges of indices of spans that should be concatenated.
       let joinRanges = createJoinRanges(originalResults);
-      let contiguousRanges = fillInGapsInRanges(joinRanges, originalResults);
-
-      return contiguousRanges.map(range => {
-        if (range.length === 1) {
-          return originalResults[range[0]]
-        } else {
-          let spansToJoin = range.map(i => originalResults[i]);
-          let currentSpan = spansToJoin.shift();
-          while (spansToJoin.length > 0) {
-            let nextSpan = spansToJoin.shift();
-            currentSpan = concatenateSpans(currentSpan, nextSpan)
-          }
-          return currentSpan;
-        }
-      });
+      let contiguousRanges = fillInGapsInRanges(joinRanges, originalResults.length);
+      return concatenateSpansFromRanges(contiguousRanges, originalResults);
     }
 
     /**
@@ -92,8 +77,28 @@ namespace wordBreakers {
             contiguousRanges.push([index]);
           }
         }
-      });
+      }
       return contiguousRanges;
+    }
+
+    /**
+     * Given an array of ranges of indices, and the corresponding spans,
+     * concatenates spans according to the ranges of indices.
+     */
+    function concatenateSpansFromRanges(ranges: number[][], originalSpans: Span[]): Span[] {
+      return ranges.map(range => {
+        if (range.length === 1) {
+          return originalSpans[range[0]];
+        } else {
+          let spansToJoin = range.map(i => originalSpans[i]);
+          let currentSpan = spansToJoin.shift();
+          while (spansToJoin.length > 0) {
+            let nextSpan = spansToJoin.shift();
+            currentSpan = concatenateSpans(currentSpan, nextSpan);
+          }
+          return currentSpan;
+        }
+      });
     }
 
     function concatenateSpans(former: Span, latter: Span) {
