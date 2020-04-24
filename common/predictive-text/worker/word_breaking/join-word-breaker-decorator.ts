@@ -12,10 +12,10 @@ namespace wordBreakers {
     const delimiters = joiners.concat();
 
     return function (input: string): Span[] {
-      let originalResults = breaker(input);
-      let joinRanges = createJoinRanges(originalResults);
-      let contiguousRanges = fillInGapsInRanges(joinRanges, originalResults.length);
-      return concatenateSpansFromRanges(contiguousRanges, originalResults);
+      let originalSpans = breaker(input);
+      let joinRanges = createJoinRanges(originalSpans);
+      let contiguousRanges = fillInGapsInRanges(joinRanges, originalSpans.length);
+      return concatenateSpansFromRanges(contiguousRanges, originalSpans);
     }
 
     /**
