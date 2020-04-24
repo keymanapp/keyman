@@ -419,6 +419,14 @@ fi
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+
+    CURRENT_PATH=`pwd`
+    # Since the batch compiler for the UI modules outputs them within a subdirectory,
+    # we need to copy them up to the base /intermediate/ folder.
+    cd "$INTERMEDIATE/source"
+    cp * ../
+    cd $CURRENT_PATH
+
     assert $INTERMEDIATE/kmwuitoolbar.js
     assert $INTERMEDIATE/kmwuitoggle.js
     assert $INTERMEDIATE/kmwuifloat.js
