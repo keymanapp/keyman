@@ -1,8 +1,6 @@
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
 
 namespace KMWRecorder {
-  type AssertCallback = (s1: any, s2: any, msg?: string) => void;
-
   export abstract class InputEvent {
     type: "key" | "osk";
     static fromJSONObject(obj: any): InputEvent {
@@ -106,21 +104,6 @@ namespace KMWRecorder {
     }
   }
 
-  var resetElement = function(ele: HTMLElement):void {
-    if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
-      window['keyman'].resetContext();
-      ele.value = "";
-    } else {
-      window['keyman'].resetContext();
-      if(ele['base']) {
-        // Gotta be extra-careful with the simulated touch fields!
-        (<any> ele /*as com.keyman.dom.TouchAliasElement*/).setText("", 0);
-      } else {
-        ele.textContent = "";
-      }
-    }
-  }
-
   export class InputTestSequence {
     inputs: InputEvent[];
     output: string;
@@ -160,24 +143,11 @@ namespace KMWRecorder {
       this.output = output;
     }
 
-    simulateSequenceOn(ele: HTMLElement, assertCallback?: AssertCallback): {success: boolean, result: string} {
-      resetElement(ele);
-      let driver = new BrowserDriver(ele);
+    test(proctor: BrowserProctor): {success: boolean, result: string} {
+      proctor.before();
 
-      for(var i=0; i < this.inputs.length; i++) {
-        driver.simulateEvent(this.inputs[i]);
-      }
-
-      var result;
-      if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
-        result = ele.value;
-      } else {
-        result = ele.textContent;
-      }
-
-      if(assertCallback) {
-        assertCallback(result, this.output, this.msg);
-      }
+      let result = proctor.simulateSequence(this);
+      proctor.assertEquals(result, this.output, this.msg);
 
       return {success: (result == this.output), result: result};
     }
@@ -392,7 +362,7 @@ namespace KMWRecorder {
     }
   }
 
-  class TestFailure {
+  export class TestFailure {
     constraint: Constraint;
     test: InputTestSequence;
     result: string;
@@ -404,7 +374,7 @@ namespace KMWRecorder {
     }
   }
 
-  class InputTestSet {
+  export class InputTestSet {
     constraint: Constraint;
     testSet: InputTestSequence[];
 
@@ -428,13 +398,19 @@ namespace KMWRecorder {
       this.testSet.push(seq);
     }
 
-    // Validity should be checked before calling this method.
-    run(ele: HTMLElement, assertCallback?: AssertCallback): TestFailure[] {
-      var failures: TestFailure[] = [];
+    // Used to determine if the current InputTestSet is applicable to be run on a device.
+    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
+      return this.constraint.matchesClient(device, usingOSK);
+    }
 
-      for(var i=0; i < this.testSet.length; i++) {
-        var testSeq = this.testSet[i];
-        var simResult = testSeq.simulateSequenceOn(ele, assertCallback);
+    // Validity should be checked before calling this method.
+    test(proctor: BrowserProctor): TestFailure[] {
+      var failures: TestFailure[] = [];
+      let testSet = this.testSet;
+
+      for(var i=0; i < testSet.length; i++) {
+        var testSeq = this[i];
+        var simResult = testSet[i].test(proctor);
         if(!simResult.success) {
           // Failed test!
           failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
@@ -442,11 +418,6 @@ namespace KMWRecorder {
       }
 
       return failures.length > 0 ? failures : null;
-    }
-
-    // Used to determine if the current InputTestSet is applicable to be run on a device.
-    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
-      return this.constraint.matchesClient(device, usingOSK);
     }
   }
 
@@ -502,17 +473,17 @@ namespace KMWRecorder {
       newSet.addTest(seq);      
     }
 
-    run(ele: HTMLElement, device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean, assertCallback?: AssertCallback) {
+    test(proctor: BrowserProctor) {
       var setHasRun = false;
       var failures: TestFailure[] = [];
 
-      window['keyman'].setActiveElement(ele['base'] ? ele['base'] : ele);
+      proctor.beforeAll();
 
       for(var i = 0; i < this.inputTestSets.length; i++) {
         var testSet = this.inputTestSets[i];
 
-        if(testSet.isValidForDevice(device, usingOSK)) {
-          var testFailures = testSet.run(ele, assertCallback);
+        if(proctor.matchesTestSet(testSet)) {
+          var testFailures = testSet.test(proctor);
           if(testFailures) {
             failures = failures.concat(testFailures);
           }

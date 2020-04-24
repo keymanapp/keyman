@@ -23,7 +23,8 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       // Prepare the context!
       var matchTest = matchDefs[j];
       var ruleSeq = new KMWRecorder.InputTestSequence(matchTest.sequence);
-      ruleSeq.simulateSequenceOn(inputElem);
+      let proctor = new KMWRecorder.BrowserProctor(inputElem, keyman.util.device.coreSpec, false);
+      ruleSeq.test(proctor);
 
       // Now for the real test!
       var res = keyman.core.keyboardInterface.fullContextMatch(ruleDef.n, inputElem._kmwAttachment.interface, ruleDef.rule);
@@ -825,7 +826,8 @@ describe('Engine', function() {
 
         // Prepare the context!
         var ruleSeq = new KMWRecorder.InputTestSequence(ruleDef.baseSequence);
-        ruleSeq.simulateSequenceOn(inputElem);
+        let proctor = new KMWRecorder.BrowserProctor(inputElem, keyman.util.device.coreSpec, false);
+        ruleSeq.test(proctor);
 
         // Now for the real test!
         var res = keyman.core.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, inputElem._kmwAttachment.interface);
