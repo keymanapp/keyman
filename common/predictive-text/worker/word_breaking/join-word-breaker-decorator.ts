@@ -16,25 +16,7 @@ namespace wordBreakers {
 
       // Stores ranges of indices of spans that should be concatenated.
       let joinRanges = createJoinRanges(originalResults);
-
-      let contiguousRanges: number[][] = [];
-      let insideRange = false;
-      let currentJoin = joinRanges.shift();
-      originalResults.forEach((_, index) => {
-        if (insideRange) {
-          if (index === lastFrom(currentJoin)) {
-            insideRange = false;
-            currentJoin = joinRanges.shift();
-          }
-        } else {
-          if (currentJoin && index === currentJoin[0]) {
-            insideRange = true;
-            contiguousRanges.push(currentJoin);
-          } else {
-            contiguousRanges.push([index]);
-          }
-        }
-      })
+      let contiguousRanges = fillInGapsInRanges(joinRanges, originalResults);
 
       return contiguousRanges.map(range => {
         if (range.length === 1) {
@@ -88,6 +70,30 @@ namespace wordBreakers {
 
       // Merge overlapping regions:
       return mergeOverlappingRanges(messyJoinRanges);
+    }
+
+    function fillInGapsInRanges<T>(joinRanges: number[][], originalResults: T[]) {
+      let contiguousRanges: number[][] = [];
+      let insideRange = false;
+      let currentJoin = joinRanges.shift();
+      originalResults.forEach((_, index) => {
+        if (insideRange) {
+          if (index === lastFrom(currentJoin)) {
+            insideRange = false;
+            currentJoin = joinRanges.shift();
+          }
+        }
+        else {
+          if (currentJoin && index === currentJoin[0]) {
+            insideRange = true;
+            contiguousRanges.push(currentJoin);
+          }
+          else {
+            contiguousRanges.push([index]);
+          }
+        }
+      });
+      return contiguousRanges;
     }
 
     function concatenateSpans(former: Span, latter: Span) {
