@@ -45,8 +45,8 @@ describe('The default searchTermToKey() function', function () {
     ['\uFE8D\uFEDF\uFED8\uFEEC\uFEEE\uFE93', '\u0627\u0644\u0642\u0647\u0648\u0629'],
 
     // Combine both NFKD **AND** knocking off diacritics:
-    // U+01C4 Ǆ -> U+0044 U+005A DZ
-    ['\u01C4', 'dz'],
+    // U+01C4 LATIN CAPITAL LETTER DZ WITH CARON (Ǆ) -> <U+0064, U+007A> (dz)
+    ['Ǆ', 'dz'],
   ];
 
   for (let [input, expected] of testCases) {
