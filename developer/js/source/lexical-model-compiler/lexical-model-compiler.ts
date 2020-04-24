@@ -54,8 +54,7 @@ export default class LexicalModelCompiler {
           createTrieDataStructure(filenames, searchTermToKey)
         }, {\n`;
 
-
-        let wordBreakerSourceCode = compileWordBreaker(modelSource.wordBreaker);
+        let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
 
         func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
@@ -68,10 +67,6 @@ export default class LexicalModelCompiler {
       default:
         throw new ModelSourceError(`Unknown model format: ${modelSource.format}`);
     }
-
-    //
-    // TODO: Load custom wordbreak source files
-    //
 
     func += fileSuffix;
 
@@ -97,20 +92,36 @@ export class ModelSourceError extends Error {
  * Returns a JavaScript expression (as a string) that can serve as a word
  * breaking function.
  */
-function compileWordBreaker(wordBreakerSpec: WordBreakerSpec) {
-  // Use the default word breaker when it's unspecified
-  if (!wordBreakerSpec) {
-    wordBreakerSpec = 'default';
-  }
-
-  if (typeof wordBreakerSpec === "string") {
+function compileWordBreaker(spec: WordBreakerSpec): string {
+  if (typeof spec.use === "string") {
     // It must be a builtin word breaker, so just instantiate it.
-    return `wordBreakers['${wordBreakerSpec}']`;
+    return `wordBreakers['${spec.use}']`;
   } else {
-    // The word breaker was passed as a literal function; use its source code.
-    return wordBreakerSpec.toString()
+    return spec.use.toString()
       // Note: the .toString() might just be the property name, but we want a
       // plain function:
       .replace(/^wordBreak(ing|er)\b/, 'function');
   }
+}
+
+/**
+ * Given a word breaker specification in any of the messy ways,
+ * normalizes it to a common form that the compiler can deal with.
+ */
+function normalizeWordBreakerSpec(wordBreakerSpec: LexicalModelSource["wordBreaker"]): WordBreakerSpec {
+  if (wordBreakerSpec == undefined) {
+    // Use the default word breaker when it's unspecified
+    return { use: 'default' };
+  } else if (isSimpleWordBreaker(wordBreakerSpec)) {
+    // The word breaker was passed as a literal function; use its source code.
+    return { use: wordBreakerSpec };
+  } else if (wordBreakerSpec.use) {
+    return wordBreakerSpec;
+  } else {
+    throw new Error(`Unknown word breaker: ${wordBreakerSpec}`);
+  }
+}
+
+function isSimpleWordBreaker(spec: WordBreakerSpec | SimpleWordBreakerSpec): spec is SimpleWordBreakerSpec  {
+  return typeof spec === "function" || spec === "default" || spec === "ascii";
 }
