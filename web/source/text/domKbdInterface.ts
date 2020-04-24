@@ -1,4 +1,4 @@
-/// <reference path="../../node_modules/keyman-keyboard-processor/src/text/kbdInterface.ts" />
+/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/kbdInterface.ts" />
 
 /*
  * This file defines DOM-specific keyboard API that is not available in headless mode, extending web-core's

@@ -1,6 +1,6 @@
 /// <reference path="../kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
 // Includes the default layout specification.
-/// <reference path="../../node_modules/keyman-keyboard-processor/src/keyboards/defaultLayouts.ts" /> 
+/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/keyboards/defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
 // Includes the banner

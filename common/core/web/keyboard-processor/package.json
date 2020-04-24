@@ -1,5 +1,5 @@
 {
-  "name": "keyman-keyboard-processor",
+  "name": "@keymanapp/keyboard-processor",
   "version": "14.0.0",
   "description": "Core module for Keyman keyboard support in KeymanWeb.",
   "repository": {

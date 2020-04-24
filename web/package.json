@@ -47,12 +47,12 @@
     "modernizr": "modernizr"
   },
   "dependencies": {
+    "@keymanapp/keyboard-processor": "^14.0.0",
     "@keymanapp/language-modeling-layer": "^14.0.0",
     "@keymanapp/lexical-model-types": "^0.0.0",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",
-    "keyman-keyboard-processor": "^14.0.0",
     "ts-node": "^8.0.2"
   }
 }
