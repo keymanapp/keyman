@@ -16,32 +16,32 @@ namespace wordBreakers {
 
       // Stores indices of spans that should be concatenated.
       // Contiguous indices in will be joined.
-      let joinRanges: number[][] = [];
+      let messyJoinRanges: number[][] = [];
 
       // Figure out where there are spans to join.
       originalResults.forEach((span, index) => {
         if (includes(delimiters, span.text)) {
-          joinRanges.push([index - 1, index, index + 1]);
+          messyJoinRanges.push([index - 1, index, index + 1]);
         }
       });
 
       // Clean up any invalid indices pushed above.
-      if (joinRanges.length > 0) {
-        if (joinRanges[0][0] < 0) {
-          joinRanges[0].shift();
+      if (messyJoinRanges.length > 0) {
+        if (messyJoinRanges[0][0] < 0) {
+          messyJoinRanges[0].shift();
         }
-        if (lastFrom(lastFrom(joinRanges)) >= originalResults.length) {
-          lastFrom(joinRanges).pop();
+        if (lastFrom(lastFrom(messyJoinRanges)) >= originalResults.length) {
+          lastFrom(messyJoinRanges).pop();
         }
       }
 
       // Join together ranges.
       let lastRange: number[] | undefined;
-      let betterRanges: number[][] = []
-      for (let range of joinRanges) {
+      let joinRanges: number[][] = []
+      for (let range of messyJoinRanges) {
         if (lastRange == undefined) {
           lastRange = range;
-          betterRanges.push(range);
+          joinRanges.push(range);
           continue;
         }
 
@@ -54,12 +54,12 @@ namespace wordBreakers {
           }
         } else {
           lastRange = range;
-          betterRanges.push(range);
+          joinRanges.push(range);
         }
       }
       
       // TODO: place empty ranges in between.
-      let contiguousRanges: number[][] = betterRanges.concat();
+      let contiguousRanges: number[][] = joinRanges.concat();
 
       return contiguousRanges.map(range => {
         if (range.length === 1) {
