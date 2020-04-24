@@ -42,7 +42,7 @@ namespace wordBreakers {
         }
       });
 
-      // Some indices push above are out of range.
+      // Some indices pushed above are out of range.
       // Get rid of them!
       if (messyJoinRanges.length > 0) {
         if (messyJoinRanges[0][0] < 0) {
@@ -57,18 +57,22 @@ namespace wordBreakers {
       return mergeOverlappingRanges(messyJoinRanges);
     }
 
-    function fillInGapsInRanges<T>(joinRanges: number[][], originalResults: T[]) {
+    /**
+     * Given an array of ranges of indices that may have "gaps",
+     * e.g., not covering all indices less than {limit},
+     * fills in those gaps with "singleton" ranges.
+     */
+    function fillInGapsInRanges(joinRanges: number[][], limit: number) {
       let contiguousRanges: number[][] = [];
       let insideRange = false;
       let currentJoin = joinRanges.shift();
-      originalResults.forEach((_, index) => {
+      for (let index = 0; index < limit; index++) {
         if (insideRange) {
           if (index === lastFrom(currentJoin)) {
             insideRange = false;
             currentJoin = joinRanges.shift();
           }
-        }
-        else {
+        } else {
           if (currentJoin && index === currentJoin[0]) {
             insideRange = true;
             contiguousRanges.push(currentJoin);
