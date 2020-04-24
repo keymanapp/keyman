@@ -258,6 +258,7 @@ set_npm_version () {
   npm --no-git-tag-version --allow-same-version version "$version" || fail "Could not set package version to $version."
 }
 
+# Initializes use of the npm `lerna` package within the repo.
 init_lerna() {
   WORKING_DIRECTORY=`pwd`
 
@@ -276,6 +277,8 @@ init_lerna() {
 
 # Accepts an optional parameter.
 # #1 - when set to 'false', only ensures that `npm` and `node` are accessible; does not install dependencies.
+#
+# Designed for use with the projects/packages we have (manually) listed in the base folder's lerna.json.
 verify_npm_setup () {
   if [ $# != 0 ]; then
     fetch_deps=$1
@@ -294,6 +297,10 @@ verify_npm_setup () {
     # Use lerna to ensure repo-internal dependencies are all properly linked 
     # while also installing external dependencies.  Also propagates lerna into
     # each project that can use it (once added as a dev-dependency there)
+    #
+    # `lerna` will only affect the packages listed the file lerna.json at the repo's base.
+    # The "packages" entry therein is MANUALLY managed, not automatic.  Anything not listed
+    # therein will not be affected by `lerna` commands.
     npx lerna bootstrap -- --no-optional
 
     if [ $? -ne 0 ]; then
