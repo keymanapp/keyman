@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.56 alpha 2020-04-24
+
+* fix(android): Clarify label that shows "Get Started" on startup (#3025)
+* feat(common/lmlayer): allow for verbose word breaker specification (#3023)
+
 ## 14.0.55 alpha 2020-04-23
 
 * modify(android): Convert LanguageListActivity to utility (#3018)
