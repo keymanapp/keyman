@@ -95,5 +95,21 @@ namespace KMWRecorder {
       oskKeyElement.dispatchEvent(downEvent);
       oskKeyElement.dispatchEvent(upEvent);
     }
+
+    // Execution of a test sequence depends on the testing environment; integrated
+    // testing requires browser-specific code.
+    simulateSequence(sequence: InputTestSequence): string {
+      let ele = this.target;
+
+      for(var i=0; i < sequence.inputs.length; i++) {
+        this.simulateEvent(sequence.inputs[i]);
+      }
+
+      if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
+        return ele.value;
+      } else {
+        return ele.textContent;
+      }
+    }
   }
 }

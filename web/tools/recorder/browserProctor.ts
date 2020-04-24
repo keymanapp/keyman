@@ -63,18 +63,11 @@ namespace KMWRecorder {
     // Execution of a test sequence depends on the testing environment; this handles
     // the browser-specific aspects.
     simulateSequence(sequence: InputTestSequence): string {
-      let ele = this.target;
-      let driver = new BrowserDriver(ele);
+      let driver = new BrowserDriver(this.target);
 
-      for(var i=0; i < sequence.inputs.length; i++) {
-        driver.simulateEvent(sequence.inputs[i]);
-      }
-
-      if(ele instanceof HTMLInputElement || ele instanceof HTMLTextAreaElement) {
-        return ele.value;
-      } else {
-        return ele.textContent;
-      }
+      // Yes, it's pretty simple for now... but this is only one of two code paths
+      // that will exist here, hence the abstraction.
+      return driver.simulateSequence(sequence);
     }
   }
 }
