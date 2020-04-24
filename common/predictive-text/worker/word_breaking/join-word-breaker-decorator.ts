@@ -15,8 +15,7 @@ namespace wordBreakers {
       let originalResults = breaker(input);
 
       // Stores ranges of indices of spans that should be concatenated.
-      let messyJoinRanges: number[][] = createMessyJoinRanges(originalResults);
-      let joinRanges = mergeOverlappingRanges(messyJoinRanges);
+      let joinRanges = createJoinRanges(originalResults);
 
       let contiguousRanges: number[][] = [];
       let insideRange = false;
@@ -54,9 +53,19 @@ namespace wordBreakers {
 
     /**
      * Returns ranges of indices of results that should be merged.
-     * Note! These WILL be overlapping! 
+     * 
+     * e.g., if joining on "-":
+     * 
+     *  ["-", "yâhk", "ê", "-", "nitawi", "-", "kotiskâwêyâhk", "ni", "-"]
+     *    0     1      2    3    4         5    6                7     8[:-]
+     * 
+     * will return:
+     * 
+     *  [[0, 1], [2, 3, 4, 5, 6], [7, 8]]
+     * 
+     * Those indices correspond to spans that should be joined.
      */
-    function createMessyJoinRanges(results: Span[]): number[][] {
+    function createJoinRanges(results: Span[]): number[][] {
       let messyJoinRanges: number[][] = [];
 
       // Figure out where there are spans to join.
@@ -77,7 +86,8 @@ namespace wordBreakers {
         }
       }
 
-      return messyJoinRanges;
+      // Merge overlapping regions:
+      return mergeOverlappingRanges(messyJoinRanges);
     }
 
     function concatenateSpans(former: Span, latter: Span) {
