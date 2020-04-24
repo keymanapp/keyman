@@ -100,7 +100,7 @@ keyman.touchAliasing._KeyDown = function(e) {
     return _kd(e);
   }
 
-  var event = new KMWRecorder.PhysicalInputEvent(e);
+  var event = KMWRecorder.Scribe.recordKeyboardEvent(e);
   var retVal = _kd(e);
 
   // Record the keystroke as part of a test sequence!
@@ -134,7 +134,7 @@ com.keyman.osk.PreProcessor.clickKey = function(e) {
     return _ock(e);
   }
 
-  var event = new KMWRecorder.OSKInputEvent(e);
+  var event = KMWRecorder.Scribe.recordOSKEvent(e);
   var retVal = _ock(e);
 
   // Record the click/touch as part of a test sequence!
@@ -179,8 +179,7 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
   var internalStub = keyman.keyboardManager.activeStub;
   if(internalStub && (com.keyman.dom.DOMEventHandlers.states.activeElement == in_output 
     || com.keyman.dom.DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
-    var kbdRecord = new KMWRecorder.KeyboardStub(internalStub);
-    kbdRecord.setBasePath('resources/keyboards');
+    var kbdRecord = new KMWRecorder.Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
     var ta_activeStub = document.getElementById('activeStub');
     ta_activeStub.value = JSON.stringify(kbdRecord);
     

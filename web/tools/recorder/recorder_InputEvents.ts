@@ -1,4 +1,5 @@
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
+/// <reference path="scribe.ts" />
 
 namespace KMWRecorder {
   export abstract class InputEvent {
@@ -41,35 +42,16 @@ namespace KMWRecorder {
     modifierSet: number;
     location: number;
 
-    constructor(e: KeyboardEvent|PhysicalInputEvent) {
+    constructor(e?: PhysicalInputEvent) { // parameter is used to reconstruct from JSON.
       super();
-      // We condition upon newly-generated events, as a PhysicalInputEvent from JSON
-      // will lack its proper prototype, etc.
-      if(e instanceof KeyboardEvent) {
-        this.key    = e.key;
-        this.code    = e.code;
-        this.keyCode = e.keyCode;
-        this.modifierSet = this.compileModifierState(e);
-        this.location = e.location;
-      } else {
+
+      if(e) {
         this.key = e.key;
         this.code = e.code;
         this.keyCode = e.keyCode;
         this.modifierSet = e.modifierSet;
         this.location = e.location;
       }
-    }
-
-    private compileModifierState(e: KeyboardEvent): number {
-      var flagSet: number = 0;
-
-      for(var key in PhysicalInputEvent.modifierCodes) {
-        if(e.getModifierState(key)) {
-          flagSet |= PhysicalInputEvent.modifierCodes[key];
-        }
-      }
-
-      return flagSet;
     }
 
     getModifierState(key: string): boolean {
@@ -93,13 +75,11 @@ namespace KMWRecorder {
     type: "osk" = "osk";
     keyID: string;
 
-    // osk.clickKey receives the element clicked or touched in OSK interactions.
-    constructor(ele: HTMLDivElement|OSKInputEvent) {
+    // The parameter may be used to reconstruct the item from raw JSON.
+    constructor(e?: OSKInputEvent) {
       super();
-      if(ele instanceof HTMLDivElement) {
-        this.keyID = ele.id;
-      } else {
-        this.keyID = ele.keyID;
+      if(e) {
+        this.keyID = e.keyID;
       }
     }
   }
@@ -199,7 +179,7 @@ namespace KMWRecorder {
     }
   }
 
-  class LanguageStubForKeyboard {
+  export class LanguageStubForKeyboard {
     id: string;
     name: string;
     region: string;
@@ -239,42 +219,20 @@ namespace KMWRecorder {
 
     // Constructs a stub usable with KeymanWeb's addKeyboards() API function from
     // the internally-tracked ActiveStub value for that keyboard.
-    constructor(activeStub: any) {
-      if(activeStub.KI) {
-        this.id = activeStub.KI;
-        this.id = this.id.replace('Keyboard_', '');
-  
-        this.name = activeStub.KN;
-        this.filename = activeStub.KF;
-  
-        this.languages = [new LanguageStubForKeyboard(activeStub)];
-      } else {
-        this.id = activeStub.id;
-        this.name = activeStub.name;
-        this.filename = activeStub.filename;
+    constructor(json?: KeyboardStub) {
+      if(json) {
+        this.id = json.id;
+        this.name = json.name;
+        this.filename = json.filename;
 
-        if(activeStub.languages instanceof Object) {
-          this.languages = new LanguageStubForKeyboard(activeStub.languages);
+        if(!Array.isArray(json.languages)) {
+          this.languages = new LanguageStubForKeyboard(json.languages);
         } else {
           this.languages = [];
-          for(var i=0; i < activeStub.languages.length; i++) {
-            this.languages.push(new LanguageStubForKeyboard(activeStub.languages[i]));
+          for(var i=0; i < json.languages.length; i++) {
+            this.languages.push(new LanguageStubForKeyboard(json.languages[i]));
           }
         }
-      }
-    }
-
-    setBasePath(filePath: string, force?: boolean) {
-      var linkParser = document.createElement<"a">("a");
-      linkParser.href = filePath;
-
-      if(force === undefined) {
-        force = true;
-      }
-
-      if(force || (this.filename.indexOf(linkParser.protocol) < 0 && this.filename.indexOf('/') != 0)) {
-        var file = this.filename.substr(this.filename.lastIndexOf('/')+1);
-        this.filename = filePath + '/' + file;
       }
     }
 
