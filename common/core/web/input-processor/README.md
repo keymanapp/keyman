@@ -16,20 +16,6 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install nodejs
 ```
 
-* A globally-installed `lerna` package (`npm install -g lerna`)
-  * Builds will call `lerna bootstrap` to setup and manage all needed `npm link`s for within-repo dependencies.
-
 **********************************************************************
 
-### `build.sh` options:
-
 The build script may be found at src/build.sh.
-
-*  `// TODO: enumerate build options`
-	
-
-### Unit Testing ###
-
-Before running unit tests on the Keyboard Processor module, first run `./build.sh` according to the instructions above.
-
-Once the build is complete, running `npm test` will run the unit testing suite on your local machine in-browser.  Alternatively, see `unit_tests/test.sh`, which the former command executes.
