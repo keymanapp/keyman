@@ -20,16 +20,16 @@ namespace wordBreakers {
 
     /**
      * Returns ranges of indices of results that should be merged.
-     * 
+     *
      * e.g., if joining on "-":
-     * 
+     *
      *  ["-", "yâhk", "ê", "-", "nitawi", "-", "kotiskâwêyâhk", "ni", "-"]
      *    0     1      2    3    4         5    6                7     8[:-]
-     * 
+     *
      * will return:
-     * 
+     *
      *  [[0, 1], [2, 3, 4, 5, 6], [7, 8]]
-     * 
+     *
      * Those indices correspond to spans that should be joined.
      */
     function createJoinRanges(results: Span[]): number[][] {
@@ -45,9 +45,11 @@ namespace wordBreakers {
       // Some indices pushed above are out of range.
       // Get rid of them!
       if (messyJoinRanges.length > 0) {
+        // We may have added -1
         if (messyJoinRanges[0][0] < 0) {
           messyJoinRanges[0].shift();
         }
+        // We may have added 1 past the array's valid indices
         if (lastFrom(lastFrom(messyJoinRanges)) >= results.length) {
           lastFrom(messyJoinRanges).pop();
         }
@@ -69,15 +71,17 @@ namespace wordBreakers {
       for (let index = 0; index < limit; index++) {
         if (insideRange) {
           if (index === lastFrom(currentJoin)) {
+            // exit the range
             insideRange = false;
             currentJoin = joinRanges.shift();
           }
         } else {
           if (currentJoin && index === currentJoin[0]) {
+            // enter the range
             insideRange = true;
             contiguousRanges.push(currentJoin);
-          }
-          else {
+          } else {
+            // fill in the gap!
             contiguousRanges.push([index]);
           }
         }
@@ -93,38 +97,26 @@ namespace wordBreakers {
       return ranges.map(range => {
         if (range.length === 1) {
           return originalSpans[range[0]];
-        } else {
-          let spansToJoin = range.map(i => originalSpans[i]);
-          let currentSpan = spansToJoin.shift();
-          while (spansToJoin.length > 0) {
-            let nextSpan = spansToJoin.shift();
-            currentSpan = concatenateSpans(currentSpan, nextSpan);
-          }
-          return currentSpan;
         }
+
+        // We need to concatenate two or more spans:
+        let spansToJoin = range.map(i => originalSpans[i]);
+        let currentSpan = spansToJoin.shift();
+        while (spansToJoin.length > 0) {
+          let nextSpan = spansToJoin.shift();
+          currentSpan = concatenateSpans(currentSpan, nextSpan);
+        }
+        return currentSpan;
       });
-    }
-
-    function concatenateSpans(former: Span, latter: Span) {
-      if (latter.start !== former.end) {
-        throw new Error(`Cannot concatenate non-contiguous spans: ${JSON.stringify(former)}/${JSON.stringify(latter)}`);
-      }
-
-      return {
-        start: former.start,
-        end: latter.end,
-        length: former.length + latter.length,
-        text: former.text + latter.text
-      };
     }
 
     /**
      * Given ranges like this that may overlap:
-     * 
+     *
      *  [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
-     * 
+     *
      * Returns this:
-     * 
+     *
      *  [[1, 2, 3, 4, 5], [6, 7, 8]]
      */
     function mergeOverlappingRanges(messyRanges: number[][]): number[][] {
@@ -152,10 +144,23 @@ namespace wordBreakers {
       return ranges;
     }
 
+    function concatenateSpans(former: Span, latter: Span) {
+      if (latter.start !== former.end) {
+        throw new Error(`Cannot concatenate non-contiguous spans: ${JSON.stringify(former)}/${JSON.stringify(latter)}`);
+      }
+
+      return {
+        start: former.start,
+        end: latter.end,
+        length: former.length + latter.length,
+        text: former.text + latter.text
+      };
+    }
+
     /**
      * When Array.prototype.include() doesn't exist:
      */
-    function includes<T>(haystack: T[], needle: T) {
+    function includes<T>(haystack: T[], needle: T): boolean {
       for (let item of haystack) {
         if (item === needle)
           return true;
