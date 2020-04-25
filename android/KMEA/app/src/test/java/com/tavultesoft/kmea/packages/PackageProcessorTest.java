@@ -134,7 +134,8 @@ public class PackageProcessorTest {
     String pkgVersion = PP.getPackageVersion(json);
 
     String languageID = null;
-    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0),
+      "gff_amh_7_test_json", pkgVersion, languageID, false);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
     amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
@@ -143,7 +144,7 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
+    amharic.put(KMManager.KMKey_CustomKeyboard, "N");
     amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     // If languageID doesn't match, verify only the first language is installed with the keyboard
@@ -151,14 +152,15 @@ public class PackageProcessorTest {
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
     languageID = "am";
-    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0),
+      "gff_amh_7_test_json", pkgVersion, languageID, false);
 
     // Verify "am" matched
     Assert.assertEquals(amharic, keyboards[0]);
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
     languageID = "GEZ";
-    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID, true);
 
     HashMap<String, String> geez = new HashMap<String, String>();
     geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
@@ -185,7 +187,7 @@ public class PackageProcessorTest {
 
   @Test
   public void test_installKMP() throws Exception {
-    List<Map<String, String>> installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
+    List<Map<String, String>> installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY, false);
 
     Assert.assertTrue(TEST_GFF_KMP_TARGET.exists());
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
@@ -197,13 +199,13 @@ public class PackageProcessorTest {
     List<Map<String, String>> installedKbds;
     String version;
 
-    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY, false);
     version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
 
     extractAltTestPackage();
-    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY);
+    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY, false);
     version = PP_ALT.getPackageVersion(PP_ALT.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
@@ -216,13 +218,13 @@ public class PackageProcessorTest {
     String version;
 
     extractAltTestPackage();
-    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY);
+    installedKbds = PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY, false);
     version = PP_ALT.getPackageVersion(PP_ALT.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.5", version);
 
     extractBaseTestPackage();
-    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
+    installedKbds = PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY, false);
     version = PP.getPackageVersion(PP.loadPackageInfo(installedKMP));
     Assert.assertEquals(TEST_GFF_KBD_COUNT, installedKbds.size());
     Assert.assertEquals("1.4", version);
@@ -271,14 +273,14 @@ public class PackageProcessorTest {
     Assert.assertFalse(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     extractAltTestPackage();
-    PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY);
+    PP_ALT.processKMP(TEST_GFF_KMP_FILE_ALT, tempPkgAlt, PackageProcessor.PP_KEYBOARDS_KEY, false);
 
     Assert.assertTrue(PP.isDowngrade(TEST_GFF_KMP_FILE));
     Assert.assertFalse(PP.isSameVersion(TEST_GFF_KMP_FILE));
 
     // Test 2 - when it's an equal version.
     extractBaseTestPackage();
-    PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY);
+    PP.processKMP(TEST_GFF_KMP_FILE, tempPkg, PackageProcessor.PP_KEYBOARDS_KEY, false);
     Assert.assertFalse(PP.isDowngrade(TEST_GFF_KMP_FILE));
     Assert.assertTrue(PP.isSameVersion(TEST_GFF_KMP_FILE));
 

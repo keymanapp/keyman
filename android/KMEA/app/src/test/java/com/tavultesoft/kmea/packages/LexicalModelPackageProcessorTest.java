@@ -65,7 +65,7 @@ public class LexicalModelPackageProcessorTest {
     Assert.assertNotNull(json);
     String pkgVersion = lmPP.getPackageVersion(json);
 
-    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion, "en");
+    Map<String, String>[] models = lmPP.processEntry(json.getJSONArray("lexicalModels").getJSONObject(0), "example.en.custom", pkgVersion, "en", true);
 
     HashMap<String, String> en_custom = new HashMap<String, String>();
     en_custom.put(KMManager.KMKey_PackageID, "example.en.custom");
@@ -75,6 +75,7 @@ public class LexicalModelPackageProcessorTest {
     en_custom.put(KMManager.KMKey_LanguageID, "en");
     en_custom.put(KMManager.KMKey_LanguageName, "English");
     en_custom.put(KMManager.KMKey_CustomHelpLink, "");
+    en_custom.put(KMManager.KMKey_CustomModel, "Y");
 
     Assert.assertEquals(en_custom, models[0]);
 
@@ -88,7 +89,7 @@ public class LexicalModelPackageProcessorTest {
 
   @Test
   public void test_kmpProcessLexicalModel() throws Exception {
-    List<Map<String, String>> installedModels = lmPP.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, tempPkg, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+    List<Map<String, String>> installedModels = lmPP.processKMP(TEST_EN_CUSTOM_MODEL_KMP_FILE, tempPkg, PackageProcessor.PP_LEXICAL_MODELS_KEY, false);
 
     Assert.assertEquals(TEST_EN_CUSTOM_MODEL_COUNT, installedModels.size());
   }

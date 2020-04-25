@@ -58,8 +58,10 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
     return false;
   }
 
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion,
+                                            String languageID, boolean isCustom) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
+    String isCustomStr = isCustom ? "Y" : "N";
 
     String modelId = jsonEntry.getString("id");
     if (lexicalModelExists(packageId, modelId)) {
@@ -74,6 +76,8 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
         models[i].put(KMManager.KMKey_LexicalModelVersion, packageVersion);
         models[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id").toLowerCase());
         models[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
+
+        models[i].put(KMManager.KMKey_CustomModel, isCustomStr);
 
         if (welcomeExists(packageId)) {
           File kmpFile = new File(packageId + ".kmp");
@@ -96,13 +100,15 @@ public class LexicalModelPackageProcessor extends PackageProcessor {
    * @param path Filepath of a newly downloaded .kmp file.
    * @param tempPath Filepath of temporarily extracted .kmp file
    * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
+   * @param isCustom Boolean if ad-hoc custom install
    * @return A list of data maps of the newly installed and/or newly upgraded lexical models found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
    * @throws IOException
    * @throws JSONException
    */
-  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
-    return super.processKMP(path, tempPath, key, null);
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key,
+                                              boolean isCustom) throws IOException, JSONException {
+    return super.processKMP(path, tempPath, key, null, isCustom);
   }
 }

@@ -65,7 +65,9 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
             String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
             if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
               File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-              installedLexicalModels.addAll(kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY));
+              // All cloud lexical model packages are not custom
+              boolean isCustom = false;
+              installedLexicalModels.addAll(kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY, isCustom));
             }
           }
         }

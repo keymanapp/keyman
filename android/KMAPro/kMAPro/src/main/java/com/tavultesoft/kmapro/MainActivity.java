@@ -142,10 +142,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           String downloadedFilename = resultData.getString("filename");
           String languageID = resultData.getString("language");
           String kmpFilename = resultData.getString("destination") + File.separator + downloadedFilename;
+          String url = resultData.getString("url");
 
           Bundle bundle = new Bundle();
           bundle.putString("kmpFile", kmpFilename);
           bundle.putString("language", languageID);
+          bundle.putBoolean("custom", FileUtils.isCustomKeyboard(url));
           Intent packageIntent = new Intent(getApplicationContext(), PackageActivity.class);
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
@@ -188,8 +190,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     KMManager.executeResourceUpdate(this);
 
-    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    // Default resources not considered "custom"
+    String customResource = "N";
+
     // Add default keyboard
+    // KMManager.copyAssets() will have already copied and installed kmp's included in the app
+    SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
     if (!installDefaultKeyboard) {
       HashMap<String, String> kbInfo = new HashMap<String, String>();
@@ -203,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       File welcomeFile = new File(KMManager.getPackagesDir(), KMManager.KMDefault_PackageID + File.separator + FileUtils.WELCOME_HTM);
       kbInfo.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+      kbInfo.put(KMManager.KMKey_CustomKeyboard, customResource);
       KMManager.addKeyboard(this, kbInfo);
 
       SharedPreferences.Editor editor = prefs.edit();
@@ -220,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, KMManager.KMDefault_DictionaryModelName);
       lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion,
         KMManager.getLexicalModelPackageVersion(context, KMManager.KMDefault_DictionaryPackageID));
+      lexicalModelInfo.put(KMManager.KMKey_CustomModel, customResource);
       /*
       // If welcome.htm exists, add custom help link
       welcomeFile = new File(KMManager.getLexicalModelsDir(), KMManager.KMDefault_DictionaryPackageID + File.separator + FileUtils.WELCOME_HTM);
@@ -606,8 +614,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       }
       if (url != null) {
         // URL contains KMP to download in background.
-        boolean isCustom = FileUtils.isCustomKeyboard(url);
-
         String filename = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Filename);
         if (filename == null) {
           FileUtils.getFilename(url);
@@ -616,6 +622,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         // Parse the url for the BCP 47 language ID
         Uri uri = Uri.parse(url);
         String languageID = uri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
+        if (languageID != null) {
+          languageID = languageID.toLowerCase();
+        }
 
         // Keyboard download endpoint:
         // download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
@@ -912,13 +921,20 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     }
   }
 
-  // TODO: Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
     if (data != null) {
       useLocalKMP(context, data, false);
     }
   }
 
+  /**
+   * Utility to copy a local .kmp file to app cache and then call PackageActivity().
+   * All packages installed this way are considered "custom".
+   * @param context Context
+   * @param data Uri - The full URI to the local .kmp file. Supported schemes are "content" and "file"
+   * @param silentInstall boolean - When true, PackageActivity() won't display any of the
+   *                      readme.htm / welcome.htm documentation during package installation
+   */
   public static void useLocalKMP(Context context, Uri data, boolean silentInstall) {
     String filename = "";
     String cacheKMPFilename = "";
@@ -973,6 +989,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (cacheKMPFile != null) {
       bundle.putString("kmpFile", cacheKMPFile.getAbsolutePath());
       bundle.putBoolean("silentInstall", silentInstall);
+      bundle.putBoolean("custom", true);
 
       Intent packageIntent = new Intent(context, PackageActivity.class);
       packageIntent.putExtras(bundle);

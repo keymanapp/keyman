@@ -98,7 +98,10 @@ public final class ModelPickerActivity extends AppCompatActivity {
           String modelID = modelInfo.get(KMManager.KMKey_LexicalModelID);
           String modelName = modelInfo.get(KMManager.KMKey_LexicalModelName);
           String langName = modelInfo.get(KMManager.KMKey_LanguageName);
-
+          String customModel = "Y";
+          if (modelInfo.containsKey(KMManager.KMKey_CustomModel)) {
+            customModel = modelInfo.get(KMManager.KMKey_CustomModel);
+          }
           // File check to see if lexical model already exists locally
           File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
 
@@ -127,6 +130,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
             bundle.putString(KMManager.KMKey_LexicalModelVersion,
                 modelInfo.get(KMManager.KMKey_LexicalModelVersion));
             bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
+            bundle.putString(KMManager.KMKey_CustomModel, customModel);
             Intent i = new Intent(context, ModelInfoActivity.class);
             i.putExtras(bundle);
             startActivityForResult(i, 1);

@@ -237,7 +237,9 @@ public class JSONUtils {
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
                 modelObj.put(KMManager.KMKey_LexicalModelVersion, packageVersion);
-                modelObj.put(KMManager.KMKey_CustomModel, "Y");
+
+                // KMManager.KMKey_CustomModel is inconclusive since we don't know where the kmp.json originated
+
                 if (containsHelp) {
                   File welcomeFile = new File(pkg, "welcome.htm");
                   modelObj.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());

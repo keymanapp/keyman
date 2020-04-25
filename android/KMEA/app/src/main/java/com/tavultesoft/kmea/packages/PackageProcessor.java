@@ -143,11 +143,14 @@ public class PackageProcessor {
    * @param packageVersion Package version (used for lexical model version)
    * @param languageID Preferred language ID to associate with the entry. If not found,
    *                   the first language in kmp.json is used.
+   * @param isCustom Boolean if package is custom ad-hoc install
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion,
+                                            String languageID, boolean isCustom) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
+    String isCustomStr = isCustom ? "Y" : "N";
 
     String keyboardId = jsonEntry.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
@@ -174,8 +177,7 @@ public class PackageProcessor {
         keyboards[i].put(KMManager.KMKey_OskFont, jsonEntry.getString("oskFont"));
       }
 
-      // For now, all KMP distributed keyboards are custom
-      keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
+      keyboards[i].put(KMManager.KMKey_CustomKeyboard, isCustomStr);
       if (welcomeExists(packageId)) {
         File kmpFile = new File(packageId + ".kmp");
         File packageDir = constructPath(kmpFile, false);
@@ -414,6 +416,7 @@ public class PackageProcessor {
    * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
    * @param languageID String of the preferred language ID to associate with the entry. If languageID is null or
    *                   not found in kmp.json, then the first entry will be added.
+   * @param isCustom Boolean if custom ad-hoc install
    * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
@@ -422,7 +425,8 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public List<Map<String, String>> processKMP(File path, File tempPath, String key, String languageID) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key,
+                                              String languageID, boolean isCustom) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
     ArrayList<Map<String, String>> specs = new ArrayList<>();
@@ -456,7 +460,8 @@ public class PackageProcessor {
       JSONArray entries = newInfoJSON.getJSONArray(key);
 
       for (int i = 0; i < entries.length(); i++) {
-        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion, languageID);
+        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion,
+          languageID, isCustom);
         if (maps != null) {
           specs.addAll(Arrays.asList(maps));
         }
@@ -467,7 +472,8 @@ public class PackageProcessor {
     return specs;
   }
 
-  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
-    return processKMP(path, tempPath, key, null);
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key,
+                                              boolean isCustom) throws IOException, JSONException {
+    return processKMP(path, tempPath, key, null, isCustom);
   }
 }

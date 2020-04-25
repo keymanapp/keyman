@@ -54,6 +54,7 @@ public class PackageActivity extends AppCompatActivity {
     setContentView(R.layout.activity_package_installer);
     boolean silentInstall = false;
     String languageID = null;
+    boolean isCustom = true;
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
@@ -61,6 +62,7 @@ public class PackageActivity extends AppCompatActivity {
       kmpFile = new File(bundle.getString("kmpFile"));
       silentInstall = bundle.getBoolean("silentInstall", false);
       languageID = bundle.getString("language", null);
+      isCustom = bundle.getBoolean("custom", true);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -90,7 +92,7 @@ public class PackageActivity extends AppCompatActivity {
 
     // Silent installation (skip displaying welcome.htm and user confirmation)
     if (silentInstall) {
-      installPackage(context, pkgTarget, pkgId, languageID, true);
+      installPackage(context, pkgTarget, pkgId, languageID, isCustom, true);
       return;
     }
 
@@ -183,7 +185,7 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
-    initializeButtons(context, pkgId, languageID, pkgTarget);
+    initializeButtons(context, pkgId, languageID, isCustom, pkgTarget);
   }
 
   /**
@@ -191,9 +193,11 @@ public class PackageActivity extends AppCompatActivity {
    * @param context the context
    * @param pkgId the keyman package id
    * @param languageID the optional language id
+   * @param isCustom Boolean: true if custom ad-hoc package install
    * @param pkgTarget  String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    */
-  private void initializeButtons(final Context context, final String pkgId, final String languageID, final String pkgTarget) {
+  private void initializeButtons(final Context context, final String pkgId, final String languageID,
+                                 final boolean isCustom, final String pkgTarget) {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
     final Button finishButton = (Button) findViewById(R.id.finishButton);
@@ -203,7 +207,7 @@ public class PackageActivity extends AppCompatActivity {
       public void onClick(View v) {
 
 
-        installPackage(context, pkgTarget, pkgId, languageID, false);
+        installPackage(context, pkgTarget, pkgId, languageID, isCustom,false);
       }
     });
 
@@ -316,9 +320,11 @@ public class PackageActivity extends AppCompatActivity {
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param pkgId String      The Keyman package ID
    * @param languageID String The optional language ID
+   * @param isCustom boolean  If true, the package is considered custom ad-hoc install
    * @param anSilentInstall boolean If true, don't display readme.htm/welcome.htm content during installation
    */
-  private void installPackage(Context context, String pkgTarget, String pkgId, String languageID, boolean anSilentInstall) {
+  private void installPackage(Context context, String pkgTarget, String pkgId, String languageID,
+                              boolean isCustom, boolean anSilentInstall) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
@@ -327,7 +333,8 @@ public class PackageActivity extends AppCompatActivity {
         //kmpDataset.keyboards.addAll(kbdsList);
 
         List<Map<String, String>> installedPackageKeyboards =
-          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, languageID);
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY,
+            languageID, isCustom);
         // Do the notifications!
         boolean success = installedPackageKeyboards.size() != 0;
         boolean _cleanup = true;
@@ -347,7 +354,8 @@ public class PackageActivity extends AppCompatActivity {
         }
       } else if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         List<Map<String, String>> installedLexicalModels =
-          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY,
+            languageID, isCustom);
         // Do the notifications
         boolean success = installedLexicalModels.size() != 0;
         boolean _cleanup = true;

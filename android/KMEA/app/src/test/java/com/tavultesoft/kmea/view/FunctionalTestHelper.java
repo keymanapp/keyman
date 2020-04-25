@@ -66,7 +66,7 @@ class FunctionalTestHelper {
     PackageProcessor kmpProcessor =  new PackageProcessor(new File(KMManager.getResourceRoot()));
 
     File tempPackagePath = kmpProcessor.unzipKMP(aKPMFile);
-    List<Map<String, String>> installedKbds = kmpProcessor.processKMP(aKPMFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+    List<Map<String, String>> installedKbds = kmpProcessor.processKMP(aKPMFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, true);
 
     Assert.assertEquals(installedKbds.size(),1);
 

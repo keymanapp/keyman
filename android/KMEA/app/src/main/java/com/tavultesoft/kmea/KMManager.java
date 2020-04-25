@@ -527,6 +527,8 @@ public final class KMManager {
       }
 
       // Copy and install all KMP files (Issue for FV app?)
+      // These are treated as non-custom
+      boolean isCustom = false;
       File resourceRoot = new File(getResourceRoot());
       PackageProcessor kmpProcessor = new PackageProcessor(resourceRoot);
       LexicalModelPackageProcessor lmkmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
@@ -542,11 +544,11 @@ public final class KMManager {
           tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
 
           if (FileUtils.hasLexicalModelPackageExtension(assetFile)) {
-            lmkmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+            lmkmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY, isCustom);
           } else {
             // Not using the list of entries returned from processKMP()
             // because the main App will add the keyboard/lexical model info
-            kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+            kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, isCustom);
           }
         }
       }

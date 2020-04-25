@@ -27,6 +27,7 @@ public class DownloadIntentService extends IntentService {
         bundle.putString("destination", destination);
         bundle.putString("filename", filename);
         bundle.putString("language", languageID);
+        bundle.putString("url", url);
         receiver.send(FileUtils.DOWNLOAD_SUCCESS, bundle);
       } else {
         receiver.send(FileUtils.DOWNLOAD_ERROR, bundle);
