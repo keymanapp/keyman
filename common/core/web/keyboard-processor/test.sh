@@ -5,8 +5,7 @@ cd $(dirname "$BASH_SOURCE")
 
 # Include useful testing resource functions
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../.."
-. "$KEYMAN_ROOT/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # A simple utility script to facilitate unit-testing for the LM Layer.
