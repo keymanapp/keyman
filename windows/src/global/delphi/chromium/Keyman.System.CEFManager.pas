@@ -27,6 +27,7 @@ type
     FWindows: TList<IKeymanCEFHost>;
     FShutdownCompletionHandler: TNotifyEvent;
     procedure CompletionHandler(Sender: IKeymanCEFHost);
+    procedure Cleanup(Sender: TObject);
   public
     const ProcessMessage_GetWindowSize = 'ProcessMessage_ResizeByContent';
   public
@@ -52,6 +53,7 @@ uses
 
   Sentry.Client,
 
+  Keyman.System.KeymanSentryClient,
   KeymanPaths,
   KeymanVersion,
 //  RedistFiles,
@@ -113,15 +115,22 @@ begin
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.79 Safari/537.36 (TIKE/'+SKeymanVersion+')';
 
   GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
+
+  TKeymanSentryClient.OnBeforeShutdown := Self.Cleanup;
+end;
+
+procedure TCEFManager.Cleanup(Sender: TObject);
+begin
+  FreeAndNil(FWindows);
+  GlobalCEFApp.Free;
+  GlobalCEFApp := nil;
+  FInitializeCEF := nil;
 end;
 
 destructor TCEFManager.Destroy;
 begin
   Assert(FWindows.Count = 0);
-  FreeAndNil(FWindows);
-  GlobalCEFApp.Free;
-  GlobalCEFApp := nil;
-  FInitializeCEF := nil;
+  Cleanup(nil);
   inherited Destroy;
 end;
 

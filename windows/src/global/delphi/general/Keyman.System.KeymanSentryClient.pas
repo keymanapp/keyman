@@ -3,6 +3,7 @@ unit Keyman.System.KeymanSentryClient;
 interface
 
 uses
+  System.Classes,
   Sentry.Client;
 
 type
@@ -12,6 +13,7 @@ type
   private
     class var FInstance: TKeymanSentryClient;
     class var FClient: TSentryClient;
+    class var FOnBeforeShutdown: TNotifyEvent;
   private
     FFlags: TKeymanSentryClientFlags;
     FProject: TKeymanSentryClientProject;
@@ -33,6 +35,7 @@ type
     class procedure Stop;
     class property Client: TSentryClient read FClient;
     class property Instance: TKeymanSentryClient read FInstance;
+    class property OnBeforeShutdown: TNotifyEvent read FOnBeforeShutdown write FOnBeforeShutdown;
   public
     const LOGGER_DEVELOPER_IDE = 'KeymanDeveloper.IDE';
     const LOGGER_DEVELOPER_TOOLS = 'KeymanDeveloper.Tools';
@@ -45,7 +48,6 @@ type
 implementation
 
 uses
-  System.Classes,
   System.Generics.Collections,
   System.JSON,
   System.StrUtils,
@@ -114,6 +116,9 @@ begin
     // We need to look for a kmcomapi errlog and report that
     if FClient.ReportExceptions then
       ReportRemoteErrors(EventID);
+
+    if Assigned(FOnBeforeShutdown) then
+      FOnBeforeShutdown(Self);
 
     if kscfShowUI in FFlags then
     begin
