@@ -10,7 +10,8 @@ describe('compileModel', function () {
     'example.qaa.sencoten',
     'example.qaa.trivial',
     'example.qaa.utf16le',
-    'example.qaa.wordbreaker'
+    'example.qaa.wordbreaker',
+    'example.qaa.joinwordbreaker'
   ];
 
   for (let modelID of MODELS) {
