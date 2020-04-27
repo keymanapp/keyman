@@ -50,7 +50,7 @@ public class CloudDataJsonUtilTest {
       List<LexicalModel> results = CloudDataJsonUtil.processLexicalModelJSON(cloud);
 
     LexicalModel lmInfo = results.get(0);
-    Assert.assertEquals("str-latn", lmInfo.getLanguageCode());
+    Assert.assertEquals("str-latn", lmInfo.getLanguageID());
   }
 
 }

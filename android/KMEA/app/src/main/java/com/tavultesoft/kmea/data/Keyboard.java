@@ -89,6 +89,9 @@ public class Keyboard implements Serializable, LanguageResource {
 
   public String getOSKFont() { return oskFont; }
 
+  public String getLanguageID() { return languageID; }
+
+  // Deprecated in Keyman 14.0 for getLanguageID()
   @Override
   public String getLanguageCode() { return languageID; }
 
@@ -100,6 +103,10 @@ public class Keyboard implements Serializable, LanguageResource {
 
   public String getVersion() { return version; }
 
+  public String getPackageID() { return packageID; }
+
+  // Deprecated in Keyman 14.0 for getPackageID()
+  @Override
   public String getPackage() { return packageID; }
 
   public Bundle buildDownloadBundle() {
@@ -120,7 +127,7 @@ public class Keyboard implements Serializable, LanguageResource {
 
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
-      boolean lgCodeMatch = ((Keyboard) obj).getLanguageCode().equals(this.getLanguageCode());
+      boolean lgCodeMatch = ((Keyboard) obj).getLanguageID().equals(this.getLanguageID());
       boolean idMatch = ((Keyboard) obj).getResourceId().equals(this.getResourceId());
 
       return lgCodeMatch && idMatch;
@@ -132,7 +139,7 @@ public class Keyboard implements Serializable, LanguageResource {
   @Override
   public int hashCode() {
     String id = getResourceId();
-    String lgCode = getLanguageCode();
+    String lgCode = getLanguageID();
     return id.hashCode() * lgCode.hashCode();
   }
 }

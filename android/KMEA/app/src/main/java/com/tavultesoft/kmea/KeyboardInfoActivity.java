@@ -62,7 +62,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
 
     listView = (ListView) findViewById(R.id.listView);
     final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
-    final String packageID = kbd.getPackage();
+    final String packageID = kbd.getPackageID();
     final String kbID = kbd.getResourceId();
     final String kbName = kbd.getResourceName();
     final String kbVersion = kbd.getVersion();

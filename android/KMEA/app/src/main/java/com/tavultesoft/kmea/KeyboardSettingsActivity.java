@@ -69,8 +69,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final ListView listView = findViewById(R.id.listView);
 
     final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
-    final String packageID = kbd.getPackage();
-    final String languageID = kbd.getLanguageCode();
+    final String packageID = kbd.getPackageID();
+    final String languageID = kbd.getLanguageID();
     final String languageName = kbd.getLanguageName();
     final String kbID = kbd.getResourceId();
     final String kbName = kbd.getResourceName();
