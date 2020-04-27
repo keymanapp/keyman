@@ -9,6 +9,7 @@
 
 Sentry.init({
   dsn: 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5',  // Keyman Desktop
+  environment: '$Environment',
   release: 'release-$VersionWithTag'
 });
 
