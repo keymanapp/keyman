@@ -62,12 +62,16 @@ var
   Keyman_Diagnostic: TKeyman_Diagnostic;
 begin
   h := GetModuleHandle('keyman32.dll');
-  if h <> 0 then
+  if h = 0 then
   begin
-    Keyman_Diagnostic := GetProcAddress(h, 'Keyman_Diagnostic');
-    if Assigned(Keyman_Diagnostic) then
-      Keyman_Diagnostic(0);
+    ShowMessage('keyman32.dll is not loaded. Make sure Keyman is running.');
+    Exit;
   end;
+
+  Keyman_Diagnostic := GetProcAddress(h, 'Keyman_Diagnostic');
+  if Assigned(Keyman_Diagnostic)
+    then Keyman_Diagnostic(0)
+    else ShowMessage('Could not find export Keyman_Diagnostic in keyman32.dll');
 end;
 
 procedure TfrmDiagnosticTests.cmdSendTestKMTipExceptionClick(Sender: TObject);
@@ -76,12 +80,16 @@ var
   Keyman_Diagnostic: TKeyman_Diagnostic;
 begin
   h := GetModuleHandle('kmtip.dll');
-  if h <> 0 then
+  if h = 0 then
   begin
-    Keyman_Diagnostic := GetProcAddress(h, 'Keyman_Diagnostic');
-    if Assigned(Keyman_Diagnostic) then
-      Keyman_Diagnostic(0);
+    ShowMessage('kmtip.dll is not loaded. Make sure Keyman is running and a Keyman keyboard is selected.');
+    Exit;
   end;
+
+  Keyman_Diagnostic := GetProcAddress(h, 'Keyman_Diagnostic');
+  if Assigned(Keyman_Diagnostic)
+    then Keyman_Diagnostic(0)
+    else ShowMessage('Could not find export Keyman_Diagnostic in kmtip.dll');
 end;
 
 class procedure TfrmDiagnosticTests.Run;

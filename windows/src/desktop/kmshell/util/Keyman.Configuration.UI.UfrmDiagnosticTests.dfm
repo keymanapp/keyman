@@ -30,7 +30,8 @@ object frmDiagnosticTests: TfrmDiagnosticTests
     Width = 185
     Height = 25
     Caption = 'Send Test COM &API Exception'
-    TabOrder = 1
+    TabOrder = 2
+    OnClick = cmdSendTestCOMAPIEventClick
   end
   object cmdClose: TButton
     Left = 279
@@ -40,7 +41,7 @@ object frmDiagnosticTests: TfrmDiagnosticTests
     Cancel = True
     Caption = '&Close'
     ModalResult = 1
-    TabOrder = 2
+    TabOrder = 5
   end
   object cmdSendTestEvent: TButton
     Left = 8
@@ -48,7 +49,7 @@ object frmDiagnosticTests: TfrmDiagnosticTests
     Width = 185
     Height = 25
     Caption = '&Send Test Event'
-    TabOrder = 3
+    TabOrder = 1
     OnClick = cmdSendTestEventClick
   end
   object cmdSendTestKeyman32Exception: TButton
@@ -57,7 +58,7 @@ object frmDiagnosticTests: TfrmDiagnosticTests
     Width = 185
     Height = 25
     Caption = 'Send Test &keyman32 Exception'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = cmdSendTestKeyman32ExceptionClick
   end
   object cmdSendTestKMTipException: TButton
@@ -66,7 +67,7 @@ object frmDiagnosticTests: TfrmDiagnosticTests
     Width = 185
     Height = 25
     Caption = 'Send Test km&tip Exception'
-    TabOrder = 5
+    TabOrder = 4
     OnClick = cmdSendTestKMTipExceptionClick
   end
 end
