@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "karma": "karma",
-    "lerna": "cd ../ && npm run lerna --",
+    "lerna": "cd ../.. && npm run lerna --",
     "mocha": "mocha",
     "test": "bash ./unit_tests/test.sh",
     "tsc": "tsc"
