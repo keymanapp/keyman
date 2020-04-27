@@ -50,8 +50,6 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
         List<Keyboard> kbdList = new ArrayList<>(kbdMapList.size());
 
         for(HashMap<String, String> kbdMap: kbdMapList) {
-          boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
-            kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
           boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
             kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
 
@@ -61,12 +59,11 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
             kbdMap.get(KMManager.KMKey_KeyboardName),
             kbdMap.get(KMManager.KMKey_LanguageID),
             kbdMap.get(KMManager.KMKey_LanguageName),
-            isCustom,
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
             isNewKeyboard,
             MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
-            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
+            MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
           );
           kbdList.add(k);
         }

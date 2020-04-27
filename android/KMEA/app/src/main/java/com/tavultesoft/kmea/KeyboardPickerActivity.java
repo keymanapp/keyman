@@ -585,8 +585,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
 
     for(HashMap<String, String> kbdMap: kbdMapList) {
-      boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
-        kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
       boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
         kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
 
@@ -596,24 +594,33 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         kbdMap.get(KMManager.KMKey_KeyboardName),
         kbdMap.get(KMManager.KMKey_LanguageID),
         kbdMap.get(KMManager.KMKey_LanguageName),
-        isCustom,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
         isNewKeyboard,
         MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
-        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
-        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
-        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
       );
       kbdsList.add(k);
     }
 
-    List<? extends Map<String, String>> lexMapList = getLexicalModelsList(context);
+    List<HashMap<String, String>> lexMapList = getLexicalModelsList(context);
     if(lexMapList == null) {
       lexMapList = new ArrayList<>(0);
     }
     List<LexicalModel> lexList = new ArrayList<>(lexMapList.size());
 
-    for(Map<String, String> map: lexMapList) {
-      lexList.add(new LexicalModel(map));
+    for(HashMap<String, String> lmMap: lexMapList) {
+      LexicalModel m = new LexicalModel(
+        lmMap.get(KMManager.KMKey_PackageID),
+        lmMap.get(KMManager.KMKey_LexicalModelID),
+        lmMap.get(KMManager.KMKey_LexicalModelName),
+        lmMap.get(KMManager.KMKey_LanguageID),
+        lmMap.get(KMManager.KMKey_LanguageName),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
+        "" // TODO: add model URL
+      );
+      lexList.add(m);
     }
 
     storageDataset = new Dataset(context);
@@ -633,8 +640,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     List<HashMap<String, String>> mapList = getKeyboardsList(context);
     List<Keyboard> kbdList = new ArrayList<>(mapList.size());
     for(HashMap<String, String> kbdMap: mapList) {
-      boolean isCustom = kbdMap.containsKey(KMManager.KMKey_CustomKeyboard) &&
-        kbdMap.get(KMManager.KMKey_CustomKeyboard).equals("Y");
       boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
         kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
 
@@ -644,12 +649,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         kbdMap.get(KMManager.KMKey_KeyboardName),
         kbdMap.get(KMManager.KMKey_LanguageID),
         kbdMap.get(KMManager.KMKey_LanguageName),
-        isCustom,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
         isNewKeyboard,
         MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
-        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null),
-        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
-        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, "")
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
       );
       kbdList.add(k);
     }
@@ -662,13 +666,22 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     storage.lexicalModels.setNotifyOnChange(false);
     storage.lexicalModels.clear();
 
-    List<? extends Map<String, String>> mapList = getLexicalModelsList(context);
+    List<HashMap<String, String>> mapList = getLexicalModelsList(context);
     List<LexicalModel> lexList = new ArrayList<>(mapList.size());
-    for(Map<String, String> map: mapList) {
-      lexList.add(new LexicalModel(map));
+    for(HashMap<String, String> lmMap: mapList) {
+      LexicalModel m = new LexicalModel(
+        lmMap.get(KMManager.KMKey_PackageID),
+        lmMap.get(KMManager.KMKey_LexicalModelID),
+        lmMap.get(KMManager.KMKey_LexicalModelName),
+        lmMap.get(KMManager.KMKey_LanguageID),
+        lmMap.get(KMManager.KMKey_LanguageName),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
+        "" // model URL
+      );
+      lexList.add(m);
     }
     storage.lexicalModels.addAll(lexList);
-
     storage.lexicalModels.notifyDataSetChanged();
   }
 

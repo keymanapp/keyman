@@ -209,7 +209,9 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         Keyboard kbdInfo = ((FilteredKeyboardsAdapter) listView.getAdapter()).getItem(position);
         Intent intent = new Intent(context, KeyboardSettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.putExtra(KMManager.KMKey_Keyboard, kbdInfo);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(KMManager.KMKey_Keyboard, kbdInfo);
+        intent.putExtras(bundle);
         startActivity(intent);
       }
     });

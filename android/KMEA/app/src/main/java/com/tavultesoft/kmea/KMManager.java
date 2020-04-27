@@ -174,6 +174,7 @@ public final class KMManager {
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
+  public static final String KMKey_LexicalModel = "lm";
   public static final String KMKey_LexicalModelID = "lmId";
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
@@ -743,14 +744,6 @@ public final class KMManager {
           shouldUpdateList = true;
         }
 
-        String isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard);
-        if (isCustom == null || isCustom.equals("U")) {
-          String kbKey = String.format("%s_%s", langID, kbID);
-          kbInfo.put(KMManager.KMKey_CustomKeyboard, isCustomKeyboard(context, kbKey));
-          kbList.set(i, kbInfo);
-          shouldUpdateList = true;
-        }
-
         if (kbID.equals(KMManager.KMDefault_KeyboardID) && langID.equals(KMManager.KMDefault_LanguageID)) {
           int defKbIndex = KMManager.getKeyboardIndex(context, KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID);
           if (defKbIndex == 0 && i > 0)
@@ -784,21 +777,6 @@ public final class KMManager {
         }
       }
     }
-  }
-
-  private static String isCustomKeyboard(Context context, String keyboardKey) {
-    String isCustom = "U";
-    HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
-    if (keyboardsInfo != null) {
-      HashMap<String, String> kbInfo = keyboardsInfo.get(keyboardKey);
-      if (kbInfo != null) {
-        isCustom = "N";
-      } else {
-        isCustom = "Y";
-      }
-    }
-
-    return isCustom;
   }
 
   /**
@@ -1784,7 +1762,6 @@ public final class KMManager {
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
         double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
         String suggestionJSON = urlCommand.getQueryParameter("suggestion");
-        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
 
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
@@ -1796,7 +1773,7 @@ public final class KMManager {
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
+          Log.v("KMEA", "Is a <keep> suggestion: "); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
@@ -2026,7 +2003,6 @@ public final class KMManager {
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
         double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
         String suggestionJSON = urlCommand.getQueryParameter("suggestion");
-        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
 
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
@@ -2038,7 +2014,7 @@ public final class KMManager {
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
+          Log.v("KMEA", "Is a <keep> suggestion: "); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
