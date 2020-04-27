@@ -8,7 +8,7 @@
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../.."
-. "$KEYMAN_ROOT/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
@@ -18,15 +18,6 @@ assert ( ) {
         fail "Build failed."
         exit 1
     fi
-}
-
-fail() {
-    FAILURE_MSG="$1"
-    if [[ "$FAILURE_MSG" == "" ]]; then
-        FAILURE_MSG="Unknown failure"
-    fi
-    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
-    exit 1
 }
 
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
