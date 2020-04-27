@@ -1,4 +1,4 @@
-/// <reference path="../../node_modules/keyman-keyboard-processor/src/text/engineDeviceSpec.ts" />
+/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
 
 namespace KMWRecorder {
   type AssertCallback = (s1: any, s2: any, msg?: string) => void;
