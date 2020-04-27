@@ -260,19 +260,16 @@ set_npm_version () {
 
 # Initializes use of the npm `lerna` package within the repo.
 init_lerna() {
-  WORKING_DIRECTORY=`pwd`
-
   if [ "${KEYMAN_ROOT}" = "" ]; then
     fail "KEYMAN_ROOT not defined; cannot bootstrap repo's dependencies"
   fi
 
   # At its base, lerna does use an npm-friendly package.json.  Installing that allows the base lerna install to work.
-  cd "$KEYMAN_ROOT"
+  # We already changed directory in the parent script.
   npm install --no-optional
 
   # Now that it exists, we can run the following command locally.  (Otherwise, npx will temporarily download everything again, each time!)
-  npx lerna bootstrap
-  cd "$WORKING_DIRECTORY"
+  # npm run lerna bootstrap
 }
 
 # Accepts an optional parameter.
@@ -291,8 +288,11 @@ verify_npm_setup () {
       fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
   if [ $fetch_deps = true ]; then
-    # Is lerna locally installed?  If not, initialize it at the repo's base locally.
-    npm list lerna >/dev/null || init_lerna
+    WORKING_DIRECTORY=`pwd`
+    cd "$KEYMAN_ROOT"
+
+    # Ensure the repo's base resources are installed.  (This ensures the local `lerna` install is available.)
+    npm install --no-optional
 
     # Use lerna to ensure repo-internal dependencies are all properly linked 
     # while also installing external dependencies.  Also propagates lerna into
@@ -301,10 +301,37 @@ verify_npm_setup () {
     # `lerna` will only affect the packages listed the file lerna.json at the repo's base.
     # The "packages" entry therein is MANUALLY managed, not automatic.  Anything not listed
     # therein will not be affected by `lerna` commands.
-    npx lerna bootstrap -- --no-optional
+    #
+    # Calls repo's base package 'bootstrap' script, performing the needed `lerna bootstrap -- --no-optional` command.
+    npm run bootstrap
+
+    # Alternatively, without the specific script:
+    #   npx lerna bootstrap -- --no-optional             # ONLY SAFE AT REPO'S BASE (otherwise, temporarily re-downloads `lerna`!)
+    #   - or -
+    #   npm run lerna -- bootstrap -- -- --no-optional   # Possible to use within sub-packages with proper setup.  (See below.)
+    
+    # Note:  calling the above WITHOUT changing directories to $KEYMAN_ROOT will re-download lerna.
+    #
+    # Instead, configuring each package like this:
+    #
+    # "scripts": {
+    #   "lerna": "cd ../ && npm run lerna --"
+    # },
+    #
+    # and calling this:
+    #   npm run lerna bootstrap -- -- --no-optional
+    # will suffice.
+    #
+    # (The cd ../ will make the base repo's package.json the default for npm lookups.)
+    # (The double '--' is required due to the nested `npm run lerna` call, to ensure the parameters are properly passed through.)
 
     if [ $? -ne 0 ]; then
+      # restore original working directory
+      cd "$WORKING_DIRECTORY"
       fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    else
+      # restore original working directory
+      cd "$WORKING_DIRECTORY"
     fi
   fi
 }

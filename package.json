@@ -5,6 +5,8 @@
     "lerna": "^3.20.2"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap -- --no-optional",
+    "lerna": "lerna",
+    "version": "lerna version --amend --yes --force-publish --no-git-tag-version"
   }
 }
