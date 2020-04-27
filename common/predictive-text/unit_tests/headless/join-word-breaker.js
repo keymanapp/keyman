@@ -36,6 +36,22 @@ describe('The join word breaker decorator', function () {
 
     // Do not perform any joins:
     ["hello world", "-", ["hello", "world"], ["hello", "world"]],
+
+    // Joining using multiple joiners
+    [
+      "Email: no-body@example.com",
+      ["@", "-"],
+      ["Email", ":", "no", "-", "body", "@", "example.com"],
+      ["Email", ":", "no-body@example.com"]
+    ],
+    
+    // Joining with two or more joiners in a row 
+    [
+      "nobody@@example.com",
+      ["@"],
+      ["nobody", "@", "@", "example.com"],
+      ["nobody@@example.com"]
+    ]
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
