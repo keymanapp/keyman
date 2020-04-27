@@ -125,7 +125,7 @@ cd $BASE_PATH/../source
 
 # First:  Keyboard Processor tests.
 echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
-cd $WORKING_DIRECTORY/node_modules/keyman-keyboard-processor
+cd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
 cd $WORKING_DIRECTORY
