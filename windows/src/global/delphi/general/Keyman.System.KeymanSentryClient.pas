@@ -39,8 +39,8 @@ type
   public
     const LOGGER_DEVELOPER_IDE = 'KeymanDeveloper.IDE';
     const LOGGER_DEVELOPER_TOOLS = 'KeymanDeveloper.Tools';
-    const LOGGER_DESKTOP = 'KeymanDesktop';
-    const LOGGER_DESKTOP_ENGINE = 'KeymanDesktop.Engine';
+    const LOGGER_DESKTOP = 'KeymanWindows';
+    const LOGGER_DESKTOP_ENGINE = 'KeymanWindows.Engine';
     const S_Sentry_ViewEvent_URL = 'https://sentry.keyman.com/organizations/keyman/projects/%0:s/events/%1:s/'; // Do not localize
   end;
 
