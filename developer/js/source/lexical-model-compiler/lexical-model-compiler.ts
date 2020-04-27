@@ -93,11 +93,19 @@ export class ModelSourceError extends Error {
  * breaking function.
  */
 function compileWordBreaker(spec: WordBreakerSpec): string {
-  return compileInnerWordBreaker(spec.use);
+  let baseWordBreakerCode = compileInnerWordBreaker(spec.use);
+
+  if (spec.joinWordsAt == undefined) {
+    // No need to decorate; return it as-is
+    return baseWordBreakerCode;
+  }
+  // Let's decorate it with the join word breaker!
+  return `wordBreakers.join_(${baseWordBreakerCode},${JSON.stringify(spec.joinWordsAt)})`;
 }
 
 /**
  * Compiles the base word breaker, that may be decorated later.
+ * Returns the source code of a JavaScript expression.
  */
 function compileInnerWordBreaker(spec: SimpleWordBreakerSpec): string {
   if (typeof spec === "string") {
