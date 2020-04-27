@@ -19,11 +19,11 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "chai": "^4.2.0",
-    "lerna": "^3.20.2",
     "mocha": "^5.2.0",
     "typescript": "^3.7.2"
   },
   "scripts": {
+    "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
     "test": "bash ./unit_tests/test.sh"
   },
