@@ -122,6 +122,7 @@ namespace wordBreakers {
     function mergeOverlappingRanges(messyRanges: number[][]): number[][] {
       let lastRange: number[] | undefined;
       let ranges: number[][] = [];
+
       for (let range of messyRanges) {
         if (lastRange == undefined) {
           lastRange = range;
@@ -130,9 +131,14 @@ namespace wordBreakers {
         }
 
         let last = lastFrom(lastRange);
-        if (last === range[0]) {
-          // exclude the first element:
-          range.shift();
+        if (last >= range[0]) {
+          // Remove the overlapping elements:
+          while (range.length > 0 && last >= range[0]) {
+            range.shift();
+            last = lastFrom(lastRange);
+          }
+
+          // Extend the last range with what remains.
           for (let v of range) {
             lastRange.push(v);
           }
