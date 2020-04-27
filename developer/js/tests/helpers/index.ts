@@ -87,8 +87,27 @@ export function compileModelSourceCode(code: string) {
     }
   });
 
+  // We expect the compiled model to reach into the `wordBreaker` namespace,
+  // and maybe get a function. Problem is, we don't know
+  // what functions are available!
+  // This proxy allows us to intercept
+  //    wordBreakers.*
+  // meaning that when the compiled code tries to do this:
+  //
+  //    wordBreaker["someWordBreaker"]
+  //
+  // ...we can intercept the name "someWordBreaker".
+  let wordBreakerNamespace = new Proxy({}, {
+    get(_target, property)  {
+      if (typeof property !== 'string')
+        throw new Error(`Don't know how to handle non-string property: ${String(property)}`);
+      return function dummyWordBreaker() {
+      }
+    }
+  });
+
   try {
-    module(fakeLMLayerWorker, modelsNamespace, {});
+    module(fakeLMLayerWorker, modelsNamespace, wordBreakerNamespace);
   } catch (err) {
     error = err;
   }
