@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.57 alpha 2020-04-27
+
+* modify(common): Update to Unicode 13.0 (#3029)
+* modify(android): Refactor Keyboard class to not use Map (#3020)
+
 ## 14.0.56 alpha 2020-04-24
 
 * fix(android): Clarify label that shows "Get Started" on startup (#3025)
