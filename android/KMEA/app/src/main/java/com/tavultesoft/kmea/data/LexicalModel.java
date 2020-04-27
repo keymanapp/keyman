@@ -32,6 +32,11 @@ public class LexicalModel implements Serializable, LanguageResource {
     return this.map.get(KMManager.KMKey_LexicalModelID);
   }
 
+  public String getLanguageID() {
+    return this.map.get(KMManager.KMKey_LanguageID);
+  }
+
+  // Deprecate in Keyman 14.0 for getLanguageID()
   @Override
   public String getLanguageCode() {
     return this.map.get(KMManager.KMKey_LanguageID);
@@ -49,6 +54,9 @@ public class LexicalModel implements Serializable, LanguageResource {
     return this.map.get(KMManager.KMKey_LexicalModelVersion);
   }
 
+  public String getPackageID() { return this.map.get(KMManager.KMKey_PackageID); }
+
+  // Deprecate in Keyman 14.0 for getPackageID()
   public String getPackage() {
     return this.map.get(KMManager.KMKey_PackageID);
   }
@@ -72,7 +80,7 @@ public class LexicalModel implements Serializable, LanguageResource {
       return null;
     }
 
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackage());
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, getPackageID());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_ID, getResourceId());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, getLanguageCode());
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, getResourceName());
@@ -90,7 +98,7 @@ public class LexicalModel implements Serializable, LanguageResource {
 
   public boolean equals(Object obj) {
     if(obj instanceof LexicalModel) {
-      boolean lgCodeMatch = ((LexicalModel) obj).getLanguageCode().equals(this.getLanguageCode());
+      boolean lgCodeMatch = ((LexicalModel) obj).getLanguageID().equals(this.getLanguageID());
       boolean idMatch = ((LexicalModel) obj).getResourceId().equals(this.getResourceId());
 
       return lgCodeMatch && idMatch;

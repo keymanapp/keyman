@@ -158,6 +158,7 @@ public final class KMManager {
   public static final String KMKey_KeyboardCount = "kbCount";
   public static final String KMKey_HelpLink = "helpLink";
   public static final String KMKey_Icon = "icon";
+  public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";

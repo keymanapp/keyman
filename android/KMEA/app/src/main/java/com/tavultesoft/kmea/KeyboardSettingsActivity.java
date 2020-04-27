@@ -68,25 +68,18 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     final ListView listView = findViewById(R.id.listView);
 
-    final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
-    final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
-    final String languageName = getIntent().getStringExtra(KMManager.KMKey_LanguageName);
-    final String kbID = getIntent().getStringExtra(KMManager.KMKey_KeyboardID);
-    final String kbName = getIntent().getStringExtra(KMManager.KMKey_KeyboardName);
-    final String kbVersion = getIntent().getStringExtra(KMManager.KMKey_KeyboardVersion);
+    final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
+    final String packageID = kbd.getPackageID();
+    final String languageID = kbd.getLanguageID();
+    final String languageName = kbd.getLanguageName();
+    final String kbID = kbd.getResourceId();
+    final String kbName = kbd.getResourceName();
+    final String kbVersion = kbd.getVersion();
     String latestKbdCloudVersion = kbVersion;
 
     // Determine if keyboard update is available from the cloud
     Dataset dataset = CloudRepository.shared.fetchDataset(this);
-    HashMap<String, String> kbInfo = new HashMap<>();
-    kbInfo.put(KMManager.KMKey_PackageID, packageID);
-    kbInfo.put(KMManager.KMKey_LanguageID, languageID);
-    kbInfo.put(KMManager.KMKey_LanguageName, languageName);
-    kbInfo.put(KMManager.KMKey_KeyboardID, kbID);
-    kbInfo.put(KMManager.KMKey_KeyboardName, kbName);
-
-    Keyboard kbdQuery = new Keyboard(kbInfo);
-    final Keyboard latestKbd = dataset.keyboards.findMatch(kbdQuery);
+    final Keyboard latestKbd = dataset.keyboards.findMatch(kbd);
     if (latestKbd != null) {
       latestKbdCloudVersion = latestKbd.getVersion();
     }
@@ -113,8 +106,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     // Display keyboard help link
     hashMap = new HashMap<>();
-    final String helpUrlStr = getIntent().getStringExtra(KMManager.KMKey_HelpLink);
-    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    final String customHelpLink = kbd.getCustomHelpLink();
     // Check if app declared FileProvider
     icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
@@ -174,7 +166,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
         // "Help" link clicked
         } else if (itemTitle.equals(getString(R.string.help_link))) {
-          if (customHelpLink != null) {
+          if (FileUtils.isWelcomeFile(customHelpLink)) {
             // Display local welcome.htm help file, including associated assets
             Intent i = HelpFile.toActionView(context, customHelpLink, packageID);
 
@@ -183,7 +175,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
             }
           } else {
             Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(helpUrlStr));
+            i.setData(Uri.parse(customHelpLink));
             startActivity(i);
           }
 
@@ -206,7 +198,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
-      String url = String.format("%s%s", QRCodeUtil.QR_BASE, kbID);
+      String url = String.format(QRCodeUtil.QR_BASE, kbID);
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);
