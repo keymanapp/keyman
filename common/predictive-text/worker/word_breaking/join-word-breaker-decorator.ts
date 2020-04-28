@@ -54,19 +54,6 @@ namespace wordBreakers {
         messyJoinRanges.push(window);
       });
 
-      // Some indices pushed above are out of range.
-      // Get rid of them!
-      if (messyJoinRanges.length > 0) {
-        // We may have added -1
-        if (messyJoinRanges[0][0] < 0) {
-          messyJoinRanges[0].shift();
-        }
-        // We may have added 1 past the array's valid indices
-        if (lastFrom(lastFrom(messyJoinRanges)) >= results.length) {
-          lastFrom(messyJoinRanges).pop();
-        }
-      }
-
       // Merge overlapping regions:
       return mergeOverlappingRanges(messyJoinRanges);
     }
