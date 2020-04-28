@@ -175,13 +175,13 @@ namespace KMWRecorder {
           return _originalKeyDown(e);
         }
 
-        var event = KMWRecorder.Scribe.recordKeyboardEvent(e);
+        recorderScribe._currentEvent = KMWRecorder.Scribe.recordKeyboardEvent(e);
         var retVal = _originalKeyDown(e);
 
         // Record the keystroke as part of a test sequence!
         // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
         window.setTimeout(function() {
-          recorderScribe.addInputRecord(event, in_output.getText());
+          recorderScribe.addInputRecord(recorderScribe._currentEvent, in_output.getText());
         }, 1);
         
         return retVal;
@@ -194,11 +194,11 @@ namespace KMWRecorder {
           return _originalClickKey(e);
         }
 
-        var event = KMWRecorder.Scribe.recordOSKEvent(e);
+        recorderScribe._currentEvent = KMWRecorder.Scribe.recordOSKEvent(e);
         var retVal = _originalClickKey(e);
 
         // Record the click/touch as part of a test sequence!
-        recorderScribe.addInputRecord(event, in_output.getText());
+        recorderScribe.addInputRecord(recorderScribe._currentEvent, in_output.getText());
         return retVal;
       }
 
@@ -237,6 +237,17 @@ namespace KMWRecorder {
           }
         }
         recorderScribe.keyboardJustActivated = false;
+      }
+
+      var _originalProcessKeyEvent = keyman.core.processKeyEvent.bind(keyman.core);
+      keyman.core.processKeyEvent = function(keyEvent /* com.keyman.text.KeyEvent */) {
+        let currentDOMEvent = recorderScribe._currentEvent;
+        _originalProcessKeyEvent(keyEvent);
+
+        // TODO:  Record the pair.
+
+        // Now that we've processed the pair, clear the tracked _currentEvent instance.
+        recorderScribe._currentEvent = null;
       }
     }
   }
