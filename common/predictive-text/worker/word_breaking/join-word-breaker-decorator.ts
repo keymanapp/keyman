@@ -37,9 +37,21 @@ namespace wordBreakers {
 
       // Figure out where there are spans to join.
       results.forEach((span, index) => {
-        if (includes(delimiters, span.text)) {
-          messyJoinRanges.push([index - 1, index, index + 1]);
+        if (!includes(delimiters, span.text)) {
+          return;
         }
+
+        let window = [];
+        if (results[index - 1] && results[index - 1].end === results[index].start) {
+          window.push(index - 1);
+        }
+        window.push(index);
+
+        if (results[index + 1] && results[index].end === results[index + 1].start) {
+          window.push(index + 1);
+        }
+
+        messyJoinRanges.push(window);
       });
 
       // Some indices pushed above are out of range.
