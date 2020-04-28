@@ -16,7 +16,21 @@ declare class EventEmitter {
 
   // Defines the actual event-raising function.
   emit(eventName: string, ...args: any[]);
-}  
+}
+
+// Makes sure the code below knows that the namespaces exist.
+namespace com.keyman {
+  export namespace dom {
+    export declare var DOMEventHandlers: any;
+    export declare class Utils {
+      static getOutputTarget(elem: HTMLElement): any; // text.OutputTarget;
+    }
+  }
+
+  export namespace osk {
+    export declare var PreProcessor: any;
+  }
+}
 
 namespace KMWRecorder {
   /**
@@ -87,6 +101,8 @@ namespace KMWRecorder {
     inputJSON: InputTestSequence = new InputTestSequence();
     testDefinition: KeyboardTest = new KeyboardTest();
 
+    keyboardJustActivated: boolean = false;
+
     addInputRecord(json: InputEvent, currentOutput: string) {
       this.inputJSON.addInput(json, currentOutput);
       this.raiseRecordChanged();
@@ -136,6 +152,83 @@ namespace KMWRecorder {
 
     private raiseTestChanged() {
       this.emit('test-changed', this.testDefinition ? JSON.stringify(this.testDefinition, null, '  ') : '');
+    }
+
+    // Time for the 'magic'.  Yay, JavaScript method extension strategies...
+    initHooks(recordingElement: HTMLElement) {
+      let keyman = window['keyman'];
+      let recorderScribe = this;
+
+      let _originalKeyDown = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
+      keyman.touchAliasing._KeyDown = function(e) {
+        let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
+        if(!in_output || com.keyman.dom.DOMEventHandlers.states.activeElement != in_output.getElement()) {
+          return _originalKeyDown(e);
+        }
+
+        var event = KMWRecorder.Scribe.recordKeyboardEvent(e);
+        var retVal = _originalKeyDown(e);
+
+        // Record the keystroke as part of a test sequence!
+        // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
+        window.setTimeout(function() {
+          recorderScribe.addInputRecord(event, in_output.getText());
+        }, 1);
+        
+        return retVal;
+      }
+
+      var _originalClickKey = com.keyman.osk.PreProcessor.clickKey; //.bind(keyman.osk);
+      com.keyman.osk.PreProcessor.clickKey = function(e) {
+        let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
+        if(!in_output || com.keyman.dom.DOMEventHandlers.states.activeElement != in_output.getElement()) {
+          return _originalClickKey(e);
+        }
+
+        var event = KMWRecorder.Scribe.recordOSKEvent(e);
+        var retVal = _originalClickKey(e);
+
+        // Record the click/touch as part of a test sequence!
+        recorderScribe.addInputRecord(event, in_output.getText());
+        return retVal;
+      }
+
+      var _originalSetActiveKeyboard = keyman.keyboardManager._SetActiveKeyboard.bind(keyman.keyboardManager);
+      keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, saveCookie) {
+        let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
+        // If it's not on our recording control, ignore the change and do nothing special.
+        if(!in_output || document.activeElement != in_output.getElement()) {
+          _originalSetActiveKeyboard(PInternalName, PLgCode, saveCookie);
+          return;
+        }
+
+        let testDefinition = recorderScribe.testDefinition;
+        var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == PInternalName)
+          && (testDefinition.keyboard.getFirstLanguage() == PLgCode);
+
+        if(!testDefinition.isEmpty() && !sameKbd && !recorderScribe.keyboardJustActivated) {
+          if(!confirm("Changing the keyboard will clear the current test set.  Are you sure?")) {
+            _originalSetActiveKeyboard("Keyboard_" + testDefinition.keyboard.id, testDefinition.keyboard.languages[0].id);
+            return;
+          }
+        }
+        _originalSetActiveKeyboard(PInternalName, PLgCode, saveCookie);
+
+        // What's the active stub immediately after our _SetActiveKeyboard call?
+        var internalStub = keyman.keyboardManager.activeStub;
+        if(internalStub && (com.keyman.dom.DOMEventHandlers.states.activeElement == in_output.getElement())) {
+          var kbdRecord = KMWRecorder.Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
+
+          recorderScribe.emit('stub-changed', JSON.stringify(kbdRecord));
+          // var ta_activeStub = document.getElementById('activeStub');
+          // ta_activeStub.value = JSON.stringify(kbdRecord);
+          
+          if(!sameKbd && !recorderScribe.keyboardJustActivated) {
+            recorderScribe.setTestDefinition(new KMWRecorder.KeyboardTest(kbdRecord));
+          }
+        }
+        recorderScribe.keyboardJustActivated = false;
+      }
     }
   }
 }

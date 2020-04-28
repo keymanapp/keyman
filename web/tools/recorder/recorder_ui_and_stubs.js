@@ -1,13 +1,8 @@
 var UNIT_TEST_FOLDER_RELATIVE_PATH = "../../unit_tests";
-var inputJSON = new KMWRecorder.InputTestSequence();
-var testDefinition = new KMWRecorder.KeyboardTest();
 
 var ta_inputJSON;
 var in_output;
-
 var recorderScribe;
-
-var justActivated = false;
 
 function focusReceiver() {
   var receiver = document.getElementById('receiver');
@@ -94,26 +89,6 @@ setTestDefinition = function(testDef) {
   recorderScribe.setTestDefinition(testDef);
 }
 
-// Time for the 'magic'.  Yay, JavaScript method extension strategies...
-var _kd = keyman.touchAliasing._KeyDown.bind(keyman.touchAliasing);
-keyman.touchAliasing._KeyDown = function(e) {
-  if(com.keyman.dom.DOMEventHandlers.states.activeElement != in_output &&
-    com.keyman.dom.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
-    return _kd(e);
-  }
-
-  var event = KMWRecorder.Scribe.recordKeyboardEvent(e);
-  var retVal = _kd(e);
-
-  // Record the keystroke as part of a test sequence!
-  // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
-  window.setTimeout(function() {
-    recorderScribe.addInputRecord(event, in_output.value);
-  }, 1);
-  
-  return retVal;
-}
-
 copyTestDefinition = function() {
   var masterJSON = document.getElementById('masterJSON');
 
@@ -129,39 +104,9 @@ copyTestDefinition = function() {
   alert("Unable to copy successfully.");
 }
 
-var _ock = com.keyman.osk.PreProcessor.clickKey; //.bind(keyman.osk);
-com.keyman.osk.PreProcessor.clickKey = function(e) {
-  if(com.keyman.dom.DOMEventHandlers.states.activeElement != in_output &&
-    com.keyman.dom.DOMEventHandlers.states.activeElement != in_output['kmw_ip']) {
-    return _ock(e);
-  }
-
-  var event = KMWRecorder.Scribe.recordOSKEvent(e);
-  var retVal = _ock(e);
-
-  // Record the click/touch as part of a test sequence!
-  recorderScribe.addInputRecord(event, in_output.value);
-  return retVal;
-}
-
-var _sak = keyman.keyboardManager._SetActiveKeyboard.bind(keyman.keyboardManager);
-keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, saveCookie) {
-  // If it's not on our recording control, ignore the change and do nothing special.
-  if(document.activeElement != in_output && document.activeElement != in_output['kmw_ip']) {
-    _sak(PInternalName, PLgCode, saveCookie);
-    return;
-  }
-
-  var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == PInternalName)
-    && (testDefinition.keyboard.getFirstLanguage() == PLgCode);
-
-  if(!testDefinition.isEmpty() && !sameKbd && !justActivated) {
-    if(!confirm("Changing the keyboard will clear the current test set.  Are you sure?")) {
-      _sak("Keyboard_" + testDefinition.keyboard.id, testDefinition.keyboard.languages[0].id);
-      return;
-    }
-  }
-  _sak(PInternalName, PLgCode, saveCookie);
+onKeyboardChanged = function(kbdProperties) {
+  let PInternalName = kbdProperties.internalName;
+  let PLgCode = kbdProperties.languageCode;
 
   // Set the current keyboard on our select element
   var kbdSelect = document.getElementById("KMW_Keyboard");
@@ -176,20 +121,6 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
       }
     }
   }
-
-  // What's the active stub immediately after our _SetActiveKeyboard call?
-  var internalStub = keyman.keyboardManager.activeStub;
-  if(internalStub && (com.keyman.dom.DOMEventHandlers.states.activeElement == in_output 
-    || com.keyman.dom.DOMEventHandlers.states.activeElement == in_output['kmw_ip'])) {
-    var kbdRecord = new KMWRecorder.Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
-    var ta_activeStub = document.getElementById('activeStub');
-    ta_activeStub.value = JSON.stringify(kbdRecord);
-    
-    if(!sameKbd && !justActivated) {
-      recorderScribe.setTestDefinition(new KMWRecorder.KeyboardTest(kbdRecord));
-    }
-  }
-  justActivated = false;
 }
 
 function errorUpdate() {
@@ -214,12 +145,14 @@ window.addEventListener('load', function() {
 
   // Set up Scribe methods
   recorderScribe = new KMWRecorder.Scribe();
+  recorderScribe.initHooks(in_output);
   recorderScribe.on('record-changed', onUpdateInputRecord);
   recorderScribe.on('record-reset', onResetInputRecord);
   recorderScribe.on('test-changed', onTestDefinitionChanged);
 
   keyman.attachToControl(in_output);
   keyman.setKeyboardForControl(in_output, '', '');
+  keyman.addEventListener('keyboardchange', onKeyboardChanged);
   onResetInputRecord();
   initDevice();
   setupKeyboardPicker();
@@ -272,7 +205,7 @@ function doKeyboardChange(name, languageCode) {
   if(!activeElement) {
     activeElement = in_output;
   }
-  justActivated = true;
+  recorderScribe.keyboardJustActivated = true;
   focusReceiver();
   keyman.setActiveKeyboard(name, languageCode);
   activeElement.focus();
