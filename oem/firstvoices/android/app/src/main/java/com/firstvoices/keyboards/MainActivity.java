@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SentryAndroid.init(context, options -> {
+        SentryAndroid.init(this, options -> {
           options.setRelease("release-"+com.tavultesoft.kmea.BuildConfig.VERSION_NAME);
           options.setEnvironment(com.tavultesoft.kmea.BuildConfig.VERSION_ENVIRONMENT);
         });
