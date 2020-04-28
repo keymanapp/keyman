@@ -195,7 +195,7 @@ namespace KMWRecorder {
 
     get inputEventSpec(): InputEventSpec {
       let eventSpec = new OSKInputEventSpec();
-      eventSpec.keyID = this.keyName;
+      eventSpec.keyID = this.layer + '-' + this.keyName;
 
       return eventSpec;
     }
