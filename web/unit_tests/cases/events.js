@@ -26,7 +26,7 @@ describe('Event Management', function() {
 
   it('Keystroke-based onChange event generation', function(done) {
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
-    var event = new KMWRecorder.PhysicalInputEvent(simple_A);
+    var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
     var aliasing = false;
@@ -63,7 +63,7 @@ describe('Event Management', function() {
 
   it('OSK-based onChange event generation', function(done) {
     var simple_A = {"type":"osk","keyID":"default-K_A"};
-    var event = new KMWRecorder.OSKInputEvent(simple_A);
+    var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
     var aliasing = false;
@@ -107,7 +107,7 @@ describe('Event Management', function() {
     }
 
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
-    var event = new KMWRecorder.PhysicalInputEvent(simple_A);
+    var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
     var aliasing = false;
@@ -142,7 +142,7 @@ describe('Event Management', function() {
     }
 
     var simple_A = {"type":"osk","keyID":"default-K_A"};
-    var event = new KMWRecorder.OSKInputEvent(simple_A);
+    var event = new KMWRecorder.OSKInputEventSpec(simple_A);
 
     var ele = document.getElementById("input");
     var aliasing = false;

@@ -2,17 +2,17 @@
 /// <reference path="scribe.ts" />
 
 namespace KMWRecorder {
-  export abstract class InputEvent {
+  export abstract class InputEventSpec {
     type: "key" | "osk";
-    static fromJSONObject(obj: any): InputEvent {
+    static fromJSONObject(obj: any): InputEventSpec {
       if(obj && obj.type) {
         if(obj.type == "key") {
-          return new PhysicalInputEvent(obj);
+          return new PhysicalInputEventSpec(obj);
         } else if(obj.type == "osk") {
-          return new OSKInputEvent(obj);
+          return new OSKInputEventSpec(obj);
         }
       } else {
-        throw new SyntaxError("Error in JSON format corresponding to an InputEvent!");
+        throw new SyntaxError("Error in JSON format corresponding to an InputEventSpec!");
       }
     }
 
@@ -23,7 +23,7 @@ namespace KMWRecorder {
     }
   }
 
-  export class PhysicalInputEvent extends InputEvent {
+  export class PhysicalInputEventSpec extends InputEventSpec {
     static readonly modifierCodes: { [mod:string]: number } = {
       "Shift":0x0001,
       "Control":0x0002,
@@ -42,7 +42,7 @@ namespace KMWRecorder {
     modifierSet: number;
     location: number;
 
-    constructor(e?: PhysicalInputEvent) { // parameter is used to reconstruct from JSON.
+    constructor(e?: PhysicalInputEventSpec) { // parameter is used to reconstruct from JSON.
       super();
 
       if(e) {
@@ -55,13 +55,13 @@ namespace KMWRecorder {
     }
 
     getModifierState(key: string): boolean {
-      return (PhysicalInputEvent.modifierCodes[key] & this.modifierSet) != 0;
+      return (PhysicalInputEventSpec.modifierCodes[key] & this.modifierSet) != 0;
     }
 
     generateModifierString(): string {
       var list: string = "";
 
-      for(var key in PhysicalInputEvent.modifierCodes) {
+      for(var key in PhysicalInputEventSpec.modifierCodes) {
         if(this.getModifierState(key)) {
           list += ((list != "" ? " " : "") + key);
         }
@@ -71,12 +71,12 @@ namespace KMWRecorder {
     }
   }
 
-  export class OSKInputEvent extends InputEvent {
+  export class OSKInputEventSpec extends InputEventSpec {
     type: "osk" = "osk";
     keyID: string;
 
     // The parameter may be used to reconstruct the item from raw JSON.
-    constructor(e?: OSKInputEvent) {
+    constructor(e?: OSKInputEventSpec) {
       super();
       if(e) {
         this.keyID = e.keyID;
@@ -85,11 +85,11 @@ namespace KMWRecorder {
   }
 
   export class InputTestSequence {
-    inputs: InputEvent[];
+    inputs: InputEventSpec[];
     output: string;
     msg?: string;
 
-    constructor(ins?: InputEvent[] | InputTestSequence, outs?: string, msg?: string) {
+    constructor(ins?: InputEventSpec[] | InputTestSequence, outs?: string, msg?: string) {
       if(ins) {
         if(ins instanceof Array) {
           this.inputs = [].concat(ins);
@@ -98,7 +98,7 @@ namespace KMWRecorder {
           this.inputs = [];
 
           for(var ie=0; ie < ins.inputs.length; ie++) {
-            this.inputs.push(InputEvent.fromJSONObject(ins.inputs[ie]));
+            this.inputs.push(InputEventSpec.fromJSONObject(ins.inputs[ie]));
           }
 
           this.output = ins.output;
@@ -118,7 +118,7 @@ namespace KMWRecorder {
       }
     }
 
-    addInput(event: InputEvent, output: string) {
+    addInput(event: InputEventSpec, output: string) {
       this.inputs.push(event);
       this.output = output;
     }
@@ -151,7 +151,7 @@ namespace KMWRecorder {
 
     hasOSKInteraction(): boolean {
       for(var i=0; i < this.inputs.length; i++) {
-        if(this.inputs[i] instanceof OSKInputEvent) {
+        if(this.inputs[i] instanceof OSKInputEventSpec) {
           return true;
         }
       }

@@ -39,8 +39,8 @@ namespace KMWRecorder {
    */
   export class Scribe extends EventEmitter {
     //#region Static methods for recording input events
-    static recordKeyboardEvent(e: KeyboardEvent): PhysicalInputEvent {
-      let recording = new PhysicalInputEvent();
+    static recordKeyboardEvent(e: KeyboardEvent): PhysicalInputEventSpec {
+      let recording = new PhysicalInputEventSpec();
 
       recording.key    = e.key;
       recording.code    = e.code;
@@ -49,9 +49,9 @@ namespace KMWRecorder {
 
       var flagSet: number = 0;
 
-      for(var key in PhysicalInputEvent.modifierCodes) {
+      for(var key in PhysicalInputEventSpec.modifierCodes) {
         if(e.getModifierState(key)) {
-          flagSet |= PhysicalInputEvent.modifierCodes[key];
+          flagSet |= PhysicalInputEventSpec.modifierCodes[key];
         }
       }
 
@@ -60,8 +60,8 @@ namespace KMWRecorder {
       return recording;
     }
 
-    static recordOSKEvent(e: HTMLDivElement): OSKInputEvent {
-      let recording = new OSKInputEvent();
+    static recordOSKEvent(e: HTMLDivElement): OSKInputEventSpec {
+      let recording = new OSKInputEventSpec();
       recording.keyID = e.id;
       return recording;
     }
@@ -97,6 +97,7 @@ namespace KMWRecorder {
     }
     //#endregion
 
+    _currentEvent: InputEventSpec;
     _currentSequence: InputTestSequence = new InputTestSequence();
     _testDefinition: KeyboardTest = new KeyboardTest();
 
@@ -124,7 +125,7 @@ namespace KMWRecorder {
       this.raiseTestChanged();
     }
 
-    addInputRecord(json: InputEvent, currentOutput: string) {
+    addInputRecord(json: InputEventSpec, currentOutput: string) {
       this.currentSequence.addInput(json, currentOutput);
       this.raiseRecordChanged();
     }

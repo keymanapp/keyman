@@ -18,18 +18,18 @@ namespace KMWRecorder {
       this.target = target;
     }
 
-    simulateEvent(eventSpec: InputEvent) {
+    simulateEvent(eventSpec: InputEventSpec) {
       switch(eventSpec.type) {
         case "key":
-          this.simulateHardwareEvent(eventSpec as PhysicalInputEvent);
+          this.simulateHardwareEvent(eventSpec as PhysicalInputEventSpec);
           break;
         case "osk":
-          this.simulateOSKEvent(eventSpec as OSKInputEvent);
+          this.simulateOSKEvent(eventSpec as OSKInputEventSpec);
           break;
       }
     }
 
-    simulateHardwareEvent(eventSpec: PhysicalInputEvent) {
+    simulateHardwareEvent(eventSpec: PhysicalInputEventSpec) {
       var event: Event;
 
       // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
@@ -51,7 +51,7 @@ namespace KMWRecorder {
       this.target.dispatchEvent(event);
     }
 
-    simulateOSKEvent(eventSpec: OSKInputEvent) {
+    simulateOSKEvent(eventSpec: OSKInputEventSpec) {
       let target = this.target;
       let oskKeyElement = document.getElementById(eventSpec.keyID);
 

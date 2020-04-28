@@ -428,7 +428,7 @@ if(typeof(DynamicElements) == 'undefined') {
   // object as the rest of DynamicElements, which is useful for numerous test cases.
   DynamicElements.init = function() {
     var s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
-    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEvent(s_key_json);
+    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEventSpec(s_key_json);
 
     DynamicElements.enabledLaoOutput = "ຫ";
     DynamicElements.enabledKhmerOutput = "ស";
