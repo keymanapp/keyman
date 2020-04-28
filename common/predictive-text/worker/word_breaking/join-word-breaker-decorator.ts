@@ -46,12 +46,13 @@ namespace wordBreakers {
         let current: Span | undefined = results[index];
 
         let window = [];
-        if (previous && previous.end === current.start) {
+        if (previous && spansAreBackToBack(previous, current)) {
           window.push(index - 1);
         }
+
         window.push(index);
 
-        if (next && current.end === next.start) {
+        if (next && spansAreBackToBack(current, next)) {
           window.push(index + 1);
         }
 
@@ -90,6 +91,14 @@ namespace wordBreakers {
         }
       }
       return contiguousRanges;
+    }
+
+    /**
+     * Returns true when the spans are contiguous.
+     * Order matters when calling this function!
+     */
+    function spansAreBackToBack(former: Span, latter: Span): boolean {
+      return former.end === latter.start;
     }
 
     /**
