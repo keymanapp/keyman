@@ -60,6 +60,14 @@ describe('The join word breaker decorator', function () {
       ["this", "-", "is", "-", "bad"],
       ["this-", "is", "-bad"]
     ],
+
+    // different but adjacent joiners
+    [
+      "kawé:-conjugator",
+      ["-", ":"],
+      ["kawé", ":", "-", "conjugator"],
+      ["kawé:-conjugator"],
+    ],
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
