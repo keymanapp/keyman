@@ -133,8 +133,9 @@ namespace KMWRecorder {
     constructor(keystroke: RecordedPhysicalKeystroke|com.keyman.text.KeyEvent, eventSpec?: PhysicalInputEventSpec) {
       super();
 
-      if(keystroke instanceof com.keyman.text.KeyEvent) {
+      if(keystroke instanceof com.keyman.text.KeyEvent || typeof keystroke.type === 'undefined') {
         // Store what is necessary for headless event reconstruction.
+        keystroke = keystroke as com.keyman.text.KeyEvent;
         this.keyCode = keystroke.Lcode;
         this.states = keystroke.Lstates;
         this.modifiers = keystroke.Lmodifiers;
@@ -176,7 +177,8 @@ namespace KMWRecorder {
     constructor(keystroke: RecordedSyntheticKeystroke|com.keyman.text.KeyEvent) {
       super();
 
-      if(keystroke instanceof com.keyman.text.KeyEvent) {
+      if(keystroke instanceof com.keyman.text.KeyEvent || typeof keystroke.type === 'undefined') {
+        keystroke = keystroke as com.keyman.text.KeyEvent;
         // Store what is necessary for headless event reconstruction.
 
         // Also store the DOM-based event spec for use in integrated testing.
@@ -199,18 +201,48 @@ namespace KMWRecorder {
     }
   }
 
-  export interface TestSequence {
-    hasOSKInteraction(): boolean;
-    test(proctor: BrowserProctor): {success: boolean, result: string};
-    toPrettyJSON(): string;
+  export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEventSpec> {
+    inputs: KeyRecord[];
+    output: string;
+    msg?: string;
+
+    abstract hasOSKInteraction(): boolean;
+
+    test(proctor: BrowserProctor): {success: boolean, result: string} {
+      proctor.before();
+
+      let result = proctor.simulateSequence(this);
+      proctor.assertEquals(result, this.output, this.msg);
+
+      return {success: (result == this.output), result: result};
+    }
+
+    toPrettyJSON(): string {
+      var str = "{ ";
+      if(this.output) {
+        str += "\"output\": \"" + this.output + "\", ";
+      }
+      str += "\"inputs\": [\n";
+      for(var i = 0; i < this.inputs.length; i++) {
+        str += "  " + this.inputs[i].toPrettyJSON() + ((i == this.inputs.length-1) ? "\n" : ",\n");
+      }
+      if(this.msg) {
+        str += "], \"message\": \"" + this.msg + "\" }";
+      } else {
+        str += "]}";
+      }
+      return str;
+    }
   }
 
-  export class InputEventSpecSequence implements TestSequence {
+  export class InputEventSpecSequence extends TestSequence<InputEventSpec> {
     inputs: InputEventSpec[];
     output: string;
     msg?: string;
 
     constructor(ins?: InputEventSpec[] | InputEventSpecSequence, outs?: string, msg?: string) {
+      super();
+
       if(ins) {
         if(ins instanceof Array) {
           this.inputs = [].concat(ins);
@@ -244,35 +276,63 @@ namespace KMWRecorder {
       this.output = output;
     }
 
-    test(proctor: BrowserProctor): {success: boolean, result: string} {
-      proctor.before();
+    hasOSKInteraction(): boolean {
+      for(var i=0; i < this.inputs.length; i++) {
+        if(this.inputs[i] instanceof OSKInputEventSpec) {
+          return true;
+        }
+      }
 
-      let result = proctor.simulateSequence(this);
-      proctor.assertEquals(result, this.output, this.msg);
+      return false;
+    }
+  }
 
-      return {success: (result == this.output), result: result};
+  export class RecordedKeystrokeSequence extends TestSequence<RecordedKeystroke> {
+    inputs: RecordedKeystroke[];
+    output: string;
+    msg?: string;
+
+    constructor(ins?: RecordedKeystroke[], outs?: string, msg?: string)
+    constructor(sequence: RecordedKeystrokeSequence)
+    constructor(ins?: RecordedKeystroke[] | RecordedKeystrokeSequence, outs?: string, msg?: string) {
+      super();
+
+      if(ins) {
+        if(ins instanceof Array) {
+          this.inputs = [].concat(ins);
+        } else {
+          // We're constructing from existing JSON.
+          this.inputs = [];
+
+          for(var ie=0; ie < ins.inputs.length; ie++) {
+            this.inputs.push(RecordedKeystroke.fromJSONObject(ins.inputs[ie]));
+          }
+
+          this.output = ins.output;
+          this.msg = ins.msg;
+          return;
+        }
+      } else {
+        this.inputs = [];
+      }
+
+      if(outs) {
+        this.output = outs;
+      }
+
+      if(msg) {
+        this.msg = msg;
+      }
     }
 
-    toPrettyJSON(): string {
-      var str = "{ ";
-      if(this.output) {
-        str += "\"output\": \"" + this.output + "\", ";
-      }
-      str += "\"inputs\": [\n";
-      for(var i = 0; i < this.inputs.length; i++) {
-        str += "  " + this.inputs[i].toPrettyJSON() + ((i == this.inputs.length-1) ? "\n" : ",\n");
-      }
-      if(this.msg) {
-        str += "], \"message\": \"" + this.msg + "\" }";
-      } else {
-        str += "]}";
-      }
-      return str;
+    addInput(event: RecordedKeystroke, output: string) {
+      this.inputs.push(event);
+      this.output = output;
     }
 
     hasOSKInteraction(): boolean {
       for(var i=0; i < this.inputs.length; i++) {
-        if(this.inputs[i] instanceof OSKInputEventSpec) {
+        if(this.inputs[i] instanceof RecordedSyntheticKeystroke) {
           return true;
         }
       }
@@ -453,7 +513,7 @@ namespace KMWRecorder {
     }
   }
   
-  export interface TestSet<Sequence extends TestSequence> {
+  export interface TestSet<Sequence extends TestSequence<any>> {
     constraint: Constraint;
 
     addTest(seq: Sequence): void;
@@ -485,6 +545,56 @@ namespace KMWRecorder {
     }
 
     addTest(seq: InputEventSpecSequence) {
+      this.testSet.push(seq);
+    }
+
+    // Used to determine if the current EventSpecTestSet is applicable to be run on a device.
+    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
+      return this.constraint.matchesClient(device, usingOSK);
+    }
+
+    // Validity should be checked before calling this method.
+    test(proctor: BrowserProctor): TestFailure[] {
+      var failures: TestFailure[] = [];
+      let testSet = this.testSet;
+
+      for(var i=0; i < testSet.length; i++) {
+        var testSeq = this[i];
+        var simResult = testSet[i].test(proctor);
+        if(!simResult.success) {
+          // Failed test!
+          failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
+        }
+      }
+
+      return failures.length > 0 ? failures : null;
+    }
+  }
+
+  /**
+   * The core constraint-specific test set definition used for testing versions 10.0 to 13.0.
+   */
+  export class RecordedSequenceTestSet implements TestSet<RecordedKeystrokeSequence> {
+    constraint: Constraint;
+    testSet: RecordedKeystrokeSequence[];
+
+    constructor(constraint: Constraint|RecordedSequenceTestSet) {
+      if("target" in constraint) {
+        this.constraint = constraint as Constraint;
+        this.testSet = [];
+      } else {
+        var json = constraint as RecordedSequenceTestSet;
+        this.constraint = new Constraint(json.constraint);
+        this.testSet = [];
+
+        // Clone each test sequence / reconstruct from methodless JSON object.
+        for(var i=0; i < json.testSet.length; i++) {
+          this.testSet.push(new RecordedKeystrokeSequence(json.testSet[i]));
+        }
+      }
+    }
+
+    addTest(seq: RecordedKeystrokeSequence) {
       this.testSet.push(seq);
     }
 
@@ -573,7 +683,11 @@ namespace KMWRecorder {
       }
     }
 
-    addTest(constraint: Constraint, seq: TestSequence) {
+    addTest(constraint: Constraint, seq: RecordedKeystrokeSequence) {
+      if(!this.specVersion.equals(KeyboardTest.CURRENT_VERSION)) {
+        throw new Error("The currently-loaded test was built to an outdated specification and may not be altered.");
+      }
+
       for(var i=0; i < this.inputTestSets.length; i++) {
         if(this.inputTestSets[i].constraint.equals(constraint)) {
           this.inputTestSets[i].addTest(seq);
@@ -581,10 +695,9 @@ namespace KMWRecorder {
         }
       }
 
-      // TODO:  convert to new format
-      var newSet = new EventSpecTestSet(new Constraint(constraint));
+      var newSet = new RecordedSequenceTestSet(new Constraint(constraint));
       this.inputTestSets.push(newSet);
-      newSet.addTest(seq as InputEventSpecSequence);      
+      newSet.addTest(seq);      
     }
 
     test(proctor: BrowserProctor) { // TODO:  Convert to abstract / interface base `Proctor`.

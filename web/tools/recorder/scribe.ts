@@ -109,16 +109,16 @@ namespace KMWRecorder {
     //#endregion
 
     _currentKeyEvent: com.keyman.text.KeyEvent;
-    _currentSequence: InputEventSpecSequence = new InputEventSpecSequence();
+    _currentSequence: RecordedKeystrokeSequence = new RecordedKeystrokeSequence();
     _testDefinition: KeyboardTest = new KeyboardTest();
 
     keyboardJustActivated: boolean = false;
 
-    get currentSequence(): InputEventSpecSequence {
+    get currentSequence(): RecordedKeystrokeSequence {
       return this._currentSequence;
     }
 
-    set currentSequence(value: InputEventSpecSequence) {
+    set currentSequence(value: RecordedKeystrokeSequence) {
       this._currentSequence = value;
       this.raiseRecordChanged();
     }
@@ -136,14 +136,14 @@ namespace KMWRecorder {
       this.raiseTestChanged();
     }
 
-    addInputRecord(json: InputEventSpec, currentOutput: string) {
+    addInputRecord(json: RecordedKeystroke, currentOutput: string) {
       this.currentSequence.addInput(json, currentOutput);
       this.raiseRecordChanged();
     }
 
     resetInputRecord() {
       window['keyman'].resetContext();
-      this.currentSequence = new KMWRecorder.InputEventSpecSequence();
+      this.currentSequence = new KMWRecorder.RecordedKeystrokeSequence();
 
       this.emit('record-reset', null);
     }
@@ -192,9 +192,8 @@ namespace KMWRecorder {
         let recording = Scribe.recordKeystroke(recorderScribe._currentKeyEvent, event);
         // Record the keystroke as part of a test sequence!
         // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
-        // TODO:  convert to use of `recording`.
         window.setTimeout(function() {
-          recorderScribe.addInputRecord(event, in_output.getText());
+          recorderScribe.addInputRecord(recording, in_output.getText());
         }, 1);
         
         return retVal;
@@ -213,8 +212,7 @@ namespace KMWRecorder {
         let recording = Scribe.recordKeystroke(recorderScribe._currentKeyEvent, event);
 
         // Record the click/touch as part of a test sequence!
-        // TODO:  Convert to use of `recording`.
-        recorderScribe.addInputRecord(event, in_output.getText());
+        recorderScribe.addInputRecord(recording, in_output.getText());
         return retVal;
       }
 
