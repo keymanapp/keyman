@@ -1,4 +1,5 @@
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
+/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts" />
 /// <reference path="scribe.ts" />
 
 namespace KMWRecorder {
@@ -381,6 +382,17 @@ namespace KMWRecorder {
 
   export class KeyboardTest {
     /**
+     * Indicates what version of KMW's recorder the spec conforms to.
+     */
+    private specVersion: com.keyman.utils.Version = new com.keyman.utils.Version("14.0");
+
+    /**
+     * The version of KMW in which the Recorder was first written.  Worked from 10.0 to 13.0 with 
+     * only backward-compatible changes and minor tweaks to conform to internal API shifts.
+     */
+    private static FALLBACK_VERSION = new com.keyman.utils.Version("10.0");
+
+    /**
      * The stub information to be passed into keyman.addKeyboards() in order to run the test.
      */
     keyboard: KeyboardStub;
@@ -401,17 +413,22 @@ namespace KMWRecorder {
         this.inputTestSets = [];
         return;
       } else if(typeof(fromJSON) == 'string') {
-        fromJSON = JSON.parse(fromJSON);
+        fromJSON = JSON.parse(fromJSON) as KeyboardTest;
+        if(!fromJSON.specVersion) {
+          fromJSON.specVersion = KeyboardTest.FALLBACK_VERSION;
+        } else {
+          // Is serialized to a String when saved.
+          fromJSON.specVersion = new com.keyman.utils.Version(fromJSON.specVersion as unknown as string);
+        }
       } else if(fromJSON instanceof KeyboardStub) {
         this.keyboard = fromJSON;
         this.inputTestSets = [];
         return;
       }
 
-      fromJSON = fromJSON as KeyboardTest;
-
       this.keyboard = new KeyboardStub(fromJSON.keyboard);
       this.inputTestSets = [];
+      this.specVersion = fromJSON.specVersion;
 
       for(var i=0; i < fromJSON.inputTestSets.length; i++) {
         this.inputTestSets[i] = new EventSpecTestSet(fromJSON.inputTestSets[i]);
@@ -464,6 +481,10 @@ namespace KMWRecorder {
 
     isEmpty() {
       return this.inputTestSets.length == 0;
+    }
+
+    toPrettyJSON() {
+      return JSON.stringify(this, null, '  ');
     }
   }
 }

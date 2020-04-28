@@ -160,7 +160,7 @@ namespace KMWRecorder {
     }
 
     private raiseTestChanged() {
-      this.emit('test-changed', this.testDefinition ? JSON.stringify(this.testDefinition, null, '  ') : '');
+      this.emit('test-changed', this.testDefinition ? this.testDefinition.toPrettyJSON() : '');
     }
 
     // Time for the 'magic'.  Yay, JavaScript method extension strategies...
