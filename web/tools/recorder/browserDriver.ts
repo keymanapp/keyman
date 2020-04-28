@@ -98,7 +98,7 @@ namespace KMWRecorder {
 
     // Execution of a test sequence depends on the testing environment; integrated
     // testing requires browser-specific code.
-    simulateSequence(sequence: InputTestSequence): string {
+    simulateSequence(sequence: InputEventSpecSequence): string {
       let ele = this.target;
 
       for(var i=0; i < sequence.inputs.length; i++) {

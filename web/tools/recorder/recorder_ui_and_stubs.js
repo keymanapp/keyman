@@ -76,7 +76,7 @@ function saveInputRecord() {
 }
 
 reviseInputRecord = function() {
-  recorderScribe.currentSequence = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
+  recorderScribe.currentSequence = new KMWRecorder.InputEventSpecSequence(JSON.parse(ta_inputJSON.value));
 }
 
 onTestDefinitionChanged = function(testDefJSON) {

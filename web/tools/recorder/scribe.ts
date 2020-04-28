@@ -98,16 +98,16 @@ namespace KMWRecorder {
     //#endregion
 
     _currentEvent: InputEventSpec;
-    _currentSequence: InputTestSequence = new InputTestSequence();
+    _currentSequence: InputEventSpecSequence = new InputEventSpecSequence();
     _testDefinition: KeyboardTest = new KeyboardTest();
 
     keyboardJustActivated: boolean = false;
 
-    get currentSequence(): InputTestSequence {
+    get currentSequence(): InputEventSpecSequence {
       return this._currentSequence;
     }
 
-    set currentSequence(value: InputTestSequence) {
+    set currentSequence(value: InputEventSpecSequence) {
       this._currentSequence = value;
       this.raiseRecordChanged();
     }
@@ -132,7 +132,7 @@ namespace KMWRecorder {
 
     resetInputRecord() {
       window['keyman'].resetContext();
-      this.currentSequence = new KMWRecorder.InputTestSequence();
+      this.currentSequence = new KMWRecorder.InputEventSpecSequence();
 
       this.emit('record-reset', null);
     }

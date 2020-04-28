@@ -22,7 +22,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
     for(var j = 0; j < matchDefs.length; j++) {
       // Prepare the context!
       var matchTest = matchDefs[j];
-      var ruleSeq = new KMWRecorder.InputTestSequence(matchTest.sequence);
+      var ruleSeq = new KMWRecorder.InputEventSpecSequence(matchTest.sequence);
       let proctor = new KMWRecorder.BrowserProctor(inputElem, keyman.util.device.coreSpec, false);
       ruleSeq.test(proctor);
 
@@ -825,7 +825,7 @@ describe('Engine', function() {
         var ruleDef = FULL_RULE_SET[i];
 
         // Prepare the context!
-        var ruleSeq = new KMWRecorder.InputTestSequence(ruleDef.baseSequence);
+        var ruleSeq = new KMWRecorder.InputEventSpecSequence(ruleDef.baseSequence);
         let proctor = new KMWRecorder.BrowserProctor(inputElem, keyman.util.device.coreSpec, false);
         ruleSeq.test(proctor);
 

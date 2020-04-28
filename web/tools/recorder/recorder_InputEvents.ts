@@ -84,12 +84,12 @@ namespace KMWRecorder {
     }
   }
 
-  export class InputTestSequence {
+  export class InputEventSpecSequence {
     inputs: InputEventSpec[];
     output: string;
     msg?: string;
 
-    constructor(ins?: InputEventSpec[] | InputTestSequence, outs?: string, msg?: string) {
+    constructor(ins?: InputEventSpec[] | InputEventSpecSequence, outs?: string, msg?: string) {
       if(ins) {
         if(ins instanceof Array) {
           this.inputs = [].concat(ins);
@@ -322,41 +322,41 @@ namespace KMWRecorder {
 
   export class TestFailure {
     constraint: Constraint;
-    test: InputTestSequence;
+    test: InputEventSpecSequence;
     result: string;
 
-    constructor(constraint: Constraint, test: InputTestSequence, output: string) {
+    constructor(constraint: Constraint, test: InputEventSpecSequence, output: string) {
       this.constraint = constraint;
       this.test = test;
       this.result = output;
     }
   }
 
-  export class InputTestSet {
+  export class EventSpecTestSet {
     constraint: Constraint;
-    testSet: InputTestSequence[];
+    testSet: InputEventSpecSequence[];
 
-    constructor(constraint: Constraint|InputTestSet) {
+    constructor(constraint: Constraint|EventSpecTestSet) {
       if("target" in constraint) {
         this.constraint = constraint as Constraint;
         this.testSet = [];
       } else {
-        var json = constraint as InputTestSet;
+        var json = constraint as EventSpecTestSet;
         this.constraint = new Constraint(json.constraint);
         this.testSet = [];
 
         // Clone each test sequence / reconstruct from methodless JSON object.
         for(var i=0; i < json.testSet.length; i++) {
-          this.testSet.push(new InputTestSequence(json.testSet[i]));
+          this.testSet.push(new InputEventSpecSequence(json.testSet[i]));
         }
       }
     }
 
-    addTest(seq: InputTestSequence) {
+    addTest(seq: InputEventSpecSequence) {
       this.testSet.push(seq);
     }
 
-    // Used to determine if the current InputTestSet is applicable to be run on a device.
+    // Used to determine if the current EventSpecTestSet is applicable to be run on a device.
     isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
       return this.constraint.matchesClient(device, usingOSK);
     }
@@ -389,7 +389,7 @@ namespace KMWRecorder {
      * The master array of test sets, each of which specifies constraints a client must fulfill for
      * the tests contained therein to be valid.
      */
-    inputTestSets: InputTestSet[];
+    inputTestSets: EventSpecTestSet[];
 
     /**
      * Reconstructs a KeyboardTest object from its JSON representation, restoring its methods. 
@@ -414,11 +414,11 @@ namespace KMWRecorder {
       this.inputTestSets = [];
 
       for(var i=0; i < fromJSON.inputTestSets.length; i++) {
-        this.inputTestSets[i] = new InputTestSet(fromJSON.inputTestSets[i]);
+        this.inputTestSets[i] = new EventSpecTestSet(fromJSON.inputTestSets[i]);
       }
     }
 
-    addTest(constraint: Constraint, seq: InputTestSequence) {
+    addTest(constraint: Constraint, seq: InputEventSpecSequence) {
       for(var i=0; i < this.inputTestSets.length; i++) {
         if(this.inputTestSets[i].constraint.equals(constraint)) {
           this.inputTestSets[i].addTest(seq);
@@ -426,7 +426,7 @@ namespace KMWRecorder {
         }
       }
 
-      var newSet = new InputTestSet(new Constraint(constraint));
+      var newSet = new EventSpecTestSet(new Constraint(constraint));
       this.inputTestSets.push(newSet);
       newSet.addTest(seq);      
     }

@@ -56,13 +56,13 @@ namespace KMWRecorder {
 
     // We only need to filter test cases when performing tests in an integrated
     // environment.
-    matchesTestSet(testSet: InputTestSet) {
+    matchesTestSet(testSet: EventSpecTestSet) {
       return testSet.isValidForDevice(this.device, this.usingOSK);
     }
 
     // Execution of a test sequence depends on the testing environment; this handles
     // the browser-specific aspects.
-    simulateSequence(sequence: InputTestSequence): string {
+    simulateSequence(sequence: InputEventSpecSequence): string {
       let driver = new BrowserDriver(this.target);
 
       // Yes, it's pretty simple for now... but this is only one of two code paths
