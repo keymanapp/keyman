@@ -85,7 +85,11 @@ namespace KMWRecorder {
     }
   }
 
-  export class InputEventSpecSequence {
+  export interface TestSequence {
+    test(proctor: BrowserProctor): {success: boolean, result: string};
+  }
+
+  export class InputEventSpecSequence implements TestSequence {
     inputs: InputEventSpec[];
     output: string;
     msg?: string;
@@ -332,8 +336,19 @@ namespace KMWRecorder {
       this.result = output;
     }
   }
+  
+  export interface TestSet<Sequence extends TestSequence> {
+    constraint: Constraint;
 
-  export class EventSpecTestSet {
+    addTest(seq: Sequence): void;
+    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean): boolean;
+    test(proctor: BrowserProctor): TestFailure[];
+  }
+
+  /**
+   * The core constraint-specific test set definition used for testing versions 10.0 to 13.0.
+   */
+  export class EventSpecTestSet implements TestSet<InputEventSpecSequence> {
     constraint: Constraint;
     testSet: InputEventSpecSequence[];
 
@@ -384,13 +399,14 @@ namespace KMWRecorder {
     /**
      * Indicates what version of KMW's recorder the spec conforms to.
      */
-    private specVersion: com.keyman.utils.Version = new com.keyman.utils.Version("14.0");
+    private specVersion: com.keyman.utils.Version = KeyboardTest.CURRENT_VERSION;
 
     /**
      * The version of KMW in which the Recorder was first written.  Worked from 10.0 to 13.0 with 
      * only backward-compatible changes and minor tweaks to conform to internal API shifts.
      */
-    private static FALLBACK_VERSION = new com.keyman.utils.Version("10.0");
+    public static readonly FALLBACK_VERSION = new com.keyman.utils.Version("10.0");
+    public static readonly CURRENT_VERSION  = new com.keyman.utils.Version("14.0");
 
     /**
      * The stub information to be passed into keyman.addKeyboards() in order to run the test.
@@ -401,7 +417,7 @@ namespace KMWRecorder {
      * The master array of test sets, each of which specifies constraints a client must fulfill for
      * the tests contained therein to be valid.
      */
-    inputTestSets: EventSpecTestSet[];
+    inputTestSets: TestSet<any>[];
 
     /**
      * Reconstructs a KeyboardTest object from its JSON representation, restoring its methods. 
@@ -414,28 +430,34 @@ namespace KMWRecorder {
         return;
       } else if(typeof(fromJSON) == 'string') {
         fromJSON = JSON.parse(fromJSON) as KeyboardTest;
-        if(!fromJSON.specVersion) {
-          fromJSON.specVersion = KeyboardTest.FALLBACK_VERSION;
-        } else {
-          // Is serialized to a String when saved.
-          fromJSON.specVersion = new com.keyman.utils.Version(fromJSON.specVersion as unknown as string);
-        }
       } else if(fromJSON instanceof KeyboardStub) {
         this.keyboard = fromJSON;
         this.inputTestSets = [];
         return;
       }
 
+      if(!fromJSON.specVersion) {
+        fromJSON.specVersion = KeyboardTest.FALLBACK_VERSION;
+      } else {
+        // Is serialized to a String when saved.
+        fromJSON.specVersion = new com.keyman.utils.Version(fromJSON.specVersion as unknown as string);
+      }
+
       this.keyboard = new KeyboardStub(fromJSON.keyboard);
       this.inputTestSets = [];
       this.specVersion = fromJSON.specVersion;
 
-      for(var i=0; i < fromJSON.inputTestSets.length; i++) {
-        this.inputTestSets[i] = new EventSpecTestSet(fromJSON.inputTestSets[i]);
+      if(this.specVersion.equals(KeyboardTest.FALLBACK_VERSION)) {
+        // Top-level test spec:  EventSpecTestSet, based entirely on browser events.
+        for(var i=0; i < fromJSON.inputTestSets.length; i++) {
+          this.inputTestSets[i] = new EventSpecTestSet(fromJSON.inputTestSets[i] as EventSpecTestSet);
+        }
+      } else {
+        // TODO: use the (not-yet-written) KeystrokeTestSet instead.
       }
     }
 
-    addTest(constraint: Constraint, seq: InputEventSpecSequence) {
+    addTest(constraint: Constraint, seq: TestSequence) {
       for(var i=0; i < this.inputTestSets.length; i++) {
         if(this.inputTestSets[i].constraint.equals(constraint)) {
           this.inputTestSets[i].addTest(seq);
@@ -443,17 +465,24 @@ namespace KMWRecorder {
         }
       }
 
+      // TODO:  convert to new format
       var newSet = new EventSpecTestSet(new Constraint(constraint));
       this.inputTestSets.push(newSet);
-      newSet.addTest(seq);      
+      newSet.addTest(seq as InputEventSpecSequence);      
     }
 
-    test(proctor: BrowserProctor) {
+    test(proctor: BrowserProctor) { // TODO:  Convert to abstract / interface base `Proctor`.
       var setHasRun = false;
       var failures: TestFailure[] = [];
 
       proctor.beforeAll();
 
+      // The original test spec requires a browser environment and thus requires its own `.run` implementation.
+      if(this.specVersion.equals(KeyboardTest.FALLBACK_VERSION) && !(proctor instanceof BrowserProctor)) {
+        throw Error("Cannot perform version " + KeyboardTest.FALLBACK_VERSION + "-based testing outside of browser-based environments.");
+      }
+
+      // Otherwise, the test spec instances will know how to run in any currently-supported environment.
       for(var i = 0; i < this.inputTestSets.length; i++) {
         var testSet = this.inputTestSets[i];
 
