@@ -63,7 +63,7 @@ describe('The join word breaker decorator', function () {
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
-    it.only(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
+    it(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
       let breakWords = decorateWithJoin(defaultWordBreaker, joiners);
       let unjoinedResult = defaultWordBreaker(phrase).map(onlyText);
       assert.deepEqual(unjoinedResult, unjoined);
