@@ -51,11 +51,19 @@ describe('The join word breaker decorator', function () {
       ["@"],
       ["nobody", "@", "@", "example.com"],
       ["nobody@@example.com"]
-    ]
+    ],
+
+    // it should NOT join non-contiguous spans:
+    [
+      "this- is -bad",
+      ["-"],
+      ["this", "-", "is", "-", "bad"],
+      ["this-", "is", "-bad"]
+    ],
   ]
 
   for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
-    it(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
+    it.only(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
       let breakWords = decorateWithJoin(defaultWordBreaker, joiners);
       let unjoinedResult = defaultWordBreaker(phrase).map(onlyText);
       assert.deepEqual(unjoinedResult, unjoined);
