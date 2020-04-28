@@ -65,14 +65,21 @@ namespace KMWRecorder {
     simulateSequence(sequence: TestSequence<any>): string {
       let driver = new BrowserDriver(this.target);
 
-      // Yes, it's pretty simple for now... but this is only one of two code paths
-      // that will exist here, hence the abstraction.
+      // For the version 10.0 spec
       if(sequence instanceof InputEventSpecSequence) {
         return driver.simulateSequence(sequence);
-      } else {
-        // Convert new spec sequence to an InputEventSpecSequence.
-        // is not yet implemented.
-        throw new Error("code path not yet implemented");
+
+        // For the version 14.0+ spec
+      } else if(sequence instanceof RecordedKeystrokeSequence) {
+        let inputSpecs: InputEventSpec[] = [];
+
+        for(let i=0; i < sequence.inputs.length; i++) {
+          inputSpecs[i] = sequence.inputs[i].inputEventSpec;
+        }
+
+        // Converts the sequence back to version 10.0, since it's very well made for browser simulation.
+        let eventSpecSequence = new InputEventSpecSequence(inputSpecs, sequence.output, sequence.msg);
+        return driver.simulateSequence(eventSpecSequence);
       }
     }
   }
