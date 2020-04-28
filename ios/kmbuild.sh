@@ -165,13 +165,15 @@ echo
 echo "Build products will be set with the following version metadata:"
 echo "  * VERSION=$VERSION"
 echo "  * VERSION_WITH_TAG=$VERSION_WITH_TAG"
+echo "  * VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT"
 echo
 echo "Building KMEI..."
 
 rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
 xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
-           VERSION_WITH_TAG=$VERSION_WITH_TAG
+           VERSION_WITH_TAG=$VERSION_WITH_TAG \
+           VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT
 
 if [ $? -ne 0 ]; then
   fail "KMEI build failed."
@@ -190,7 +192,8 @@ if [ $DO_KEYMANAPP = true ]; then
     if [ $DO_ARCHIVE = false ]; then
       xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                  VERSION=$VERSION \
-                 VERSION_WITH_TAG=$VERSION_WITH_TAG
+                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
+                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -204,7 +207,8 @@ if [ $DO_KEYMANAPP = true ]; then
                  -archivePath $ARCHIVE_PATH \
                  archive -allowProvisioningUpdates \
                  VERSION=$VERSION \
-                 VERSION_WITH_TAG=$VERSION_WITH_TAG
+                 VERSION_WITH_TAG=$VERSION_WITH_TAG \
+                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT
 
       assertDirExists "$ARCHIVE_PATH"
 

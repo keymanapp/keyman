@@ -30,16 +30,16 @@ public class SentryManager {
         log.debug("Sentry error logging enabled.")
       #endif
 
-      #if DEBUG
-        let environment = "DEVELOPMENT-\(Version.currentTagged.majorMinor.fullString)"
-      #else
-        let environment = "PRODUCTION-\(Version.currentTagged.majorMinor.fullString)"
-      #endif
+      let infoDict = Bundle.main.infoDictionary
+      let versionWithTag = infoDict?["KeymanVersionWithTag"] as? String ?? ""
+      let environment = infoDict?["KeymanVersionEnvironment"] as? String ?? ""
+      let release = "release-\(versionWithTag)"
 
       let options: [String: Any] = [
         "dsn": "https://d14d2efb594e4345b8367dbb61ebceaf@sentry.keyman.com/8",
         "enabled": allowEnabled && sendingEnabled,
-        "environment": environment
+        "environment": environment,
+        "release": release
       ]
       Sentry.Client.shared = try Sentry.Client(options: options)
       try Sentry.Client.shared?.startCrashHandler()
