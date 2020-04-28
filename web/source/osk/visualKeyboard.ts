@@ -227,7 +227,10 @@ namespace com.keyman.osk {
       var width: number = OSKKey.getTextWidth(osk, keyText, styleSpec);
       if(width == 0 && keyText != '' && keyText != '\xa0') {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
-        keyText = '\u25cc' + keyText;
+
+        // Disabled by mcdurdin 2020-04-09; dotted circle display is inconsistent on iOS/Safari
+        // at least and doesn't combine with diacritic marks. 
+        // keyText = '\u25cc' + keyText;
 
         if(activeKeyboard && activeKeyboard.isRTL) {
           // Add the RTL marker to ensure it displays properly.
