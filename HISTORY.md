@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.58 alpha 2020-04-28
+
+* change(common/lmlayer): improvements to default searchTermToKey (#3024)
+
 ## 14.0.57 alpha 2020-04-27
 
 * modify(common): Update to Unicode 13.0 (#3029)
