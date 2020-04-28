@@ -97,56 +97,64 @@ namespace KMWRecorder {
     }
     //#endregion
 
-    // TODO:  rename variable to something better.  Currently preserved for easier refactoring comparisons.
-    inputJSON: InputTestSequence = new InputTestSequence();
-    testDefinition: KeyboardTest = new KeyboardTest();
+    _currentSequence: InputTestSequence = new InputTestSequence();
+    _testDefinition: KeyboardTest = new KeyboardTest();
 
     keyboardJustActivated: boolean = false;
 
+    get currentSequence(): InputTestSequence {
+      return this._currentSequence;
+    }
+
+    set currentSequence(value: InputTestSequence) {
+      this._currentSequence = value;
+      this.raiseRecordChanged();
+    }
+
+    get testDefinition(): KeyboardTest {
+      return this._testDefinition;
+    }
+
+    set testDefinition(value: KeyboardTest) {
+      if(!value) {
+        // It should never be null or undefined.
+        throw new Error("Scribe's test definition must never be null or undefined!");
+      }
+      this._testDefinition = value;
+      this.raiseTestChanged();
+    }
+
     addInputRecord(json: InputEvent, currentOutput: string) {
-      this.inputJSON.addInput(json, currentOutput);
+      this.currentSequence.addInput(json, currentOutput);
       this.raiseRecordChanged();
     }
 
     resetInputRecord() {
       window['keyman'].resetContext();
-      this.inputJSON = new KMWRecorder.InputTestSequence();
+      this.currentSequence = new KMWRecorder.InputTestSequence();
 
       this.emit('record-reset', null);
     }
 
-    setInputRecord(record: InputTestSequence) {
-      this.inputJSON = record;
-      this.raiseRecordChanged();
-    }
-
     errorUpdate(msg: string) {
       if(msg) {
-        this.inputJSON.msg = msg;
+        this.currentSequence.msg = msg;
       } else {
-        delete this.inputJSON.msg;
+        delete this.currentSequence.msg;
       }
     
       this.raiseRecordChanged();
     }
 
     private raiseRecordChanged() {
-      this.emit('record-changed', this.inputJSON.toPrettyJSON());
+      this.emit('record-changed', this.currentSequence.toPrettyJSON());
     }
 
     saveInputRecord(config: Constraint) {
-      if(this.inputJSON.inputs.length > 0) {
-        this.testDefinition.addTest(config, this.inputJSON);
+      if(this.currentSequence.inputs.length > 0) {
+        this.testDefinition.addTest(config, this.currentSequence);
       }
       this.resetInputRecord();
-      this.raiseTestChanged();
-    }
-
-    setTestDefinition(testDef: KeyboardTest) {
-      if(!testDef) {
-        testDef = new KeyboardTest();
-      }
-      this.testDefinition = testDef;
       this.raiseTestChanged();
     }
 
@@ -224,7 +232,7 @@ namespace KMWRecorder {
           // ta_activeStub.value = JSON.stringify(kbdRecord);
           
           if(!sameKbd && !recorderScribe.keyboardJustActivated) {
-            recorderScribe.setTestDefinition(new KMWRecorder.KeyboardTest(kbdRecord));
+            recorderScribe.testDefinition = new KMWRecorder.KeyboardTest(kbdRecord);
           }
         }
         recorderScribe.keyboardJustActivated = false;

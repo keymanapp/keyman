@@ -61,7 +61,7 @@ copyInputRecord = function() {
 
 function saveInputRecord() {
   var target;
-  if(recorderScribe.inputJSON.hasOSKInteraction()) {
+  if(recorderScribe.currentSequence.hasOSKInteraction()) {
     var device = new com.keyman.Device();
     device.detect();
     target = device.formFactor;
@@ -76,8 +76,7 @@ function saveInputRecord() {
 }
 
 reviseInputRecord = function() {
-  let inputJSON = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
-  recorderScribe.setInputRecord(inputJSON);
+  recorderScribe.currentSequence = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
 }
 
 onTestDefinitionChanged = function(testDefJSON) {
@@ -86,7 +85,10 @@ onTestDefinitionChanged = function(testDefJSON) {
 }
 
 setTestDefinition = function(testDef) {
-  recorderScribe.setTestDefinition(testDef);
+  if(!testDef) {
+    testDef = new KMWRecorder.KeyboardTest();
+  }
+  recorderScribe.testDefinition = testDef;
 }
 
 copyTestDefinition = function() {
@@ -153,10 +155,14 @@ window.addEventListener('load', function() {
   keyman.attachToControl(in_output);
   keyman.setKeyboardForControl(in_output, '', '');
   keyman.addEventListener('keyboardchange', onKeyboardChanged);
+
+  // Used to initialize the responsive JSON-display elements.
   onResetInputRecord();
+  onTestDefinitionChanged('');
+
+  // Other setup.
   initDevice();
   setupKeyboardPicker();
-  recorderScribe.setTestDefinition();
 
   var errorInput = document.getElementById('errorText');
   if(errorInput['kmw_ip']) {
@@ -227,7 +233,7 @@ function loadExistingTest(files) {
     reader.onload = function() {
       try {
         var kbdTest = new KMWRecorder.KeyboardTest(reader.result);
-        recorderScribe.setTestDefinition(kbdTest)
+        recorderScribe.testDefinition = kbdTest;
 
         // Make sure we've loaded the keyboard!  Problem - we're not running from the unit_tests folder!
         var kbdStub = new KMWRecorder.KeyboardStub(kbdTest.keyboard);
