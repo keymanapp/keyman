@@ -41,13 +41,17 @@ namespace wordBreakers {
           return;
         }
 
+        let previous: Span | undefined = results[index - 1];
+        let next: Span | undefined = results[index + 1];
+        let current: Span | undefined = results[index];
+
         let window = [];
-        if (results[index - 1] && results[index - 1].end === results[index].start) {
+        if (previous && previous.end === current.start) {
           window.push(index - 1);
         }
         window.push(index);
 
-        if (results[index + 1] && results[index].end === results[index + 1].start) {
+        if (next && current.end === next.start) {
           window.push(index + 1);
         }
 
