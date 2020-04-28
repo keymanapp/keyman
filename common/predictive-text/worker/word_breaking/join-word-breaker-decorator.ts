@@ -41,17 +41,21 @@ namespace wordBreakers {
           return;
         }
 
-        let previous: Span | undefined = results[index - 1];
-        let next: Span | undefined = results[index + 1];
+        // the span at this index SHOULD be joined with its neighbors
+        // let's create a window of 1–3 contiguous indices that
+        // should be joined:
+        let window = [];
         let current: Span | undefined = results[index];
 
-        let window = [];
+        let previous: Span | undefined = results[index - 1];
         if (previous && spansAreBackToBack(previous, current)) {
           window.push(index - 1);
         }
 
+        // The window ALWAYS contains the joiner.
         window.push(index);
 
+        let next: Span | undefined = results[index + 1];
         if (next && spansAreBackToBack(current, next)) {
           window.push(index + 1);
         }
