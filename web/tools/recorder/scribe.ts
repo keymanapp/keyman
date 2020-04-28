@@ -39,6 +39,17 @@ namespace KMWRecorder {
    */
   export class Scribe extends EventEmitter {
     //#region Static methods for recording input events
+    static recordKeystroke(e: com.keyman.text.KeyEvent, eventSpec: InputEventSpec) {
+      var recording: RecordedKeystroke;
+      if(e.isSynthetic) {
+        recording = new RecordedSyntheticKeystroke(e);
+      } else {
+        recording = new RecordedPhysicalKeystroke(e, eventSpec as PhysicalInputEventSpec);
+      }
+
+      return recording;
+    }
+
     static recordKeyboardEvent(e: KeyboardEvent): PhysicalInputEventSpec {
       let recording = new PhysicalInputEventSpec();
 
@@ -97,7 +108,7 @@ namespace KMWRecorder {
     }
     //#endregion
 
-    _currentEvent: InputEventSpec;
+    _currentKeyEvent: com.keyman.text.KeyEvent;
     _currentSequence: InputEventSpecSequence = new InputEventSpecSequence();
     _testDefinition: KeyboardTest = new KeyboardTest();
 
@@ -175,13 +186,15 @@ namespace KMWRecorder {
           return _originalKeyDown(e);
         }
 
-        recorderScribe._currentEvent = KMWRecorder.Scribe.recordKeyboardEvent(e);
+        let event = KMWRecorder.Scribe.recordKeyboardEvent(e);
         var retVal = _originalKeyDown(e);
 
+        let recording = Scribe.recordKeystroke(recorderScribe._currentKeyEvent, event);
         // Record the keystroke as part of a test sequence!
         // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
+        // TODO:  convert to use of `recording`.
         window.setTimeout(function() {
-          recorderScribe.addInputRecord(recorderScribe._currentEvent, in_output.getText());
+          recorderScribe.addInputRecord(event, in_output.getText());
         }, 1);
         
         return retVal;
@@ -194,11 +207,14 @@ namespace KMWRecorder {
           return _originalClickKey(e);
         }
 
-        recorderScribe._currentEvent = KMWRecorder.Scribe.recordOSKEvent(e);
+        let event = KMWRecorder.Scribe.recordOSKEvent(e);
         var retVal = _originalClickKey(e);
 
+        let recording = Scribe.recordKeystroke(recorderScribe._currentKeyEvent, event);
+
         // Record the click/touch as part of a test sequence!
-        recorderScribe.addInputRecord(recorderScribe._currentEvent, in_output.getText());
+        // TODO:  Convert to use of `recording`.
+        recorderScribe.addInputRecord(event, in_output.getText());
         return retVal;
       }
 
@@ -241,13 +257,8 @@ namespace KMWRecorder {
 
       var _originalProcessKeyEvent = keyman.core.processKeyEvent.bind(keyman.core);
       keyman.core.processKeyEvent = function(keyEvent /* com.keyman.text.KeyEvent */) {
-        let currentDOMEvent = recorderScribe._currentEvent;
-        _originalProcessKeyEvent(keyEvent);
-
-        // TODO:  Record the pair.
-
-        // Now that we've processed the pair, clear the tracked _currentEvent instance.
-        recorderScribe._currentEvent = null;
+        recorderScribe._currentKeyEvent = keyEvent;
+        return _originalProcessKeyEvent(keyEvent);
       }
     }
   }

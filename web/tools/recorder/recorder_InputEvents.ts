@@ -1,8 +1,10 @@
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
 /// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts" />
+/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/keyEvent.ts" />
 /// <reference path="scribe.ts" />
 
 namespace KMWRecorder {
+  //#region Defines the InputEventSpec set, used to reconstruct DOM-based events for browser-based simulation
   export abstract class InputEventSpec {
     type: "key" | "osk";
     static fromJSONObject(obj: any): InputEventSpec {
@@ -84,9 +86,123 @@ namespace KMWRecorder {
       }
     }
   }
+  //#endregion
+
+  export abstract class RecordedKeystroke {
+    type: "key" | "osk";
+
+    static fromJSONObject(obj: any): RecordedKeystroke {
+      if(obj && obj.type) {
+        if(obj.type == "key") {
+          return new RecordedPhysicalKeystroke(obj as RecordedPhysicalKeystroke); 
+        } else if(obj && obj.type) {
+          //
+        }
+      } else {
+        throw new SyntaxError("Error in JSON format corresponding to a RecordedKeystroke!");
+      }
+    }
+
+    toPrettyJSON(): string {
+      // We want the default, non-spaced JSON for this class, even when otherwise adding whitespace.
+      var str = JSON.stringify(this);
+      return str;
+    }
+
+    /**
+     * Returns an InputEventSpec that may be used to simulate the keystroke within a browser-based environment.
+     */
+    abstract get inputEventSpec(): InputEventSpec;
+  }
+
+  export class RecordedPhysicalKeystroke extends RecordedKeystroke {
+    // KeyboardEvent properties
+    type: "key" = "key";
+
+    keyCode: number;  // may be different from eventSpec's value b/c keymapping
+    states: number;
+    modifiers: number;
+    modifierChanged: boolean;
+    isVirtualKey: boolean;
+    vkCode: number;  // may be possible to eliminate; differences arise from mnemonics.
+
+    eventSpec: PhysicalInputEventSpec;
+
+    constructor(keystroke: RecordedPhysicalKeystroke)
+    constructor(keystroke: com.keyman.text.KeyEvent, eventSpec: PhysicalInputEventSpec)
+    constructor(keystroke: RecordedPhysicalKeystroke|com.keyman.text.KeyEvent, eventSpec?: PhysicalInputEventSpec) {
+      super();
+
+      if(keystroke instanceof com.keyman.text.KeyEvent) {
+        // Store what is necessary for headless event reconstruction.
+        this.keyCode = keystroke.Lcode;
+        this.states = keystroke.Lstates;
+        this.modifiers = keystroke.Lmodifiers;
+        this.modifierChanged = !!keystroke.LmodifierChange;
+        this.isVirtualKey = keystroke.LisVirtualKey;
+        this.vkCode = keystroke.vkCode;
+
+        // Also store the DOM-based event spec for use in integrated testing.
+        this.eventSpec = eventSpec;
+      } else {
+        // It might be a raw object, from JSON.
+        this.keyCode = keystroke.keyCode;
+        this.states = keystroke.states;
+        this.modifiers = keystroke.modifiers;
+        this.modifierChanged = keystroke.modifierChanged;
+        this.isVirtualKey = keystroke.isVirtualKey;
+        this.vkCode = keystroke.vkCode;
+
+        this.eventSpec = keystroke.eventSpec;
+      }
+    }
+
+    get inputEventSpec(): InputEventSpec {
+      return this.eventSpec;
+    }
+  }
+
+  export class RecordedSyntheticKeystroke extends RecordedKeystroke {
+    // KeyboardEvent properties
+    type: "osk" = "osk";
+
+    keyName: string;
+    layer: string;
+
+    keyDistribution?: com.keyman.text.KeyDistribution;
+
+    constructor(keystroke: RecordedSyntheticKeystroke)
+    constructor(keystroke: com.keyman.text.KeyEvent)
+    constructor(keystroke: RecordedSyntheticKeystroke|com.keyman.text.KeyEvent) {
+      super();
+
+      if(keystroke instanceof com.keyman.text.KeyEvent) {
+        // Store what is necessary for headless event reconstruction.
+
+        // Also store the DOM-based event spec for use in integrated testing.
+        this.layer = keystroke.kbdLayer;
+        this.keyName = keystroke.kName;
+        this.keyDistribution = keystroke.keyDistribution;
+      } else {
+        // It might be a raw object, from JSON.
+        this.layer = keystroke.layer;
+        this.keyName = keystroke.keyName;
+        this.keyDistribution = keystroke.keyDistribution;
+      }
+    }
+
+    get inputEventSpec(): InputEventSpec {
+      let eventSpec = new OSKInputEventSpec();
+      eventSpec.keyID = this.keyName;
+
+      return eventSpec;
+    }
+  }
 
   export interface TestSequence {
+    hasOSKInteraction(): boolean;
     test(proctor: BrowserProctor): {success: boolean, result: string};
+    toPrettyJSON(): string;
   }
 
   export class InputEventSpecSequence implements TestSequence {
