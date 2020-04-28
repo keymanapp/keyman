@@ -5,6 +5,8 @@ var testDefinition = new KMWRecorder.KeyboardTest();
 var ta_inputJSON;
 var in_output;
 
+var recorderScribe;
+
 var justActivated = false;
 
 function focusReceiver() {
@@ -28,17 +30,18 @@ setElementText = function(ele, text) {
   }
 }
 
-addInputRecord = function(json) {
-  inputJSON.addInput(json, in_output.value);
-  setElementText(ta_inputJSON, inputJSON.toPrettyJSON());
+onUpdateInputRecord = function(json) {
+  setElementText(ta_inputJSON, json);
+}
+
+onResetInputRecord = function() {
+  setElementText(ta_inputJSON, "");
+  setElementText(in_output, "");
+  setElementText(document.getElementById('errorText'), "");
 }
 
 resetInputRecord = function() {
-  setElementText(ta_inputJSON, "");
-  setElementText(in_output, "");
-  keyman.resetContext();
-
-  inputJSON = new KMWRecorder.InputTestSequence();
+  recorderScribe.resetInputRecord();
 }
 
 copyInputRecord = function() {
@@ -63,7 +66,7 @@ copyInputRecord = function() {
 
 function saveInputRecord() {
   var target;
-  if(inputJSON.hasOSKInteraction()) {
+  if(recorderScribe.inputJSON.hasOSKInteraction()) {
     var device = new com.keyman.Device();
     device.detect();
     target = device.formFactor;
@@ -74,22 +77,21 @@ function saveInputRecord() {
   var browsers = getBrowsers();
   var config = new KMWRecorder.Constraint(target, os_list, browsers);
 
-  testDefinition.addTest(config, inputJSON);
-  resetInputRecord();
-  setTestDefinition(testDefinition);
+  recorderScribe.saveInputRecord(config);
 }
 
 reviseInputRecord = function() {
-  inputJSON = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
-  setElementText(in_output, inputJSON.output)
+  let inputJSON = new KMWRecorder.InputTestSequence(JSON.parse(ta_inputJSON.value));
+  recorderScribe.setInputRecord(inputJSON);
+}
+
+onTestDefinitionChanged = function(testDefJSON) {
+  var masterJSON = document.getElementById('masterJSON');
+  masterJSON.value = testDefJSON;
 }
 
 setTestDefinition = function(testDef) {
-  if(testDef) {
-    testDefinition = testDef;
-  }
-  var masterJSON = document.getElementById('masterJSON');
-  masterJSON.value = JSON.stringify(testDefinition, null, '  ');
+  recorderScribe.setTestDefinition(testDef);
 }
 
 // Time for the 'magic'.  Yay, JavaScript method extension strategies...
@@ -106,7 +108,7 @@ keyman.touchAliasing._KeyDown = function(e) {
   // Record the keystroke as part of a test sequence!
   // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
   window.setTimeout(function() {
-    addInputRecord(event);
+    recorderScribe.addInputRecord(event, in_output.value);
   }, 1);
   
   return retVal;
@@ -138,7 +140,7 @@ com.keyman.osk.PreProcessor.clickKey = function(e) {
   var retVal = _ock(e);
 
   // Record the click/touch as part of a test sequence!
-  addInputRecord(event);
+  recorderScribe.addInputRecord(event, in_output.value);
   return retVal;
 }
 
@@ -184,7 +186,7 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
     ta_activeStub.value = JSON.stringify(kbdRecord);
     
     if(!sameKbd && !justActivated) {
-      setTestDefinition(new KMWRecorder.KeyboardTest(kbdRecord));
+      recorderScribe.setTestDefinition(new KMWRecorder.KeyboardTest(kbdRecord));
     }
   }
   justActivated = false;
@@ -192,13 +194,7 @@ keyman.keyboardManager._SetActiveKeyboard = function(PInternalName, PLgCode, sav
 
 function errorUpdate() {
   var errorInput = document.getElementById('errorText');
-  if(errorInput.value) {
-    inputJSON.msg = errorInput.value;
-  } else {
-    delete inputJSON.msg;
-  }
-
-  setElementText(ta_inputJSON, inputJSON.toPrettyJSON());
+  recorderScribe.errorUpdate(errorInput.value);
 }
 
 var initDevice = function() {
@@ -216,12 +212,18 @@ window.addEventListener('load', function() {
   ta_inputJSON = document.getElementById('inputRecord');
   in_output = document.getElementById('receiver');
 
+  // Set up Scribe methods
+  recorderScribe = new KMWRecorder.Scribe();
+  recorderScribe.on('record-changed', onUpdateInputRecord);
+  recorderScribe.on('record-reset', onResetInputRecord);
+  recorderScribe.on('test-changed', onTestDefinitionChanged);
+
   keyman.attachToControl(in_output);
   keyman.setKeyboardForControl(in_output, '', '');
-  resetInputRecord();
+  onResetInputRecord();
   initDevice();
   setupKeyboardPicker();
-  setTestDefinition();
+  recorderScribe.setTestDefinition();
 
   var errorInput = document.getElementById('errorText');
   if(errorInput['kmw_ip']) {
@@ -292,7 +294,7 @@ function loadExistingTest(files) {
     reader.onload = function() {
       try {
         var kbdTest = new KMWRecorder.KeyboardTest(reader.result);
-        setTestDefinition(kbdTest)
+        recorderScribe.setTestDefinition(kbdTest)
 
         // Make sure we've loaded the keyboard!  Problem - we're not running from the unit_tests folder!
         var kbdStub = new KMWRecorder.KeyboardStub(kbdTest.keyboard);
