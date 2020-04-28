@@ -63,10 +63,19 @@ describe('The join word breaker decorator', function () {
 
     // different but adjacent joiners
     [
-      "kawé:-conjugator",
+      "I made the kawé:-conjugator.",
       ["-", ":"],
-      ["kawé", ":", "-", "conjugator"],
-      ["kawé:-conjugator"],
+      ["I", "made", "the", "kawé", ":", "-", "conjugator", "."],
+      ["I", "made", "the", "kawé:-conjugator", "."]
+    ],
+
+    // 3+ joiners in a row
+    [
+      // NB: – is U+2001 EN DASH
+      "This language is nut–=💠¤~ty!",
+      ["~", "–", "¤", "=", "💠"],
+      ["This", "language", "is", "nut", "–", "=", "💠", "¤", "~", "ty", "!"],
+      ["This", "language", "is", "nut–=💠¤~ty", "!"],
     ],
   ]
 
