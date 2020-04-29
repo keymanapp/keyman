@@ -10,6 +10,8 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+WORKING_DIRECTORY=`pwd`
+
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
@@ -218,6 +220,7 @@ compilecmd="$compiler"
 # Establish default build parameters
 set_default_vars ( ) {
     BUILD_LMLAYER=true
+    BUILD_CORE=true
     BUILD_UI=true
     BUILD_EMBED=true
     BUILD_FULLWEB=true
@@ -244,6 +247,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
+            BUILD_CORE=false
             ;;
         -test)
             set_default_vars
@@ -319,6 +323,17 @@ if [ $BUILD_LMLAYER = true ]; then
     echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
     cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
     echo "Language Modeling layer compilation successful."
+    echo ""
+fi
+
+if [ $BUILD_CORE = true ]; then
+    # Ensure that the KeyboardProcessor module compiles properly.
+    cd ../../common/core/web/keyboard-processor/src
+    echo ""
+    echo "Compiling KMW's Keyboard Processor module..."
+    ./build.sh || fail "Failed to compile the core/web/keyboard-processor module."
+    cd $WORKING_DIRECTORY
+    echo "Keyboard Processor module compilation successful."
     echo ""
 fi
 
@@ -404,6 +419,14 @@ fi
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+
+    CURRENT_PATH=`pwd`
+    # Since the batch compiler for the UI modules outputs them within a subdirectory,
+    # we need to copy them up to the base /intermediate/ folder.
+    cd "$INTERMEDIATE/source"
+    cp * ../
+    cd $CURRENT_PATH
+
     assert $INTERMEDIATE/kmwuitoolbar.js
     assert $INTERMEDIATE/kmwuitoggle.js
     assert $INTERMEDIATE/kmwuifloat.js

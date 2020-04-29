@@ -8,6 +8,8 @@
 	"target": "es5"
 	},
   "files": [
+		"../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts",
+		"../node_modules/@keyman/language-modeling-layer/message.d.ts",
 		"renderer_core.ts"
   ]
 }

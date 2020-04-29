@@ -44,6 +44,7 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
+    "@keymanapp/keyboard-processor": "^14.0.0",
     "@keymanapp/lexical-model-types": "^0.0.0",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",

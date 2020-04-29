@@ -1,6 +1,5 @@
 /// <reference path="kmwbase.ts" />
 /// <reference path="kmwutils.ts" />
-/// <reference path="text/kbdInterface.ts" />
 
 /**
  * This file generates aliases linking renamed functions to some of our published developer API for KMW.

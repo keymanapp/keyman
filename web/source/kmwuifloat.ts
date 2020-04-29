@@ -1,4 +1,7 @@
-/// <reference path="kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="../node_modules/@keymanapp/lexical-model-types/index.d.ts" />
+/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/outputTarget.ts" />
+// Includes KMW-added property declaration extensions for HTML elements.
+/// <reference path="kmwexthtml.ts" />
 
 /***
    KeymanWeb 11.0
