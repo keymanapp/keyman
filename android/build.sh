@@ -38,7 +38,7 @@ cd "$KEYMAN_ROOT/android"
 
 if [ ! -z "$RELEASE_OEM" ]; then
   pushd "$KEYMAN_ROOT/oem/firstvoices/android"
-  ./build.sh -lib-nobuild "$@"
+  ./build.sh -download-keyboards -lib-nobuild "$@"
 
   if [ $? -ne 0 ]; then
     die "ERROR: oem/firstvoices/android/build.sh failed"
