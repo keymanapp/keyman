@@ -35,6 +35,7 @@ android {
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
+        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
     }
 
     String env_release_store_file = System.getenv("oem_firstvoices_release_store_file")

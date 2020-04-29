@@ -42,6 +42,9 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
   strcat_s(szPath, "keyman-sentry-db");
   sentry_options_set_database_path(options, szPath);
 
+  sentry_options_set_release(options, "release-" KEYMAN_VersionWithTag); // matches git tag
+  sentry_options_set_environment(options, KEYMAN_Environment); // stable, beta, alpha, test, local
+  
   // We don't currently need to set this, because it will be same path
   // as all our c++ executables.
   //sentry_options_set_handler_path(options, "path/to/crashpad_handler");
@@ -64,9 +67,6 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
     g_report_messages = true;
   }
 
-  sentry_options_set_release(options, KEYMAN_VersionWithTag);
-
-  //sentry_options_set_environment(options, NULL);
   //sentry_options_set_dist(options, NULL);
   //sentry_options_set_debug(options, 1);
 

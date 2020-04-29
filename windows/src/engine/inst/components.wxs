@@ -116,6 +116,10 @@
         <File Id="sentry.x64.dll" KeyPath="yes" />
       </Component>
 
+      <Component Guid="{AF7C9288-7085-4C02-AA79-9DA4F152BDBB}">
+        <File Name="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
+
       <Component Guid="{B8867245-9570-4B63-B631-00F1474F71D4}">
         <File Id="tsysinfo.exe" Name="tsysinfo.exe" KeyPath="yes" />
         <RegistryValue Root="HKCR" Key=".tsi" Type="string" Value="Keyman.File.Diagnostics" />

@@ -4,6 +4,8 @@
 <dict>
 	<key>KeymanVersionWithTag</key>
 	<string>10.0.0-local</string>
+  <key>KeymanVersionEnvironment</key>
+  <string>local</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

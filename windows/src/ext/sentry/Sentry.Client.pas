@@ -160,7 +160,7 @@ begin
   if ExceptionErrorMessage(E, AExceptAddr, Buffer, BufferSize) = 0 then
     StrCopy(Buffer, 'Unknown exception');
 
-  if raw_frame_count = 0 then
+  if (raw_frame_count = 0) or (raw_frames[0] <> NativeUInt(AExceptAddr)) then
   begin
     // If we get here, this is most likely an exception that was
     // never raised, as otherwise our vectored handler should have
@@ -190,20 +190,17 @@ var
   Skip: Integer;
   LastMask: TArithmeticExceptionMask;
 begin
-  if raw_frame_count = 0 then
-  begin
-    // Floating point state may be broken here, so let's mask it out and continue
-    // We'll restore state afterwards
-    LastMask := System.Math.SetExceptionMask([]);
+  // Floating point state may be broken here, so let's mask it out and continue
+  // We'll restore state afterwards
+  LastMask := System.Math.SetExceptionMask([]);
 
-    if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
-      then Skip := DELPHI_FRAMES_TO_SKIP
-      else Skip := 0;
-    CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
+  if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
+    then Skip := DELPHI_FRAMES_TO_SKIP
+    else Skip := 0;
+  CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
-    // Restore FP state
-    System.Math.SetExceptionMask(LastMask);
-  end;
+  // Restore FP state
+  System.Math.SetExceptionMask(LastMask);
 
   Result := 0; //EXCEPTION_CONTINUE_SEARCH;
 end;
@@ -309,14 +306,17 @@ end;
 
 function TSentryClient.EventIDToString(AGuid: PByte): String;
 var
-  Guid: PGUID;
+  i: Integer;
+  p: PChar;
 begin
-  Guid := PGUID(@AGuid[0]);
-  // Copied from System.SysUtils.GuidToString and cleaned up for use with Sentry
   SetLength(Result, 32);
-  StrLFmt(PChar(Result), 32, '%.8X%.4X%.4X%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X',   // do not localize
-    [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
-    Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+  p := PChar(Result);
+  for i := 0 to 15 do
+  begin
+    StrLFmt(p, 2, '%.2X', [AGuid^]);
+    Inc(p, 2);
+    Inc(AGuid);
+  end;
 end;
 
 function TSentryClient.ConvertRawStackToSentryStack: sentry_value_t;
@@ -383,6 +383,11 @@ begin
       raw_frame_count := 0;
     end;
 
+    // We will rebuild the module list at time of event in order to ensure we
+    // don't lose dynamically loaded modules, as far as possible. This is
+    // potentially slow, but this is probably a fatal code path anyway ...
+    sentry_clear_modulecache;
+
     uuid := sentry_capture_event(event);
     Result := EventIDToString(@uuid.bytes[0]);
 
@@ -423,7 +428,7 @@ begin
     if IncludeStack then
     begin
       CaptureStackTrace(nil, FRAMES_TO_SKIP);
-      if raw_frame_count <> 0 then
+      if raw_frame_count > 0 then
       begin
         threads := ConvertRawStackToSentryStack;
         if threads <> 0 then
@@ -454,14 +459,17 @@ procedure CaptureStackTrace(TopAddr: Pointer; FramesToSkip: Integer);
 var
   p: PNativeUInt;
 begin
-  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, @raw_frames[0], nil);
-
-  p := @raw_frames[raw_frame_count];
+  p := @raw_frames[0];
   if TopAddr <> nil then
   begin
     p^ := NativeUInt(TopAddr);
-    Inc(raw_frame_count);
+    Inc(p);
   end;
+
+  raw_frame_count := RtlCaptureStackBackTrace(FramesToSkip, MAX_FRAMES-1, p, nil);
+
+  if TopAddr <> nil then
+    Inc(raw_frame_count);
 end;
 
 ///

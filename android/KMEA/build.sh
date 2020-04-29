@@ -13,7 +13,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage ( ) {
-    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test]"
+    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test] | [-debug]"
     echo
     echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
     echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
@@ -21,6 +21,7 @@ display_usage ( ) {
     echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
     echo "  -no-test                Don't run the unit-test suite.  Use for development builds"
     echo "                          to facilitate manual debugging and testing"
+    echo "  -debug                  Local debug build; use for development builds"
     exit 1
 }
 

@@ -71,6 +71,26 @@ var
     ('"CompanyName",', '"FileDescription",', '"FileVersion",', '"InternalName",', '"LegalCopyright",',
      '"LegalTradmarks",', '"OriginalFilename",', '"ProductName",', '"ProductVersion",', '"Comments",');
 
+function ConstructEnvironmentTag(const tier: string): string;
+var
+  TEAMCITY_VERSION, TEAMCITY_PR_NUMBER: string;
+begin
+  TEAMCITY_VERSION := GetEnvironmentVariable('TEAMCITY_VERSION');
+  if TEAMCITY_VERSION = '' then
+  begin
+    // Local dev machine, not TeamCity
+    Result := 'local';
+  end
+  else
+  begin
+    // On TeamCity; are we running a pull request build or a master/beta/stable build?
+    TEAMCITY_PR_NUMBER := GetEnvironmentVariable('TEAMCITY_PR_NUMBER');
+    if TEAMCITY_PR_NUMBER <> ''
+      then Result := 'test'
+      else Result := tier;
+  end;
+end;
+
 function ConstructVersionTag(const tier: string): string;
 var
   TEAMCITY_VERSION, TEAMCITY_PR_NUMBER: string;
@@ -111,6 +131,7 @@ var
   s: string;
   n: Integer;
   versionFile, tierFile, version, tier, tag: string;
+  environment: string;
 begin
   FMode := mmUnknown;
 
@@ -174,8 +195,9 @@ begin
   end;
 
   tag := ConstructVersionTag(tier);
+  environment := ConstructEnvironmentTag(tier);
 
-  VersionInfo := BuildKeymanVersionInfo(version, tier, tag);
+  VersionInfo := BuildKeymanVersionInfo(version, tier, tag, environment);
 
   Result := True;
 end;
@@ -288,6 +310,7 @@ begin
     s := StringReplace(s, '$Tag',            VersionInfo.Tag,            [rfReplaceAll]);
     s := StringReplace(s, '$VersionWithTag', VersionInfo.VersionWithTag, [rfReplaceAll]);
     s := StringReplace(s, '$VersionRc',      VersionInfo.VersionRc,      [rfReplaceAll]);
+    s := StringReplace(s, '$Environment',    VersionInfo.Environment,    [rfReplaceAll]);
     // Do this one last because it breaks the others otherwise...
     s := StringReplace(s, '$Version',        VersionInfo.Version,        [rfReplaceAll]);
 

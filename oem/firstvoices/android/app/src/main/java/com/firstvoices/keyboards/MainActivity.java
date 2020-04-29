@@ -24,7 +24,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SentryAndroid.init(this);
+        SentryAndroid.init(this, options -> {
+          options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
+          options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+        });
 
         setContentView(R.layout.activity_main);
 
