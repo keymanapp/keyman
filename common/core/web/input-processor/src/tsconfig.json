@@ -12,7 +12,7 @@
   "outFile": "../dist/index.js"
   },
   "files": [
-    "../node_modules/@keymanapp/language-modeling-layer/node-defaultWorker.ts",
+    "../node_modules/@keymanapp/lexical-model-layer/node-defaultWorker.ts",
 		"text/inputProcessor.ts"
   ]
 }

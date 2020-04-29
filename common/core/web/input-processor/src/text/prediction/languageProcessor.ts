@@ -1,6 +1,6 @@
-///<reference path="../../../node_modules/@keymanapp/language-modeling-layer/embedded_worker.d.ts" />
-///<reference path="../../../node_modules/@keymanapp/language-modeling-layer/message.d.ts" />
-///<reference path="../../../node_modules/@keymanapp/language-modeling-layer/index.ts" />
+///<reference path="../../../node_modules/@keymanapp/lexical-model-layer/embedded_worker.d.ts" />
+///<reference path="../../../node_modules/@keymanapp/lexical-model-layer/message.d.ts" />
+///<reference path="../../../node_modules/@keymanapp/lexical-model-layer/index.ts" />
 ///<reference path="../../includes/events.ts" />
 
 namespace com.keyman.text.prediction {
