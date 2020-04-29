@@ -1,5 +1,11 @@
 # Keyman for Linux Version History
 
+# 2020-02-20 13.0.101 stable
+* Bug Fix: Add Keyman gsettings schema to manifest (#2688)
+
+# 2020-02-19 13.0.100 stable
+* 13.0 stable release
+
 # 2020-02-18 13.0.30 beta
 * Bug Fix:
   * Include Keyman gsettings schema for packaging (#2675)

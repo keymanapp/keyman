@@ -1,5 +1,39 @@
 # Keyman for Android Version History
 
+## 2020-04-20 13.0.6209 stable
+* Bug fix:
+  * Fix crash involving system keyboard update notifications (#3007)
+
+## 2020-04-15 13.0.6208 stable
+* no change to Keyman for Android (updated Keyman Web Engine #2957)
+
+## 2020-04-01 13.0.6207 stable
+* Bug fix:
+  * Fix crash involving globe button with 3rd party apps (#2932)
+
+## 2020-03-18 13.0.6206 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2841, 2839)
+
+## 2020-03-13 13.0.6205 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2823, 2821, 2820, 2823)
+
+## 2020-03-11 13.0.6204 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2807, 2797)
+
+## 2020-03-09 13.0.6203 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2694)
+
+## 2020-03-06 13.0.6202 stable
+* No change to Keyman for Android (updated Keyman Web Engine, #2781)
+
+## 2020-02-25 13.0.6201 stable
+* Bug fix:
+  * Fix crash involving empty keyboard list (#2723)
+  * Sanitize app version for api query (#2724)
+
+## 2020-02-19 13.0.6200 stable
+* Release 13.0
+
 ## 2020-02-14 13.0.6059 beta
 * Bug fix:
   * Re-initialize CloudDownloadManager when downloading resources after Keyman app is closed (#2635)
@@ -105,7 +139,7 @@
 ## 2019-10-25 12.0.4205 stable
 * Bug fix:
   * Use lexical model package version for dataset (#2242)
-  
+
 ## 2019-10-14 12.0.4204 stable
 * Bug Fix:
   * FirstVoices app may crash if analytics is not present (#2204)
@@ -219,7 +253,7 @@
 
 ## 2019-02-15 11.0.2062 beta
 * No changes.
-  
+
 ## 2019-02-07 11.0.2061 beta
 * Bug fix:
   * Add notifications when keyboard or font fails to download from Keyman cloud (#1570)
@@ -333,7 +367,7 @@
 ## 2018-06-11 10.0.399 beta
 * Consolidate Info view (#972)
 * Platform tests (in keyboards) are now consistent across all platforms (#969)
- 
+
 ## 2018-06-05 10.0.398 beta
 * Fix globe button for system keyboard (#942)
 
@@ -402,7 +436,7 @@
 * Initial beta release of Keyman for Android 10.0
 
 ## 10.0 alpha
-* Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text 
+* Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text
   from being processed as key codes, and fixes the app crash when longpress with K_SPACE.
 * Added support for L/R Alt and Ctrl and Caps Lock modifiers for keyboards if specified by a keyboard designer
 * Add feature to reset keyboard to default layer when new input field focused (#288)
@@ -413,7 +447,7 @@
 * Add feature to install ad-hoc keyboards via .kmp packages
 * Add [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/) for generating crash reports
 * Add Material Design [icons](https://material.io/icons/)
-* Fix path to special OSK font for longpress of special keys (#239) 
+* Fix path to special OSK font for longpress of special keys (#239)
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable

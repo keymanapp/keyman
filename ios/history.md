@@ -1,5 +1,24 @@
 # Keyman for iPhone and iPad Version History
 
+## 2020-04-15 13.0.106 stable
+* Adds workaround for iOS 13.4 bug that breaks longpresses (#2960, #2970)
+* Mitigates bug where in-app keyboard would reset inappropriately (#2952)
+* Fixes issue where base key could output at same time a popup key was selected (#2882)
+
+## 2020-03-17 13.0.105 stable
+* Fixes issues with keyboard banner display (#2841)
+
+## 2020-03-09 13.0.102 stable
+* Pre-emptively fixes issue with keyboard scaling for as-of-yet unreleased devices (#2704)
+* Fixes in-app Info help link (#2774)
+* Fixes issue with select keyboard rules causing loss of context when removing context up to a newline (#2776)
+
+## 2020-02-19 13.0.100 stable
+* Release of Keyman 13 for iPhone and iPad
+* New Feature: QR Code support for sharing keyboards
+* New Feature: Dark mode support
+* New Feature: File browser for installing keyboard packages saved on device
+
 ## 2020-02-19 13.0.72 beta
 * Fixes issue with KeymanEngine demo app and missing color definition in KeymanEngine library (#2662)
 * Updates offline help content for 13.0 release (#2671)
@@ -39,7 +58,7 @@
 * Bug fix: Multi-row longpress keys not contained within keyboard bounds (#2306, 12.0:#2317)
 * Bug fix: Fixes bug where the keyboard might display within the settings menu (#2470)
 * Bug fix: Fix situation where lexical model fails to install with missing version number (#2191, 12.0:#2193)
-* Bug fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403, 12.0:#2420) 
+* Bug fix: Mismatch for BCP 47 codes caused keyboard downloads to fail (#2403, 12.0:#2420)
 * Bug fix: If malformed data was returned from an online API, Keyman could crash (#2368)
 * Bug fix: Unable to replace previously installed KMP from ad-hoc file (#2459, 12.0:#2461)
 * Bug fix: Default model (MTNT) installation was not happening (#2532)
@@ -123,7 +142,7 @@
   * Removed deprecated code to to support keyman:// scheme for ad-hoc distribution (#1160)
   * Updated the default keyboard to `sil_euro_latin` (#1417, #1288)
   * Added SIL logo to info page (#1164)
-  
+
 * Bug Fixes:
   * Bookmark add button is enabled only when title/url fields have text (#1073)
   * Fixed bug behind some crashes of system keyboard (#1166)
@@ -133,8 +152,8 @@
   * Fixed issue with incorrect font on key caps in some situations (#1450)
   * Various crashes (#1057, #1301)
 
-## 2018-08-02 10.0.208 stable 
-* Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159) 
+## 2018-08-02 10.0.208 stable
+* Fixed OSK layout problems (and possible crash) on iOS 11 on certain hardware (#1089, #1159)
 
 ## 2018-07-06 10.0.203 stable
 * Fixes an issue where a keyboard with varying row counts in different layers could crash (#1056, #1057)
@@ -214,7 +233,7 @@
 
 ## 2017-08-26 2.6.4 stable
 * Fixed bug with blank keyboard on some devices (#218)
-* Fixed bug with keyboard width being incorrect on iPhone 7, iPhone 7+ (#224) 
+* Fixed bug with keyboard width being incorrect on iPhone 7, iPhone 7+ (#224)
 
 ## 2017-08-18 2.6.0 beta
 * Numerous keyboarding bugfixes
@@ -279,11 +298,11 @@
 
 ### Known Issues
 
-* iOS 7.1 has a problem with installed font profiles: once you restart your device, and in certain other situations, the installed font profiles become unavailable and language fonts will fail to display. While this is not a bug in Keyman as such, it can impact usage of your language in some apps. 
-* We have received some reports of a bug with fonts in version 1.2: for some users, their language font fails to display after upgrading to version 1.2 from an earlier version. This is happening due to a change in the cached data for your language. To fix the problem on your iPhone or iPad: 
-	* Open the Keyboards list by touching the globe button on the keyboard. 
-	* Swipe left on the keyboard with the issue to delete it. 
-	* Click the Add (+) button to reinstall the keyboard. You should not need to reinstall the font profile. 
+* iOS 7.1 has a problem with installed font profiles: once you restart your device, and in certain other situations, the installed font profiles become unavailable and language fonts will fail to display. While this is not a bug in Keyman as such, it can impact usage of your language in some apps.
+* We have received some reports of a bug with fonts in version 1.2: for some users, their language font fails to display after upgrading to version 1.2 from an earlier version. This is happening due to a change in the cached data for your language. To fix the problem on your iPhone or iPad:
+	* Open the Keyboards list by touching the globe button on the keyboard.
+	* Swipe left on the keyboard with the issue to delete it.
+	* Click the Add (+) button to reinstall the keyboard. You should not need to reinstall the font profile.
 
 ## 1.3.0 stable
 ### New Features
@@ -301,18 +320,18 @@
 
 ### Known Issues
 
-* iOS 7.1 has a problem with installed font profiles: once you restart your device, and in certain other situations, the installed font profiles become unavailable and language fonts will fail to display. While this is not a bug in Keyman as such, it can impact usage of your language in some apps. 
-* We have received some reports of a bug with fonts in version 1.2: for some users, their language font fails to display after upgrading to version 1.2 from an earlier version. This is happening due to a change in the cached data for your language. To fix the problem on your iPhone or iPad: 
-	* Open the Keyboards list by touching the globe button on the keyboard. 
-	* Swipe left on the keyboard with the issue to delete it. 
-	* Click the Add (+) button to reinstall the keyboard. You should not need to reinstall the font profile. 
+* iOS 7.1 has a problem with installed font profiles: once you restart your device, and in certain other situations, the installed font profiles become unavailable and language fonts will fail to display. While this is not a bug in Keyman as such, it can impact usage of your language in some apps.
+* We have received some reports of a bug with fonts in version 1.2: for some users, their language font fails to display after upgrading to version 1.2 from an earlier version. This is happening due to a change in the cached data for your language. To fix the problem on your iPhone or iPad:
+	* Open the Keyboards list by touching the globe button on the keyboard.
+	* Swipe left on the keyboard with the issue to delete it.
+	* Click the Add (+) button to reinstall the keyboard. You should not need to reinstall the font profile.
 
 ## 1.2.0 stable
 ### New Features
 
-* Install custom keyboards created with Keyman Developer 9 (free download for Windows) 
-* User interface updated for iOS 7 
-* Performance improvements 
+* Install custom keyboards created with Keyman Developer 9 (free download for Windows)
+* User interface updated for iOS 7
+* Performance improvements
 
 ### Bug Fixes
 
@@ -323,25 +342,25 @@
 
 ### Known Issues
 
-* iOS 7.1 has a problem with installed font profiles: once you restart your device, and in certain other situations, the installed font profiles become unavailable and language fonts will fail to display. While this is not a bug in Keyman as such, it can impact usage of your language in some apps. 
-* We have received some reports of a bug with fonts in version 1.2: for some users, their language font fails to display after upgrading to version 1.2 from an earlier version. This is happening due to a change in the cached data for your language. To fix the problem on your iPhone or iPad: 
-	* Open the Keyboards list by touching the globe button on the keyboard. 
-	* Swipe left on the keyboard with the issue to delete it. 
-	* Click the Add (+) button to reinstall the keyboard. You should not need to reinstall the font profile. 
+* iOS 7.1 has a problem with installed font profiles: once you restart your device, and in certain other situations, the installed font profiles become unavailable and language fonts will fail to display. While this is not a bug in Keyman as such, it can impact usage of your language in some apps.
+* We have received some reports of a bug with fonts in version 1.2: for some users, their language font fails to display after upgrading to version 1.2 from an earlier version. This is happening due to a change in the cached data for your language. To fix the problem on your iPhone or iPad:
+	* Open the Keyboards list by touching the globe button on the keyboard.
+	* Swipe left on the keyboard with the issue to delete it.
+	* Click the Add (+) button to reinstall the keyboard. You should not need to reinstall the font profile.
 
 ## 1.1.0 stable
 ### New Features
 
-* Font installation for your language for iOS 7+ 
-* Keyman now opens in response to keyman://localhost/open links on websites 
-* Text and text size are now saved and loaded back automatically after restarting the app. 
+* Font installation for your language for iOS 7+
+* Keyman now opens in response to keyman://localhost/open links on websites
+* Text and text size are now saved and loaded back automatically after restarting the app.
 
 ### Bug Fixes
 
-* Copy/Paste no longer fails if the text contains apostrophe character 
+* Copy/Paste no longer fails if the text contains apostrophe character
 * Fix for Javascript code injection
-* Popup keys no longer appear unexpectedly after key touch 
-* (>) button in keyboard list now operates 
+* Popup keys no longer appear unexpectedly after key touch
+* (>) button in keyboard list now operates
 * Action button popups no longer overlap the button on iPad
 * Keyboard height now always cleanly matches available height in landscape mode
 * Help bubble for keyboard change button now shows on first use

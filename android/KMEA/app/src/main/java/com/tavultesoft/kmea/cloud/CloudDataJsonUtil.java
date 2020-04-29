@@ -36,7 +36,7 @@ public class CloudDataJsonUtil {
   }
 
   public static HashMap<String,String> createKeyboardInfoMap(String aPackageId,String aLanguageId, String aLanguageName, String aKeyboardId,
-                                                   String aKeyboardName, String aKeyboardVersion, String anIsCustomKeyboard,
+                                                   String aKeyboardName, String aKeyboardVersion,
                                                    String aFont, String aOskFont, String aCustomHelpLink)
   {
     HashMap<String, String> keyboardInfo = new HashMap<String, String>();
@@ -46,7 +46,6 @@ public class CloudDataJsonUtil {
     keyboardInfo.put(KMManager.KMKey_KeyboardName, aKeyboardName);
     keyboardInfo.put(KMManager.KMKey_LanguageName, aLanguageName);
     keyboardInfo.put(KMManager.KMKey_KeyboardVersion, aKeyboardVersion);
-    keyboardInfo.put(KMManager.KMKey_CustomKeyboard, anIsCustomKeyboard);
     keyboardInfo.put(KMManager.KMKey_Font, aFont);
     if (aOskFont != null) {
       keyboardInfo.put(KMManager.KMKey_OskFont, aOskFont);
@@ -64,43 +63,23 @@ public class CloudDataJsonUtil {
       return keyboardsList;
     }
 
-    String isCustom = fromKMP ? "Y" : "N";
-
     try {
       // Thank you, Cloud API format.
       JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
       for (int i = 0; i < languages.length(); i++) {
-        JSONObject language = languages.getJSONObject(i);
+        JSONObject languageJSON = languages.getJSONObject(i);
+        JSONArray langKeyboards = languageJSON.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
 
-        String langID = language.getString(KMManager.KMKey_ID);
-        String langName = language.getString(KMManager.KMKey_Name);
-
-        JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-
+        // Can't foreach a JSONArray
         int kbLength = langKeyboards.length();
         for (int j = 0; j < kbLength; j++) {
           JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
-          String pkgID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-          String kbID = keyboardJSON.getString(KMManager.KMKey_ID);
-          String kbName = keyboardJSON.getString(KMManager.KMKey_Name);
-          String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-          String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
-          String customHelpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink, null);
-
-          //String kbKey = String.format("%s_%s", langID, kbID);
-          HashMap<String, String> hashMap = createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null, customHelpLink);
-
-
-//          if (keyboardModifiedDates.get(kbID) == null) {
-//            keyboardModifiedDates.put(kbID, keyboardJSON.getString(KMManager.KMKey_KeyboardModified));
-//          }
-
-          keyboardsList.add(new Keyboard(hashMap));
+          keyboardsList.add(new Keyboard(languageJSON, keyboardJSON));
         }
       }
     } catch (JSONException | NullPointerException e) {
       Log.e(TAG, "JSONParse Error: " + e);
-      return new ArrayList<>();  // Is this ideal?
+      return new ArrayList<Keyboard>();  // Is this ideal?
     }
 
     return keyboardsList;
@@ -113,59 +92,12 @@ public class CloudDataJsonUtil {
       // Parse each model JSON Object.
       int modelsLength = models.length();
       for (int i = 0; i < modelsLength; i++) {
-        JSONObject model = models.getJSONObject(i);
-        String packageID = "", modelURL = "";
-        if (model.has(KMManager.KMKey_PackageID)) {
-          packageID = model.getString(KMManager.KMKey_PackageID);
-        } else {
-          // Determine package ID from packageFilename
-          modelURL = model.optString("packageFilename", "");
-          packageID = FileUtils.getFilename(modelURL);
-          packageID = packageID.replace(FileUtils.MODELPACKAGE, "");
-        }
-
-        // api.keyman.com query returns an array of language IDs Strings while
-        // kmp.json "languages" is an array of JSONObject
-        String languageID = "", langName = "";
-        Object obj = model.getJSONArray("languages");
-        if (((JSONArray) obj).get(0) instanceof String) {
-          // language name not provided, so re-use language ID
-          languageID = model.getJSONArray("languages").getString(0);
-          langName = languageID;
-        } else if (((JSONArray) obj).get(0) instanceof JSONObject) {
-          JSONObject languageObj = model.getJSONArray("languages").getJSONObject(0);
-          languageID = languageObj.getString("id");
-          langName = languageObj.getString("name");
-        }
-
-        String modelID = model.getString(KMManager.KMKey_ID);
-        String modelName = model.getString(KMManager.KMKey_Name);
-
-        // Cloud data may not contain lexical model version, so fallback to (package) version
-        String version = model.optString(KMManager.KMKey_Version, "1.0");
-        String modelVersion = model.optString(KMManager.KMKey_LexicalModelVersion, version);
-
-        String isCustom = model.optString(KMManager.KMKey_CustomModel, "N");
-        
-        String icon = "0";
-
-        HashMap<String, String> hashMap = new HashMap<String, String>();
-        hashMap.put(KMManager.KMKey_PackageID, packageID);
-        hashMap.put(KMManager.KMKey_LanguageID, languageID.toLowerCase());
-        hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
-        hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
-        hashMap.put(KMManager.KMKey_LanguageName, langName);
-        hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
-        hashMap.put(KMManager.KMKey_CustomModel, isCustom);
-        hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
-        hashMap.put("isEnabled", "true");
-        hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
-
-        modelList.add(new LexicalModel(hashMap));
+        JSONObject modelJSON = models.getJSONObject(i);
+        modelList.add(new LexicalModel(modelJSON));
       }
     } catch (JSONException | NullPointerException e) {
       Log.e(TAG, "JSONParse Error: " + e);
-      return new ArrayList<>();  // Is this ideal?
+      return new ArrayList<LexicalModel>();  // Is this ideal?
     }
 
     return modelList;
