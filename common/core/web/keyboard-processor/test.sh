@@ -12,7 +12,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
 display_usage ( ) {
-  echo "test.sh [-skip-package-install][ -? | -h | -help]"
+  echo "test.sh [-skip-package-install] [-CI] [ -? | -h | -help]"
   echo "  -CI               to perform continuous-integration friendly tests and reporting"
   echo "  -? | -h | -help   to display this help information"
   echo "  -skip-package-install         to bypass refreshing dependencies.  Useful when called by scripts that pre-fetch"
