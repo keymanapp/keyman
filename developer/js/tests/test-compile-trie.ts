@@ -3,6 +3,7 @@ import {assert} from 'chai';
 import 'mocha';
 
 import {makePathToFixture, compileModelSourceCode} from './helpers';
+import { createTrieDataStructure } from '../dist/lexical-model-compiler/build-trie';
 
 describe('LexicalModelCompiler', function () {
   describe('#generateLexicalModelCode', function () {
@@ -24,6 +25,9 @@ describe('LexicalModelCompiler', function () {
       // Sanity check: the word list has three total unweighted words, with a
       // total weight of 3!
       assert.match(code, /\btotalWeight\b["']?:\s*3\b/);
+
+      // Sanity check: the word breaker is a property of the object.
+      assert.match(code, /\bwordBreaker\b["']?:\s*wordBreakers\b/);
     });
 
     it('should compile a word list exported by Microsoft Excel', function () {
@@ -103,5 +107,46 @@ describe('LexicalModelCompiler', function () {
     // total weight of 27,596!
     assert.match(code, /\btotalWeight\b["']?:\s*27596\b/);
   });
+
+  it('should include the source code of its search term to key function', function () {
+    const MODEL_ID = 'example.qaa.trivial';
+    const PATH = makePathToFixture(MODEL_ID);
+    let compiler = new LexicalModelCompiler;
+    let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      format: 'trie-1.0',
+      sources: ['wordlist.tsv']
+      // NOTE: we intentionally OMIT the searchTermToKey function
+      // so that the default can be provided.
+    }, PATH) as string;
+
+    assert.match(code, /(["']|)searchTermToKey\1:\s*function\b/,
+      'expected to find searchTermToKey specified as a function'
+    );
+  });
 });
 
+describe('createTrieDataStructure()', function () {
+  const WORDLIST_FILENAME = makePathToFixture('example.qaa.trivial', 'wordlist.tsv');
+
+  it('must be given an explicit searchTermToKey function', function () {
+    assert.throws(function () {
+      createTrieDataStructure([WORDLIST_FILENAME]);
+    }, TypeError)
+  });
+
+  it('uses the provided searchTermToKey function', function () {
+    // check if the expected key is in the resultant data structure.
+    // N.B., we assume the wordlist contains the wordform "turtles"
+    let lowercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
+      return wf.toLowerCase()
+    })
+    assert.match(lowercaseSourceCode, /"key":\s*"turtles"/);
+    assert.notMatch(lowercaseSourceCode, /"key":\s*"TURTLES"/);
+
+    let uppercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
+      return wf.toUpperCase()
+    })
+    assert.match(uppercaseSourceCode, /"key":\s*"TURTLES"/);
+    assert.notMatch(uppercaseSourceCode, /"key":\s*"turtles"/);
+  })
+});
