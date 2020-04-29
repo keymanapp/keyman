@@ -29,7 +29,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_LANG_ID = "KMKeyboardActivity.langID";
   public static final String ARG_KB_NAME = "KMKeyboardActivity.kbName";
   public static final String ARG_LANG_NAME = "KMKeyboardActivity.langName";
-  public static final String ARG_IS_CUSTOM = "KMKeyboardActivity.isCustom";
   public static final String ARG_MODEL_ID = "KMKeyboardActivity.modelID";
   public static final String ARG_MODEL_NAME = "KMKeyboardActivity.modelName";
   public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
@@ -68,7 +67,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   private String modelName;
   private String kbName;
   private String langName;
-  private Boolean isCustom;
   private Boolean downloadOnlyLexicalModel;
 
   private String customKeyboard;
@@ -102,16 +100,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     if (downloadOnlyLexicalModel) {
       modelID = bundle.getString(ARG_MODEL_ID);
       modelName = bundle.getString(ARG_MODEL_NAME);
-      isCustom = false;
       url = bundle.getString(ARG_MODEL_URL);
     } else {
 
       kbID = bundle.getString(ARG_KB_ID);
       kbName = bundle.getString(ARG_KB_NAME);
-      isCustom = bundle.getBoolean(ARG_IS_CUSTOM);
 
       // URL parameters for custom keyboard (if they exist)
-      customKeyboard = bundle.getString(ARG_KEYBOARD);
       customLanguage = bundle.getString(ARG_LANGUAGE);
       url = bundle.getString(ARG_URL);
       filename = bundle.getString(ARG_FILENAME);
@@ -211,7 +206,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   private ArrayList<CloudApiTypes.CloudApiParam> prepareCloudApiParamsForKeyboardDownload()
   {
     if (pkgID == null || pkgID.trim().isEmpty() ||
-      (!isCustom && (langID == null || langID.trim().isEmpty() || kbID == null || kbID.trim().isEmpty()))) {
+        langID == null || langID.trim().isEmpty() ||
+        kbID == null || kbID.trim().isEmpty()) {
       throw new IllegalStateException("Invalid keyboard");
     }
 
@@ -219,31 +215,23 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
     String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(this);
 
-    if (isCustom) {
-      //TODO: will end up in an exception during download???
-      cloudQueries.add(new CloudApiTypes.CloudApiParam(
-        CloudApiTypes.ApiTarget.KeyboardData, url));
-    }
-    else
-    {
-      // Keyman cloud
-      // Sanitize appVersion to #.#.# to match the API spec
-      String appVersion = KMManager.getVersion();
-      String _remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
-        kKeymanApiBaseURL, langID, kbID, appVersion, deviceType);
-      cloudQueries.add(
-        new CloudApiTypes.CloudApiParam(
-          CloudApiTypes.ApiTarget.Keyboard, _remoteUrl)
-          .setType(CloudApiTypes.JSONType.Object)
-          .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_IS_CUSTOM,isCustom)
-          .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_LANG_ID,langID)
-           .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_KB_ID,kbID));
+    // Keyman cloud
+    // Sanitize appVersion to #.#.# to match the API spec
+    String appVersion = KMManager.getVersion();
+    String _remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
+      kKeymanApiBaseURL, langID, kbID, appVersion, deviceType);
+    cloudQueries.add(
+      new CloudApiTypes.CloudApiParam(
+        CloudApiTypes.ApiTarget.Keyboard, _remoteUrl)
+        .setType(CloudApiTypes.JSONType.Object)
+        .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_LANG_ID,langID)
+         .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_KB_ID,kbID));
 
-      String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
-      cloudQueries.add(new CloudApiTypes.CloudApiParam(
-        CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
-        .setType(CloudApiTypes.JSONType.Array));
-    }
+    String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
+    cloudQueries.add(new CloudApiTypes.CloudApiParam(
+      CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
+      .setType(CloudApiTypes.JSONType.Array));
+
     return cloudQueries;
   }
 

@@ -68,12 +68,16 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     final ListView listView = findViewById(R.id.listView);
 
-    final Keyboard kbd = (Keyboard)getIntent().getSerializableExtra(KMManager.KMKey_Keyboard);
+    Bundle bundle = getIntent().getExtras();
+    if (bundle == null) {
+      return;
+    }
+    final Keyboard kbd = (Keyboard)bundle.getSerializable(KMManager.KMKey_Keyboard);
     final String packageID = kbd.getPackageID();
     final String languageID = kbd.getLanguageID();
     final String languageName = kbd.getLanguageName();
-    final String kbID = kbd.getResourceId();
-    final String kbName = kbd.getResourceName();
+    final String kbID = kbd.getKeyboardID();
+    final String kbName = kbd.getKeyboardName();
     final String kbVersion = kbd.getVersion();
     String latestKbdCloudVersion = kbVersion;
 
@@ -106,7 +110,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
     // Display keyboard help link
     hashMap = new HashMap<>();
-    final String customHelpLink = kbd.getCustomHelpLink();
+    final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
     icon = String.valueOf(R.drawable.ic_arrow_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist

@@ -605,9 +605,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         url = data.toString();
       }
       if (url != null) {
-        // URL contains KMP to download in background.
-        boolean isCustom = FileUtils.isCustomKeyboard(url);
-
         String filename = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Filename);
         if (filename == null) {
           FileUtils.getFilename(url);

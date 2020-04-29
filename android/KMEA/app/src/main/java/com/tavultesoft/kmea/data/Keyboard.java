@@ -12,38 +12,26 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.Map;
 
-public class Keyboard implements Serializable, LanguageResource {
+public class Keyboard extends LanguageResource implements Serializable {
   private static final String TAG = "Keyboard";
   private static final String HELP_URL_FORMATSTR = "https://help.keyman.com/keyboard/%s/%s";
 
-  private String packageID;
-  private String keyboardID;
-  private String keyboardName;
-  private String languageID;
-  private String languageName;
-  private boolean isCustomKeyboard;
   private boolean isNewKeyboard;
   private String font;
   private String oskFont;
-  private String helpLink;
-  private String version;
 
   public Keyboard(JSONObject languageJSON, JSONObject keyboardJSON) {
     try {
       this.packageID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
 
-      this.keyboardID = keyboardJSON.getString(KMManager.KMKey_ID);
+      this.resourceID = keyboardJSON.getString(KMManager.KMKey_ID);
 
-      this.keyboardName = keyboardJSON.getString(KMManager.KMKey_Name);
+      this.resourceName = keyboardJSON.getString(KMManager.KMKey_Name);
 
       // language ID and language name from languageJSON
       this.languageID = languageJSON.getString(KMManager.KMKey_ID).toLowerCase();
       this.languageName = languageJSON.getString(KMManager.KMKey_Name);
-
-      this.isCustomKeyboard = keyboardJSON.has(KMManager.KMKey_CustomKeyboard) &&
-        keyboardJSON.get(KMManager.KMKey_CustomKeyboard).equals("Y");
 
       this.isNewKeyboard = keyboardJSON.has(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
         keyboardJSON.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
@@ -55,70 +43,47 @@ public class Keyboard implements Serializable, LanguageResource {
       this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
-        String.format(HELP_URL_FORMATSTR, this.keyboardID, this.version));
+        String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
     } catch (JSONException e) {
       Log.e(TAG, "Keyboard exception parsing JSON: " + e);
     }
   }
 
   public Keyboard(String packageID, String keyboardID, String keyboardName, String languageID, String languageName,
-                  boolean isCustomKeyboard, boolean isNewKeyboard,
-                  String font, String oskFont, String version, String helpLink) {
+                  String version, String helpLink,
+                  boolean isNewKeyboard, String font, String oskFont) {
 
     this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
-    this.keyboardID = keyboardID;
-    this.keyboardName = keyboardName;
+    this.resourceID = keyboardID;
+    this.resourceName = keyboardName;
     this.languageID = languageID.toLowerCase();
     this.languageName = languageName;
-    this.isCustomKeyboard = isCustomKeyboard;
+    this.version = (version != null) ? version : "1.0";
+    this.helpLink = (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
+      String.format(HELP_URL_FORMATSTR, this.resourceID, this.version);
+
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
     this.oskFont = (oskFont != null) ? oskFont : "";
-    this.version = (version != null) ? version : "1.0";
-    this.helpLink = (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-      String.format(HELP_URL_FORMATSTR, this.keyboardID, this.version);
   }
 
-  public boolean isCustomKeyboard() { return isCustomKeyboard; }
+  public String getKeyboardID() { return getResourceID(); }
+  public String getKeyboardName() { return getResourceName(); }
 
   public boolean isNewKeyboard() { return isNewKeyboard; }
-
-  public String getResourceId() { return keyboardID; }
 
   public String getFont() { return font; }
 
   public String getOSKFont() { return oskFont; }
 
-  public String getLanguageID() { return languageID; }
-
-  // Deprecated in Keyman 14.0 for getLanguageID()
-  @Override
-  public String getLanguageCode() { return languageID; }
-
-  public String getLanguageName() { return languageName; }
-
-  public String getResourceName() { return keyboardName; }
-
-  public String getCustomHelpLink() { return helpLink; }
-
-  public String getVersion() { return version; }
-
-  public String getPackageID() { return packageID; }
-
-  // Deprecated in Keyman 14.0 for getPackageID()
-  @Override
-  public String getPackage() { return packageID; }
-
   public Bundle buildDownloadBundle() {
     Bundle bundle = new Bundle();
 
     bundle.putString(KMKeyboardDownloaderActivity.ARG_PKG_ID, packageID);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, keyboardID);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_ID, resourceID);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, keyboardName);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KB_NAME, resourceName);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, languageName);
-
-    bundle.putBoolean(KMKeyboardDownloaderActivity.ARG_IS_CUSTOM, isCustomKeyboard);
 
     bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, helpLink);
 
@@ -128,7 +93,7 @@ public class Keyboard implements Serializable, LanguageResource {
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
       boolean lgCodeMatch = ((Keyboard) obj).getLanguageID().equals(this.getLanguageID());
-      boolean idMatch = ((Keyboard) obj).getResourceId().equals(this.getResourceId());
+      boolean idMatch = ((Keyboard) obj).getKeyboardID().equals(this.getKeyboardID());
 
       return lgCodeMatch && idMatch;
     }
@@ -136,10 +101,4 @@ public class Keyboard implements Serializable, LanguageResource {
     return false;
   }
 
-  @Override
-  public int hashCode() {
-    String id = getResourceId();
-    String lgCode = getLanguageID();
-    return id.hashCode() * lgCode.hashCode();
-  }
 }

@@ -75,7 +75,6 @@ public final class LanguageListUtil {
           String kbName = "";
           String langName = language.getString(KMManager.KMKey_Name);
           String kbVersion = "1.0";
-          String isCustom = "N";
           String kbFont = "";
           JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
           JSONObject keyboard = null;
@@ -95,7 +94,6 @@ public final class LanguageListUtil {
             hashMap.put(KMManager.KMKey_KeyboardName, kbName);
             hashMap.put(KMManager.KMKey_LanguageName, langName);
             hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-            hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
             hashMap.put(KMManager.KMKey_Font, kbFont);
             keyboardsInfo.put(kbKey, hashMap);
 
@@ -117,7 +115,6 @@ public final class LanguageListUtil {
               hashMap.put(KMManager.KMKey_KeyboardName, kbName);
               hashMap.put(KMManager.KMKey_LanguageName, langName);
               hashMap.put(KMManager.KMKey_KeyboardVersion, kbVersion);
-              hashMap.put(KMManager.KMKey_CustomKeyboard, isCustom);
               hashMap.put(KMManager.KMKey_Font, kbFont);
               keyboardsInfo.put(kbKey, hashMap);
 
