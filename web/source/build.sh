@@ -227,6 +227,7 @@ set_default_vars ( ) {
     BUILD_DEBUG_EMBED=false
     BUILD_COREWEB=true
     DO_MINIFY=true
+    FETCH_DEPS=true
 }
 
 if [[ $# = 0 ]]; then
@@ -256,6 +257,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_UI=false
             BUILD_EMBED=false
             BUILD_FULLWEB=false
+            FETCH_DEPS=false
             ;;
         -embed)
             set_default_vars
@@ -296,8 +298,13 @@ readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
 readonly DO_MINIFY
 
-# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-verify_npm_setup
+if [ $FETCH_DEPS = true ]; then
+    # Ensure the dependencies are downloaded.
+    verify_npm_setup
+
+    echo "Copying testing resource ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
+fi
 
 if [ $DO_MINIFY = true ]; then
     # NPM install is required for the file to be present.
@@ -307,33 +314,27 @@ if [ $DO_MINIFY = true ]; then
         exit 1
     fi
 
-    # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
-    echo "Compiling build tools for minified build products"
-    $compiler --build "source/$minified_sourcemap_cleaner/tsconfig.json"
-    assert "$minified_sourcemap_cleaner/index.js"
-fi
-
-if [ $BUILD_LMLAYER = true ]; then
-    # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
-    cd ../../common/predictive-text/
-    echo ""
-    echo "Compiling the Language Modeling layer module..."
-    ./build.sh || fail "Failed to compile the language modeling layer module."
-    cd ../../web/source
-    echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
-    echo "Language Modeling layer compilation successful."
-    echo ""
+    if [ $FETCH_DEPS = true ]; then
+        # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
+        echo "Compiling build tools for minified build products"
+        $compiler --build "source/$minified_sourcemap_cleaner/tsconfig.json"
+        assert "$minified_sourcemap_cleaner/index.js"
+    fi
 fi
 
 if [ $BUILD_CORE = true ]; then
-    # Ensure that the KeyboardProcessor module compiles properly.
-    cd ../../common/core/web/keyboard-processor/src
+    CORE_FLAGS="-skip-package-install"
+    if [ $BUILD_LMLAYER = false ]; then
+        CORE_FLAGS="$CORE_FLAGS -test"
+    fi
+
+    # Ensure that the Input Processor module compiles properly.
+    cd ../../common/core/web/input-processor/src
     echo ""
-    echo "Compiling KMW's Keyboard Processor module..."
-    ./build.sh || fail "Failed to compile the core/web/keyboard-processor module."
+    echo "${TERM_HEADING}Compiling local KeymanWeb dependencies...${NORMAL}"
+    ./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
     cd $WORKING_DIRECTORY
-    echo "Keyboard Processor module compilation successful."
+    echo "${TERM_HEADING}Local KeymanWeb dependency compilations completed successfully.${NORMAL}"
     echo ""
 fi
 

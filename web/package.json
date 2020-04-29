@@ -47,6 +47,7 @@
     "modernizr": "modernizr"
   },
   "dependencies": {
+    "@keymanapp/input-processor": "^14.0.0",
     "@keymanapp/keyboard-processor": "^14.0.0",
     "@keymanapp/lexical-model-layer": "^14.0.0",
     "@keymanapp/lexical-model-types": "^0.0.0",
