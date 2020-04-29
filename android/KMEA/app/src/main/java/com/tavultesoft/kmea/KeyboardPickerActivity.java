@@ -578,24 +578,49 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       return storageDataset;
     }
 
-    List<? extends Map<String, String>> kbdMapList = getKeyboardsList(context);
+    List<HashMap<String, String>> kbdMapList = getKeyboardsList(context);
     if (kbdMapList == null) {
       kbdMapList = new ArrayList<>(0);
     }
     List<Keyboard> kbdsList = new ArrayList<>(kbdMapList.size());
 
-    for(Map<String, String> map: kbdMapList) {
-      kbdsList.add(new Keyboard(map));
+    for(HashMap<String, String> kbdMap: kbdMapList) {
+      boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
+        kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
+
+      Keyboard k = new Keyboard(
+        kbdMap.get(KMManager.KMKey_PackageID),
+        kbdMap.get(KMManager.KMKey_KeyboardID),
+        kbdMap.get(KMManager.KMKey_KeyboardName),
+        kbdMap.get(KMManager.KMKey_LanguageID),
+        kbdMap.get(KMManager.KMKey_LanguageName),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
+        isNewKeyboard,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
+      );
+      kbdsList.add(k);
     }
 
-    List<? extends Map<String, String>> lexMapList = getLexicalModelsList(context);
+    List<HashMap<String, String>> lexMapList = getLexicalModelsList(context);
     if(lexMapList == null) {
       lexMapList = new ArrayList<>(0);
     }
     List<LexicalModel> lexList = new ArrayList<>(lexMapList.size());
 
-    for(Map<String, String> map: lexMapList) {
-      lexList.add(new LexicalModel(map));
+    for(HashMap<String, String> lmMap: lexMapList) {
+      LexicalModel m = new LexicalModel(
+        lmMap.get(KMManager.KMKey_PackageID),
+        lmMap.get(KMManager.KMKey_LexicalModelID),
+        lmMap.get(KMManager.KMKey_LexicalModelName),
+        lmMap.get(KMManager.KMKey_LanguageID),
+        lmMap.get(KMManager.KMKey_LanguageName),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
+        "" // TODO: add model URL
+      );
+      lexList.add(m);
     }
 
     storageDataset = new Dataset(context);
@@ -612,10 +637,25 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     storage.keyboards.setNotifyOnChange(false);
     storage.keyboards.clear();
 
-    List<? extends Map<String, String>> mapList = getKeyboardsList(context);
+    List<HashMap<String, String>> mapList = getKeyboardsList(context);
     List<Keyboard> kbdList = new ArrayList<>(mapList.size());
-    for(Map<String, String> map: mapList) {
-      kbdList.add(new Keyboard(map));
+    for(HashMap<String, String> kbdMap: mapList) {
+      boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
+        kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
+
+      Keyboard k = new Keyboard(
+        kbdMap.get(KMManager.KMKey_PackageID),
+        kbdMap.get(KMManager.KMKey_KeyboardID),
+        kbdMap.get(KMManager.KMKey_KeyboardName),
+        kbdMap.get(KMManager.KMKey_LanguageID),
+        kbdMap.get(KMManager.KMKey_LanguageName),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
+        isNewKeyboard,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
+      );
+      kbdList.add(k);
     }
     storage.keyboards.addAll(kbdList);
     storage.keyboards.notifyDataSetChanged();
@@ -626,13 +666,22 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     storage.lexicalModels.setNotifyOnChange(false);
     storage.lexicalModels.clear();
 
-    List<? extends Map<String, String>> mapList = getLexicalModelsList(context);
+    List<HashMap<String, String>> mapList = getLexicalModelsList(context);
     List<LexicalModel> lexList = new ArrayList<>(mapList.size());
-    for(Map<String, String> map: mapList) {
-      lexList.add(new LexicalModel(map));
+    for(HashMap<String, String> lmMap: mapList) {
+      LexicalModel m = new LexicalModel(
+        lmMap.get(KMManager.KMKey_PackageID),
+        lmMap.get(KMManager.KMKey_LexicalModelID),
+        lmMap.get(KMManager.KMKey_LexicalModelName),
+        lmMap.get(KMManager.KMKey_LanguageID),
+        lmMap.get(KMManager.KMKey_LanguageName),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
+        "" // model URL
+      );
+      lexList.add(m);
     }
     storage.lexicalModels.addAll(lexList);
-
     storage.lexicalModels.notifyDataSetChanged();
   }
 
@@ -830,19 +879,9 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return null;
   }
 
+  // This is deprecated in Keyman 14.0
   protected static void showLanguageList(Context context) {
-    if (KMManager.hasConnection(context) || CloudDataJsonUtil.getKeyboardCacheFile(context).exists()) {
-      Intent i = new Intent(context, LanguageListActivity.class);
-      i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-      context.startActivity(i);
-    } else {
-      AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-      dialogBuilder.setTitle(context.getString(R.string.title_add_keyboard));
-      dialogBuilder.setMessage(String.format("\n%s\n", context.getString(R.string.cannot_connect)));
-      dialogBuilder.setPositiveButton(context.getString(R.string.label_ok), null);
-      AlertDialog dialog = dialogBuilder.create();
-      dialog.show();
-    }
+    return;
   }
 
   public static void handleDownloadedKeyboard(Context context, HashMap<String, String> keyboardInfo) {

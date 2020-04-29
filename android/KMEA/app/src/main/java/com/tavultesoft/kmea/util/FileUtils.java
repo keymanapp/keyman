@@ -230,25 +230,6 @@ public final class FileUtils {
   }
 
   /**
-   * Utility to parse a URL and determine if it's a custom keyboard
-   * @param u String of the URL
-   * @return boolean false if URL matches [*.]keyman.com/
-   */
-  public static boolean isCustomKeyboard(String u) {
-    boolean ret = true;
-    if (u == null) {
-      return ret;
-    }
-    String lowerU = u.toLowerCase();
-    Pattern pattern = Pattern.compile("^http(s)?://(.+\\.)?keyman.com/.*");
-    Matcher matcher = pattern.matcher(lowerU);
-    if (matcher.matches()) {
-      ret = false;
-    }
-    return ret;
-  }
-
-  /**
    * Utility to parse a URL and determine if it's a valid keyman:<method>
    * Currently, only "keyman" scheme with "download" path and query is supported.
    * Legacy keyman:// protocol is deprecated and not supported.

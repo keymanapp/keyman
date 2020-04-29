@@ -116,12 +116,11 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
           i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
           i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           context.startActivity(i);
+        /*
         } else if (KeyboardPickerActivity.hasKeyboardFromPackage()) {
           // Scenario 2: Local kmp.json files in packages/
-          dismissOnSelect = false;
-          Intent i = new Intent(context, LanguageListActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-          context.startActivity(i);
+          // TODO: Cleanly re-implement this based on the languages available in each package
+        */
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));

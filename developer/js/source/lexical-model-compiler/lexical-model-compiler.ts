@@ -8,7 +8,7 @@
 import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
-import { createTrieDataStructure } from "./build-trie";
+import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
 
 export default class LexicalModelCompiler {
 
@@ -26,30 +26,6 @@ export default class LexicalModelCompiler {
     const filePrefix: string = `(function() {\n'use strict';\n`;
     const fileSuffix: string = `})();`;
     let func = filePrefix;
-
-    // Figure out what word breaker the model is using, if any.
-    let wordBreakerSpec = getWordBreakerSpec();
-    let wordBreakerSourceCode: string = null;
-    if (wordBreakerSpec) {
-      if (typeof wordBreakerSpec === "string") {
-        // It must be a builtin word breaker, so just instantiate it.
-        wordBreakerSourceCode = `wordBreakers['${wordBreakerSpec}']`;
-      } else if (typeof wordBreakerSpec === "function") {
-        // The word breaker was passed as a literal function; use its source code.
-        wordBreakerSourceCode = wordBreakerSpec.toString()
-        // Note: the .toString() might just be the property name, but we want a
-        // plain function:
-          .replace(/^wordBreak(ing|er)\b/, 'function');
-      }
-    }
-
-    function getWordBreakerSpec() {
-      if (modelSource.wordBreaker) {
-        return modelSource.wordBreaker;
-      } else {
-        return null;
-      }
-    }
 
     //
     // Emit the model as code and data
@@ -71,15 +47,18 @@ export default class LexicalModelCompiler {
         // file, rather than the current working directory.
         let filenames = modelSource.sources.map(filename => path.join(sourcePath, filename));
 
+        // Use the default search term to key function, if left unspecified.
+        let searchTermToKey = modelSource.searchTermToKey || defaultSearchTermToKey;
+
         func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(filenames, modelSource.searchTermToKey)
+          createTrieDataStructure(filenames, searchTermToKey)
         }, {\n`;
-        if (wordBreakerSourceCode) {
-          func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
-        }
-        if (modelSource.searchTermToKey) {
-          func += `  searchTermToKey: ${modelSource.searchTermToKey.toString()},\n`;
-        }
+
+        let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
+        func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
+
+        func += `  searchTermToKey: ${searchTermToKey.toString()},\n`;
+
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;
         }
@@ -88,10 +67,6 @@ export default class LexicalModelCompiler {
       default:
         throw new ModelSourceError(`Unknown model format: ${modelSource.format}`);
     }
-
-    //
-    // TODO: Load custom wordbreak source files
-    //
 
     func += fileSuffix;
 
@@ -111,4 +86,42 @@ export default class LexicalModelCompiler {
 };
 
 export class ModelSourceError extends Error {
+}
+
+/**
+ * Returns a JavaScript expression (as a string) that can serve as a word
+ * breaking function.
+ */
+function compileWordBreaker(spec: WordBreakerSpec): string {
+  if (typeof spec.use === "string") {
+    // It must be a builtin word breaker, so just instantiate it.
+    return `wordBreakers['${spec.use}']`;
+  } else {
+    return spec.use.toString()
+      // Note: the .toString() might just be the property name, but we want a
+      // plain function:
+      .replace(/^wordBreak(ing|er)\b/, 'function');
+  }
+}
+
+/**
+ * Given a word breaker specification in any of the messy ways,
+ * normalizes it to a common form that the compiler can deal with.
+ */
+function normalizeWordBreakerSpec(wordBreakerSpec: LexicalModelSource["wordBreaker"]): WordBreakerSpec {
+  if (wordBreakerSpec == undefined) {
+    // Use the default word breaker when it's unspecified
+    return { use: 'default' };
+  } else if (isSimpleWordBreaker(wordBreakerSpec)) {
+    // The word breaker was passed as a literal function; use its source code.
+    return { use: wordBreakerSpec };
+  } else if (wordBreakerSpec.use) {
+    return wordBreakerSpec;
+  } else {
+    throw new Error(`Unknown word breaker: ${wordBreakerSpec}`);
+  }
+}
+
+function isSimpleWordBreaker(spec: WordBreakerSpec | SimpleWordBreakerSpec): spec is SimpleWordBreakerSpec  {
+  return typeof spec === "function" || spec === "default" || spec === "ascii";
 }

@@ -158,6 +158,7 @@ public final class KMManager {
   public static final String KMKey_KeyboardCount = "kbCount";
   public static final String KMKey_HelpLink = "helpLink";
   public static final String KMKey_Icon = "icon";
+  public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_KeyboardID = "kbId";
   public static final String KMKey_KeyboardName = "kbName";
   public static final String KMKey_KeyboardVersion = "version";
@@ -173,6 +174,7 @@ public final class KMManager {
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
+  public static final String KMKey_LexicalModel = "lm";
   public static final String KMKey_LexicalModelID = "lmId";
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
@@ -329,21 +331,24 @@ public final class KMManager {
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
+   * @param keyboard KeyboardType
    * @return RelativeLayout.LayoutParams
    */
-  private static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+  private static RelativeLayout.LayoutParams getKeyboardLayoutParams(KeyboardType keyboard) {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
-    params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+    }
    return params;
   }
 
   private static void initInAppKeyboard(Context appContext) {
     if (InAppKeyboard == null) {
       InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.setVerticalScrollBarEnabled(false);
       InAppKeyboard.setHorizontalScrollBarEnabled(false);
@@ -356,7 +361,7 @@ public final class KMManager {
   private static void initSystemKeyboard(Context appContext) {
     if (SystemKeyboard == null) {
       SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.setVerticalScrollBarEnabled(false);
       SystemKeyboard.setHorizontalScrollBarEnabled(false);
@@ -438,12 +443,12 @@ public final class KMManager {
   public static void onConfigurationChanged(Configuration newConfig) {
     // KMKeyboard
     if (InAppKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
@@ -739,14 +744,6 @@ public final class KMManager {
           shouldUpdateList = true;
         }
 
-        String isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard);
-        if (isCustom == null || isCustom.equals("U")) {
-          String kbKey = String.format("%s_%s", langID, kbID);
-          kbInfo.put(KMManager.KMKey_CustomKeyboard, isCustomKeyboard(context, kbKey));
-          kbList.set(i, kbInfo);
-          shouldUpdateList = true;
-        }
-
         if (kbID.equals(KMManager.KMDefault_KeyboardID) && langID.equals(KMManager.KMDefault_LanguageID)) {
           int defKbIndex = KMManager.getKeyboardIndex(context, KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID);
           if (defKbIndex == 0 && i > 0)
@@ -780,21 +777,6 @@ public final class KMManager {
         }
       }
     }
-  }
-
-  private static String isCustomKeyboard(Context context, String keyboardKey) {
-    String isCustom = "U";
-    HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListActivity.getKeyboardsInfo(context);
-    if (keyboardsInfo != null) {
-      HashMap<String, String> kbInfo = keyboardsInfo.get(keyboardKey);
-      if (kbInfo != null) {
-        isCustom = "N";
-      } else {
-        isCustom = "Y";
-      }
-    }
-
-    return isCustom;
   }
 
   /**
@@ -881,12 +863,14 @@ public final class KMManager {
       prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(languageID), true);
     boolean mayCorrect = prefs.getBoolean(LanguageSettingsActivity.getLanguageCorrectionPreferenceKey(languageID), true);
 
-    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+    RelativeLayout.LayoutParams params;
     if (InAppKeyboard != null && InAppKeyboardLoaded && !InAppKeyboardShouldIgnoreTextChange) {
+      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
       InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (SystemKeyboard != null && SystemKeyboardLoaded && !SystemKeyboardShouldIgnoreTextChange) {
+      params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.loadJavascript(String.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
@@ -1040,9 +1024,9 @@ public final class KMManager {
         currentBanner = KMManager.KM_BANNER_STATE_BLANK;
 
       if(result1)
-        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams());
+        InAppKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP));
       if(result2)
-        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams());
+        SystemKeyboard.setLayoutParams(getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM));
     }
 
     registerAssociatedLexicalModel(languageID);
@@ -1176,7 +1160,7 @@ public final class KMManager {
     } else {
       kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
 
-      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListActivity.getKeyboardsInfo(context);
+      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
       if (keyboardsInfo != null) {
         // Check version
         String kbKey = String.format("%s_%s", languageID, keyboardID);
@@ -1369,8 +1353,9 @@ public final class KMManager {
     KeyboardPickerActivity.listFont = typeface;
   }
 
+  // This API is deprecated in Keyman 14.0
   public static void showLanguageList(Context context) {
-    KeyboardPickerActivity.showLanguageList(context);
+    return;
   }
 
   public static void setNumericLayer(KeyboardType kbType) {
@@ -1753,9 +1738,15 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ?
+        boolean isModelActive = change.equals("active");
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean modelPredictionPref = false;
+        if(currentLexicalModel != null) {
+          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+        }
+        currentBanner = (isModelActive && modelPredictionPref) ?
           KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_INAPP);
         InAppKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace
@@ -1771,7 +1762,6 @@ public final class KMManager {
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
         double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
         String suggestionJSON = urlCommand.getQueryParameter("suggestion");
-        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
 
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
@@ -1783,7 +1773,7 @@ public final class KMManager {
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
+          Log.v("KMEA", "Is a <keep> suggestion: "); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());
@@ -1989,8 +1979,15 @@ public final class KMManager {
       } else if (url.indexOf("refreshBannerHeight") >= 0) {
         int start = url.indexOf("change=") + 7;
         String change = url.substring(start);
-        currentBanner = (change.equals("loaded")) ? KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
-        RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+        boolean isModelActive = change.equals("active");
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        boolean modelPredictionPref = false;
+        if(currentLexicalModel != null) {
+          modelPredictionPref = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+        }
+        currentBanner = (isModelActive && modelPredictionPref) ?
+          KM_BANNER_STATE_SUGGESTION : KM_BANNER_STATE_BLANK;
+        RelativeLayout.LayoutParams params = getKeyboardLayoutParams(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         SystemKeyboard.setLayoutParams(params);
       } else if (url.indexOf("suggestPopup") >= 0) {
         // URL has actual path to the keyboard.html file as a prefix!  We need to replace
@@ -2006,7 +2003,6 @@ public final class KMManager {
         double width = Float.parseFloat(urlCommand.getQueryParameter("w"));
         double height = Float.parseFloat(urlCommand.getQueryParameter("h"));
         String suggestionJSON = urlCommand.getQueryParameter("suggestion");
-        boolean isCustom = Boolean.parseBoolean(urlCommand.getQueryParameter("custom"));
 
         JSONParser parser = new JSONParser();
         JSONObject obj = parser.getJSONObjectFromURIString(suggestionJSON);
@@ -2018,7 +2014,7 @@ public final class KMManager {
         try {
           Log.v("KMEA", "Suggestion display: " + obj.getString("displayAs"));
           Log.v("KMEA", "Suggestion's banner coords: " + x + ", " + y + ", " + width + ", " + height);
-          Log.v("KMEA", "Is a <keep> suggestion: " + isCustom); // likely outdated now that tags exist.
+          Log.v("KMEA", "Is a <keep> suggestion: "); // likely outdated now that tags exist.
         } catch (JSONException e) {
           //e.printStackTrace();
           Log.v("KMEA", "JSON parsing error: " + e.getMessage());

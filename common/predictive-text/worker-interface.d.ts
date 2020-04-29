@@ -18,8 +18,7 @@ interface PostMessageOptions {
 /** This Web Workers API interface represents a background task that can be easily created and can send messages back to its creator. Creating a worker is as simple as calling the Worker() constructor and specifying a script to be run in the worker thread. */
 interface Worker {
   onmessage: ((this: Worker, ev: MessageEvent) => any) | null;
-  postMessage(message: any, transfer: any[]): void;
-  postMessage(message: any, options?: PostMessageOptions): void;
+  postMessage(message: any): void;
   terminate(): void;
   
   // addEventListener and removeEventListener also exist, but we don't utilize them.

@@ -73,7 +73,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
-    getStartedPreference.setTitle(getString(R.string.show_get_started));
+    getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
+
     getStartedPreference.setDefaultValue(true);
 
     // Blocks the default checkmark interaction; we want to control the checkmark's state separately
