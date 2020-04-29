@@ -14,10 +14,10 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 cd "$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
-    echo "build.sh [-no-lerna | -test"
+    echo "build.sh [-skip-package-install | -S] [-test]"
     echo
-    echo "  -no-lerna         skips the `lerna bootstrap` dependency check."
-    echo "                    Intended for use when this script is called by another build script."
+    echo "  -skip-package-install  (or -S) skips the `lerna bootstrap` dependency check."
+    echo "                         Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
     exit 1
@@ -34,7 +34,8 @@ set_default_vars
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -no-lerna)
+        -skip-package-install)
+        -S)
             set_default_vars
             FETCH_DEPS=false
             ;;

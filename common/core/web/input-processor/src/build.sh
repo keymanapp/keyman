@@ -14,11 +14,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 cd "$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
-    echo "build.sh [-no-lerna | -test"
+    echo "build.sh [-skip-package-install | -S] [-test]"
     echo
-    echo "  -test             to compile for testing without re-fetching external dependencies"
-    echo "                    or recompiling the lm-layer module."
-    echo "  -no-lerna         skips the `lerna bootstrap` dependency check."
+    echo "  -test                  to compile for testing without re-fetching external dependencies"
+    echo "                         or recompiling the lm-layer module."
+    echo "  -skip-package-install  (or -S) skips the `lerna bootstrap` dependency check."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
     exit 1
@@ -42,7 +42,8 @@ while [[ $# -gt 0 ]] ; do
             BUILD_LMLAYER=false
             FETCH_DEPS=false
             ;;
-        -no-lerna)
+        -skip-package-install)
+        -S)
             set_default_vars
             FETCH_DEPS=false
             ;;
@@ -58,7 +59,7 @@ if [ $FETCH_DEPS = true ]; then
 fi
 
 if [ $BUILD_LMLAYER = true ]; then
-    FLAGS="-no-lerna"
+    FLAGS="-skip-package-install"
 
     # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
     cd ../../../../predictive-text/
@@ -72,7 +73,7 @@ if [ $BUILD_LMLAYER = true ]; then
 fi
 
 if [ $BUILD_CORE = true ]; then
-    FLAGS="-no-lerna"
+    FLAGS="-skip-package-install"
 
     # Ensure that the KeyboardProcessor module compiles properly.
     cd ../../keyboard-processor/src

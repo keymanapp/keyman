@@ -13,6 +13,6 @@ dist/
 node_modules/
 unit_tests/modernizr.js
 source/environment.inc.ts
-**/.idea/**/*.xml
-**/*.iml
-**/*.kpj.user
+.idea/**/*.xml
+*.iml
+*.kpj.user

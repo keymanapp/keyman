@@ -323,7 +323,7 @@ if [ $DO_MINIFY = true ]; then
 fi
 
 if [ $BUILD_CORE = true ]; then
-    CORE_FLAGS="-no-lerna"
+    CORE_FLAGS="-skip-package-install"
     if [ $BUILD_LMLAYER = false ]; then
         CORE_FLAGS="$CORE_FLAGS -test"
     fi

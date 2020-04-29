@@ -107,14 +107,14 @@ clean ( ) {
 }
 
 display_usage ( ) {
-  echo "Usage: $0 [-clean] [-no-lerna] [-test | -tdd]"
+  echo "Usage: $0 [-clean] [-skip-package-install | -S] [-test | -tdd]"
   echo "       $0 -help"
   echo
-  echo "  -clean              to erase pre-existing build products before a re-build"
-  echo "  -help               displays this screen and exits"
-  echo "  -no-lerna           skips dependency updates"
-  echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
-  echo "  -test               runs unit and integration tests after building"
+  echo "  -clean                 to erase pre-existing build products before a re-build"
+  echo "  -help                  displays this screen and exits"
+  echo "  -skip-package-install  (or -S) skips dependency updates"
+  echo "  -tdd                   skips dependency updates, builds, then runs unit tests only"
+  echo "  -test                  runs unit and integration tests after building"
 }
 
 # Creates embedded_worker.js. Must be run after the worker is built for the
@@ -172,7 +172,8 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit
       ;;
-    -no-lerna)
+    -skip-package-install)
+    -S)
       fetch_deps=false
       ;;
     -test)
