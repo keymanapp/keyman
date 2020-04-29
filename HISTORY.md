@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.60 alpha 2020-04-29
+
+* feat(common): initial use of lerna (in-repo package links only) (#2997)
+* change(web/engine): spins core/web/keyboard-processor package off from KeymanWeb (#3001)
+* change(web/engine): spins core/web/input-processor package off from KeymanWeb (#3008)
+* chore(common/lmlayer): change author from personal to work affiliation (#3046)
+
 ## 14.0.59 alpha 2020-04-29
 
 * chore: merge stable history (#3037)
