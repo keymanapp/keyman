@@ -7,7 +7,7 @@
 // Defines the web-page interface object.
 /// <reference path="singleton.ts" />
 // Defines the core text processor.
-/// <reference path="text/inputProcessor.ts" />
+/// <reference path="../node_modules/@keymanapp/input-processor/src/text/inputProcessor.ts" />
 // Extends KeyboardInterface with DOM-oriented offerings.
 /// <reference path="text/domKbdInterface.ts" />
 // Defines the web-page interface object.
@@ -22,8 +22,6 @@
 /// <reference path="kmwuimanager.ts" />
 // Defines OSK management code.
 /// <reference path="osk/oskManager.ts" />
-// Defines the language modeling layer (for use in autocorrect and text prediction)
-/// <reference path="includes/lmlayer.ts" />
 // Defines the model manager.
 /// <reference path="text/prediction/modelManager.ts" />
 
@@ -170,7 +168,7 @@ namespace com.keyman {
       this.osk.shutdown();
       this.util.shutdown();
       this.keyboardManager.shutdown();
-      this.modelManager.shutdown();
+      this.core.languageProcessor.shutdown();
 
       if(this.ui && this.ui.shutdown) {
         this.ui.shutdown();
@@ -670,5 +668,8 @@ if(!window['keyman'] || !window['keyman']['loaded']) {
      * As this is the base object, not creating it prevents a KMW system reset.
      */
     window['keyman'] = com.keyman['singleton'] = com.keyman.singleton = new KeymanBase();
+
+    // TODO:  Eliminate the need for this.  Will require more refactoring & redesign to drop.
+    window['keyman'].core.languageProcessor.init();
   })();
 }

@@ -1,7 +1,5 @@
 // Includes version-related functionality
-///<reference path="utils/version.ts"/>
 ///<reference path="utils/styleConstants.ts" />
-///<reference path="text/engineDeviceSpec.ts" />
 
 // The Device object definition -------------------------------------------------
 

@@ -9,6 +9,21 @@ interface LexicalModelDeclaration {
   //... metadata ...
 }
 
+/**
+ * Keyman 14.0+ word breaker specification:
+ *
+ * Can support all old word breaking specification,
+ * but can also be extended with options.
+ */
+interface WordBreakerSpec {
+  readonly use: SimpleWordBreakerSpec;
+}
+
+/**
+ * Keyman 11.0+ word breaker specification:
+ */
+type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
+
 interface LexicalModelSource extends LexicalModelDeclaration {
   readonly sources: Array<string>;
   /**
@@ -25,7 +40,7 @@ interface LexicalModelSource extends LexicalModelDeclaration {
    *  - word breaking function -- provide your own function that breaks words.
    *  - class-based word-breaker - may be supported in the future.
    */
-  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
+  readonly wordBreaker?: WordBreakerSpec | SimpleWordBreakerSpec;
 
   /**
    * How to simplify words, to convert them into simplifired search keys

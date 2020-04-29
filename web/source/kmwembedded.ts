@@ -1,6 +1,4 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-// Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 
@@ -398,7 +396,7 @@ namespace com.keyman.text {
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=core.keyboardProcessor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -522,7 +520,7 @@ namespace com.keyman.text {
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return keyman.core.processKeyEvent(Lkc); // Lack of second argument -> `usingOSK == false`
+      return keyman.core.processKeyEvent(Lkc) != null;
     } catch (err) {
       console.error(err.message, err);
       return false;

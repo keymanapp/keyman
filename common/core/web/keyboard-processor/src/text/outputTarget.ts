@@ -2,8 +2,6 @@
 ///<reference path="../text/kmwstring.ts" />
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
-// Defines relevant LMLayer-related interfaces.
-///<reference path="../includes/lmMsgs.d.ts" />
 // Defines the KeyEvent type.
 ///<reference path="keyEvent.ts" />
 

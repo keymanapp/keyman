@@ -1,5 +1,3 @@
-/// <reference path="kbdInterface.ts" />
-
 /*
  * This file defines DOM-specific keyboard API that is not available in headless mode, extending web-core's
  * base KeyboardInterface offerings.

@@ -1,5 +1,3 @@
-/// <reference path="../keyboards/activeLayout.ts" />
-/// <reference path="../utils/version.ts" />
 /// <reference path="preProcessor.ts" />
 
 namespace com.keyman.osk {
@@ -607,7 +605,7 @@ namespace com.keyman.osk {
         // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
         // even if it's "hollow".
         let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
-        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, device.formFactor);
+        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as text.FormFactor);
       }
       this.layers=layout['layer'];
 
@@ -889,7 +887,7 @@ namespace com.keyman.osk {
 
     getTouchProbabilities(touch: Touch): text.KeyDistribution {
       let keyman = com.keyman.singleton;
-      if(!keyman.modelManager.mayCorrect) {
+      if(!keyman.core.languageProcessor.mayCorrect) {
         return null;
       }
 

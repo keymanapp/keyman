@@ -257,7 +257,7 @@ namespace com.keyman.osk {
       }
       
       // Find the state of the context at the time the prediction-triggering keystroke was applied.
-      let original = keyman.modelManager.getPredictionState(this._suggestion.transformId);
+      let original = keyman.core.languageProcessor.getPredictionState(this._suggestion.transformId);
       if(!original) {
         console.warn("Could not apply the Suggestion!");
         return [null, null];
@@ -280,7 +280,7 @@ namespace com.keyman.osk {
         // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
         // values as needed for use with their IME interfaces.
         let transform = final.buildTransformFrom(target);
-        let wordbreakPromise = keyman.modelManager.wordbreak(target); // Also build the display string for the reversion.
+        let wordbreakPromise = keyman.core.languageProcessor.wordbreak(target); // Also build the display string for the reversion.
         target.apply(transform);
 
         // Signal the necessary text changes to the embedding app, if it exists.
@@ -423,23 +423,23 @@ namespace com.keyman.osk {
       let keyman = com.keyman.singleton;
       let manager = this.manager;
 
-      keyman.modelManager['addEventListener']('invalidatesuggestions', manager.invalidateSuggestions);
-      keyman.modelManager['addEventListener']('suggestionsready', manager.updateSuggestions);
-      keyman.modelManager['addEventListener']('tryaccept', manager.tryAccept);
-      keyman.modelManager['addEventListener']('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.addListener('invalidatesuggestions', manager.invalidateSuggestions);
+      keyman.core.languageProcessor.addListener('suggestionsready', manager.updateSuggestions);
+      keyman.core.languageProcessor.addListener('tryaccept', manager.tryAccept);
+      keyman.core.languageProcessor.addListener('tryrevert', manager.tryRevert);
 
       // Trigger a null-based initial prediction to kick things off.
-      keyman.modelManager.predict();
+      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
     }
 
     deactivate() {
       let keyman = com.keyman.singleton;
       let manager = this.manager;
 
-      keyman.modelManager['removeEventListener']('invalidatesuggestions', manager.invalidateSuggestions);
-      keyman.modelManager['removeEventListener']('suggestionsready', manager.updateSuggestions);
-      keyman.modelManager['removeEventListener']('tryaccept', manager.tryAccept);
-      keyman.modelManager['removeEventListener']('tryrevert', manager.tryRevert);
+      keyman.core.languageProcessor.removeListener('invalidatesuggestions', manager.invalidateSuggestions);
+      keyman.core.languageProcessor.removeListener('suggestionsready', manager.updateSuggestions);
+      keyman.core.languageProcessor.removeListener('tryaccept', manager.tryAccept);
+      keyman.core.languageProcessor.removeListener('tryrevert', manager.tryRevert);
     }
 
     rotateSuggestions() {
@@ -607,7 +607,7 @@ namespace com.keyman.osk {
       // Request a 'new' prediction based on current context with a nil Transform.
       let keyman = com.keyman.singleton;
       this.swallowPrediction = true;
-      keyman.modelManager.predict();
+      keyman.core.languageProcessor.predictFromTarget(dom.Utils.getOutputTarget());
     }
 
     private showRevert() {

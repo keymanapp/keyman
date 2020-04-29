@@ -1,25 +1,25 @@
 {
-  "name": "keyman-lmlayer-prototype",
-  "version": "0.0.0",
+  "name": "@keymanapp/lexical-model-layer",
+  "version": "14.0.0",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
   "scripts": {
     "karma": "karma",
+    "lerna": "cd ../.. && npm run lerna --",
     "mocha": "mocha",
     "test": "bash ./unit_tests/test.sh",
-    "tsc": "tsc",
-    "install": "npm link @keymanapp/lexical-model-types"
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eddieantonio/keyman-lmlayer-prototype.git"
+    "url": "git+https://github.com/keymanapp/keyman.git"
   },
-  "author": "Eddie Antonio Santos <easantos@ualberta.ca> (http://eddieantonio.ca/)",
+  "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eddieantonio/keyman-lmlayer-prototype/issues"
+    "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/eddieantonio/keyman-lmlayer-prototype#readme",
+  "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@types/node": "^10.12.11",
     "chai": "^4.2.0",
@@ -44,6 +44,8 @@
     "typescript": "^3.2.1"
   },
   "dependencies": {
+    "@keymanapp/keyboard-processor": "^14.0.0",
+    "@keymanapp/lexical-model-types": "^0.0.0",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",
     "string.prototype.startswith": "^0.2.0"

@@ -38,6 +38,11 @@ namespace com.keyman.text {
      */
     warningLog?: string;
 
+    /**
+     * If predictive text is active, contains a Promise returning predictive Suggestions.
+     */
+    predictionPromise?: Promise<Suggestion[]>;
+
     finalize(processor: KeyboardProcessor) {
       let outputTarget = this.transcription.keystroke.Ltarg;
 

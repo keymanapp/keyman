@@ -39,7 +39,7 @@
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
-      kmw.addEventListener('mm.modelchange', onModelChange);
+      kmw.core.languageProcessor.on('statechange', onStateChange);
 
       notifyHost('pageLoaded');
     }
@@ -95,8 +95,8 @@
       window.jsInterface.beepKeyboard();
     }
 
-    function onModelChange(change) {
-      //window.console.log('onModelChange change: ' + change);
+    function onStateChange(change) {
+      //window.console.log('onStateChange change: ' + change);
 
       // Refresh KMW OSK
       var kmw=window['keyman'];

@@ -34,6 +34,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 
 . "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
+. "$(dirname "$THIS_SCRIPT")/jq.inc.sh"
 
 #
 # Iterate through the platforms 'array' passed in and
@@ -81,10 +82,6 @@ fi
 # different pull requests; and there is no way to know which base is
 # targeted by the PR other than to ask GitHub, anyway.)
 #
-
-# For now, this script runs only on Windows agents. In the future we
-# may need to make this a little more platform-agnostic
-JQ="$(dirname "$THIS_SCRIPT")/jq-win64.exe"
 
 echo ". Get information about pull request #$PRNUM from GitHub"
 prinfo=`curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`

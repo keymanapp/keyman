@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "none",
+    "outFile": "./build/index.js",
+    "inlineSources": true,
+    "sourceMap": true,
+    "target": "es5",
+    "lib": ["es6", "dom"]
+  },
+  "include" : [
+    "./*.ts"
+  ],
+  "exclude" : [
+    "node-defaultWorker.ts",
+    "virtualizedWorker.ts",
+    "index.d.ts",
+    "worker-interface.d.ts",
+    "node_modules",
+    "testing"
+  ]
+}

@@ -1,5 +1,63 @@
 # Keyman Version History
 
+## 14.0.60 alpha 2020-04-29
+
+* feat(common): initial use of lerna (in-repo package links only) (#2997)
+* change(web/engine): spins core/web/keyboard-processor package off from KeymanWeb (#3001)
+* change(web/engine): spins core/web/input-processor package off from KeymanWeb (#3008)
+* chore(common/lmlayer): change author from personal to work affiliation (#3046)
+
+## 14.0.59 alpha 2020-04-29
+
+* chore: merge stable history (#3037)
+* feat(common/lmlayer): create join word breaker decorator (#3021)
+* fix(ios): download fv keyboards (#3040)
+* modify(android): Refactor LanguageResource() and remove "Custom" property (#3033)
+
+## 14.0.58 alpha 2020-04-28
+
+* change(common/lmlayer): improvements to default searchTermToKey (#3024)
+
+## 14.0.57 alpha 2020-04-27
+
+* modify(common): Update to Unicode 13.0 (#3029)
+* modify(android): Refactor Keyboard class to not use Map (#3020)
+
+## 14.0.56 alpha 2020-04-24
+
+* fix(android): Clarify label that shows "Get Started" on startup (#3025)
+* feat(common/lmlayer): allow for verbose word breaker specification (#3023)
+
+## 14.0.55 alpha 2020-04-23
+
+* modify(android): Convert LanguageListActivity to utility (#3018)
+* refactor(web/engine): successful web-core compilation (#2992)
+* change(common/lmlayer): always bundle searchTermToKey() with model (#2971)
+* change(common/lmlayer): remove NFD table (#3014)
+
+## 14.0.54 alpha 2020-04-22
+
+* refactor(common/lmlayer): word breaker compilation (#3016)
+
+## 14.0.53 alpha 2020-04-21
+
+* refactor(common/lmlayer): Abstracted connection between LMLayer and Worker initialization (#2986)
+* refactor(common/lmlayer): starts a formal 'headless' mode (#2987)
+* fix(android): predictive banner display bugfix (#3010)
+* fix(android): Fix system keyboard alignment (#3009)
+
+## 14.0.52 alpha 2020-04-17
+
+* refactor(web/engine): precomputation for OSK key events, headless production thereof (#2969)
+* refactor(web/engine): initial ModelManager split (#2974)
+* refactor(web/engine): lm-layer enablement state management rework (#2975)
+* refactor(web/engine): predictive data routing, LanguageProcessor as EventEmitter (#2976)
+* refactor(web/engine): web-core build prep (#2982)
+
+## 14.0.51 alpha 2020-04-16
+
+* modify(android): Update minimum SDK to 21 (#2993)
+
 ## 14.0.50 alpha 2020-04-15
 
 * fix(android): Handle default font DejaVuSans.ttf (#2981)

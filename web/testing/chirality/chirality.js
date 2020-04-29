@@ -54,7 +54,7 @@ function Keyboard_chirality() {
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
       // The following uses a non-public property potentially subject to change in the future.
-      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | core.keyboardProcessor.getModifierState(layers[i]);
+      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | com.keyman.text.KeyboardProcessor.getModifierState(layers[i]);
       var layer = layers[i];
       
       for(var key=0; key < kls[layer].length; key++) {

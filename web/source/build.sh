@@ -7,7 +7,10 @@
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
+
+WORKING_DIRECTORY=`pwd`
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
@@ -36,15 +39,6 @@ assert ( ) {
         fail "Build failed."
         exit 1
     fi
-}
-
-fail() {
-    FAILURE_MSG="$1"
-    if [[ "$FAILURE_MSG" == "" ]]; then
-        FAILURE_MSG="Unknown failure"
-    fi
-    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
-    exit 1
 }
 
 # Build products for each main target.
@@ -226,12 +220,14 @@ compilecmd="$compiler"
 # Establish default build parameters
 set_default_vars ( ) {
     BUILD_LMLAYER=true
+    BUILD_CORE=true
     BUILD_UI=true
     BUILD_EMBED=true
     BUILD_FULLWEB=true
     BUILD_DEBUG_EMBED=false
     BUILD_COREWEB=true
     DO_MINIFY=true
+    FETCH_DEPS=true
 }
 
 if [[ $# = 0 ]]; then
@@ -252,6 +248,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_EMBED=false
             BUILD_FULLWEB=false
             BUILD_COREWEB=false
+            BUILD_CORE=false
             ;;
         -test)
             set_default_vars
@@ -260,6 +257,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_UI=false
             BUILD_EMBED=false
             BUILD_FULLWEB=false
+            FETCH_DEPS=false
             ;;
         -embed)
             set_default_vars
@@ -300,12 +298,12 @@ readonly BUILD_DEBUG_EMBED
 readonly BUILD_COREWEB
 readonly DO_MINIFY
 
-# Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
+if [ $FETCH_DEPS = true ]; then
+    # Ensure the dependencies are downloaded.
+    verify_npm_setup
 
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+    echo "Copying testing resource ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
+    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
 fi
 
 if [ $DO_MINIFY = true ]; then
@@ -316,22 +314,27 @@ if [ $DO_MINIFY = true ]; then
         exit 1
     fi
 
-    # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
-    echo "Compiling build tools for minified build products"
-    $compiler --build "source/$minified_sourcemap_cleaner/tsconfig.json"
-    assert "$minified_sourcemap_cleaner/index.js"
+    if [ $FETCH_DEPS = true ]; then
+        # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
+        echo "Compiling build tools for minified build products"
+        $compiler --build "source/$minified_sourcemap_cleaner/tsconfig.json"
+        assert "$minified_sourcemap_cleaner/index.js"
+    fi
 fi
 
-if [ $BUILD_LMLAYER = true ]; then
-    # Ensure that the LMLayer compiles properly, readying the build product for comsumption by KMW.
-    cd ../../common/predictive-text/
+if [ $BUILD_CORE = true ]; then
+    CORE_FLAGS="-skip-package-install"
+    if [ $BUILD_LMLAYER = false ]; then
+        CORE_FLAGS="$CORE_FLAGS -test"
+    fi
+
+    # Ensure that the Input Processor module compiles properly.
+    cd ../../common/core/web/input-processor/src
     echo ""
-    echo "Compiling the Language Modeling layer module..."
-    ./build.sh || fail "Failed to compile the language modeling layer module."
-    cd ../../web/source
-    echo "Copying ${PREDICTIVE_TEXT_SOURCE} to ${PREDICTIVE_TEXT_OUTPUT}"
-    cp "${PREDICTIVE_TEXT_SOURCE}" "${PREDICTIVE_TEXT_OUTPUT}" || fail "Failed to copy predictive text model"
-    echo "Language Modeling layer compilation successful."
+    echo "${TERM_HEADING}Compiling local KeymanWeb dependencies...${NORMAL}"
+    ./build.sh $CORE_FLAGS || fail "Failed to compile KeymanWeb dependencies"
+    cd $WORKING_DIRECTORY
+    echo "${TERM_HEADING}Local KeymanWeb dependency compilations completed successfully.${NORMAL}"
     echo ""
 fi
 
@@ -417,6 +420,14 @@ fi
 if [ $BUILD_UI = true ]; then
     echo Compile UI Modules...
     $compilecmd -p $NODE_SOURCE/tsconfig.ui.json
+
+    CURRENT_PATH=`pwd`
+    # Since the batch compiler for the UI modules outputs them within a subdirectory,
+    # we need to copy them up to the base /intermediate/ folder.
+    cd "$INTERMEDIATE/source"
+    cp * ../
+    cd $CURRENT_PATH
+
     assert $INTERMEDIATE/kmwuitoolbar.js
     assert $INTERMEDIATE/kmwuitoggle.js
     assert $INTERMEDIATE/kmwuifloat.js
