@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Build the keyboards referred to in ../keyboards.csv and copy them + metadata 
+# Build the keyboards referred to in ../keyboards.csv and copy them + metadata
 # to the FirstVoices/Keyboards folder
 
 # keyboards.csv has columns Shortname,ID,Name,Region,OldVersion
@@ -13,11 +13,18 @@ set -u
 # set -x: Debugging use, print each statement
 # set -x
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+# . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/jq.inc.sh"
+
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'
-KEYBOARDS_ROOT=../../../../keyboards
+KEYBOARDS_ROOT=$(dirname "$THIS_SCRIPT")/../../../../keyboards
 TARGET=FirstVoices/Keyboards
-
 
 
 function die {
@@ -127,7 +134,7 @@ if [ $DO_DOWNLOAD = true ]; then
     while IFS=, read -r shortname id name region old_keyboard; do
       echo "Downloading $id ($name)"
       # Get latest version
-      URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | jq -r .js`
+      URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | "$JQ" -r .js`
       curl -s "$URL_DOWNLOAD_FILE" > "$SCRIPT_ROOT/$TARGET/files/$id.js"
       curl -s "${URL_DOWNLOAD_FILE%.*}.keyboard_info" > "$SCRIPT_ROOT/$TARGET/files/$id.keyboard_info"
     done
