@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
-  "author": "Eddie Antonio Santos <easantos@ualberta.ca> (http://eddieantonio.ca/)",
+  "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
