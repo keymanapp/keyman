@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.59 alpha 2020-04-29
+
+* chore: merge stable history (#3037)
+* feat(common/lmlayer): create join word breaker decorator (#3021)
+* fix(ios): download fv keyboards (#3040)
+* modify(android): Refactor LanguageResource() and remove "Custom" property (#3033)
+
 ## 14.0.58 alpha 2020-04-28
 
 * change(common/lmlayer): improvements to default searchTermToKey (#3024)
