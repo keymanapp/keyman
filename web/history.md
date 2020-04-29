@@ -1,5 +1,26 @@
 # KeymanWeb Version History
 
+## 2020-04-15 13.0.106 stable
+* Fixes issues with matching input against possible predictions (#2957)
+* Adds support for use of web popup keys in embedded mode (#2970)
+
+## 2020-03-18 13.0.105 stable
+* Fixes issue in OSK layer resizing that affected iOS app (#2841)
+* Fixes issue with text output to content-editable elements and design-mode iframes (#2839)
+
+## 2020-03-13 13.0.104 stable
+* Bug fix: further updates BuildVisualKeyboard (#2823)
+* Bug fix: fixes word lookup for wordlist models for languages in the SMP Unicode planes (#2821)
+* Bug fix: fixes issue with touch-layout popup key modifier interpretation (#2820)
+* Bug fix: fixes issue with bulk-rendering OSK validation dev tool (#2823)
+
+## 2020-03-11 13.0.103 stable
+* Bug fix: updates BuildVisualKeyboard for generating help documentation (#2807)
+* Bug fix: fixes issue with addKeyboards Cloud API call (#2797)
+
+## 2020-03-06 13.0.101 stable
+* Bug fix: support .otf extension for web fonts (#2781)
+
 ## 2020-02-14 13.0.39 beta
 * Bug fix: spurious console warnings generated for desktop-based keyboards used in touch mode (#2647)
 * Change: Updated predictive-text banner styling (#2629)
@@ -45,7 +66,7 @@
 
 ## 2019-11-25 12-0.103 stable
 * Change: Updates to build environment only (#2372)
-        
+
 ## 2019-11-13 12.0.102 stable
 * Bug fix: Fixes issue with mnemonic keyboard handling of backspace and delete keys (#2288)
 * Bug fix: Fix for iOS Safari's "Request Desktop Website" option disabling touch interactivity (#2283)
@@ -169,7 +190,7 @@
 * New Features:
   * Added `setNumericLayer()` for embedded platforms to change OSK to numeric layer. (#1218)
   * Added support for Promises to `init()` and `setActiveKeyboard()`. (#1432)
-  
+
 * Changes:
   * Added OSK bulk rendering script for testing (#1432)
   * Code refactors (#1403)
@@ -379,9 +400,9 @@ when the initialization option `attachType` is set to auto and will attach/detac
 * Correct invalid return values in smpstring.js.
 * Remove debug reference from kmwtoggle.js.
 * kmwbase.js: accept file: as protocol for page or resource references.
-* Expose font checking as *isFontAvailable(name)* to allow site developers to check that a custom font has in fact been installed by the user's browser. 
-(This was added partly to make it possible to know if cross-source font loading was being prevented, 
-as by Firefox unless an override option is set. Not currently used, as use during page loading is 
+* Expose font checking as *isFontAvailable(name)* to allow site developers to check that a custom font has in fact been installed by the user's browser.
+(This was added partly to make it possible to know if cross-source font loading was being prevented,
+as by Firefox unless an override option is set. Not currently used, as use during page loading is
 problematic.)
 
 ## 2014-10-20 2.0.365 stable
