@@ -34,8 +34,7 @@ set_default_vars
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -skip-package-install)
-        -S)
+        -skip-package-install|-S)
             set_default_vars
             FETCH_DEPS=false
             ;;

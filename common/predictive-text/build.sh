@@ -150,8 +150,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit
       ;;
-    -skip-package-install)
-    -S)
+    -skip-package-install|-S)
       fetch_deps=false
       ;;
     -test)

@@ -42,8 +42,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_LMLAYER=false
             FETCH_DEPS=false
             ;;
-        -skip-package-install)
-        -S)
+        -skip-package-install|-S)
             set_default_vars
             FETCH_DEPS=false
             ;;
