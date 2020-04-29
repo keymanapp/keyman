@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Build the keyboards referred to in ../keyboards.csv and copy them + metadata 
+# Build the keyboards referred to in ../keyboards.csv and copy them + metadata
 # to the FirstVoices/Keyboards folder
-
-# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
-# the same parent folder as this repo, with the default name 'keyboards'
 
 # keyboards.csv has columns Shortname,ID,Name,Region,OldVersion
 
@@ -16,6 +13,18 @@ set -u
 # set -x: Debugging use, print each statement
 # set -x
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+# . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/jq.inc.sh"
+
+# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
+# the same parent folder as this repo, with the default name 'keyboards'
+KEYBOARDS_ROOT=$(dirname "$THIS_SCRIPT")/../../../../keyboards
+TARGET=FirstVoices/Keyboards
 
 
 function die {
@@ -24,9 +33,10 @@ function die {
 }
 
 function display_usage {
-  echo "Usage: build_keyboards.sh [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"
+  echo "Usage: build_keyboards.sh [-download-keyboards] [-copy-keyboards] [-clean-keyboards] [-debug] [-h|-?]"
   echo "Builds all keyboards used by the app and copies them into the"
   echo "target path."
+  echo "  -download-keyboards: Download keyboards from downloads.keyman.com"
   echo "  -copy-keyboards: Only copy the keyboards; don't rebuild them"
   echo "  -clean-keyboards: Clean the keyboards from this repo"
   echo "  -debug: Build debug versions of the keyboards"
@@ -36,10 +46,16 @@ function display_usage {
 DO_CLEAN=true
 DO_COPY=true
 DO_BUILD=true
+DO_DOWNLOAD=false
 
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
+    -download-keyboards)
+      DO_DOWNLOAD=true
+      DO_COPY=false
+      DO_BUILD=false
+      ;;
     -copy-keyboards)
       DO_BUILD=false
       ;;
@@ -58,10 +74,13 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Clean existing Keyboards folder
+# Can't remove entire folder because Android has other assets/
 
 if [ $DO_CLEAN = true ]; then
   echo "Cleaning target path $KEYBOARDS_TARGET"
-  rm -rf $KEYBOARDS_TARGET/*
+  rm -rf "$KEYBOARDS_TARGET/*.kmp"
+  rm -rf "$KEYBOARDS_TARGET/*.js"
+  rm -rf "$KEYBOARDS_TARGET/*.keyboard_info"
   echo "Removing file $KEYBOARDS_CSV_TARGET"
   rm -f $KEYBOARDS_CSV_TARGET
 fi
@@ -94,13 +113,49 @@ if [ $DO_BUILD = true ] || [ $DO_COPY = true ]; then
         echo "Copying $id ($name) to $KEYBOARDS_TARGET"
         mkdir -p "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id"
         unzip -o release/$shortname/$id/build/$id.kmp $id.js kmp.json -d "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id/" 
-        # cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
+        cp release/$shortname/$id/build/$id.keyboard_info "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
       fi
 #        die "done"
     done
   } < "$SCRIPT_ROOT/../keyboards.csv"
 
   popd
+fi
+
+if [ $DO_DOWNLOAD = true ]; then
+  echo "Downloading keyboards from downloads.keyman.com"
+
+  cp ../keyboards.csv "$KEYBOARDS_CSV_TARGET"
+
+  SCRIPT_ROOT=`pwd`
+  URL_DOWNLOAD=https://downloads.keyman.com
+  URL_API_VERSION=${URL_DOWNLOAD}/api/keyboard/
+
+  case "${OSTYPE}" in
+    "cygwin" | "msys")
+      # Desktop and Android use fv_all.kmp
+      id="fv_all"
+      echo "Downloading $id"
+      URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | "$JQ" -r .kmp`
+      curl -s "$URL_DOWNLOAD_FILE" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.kmp"
+      ;;
+    *)
+      # iOS still copies individual JS keyboard files
+      {
+        # Skip header line
+        read
+
+        # Read CSV and build each referenced keyboard
+        while IFS=, read -r shortname id name region old_keyboard; do
+          echo "Downloading $id ($name)"
+          # Get latest version
+          URL_DOWNLOAD_FILE=`curl -s "$URL_API_VERSION/$id" | "$JQ" -r .js`
+          curl -s "$URL_DOWNLOAD_FILE" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.js"
+          curl -s "${URL_DOWNLOAD_FILE%.*}.keyboard_info" > "$SCRIPT_ROOT/$KEYBOARDS_TARGET/$id.keyboard_info"
+        done
+      } < "$SCRIPT_ROOT/../keyboards.csv"
+      ;;
+  esac  
 fi
 
 echo "Keyboards built successfully."

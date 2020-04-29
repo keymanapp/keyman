@@ -34,6 +34,8 @@ final class FVShared {
 
     private static final String FVKeyboardHelpLink = "http://help.keyman.com/keyboard/";
 
+    private static final String FVDefault_PackageID = "fv_all";
+
     /// Describes a keyboard used in FirstVoices Keyboards
     static class FVKeyboard {
         final String id, name, legacyId;
@@ -235,7 +237,7 @@ final class FVShared {
                 if(loadedKeyboards.contains(keyboard.id)) {
                     // Load the .keyboard_info file and find its first language code
                     HashMap<String, String> kbInfo = new HashMap<>();
-                    kbInfo.put(KMManager.KMKey_PackageID, keyboard.id); //TODO: we want to share keyboard build scripts between ios and android; can we do this?
+                    kbInfo.put(KMManager.KMKey_PackageID, FVDefault_PackageID); //TODO: we want to share keyboard build scripts between ios and android; can we do this?
                     kbInfo.put(KMManager.KMKey_KeyboardID, keyboard.id);
                     kbInfo.put(KMManager.KMKey_LanguageID, "en"); //TODO: use language code from kmp.json
                     kbInfo.put(KMManager.KMKey_KeyboardName, keyboard.name);
@@ -258,6 +260,7 @@ final class FVShared {
             else {
                 // Add a default keyboard in if none are available
                 HashMap<String, String> kbInfo = new HashMap<>();
+                kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
                 kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
                 kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
                 kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
