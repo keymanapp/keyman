@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     context = this;
 
     SentryAndroid.init(context, options -> {
-      options.setRelease("release-"+com.tavultesoft.kmea.BuildConfig.VERSION_NAME);
-      options.setEnvironment(com.tavultesoft.kmea.BuildConfig.VERSION_ENVIRONMENT);
+      options.setRelease("release-"+com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+      options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
     });
 
     checkStoragePermission(null);
