@@ -7,6 +7,7 @@
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its own folder
@@ -36,15 +37,6 @@ assert ( ) {
         fail "Build failed."
         exit 1
     fi
-}
-
-fail() {
-    FAILURE_MSG="$1"
-    if [[ "$FAILURE_MSG" == "" ]]; then
-        FAILURE_MSG="Unknown failure"
-    fi
-    echo "${ERROR_RED}$FAILURE_MSG${NORMAL}"
-    exit 1
 }
 
 # Build products for each main target.
@@ -301,12 +293,7 @@ readonly BUILD_COREWEB
 readonly DO_MINIFY
 
 # Ensure the dependencies are downloaded.  --no-optional should help block fsevents warnings.
-echo "Node.js + dependencies check"
-npm install --no-optional
-
-if [ $? -ne 0 ]; then
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
-fi
+verify_npm_setup
 
 if [ $DO_MINIFY = true ]; then
     # NPM install is required for the file to be present.

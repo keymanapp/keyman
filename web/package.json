@@ -1,6 +1,6 @@
 {
   "name": "keyman",
-  "version": "11.0.0",
+  "version": "14.0.0",
   "description": "Facilitates text input in any language.",
   "repository": {
     "type": "git",
@@ -43,9 +43,11 @@
     "tsc": "tsc",
     "test": "bash ./unit_tests/test.sh",
     "karma": "karma",
+    "lerna": "cd ../ && npm run lerna --",
     "modernizr": "modernizr"
   },
   "dependencies": {
+    "@keymanapp/lexical-model-layer": "^14.0.0",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",

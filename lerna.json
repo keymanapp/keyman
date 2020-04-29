@@ -1,0 +1,8 @@
+{
+  "packages": [
+    "common/predictive-text",
+    "common/lexical-model-types",
+    "web"
+  ],
+  "version": "14.0.0"
+}
