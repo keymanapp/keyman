@@ -12,10 +12,10 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
 display_usage ( ) {
-  echo "test.sh [-no-lerna][ -? | -h | -help]"
+  echo "test.sh [-skip-package-install][ -? | -h | -help]"
   echo "  -CI               to perform continuous-integration friendly tests and reporting"
   echo "  -? | -h | -help   to display this help information"
-  echo "  -no-lerna         to bypass refreshing dependencies.  Useful when called by scripts that pre-fetch"
+  echo "  -skip-package-install         to bypass refreshing dependencies.  Useful when called by scripts that pre-fetch"
   echo ""
   exit 0
 }
@@ -48,7 +48,7 @@ while [[ $# -gt 0 ]] ; do
     -CI)
       CI_REPORTING=1
       ;;
-    -no-lerna)
+    -skip-package-install)
       FETCH_DEPS=false
   esac
   shift # past argument

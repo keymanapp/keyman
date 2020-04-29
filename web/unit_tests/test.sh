@@ -68,7 +68,7 @@ get_browser_set_for_OS
 CONFIG=manual.conf.js  # TODO - get/make OS-specific version
 DEBUG=false
 FLAGS=
-HEADLESS_FLAGS=-no-lerna
+HEADLESS_FLAGS=-skip-package-install
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
