@@ -28,12 +28,16 @@ readonly ENGINE_TEST_OUTPUT
 # (Facilitates automated setup for build agents.)
 PATH="../../node_modules/.bin:$PATH"
 
+pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
+./build.sh -skip-package-install || fail "recorder-core compilation failed."
+popd
+
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
 $compilecmd -p "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
-    fail "KeymanWeb test sequence recorder compilation failed."
+    fail "KeymanWeb test sequence recorder compilation failed; aborting full Recorder compilation."
 fi
 
 PRODUCT="$SCRIPT_DIR/$OUTPUT_DIR/$OUTPUT"

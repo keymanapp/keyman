@@ -1,7 +1,7 @@
-/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
-/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts" />
-/// <reference path="../../node_modules/@keymanapp/keyboard-processor/src/text/keyEvent.ts" />
-/// <reference path="scribe.ts" />
+/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
+/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts" />
+/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/keyEvent.ts" />
+/// <reference path="proctor.ts" />
 
 namespace KMWRecorder {
   //#region Defines the InputEventSpec set, used to reconstruct DOM-based events for browser-based simulation
@@ -208,7 +208,7 @@ namespace KMWRecorder {
 
     abstract hasOSKInteraction(): boolean;
 
-    test(proctor: BrowserProctor): {success: boolean, result: string} {
+    test(proctor: Proctor): {success: boolean, result: string} {
       proctor.before();
 
       let result = proctor.simulateSequence(this);
@@ -518,7 +518,7 @@ namespace KMWRecorder {
 
     addTest(seq: Sequence): void;
     isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean): boolean;
-    test(proctor: BrowserProctor): TestFailure[];
+    test(proctor: Proctor): TestFailure[];
   }
 
   /**
@@ -554,7 +554,7 @@ namespace KMWRecorder {
     }
 
     // Validity should be checked before calling this method.
-    test(proctor: BrowserProctor): TestFailure[] {
+    test(proctor: Proctor): TestFailure[] {
       var failures: TestFailure[] = [];
       let testSet = this.testSet;
 
@@ -604,7 +604,7 @@ namespace KMWRecorder {
     }
 
     // Validity should be checked before calling this method.
-    test(proctor: BrowserProctor): TestFailure[] {
+    test(proctor: Proctor): TestFailure[] {
       var failures: TestFailure[] = [];
       let testSet = this.testSet;
 
@@ -702,14 +702,14 @@ namespace KMWRecorder {
       newSet.addTest(seq);      
     }
 
-    test(proctor: BrowserProctor) { // TODO:  Convert to abstract / interface base `Proctor`.
+    test(proctor: Proctor) { // TODO:  Convert to abstract / interface base `Proctor`.
       var setHasRun = false;
       var failures: TestFailure[] = [];
 
       proctor.beforeAll();
 
       // The original test spec requires a browser environment and thus requires its own `.run` implementation.
-      if(this.specVersion.equals(KeyboardTest.FALLBACK_VERSION) && !(proctor instanceof BrowserProctor)) {
+      if(!(proctor.compatibleWithSuite(this))) {
         throw Error("Cannot perform version " + KeyboardTest.FALLBACK_VERSION + "-based testing outside of browser-based environments.");
       }
 

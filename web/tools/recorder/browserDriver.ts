@@ -1,4 +1,4 @@
-/// <reference path="recorder_InputEvents.ts" />
+/// <reference path="../../node_modules/@keymanapp/recorder-core/src/index.ts" />
 
 namespace KMWRecorder {
   export class BrowserDriver {

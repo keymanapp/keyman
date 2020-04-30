@@ -1,4 +1,7 @@
 /// <reference path="browserDriver.ts" />
+// In theory, we could totally split Scribe off into its own, separate micro-module.
+// Only BrowserDriver.ts and its prerequisites are needed during actual integrated unit testing.
+/// <reference path="scribe.ts" />
 
 namespace KMWRecorder {
   type AssertCallback = (s1: any, s2: any, msg?: string) => void;
@@ -23,25 +26,15 @@ namespace KMWRecorder {
    * 
    * Future notes:  further abstraction needed; much of this code will be in common with Node.
    */
-  export class BrowserProctor {
+  export class BrowserProctor extends Proctor {
     target: HTMLElement;
-    device: com.keyman.text.EngineDeviceSpec;
     usingOSK: boolean;
 
-    _assert: AssertCallback;
-
     constructor(target: HTMLElement, device: com.keyman.text.EngineDeviceSpec, usingOSK: boolean, assert: AssertCallback) {
+      super(device, assert);
+
       this.target = target;
-      this.device = device;
       this.usingOSK = usingOSK;
-
-      this._assert = assert;
-    }
-
-    assertEquals(s1: unknown, s2: unknown, msg?: string) {
-      if(this._assert) {
-        this._assert(s1, s2, msg);
-      }
     }
 
     // Performs browser-specific global test prep.
@@ -52,6 +45,12 @@ namespace KMWRecorder {
 
     before() {
       resetElement(this.target);
+    }
+
+    compatibleWithSuite(testSuite: KeyboardTest): boolean {
+      // So far, the only thing using Recorder code always specifies the necessary data to construct
+      // DOM events for use in integrated testing.
+      return true;
     }
 
     // We only need to filter test cases when performing tests in an integrated

@@ -1,4 +1,4 @@
-/// <reference path="recorder_InputEvents.ts" />
+/// <reference path="../../node_modules/@keymanapp/recorder-core/src/index.ts" />
 /// <reference path="../../node_modules/eventemitter3/index.js" />
 
 //Since TS won't recognize the types b/c no "import"/"require" statements.
