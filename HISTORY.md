@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.61 alpha 2020-04-30
+
+* chore(deps): bump @actions/http-client from 1.0.3 to 1.0.8 in /resources/build/version (#3047)
+* fix(ios): firstvoices icon and version info (#3044)
+* feat(windows): Sentry integration fixes and polish (#3006)
+* feat(common/lmlayer): compile joinWordsAt property (#3032)
+
 ## 14.0.60 alpha 2020-04-29
 
 * feat(common): initial use of lerna (in-repo package links only) (#2997)
