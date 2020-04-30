@@ -1,5 +1,16 @@
-function loadKeyboards() { 
-  var filePrefix = "../../unit_tests/resources/json/keyboards/";
+function loadKeyboards() {
+  var commonPrefix = "/resources";
+
+  if(location.protocol == "file:") {
+    // Note:  won't actually work, as it'll be blocked by CORS / same-origin policy when
+    // KeymanWeb tries to load the stub via the file: protocol.
+    //
+    // Both Firefox and Chrome don't like that it's not data: or http:/https:
+    // and will consider the local files to be "remote resource[s]".
+    commonPrefix = "../../../common/core/web/tests/resources";
+  }
+
+  var filePrefix = commonPrefix + "/json/keyboards/";
 
   // Existing unit_test stubs at the time of writing:
   var preloadFiles = [
@@ -32,7 +43,7 @@ function addKeyboard(n) {
     case 4:
       sKbd=document.getElementById('kbd_stub_add').value;
       var stub = new KMWRecorder.KeyboardStub(JSON.parse(sKbd));
-      stub.setBasePath("../../unit_tests/resources/keyboards", false);
+      stub.setBasePath(commonPrefix + "/keyboards", false);
       keyman.addKeyboards(stub);
 
       // We actually know the exact details for this one easily, so set it as active!

@@ -410,6 +410,8 @@ function loadExistingStubs(files) {
         alert("File " + file + " does not contain a valid KeyboardStub definition.");
       }
       console.error(e);
+      let stubHelpDiv = document.getElementById("stubHelp");
+      stubHelpDiv.style.display="inline-block";
     }
   }
 

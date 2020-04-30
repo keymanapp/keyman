@@ -87,7 +87,7 @@
     <tr>
       <td style="width:100%">
         <h2>Load Existing JSON</h2>
-        Please ensure that the keyboard(s) being loaded are stored within ../../unit_tests/resources/json/keyboards, if applicable.
+        <p>Please ensure that the keyboard(s) being loaded may be referenced at &lt;server-root&gt;/resources/json/keyboards.</p>
         <p>
           Testing File:
           <input type="file" id="existingFile" accept=".json" value="../unit_tests/resources/json/engine_tests/" onchange="loadExistingTest(this.files);" />
@@ -96,6 +96,11 @@
           Keyboard Stubs:
           <input type="file" id="existingStubs" accept=".json" value="../unit_tests/resources/json/keyboards/" onchange="loadExistingStubs(this.files);" multiple/>
         </p>
+        <div id="stubHelp" style="display: none">
+          <h3>Setup help</h3>
+          <p>If using apache2 for local web testing, you may wish to add an Alias entry to the relevant httpd.conf file as follows:</p>
+          <pre><code>Alias "/resources" "&lt;repo-path&gt;/common/core/web/tests/resources"</code></pre>
+        </div>
       </td>
     </tr>
   </table>
