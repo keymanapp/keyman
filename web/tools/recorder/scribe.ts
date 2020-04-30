@@ -221,8 +221,7 @@ namespace KMWRecorder {
         let in_output = com.keyman.dom.Utils.getOutputTarget(recordingElement);
         // If it's not on our recording control, ignore the change and do nothing special.
         if(!in_output || document.activeElement != in_output.getElement()) {
-          _originalSetActiveKeyboard(PInternalName, PLgCode, saveCookie);
-          return;
+          return _originalSetActiveKeyboard(PInternalName, PLgCode, saveCookie);
         }
 
         let testDefinition = recorderScribe.testDefinition;
@@ -231,11 +230,10 @@ namespace KMWRecorder {
 
         if(!testDefinition.isEmpty() && !sameKbd && !recorderScribe.keyboardJustActivated) {
           if(!confirm("Changing the keyboard will clear the current test set.  Are you sure?")) {
-            _originalSetActiveKeyboard("Keyboard_" + testDefinition.keyboard.id, testDefinition.keyboard.languages[0].id);
-            return;
+            return _originalSetActiveKeyboard("Keyboard_" + testDefinition.keyboard.id, testDefinition.keyboard.languages[0].id);
           }
         }
-        _originalSetActiveKeyboard(PInternalName, PLgCode, saveCookie);
+        let promise = _originalSetActiveKeyboard(PInternalName, PLgCode, saveCookie);
 
         // What's the active stub immediately after our _SetActiveKeyboard call?
         var internalStub = keyman.keyboardManager.activeStub;
@@ -251,6 +249,8 @@ namespace KMWRecorder {
           }
         }
         recorderScribe.keyboardJustActivated = false;
+
+        return promise;
       }
 
       var _originalProcessKeyEvent = keyman.core.processKeyEvent.bind(keyman.core);

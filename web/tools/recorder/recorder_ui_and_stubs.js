@@ -213,8 +213,10 @@ function doKeyboardChange(name, languageCode) {
   }
   recorderScribe.keyboardJustActivated = true;
   focusReceiver();
-  keyman.setActiveKeyboard(name, languageCode);
-  activeElement.focus();
+  let promise = keyman.setActiveKeyboard(name, languageCode);
+  return promise.then(function() {
+    activeElement.focus();
+  });
 }
 
 /* Called when user selects an item in the KMW_Keyboard SELECT */
@@ -231,8 +233,9 @@ function loadExistingTest(files) {
   if(files.length > 0) {
     var reader = new FileReader();
     reader.onload = function() {
+      var kbdTest;
       try {
-        var kbdTest = new KMWRecorder.KeyboardTest(reader.result);
+        kbdTest = new KMWRecorder.KeyboardTest(reader.result);
         recorderScribe.testDefinition = kbdTest;
 
         // Make sure we've loaded the keyboard!  Problem - we're not running from the unit_tests folder!
@@ -240,12 +243,23 @@ function loadExistingTest(files) {
         kbdStub.filename = UNIT_TEST_FOLDER_RELATIVE_PATH + "/" + kbdStub.filename;
 
         keyman.addKeyboards(kbdStub);
-
-        doKeyboardChange("Keyboard_" + kbdTest.keyboard.id, kbdTest.keyboard.getFirstLanguage());
       } catch (e) {
         alert("File does not contain a valid KeyboardTest definition.")
         console.error(e);
       }
+
+      let promise = doKeyboardChange("Keyboard_" + kbdTest.keyboard.id, kbdTest.keyboard.getFirstLanguage());
+      promise.then(function() {
+        let convertBtn = document.getElementById('btnConvert');
+        convertBtn.style.display = kbdTest.isLegacy ? 'inline-block' : 'none';
+
+        if(confirm("This test definition uses an older version of the KMW test spec.  Update?  ('OK' to update, 'Cancel' to load in read-only mode.)")) {
+          // TODO:  Do the things!
+          console.warn("Test Set conversion not yet implemented.");
+          
+          // TODO:  On successful conversion, re-hide the convert button.
+        }
+      });
     }
     reader.readAsText(files[0]);
   }
