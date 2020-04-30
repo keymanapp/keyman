@@ -71,7 +71,7 @@
               }
             }
           ],
-          "output": "no foo."
+          "output": "foo."
         }
       ]
     }
