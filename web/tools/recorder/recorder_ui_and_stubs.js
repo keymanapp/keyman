@@ -1,4 +1,5 @@
-var UNIT_TEST_FOLDER_RELATIVE_PATH = "../../unit_tests";
+// Based on establishing an alias on localhost.
+var UNIT_TEST_FOLDER_RELATIVE_PATH = "";
 
 var ta_inputJSON;
 var in_output;
