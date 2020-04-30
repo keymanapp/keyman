@@ -254,13 +254,7 @@ function loadExistingTest(files) {
         convertBtn.style.display = kbdTest.isLegacy ? 'inline-block' : 'none';
 
         if(confirm("This test definition uses an older version of the KMW test spec.  Update?  ('OK' to update, 'Cancel' to load in read-only mode.)")) {
-          convertTestDefinition(kbdTest).then(function(success) {
-            if(success) {
-              alert("Test Definition conversion complete.");
-            } else {
-              alert("Issue(s) detected during attempted conversion; process aborted.");
-            }
-          });
+          convertTestDefinition(kbdTest);
         }
       });
     }
@@ -298,7 +292,12 @@ function convertTestDefinition(sourceSet) {
   }).then(function(success) {
     // Reset KMW's detected-device set to normal.
     keyman.util.initDevices();
-    return success;
+
+    if(success) {
+      alert("Test Definition conversion complete.");
+    } else {
+      alert("Issue(s) detected during attempted conversion; process aborted.");
+    }
   });
 }
 
