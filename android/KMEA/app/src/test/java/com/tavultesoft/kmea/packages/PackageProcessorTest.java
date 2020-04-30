@@ -143,7 +143,6 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
     amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     // If languageID doesn't match, verify only the first language is installed with the keyboard
@@ -167,7 +166,6 @@ public class PackageProcessorTest {
     geez.put(KMManager.KMKey_LanguageID, "gez");
     geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
     geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    geez.put(KMManager.KMKey_CustomKeyboard, "Y");
     geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
     // Verify "gez" matched

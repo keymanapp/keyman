@@ -174,8 +174,6 @@ public class PackageProcessor {
         keyboards[i].put(KMManager.KMKey_OskFont, jsonEntry.getString("oskFont"));
       }
 
-      // For now, all KMP distributed keyboards are custom
-      keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
       if (welcomeExists(packageId)) {
         File kmpFile = new File(packageId + ".kmp");
         File packageDir = constructPath(kmpFile, false);

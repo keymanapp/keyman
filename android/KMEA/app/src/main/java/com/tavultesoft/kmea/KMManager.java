@@ -169,8 +169,6 @@ public final class KMManager {
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-  public static final String KMKey_CustomModel = "CustomModel";
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
@@ -716,7 +714,6 @@ public final class KMManager {
         newKbInfo.put(KMManager.KMKey_KeyboardVersion,
           getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID,
             KMManager.KMDefault_KeyboardID));
-        newKbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
         newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
         kbList.set(0, newKbInfo);
         shouldUpdateList = true;

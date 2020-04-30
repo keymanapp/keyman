@@ -35,7 +35,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
 
   // custom keyboard
-  public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";
   public static final String ARG_LANGUAGE = "KMKeyboardActivity.language";
   public static final String ARG_URL = "KMKeyboardActivity.url";
   public static final String ARG_FILENAME = "KMKeyboardActivity.filename";

@@ -117,7 +117,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
       kbInfo.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
         context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
-      kbInfo.put(KMManager.KMKey_CustomKeyboard, "N");
       kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
       keyboardsList.add(kbInfo);
 

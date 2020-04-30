@@ -72,7 +72,6 @@ public class JSONUtils {
                 kbdObj.put(KMManager.KMKey_Name, kbdName);
                 kbdObj.put("filename", kbdFilename);
                 kbdObj.put(KMManager.KMKey_KeyboardVersion, kbdVersion);
-                kbdObj.put(KMManager.KMKey_CustomKeyboard, "Y");
                 if (kmpKeyboardObj.has(KMManager.KMKey_DisplayFont)) {
                  kbdObj.put(KMManager.KMKey_Font, kmpKeyboardObj.getString(KMManager.KMKey_DisplayFont));
                 }
@@ -237,7 +236,6 @@ public class JSONUtils {
                 modelObj.put(KMManager.KMKey_Name, modelName);
                 modelObj.put("filename", modelFilename);
                 modelObj.put(KMManager.KMKey_LexicalModelVersion, packageVersion);
-                modelObj.put(KMManager.KMKey_CustomModel, "Y");
                 if (containsHelp) {
                   File welcomeFile = new File(pkg, "welcome.htm");
                   modelObj.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
