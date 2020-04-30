@@ -323,6 +323,7 @@ function convertSet(testSet) {
   for(let i = 0; i < testSet.testSet.length; i++) { // Cannot use for(let sequence of ...) b/c not Promise-compatible.
     let sequence = testSet.testSet[i];
     currentPromise = currentPromise.then(function() {
+      keyman.setActiveElement(in_output); // Ensure it's the active element; some of the recorder/conversion process will change this!
       proctor.simulateSequence(sequence);
 
       // Copy over any custom error messages that would be displayed on unit test failure.
@@ -331,11 +332,24 @@ function convertSet(testSet) {
       }
       
       return new Promise(function(resolve) {
-        window.setTimeout(function() {
+        let saveFunc = function() {
           // May need conversion in the future, but is fine for now - the 'Constraint' part of the spec didn't change.
           saveInputRecord(testSet.constraint);  // Directly copy the original constraint.
           resolve();
-        }, sequence.inputs.length+1); // Each input has a 1 sec wait, so we wait 1 sec more than that.
+        };
+
+        let saveCheck = function() {
+          if(recorderScribe.currentSequence.inputs.length == sequence.inputs.length) {
+            saveFunc();
+          } else {
+            // Delay until all inputs have processed properly.
+            window.setTimeout(function() {
+              saveCheck(); // Wait an extra block of time if the results aren't ready yet.
+            }, sequence.inputs.length); // Each input has a 1 ms wait before addInputRecord is called.
+          }
+        }
+
+        saveCheck();
       });
     });
   }
