@@ -226,7 +226,7 @@ namespace KMWRecorder {
 
         let testDefinition = recorderScribe.testDefinition;
         var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == PInternalName)
-          && (testDefinition.keyboard.getFirstLanguage() == PLgCode);
+          && (!testDefinition.keyboard.getFirstLanguage() || (testDefinition.keyboard.getFirstLanguage() == PLgCode));
 
         if(!testDefinition.isEmpty() && !sameKbd && !recorderScribe.keyboardJustActivated) {
           if(!confirm("Changing the keyboard will clear the current test set.  Are you sure?")) {

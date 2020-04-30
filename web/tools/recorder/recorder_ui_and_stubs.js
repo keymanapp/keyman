@@ -254,13 +254,13 @@ function loadExistingTest(files) {
         convertBtn.style.display = kbdTest.isLegacy ? 'inline-block' : 'none';
 
         if(confirm("This test definition uses an older version of the KMW test spec.  Update?  ('OK' to update, 'Cancel' to load in read-only mode.)")) {
-          let success = convertTestDefinition(kbdTest);
-
-          if(success) {
-            alert("Test Definition conversion complete.");
-          } else {
-            alert("Issue(s) detected during attempted conversion; process aborted.");
-          }
+          convertTestDefinition(kbdTest).then(function(success) {
+            if(success) {
+              alert("Test Definition conversion complete.");
+            } else {
+              alert("Issue(s) detected during attempted conversion; process aborted.");
+            }
+          });
         }
       });
     }
@@ -274,26 +274,32 @@ function convertTestDefinition(sourceSet) {
     sourceSet = recorderScribe.testDefinition;
   }
 
-  try {
-    setTestDefinition(new KMWRecorder.KeyboardTest(sourceSet.keyboard));
+  setTestDefinition(new KMWRecorder.KeyboardTest(sourceSet.keyboard));
 
-    // Iterate over the contained TestSets and simulate them, allowing re-recording of the events
-    // with the up-to-date Recorder version.
-    for(testSet of sourceSet.inputTestSets) {
-      convertSet(testSet);
-    }
+  let currentPromise = Promise.resolve();
 
+  // Iterate over the contained TestSets and simulate them, allowing re-recording of the events
+  // with the up-to-date Recorder version.
+  for(let i=0; i < sourceSet.inputTestSets.length; i++) {
+    let testSet = sourceSet.inputTestSets[i];
+    currentPromise = currentPromise.then(function() { return convertSet(testSet); });
+  }
+
+  return currentPromise.then(function() {
+    // success!
     let convertBtn = document.getElementById('btnConvert');
     convertBtn.style.display = 'none';
     return true;
-  } catch (e) {
+  }, function() {
+    // failure.
     // Restore the original test def, as if we hadn't tried to convert it.
     setTestDefinition(sourceSet);
     return false;
-  } finally {
+  }).then(function(success) {
     // Reset KMW's detected-device set to normal.
     keyman.util.initDevices();
-  }
+    return success;
+  });
 }
 
 function convertSet(testSet) {
@@ -312,20 +318,28 @@ function convertSet(testSet) {
   let proctor = new KMWRecorder.BrowserProctor(in_output, simDevice.coreSpec, testSet.constraint.target != 'hardware');
   proctor.beforeAll();
 
-  for(sequence of testSet.testSet) {
-    // WARNING:  does not give time for any 1-second timeouts to do their thing!
-    // TODO:  should probably be Promise-based... which then requires propagation of Promise stuff.
-    //        But this would ensure accuracy for sequences that rely upon browser-default output.
-    proctor.simulateSequence(sequence);
-    
-    // Copy over any custom error messages that would be displayed on unit test failure.
-    if(sequence.msg) {
-      recorderScribe.errorUpdate(sequence.msg);
-    }
+  let currentPromise = Promise.resolve();
+  for(let i = 0; i < testSet.testSet.length; i++) { // Cannot use for(let sequence of ...) b/c not Promise-compatible.
+    let sequence = testSet.testSet[i];
+    currentPromise = currentPromise.then(function() {
+      proctor.simulateSequence(sequence);
 
-    // May need conversion in the future, but is fine for now - the 'Constraint' part of the spec didn't change.
-    saveInputRecord(testSet.constraint);  // Directly copy the original constraint.
+      // Copy over any custom error messages that would be displayed on unit test failure.
+      if(sequence.msg) {
+        recorderScribe.errorUpdate(sequence.msg);
+      }
+      
+      return new Promise(function(resolve) {
+        window.setTimeout(function() {
+          // May need conversion in the future, but is fine for now - the 'Constraint' part of the spec didn't change.
+          saveInputRecord(testSet.constraint);  // Directly copy the original constraint.
+          resolve();
+        }, 1);
+      });
+    });
   }
+
+  return currentPromise;
 }
 
 function deviceFromConstraint(constraint) {
