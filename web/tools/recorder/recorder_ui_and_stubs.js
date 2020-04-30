@@ -253,7 +253,7 @@ function loadExistingTest(files) {
         let convertBtn = document.getElementById('btnConvert');
         convertBtn.style.display = kbdTest.isLegacy ? 'inline-block' : 'none';
 
-        if(confirm("This test definition uses an older version of the KMW test spec.  Update?  ('OK' to update, 'Cancel' to load in read-only mode.)")) {
+        if(kbdTest.isLegacy && confirm("This test definition uses an older version of the KMW test spec.  Update?  ('OK' to update, 'Cancel' to load in read-only mode.)")) {
           convertTestDefinition(kbdTest);
         }
       });
@@ -335,7 +335,7 @@ function convertSet(testSet) {
           // May need conversion in the future, but is fine for now - the 'Constraint' part of the spec didn't change.
           saveInputRecord(testSet.constraint);  // Directly copy the original constraint.
           resolve();
-        }, 1);
+        }, sequence.inputs.length+1); // Each input has a 1 sec wait, so we wait 1 sec more than that.
       });
     });
   }
