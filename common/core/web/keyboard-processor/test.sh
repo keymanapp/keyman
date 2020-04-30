@@ -1,40 +1,31 @@
-#! /bin/bash
+#!/bin/bash
 
 # We should work within the script's directory, not the one we were called in.
 cd $(dirname "$BASH_SOURCE")
 
 # Include useful testing resource functions
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 # A simple utility script to facilitate unit-testing for the LM Layer.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
 
 display_usage ( ) {
   echo "test.sh [-skip-package-install] [-CI] [ -? | -h | -help]"
-  echo "  -CI               to perform continuous-integration friendly tests and reporting"
-  echo "  -? | -h | -help   to display this help information"
-  echo "  -skip-package-install         to bypass refreshing dependencies.  Useful when called by scripts that pre-fetch"
+  echo "  -CI                    to perform continuous-integration friendly tests and reporting formatted for TeamCity"
+  echo "  -? | -h | -help        to display this help information"
+  echo "  -skip-package-install  to bypass refreshing dependencies.  Useful when called by scripts that pre-fetch"
   echo ""
   exit 0
 }
 
-test-headless ( ) {
-  _FLAGS=$FLAGS
-  if (( CI_REPORTING )); then
-    _FLAGS="$_FLAGS --reporter mocha-teamcity-reporter"
-  fi
-
-  npm run mocha -- --recursive $_FLAGS ./tests/cases/*.js
-}
-
 # Defaults
-get_builder_OS  # return:  os_id="linux"|"mac"|"win" 
-
 FLAGS=
 CI_REPORTING=0
-RUN_HEADLESS=1
 FETCH_DEPS=true
 
 # Parse args
@@ -58,8 +49,14 @@ if [ $FETCH_DEPS = true ]; then
   verify_npm_setup
 fi
 
+test-headless ( ) {
+  if (( CI_REPORTING )); then
+    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+  fi
+
+  npm run mocha -- --recursive $_FLAGS ./tests/cases/*.js
+}
+
 # Run headless (browserless) tests.
-if (( RUN_HEADLESS )); then
-  test-headless || fail "Keyboard Processor tests failed!"
-fi
+test-headless || fail "Keyboard Processor tests failed!"
 

@@ -2,11 +2,12 @@
 
 WORKING_DIRECTORY=`pwd`
 
-# Include useful testing resource functions
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../.."
-. "$KEYMAN_ROOT/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
 # A simple utility script to facilitate our different modes for unit-testing KMW.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
@@ -115,7 +116,6 @@ if [ $CONFIG = CI.conf.js ]; then
 fi
 
 BASE_PATH=`dirname $BASH_SOURCE`
-echo "$BASE_PATH"
 cd $BASE_PATH/../source
 
 ./build_dev_resources.sh
@@ -125,10 +125,10 @@ cd $BASE_PATH/../source
 
 # First:  Keyboard Processor tests.
 echo "${TERM_HEADING}Running Keyboard Processor test suite${NORMAL}"
-cd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
+pushd $WORKING_DIRECTORY/node_modules/@keymanapp/keyboard-processor
 ./test.sh $HEADLESS_FLAGS || fail "Tests failed by dependencies; aborting integration tests."
 # Once done, now we run the integrated (KeymanWeb) tests.
-cd $WORKING_DIRECTORY
+popd
 
 echo "${TERM_HEADING}Running KeymanWeb integration test suite${NORMAL}"
 npm --no-color run modernizr -- -c unit_tests/modernizr.config.json -d unit_tests/modernizr.js

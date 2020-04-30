@@ -44,7 +44,7 @@ describe('KeyboardProcessor', function() {
   });
 
   describe('processKeystroke', function() {
-    it('simple output, no context', function() {
+    it('has simple output, no context', function() {
       let kp = new KeyboardProcessor();
 
       // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will

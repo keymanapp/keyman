@@ -688,6 +688,6 @@ namespace com.keyman.text {
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = ns.KeyboardProcessor;
     //@ts-ignore
-    ns.KeyboardProcessor.com = com; // Export the root namespace, while we're at it - just in case.
+    ns.KeyboardProcessor.com = com; // Export the root namespace so that all KeyboardProcessor classes are accessible by unit tests.
   }
 }());
