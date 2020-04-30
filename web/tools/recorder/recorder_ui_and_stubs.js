@@ -262,6 +262,8 @@ function loadExistingTest(files) {
   }
 }
 
+// --------- TEST DEFINITIONS: SPEC VERSION MIGRATION ----------
+
 function convertTestDefinition(sourceSet) {
   if(!sourceSet) {
     // Called via HTML button, so we use the currently-loaded test definition.
@@ -370,6 +372,8 @@ function deviceFromConstraint(constraint) {
 
   return simDevice;
 }
+
+// ----------- END SPEC VERSION MIGRATION -------------
 
 function loadExistingStubs(files) {
   
