@@ -286,9 +286,10 @@ function convertTestDefinition(sourceSet) {
     let convertBtn = document.getElementById('btnConvert');
     convertBtn.style.display = 'none';
     return true;
-  }, function() {
+  }, function(error) {
     // failure.
     // Restore the original test def, as if we hadn't tried to convert it.
+    console.error(error);
     setTestDefinition(sourceSet);
     return false;
   }).then(function(success) {
