@@ -11,7 +11,7 @@ describe('Basic KeymanWeb', function() {
   beforeEach(function(done) {
     this.timeout(kmwconfig.timeouts.scriptLoad);
 
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
     fixture.load("singleInput.html");
     setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });
@@ -39,7 +39,7 @@ Modernizr.on('touchevents', function(result) {
 
       beforeEach(function(done) {
         this.timeout(kmwconfig.timeouts.uiLoad);
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         // Sequentially loads two scripts, so 2x timeout.
@@ -73,7 +73,7 @@ Modernizr.on('touchevents', function(result) {
 
       beforeEach(function(done) {
         this.timeout(kmwconfig.timeouts.uiLoad);
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         // Sequentially loads two scripts, so 2x timeout.
@@ -94,7 +94,7 @@ Modernizr.on('touchevents', function(result) {
 
       beforeEach(function(done) {
         this.timeout(kmwconfig.timeouts.uiLoad);
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         // Sequentially loads two scripts, so 2x timeout.
@@ -128,7 +128,7 @@ Modernizr.on('touchevents', function(result) {
 
       beforeEach(function(done) {
         this.timeout(kmwconfig.timeouts.uiLoad);
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         fixture.load('singleInput.html');
 
         setupKMW('toolbar', done, kmwconfig.timeouts.uiLoad, function() { return keyman.ui.init; });

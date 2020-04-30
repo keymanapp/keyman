@@ -1,5 +1,5 @@
 function loadKeyboards() { 
-  var filePrefix = "../../unit_tests/json/keyboards/";
+  var filePrefix = "../../unit_tests/resources/json/keyboards/";
 
   // Existing unit_test stubs at the time of writing:
   var preloadFiles = [

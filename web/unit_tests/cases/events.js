@@ -5,7 +5,7 @@ describe('Event Management', function() {
 
   before(function(done) {
     this.timeout(kmwconfig.timeouts.scriptLoad * 2);
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
     fixture.load("eventTestConfig.html");
 
     setupKMW(null, function() {

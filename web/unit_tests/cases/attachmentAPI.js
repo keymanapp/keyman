@@ -5,7 +5,7 @@ describe('Attachment API', function() {
 
   before(function(done) {
     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
 
     this.timeout(kmwconfig.timeouts.scriptLoad * 3);
     setupKMW({ attachType:'manual' }, function() {
@@ -191,7 +191,7 @@ Modernizr.on('touchevents', function(result) {
       before(function(done) {
         this.timeout(kmwconfig.timeouts.scriptLoad);
 
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
       
@@ -259,7 +259,7 @@ Modernizr.on('touchevents', function(result) {
       before(function(done) {
         this.timeout(kmwconfig.timeouts.scriptLoad);
 
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
       

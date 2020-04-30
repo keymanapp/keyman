@@ -9,7 +9,7 @@ describe('Engine - Deadkeys', function() {
   this.timeout(kmwconfig.timeouts.scriptLoad);
 
   before(function(done) {
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
     setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
   });
 
