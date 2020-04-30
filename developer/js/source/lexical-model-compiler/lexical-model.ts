@@ -17,6 +17,13 @@ interface LexicalModelDeclaration {
  */
 interface WordBreakerSpec {
   readonly use: SimpleWordBreakerSpec;
+  /**
+   * If present, joins words that were split by the word breaker
+   * together at the given strings. e.g.,
+   *
+   *    joinWordsAt: ['-'] // to keep hyphenated items together
+   */
+  readonly joinWordsAt?: string[];
 }
 
 /**
