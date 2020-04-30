@@ -96,7 +96,7 @@ namespace KMWRecorder {
         if(obj.type == "key") {
           return new RecordedPhysicalKeystroke(obj as RecordedPhysicalKeystroke); 
         } else if(obj && obj.type) {
-          //
+          return new RecordedSyntheticKeystroke(obj as RecordedSyntheticKeystroke);
         }
       } else {
         throw new SyntaxError("Error in JSON format corresponding to a RecordedKeystroke!");
@@ -154,7 +154,7 @@ namespace KMWRecorder {
         this.isVirtualKey = keystroke.isVirtualKey;
         this.vkCode = keystroke.vkCode;
 
-        this.eventSpec = keystroke.eventSpec;
+        this.eventSpec = new PhysicalInputEventSpec(keystroke.eventSpec); // must also be reconstructed.
       }
     }
 
@@ -679,7 +679,9 @@ namespace KMWRecorder {
           this.inputTestSets[i] = new EventSpecTestSet(fromJSON.inputTestSets[i] as EventSpecTestSet);
         }
       } else {
-        // TODO: use the (not-yet-written) KeystrokeTestSet instead.
+        for(var i=0; i < fromJSON.inputTestSets.length; i++) {
+          this.inputTestSets[i] = new RecordedSequenceTestSet(fromJSON.inputTestSets[i] as RecordedSequenceTestSet);
+        }
       }
     }
 
@@ -743,6 +745,10 @@ namespace KMWRecorder {
 
     toPrettyJSON() {
       return JSON.stringify(this, null, '  ');
+    }
+
+    get isLegacy(): boolean {
+      return !this.specVersion.equals(KeyboardTest.CURRENT_VERSION);
     }
   }
 }
