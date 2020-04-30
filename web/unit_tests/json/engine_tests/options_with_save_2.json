@@ -1,4 +1,5 @@
 {
+  "specVersion": "14.0",
   "keyboard": {
     "id": "options_with_save",
     "name": "Variable-store test kbd: options_with_save",
@@ -23,11 +24,19 @@
           "inputs": [
             {
               "type": "key",
-              "key": "a",
-              "code": "KeyA",
               "keyCode": 65,
-              "modifierSet": 0,
-              "location": 0
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
             }
           ],
           "output": "no foo."
