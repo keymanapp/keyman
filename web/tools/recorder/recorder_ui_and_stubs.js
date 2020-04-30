@@ -59,20 +59,20 @@ copyInputRecord = function() {
   alert("Unable to copy successfully.");
 }
 
-function saveInputRecord() {
-  var target;
-  if(recorderScribe.currentSequence.hasOSKInteraction()) {
-    var device = new com.keyman.Device();
-    device.detect();
-    target = device.formFactor;
-  } else {
-    target = 'hardware';
+function saveInputRecord(constraint) {
+  if(!constraint) {
+    var target;
+    if(recorderScribe.currentSequence.hasOSKInteraction()) {
+      target = keyman.util.device.formFactor;
+    } else {
+      target = 'hardware';
+    }
+    var os_list = getPlatforms();
+    var browsers = getBrowsers();
+    constraint = new KMWRecorder.Constraint(target, os_list, browsers);
   }
-  var os_list = getPlatforms();
-  var browsers = getBrowsers();
-  var config = new KMWRecorder.Constraint(target, os_list, browsers);
 
-  recorderScribe.saveInputRecord(config);
+  recorderScribe.saveInputRecord(constraint);
 }
 
 reviseInputRecord = function() {
@@ -254,15 +254,108 @@ function loadExistingTest(files) {
         convertBtn.style.display = kbdTest.isLegacy ? 'inline-block' : 'none';
 
         if(confirm("This test definition uses an older version of the KMW test spec.  Update?  ('OK' to update, 'Cancel' to load in read-only mode.)")) {
-          // TODO:  Do the things!
-          console.warn("Test Set conversion not yet implemented.");
-          
-          // TODO:  On successful conversion, re-hide the convert button.
+          let success = convertTestDefinition(kbdTest);
+
+          if(success) {
+            alert("Test Definition conversion complete.");
+          } else {
+            alert("Issue(s) detected during attempted conversion; process aborted.");
+          }
         }
       });
     }
     reader.readAsText(files[0]);
   }
+}
+
+function convertTestDefinition(sourceSet) {
+  if(!sourceSet) {
+    // Called via HTML button, so we use the currently-loaded test definition.
+    sourceSet = recorderScribe.testDefinition;
+  }
+
+  try {
+    setTestDefinition(new KMWRecorder.KeyboardTest(sourceSet.keyboard));
+
+    // Iterate over the contained TestSets and simulate them, allowing re-recording of the events
+    // with the up-to-date Recorder version.
+    for(testSet of sourceSet.inputTestSets) {
+      convertSet(testSet);
+    }
+
+    let convertBtn = document.getElementById('btnConvert');
+    convertBtn.style.display = 'none';
+    return true;
+  } catch (e) {
+    // Restore the original test def, as if we hadn't tried to convert it.
+    setTestDefinition(sourceSet);
+    return false;
+  } finally {
+    // Reset KMW's detected-device set to normal.
+    keyman.util.initDevices();
+  }
+}
+
+function convertSet(testSet) {
+  // Ensure KMW's master Device property reflects what is needed for the test!
+  let simDevice = deviceFromConstraint(testSet.constraint);
+  let simPhysDevice = new com.keyman.Device();
+  simPhysDevice.touchable = false;
+  simPhysDevice.browser = simDevice.browser;
+  simPhysDevice.formFactor = 'desktop';
+  simPhysDevice.OS = simDevice.OS;
+
+  keyman.util.device = simDevice;
+  keyman.util.physicalDevice = simPhysDevice;
+
+  // Now to run the tests.
+  let proctor = new KMWRecorder.BrowserProctor(in_output, simDevice.coreSpec, testSet.constraint.target != 'hardware');
+  proctor.beforeAll();
+
+  for(sequence of testSet.testSet) {
+    // WARNING:  does not give time for any 1-second timeouts to do their thing!
+    // TODO:  should probably be Promise-based... which then requires propagation of Promise stuff.
+    //        But this would ensure accuracy for sequences that rely upon browser-default output.
+    proctor.simulateSequence(sequence);
+    
+    // Copy over any custom error messages that would be displayed on unit test failure.
+    if(sequence.msg) {
+      recorderScribe.errorUpdate(sequence.msg);
+    }
+
+    // May need conversion in the future, but is fine for now - the 'Constraint' part of the spec didn't change.
+    saveInputRecord(testSet.constraint);  // Directly copy the original constraint.
+  }
+}
+
+function deviceFromConstraint(constraint) {
+  let trueDevice = new com.keyman.Device();
+  trueDevice.detect();
+
+  let simDevice = new com.keyman.Device();
+  simDevice.detect();
+
+  if(constraint.validOSList && constraint.validOSList.indexOf(trueDevice.OS) < 0) {
+    simDevice.OS = constraint.validOSList[0];
+  }
+
+  if(constraint.validBrowsers && constraint.validBrowsers.indexOf(trueDevice.browser) < 0) {
+    simDevice.browser = constraint.validBrowsers[0];
+  }
+
+  // Now, the more difficult one:  form-factor matching.
+  switch(constraint.target) {
+    case 'hardware':
+      simDevice.formFactor = 'desktop';
+      break;
+    case 'desktop':
+    case 'phone':
+    case 'tablet':
+      simDevice.formFactor = constraint.target;
+      simDevice.touchable = 'true';
+  }
+
+  return simDevice;
 }
 
 function loadExistingStubs(files) {
