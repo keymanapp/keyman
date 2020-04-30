@@ -625,7 +625,7 @@ namespace KMWRecorder {
     /**
      * Indicates what version of KMW's recorder the spec conforms to.
      */
-    private specVersion: com.keyman.utils.Version = KeyboardTest.CURRENT_VERSION;
+    public specVersion: com.keyman.utils.Version = KeyboardTest.CURRENT_VERSION;
 
     /**
      * The version of KMW in which the Recorder was first written.  Worked from 10.0 to 13.0 with 

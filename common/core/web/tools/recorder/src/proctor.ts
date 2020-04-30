@@ -1,5 +1,5 @@
 namespace KMWRecorder {
-  type AssertCallback = (s1: any, s2: any, msg?: string) => void;
+  export type AssertCallback = (s1: any, s2: any, msg?: string) => void;
 
   /**
    * Facilitates running Recorder-generated tests on various platforms.
