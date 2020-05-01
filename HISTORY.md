@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.62 alpha 2020-05-01
+
+* modify(oem): Update DSN for FV Android app (#3050)
+* feat(web/engine): Basic KeyboardProcessor tests (#2994)
+* fix(oem,common): Update FirstVoices build_keyboards.sh script (#3045)
+
 ## 14.0.61 alpha 2020-04-30
 
 * chore(deps): bump @actions/http-client from 1.0.3 to 1.0.8 in /resources/build/version (#3047)
