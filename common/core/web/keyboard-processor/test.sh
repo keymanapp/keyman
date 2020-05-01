@@ -54,7 +54,7 @@ test-headless ( ) {
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/*.js
+  npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
 
 # Build test dependency

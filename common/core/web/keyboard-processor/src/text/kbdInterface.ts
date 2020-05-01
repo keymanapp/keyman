@@ -184,7 +184,7 @@ namespace com.keyman.text {
     _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
     // Must be accessible to some of the keyboard API methods.
-    activeKeyboard: any;
+    activeKeyboard: keyboards.Keyboard;
     activeDevice: EngineDeviceSpec;
 
     variableStoreSerializer?: VariableStoreSerializer;
