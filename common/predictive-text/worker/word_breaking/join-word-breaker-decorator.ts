@@ -63,9 +63,11 @@ namespace wordBreakers {
       }
 
       function concatLastSpanInStackWith(span: Span) {
-        let top = stack.pop();
+        let lastIndex = stack.length - 1;
+
+        let top = stack[lastIndex];
         let joinedSpan = concatenateSpans(top, span);
-        stack.push(joinedSpan);
+        stack[lastIndex] = joinedSpan;
       }
     }
 
