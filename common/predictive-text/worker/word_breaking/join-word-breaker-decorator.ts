@@ -14,29 +14,11 @@ namespace wordBreakers {
     return function (input: string): Span[] {
       let originalSpans = breaker(input);
 
-      const enum State {
-        UNINITIALIZED, // stack is empty
-        UNJOINED, // stack always has at least one span
-        JOINED // stack always has at least one span
-      }
-
-      let state: State = State.UNINITIALIZED;
+      let state = uninitializedState;
       let stack: Span[] = [];
 
       for (let span of originalSpans) {
-        switch (state) {
-        case State.UNINITIALIZED:
-          state = uninitializedState(span);
-          break;
-
-        case State.UNJOINED:
-          state = unjoinedState(span);
-          break;
-
-        case State.JOINED:
-          state = joinedState(span);
-          break;
-        }
+        state = state(span);
       }
 
       return stack;
@@ -50,9 +32,9 @@ namespace wordBreakers {
       function uninitializedState(span: Span) {
         stack.push(span);
         if (includes(delimiters, span.text)) {
-          return State.JOINED;
+          return joinedState;
         } else {
-          return State.UNJOINED;
+          return unjoinedState
         }
       }
 
@@ -64,25 +46,25 @@ namespace wordBreakers {
           } else {
             stack.push(span);
           }
-          return State.JOINED;
+          return joinedState;
         } else {
           stack.push(span);
-          return State.UNJOINED;
+          return unjoinedState;
         }
       }
 
       function joinedState(span: Span) {
         if (!spansAreBackToBack(lastFrom(stack), span)) {
           stack.push(span);
-          return State.UNJOINED;
+          return unjoinedState;
         }
 
         appendToTopOfStack(span);
 
         if (includes(delimiters, span.text)) {
-          return State.JOINED;
+          return joinedState;
         } else {
-          return State.UNJOINED;
+          return unjoinedState;
         }
       }
     }
