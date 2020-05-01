@@ -116,9 +116,7 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\utildir.pas">
-            <Form>R icons.res</Form>
-        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>

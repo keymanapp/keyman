@@ -201,9 +201,7 @@
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas">
-            <Form>$R *.res</Form>
-        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\KeymanPaths.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\ext\sentry\Sentry.Client.Vcl.pas"/>
         <DCCReference Include="..\..\ext\sentry\sentry.pas"/>
