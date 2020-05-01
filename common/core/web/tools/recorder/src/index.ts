@@ -619,6 +619,24 @@ namespace KMWRecorder {
 
       return failures.length > 0 ? failures : null;
     }
+
+    toTestName(): string {
+      let name = "constraint: for " + this.constraint.target;
+
+      if(this.constraint.target == 'hardware') {
+        name += " keyboard";
+      } else {
+        name += " OSK";
+      }
+      if(this.constraint.validOSList) {
+        name += " on OS of " + JSON.stringify(this.constraint.validOSList);
+      }
+      if(this.constraint.validBrowsers) {
+        name += " in browser of " + JSON.stringify(this.constraint.validBrowsers);
+      }
+
+      return name;
+    }
   }
 
   export class KeyboardTest {

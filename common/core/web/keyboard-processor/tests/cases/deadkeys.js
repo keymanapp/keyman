@@ -9,8 +9,11 @@ let KMWRecorder = require('../../../tools/recorder/dist/nodeProctor');
 global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
 describe('Engine - Deadkeys', function() {
+  let testJSONtext = fs.readFileSync('../tests/resources/json/engine_tests/deadkeys.json');
+  // Common test suite setup.
+  let testSuite = new KMWRecorder.KeyboardTest(JSON.parse(testJSONtext));
+
   var keyboard;
-  var testSuite;
   let device = {
     formFactor: 'desktop',
     OS: 'windows',
@@ -18,12 +21,7 @@ describe('Engine - Deadkeys', function() {
   }
 
   before(function() {
-    // Load the test suite.
-    let testJSONtext = fs.readFileSync('../tests/resources/json/engine_tests/deadkeys.json');
-
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    testSuite = new KMWRecorder.KeyboardTest(JSON.parse(testJSONtext));
-
     // Load the keyboard.  We'll need a KeyboardProcessor instance as an intermediary.
     let kp = new KeyboardProcessor();
 
@@ -40,8 +38,14 @@ describe('Engine - Deadkeys', function() {
     assert.equal(keyboard.id, "Keyboard_test_deadkeys");
   });
 
-  it('Keyboard simulation', function() {
-    let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
-    testSuite.test(proctor);
-  });
+  // Converts each test set into its own Mocha-level test.
+  for(let set of testSuite.inputTestSets) {
+    it(set.toTestName(), function() {
+      let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+      if(!proctor.compatibleWithSuite(testSuite)) {
+        skip("Cannot run this test suite on Node.");
+      }
+      testSuite.test(proctor);
+    })
+  }
 });
