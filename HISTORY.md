@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.63 alpha 2020-05-01
+
+* fix(android): Fix FileUtilsTest to be cross-platform (#3061)
+* fix(windows): add LARGEADDRESSAWARE flag for all CEF processes (#3064)
+* Fix/android/remove more custom (#3051)
+* fix(ios): FV settings bundle for SWKeyboard (#3066)
+* change(common/lmlayer): single-pass join word breaker decorator (#3059)
+
 ## 14.0.62 alpha 2020-05-01
 
 * modify(oem): Update DSN for FV Android app (#3050)
