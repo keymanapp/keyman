@@ -289,6 +289,7 @@
 				98C9A8B81BFBF23C009E9A4F /* Sources */,
 				98C9A8B91BFBF23C009E9A4F /* Frameworks */,
 				98C9A8BA1BFBF23C009E9A4F /* Resources */,
+				37B453EF245C09CE008877E5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -420,6 +421,24 @@
 			shellScript = "echo \"-- Copying Frameworks --\"\n/usr/local/bin/carthage copy-frameworks\n\n\n";
 			showEnvVarsInLog = 0;
 		};
+		37B453EF245C09CE008877E5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			showEnvVarsInLog = 0;
+		};
 		37DF007C24595F6F00C73128 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -436,6 +455,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n. \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\n# true:  applies VERSION_WITH_TAG to custom KeymanVersionWithTag plist member used for in-app display\nphaseSetBundleVersions true\n\n# Also updates the version string for Settings\nsetSettingsBundleVersion\n";
+			showEnvVarsInLog = 0;
 		};
 		9800EC5D1C029FCD00BF0FB5 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -449,6 +469,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/FirstVoices/Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/FirstVoices/Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -686,6 +707,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";
@@ -713,6 +735,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "";

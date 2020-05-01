@@ -1020,6 +1020,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
