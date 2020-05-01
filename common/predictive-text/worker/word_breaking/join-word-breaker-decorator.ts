@@ -23,12 +23,6 @@ namespace wordBreakers {
 
       return stack;
 
-      function appendToTopOfStack(span: Span) {
-        let top = stack.pop();
-        let joinedSpan = concatenateSpans(top, span);
-        stack.push(joinedSpan);
-      }
-
       function emptyStack(span: Span) {
         stack.push(span);
         if (includes(delimiters, span.text)) {
@@ -39,10 +33,10 @@ namespace wordBreakers {
       }
 
       function unjoined(span: Span) {
+        // NB: stack has at least one span in it
         if (includes(delimiters, span.text)) {
-          // well, now we should join them!
           if (spansAreBackToBack(lastFrom(stack), span)) {
-            appendToTopOfStack(span);
+            concatLastSpanInStackWith(span);
           } else {
             stack.push(span);
           }
@@ -54,18 +48,24 @@ namespace wordBreakers {
       }
 
       function joined(span: Span) {
+        // NB: stack has at least one span in it
         if (!spansAreBackToBack(lastFrom(stack), span)) {
           stack.push(span);
           return unjoined;
         }
 
-        appendToTopOfStack(span);
-
+        concatLastSpanInStackWith(span);
         if (includes(delimiters, span.text)) {
           return joined;
         } else {
           return unjoined;
         }
+      }
+
+      function concatLastSpanInStackWith(span: Span) {
+        let top = stack.pop();
+        let joinedSpan = concatenateSpans(top, span);
+        stack.push(joinedSpan);
       }
     }
 
