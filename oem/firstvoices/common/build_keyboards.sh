@@ -84,7 +84,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Check that $KEYBOARDS_TARGET is valid
-if [[ $KEYBOARDS_TARGET == "" ]]; then
+if [[ -z "$KEYBOARDS_TARGET" ]]; then
   die "KEYBOARDS_TARGET cannot be empty"
 fi
 
