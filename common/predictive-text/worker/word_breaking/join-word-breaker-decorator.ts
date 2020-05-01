@@ -14,9 +14,18 @@ namespace wordBreakers {
     return function (input: string): Span[] {
       let originalSpans = breaker(input);
 
+      // Implements a finite-state transducer (FST) where:
+      //  - Transductions are pushed onto a stack
+      //  - There are three states:
+      //    - empty stack (initial state)
+      //    - unjoined
+      //    - joined
+      // - all three states are accepting states
+      // - there is NO backtracking on the input
+      //   (hence the for-loop over the input tape)
+      // - each state is a JavaScript callback (function)
       let state = emptyStack;
       let stack: Span[] = [];
-
       for (let span of originalSpans) {
         state = state(span);
       }
@@ -40,10 +49,13 @@ namespace wordBreakers {
           if (spansAreBackToBack(lastFrom(stack), span)) {
             concatLastSpanInStackWith(span);
           } else {
+            // Spans are non-contiguous, so don't join them!
             stack.push(span);
           }
           return joined;
+
         } else {
+          // Span cannot be joined
           stack.push(span);
           return unjoined;
         }
