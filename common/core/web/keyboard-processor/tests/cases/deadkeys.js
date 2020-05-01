@@ -45,7 +45,7 @@ describe('Engine - Deadkeys', function() {
       if(!proctor.compatibleWithSuite(testSuite)) {
         skip("Cannot run this test suite on Node.");
       }
-      testSuite.test(proctor);
+      set.test(proctor);
     })
   }
 });
