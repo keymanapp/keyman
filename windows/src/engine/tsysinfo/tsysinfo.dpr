@@ -1,6 +1,7 @@
 program tsysinfo;
 
 uses
+  Winapi.Windows,
   Forms,
   winver in 'winver.pas',
   fileversioninfo in 'fileversioninfo.pas',

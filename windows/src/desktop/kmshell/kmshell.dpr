@@ -1,6 +1,7 @@
 program kmshell;
 
 uses
+  Winapi.Windows,
   comobj,
   Forms,
   SysUtils,

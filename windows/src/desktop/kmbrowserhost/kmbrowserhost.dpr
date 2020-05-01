@@ -1,6 +1,7 @@
 program kmbrowserhost;
 
 uses
+  Winapi.Windows,
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
