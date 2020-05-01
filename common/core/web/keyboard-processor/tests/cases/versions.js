@@ -1,17 +1,10 @@
-var assert = chai.assert;
+var assert = require('chai').assert;
+let KeyboardProcessor = require('../../dist');
+
+// Required initialization setup.
+global.com = KeyboardProcessor.com; // exports all keyboard-processor namespacing.
 
 describe('Version Logic', function() {
-  this.timeout(kmwconfig.timeouts.standard);
-
-  before(function(done) {
-    this.timeout(kmwconfig.timeouts.scriptLoad);
-    setupKMW(null, done, kmwconfig.timeouts.scriptLoad);
-  });
-  
-  after(function() {
-    teardownKMW();
-  });
-  
   it('Should provide a default, fallback value when nothing is specified', function() {
     var fallback = new com.keyman.utils.Version(undefined);
     assert.isTrue(fallback.equals(com.keyman.utils.Version.DEVELOPER_VERSION_FALLBACK));

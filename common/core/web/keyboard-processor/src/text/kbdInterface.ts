@@ -958,5 +958,52 @@ namespace com.keyman.text {
 
       return behavior;
     }
+
+    /**
+     * Publishes the KeyboardInterface's shorthand API names.  As this assigns the current functions
+     * held by the longform versions, note that this should be called after replacing any of them via
+     * JS method extension.
+     * 
+     * DOM-aware KeymanWeb should call this after its domKbdInterface.ts code is loaded, as it replaces
+     * a few.  (This is currently done within its kmwapi.ts.)
+     */
+    static __publishShorthandAPI() {
+      // Keyboard callbacks
+      let prototype = this.prototype;
+
+      var exportKBCallback = function(miniName: string, longName: string) {
+        prototype[miniName] = prototype[longName];
+      }
+
+      exportKBCallback('KSF', 'saveFocus');
+      exportKBCallback('KBR', 'beepReset');
+      exportKBCallback('KT', 'insertText');
+      exportKBCallback('KR', 'registerKeyboard');
+      exportKBCallback('KRS', 'registerStub');
+      exportKBCallback('KC', 'context');
+      exportKBCallback('KN', 'nul');
+      exportKBCallback('KCM', 'contextMatch');
+      exportKBCallback('KFCM', 'fullContextMatch');
+      exportKBCallback('KIK', 'isKeypress');
+      exportKBCallback('KKM', 'keyMatch');
+      exportKBCallback('KSM', 'stateMatch');
+      exportKBCallback('KKI', 'keyInformation');
+      exportKBCallback('KDM', 'deadkeyMatch');
+      exportKBCallback('KB', 'beep');
+      exportKBCallback('KA', 'any');
+      exportKBCallback('KDC', 'deleteContext');
+      exportKBCallback('KO', 'output');
+      exportKBCallback('KDO', 'deadkeyOutput');
+      exportKBCallback('KIO', 'indexOutput');
+      exportKBCallback('KIFS', 'ifStore');
+      exportKBCallback('KSETS', 'setStore');
+      exportKBCallback('KLOAD', 'loadStore');
+      exportKBCallback('KSAVE', 'saveStore');
+    }
   }
+
+  (function() {
+    // This will be the only call within the keyboard-processor module.
+    KeyboardInterface.__publishShorthandAPI();
+  }());
 }

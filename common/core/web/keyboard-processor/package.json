@@ -20,12 +20,14 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
+    "mocha-teamcity-reporter": "^3.0.0",
     "typescript": "^3.7.2"
   },
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
-    "test": "bash ./unit_tests/test.sh"
+    "test": "bash ./test.sh",
+    "mocha": "mocha"
   },
   "dependencies": {
     "@keymanapp/lexical-model-types": "^0.0.0",

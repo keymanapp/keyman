@@ -44,6 +44,7 @@
     "test": "bash ./unit_tests/test.sh",
     "karma": "karma",
     "lerna": "cd ../ && npm run lerna --",
+    "mocha": "mocha",
     "modernizr": "modernizr"
   },
   "dependencies": {
