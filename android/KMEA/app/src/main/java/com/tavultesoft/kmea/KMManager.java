@@ -169,6 +169,13 @@ public final class KMManager {
   public static final String KMKey_FontFiles = "files";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
+
+  // Intend to deprecate: KMKey_CustomKeyboard is no longer used and will be deprecated in Keyman 15.0
+  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
+
+  // Intend to deprecate: KMKey_CustomModel is no longer used and will be deprecated in Keyman 15.0
+  public static final String KMKey_CustomModel = "CustomModel";
+
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
