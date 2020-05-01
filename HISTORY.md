@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.64 alpha 2020-05-01
+
+* fix(ios): add sentry framework to fv keyboards (#3069)
+
 ## 14.0.63 alpha 2020-05-01
 
 * fix(android): Fix FileUtilsTest to be cross-platform (#3061)
