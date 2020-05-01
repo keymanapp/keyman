@@ -61,3 +61,8 @@ $compilecmd -p "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
     fail "KeymanWeb recorder-core compilation failed."
 fi
+
+$compilecmd -p "$SCRIPT_DIR/nodeProctor.tsconfig.json"
+if [ $? -ne 0 ]; then
+    fail "Node-based unit-test Proctor compilation failed."
+fi

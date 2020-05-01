@@ -702,7 +702,7 @@ namespace KMWRecorder {
       newSet.addTest(seq);      
     }
 
-    test(proctor: Proctor) { // TODO:  Convert to abstract / interface base `Proctor`.
+    test(proctor: Proctor) {
       var setHasRun = false;
       var failures: TestFailure[] = [];
 
