@@ -14,7 +14,7 @@ namespace wordBreakers {
     return function (input: string): Span[] {
       let originalSpans = breaker(input);
 
-      let state = uninitializedState;
+      let state = emptyStack;
       let stack: Span[] = [];
 
       for (let span of originalSpans) {
@@ -29,16 +29,16 @@ namespace wordBreakers {
         stack.push(joinedSpan);
       }
 
-      function uninitializedState(span: Span) {
+      function emptyStack(span: Span) {
         stack.push(span);
         if (includes(delimiters, span.text)) {
-          return joinedState;
+          return joined;
         } else {
-          return unjoinedState
+          return unjoined
         }
       }
 
-      function unjoinedState(span: Span) {
+      function unjoined(span: Span) {
         if (includes(delimiters, span.text)) {
           // well, now we should join them!
           if (spansAreBackToBack(lastFrom(stack), span)) {
@@ -46,25 +46,25 @@ namespace wordBreakers {
           } else {
             stack.push(span);
           }
-          return joinedState;
+          return joined;
         } else {
           stack.push(span);
-          return unjoinedState;
+          return unjoined;
         }
       }
 
-      function joinedState(span: Span) {
+      function joined(span: Span) {
         if (!spansAreBackToBack(lastFrom(stack), span)) {
           stack.push(span);
-          return unjoinedState;
+          return unjoined;
         }
 
         appendToTopOfStack(span);
 
         if (includes(delimiters, span.text)) {
-          return joinedState;
+          return joined;
         } else {
-          return unjoinedState;
+          return unjoined;
         }
       }
     }
