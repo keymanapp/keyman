@@ -61,7 +61,7 @@ namespace KMWRecorder {
 
     // Execution of a test sequence depends on the testing environment; this handles
     // the browser-specific aspects.
-    simulateSequence(sequence: TestSequence<any>): string {
+    simulateSequence(sequence: TestSequence<any>, outputTarget?: com.keyman.text.OutputTarget): string {
       let driver = new BrowserDriver(this.target);
 
       // For the version 10.0 spec

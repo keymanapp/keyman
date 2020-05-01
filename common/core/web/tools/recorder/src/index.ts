@@ -208,10 +208,15 @@ namespace KMWRecorder {
 
     abstract hasOSKInteraction(): boolean;
 
-    test(proctor: Proctor): {success: boolean, result: string} {
+    test(proctor: Proctor, target?: com.keyman.text.OutputTarget): {success: boolean, result: string} {
+      // Start with an empty OutputTarget and a fresh KeyboardProcessor.
+      if(!target) {
+        target = new com.keyman.text.Mock();
+      }
+
       proctor.before();
 
-      let result = proctor.simulateSequence(this);
+      let result = proctor.simulateSequence(this, target);
       proctor.assertEquals(result, this.output, this.msg);
 
       return {success: (result == this.output), result: result};

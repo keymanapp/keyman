@@ -38,9 +38,11 @@ namespace KMWRecorder {
       return true;
     }
 
-    simulateSequence(sequence: TestSequence<any>): string {
+    simulateSequence(sequence: TestSequence<any>, target?: com.keyman.text.OutputTarget): string {
       // Start with an empty OutputTarget and a fresh KeyboardProcessor.
-      let target = new com.keyman.text.Mock();
+      if(!target) {
+        target = new com.keyman.text.Mock();
+      }
 
       // Establish a fresh processor, setting its keyboard appropriately for the test.
       let processor = new com.keyman.text.KeyboardProcessor();
@@ -79,13 +81,13 @@ namespace KMWRecorder {
           let ruleBehavior = processor.processKeystroke(keyEvent, target);
 
           if(this.debugMode) {
-            console.log(JSON.stringify(ruleBehavior, null, ' '));
+            console.log(JSON.stringify(target, null, '  '));
+            console.log(JSON.stringify(ruleBehavior, null, '  '));
           }
         }
       } else {
         throw new Error("NodeProctor only supports RecordedKeystrokeSequences for testing at present.");
       }
-
       return target.getText();
     }
 

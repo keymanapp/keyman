@@ -1,5 +1,6 @@
 var assert = chai.assert;
 
+// ruleSet - array of tests.
 function runEngineRuleSet(ruleSet, defaultNoun) {
   var inputElem = document.getElementById('singleton');
   keyman.setActiveElement(inputElem);
@@ -11,7 +12,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
   defaultNoun = defaultNoun ? defaultNoun : "Rule";
 
   for(var i = 0; i < ruleSet.length; i++) {
-    var ruleDef = ruleSet[i];
+    var ruleDef = ruleSet[i]; // for example, DEADKEY_TEST_1.
 
     var matchDefs = [{
         sequence: ruleDef.baseSequence,
