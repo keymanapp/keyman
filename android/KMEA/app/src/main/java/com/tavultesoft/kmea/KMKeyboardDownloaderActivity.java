@@ -34,12 +34,6 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
   public static final String ARG_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
 
-  // custom keyboard
-  public static final String ARG_KEYBOARD = "KMKeyboardActivity.keyboard";
-  public static final String ARG_LANGUAGE = "KMKeyboardActivity.language";
-  public static final String ARG_URL = "KMKeyboardActivity.url";
-  public static final String ARG_FILENAME = "KMKeyboardActivity.filename";
-
   public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
   public static final String kKeymanApiModelURL = "https://api.keyman.com/model";
 
@@ -105,34 +99,10 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
       kbID = bundle.getString(ARG_KB_ID);
       kbName = bundle.getString(ARG_KB_NAME);
-
-      // URL parameters for custom keyboard (if they exist)
-      customLanguage = bundle.getString(ARG_LANGUAGE);
-      url = bundle.getString(ARG_URL);
-      filename = bundle.getString(ARG_FILENAME);
-      if (filename == null || filename.isEmpty()) {
-        filename = "unknown";
-      }
     }
 
-    String title;
-    if (url != null) {
-      title = String.format("%s: %s", getString(R.string.custom_keyboard), filename);
-    } else if (customKeyboard != null && customLanguage != null &&
-        !customKeyboard.trim().isEmpty() && !customLanguage.trim().isEmpty()) {
-      int kbIndex = KMManager.getKeyboardIndex(getApplicationContext(), customKeyboard, customLanguage);
-
-      if (kbIndex >= 0) {
-        KMManager.setKeyboard(getApplicationContext(), kbIndex);
-        // No interaction needed
-        return; // false
-      }
-
-      title = String.format("%s_%s", customLanguage, customKeyboard);
-    } else {
-      // Download keyboard from cloud server
-      title = String.format("%s: %s", langName, kbName);
-    }
+    // Download keyboard from cloud server
+    String title = String.format("%s: %s", langName, kbName);
 
     DialogFragment dialog;
     if (downloadOnlyLexicalModel) {
