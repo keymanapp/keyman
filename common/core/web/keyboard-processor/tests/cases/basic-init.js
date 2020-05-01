@@ -42,37 +42,4 @@ describe('KeyboardProcessor', function() {
       assert.equal('Keyboard_khmer_angkor', kp.activeKeyboard.id, 'Unexpected keyboard id found after script load');
     });
   });
-
-  describe('processKeystroke', function() {
-    it('has simple output, no context', function() {
-      let kp = new KeyboardProcessor();
-
-      // These two lines will load a keyboard from its file; headless-mode `registerKeyboard` will
-      // automatically set the keyboard as active.
-      var script = new vm.Script(fs.readFileSync('../tests/resources/keyboards/khmer_angkor.js'));
-      script.runInThisContext();
-
-      // Fetch a key from the keyboard's layout.
-      let defaultLayer = kp.activeKeyboard.layout('desktop').getLayer('default');
-      assert.isNotNull(defaultLayer);
-      let keyS = defaultLayer.getKey('K_S');
-      assert.isNotNull(keyS);
-
-      //Get the default synthetic key event for said key.
-      let mock = new com.keyman.text.Mock();
-      let keyEvent = keyS.constructKeyEvent(kp, mock, 
-                                            new com.keyman.text.EngineDeviceSpec('chrome', 'desktop', 'windows', false)
-      );
-
-      assert.isNotNull(keyEvent);
-
-      let ruleBehavior = kp.processKeystroke(keyEvent, mock);
-      assert.isNotNull(ruleBehavior);
-      assert.isNotNull(ruleBehavior.transcription);
-      assert.equal(mock.getText(), 'ស', 'Unexpected output from key event');
-
-      let transform = ruleBehavior.transcription.transform;
-      assert.isNotNull(transform);
-    })
-  });
 });
