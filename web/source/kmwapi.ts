@@ -23,6 +23,8 @@
 }());
 
 (function() {
-  // DOM-aware KeymanWeb overwrites some of the API functions.
+  // DOM-aware KeymanWeb overwrites some of the API functions, so we
+  // re-publish the API so that the overwritten functions are accessible
+  // via their short-form equivalents found in actual keyboard code.
   com.keyman.text.KeyboardInterface.__publishShorthandAPI();
 }());

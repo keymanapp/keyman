@@ -959,9 +959,14 @@ namespace com.keyman.text {
       return behavior;
     }
 
-    // Publishes the KeyboardInterface's shorthand API names.
-    // Note that this may need to be called multiple times; a keyboard-processor consumer
-    // may extend or overwrite some of the callbacks after this method's initial call.
+    /**
+     * Publishes the KeyboardInterface's shorthand API names.  As this assigns the current functions
+     * held by the longform versions, note that this should be called after replacing any of them via
+     * JS method extension.
+     * 
+     * DOM-aware KeymanWeb should call this after its domKbdInterface.ts code is loaded, as it replaces
+     * a few.  (This is currently done within its kmwapi.ts.)
+     */
     static __publishShorthandAPI() {
       // Keyboard callbacks
       let prototype = this.prototype;
