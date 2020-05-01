@@ -23,9 +23,11 @@ namespace wordBreakers {
 
       return stack;
 
+      /******************* States *******************/
       function emptyStack(span: Span) {
         stack.push(span);
-        if (includes(delimiters, span.text)) {
+
+        if (isJoiner(span)) {
           return joined;
         } else {
           return unjoined
@@ -34,7 +36,7 @@ namespace wordBreakers {
 
       function unjoined(span: Span) {
         // NB: stack has at least one span in it
-        if (includes(delimiters, span.text)) {
+        if (isJoiner(span)) {
           if (spansAreBackToBack(lastFrom(stack), span)) {
             concatLastSpanInStackWith(span);
           } else {
@@ -50,18 +52,21 @@ namespace wordBreakers {
       function joined(span: Span) {
         // NB: stack has at least one span in it
         if (!spansAreBackToBack(lastFrom(stack), span)) {
+          // Spans are non-contiguous and cannot be joined:
           stack.push(span);
           return unjoined;
         }
 
+        // Spans are contiguous
         concatLastSpanInStackWith(span);
-        if (includes(delimiters, span.text)) {
+        if (isJoiner(span)) {
           return joined;
         } else {
           return unjoined;
         }
       }
 
+      /****************** Helpers ******************/
       function concatLastSpanInStackWith(span: Span) {
         let lastIndex = stack.length - 1;
 
@@ -69,6 +74,10 @@ namespace wordBreakers {
         let joinedSpan = concatenateSpans(top, span);
         stack[lastIndex] = joinedSpan;
       }
+    }
+
+    function isJoiner(span: Span) {
+      return includes(delimiters, span.text);
     }
 
     /**
