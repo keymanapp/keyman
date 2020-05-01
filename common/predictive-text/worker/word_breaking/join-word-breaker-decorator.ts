@@ -26,45 +26,15 @@ namespace wordBreakers {
       for (let span of originalSpans) {
         switch (state) {
         case State.UNINITIALIZED:
-          stack.push(span);
-
-          if (includes(delimiters, span.text)) {
-            state = State.JOINED;
-          } else {
-            state = State.UNJOINED;
-          }
+          state = uninitializedState(span);
           break;
 
         case State.UNJOINED:
-          if (includes(delimiters, span.text)) {
-            // well, now we should join them!
-            if (spansAreBackToBack(lastFrom(stack), span)) {
-              appendToTopOfStack(span);
-            } else {
-              stack.push(span);
-            }
-
-            state = State.JOINED;
-          } else {
-            stack.push(span);
-            state = State.UNJOINED;
-          }
+          state = unjoinedState(span);
           break;
 
         case State.JOINED:
-          if (!spansAreBackToBack(lastFrom(stack), span)) {
-            stack.push(span);
-            state = State.UNJOINED;
-            break;
-          }
-
-          appendToTopOfStack(span);
-
-          if (includes(delimiters, span.text)) {
-            state = State.JOINED;
-          } else {
-            state = State.UNJOINED;
-          }
+          state = joinedState(span);
           break;
         }
       }
@@ -76,8 +46,46 @@ namespace wordBreakers {
         let joinedSpan = concatenateSpans(top, span);
         stack.push(joinedSpan);
       }
-    }
 
+      function uninitializedState(span: Span) {
+        stack.push(span);
+        if (includes(delimiters, span.text)) {
+          return State.JOINED;
+        } else {
+          return State.UNJOINED;
+        }
+      }
+
+      function unjoinedState(span: Span) {
+        if (includes(delimiters, span.text)) {
+          // well, now we should join them!
+          if (spansAreBackToBack(lastFrom(stack), span)) {
+            appendToTopOfStack(span);
+          } else {
+            stack.push(span);
+          }
+          return State.JOINED;
+        } else {
+          stack.push(span);
+          return State.UNJOINED;
+        }
+      }
+
+      function joinedState(span: Span) {
+        if (!spansAreBackToBack(lastFrom(stack), span)) {
+          stack.push(span);
+          return State.UNJOINED;
+        }
+
+        appendToTopOfStack(span);
+
+        if (includes(delimiters, span.text)) {
+          return State.JOINED;
+        } else {
+          return State.UNJOINED;
+        }
+      }
+    }
 
     /**
      * Returns true when the spans are contiguous.
