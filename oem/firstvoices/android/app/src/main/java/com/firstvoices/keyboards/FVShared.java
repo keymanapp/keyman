@@ -242,7 +242,6 @@ final class FVShared {
                     kbInfo.put(KMManager.KMKey_LanguageName, keyboard.name);
                     kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0"); //TODO: use keyboard version from kmp.json
                     kbInfo.put(KMManager.KMKey_Font, "NotoSansCanadianAboriginal.ttf");
-                    kbInfo.put(KMManager.KMKey_CustomKeyboard, "Y");
                     kbInfo.put(KMManager.KMKey_CustomHelpLink, String.format("%s%s", FVKeyboardHelpLink, keyboard.id));
                     KMManager.addKeyboard(context, kbInfo);
                 }
