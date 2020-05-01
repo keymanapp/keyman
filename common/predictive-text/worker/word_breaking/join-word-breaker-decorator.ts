@@ -13,88 +13,83 @@ namespace wordBreakers {
 
     return function (input: string): Span[] {
       let originalSpans = breaker(input);
-      let joinRanges = createJoinRanges(originalSpans);
-      let contiguousRanges = fillInGapsInRanges(joinRanges, originalSpans.length);
-      return concatenateSpansFromRanges(contiguousRanges, originalSpans);
-    }
 
-    /**
-     * Returns ranges of indices of results that should be merged.
-     *
-     * e.g., if joining on "-":
-     *
-     *  ["-", "yâhk", "ê", "-", "nitawi", "-", "kotiskâwêyâhk", "ni", "-"]
-     *    0     1      2    3    4         5    6                7     8[:-]
-     *
-     * will return:
-     *
-     *  [[0, 1], [2, 3, 4, 5, 6], [7, 8]]
-     *
-     * Those indices correspond to spans that should be joined.
-     */
-    function createJoinRanges(results: Span[]): number[][] {
-      let messyJoinRanges: number[][] = [];
+      // Implements a finite-state transducer (FST) where:
+      //  - Transductions are pushed onto a stack
+      //  - There are three states:
+      //    - empty stack (initial state)
+      //    - unjoined
+      //    - joined
+      // - all three states are accepting states
+      // - there is NO backtracking on the input
+      //   (hence the for-loop over the input tape)
+      // - each state is a JavaScript callback (function)
+      let state = emptyStack;
+      let stack: Span[] = [];
+      for (let span of originalSpans) {
+        state = state(span);
+      }
 
-      // Figure out where there are spans to join.
-      results.forEach((span, index) => {
-        if (!includes(delimiters, span.text)) {
-          return;
-        }
+      return stack;
 
-        // the span at this index SHOULD be joined with its neighbors
-        // let's create a window of 1–3 contiguous indices that
-        // should be joined:
-        let window = [];
-        let current: Span | undefined = results[index];
+      /******************* States *******************/
+      function emptyStack(span: Span) {
+        stack.push(span);
 
-        let previous: Span | undefined = results[index - 1];
-        if (previous && spansAreBackToBack(previous, current)) {
-          window.push(index - 1);
-        }
-
-        // The window ALWAYS contains the joiner.
-        window.push(index);
-
-        let next: Span | undefined = results[index + 1];
-        if (next && spansAreBackToBack(current, next)) {
-          window.push(index + 1);
-        }
-
-        messyJoinRanges.push(window);
-      });
-
-      // Merge overlapping regions:
-      return mergeOverlappingRanges(messyJoinRanges);
-    }
-
-    /**
-     * Given an array of ranges of indices that may have "gaps",
-     * e.g., not covering all indices less than {limit},
-     * fills in those gaps with "singleton" ranges.
-     */
-    function fillInGapsInRanges(joinRanges: number[][], limit: number) {
-      let contiguousRanges: number[][] = [];
-      let insideRange = false;
-      let currentJoin = joinRanges.shift();
-      for (let index = 0; index < limit; index++) {
-        if (insideRange) {
-          if (index === lastFrom(currentJoin)) {
-            // exit the range
-            insideRange = false;
-            currentJoin = joinRanges.shift();
-          }
+        if (isJoiner(span)) {
+          return joined;
         } else {
-          if (currentJoin && index === currentJoin[0]) {
-            // enter the range
-            insideRange = true;
-            contiguousRanges.push(currentJoin);
-          } else {
-            // fill in the gap!
-            contiguousRanges.push([index]);
-          }
+          return unjoined
         }
       }
-      return contiguousRanges;
+
+      function unjoined(span: Span) {
+        // NB: stack has at least one span in it
+        if (isJoiner(span)) {
+          if (spansAreBackToBack(lastFrom(stack), span)) {
+            concatLastSpanInStackWith(span);
+          } else {
+            // Spans are non-contiguous, so don't join them!
+            stack.push(span);
+          }
+          return joined;
+
+        } else {
+          // Span cannot be joined
+          stack.push(span);
+          return unjoined;
+        }
+      }
+
+      function joined(span: Span) {
+        // NB: stack has at least one span in it
+        if (!spansAreBackToBack(lastFrom(stack), span)) {
+          // Spans are non-contiguous and cannot be joined:
+          stack.push(span);
+          return unjoined;
+        }
+
+        // Spans are contiguous
+        concatLastSpanInStackWith(span);
+        if (isJoiner(span)) {
+          return joined;
+        } else {
+          return unjoined;
+        }
+      }
+
+      /****************** Helpers ******************/
+      function concatLastSpanInStackWith(span: Span) {
+        let lastIndex = stack.length - 1;
+
+        let top = stack[lastIndex];
+        let joinedSpan = concatenateSpans(top, span);
+        stack[lastIndex] = joinedSpan;
+      }
+    }
+
+    function isJoiner(span: Span) {
+      return includes(delimiters, span.text);
     }
 
     /**
@@ -103,67 +98,6 @@ namespace wordBreakers {
      */
     function spansAreBackToBack(former: Span, latter: Span): boolean {
       return former.end === latter.start;
-    }
-
-    /**
-     * Given an array of ranges of indices, and the corresponding spans,
-     * concatenates spans according to the ranges of indices.
-     */
-    function concatenateSpansFromRanges(ranges: number[][], originalSpans: Span[]): Span[] {
-      return ranges.map(range => {
-        if (range.length === 1) {
-          return originalSpans[range[0]];
-        }
-
-        // We need to concatenate two or more spans:
-        let spansToJoin = range.map(i => originalSpans[i]);
-        let currentSpan = spansToJoin.shift();
-        while (spansToJoin.length > 0) {
-          let nextSpan = spansToJoin.shift();
-          currentSpan = concatenateSpans(currentSpan, nextSpan);
-        }
-        return currentSpan;
-      });
-    }
-
-    /**
-     * Given ranges like this that may overlap:
-     *
-     *  [[1, 2, 3], [3, 4, 5], [6, 7, 8]]
-     *
-     * Returns this:
-     *
-     *  [[1, 2, 3, 4, 5], [6, 7, 8]]
-     */
-    function mergeOverlappingRanges(messyRanges: number[][]): number[][] {
-      let lastRange: number[] | undefined;
-      let ranges: number[][] = [];
-
-      for (let range of messyRanges) {
-        if (lastRange == undefined) {
-          lastRange = range;
-          ranges.push(range);
-          continue;
-        }
-
-        let last = lastFrom(lastRange);
-        if (last >= range[0]) {
-          // Remove the overlapping elements:
-          while (range.length > 0 && last >= range[0]) {
-            range.shift();
-            last = lastFrom(lastRange);
-          }
-
-          // Extend the last range with what remains.
-          for (let v of range) {
-            lastRange.push(v);
-          }
-        } else {
-          lastRange = range;
-          ranges.push(range);
-        }
-      }
-      return ranges;
     }
 
     function concatenateSpans(former: Span, latter: Span) {
