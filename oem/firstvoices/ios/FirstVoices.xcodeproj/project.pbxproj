@@ -12,6 +12,7 @@
 		37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6F231637EA00C73C6A /* Reachability.framework */; };
 		37150F75231637EA00C73C6A /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F70231637EA00C73C6A /* Zip.framework */; };
 		37150F76231637EA00C73C6A /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F71231637EA00C73C6A /* XCGLogger.framework */; };
+		37B1C772245CD88B00A95075 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B1C771245CD88B00A95075 /* Sentry.framework */; };
 		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
 		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
 		37EA1F1F228A1823003E710C /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37EA1F1D228A1809003E710C /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -80,6 +81,7 @@
 		37150F6F231637EA00C73C6A /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		37150F70231637EA00C73C6A /* Zip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Zip.framework; path = Carthage/Build/iOS/Zip.framework; sourceTree = "<group>"; };
 		37150F71231637EA00C73C6A /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
+		37B1C771245CD88B00A95075 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../../ios/Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		37C183B822932AD2009F9EFD /* FVKeyboardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardList.swift; sourceTree = "<group>"; };
 		37C183BC2293321C009F9EFD /* Instructions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Instructions; path = FirstVoices/Instructions; sourceTree = "<group>"; };
 		37EA1F1D228A1809003E710C /* KeymanEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37B1C772245CD88B00A95075 /* Sentry.framework in Frameworks */,
 				37150F72231637EA00C73C6A /* DeviceKit.framework in Frameworks */,
 				37150F73231637EA00C73C6A /* ObjcExceptionBridging.framework in Frameworks */,
 				37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */,
@@ -247,6 +250,7 @@
 		98C9A9FB1BFC19ED009E9A4F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				37B1C771245CD88B00A95075 /* Sentry.framework */,
 				37150F6D231637E900C73C6A /* DeviceKit.framework */,
 				37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */,
 				37150F6F231637EA00C73C6A /* Reachability.framework */,
