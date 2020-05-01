@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowLog;
 
+import java.io.File;
 import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
@@ -264,7 +265,7 @@ public class FileUtilsTest {
     filename = "test/welcome.HTM";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));
 
-    filename = "test\\welcome.htm";
+    filename = "test" + File.separator + "welcome.htm";
     Assert.assertTrue(FileUtils.isWelcomeFile(filename));
 
     filename = "test/WELCOME.HTM";
