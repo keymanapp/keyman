@@ -41,9 +41,7 @@ namespace wordBreakers {
           if (includes(delimiters, span.text)) {
             // well, now we should join them!
             if (spansAreBackToBack(lastFrom(stack), span)) {
-              let top = stack.pop();
-              let joinedSpan = concatenateSpans(top, span);
-              stack.push(joinedSpan);
+              appendToTopOfStack(span);
             } else {
               stack.push(span);
             }
@@ -62,9 +60,7 @@ namespace wordBreakers {
             break;
           }
 
-          let top = stack.pop();
-          let joinedSpan = concatenateSpans(top, span);
-          stack.push(joinedSpan);
+          appendToTopOfStack(span);
 
           if (includes(delimiters, span.text)) {
             state = State.JOINED;
@@ -76,7 +72,14 @@ namespace wordBreakers {
       }
 
       return stack;
+
+      function appendToTopOfStack(span: Span) {
+        let top = stack.pop();
+        let joinedSpan = concatenateSpans(top, span);
+        stack.push(joinedSpan);
+      }
     }
+
 
     /**
      * Returns true when the spans are contiguous.
