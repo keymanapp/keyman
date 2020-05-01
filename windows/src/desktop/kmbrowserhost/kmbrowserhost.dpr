@@ -1,6 +1,7 @@
 program kmbrowserhost;
 
 uses
+  Winapi.Windows,
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
@@ -22,6 +23,10 @@ uses
 {R icons.res}
 {$R version.res}
 {$R manifest.res}
+
+// CEF3 needs to set the LARGEADDRESSAWARE flag which allows 32-bit processes to use up to 3GB of RAM.
+// If you don't add this flag the rederer process will crash when you try to load large images.
+{$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
 const
   LOGGER_DESKTOP_KMBROWSERHOST = TKeymanSentryClient.LOGGER_DESKTOP + '.kmbrowserhost';
