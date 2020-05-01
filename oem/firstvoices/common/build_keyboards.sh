@@ -2,6 +2,9 @@
 
 # Build the keyboards referred to in ../keyboards.csv and copy them + metadata
 # to the FirstVoices/Keyboards folder
+
+# This build script assumes that the https://github.com/keymanapp/keyboards repo is in
+# the same parent folder as this repo, with the default name 'keyboards'
 # Alternatively, the keyboards can be downloaded from downloads.keyman.com
 #
 # keyboards.csv has columns Shortname,ID,Name,Region,OldVersion
@@ -20,11 +23,11 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 # . "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'
-KEYBOARDS_ROOT=$(dirname "$THIS_SCRIPT")/../../../keyboards
+KEYBOARDS_ROOT="$KEYMAN_ROOT/../keyboards"
 
 function die {
   echo "FATAL: $1"
@@ -80,13 +83,18 @@ while [[ $# -gt 0 ]] ; do
   shift
 done
 
+# Check that $KEYBOARDS_TARGET is valid
+if [[ $KEYBOARDS_TARGET == "" ]]; then
+  die "KEYBOARDS_TARGET cannot be empty"
+fi
+
 # Clean existing Keyboards folder
 # Can't remove entire folder because Android has other assets/
 
 if [ $DO_CLEAN = true ]; then
   echo "Cleaning target path $KEYBOARDS_TARGET"
-  rm -rf "$KEYBOARDS_TARGET/*.kmp"
-  rm -rf "$KEYBOARDS_TARGET/*.keyboard_info"
+  rm -f "$KEYBOARDS_TARGET/*.kmp"
+  rm -f "$KEYBOARDS_TARGET/*.keyboard_info"
   echo "Removing file $KEYBOARDS_CSV_TARGET"
   rm -f $KEYBOARDS_CSV_TARGET
 fi

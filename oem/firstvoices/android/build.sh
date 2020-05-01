@@ -26,6 +26,7 @@ display_usage ( ) {
 }
 
 export TARGET=FirstVoices
+# If building/copying keyboards, KEYBOARDS_TARGET=app/src/main/assets/packages
 export KEYBOARDS_TARGET=app/src/main/assets
 export KEYBOARDS_CSV_TARGET=app/src/main/assets/keyboards.csv
 
