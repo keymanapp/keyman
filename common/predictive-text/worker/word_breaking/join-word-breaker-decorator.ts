@@ -13,9 +13,69 @@ namespace wordBreakers {
 
     return function (input: string): Span[] {
       let originalSpans = breaker(input);
-      let joinRanges = createJoinRanges(originalSpans);
-      let contiguousRanges = fillInGapsInRanges(joinRanges, originalSpans.length);
-      return concatenateSpansFromRanges(contiguousRanges, originalSpans);
+      // TEMP: "dumb down" the spans
+      originalSpans = originalSpans.map(({start, end, length, text}) => ({start, end, length, text}));
+
+      const enum State {
+        UNINITIALIZED, // stack is empty
+        UNJOINED, // stack always has at least one span
+        JOINED // stack always has at least one span
+      }
+
+      let state: State = State.UNINITIALIZED;
+      let stack: Span[] = [];
+
+      for (let span of originalSpans) {
+        switch (state) {
+        case State.UNINITIALIZED:
+          stack.push(span);
+
+          if (includes(delimiters, span.text)) {
+            state = State.JOINED;
+          } else {
+            state = State.UNJOINED;
+          }
+          break;
+
+        case State.UNJOINED:
+          if (includes(delimiters, span.text)) {
+            // well, now we should join them!
+            if (spansAreBackToBack(lastFrom(stack), span)) {
+              let top = stack.pop();
+              let joinedSpan = concatenateSpans(top, span);
+              stack.push(joinedSpan);
+            } else {
+              stack.push(span);
+            }
+
+            state = State.JOINED;
+          } else {
+            stack.push(span);
+            state = State.UNJOINED;
+          }
+          break;
+
+        case State.JOINED:
+          if (!spansAreBackToBack(lastFrom(stack), span)) {
+            stack.push(span);
+            state = State.UNJOINED;
+            break;
+          }
+
+          let top = stack.pop();
+          let joinedSpan = concatenateSpans(top, span);
+          stack.push(joinedSpan);
+
+          if (includes(delimiters, span.text)) {
+            state = State.JOINED;
+          } else {
+            state = State.UNJOINED;
+          }
+          break;
+        }
+      }
+
+      return stack;
     }
 
     /**
