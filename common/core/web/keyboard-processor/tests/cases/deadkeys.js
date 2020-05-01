@@ -40,12 +40,16 @@ describe('Engine - Deadkeys', function() {
 
   // Converts each test set into its own Mocha-level test.
   for(let set of testSuite.inputTestSets) {
-    it(set.toTestName(), function() {
-      let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
-      if(!proctor.compatibleWithSuite(testSuite)) {
-        skip("Cannot run this test suite on Node.");
-      }
-      set.test(proctor);
-    })
+    let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+      
+    if(!proctor.compatibleWithSuite(testSuite)) {
+      it.skip(set.toTestName() + " - Cannot run this test suite on Node.");
+    } else {
+      it(set.toTestName(), function() {
+        // Refresh the proctor instance at runtime.
+        let proctor = new KMWRecorder.NodeProctor(keyboard, device, assert.equal);
+        set.test(proctor);
+      });
+    }
   }
 });

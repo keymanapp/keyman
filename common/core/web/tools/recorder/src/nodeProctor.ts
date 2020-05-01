@@ -4,6 +4,7 @@
 namespace KMWRecorder {
   export class NodeProctor extends Proctor {
     private keyboard: com.keyman.keyboards.Keyboard;
+    public __debug = false;
 
     constructor(keyboard: com.keyman.keyboards.Keyboard, device: com.keyman.text.EngineDeviceSpec, assert: AssertCallback) {
       super(device, assert);
@@ -22,6 +23,14 @@ namespace KMWRecorder {
     compatibleWithSuite(testSuite: KeyboardTest): boolean {
       // Original-version tests did not supply core-compatible KeyEvent data.
       return !testSuite.specVersion.equals(KeyboardTest.FALLBACK_VERSION);
+    }
+
+    get debugMode(): boolean {
+      return this.__debug;
+    }
+
+    set debugMode(value: boolean) {
+      this.__debug = value;
     }
 
     matchesTestSet(testSet: TestSet<any>) {
@@ -68,6 +77,10 @@ namespace KMWRecorder {
           // ... we _could_ if we wanted to, though.  The framework is mostly in place; 
           // it's a matter of actually adding the feature.
           let ruleBehavior = processor.processKeystroke(keyEvent, target);
+
+          if(this.debugMode) {
+            console.log(JSON.stringify(ruleBehavior, null, ' '));
+          }
         }
       } else {
         throw new Error("NodeProctor only supports RecordedKeystrokeSequences for testing at present.");
