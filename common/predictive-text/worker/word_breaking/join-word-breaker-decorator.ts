@@ -13,8 +13,6 @@ namespace wordBreakers {
 
     return function (input: string): Span[] {
       let originalSpans = breaker(input);
-      // TEMP: "dumb down" the spans
-      originalSpans = originalSpans.map(({start, end, length, text}) => ({start, end, length, text}));
 
       const enum State {
         UNINITIALIZED, // stack is empty
