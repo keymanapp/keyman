@@ -1,7 +1,8 @@
 var assert = require('chai').assert;
 
-var defaultWordBreaker = require('../../build/intermediate').wordBreakers['default'];
-var decorateWithJoin = require('../../build/intermediate').wordBreakers['join_'];
+var defaultWordBreaker = require('../../../common/predictive-text/build/intermediate').wordBreakers['default'];
+import {decorateWithJoin} from '../dist/lexical-model-compiler/join-word-breaker-decorator';
+
 
 describe('The join word breaker decorator', function () {
   it('should decorate an existing word breaker', function () {
@@ -9,7 +10,7 @@ describe('The join word breaker decorator', function () {
     assert.isFunction(breakWords);
   });
 
-  const TEST_CASES = [
+  const TEST_CASES: [string, string[], string[], string[]][] = [
     /* input,      joiners,  default breaks,        breaks with joins */
     // Original test case from https://github.com/keymanapp/keyman/issues/2753
     ['khui-chhùi', ['-'],   ["khui", "-", "chhùi"], ["khui-chhùi"]], 
@@ -35,7 +36,7 @@ describe('The join word breaker decorator', function () {
     ],
 
     // Do not perform any joins:
-    ["hello world", "-", ["hello", "world"], ["hello", "world"]],
+    ["hello world", ["-"], ["hello", "world"], ["hello", "world"]],
 
     // Joining using multiple joiners
     [
@@ -91,9 +92,8 @@ describe('The join word breaker decorator', function () {
 
   /**
    * Get just the text from a span.
-   * @param {Span} span 
    */
-  function onlyText(span) {
+  function onlyText(span: Span) {
     return span.text;
   }
 });
