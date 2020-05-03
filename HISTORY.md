@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.65 alpha 2020-05-03
+
+* fix(ios): try embed of sentry again for fv (#3072)
+
 ## 14.0.64 alpha 2020-05-01
 
 * fix(ios): add sentry framework to fv keyboards (#3069)
