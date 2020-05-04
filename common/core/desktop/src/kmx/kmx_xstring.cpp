@@ -149,8 +149,8 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
     while(*p != UC_SENTINEL && n < 10) { p--; n++; }
 
     if(p < pStart) {
-      assert("Attempted to move prior to start of string");
-      return NULL;
+      // May be a malformed virtual key
+      return pStart;
     }
     return p;
   }
@@ -162,7 +162,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
     return p-1;
   }
   else if(*(p-1) == UC_SENTINEL) return p-1;
-  else if(*(p-2) == UC_SENTINEL && p > pStart+1)
+  else if(p > pStart+1 && *(p-2) == UC_SENTINEL)
   {
     switch(*(p-1))
     {
@@ -178,7 +178,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
         return p-2;
     }
   }
-  else if(*(p-3) == UC_SENTINEL && p > pStart+2)
+  else if(p > pStart+2 && *(p-3) == UC_SENTINEL)
   {
     switch(*(p-2))
     {
@@ -188,7 +188,7 @@ PKMX_WCHAR km::kbp::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
         return p-3;
     }
   }
-  else if(*(p-4) == UC_SENTINEL && p > pStart+3)
+  else if(p > pStart+3 && *(p-4) == UC_SENTINEL)
   {
     switch(*(p-3))
     {

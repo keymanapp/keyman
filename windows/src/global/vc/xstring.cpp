@@ -61,22 +61,34 @@ PWSTR incxstr(PWSTR p)
 	}
 }
 
-PWSTR decxstr(PWSTR p)
+PWSTR decxstr(PWSTR p, PWSTR pStart)
 {
-	p--;
+  if (p <= pStart) {
+    assert("Attempted to move prior to start of string");
+    return NULL;
+  }
+
+  p--;
 	if(*p == UC_SENTINEL_EXTENDEDEND)
 	{
 		int n = 0;
 		while(*p != UC_SENTINEL && n < 10) { p--; n++; }
-		return p;
+
+    if (p < pStart) {
+      // May be a malformed virtual key
+      return pStart;
+    }
+    return p;
 	}
 
-	if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF)
+  if (p == pStart) return p; // Don't allow test before pStart
+
+  if(*p >= 0xDC00 && *p <= 0xDFFF && *(p-1) >= 0xD800 && *(p-1) <= 0xDBFF)
 	{
 		return p-1;
 	}
 	else if(*(p-1) == UC_SENTINEL) return p-1;
-	else if(*(p-2) == UC_SENTINEL) 
+	else if(p > pStart + 1 && *(p-2) == UC_SENTINEL)
 	{
 		switch(*(p-1))
 		{
@@ -92,7 +104,7 @@ PWSTR decxstr(PWSTR p)
         return p-2;
 		}
 	}
-	else if(*(p-3) == UC_SENTINEL) 
+	else if(p > pStart + 2 && *(p-3) == UC_SENTINEL)
 	{
 		switch(*(p-2))
 		{
@@ -102,7 +114,7 @@ PWSTR decxstr(PWSTR p)
 				return p-3;
 		}
 	}
-  else if(*(p-4) == UC_SENTINEL)
+  else if(p > pStart + 3 && *(p-4) == UC_SENTINEL)
   {
     switch(*(p-3))
     {
