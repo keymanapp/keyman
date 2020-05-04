@@ -9,7 +9,7 @@ project('keyboardprocessor', 'cpp', 'c',
         # Get version number from file (VERSION.md is in root of repo)
         # Fallback to "more" for Windows compatbility
         version: run_command(find_program('cat', 'more'),
-                 files('..\..\..\VERSION.md')).stdout().strip(),
+                 files('../../../VERSION.md')).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14'])
