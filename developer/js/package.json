@@ -12,7 +12,6 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha",
-    "install": "npm link @keymanapp/lexical-model-types",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -38,6 +37,7 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
+    "@keymanapp/lexical-model-types": "^0.0.0",
     "commander": "^3.0.0",
     "typescript": "^3.2.4",
     "xml2js": "^0.4.19"
@@ -47,6 +47,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.14.6",
     "@types/xml2js": "^0.4.5",
+    "@keymanapp/lexical-model-layer": "^14.0.0",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
     "jszip": "^2.5.0",

@@ -13,18 +13,18 @@ describe('The join word breaker decorator', function () {
   const TEST_CASES: [string, string[], string[], string[]][] = [
     /* input,      joiners,  default breaks,        breaks with joins */
     // Original test case from https://github.com/keymanapp/keyman/issues/2753
-    ['khui-chhùi', ['-'],   ["khui", "-", "chhùi"], ["khui-chhùi"]], 
+    ['khui-chhùi', ['-'],   ["khui", "-", "chhùi"], ["khui-chhùi"]],
 
-    // Plains Cree SRO: 
+    // Plains Cree SRO:
     ['ê-kotiskâwêyâhk', ['-'], ['ê', '-', 'kotiskâwêyâhk'], ['ê-kotiskâwêyâhk']],
 
     // Edge cases:
 
     // Joiner alone:
     ['-', ['-'], ['-'], ['-']],
-    // Joiner at the end: 
+    // Joiner at the end:
     ['ni-', ['-'], ['ni', '-'], ['ni-']],
-    // Joiner at the end: 
+    // Joiner at the end:
     ['-ân', ['-'], ['-', 'ân'], ['-ân']],
 
     // This was my guiding test case:
@@ -45,8 +45,8 @@ describe('The join word breaker decorator', function () {
       ["Email", ":", "no", "-", "body", "@", "example.com"],
       ["Email", ":", "no-body@example.com"]
     ],
-    
-    // Joining with two or more joiners in a row 
+
+    // Joining with two or more joiners in a row
     [
       "nobody@@example.com",
       ["@"],

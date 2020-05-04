@@ -4,7 +4,8 @@
     "common/core/web/keyboard-processor",
     "common/predictive-text",
     "common/lexical-model-types",
-    "web"
+    "web",
+    "developer/js"
   ],
   "version": "14.0.0"
 }

@@ -7,12 +7,10 @@
 set -eu
 
 # Include some helper functions from resources
-. ../../resources/shellHelperFunctions.sh
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../.."
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 EX_USAGE=64
-
-# Where to find lexical model types.
-LEXICAL_MODELS_TYPES=../../common/lexical-model-types
-
 
 # Build the main script.
 build () {
@@ -130,10 +128,7 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  # Ensure that the local npm package can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
-
-  npm install || fail "Could not download dependencies."
+  verify_npm_setup true || fail "Could not setup dependencies."
 fi
 
 if [ -n "$publish_version" ]; then
