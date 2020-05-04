@@ -10,24 +10,35 @@ if "%1"=="x64" goto build
 echo "Invalid parameter."
 goto help
 
+rem ----------------------------------
+
 :help
 echo Usage: build-core.bat x86^|x64^|all [-c]
+echo -c will leave your environment configured for Visual Studio for selected platform.
+echo -c can be used only with x86 and x64 options
 goto :eof
+
+rem ----------------------------------
 
 :all
+
 setlocal
 cd %KEYMAN_ROOT%\common\core\desktop
-cmd /c build.bat x86 -i
+cmd /c build.bat x86
 if errorlevel 1 exit /b !errorlevel!
 
 cd %KEYMAN_ROOT%\common\core\desktop
-cmd /c build.bat x64 -i
+cmd /c build.bat x64
 if errorlevel 1 exit /b !errorlevel!
 
 goto :eof
 
+rem ----------------------------------
+
 :build
+
 if "%2"=="-c" goto :setup
+
 set ARCH=%1
 echo Building Keyman Core for Windows !ARCH!
 
@@ -71,7 +82,9 @@ if errorlevel 1 exit /b !errorlevel!
 
 cd ..
 
-if "%2"=="-i" goto :eof
+goto :eof
+
+rem ----------------------------------
 
 :setup
 
@@ -84,4 +97,4 @@ for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -latest -re
 %VCVARSALL% %1 8.1
 goto :eof
 
-rem EOF
+rem ----------------------------------
