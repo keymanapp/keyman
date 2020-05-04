@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.66 alpha 2020-05-04
+
+* feat(web): test Recorder overhaul, Node-based tests using Recorder for KeyboardProcessor (#3060)
+* fix(ios): fv add sentry framework to carthage build step (#3074)
+
 ## 14.0.65 alpha 2020-05-03
 
 * fix(ios): try embed of sentry again for fv (#3072)
