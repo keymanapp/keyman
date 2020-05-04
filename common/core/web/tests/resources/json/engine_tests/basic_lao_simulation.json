@@ -1,0 +1,104 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "lao_2008_basic",
+    "name": "Lao Basic",
+    "filename": "resources/keyboards/lao_2008_basic.js",
+    "languages": [
+      {
+        "id": "lo",
+        "name": "Lao",
+        "region": "Asia"
+      }
+    ]
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 83,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "s",
+                "code": "KeyS",
+                "keyCode": 83,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "ຫ"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "desktop",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            }
+          ],
+          "output": "ຫ"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "phone",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            }
+          ],
+          "output": "ຫ"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "tablet",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_S"
+            }
+          ],
+          "output": "ຫ"
+        }
+      ]
+    }
+  ]
+}

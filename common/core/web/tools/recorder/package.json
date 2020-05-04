@@ -1,0 +1,26 @@
+{
+  "name": "@keymanapp/recorder-core",
+  "version": "14.0.0",
+  "description": "Core classes used to develop KeymanWeb test cases based on keystrokes",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "dependencies": {
+    "@keymanapp/keyboard-processor": "^14.0.0",
+    "@keymanapp/lexical-model-types": "^0.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.2"
+  }
+}

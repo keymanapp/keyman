@@ -52,6 +52,7 @@
     "@keymanapp/keyboard-processor": "^14.0.0",
     "@keymanapp/lexical-model-layer": "^14.0.0",
     "@keymanapp/lexical-model-types": "^0.0.0",
+    "@keymanapp/recorder-core": "^14.0.0",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",

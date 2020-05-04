@@ -246,20 +246,23 @@ var loadKeyboardFromJSON = function(jsonPath, callback, timeout) {
   loadKeyboardStub(stub, callback, timeout);
 }
 
-function runLoadedKeyboardTest(testDef, usingOSK, assertCallback) {
+function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
   var inputElem = document.getElementById('singleton');
-    if(inputElem['kmw_ip']) {
-      inputElem = inputElem['kmw_ip'];
-    }
+  if(inputElem['kmw_ip']) {
+    inputElem = inputElem['kmw_ip'];
+  }
 
-    testDef.run(inputElem, usingOSK, assertCallback);
+  let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
+  testDef.test(proctor);
 }
 
 function runKeyboardTestFromJSON(jsonPath, params, callback, assertCallback, timeout) {
   var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
+  let device = new com.keyman.Device();
+  device.detect();
 
   loadKeyboardStub(testSpec.keyboard, function() {
-    runLoadedKeyboardTest(testSpec, params.usingOSK, assertCallback);
+    runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
     keyman.removeKeyboards(testSpec.keyboard.id);
     callback();
   }, timeout);
@@ -425,7 +428,7 @@ if(typeof(DynamicElements) == 'undefined') {
   // object as the rest of DynamicElements, which is useful for numerous test cases.
   DynamicElements.init = function() {
     var s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
-    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEvent(s_key_json);
+    DynamicElements.keyCommand = new KMWRecorder.PhysicalInputEventSpec(s_key_json);
 
     DynamicElements.enabledLaoOutput = "ຫ";
     DynamicElements.enabledKhmerOutput = "ស";

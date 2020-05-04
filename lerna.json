@@ -2,6 +2,7 @@
   "packages": [
     "common/core/web/input-processor",
     "common/core/web/keyboard-processor",
+    "common/core/web/tools/recorder",
     "common/predictive-text",
     "common/lexical-model-types",
     "web"

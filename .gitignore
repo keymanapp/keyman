@@ -260,3 +260,4 @@ resources/environment.sh
 /common/core/desktop/VERSION.md
 
 **/node_modules/
+lerna-debug.log

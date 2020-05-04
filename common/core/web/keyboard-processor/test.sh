@@ -54,8 +54,13 @@ test-headless ( ) {
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/*.js
+  npm run mocha -- --recursive $FLAGS ./tests/cases/
 }
+
+# Build test dependency
+pushd "$KEYMAN_ROOT/common/core/web/tools/recorder/src"
+./build.sh -skip-package-install || fail "recorder-core compilation failed."
+popd
 
 # Run headless (browserless) tests.
 test-headless || fail "Keyboard Processor tests failed!"

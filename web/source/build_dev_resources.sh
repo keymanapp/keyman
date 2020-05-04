@@ -23,9 +23,9 @@ assert ( ) {
 verify_npm_setup
 
 # Definition of global compile constants
-SCRIPT_TAGS=( "recorder"                "dev_resources" )
-PRODUCTS=(    "recorder_InputEvents.js" "dev_resources.js")
-FOLDERS=(     "recorder"                "dev_resources")
+SCRIPT_TAGS=( "dev_resources" )
+PRODUCTS=(    "dev_resources.js")
+FOLDERS=(     "dev_resources")
 OUTPUT_BASE="../release"
 PRODUCT_COUNT=${#PRODUCTS[@]}
 

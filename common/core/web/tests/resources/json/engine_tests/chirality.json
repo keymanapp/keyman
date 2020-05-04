@@ -1,0 +1,639 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "test_chirality",
+    "name": "KeymanWeb Chirality Tester",
+    "filename": "resources/keyboards/test_chirality.js",
+    "languages": {}
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "DF_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 17,
+              "states": 10752,
+              "modifiers": 1,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Control",
+                "code": "ControlLeft",
+                "keyCode": 17,
+                "location": 1,
+                "modifierSet": 2
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 1,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 2
+              }
+            }
+          ],
+          "output": "LC_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 18,
+              "states": 10752,
+              "modifiers": 4,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Alt",
+                "code": "AltLeft",
+                "keyCode": 18,
+                "location": 1,
+                "modifierSet": 4
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 4,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 4
+              }
+            }
+          ],
+          "output": "LA_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 18,
+              "states": 10752,
+              "modifiers": 8,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Alt",
+                "code": "AltRight",
+                "keyCode": 18,
+                "location": 2,
+                "modifierSet": 4
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 8,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 4
+              }
+            }
+          ],
+          "output": "RA_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 17,
+              "states": 10752,
+              "modifiers": 2,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Control",
+                "code": "ControlRight",
+                "keyCode": 17,
+                "location": 2,
+                "modifierSet": 2
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 2,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 2
+              }
+            }
+          ],
+          "output": "RC_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 17,
+              "states": 10752,
+              "modifiers": 1,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Control",
+                "code": "ControlLeft",
+                "keyCode": 17,
+                "location": 1,
+                "modifierSet": 2
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 17,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 3
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 17,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "A",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 3
+              }
+            }
+          ],
+          "output": "LC_CAP_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 17,
+              "states": 10752,
+              "modifiers": 1,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Control",
+                "code": "ControlLeft",
+                "keyCode": 17,
+                "location": 1,
+                "modifierSet": 2
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 18,
+              "states": 10752,
+              "modifiers": 8,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Alt",
+                "code": "AltLeft",
+                "keyCode": 18,
+                "location": 1,
+                "modifierSet": 6
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 8,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 6
+              }
+            }
+          ],
+          "msg": "AltGr emulation failed!",
+          "output": "RA_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 17,
+              "states": 10752,
+              "modifiers": 1,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Control",
+                "code": "ControlLeft",
+                "keyCode": 17,
+                "location": 1,
+                "modifierSet": 2
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 18,
+              "states": 10752,
+              "modifiers": 8,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Alt",
+                "code": "AltLeft",
+                "keyCode": 18,
+                "location": 1,
+                "modifierSet": 6
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 24,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 7
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 24,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "A",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 7
+              }
+            }
+          ],
+          "msg": "AltGr emulation failed!",
+          "output": "RA_CAP_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 18,
+              "states": 10752,
+              "modifiers": 4,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Alt",
+                "code": "AltLeft",
+                "keyCode": 18,
+                "location": 1,
+                "modifierSet": 4
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 16,
+              "states": 10752,
+              "modifiers": 20,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "Shift",
+                "code": "ShiftLeft",
+                "keyCode": 16,
+                "location": 1,
+                "modifierSet": 5
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 20,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "A",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 5
+              }
+            }
+          ],
+          "output": "LA_CAP_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 20,
+              "states": 10496,
+              "modifiers": 0,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "CapsLock",
+                "code": "CapsLock",
+                "keyCode": 20,
+                "location": 0,
+                "modifierSet": 16
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10496,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "A",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 16
+              }
+            }
+          ],
+          "output": "CAPSLOCK_DF_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10496,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "B",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 16
+              }
+            }
+          ],
+          "output": "b"
+        },
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 66,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": true,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "b",
+                "code": "KeyB",
+                "keyCode": 66,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "b"
+        }
+      ]
+    },
+    {
+      "constraint": {
+        "target": "desktop",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "DF_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_LCONTROL"
+            },
+            {
+              "type": "osk",
+              "layer": "leftctrl",
+              "keyName": "K_LALT"
+            },
+            {
+              "type": "osk",
+              "layer": "leftctrl-leftalt",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "RA_a",
+          "msg": "OSK-based AltGr emulation failed!"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_LCONTROL"
+            },
+            {
+              "type": "osk",
+              "layer": "leftctrl",
+              "keyName": "K_LALT"
+            },
+            {
+              "type": "osk",
+              "layer": "leftctrl-leftalt",
+              "keyName": "K_SHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "leftctrl-leftalt-shift",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "RA_CAP_a",
+          "msg": "OSK-based AltGr emulation failed!"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_RALT"
+            },
+            {
+              "type": "osk",
+              "layer": "rightalt",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "RA_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_RCONTROL"
+            },
+            {
+              "type": "osk",
+              "layer": "rightctrl",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "RC_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_RALT"
+            },
+            {
+              "type": "osk",
+              "layer": "rightalt",
+              "keyName": "K_RCONTROL"
+            },
+            {
+              "type": "osk",
+              "layer": "rightctrl-rightalt",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "RCA_a"
+        },
+        {
+          "inputs": [
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_CAPS"
+            },
+            {
+              "type": "osk",
+              "layer": "default",
+              "keyName": "K_RCONTROL"
+            },
+            {
+              "type": "osk",
+              "layer": "rightctrl",
+              "keyName": "K_RSHIFT"
+            },
+            {
+              "type": "osk",
+              "layer": "rightctrl-shift",
+              "keyName": "K_A"
+            }
+          ],
+          "output": "CAPSLOCK_RC_CAP_a"
+        }
+      ]
+    }
+  ]
+}
