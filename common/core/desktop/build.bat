@@ -1,7 +1,6 @@
 @echo off
 
 setlocal enabledelayedexpansion
-setlocal
 
 if "%1"=="" goto help
 if "%1"=="all" goto all
@@ -12,21 +11,23 @@ echo "Invalid parameter."
 goto help
 
 :help
-echo Usage: build-core.bat x86^|x64^|all
+echo Usage: build-core.bat x86^|x64^|all [-c]
 goto :eof
 
 :all
+setlocal
 cd %KEYMAN_ROOT%\common\core\desktop
-cmd /c build.bat x86
+cmd /c build.bat x86 -i
 if errorlevel 1 exit /b !errorlevel!
 
 cd %KEYMAN_ROOT%\common\core\desktop
-cmd /c build.bat x64
+cmd /c build.bat x64 -i
 if errorlevel 1 exit /b !errorlevel!
 
 goto :eof
 
 :build
+if "%2"=="-c" goto :setup
 set ARCH=%1
 echo Building Keyman Core for Windows !ARCH!
 
@@ -69,5 +70,18 @@ meson test --print-errorlogs
 if errorlevel 1 exit /b !errorlevel!
 
 cd ..
+
+if "%2"=="-i" goto :eof
+
+:setup
+
+rem Standalone build, so we'll make the environment available to the caller
+rem Also setup
+endlocal
+for /f "usebackq tokens=*" %%i in (`..\..\..\resources\build\vswhere -latest -requires Microsoft.Component.MSBuild -find **\vcvarsall.bat`) do (
+  set VCVARSALL="%%i"
+)
+%VCVARSALL% %1 8.1
 goto :eof
 
+rem EOF
