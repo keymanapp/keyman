@@ -143,6 +143,28 @@ BOOL ProcessHook()
 
 	ProcessGroup(gp);
 
+  if (fOutputKeystroke && !_td->app->IsQueueEmpty()) {
+    //
+    // #2759: The keyboard has requested that the default output
+    // should be emitted. With .kmn, this is done with 'use(final)'
+    // where 'group(final) using keys' is an empty group. Typical
+    // use case is to allow ENTER, TAB, etc, to be emitted as
+    // normal but to do some preprocessing first. A classic example
+    // is final sigma for Greek which changes only when the word is
+    // 'complete'.
+    //
+    // We have some events in the queue, so we need to
+    // block the default keystroke, emit those characters, and
+    // then synthesize the original keystroke
+    //
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: %d events in queue and default output requested.", _td->app->GetQueueSize());
+    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
+    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
+    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
+    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
+    fOutputKeystroke = FALSE;
+  }
+
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
 	{
 		_td->app->SetCurrentShiftState(Globals::get_ShiftState());
