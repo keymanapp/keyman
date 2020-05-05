@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.67 alpha 2020-05-05
+
+* fix(ios): Additional libraries for FirstVoices SWKeyboard (#3080)
+
 ## 14.0.66 alpha 2020-05-04
 
 * feat(web): test Recorder overhaul, Node-based tests using Recorder for KeyboardProcessor (#3060)
