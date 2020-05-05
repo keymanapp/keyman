@@ -12,6 +12,10 @@
 		37150F74231637EA00C73C6A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6F231637EA00C73C6A /* Reachability.framework */; };
 		37150F75231637EA00C73C6A /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F70231637EA00C73C6A /* Zip.framework */; };
 		37150F76231637EA00C73C6A /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F71231637EA00C73C6A /* XCGLogger.framework */; };
+		3729344024613C9900C5428C /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6E231637EA00C73C6A /* ObjcExceptionBridging.framework */; };
+		3729344124613CA700C5428C /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F71231637EA00C73C6A /* XCGLogger.framework */; };
+		3729344224613CB600C5428C /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 372A4B9C245E904A001C1F80 /* Sentry.framework */; };
+		3729344324613CC200C5428C /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F70231637EA00C73C6A /* Zip.framework */; };
 		372A4B9D245E904A001C1F80 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 372A4B9C245E904A001C1F80 /* Sentry.framework */; };
 		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
 		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
@@ -142,6 +146,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
+				3729344024613C9900C5428C /* ObjcExceptionBridging.framework in Frameworks */,
+				3729344124613CA700C5428C /* XCGLogger.framework in Frameworks */,
+				3729344224613CB600C5428C /* Sentry.framework in Frameworks */,
+				3729344324613CC200C5428C /* Zip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -711,7 +719,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = D7TR486TEH;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -739,7 +750,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = D7TR486TEH;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
