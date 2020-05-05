@@ -19,7 +19,35 @@ public class LexicalModel extends LanguageResource implements Serializable {
   // Only used to build download bundle from cloud
   private String modelURL;
 
-  public LexicalModel(JSONObject lexicalModelJSON) {
+  // JSON key
+  public static String LM_MODEL_URL_KEY = "modelURL";
+
+  /**
+   * Constructor using JSON Object from installed lexical models list
+   * @param installedObj
+   */
+  public LexicalModel(JSONObject installedObj) {
+    try {
+      this.packageID = installedObj.getString(LanguageResource.LR_PACKAGE_ID_KEY);
+      this.resourceID = installedObj.getString(LanguageResource.LR_RESOURCE_ID_KEY);
+      this.resourceName = installedObj.getString(LanguageResource.LR_RESOURCE_NAME_KEY);
+      this.languageID = installedObj.getString(LanguageResource.LR_LANGUAGE_ID_KEY);
+      this.languageName = installedObj.getString(LanguageResource.LR_LANGUAGE_NAME_KEY);
+      this.version = installedObj.getString(LanguageResource.LR_VERSION_KEY);
+      this.helpLink = installedObj.getString(LanguageResource.LR_HELP_LINK_KEY);
+
+      this.modelURL = installedObj.getString(LM_MODEL_URL_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "JSON exception: " + e);
+    }
+  }
+
+  /**
+   * Constructor using JSON Object from lexical model cloud catalog
+   * @param lexicalModelJSON
+   * @param fromCloud boolean - only really used to make a unique prototype
+   */
+  public LexicalModel(JSONObject lexicalModelJSON, boolean fromCloud) {
     try {
       this.modelURL = lexicalModelJSON.optString("packageFilename", "");
 
@@ -115,4 +143,27 @@ public class LexicalModel extends LanguageResource implements Serializable {
     return false;
   }
 
+  public JSONObject toJSON() {
+    JSONObject o = super.toJSON();
+    if (o != null) {
+      try {
+        o.put(LM_MODEL_URL_KEY, this.modelURL);
+      } catch (JSONException e) {
+        Log.e(TAG, "toJSON exception: " + e);
+      }
+    }
+
+    return o;
+  }
+
+  // default nrc.en.mtnt English dictionary
+  public static final LexicalModel DEFAULT_LEXICAL_MODEL = new LexicalModel(
+    KMManager.KMDefault_DictionaryPackageID,
+    KMManager.KMDefault_DictionaryModelID,
+    KMManager.KMDefault_DictionaryModelName,
+    KMManager.KMDefault_LanguageID,
+    KMManager.KMDefault_LanguageName,
+    KMManager.KMDefault_DictionaryVersion,
+    "",
+    "");
 }

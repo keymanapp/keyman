@@ -21,6 +21,38 @@ public class Keyboard extends LanguageResource implements Serializable {
   private String font;
   private String oskFont;
 
+  // JSON keys
+  public static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
+  public static String KB_FONT_KEY = "font";
+  public static String KB_OSK_FONT_KEY = "oskFont";
+
+  /**
+   * Constructor using JSON Objects from installed keyboards list
+   * @param installedObj
+   */
+  public Keyboard(JSONObject installedObj) {
+    try {
+      this.packageID = installedObj.getString(LanguageResource.LR_PACKAGE_ID_KEY);
+      this.resourceID = installedObj.getString(LanguageResource.LR_RESOURCE_ID_KEY);
+      this.resourceName = installedObj.getString(LanguageResource.LR_RESOURCE_NAME_KEY);
+      this.languageID = installedObj.getString(LanguageResource.LR_LANGUAGE_ID_KEY);
+      this.languageName = installedObj.getString(LanguageResource.LR_LANGUAGE_NAME_KEY);
+      this.version = installedObj.getString(LanguageResource.LR_VERSION_KEY);
+      this.helpLink = installedObj.getString(LanguageResource.LR_HELP_LINK_KEY);
+
+      this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
+      this.font = installedObj.getString(KB_FONT_KEY);
+      this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "JSON exception: " + e);
+    }
+  }
+
+  /**
+   * Constructor usong JSON Objects from keyboard cloud catalog
+   * @param languageJSON
+   * @param keyboardJSON
+   */
   public Keyboard(JSONObject languageJSON, JSONObject keyboardJSON) {
     try {
       this.packageID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -101,4 +133,30 @@ public class Keyboard extends LanguageResource implements Serializable {
     return false;
   }
 
+  public JSONObject toJSON() {
+    JSONObject o = super.toJSON();
+    if (o != null) {
+      try {
+        o.put(KB_NEW_KEYBOARD_KEY, this.isNewKeyboard);
+        o.put(KB_FONT_KEY, this.font);
+        o.put(KB_OSK_FONT_KEY, this.oskFont);
+      } catch (JSONException e) {
+        Log.e(TAG, "toJSON exception: " + e);
+      }
+    }
+    return o;
+  }
+
+  // Default sil_euro_latin keyboard
+  public static final Keyboard DEFAULT_KEYBOARD = new Keyboard(
+    KMManager.KMDefault_PackageID,
+    KMManager.KMDefault_KeyboardID,
+    KMManager.KMDefault_KeyboardName,
+    KMManager.KMDefault_LanguageID,
+    KMManager.KMDefault_LanguageName,
+    KMManager.KMDefault_KeyboardVersion,
+    null, // will use help.keyman.com link because context required to determine local welcome.htm path
+    false,
+    KMManager.KMDefault_KeyboardFont,
+    KMManager.KMDefault_KeyboardFont);
 }
