@@ -1,18 +1,18 @@
 /*
   Name:             xstring
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Aug 2012
 
   Modified Date:    27 Aug 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Aug 2012 - mcdurdin - I3439 - V9.0 - Refactor xstring support in C++ code
 */
 #include "pch.h"
@@ -99,8 +99,8 @@ PWSTR decxstr(PWSTR p, PWSTR pStart)
 			case CODE_CLEARCONTEXT:
 			case CODE_CALL:
 			case CODE_CONTEXTEX:
-      case CODE_RESETOPT: 
-      case CODE_SAVEOPT:  
+      case CODE_RESETOPT:
+      case CODE_SAVEOPT:
         return p-2;
 		}
 	}
@@ -109,7 +109,7 @@ PWSTR decxstr(PWSTR p, PWSTR pStart)
 		switch(*(p-2))
 		{
 			case CODE_INDEX:
-      case CODE_SETOPT:   
+      case CODE_SETOPT:
       case CODE_SETSYSTEMSTORE:
 				return p-3;
 		}
@@ -164,7 +164,7 @@ int xstrpos(PWSTR p1, PWSTR p)
 PWSTR xstrchr(PWSTR buf, PWSTR chr)
 {
   for(PWSTR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
-    if(!wcsncmp(buf, chr, (int)(q-buf)))
+    if(!wcsncmp(buf, chr, (intptr_t)(q-buf)))
       return buf;
   return NULL;
 }
@@ -173,5 +173,5 @@ int xchrcmp(PWSTR ch1, PWSTR ch2)
 {
   PWSTR nch1 = incxstr(ch1);
   if(nch1 == ch1) return *ch2 - *ch1; /* comparing *ch2 to nul */
-  return wcsncmp(ch1, ch2, (int)(nch1-ch1));
+  return wcsncmp(ch1, ch2, (intptr_t)(nch1-ch1));
 }
