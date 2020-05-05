@@ -16,7 +16,7 @@ namespace kmx {
 #define Uni_UTF32ToSurrogate2(ch) (((ch) - 0x10000) % 0x400 + 0xDC00)
 
 PKMX_WCHAR incxstr(PKMX_WCHAR p);
-PKMX_WCHAR decxstr(PKMX_WCHAR p);
+PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart);
 int xstrlen(PKMX_WCHAR p);
 int xstrlen_ignoreifopt(PKMX_WCHAR p);
 int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p);

@@ -3,7 +3,7 @@
 ## Prerequisites
 - Python 3
 - Meson build system.
-- C++14 or later compiler.
+- C++14 or later compiler (VC++ 2017 or later for Windows).
 - lib std::fs
 - kmcomp (for tests) -- must be added to path
 
@@ -28,7 +28,14 @@ python3 -m pip install meson
 ```
 
 ## Building
-In your source directory do the following:
+For Windows, use `build.bat` -- this handles environment and x86/x64
+cross-compiles with Visual Studio 2017+:
+
+```
+build.bat all
+```
+
+For all other platforms, in your source directory do the following:
 ```
 cd desktop
 meson build --werror
@@ -43,10 +50,10 @@ in this repo in /windows/src/developer/kmcomp. The compiler is currently availab
 PE executable only, but it does run under WINE.
 
 ### Windows
-The search path can be edited through System settings / Advanced system settings / 
+The search path can be edited through System settings / Advanced system settings /
 Environment Variables / User environment variables.
 
-If you have Keyman Developer installed, add %KeymanDeveloperPath% to your path. Otherwise, add 
+If you have Keyman Developer installed, add %KeymanDeveloperPath% to your path. Otherwise, add
 the path where you extracted the kmcomp archive.
 
 ### Linux

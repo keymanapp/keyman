@@ -1,5 +1,5 @@
 PWSTR incxstr(PWSTR p);
-PWSTR decxstr(PWSTR p);
+PWSTR decxstr(PWSTR p, PWSTR pStart);
 int xstrlen(PWSTR p);
 int xstrlen_ignoreifopt(PWSTR p);
 int xstrpos(PWSTR p1, PWSTR p);
