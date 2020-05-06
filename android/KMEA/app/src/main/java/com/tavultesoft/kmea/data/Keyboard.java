@@ -25,26 +25,24 @@ public class Keyboard extends LanguageResource implements Serializable {
   private String oskFont;
 
   // JSON keys
-  public static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
-  public static String KB_FONT_KEY = "font";
-  public static String KB_OSK_FONT_KEY = "oskFont";
+  private static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
+  private static String KB_FONT_KEY = "font";
+  private static String KB_OSK_FONT_KEY = "oskFont";
 
   /**
    * Constructor using JSON Objects from installed keyboards list
    * @param installedObj
    */
   public Keyboard(JSONObject installedObj) {
-    super(installedObj);
     this.fromJSON(installedObj);
   }
 
   /**
-   * Constructor usong JSON Objects from keyboard cloud catalog
+   * Constructor using JSON Objects from keyboard cloud catalog
    * @param languageJSON
    * @param keyboardJSON
    */
   public Keyboard(JSONObject languageJSON, JSONObject keyboardJSON) {
-    super(languageJSON, keyboardJSON);
     try {
       this.packageID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
 
@@ -76,10 +74,9 @@ public class Keyboard extends LanguageResource implements Serializable {
                   String languageID, String languageName, String version,
                   String helpLink,
                   boolean isNewKeyboard, String font, String oskFont) {
-    super(packageID, keyboardID, keyboardName, languageID, languageName, version);
-
-    this.helpLink = (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-      String.format(HELP_URL_FORMATSTR, this.resourceID, this.version);
+    super(packageID, keyboardID, keyboardName, languageID, languageName, version,
+      (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
+        String.format(HELP_URL_FORMATSTR, keyboardID, version));
 
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";

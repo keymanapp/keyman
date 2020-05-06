@@ -23,14 +23,13 @@ public class LexicalModel extends LanguageResource implements Serializable {
   private String modelURL;
 
   // JSON key
-  public static String LM_MODEL_URL_KEY = "modelURL";
+  private static String LM_MODEL_URL_KEY = "modelURL";
 
   /**
    * Constructor using JSON Object from installed lexical models list
    * @param installedObj
    */
   public LexicalModel(JSONObject installedObj) {
-    super(installedObj);
     this.fromJSON(installedObj);
   }
 
@@ -40,7 +39,6 @@ public class LexicalModel extends LanguageResource implements Serializable {
    * @param fromCloud boolean - only really used to make a unique prototype
    */
   public LexicalModel(JSONObject lexicalModelJSON, boolean fromCloud) {
-    super(lexicalModelJSON, fromCloud);
     try {
       this.modelURL = lexicalModelJSON.optString("packageFilename", "");
 
@@ -87,9 +85,10 @@ public class LexicalModel extends LanguageResource implements Serializable {
                       String languageID, String languageName,  String version,
                       String helpLink,
                       String modelURL) {
-    super(packageID, lexicalModelID, lexicalModelName, languageID, languageName, version);
+    // TODO: handle help links
+    super(packageID, lexicalModelID, lexicalModelName, languageID, languageName,
+        version, "");
 
-    this.helpLink = ""; // TODO: Handle help links
     this.modelURL = modelURL;
   }
 
@@ -131,6 +130,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
   }
 
   protected void fromJSON(JSONObject installedObj) {
+    super.fromJSON(installedObj);
     try {
       this.modelURL = installedObj.getString(LM_MODEL_URL_KEY);
     } catch (JSONException e) {

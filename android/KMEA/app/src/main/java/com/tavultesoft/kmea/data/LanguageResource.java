@@ -23,13 +23,13 @@ public abstract class LanguageResource implements Serializable {
   protected String helpLink;
 
   // JSON keys
-  public static String LR_PACKAGE_ID_KEY = "packageID";
-  public static String LR_RESOURCE_ID_KEY = "resourceID";
-  public static String LR_RESOURCE_NAME_KEY = "resourceName";
-  public static String LR_LANGUAGE_ID_KEY = "languageID";
-  public static String LR_LANGUAGE_NAME_KEY = "languageName";
-  public static String LR_VERSION_KEY = "version";
-  public static String LR_HELP_LINK_KEY = "helpLink";
+  private static String LR_PACKAGE_ID_KEY = "packageID";
+  private static String LR_RESOURCE_ID_KEY = "resourceID";
+  private static String LR_RESOURCE_NAME_KEY = "resourceName";
+  private static String LR_LANGUAGE_ID_KEY = "languageID";
+  private static String LR_LANGUAGE_NAME_KEY = "languageName";
+  private static String LR_VERSION_KEY = "version";
+  private static String LR_HELP_LINK_KEY = "helpLink";
 
   private static final String TAG = "LanguageResource";
 
@@ -64,6 +64,10 @@ public abstract class LanguageResource implements Serializable {
 
   public abstract Bundle buildDownloadBundle();
 
+  public LanguageResource() {
+    // Noop
+  }
+
   /**
    * Constructor using JSON Objects from installed language resource list
    * @param installedObj
@@ -72,26 +76,19 @@ public abstract class LanguageResource implements Serializable {
     this.fromJSON(installedObj);
   }
 
-  public LanguageResource(JSONObject languageJSON, JSONObject keyboardJSON) {
-    // Noop - needed for Keyboard()
-  }
-
-  public LanguageResource(JSONObject lexicalModelJSON, boolean fromCloud) {
-    // Noop - needed for LexicalModel()
-  }
-
   /**
    * Constructor using properties
-   * For now, helpLink not included because it's only used by Keyboard
    * @param packageID
    * @param resourceID
    * @param resourceName
    * @param languageID
    * @param languageName
    * @param version
+   * @param helpLink
    */
   public LanguageResource(String packageID, String resourceID, String resourceName,
-                          String languageID, String languageName, String version) {
+                          String languageID, String languageName, String version,
+                          String helpLink) {
     this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
     this.resourceID = resourceID;
     this.resourceName = resourceName;
@@ -99,6 +96,7 @@ public abstract class LanguageResource implements Serializable {
     // If language name not provided, fallback to re-use language ID
     this.languageName = (languageName != null && !languageName.isEmpty()) ? languageName : this.languageID;
     this.version = (version != null) ? version : "1.0";
+    this.helpLink = helpLink;
   }
 
   protected void fromJSON(JSONObject installedObj) {
