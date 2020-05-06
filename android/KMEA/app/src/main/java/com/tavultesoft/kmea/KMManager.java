@@ -63,6 +63,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
@@ -223,6 +224,10 @@ public final class KMManager {
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
+
+  public static final String KMFilename_InstalledLexicalModelsList = "lexical_models_list.json";
+
+  // Deprecated by KMFilename_Installed_KeyboardsList and KMFilename_InstalledLexicalModelsList above
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
   public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
 
@@ -289,6 +294,8 @@ public final class KMManager {
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
+
+    KeyboardController.getInstance().initialize(appContext);
 
     CloudDownloadMgr.getInstance().initialize(appContext);
   }

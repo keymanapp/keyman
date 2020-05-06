@@ -62,6 +62,10 @@ public abstract class LanguageResource implements Serializable {
     return id.hashCode() * lgCode.hashCode();
   }
 
+  public String getKey() {
+    return String.format("%s_%s", languageID, resourceID);
+  }
+
   public abstract Bundle buildDownloadBundle();
 
   public LanguageResource() {
