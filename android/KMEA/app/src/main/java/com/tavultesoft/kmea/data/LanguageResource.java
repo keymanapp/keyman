@@ -69,14 +69,6 @@ public abstract class LanguageResource implements Serializable {
   }
 
   /**
-   * Constructor using JSON Objects from installed language resource list
-   * @param installedObj
-   */
-  public LanguageResource(JSONObject installedObj) {
-    this.fromJSON(installedObj);
-  }
-
-  /**
    * Constructor using properties
    * @param packageID
    * @param resourceID
