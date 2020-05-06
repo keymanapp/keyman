@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.68 alpha 2020-05-06
+
+* fix(common): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
+* modify(android): Add methods to go between LanguageResource and JSON (#3079)
+* feat(common): auto-update for package versioning (#3078)
+
 ## 14.0.67 alpha 2020-05-05
 
 * fix(ios): Additional libraries for FirstVoices SWKeyboard (#3080)

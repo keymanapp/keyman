@@ -3,9 +3,9 @@
     "common/core/web/input-processor",
     "common/core/web/keyboard-processor",
     "common/core/web/tools/recorder",
-    "common/predictive-text",
     "common/lexical-model-types",
+    "common/predictive-text",
     "web"
   ],
-  "version": "14.0.0"
+  "version": "14.0.69"
 }
