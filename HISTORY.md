@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.69 alpha 2020-05-06
+
+* fix(common): npm install required for auto inc lerna versions (#3089)
+* fix(windows): sentry x64 stacks truncated pointers (#3087)
+
 ## 14.0.68 alpha 2020-05-06
 
 * fix(common): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
