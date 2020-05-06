@@ -206,11 +206,14 @@ public final class KMManager {
   public static final String KMDefault_KeyboardName = "EuroLatin (SIL) Keyboard";
   public static final String KMDefault_LanguageName = "English";
   public static final String KMDefault_KeyboardFont = "DejaVuSans.ttf";
+  public static final String KMDefault_KeyboardVersion = "1.8.1";
+  public static final String KMDefault_KeyboardKMP = KMDefault_PackageID + FileUtils.KEYMANPACKAGE;
 
   // Default Dictionary Info
   public static final String KMDefault_DictionaryPackageID = "nrc.en.mtnt";
   public static final String KMDefault_DictionaryModelID = "nrc.en.mtnt";
   public static final String KMDefault_DictionaryModelName = "English dictionary (MTNT)";
+  public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
   // Keyman files

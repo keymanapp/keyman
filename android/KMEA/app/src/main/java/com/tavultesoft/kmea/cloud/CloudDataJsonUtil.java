@@ -93,7 +93,7 @@ public class CloudDataJsonUtil {
       int modelsLength = models.length();
       for (int i = 0; i < modelsLength; i++) {
         JSONObject modelJSON = models.getJSONObject(i);
-        modelList.add(new LexicalModel(modelJSON));
+        modelList.add(new LexicalModel(modelJSON, true));
       }
     } catch (JSONException | NullPointerException e) {
       Log.e(TAG, "JSONParse Error: " + e);
