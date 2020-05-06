@@ -103,6 +103,8 @@ if [ "$action" == "commit" ]; then
 
   # Also updates package versions, committing those changes
   # Uses the 'version' run script defined in the base package.json.
+  npm install
+
   npm run version -- "$NEWVERSION"
 
   # Version info will be updated in lerna.json and all the lerna-managed package.json files.
