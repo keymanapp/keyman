@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
@@ -27,19 +30,8 @@ public class LexicalModel extends LanguageResource implements Serializable {
    * @param installedObj
    */
   public LexicalModel(JSONObject installedObj) {
-    try {
-      this.packageID = installedObj.getString(LanguageResource.LR_PACKAGE_ID_KEY);
-      this.resourceID = installedObj.getString(LanguageResource.LR_RESOURCE_ID_KEY);
-      this.resourceName = installedObj.getString(LanguageResource.LR_RESOURCE_NAME_KEY);
-      this.languageID = installedObj.getString(LanguageResource.LR_LANGUAGE_ID_KEY);
-      this.languageName = installedObj.getString(LanguageResource.LR_LANGUAGE_NAME_KEY);
-      this.version = installedObj.getString(LanguageResource.LR_VERSION_KEY);
-      this.helpLink = installedObj.getString(LanguageResource.LR_HELP_LINK_KEY);
-
-      this.modelURL = installedObj.getString(LM_MODEL_URL_KEY);
-    } catch (JSONException e) {
-      Log.e(TAG, "JSON exception: " + e);
-    }
+    super(installedObj);
+    this.fromJSON(installedObj);
   }
 
   /**
@@ -48,6 +40,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
    * @param fromCloud boolean - only really used to make a unique prototype
    */
   public LexicalModel(JSONObject lexicalModelJSON, boolean fromCloud) {
+    super(lexicalModelJSON, fromCloud);
     try {
       this.modelURL = lexicalModelJSON.optString("packageFilename", "");
 
@@ -90,18 +83,12 @@ public class LexicalModel extends LanguageResource implements Serializable {
     }
   }
 
-  public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName, String languageID, String languageName,
-                      String version, String helpLink,
+  public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,
+                      String languageID, String languageName,  String version,
+                      String helpLink,
                       String modelURL) {
+    super(packageID, lexicalModelID, lexicalModelName, languageID, languageName, version);
 
-    this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
-    this.resourceID = lexicalModelID;
-    this.resourceName = lexicalModelName;
-    this.languageID = languageID.toLowerCase();
-    // If language name not provided, fallback to re-use language ID
-    this.languageName = (languageName != null && !languageName.isEmpty()) ? languageName : this.languageID;
-
-    this.version = (version != null) ? version : "1.0";
     this.helpLink = ""; // TODO: Handle help links
     this.modelURL = modelURL;
   }
@@ -143,13 +130,21 @@ public class LexicalModel extends LanguageResource implements Serializable {
     return false;
   }
 
+  protected void fromJSON(JSONObject installedObj) {
+    try {
+      this.modelURL = installedObj.getString(LM_MODEL_URL_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "fromJSON() exception: " + e);
+    }
+  }
+
   public JSONObject toJSON() {
     JSONObject o = super.toJSON();
     if (o != null) {
       try {
         o.put(LM_MODEL_URL_KEY, this.modelURL);
       } catch (JSONException e) {
-        Log.e(TAG, "toJSON exception: " + e);
+        Log.e(TAG, "toJSON() exception: " + e);
       }
     }
 

@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
@@ -31,21 +34,8 @@ public class Keyboard extends LanguageResource implements Serializable {
    * @param installedObj
    */
   public Keyboard(JSONObject installedObj) {
-    try {
-      this.packageID = installedObj.getString(LanguageResource.LR_PACKAGE_ID_KEY);
-      this.resourceID = installedObj.getString(LanguageResource.LR_RESOURCE_ID_KEY);
-      this.resourceName = installedObj.getString(LanguageResource.LR_RESOURCE_NAME_KEY);
-      this.languageID = installedObj.getString(LanguageResource.LR_LANGUAGE_ID_KEY);
-      this.languageName = installedObj.getString(LanguageResource.LR_LANGUAGE_NAME_KEY);
-      this.version = installedObj.getString(LanguageResource.LR_VERSION_KEY);
-      this.helpLink = installedObj.getString(LanguageResource.LR_HELP_LINK_KEY);
-
-      this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
-      this.font = installedObj.getString(KB_FONT_KEY);
-      this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
-    } catch (JSONException e) {
-      Log.e(TAG, "JSON exception: " + e);
-    }
+    super(installedObj);
+    this.fromJSON(installedObj);
   }
 
   /**
@@ -54,6 +44,7 @@ public class Keyboard extends LanguageResource implements Serializable {
    * @param keyboardJSON
    */
   public Keyboard(JSONObject languageJSON, JSONObject keyboardJSON) {
+    super(languageJSON, keyboardJSON);
     try {
       this.packageID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
 
@@ -81,16 +72,12 @@ public class Keyboard extends LanguageResource implements Serializable {
     }
   }
 
-  public Keyboard(String packageID, String keyboardID, String keyboardName, String languageID, String languageName,
-                  String version, String helpLink,
+  public Keyboard(String packageID, String keyboardID, String keyboardName,
+                  String languageID, String languageName, String version,
+                  String helpLink,
                   boolean isNewKeyboard, String font, String oskFont) {
+    super(packageID, keyboardID, keyboardName, languageID, languageName, version);
 
-    this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
-    this.resourceID = keyboardID;
-    this.resourceName = keyboardName;
-    this.languageID = languageID.toLowerCase();
-    this.languageName = languageName;
-    this.version = (version != null) ? version : "1.0";
     this.helpLink = (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
       String.format(HELP_URL_FORMATSTR, this.resourceID, this.version);
 
@@ -131,6 +118,17 @@ public class Keyboard extends LanguageResource implements Serializable {
     }
 
     return false;
+  }
+
+  protected void fromJSON(JSONObject installedObj) {
+    super.fromJSON(installedObj);
+    try {
+      this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
+      this.font = installedObj.getString(KB_FONT_KEY);
+      this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "fromJSON exception: " + e);
+    }
   }
 
   public JSONObject toJSON() {

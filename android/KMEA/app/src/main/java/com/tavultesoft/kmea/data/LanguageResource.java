@@ -1,7 +1,12 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
 import android.util.Log;
+
+import com.tavultesoft.kmea.KMManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +63,57 @@ public abstract class LanguageResource implements Serializable {
   }
 
   public abstract Bundle buildDownloadBundle();
+
+  /**
+   * Constructor using JSON Objects from installed language resource list
+   * @param installedObj
+   */
+  public LanguageResource(JSONObject installedObj) {
+    this.fromJSON(installedObj);
+  }
+
+  public LanguageResource(JSONObject languageJSON, JSONObject keyboardJSON) {
+    // Noop - needed for Keyboard()
+  }
+
+  public LanguageResource(JSONObject lexicalModelJSON, boolean fromCloud) {
+    // Noop - needed for LexicalModel()
+  }
+
+  /**
+   * Constructor using properties
+   * For now, helpLink not included because it's only used by Keyboard
+   * @param packageID
+   * @param resourceID
+   * @param resourceName
+   * @param languageID
+   * @param languageName
+   * @param version
+   */
+  public LanguageResource(String packageID, String resourceID, String resourceName,
+                          String languageID, String languageName, String version) {
+    this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
+    this.resourceID = resourceID;
+    this.resourceName = resourceName;
+    this.languageID = languageID.toLowerCase();
+    // If language name not provided, fallback to re-use language ID
+    this.languageName = (languageName != null && !languageName.isEmpty()) ? languageName : this.languageID;
+    this.version = (version != null) ? version : "1.0";
+  }
+
+  protected void fromJSON(JSONObject installedObj) {
+    try {
+      this.packageID = installedObj.getString(LanguageResource.LR_PACKAGE_ID_KEY);
+      this.resourceID = installedObj.getString(LanguageResource.LR_RESOURCE_ID_KEY);
+      this.resourceName = installedObj.getString(LanguageResource.LR_RESOURCE_NAME_KEY);
+      this.languageID = installedObj.getString(LanguageResource.LR_LANGUAGE_ID_KEY);
+      this.languageName = installedObj.getString(LanguageResource.LR_LANGUAGE_NAME_KEY);
+      this.version = installedObj.getString(LanguageResource.LR_VERSION_KEY);
+      this.helpLink = installedObj.getString(LanguageResource.LR_HELP_LINK_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "fromJSON() exception: " + e);
+    }
+  }
 
   public JSONObject toJSON() {
     JSONObject o = new JSONObject();
