@@ -97,7 +97,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
   for (int i = (int)frameCount - 1; i >= 0; i--) {
     sentry_value_t frame = sentry_value_new_object();
     char buf[24];
-    wsprintfA(buf, "0x%x", DWORD_PTR(walked_backtrace[i]));
+    wsprintfA(buf, "0x%Ix", DWORD_PTR(walked_backtrace[i]));
     sentry_value_set_by_key(frame, "instruction_addr", sentry_value_new_string(buf));
     sentry_value_append(frames, frame);
   }
@@ -106,7 +106,7 @@ sentry_value_t CaptureStackTrace(PVOID TopAddr, DWORD FramesToSkip) {
   if (TopAddr != NULL) {
     sentry_value_t frame = sentry_value_new_object();
     char buf[24];
-    wsprintfA(buf, "0x%x", DWORD_PTR(TopAddr));
+    wsprintfA(buf, "0x%Ix", DWORD_PTR(TopAddr));
     sentry_value_set_by_key(frame, "instruction_addr", sentry_value_new_string(buf));
     sentry_value_append(frames, frame);
   }
