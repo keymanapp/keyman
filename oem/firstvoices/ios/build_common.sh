@@ -109,7 +109,16 @@ done
 # Build Keyman Engine
 #
 
-KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-iphoneos/KeymanEngine.framework"
+if [ $CONFIG = "Debug" ]; then
+    # When doing a debug run, we'd like to be able to run the result in the Simulator.
+    # 'universal' can be run both on real devices and in the simulator.
+    PLATFORM_TARGET="universal"
+else
+    # Actual release builds can't have Simulator-targeted content; Apple will block the submission.
+    PLATFORM_TARGET="iphoneos"
+fi
+
+KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-$PLATFORM_TARGET/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
