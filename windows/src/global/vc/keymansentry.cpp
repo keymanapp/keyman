@@ -32,15 +32,21 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
   // Set the sentry-db-directory to a writeable location
 
   char szPath[MAX_PATH + 17]; // length(keyman-sentry-db)+1
-  GetTempPathA(MAX_PATH, szPath);
-  char *p = strchr(szPath, 0);
-  if (p > szPath && *(p - 1) != '\\') {
-    *p++ = '\\';
-    *p = 0;
-  }
 
-  strcat_s(szPath, "keyman-sentry-db");
-  sentry_options_set_database_path(options, szPath);
+  LPITEMIDLIST pidl;
+  if (SUCCEEDED(SHGetFolderLocation(0, CSIDL_LOCAL_APPDATA, NULL, 0, &pidl))) {
+    if (SUCCEEDED(SHGetPathFromIDListA(pidl, szPath))) {
+      char *p = strchr(szPath, 0);
+      if (p > szPath && *(p - 1) != '\\') {
+        *p++ = '\\';
+        *p = 0;
+      }
+
+      strcat_s(szPath, "sentry-db");
+      sentry_options_set_database_path(options, szPath);
+    }
+    ILFree(pidl);
+  }
 
   sentry_options_set_release(options, "release-" KEYMAN_VersionWithTag); // matches git tag
   sentry_options_set_environment(options, KEYMAN_Environment); // stable, beta, alpha, test, local
