@@ -34,7 +34,7 @@ get_local_dependencies() {
 
   # Sadly, we can't rely on the bash script `readlines` command - not all shells  (eg: macOS) support it!
   # This will have the same net effect.
-  IFS=$'\n'
+  IFS=$'\r\n'
   packages=(${localDeps}); # Convert the output $localDeps string into a script-friendly array.
   unset IFS
 }
