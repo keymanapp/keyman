@@ -1,5 +1,11 @@
 #!/bin/bash
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+## END STANDARD BUILD SCRIPT INCLUDE
+. "$(dirname "$THIS_SCRIPT")/build/jq.inc.sh"
+
 display_usage ( ) {
   echo ""
   echo "package-utils.sh accepts one of the following options:"
@@ -24,7 +30,7 @@ PACKAGE_STASH='__node_modules'
 
 # Stores all @keymanapp package dependency/dev-dependency names to the 'packages' array.
 get_local_dependencies() {
-  localDeps=`cat package.json | jq -r ".dependencies, .devDependencies | to_entries | map(select(.key | match(\"@keymanapp/\";\"i\"))) | map(.key) | .[]"`
+  localDeps=`cat package.json | $JQ -r ".dependencies, .devDependencies | to_entries | map(select(.key | match(\"@keymanapp/\";\"i\"))) | map(.key) | .[]"`
 
   # Sadly, we can't rely on the bash script `readlines` command - not all shells  (eg: macOS) support it!
   # This will have the same net effect.
