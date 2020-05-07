@@ -57,10 +57,31 @@ declare var com;
     return event;
   }
 
+  function attachEventMetadata(event: any) {
+    event.extra = event.extra || [];
+    event.extra.push({
+      initialized: window['keyman']['getDebugInfo']()
+    });
+
+    return event;
+  }
+
+  /**
+   * Pre-processes a Sentry event object to provide more metadata and enhance the Sentry server's
+   * ability to match the error against release artifacts.
+   * @param event A Sentry-generated event
+   */
+  function eventPreparer(event: any) {
+    event = pathFilter(event);
+    event = attachEventMetadata(event);
+
+    return null; //event
+  }
+
   // Do the actual Sentry initialization.
   //@ts-ignore
   Sentry.init({
-    beforeSend: pathFilter,
+    beforeSend: eventPreparer,
     // FIXME:  DO NOT LEAVE IN PRODUCTION!
     debug: true,
     dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
