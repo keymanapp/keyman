@@ -1,5 +1,9 @@
 # Keyman for Android Version History
 
+## 2020-05-07 13.0.6210 stable
+* Bug fix:
+  * Back button dismisses system keyboard (#3094)
+
 ## 2020-04-20 13.0.6209 stable
 * Bug fix:
   * Fix crash involving system keyboard update notifications (#3007)
