@@ -2,16 +2,19 @@
 
 display_usage ( ) {
   echo ""
-  echo "package-utils.sh link-stash | link-unstash"
-  echo
+  echo "package-utils.sh accepts one of the following options:"
+  echo ""
   echo "  clean-external-deps  to erase the node_modules folder without erasing links."
-  echo "                       Internally uses both link-stash and link-unstash"
+  echo "                       Internally uses both link-stash and link-unstash."
   echo ""
   echo "  link-stash           to 'stash' the package's local links in a temporary"
   echo "                       directory."
   echo ""
   echo "  link-unstash         reverses 'link-stash', restoring the links to their"
   echo "                       original location and removing the temp directory."
+  echo ""
+  echo "  list-links           outputs the list of local dependencies used by the"
+  echo "                       current package.json."
   echo "" 
   exit 1
 }
@@ -21,7 +24,7 @@ PACKAGE_STASH='__node_modules'
 
 # Stores all @keymanapp package dependency/dev-dependency names to the 'packages' array.
 get_local_dependencies() {
-  localDeps=`cat package.json | jq -r '.dependencies, .devDependencies | to_entries | map(select(.key | match("@keymanapp/";"i"))) | map(.key) | .[]'`
+  localDeps=`cat package.json | jq -r ".dependencies, .devDependencies | to_entries | map(select(.key | match(\"@keymanapp/\";\"i\"))) | map(.key) | .[]"`
 
   # Sadly, we can't rely on the bash script `readlines` command - not all shells  (eg: macOS) support it!
   # This will have the same net effect.
@@ -62,6 +65,13 @@ if [ $# -eq 0 ]; then
   display_usage
 else
   case $1 in
+    list-links)
+      get_local_dependencies
+
+      for dep in "${packages[@]}"; do
+        echo "$dep"
+      done
+      ;;
     link-stash)
       QUIET=false
       stash_package_links

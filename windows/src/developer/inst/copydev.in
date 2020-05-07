@@ -88,7 +88,14 @@ heat-model-compiler:
 
     # Remove files we don't want to harvest; build a product node_modules folder
     cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\node_modules
+
+    # Clear out the node_modules folder while keeping any pre-established npm links.
+!ifdef GIT_BASH_FOR_KEYMAN
+    $(GIT_BASH_FOR_KEYMAN) $(KEYMAN_ROOT)\resources\package-utils.sh clean-external-deps
+!else
+    start /wait $(KEYMAN_ROOT)\resources\package-utils.sh clean-external-deps
+!endif
+
     npm install --production
 
     # We don't need source for the compiler or the unit tests
