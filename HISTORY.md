@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.70 alpha 2020-05-07
+
+* fix(android): Fix back button after System Keyboard dismissed (#3093)
+* fix(android): Back button to dismiss KMSample2 system keyboard (#3095)
+* fix(oem): Back button to dismiss FV Android system keyboard (#3096)
+
 ## 14.0.69 alpha 2020-05-06
 
 * fix(common): npm install required for auto inc lerna versions (#3089)
