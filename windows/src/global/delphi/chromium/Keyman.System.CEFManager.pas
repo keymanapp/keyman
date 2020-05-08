@@ -53,12 +53,8 @@ uses
   Winapi.Tlhelp32,
   Winapi.Windows,
 
-  Sentry.Client,
-
-  Keyman.System.KeymanSentryClient,
   KeymanPaths,
   KeymanVersion,
-//  RedistFiles,
   RegistryKeys,
   VersionInfo,
   uCEFConstants,
@@ -67,7 +63,6 @@ uses
   uCEFMiscFunctions,
   uCEFProcessMessage,
   uCEFTypes;
-//  UTikeDebugMode;
 
 procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
                                                     sourceProcess : TCefProcessId;
