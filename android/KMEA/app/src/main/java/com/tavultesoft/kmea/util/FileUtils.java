@@ -6,13 +6,18 @@ import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
 
+import org.json.JSONArray;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +28,7 @@ import java.util.regex.Pattern;
   * This might be usable once we can upgrade to Android Oreo
  */
 public final class FileUtils {
+  public static final String TAG = "FileUtils";
 
   public static final int DOWNLOAD_ERROR = -1;
   public static final int DOWNLOAD_SUCCESS = 1;
@@ -213,6 +219,23 @@ public final class FileUtils {
     }
   }
 
+  public static boolean saveList(Context context, String listName, JSONArray arr) {
+    boolean result;
+    final int INDENT = 2; // 2 spaces indent
+    try {
+      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), listName);
+      OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+      outputStream.write(arr.toString(INDENT));
+      outputStream.flush();
+      outputStream.close();
+      result = true;
+    } catch (Exception e) {
+      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
+      result = false;
+    }
+
+    return result;
+  }
   /**
    * Utility to parse a URL and extract the filename
    * @param urlStr String
