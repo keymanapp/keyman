@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -151,9 +152,23 @@ final class KMKeyboard extends WebView {
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
             ". Loading default keyboard", Toast.LENGTH_LONG).show();
 
-          setKeyboard(KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
-            KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
-            KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
+          Keyboard defaultKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
+          if (defaultKeyboard != null) {
+            setKeyboard(
+              // Revert to first keyboard in the list
+              defaultKeyboard.getPackageID(),
+              defaultKeyboard.getKeyboardID(),
+              defaultKeyboard.getLanguageID(),
+              defaultKeyboard.getKeyboardName(),
+              defaultKeyboard.getLanguageName(),
+              defaultKeyboard.getFont(),
+              defaultKeyboard.getOSKFont());
+          } else {
+            // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
+            setKeyboard(KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
+              KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
+              KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
+          }
         }
 
         return true;

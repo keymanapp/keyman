@@ -107,11 +107,12 @@ public class KeyboardController {
       } else {
         // No installed keyboards lists so assume default
         // TODO: What about 3rd-party apps w/o sil_euro_latin?
-        list.add(Keyboard.DEFAULT_KEYBOARD);
+        Log.w(TAG, "initialize with no default keyboard");
+        //list.add(Keyboard.DEFAULT_KEYBOARD);
       }
 
       // We'd prefer not to overwrite a file if it exists
-      if (!keyboards_json.exists()) {
+      if (!keyboards_json.exists() && list != null && list.size() > 0) {
         save(context);
       }
 
@@ -209,12 +210,22 @@ public class KeyboardController {
    * @return boolean - Status if the keyboard list was successfully saved
    */
   public boolean save(Context context) {
+    boolean result = false;
+    if (list == null || list.size() < 1) {
+      return result;
+    }
+
     JSONArray arr = new JSONArray();
     for (Keyboard k : list) {
       JSONObject o = k.toJSON();
       arr.put(o);
     }
-    boolean result = FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+
+    if (arr.length() < 1) {
+      return result;
+    }
+
+    FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
     return result;
   }
 }
