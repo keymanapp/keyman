@@ -154,6 +154,20 @@ begin
   Result := GlobalCEFApp.StartSubProcess;
 end;
 
+/// Start a watchdog thread to terminate process when parent does
+///
+/// Description: This should be run only in the context of the child process.
+/// It will normally only happen in an abnormal termination of the parent
+/// process (because otherwise the main thread of the child process receives an
+/// orderly request to shut down, and does so), but in the situation where the
+/// parent process disappears without making that request, this lets the child
+/// process do the work.
+///
+/// This is probably a gap in Chromium Embedded Framework but AFAICT it has not
+/// been resolved and this was the suggested fix, e.g. at
+/// https://magpcss.org/ceforum/viewtopic.php?p=37820&sid=11f6fcabc4089e41283bd5b9ec17267e#p37820
+/// which I have taken and cleaned up because it seemed appropriate.
+///
 procedure TCEFManager.LaunchWatchdog;
 
   function GetParentProcess: THandle;
