@@ -157,12 +157,26 @@ BOOL ProcessHook()
     // block the default keystroke, emit those characters, and
     // then synthesize the original keystroke
     //
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: %d events in queue and default output requested.", _td->app->GetQueueSize());
-    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
-    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
-    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
-    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
-    fOutputKeystroke = FALSE;
+    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: %d events in queue and default output requested. [IsLegacy:%d, IsUpdateable:%d]", _td->app->GetQueueSize(), _td->app->IsLegacy(), _td->TIPFUpdateable);
+
+    if (_td->app->IsLegacy()) {
+      _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
+      _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
+      _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
+      _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
+      fOutputKeystroke = FALSE;
+    }
+    else if (!_td->TIPFUpdateable) {
+      //
+      // #2759: kmtip calls this function twice for each keystroke, first to
+      // determine if we are doing processing work (IsUpdateable() == FALSE),
+      // then to actually do the work. We want to say, "yes we are doing
+      // processing work", which we currently do by returning TRUE
+      // (that is, setting fOutputKeystroke to FALSE), and then for the second
+      // pass, we will do the work and then output the keytroke. Tricky.
+      //
+      fOutputKeystroke = FALSE;
+    }
   }
 
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
