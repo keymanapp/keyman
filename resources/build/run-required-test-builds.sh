@@ -36,6 +36,7 @@ readonly KEYMAN_ROOT
 
 . "$(dirname "$THIS_SCRIPT")/trigger-definitions.sh"
 . "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
+. "$(dirname "$THIS_SCRIPT")/jq.inc.sh"
 
 #
 # Iterate through the platforms 'array' passed in and 
