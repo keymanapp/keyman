@@ -105,10 +105,10 @@ public class KeyboardController {
           list.add(Keyboard.DEFAULT_KEYBOARD);
         }
       } else {
-        // No installed keyboards lists so assume default
-        // TODO: What about 3rd-party apps w/o sil_euro_latin?
-        Log.w(TAG, "initialize with no default keyboard");
+        // No installed keyboards lists
+        // 3rd-party OEM may not have sil_euro_latin, so don't assign a default keyboard
         //list.add(Keyboard.DEFAULT_KEYBOARD);
+        Log.w(TAG, "initialize with no default keyboard");
       }
 
       // We'd prefer not to overwrite a file if it exists
@@ -188,12 +188,13 @@ public class KeyboardController {
 
   /**
    * Remove the keyboard at the specified index.
-   * Cannot remove index 0 (default)
+   * KeyboardPickerActivity checks that index > 0
+   * But we'll allow OEM apps to remove any keyboard
    * @param index
    */
   public void remove(int index) {
     // Check initialized, and disallow removing default keyboard
-    if (!isInitialized || (index <= 0)) {
+    if (!isInitialized) {
       return;
     }
 

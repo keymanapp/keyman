@@ -103,9 +103,7 @@ public class KeyboardPickerTest {
   {
       KeyboardPickerActivity activity = keyboardPickerActivityActivityController.get();
 
-      // get current keyboard
-      Keyboard _old = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
-      Assert.assertNotNull(_old);
+      // Default keyboard no longer installed
 
       // install new custom keyboard programmatically
       FunctionalTestHelper.installCustomKeyboard(TEST_GFF_KMP_FILE);
@@ -115,7 +113,7 @@ public class KeyboardPickerTest {
       Assert.assertNotNull(_view);
 
       // click the new installed keyboard, to select it.
-      View _itemview = _view.getAdapter().getView(1, null, null);
+      View _itemview = _view.getAdapter().getView(0, null, null);
       Assert.assertNotNull(_itemview);
       _view.performItemClick(_itemview,1,_view.getAdapter().getItemId(1));
 
@@ -125,8 +123,6 @@ public class KeyboardPickerTest {
       // check if keyboardswitch is done
       Keyboard _current = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
       Assert.assertNotNull(_current);
-
-      Assert.assertNotEquals(_old.getKeyboardID(),_current.getKeyboardID());
   }
 
   /**
@@ -152,7 +148,8 @@ public class KeyboardPickerTest {
       Assert.assertNotNull(_view);
 
       // click the info button to open keyboard info activity
-      View _itemview = _view.getAdapter().getView(1, null, null);
+      int expectedKeyboardID = 0; // Index for expected keyboard
+      View _itemview = _view.getAdapter().getView(expectedKeyboardID, null, null);
       Assert.assertNotNull(_itemview);
       _itemview.findViewById(R.id.imageButton1).performClick();
 
@@ -170,7 +167,7 @@ public class KeyboardPickerTest {
       Assert.assertNotNull(_infolistview);
 
       //find helplink and click
-      View _helplink = _view.getAdapter().getView(1, null, null);
+      View _helplink = _view.getAdapter().getView(expectedKeyboardID, null, null);
       Assert.assertNotNull(_helplink);
       _infolistview.performItemClick(_helplink,1,_infolistview.getAdapter().getItemId(1));
 
