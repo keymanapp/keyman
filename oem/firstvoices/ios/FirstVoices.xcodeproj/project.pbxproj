@@ -52,6 +52,7 @@
 		98C9A8F01BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */; };
 		98C9A8F11BFBF6C1009E9A4F /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */; };
 		98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */; };
+		CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6D231637E900C73C6A /* DeviceKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -148,6 +149,7 @@
 				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
 				3729344024613C9900C5428C /* ObjcExceptionBridging.framework in Frameworks */,
 				3729344124613CA700C5428C /* XCGLogger.framework in Frameworks */,
+				CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */,
 				3729344224613CB600C5428C /* Sentry.framework in Frameworks */,
 				3729344324613CC200C5428C /* Zip.framework in Frameworks */,
 			);
@@ -676,7 +678,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards;
+				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices_Keyboards";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
@@ -705,7 +707,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards;
+				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices_Keyboards";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 4.2;
 			};
@@ -734,7 +736,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards.swkeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards_SWKeyboard;
+				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices_Keyboards_SWKeyboard";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -764,7 +766,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.firstvoices.keyboards.swkeyboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = FirstVoices_Keyboards_SWKeyboard;
+				PROVISIONING_PROFILE_SPECIFIER = "FirstVoices_Keyboards_SWKeyboard";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 4.2;
