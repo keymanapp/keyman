@@ -47,6 +47,7 @@
 		98C9A8F01BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E51BFBF6C1009E9A4F /* banner-Portrait@2x~ipad.png */; };
 		98C9A8F11BFBF6C1009E9A4F /* banner-Portrait@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E61BFBF6C1009E9A4F /* banner-Portrait@3x.png */; };
 		98C9A8F21BFBF6C1009E9A4F /* banner-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 98C9A8E71BFBF6C1009E9A4F /* banner-Portrait~ipad.png */; };
+		CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37150F6D231637E900C73C6A /* DeviceKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -138,6 +139,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
+				3729344024613C9900C5428C /* ObjcExceptionBridging.framework in Frameworks */,
+				3729344124613CA700C5428C /* XCGLogger.framework in Frameworks */,
+				CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */,
+				3729344324613CC200C5428C /* Zip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

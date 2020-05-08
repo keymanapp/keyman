@@ -17,17 +17,12 @@ import Foundation
 // display and install the keyboard into Keyman Engine. Most of the data
 // in the files is ignored.
 //
-struct KeyboardInfoLanguage: Decodable {
-  let displayName: String
-  let languageName: String
-  let scriptName: String
-}
 
 struct KeyboardInfo: Decodable {
   let id: String
   let version: String
   let name: String
-  let languages: [String:KeyboardInfoLanguage]
+  let languages: [String]
 }
 
 class KeyboardInfoParser {
