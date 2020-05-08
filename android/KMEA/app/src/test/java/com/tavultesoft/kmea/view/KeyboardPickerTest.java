@@ -11,6 +11,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardInfoActivity;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.data.Keyboard;
 
 import org.json.JSONException;
 import org.junit.After;
@@ -103,7 +104,7 @@ public class KeyboardPickerTest {
       KeyboardPickerActivity activity = keyboardPickerActivityActivityController.get();
 
       // get current keyboard
-      Map<String,String> _old = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
+      Keyboard _old = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
       Assert.assertNotNull(_old);
 
       // install new custom keyboard programmatically
@@ -122,10 +123,10 @@ public class KeyboardPickerTest {
       Assert.assertTrue(activity.isFinishing());
 
       // check if keyboardswitch is done
-      Map<String,String> _current = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
+      Keyboard _current = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
       Assert.assertNotNull(_current);
 
-      Assert.assertNotEquals(_old.get(KMManager.KMKey_KeyboardID),_current.get(KMManager.KMKey_KeyboardID));
+      Assert.assertNotEquals(_old.getKeyboardID(),_current.getKeyboardID());
   }
 
   /**

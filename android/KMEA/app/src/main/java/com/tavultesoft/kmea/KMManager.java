@@ -63,6 +63,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.data.Dataset;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
@@ -281,7 +282,6 @@ public final class KMManager {
       copyAssets(appContext);
 
       migrateOldKeyboardFiles(appContext);
-      updateOldKeyboardsList(appContext);
       didCopyAssets = true;
     }
 
@@ -712,87 +712,6 @@ public final class KMManager {
     }
   }
 
-  public static void updateOldKeyboardsList(Context context) {
-    ArrayList<HashMap<String, String>> kbList = KeyboardPickerActivity.getKeyboardsList(context);
-    if (kbList != null && kbList.size() > 0) {
-      boolean shouldUpdateList = false;
-      boolean shouldClearCache = false;
-      HashMap<String, String> kbInfo = kbList.get(0);
-      String pkgID = kbInfo.get(KMKey_PackageID);
-      String kbID = kbInfo.get(KMKey_KeyboardID);
-      if ( kbID.equals("us") || kbID.equals("european2") ||
-        (pkgID.equals(KMDefault_UndefinedPackageID) && kbID.equals(KMDefault_KeyboardID)) ) {
-        HashMap<String, String> newKbInfo = new HashMap<String, String>();
-        newKbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
-        newKbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-        newKbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-        newKbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-        newKbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-        newKbInfo.put(KMManager.KMKey_KeyboardVersion,
-          getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID,
-            KMManager.KMDefault_KeyboardID));
-        newKbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-        kbList.set(0, newKbInfo);
-        shouldUpdateList = true;
-        shouldClearCache = true;
-      }
-
-      int index2Remove = -1;
-      int kblCount = kbList.size();
-      for (int i = 0; i < kblCount; i++) {
-        kbInfo = kbList.get(i);
-
-        kbID = kbInfo.get(KMKey_KeyboardID);
-        pkgID = kbInfo.get(KMKey_PackageID);
-        if (pkgID == null || pkgID.isEmpty()) {
-          pkgID = KMDefault_UndefinedPackageID;
-          kbInfo.put(KMManager.KMKey_PackageID, pkgID);
-          shouldUpdateList = true;
-        }
-        String langID = kbInfo.get(KMKey_LanguageID);
-        String kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
-        String latestKbVersion = getLatestKeyboardFileVersion(context, pkgID, kbID);
-        if ((latestKbVersion != null) && (kbVersion == null || !kbVersion.equals(latestKbVersion))) {
-          kbInfo.put(KMManager.KMKey_KeyboardVersion, latestKbVersion);
-          kbList.set(i, kbInfo);
-          shouldUpdateList = true;
-        }
-
-        if (kbID.equals(KMManager.KMDefault_KeyboardID) && langID.equals(KMManager.KMDefault_LanguageID)) {
-          int defKbIndex = KMManager.getKeyboardIndex(context, KMManager.KMDefault_KeyboardID, KMManager.KMDefault_LanguageID);
-          if (defKbIndex == 0 && i > 0)
-            index2Remove = i;
-        }
-      }
-
-      if (index2Remove > 0) {
-        kbList.remove(index2Remove);
-        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-        if (index == index2Remove) {
-          index = 0;
-        } else if (index > index2Remove) {
-          index--;
-        }
-        editor.putInt(KMManager.KMKey_UserKeyboardIndex, index);
-        editor.commit();
-        shouldUpdateList = true;
-      }
-
-      if (shouldUpdateList) {
-        KeyboardPickerActivity.updateKeyboardsList(context, kbList);
-      }
-
-      if (shouldClearCache) {
-        File cache = CloudDataJsonUtil.getKeyboardCacheFile(appContext);
-        if (cache.exists()) {
-          cache.delete();
-        }
-      }
-    }
-  }
-
   /**
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
@@ -835,7 +754,7 @@ public final class KMManager {
     return font;
   }
 
-  public static ArrayList<HashMap<String, String>> getKeyboardsList(Context context) {
+  public static List<Keyboard> getKeyboardsList(Context context) {
     return KeyboardPickerActivity.getKeyboardsList(context);
   }
 
@@ -963,9 +882,10 @@ public final class KMManager {
     return null;
   }
 
-  public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
+  public static boolean addKeyboard(Context context, Keyboard keyboardInfo) {
+    String packageID = keyboardInfo.getPackageID();
+    String keyboardID = keyboardInfo.getKeyboardID();
+    keyboardInfo.setNewKeyboard(true);
 
     // Log Sentry analytic event, ignoring default keyboard
     if (Sentry.isEnabled() && !(packageID.equalsIgnoreCase(KMManager.KMDefault_PackageID) &&
@@ -974,12 +894,12 @@ public final class KMManager {
       breadcrumb.setMessage("KMManager.addKeyboard");
       breadcrumb.setCategory("addKeyboard");
       breadcrumb.setLevel(SentryLevel.INFO);
-      breadcrumb.setData("packageID", keyboardInfo.get(KMManager.KMKey_PackageID));
-      breadcrumb.setData("keyboardID", keyboardInfo.get(KMManager.KMKey_KeyboardID));
-      breadcrumb.setData("keyboardName", keyboardInfo.get(KMManager.KMKey_KeyboardName));
-      breadcrumb.setData("keyboardVersion", keyboardInfo.get(KMManager.KMKey_KeyboardVersion));
-      breadcrumb.setData("languageID", keyboardInfo.get(KMManager.KMKey_LanguageID));
-      breadcrumb.setData("languageName", keyboardInfo.get(KMManager.KMKey_LanguageName));
+      breadcrumb.setData("packageID", packageID);
+      breadcrumb.setData("keyboardID", keyboardID);
+      breadcrumb.setData("keyboardName", keyboardInfo.getKeyboardName());
+      breadcrumb.setData("keyboardVersion", keyboardInfo.getVersion());
+      breadcrumb.setData("languageID", keyboardInfo.getLanguageID());
+      breadcrumb.setData("languageName", keyboardInfo.getLanguageName());
 
       Sentry.addBreadcrumb(breadcrumb);
 
@@ -988,6 +908,25 @@ public final class KMManager {
     }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
+  }
+
+  // Intend to deprecate in Keyman 15.0
+  public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
+    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
+    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
+    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
+    String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
+    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
+    String version = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
+    String helpLink = keyboardInfo.get(KMManager.KMKey_CustomHelpLink);
+    String font = keyboardInfo.get(KMManager.KMKey_Font);
+    String oskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+    boolean isNewKeyboard = true;
+
+    Keyboard k = new Keyboard(packageID, keyboardID, keyboardName,
+          languageID, languageName, version, helpLink,
+      isNewKeyboard, font, oskFont);
+    return addKeyboard(context, k);
   }
 
   public static boolean removeKeyboard(Context context, int position) {
@@ -1064,36 +1003,36 @@ public final class KMManager {
   }
 
   public static boolean setKeyboard(Context context, int position) {
-    HashMap<String, String> keyboardInfo = getKeyboardInfo(context, position);
+    Keyboard keyboardInfo = getKeyboardInfo(context, position);
     if (keyboardInfo == null)
       return false;
 
-    String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
-    String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    String langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
-    String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-    String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-    String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-    String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+    String pkgId = keyboardInfo.getPackageID();
+    String kbId = keyboardInfo.getKeyboardID();
+    String langId = keyboardInfo.getLanguageID();
+    String kbName = keyboardInfo.getKeyboardName();
+    String langName = keyboardInfo.getLanguageName();
+    String kFont = keyboardInfo.getFont();
+    String kOskFont = keyboardInfo.getOSKFont();
     return setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
   }
 
   public static void switchToNextKeyboard(Context context) {
     int index = KeyboardPickerActivity.getCurrentKeyboardIndex(context);
     index++;
-    HashMap<String, String> kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
+    Keyboard kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
     if (kbInfo == null) {
       index = 0;
       kbInfo = KeyboardPickerActivity.getKeyboardInfo(context, index);
     }
 
-    String pkgId = kbInfo.get(KMManager.KMKey_PackageID);
-    String kbId = kbInfo.get(KMManager.KMKey_KeyboardID);
-    String langId = kbInfo.get(KMManager.KMKey_LanguageID);
-    String kbName = kbInfo.get(KMManager.KMKey_KeyboardName);
-    String langName = kbInfo.get(KMManager.KMKey_LanguageName);
-    String kFont = kbInfo.get(KMManager.KMKey_Font);
-    String kOskFont = kbInfo.get(KMManager.KMKey_OskFont);
+    String pkgId = kbInfo.getPackageID();
+    String kbId = kbInfo.getKeyboardID();
+    String langId = kbInfo.getLanguageID();
+    String kbName = kbInfo.getKeyboardName();
+    String langName = kbInfo.getLanguageName();
+    String kFont = kbInfo.getFont();
+    String kOskFont = kbInfo.getOSKFont();
     if (InAppKeyboard != null) {
       InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
     }
@@ -1455,7 +1394,7 @@ public final class KMManager {
     return KeyboardPickerActivity.getCurrentKeyboardIndex(context);
   }
 
-  public static HashMap<String, String> getCurrentKeyboardInfo(Context context) {
+  public static Keyboard getCurrentKeyboardInfo(Context context) {
     return KeyboardPickerActivity.getCurrentKeyboardInfo(context);
   }
 
@@ -1470,7 +1409,7 @@ public final class KMManager {
     return index;
   }
 
-  public static HashMap<String, String> getKeyboardInfo(Context context, int index) {
+  public static Keyboard getKeyboardInfo(Context context, int index) {
     return KeyboardPickerActivity.getKeyboardInfo(context, index);
   }
 
@@ -1588,7 +1527,7 @@ public final class KMManager {
     }
 
     private void pageLoaded(WebView view, String url) {
-      String langId = KMManager.KMKey_LanguageID;
+      String langId;
       Log.d("KMEA", "pageLoaded: [inapp] " + url);
       if (url.startsWith("file")) { //endsWith(KMFilename_KeyboardHtml)) {
         InAppKeyboardLoaded = true;
@@ -1599,22 +1538,23 @@ public final class KMManager {
           if (index < 0) {
             index = 0;
           }
-          HashMap<String, String> keyboardInfo = KMManager.getKeyboardInfo(context, index);
+          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
           if (keyboardInfo != null) {
-            String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
-            String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-            langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
-            String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-            String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-            String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-            String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+            String pkgId = keyboardInfo.getPackageID();
+            String kbId = keyboardInfo.getKeyboardID();
+            langId = keyboardInfo.getLanguageID();
+            String kbName = keyboardInfo.getKeyboardName();
+            String langName = keyboardInfo.getLanguageName();
+            String kFont = keyboardInfo.getFont();
+            String kOskFont = keyboardInfo.getOSKFont();
             InAppKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
+            langId = KMDefault_LanguageID;
             InAppKeyboard.setKeyboard(KMDefault_PackageID, KMDefault_KeyboardID,
-              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+              langId, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
 
-         registerAssociatedLexicalModel(langId);
+          registerAssociatedLexicalModel(langId);
         }
 
         Handler handler = new Handler();
@@ -1816,7 +1756,7 @@ public final class KMManager {
     }
 
     private void pageLoaded(WebView view, String url) {
-      String langId = KMManager.KMKey_LanguageID;
+      String langId;
       Log.d("KMEA", "pageLoaded: [system] " + url);
       if (url.startsWith("file:")) {
         SystemKeyboardLoaded = true;
@@ -1826,23 +1766,25 @@ public final class KMManager {
           if (index < 0) {
             index = 0;
           }
-          HashMap<String, String> keyboardInfo = KMManager.getKeyboardInfo(context, index);
+          Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
           if (keyboardInfo != null) {
-            String pkgId = keyboardInfo.get(KMManager.KMKey_PackageID);
-            String kbId = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-            langId = keyboardInfo.get(KMManager.KMKey_LanguageID);
-            String kbName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-            String langName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-            String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-            String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
+            String pkgId = keyboardInfo.getPackageID();
+            String kbId = keyboardInfo.getKeyboardID();
+            langId = keyboardInfo.getLanguageID();
+            String kbName = keyboardInfo.getKeyboardName();
+            String langName = keyboardInfo.getLanguageName();
+            String kFont = keyboardInfo.getFont();
+            String kOskFont = keyboardInfo.getOSKFont();
             SystemKeyboard.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
           } else {
+            langId = KMDefault_LanguageID;
             SystemKeyboard.setKeyboard(KMDefault_UndefinedPackageID, KMDefault_KeyboardID,
-              KMDefault_LanguageID, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
+              langId, KMDefault_KeyboardName, KMDefault_LanguageName, KMDefault_KeyboardFont, null);
           }
+
+          registerAssociatedLexicalModel(langId);
         }
 
-        registerAssociatedLexicalModel(langId);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

@@ -90,7 +90,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       }
 
       // If the active keyboard is for this language, immediately enact the new pref setting.
-      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).get(KMManager.KMKey_LanguageID);
+      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
       if (kbdLgCode.equals(lgCode)) {
         // Not only registers the model but also applies our modeling preferences.
         KMManager.registerAssociatedLexicalModel(lgCode);

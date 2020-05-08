@@ -7,11 +7,13 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -1212,7 +1214,7 @@ final class KMKeyboard extends WebView {
 
     if (KMManager.getGlobeKeyAction(keyboardType) == KMManager.GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
       // Help bubble is disabled if next keyboard is not available for this action
-      ArrayList<HashMap<String, String>> keyboardsList = KMManager.getKeyboardsList(context);
+      List<Keyboard> keyboardsList = KMManager.getKeyboardsList(context);
       if (keyboardsList == null) {
         return;
       }

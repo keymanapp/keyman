@@ -129,7 +129,9 @@ public class KeyboardController {
       Log.e(TAG, "get while KeyboardController() not initialized");
       return null;
     }
-    return list;
+    synchronized (list) {
+      return list;
+    }
   }
 
   /**
@@ -146,9 +148,11 @@ public class KeyboardController {
       return null;
     }
 
-    if (list != null && index < list.size()) {
-      Keyboard k = list.get(index);
-      return k;
+    synchronized (list) {
+      if (list != null && index < list.size()) {
+        Keyboard k = list.get(index);
+        return k;
+      }
     }
 
     Log.e(TAG, "getKeyboardInfo failed with index " + index);
@@ -157,7 +161,7 @@ public class KeyboardController {
 
   /**
    * Add a new keyboard to the keyboard list. If the keyboard already exists, the keyboard
-   * information is updated
+   * information is updated.
    * @param newKeyboard
    */
   public void add(Keyboard newKeyboard) {
@@ -166,30 +170,51 @@ public class KeyboardController {
       return;
     }
 
-    for (int i=0; i<list.size(); i++) {
-      // Update existing keyboard entry
-      if (newKeyboard.equals(list.get(i))) {
-        Log.d(TAG, "Updating keyboard with newKeyboard");
-        list.set(i, newKeyboard);
-        return;
+    synchronized (list) {
+      for (int i = 0; i < list.size(); i++) {
+        // Update existing keyboard entry
+        if (newKeyboard.equals(list.get(i))) {
+          Log.d(TAG, "Updating keyboard with newKeyboard");
+          list.set(i, newKeyboard);
+          return;
+        }
       }
-    }
 
-    // Add new keyboard
-    list.add(newKeyboard);
+      // Add new keyboard
+      list.add(newKeyboard);
+    }
   }
 
+  /**
+   * Remove the keyboard at the specified index.
+   * Cannot remove index 0 (default)
+   * @param index
+   */
+  public void remove(int index) {
+    // Check initialized, and disallow removing default keyboard
+    if (!isInitialized || (index <= 0)) {
+      return;
+    }
+
+    synchronized (list) {
+      if (index < list.size()) {
+        list.remove(index);
+      }
+    }
+  }
 
   /**
    * Convert the installed keyboard list to JSONArray and write to file
    * @param context
+   * @return boolean - Status if the keyboard list was successfully saved
    */
-  public void save(Context context) {
+  public boolean save(Context context) {
     JSONArray arr = new JSONArray();
     for (Keyboard k : list) {
       JSONObject o = k.toJSON();
       arr.put(o);
     }
-    FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+    boolean result = FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+    return result;
   }
 }
