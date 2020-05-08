@@ -25,37 +25,27 @@ import java.util.HashMap;
 import java.util.List;
 
 public class KeyboardController {
-  public static final String TAG = "InstalledKBList";
+  public static final String TAG = "KeyboardController";
   public static final String KMFilename_Installed_KeyboardsList = "keyboards_list.json";
 
   private static KeyboardController instance;
 
   /**
-   * @return get or create shared instance.
+   * @return get or create shared singleton instance.
    */
   public static KeyboardController getInstance() {
     if (instance == null) {
-      createInstance();
+      instance = new KeyboardController();
     }
     return instance;
-  }
-
-  /**
-   * create singleton instance.
-   */
-  private synchronized static void createInstance()
-  {
-    if (instance != null) {
-      return;
-    }
-    instance = new KeyboardController();
   }
 
   private boolean isInitialized = false;
   private List<Keyboard> list;
 
-  public synchronized  void initialize(Context context) {
+  public synchronized void initialize(Context context) {
     if (isInitialized) {
+      Log.w(TAG, "initialize called multiple times");
       return;
     }
 
@@ -124,6 +114,8 @@ public class KeyboardController {
       if (!keyboards_json.exists()) {
         save(context);
       }
+
+      // TODO when feature stabilized: Delete legacy keyboards_list.dat (KMManager.KMFilename_KeyboardsList)
     }
     isInitialized = true;
   }
@@ -134,7 +126,8 @@ public class KeyboardController {
    */
   public List<Keyboard> get() {
     if (!isInitialized) {
-      return null; // Log error?
+      Log.e(TAG, "get while KeyboardController() not initialized");
+      return null;
     }
     return list;
   }
@@ -145,7 +138,11 @@ public class KeyboardController {
    * @return Keyboard
    */
   public Keyboard getKeyboardInfo(int index) {
-    if (!isInitialized || (index < 0)) {
+    if (!isInitialized) {
+      Log.e(TAG, "getKeyboardInfo while KeyboardController() not initialized");
+      return null;
+    } else if (index < 0) {
+      Log.e(TAG, "getKeyboardInfo with invalid index: " + index);
       return null;
     }
 
@@ -154,6 +151,7 @@ public class KeyboardController {
       return k;
     }
 
+    Log.e(TAG, "getKeyboardInfo failed with index " + index);
     return null;
   }
 
@@ -164,6 +162,7 @@ public class KeyboardController {
    */
   public void add(Keyboard newKeyboard) {
     if (!isInitialized || list == null) {
+      Log.e(TAG, "add while KeyboardController() not initialized");
       return;
     }
 

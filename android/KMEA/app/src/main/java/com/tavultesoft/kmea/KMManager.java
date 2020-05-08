@@ -225,7 +225,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_Osk_Woff_Font = "keymanweb-osk.woff";
 
-  public static final String KMFilename_InstalledLexicalModelsList = "lexical_models_list.json";
+  public static final String KMFilename_Installed_LexicalModelsList = "lexical_models_list.json";
 
   // Deprecated by KMFilename_Installed_KeyboardsList and KMFilename_InstalledLexicalModelsList above
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
