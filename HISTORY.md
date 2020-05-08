@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.72 alpha 2020-05-08
+
+* fix(ios/oem): Fixes FV app's system keyboard (#3105)
+* fix(ios/oem): FV light mode lock and basic banner fix (#3108)
+* fix(windows): sentry cef shutdown interactions (#3107)
+* feat(android): Migrate installed keyboards list to keyboards_list.json (#3091)
+
 ## 14.0.71 alpha 2020-05-08
 
 * fix(windows): use consistent sentry db location (#3100)
