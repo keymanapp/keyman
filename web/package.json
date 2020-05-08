@@ -1,6 +1,6 @@
 {
   "name": "keyman",
-  "version": "14.0.71",
+  "version": "14.0.72",
   "description": "Facilitates text input in any language.",
   "repository": {
     "type": "git",
@@ -48,11 +48,11 @@
     "modernizr": "modernizr"
   },
   "dependencies": {
-    "@keymanapp/input-processor": "^14.0.71",
-    "@keymanapp/keyboard-processor": "^14.0.71",
-    "@keymanapp/lexical-model-layer": "^14.0.71",
-    "@keymanapp/lexical-model-types": "^14.0.71",
-    "@keymanapp/recorder-core": "^14.0.71",
+    "@keymanapp/input-processor": "^14.0.72",
+    "@keymanapp/keyboard-processor": "^14.0.72",
+    "@keymanapp/lexical-model-layer": "^14.0.72",
+    "@keymanapp/lexical-model-types": "^14.0.72",
+    "@keymanapp/recorder-core": "^14.0.72",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",

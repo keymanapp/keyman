@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.71 alpha 2020-05-08
+
+* fix(windows): use consistent sentry db location (#3100)
+
 ## 14.0.70 alpha 2020-05-07
 
 * fix(android): Fix back button after System Keyboard dismissed (#3093)
