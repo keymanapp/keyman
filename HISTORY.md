@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.74 alpha 2020-05-11
+
+* fix(windows): kmbrowserhost was missing debug info (#3117)
+
 ## 14.0.73 alpha 2020-05-11
 
 * fix(windows): force output keystroke failure (#3083)
