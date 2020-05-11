@@ -27,7 +27,7 @@ uses
   Classes,
   TempFileManager,
   XMLRenderer,
-  Windows;
+  Winapi.Windows;
 
 type
   TKeyboardListXMLRenderer = class(TXMLRenderer)
@@ -38,17 +38,16 @@ type
   protected
     function XMLData(FRefreshKeyman: Boolean): WideString; override;
   public
-    constructor Create;
+    constructor Create(AOwner: TXMLRenderers);
     destructor Destroy; override;
   end;
 
 implementation
 
 uses
-  Dialogs,
-  kmint,
-  SysUtils,
-  Variants,
+  System.SysUtils,
+  System.Variants,
+
   keymanapi_TLB,
   utilsystem,
   utildir,
@@ -56,9 +55,9 @@ uses
 
 { TKeyboardListXMLRenderer }
 
-constructor TKeyboardListXMLRenderer.Create;
+constructor TKeyboardListXMLRenderer.Create(AOwner: TXMLRenderers);
 begin
-  inherited Create;
+  inherited Create(AOwner);
   FFileReferences := TStringList.Create;
   FTempPath := KGetTempPath;
 end;

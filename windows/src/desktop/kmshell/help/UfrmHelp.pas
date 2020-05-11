@@ -119,7 +119,7 @@ end;
 procedure TfrmHelp.TntFormCreate(Sender: TObject);
 begin
   inherited;
-  XMLRenderers.RenderTemplate := 'Help.xsl';
+  FRenderPage := 'help';
 end;
 
 procedure TfrmHelp.WMUserFormShown(var Message: TMessage);
@@ -134,12 +134,10 @@ begin
   end
   else
     FXML := '';
-  if not XMLRenderers.TemplateExists then DoHelpTarget(htProduct)
-  else
-  begin
-    Content_Render(False, FXML);
-    inherited;
-  end;
+
+  // TODO: xml
+  Content_Render(False, FXML);
+  inherited;
 end;
 
 procedure TfrmHelp.OpenKeyboardHelp;

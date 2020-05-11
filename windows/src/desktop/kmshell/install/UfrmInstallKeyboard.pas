@@ -312,8 +312,8 @@ begin
       FXML := FKeyboard.SerializeXML(keymanapi_TLB.ksfExportImages, FTempPath, FFileReferences);
     end;
 
-    XMLRenderers.RenderTemplate := 'InstallKeyboard.xsl';
-    XMLRenderers.Add(TGenericXMLRenderer.Create(FXML));
+    // TODO: xml
+    FRenderPage := 'installkeyboard';
     Content_Render;
   finally
     Screen.Cursor := crDefault;

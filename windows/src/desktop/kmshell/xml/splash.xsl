@@ -8,14 +8,14 @@
 
 <html>
 <head>
-  <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
+  <script src="/app/sentry.bundle.min.js"></script>
+  <script src="/app/sentry.init.js"></script>
   <title><xsl:value-of select="($locale/String[@Id='S_Splash_Title'])[1]" /></title>
   <style> * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";} </style>
-  <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
-  <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>splash.css</xsl:attribute></link>
-  <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu.js</xsl:attribute><xsl:text> </xsl:text></script>
-  <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>splash.js</xsl:attribute><xsl:text> </xsl:text></script>
+  <link rel="stylesheet" type="text/css" href="/app/menu.css" />
+  <link rel="stylesheet" type="text/css" href="/app/splash.css" />
+  <script src="/app/menu.js"></script>
+  <script src="/app/splash.js"></script>
 </head>
 
 <body>

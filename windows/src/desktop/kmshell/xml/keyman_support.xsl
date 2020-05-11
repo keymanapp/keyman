@@ -12,11 +12,7 @@
     <div id="subcontent_support" class="content">
       <div id="support_content">
         <div class="support_title">
-          <img>
-            <xsl:attribute name="src">
-              <xsl:value-of select="/Keyman/templatepath"/>keyman-desktop.png
-            </xsl:attribute>
-          </img>
+          <img src="/app/keyman-desktop.png" />
         </div>
 
         <div class="support_edition">

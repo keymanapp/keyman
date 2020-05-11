@@ -81,7 +81,7 @@ begin
   FInstance := Self;
   inherited;
   Position := poScreenCenter;
-  XMLRenderers.RenderTemplate := 'Hint.xsl';
+  FRenderPage := 'hint';
 end;
 
 procedure TfrmHint.TntFormDestroy(Sender: TObject);
@@ -103,7 +103,8 @@ begin
 
   FXML := FXML + '</Buttons>';
 
-  XMLRenderers.Add(TGenericXMLRenderer.Create(FXML));
+  FRenderPage := 'hint';
+//  TODO: XMLRenderers.Add(TGenericXMLRenderer.Create(XMLRenderers, FXML));
   Content_Render;
   inherited;
 end;

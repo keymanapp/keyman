@@ -10,11 +10,11 @@
     <html>
       <head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
         <title><xsl:value-of select="$locale/String[@Id='S_InstallKeyboard_Title']"/></title>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>installkeyboard.css</xsl:attribute></link>
+        <link rel="stylesheet" type="text/css" href="/app/config.css" />
+        <link rel="stylesheet" type="text/css" href="/app/installkeyboard.css" />
         <style type="text/css">
           * {
             font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
@@ -37,8 +37,7 @@
             width: <xsl:value-of select="$locale_installkeyboard/@Width - 16" />px;
           }
         </style>
-        <script type="text/javascript"><xsl:attribute name='src'><xsl:value-of select="/Keyman/templatepath"/>installkeyboard.js</xsl:attribute></script>
-
+        <script src="/app/installkeyboard.js"></script>
       </head>
       <body>
         <div id="background"></div>
@@ -51,14 +50,14 @@
               <img style="height: 250px; width: 140px;">
                 <xsl:choose>
                   <xsl:when test="/Keyman/KeymanKeyboardFile">
-                    <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>defaultkeyboard.gif</xsl:attribute>
+                    <xsl:attribute name="src">/app/defaultkeyboard.gif</xsl:attribute>
                   </xsl:when>
                   <xsl:when test="/Keyman/KeymanPackageFile/graphic">
                     <xsl:attribute name="src"><xsl:value-of select="/Keyman/imagepath"/><xsl:value-of select="/Keyman/KeymanPackageFile/graphic" /></xsl:attribute>
                     <xsl:attribute name="style">height: 250px; width: 140px; border: solid 1px black</xsl:attribute>
                   </xsl:when>
                   <xsl:otherwise>
-                    <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>defaultpackage.gif</xsl:attribute>
+                    <xsl:attribute name="src">/app/defaultpackage.gif</xsl:attribute>
                   </xsl:otherwise>
                 </xsl:choose>
               </img>
@@ -87,9 +86,7 @@
                         </img>
                       </xsl:when>
                       <xsl:otherwise>
-                        <img style="margin-right: 6px; float: left; height: 16px; width: 16px;">
-                          <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>no_icon.gif</xsl:attribute>
-                        </img>
+                        <img style="margin-right: 6px; float: left; height: 16px; width: 16px;" src="/app/no_icon.gif" />
                       </xsl:otherwise>
                     </xsl:choose>
                     <xsl:value-of select="/Keyman/KeymanKeyboardFile/name" />

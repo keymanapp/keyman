@@ -13,11 +13,11 @@
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
 				<title><xsl:value-of select="$locale/String[@Id=$HintTitle]" /></title>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>hint.css</xsl:attribute></link>
+        <link rel="stylesheet" type="text/css" href="/app/config.css" />
+        <link rel="stylesheet" type="text/css" href="/app/hint.css" />
 				<style type="text/css">
 					* {
             font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
@@ -53,12 +53,7 @@
           <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
 
 					<div id="header">
-						<img id="icon" src="hints.png" alt="Hint">
-							<xsl:attribute name="src">
-								<xsl:value-of select="/Keyman/templatepath"/>48.png
-							</xsl:attribute>
-						</img>
-
+						<img id="icon" src="hints.png" alt="Hint" src="/app/48.png" />
 						<div id="title">
 							<xsl:value-of select="$locale/String[@Id=$HintTitle]" />
 						</div>
@@ -104,11 +99,7 @@
   Example of how to do a custom hint
 
 	<xsl:template match="Hint[@ID='KH_EXITPRODUCT']">
-		<img id="exiticon" alt="icon">
-			<xsl:attribute name="src">
-				<xsl:value-of select="/Keyman/templatepath"/>keyman_48x48.png
-			</xsl:attribute>
-		</img>
+		<img id="exiticon" alt="icon" src="/app/keyman_48x48.png" />
 		<xsl:value-of select="$locale/String[@Id=$Hint]" />
 	</xsl:template>
 -->

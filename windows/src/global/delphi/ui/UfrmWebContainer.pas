@@ -57,8 +57,8 @@ type
     procedure TntFormDestroy(Sender: TObject);
   private
     FDialogName: WideString;
-    FXMLRenderers: TXMLRenderers;
-    FXMLFileName: TTempFile;
+//    FXMLRenderers: TXMLRenderers;
+//    FXMLFileName: TTempFile;
 //    FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
@@ -66,6 +66,7 @@ type
     procedure ContributeUILanguages;
   protected
     cef: TframeCEFHost;
+    FRenderPage: string;
 
     procedure cefLoadEnd(Sender: TObject); virtual;
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); virtual;
@@ -84,7 +85,7 @@ type
 
 
     procedure Content_Render(FRefreshKeyman: Boolean = False; const AdditionalData: WideString = ''); virtual;
-    property XMLRenderers: TXMLRenderers read FXMLRenderers;
+//    property XMLRenderers: TXMLRenderers read FXMLRenderers;
     procedure WndProc(var Message: TMessage); override;  // I2720
   public
     constructor Create(AOwner: TComponent); override;
@@ -112,6 +113,7 @@ uses
 
   custinterfaces,
   ErrorControlledRegistry,
+  Keyman.Configuration.System.UmodWebHttpServer,
   kmint,
   UILanguages,
   UfrmScriptError,
@@ -134,19 +136,10 @@ procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
 var
   FWidth, FHeight: Integer;
 begin
-  FreeAndNil(FXMLFileName);   // I4181
+//  FreeAndNil(FXMLFileName);   // I4181
 
-  try
-    FXMLFileName := FXMLRenderers.RenderToFile(FRefreshKeyman, AdditionalData);
-  except
-    on E:EXMLRenderer do
-    begin
-      ShowMessage(E.Message);
-      Exit;
-    end;
-  end;
-
-  FDialogName := ChangeFileExt(ExtractFileName(FXMLRenderers.RenderTemplate), '');
+  // TODO: change this to use the same as FRenderPage
+  FDialogName := FRenderPage; // ChangeFileExt(ExtractFileName(FXMLRenderers.xRenderTemplate), '');
   HelpType := htKeyword;
   HelpKeyword := FDialogName;
 
@@ -160,7 +153,7 @@ begin
     ClientHeight := FHeight;
   end;
 
-  cef.Navigate(FXMLFileName.Name);
+  cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage); // FXMLFileName.Name);
 end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
@@ -208,8 +201,6 @@ end;
 procedure TfrmWebContainer.TntFormCreate(Sender: TObject);
 begin
   inherited;
-  FXMLRenderers := TXMLRenderers.Create;
-
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
   cef.Visible := True;
@@ -247,8 +238,8 @@ end;
 procedure TfrmWebContainer.TntFormDestroy(Sender: TObject);
 begin
   inherited;
-  FXMLRenderers.Free;
-  FreeAndNil(FXMLFileName);   // I4181
+//  FXMLRenderers.Free;
+//  FreeAndNil(FXMLFileName);   // I4181
 end;
 
 procedure TfrmWebContainer.DownloadUILanguages;

@@ -1,4 +1,4 @@
-unit Keyman.Developer.System.HttpServer.Base;
+unit Keyman.System.HttpServer.Base;
 
 interface
 
@@ -63,6 +63,7 @@ begin
     AResponseInfo.HTTPServer.MIMETable.LoadTypesFromOS := False;
     AResponseInfo.ContentType := AResponseInfo.HTTPServer.MIMETable.GetFileMIMEType(AFileName);
   end;
+
   AResponseInfo.CharSet := 'UTF-8';
   AResponseInfo.ContentLength := FileSizeByName(AFileName);
 //AResponseInfo.LastModified := GetFileDate(doc);

@@ -89,9 +89,8 @@ begin
       '<Password>'+XMLEncode(FPassword)+'</Password>'+
     '</Proxy>';
 
-  XMLRenderers.RenderTemplate := 'ProxyConfiguration.xsl';
-  XMLRenderers.Add(TGenericXMLRenderer.Create(xml));
-
+  FRenderPage := 'proxyconfiguration';
+  // TODO: xml
   Content_Render;
 end;
 

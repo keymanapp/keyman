@@ -55,13 +55,19 @@ type
   EXMLRenderer = class(Exception)
   end;
 
+  TXMLRenderers = class;
+
   TXMLRenderer = class
   private
+    FOwner: TXMLRenderers;
     FXMLFileName: WideString;
+    function Getkmcom: IKeyman;
   protected
     function XMLData(FRefreshKeyman: Boolean): WideString; virtual; abstract;
     function Stylesheet: WideString; virtual;
+    property kmcom: IKeyman read Getkmcom;
   public
+    constructor Create(AOwner: TXMLRenderers);
     function Render: Boolean;
     function GetXMLData(FRefreshKeyman: Boolean): WideString;
     property XMLFileName: WideString read FXMLFileName;
@@ -70,18 +76,20 @@ type
   TXMLRenderers = class(TObjectList)
   private
     FRenderTemplate: WideString;
+    Fkmcom: IKeyman;
     function GetItem(Index: Integer): TXMLRenderer;
     procedure SetItem(Index: Integer; const Value: TXMLRenderer);
     function GetUILanguages: WideString;
+    function Getkmcom: IKeyman;
+    function GetXMLTemplatePath(const FileName: WideString): WideString;
   public
     constructor Create;
     function RenderToFile(FRefreshKeyman: Boolean = False; const AdditionalData: WideString = ''): TTempFile;   // I4181
     function TemplateExists: Boolean;
+    property kmcom: IKeyman read Getkmcom;
     property Items[Index: Integer]: TXMLRenderer read GetItem write SetItem; default;
-    property RenderTemplate: WideString read FRenderTemplate write FRenderTemplate;
+    property xRenderTemplate: WideString read FRenderTemplate write FRenderTemplate;
   end;
-
-function GetXMLTemplatePath(const FileName: WideString): WideString;
 
 implementation
 
@@ -90,7 +98,6 @@ uses
   GetOSVersion,
   KeymanPaths,
   KLog,
-  kmint,
   WideStrUtils,
   StrUtils,
   TypInfo,
@@ -106,6 +113,17 @@ uses
   xmlintf;
 
 { TXMLRendererRenderer }
+
+constructor TXMLRenderer.Create(AOwner: TXMLRenderers);
+begin
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+function TXMLRenderer.Getkmcom: IKeyman;
+begin
+  Result := FOwner.kmcom;
+end;
 
 function TXMLRenderer.GetXMLData(FRefreshKeyman: Boolean): WideString;
 begin
@@ -141,6 +159,13 @@ end;
 function TXMLRenderers.GetItem(Index: Integer): TXMLRenderer;
 begin
   Result := inherited GetItem(Index) as TXMLRenderer;
+end;
+
+function TXMLRenderers.Getkmcom: IKeyman;
+begin
+  if Fkmcom = nil then
+    Fkmcom := CoKeyman.Create;
+  Result := Fkmcom;
 end;
 
 function TXMLRenderers.GetUILanguages: WideString;
@@ -181,7 +206,7 @@ begin
 
   FOutput := TStringList.Create;
   try
-    with kmint.KeymanCustomisation.CustMessages do
+    with (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages do
     begin
       s := GetLocalePathForLocale(LanguageCode); // + '/locale.xml';
       if not FileExists(s) then
@@ -262,12 +287,12 @@ begin
   if DirectoryExists(Result + 'xml') then Result := Result + 'xml\';
 end;
 
-function GetXMLTemplatePath(const FileName: WideString): WideString;
+function TXMLRenderers.GetXMLTemplatePath(const FileName: WideString): WideString;
 var
   Customisation: IKeymanCustomisation;
   CustMessages: IKeymanCustomisationMessages;
 begin
-  Customisation := kmint.KeymanCustomisation;
+  Customisation := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation;
   CustMessages := Customisation.CustMessages;
   with CustMessages do
   begin

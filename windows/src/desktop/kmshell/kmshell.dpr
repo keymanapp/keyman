@@ -159,7 +159,10 @@ uses
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
-  Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests};
+  Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests},
+  Keyman.Configuration.System.UmodWebHttpServer in 'web\Keyman.Configuration.System.UmodWebHttpServer.pas' {modWebHttpServer: TDataModule},
+  Keyman.Configuration.System.HttpServer.App in 'web\Keyman.Configuration.System.HttpServer.App.pas',
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
@@ -180,7 +183,12 @@ begin
       try
         Application.Initialize;
         Application.Title := 'Keyman Configuration';
-        Run;
+        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+  try
+          Run;
+        finally
+          FreeAndNil(modWebHttpServer);
+        end;
       except
         on E:Exception do
           SentryHandleException(E);

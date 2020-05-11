@@ -75,8 +75,7 @@ uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
   keymanapi_TLB, UfrmKeymanBase,
-  UfrmWebContainer,
-  XMLRenderer;
+  UfrmWebContainer;
 
 type
   TfrmMain = class(TfrmWebContainer)
@@ -164,14 +163,11 @@ uses
   GetOSVersion,
   Hints,
   HotkeyUtils,
-  HotkeysXMLRenderer,
-  KeyboardListXMLRenderer,
   Imm,
   initprog,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
   KeyNames,
-  LanguagesXMLRenderer,
   custinterfaces,
   KLog,
   kmint,
@@ -179,14 +175,13 @@ uses
   MessageIdentifiers,
   onlineconstants,
   OnlineUpdateCheck,
-  OptionsXMLRenderer,
   //GlobalProxySettings,
   //Registration,
   ErrorControlledRegistry,
+  Keyman.Configuration.System.UmodWebHttpServer,
   RegistryKeys,
   ShellApi,
   StrUtils,
-  SupportXMLRenderer,
   UfrmChangeHotkey,
   UfrmHTML,
   UfrmInstallKeyboard,
@@ -233,18 +228,13 @@ begin
 
   InitNonVisualComponents;
 
-  XMLRenderers.RenderTemplate := 'Keyman.xsl';
-  XMLRenderers.Add(TKeyboardListXMLRenderer.Create);
-  XMLRenderers.Add(THotkeysXMLRenderer.Create);
-  XMLRenderers.Add(TOptionsXMLRenderer.Create(Self));
-  XMLRenderers.Add(TLanguagesXMLRenderer.Create);
-  XMLRenderers.Add(TSupportXMLRenderer.Create);
-
   Icon.ReleaseHandle;
   Icon.Handle := DuplicateIcon(hInstance, Application.Icon.Handle);
 
   Keyboards_Init;
   Options_Init;
+
+  FRenderPage := 'main';
 
   Do_Content_Render(False);
 end;

@@ -50,8 +50,7 @@ uses
   MessageIdentifiers,
   MessageIdentifierConsts,
   strutils,
-  utilxml,
-  GenericXMLRenderer;
+  utilxml;
 
 {$R *.DFM}
 
@@ -89,6 +88,7 @@ var
 begin
   inherited;
 
+  // TODO: refactor data
   xml := '';
 
   if (FParams.Keyman.DownloadURL <> '') then
@@ -128,9 +128,7 @@ begin
 //    '<PatchText>'+xmlencode(MsgFromIdFormat(SKUpdate_PatchText, [FPatchSize div 1024]))+'</PatchText>';
   end;
 
-  XMLRenderers.RenderTemplate := 'OnlineUpdate.xsl';
-  XMLRenderers.Add(TGenericXMLRenderer.Create(xml));
-
+  FRenderPage := 'onlineupdate';
   Content_Render;
 end;
 

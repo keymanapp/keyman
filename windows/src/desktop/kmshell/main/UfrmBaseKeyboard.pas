@@ -44,11 +44,10 @@ var
 begin
   inherited;
 
+  // TODO: xml
   xml := TBaseKeyboards.EnumerateXML(kmcom.Options['koBaseLayout'].Value);
 
-  XMLRenderers.RenderTemplate := 'BaseKeyboard.xsl';
-  XMLRenderers.Add(TGenericXMLRenderer.Create(xml));
-
+  FRenderPage := 'basekeyboard';
   Content_Render;
 end;
 

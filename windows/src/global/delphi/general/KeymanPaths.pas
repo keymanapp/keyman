@@ -32,6 +32,7 @@ type
     class function KeymanEngineInstallDir: string; static;
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
+    class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
@@ -290,6 +291,39 @@ begin
   ForceDirectories(Result);  // I2768
   if app <> '' then
     Result := Result + app + '-' + IntToStr(GetCurrentProcessId) + '.log';
+end;
+
+class function TKeymanPaths.KeymanConfigStaticHttpFilesPath(const filename: string): string;
+var
+  keyman_root: string;
+begin
+  // Look up KEYMAN_ROOT development variable -- if found and executable
+  // within that path then use that as source path
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  begin
+    Exit(IncludeTrailingPathDelimiter(keyman_root) + 'windows\src\desktop\kmshell\xml\' + filename);
+  end;
+
+  Result := GetDebugPath('KeymanConfigStaticHttpFilesPath', '');
+  if Result = '' then
+  begin
+    // Look for install path for Keyman Desktop
+    Result := TKeymanPaths.KeymanDesktopInstallPath;
+    if Result = '' then
+      // Not found, so assume folder of executable
+      Result := ExtractFilePath(ParamStr(0));
+  end;
+  if DirectoryExists(Result + 'xml') then
+    Result := Result + 'xml\'
+  else
+  begin
+    if not FileExists(Result + 'locale.xml') then
+    begin
+    end;
+  end;
+
+  Result := Result + filename;
 end;
 
 end.

@@ -162,14 +162,11 @@ var
 begin
   xml := '';
 
+  // TODO: xml
   xml := xml + '<Version>'+xmlencode(MsgFromIdFormat(SKSplashVersion, [GetVersionString]))+'</Version>';
 //  xml := xml + '<Keyboards)Count>'+IntToStr(kmcom.Keyboards.Count)+'</KeyboardCount>';
 
-  XMLRenderers.RenderTemplate := 'Splash.xsl';
-  XMLRenderers.Clear;
-  XMLRenderers.Add(TGenericXMLRenderer.Create(xml));
-  XMLRenderers.Add(TKeyboardListXMLRenderer.Create);
-
+  FRenderPage := 'splash';
   Content_Render;
 end;
 
