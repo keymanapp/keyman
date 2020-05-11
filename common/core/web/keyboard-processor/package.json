@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/keyboard-processor",
-  "version": "14.0.73",
+  "version": "14.0.74",
   "description": "Core module for Keyman keyboard support in KeymanWeb.",
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     "mocha": "mocha"
   },
   "dependencies": {
-    "@keymanapp/lexical-model-types": "^14.0.73",
+    "@keymanapp/lexical-model-types": "^14.0.74",
     "@types/node": "^11.9.4",
     "ts-node": "^8.0.2"
   }

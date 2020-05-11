@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.73 alpha 2020-05-11
+
+* fix(windows): force output keystroke failure (#3083)
+* fix(windows): kmshell title and kmbrowserhost sentry (#3115)
+
 ## 14.0.72 alpha 2020-05-08
 
 * fix(ios/oem): Fixes FV app's system keyboard (#3105)
