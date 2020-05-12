@@ -29,6 +29,10 @@ add_package() {
   lerna_data=`cat lerna.json`
   new_data=`echo "$lerna_data" | $JQ ".packages += [\"$1\"]"`
 
+  if [ $? != 0 ]; then
+    exit 1
+  fi
+
   cp lerna.json lerna.json.backup
   echo "$new_data" > lerna.json
 
@@ -40,6 +44,9 @@ remove_package() {
 
   lerna_data=`cat lerna.json`
   new_data=`echo "$lerna_data" | $JQ "del(.packages[] | select(. ==\"$1\"))"`
+  if [ $? != 0 ]; then
+    exit 1
+  fi
 
   cp lerna.json lerna.json.backup
   echo "$new_data" > lerna.json

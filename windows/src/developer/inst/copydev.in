@@ -17,6 +17,8 @@ KEYMAN_WIX_TEMP_CEF=$(TEMP)\keyman_wix_build\cef
 KEYMAN_WIX_TEMP_TEMPLATES=$(TEMP)\keyman_wix_build\templates
 KEYMAN_WIX_TEMP_MODELCOMPILER=$(TEMP)\keyman_wix_build\ModelCompiler
 
+KEYMAN_INTERMEDIATE_MODELCOMPILER=$(ROOT)\bin\intermediate\ModelCompiler
+
 KEYMAN_DEVELOPER_TEMPLATES_ROOT=$(ROOT)\src\developer\kmconvert\data
 KEYMAN_MODELCOMPILER_ROOT=$(KEYMAN_ROOT)\developer\js
 
@@ -81,16 +83,48 @@ heat-model-compiler:
     # operating systems, node.js is a dependency and the compiler can be installed with
     # `npm install @keymanapp/lexical-model-compiler`.
 
+    # First, we copy the files to an intermediate temp-folder rooted within repo space.
+    -rmdir /s/q $(KEYMAN_INTERMEDIATE_MODELCOMPILER)
+    mkdir $(KEYMAN_INTERMEDIATE_MODELCOMPILER)
+    xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\ /s
+
+    # Remove files we don't want to harvest; build a product node_modules folder
+    -rmdir /s/q $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\node_modules
+
+    cd $(KEYMAN_ROOT)
+!ifdef GIT_BASH_FOR_KEYMAN
+    # attach to lerna management
+    $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh add-package "windows/bin/intermediate/ModelCompiler"
+
+    # leverage lerna to retrieve only the resources needed for production.
+    # Avoids retrieving local resources from remote (which `npm install` would do)
+    npm run lerna -- bootstrap -- --production
+
+    # detach from lerna
+    $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh remove-package "windows/bin/intermediate/ModelCompiler"
+!else
+    # attach to lerna management
+    start /wait .\resources\lerna-utils.sh add-package "windows/bin/intermediate/ModelCompiler"
+
+    # leverage lerna to retrieve only the resources needed for production.
+    # We're at the repo's base - ensure that Lerna is available first.
+    npm install
+    # Installs needed dependencies in repo packages (using `npm link` where possible)
+    npm run lerna -- bootstrap -- --production
+
+    # detach from lerna
+    start /wait .\resources\lerna-utils.sh remove-package "windows/bin/intermediate/ModelCompiler"
+!endif
+
+    # node_modules harvest complete - we can now do the rest in true $(TEMP) space.
+
     # We copy the files to a temp folder in order to exclude thumbs.db, .vs, etc from harvesting
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     mkdir $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_WIX_TEMP_MODELCOMPILER)\ /s
+    xcopy $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\* $(KEYMAN_WIX_TEMP_MODELCOMPILER)\ /s
 
-    # Remove files we don't want to harvest; build a product node_modules folder
     cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\node_modules
-    npm install --production
-
+    
     # We don't need source for the compiler or the unit tests
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\source
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\tests
