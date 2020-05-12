@@ -25,7 +25,6 @@ implementation
 
 uses
   BaseKeyboards,
-  GenericXMLRenderer,
   kmint;
 
 function ConfigureBaseKeyboard: Boolean;
@@ -39,13 +38,8 @@ begin
 end;
 
 procedure TfrmBaseKeyboard.TntFormCreate(Sender: TObject);
-var
-  xml: WideString;
 begin
   inherited;
-
-  // TODO: xml
-  xml := TBaseKeyboards.EnumerateXML(kmcom.Options['koBaseLayout'].Value);
 
   FRenderPage := 'basekeyboard';
   Content_Render;

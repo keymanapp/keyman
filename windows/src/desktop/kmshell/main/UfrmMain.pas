@@ -23,7 +23,7 @@
                     06 Oct 2006 - mcdurdin - Add download keyboard
                     04 Dec 2006 - mcdurdin - Use T-frmWebContainer;
                     04 Dec 2006 - mcdurdin - Add keyboard_download, package_welcome, footer_buy, select_uilanguage
-                    05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
+                    05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     05 Dec 2006 - mcdurdin - Localize additional messages
                     12 Dec 2006 - mcdurdin - Capitalize form name; start on Keyboards page, not options
                     04 Jan 2007 - mcdurdin - Proxy support
@@ -198,7 +198,6 @@ uses
   utilkmshell,
   utilhttp,
   utiluac,
-  utilxml,
   Variants;
 
 type
@@ -234,7 +233,7 @@ begin
   Keyboards_Init;
   Options_Init;
 
-  FRenderPage := 'main';
+  FRenderPage := 'keyman'; // TODO: rename to 'main'? or 'config'?
 
   Do_Content_Render(False);
 end;
@@ -273,16 +272,17 @@ end;
 
 procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
 var
-  s: string;
+  query: string;
 begin
   SaveState;
 
-  s := '<state>'+XMLEncode(FState)+'</state>';
-  s := s + '<basekeyboard id="'+IntToHex(Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),8)+'">'+
-    XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))+
-    '</basekeyboard>';   // I4169
+  query := Format('state=%s&basekeyboardname=%s&basekeyboardid=%08.8x', [
+    UrlEncode(FState),
+    UrlEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value)),
+    Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value)
+  ]);
 
-  Content_Render(FRefreshKeyman, s);
+  Content_Render(FRefreshKeyman, query);
 end;
 
 procedure TfrmMain.FireCommand(const command: WideString; params: TStringList);

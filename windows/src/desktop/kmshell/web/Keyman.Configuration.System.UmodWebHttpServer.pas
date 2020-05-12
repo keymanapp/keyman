@@ -13,7 +13,8 @@ uses
   IdCustomTCPServer,
   IdHTTPServer,
 
-  Keyman.Configuration.System.HttpServer.App;
+  Keyman.Configuration.System.HttpServer.App,
+  Keyman.Configuration.System.HttpServer.SharedData;
 
 type
   TmodWebHttpServer = class(TDataModule)
@@ -21,10 +22,13 @@ type
     procedure httpCommandGet(AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
     procedure DataModuleCreate(Sender: TObject);
+    procedure DataModuleDestroy(Sender: TObject);
   private
+    FSharedData: THttpServerSharedData;
     function GetPort: Integer;
     function GetHost: string;
   public
+    property SharedData: THttpServerSharedData read FSharedData;
     property Port: Integer read GetPort;
     property Host: string read GetHost;
   end;
@@ -51,10 +55,16 @@ procedure TmodWebHttpServer.DataModuleCreate(Sender: TObject);
 var
   b: TIdSocketHandle;
 begin
+  FSharedData := THttpServerSharedData.Create;
   b := http.Bindings.Add;
   b.Port := 8009; //0;
   b.IP := '127.0.0.1';
   http.Active := True;
+end;
+
+procedure TmodWebHttpServer.DataModuleDestroy(Sender: TObject);
+begin
+  FreeAndNil(FSharedData);
 end;
 
 function TmodWebHttpServer.GetHost: string;
@@ -74,12 +84,7 @@ var
 begin
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   try
-    FApp := TAppHttpResponder.Create(AContext, ARequestInfo, AResponseInfo);
-    try
-      FApp.ProcessRequest;
-    finally
-      FreeAndNil(FApp);
-    end;
+    TAppHttpResponder.DoProcessRequest(SharedData, AContext, ARequestInfo, AResponseInfo);
   finally
     CoUninitialize;
   end;

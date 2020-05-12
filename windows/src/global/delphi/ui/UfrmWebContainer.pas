@@ -49,17 +49,13 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, UfrmKeymanBase,
-  XMLRenderer, keymanapi_TLB, UserMessages, TempFileManager, Keyman.UI.UframeCEFHost;
+  keymanapi_TLB, UserMessages, TempFileManager, Keyman.UI.UframeCEFHost;
 
 type
   TfrmWebContainer = class(TfrmKeymanBase)
     procedure TntFormCreate(Sender: TObject);
-    procedure TntFormDestroy(Sender: TObject);
   private
     FDialogName: WideString;
-//    FXMLRenderers: TXMLRenderers;
-//    FXMLFileName: TTempFile;
-//    FNoMoreErrors: Boolean;   // I4181
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
     procedure DownloadUILanguages;
@@ -84,8 +80,7 @@ type
     procedure UILanguage(params: TStringList);
 
 
-    procedure Content_Render(FRefreshKeyman: Boolean = False; const AdditionalData: WideString = ''); virtual;
-//    property XMLRenderers: TXMLRenderers read FXMLRenderers;
+    procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); virtual;
     procedure WndProc(var Message: TMessage); override;  // I2720
   public
     constructor Create(AOwner: TComponent); override;
@@ -107,6 +102,8 @@ var
 implementation
 
 uses
+  System.StrUtils,
+
   uCEFConstants,
   uCEFInterfaces,
   uCEFTypes,
@@ -132,14 +129,13 @@ begin
 end;
 
 procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
-  const AdditionalData: WideString);
+  const Query: string);
 var
   FWidth, FHeight: Integer;
 begin
 //  FreeAndNil(FXMLFileName);   // I4181
 
-  // TODO: change this to use the same as FRenderPage
-  FDialogName := FRenderPage; // ChangeFileExt(ExtractFileName(FXMLRenderers.xRenderTemplate), '');
+  FDialogName := FRenderPage;
   HelpType := htKeyword;
   HelpKeyword := FDialogName;
 
@@ -153,7 +149,7 @@ begin
     ClientHeight := FHeight;
   end;
 
-  cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage); // FXMLFileName.Name);
+  cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage+IfThen(Query='','','?'+Query)); // FXMLFileName.Name);
 end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);
@@ -233,13 +229,6 @@ begin
     else if e.event.windows_key_code = VK_F1 then
       Application.HelpJump('context_'+lowercase(FDialogName));
   end;
-end;
-
-procedure TfrmWebContainer.TntFormDestroy(Sender: TObject);
-begin
-  inherited;
-//  FXMLRenderers.Free;
-//  FreeAndNil(FXMLFileName);   // I4181
 end;
 
 procedure TfrmWebContainer.DownloadUILanguages;

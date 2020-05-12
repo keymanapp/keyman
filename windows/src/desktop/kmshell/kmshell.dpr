@@ -162,7 +162,10 @@ uses
   Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests},
   Keyman.Configuration.System.UmodWebHttpServer in 'web\Keyman.Configuration.System.UmodWebHttpServer.pas' {modWebHttpServer: TDataModule},
   Keyman.Configuration.System.HttpServer.App in 'web\Keyman.Configuration.System.HttpServer.App.pas',
-  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas';
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
+  Keyman.Configuration.System.HttpServer.SharedData in 'web\Keyman.Configuration.System.HttpServer.SharedData.pas',
+  Keyman.Configuration.System.HttpServer.App.OnlineUpdate in 'web\Keyman.Configuration.System.HttpServer.App.OnlineUpdate.pas',
+  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

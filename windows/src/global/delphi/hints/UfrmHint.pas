@@ -55,7 +55,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Hints, XMLRenderer, GenericXMLRenderer;
+  Hints;
 
 procedure TfrmHint.FireCommand(const command: WideString;
   params: TStringList);

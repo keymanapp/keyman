@@ -14,7 +14,7 @@
   Todo:             
   Notes:            
   History:          06 Oct 2006 - mcdurdin - Initial version
-                    05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
+                    05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     12 Dec 2006 - mcdurdin - Capitalize form name
                     04 Jan 2007 - mcdurdin - Add proxy support
                     15 Jan 2007 - mcdurdin - Use name of file in Content-Disposition
@@ -41,7 +41,6 @@ type
     dlgSaveFile: TSaveDialog;
     procedure TntFormShow(Sender: TObject);
   private
-    FXML: WideString;
     FURL: WideString;
     FFileName: WideString;
     procedure Download(params: TStringList);
@@ -60,8 +59,7 @@ uses
   Upload_Settings,
   utildir,
   VersionInfo,
-  WideStrings,
-  GenericXMLRenderer;
+  WideStrings;
 
 {$R *.dfm}
 

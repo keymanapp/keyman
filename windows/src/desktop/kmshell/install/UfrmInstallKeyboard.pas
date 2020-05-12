@@ -17,7 +17,7 @@
                     01 Aug 2006 - mcdurdin - Check if keyboard is already installed and uninstall if so
                     06 Oct 2006 - mcdurdin - Display welcome after package install
                     04 Dec 2006 - mcdurdin - Change to a xml/xslt/html page
-                    05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
+                    05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     12 Dec 2006 - mcdurdin - Refresh after uninstalling keyboard
                     12 Dec 2006 - mcdurdin - Fix package and keyboard names in messages
                     12 Dec 2006 - mcdurdin - Capitalize form name
@@ -98,7 +98,6 @@ implementation
 uses
   ComObj,
   custinterfaces,
-  GenericXMLRenderer,
   GetOSVersion,
   MessageIdentifierConsts,
   MessageIdentifiers,
@@ -312,9 +311,8 @@ begin
       FXML := FKeyboard.SerializeXML(keymanapi_TLB.ksfExportImages, FTempPath, FFileReferences);
     end;
 
-    // TODO: xml
     FRenderPage := 'installkeyboard';
-    Content_Render;
+    Content_Render(False, 'file='+Value); // TODO: xml
   finally
     Screen.Cursor := crDefault;
   end;

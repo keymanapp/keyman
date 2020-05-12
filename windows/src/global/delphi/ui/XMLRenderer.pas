@@ -288,11 +288,13 @@ begin
 end;
 
 function TXMLRenderers.GetXMLTemplatePath(const FileName: WideString): WideString;
-var
-  Customisation: IKeymanCustomisation;
-  CustMessages: IKeymanCustomisationMessages;
+//var
+//  Customisation: IKeymanCustomisation;
+//  CustMessages: IKeymanCustomisationMessages;
 begin
-  Customisation := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation;
+  Result := TKeymanPaths.KeymanConfigStaticHttpFilesPath;
+
+  {Customisation := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation;
   CustMessages := Customisation.CustMessages;
   with CustMessages do
   begin
@@ -301,7 +303,7 @@ begin
     if (ExtractFileName(Result) = 'locale.xml') and FileExists(ExtractFilePath(Result) + '\'+FileName)
       then Result := ExtractFilePath(Result) + '\'
       else Result := OldXMLTemplatePath;
-  end;
+  end;}
 end;
 
 end.

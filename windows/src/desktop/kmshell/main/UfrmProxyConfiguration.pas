@@ -39,7 +39,6 @@ type
 implementation
 
 uses
-  GenericXMLRenderer,
   GlobalProxySettings,
   utilxml;
 
