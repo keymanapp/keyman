@@ -1,11 +1,12 @@
 /// <reference types="@keymanapp/lexical-model-types" />
 
-var assert = require('chai').assert;
-var breakASCIIWords = require('../').ascii;
+import {assert} from 'chai';
+import {ascii as breakASCIIWords} from '../'
+
 
 describe('The ASCII word breaker', function () {
   it('should break simple English sentences', function () {
-    let breaks: Span[] = breakASCIIWords('Look! -- The quick brown fox jumps... over the lazy dog!');
+    let breaks = breakASCIIWords('Look! -- The quick brown fox jumps... over the lazy dog!');
     let words = breaks.map(span => span.text);
     assert.deepEqual(words, ['Look', 'The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']);
   });

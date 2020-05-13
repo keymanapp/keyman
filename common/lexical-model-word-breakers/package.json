@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@keymanapp/lexical-model-types": "^14.0.75",
+    "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
