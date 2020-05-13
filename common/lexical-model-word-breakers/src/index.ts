@@ -1,5 +1,6 @@
 import {ascii} from "./ascii-word-breaker";
+import {placeholder} from './placeholder';
 import {default_} from "./default";
 
-export {ascii};
+export {ascii, placeholder};
 export {default_ as default};
