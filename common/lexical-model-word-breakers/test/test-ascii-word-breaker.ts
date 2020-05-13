@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/lexical-model-types" />
-
 import {assert} from 'chai';
 import {ascii as breakASCIIWords} from '../src'
 

@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/lexical-model-types" />
-
 import {assert} from 'chai';
 import {placeholder as breakWords} from '../src';
 

@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/lexical-model-types"/>
-
 /**
  * Splits ASCII words.
  * 
