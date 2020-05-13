@@ -1,0 +1,40 @@
+{
+  "name": "@keymanapp/lexical-model-word-breakers",
+  "version": "14.0.75",
+  "description": "Word breakers bundled in the LMLayer",
+  "keywords": [
+    "lexical model",
+    "word breaker",
+    "lmlayer"
+  ],
+  "contributors": [
+	"Eddie Antonio Santos <easantos@ualberta.ca>"
+  ],
+  "homepage": "https://github.com/keymanapp/keyman",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "devDependencies": {
+    "typescript": "^3.2.1",
+    "@keymanapp/lexical-model-types": "^14.0.75"
+  }
+}
