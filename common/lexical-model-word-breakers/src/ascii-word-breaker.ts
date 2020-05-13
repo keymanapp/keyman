@@ -8,7 +8,7 @@
 export function ascii(phrase: string): Span[] {
   let matchWord = /[A-Za-z0-9']+/g;
   let words: Span[] = [];
-  let match: RegExpExecArray;
+  let match: RegExpExecArray | null;
   while ((match = matchWord.exec(phrase)) !== null) {
     words.push(new RegExpDerivedSpan(match[0], match.index));
   }
