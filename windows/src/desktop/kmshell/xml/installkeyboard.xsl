@@ -53,7 +53,7 @@
                     <xsl:attribute name="src">/app/defaultkeyboard.gif</xsl:attribute>
                   </xsl:when>
                   <xsl:when test="/Keyman/KeymanPackageFile/graphic">
-                    <xsl:attribute name="src"><xsl:value-of select="/Keyman/imagepath"/><xsl:value-of select="/Keyman/KeymanPackageFile/graphic" /></xsl:attribute>
+                    <xsl:attribute name="src">/data/installkeyboard/package/<xsl:value-of select="/Keyman/KeymanPackageFile/graphic" />?tag=<xsl:value-of select="/Keyman/PageTag"/></xsl:attribute>
                     <xsl:attribute name="style">height: 250px; width: 140px; border: solid 1px black</xsl:attribute>
                   </xsl:when>
                   <xsl:otherwise>
@@ -70,7 +70,7 @@
               </div>
               <div class="content" id="readme">
                 <iframe style="visibility: visible; width:446px; height:100%; padding: 0px; margins: 0px" scrolling="auto" frameborder="no" id="frameReadme">
-                  <xsl:attribute name="src"><xsl:value-of select="/Keyman/KeymanPackageFile/readme" /></xsl:attribute>
+                  <xsl:attribute name="src">/data/installkeyboard/package/<xsl:value-of select="/Keyman/KeymanPackageFile/readme" />?tag=<xsl:value-of select="/Keyman/PageTag"/></xsl:attribute>
                 </iframe>
               </div>
             </xsl:if>
@@ -82,7 +82,7 @@
                     <xsl:choose>
                       <xsl:when test="//KeymanKeyboardFile/bitmap">
                         <img style="margin-right: 6px; float: left; height: 16px; width: 16px;">
-                          <xsl:attribute name="src"><xsl:value-of select="//KeymanKeyboardFile[1]/bitmap"/></xsl:attribute>
+                          <xsl:attribute name="src">/data/installkeyboard/bitmap/<xsl:value-of select="//KeymanKeyboardFile[1]/bitmap"/>?tag=<xsl:value-of select="/Keyman/PageTag"/></xsl:attribute>
                         </img>
                       </xsl:when>
                       <xsl:otherwise>

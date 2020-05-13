@@ -25,8 +25,7 @@ type
     FRequestInfo: TIdHTTPRequestInfo;
     FResponseInfo: TIdHTTPResponseInfo;
     FXMLRenderers: TXMLRenderers;
-    procedure ProcessPageMain(const Params: TStrings);
-    procedure ProcessPageHint;
+    procedure ProcessPageHint(const Params: TStrings);
     procedure ProcessPageSplash;
     procedure ProcessPageHelp(const Params: TStrings);
     procedure ProcessPageBaseKeyboard;
@@ -35,9 +34,12 @@ type
       AContext: TIdContext;
       ARequestInfo: TIdHTTPRequestInfo;
       AResponseInfo: TIdHTTPResponseInfo);
+    procedure ProcessPageDownloadKeyboard;
   protected
     procedure ProcessXMLPage(const s: string = '');
     procedure ProcessRequest; virtual;
+    function GetTaggedData(const IID: TGUID; out Intf): Boolean;
+
     property SharedData: THttpServerSharedData read FSharedData;
     property Context: TIdContext read FContext;
     property RequestInfo: TIdHTTPRequestInfo read FRequestInfo;
@@ -57,6 +59,7 @@ implementation
 
 uses
   System.Contnrs,
+  System.StrUtils,
   System.SysUtils,
 
   BaseKeyboards,
@@ -90,23 +93,19 @@ begin
       RespondFile(p, FContext, FRequestInfo, FResponseInfo);
     end;
   end
-  else if FRequestInfo.Document.StartsWith('/doc/') then
-  begin
-    // Respond with content
-  end
   else if FRequestInfo.Document.StartsWith('/page/') then
   begin
     // Retrieve data from kmcom etc
-    if FRequestInfo.Document = '/page/keyman' then
-      ProcessPageMain(FRequestInfo.Params)
-    else if FRequestInfo.Document = '/page/hint' then
-      ProcessPageHint
+    if FRequestInfo.Document = '/page/hint' then
+      ProcessPageHint(FRequestInfo.Params)
     else if FRequestInfo.Document = '/page/help' then
       ProcessPageHelp(FRequestInfo.Params)
     else if FRequestInfo.Document = '/page/splash' then
       ProcessPageSplash
     else if FRequestInfo.Document = '/page/basekeyboard' then
       ProcessPageBaseKeyboard
+    else if FRequestInfo.Document = '/page/downloadkeyboard' then
+      ProcessPageDownloadKeyboard
     else
     begin
       // Generic response
@@ -148,13 +147,18 @@ class procedure TAppHttpResponder.DoProcessRequest(ASharedData: THttpServerShare
 var
   FClass: TAppHttpResponderClass;
   FApp: TAppHttpResponder;
+  key: string;
 begin
-  if FRegisteredClasses.ContainsKey(ARequestInfo.Document) then
+  FClass := TAppHttpResponder;
+
+  for key in FRegisteredClasses.Keys do
   begin
-    FClass := FRegisteredClasses[ARequestInfo.Document]
-  end
-  else
-    FClass := TAppHttpResponder;
+    if ARequestInfo.Document.StartsWith(key) then
+    begin
+      FClass := FRegisteredClasses[key];
+      Break;
+    end;
+  end;
 
   FApp := FClass.Create(ASharedData, AContext, ARequestInfo, AResponseInfo);
   try
@@ -164,10 +168,23 @@ begin
   end;
 end;
 
-procedure TAppHttpResponder.ProcessPageHint;
+procedure TAppHttpResponder.ProcessPageHint(const Params: TStrings);
+var
+  FXML, FButtons: string;
 begin
+  FXML :=
+    '<Hint ID="'+XMLEncode(Params.Values['id']) + '" />' +
+    '<Buttons>';
+
+  FButtons := Params.Values['buttons'];
+  if FButtons.Contains('ok') then FXML := FXML + '<Button ID="OK" />';
+  if FButtons.Contains('cancel') then FXML := FXML + '<Button ID="Cancel" />';
+
+  FXML := FXML + '</Buttons>';
+
   FXMLRenderers.xRenderTemplate := 'Hint.xsl';
-  ProcessXMLPage('');
+  FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, FXML));
+  ProcessXMLPage;
 end;
 
 procedure TAppHttpResponder.ProcessPageHelp(const Params: TStrings);
@@ -178,26 +195,6 @@ begin
     then s := Format('<Keyboard Name="%s" />', [XMLEncode(Params.Values['keyboard'])])
     else s := '';
   FXMLRenderers.xRenderTemplate := 'Help.xsl';
-  ProcessXMLPage(s);
-end;
-
-procedure TAppHttpResponder.ProcessPageMain(const Params: TStrings);
-var
-  s: string;
-begin
-  s := Format('<state>%s</state><basekeyboard id="%s">%s</basekeyboard>', [
-    XMLEncode(Params.Values['state']),
-    XMLEncode(Params.Values['basekeyboardid']),
-    XMLEncode(Params.Values['basekeyboardname'])
-  ]);
-
-  FXMLRenderers.xRenderTemplate := 'Keyman.xsl';
-  FXMLRenderers.Add(TKeyboardListXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(THotkeysXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
-  FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
-
   ProcessXMLPage(s);
 end;
 
@@ -227,12 +224,27 @@ begin
   ProcessXMLPage;
 end;
 
+procedure TAppHttpResponder.ProcessPageDownloadKeyboard;
+var
+  xml: string;
+begin
+  xml := '<Version>'+CKeymanVersionInfo.VersionWin+'</Version>';
+  FXMLRenderers.xRenderTemplate := 'downloadkeyboard.xsl';
+  FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, xml));
+  ProcessXMLPage;
+end;
+
 procedure TAppHttpResponder.ProcessXMLPage(const s: string);
 var
   FXMLFileName: TTempFile;
   FFileStream: TFileStream;
+  PageTag: string;
 begin
-  FXMLFileName := FXMLRenderers.RenderToFile(False, s); // FRefreshKeyman, AdditionalData);
+  PageTag := RequestInfo.Params.Values['tag'];
+  if PageTag <> '' then
+    PageTag := '<PageTag>'+PageTag+'</PageTag>';
+
+  FXMLFileName := FXMLRenderers.RenderToFile(False, s + PageTag); // FRefreshKeyman, AdditionalData);
 
   FResponseInfo.ContentStream := TMemoryStream.Create;
   FResponseInfo.FreeContentStream := True;
@@ -245,6 +257,24 @@ begin
   end;
 
   FResponseInfo.ContentStream.Position := 0;
+  FResponseInfo.ContentType := 'text/html; charset=UTF-8';
+end;
+
+function TAppHttpResponder.GetTaggedData(const IID: TGUID; out Intf): Boolean;
+var
+  tag: Integer;
+  u: IInterface;
+  PageTag: string;
+begin
+  Result := False;
+  PageTag := RequestInfo.Params.Values['tag'];
+  tag := StrToIntDef(PageTag, -1);
+  if tag >= 0 then
+  begin
+    u := SharedData.Get(tag);
+    if Assigned(u) then
+      Result := Supports(u, IID, Intf);
+  end;
 end;
 
 class procedure TAppHttpResponder.Register(const page: string; ClassType: TAppHttpResponderClass);

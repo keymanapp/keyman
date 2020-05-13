@@ -32,7 +32,7 @@ uses
 type
   TKeyboardListXMLRenderer = class(TXMLRenderer)
   private
-    FTempPath: string;
+//    FTempPath: string;
     FFileReferences: TStrings;
     procedure DeleteFileReferences;
   protected
@@ -40,6 +40,7 @@ type
   public
     constructor Create(AOwner: TXMLRenderers);
     destructor Destroy; override;
+    property FileReferences: TStrings read FFileReferences;
   end;
 
 implementation
@@ -59,7 +60,6 @@ constructor TKeyboardListXMLRenderer.Create(AOwner: TXMLRenderers);
 begin
   inherited Create(AOwner);
   FFileReferences := TStringList.Create;
-  FTempPath := KGetTempPath;
 end;
 
 procedure TKeyboardListXMLRenderer.DeleteFileReferences;
@@ -67,7 +67,7 @@ var
   i: Integer;
 begin
   for i := 0 to FFileReferences.Count - 1 do
-    DeleteFile(FTempPath + FFileReferences[i]);   // I4181
+    DeleteFile(Owner.TempPath + FFileReferences[i]);   // I4181
   FFileReferences.Clear;
 end;
 
@@ -85,7 +85,7 @@ function TKeyboardListXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
       I: Integer;
     begin
       References := Null; // I2678
-      Result := kbd.SerializeXML(ksfExportImages, FTempPath, References);
+      Result := kbd.SerializeXML(ksfExportImages, Owner.TempPath, References);
       if not VarIsNull(References) then // I2678
         for I := VarArrayLowBound(References, 1) to VarArrayHighBound(References, 1) do
           FFileReferences.Add(References[I]);
@@ -97,7 +97,7 @@ function TKeyboardListXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
       I: Integer;
     begin
       References := Null; // I2678
-      Result := pkg.SerializeXML(ksfExportImages, FTempPath, References);
+      Result := pkg.SerializeXML(ksfExportImages, Owner.TempPath, References);
       if not VarIsNull(References) then // I2678
         for I := VarArrayLowBound(References, 1) to VarArrayHighBound(References, 1) do
           FFileReferences.Add(References[I]);
@@ -106,7 +106,7 @@ function TKeyboardListXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
 var
   I: Integer;
 begin
-  Result := '<ImagePath>'+XMLEncode(FTempPath)+'</ImagePath>';
+//  Result := '<ImagePath>'+XMLEncode(FTempPath)+'</ImagePath>';
 
   DeleteFileReferences;
 

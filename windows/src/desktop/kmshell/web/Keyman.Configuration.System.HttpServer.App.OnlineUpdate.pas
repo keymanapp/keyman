@@ -31,20 +31,9 @@ procedure TOnlineUpdateHttpResponder.ProcessRequest;
 var
   xml: string;
   i: Integer;
-  u: IUnknown;
   data: IOnlineUpdateSharedData;
-  tag: Integer;
 begin
-  data := nil;
-  tag := StrToIntDef(RequestInfo.Params.Values['tag'], -1);
-  if (tag >= 0) then
-  begin
-    u := SharedData.Get(tag);
-    if Assigned(u) then
-      Supports(u, IOnlineUpdateSharedData, data);
-  end;
-
-  if data = nil then
+  if not GetTaggedData(IOnlineUpdateSharedData, data) then
   begin
     Respond404(Context, RequestInfo, ResponseInfo);
     Exit;
@@ -54,7 +43,6 @@ begin
 
   if (data.Params.Keyman.DownloadURL <> '') then
   begin
-//    FParams.Keyman.Install := True;
     xml := xml +
       '<Update>'+
         '<index>0</index>'+

@@ -62,10 +62,7 @@
         <img style="width: 16px; height:16px;">
           <xsl:choose>
             <xsl:when test="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]/bitmap">
-              <xsl:attribute name="src">
-                <xsl:value-of select="/Keyman/ImagePath"/>
-                <xsl:value-of select="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]/bitmap"/>
-              </xsl:attribute>
+              <xsl:attribute name="src">/data/keyman/bitmap/<xsl:value-of select="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]/bitmap"/>?tag=<xsl:value-of select="/Keyman/PageTag" /></xsl:attribute>
             </xsl:when>
             <xsl:when test="//KeymanKeyboardInstalled[id=current()/keymankeyboardid]">
               <xsl:attribute name="src">/app/no_icon.png</xsl:attribute>

@@ -58,7 +58,7 @@ begin
   FSharedData := THttpServerSharedData.Create;
   b := http.Bindings.Add;
   b.Port := 8009; //0;
-  b.IP := '127.0.0.1';
+  b.IP := '127.0.0.1'; // only on local computer
   http.Active := True;
 end;
 
@@ -79,8 +79,6 @@ end;
 
 procedure TmodWebHttpServer.httpCommandGet(AContext: TIdContext;
   ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
-var
-  FApp: TAppHttpResponder;
 begin
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   try

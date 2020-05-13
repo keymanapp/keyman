@@ -40,7 +40,6 @@ end;
 procedure TfrmBaseKeyboard.TntFormCreate(Sender: TObject);
 begin
   inherited;
-
   FRenderPage := 'basekeyboard';
   Content_Render;
 end;

@@ -107,15 +107,8 @@
           <div class="list_icon">
             <img style="width: 16px; height:16px;">
               <xsl:choose>
-                <xsl:when test="bitmap">
-                  <xsl:attribute name="src">
-                    <xsl:value-of select="/Keyman/ImagePath"/>
-                    <xsl:value-of select="bitmap"/>
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:attribute name="src">/app/no_icon.gif</xsl:attribute>
-                </xsl:otherwise>
+                <xsl:when test="bitmap"><xsl:attribute name="src">/data/keyman/bitmap/<xsl:value-of select="bitmap"/>?tag=<xsl:value-of select="/Keyman/PageTag" /></xsl:attribute></xsl:when>
+                <xsl:otherwise><xsl:attribute name="src">/app/no_icon.gif</xsl:attribute></xsl:otherwise>
               </xsl:choose>
             </img>
           </div>

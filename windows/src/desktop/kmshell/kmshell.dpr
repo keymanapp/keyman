@@ -165,7 +165,10 @@ uses
   Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Configuration.System.HttpServer.SharedData in 'web\Keyman.Configuration.System.HttpServer.SharedData.pas',
   Keyman.Configuration.System.HttpServer.App.OnlineUpdate in 'web\Keyman.Configuration.System.HttpServer.App.OnlineUpdate.pas',
-  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas';
+  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas',
+  Keyman.Configuration.System.HttpServer.App.InstallKeyboard in 'web\Keyman.Configuration.System.HttpServer.App.InstallKeyboard.pas',
+  Keyman.Configuration.System.HttpServer.App.ProxyConfiguration in 'web\Keyman.Configuration.System.HttpServer.App.ProxyConfiguration.pas',
+  Keyman.Configuration.System.HttpServer.App.ConfigMain in 'web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

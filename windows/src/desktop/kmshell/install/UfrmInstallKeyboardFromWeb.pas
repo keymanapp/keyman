@@ -209,9 +209,7 @@ procedure TfrmInstallKeyboardFromWeb.TntFormShow(Sender: TObject);
 begin
   // Ensures keyman.com hosted site opens locally
   cef.ShouldOpenRemoteUrlsInBrowser := False;
-  // TODO: xml
   FRenderPage := 'downloadkeyboard';
-//    XMLRenderers.Add(TGenericXMLRenderer.Create(FXML + '<Version>'+GetVersionString+'</Version>'));  // I1366 - Add version info
   Content_Render;
   inherited;
 end;

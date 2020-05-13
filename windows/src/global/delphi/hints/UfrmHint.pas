@@ -55,7 +55,10 @@ implementation
 {$R *.dfm}
 
 uses
-  Hints;
+  System.StrUtils,
+
+  Hints,
+  utilhttp;
 
 procedure TfrmHint.FireCommand(const command: WideString;
   params: TStringList);
@@ -92,20 +95,16 @@ end;
 
 procedure TfrmHint.TntFormShow(Sender: TObject);
 var
-  FXML: WideString;
+  query: string;
 begin
-  FXML :=
-    '<Hint ID="'+GetHintName(FHint) + '" />' +
-    '<Buttons>';
-
-  if mbOK in FButtons then FXML := FXML + '<Button ID="OK" />';
-  if mbCancel in FButtons then FXML := FXML + '<Button ID="Cancel" />';
-
-  FXML := FXML + '</Buttons>';
+  query := Format('id=%s&buttons=%s', [
+    UrlEncode(GetHintName(FHint)),
+    IfThen(mbOK in FButtons, 'ok,') +
+    IfThen(mbCancel in FButtons, 'cancel,')
+  ]);
 
   FRenderPage := 'hint';
-//  TODO: XMLRenderers.Add(TGenericXMLRenderer.Create(XMLRenderers, FXML));
-  Content_Render;
+  Content_Render(False, query);
   inherited;
 end;
 

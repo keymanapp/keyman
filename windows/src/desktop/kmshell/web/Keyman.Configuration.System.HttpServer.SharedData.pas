@@ -45,14 +45,17 @@ uses
 
 function THttpServerSharedData.Add(Data: IUnknown): Integer;
 begin
-  Result := FData.Add(Data);
+  // We use a non-zero tag to avoid difficult to trace bugs where an
+  // uninitialised page tag is referenced (which in a class will be zero).
+  Result := FData.Add(Data) + 1;
 end;
 
 procedure THttpServerSharedData.Remove(Tag: Integer);
 begin
   // Decrements reference count, ensures new attempts to get the data will fail
   // and allowing the data to be released when all existing references disappear
-  FData[Tag] := nil;
+  if Tag > 0 then
+    FData[Tag-1] := nil;
 end;
 
 constructor THttpServerSharedData.Create;
@@ -69,7 +72,9 @@ end;
 
 function THttpServerSharedData.Get(Tag: Integer): IUnknown;
 begin
-  Result := FData[Tag];
+  if Tag > 0
+    then Result := FData[Tag-1]
+    else Result := nil;
 end;
 
 end.

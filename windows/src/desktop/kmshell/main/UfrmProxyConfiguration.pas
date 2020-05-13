@@ -61,7 +61,7 @@ procedure TfrmProxyConfiguration.Footer_OK(params: TStringList);
 var
   FPassword: WideString;
 begin
-  if params.Values['password'] = '##PASSWORD##'
+  if params.Values['password'] = ProxySettingsStandinPassword
     then FPassword := GetProxySettings.Password
     else FPassword := params.Values['password'];
 
@@ -71,25 +71,9 @@ begin
 end;
 
 procedure TfrmProxyConfiguration.TntFormCreate(Sender: TObject);
-var
-  FPassword, xml: WideString;
 begin
   inherited;
-
-  if GetProxySettings.Password <> ''
-    then FPassword := '##PASSWORD##'
-    else FPassword := '';
-
-  xml :=
-    '<Proxy>'+
-      '<Server>'+XMLEncode(GetProxySettings.Server)+'</Server>'+
-      '<Port>'+IntToStr(GetProxySettings.Port)+'</Port>'+
-      '<Username>'+XMLEncode(GetProxySettings.Username)+'</Username>'+
-      '<Password>'+XMLEncode(FPassword)+'</Password>'+
-    '</Proxy>';
-
   FRenderPage := 'proxyconfiguration';
-  // TODO: xml
   Content_Render;
 end;
 

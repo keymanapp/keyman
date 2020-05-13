@@ -56,11 +56,26 @@ unit UfrmInstallKeyboard;  // I3306   // I3612
 interface
 
 uses
+  System.Classes,
   System.Contnrs,
+  System.SysUtils,
+  System.Types,
   System.UITypes,
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, keymanapi_TLB, Menus, UfrmKeymanBase, UfrmWebContainer,
-  WideStrings;
+  System.WideStrings,
+
+  Winapi.Messages,
+  Winapi.Windows,
+
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+
+  keymanapi_TLB,
+  UfrmKeymanBase,
+  UfrmWebContainer;
 
 
 type
@@ -71,15 +86,17 @@ type
     FKeyboard: IKeymanKeyboardFile;
     FPackage: IKeymanPackageFile;
 
-    FFileReferences: OleVariant;
+    FFiles: TStringDynArray;
     FTempPath: string;
     FSilent: Boolean;
+    PageTag: Integer;
     //FLanguageEnvironmentManager: TLanguageEnvironmentManager; // I1220
 
     procedure SetInstallFile(const Value: string);
     procedure DeleteFileReferences;
     procedure InstallKeyboard(const ALogFile: string);
     procedure CheckLogFileForWarnings(const Filename: string; Silent: Boolean);
+    function CleanupPaths(var xml: string): string;
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
@@ -96,17 +113,21 @@ implementation
 {$R *.DFM}
 
 uses
-  ComObj,
+  System.StrUtils,
+  System.Variants,
+  System.Win.ComObj,
+  Winapi.ShellApi,
+
   custinterfaces,
   GetOSVersion,
   MessageIdentifierConsts,
   MessageIdentifiers,
   Keyman.Configuration.UI.MitigationForWin10_1803,
+  Keyman.Configuration.System.HttpServer.App.InstallKeyboard,
+  Keyman.Configuration.System.UmodWebHttpServer,
   kmcomapi_errors,
   kmint,
   OnlineConstants,
-  ShellApi,
-  StrUtils,
   TempFileManager,
   UfrmHTML,
   //UfrmSelectLanguage,
@@ -115,7 +136,8 @@ uses
   utilsystem,
   utiluac,
   UtilWaitForTSF,
-  Variants;
+  Xml.XmlDoc,
+  Xml.XmlIntf;
 
 {procedure FixupShadowKeyboards;
 begin
@@ -269,8 +291,11 @@ end;
 
 procedure TfrmInstallKeyboard.SetInstallFile(const Value: string);
 var
-  FXML: WideString;
+  FXML: string;
+  FFileReferences: OleVariant;
   i: Integer;
+  Data: IInstallKeyboardSharedData;
+  FPackagePath: string;
 begin
   screen.Cursor := crHourglass;
   try
@@ -311,16 +336,59 @@ begin
       FXML := FKeyboard.SerializeXML(keymanapi_TLB.ksfExportImages, FTempPath, FFileReferences);
     end;
 
+    if VarIsArray(FFileReferences) then
+    begin
+      SetLength(FFiles, VarArrayHighBound(FFileReferences, 1) - VarArrayLowBound(FFileReferences, 1) + 1);
+      for I := VarArrayLowBound(FFileReferences, 1) to VarArrayHighBound(FFileReferences, 1) do
+        FFiles[I-VarArrayLowBound(FFileReferences, 1)] := FFileReferences[I];
+    end;
+
+    FPackagePath := CleanupPaths(FXML);
+
+    Data := TInstallKeyboardSharedData.Create(FXML, FTempPath, FPackagePath, FFiles);
+    PageTag := modWebHttpServer.SharedData.Add(Data);
     FRenderPage := 'installkeyboard';
-    Content_Render(False, 'file='+Value); // TODO: xml
+    Content_Render(False, 'tag='+IntToStr(PageTag));
   finally
     Screen.Cursor := crDefault;
   end;
 end;
 
+function TfrmInstallKeyboard.CleanupPaths(var xml: string): string;
+var
+  doc: IXMLDocument;
+  node: IXMLNode;
+begin
+  // TODO: add ksfRelativePaths to SerializeXML and add ChildValues['packagepath']
+  // so this is not necessary; this requires update to Keyman API though.
+
+  Result := '';
+  doc := LoadXMLData(xml);
+
+  node := doc.DocumentElement.ChildNodes.FindNode('readme');
+  if Assigned(node) then
+  begin
+    Result := node.NodeValue;
+    node.NodeValue := ExtractFileName(Result);
+    Result := ExtractFilePath(Result);
+  end;
+
+  node := doc.DocumentElement.ChildNodes.FindNode('graphic');
+  if Assigned(node) then
+  begin
+    Result := node.NodeValue;
+    node.NodeValue := ExtractFileName(Result);
+    Result := ExtractFilePath(Result);
+  end;
+
+  doc.SaveToXML(xml);
+end;
+
 procedure TfrmInstallKeyboard.TntFormDestroy(Sender: TObject);
 begin
   inherited;
+  if PageTag > 0 then
+    modWebHttpServer.SharedData.Remove(PageTag);
   DeleteFileReferences;
 end;
 
@@ -328,9 +396,9 @@ procedure TfrmInstallKeyboard.DeleteFileReferences;
 var
   I: Integer;
 begin
-  if VarIsArray(FFileReferences) then
-    for I := VarArrayLowBound(FFileReferences, 1) to VarArrayHighBound(FFileReferences, 1) do
-      DeleteFile(FTempPath + FFileReferences[i]);   // I4181
+  for I := Low(FFiles) to High(FFiles) do
+    System.SysUtils.DeleteFile(FTempPath + FFiles[i]);   // I4181
+  SetLength(FFiles, 0);
 end;
 
 procedure TfrmInstallKeyboard.FireCommand(const command: WideString; params: TStringList);

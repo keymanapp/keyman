@@ -74,7 +74,10 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
-  keymanapi_TLB, UfrmKeymanBase,
+  keymanapi_TLB,
+  XMLRenderer,
+  KeyboardListXMLRenderer,
+  UfrmKeymanBase,
   UfrmWebContainer;
 
 type
@@ -85,7 +88,11 @@ type
     procedure TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   private
+    FPageTag: Integer;
     FClosing: Boolean;
+
+    FKeyboardXMLRenderer: TKeyboardListXMLRenderer;
+    FXMLRenderers: TXMLRenderers;
 
     DebuggingChecked: Boolean;   // I3630
 
@@ -179,6 +186,7 @@ uses
   //Registration,
   ErrorControlledRegistry,
   Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.Configuration.System.HttpServer.App.ConfigMain,
   RegistryKeys,
   ShellApi,
   StrUtils,
@@ -198,6 +206,11 @@ uses
   utilkmshell,
   utilhttp,
   utiluac,
+  utilxml,
+  HotkeysXMLRenderer,
+  OptionsXMLRenderer,
+  LanguagesXMLRenderer,
+  SupportXMLRenderer,
   Variants;
 
 type
@@ -234,6 +247,14 @@ begin
   Options_Init;
 
   FRenderPage := 'keyman'; // TODO: rename to 'main'? or 'config'?
+  FXMLRenderers := TXMLRenderers.Create;
+  FXMLRenderers.xRenderTemplate := 'Keyman.xsl';
+  FKeyboardXMLRenderer := TKeyboardListXMLRenderer.Create(FXMLRenderers);
+  FXMLRenderers.Add(FKeyboardXMLRenderer);
+  FXMLRenderers.Add(THotkeysXMLRenderer.Create(FXMLRenderers));
+  FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
+  FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
+  FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
 
   Do_Content_Render(False);
 end;
@@ -262,7 +283,9 @@ begin
   end;
 
   Application.OnActivate := nil;
-  //xmlstylesheet := nil;
+  FreeAndNil(FXMLRenderers);
+  if FPageTag > 0 then
+    modWebHttpServer.SharedData.Remove(FPageTag);
   inherited;
 end;
 
@@ -272,17 +295,39 @@ end;
 
 procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
 var
-  query: string;
+  data: IConfigMainSharedData;
+  d: TConfigMainSharedData;
+  s: string;
 begin
   SaveState;
 
-  query := Format('state=%s&basekeyboardname=%s&basekeyboardid=%08.8x', [
-    UrlEncode(FState),
-    UrlEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value)),
-    Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value)
+  if FPageTag > 0 then
+  begin
+    modWebHttpServer.SharedData.Remove(FPageTag);
+    FPageTag := 0;
+  end;
+
+  // TODO: Unlike other forms, we currently render the XML here in the window in
+  // order to avoid loading the Keyman Configuration data for every page view. A
+  // better approach would be shared data but the threading concerns for keyman
+  // API mean that this is a bigger job
+
+  d := TConfigMainSharedData.Create(FXMLRenderers.TempPath);
+  data := d;
+
+  FPageTag := modWebHttpServer.SharedData.Add(d);
+
+  s := Format('<PageTag>%d</PageTag><state>%s</state><basekeyboard id="%08.8x">%s</basekeyboard>', [
+    FPageTag,
+    FState,
+    Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),
+    XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
   ]);
 
-  Content_Render(FRefreshKeyman, query);
+  d.SetHTML(FXMLRenderers.RenderToString(False, s));
+  d.SetFiles(FKeyboardXMLRenderer.FileReferences.ToStringArray);
+
+  Content_Render(FRefreshKeyman, 'tag='+IntToStr(FPageTag));
 end;
 
 procedure TfrmMain.FireCommand(const command: WideString; params: TStringList);
