@@ -1,5 +1,31 @@
 # Keyman Version History
 
+## 14.0.74 alpha 2020-05-11
+
+* fix(windows): kmbrowserhost was missing debug info (#3117)
+
+## 14.0.73 alpha 2020-05-11
+
+* fix(windows): force output keystroke failure (#3083)
+* fix(windows): kmshell title and kmbrowserhost sentry (#3115)
+
+## 14.0.72 alpha 2020-05-08
+
+* fix(ios/oem): Fixes FV app's system keyboard (#3105)
+* fix(ios/oem): FV light mode lock and basic banner fix (#3108)
+* fix(windows): sentry cef shutdown interactions (#3107)
+* feat(android): Migrate installed keyboards list to keyboards_list.json (#3091)
+
+## 14.0.71 alpha 2020-05-08
+
+* fix(windows): use consistent sentry db location (#3100)
+
+## 14.0.70 alpha 2020-05-07
+
+* fix(android): Fix back button after System Keyboard dismissed (#3093)
+* fix(android): Back button to dismiss KMSample2 system keyboard (#3095)
+* fix(oem): Back button to dismiss FV Android system keyboard (#3096)
+
 ## 14.0.69 alpha 2020-05-06
 
 * fix(common): npm install required for auto inc lerna versions (#3089)

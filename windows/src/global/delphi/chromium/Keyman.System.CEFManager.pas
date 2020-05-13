@@ -28,6 +28,7 @@ type
     FShutdownCompletionHandler: TNotifyEvent;
     procedure CompletionHandler(Sender: IKeymanCEFHost);
     procedure Cleanup(Sender: TObject);
+    procedure LaunchWatchdog;
   public
     const ProcessMessage_GetWindowSize = 'ProcessMessage_ResizeByContent';
   public
@@ -49,14 +50,11 @@ implementation
 uses
   System.SysUtils,
   Winapi.ShlObj,
+  Winapi.Tlhelp32,
   Winapi.Windows,
 
-  Sentry.Client,
-
-  Keyman.System.KeymanSentryClient,
   KeymanPaths,
   KeymanVersion,
-//  RedistFiles,
   RegistryKeys,
   VersionInfo,
   uCEFConstants,
@@ -65,7 +63,6 @@ uses
   uCEFMiscFunctions,
   uCEFProcessMessage,
   uCEFTypes;
-//  UTikeDebugMode;
 
 procedure GlobalCEFApp_ProcessMessageReceived(const browser       : ICefBrowser;
                                                     sourceProcess : TCefProcessId;
@@ -116,7 +113,9 @@ begin
 
   GlobalCEFApp.OnProcessMessageReceived := GlobalCEFApp_ProcessMessageReceived;
 
-  TKeymanSentryClient.OnBeforeShutdown := Self.Cleanup;
+  // We no longer attempt to cleanup before shutdown, and rely on the child cef
+  // processes to do the cleanup, which is more reliable.
+  // TKeymanSentryClient.OnBeforeShutdown := Self.Cleanup;
 end;
 
 procedure TCEFManager.Cleanup(Sender: TObject);
@@ -141,12 +140,80 @@ end;
 
 function TCEFManager.Start: Boolean;
 begin
+  if GlobalCEFApp.ProcessType <> ptBrowser then
+  begin
+    LaunchWatchdog;
+  end;
+
   Result := GlobalCEFApp.StartMainProcess;
 end;
 
 function TCEFManager.StartSubProcess: Boolean;
 begin
+  LaunchWatchdog;
   Result := GlobalCEFApp.StartSubProcess;
+end;
+
+/// Start a watchdog thread to terminate process when parent does
+///
+/// Description: This should be run only in the context of the child process.
+/// It will normally only happen in an abnormal termination of the parent
+/// process (because otherwise the main thread of the child process receives an
+/// orderly request to shut down, and does so), but in the situation where the
+/// parent process disappears without making that request, this lets the child
+/// process do the work.
+///
+/// This is probably a gap in Chromium Embedded Framework but AFAICT it has not
+/// been resolved and this was the suggested fix, e.g. at
+/// https://magpcss.org/ceforum/viewtopic.php?p=37820&sid=11f6fcabc4089e41283bd5b9ec17267e#p37820
+/// which I have taken and cleaned up because it seemed appropriate.
+///
+procedure TCEFManager.LaunchWatchdog;
+
+  function GetParentProcess: THandle;
+  var
+    Snapshot: THandle;
+    ProcessEntry: TProcessEntry32;
+    CurrentProcessId: DWORD;
+  begin
+    Snapshot := CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if Snapshot = INVALID_HANDLE_VALUE then
+      Exit(0);
+
+    FillChar(ProcessEntry, sizeof(TProcessEntry32), 0);
+    ProcessEntry.dwSize := sizeof(TProcessEntry32);
+    CurrentProcessId := GetCurrentProcessId;
+
+    if Process32First(Snapshot, ProcessEntry) then
+    begin
+      repeat
+        if ProcessEntry.th32ProcessID = CurrentProcessId then
+          Break;
+      until not Process32Next(Snapshot, ProcessEntry);
+    end;
+
+    CloseHandle(Snapshot);
+
+    if ProcessEntry.th32ProcessID <> CurrentProcessId then
+      Exit(0);
+
+    Result := OpenProcess(SYNCHRONIZE, False, ProcessEntry.th32ParentProcessID);
+  end;
+
+var
+  hParentProcess: THandle;
+begin
+  hParentProcess := GetParentProcess;
+  if hParentProcess <> 0 then
+  begin
+    TThread.CreateAnonymousThread(
+      procedure
+      begin
+        WaitForSingleObject(hParentProcess, INFINITE);
+        ExitProcess(0);
+      end
+    ).Start;
+  end;
 end;
 
 function TCEFManager.StartShutdown(CompletionHandler: TNotifyEvent): Boolean;

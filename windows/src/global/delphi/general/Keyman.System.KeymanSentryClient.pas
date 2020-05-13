@@ -54,9 +54,11 @@ uses
   System.SysUtils,
   System.Win.Registry,
 {$IF NOT DEFINED(CONSOLE)}
+{$IF NOT DEFINED(SENTRY_NOVCL)}
   System.UITypes,
   Vcl.Dialogs,
   Vcl.Forms,
+{$ENDIF}
 {$ENDIF}
 
   sentry,
@@ -142,13 +144,17 @@ begin
 {$ELSE}
       // Launch external gui exception dialog app.
       // Usage: tsysinfo -c <crashid> <appname> <appid> [sentryprojectname [classname [message]]]
+{$IF NOT DEFINED(SENTRY_NOVCL)}
       if Assigned(Application)
         then ApplicationTitle := Application.Title
         else ApplicationTitle := AppID;
+{$ELSE}
+      ApplicationTitle := AppID;
+{$ENDIF}
 
       CommandLine := Format('-c "%s" "%s" "%s" "%s" "%s" "%s"', [
         IfThen(EventID = '', '_', EventID),
-        ApplicationTitle,
+        IfThen(ApplicationTitle = '', ChangeFileExt(ExtractFileName(ParamStr(0)),''), ApplicationTitle),
         AppID,
         ProjectName,
         EventClassName,
@@ -158,9 +164,11 @@ begin
       if not TUtilExecute.Shell(0, TKeymanPaths.KeymanEngineInstallPath('tsysinfo.exe'),  // I3349
           TKeymanPaths.KeymanEngineInstallPath(''), CommandLine) then
       begin
+{$IF NOT DEFINED(SENTRY_NOVCL)}
         MessageDlg(Application.Title+' has had a fatal error.  An additional error was encountered '+
           'starting the exception manager ('+SysErrorMessage(GetLastError)+'). '+
           'This error has been automatically reported to the Keyman team.', mtError, [mbOK], 0);
+{$ENDIF}
       end;
 {$ENDIF}
     end;
@@ -299,7 +307,7 @@ begin
   end;
 
   o.HandlerPath := ExtractFilePath(FindSentryDLL) + 'crashpad_handler.exe';
-  o.DatabasePath := TKeymanPaths.ErrorLogPath('sentry-db');
+  o.DatabasePath := TKeymanPaths.ErrorLogPath + 'sentry-db';
 
   FClient := SentryClientClass.Create(o, ALogger, f);
   FClient.OnAfterEvent := ClientAfterEvent;
