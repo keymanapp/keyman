@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
@@ -21,6 +24,24 @@ public class Keyboard extends LanguageResource implements Serializable {
   private String font;
   private String oskFont;
 
+  // JSON keys
+  private static String KB_NEW_KEYBOARD_KEY = "isNewKeyboard";
+  private static String KB_FONT_KEY = "font";
+  private static String KB_OSK_FONT_KEY = "oskFont";
+
+  /**
+   * Constructor using JSON Objects from installed keyboards list
+   * @param installedObj
+   */
+  public Keyboard(JSONObject installedObj) {
+    this.fromJSON(installedObj);
+  }
+
+  /**
+   * Constructor using JSON Objects from keyboard cloud catalog
+   * @param languageJSON
+   * @param keyboardJSON
+   */
   public Keyboard(JSONObject languageJSON, JSONObject keyboardJSON) {
     try {
       this.packageID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
@@ -49,18 +70,13 @@ public class Keyboard extends LanguageResource implements Serializable {
     }
   }
 
-  public Keyboard(String packageID, String keyboardID, String keyboardName, String languageID, String languageName,
-                  String version, String helpLink,
+  public Keyboard(String packageID, String keyboardID, String keyboardName,
+                  String languageID, String languageName, String version,
+                  String helpLink,
                   boolean isNewKeyboard, String font, String oskFont) {
-
-    this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
-    this.resourceID = keyboardID;
-    this.resourceName = keyboardName;
-    this.languageID = languageID.toLowerCase();
-    this.languageName = languageName;
-    this.version = (version != null) ? version : "1.0";
-    this.helpLink = (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-      String.format(HELP_URL_FORMATSTR, this.resourceID, this.version);
+    super(packageID, keyboardID, keyboardName, languageID, languageName, version,
+      (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
+        String.format(HELP_URL_FORMATSTR, keyboardID, version));
 
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
@@ -101,4 +117,41 @@ public class Keyboard extends LanguageResource implements Serializable {
     return false;
   }
 
+  protected void fromJSON(JSONObject installedObj) {
+    super.fromJSON(installedObj);
+    try {
+      this.isNewKeyboard = installedObj.getBoolean(KB_NEW_KEYBOARD_KEY);
+      this.font = installedObj.getString(KB_FONT_KEY);
+      this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "fromJSON exception: " + e);
+    }
+  }
+
+  public JSONObject toJSON() {
+    JSONObject o = super.toJSON();
+    if (o != null) {
+      try {
+        o.put(KB_NEW_KEYBOARD_KEY, this.isNewKeyboard);
+        o.put(KB_FONT_KEY, this.font);
+        o.put(KB_OSK_FONT_KEY, this.oskFont);
+      } catch (JSONException e) {
+        Log.e(TAG, "toJSON exception: " + e);
+      }
+    }
+    return o;
+  }
+
+  // Default sil_euro_latin keyboard
+  public static final Keyboard DEFAULT_KEYBOARD = new Keyboard(
+    KMManager.KMDefault_PackageID,
+    KMManager.KMDefault_KeyboardID,
+    KMManager.KMDefault_KeyboardName,
+    KMManager.KMDefault_LanguageID,
+    KMManager.KMDefault_LanguageName,
+    KMManager.KMDefault_KeyboardVersion,
+    null, // will use help.keyman.com link because context required to determine local welcome.htm path
+    false,
+    KMManager.KMDefault_KeyboardFont,
+    KMManager.KMDefault_KeyboardFont);
 }

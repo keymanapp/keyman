@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
@@ -19,7 +22,23 @@ public class LexicalModel extends LanguageResource implements Serializable {
   // Only used to build download bundle from cloud
   private String modelURL;
 
-  public LexicalModel(JSONObject lexicalModelJSON) {
+  // JSON key
+  private static String LM_MODEL_URL_KEY = "modelURL";
+
+  /**
+   * Constructor using JSON Object from installed lexical models list
+   * @param installedObj
+   */
+  public LexicalModel(JSONObject installedObj) {
+    this.fromJSON(installedObj);
+  }
+
+  /**
+   * Constructor using JSON Object from lexical model cloud catalog
+   * @param lexicalModelJSON
+   * @param fromCloud boolean - only really used to make a unique prototype
+   */
+  public LexicalModel(JSONObject lexicalModelJSON, boolean fromCloud) {
     try {
       this.modelURL = lexicalModelJSON.optString("packageFilename", "");
 
@@ -62,19 +81,14 @@ public class LexicalModel extends LanguageResource implements Serializable {
     }
   }
 
-  public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName, String languageID, String languageName,
-                      String version, String helpLink,
+  public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,
+                      String languageID, String languageName,  String version,
+                      String helpLink,
                       String modelURL) {
+    // TODO: handle help links
+    super(packageID, lexicalModelID, lexicalModelName, languageID, languageName,
+        version, "");
 
-    this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
-    this.resourceID = lexicalModelID;
-    this.resourceName = lexicalModelName;
-    this.languageID = languageID.toLowerCase();
-    // If language name not provided, fallback to re-use language ID
-    this.languageName = (languageName != null && !languageName.isEmpty()) ? languageName : this.languageID;
-
-    this.version = (version != null) ? version : "1.0";
-    this.helpLink = ""; // TODO: Handle help links
     this.modelURL = modelURL;
   }
 
@@ -115,4 +129,36 @@ public class LexicalModel extends LanguageResource implements Serializable {
     return false;
   }
 
+  protected void fromJSON(JSONObject installedObj) {
+    super.fromJSON(installedObj);
+    try {
+      this.modelURL = installedObj.getString(LM_MODEL_URL_KEY);
+    } catch (JSONException e) {
+      Log.e(TAG, "fromJSON() exception: " + e);
+    }
+  }
+
+  public JSONObject toJSON() {
+    JSONObject o = super.toJSON();
+    if (o != null) {
+      try {
+        o.put(LM_MODEL_URL_KEY, this.modelURL);
+      } catch (JSONException e) {
+        Log.e(TAG, "toJSON() exception: " + e);
+      }
+    }
+
+    return o;
+  }
+
+  // default nrc.en.mtnt English dictionary
+  public static final LexicalModel DEFAULT_LEXICAL_MODEL = new LexicalModel(
+    KMManager.KMDefault_DictionaryPackageID,
+    KMManager.KMDefault_DictionaryModelID,
+    KMManager.KMDefault_DictionaryModelName,
+    KMManager.KMDefault_LanguageID,
+    KMManager.KMDefault_LanguageName,
+    KMManager.KMDefault_DictionaryVersion,
+    "",
+    "");
 }

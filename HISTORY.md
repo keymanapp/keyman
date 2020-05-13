@@ -1,5 +1,55 @@
 # Keyman Version History
 
+## 14.0.74 alpha 2020-05-11
+
+* fix(windows): kmbrowserhost was missing debug info (#3117)
+
+## 14.0.73 alpha 2020-05-11
+
+* fix(windows): force output keystroke failure (#3083)
+* fix(windows): kmshell title and kmbrowserhost sentry (#3115)
+
+## 14.0.72 alpha 2020-05-08
+
+* fix(ios/oem): Fixes FV app's system keyboard (#3105)
+* fix(ios/oem): FV light mode lock and basic banner fix (#3108)
+* fix(windows): sentry cef shutdown interactions (#3107)
+* feat(android): Migrate installed keyboards list to keyboards_list.json (#3091)
+
+## 14.0.71 alpha 2020-05-08
+
+* fix(windows): use consistent sentry db location (#3100)
+
+## 14.0.70 alpha 2020-05-07
+
+* fix(android): Fix back button after System Keyboard dismissed (#3093)
+* fix(android): Back button to dismiss KMSample2 system keyboard (#3095)
+* fix(oem): Back button to dismiss FV Android system keyboard (#3096)
+
+## 14.0.69 alpha 2020-05-06
+
+* fix(common): npm install required for auto inc lerna versions (#3089)
+* fix(windows): sentry x64 stacks truncated pointers (#3087)
+
+## 14.0.68 alpha 2020-05-06
+
+* fix(common): enable build for win x64, use global VERSION.md and fix decxstr() bug (#3076)
+* modify(android): Add methods to go between LanguageResource and JSON (#3079)
+* feat(common): auto-update for package versioning (#3078)
+
+## 14.0.67 alpha 2020-05-05
+
+* fix(ios): Additional libraries for FirstVoices SWKeyboard (#3080)
+
+## 14.0.66 alpha 2020-05-04
+
+* feat(web): test Recorder overhaul, Node-based tests using Recorder for KeyboardProcessor (#3060)
+* fix(ios): fv add sentry framework to carthage build step (#3074)
+
+## 14.0.65 alpha 2020-05-03
+
+* fix(ios): try embed of sentry again for fv (#3072)
+
 ## 14.0.64 alpha 2020-05-01
 
 * fix(ios): add sentry framework to fv keyboards (#3069)

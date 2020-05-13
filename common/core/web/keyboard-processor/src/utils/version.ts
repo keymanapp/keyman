@@ -75,6 +75,10 @@ namespace com.keyman.utils {
       return this.components.join('.');
     }
 
+    toJSON(): string {
+      return this.toString();
+    }
+
     equals(other: Version): boolean {
       return this.compareTo(other) == 0;
     }

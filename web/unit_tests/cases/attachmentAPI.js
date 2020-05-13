@@ -5,7 +5,7 @@ describe('Attachment API', function() {
 
   before(function(done) {
     assert.isFalse(com.keyman.karma.DEVICE_DETECT_FAILURE, "Cannot run due to device detection failure.");
-    fixture.setBase('unit_tests/fixtures');
+    fixture.setBase('fixtures');
 
     this.timeout(kmwconfig.timeouts.scriptLoad * 3);
     setupKMW({ attachType:'manual' }, function() {
@@ -40,11 +40,12 @@ describe('Attachment API', function() {
   it("Attachment/Detachment", function(done) {
     // Since we're in 'manual', we start detached.
     var ele = document.getElementById(DynamicElements.addInput());
-    window.setTimeout(function() {
 
+    window.setTimeout(function() {
       // Ensure we didn't auto-attach.
       DynamicElements.assertDetached(ele);
-      DynamicElements.keyCommand.simulateEventOn(ele);
+      let eventDriver = new KMWRecorder.BrowserDriver(ele);
+      eventDriver.simulateEvent(DynamicElements.keyCommand);
 
       var val = ele.value;
       ele.value = "";
@@ -54,7 +55,8 @@ describe('Attachment API', function() {
       DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
 
       // A keystroke must target the input-receiving element.  For touch, that's the alias.
-      DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+      eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+      eventDriver.simulateEvent(DynamicElements.keyCommand);
 
       val = retrieveAndReset(ele);
 
@@ -75,14 +77,16 @@ describe('Attachment API', function() {
       // for the change to take effect.
       window.setTimeout(function() {
         DynamicElements.assertAttached(ele);
-        DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+        let eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+        eventDriver.simulateEvent(DynamicElements.keyCommand);
         val = retrieveAndReset(ele);  
         assert.equal(val, DynamicElements.disabledOutput, "'Disabled' element performed keystroke processing!");
 
         keyman.enableControl(ele);
         window.setTimeout(function() {
           DynamicElements.assertAttached(ele); // Happens in-line, since we directly request the attachment.
-          DynamicElements.keyCommand.simulateEventOn(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+          let eventDriver = new KMWRecorder.BrowserDriver(ele['kmw_ip'] ? ele['kmw_ip'] : ele);
+          eventDriver.simulateEvent(DynamicElements.keyCommand);
           val = retrieveAndReset(ele);
           assert.equal(val, DynamicElements.enabledLaoOutput, "'Enabled' element did not perform keystroke processing!");
           done();
@@ -107,25 +111,28 @@ describe('Attachment API', function() {
 
     // Set control with independent keyboard.
     keyman.setKeyboardForControl(input, "khmer_angkor", "km");
-    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    var eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not use control's keyboard settings!");
 
     // Swap to a global-linked control...
     keyman.setActiveElement(textarea);
-    DynamicElements.keyCommand.simulateEventOn(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not use manage keyboard settings correctly for global-linked control!");
 
     // Swap back and check that the settings persist.
     keyman.setActiveElement(input);
-    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW forgot control's independent keyboard settings!");
 
     // Finally, clear the independent setting.
     keyman.setKeyboardForControl(input, null, null);
-    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
   });
@@ -146,13 +153,15 @@ describe('Attachment API', function() {
 
     // Set control with independent keyboard.
     keyman.setKeyboardForControl(textarea, "khmer_angkor", "km");
-    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    var eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW set independent keyboard for the incorrect control!");
 
     // Swap to a global-linked control...
     keyman.setActiveElement(textarea);
-    DynamicElements.keyCommand.simulateEventOn(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver = new KMWRecorder.BrowserDriver(textarea['kmw_ip'] ? textarea['kmw_ip'] : textarea);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(textarea);
     assert.equal(val, DynamicElements.enabledKhmerOutput, "KMW did not properly store keyboard for the previously-inactive control!");
 
@@ -160,13 +169,14 @@ describe('Attachment API', function() {
     keyman.setActiveElement(input);
     keyman.setKeyboardForControl(textarea, null, null);
 
-    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver = new KMWRecorder.BrowserDriver(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW made a strange error when clearing an inactive control's keyboard setting!");
 
     keyman.setActiveElement(textarea);
     // Finally, clear the independent setting.
-    DynamicElements.keyCommand.simulateEventOn(input['kmw_ip'] ? input['kmw_ip'] : input);
+    eventDriver.simulateEvent(DynamicElements.keyCommand);
     val = retrieveAndReset(input);
     assert.equal(val, DynamicElements.enabledLaoOutput, "KMW did not properly clear control's independent keyboard settings!");
   });
@@ -181,7 +191,7 @@ Modernizr.on('touchevents', function(result) {
       before(function(done) {
         this.timeout(kmwconfig.timeouts.scriptLoad);
 
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
       
@@ -249,7 +259,7 @@ Modernizr.on('touchevents', function(result) {
       before(function(done) {
         this.timeout(kmwconfig.timeouts.scriptLoad);
 
-        fixture.setBase('unit_tests/fixtures');
+        fixture.setBase('fixtures');
         setupKMW({ attachType:'auto' }, done, kmwconfig.timeouts.scriptLoad);
       });
       

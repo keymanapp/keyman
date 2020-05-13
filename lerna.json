@@ -2,10 +2,11 @@
   "packages": [
     "common/core/web/input-processor",
     "common/core/web/keyboard-processor",
-    "common/predictive-text",
+    "common/core/web/tools/recorder",
     "common/lexical-model-types",
+    "common/predictive-text",
     "web",
     "developer/js"
   ],
-  "version": "14.0.0"
+  "version": "14.0.75"
 }

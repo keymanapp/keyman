@@ -1,6 +1,7 @@
 program kmbrowserhost;
 
 uses
+  System.SysUtils,
   Winapi.Windows,
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
@@ -16,7 +17,6 @@ uses
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
-  Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
 
@@ -31,15 +31,20 @@ uses
 const
   LOGGER_DESKTOP_KMBROWSERHOST = TKeymanSentryClient.LOGGER_DESKTOP + '.kmbrowserhost';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop,
+  TKeymanSentryClient.Start(TSentryClient, kscpDesktop,
     LOGGER_DESKTOP_KMBROWSERHOST, [kscfCaptureExceptions, kscfTerminate]); // no ui wanted
   try
-    TKeymanSentryClient.Validate;
-    FInitializeCEF := TCEFManager.Create;
     try
-      FInitializeCEF.StartSubProcess;
-    finally
-      FInitializeCEF.Free;
+      TKeymanSentryClient.Validate;
+      FInitializeCEF := TCEFManager.Create;
+      try
+        FInitializeCEF.StartSubProcess;
+      finally
+        FInitializeCEF.Free;
+      end;
+    except
+      on E:Exception do
+        SentryHandleException(E);
     end;
   finally
     TKeymanSentryClient.Stop;

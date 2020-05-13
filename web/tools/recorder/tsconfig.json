@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"inlineSources": true,
+	"module": "none",
+	"outFile": "build/recorder_InputEvents.js",
+	"sourceMap": true,
+	"target": "es5"
+	},
+  "files": [
+		"../../node_modules/@keymanapp/lexical-model-layer/message.d.ts",
+		"browserProctor.ts"
+  ]
+}

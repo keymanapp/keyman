@@ -26,7 +26,7 @@
    // I4287
 #include "pch.h"
 
-PWSTR decxstr(PWSTR p);
+PWSTR decxstr(PWSTR p, PWSTR pStart);
 
 const LPSTR ItemTypes[8] = {
 	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
@@ -61,7 +61,7 @@ WCHAR *AppContext::Buf(int n)
 	//if(n == 0) return wcschr(CurContext, 0);
 	//if(*CurContext == 0) return NULL;
 
-	for(p = wcschr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p), n--);
+	for(p = wcschr(CurContext, 0); n > 0 && p > CurContext; p = decxstr(p, CurContext), n--);
 	//for(p = wcschr(CurContext, 0); n > 0 && p > CurContext; p--, n--);
 
 	if(n > 0) return NULL;
@@ -75,7 +75,7 @@ WCHAR *AppContext::BufMax(int n)  // Used only by IMX DLLs
 	if(CurContext == p || n == 0) return p; /* empty context or 0 characters requested, return pointer to end of context */  // I3091
 
   WCHAR *q = p;  // I3091
-	for(; p > CurContext && (int)(q-p) < n; p = decxstr(p));  // I3091
+	for(; p > CurContext && (int)(q-p) < n; p = decxstr(p, CurContext));  // I3091
 
   if((int)(q-p) > n) p = incxstr(p); /* Copes with deadkey or supplementary pair at start of returned buffer making it too long */  // I3091
 

@@ -179,6 +179,7 @@ begin
       if FInitializeCEF.Start then
       try
         Application.Initialize;
+        Application.Title := 'Keyman Configuration';
         Run;
       except
         on E:Exception do
