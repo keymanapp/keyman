@@ -1,8 +1,12 @@
 ///<reference path="../node_modules/@sentry/browser/build/bundle.min.js" />
 
-declare var com;
+namespace com.keyman {
+  /**
+   * Controls whether or not the generated Sentry event is logged to the console (true)
+   * or sent to our Sentry server (false).
+   */
+  let DEBUG = true;
 
-(function() {
   var ALIASABLE_FILES = {
     'keymanweb.js':    'keymanweb.js',
     'kmwuibutton.js':  'kmwuibutton.js',
@@ -58,11 +62,7 @@ declare var com;
   }
 
   function attachEventMetadata(event: any) {
-    event.extra = event.extra || [];
-    event.extra.push({
-      initialized: window['keyman']['getDebugInfo']()
-    });
-
+    event.extra.keymanState = window['keyman']['getDebugInfo']();
     return event;
   }
 
@@ -75,16 +75,44 @@ declare var com;
     event = pathFilter(event);
     event = attachEventMetadata(event);
 
-    return null; //event
+    if(DEBUG) {
+      console.log("DEBUG:  event object for Sentry")
+      console.log(event);
+      return null; //event
+    } else {
+      return event;
+    }
   }
 
-  // Do the actual Sentry initialization.
-  //@ts-ignore
-  Sentry.init({
-    beforeSend: eventPreparer,
-    // FIXME:  DO NOT LEAVE IN PRODUCTION!
-    debug: true,
-    dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
-    release: com.keyman.environment.SENTRY_RELEASE
-  });
-})()
+  /**
+   * Allows debugging our custom event preparation code without bombarding Sentry with errors
+   * during development.
+   * @param event
+   */
+  function __metaPreparer(event: any) {
+    if(DEBUG) {
+      try {
+        return eventPreparer(event);
+      } catch(err) {
+        console.log(err);
+      }
+    } else {
+      // If not in DEBUG mode, simply forward to the actual preparer; we should be notified
+      // of any event-prep errors that may occur.
+      return eventPreparer(event);
+    }
+  }
+
+  export class KeymanSentryManager {
+    init() {
+      // Do the actual Sentry initialization.
+      //@ts-ignore
+      Sentry.init({
+        beforeSend: __metaPreparer,
+        debug: DEBUG,
+        dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
+        release: com.keyman.environment.SENTRY_RELEASE
+      });
+    }
+  }
+}

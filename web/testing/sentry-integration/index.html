@@ -42,6 +42,9 @@
       kmw.init({
 		attachType:'auto'
         });
+
+      var sentryManager = new com.keyman.KeymanSentryManager();
+      sentryManager.init();
     </script> 
     
     <!-- Add keyboard management script for local selection of keyboards to use -->
@@ -51,7 +54,7 @@
 
 <!-- Sample page HTML -->  
   <body onload='loadKeyboards(1);'> 
-    <h2>KeymanWeb Sample Page - Unminified Source</h2>
+    <h2>KeymanWeb Sample Page - Sentry Setup test host</h2>
 
     <div>
     <!-- 

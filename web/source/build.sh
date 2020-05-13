@@ -314,6 +314,7 @@ if [ $DO_MINIFY = true ]; then
         exit 1
     fi
 
+    # Only run if BOTH cases are true b/c it's a minification-focused 'dependency'.
     if [ $FETCH_DEPS = true ]; then
         # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
         echo "Compiling build tools for minified build products"
@@ -324,6 +325,14 @@ fi
 
 if [ $BUILD_CORE = true ]; then
     CORE_FLAGS="-skip-package-install"
+
+    # Build the sentry-manager module - it's used in embedded contexts and on one testing page.
+    echo "${TERM_HEADING}Compiling KeymanWeb's sentry-manager module...${NORMAL}"
+    pushd ../../common/core/web/tools/sentry-manager/src
+    ./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
+    popd
+    echo "${TERM_HEADING}sentry-manager module compiled successfully.${NORMAL}"
+
     if [ $BUILD_LMLAYER = false ]; then
         CORE_FLAGS="$CORE_FLAGS -test"
     fi

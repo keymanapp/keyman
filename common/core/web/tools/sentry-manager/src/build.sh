@@ -54,6 +54,9 @@ OUTPUT="index.js"
 # (Facilitates automated setup for build agents.)
 PATH="../node_modules/.bin:$PATH"
 
+# Ensure the environment definition variables are available.
+exportEnvironmentDefinitionTS
+
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
