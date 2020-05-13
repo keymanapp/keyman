@@ -3,7 +3,7 @@
  */
 
 import {assert} from 'chai';
-import {default as breakWords} from '../'
+import {default as breakWords} from '../src';
 
 const SHY = '\u00AD';
 

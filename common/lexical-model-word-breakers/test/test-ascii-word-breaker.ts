@@ -1,7 +1,7 @@
 /// <reference types="@keymanapp/lexical-model-types" />
 
 import {assert} from 'chai';
-import {ascii as breakASCIIWords} from '../'
+import {ascii as breakASCIIWords} from '../src'
 
 
 describe('The ASCII word breaker', function () {
