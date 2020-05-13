@@ -383,6 +383,10 @@ namespace com.keyman.keyboards {
       // }
       this.doKeyboardChange(PInternalName, PLgCode);
 
+      p.catch(function() {
+        throw new Error("Unable to load keyboard with internal name \"" + PInternalName + "\", language code \"" + PLgCode + "\".");
+      })
+
       return p;
     }
     
