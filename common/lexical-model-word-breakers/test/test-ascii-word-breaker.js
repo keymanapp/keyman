@@ -1,6 +1,5 @@
 var assert = require('chai').assert;
-
-var breakASCIIWords = require('../../build/intermediate').wordBreakers['ascii'];
+var breakASCIIWords = require('../').ascii;
 
 describe('The ASCII word breaker', function () {
   it('should break simple English sentences', function () {

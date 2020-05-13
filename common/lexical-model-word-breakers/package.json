@@ -14,7 +14,6 @@
   "license": "MIT",
   "main": "lib/index.js",
   "directories": {
-    "lib": "lib",
     "test": "test"
   },
   "files": [
@@ -28,6 +27,7 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
+    "build": "tsc",
     "test": "mocha"
   },
   "bugs": {
