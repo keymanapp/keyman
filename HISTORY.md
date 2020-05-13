@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.75 alpha 2020-05-13
+
+* feat(android): Add Tamil lexical model to KMSample2 (#3123)
+
 ## 14.0.74 alpha 2020-05-11
 
 * fix(windows): kmbrowserhost was missing debug info (#3117)
