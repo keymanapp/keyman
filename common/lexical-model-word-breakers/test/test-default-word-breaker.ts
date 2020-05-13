@@ -1,9 +1,10 @@
 /**
  * Smoke-test the default
  */
-var assert = require('chai').assert;
 
-var breakWords = require('..').default;
+import {assert} from 'chai';
+import {default as breakWords} from '../'
+
 const SHY = '\u00AD';
 
 describe('The default word breaker', function () {
