@@ -9,6 +9,7 @@ import * as ts from "typescript";
 import * as fs from "fs";
 import * as path from "path";
 import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
+import {decorateWithJoin} from "./join-word-breaker-decorator";
 
 export default class LexicalModelCompiler {
 
@@ -99,8 +100,14 @@ function compileWordBreaker(spec: WordBreakerSpec): string {
     // No need to decorate; return it as-is
     return baseWordBreakerCode;
   }
-  // Let's decorate it with the join word breaker!
-  return `wordBreakers.join_(${baseWordBreakerCode},${JSON.stringify(spec.joinWordsAt)})`;
+
+  // Bundle the source of the join decorator, as an IIFE,
+  // like this: (function join(breaker, joiners) {/*...*/}(breaker, joiners)) 
+  // The decorator will run IMMEDIATELY when the model is loaded,
+  // by the LMLayer returning the decorated word breaker to the
+  // LMLayer model.
+  let joinerExpr: string = JSON.stringify(spec.joinWordsAt)
+  return `(${decorateWithJoin.toString()}(${baseWordBreakerCode}, ${joinerExpr}))`;
 }
 
 /**

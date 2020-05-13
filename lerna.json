@@ -5,7 +5,8 @@
     "common/core/web/tools/recorder",
     "common/lexical-model-types",
     "common/predictive-text",
-    "web"
+    "web",
+    "developer/js"
   ],
   "version": "14.0.70"
 }
