@@ -86,7 +86,11 @@ heat-model-compiler:
     # First, we copy the files to an intermediate temp-folder rooted within repo space.
     -rmdir /s/q $(KEYMAN_INTERMEDIATE_MODELCOMPILER)
     mkdir $(KEYMAN_INTERMEDIATE_MODELCOMPILER)
-    xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\ /s
+
+    # Performs the copy, but first copies over a file filter that is subsequently removed after the copy.
+    copy /Y $(ROOT)\src\developer\inst\exclude-node_modules $(KEYMAN_MODELCOMPILER_ROOT)
+    xcopy $(KEYMAN_MODELCOMPILER_ROOT)\* $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\ /s /EXCLUDE:exclude-node_modules
+    del $(KEYMAN_MODELCOMPILER_ROOT)\exclude-node_modules
 
     # Remove files we don't want to harvest; build a product node_modules folder
     -rmdir /s/q $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\node_modules
@@ -95,6 +99,7 @@ heat-model-compiler:
 !ifdef GIT_BASH_FOR_KEYMAN
     # attach to lerna management
     $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh add-package "windows/bin/intermediate/ModelCompiler"
+    $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh remove-package "developer/js"
 
     # leverage lerna to retrieve only the resources needed for production.
     # Avoids retrieving local resources from remote (which `npm install` would do)
@@ -102,9 +107,11 @@ heat-model-compiler:
 
     # detach from lerna
     $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh remove-package "windows/bin/intermediate/ModelCompiler"
+    $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh add-package "developer/js"
 !else
     # attach to lerna management
     start /wait .\resources\lerna-utils.sh add-package "windows/bin/intermediate/ModelCompiler"
+    start /wait .\resources\lerna-utils.sh remove-package "developer/js"
 
     # leverage lerna to retrieve only the resources needed for production.
     # We're at the repo's base - ensure that Lerna is available first.
@@ -114,6 +121,7 @@ heat-model-compiler:
 
     # detach from lerna
     start /wait .\resources\lerna-utils.sh remove-package "windows/bin/intermediate/ModelCompiler"
+    start /wait .\resources\lerna-utils.sh add-package "developer/js"
 !endif
 
     # node_modules harvest complete - we can now do the rest in true $(TEMP) space.
