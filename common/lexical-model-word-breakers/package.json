@@ -8,14 +8,14 @@
     "lmlayer"
   ],
   "contributors": [
-	"Eddie Antonio Santos <easantos@ualberta.ca>"
+    "Eddie Antonio Santos <easantos@ualberta.ca>"
   ],
   "homepage": "https://github.com/keymanapp/keyman",
   "license": "MIT",
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
-    "test": "tests"
+    "test": "test"
   },
   "files": [
     "lib"
@@ -28,13 +28,15 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "mocha"
   },
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "typescript": "^3.2.1",
-    "@keymanapp/lexical-model-types": "^14.0.75"
+    "@keymanapp/lexical-model-types": "^14.0.75",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "typescript": "^3.2.1"
   }
 }
