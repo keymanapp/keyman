@@ -183,6 +183,7 @@ namespace com.keyman {
     ['getDebugInfo']() {
       let metadata = {
         attachType: this.options.attachType,
+        device: this.util.device,
         initialized: this.initialized,
         isEmbedded: this.isEmbedded,
         ui: this.ui ? this.ui.name : null
