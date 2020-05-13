@@ -1,11 +1,18 @@
 # `@keymanapp/lexical-model-word-breakers`
 
-> TODO: description
+The word breakers bundled in Keyman's lexical model layer (LMLayer).
+
+Includes:
+
+ - `default` — a word breaker based on the Unicode default word boundary specification
+ - _deprecated_ `ascii` — an example word breaker
+ - _deprecated_ `placeholder` — an example word breaker
 
 ## Usage
 
 ```
-const lexicalModelWordBreakers = require('@keymanapp/lexical-model-word-breakers');
+import {default as breakWords} from '@keymanapp/lexical-model-word-breakers';
 
-// TODO: DEMONSTRATE API
+console.log(breakWords('Hello, World!').map(span => span.text));
+// prints: [ 'Hello', ',', 'World', '!' ]
 ```
