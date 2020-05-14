@@ -234,9 +234,9 @@ begin
   Keyboards_Init;
   Options_Init;
 
-  FRenderPage := 'keyman'; // TODO: rename to 'main'? or 'config'?
+  FRenderPage := 'keyman'; // TODO: rename to 'configmain'
   FXMLRenderers := TXMLRenderers.Create;
-  FXMLRenderers.xRenderTemplate := 'Keyman.xsl';
+  FXMLRenderers.RenderTemplate := 'Keyman.xsl';
   FKeyboardXMLRenderer := TKeyboardListXMLRenderer.Create(FXMLRenderers);
   FXMLRenderers.Add(FKeyboardXMLRenderer);
   FXMLRenderers.Add(THotkeysXMLRenderer.Create(FXMLRenderers));

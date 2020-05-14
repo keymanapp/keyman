@@ -52,7 +52,7 @@ begin
     ps.Free;
   end;
 
-  XMLRenderers.xRenderTemplate := 'proxyconfiguration.xsl';
+  XMLRenderers.RenderTemplate := 'proxyconfiguration.xsl';
   XMLRenderers.Clear;
   XMLRenderers.Add(TGenericXMLRenderer.Create(XMLRenderers, xml));
   ProcessXMLPage;

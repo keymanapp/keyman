@@ -117,7 +117,7 @@ end;
 
 procedure TInstallKeyboardHttpResponder.ProcessPage(data: IInstallKeyboardSharedData);
 begin
-  XMLRenderers.xRenderTemplate := 'installkeyboard.xsl';
+  XMLRenderers.RenderTemplate := 'installkeyboard.xsl';
   XMLRenderers.Clear;
   XMLRenderers.Add(TGenericXMLRenderer.Create(XMLRenderers, data.XML));
   ProcessXMLPage;

@@ -71,12 +71,9 @@ begin
           '<DownloadURL>'+xmlencode(data.Params.Packages[i].DownloadURL)+'</DownloadURL>'+
         '</Package>'+
       '</Update>';
-
-//    '<NewVersionText>'+xmlencode(MsgFromIdFormat(SKUpdate_NewVersionText, [FNewVersion, FCurrentVersion]))+'</NewVersionText>'+
-//    '<PatchText>'+xmlencode(MsgFromIdFormat(SKUpdate_PatchText, [FPatchSize div 1024]))+'</PatchText>';
   end;
 
-  XMLRenderers.xRenderTemplate := 'onlineupdate.xsl';
+  XMLRenderers.RenderTemplate := 'onlineupdate.xsl';
   XMLRenderers.Clear;
   XMLRenderers.Add(TGenericXMLRenderer.Create(XMLRenderers, xml));
   ProcessXMLPage;

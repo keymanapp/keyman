@@ -95,7 +95,7 @@ begin
   end
   else if FRequestInfo.Document.StartsWith('/page/') then
   begin
-    // Retrieve data from kmcom etc
+    // Transform an XSL into a HTML page
     if FRequestInfo.Document = '/page/hint' then
       ProcessPageHint(FRequestInfo.Params)
     else if FRequestInfo.Document = '/page/help' then
@@ -108,10 +108,10 @@ begin
       ProcessPageDownloadKeyboard
     else
     begin
-      // Generic response
-      FXMLRenderers.xRenderTemplate := FRequestInfo.Document.Substring('/page/'.Length) + '.xsl';
+      // Generic response -- no special parameters needed
+      FXMLRenderers.RenderTemplate := FRequestInfo.Document.Substring('/page/'.Length) + '.xsl';
       FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers));
-      ProcessXMLPage('');
+      ProcessXMLPage;
     end;
   end;
 
@@ -182,7 +182,7 @@ begin
 
   FXML := FXML + '</Buttons>';
 
-  FXMLRenderers.xRenderTemplate := 'Hint.xsl';
+  FXMLRenderers.RenderTemplate := 'Hint.xsl';
   FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, FXML));
   ProcessXMLPage;
 end;
@@ -194,7 +194,7 @@ begin
   if Params.Values['keyboard'] <> ''
     then s := Format('<Keyboard Name="%s" />', [XMLEncode(Params.Values['keyboard'])])
     else s := '';
-  FXMLRenderers.xRenderTemplate := 'Help.xsl';
+  FXMLRenderers.RenderTemplate := 'Help.xsl';
   ProcessXMLPage(s);
 end;
 
@@ -207,7 +207,7 @@ begin
     xmlencode(TLocaleStrings.MsgFromIdFormat(FXMLRenderers.kmcom, SKSplashVersion, [CKeymanVersionInfo.VersionWithTag]))+
     '</Version>';
 
-  FXMLRenderers.xRenderTemplate := 'Splash.xsl';
+  FXMLRenderers.RenderTemplate := 'Splash.xsl';
   FXMLRenderers.Clear;
   FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, xml));
   FXMLRenderers.Add(TKeyboardListXMLRenderer.Create(FXMLRenderers));
@@ -219,7 +219,7 @@ var
   xml: string;
 begin
   xml := TBaseKeyboards.EnumerateXML(FXMLRenderers.kmcom.Options['koBaseLayout'].Value);
-  FXMLRenderers.xRenderTemplate := 'basekeyboard.xsl';
+  FXMLRenderers.RenderTemplate := 'basekeyboard.xsl';
   FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, xml));
   ProcessXMLPage;
 end;
@@ -229,32 +229,24 @@ var
   xml: string;
 begin
   xml := '<Version>'+CKeymanVersionInfo.VersionWin+'</Version>';
-  FXMLRenderers.xRenderTemplate := 'downloadkeyboard.xsl';
+  FXMLRenderers.RenderTemplate := 'downloadkeyboard.xsl';
   FXMLRenderers.Add(TGenericXMLRenderer.Create(FXMLRenderers, xml));
   ProcessXMLPage;
 end;
 
 procedure TAppHttpResponder.ProcessXMLPage(const s: string);
 var
-  FXMLFileName: TTempFile;
-  FFileStream: TFileStream;
+  FXML: string;
   PageTag: string;
 begin
   PageTag := RequestInfo.Params.Values['tag'];
   if PageTag <> '' then
     PageTag := '<PageTag>'+PageTag+'</PageTag>';
 
-  FXMLFileName := FXMLRenderers.RenderToFile(False, s + PageTag); // FRefreshKeyman, AdditionalData);
+  FXML := FXMLRenderers.RenderToString(False, s + PageTag);
 
-  FResponseInfo.ContentStream := TMemoryStream.Create;
+  FResponseInfo.ContentStream := TStringStream.Create(FXML, TEncoding.UTF8);
   FResponseInfo.FreeContentStream := True;
-
-  FFileStream := TFileStream.Create(FXMLFileName.Name, fmOpenRead or fmShareDenyWrite);
-  try
-    FResponseInfo.ContentStream.CopyFrom(FFileStream, 0);
-  finally
-    FFileStream.Free;
-  end;
 
   FResponseInfo.ContentStream.Position := 0;
   FResponseInfo.ContentType := 'text/html; charset=UTF-8';
