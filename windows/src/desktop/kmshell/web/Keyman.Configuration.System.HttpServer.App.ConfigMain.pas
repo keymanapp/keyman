@@ -5,6 +5,8 @@ interface
 uses
   System.Types,
 
+  IdCustomHttpServer,
+
   Keyman.Configuration.System.HttpServer.App,
   OnlineUpdateCheck; // TODO refactor dependency chain so data and code are separate units
 
@@ -14,6 +16,9 @@ type
     function HTML: string;
     function BitmapPath: string;
     function Files: TStringDynArray;
+    function GetState: string;
+    procedure SetState(const Value: string);
+    property State: string read GetState write SetState;
   end;
 
   TConfigMainSharedData = class(TInterfacedObject, IConfigMainSharedData)
@@ -25,6 +30,10 @@ type
     constructor Create(const ABitmapPath: string);
     procedure SetFiles(const AFiles: TStringDynArray);
     procedure SetHTML(const AHTML: string);
+
+    function GetState: string;
+    procedure SetState(const Value: string);
+
     function HTML: string;
     function BitmapPath: string;
     function Files: TStringDynArray;
@@ -34,6 +43,7 @@ type
   private
     procedure ProcessBitmap(data: IConfigMainSharedData; const document: string);
     procedure ProcessPage(data: IConfigMainSharedData);
+    procedure ProcessState(data: IConfigMainSharedData);
   public
     procedure ProcessRequest; override;
   end;
@@ -44,11 +54,15 @@ uses
   System.Classes,
   System.Contnrs,
   System.StrUtils,
-  System.SysUtils;
+  System.SysUtils,
+
+  ErrorControlledRegistry,
+  RegistryKeys;
 
 const
   Path_Page = '/page/keyman';
   Path_Bitmap = '/data/keyman/bitmap/';
+  Path_State = '/data/keyman/state';
 
 { TOnlineUpdateHttpResponder }
 
@@ -83,6 +97,23 @@ begin
   Respond404(Context, RequestInfo, ResponseInfo);
 end;
 
+procedure TConfigMainHttpResponder.ProcessState(data: IConfigMainSharedData);
+begin
+  if RequestInfo.CommandType = hcGET then
+  begin
+    ResponseInfo.ContentType := 'application/json; charset=utf-8';
+    ResponseInfo.ContentText := data.State;
+  end
+  else if RequestInfo.CommandType = hcPOST then
+  begin
+    data.State := RequestInfo.Params.Values['state'];
+    ResponseInfo.ContentType := 'application/json; charset=utf-8';
+    ResponseInfo.ContentText := data.State;
+  end
+  else
+    Respond404(Context, RequestInfo, ResponseInfo);
+end;
+
 procedure TConfigMainHttpResponder.ProcessRequest;
 var
   data: IConfigMainSharedData;
@@ -97,6 +128,8 @@ begin
     ProcessBitmap(data, RequestInfo.Document.Substring(Path_Bitmap.Length))
   else if RequestInfo.Document = Path_Page then
     ProcessPage(data)
+  else if RequestInfo.Document = Path_State then
+    ProcessState(data)
   else
     Respond404(Context, RequestInfo, ResponseInfo);
 end;
@@ -134,7 +167,31 @@ begin
   FHTML := AHTML;
 end;
 
+function TConfigMainSharedData.GetState: string;
+begin
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) and ValueExists(SRegValue_ConfigurationState)
+      then Result := ReadString(SRegValue_ConfigurationState)
+      else Result := '0';
+  finally
+    Free;
+  end;
+end;
+
+procedure TConfigMainSharedData.SetState(const Value: string);
+begin
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
+      WriteString(SRegValue_ConfigurationState, Value);
+  finally
+    Free;
+  end;
+end;
+
 initialization
   TConfigMainHttpResponder.Register(Path_Page, TConfigMainHttpResponder);
   TConfigMainHttpResponder.Register(Path_Bitmap, TConfigMainHttpResponder);
+  TConfigMainHttpResponder.Register(Path_State, TConfigMainHttpResponder);
 end.

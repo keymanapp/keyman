@@ -53,7 +53,7 @@
           <div id="captionBox"><div id="c1"></div><div id="c2"></div><div id="c3"></div></div>
 
 					<div id="header">
-						<img id="icon" src="hints.png" alt="Hint" src="/app/48.png" />
+						<img id="icon" alt="Hint" src="/app/hints.png" />
 						<div id="title">
 							<xsl:value-of select="$locale/String[@Id=$HintTitle]" />
 						</div>

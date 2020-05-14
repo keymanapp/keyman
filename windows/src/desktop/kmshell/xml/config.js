@@ -207,13 +207,22 @@ document.addEventListener("DOMContentLoaded", windowResize);
     var state = {
       activeIndex: menuframe_activeindex,
       keyboards: [],
-      keyboardsScrollTop: $('#subcontent_keyboards').scrollTop()
+      // TODO: scrollTop is not known when element is display:none
+      keyboardsScrollTop: $('#subcontent_keyboards').scrollTop(),
+      optionsScrollTop: $('#subcontent_options').scrollTop(),
+      hotkeysScrollTop: $('#subcontent_hotkeys').scrollTop()
     };
     var keyboards = $('div.list_item');
     keyboards.each(function(index) {
-      state.keyboards.push({name: $(this).data('name'), expanded: $(this).hasClass('expanded')});
+      const name = $(this).data('name');
+      if(name) {
+        state.keyboards.push({name: name, expanded: $(this).hasClass('expanded')});
+      }
     });
-    $('#state').text(JSON.stringify(state));
+    const stateJson = JSON.stringify(state);
+    const params = new URLSearchParams(window.location.search);
+    const PageTag = params.get('tag');
+    jQuery.post('/data/keyman/state', { tag: PageTag, state: stateJson });
   }
 
   function load_state() {
@@ -235,11 +244,17 @@ document.addEventListener("DOMContentLoaded", windowResize);
             $('div.list_item[data-name="'+state.keyboards[i].name+'"]').addClass('expanded');
         }
       }
-      if(state.keyboardsScrollTop) {
-      //alert(state.keyboardsScrollTop);
-        window.setTimeout(function() { $('#subcontent_keyboards').scrollTop(state.keyboardsScrollTop); }, 1);
-      //alert($('#subcontent_keyboards').scrollTop());
-      }
+      window.setTimeout(function() {
+        if(state.keyboardsScrollTop) {
+          $('#subcontent_keyboards').scrollTop(state.keyboardsScrollTop);
+        }
+        if(state.optionsScrollTop) {
+          $('#subcontent_options').scrollTop(state.optionsScrollTop);
+        }
+        if(state.hotkeysScrollTop) {
+          $('#subcontent_hotkeys').scrollTop(state.hotkeysScrollTop);
+        }
+      }, 1);
     }
     loading_state = false;
   }
@@ -247,6 +262,8 @@ document.addEventListener("DOMContentLoaded", windowResize);
   $( document ).ready(function() {
     load_state();
     $('#subcontent_keyboards').scroll(function() { save_state(); });
+    $('#subcontent_options').scroll(function() { save_state(); });
+    $('#subcontent_hotkeys').scroll(function() { save_state(); });
   });
 
 

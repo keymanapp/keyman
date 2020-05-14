@@ -99,8 +99,6 @@ type
     dlgOpenAddin: TOpenDialog;
     dlgOpenVisualKeyboard: TOpenDialog;
 
-    FState: string;
-
     procedure dlgOpenVisualKeyboardCanClose(Sender: TObject; var CanClose: Boolean);
 
     procedure Keyboard_Install;
@@ -140,7 +138,6 @@ type
     procedure Support_ContactSupport(params: TStringList);   // I4390
     procedure OpenSite(params: TStringList);
     procedure RefreshKeymanConfiguration;
-    procedure SaveState;
     procedure Keyboard_Download;
     function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
     function MustReboot: Boolean;
@@ -229,15 +226,6 @@ begin
 
   kmcom.AutoApply := False;
 
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) and ValueExists(SRegValue_ConfigurationState)
-      then FState := ReadString(SRegValue_ConfigurationState)
-      else FState := '0';
-  finally
-    Free;
-  end;
-
   InitNonVisualComponents;
 
   Icon.ReleaseHandle;
@@ -274,14 +262,6 @@ end;
 
 procedure TfrmMain.TntFormDestroy(Sender: TObject);
 begin
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
-      WriteString(SRegValue_ConfigurationState, FState);
-  finally
-    Free;
-  end;
-
   Application.OnActivate := nil;
   FreeAndNil(FXMLRenderers);
   if FPageTag > 0 then
@@ -299,8 +279,6 @@ var
   d: TConfigMainSharedData;
   s: string;
 begin
-  SaveState;
-
   if FPageTag > 0 then
   begin
     modWebHttpServer.SharedData.Remove(FPageTag);
@@ -319,7 +297,7 @@ begin
 
   s := Format('<PageTag>%d</PageTag><state>%s</state><basekeyboard id="%08.8x">%s</basekeyboard>', [
     FPageTag,
-    FState,
+    XMLEncode(data.State),
     Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
   ]);
@@ -891,7 +869,6 @@ end;
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   inherited;
-  SaveState;
   CanClose := True;
 end;
 
@@ -903,22 +880,6 @@ end;
 procedure TfrmMain.RefreshKeymanConfiguration;
 begin
   Do_Content_Render(True);
-end;
-
-procedure TfrmMain.SaveState;
-begin
-{$MESSAGE HINT 'TODO: Save state support'}
-  {try  TODO: save state
-    if Assigned(web.Document) then
-    begin
-      elem:= (web.Document as IHTMLDocument3).getElementById('state');
-      if elem <> nil then
-        FState := elem.innerText;
-      elem := nil;
-    end;
-  except
-    FState := '';
-  end;}
 end;
 
 class function TfrmMain.ShouldRegisterWindow: Boolean; // I2720
