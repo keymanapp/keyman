@@ -275,8 +275,8 @@ end;
 
 procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
 var
-  data: IConfigMainSharedData;
-  d: TConfigMainSharedData;
+  sharedDataIntf: IConfigMainSharedData;
+  sharedData: TConfigMainSharedData;
   s: string;
 begin
   if FPageTag > 0 then
@@ -290,20 +290,23 @@ begin
   // better approach would be shared data but the threading concerns for keyman
   // API mean that this is a bigger job
 
-  d := TConfigMainSharedData.Create(FXMLRenderers.TempPath);
-  data := d;
+  sharedData := TConfigMainSharedData.Create;
+  sharedDataIntf := sharedData;
 
-  FPageTag := modWebHttpServer.SharedData.Add(d);
+  FPageTag := modWebHttpServer.SharedData.Add(sharedDataIntf);
 
   s := Format('<PageTag>%d</PageTag><state>%s</state><basekeyboard id="%08.8x">%s</basekeyboard>', [
-    FPageTag,
-    XMLEncode(data.State),
+    FPageTag, // This is used in the XSL transform
+    XMLEncode(sharedDataIntf.State),
     Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
   ]);
 
-  d.SetHTML(FXMLRenderers.RenderToString(False, s));
-  d.SetFiles(FKeyboardXMLRenderer.FileReferences.ToStringArray);
+  sharedData.Init(
+    FXMLRenderers.TempPath,
+    FXMLRenderers.RenderToString(False, s),
+    FKeyboardXMLRenderer.FileReferences.ToStringArray
+  );
 
   Content_Render(FRefreshKeyman, 'tag='+IntToStr(FPageTag));
 end;

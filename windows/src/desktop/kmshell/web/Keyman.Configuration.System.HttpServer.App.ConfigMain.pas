@@ -7,17 +7,20 @@ uses
 
   IdCustomHttpServer,
 
-  Keyman.Configuration.System.HttpServer.App,
-  OnlineUpdateCheck; // TODO refactor dependency chain so data and code are separate units
+  Keyman.Configuration.System.HttpServer.App;
 
 type
   IConfigMainSharedData = interface
     ['{69D029C0-4537-4CBE-B525-C34B0E809820}']
-    function HTML: string;
-    function BitmapPath: string;
-    function Files: TStringDynArray;
+    function GetBitmapPath: string;
+    function GetFiles: TStringDynArray;
+    function GetHTML: string;
     function GetState: string;
     procedure SetState(const Value: string);
+
+    property BitmapPath: string read GetBitmapPath;
+    property Files: TStringDynArray read GetFiles;
+    property HTML: string read GetHTML;
     property State: string read GetState write SetState;
   end;
 
@@ -27,16 +30,15 @@ type
     FHTML: string;
     FFiles: TStringDynArray;
   public
-    constructor Create(const ABitmapPath: string);
-    procedure SetFiles(const AFiles: TStringDynArray);
-    procedure SetHTML(const AHTML: string);
+    procedure Init(const ABitmapPath, AHTML: string; const AFiles: TStringDynArray);
 
+    { IConfigMainSharedData }
     function GetState: string;
     procedure SetState(const Value: string);
 
-    function HTML: string;
-    function BitmapPath: string;
-    function Files: TStringDynArray;
+    function GetHTML: string;
+    function GetBitmapPath: string;
+    function GetFiles: TStringDynArray;
   end;
 
   TConfigMainHttpResponder = class(TAppHttpResponder)
@@ -98,14 +100,10 @@ end;
 
 procedure TConfigMainHttpResponder.ProcessState(data: IConfigMainSharedData);
 begin
-  if RequestInfo.CommandType = hcGET then
+  if RequestInfo.CommandType in [hcGET, hcPOST] then
   begin
-    ResponseInfo.ContentType := 'application/json; charset=utf-8';
-    ResponseInfo.ContentText := data.State;
-  end
-  else if RequestInfo.CommandType = hcPOST then
-  begin
-    data.State := RequestInfo.Params.Values['state'];
+    if RequestInfo.CommandType = hcPOST then
+      data.State := RequestInfo.Params.Values['state'];
     ResponseInfo.ContentType := 'application/json; charset=utf-8';
     ResponseInfo.ContentText := data.State;
   end
@@ -135,35 +133,29 @@ end;
 
 { TConfigMainSharedData }
 
-function TConfigMainSharedData.BitmapPath: string;
+function TConfigMainSharedData.GetBitmapPath: string;
 begin
   Result := FBitmapPath;
 end;
 
-constructor TConfigMainSharedData.Create(const ABitmapPath: string);
-begin
-  inherited Create;
-  FBitmapPath := ABitmapPath;
-end;
-
-function TConfigMainSharedData.Files: TStringDynArray;
+function TConfigMainSharedData.GetFiles: TStringDynArray;
 begin
   Result := FFiles;
 end;
 
-function TConfigMainSharedData.HTML: string;
+function TConfigMainSharedData.GetHTML: string;
 begin
   Result := FHTML;
 end;
 
-procedure TConfigMainSharedData.SetFiles(const AFiles: TStringDynArray);
+procedure TConfigMainSharedData.Init(const ABitmapPath, AHTML: string; const AFiles: TStringDynArray);
 begin
-  FFiles := AFiles;
-end;
-
-procedure TConfigMainSharedData.SetHTML(const AHTML: string);
-begin
+  // Note: we have a separate Init call because we need to have the object to add to the shared data
+  // to inject the shared data tag into the HTML. This is a side-effect of rendering the HTML in the
+  // form which will be eliminated in a future refactor
+  FBitmapPath := ABitmapPath;
   FHTML := AHTML;
+  FFiles := AFiles;
 end;
 
 function TConfigMainSharedData.GetState: string;
