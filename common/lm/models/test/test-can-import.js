@@ -1,9 +1,8 @@
 const assert = require("chai").assert;
-
-require('../');
+const models = require('../').models;
 
 describe('Mocha', function () {
   it('should work', function () {
-    assert.isOk(new Models.MyModel());
+    assert.isOk(new models.MyModel());
   });
 });
