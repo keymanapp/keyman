@@ -1,3 +1,4 @@
+/// <reference path="../../node_modules/@keymanapp/lexical-model-models/src/index.ts" />
 namespace models {
   export function applyTransform(transform: Transform, context: Context): Context {
     // First, get the current context
