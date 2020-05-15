@@ -53,6 +53,7 @@ namespace com.keyman {
 
     // Filters all expected but unnecessary path prefixes, affixes, and suffixes reported by Sentry from our products.
     // This allows us to mask all different sorts of installations with a single uploaded path.
+    // Modifies original object.
     pathFilter(event: any) {
       // Get the underlying JS error.
       let exception = event.exception;
@@ -74,52 +75,61 @@ namespace com.keyman {
           }
         }
       }
-
-      return event;
     }
 
+    // Attaches some useful debugging information to the specified object, pass-by-reference style.
     attachEventMetadata(event: any) {
       // Ensure that the 'extra' object exists.  (May not exist for synthetic/custom Errors.)
       event.extra = event.extra || {};
       event.extra.keymanState = window['keyman']['getDebugInfo']();
       event.extra.keymanHostPlatform = this.keymanPlatform;
-      return event;
     }
 
     /**
-     * Pre-processes a Sentry event object to provide more metadata and enhance the Sentry server's
-     * ability to match the error against release artifacts.
+     * Pre-processes a Sentry event object (in-place) to provide more metadata and enhance 
+     * the Sentry server's ability to match the error against release artifacts.
      * @param event A Sentry-generated event
      */
-    eventPreparer(event: any) {
-      event = this.pathFilter(event);
-      event = this.attachEventMetadata(event);
+    prepareEvent(event: any): boolean {
+      this.pathFilter(event);
+      this.attachEventMetadata(event);
 
       if(DEBUG) {
         console.log("DEBUG:  event object for Sentry")
         console.log(event);
-        return null; //event
+        return false; //event
       } else {
-        return event;
+        return true;
       }
     }
 
     /**
      * Allows debugging our custom event preparation code without bombarding Sentry with errors
      * during development.
+     * 
+     * Note that Sentry expects us either to return the event object to be sent or to return `null` 
+     * if we want to prevent the event from being sent to the server.
      * @param event
      */
-    __metaPreparer(event: any) {
+    prepareEventDebugWrapper(event: any) {
       if(DEBUG) {
         try {
-          return this.eventPreparer(event);
+          if(this.prepareEvent(event)) {
+            return event;
+          } else {
+            return null;
+          }
         } catch(err) {
           console.log(err);
         }
       } else {
         // If not in DEBUG mode, simply forward to the actual preparer; we should be notified
         // of any event-prep errors that may occur.
-        return this.eventPreparer(event);
+        if(this.prepareEvent(event)) {
+          return event;
+        } else {
+          return null;
+        }
       }
     }
 
@@ -127,7 +137,7 @@ namespace com.keyman {
       // Do the actual Sentry initialization.
       //@ts-ignore
       Sentry.init({
-        beforeSend: this.__metaPreparer.bind(this),
+        beforeSend: this.prepareEventDebugWrapper.bind(this),
         debug: DEBUG,
         dsn: 'https://cf96f32d107c4286ab2fd82af49c4d3b@sentry.keyman.com/11', // keyman-web DSN
         release: com.keyman.environment.SENTRY_RELEASE
