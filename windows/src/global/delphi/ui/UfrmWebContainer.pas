@@ -49,7 +49,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, UfrmKeymanBase,
-  keymanapi_TLB, UserMessages, TempFileManager, Keyman.UI.UframeCEFHost;
+  keymanapi_TLB, UserMessages, Keyman.UI.UframeCEFHost;
 
 type
   TfrmWebContainer = class(TfrmKeymanBase)
@@ -133,8 +133,6 @@ procedure TfrmWebContainer.Content_Render(FRefreshKeyman: Boolean;
 var
   FWidth, FHeight: Integer;
 begin
-//  FreeAndNil(FXMLFileName);   // I4181
-
   FDialogName := FRenderPage;
   HelpType := htKeyword;
   HelpKeyword := FDialogName;
@@ -149,7 +147,7 @@ begin
     ClientHeight := FHeight;
   end;
 
-  cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage+IfThen(Query='','','?'+Query)); // FXMLFileName.Name);
+  cef.Navigate(modWebHttpServer.Host + '/page/'+FRenderPage+IfThen(Query='','','?'+Query));
 end;
 
 procedure TfrmWebContainer.Do_Content_Render(FRefreshKeyman: Boolean);

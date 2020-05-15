@@ -126,7 +126,7 @@ uses
   Keyman.System.SharedBuffers in 'Keyman.System.SharedBuffers.pas',
   Keyman.System.Security in '..\..\global\delphi\general\Keyman.System.Security.pas',
   Keyman.Winapi.VersionHelpers in '..\..\global\delphi\winapi\Keyman.Winapi.VersionHelpers.pas',
-  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas' {$R ICONS.RES},
+  Keyman.System.FrameworkInputPane in 'touchkeyboard\Keyman.System.FrameworkInputPane.pas',
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',

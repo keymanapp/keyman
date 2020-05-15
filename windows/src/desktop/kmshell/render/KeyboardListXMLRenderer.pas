@@ -25,14 +25,12 @@ interface
 
 uses
   Classes,
-  TempFileManager,
   XMLRenderer,
   Winapi.Windows;
 
 type
   TKeyboardListXMLRenderer = class(TXMLRenderer)
   private
-//    FTempPath: string;
     FFileReferences: TStrings;
     procedure DeleteFileReferences;
   protected
@@ -106,8 +104,6 @@ function TKeyboardListXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;
 var
   I: Integer;
 begin
-//  Result := '<ImagePath>'+XMLEncode(FTempPath)+'</ImagePath>';
-
   DeleteFileReferences;
 
   if FRefreshKeyman then

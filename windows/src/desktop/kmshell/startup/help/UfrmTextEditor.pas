@@ -53,7 +53,7 @@ uses
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, ActiveX,
   ToolWin, Menus,
   ActnList, ImgList, Keyman.UI.UframeCEFHost,
-  utilcheckfonts, AppEvnts, KeymanTextEditorRichEdit, TempFileManager,
+  utilcheckfonts, AppEvnts, KeymanTextEditorRichEdit,
   UfrmKeymanBase, UserMessages, System.Actions, System.ImageList;
 
 type

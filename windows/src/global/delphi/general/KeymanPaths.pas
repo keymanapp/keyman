@@ -308,19 +308,12 @@ begin
   Result := GetDebugPath('KeymanConfigStaticHttpFilesPath', '');
   if Result = '' then
   begin
-    // Look for install path for Keyman Desktop
-    Result := TKeymanPaths.KeymanDesktopInstallPath;
-    if Result = '' then
-      // Not found, so assume folder of executable
-      Result := ExtractFilePath(ParamStr(0));
-  end;
-  if DirectoryExists(Result + 'xml') then
-    Result := Result + 'xml\'
-  else
-  begin
-    if not FileExists(Result + 'locale.xml') then
-    begin
-    end;
+    Result := ExtractFilePath(ParamStr(0));
+
+    // The xml files may be in the same folder as the executable
+    // for some 3rd party distributions of Keyman Desktop files.
+    if FileExists(Result + 'xml\locale.xml') then
+      Result := Result + 'xml\';
   end;
 
   Result := Result + filename;

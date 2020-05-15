@@ -73,7 +73,6 @@ uses
   LanguagesXMLRenderer,
   OptionsXMLRenderer,
   SupportXMLRenderer,
-  TempFileManager,
   utilxml;
 
 { THttpServerApp }
