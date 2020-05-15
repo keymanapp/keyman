@@ -3,8 +3,7 @@
 // Defines the KeyEvent type.
 ///<reference path="keyEvent.ts" />
 
-// Also relies on string-extensions provided by the web-utils package
-// TODO:  Consider making this either its own package or part of web-utils.
+// Also relies on string-extensions provided by the web-utils package.
 
 namespace com.keyman.text {
   export class TextTransform implements Transform {
