@@ -1,4 +1,4 @@
-namespace Models {
+namespace models {
   export class MyModel {
   };
 };

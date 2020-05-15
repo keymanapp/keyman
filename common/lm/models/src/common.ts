@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/@keymanapp/lexical-model-models/src/index.ts" />
 namespace models {
   export function applyTransform(transform: Transform, context: Context): Context {
     // First, get the current context
@@ -23,10 +22,10 @@ namespace models {
   }
 
   /**
-   * 
+   *
    * @param transform Merges one transform into another, mutating the first parameter to
    *                  include the effects of the second.
-   * @param prefix 
+   * @param prefix
    */
   export function prependTransform(transform: Transform, prefix: Transform) {
     transform.insert = prefix.insert + transform.insert;

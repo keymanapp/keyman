@@ -22,7 +22,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="../word_breaking/placeholder-word-breaker.ts" />
+/// <reference path="../node_modules/@keymanapp/lexical-model-types/index.d.ts"/>
 /// <reference path="common.ts" />
 
 /**
@@ -85,6 +85,7 @@
         trieData['totalWeight'],
         options.searchTermToKey as Wordform2Key || defaultSearchTermToKey
       );
+      // @ts-ignore
       this.breakWords = options.wordBreaker || wordBreakers['default'];
       this.punctuation = options.punctuation;
     }
