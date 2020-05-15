@@ -45,7 +45,9 @@ uses
   IdGlobal,
   IdGlobalProtocols,
   IdSocketHandle,
-  IdStack;
+  IdStack,
+
+  DebugPaths;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
@@ -57,8 +59,12 @@ var
 begin
   FSharedData := THttpServerSharedData.Create;
   b := http.Bindings.Add;
-  b.Port := 8009; //0;
-  b.IP := '127.0.0.1'; // only on local computer
+
+  // listen only on localhost interface
+  // If HKCU\Software\Keyman\Debug:ConfigHttpPort [REG_SZ] is set, then
+  // use that port, otherwise use randomly allocated port.
+  b.Port := StrToIntDef(GetDebugPath('ConfigHttpPort', '0'), 0);
+  b.IP := '127.0.0.1';
   http.Active := True;
 end;
 
