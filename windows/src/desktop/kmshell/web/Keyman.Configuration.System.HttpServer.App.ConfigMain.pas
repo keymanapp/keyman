@@ -68,10 +68,9 @@ const
 
 procedure TConfigMainHttpResponder.ProcessPage(data: IConfigMainSharedData);
 begin
-  // TODO: The render is currently done in the main form.
-
-  // PageTag := RequestInfo.Params.Values['tag'];
-
+  // Note: The render is currently done in the main form. This will be refactored
+  // at some point in the future but presently there are still some lifecycle
+  // dependencies.
   ResponseInfo.ContentStream := TStringStream.Create(data.HTML, TEncoding.UTF8);
   ResponseInfo.FreeContentStream := True;
   ResponseInfo.ContentStream.Position := 0;
