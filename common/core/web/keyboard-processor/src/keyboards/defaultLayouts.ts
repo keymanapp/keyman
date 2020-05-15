@@ -3,8 +3,7 @@
    Copyright 2017 SIL International
 ***/
 
-///<reference path="../utils/version.ts"/>
-///<reference path="../utils/deepCopy.ts"/>
+// Relies on web-utils for version and deep-copy functionality.
 
 namespace com.keyman.keyboards {
   let Codes = com.keyman.text.Codes;

@@ -1,7 +1,11 @@
 /***
-   KeymanWeb 11.0
-   Copyright 2019 SIL International
+   KeymanWeb 14.0
+   Copyright 2020 SIL International
 ***/
+
+/*
+ * TODO:  Remove this file as part of addressing https://github.com/keymanapp/keyman/issues/2492.
+ */
 
 interface StringConstructor {
   kmwFromCharCode(cp0: number): string,

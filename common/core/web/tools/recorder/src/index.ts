@@ -1,5 +1,4 @@
 /// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts" />
 /// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/keyEvent.ts" />
 /// <reference path="proctor.ts" />
 
