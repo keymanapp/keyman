@@ -64,6 +64,7 @@ type
     cef: TframeCEFHost;
     FRenderPage: string;
 
+    procedure cefTitleChange(Sender: TObject; const title: string); virtual;
     procedure cefLoadEnd(Sender: TObject); virtual;
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean); virtual;
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean); virtual;
@@ -205,6 +206,7 @@ begin
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
   cef.OnResizeFromDocument := cefResizeFromDocument;
   cef.OnHelpTopic := cefHelpTopic;
+  cef.OnTitleChange := cefTitleChange;
 end;
 
 procedure TfrmWebContainer.cefCommand(Sender: TObject; const command: string; params: TStringList);
@@ -255,8 +257,6 @@ begin
   AssertVclThread;
   cef.DoResizeByContent;
   Screen.Cursor := crDefault;
-  if ShouldSetCaption then Self.Caption := cef.cef.Browser.MainFrame.Name;
-  if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
 end;
 
 procedure TfrmWebContainer.cefPreKeySyncEvent(Sender: TObject;
@@ -276,6 +276,12 @@ begin
   ClientHeight := aheight;
   Left := (Screen.Width - Width) div 2;
   Top := (Screen.Height - Height) div 2;
+end;
+
+procedure TfrmWebContainer.cefTitleChange(Sender: TObject; const title: string);
+begin
+  if ShouldSetCaption then Self.Caption := title;
+  if ShouldSetAppTitle then Application.Title := Self.Caption;  // I2786
 end;
 
 function IsLocalURL(URL: WideString): Boolean;
