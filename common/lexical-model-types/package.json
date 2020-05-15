@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/lexical-model-types",
-  "version": "14.0.76",
+  "version": "14.0.77",
   "description": "Type definitions in used in the LMLayer (lexical model/predictive text) component of Keyman.",
   "types": "./index.d.ts",
   "scripts": {
