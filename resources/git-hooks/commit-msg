@@ -15,7 +15,11 @@
 # Get the directory where this script lives, i.e. resources/git-hooks
 HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
 
-. $HOOK_DIRECTORY/commit-msg-defs
+if [ -f $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs ]; then
+  . $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs
+else
+  . $HOOK_DIRECTORY/commit-msg-defs
+fi
 
 #
 # Define terminal colours.
