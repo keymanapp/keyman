@@ -27,6 +27,7 @@ import java.util.List;
 public class KeyboardController {
   public static final String TAG = "KeyboardController";
   public static final String KMFilename_Installed_KeyboardsList = "keyboards_list.json";
+  public static final int INDEX_NOT_FOUND = -1;
 
   private static KeyboardController instance;
 
@@ -161,6 +162,44 @@ public class KeyboardController {
   }
 
   /**
+   * Given a key, return the index of the matching keyboard.
+   * If no match, returns INDEX_NOT_FOUND
+   * @param key - String of the key to find
+   * @return int - Index of the matching keyboard
+   */
+  public int getKeyboardIndex(String key) {
+    int index = INDEX_NOT_FOUND;
+    if (!isInitialized || list == null) {
+      Log.e(TAG, "getIndexOfKey while KeyboardController() not initialized");
+      return index;
+    }
+    if (key == null || key.isEmpty()) {
+      return index;
+    }
+
+    synchronized (list) {
+      for (int i=0; i<list.size(); i++) {
+        Keyboard k = list.get(i);
+        if (k.getKey().equalsIgnoreCase(key)) {
+          return i;
+        }
+      }
+    }
+
+    Log.d(TAG, "getIndexOfKey failed for key " + key);
+    return index;
+  }
+
+  /**
+   * Given a key, return if the keyboard exists in the installed keyboards list
+   * @param key - String of the key to find
+   * @return boolean whether the matching keyboard exists
+   */
+  public boolean keyboardExists(String key) {
+    return getKeyboardIndex(key) != INDEX_NOT_FOUND;
+  }
+
+  /**
    * Add a new keyboard to the keyboard list. If the keyboard already exists, the keyboard
    * information is updated.
    * @param newKeyboard
@@ -188,8 +227,6 @@ public class KeyboardController {
 
   /**
    * Remove the keyboard at the specified index.
-   * KeyboardPickerActivity checks that index > 0
-   * But we'll allow OEM apps to remove any keyboard
    * @param index
    */
   public void remove(int index) {
@@ -199,7 +236,7 @@ public class KeyboardController {
     }
 
     synchronized (list) {
-      if (index < list.size()) {
+      if (index != INDEX_NOT_FOUND && index < list.size()) {
         list.remove(index);
       }
     }
@@ -226,7 +263,7 @@ public class KeyboardController {
       return result;
     }
 
-    FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+    result = FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
     return result;
   }
 }

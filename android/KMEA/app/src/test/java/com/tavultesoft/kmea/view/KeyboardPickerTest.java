@@ -2,6 +2,7 @@ package com.tavultesoft.kmea.view;
 
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
@@ -35,6 +36,7 @@ public class KeyboardPickerTest {
 
   private static final File TEST_RESOURCE_ROOT = new File("test_resources");
 
+  private static final File TEST_DEFAULT_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + "sil_euro_latin.kmp");
   private static final String TEST_GFF_KMP_NAME = "gff_amh_7_test_json";
   private static final File TEST_GFF_KMP_FILE = new File(TEST_RESOURCE_ROOT, "v14" + File.separator + TEST_GFF_KMP_NAME + ".kmp");
 
@@ -50,6 +52,14 @@ public class KeyboardPickerTest {
     FunctionalTestHelper.initializeKeyman();
     //initializes the keyboard picker (and keyboard list in background)
     keyboardPickerActivityActivityController = Robolectric.buildActivity(KeyboardPickerActivity.class).setup();
+
+
+// install new custom keyboard programmatically
+    try {
+      FunctionalTestHelper.installCustomKeyboard(TEST_DEFAULT_KMP_FILE);
+    } catch (IOException | JSONException e) {
+      Log.e("KeyboardPickerTest", "Exception installing default kmp");
+    }
 
     //Initial keyboard load (normally done by webview)
     // should be done directly in  FunctionalTestHelper.initializeKeyman();
@@ -103,8 +113,6 @@ public class KeyboardPickerTest {
   {
       KeyboardPickerActivity activity = keyboardPickerActivityActivityController.get();
 
-      // Default keyboard no longer installed
-
       // install new custom keyboard programmatically
       FunctionalTestHelper.installCustomKeyboard(TEST_GFF_KMP_FILE);
 
@@ -113,7 +121,7 @@ public class KeyboardPickerTest {
       Assert.assertNotNull(_view);
 
       // click the new installed keyboard, to select it.
-      View _itemview = _view.getAdapter().getView(0, null, null);
+      View _itemview = _view.getAdapter().getView(1, null, null);
       Assert.assertNotNull(_itemview);
       _view.performItemClick(_itemview,1,_view.getAdapter().getItemId(1));
 
@@ -121,7 +129,8 @@ public class KeyboardPickerTest {
       Assert.assertTrue(activity.isFinishing());
 
       // check if keyboardswitch is done
-      Keyboard _current = KMManager.getCurrentKeyboardInfo(ApplicationProvider.getApplicationContext());
+      int index = KeyboardPickerActivity.getCurrentKeyboardIndex();
+      Keyboard _current = KMManager.getKeyboardInfo(ApplicationProvider.getApplicationContext(), index);
       Assert.assertNotNull(_current);
   }
 

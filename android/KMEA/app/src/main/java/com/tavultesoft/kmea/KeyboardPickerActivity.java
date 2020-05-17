@@ -134,6 +134,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     listView.setOnItemLongClickListener(new OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        // Prevent the default keyboard from being removed
         if (position > 0 && canRemoveKeyboard) {
           PopupMenu popup = new PopupMenu(context, view);
           popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
@@ -166,7 +167,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
       @Override
       public void onKeyboardChanged(String newKeyboard) {
-          int _index = getKeyboardIndex(context,newKeyboard);
+          int _index = KeyboardController.getInstance().getKeyboardIndex(newKeyboard);
           if(_index>=0)
           {
             Keyboard _keyboard = KeyboardController.getInstance().getKeyboardInfo(_index);
@@ -236,21 +237,16 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     finish();
   }
 
-  private static int getCurrentKeyboardIndex() {
+  /**
+   * Get the current keyboard index. Only to use for KeyboardPickerActivity or unit test.
+   * @return int of the matching keyboard index. If current index not found, return 0
+   */
+  public static int getCurrentKeyboardIndex() {
     int pos = 0;
-    List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
-    if (keyboardsList != null) {
-      int length = keyboardsList.size();
-      for (int i = 0; i < length; i++) {
-        Keyboard kbInfo = keyboardsList.get(i);
-        if (kbInfo.getKey().equals(KMKeyboard.currentKeyboard())) {
-          pos = i;
-          break;
-        }
-      }
-    }
+    pos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
 
-    return pos;
+    // If index not found, return first index
+    return (pos != KeyboardController.INDEX_NOT_FOUND) ? pos : 0;
   }
 
   private static boolean saveList(Context context, String listName) {
@@ -309,13 +305,10 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     String kbId = kbInfo.getKeyboardID();
     String langId = kbInfo.getLanguageID();
     String kbName = kbInfo.getKeyboardName();
-    String langName = kbInfo.getLanguageName();
-    String kFont = kbInfo.getFont();
-    String kOskFont = kbInfo.getOSKFont();
     if(aPrepareOnly)
       KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
     else
-      KMManager.setKeyboard(pkgId, kbId, langId, kbName, langName, kFont, kOskFont);
+      KMManager.setKeyboard(kbInfo);
   }
 
   protected static boolean addKeyboard(Context context, Keyboard keyboardInfo) {
@@ -382,6 +375,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   protected static boolean removeKeyboard(Context context, int position) {
     boolean result = false;
 
+    // Prevent the first keyboard (index 0) from being removed
     if (position > 0) {
       KeyboardController.getInstance().remove(position);
       result = KeyboardController.getInstance().save(context);
@@ -606,52 +600,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return false;
   }
 
-  protected static int getCurrentKeyboardIndex(Context context) {
-    int index = -1;
-
-    List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
-    if (keyboardsList != null) {
-      for(int i=0; i<keyboardsList.size(); i++) {
-        Keyboard k = keyboardsList.get(i);
-        if (k.getKey().equals(KMKeyboard.currentKeyboard())) {
-          index = i;
-          break;
-        }
-      }
-    }
-
-    return index;
-  }
-
-  protected static Keyboard getCurrentKeyboardInfo(Context context) {
-    List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
-    if (keyboardsList != null) {
-      int index = getCurrentKeyboardIndex(context);
-      if (index >= 0) {
-        return KeyboardController.getInstance().getKeyboardInfo(index);
-      }
-    }
-
-    return null;
-  }
-
-  protected static int getKeyboardIndex(Context context, String keyboardKey) {
-    int index = -1;
-
-    List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
-    if (keyboardsList != null) {
-      for(int i=0; i<keyboardsList.size(); i++) {
-        Keyboard k = keyboardsList.get(i);
-        if (k.getKey().equals(keyboardKey)) {
-          index = i;
-          break;
-        }
-      }
-    }
-
-    return index;
-  }
-
   /**
    * Get the index of a lexical model key in the list of installed lexical models.
    * @param context
@@ -681,14 +629,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     }
 
     return index;
-  }
-
-  protected static Keyboard getKeyboardInfo(Context context, int index) {
-    if (index < 0) {
-      return null;
-    }
-
-    return KeyboardController.getInstance().getKeyboardInfo(index);
   }
 
   protected static HashMap<String, String> getLexicalModelInfo(Context context,int index) {

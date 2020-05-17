@@ -152,22 +152,13 @@ final class KMKeyboard extends WebView {
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
             ". Loading default keyboard", Toast.LENGTH_LONG).show();
 
-          Keyboard defaultKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
-          if (defaultKeyboard != null) {
-            setKeyboard(
-              // Revert to first keyboard in the list
-              defaultKeyboard.getPackageID(),
-              defaultKeyboard.getKeyboardID(),
-              defaultKeyboard.getLanguageID(),
-              defaultKeyboard.getKeyboardName(),
-              defaultKeyboard.getLanguageName(),
-              defaultKeyboard.getFont(),
-              defaultKeyboard.getOSKFont());
+          Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
+          if (firstKeyboard != null) {
+            // Revert to first keyboard in the list
+            setKeyboard(firstKeyboard);
           } else {
             // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
-            setKeyboard(KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
-              KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
-              KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
+            setKeyboard(Keyboard.DEFAULT_KEYBOARD);
           }
         }
 
@@ -617,6 +608,22 @@ final class KMKeyboard extends WebView {
     }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
+
+    return retVal;
+  }
+
+  public boolean setKeyboard(Keyboard k) {
+    boolean retVal = false;
+    if (k != null) {
+      retVal = setKeyboard(
+        k.getPackageID(),
+        k.getKeyboardID(),
+        k.getLanguageID(),
+        k.getKeyboardName(),
+        k.getLanguageName(),
+        k.getFont(),
+        k.getOSKFont());
+    }
 
     return retVal;
   }

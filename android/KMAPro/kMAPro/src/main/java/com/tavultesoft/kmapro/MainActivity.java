@@ -1065,17 +1065,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     for(int i=0; i < keyboardsInstalled.size(); i++) {
-      HashMap<String, String> keyboardInfo = new HashMap<>(keyboardsInstalled.get(i));
+      HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
+      Keyboard keyboardInfo = new Keyboard(
+        hashMap.get(KMManager.KMKey_PackageID),
+        hashMap.get(KMManager.KMKey_KeyboardID),
+        hashMap.get(KMManager.KMKey_KeyboardName),
+        hashMap.get(KMManager.KMKey_LanguageID),
+        hashMap.get(KMManager.KMKey_LanguageName),
+        hashMap.get(KMManager.KMKey_Version),
+        hashMap.get(KMManager.KMKey_HelpLink),
+        true,
+        hashMap.get(KMManager.KMKey_Font),
+        hashMap.get(KMManager.KMKey_OskFont));
+
       if (i == 0) {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-          String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-          String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-          String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-          String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-          String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-          String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          KMManager.setKeyboard(keyboardInfo);
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
