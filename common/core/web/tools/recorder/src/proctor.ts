@@ -8,11 +8,11 @@ namespace KMWRecorder {
    * keyboard-processor and input-processor will use a Node-based version instead.
    */
   export abstract class Proctor {
-    device: com.keyman.text.EngineDeviceSpec;
+    device: com.keyman.utils.DeviceSpec;
 
     _assert: AssertCallback;
 
-    constructor(device: com.keyman.text.EngineDeviceSpec, assert: AssertCallback) {
+    constructor(device: com.keyman.utils.DeviceSpec, assert: AssertCallback) {
       this.device = device;
 
       this._assert = assert;

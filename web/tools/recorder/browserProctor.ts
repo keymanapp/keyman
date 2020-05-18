@@ -30,7 +30,7 @@ namespace KMWRecorder {
     target: HTMLElement;
     usingOSK: boolean;
 
-    constructor(target: HTMLElement, device: com.keyman.text.EngineDeviceSpec, usingOSK: boolean, assert: AssertCallback) {
+    constructor(target: HTMLElement, device: com.keyman.utils.DeviceSpec, usingOSK: boolean, assert: AssertCallback) {
       super(device, assert);
 
       this.target = target;

@@ -1,4 +1,3 @@
-/// <reference path="engineDeviceSpec.ts" />
 /// <reference path="outputTarget.ts" />
 
 namespace com.keyman.text {
@@ -31,7 +30,7 @@ namespace com.keyman.text {
     /**
      * The device model for web-core to follow when processing the keystroke.
      */
-    device: EngineDeviceSpec;
+    device: utils.DeviceSpec;
 
     /**
      * `true` if this event was produced by sources other than a DOM-based KeyboardEvent.

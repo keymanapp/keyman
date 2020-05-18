@@ -107,7 +107,7 @@ namespace com.keyman.keyboards {
       this.baseKeyEvent = Lkc;
     }
 
-    constructKeyEvent(keyboardProcessor: text.KeyboardProcessor, target: text.OutputTarget, device: text.EngineDeviceSpec): text.KeyEvent {
+    constructKeyEvent(keyboardProcessor: text.KeyboardProcessor, target: text.OutputTarget, device: utils.DeviceSpec): text.KeyEvent {
       // Make a deep copy of our preconstructed key event, filling it out from there.
       let Lkc = utils.deepCopy(this.baseKeyEvent);
       Lkc.Ltarg = target;
@@ -466,7 +466,7 @@ namespace com.keyman.keyboards {
     keyLabels: boolean;
     isDefault?: boolean;
     keyboard: Keyboard;
-    formFactor: text.FormFactor;
+    formFactor: utils.FormFactor;
 
     /**
      * Facilitates mapping layer id strings to their specification objects.
@@ -486,7 +486,7 @@ namespace com.keyman.keyboards {
      * @param layout
      * @param formFactor
      */
-    static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: text.FormFactor): ActiveLayout {
+    static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: utils.FormFactor): ActiveLayout {
       if(layout == null) {
         throw new Error("Cannot build an ActiveLayout for a null specification.");
       }
