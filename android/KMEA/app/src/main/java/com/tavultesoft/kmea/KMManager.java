@@ -1273,7 +1273,6 @@ public final class KMManager {
    * @return check for unit test.
    */
   public static boolean isTestMode() {
-    //return true; // do not commit
     return Boolean.parseBoolean(System.getProperty("kmeaTestMode"));
   }
 
