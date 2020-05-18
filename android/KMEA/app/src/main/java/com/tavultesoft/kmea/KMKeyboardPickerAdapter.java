@@ -44,8 +44,6 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     //        should instead refer to this adapter.)
     super(context, KEYBOARD_LAYOUT_RESOURCE, adapter, new AdapterFilter<Keyboard, Dataset.Keyboards, Void>() {
 
-      // Yeah, so this is a MASSIVE hack.  Right now, it's either this or refactor up to 60
-      // separate references to keyboardList within KeyboardPickerActivity.  Yikes.
       public List<Keyboard> selectFrom(Dataset.Keyboards adapter, Void dummy) {
         // Return the keyboards list
         return adapter.asList();
