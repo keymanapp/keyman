@@ -1429,7 +1429,7 @@ public final class KMManager {
 
     if (packageID != null && keyboardID != null && languageID != null) {
       String kbKey = String.format("%s_%s", languageID, keyboardID);
-      result = KeyboardPickerActivity.containsKeyboard(context, kbKey);
+      result = KeyboardController.getInstance().keyboardExists(kbKey);
     }
 
     return result;

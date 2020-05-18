@@ -568,18 +568,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return getList(context, KMManager.KMFilename_LexicalModelsList);
   }
 
-  protected static boolean containsKeyboard(Context context, String keyboardKey) {
-    List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
-
-    for(Keyboard k : keyboardsList) {
-      if (k.getKey().equals(keyboardKey)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public static boolean containsLexicalModel(Context context, String lexicalModelKey) {
     if (lexicalModelsList == null) {
       lexicalModelsList = getLexicalModelsList(context);
