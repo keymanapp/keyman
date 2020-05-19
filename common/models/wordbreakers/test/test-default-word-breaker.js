@@ -2,12 +2,12 @@
  * Smoke-test the default
  */
 
-import {assert} from 'chai';
-import {default as breakWords} from '../src';
+const assert = require('chai').assert;
+const breakWords = require('..').wordBreakers['default'];
 
 const SHY = '\u00AD';
 
-describe.skip('The default word breaker', function () {
+describe('The default word breaker', function () {
   it('should break multilingual text', function () {
     let breaks = breakWords(
       `Добрый день! ᑕᐻ᙮ — after working on ka${SHY}wen${SHY}non:${SHY}nis,
