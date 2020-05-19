@@ -2,6 +2,8 @@
 
 This folder contains definitions for valid scopes and commit types for Keyman.
 
+[Scope Documentation](https://docs.google.com/document/d/10CTCXbNrMpl-W9gXM2fRUdrN9_toGvsqiXhk8S2CfEw/edit#)
+
 ## scopes.json
 
 * A tree structured JSON object, with root node `"scopes"`.
