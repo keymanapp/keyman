@@ -17,6 +17,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "directories": {
+    "lib": "lib",
     "test": "test"
   },
   "files": [
@@ -32,7 +33,7 @@
   "scripts": {
     "build": "tsc",
     "prepublish": "npm run build",
-    "test": "mocha -r ts-node/register test/**/*.ts"
+    "test": "mocha"
   },
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
