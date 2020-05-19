@@ -31,7 +31,7 @@ type
   private
     { Private declarations }
   protected
-    procedure Content_Render(FRefreshKeyman: Boolean = False; const AdditionalData: WideString = ''); override;
+    procedure Content_Render(FRefreshKeyman: Boolean = False; const Query: string = ''); override;
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
     { Public declarations }
@@ -87,7 +87,7 @@ begin
 end;
 
 procedure TfrmKeepInTouch.Content_Render(FRefreshKeyman: Boolean;
-  const AdditionalData: WideString);
+  const Query: string);
 var
   FPath: string;
 begin
