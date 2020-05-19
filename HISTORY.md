@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.77 alpha 2020-05-19
+
+* refactor(web/engine): Moves common utility functions into separate `web-utils` package (#3130)
+* refactor(web/engine): renames DeviceSpec, moves to utils (#3132)
+* fix(ios): Fixes keyboard metadata decoding, tweaks to project files  (#3137)
+* feat(windows): Use http: instead of file: for Configuration UI (#3127)
+
 ## 14.0.76 alpha 2020-05-15
 
 * fix(windows): use correct name for Sentry in C++ (#3129)
