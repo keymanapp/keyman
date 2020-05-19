@@ -22,7 +22,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="../word_breaking/placeholder-word-breaker.ts" />
 /// <reference path="common.ts" />
 
 /**
