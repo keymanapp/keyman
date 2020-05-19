@@ -1,4 +1,4 @@
-# `@keymanapp/lexical-model-word-breakers`
+# `@keymanapp/models-wordbreakers`
 
 The word breakers bundled in Keyman's lexical model layer (LMLayer).
 
@@ -11,7 +11,8 @@ Includes:
 ## Usage
 
 ```
-import {default as breakWords} from '@keymanapp/lexical-model-word-breakers';
+import {wordBreakers} from '@keymanapp/models-wordbreakers';
+const breakWords = wordBreakers['default'];
 
 console.log(breakWords('Hello, World!').map(span => span.text));
 // prints: [ 'Hello', ',', 'World', '!' ]
