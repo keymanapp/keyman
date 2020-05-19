@@ -18,6 +18,10 @@ HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || rea
 . "$HOOK_DIRECTORY/../build/jq.inc.sh"
 . "$HOOK_DIRECTORY/commit-msg-defs"
 
+#
+# Read from our globally shared JSON-formatted scopes and types
+#
+
 scopes=( $("$JQ" -r '[.scopes | paths | reduce .[] as $item (""; if . == "" then $item else . + "/" + $item end)] | join(" ")' < "$HOOK_DIRECTORY/../scopes/scopes.json") )
 types=( $("$JQ" -r '.commitTypes | join(" ")' < "$HOOK_DIRECTORY/../scopes/commit-types.json") )
 
@@ -95,6 +99,8 @@ function print_error() {
   echo -e "Optionally, append ${t_grn}Fixes #1234${t_end}\n"
   echo -e "${t_cyn}Example:${t_end} fix(windows): Re-attaches the widget plug which had fallen out. Fixes #1111"
   echo -e "${t_cyn}Reference${t_end}: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes"
+  echo -e ""
+  echo -e "Tips: Don't include a period at the end of the first line; best to put 'Fixes #1111' on a line of its own."
   echo -e ""
   echo -e "This script: $0"
 }
