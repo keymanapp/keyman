@@ -15,11 +15,11 @@
 # Get the directory where this script lives, i.e. resources/git-hooks
 HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
 
-if [ -f $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs ]; then
-  . $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs
-else
-  . $HOOK_DIRECTORY/commit-msg-defs
-fi
+. "$HOOK_DIRECTORY/../build/jq.inc.sh"
+. "$HOOK_DIRECTORY/commit-msg-defs"
+
+scopes=( $("$JQ" -r '[.scopes | paths | reduce .[] as $item (""; if . == "" then $item else . + "/" + $item end)] | join(" ")' < "$HOOK_DIRECTORY/../scopes/scopes.json") )
+types=( $("$JQ" -r '.commitTypes | join(" ")' < "$HOOK_DIRECTORY/../scopes/commit-types.json") )
 
 #
 # Define terminal colours.
