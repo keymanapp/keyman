@@ -31,6 +31,7 @@
     "@keymanapp/keyboard-processor": "^14.0.77",
     "@keymanapp/lexical-model-layer": "^14.0.77",
     "@keymanapp/lexical-model-types": "^14.0.77",
+    "@keymanapp/web-utils": "^14.0.77",
     "@types/node": "^11.9.4",
     "eventemitter3": "^4.0.0",
     "ts-node": "^8.0.2"

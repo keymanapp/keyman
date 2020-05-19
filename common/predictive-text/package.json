@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@types/node": "^10.12.11",
+    "@types/node": "^10.17.21",
     "chai": "^4.2.0",
     "karma": "^4.2.0",
     "karma-browserstack-launcher": "^1.5.1",
@@ -41,10 +41,10 @@
     "mocha-teamcity-reporter": "^2.5.1",
     "sinon": "^7.1.1",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.1"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@keymanapp/keyboard-processor": "^14.0.77",
+    "@keymanapp/web-utils": "^14.0.77",
     "@keymanapp/lexical-model-types": "^14.0.77",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",

@@ -53,6 +53,7 @@
     "@keymanapp/lexical-model-layer": "^14.0.77",
     "@keymanapp/lexical-model-types": "^14.0.77",
     "@keymanapp/recorder-core": "^14.0.77",
+    "@keymanapp/web-utils": "^14.0.77",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",

@@ -5,15 +5,12 @@
 	"outDir": "../dist/",
 	"inlineSources": true,
   "sourceMap": true,
-  "sourceRoot": "/keyman/",
   "target": "es5",
   "types": ["node"],
   "lib": ["es6"],
   "outFile": "../dist/index.js"
   },
   "files": [
-    "../node_modules/@keymanapp/web-utils/src/index.ts",
-    "../node_modules/@keymanapp/lexical-model-layer/node-defaultWorker.ts",
-		"text/inputProcessor.ts"
+		"index.ts"
   ]
 }

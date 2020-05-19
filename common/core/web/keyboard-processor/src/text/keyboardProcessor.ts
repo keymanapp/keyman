@@ -1,5 +1,3 @@
-// Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
 // Establishes key-code definitions.
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
@@ -14,8 +12,8 @@
 /// <reference path="keyMapping.ts" />
 // Defines a core-compatible 'Device' analogue for use in keyEvent processing
 /// <reference path="engineDeviceSpec.ts" />
-// Defines the getGlobalObject() utility method.
-/// <reference path="../utils/globalObject.ts" />
+
+// Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
 namespace com.keyman.text {
   export type BeepHandler = (outputTarget: OutputTarget) => void;

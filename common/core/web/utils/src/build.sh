@@ -1,14 +1,12 @@
 #! /bin/bash
 # 
-# Compiles development-related KeymanWeb resources for use with developing/running tests.
-#   - the Recorder module (for engine tests)
-#   - the DOM module (for touch-alias and element-interface tests)
+# Compiles common TS-based utility functions for use among Keyman's codebase
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
-KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../../.."
+KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../.."
 . "$KEYMAN_ROOT/resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
@@ -29,6 +27,9 @@ set_default_vars ( ) {
 }
 
 set_default_vars
+
+# Generates a linkable TS file; defined in resources/build-utils.sh.
+exportEnvironmentDefinitionTS
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -57,20 +58,7 @@ PATH="../node_modules/.bin:$PATH"
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
-pushd ../../../utils/src
-./build.sh -skip-package-install
-
-if [ $? -ne 0 ]; then
-    fail "KeymanWeb utility function library compilation failed."
-fi
-popd
-
 $compilecmd -p "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
-    fail "KeymanWeb recorder-core compilation failed."
-fi
-
-$compilecmd -p "$SCRIPT_DIR/nodeProctor.tsconfig.json"
-if [ $? -ne 0 ]; then
-    fail "Node-based unit-test Proctor compilation failed."
+    fail "Utility-function package compilation failed."
 fi
