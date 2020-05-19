@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "none",
     "lib": ["es6"],
     "target": "es5",
     "declaration": true,
     "sourceMap": true,
-    "outDir": "lib",
+    "outFile": "index.js",
     "strict": true,
     "allowJs": false,
     "typeRoots": [
