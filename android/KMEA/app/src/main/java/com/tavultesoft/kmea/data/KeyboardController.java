@@ -186,7 +186,7 @@ public class KeyboardController {
       }
     }
 
-    Log.d(TAG, "getIndexOfKey failed for key " + key);
+    Log.e(TAG, "getKeyboardIndex failed for key " + key);
     return index;
   }
 

@@ -129,7 +129,7 @@ public class KeyboardPickerTest {
       Assert.assertTrue(activity.isFinishing());
 
       // check if keyboardswitch is done
-      int index = KeyboardPickerActivity.getCurrentKeyboardIndex();
+      int index = KeyboardPickerActivity.selectedIndex();
       Keyboard _current = KMManager.getKeyboardInfo(ApplicationProvider.getApplicationContext(), index);
       Assert.assertNotNull(_current);
   }

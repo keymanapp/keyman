@@ -62,7 +62,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   private static int selectedIndex = 0;
   private static final String TAG = "KeyboardPickerActivity";
 
-  protected static int selectedIndex() {
+  public static int selectedIndex() {
     return selectedIndex;
   }
 
@@ -156,7 +156,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       }
     });
 
-    int curKbPos = getCurrentKeyboardIndex();
+    int curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     setSelection(curKbPos);
 
     KMKeyboard.addOnKeyboardEventListener(new KeyboardEventHandler.OnKeyboardEventListener() {
@@ -208,7 +208,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       adapter.notifyDataSetChanged();
     }
 
-    int curKbPos = getCurrentKeyboardIndex();
+    int curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     setSelection(curKbPos);
     if (!shouldCheckKeyboardUpdates)
       return;
@@ -235,19 +235,6 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   @Override
   public void onBackPressed() {
     finish();
-  }
-
-  /**
-   * Get the current keyboard index. Only to use for KeyboardPickerActivity or unit test.
-   * @return int of the matching keyboard index. If current index not found, return 0
-   */
-  public static int getCurrentKeyboardIndex() {
-    int pos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
-
-    // Always return a valid index.
-    // If index to the current keyboard not found, return index to the first keyboard
-    // (Have to assume at least the default keyboard exists)
-    return (pos != KeyboardController.INDEX_NOT_FOUND) ? pos : 0;
   }
 
   private static boolean saveList(Context context, String listName) {
@@ -388,7 +375,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
   }
 
   protected static void deleteKeyboard(Context context, int position) {
-    int curKbPos = getCurrentKeyboardIndex();
+    int curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
     boolean result = removeKeyboard(context, position);
 
     if (result) {
@@ -400,7 +387,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       if (position == curKbPos && listView != null) {
         switchKeyboard(0,false);
       } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
-        curKbPos = getCurrentKeyboardIndex();
+        curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
         setSelection(curKbPos);
       }
     }
