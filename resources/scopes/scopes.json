@@ -21,6 +21,7 @@
       "samples": null
     },
     "web": {
+      "bookmarklet": null,
       "engine": null,
       "resources": null,
       "ui": null,
@@ -43,7 +44,7 @@
           "desktop": null,
           "web": null
       },
-      "model": {
+      "models": {
         "types": null,
         "templates": null,
         "wordbreakers": null
