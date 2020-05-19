@@ -242,10 +242,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
    * @return int of the matching keyboard index. If current index not found, return 0
    */
   public static int getCurrentKeyboardIndex() {
-    int pos = 0;
-    pos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
+    int pos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
 
-    // If index not found, return first index
+    // Always return a valid index.
+    // If index to the current keyboard not found, return index to the first keyboard
+    // (Have to assume at least the default keyboard exists)
     return (pos != KeyboardController.INDEX_NOT_FOUND) ? pos : 0;
   }
 
