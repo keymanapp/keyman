@@ -1,3 +1,1 @@
-import {ascii} from "./ascii";
-
-export {ascii};
+/// <reference path="./ascii.ts" />
