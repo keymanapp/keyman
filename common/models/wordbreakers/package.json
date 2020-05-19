@@ -1,7 +1,7 @@
 {
   "name": "@keymanapp/models-wordbreakers",
   "version": "14.0.75",
-  "description": "Word breakers bundled in the LMlayer",
+  "description": "Word breakers bundled in the modeling layer",
   "keywords": [
     "lexical model",
     "models",

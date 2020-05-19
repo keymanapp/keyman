@@ -1,6 +1,6 @@
 # `@keymanapp/models-wordbreakers`
 
-The word breakers bundled in Keyman's lexical model layer (LMLayer).
+The word breakers bundled in Keyman's modeling layer (common/models).
 
 Includes:
 
