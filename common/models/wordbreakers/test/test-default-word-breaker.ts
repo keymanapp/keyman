@@ -7,7 +7,7 @@ import {default as breakWords} from '../src';
 
 const SHY = '\u00AD';
 
-describe('The default word breaker', function () {
+describe.skip('The default word breaker', function () {
   it('should break multilingual text', function () {
     let breaks = breakWords(
       `Добрый день! ᑕᐻ᙮ — after working on ka${SHY}wen${SHY}non:${SHY}nis,
