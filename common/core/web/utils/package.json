@@ -1,0 +1,22 @@
+{
+  "name": "@keymanapp/web-utils",
+  "version": "14.0.76",
+  "description": "Common utility functions used throughout other Keyman packages",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "devDependencies": {
+    "typescript": "^3.7.2"
+  }
+}

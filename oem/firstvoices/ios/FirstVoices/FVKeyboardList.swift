@@ -229,7 +229,7 @@ class FVRegionStorage {
 
           let keyboard: InstallableKeyboard = InstallableKeyboard.init(id: kb.id,
                                                                        name: kb.name,
-                                                                       languageID: keyboardInfo.languages[keyboardInfo.languages.startIndex],
+                                                                       languageID: keyboardInfo.languages.keys[keyboardInfo.languages.startIndex],
                                                                        languageName: kb.name,
                                                                        version: keyboardInfo.version,
                                                                        isRTL: false,

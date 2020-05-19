@@ -254,7 +254,7 @@ uses
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
-  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
   Keyman.UI.FontUtils in '..\..\global\delphi\general\Keyman.UI.FontUtils.pas',
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
@@ -325,8 +325,8 @@ begin
         if TikeActive then Exit;
         InitClasses;
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-        Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-        Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
       end;
     finally
       FInitializeCEF.Free;

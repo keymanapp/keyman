@@ -52,8 +52,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ComCtrls, ExtCtrls, ActiveX,
   ToolWin, Menus,
-  XMLRenderer, GenericXMLRenderer, ActnList, ImgList, Keyman.UI.UframeCEFHost,
-  utilcheckfonts, AppEvnts, KeymanTextEditorRichEdit, TempFileManager,
+  ActnList, ImgList, Keyman.UI.UframeCEFHost,
+  utilcheckfonts, AppEvnts, KeymanTextEditorRichEdit,
   UfrmKeymanBase, UserMessages, System.Actions, System.ImageList;
 
 type
@@ -149,8 +149,6 @@ type
     FCheckFontsThread: TCheckFontsThread;
     FCheckFontKeyboards: TCheckFontKeyboards;
     FMustCheckFonts: Boolean;
-    FFontWebFileName: TTempFile;   // I4181
-    { Private declarations }
 
     procedure CMFontChange(var Message: TMessage); message CM_FONTCHANGE;
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
@@ -170,7 +168,7 @@ type
 
     procedure CheckKeyboardFonts(FSetFont: Boolean);
     procedure CheckFontsThreadComplete(Sender: TObject);
-    function LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
+    procedure LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = '');   // I4181
 
     procedure HideFontsBox;
     procedure FireCommand(const command: WideString; params: TStringList);
@@ -321,7 +319,6 @@ procedure TfrmTextEditor.TntFormDestroy(Sender: TObject);
 begin
   inherited;
   PostKeymanControlMessage(KMC_NOTIFYWELCOME, NW_NOTIFYHANDLE, 0);
-  FreeAndNil(FFontWebFileName);   // I4181
 end;
 
 procedure TfrmTextEditor.TntFormPaint(Sender: TObject);
@@ -363,23 +360,10 @@ begin
 end;}
 
 
-function TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = ''): TTempFile;   // I4181
-var
-  FXMLRenderers: TXMLRenderers;
-  FXMLFileName: TTempFile;   // I4181
+procedure TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const name: WideString; const AdditionalData: WideString = '');   // I4181
 begin
-  FXMLRenderers := TXMLRenderers.Create;
-  try
-    FXMLRenderers.RenderTemplate := name+'.xsl';
-    FXMLRenderers.Add(TGenericXMLRenderer.Create);
-    FXMLFileName := FXMLRenderers.RenderToFile(False, AdditionalData);
-  finally
-    FXMLRenderers.Free;
-  end;
-
-  web.Navigate(FXMLFileName.Name);   // I4181
-
-  Result := FXMLFileName;   // I4181
+  // TODO: deal with AdditionalData (query params?)
+  web.Navigate('/page/'+name); //FXMLFileName.Name);   // I4181
 end;
 
 procedure TfrmTextEditor.mnuViewFontHelperClick(Sender: TObject);
@@ -576,8 +560,7 @@ begin
   lang := kmcom.Control.ActiveLanguage;
   if (lang = nil) or (lang.KeymanKeyboardLanguage = nil) then
   begin
-    FreeAndNil(FFontWebFileName);   // I4181
-    FFontWebFileName := LoadWebBox(cefFonts, 'welcome_fonts', '<not_keyman />');   // I4181
+    LoadWebBox(cefFonts, 'welcome_fonts', '<not_keyman />');   // I4181
     //HideFontsBox;
     Exit;
   end;
@@ -587,8 +570,7 @@ begin
     FKeyboard := FCheckFontKeyboards.Keyboards[lang.KeymanKeyboardLanguage.OwnerKeyboard.ID];
     if not Assigned(FKeyboard) then
     begin
-      FreeAndNil(FFontWebFileName);   // I4181
-      FFontWebFileName := LoadWebBox(cefFonts, 'welcome_fonts', ''); // I1534 - show hint for non-Unicode keyboards   // I4181
+      LoadWebBox(cefFonts, 'welcome_fonts', ''); // I1534 - show hint for non-Unicode keyboards   // I4181
       Exit;
     end;
 
@@ -610,8 +592,7 @@ begin
       FFontsData := FFontsData + '<Font Name="'+XmlEncode(FKeyboard.Fonts[I].FontName)+'" Coverage="'+IntToStr(FKeyboard.Fonts[i].Coverage)+'" />';
     FFontsData := FFontsData + '</Fonts>';
 
-    FreeAndNil(FFontWebFileName);   // I4181
-    FFontWebFileName := LoadWebBox(cefFonts, 'welcome_fonts', FFontsData);   // I4181
+    LoadWebBox(cefFonts, 'welcome_fonts', FFontsData);   // I4181
 
     if (FKeyboard.Fonts.Count > 0) and FSetFont then
       CurrText.Name := FKeyboard.Fonts[0].FontName;

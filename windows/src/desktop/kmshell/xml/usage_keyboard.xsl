@@ -10,8 +10,8 @@
 
 		<html>
 			<head>
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
 				<title>
 					<xsl:value-of select="$locale/String[@Id='Usage_Title']" />
 				</title>

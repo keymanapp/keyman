@@ -30,19 +30,16 @@ type
   protected
     function XMLData(FRefreshKeyman: Boolean): WideString; override;
   public
-    constructor Create(const AXML: WideString = '');
+    constructor Create(AOwner: TXMLRenderers; const AXML: WideString = '');
   end;
 
 implementation
 
-uses
-  kmint;
-
 { TGenericXMLRenderer }
 
-constructor TGenericXMLRenderer.Create(const AXML: WideString);
+constructor TGenericXMLRenderer.Create(AOwner: TXMLRenderers; const AXML: WideString);
 begin
-  inherited Create;
+  inherited Create(AOwner);
   FXML := AXML;
 end;
 

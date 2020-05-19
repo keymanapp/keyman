@@ -252,8 +252,8 @@ namespace com.keyman {
     /**
      * Returns a slimmer, web-core compatible version of this object.
      */
-    public get coreSpec(): text.EngineDeviceSpec {
-      return new text.EngineDeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
+    public get coreSpec(): utils.DeviceSpec {
+      return new utils.DeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
     }
   }
 }

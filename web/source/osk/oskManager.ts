@@ -226,7 +226,7 @@ namespace com.keyman.osk {
 
         // Generate a visual keyboard from the layout (or layout default)
         // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
-        if(activeKeyboard && activeKeyboard.layout(device.formFactor as text.FormFactor)) {
+        if(activeKeyboard && activeKeyboard.layout(device.formFactor as utils.FormFactor)) {
           this._GenerateVisualKeyboard(activeKeyboard);
         } else if(!activeKeyboard) {
           this._GenerateVisualKeyboard(null);

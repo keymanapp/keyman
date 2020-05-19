@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.76 alpha 2020-05-15
+
+* fix(windows): use correct name for Sentry in C++ (#3129)
+* chore: Allow to override hook defs (#3112)
+
+## 14.0.75 alpha 2020-05-13
+
+* feat(android): Add Tamil lexical model to KMSample2 (#3123)
+
 ## 14.0.74 alpha 2020-05-11
 
 * fix(windows): kmbrowserhost was missing debug info (#3117)

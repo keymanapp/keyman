@@ -6,7 +6,7 @@ namespace KMWRecorder {
     private keyboard: com.keyman.keyboards.Keyboard;
     public __debug = false;
 
-    constructor(keyboard: com.keyman.keyboards.Keyboard, device: com.keyman.text.EngineDeviceSpec, assert: AssertCallback) {
+    constructor(keyboard: com.keyman.keyboards.Keyboard, device: com.keyman.utils.DeviceSpec, assert: AssertCallback) {
       super(device, assert);
 
       this.keyboard = keyboard;

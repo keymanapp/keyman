@@ -1,9 +1,9 @@
-// Defines KMW's string extension functions.
-///<reference path="../text/kmwstring.ts" />
 // Defines deadkey management in a manner attachable to each element interface.
 ///<reference path="../text/deadkeys.ts" />
 // Defines the KeyEvent type.
 ///<reference path="keyEvent.ts" />
+
+// Also relies on string-extensions provided by the web-utils package.
 
 namespace com.keyman.text {
   export class TextTransform implements Transform {
