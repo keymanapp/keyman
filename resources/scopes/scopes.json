@@ -7,6 +7,24 @@
       "resources": null,
       "samples": null
     },
+    "common": {
+      "core": {
+          "desktop": null,
+          "web": null
+      },
+      "models": {
+        "types": null,
+        "templates": null,
+        "wordbreakers": null
+      },
+      "resources": null
+    },
+    "developer": {
+      "compilers": null,
+      "ide": null,
+      "resources": null,
+      "tools": null
+    },
     "ios": {
       "app": null,
       "browser": null,
@@ -20,6 +38,19 @@
       "resources": null,
       "samples": null
     },
+    "mac": {
+      "config": null,
+      "engine": null,
+      "resources": null,
+      "samples": null
+    },
+    "oem": {
+      "fv": {
+        "android": null,
+        "ios": null,
+        "windows": null
+      }
+    },
     "web": {
       "bookmarklet": null,
       "engine": null,
@@ -27,37 +58,11 @@
       "ui": null,
       "samples": null
     },
-    "mac": {
+    "windows": {
       "config": null,
       "engine": null,
       "resources": null,
       "samples": null
-    },
-    "developer": {
-      "compilers": null,
-      "ide": null,
-      "resources": null,
-      "tools": null
-    },
-    "common": {
-      "core": {
-          "desktop": null,
-          "web": null
-      },
-      "models": {
-        "types": null,
-        "templates": null,
-        "wordbreakers": null
-      },
-      "resources": null,
-      "ci": null
-    },
-    "oem": {
-      "fv": {
-        "android": null,
-        "ios": null,
-        "linux": null
-      }
     }
   }
 }
