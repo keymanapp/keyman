@@ -2,8 +2,11 @@
   "name": "@keymanapp/web-utils",
   "version": "14.0.78",
   "description": "Common utility functions used throughout other Keyman packages",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types:": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsc -p ./src/tsconfig.json",
+    "prepare": "npm run build",
     "tsc": "tsc"
   },
   "repository": {
