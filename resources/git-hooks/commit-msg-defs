@@ -1,6 +1,0 @@
-#!/bin/bash
-# Configurable options for message length.
-#
-
-min_length=4
-max_length=128

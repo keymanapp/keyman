@@ -15,15 +15,21 @@
 # Get the directory where this script lives, i.e. resources/git-hooks
 HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
 
-. "$HOOK_DIRECTORY/../build/jq.inc.sh"
-. "$HOOK_DIRECTORY/commit-msg-defs"
+if [ -f $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs ]; then
+  # This script was run from a symlink and the repo in question has its own commit-msg-defs.
+  . $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs
+else
+  # We'll grab the settings from the keymanapp/keyman repository.
+  . "$HOOK_DIRECTORY/../build/jq.inc.sh"
 
-#
-# Read from our globally shared JSON-formatted scopes and types
-#
+  # Configurable options for message length.
+  min_length=4
+  max_length=128
 
-scopes=( $("$JQ" -r '[.scopes | paths | reduce .[] as $item (""; if . == "" then $item else . + "/" + $item end)] | join(" ")' < "$HOOK_DIRECTORY/../scopes/scopes.json") )
-types=( $("$JQ" -r '.commitTypes | join(" ")' < "$HOOK_DIRECTORY/../scopes/commit-types.json") )
+  # Read from our globally shared JSON-formatted scopes and types
+  scopes=( $("$JQ" -r '[.scopes | paths | reduce .[] as $item (""; if . == "" then $item else . + "/" + $item end)] | join(" ")' < "$HOOK_DIRECTORY/../scopes/scopes.json") )
+  types=( $("$JQ" -r '.commitTypes | join(" ")' < "$HOOK_DIRECTORY/../scopes/commit-types.json") )
+fi
 
 #
 # Define terminal colours.
