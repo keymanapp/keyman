@@ -372,7 +372,7 @@ namespace com.keyman.keyboards {
       }
 
       this.doBeforeKeyboardChange(PInternalName,PLgCode);     
-      let p = this._SetActiveKeyboard(PInternalName,PLgCode,true);    
+      let p: Promise<void> = this._SetActiveKeyboard(PInternalName,PLgCode,true);    
       if(this.keymanweb.domManager.getLastActiveElement() != null) {
         this.keymanweb.domManager.focusLastActiveElement(); // TODO:  Resolve without need for the cast.
       }
@@ -382,6 +382,14 @@ namespace com.keyman.keyboards {
       //   PLgCode = (<KeymanBase>keymanweb).keyboardManager.activeStub['KLC'];
       // }
       this.doKeyboardChange(PInternalName, PLgCode);
+
+      p.catch(function() {
+        // Rejection indicates a failure of the keyboard to load.
+        //
+        // In case p's rejection is never caught, throwing this error will generate logs that shows up
+        // in Sentry or in the console, with useful information for debugging either way.
+        throw new Error("Unable to load keyboard with internal name \"" + PInternalName + "\", language code \"" + PLgCode + "\".");
+      })
 
       return p;
     }

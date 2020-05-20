@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/web-utils",
-  "version": "14.0.77",
+  "version": "14.0.78",
   "description": "Common utility functions used throughout other Keyman packages",
   "main": "index.js",
   "scripts": {

@@ -25,6 +25,7 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
@@ -195,19 +196,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     // Add default keyboard
     boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
     if (!installDefaultKeyboard) {
-      HashMap<String, String> kbInfo = new HashMap<String, String>();
-      kbInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_PackageID);
-      kbInfo.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
-      kbInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-      kbInfo.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
-      kbInfo.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
-      kbInfo.put(KMManager.KMKey_KeyboardVersion,
-        KMManager.getLatestKeyboardFileVersion(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID));
-      kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
-      File welcomeFile = new File(KMManager.getPackagesDir(), KMManager.KMDefault_PackageID + File.separator + FileUtils.WELCOME_HTM);
-      kbInfo.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
-      KMManager.addKeyboard(this, kbInfo);
-
+      if (!KMManager.keyboardExists(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
+          KMManager.KMDefault_LanguageID)) {
+        KMManager.addKeyboard(this, Keyboard.DEFAULT_KEYBOARD);
+      }
       SharedPreferences.Editor editor = prefs.edit();
       editor.putBoolean(defaultKeyboardInstalled, true);
       editor.commit();
@@ -315,7 +307,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       }
 
       if (!didFail) {
-        KMManager.updateOldKeyboardsList(this);
         SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(MainActivity.didCheckUserDataKey, true);
@@ -837,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     boolean showGetStarted = prefs.getBoolean(GetStartedActivity.showGetStartedKey, true);
     if (showGetStarted) {
       boolean shouldShowGetStarted = false;
-      ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
+      List<Keyboard> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() < 2)
         shouldShowGetStarted = true;
 
@@ -1074,17 +1065,22 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
     for(int i=0; i < keyboardsInstalled.size(); i++) {
-      HashMap<String, String> keyboardInfo = new HashMap<>(keyboardsInstalled.get(i));
+      HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
+      Keyboard keyboardInfo = new Keyboard(
+        hashMap.get(KMManager.KMKey_PackageID),
+        hashMap.get(KMManager.KMKey_KeyboardID),
+        hashMap.get(KMManager.KMKey_KeyboardName),
+        hashMap.get(KMManager.KMKey_LanguageID),
+        hashMap.get(KMManager.KMKey_LanguageName),
+        hashMap.get(KMManager.KMKey_Version),
+        hashMap.get(KMManager.KMKey_HelpLink),
+        true,
+        hashMap.get(KMManager.KMKey_Font),
+        hashMap.get(KMManager.KMKey_OskFont));
+
       if (i == 0) {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-          String keyboardID = keyboardInfo.get(KMManager.KMKey_KeyboardID);
-          String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-          String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-          String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-          String kFont = keyboardInfo.get(KMManager.KMKey_Font);
-          String kOskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-          KMManager.setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName, kFont, kOskFont);
+          KMManager.setKeyboard(keyboardInfo);
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);
@@ -1095,7 +1091,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
-      KMManager.getCurrentKeyboardInfo(this).get(KMManager.KMKey_LanguageID) :
+      KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
       KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 

@@ -3,11 +3,13 @@
     "common/core/web/input-processor",
     "common/core/web/keyboard-processor",
     "common/core/web/tools/recorder",
+    "common/core/web/tools/sentry-manager",
     "common/core/web/utils",
     "common/lexical-model-types",
+    "common/models/*",
     "common/predictive-text",
     "web",
     "developer/js"
   ],
-  "version": "14.0.77"
+  "version": "14.0.78"
 }

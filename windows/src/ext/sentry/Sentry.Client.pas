@@ -57,6 +57,7 @@ type
   class var
     FInstance: TSentryClient;
   private
+    FSentryInit: Boolean;
     options: psentry_options_t;
     FVectoredExceptionHandler: PVOID;
 
@@ -243,7 +244,8 @@ begin
   if AOptions.HandlerPath <> '' then
     sentry_options_set_handler_pathw(options, PWideChar(AOptions.HandlerPath));
 
-  sentry_init(options);
+  if sentry_init(options) = 0 then
+    FSentryInit := True;
 
   if scfCaptureExceptions in AFlags then
   begin
@@ -257,7 +259,9 @@ end;
 destructor TSentryClient.Destroy;
 begin
   FInstance := nil;
-  sentry_shutdown;
+  if FSentryInit then
+    sentry_shutdown;
+  FSentryInit := False;
   if FVectoredExceptionHandler <> nil then
     RemoveVectoredExceptionHandler(FVectoredExceptionHandler);
   inherited Destroy;

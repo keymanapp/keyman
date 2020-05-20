@@ -7,11 +7,14 @@ package com.tavultesoft.kmea;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
@@ -149,9 +152,14 @@ final class KMKeyboard extends WebView {
           Toast.makeText(context, "Fatal Error with " + currentKeyboard +
             ". Loading default keyboard", Toast.LENGTH_LONG).show();
 
-          setKeyboard(KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
-            KMManager.KMDefault_LanguageID, KMManager.KMDefault_KeyboardName,
-            KMManager.KMDefault_LanguageName, KMManager.KMDefault_KeyboardFont, null);
+          Keyboard firstKeyboard = KeyboardController.getInstance().getKeyboardInfo(0);
+          if (firstKeyboard != null) {
+            // Revert to first keyboard in the list
+            setKeyboard(firstKeyboard);
+          } else {
+            // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
+            setKeyboard(Keyboard.DEFAULT_KEYBOARD);
+          }
         }
 
         return true;
@@ -600,6 +608,22 @@ final class KMKeyboard extends WebView {
     }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
+
+    return retVal;
+  }
+
+  public boolean setKeyboard(Keyboard k) {
+    boolean retVal = false;
+    if (k != null) {
+      retVal = setKeyboard(
+        k.getPackageID(),
+        k.getKeyboardID(),
+        k.getLanguageID(),
+        k.getKeyboardName(),
+        k.getLanguageName(),
+        k.getFont(),
+        k.getOSKFont());
+    }
 
     return retVal;
   }
@@ -1212,7 +1236,7 @@ final class KMKeyboard extends WebView {
 
     if (KMManager.getGlobeKeyAction(keyboardType) == KMManager.GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
       // Help bubble is disabled if next keyboard is not available for this action
-      ArrayList<HashMap<String, String>> keyboardsList = KMManager.getKeyboardsList(context);
+      List<Keyboard> keyboardsList = KMManager.getKeyboardsList(context);
       if (keyboardsList == null) {
         return;
       }
