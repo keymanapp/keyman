@@ -50,5 +50,8 @@
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "typescript": "^3.2.1"
+  },
+  "dependencies": {
+    "@keymanapp/models-wordbreakers": "^14.0.75"
   }
 }

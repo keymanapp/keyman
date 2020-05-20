@@ -85,8 +85,15 @@
         trieData['totalWeight'],
         options.searchTermToKey as Wordform2Key || defaultSearchTermToKey
       );
+      let wb: {};
       // @ts-ignore
-      this.breakWords = options.wordBreaker || wordBreakers['default'];
+      if (typeof wordBreakers !== 'undefined') {
+        // @ts-ignore
+        wb = wordBreakers;
+      } else {
+        wb = require('@keymanapp/models-wordBreakers').wordBreakers;
+      }
+      this.breakWords = options.wordBreaker || wb['default'];
       this.punctuation = options.punctuation;
     }
 
