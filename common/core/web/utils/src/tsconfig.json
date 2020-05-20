@@ -5,7 +5,7 @@
     "outDir": "../dist/",
     "inlineSources": true,
     "sourceMap": true,
-	"declaration": true,
+    "declaration": true,
     "target": "es5",
     "types": ["node"],
     "lib": ["es6"],
