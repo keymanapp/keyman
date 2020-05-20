@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 # 
 # Compiles common TS-based utility functions for use among Keyman's codebase
 

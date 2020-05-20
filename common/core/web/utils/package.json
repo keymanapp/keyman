@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types:": "./dist/index.d.ts",
   "scripts": {
-    "build": "./build.sh -skip-dependency-install",
+    "build": "bash build.sh -skip-dependency-install",
     "prepare": "npm run build",
     "tsc": "tsc"
   },
