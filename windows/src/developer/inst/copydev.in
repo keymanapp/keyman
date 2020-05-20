@@ -102,7 +102,11 @@ heat-model-compiler:
     $(GIT_BASH_FOR_KEYMAN) resources\lerna-utils.sh remove-package "developer/js"
 
     # leverage lerna to retrieve only the resources needed for production.
-    # Avoids retrieving local resources from remote (which `npm install` would do)
+    # We're at the repo's base - ensure that Lerna is available first.
+    npm install
+    # Nukes any in-place node_modules installations.
+    npm run lerna -- exec -- if exist "node_modules" rmdir "node_modules" /s /q
+    # Installs only any needed dependencies in repo packages (using `npm link` where possible)
     npm run lerna -- bootstrap -- --production
 
     # detach from lerna
@@ -116,7 +120,9 @@ heat-model-compiler:
     # leverage lerna to retrieve only the resources needed for production.
     # We're at the repo's base - ensure that Lerna is available first.
     npm install
-    # Installs needed dependencies in repo packages (using `npm link` where possible)
+    # Nukes any in-place node_modules installations
+    npm run lerna -- exec -- if exist "node_modules" rmdir "node_modules" /s /q
+    # Installs only any needed dependencies in repo packages (using `npm link` where possible)
     npm run lerna -- bootstrap -- --production
 
     # detach from lerna
@@ -130,6 +136,9 @@ heat-model-compiler:
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     mkdir $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     xcopy $(KEYMAN_INTERMEDIATE_MODELCOMPILER)\* $(KEYMAN_WIX_TEMP_MODELCOMPILER)\ /s
+
+    # Now that we've performed the copy, we can restore dev-dependency installations.
+    npm run lerna -- bootstrap
 
     cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     
