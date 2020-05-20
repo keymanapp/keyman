@@ -1,7 +1,7 @@
 {
-  "name": "@keymanapp/lexical-model-models",
+  "name": "@keymanapp/models-templates",
   "version": "14.0.76",
-  "description": "Backing model implementations for the LMLayer",
+  "description": "Backing model implementations (templates) for Keyman's modelling layer",
   "keywords": [
     "lm",
     "lmlayer",
