@@ -7,7 +7,7 @@ available_platforms=(android ios linux mac web windows)
 
 # the base folder for each pattern does not need to be included, nor oem folders
 # e.g. android='common/models|common/predictive-text'
-# will expand into android='^(android|(oem/[^/]+/android)|common/predictive-text|common/lexical-model-types)'
+# will expand into android='^(android|(oem/[^/]+/android)|common/models|common/predictive-text)'
 
 watch_android='web|common/models|common/predictive-text|common/lexical-model-types'
 watch_ios='web|common/models|common/predictive-text|common/lexical-model-types'
