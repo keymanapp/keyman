@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/@keymanapp/models-types/index.d.ts" />
-
 namespace models {
   export function applyTransform(transform: Transform, context: Context): Context {
     // First, get the current context

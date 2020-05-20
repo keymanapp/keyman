@@ -1,10 +1,15 @@
 const path = require('path');
+const assert = require('assert');
 
 var _ = global;
 
 // TODO: move this to its own package; e.g., @keymanapp/models-test-helpers
 // TODO: then mocha invocation is as follows:
 // TODO:     mocha -r @keymanapp/models-test-helpers test/
+
+// KMW string must be included, so do it here:
+require('@keymanapp/web-utils');
+assert.ok('💩'.kmwLength);
 
 /**
  * Load JSON fixtures from a well-known place.

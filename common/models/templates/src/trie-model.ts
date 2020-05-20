@@ -23,7 +23,6 @@
  */
 
 /// <reference path="common.ts" />
-/// <reference path="../node_modules/@keymanapp/web-utils/src/kmwstring.ts" />
 
 /**
  * @file trie-model.ts
