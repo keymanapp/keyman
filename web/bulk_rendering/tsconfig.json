@@ -8,8 +8,7 @@
 	"target": "es5"
 	},
   "files": [
-		"../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts",
-		"../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts",
+		"../node_modules/@keymanapp/web-utils/src/index.ts",
 		"../node_modules/@keymanapp/lexical-model-layer/message.d.ts",
 		"renderer_core.ts"
   ]

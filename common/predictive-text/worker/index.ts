@@ -30,9 +30,8 @@
  */
 
 /// <reference path="../message.d.ts" />
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/kmwstring.ts" />
 /// <reference path="models/dummy-model.ts" />
-/// <reference path="word_breaking/ascii-word-breaker.ts" />
+/// <reference path="../node_modules/@keymanapp/models-wordbreakers/src/index.ts" />
 /// <reference path="./model-compositor.ts" />
 
 /**

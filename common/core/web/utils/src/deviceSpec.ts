@@ -1,4 +1,4 @@
-namespace com.keyman.text {
+namespace com.keyman.utils {
   export enum Browser {
     Chrome = 'chrome',
     Edge = 'edge',
@@ -29,7 +29,7 @@ namespace com.keyman.text {
    * containing only the information needed by web-core for text processing use, devoid
    * of any direct references to the DOM.
    */
-  export class EngineDeviceSpec {
+  export class DeviceSpec {
     readonly browser: Browser;
     readonly formFactor: FormFactor;
     readonly OS: OperatingSystem;

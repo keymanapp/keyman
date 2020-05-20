@@ -57,6 +57,14 @@ PATH="../node_modules/.bin:$PATH"
 compiler="npm run tsc --"
 compilecmd="$compiler"
 
+pushd ../../../utils/src
+./build.sh -skip-package-install
+
+if [ $? -ne 0 ]; then
+    fail "KeymanWeb utility function library compilation failed."
+fi
+popd
+
 $compilecmd -p "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
     fail "KeymanWeb recorder-core compilation failed."

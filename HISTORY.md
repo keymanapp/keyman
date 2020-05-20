@@ -1,5 +1,37 @@
 # Keyman Version History
 
+## 14.0.77 alpha 2020-05-19
+
+* refactor(web/engine): Moves common utility functions into separate `web-utils` package (#3130)
+* refactor(web/engine): renames DeviceSpec, moves to utils (#3132)
+* fix(ios): Fixes keyboard metadata decoding, tweaks to project files  (#3137)
+* feat(windows): Use http: instead of file: for Configuration UI (#3127)
+
+## 14.0.76 alpha 2020-05-15
+
+* fix(windows): use correct name for Sentry in C++ (#3129)
+* chore: Allow to override hook defs (#3112)
+
+## 14.0.75 alpha 2020-05-13
+
+* feat(android): Add Tamil lexical model to KMSample2 (#3123)
+
+## 14.0.74 alpha 2020-05-11
+
+* fix(windows): kmbrowserhost was missing debug info (#3117)
+
+## 14.0.73 alpha 2020-05-11
+
+* fix(windows): force output keystroke failure (#3083)
+* fix(windows): kmshell title and kmbrowserhost sentry (#3115)
+
+## 14.0.72 alpha 2020-05-08
+
+* fix(ios/oem): Fixes FV app's system keyboard (#3105)
+* fix(ios/oem): FV light mode lock and basic banner fix (#3108)
+* fix(windows): sentry cef shutdown interactions (#3107)
+* feat(android): Migrate installed keyboards list to keyboards_list.json (#3091)
+
 ## 14.0.71 alpha 2020-05-08
 
 * fix(windows): use consistent sentry db location (#3100)

@@ -194,7 +194,7 @@ namespace com.keyman.dom {
       }
 
       // Check for any browser-based keymapping before returning the object.
-      if(!keyman.isEmbedded && s.device.browser == text.Browser.Firefox) {
+      if(!keyman.isEmbedded && s.device.browser == utils.Browser.Firefox) {
         // I1466 - Convert the - keycode on mnemonic as well as positional layouts
         // FireFox, Mozilla Suite
         if(KeyMapping.browserMap.FF['k'+s.Lcode]) {

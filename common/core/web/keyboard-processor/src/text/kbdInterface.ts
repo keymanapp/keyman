@@ -185,7 +185,7 @@ namespace com.keyman.text {
 
     // Must be accessible to some of the keyboard API methods.
     activeKeyboard: keyboards.Keyboard;
-    activeDevice: EngineDeviceSpec;
+    activeDevice: utils.DeviceSpec;
 
     variableStoreSerializer?: VariableStoreSerializer;
 
