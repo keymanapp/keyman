@@ -1,4 +1,3 @@
-/// <reference path="./placeholder.ts"/>
 /// <reference path="./trie-model.ts" />
 
 // Add all namespaces defined here to the global scope:
