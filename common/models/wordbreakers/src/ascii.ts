@@ -1,5 +1,21 @@
 namespace wordBreakers {
   /**
+   * Splits ASCII words.
+   *
+   * @param phrase
+   */
+  export function ascii(phrase: string): Span[] {
+    let matchWord = /[A-Za-z0-9']+/g;
+    let words: Span[] = [];
+    let match: RegExpExecArray | null;
+    while ((match = matchWord.exec(phrase)) !== null) {
+      words.push(new RegExpDerivedSpan(match[0], match.index));
+    }
+
+    return words;
+  }
+
+  /**
    * A concrete span class that derives its properties from the result of
    * RegExp.exec() array.
    */
@@ -19,21 +35,5 @@ namespace wordBreakers {
     get end(): number {
       return this.start + this.text.length;
     }
-  }
-
-  /**
-   * Splits ASCII words.
-   * 
-   * @param phrase 
-   */
-  export function ascii(phrase: string): Span[] {
-    let matchWord = /[A-Za-z0-9']+/g;
-    let words: Span[] = [];
-    let match: RegExpExecArray;
-    while ((match = matchWord.exec(phrase)) !== null) {
-      words.push(new RegExpDerivedSpan(match[0], match.index));
-    }
-
-    return words;
   }
 }

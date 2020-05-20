@@ -147,8 +147,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				37EA1F20228A183E003E710C /* KeymanEngine.framework in Frameworks */,
-				3729344024613C9900C5428C /* ObjcExceptionBridging.framework in Frameworks */,
-				3729344124613CA700C5428C /* XCGLogger.framework in Frameworks */,
 				CECB62572463E9FA006E47B5 /* DeviceKit.framework in Frameworks */,
 				3729344224613CB600C5428C /* Sentry.framework in Frameworks */,
 				3729344324613CC200C5428C /* Zip.framework in Frameworks */,
@@ -568,7 +566,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -591,7 +589,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -647,7 +645,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -664,6 +662,7 @@
 				CODE_SIGN_ENTITLEMENTS = FirstVoices/FirstVoices.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = D7TR486TEH;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -720,6 +719,7 @@
 				CODE_SIGN_ENTITLEMENTS = SWKeyboard/SWKeyboard.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = D7TR486TEH;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

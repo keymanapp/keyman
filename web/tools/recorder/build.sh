@@ -36,7 +36,7 @@ compilecmd="$compiler"
 
 $compilecmd -p "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
-    fail "KeymanWeb test sequence recorder compilation failed; aborting full Recorder compilation."
+    fail "KeymanWeb test sequence recorder compilation failed."
 fi
 
 PRODUCT="$SCRIPT_DIR/$OUTPUT_DIR/$OUTPUT"

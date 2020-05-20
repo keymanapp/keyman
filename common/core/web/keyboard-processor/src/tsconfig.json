@@ -13,6 +13,7 @@
   },
   "files": [
     "../node_modules/@keymanapp/lexical-model-types/index.d.ts",
+    "../node_modules/@keymanapp/web-utils/src/index.ts",
 		"text/keyboardProcessor.ts"
   ]
 }

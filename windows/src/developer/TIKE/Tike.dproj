@@ -491,7 +491,7 @@
         <DCCReference Include="..\..\global\delphi\chromium\Keyman.System.CEFManager.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.Debugger.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.App.pas"/>
-        <DCCReference Include="http\Keyman.Developer.System.HttpServer.Base.pas"/>
+        <DCCReference Include="..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.UI.FontUtils.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>

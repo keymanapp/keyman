@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/engineDeviceSpec.ts" />
-/// <reference path="../node_modules/@keymanapp/keyboard-processor/src/utils/version.ts" />
 /// <reference path="../node_modules/@keymanapp/keyboard-processor/src/text/keyEvent.ts" />
 /// <reference path="proctor.ts" />
 
@@ -453,7 +451,7 @@ namespace KMWRecorder {
       }
     }
 
-    matchesClient(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
+    matchesClient(device: com.keyman.utils.DeviceSpec, usingOSK?: boolean) {
       // #1:  Platform check.
       if(usingOSK === true) {
         if(this.target != device.formFactor) {
@@ -522,7 +520,7 @@ namespace KMWRecorder {
     constraint: Constraint;
 
     addTest(seq: Sequence): void;
-    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean): boolean;
+    isValidForDevice(device: com.keyman.utils.DeviceSpec, usingOSK?: boolean): boolean;
     test(proctor: Proctor): TestFailure[];
   }
 
@@ -554,7 +552,7 @@ namespace KMWRecorder {
     }
 
     // Used to determine if the current EventSpecTestSet is applicable to be run on a device.
-    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
+    isValidForDevice(device: com.keyman.utils.DeviceSpec, usingOSK?: boolean) {
       return this.constraint.matchesClient(device, usingOSK);
     }
 
@@ -604,7 +602,7 @@ namespace KMWRecorder {
     }
 
     // Used to determine if the current EventSpecTestSet is applicable to be run on a device.
-    isValidForDevice(device: com.keyman.text.EngineDeviceSpec, usingOSK?: boolean) {
+    isValidForDevice(device: com.keyman.utils.DeviceSpec, usingOSK?: boolean) {
       return this.constraint.matchesClient(device, usingOSK);
     }
 
