@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "@keymanapp/keyboard-processor": "^14.0.76",
-    "@keymanapp/lexical-model-models": "^14.0.76",
-    "@keymanapp/lexical-model-types": "^14.0.76",
+    "@keymanapp/models-templates": "^14.0.76",
+    "@keymanapp/models-types": "^14.0.76",
     "@keymanapp/models-wordbreakers": "^14.0.75",
     "@keymanapp/web-utils": "^14.0.77",
     "es6-shim": "^0.35.5",
