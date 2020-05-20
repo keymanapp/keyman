@@ -43,14 +43,12 @@
   },
   "devDependencies": {
     "@keymanapp/models-types": "^14.0.76",
+    "@keymanapp/web-utils": "^14.0.78",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.4",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "typescript": "^3.2.1"
-  },
-  "dependencies": {
-    "@keymanapp/web-utils": "^14.0.78",
-    "@types/node": "^14.0.4"
   }
 }

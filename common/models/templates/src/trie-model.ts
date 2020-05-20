@@ -22,8 +22,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="../node_modules/@keymanapp/lexical-model-types/index.d.ts"/>
 /// <reference path="common.ts" />
+/// <reference path="../node_modules/@keymanapp/web-utils/src/kmwstring.ts" />
 
 /**
  * @file trie-model.ts
