@@ -11,6 +11,7 @@ import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.LanguageSettingsActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.data.Keyboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -27,8 +28,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
-
-import java.util.HashMap;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
@@ -139,9 +138,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     } else {
       // Check if predictions needs to be re-enabled per Settings preference
       Context appContext = getApplicationContext();
-      HashMap<String, String> kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
+      Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
       if (kbInfo != null) {
-        String langId = kbInfo.get(KMManager.KMKey_LanguageID);
+        String langId = kbInfo.getLanguageID();
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(langId), true);
         KMManager.setBannerOptions(mayPredict);

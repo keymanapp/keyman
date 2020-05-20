@@ -7,6 +7,8 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.data.Keyboard;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 final class FVShared {
     private static FVShared instance = null;
@@ -224,7 +227,7 @@ final class FVShared {
     private void updateActiveKeyboardsList() {
         // Clear existing active keyboards list
 
-        ArrayList<HashMap<String, String>> activeKbList = KMManager.getKeyboardsList(context);
+        List<Keyboard> activeKbList = KMManager.getKeyboardsList(context);
         if (activeKbList != null) {
             int len = activeKbList.size();
             for (int i = len-1; i >= 0; i--)
@@ -236,15 +239,18 @@ final class FVShared {
             for(FVKeyboard keyboard : region.keyboards) {
                 if(loadedKeyboards.contains(keyboard.id)) {
                     // Load the .keyboard_info file and find its first language code
-                    HashMap<String, String> kbInfo = new HashMap<>();
-                    kbInfo.put(KMManager.KMKey_PackageID, FVDefault_PackageID); //TODO: we want to share keyboard build scripts between ios and android; can we do this?
-                    kbInfo.put(KMManager.KMKey_KeyboardID, keyboard.id);
-                    kbInfo.put(KMManager.KMKey_LanguageID, "en"); //TODO: use language code from kmp.json
-                    kbInfo.put(KMManager.KMKey_KeyboardName, keyboard.name);
-                    kbInfo.put(KMManager.KMKey_LanguageName, keyboard.name);
-                    kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0"); //TODO: use keyboard version from kmp.json
-                    kbInfo.put(KMManager.KMKey_Font, "NotoSansCanadianAboriginal.ttf");
-                    kbInfo.put(KMManager.KMKey_CustomHelpLink, String.format("%s%s", FVKeyboardHelpLink, keyboard.id));
+                    Keyboard kbInfo = new Keyboard(
+                      FVDefault_PackageID, //TODO: we want to share keyboard build scripts between ios and android; can we do this?
+                      keyboard.id,
+                      keyboard.name,
+                      "en", //TODO: use language code from kmp.json
+                      keyboard.name,
+                      "1.0", //TODO: use keyboard version from kmp.json
+                      String.format("%s%s", FVKeyboardHelpLink, keyboard.id),
+                      false,
+                      "NotoSansCanadianAboriginal.ttf",
+                      "NotoSansCanadianAboriginal.ttf");
+
                     KMManager.addKeyboard(context, kbInfo);
                 }
             }
