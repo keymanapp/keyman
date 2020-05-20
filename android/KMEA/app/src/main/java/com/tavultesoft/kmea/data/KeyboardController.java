@@ -27,6 +27,7 @@ import java.util.List;
 public class KeyboardController {
   public static final String TAG = "KeyboardController";
   public static final String KMFilename_Installed_KeyboardsList = "keyboards_list.json";
+  public static final int INDEX_NOT_FOUND = -1;
 
   private static KeyboardController instance;
 
@@ -105,13 +106,14 @@ public class KeyboardController {
           list.add(Keyboard.DEFAULT_KEYBOARD);
         }
       } else {
-        // No installed keyboards lists so assume default
-        // TODO: What about 3rd-party apps w/o sil_euro_latin?
-        list.add(Keyboard.DEFAULT_KEYBOARD);
+        // No installed keyboards lists
+        // 3rd-party OEM may not have sil_euro_latin, so don't assign a default keyboard
+        //list.add(Keyboard.DEFAULT_KEYBOARD);
+        Log.w(TAG, "initialize with no default keyboard");
       }
 
       // We'd prefer not to overwrite a file if it exists
-      if (!keyboards_json.exists()) {
+      if (!keyboards_json.exists() && list != null && list.size() > 0) {
         save(context);
       }
 
@@ -129,7 +131,9 @@ public class KeyboardController {
       Log.e(TAG, "get while KeyboardController() not initialized");
       return null;
     }
-    return list;
+    synchronized (list) {
+      return list;
+    }
   }
 
   /**
@@ -146,9 +150,11 @@ public class KeyboardController {
       return null;
     }
 
-    if (list != null && index < list.size()) {
-      Keyboard k = list.get(index);
-      return k;
+    synchronized (list) {
+      if (list != null && index < list.size()) {
+        Keyboard k = list.get(index);
+        return k;
+      }
     }
 
     Log.e(TAG, "getKeyboardInfo failed with index " + index);
@@ -156,8 +162,46 @@ public class KeyboardController {
   }
 
   /**
+   * Given a key, return the index of the matching keyboard.
+   * If no match, returns INDEX_NOT_FOUND
+   * @param key - String of the key to find
+   * @return int - Index of the matching keyboard
+   */
+  public int getKeyboardIndex(String key) {
+    int index = INDEX_NOT_FOUND;
+    if (!isInitialized || list == null) {
+      Log.e(TAG, "getIndexOfKey while KeyboardController() not initialized");
+      return index;
+    }
+    if (key == null || key.isEmpty()) {
+      return index;
+    }
+
+    synchronized (list) {
+      for (int i=0; i<list.size(); i++) {
+        Keyboard k = list.get(i);
+        if (k.getKey().equalsIgnoreCase(key)) {
+          return i;
+        }
+      }
+    }
+
+    Log.e(TAG, "getKeyboardIndex failed for key " + key);
+    return index;
+  }
+
+  /**
+   * Given a key, return if the keyboard exists in the installed keyboards list
+   * @param key - String of the key to find
+   * @return boolean whether the matching keyboard exists
+   */
+  public boolean keyboardExists(String key) {
+    return getKeyboardIndex(key) != INDEX_NOT_FOUND;
+  }
+
+  /**
    * Add a new keyboard to the keyboard list. If the keyboard already exists, the keyboard
-   * information is updated
+   * information is updated.
    * @param newKeyboard
    */
   public void add(Keyboard newKeyboard) {
@@ -166,30 +210,60 @@ public class KeyboardController {
       return;
     }
 
-    for (int i=0; i<list.size(); i++) {
-      // Update existing keyboard entry
-      if (newKeyboard.equals(list.get(i))) {
-        Log.d(TAG, "Updating keyboard with newKeyboard");
-        list.set(i, newKeyboard);
-        return;
+    synchronized (list) {
+      for (int i = 0; i < list.size(); i++) {
+        // Update existing keyboard entry
+        if (newKeyboard.equals(list.get(i))) {
+          Log.d(TAG, "Updating keyboard with newKeyboard");
+          list.set(i, newKeyboard);
+          return;
+        }
       }
-    }
 
-    // Add new keyboard
-    list.add(newKeyboard);
+      // Add new keyboard
+      list.add(newKeyboard);
+    }
   }
 
+  /**
+   * Remove the keyboard at the specified index.
+   * @param index
+   */
+  public void remove(int index) {
+    // Check initialized, and disallow removing default keyboard
+    if (!isInitialized) {
+      return;
+    }
+
+    synchronized (list) {
+      if (index != INDEX_NOT_FOUND && index < list.size()) {
+        list.remove(index);
+      }
+    }
+  }
 
   /**
    * Convert the installed keyboard list to JSONArray and write to file
    * @param context
+   * @return boolean - Status if the keyboard list was successfully saved
    */
-  public void save(Context context) {
+  public boolean save(Context context) {
+    boolean result = false;
+    if (list == null || list.size() < 1) {
+      return result;
+    }
+
     JSONArray arr = new JSONArray();
     for (Keyboard k : list) {
       JSONObject o = k.toJSON();
       arr.put(o);
     }
-    FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+
+    if (arr.length() < 1) {
+      return result;
+    }
+
+    result = FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+    return result;
   }
 }

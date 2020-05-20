@@ -12,7 +12,7 @@ uses
   IdCustomHTTPServer,
   IdHTTPServer,
 
-  Keyman.Developer.System.HttpServer.Base,
+  Keyman.System.HttpServer.Base,
 
   KeyboardFonts;
 

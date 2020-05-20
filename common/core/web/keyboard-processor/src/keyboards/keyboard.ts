@@ -251,10 +251,10 @@ namespace com.keyman.keyboards {
       return true;
     }
 
-    usesDesktopLayoutOnDevice(device: text.EngineDeviceSpec) {
+    usesDesktopLayoutOnDevice(device: utils.DeviceSpec) {
       if(this.scriptObject['KVKL']) {
         // A custom mobile layout is defined... but are we using it?
-        return device.formFactor == text.FormFactor.Desktop;
+        return device.formFactor == utils.FormFactor.Desktop;
       } else {
         return true;
       }
@@ -273,16 +273,16 @@ namespace com.keyman.keyboards {
       }
     }
 
-    private findOrConstructLayout(formFactor: text.FormFactor): LayoutFormFactor {
+    private findOrConstructLayout(formFactor: utils.FormFactor): LayoutFormFactor {
       if(this._layouts) {
         // Search for viable layouts.  `null` is allowed for desktop form factors when help text is available,
         // so we check explicitly against `undefined`.
         if(this._layouts[formFactor] !== undefined) {
           return this._layouts[formFactor];
-        } else if(formFactor == text.FormFactor.Phone && this._layouts[text.FormFactor.Tablet]) {
-          return this._layouts[text.FormFactor.Phone] = this._layouts[text.FormFactor.Tablet];
-        } else if(formFactor == text.FormFactor.Tablet && this._layouts[text.FormFactor.Phone]) {
-          return this._layouts[text.FormFactor.Tablet] = this._layouts[text.FormFactor.Phone];
+        } else if(formFactor == utils.FormFactor.Phone && this._layouts[utils.FormFactor.Tablet]) {
+          return this._layouts[utils.FormFactor.Phone] = this._layouts[utils.FormFactor.Tablet];
+        } else if(formFactor == utils.FormFactor.Tablet && this._layouts[utils.FormFactor.Phone]) {
+          return this._layouts[utils.FormFactor.Tablet] = this._layouts[utils.FormFactor.Phone];
         }
       }
 
@@ -304,7 +304,7 @@ namespace com.keyman.keyboards {
 
       // If we don't have key definitions to use for a layout but also lack help text or are a touch-based layout,
       // we make a default layout anyway.  We have to show display something usable.
-      if(!rawSpecifications && (this.helpText == '' || formFactor != text.FormFactor.Desktop)) {
+      if(!rawSpecifications && (this.helpText == '' || formFactor != utils.FormFactor.Desktop)) {
         rawSpecifications = {'F':'Tahoma', 'BK': Layouts.dfltText};
       }
 
@@ -333,7 +333,7 @@ namespace com.keyman.keyboards {
      * In such cases, please use either `helpText` or `insertHelpHTML` instead.
      * @param formFactor {string} The desired form factor for the layout.
      */
-    public layout(formFactor: text.FormFactor): ActiveLayout {
+    public layout(formFactor: utils.FormFactor): ActiveLayout {
       let rawLayout = this.findOrConstructLayout(formFactor);
 
       if(rawLayout) {
@@ -349,13 +349,13 @@ namespace com.keyman.keyboards {
       }
     }
 
-    public markLayoutCalibrated(formFactor: text.FormFactor) {
+    public markLayoutCalibrated(formFactor: utils.FormFactor) {
       if(this.layoutStates[formFactor] != LayoutState.NOT_LOADED) {
         this.layoutStates[formFactor] = LayoutState.CALIBRATED;
       }
     }
 
-    public getLayoutState(formFactor: text.FormFactor) {
+    public getLayoutState(formFactor: utils.FormFactor) {
       return this.layoutStates[formFactor];
     }
   }

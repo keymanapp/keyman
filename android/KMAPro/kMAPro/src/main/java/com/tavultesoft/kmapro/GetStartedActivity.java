@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMPBrowserActivity;
+import com.tavultesoft.kmea.data.Keyboard;
 
 import android.os.Bundle;
 import android.provider.Settings;
@@ -156,7 +157,7 @@ public class GetStartedActivity extends AppCompatActivity {
       String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
       String info = String.valueOf(R.drawable.ic_info_outline);
 
-      ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
+      List<Keyboard> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() > 1) {
         list.get(0).put(iconKey, checkbox_on);
       } else {

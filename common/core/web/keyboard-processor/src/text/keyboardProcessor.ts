@@ -1,5 +1,3 @@
-// Includes KMW string extension declarations.
-/// <reference path="kmwstring.ts" />
 // Establishes key-code definitions.
 /// <reference path="codes.ts" />
 // Defines our generalized "KeyEvent" class.
@@ -12,10 +10,8 @@
 /// <reference path="../keyboards/keyboard.ts" />
 // Defines built-in keymapping.
 /// <reference path="keyMapping.ts" />
-// Defines a core-compatible 'Device' analogue for use in keyEvent processing
-/// <reference path="engineDeviceSpec.ts" />
-// Defines the getGlobalObject() utility method.
-/// <reference path="../utils/globalObject.ts" />
+
+// Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
 namespace com.keyman.text {
   export type BeepHandler = (outputTarget: OutputTarget) => void;
@@ -536,14 +532,14 @@ namespace com.keyman.text {
       var s = activeLayer;
 
       // Do not change layer unless needed (27/08/2015)
-      if(id == activeLayer && keyEvent.device.formFactor != FormFactor.Desktop) {
+      if(id == activeLayer && keyEvent.device.formFactor != utils.FormFactor.Desktop) {
         return false;
       }
 
       var idx=id;
       var i;
 
-      if(keyEvent.device.formFactor == FormFactor.Desktop) {
+      if(keyEvent.device.formFactor == utils.FormFactor.Desktop) {
         // Need to test if target layer is a standard layer (based on the plain 'default')
         var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
@@ -672,7 +668,7 @@ namespace com.keyman.text {
       this._UpdateVKShift(null, 15, 0);
     };
 
-    setNumericLayer(device: EngineDeviceSpec) {
+    setNumericLayer(device: utils.DeviceSpec) {
       let layout = this.activeKeyboard.layout(device.formFactor);
       if(layout.getLayer('numeric')) {
         this.layerId = 'numeric';

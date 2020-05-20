@@ -1,5 +1,5 @@
 // Defines build-environment variables, as used for versioning.
-/// <reference path="../environment.inc.ts" />
+/// <reference path="environment.inc.ts" />
 
 // Ensure that this class contains no reference into core KMW code - it is referenced
 // by components intended to be modular and possible to separate from core KMW.

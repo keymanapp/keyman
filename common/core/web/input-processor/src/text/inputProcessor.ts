@@ -66,7 +66,7 @@ namespace com.keyman.text {
 
       // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
       // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-      if((formFactor == FormFactor.Desktop || !this.activeKeyboard || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
+      if((formFactor == utils.FormFactor.Desktop || !this.activeKeyboard || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
         // If it's a desktop OSK style and this triggers a layer change,
         // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
         if(this.keyboardProcessor.selectLayer(keyEvent)) {

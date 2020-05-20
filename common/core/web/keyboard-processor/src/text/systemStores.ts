@@ -1,5 +1,3 @@
-/// <reference path="engineDeviceSpec.ts" />
-
 namespace com.keyman.text {
   /**
    * Defines common behaviors associated with system stores.

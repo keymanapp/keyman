@@ -19,9 +19,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
-. "$(dirname "$THIS_SCRIPT")/sentry-control.sh"
+. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/sentry-control.inc.sh"
 
 gitbranch=`git branch --show-current`
 

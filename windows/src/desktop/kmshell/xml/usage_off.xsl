@@ -11,8 +11,8 @@
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.bundle.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>sentry.init.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
 				<title>
 					<xsl:value-of select="$locale/String[@Id='SK_Usage_Title']" />
 				</title>
@@ -72,9 +72,7 @@
 								</xsl:when>
 								<xsl:otherwise>
 									<div id="nokeyboards">
-										<img>
-											<xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>info.png</xsl:attribute>
-										</img>
+										<img src="/app/info.png" />
                     <xsl:copy-of select="($locale/String[@Id='S_Usage_NoKeyboardsInstalled'])[1]" />
 									</div>
 									<p></p>

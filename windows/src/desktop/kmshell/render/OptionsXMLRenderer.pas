@@ -27,18 +27,15 @@ interface
 
 uses
   Classes,
-  UfrmMain,
   XMLRenderer,
   Windows;
 
 type
   TOptionsXMLRenderer = class(TXMLRenderer)
-  private
-    FOwner: TfrmMain;
   protected
     function XMLData(FRefreshKeyman: Boolean): WideString; override;
   public
-    constructor Create(AOwner: TfrmMain);
+    constructor Create(AOwner: TXMLRenderers);
   end;
 
 implementation
@@ -52,10 +49,9 @@ uses
 
 { TOptionsXMLRenderer }
 
-constructor TOptionsXMLRenderer.Create(AOwner: TfrmMain);
+constructor TOptionsXMLRenderer.Create(AOwner: TXMLRenderers);
 begin
-  FOwner := AOwner;
-  inherited Create;
+  inherited Create(AOwner);
 end;
 
 function TOptionsXMLRenderer.XMLData(FRefreshKeyman: Boolean): WideString;

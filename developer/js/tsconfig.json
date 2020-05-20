@@ -12,7 +12,11 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@keymanapp"
+    ]
   },
   "include": [
     "source/**/*.ts"
