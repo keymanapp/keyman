@@ -14,7 +14,7 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../.."
 display_usage ( ) {
     echo "build.sh [-skip-dependency-install]"
     echo
-    echo "  -skip-dependency-install  skips the `lerna bootstrap` dependency check."
+    echo "  -skip-dependency-install  skips the \`lerna bootstrap\` dependency check."
     echo "                            (or -S) Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
@@ -35,15 +35,14 @@ exportEnvironmentDefinitionTS
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -skip-package-install|-S)
-            set_default_vars
+        -skip-dependency-install|-S)
             FETCH_DEPS=false
             ;;
     esac
     shift # past argument
 done
 
-if [ $FETCH_DEPS = true ]; then
+if [ "$FETCH_DEPS" = true ]; then
     verify_npm_setup
 fi
 

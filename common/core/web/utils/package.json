@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types:": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p ./src/tsconfig.json",
+    "build": "cd src/ && ./build.sh -skip-dependency-install",
     "prepare": "npm run build",
     "tsc": "tsc"
   },
