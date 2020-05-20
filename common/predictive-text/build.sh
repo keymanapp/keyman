@@ -28,7 +28,6 @@ WORKER_OUTPUT=build/intermediate
 INCLUDES_OUTPUT=build/includes
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
-LEXICAL_MODELS_TYPES=../lexical-model-types
 
 # Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
 build-browser () {

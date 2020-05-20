@@ -20,7 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference path="./node_modules/@keymanapp/lexical-model-types/index.d.ts" />
+/// <reference path="./node_modules/@keymanapp/models-types/index.d.ts" />
 
 /**
  * Tokens are signed 31-bit integers!
