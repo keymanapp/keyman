@@ -1,5 +1,5 @@
-Lexical Model Types
-===================
+`@keymanapp/models-types`
+=========================
 
 Declares TypeScript types and interfaces required to define **Lexical
 Models**, **Word breaking functions**, and all things in between.
@@ -9,7 +9,7 @@ Install
 
 > (see below if you are working in the keymanapp/keyman repo!)
 
-    npm install --save-dev @keymanapp/lexical-model-types
+    npm install --save-dev @keymanapp/models-types
 
 Usage
 -----
@@ -20,7 +20,7 @@ in your lexical model file!
 ```Typescript
 // my-nifty-model.ts
 
-import "@keymanapp/lexical-model-types";
+import "@keymanapp/models-types";
 
 export class MyNiftyClass implements LexicalModel {
   configure(capabilities: Capabilities): Configuration {
@@ -42,7 +42,7 @@ export class MyNiftyClass implements LexicalModel {
 If your are creating a **custom word breaker**, you would do the same:
 
 ```typescript
-import "@keymanapp/lexical-model-types";
+import "@keymanapp/models-types";
 
 export let myShinyWordBreaker: WordBreakingFunction;
 myShinyWordBreaker = function (phrase: string): Span[] {
@@ -59,11 +59,10 @@ Usage within keymanapp/keyman repo
 ----------------------------------
 
 To use it in other subprojects within keymanapp/keyman, ensure that this
-package is linked using:
+package is linked using **Lerna**. From the root of the repository, run:
 
-    npm link .
+    npx lerna bootstrap
 
-The following subprojects already perform `npm link .` as part of their `build.sh`:
+Add this dependency to your subproject like so:
 
-    common/predictive-text/
-    developer/js/
+    npx lerna add @keymanapp/models-types path/to/your/subproject

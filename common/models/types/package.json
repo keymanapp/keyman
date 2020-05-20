@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/keymanapp/keyman/tree/master/common/lexical-model-types#readme",
+  "homepage": "https://github.com/keymanapp/keyman/tree/master/common/models/types#readme",
   "devDependencies": {
     "typescript": "^3.6.3"
   },

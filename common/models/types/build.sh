@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Packages the lexical-model-types package.
+# Packages the @keymanapp/models-types package.
 #
 
 # Exit on command failure and when using unset variables:
