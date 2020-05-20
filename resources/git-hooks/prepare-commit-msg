@@ -31,10 +31,7 @@ else
   min_length=4
   max_length=128
 
-  #
   # Read from our globally shared JSON-formatted scopes and types
-  #
-
   scopes=( $("$JQ" -r '[.scopes | paths | reduce .[] as $item (""; if . == "" then $item else . + "/" + $item end)] | join(" ")' < "$HOOK_DIRECTORY/../scopes/scopes.json") )
   types=( $("$JQ" -r '.commitTypes | join(" ")' < "$HOOK_DIRECTORY/../scopes/commit-types.json") )
 fi
