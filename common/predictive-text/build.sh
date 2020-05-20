@@ -171,10 +171,6 @@ done
 # Check if Node.JS/npm is installed.
 verify_npm_setup $fetch_deps
 
-pushd ../core/web/utils/src
-./build.sh -skip-package-install || fail "Utility library package compilation failed."
-popd
-
 # Ensure that the build-product destination for any generated include .d.ts files exists.
 if ! [ -d $INCLUDES_OUTPUT ]; then
   mkdir -p "$INCLUDES_OUTPUT"
