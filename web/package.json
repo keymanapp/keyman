@@ -54,7 +54,7 @@
     "@keymanapp/input-processor": "^14.0.78",
     "@keymanapp/keyboard-processor": "^14.0.78",
     "@keymanapp/lexical-model-layer": "^14.0.78",
-    "@keymanapp/lexical-model-types": "^14.0.78",
+    "@keymanapp/models-types": "^14.0.78",
     "@keymanapp/recorder-core": "^14.0.78",
     "@keymanapp/web-utils": "^14.0.77",
     "@types/node": "^11.9.4",
