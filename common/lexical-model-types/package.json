@@ -1,0 +1,29 @@
+{
+  "name": "@keymanapp/lexical-model-types",
+  "version": "14.0.78",
+  "description": "(deprecated) please use @keymanapp/models-types instead!",
+  "contributors": [
+    "Eddie Antonio Santos <easantos@ualberta.ca>"
+  ],
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "license": "MIT",
+  "files": [
+    "index.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "scripts": {
+    "test": "true"
+  },
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "dependencies": {
+    "@keymanapp/models-types": "^14.0.78"
+  }
+}
