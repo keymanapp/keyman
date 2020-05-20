@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/commitTypes",
+  "definitions": {
+    "commitTypes": {
+      "type": "object",
+      "properties": {
+        "commitTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]+$"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

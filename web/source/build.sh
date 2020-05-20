@@ -206,6 +206,13 @@ INTERMEDIATE="../intermediate"
 SOURCE="."
 NODE_SOURCE="source"
 
+SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
+
+export SENTRY_URL="https://sentry.keyman.com"
+export SENTRY_ORG=keyman
+export SENTRY_PROJECT=keyman-web
+export SENTRY_LOG_LEVEL=info
+
 readonly WEB_OUTPUT
 readonly EMBED_OUTPUT
 readonly SOURCE
@@ -227,6 +234,7 @@ set_default_vars ( ) {
     BUILD_DEBUG_EMBED=false
     BUILD_COREWEB=true
     DO_MINIFY=true
+    DO_NATIVE_SENTRY=true
     FETCH_DEPS=true
 }
 
@@ -264,6 +272,7 @@ while [[ $# -gt 0 ]] ; do
             BUILD_FULLWEB=false
             BUILD_UI=false
             BUILD_COREWEB=false
+            DO_NATIVE_SENTRY=false
             ;;
         -web)
             set_default_vars
@@ -276,12 +285,14 @@ while [[ $# -gt 0 ]] ; do
             BUILD_COREWEB=false
             BUILD_FULLWEB=false
             BUILD_DEBUG_EMBED=true
+            DO_NATIVE_SENTRY=false
             ;;
         -h|-?)
             display_usage
             ;;
         -no_minify)
             DO_MINIFY=false
+            DO_NATIVE_SENTRY=false
             ;;
         -clean)
             clean
@@ -314,6 +325,7 @@ if [ $DO_MINIFY = true ]; then
         exit 1
     fi
 
+    # Only run if BOTH cases are true b/c it's a minification-focused 'dependency'.
     if [ $FETCH_DEPS = true ]; then
         # Also, build our sourcemap-root tool for cleaning up the minified version's sourcemaps.
         echo "Compiling build tools for minified build products"
@@ -324,6 +336,14 @@ fi
 
 if [ $BUILD_CORE = true ]; then
     CORE_FLAGS="-skip-package-install"
+
+    # Build the sentry-manager module - it's used in embedded contexts and on one testing page.
+    echo "${TERM_HEADING}Compiling KeymanWeb's sentry-manager module...${NORMAL}"
+    pushd ../../common/core/web/tools/sentry-manager/src
+    ./build.sh $CORE_FLAGS || fail "Failed to compile the sentry-manager module"
+    popd
+    echo "${TERM_HEADING}sentry-manager module compiled successfully.${NORMAL}"
+
     if [ $BUILD_LMLAYER = false ]; then
         CORE_FLAGS="$CORE_FLAGS -test"
     fi
@@ -381,6 +401,13 @@ if [ $BUILD_EMBED = true ]; then
         echo
         echo KMEA/KMEI version $VERSION compiled and saved under $EMBED_OUTPUT
         echo
+
+        # We always publish "embedded" mode to Sentry when minifying.
+        pushd $EMBED_OUTPUT
+        echo "Uploading to Sentry..."
+        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/embedded --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+        echo "Upload successful."
+        popd
     fi
 fi
 
@@ -462,6 +489,16 @@ if [ $BUILD_UI = true ]; then
     fi
 fi
 
+# Has its own flag due to complex logic.  Should run if $DO_MINIFY && ($BUILD_COREWEB || $BUILD_UI)
+# If only one of the two (COREWEB, UI) is run, we assume the un-run portion is 'current' and still upload it.
+if [ $DO_NATIVE_SENTRY = true ]; then
+    pushd $WEB_OUTPUT
+    echo "Uploading to Sentry..."
+    npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/web/ --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+    echo "Upload successful."
+    popd
+fi
+
 if [ $BUILD_DEBUG_EMBED = true ]; then
     # We currently have an issue with sourcemaps for minified versions.
     # We should use the unminified one instead for now.
@@ -470,4 +507,3 @@ if [ $BUILD_DEBUG_EMBED = true ]; then
     cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
     echo Uncompiled embedded application saved as keyman.js
 fi
-

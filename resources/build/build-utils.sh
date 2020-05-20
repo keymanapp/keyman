@@ -195,6 +195,7 @@ exportEnvironmentDefinitionTS ( ) {
 namespace com.keyman.environment {
   export var VERSION = \"$VERSION_RELEASE\";
   export var BUILD = $VERSION_PATCH;
+  export var SENTRY_RELEASE = \"release-$VERSION_WITH_TAG\";
 }
 " >> $ENVIRONMENT_TS
 }
