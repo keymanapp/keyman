@@ -19,7 +19,9 @@ import java.io.Serializable;
 public class LexicalModel extends LanguageResource implements Serializable {
   private static final String TAG = "lexicalModel";
 
-  // Only used to build download bundle from cloud
+  // Only used to build download bundle from cloud.
+  // This is for the initial download of the lexical model.
+  // "kmp" is used for downloading newer versions of the lexical model package.
   private String modelURL;
 
   // JSON key
@@ -83,11 +85,11 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
   public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,
                       String languageID, String languageName,  String version,
-                      String helpLink,
+                      String helpLink, String kmp,
                       String modelURL) {
     // TODO: handle help links
     super(packageID, lexicalModelID, lexicalModelName, languageID, languageName,
-        version, "");
+        version, "", kmp);
 
     this.modelURL = modelURL;
   }
@@ -159,6 +161,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
     KMManager.KMDefault_LanguageID,
     KMManager.KMDefault_LanguageName,
     KMManager.KMDefault_DictionaryVersion,
+    "",
     "",
     "");
 }

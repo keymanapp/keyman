@@ -1080,7 +1080,9 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
       if (i == 0) {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          KMManager.setKeyboard(keyboardInfo);
+          //KMManager.setKeyboard(keyboardInfo);
+          KMManager.setKeyboard(keyboardInfo.getPackageID(), keyboardInfo.getKeyboardID(), keyboardInfo.getLanguageID());
+          KMManager.getKeyboardState(this, keyboardInfo.getPackageID(), keyboardInfo.getKeyboardID(), keyboardInfo.getLanguageID()); // For testing: do not commit
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);

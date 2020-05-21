@@ -75,6 +75,7 @@ public class KeyboardController {
               kbdMap.get(KMManager.KMKey_LanguageName),
               MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
               MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
+              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_KMPLink, ""),
               isNewKeyboard,
               MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
               MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
@@ -275,7 +276,8 @@ public class KeyboardController {
       return result;
     }
 
-    result = FileUtils.saveList(context, KMFilename_Installed_KeyboardsList, arr);
+    result = FileUtils.saveList(new File(context.getDir("userdata", Context.MODE_PRIVATE),
+      KMFilename_Installed_KeyboardsList), arr);
     return result;
   }
 }

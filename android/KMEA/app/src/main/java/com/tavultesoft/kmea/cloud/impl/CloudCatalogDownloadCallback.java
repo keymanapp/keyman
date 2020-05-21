@@ -101,11 +101,11 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   void saveDataToCache(CloudCatalogDownloadReturns jsonTuple)
   {
     // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
-    if (jsonTuple.keyboardJSON != null) {
-      CloudDataJsonUtil.saveJSONObjectToCache(CloudDataJsonUtil.getKeyboardCacheFile(context), jsonTuple.keyboardJSON);
-    }
     if (jsonTuple.lexicalModelJSON != null) {
       CloudDataJsonUtil.saveJSONArrayToCache(CloudDataJsonUtil.getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
+    }
+    if (jsonTuple.packagesJSON != null) {
+      FileUtils.saveList(CloudDataJsonUtil.getResourcesCacheFile(context), jsonTuple.packagesJSON);
     }
   }
 
@@ -134,6 +134,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   {
     jsonTuple.keyboardJSON = ensureInit(aContext,aDataSet,jsonTuple.keyboardJSON);
     jsonTuple.lexicalModelJSON = ensureInit(aContext,aDataSet, jsonTuple.lexicalModelJSON);
+    jsonTuple.packagesJSON = ensureInit(aContext, aDataSet, jsonTuple.packagesJSON);
   }
 
   public void processCloudReturns(Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple, boolean executeCallbacks) {

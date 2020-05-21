@@ -10,11 +10,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.cloud.impl.CloudKeyboardDataDownloadCallback;
 import com.tavultesoft.kmea.cloud.impl.CloudKeyboardMetaDataDownloadCallback;
 import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
+import com.tavultesoft.kmea.data.KeyboardController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.tavultesoft.kmea.ConfirmDialogFragment.DialogType.DIALOG_TYPE_DOWNLOAD_KEYBOARD;
@@ -34,7 +38,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
   public static final String ARG_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
 
-  public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
+  public static final String kKeymanApiBaseURL = "https://api.keyman.com/package-version?platform=android";
+  //public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
   public static final String kKeymanApiModelURL = "https://api.keyman.com/model";
 
   private static final String TAG = "KMKbdDownloaderActivity"; // TAG needs to be less than 28 chars
@@ -183,13 +188,17 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
 
     ArrayList<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
 
-    String deviceType = CloudDataJsonUtil.getDeviceTypeForCloudQuery(this);
-
-    // Keyman cloud
-    // Sanitize appVersion to #.#.# to match the API spec
-    String appVersion = KMManager.getVersion();
-    String _remoteUrl = String.format("%s/%s/%s?version=%s&device=%s&languageidtype=bcp47",
-      kKeymanApiBaseURL, langID, kbID, appVersion, deviceType);
+    // Keyman cloud keyboard
+    // Append each keyboard id
+    String keyboardQuery = "";
+    for(Keyboard k : KeyboardController.getInstance().get()) {
+      String keyboardID = k.getKeyboardID();
+      if (!keyboardQuery.contains(keyboardID)) {
+        keyboardQuery = String.format("%s&keyboard=%s", keyboardQuery, keyboardID);
+      }
+    }
+    String _remoteUrl = String.format("%s%s",
+      kKeymanApiBaseURL, keyboardQuery);
     cloudQueries.add(
       new CloudApiTypes.CloudApiParam(
         CloudApiTypes.ApiTarget.Keyboard, _remoteUrl)
@@ -197,7 +206,18 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
         .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_LANG_ID,langID)
          .setAdditionalProperty(CloudKeyboardMetaDataDownloadCallback.PARAM_KB_ID,kbID));
 
-    String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, langID);
+    // Keyman cloud models
+    String lexicalModelQuery = "";
+    for(HashMap<String, String> hashMap : KMManager.getLexicalModelsList(this.getApplicationContext()) ) {
+      if (hashMap != null && hashMap.containsKey(KMManager.KMKey_LexicalModelID)) {
+        String lexicalModelID = hashMap.get(KMManager.KMKey_LexicalModelID);
+        if (!lexicalModelQuery.contains(lexicalModelID)) {
+          lexicalModelQuery = String.format("%s&model=%s", lexicalModelQuery, lexicalModelID);
+        }
+      }
+    }
+    String _remoteLexicalModelUrl = String.format("%s%s",
+      kKeymanApiBaseURL, lexicalModelQuery);
     cloudQueries.add(new CloudApiTypes.CloudApiParam(
       CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
       .setType(CloudApiTypes.JSONType.Array));
@@ -212,8 +232,8 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
    * @param aPreparedCloudApiParams the prepared api params
    */
   public static void downloadLexicalModel(Context context,
-                                                               String aModelId,
-                                                               List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams) {
+                                          String aModelId,
+                                          List<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams) {
 
 
     String _downloadid= CloudLexicalPackageDownloadCallback.createDownloadId(aModelId);

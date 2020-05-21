@@ -165,6 +165,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
                 preInstalledModelMap.get(KMManager.KMKey_LanguageName),
                 preInstalledModelMap.get(KMManager.KMKey_LexicalModelVersion),
                 preInstalledModelMap.get(KMManager.KMKey_HelpLink),
+                preInstalledModelMap.get(KMManager.KMKey_KMPLink),
                 "" // String modelURL
                 );
               String itemKey = String.format("%s_%s_%s",

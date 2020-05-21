@@ -62,6 +62,10 @@ public class CloudApiTypes {
      *  automatic lexical model download during keyboard download
      */
     LexicalModelPackage,
+    /**
+     * Package version download: download package version information for keyboards and lexical models
+     */
+    PackageVersion
   }
 
   public enum JSONType {

@@ -72,11 +72,11 @@ public class Keyboard extends LanguageResource implements Serializable {
 
   public Keyboard(String packageID, String keyboardID, String keyboardName,
                   String languageID, String languageName, String version,
-                  String helpLink,
+                  String helpLink, String kmp,
                   boolean isNewKeyboard, String font, String oskFont) {
     super(packageID, keyboardID, keyboardName, languageID, languageName, version,
       (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-        String.format(HELP_URL_FORMATSTR, keyboardID, version));
+        String.format(HELP_URL_FORMATSTR, keyboardID, version), kmp);
 
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
@@ -151,7 +151,8 @@ public class Keyboard extends LanguageResource implements Serializable {
     KMManager.KMDefault_LanguageID,
     KMManager.KMDefault_LanguageName,
     KMManager.KMDefault_KeyboardVersion,
-    null, // will use help.keyman.com link because context required to determine local welcome.htm path
+    null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+    "",
     false,
     KMManager.KMDefault_KeyboardFont,
     KMManager.KMDefault_KeyboardFont);

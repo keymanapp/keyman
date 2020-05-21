@@ -71,6 +71,7 @@ import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -180,6 +181,7 @@ public final class KMManager {
   public static final String KMKey_CustomModel = "CustomModel";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
+  public static final String KMKey_KMPLink = "kmp";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
   public static final String KMKey_DisplayKeyboardSwitcher = "DisplayKeyboardSwitcher";
   public static final String KMKey_LexicalModel = "lm";
@@ -920,12 +922,13 @@ public final class KMManager {
     String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
     String version = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
     String helpLink = keyboardInfo.get(KMManager.KMKey_CustomHelpLink);
+    String kmpLink = MapCompat.getOrDefault(keyboardInfo, KMManager.KMKey_KMPLink, "");
     String font = keyboardInfo.get(KMManager.KMKey_Font);
     String oskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
     boolean isNewKeyboard = true;
 
     Keyboard k = new Keyboard(packageID, keyboardID, keyboardName,
-          languageID, languageName, version, helpLink,
+          languageID, languageName, version, helpLink, kmpLink,
       isNewKeyboard, font, oskFont);
     return addKeyboard(context, k);
   }

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
 
+import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.io.BufferedInputStream;
@@ -219,23 +220,36 @@ public final class FileUtils {
     }
   }
 
-  public static boolean saveList(Context context, String listName, JSONArray arr) {
-    boolean result;
+  /**
+   * Write arr Object to filepath
+   * @param File path to filename to write
+   * @param obj JSONObject or JSONArray to save
+   * @return boolean if the save was successfull
+   */
+  public static boolean saveList(File filepath, Object obj) {
+    boolean result = false;
     final int INDENT = 2; // 2 spaces indent
     try {
-      File file = new File(context.getDir("userdata", Context.MODE_PRIVATE), listName);
-      OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-      outputStream.write(arr.toString(INDENT));
+      OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(filepath), StandardCharsets.UTF_8);
+      if (obj instanceof JSONObject) {
+        outputStream.write(((JSONObject)obj).toString(INDENT));
+        result = true;
+      } else if (obj instanceof JSONArray) {
+        outputStream.write(((JSONArray) obj).toString(INDENT));
+        result = true;
+      } else {
+        Log.e(TAG, "saveList failed. arr not JSONObject or JSONArray");
+      }
       outputStream.flush();
       outputStream.close();
-      result = true;
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
+      Log.e(TAG, "saveList failed to save " + filepath.getName() + ". Error: " + e);
       result = false;
     }
 
     return result;
   }
+
   /**
    * Utility to parse a URL and extract the filename
    * @param urlStr String

@@ -500,6 +500,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         lmMap.get(KMManager.KMKey_LanguageName),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
+        "",
         "" // TODO: add model URL
       );
       lexList.add(m);
@@ -540,7 +541,8 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         lmMap.get(KMManager.KMKey_LanguageName),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
-        "" // model URL
+        "", // latest kmp link
+        ""  // model URL
       );
       lexList.add(m);
     }
@@ -639,6 +641,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       keyboardInfo.get(KMManager.KMKey_LanguageName),
       keyboardInfo.get(KMManager.KMKey_KeyboardVersion),
       keyboardInfo.get(KMManager.KMKey_HelpLink),
+      keyboardInfo.get(KMManager.KMKey_KMPLink),
       isNewKeyboard,
       keyboardInfo.get(KMManager.KMKey_Font),
       keyboardInfo.get(KMManager.KMKey_OskFont));
