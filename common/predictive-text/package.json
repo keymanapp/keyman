@@ -45,7 +45,6 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@keymanapp/keyboard-processor": "^14.0.76",
     "@keymanapp/models-templates": "^14.0.76",
     "@keymanapp/models-types": "^14.0.76",
     "@keymanapp/models-wordbreakers": "^14.0.75",
