@@ -11,7 +11,7 @@ set -eu
 EX_USAGE=64
 
 # Where to find lexical model types.
-LEXICAL_MODELS_TYPES=../../common/lexical-model-types
+LEXICAL_MODELS_TYPES=../../common/models/types
 
 
 # Build the main script.
@@ -131,7 +131,7 @@ type npm >/dev/null ||\
 
 if (( install_dependencies )) ; then
   # Ensure that the local npm package can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
+  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link @keymanapp/models-types"
 
   npm install || fail "Could not download dependencies."
 fi

@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "none",
+    "lib": ["es6"],
+    "target": "es5",
+    "declaration": true,
+    "sourceMap": true,
+    "outFile": "index.js",
+    "strict": true,
+    "allowJs": false,
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/@keymanapp"
+    ]
+  },
+  "include": [
+	"src/**/*"
+  ],
+  "exclude": [
+	"node_modules",
+	"test/**/*.ts"
+  ]
+}

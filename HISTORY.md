@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 14.0.78 alpha 2020-05-21
+
+* refactor(common/models): factor out word breakers to their own package (#3125)
+* fix(developer): crash when developer starts (#3138)
+* modify(android): Refactor KeyboardPickerActivity (#3113)
+* chore(common/resources): cleanup scopes (#3139)
+* feat(web): starts proper KMW Sentry integration (#3122)
+* refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
+* change(web/utils): add and distribute type declaration (#3145)
+* fix(common): drops version updates for deprecated common/lexical-model-types (#3148)
+
+## 14.0.77 alpha 2020-05-19
+
+* refactor(web/engine): Moves common utility functions into separate `web-utils` package (#3130)
+* refactor(web/engine): renames DeviceSpec, moves to utils (#3132)
+* fix(ios): Fixes keyboard metadata decoding, tweaks to project files  (#3137)
+* feat(windows): Use http: instead of file: for Configuration UI (#3127)
+
 ## 14.0.76 alpha 2020-05-15
 
 * fix(windows): use correct name for Sentry in C++ (#3129)

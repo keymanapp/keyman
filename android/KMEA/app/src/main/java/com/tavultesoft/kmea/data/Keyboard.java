@@ -86,7 +86,8 @@ public class Keyboard extends LanguageResource implements Serializable {
   public String getKeyboardID() { return getResourceID(); }
   public String getKeyboardName() { return getResourceName(); }
 
-  public boolean isNewKeyboard() { return isNewKeyboard; }
+  public boolean getNewKeyboard() { return isNewKeyboard; }
+  public void setNewKeyboard(boolean isNewKeyboard) { this.isNewKeyboard = isNewKeyboard; }
 
   public String getFont() { return font; }
 

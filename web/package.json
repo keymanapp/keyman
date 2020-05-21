@@ -1,6 +1,6 @@
 {
   "name": "keyman",
-  "version": "14.0.77",
+  "version": "14.0.79",
   "description": "Facilitates text input in any language.",
   "repository": {
     "type": "git",
@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
+    "@keymanapp/web-sentry-manager": "^14.0.79",
+    "@sentry/cli": "^1.52.3",
     "chai": "^4.2.0",
     "google-closure-compiler-java": "^20200224.0.0",
     "html2canvas": "^1.0.0-alpha.12",
@@ -45,15 +47,16 @@
     "karma": "karma",
     "lerna": "cd ../ && npm run lerna --",
     "mocha": "mocha",
-    "modernizr": "modernizr"
+    "modernizr": "modernizr",
+    "sentry-cli": "sentry-cli"
   },
   "dependencies": {
-    "@keymanapp/input-processor": "^14.0.77",
-    "@keymanapp/keyboard-processor": "^14.0.77",
-    "@keymanapp/lexical-model-layer": "^14.0.77",
-    "@keymanapp/lexical-model-types": "^14.0.77",
-    "@keymanapp/recorder-core": "^14.0.77",
-    "@keymanapp/web-utils": "^14.0.77",
+    "@keymanapp/input-processor": "^14.0.79",
+    "@keymanapp/keyboard-processor": "^14.0.79",
+    "@keymanapp/lexical-model-layer": "^14.0.79",
+    "@keymanapp/lexical-model-types": "^14.0.78",
+    "@keymanapp/recorder-core": "^14.0.79",
+    "@keymanapp/web-utils": "^14.0.79",
     "@types/node": "^11.9.4",
     "es6-shim": "^0.35.5",
     "eventemitter3": "^4.0.0",

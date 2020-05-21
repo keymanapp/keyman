@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.data.KeyboardController;
 
 import java.util.ArrayList;
 
@@ -110,7 +111,7 @@ public class ConfirmDialogFragment extends DialogFragment {
               break;
             case DIALOG_TYPE_DELETE_KEYBOARD :
               // Confirmation to delete keyboard
-              int keyboardIndex = KeyboardPickerActivity.getKeyboardIndex(getActivity(), itemKey);
+              int keyboardIndex = KeyboardController.getInstance().getKeyboardIndex(itemKey);
               KeyboardPickerActivity.deleteKeyboard(getActivity(), keyboardIndex);
               dismissOnSelect = true;
               break;

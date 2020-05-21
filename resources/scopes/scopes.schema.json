@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/scopes",
+
+  "definitions": {
+    "scopes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z]+$": {
+          "anyOf": [
+            {"$ref": "#/definitions/scopes"},
+            {"type": "null"}
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
