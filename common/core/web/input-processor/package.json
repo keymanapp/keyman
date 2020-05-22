@@ -30,7 +30,7 @@
   "dependencies": {
     "@keymanapp/keyboard-processor": "^14.0.79",
     "@keymanapp/lexical-model-layer": "^14.0.79",
-    "@keymanapp/lexical-model-types": "^14.0.78",
+    "@keymanapp/models-types": "^14.0.79",
     "@keymanapp/web-utils": "^14.0.79",
     "@types/node": "^11.9.4",
     "eventemitter3": "^4.0.0",

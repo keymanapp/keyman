@@ -6,7 +6,7 @@
   "types:": "./dist/index.d.ts",
   "scripts": {
     "build": "node ../../../../resources/gosh.js ./build.sh",
-    "prepare": "npm run build",
+    "prepare": "npm run build -- -skip-package-install",
     "tsc": "tsc"
   },
   "repository": {

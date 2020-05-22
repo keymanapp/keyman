@@ -14,9 +14,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
-    echo "build.sh [-skip-dependency-install]"
+    echo "build.sh [-skip-package-install]"
     echo
-    echo "  -skip-dependency-install  skips the `lerna bootstrap` dependency check."
+    echo "  -skip-package-install  skips the `lerna bootstrap` dependency check."
     echo "                            (or -S) Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
