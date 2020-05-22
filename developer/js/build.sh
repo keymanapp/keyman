@@ -55,9 +55,11 @@ while [[ $# -gt 0 ]] ; do
         display_usage
         exit
         ;;
+      -skip-package-install|-S)
+        install_dependencies=0
+        ;;
       -test)
         run_tests=1
-        install_dependencies=1
         ;;
       -tdd)
         run_tests=1
@@ -134,10 +136,7 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  # Ensure that the local npm package can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link @keymanapp/models-types"
-
-  npm install || fail "Could not download dependencies."
+  verify_npm_setup
 fi
 
 if [ -n "$publish_version" ]; then
