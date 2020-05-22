@@ -12,6 +12,7 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha",
+    "install": "npm link @keymanapp/models-types",
     "prepublishOnly": "npm run build"
   },
   "repository": {

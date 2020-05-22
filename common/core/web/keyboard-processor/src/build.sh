@@ -49,10 +49,5 @@ fi
 # Generates a linkable TS file; defined in resources/build-utils.sh.
 exportEnvironmentDefinitionTS
 
-pushd ../../utils/src
-./build.sh -skip-package-install || fail "Failed to compile Keyman utility function package"
-echo ""
-popd
-
 # Compile web's `keyboard-processor` module.
 npm run tsc -- -p src/tsconfig.json || fail "Failed to compile the core/web/keyboard-processor module."

@@ -5,11 +5,10 @@
     "common/core/web/tools/recorder",
     "common/core/web/tools/sentry-manager",
     "common/core/web/utils",
-    "common/lexical-model-types",
-    "common/predictive-text",
-    "web",
     "developer/js",
-    "common/models/*"
+    "common/models/*",
+    "common/predictive-text",
+    "web"
   ],
-  "version": "14.0.78"
+  "version": "14.0.79"
 }

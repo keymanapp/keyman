@@ -12,6 +12,10 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../.."
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 EX_USAGE=64
 
+# Where to find lexical model types.
+LEXICAL_MODELS_TYPES=../../common/models/types
+
+
 # Build the main script.
 build () {
   npm run build || fail "Could not build top-level JavaScript file."
@@ -128,7 +132,10 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  verify_npm_setup true || fail "Could not setup dependencies."
+  # Ensure that the local npm package can be require()'d.
+  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link @keymanapp/models-types"
+
+  npm install || fail "Could not download dependencies."
 fi
 
 if [ -n "$publish_version" ]; then
