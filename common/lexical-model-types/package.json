@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/lexical-model-types",
-  "version": "14.0.79",
+  "version": "14.0.78",
   "description": "(deprecated) please use @keymanapp/models-types instead!",
   "contributors": [
     "Eddie Antonio Santos <easantos@ualberta.ca>"
