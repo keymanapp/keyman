@@ -25,7 +25,7 @@
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
-    "test": "bash ./unit_tests/test.sh"
+    "test": "node ../../../../resources/gosh.js ./unit_tests/test.sh"
   },
   "dependencies": {
     "@keymanapp/keyboard-processor": "^14.0.79",

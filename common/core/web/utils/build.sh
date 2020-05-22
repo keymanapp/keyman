@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 # 
 # Compiles common TS-based utility functions for use among Keyman's codebase
 
@@ -6,7 +6,7 @@
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
-KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../.."
+KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../.."
 . "$KEYMAN_ROOT/resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
@@ -14,7 +14,7 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../.."
 display_usage ( ) {
     echo "build.sh [-skip-dependency-install]"
     echo
-    echo "  -skip-dependency-install  skips the `lerna bootstrap` dependency check."
+    echo "  -skip-dependency-install  skips the \`lerna bootstrap\` dependency check."
     echo "                            (or -S) Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
@@ -29,21 +29,20 @@ set_default_vars ( ) {
 set_default_vars
 
 # Generates a linkable TS file; defined in resources/build-utils.sh.
-exportEnvironmentDefinitionTS
+exportEnvironmentDefinitionTS && mv environment.inc.ts src/
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -skip-package-install|-S)
-            set_default_vars
+        -skip-dependency-install|-S)
             FETCH_DEPS=false
             ;;
     esac
     shift # past argument
 done
 
-if [ $FETCH_DEPS = true ]; then
+if [ "$FETCH_DEPS" = true ]; then
     verify_npm_setup
 fi
 
