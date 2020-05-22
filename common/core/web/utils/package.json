@@ -1,12 +1,12 @@
 {
   "name": "@keymanapp/web-utils",
-  "version": "14.0.78",
+  "version": "14.0.79",
   "description": "Common utility functions used throughout other Keyman packages",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p ./src/tsconfig.json",
-    "prepare": "npm run build",
+    "build": "node ../../../../resources/gosh.js ./build.sh",
+    "prepare": "npm run build -- -skip-package-install",
     "tsc": "tsc"
   },
   "repository": {

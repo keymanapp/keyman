@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/models-templates",
-  "version": "14.0.76",
+  "version": "14.0.79",
   "description": "Backing model implementations (templates) for Keyman's modelling layer",
   "keywords": [
     "lm",
