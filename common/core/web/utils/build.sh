@@ -12,9 +12,9 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../.."
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage ( ) {
-    echo "build.sh [-skip-dependency-install]"
+    echo "build.sh [-skip-package-install]"
     echo
-    echo "  -skip-dependency-install  skips the \`lerna bootstrap\` dependency check."
+    echo "  -skip-package-install  skips the \`lerna bootstrap\` dependency check."
     echo "                            (or -S) Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
@@ -35,7 +35,7 @@ exportEnvironmentDefinitionTS && mv environment.inc.ts src/
 while [[ $# -gt 0 ]] ; do
     key="$1"
     case $key in
-        -skip-dependency-install|-S)
+        -skip-package-install|-S)
             FETCH_DEPS=false
             ;;
     esac
