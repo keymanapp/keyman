@@ -117,7 +117,8 @@ public final class KMManager {
 
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static int sysKbIndexOnLockScreen = -1;
+  // This is used to keep track of the starting system keyboard index while the screen is locked
+  private static int sysKbStartingIndexOnLockScreen = -1;
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -1815,23 +1816,25 @@ public final class KMManager {
 
         if (KMManager.shouldAllowSetKeyboard()) {
           if (SystemKeyboard.keyboardPickerEnabled) {
-            KeyguardManager km = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
             GlobeKeyAction action = sysKbGlobeKeyAction;
-            if(km.inKeyguardRestrictedInputMode()) {
+            if(keyguardManager.inKeyguardRestrictedInputMode()) {
               // Override system keyboard globe key action if screen is locked:
               // 1. Switch to next Keyman keyboard (no menu)
               // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-              if (sysKbIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+              if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+                // All the Keyman keyboards have been cycled through
                 action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
               } else {
-                if (sysKbIndexOnLockScreen == -1) {
-                  sysKbIndexOnLockScreen = getCurrentKeyboardIndex(context);
+                if (sysKbStartingIndexOnLockScreen == -1) {
+                  // Initialize the system keyboard starting index while the screen is locked
+                  sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
                 }
                 action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
               }
             } else {
-              // If screen isn't locked
-              sysKbIndexOnLockScreen = -1;
+              // If screen isn't locked, reset the starting index
+              sysKbStartingIndexOnLockScreen = -1;
             }
 
             switch (action) {
