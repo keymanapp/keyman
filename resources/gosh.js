@@ -11,7 +11,7 @@
 
  For example, in common/core/web/utils/package.json, npm run build is defined as:
 
-   "build": "node ../../../../resources/gosh.js build.sh -skip-dependency-install"
+   "build": "node ../../../../resources/gosh.js build.sh -skip-package-install"
 
  Windows launch strategy:
 
