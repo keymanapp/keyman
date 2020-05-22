@@ -18,7 +18,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "dependencies": {
     "@keymanapp/keyboard-processor": "^14.0.79",
-    "@keymanapp/lexical-model-types": "^14.0.78",
+    "@keymanapp/lexical-model-types": "^14.0.79",
     "@keymanapp/web-utils": "^14.0.79"
   },
   "devDependencies": {
