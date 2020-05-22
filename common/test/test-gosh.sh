@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 echo "Testing gosh..."
 echo "Parameters passed: $@"
 echo "This: '$0'"
