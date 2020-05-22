@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types:": "./dist/index.d.ts",
   "scripts": {
-    "build": "node ../../../../resources/gosh.js ./build.sh -skip-dependency-install",
+    "build": "node ../../../../resources/gosh.js ./build.sh",
     "prepare": "npm run build",
     "tsc": "tsc"
   },
