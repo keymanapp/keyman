@@ -26,7 +26,7 @@
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
-    "test": "bash ./test.sh",
+    "test": "node ../../../../resources/gosh.js ./test.sh",
     "mocha": "mocha"
   },
   "dependencies": {
