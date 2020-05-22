@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.79 alpha 2020-05-22
+
+* fix(android): Fix system keyboard globe button override (#3140)
+* fix(web/utils): use build script to generate environment.inc.ts (#3146)
+* change(common/core/web,web): update deps to @keymanapp/models-types (#3147)
+
 ## 14.0.78 alpha 2020-05-21
 
 * refactor(common/models): factor out word breakers to their own package (#3125)
