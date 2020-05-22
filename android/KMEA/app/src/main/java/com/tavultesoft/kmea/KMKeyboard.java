@@ -375,96 +375,44 @@ final class KMKeyboard extends WebView {
     return context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator + filename;
   }
 
+  public boolean setKeyboard(Keyboard k) {
+    boolean retVal = false;
+    if (k != null) {
+      retVal = setKeyboard(
+        k.getPackageID(),
+        k.getKeyboardID(),
+        k.getLanguageID(),
+        k.getKeyboardName(),
+        k.getLanguageName(),
+        k.getFont(),
+        k.getOSKFont());
+    }
+
+    return retVal;
+  }
+
   public boolean setKeyboard(String packageID, String keyboardID, String languageID) {
     if (packageID == null || keyboardID == null || languageID == null)
       return false;
 
     boolean retVal = true;
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
-    if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
-        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
-      packageID = KMManager.KMDefault_PackageID;
-      keyboardID = KMManager.KMDefault_KeyboardID;
-      languageID = KMManager.KMDefault_LanguageID;
-      retVal = false;
-    }
 
     String kbKey = String.format("%s_%s", languageID, keyboardID);
-    //if (kbKey.equals(currentKeyboard))
-    //  return false;
+    int index = KeyboardController.getInstance().getKeyboardIndex(kbKey);
+    Keyboard kbInfo = null;
+    if (index != KeyboardController.INDEX_NOT_FOUND) {
+      kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
+    }
 
-    String keyboardName = "";
-    String languageName = "";
-    keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
-
-    setKeyboardRoot(packageID);
-    String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
-
-    String tFont = "''";
-    String oFont = null;
-    HashMap<String, HashMap<String, String>> kbsInfo = LanguageListUtil.getKeyboardsInfo(context);
-    if (kbsInfo != null) {
-      HashMap<String, String> kbInfo = kbsInfo.get(kbKey);
-      if (kbInfo != null) {
-        keyboardName = kbInfo.get(KMManager.KMKey_KeyboardName).replace("'", "\\'");
-        languageName = kbInfo.get(KMManager.KMKey_LanguageName).replace("'", "\\'");
-        txtFont = getFontFilename(kbInfo.get(KMManager.KMKey_Font));
-        oskFont = getFontFilename(kbInfo.get(KMManager.KMKey_OskFont));
-
-        if (!txtFont.isEmpty()) {
-          tFont = makeFontPaths(kbInfo.get(KMManager.KMKey_Font));
-        }
-
-        if (!oskFont.isEmpty()) {
-          oFont = makeFontPaths(kbInfo.get(KMManager.KMKey_Font));
-        } else {
-          oskFont = null;
-        }
-
-        if (oFont == null) {
-          oFont = tFont;
-        }
-      } else {
-        return false;
-      }
+    if (!KMManager.shouldAllowSetKeyboard() || kbInfo == null) {
+      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
+        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
+      retVal = false;
     } else {
-      return false;
+      retVal = setKeyboard(kbInfo);
     }
 
-    if (tFont.equals("''")) {
-      tFont = fontUndefined;
-    }
-    if (oFont.equals("''")) {
-      oFont = fontUndefined;
-    }
-
-    // Escape single-quoted names for javascript call
-    keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
-    languageName = languageName.replaceAll("\'", "\\\\'");
-
-    String jsFormat = "setKeymanLanguage('%s','%s','%s','%s','%s', %s, %s, '%s')";
-    String jsString = String.format(jsFormat, keyboardName, keyboardID, languageName, languageID, keyboardPath, tFont, oFont, packageID);
-    loadJavascript(jsString);
-
-    this.packageID = packageID;
-    this.keyboardID = keyboardID;
-    this.keyboardName = keyboardName;
-    this.keyboardVersion = keyboardVersion;
-    currentKeyboard = kbKey;
-    keyboardSet = true;
-    saveCurrentKeyboardIndex();
-    if (dismissHelpBubble()) {
-      Handler handler = new Handler();
-      handler.postDelayed(new Runnable() {
-        @Override
-        public void run() {
-          loadJavascript("showHelpBubble()");
-        }
-      }, 2000);
-    }
-
-    KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
     return retVal;
   }
 
@@ -608,22 +556,6 @@ final class KMKeyboard extends WebView {
     }
 
     KeyboardEventHandler.notifyListeners(kbEventListeners, keyboardType, EventType.KEYBOARD_CHANGED, currentKeyboard);
-
-    return retVal;
-  }
-
-  public boolean setKeyboard(Keyboard k) {
-    boolean retVal = false;
-    if (k != null) {
-      retVal = setKeyboard(
-        k.getPackageID(),
-        k.getKeyboardID(),
-        k.getLanguageID(),
-        k.getKeyboardName(),
-        k.getLanguageName(),
-        k.getFont(),
-        k.getOSKFont());
-    }
 
     return retVal;
   }

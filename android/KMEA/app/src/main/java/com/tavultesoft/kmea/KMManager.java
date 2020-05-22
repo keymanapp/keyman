@@ -1103,34 +1103,36 @@ public final class KMManager {
 
   public static KeyboardState getKeyboardState(Context context, String packageID, String keyboardID, String languageID) {
     KeyboardState kbState = KeyboardState.KEYBOARD_STATE_UNDEFINED;
-    if (packageID == null || keyboardID == null || languageID == null)
+    if (packageID == null || keyboardID == null || languageID == null) {
       return kbState;
+    }
 
     packageID = packageID.trim();
     keyboardID = keyboardID.trim();
     languageID = languageID.trim();
-    if (keyboardID.isEmpty() || languageID.isEmpty())
+    if (keyboardID.isEmpty() || languageID.isEmpty()) {
       return kbState;
+    }
 
-    String latestVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
-    if (latestVersion == null) {
-      kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
-    } else {
+    // Check latest installed keyboard version
+    String kbKey = String.format("%s_%s", languageID, keyboardID);
+    Keyboard kbInfo = null;
+    String kbVersion = "1.0";
+    int index = KeyboardController.getInstance().getKeyboardIndex(kbKey);
+    if (index != KeyboardController.INDEX_NOT_FOUND) {
       kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
+      kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
+      kbVersion = kbInfo.getVersion();
+    } else {
+      kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
+    }
 
-      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
-      if (keyboardsInfo != null) {
-        // Check version
-        String kbKey = String.format("%s_%s", languageID, keyboardID);
-        HashMap<String, String> kbInfo = keyboardsInfo.get(kbKey);
-        String kbVersion = "1.0";
-        if (kbInfo != null) {
-          kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
-        }
+    if (kbInfo != null) {
+      // Compare with the cloud package to see if update is available
+      String latestCloudPackageVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID); // fix this
 
-        if (kbVersion != null && (FileUtils.compareVersions(kbVersion, latestVersion) == FileUtils.VERSION_GREATER)) {
-          kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
-        }
+      if (kbVersion != null && (FileUtils.compareVersions(latestCloudPackageVersion, kbVersion) == FileUtils.VERSION_GREATER)) {
+        kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
       }
     }
 
