@@ -43,7 +43,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "test": "bash ./unit_tests/test.sh",
+    "test": "node ../resources/gosh.js ./unit_tests/test.sh",
     "karma": "karma",
     "lerna": "cd ../ && npm run lerna --",
     "mocha": "mocha",
