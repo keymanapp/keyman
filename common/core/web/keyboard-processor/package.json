@@ -30,7 +30,7 @@
     "mocha": "mocha"
   },
   "dependencies": {
-    "@keymanapp/lexical-model-types": "^14.0.79",
+    "@keymanapp/lexical-model-types": "^14.0.78",
     "@keymanapp/web-utils": "^14.0.79",
     "@types/node": "^11.9.4",
     "ts-node": "^8.0.2"

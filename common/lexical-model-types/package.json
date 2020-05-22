@@ -24,6 +24,6 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/models-types": "^14.0.78"
+    "@keymanapp/models-types": "^14.0.79"
   }
 }
