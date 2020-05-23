@@ -39,7 +39,7 @@
     "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^5.2.0",
     "modernizr": "^3.7.1",
-    "typescript": "^3.7.2"
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "tsc": "tsc",
