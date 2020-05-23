@@ -22,6 +22,6 @@
     "@keymanapp/web-utils": "^14.0.80"
   },
   "devDependencies": {
-    "typescript": "^3.7.2"
+    "typescript": "^3.8.3"
   }
 }

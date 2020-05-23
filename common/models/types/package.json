@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman/tree/master/common/models/types#readme",
   "devDependencies": {
-    "typescript": "^3.6.3"
+    "typescript": "^3.8.3"
   },
   "files": [
     "README.md",

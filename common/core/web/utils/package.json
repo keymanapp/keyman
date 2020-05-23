@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "typescript": "^3.7.2"
+    "typescript": "^3.8.3"
   }
 }
