@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
+    "@keymanapp/resources-gosh": "^14.0.80",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "mocha-teamcity-reporter": "^3.0.0",
@@ -26,7 +27,7 @@
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
     "tsc": "tsc",
-    "test": "node ../../../../resources/gosh.js ./test.sh",
+    "test": "gosh ./test.sh",
     "mocha": "mocha"
   },
   "dependencies": {

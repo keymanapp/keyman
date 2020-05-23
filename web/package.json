@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
+    "@keymanapp/resources-gosh": "^14.0.80",
     "@keymanapp/web-sentry-manager": "^14.0.80",
     "@sentry/cli": "^1.52.3",
     "chai": "^4.2.0",
@@ -43,7 +44,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "test": "node ../resources/gosh.js ./unit_tests/test.sh",
+    "test": "gosh ./unit_tests/test.sh",
     "karma": "karma",
     "lerna": "cd ../ && npm run lerna --",
     "mocha": "mocha",

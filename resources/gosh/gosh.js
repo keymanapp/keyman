@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  gosh.js: launch bash script from any environment from within our package.json builds
 

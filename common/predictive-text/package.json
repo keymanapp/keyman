@@ -7,7 +7,7 @@
     "karma": "karma",
     "lerna": "cd ../.. && npm run lerna --",
     "mocha": "mocha",
-    "test": "node ../../resources/gosh.js ./unit_tests/test.sh",
+    "test": "gosh ./unit_tests/test.sh",
     "tsc": "tsc"
   },
   "repository": {
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/models-types": "^14.0.80",
+    "@keymanapp/resources-gosh": "^14.0.80",
     "@types/node": "^10.17.21",
     "chai": "^4.2.0",
     "karma": "^4.2.0",
