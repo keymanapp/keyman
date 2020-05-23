@@ -9,5 +9,8 @@
     "common/predictive-text",
     "web"
   ],
+  "hoist": [
+    "typescript"
+  ],
   "version": "14.0.80"
 }
