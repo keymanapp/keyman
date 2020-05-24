@@ -1117,17 +1117,15 @@ public final class KMManager {
     // Check latest installed keyboard version
     Keyboard kbInfo = null;
     String kbVersion = null;
+    kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
     int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
     if (index != KeyboardController.INDEX_NOT_FOUND) {
-      kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
       kbVersion = kbInfo.getVersion();
-      if (kbVersion == null) {
-        // If version not found, keyboard needs to be downloaded
-        kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
+      if (kbVersion != null) {
+        // Version exists, so keyboard is up to date
+        kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
       }
-    } else {
-      kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
     }
 
     if (kbInfo != null) {

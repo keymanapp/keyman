@@ -198,7 +198,7 @@ public class KeyboardController {
    * @return int - Index of the matching keyboard
    */
   public int getKeyboardIndex(String languageID, String keyboardID) {
-    String key = String.format("%S_%s", languageID, keyboardID);
+    String key = String.format("%s_%s", languageID, keyboardID);
     return getKeyboardIndex(key);
   }
 
