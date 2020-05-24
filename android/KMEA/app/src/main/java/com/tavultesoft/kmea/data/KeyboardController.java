@@ -191,6 +191,18 @@ public class KeyboardController {
   }
 
   /**
+   * Given a languageID and keyboardID, return the index of the matching keyboard.
+   * If no match, returns INDEX_NOT_FOUND
+   * @param languageID - String of the language ID
+   * @param keyboardID - String of the keyboard ID
+   * @return int - Index of the matching keyboard
+   */
+  public int getKeyboardIndex(String languageID, String keyboardID) {
+    String key = String.format("%S_%s", languageID, keyboardID);
+    return getKeyboardIndex(key);
+  }
+
+  /**
    * Given a key, return if the keyboard exists in the installed keyboards list
    * @param key - String of the key to find
    * @return boolean whether the matching keyboard exists

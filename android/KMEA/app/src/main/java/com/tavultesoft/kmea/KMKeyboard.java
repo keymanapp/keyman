@@ -397,16 +397,14 @@ final class KMKeyboard extends WebView {
 
     boolean retVal = true;
 
-    String kbKey = String.format("%s_%s", languageID, keyboardID);
-    int index = KeyboardController.getInstance().getKeyboardIndex(kbKey);
+    int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
     Keyboard kbInfo = null;
     if (index != KeyboardController.INDEX_NOT_FOUND) {
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
     }
 
     if (!KMManager.shouldAllowSetKeyboard() || kbInfo == null) {
-      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
-        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
+      sendError(packageID, keyboardID, languageID);
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       retVal = false;
     } else {
@@ -432,11 +430,11 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
-        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
-      packageID = KMManager.KMDefault_PackageID;
-      keyboardID = KMManager.KMDefault_KeyboardID;
-      languageID = KMManager.KMDefault_LanguageID;
+      sendError(packageID, keyboardID, languageID);
+      Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
+      packageID = kbInfo.getPackageID();
+      keyboardID = kbInfo.getKeyboardID();
+      languageID = kbInfo.getLanguageID();
       retVal = false;
     }
     String kbKey = String.format("%s_%s", languageID, keyboardID);
@@ -466,15 +464,15 @@ final class KMKeyboard extends WebView {
     boolean retVal = true;
     String keyboardVersion = KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID);
     if (!KMManager.shouldAllowSetKeyboard() || keyboardVersion == null) {
-      Toast.makeText(context, "Can't set " + packageID + "::" + keyboardID + " for " +
-        languageID + " language. Loading default keyboard", Toast.LENGTH_LONG).show();
-      packageID = KMManager.KMDefault_PackageID;
-      keyboardID = KMManager.KMDefault_KeyboardID;
-      languageID = KMManager.KMDefault_LanguageID;
-      keyboardName = KMManager.KMDefault_KeyboardName;
-      languageName = KMManager.KMDefault_LanguageName;
-      kFont = KMManager.KMDefault_KeyboardFont;
-      kOskFont = kFont;
+      sendError(packageID, keyboardID, languageID);
+      Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
+      packageID = kbInfo.getPackageID();
+      keyboardID = kbInfo.getKeyboardID();
+      languageID = kbInfo.getLanguageID();
+      keyboardName = kbInfo.getKeyboardName();
+      languageName = kbInfo.getLanguageName();
+      kFont = kbInfo.getFont();
+      kOskFont = kbInfo.getOSKFont();
       retVal = false;
     }
 
@@ -568,6 +566,14 @@ final class KMKeyboard extends WebView {
 
     return this.isChiral;
 
+  }
+
+  // Display Toast notification that keyboard selection failed, so loading default keyboard.
+  // Also sends a message to Sentry
+  private void sendError(String packageID, String keyboardID, String languageID) {
+    String msg = String.format("Can't set %s::%s for %s language. Loading default keyboard", packageID, keyboardID, languageID);
+    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+    Sentry.captureMessage(msg);
   }
 
   // Set the base path of the keyboard depending on the package ID
