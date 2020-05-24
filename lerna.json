@@ -10,6 +10,7 @@
     "web"
   ],
   "hoist": [
+    "lerna",
     "typescript"
   ],
   "version": "14.0.80"
