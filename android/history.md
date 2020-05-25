@@ -2,7 +2,7 @@
 
 ## 2020-05-25 13.0.6212 stable
 * Bug fix:
-  * Fix system keyboard globe button override ()
+  * Fix system keyboard globe button override (#3161)
 
 ## 2020-05-08 13.0.6211 stable
 * no change to Keyman for Android (rebuild FV app)
