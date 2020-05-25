@@ -1,5 +1,22 @@
 # Keyman Version History
 
+## 14.0.79 alpha 2020-05-22
+
+* fix(android): Fix system keyboard globe button override (#3140)
+* fix(web/utils): use build script to generate environment.inc.ts (#3146)
+* change(common/core/web,web): update deps to @keymanapp/models-types (#3147)
+
+## 14.0.78 alpha 2020-05-21
+
+* refactor(common/models): factor out word breakers to their own package (#3125)
+* fix(developer): crash when developer starts (#3138)
+* modify(android): Refactor KeyboardPickerActivity (#3113)
+* chore(common/resources): cleanup scopes (#3139)
+* feat(web): starts proper KMW Sentry integration (#3122)
+* refactor(common/models/types): rename @keymanapp/lexical-model-types => @keymanapp/models-types (#3143)
+* change(web/utils): add and distribute type declaration (#3145)
+* fix(common): drops version updates for deprecated common/lexical-model-types (#3148)
+
 ## 14.0.77 alpha 2020-05-19
 
 * refactor(web/engine): Moves common utility functions into separate `web-utils` package (#3130)

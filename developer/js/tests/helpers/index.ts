@@ -1,3 +1,5 @@
+/// <reference path="../../node_modules/@keymanapp/models-types/index.d.ts" />
+
 /**
  * Helpers and utilities for the Mocha tests.
  */

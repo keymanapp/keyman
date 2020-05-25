@@ -1,4 +1,4 @@
-/// <reference path="../../node_modules/@keymanapp/lexical-model-types/index.d.ts" />
+/// <reference path="../../node_modules/@keymanapp/models-types/index.d.ts" />
 
 /**
  * Returns a word breaker that joins spans of an existing word breaker.

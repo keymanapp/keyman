@@ -117,7 +117,8 @@ public final class KMManager {
 
   private static GlobeKeyAction inappKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
   private static GlobeKeyAction sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
-  private static int sysKbIndexOnLockScreen = -1;
+  // This is used to keep track of the starting system keyboard index while the screen is locked
+  private static int sysKbStartingIndexOnLockScreen = -1;
 
   protected static boolean InAppKeyboardLoaded = false;
   protected static boolean SystemKeyboardLoaded = false;
@@ -1102,33 +1103,35 @@ public final class KMManager {
 
   public static KeyboardState getKeyboardState(Context context, String packageID, String keyboardID, String languageID) {
     KeyboardState kbState = KeyboardState.KEYBOARD_STATE_UNDEFINED;
-    if (packageID == null || keyboardID == null || languageID == null)
+    if (packageID == null || keyboardID == null || languageID == null) {
       return kbState;
+    }
 
     packageID = packageID.trim();
     keyboardID = keyboardID.trim();
     languageID = languageID.trim();
-    if (keyboardID.isEmpty() || languageID.isEmpty())
+    if (keyboardID.isEmpty() || languageID.isEmpty()) {
       return kbState;
+    }
 
-    String latestVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
-    if (latestVersion == null) {
-      kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
-    } else {
-      kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
+    // Check latest installed keyboard version
+    Keyboard kbInfo = null;
+    String kbVersion = null;
+    kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
+    int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
+    if (index != KeyboardController.INDEX_NOT_FOUND) {
+      kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
+      if (kbInfo != null) {
+        kbVersion = kbInfo.getVersion();
+        if (kbVersion != null) {
+          // Compare with the cloud package to see if update is available
+          String latestCloudPackageVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID); // fix this
 
-      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
-      if (keyboardsInfo != null) {
-        // Check version
-        String kbKey = String.format("%s_%s", languageID, keyboardID);
-        HashMap<String, String> kbInfo = keyboardsInfo.get(kbKey);
-        String kbVersion = "1.0";
-        if (kbInfo != null) {
-          kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
-        }
-
-        if (kbVersion != null && (FileUtils.compareVersions(kbVersion, latestVersion) == FileUtils.VERSION_GREATER)) {
-          kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
+          if (FileUtils.compareVersions(latestCloudPackageVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+            kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
+          } else {
+            kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
+          }
         }
       }
     }
@@ -1815,29 +1818,39 @@ public final class KMManager {
 
         if (KMManager.shouldAllowSetKeyboard()) {
           if (SystemKeyboard.keyboardPickerEnabled) {
-            KeyguardManager km = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
-            if(km.inKeyguardRestrictedInputMode()) {
+            KeyguardManager keyguardManager = (KeyguardManager) appContext.getSystemService(Context.KEYGUARD_SERVICE);
+            GlobeKeyAction action = sysKbGlobeKeyAction;
+            if(keyguardManager.inKeyguardRestrictedInputMode()) {
               // Override system keyboard globe key action if screen is locked:
               // 1. Switch to next Keyman keyboard (no menu)
               // 2. When all the Keyman keyboards have been cycled through, advance to the next system keyboard
-              if (sysKbIndexOnLockScreen == -1) {
-                sysKbIndexOnLockScreen = getCurrentKeyboardIndex(context);
-                sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
-              } else if (sysKbIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
-                sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
+              if (sysKbStartingIndexOnLockScreen == getCurrentKeyboardIndex(context)) {
+                // All the Keyman keyboards have been cycled through
+                action = GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD;
+              } else {
+                if (sysKbStartingIndexOnLockScreen == -1) {
+                  // Initialize the system keyboard starting index while the screen is locked
+                  sysKbStartingIndexOnLockScreen = getCurrentKeyboardIndex(context);
+                }
+                action = GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD;
               }
             } else {
-              // If screen isn't locked, revert to default system globe key action
-              sysKbIndexOnLockScreen = -1;
-              sysKbGlobeKeyAction = GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU;
+              // If screen isn't locked, reset the starting index
+              sysKbStartingIndexOnLockScreen = -1;
             }
 
-            if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SHOW_MENU) {
-              showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-            } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD) {
-              switchToNextKeyboard(context);
-            } else if (sysKbGlobeKeyAction == GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD) {
-              advanceToNextInputMode();
+            switch (action) {
+              case GLOBE_KEY_ACTION_SHOW_MENU:
+                showKeyboardPicker(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+                break;
+              case GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD:
+                switchToNextKeyboard(context);
+                break;
+              case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
+                advanceToNextInputMode();
+                break;
+              default:
+                // Do nothing
             }
           } else {
             switchToNextKeyboard(context);

@@ -6,11 +6,17 @@
 # Exit on command failure and when using unset variables:
 set -eu
 
-# Include some helper functions from resources
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../.."
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
+
+# Where to find lexical model types.
+LEXICAL_MODELS_TYPES=../../common/models/types
+
 
 # Build the main script.
 build () {
@@ -49,9 +55,11 @@ while [[ $# -gt 0 ]] ; do
         display_usage
         exit
         ;;
+      -skip-package-install|-S)
+        install_dependencies=0
+        ;;
       -test)
         run_tests=1
-        install_dependencies=1
         ;;
       -tdd)
         run_tests=1
@@ -128,7 +136,7 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  verify_npm_setup true || fail "Could not setup dependencies."
+  verify_npm_setup
 fi
 
 if [ -n "$publish_version" ]; then
@@ -139,8 +147,6 @@ build || fail "Compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then
-  # TODO: The LMLayer should build itself, but this is necessary for now :/
-  (cd ../../common/predictive-text && ./build.sh) || fail "Could not build LMLayer"
   npm test || fail "Tests failed"
 fi
 

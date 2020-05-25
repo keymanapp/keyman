@@ -14,9 +14,9 @@ KEYMAN_ROOT="$(dirname "$THIS_SCRIPT")/../../../../../.."
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage ( ) {
-    echo "build.sh [-skip-dependency-install]"
+    echo "build.sh [-skip-package-install]"
     echo
-    echo "  -skip-dependency-install  skips the `lerna bootstrap` dependency check."
+    echo "  -skip-package-install  skips the `lerna bootstrap` dependency check."
     echo "                            (or -S) Intended for use when this script is called by another build script."
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
@@ -56,14 +56,6 @@ PATH="../node_modules/.bin:$PATH"
 
 compiler="npm run tsc --"
 compilecmd="$compiler"
-
-pushd ../../../utils/src
-./build.sh -skip-package-install
-
-if [ $? -ne 0 ]; then
-    fail "KeymanWeb utility function library compilation failed."
-fi
-popd
 
 $compilecmd -p "$SCRIPT_DIR/tsconfig.json"
 if [ $? -ne 0 ]; then
