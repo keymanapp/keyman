@@ -53,31 +53,6 @@ DO_CARTHAGE=true
 CLEAN_ONLY=false
 CONFIG=Release
 
-# Default, in case $VERSION_ENVIRONMENT is improperly specified.
-DO_SENTRY=false
-
-# Dynamically configure whether or not to upload Sentry symbols.
-case $VERSION_ENVIRONMENT in
-  # Actual release tiers
-  alpha)
-    DO_SENTRY=true
-    ;;
-  beta)
-    DO_SENTRY=true
-    ;;
-  stable)
-    DO_SENTRY=true
-    ;;
-
-  # Development builds; do not release (by default).
-  local)
-    DO_SENTRY=false
-    ;;
-  test)
-    DO_SENTRY=false
-    ;;
-esac
-
 # Parse args
 while [[ $# -gt 0 ]] ; do
     key="$1"
@@ -104,13 +79,13 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-build)
             CLEAN_ONLY=true
-            DO_SENTRY=false
+            UPLOAD_SENTRY=false
             ;;
         -no-carthage)
             DO_CARTHAGE=false
             ;;
         -upload-sentry)
-            DO_SENTRY=true
+            UPLOAD_SENTRY=true
             ;;
         -debug)
             CONFIG=Debug
@@ -196,7 +171,7 @@ echo "Build products will be set with the following version metadata:"
 echo "  * VERSION=$VERSION"
 echo "  * VERSION_WITH_TAG=$VERSION_WITH_TAG"
 echo "  * VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT"
-echo "  * DO_SENTRY=$DO_SENTRY"
+echo "  * DO_SENTRY=$UPLOAD_SENTRY"
 echo
 echo "Building KMEI..."
 
@@ -205,7 +180,7 @@ xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
            VERSION_WITH_TAG=$VERSION_WITH_TAG \
            VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-           DO_SENTRY=$DO_SENTRY
+           DO_SENTRY=$UPLOAD_SENTRY
 
 if [ $? -ne 0 ]; then
   fail "KMEI build failed."
@@ -226,7 +201,7 @@ if [ $DO_KEYMANAPP = true ]; then
                  VERSION=$VERSION \
                  VERSION_WITH_TAG=$VERSION_WITH_TAG \
                  VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-                 DO_SENTRY=$DO_SENTRY
+                 DO_SENTRY=$UPLOAD_SENTRY
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -242,7 +217,7 @@ if [ $DO_KEYMANAPP = true ]; then
                  VERSION=$VERSION \
                  VERSION_WITH_TAG=$VERSION_WITH_TAG \
                  VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
-                 DO_SENTRY=$DO_SENTRY
+                 DO_SENTRY=$UPLOAD_SENTRY
 
       assertDirExists "$ARCHIVE_PATH"
 

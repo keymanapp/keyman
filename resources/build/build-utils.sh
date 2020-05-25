@@ -141,11 +141,40 @@ function printVersionUtilsDebug() {
     echo "VERSION_WITH_TAG: $VERSION_WITH_TAG"
 }
 
+function findShouldSentryRelease() {
+    # Default, in case $VERSION_ENVIRONMENT is improperly specified.
+    UPLOAD_SENTRY=false
+
+    # Dynamically configure whether or not to upload Sentry symbols.
+    case $VERSION_ENVIRONMENT in
+    # Actual release tiers
+    alpha)
+        UPLOAD_SENTRY=true
+        ;;
+    beta)
+        UPLOAD_SENTRY=true
+        ;;
+    stable)
+        UPLOAD_SENTRY=true
+        ;;
+
+    # Development builds; do not release (by default).
+    local)
+        UPLOAD_SENTRY=false
+        ;;
+    test)
+        UPLOAD_SENTRY=false
+        ;;
+    esac
+}
+
 findRepositoryRoot
 findTier
 findVersion
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
+
+findShouldSentryRelease
 
 # Intended for use with macOS-based builds, as Xcode build phase "run script"s do not have access to important
 # environment variables.  Doesn't hurt to run it at other times as well.  The output file is .gitignore'd.
