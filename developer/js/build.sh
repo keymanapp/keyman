@@ -147,8 +147,6 @@ build || fail "Compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then
-  # TODO: The LMLayer should build itself, but this is necessary for now :/
-  (cd ../../common/predictive-text && ./build.sh) || fail "Could not build LMLayer"
   npm test || fail "Tests failed"
 fi
 
