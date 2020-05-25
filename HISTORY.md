@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.80 alpha 2020-05-25
+
+* fix(android/engine): Remove LanguageListUtil (#3155)
+* refactor(common/lmlayer): create package: @keymanapp/models-templates (#3128)
+
 ## 14.0.79 alpha 2020-05-22
 
 * fix(android): Fix system keyboard globe button override (#3140)
