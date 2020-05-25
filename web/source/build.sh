@@ -16,7 +16,7 @@ WORKING_DIRECTORY=`pwd`
 cd "$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
-    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean]"
+    echo "build.sh [-ui | -test | -embed | -web | -debug_embedded] [-no_minify] [-clean] [-upload-sentry]"
     echo
     echo "  -ui               to compile only desktop user interface modules"
     echo "  -test             to compile for testing without copying resources or" 
@@ -28,6 +28,7 @@ display_usage ( ) {
     echo "  -no_minify        to disable the minification '/release/' build sections -"  
     echo "                      the '/release/unminified' subfolders will still be built."
     echo "  -clean            to erase pre-existing build products before the build."
+    echo "  -upload-sentry    to upload debug symbols to our Sentry server"
     echo ""
     echo "  If more than one target is specified, the last one will take precedence."
     exit 1
@@ -297,9 +298,17 @@ while [[ $# -gt 0 ]] ; do
         -clean)
             clean
             ;;
+        -upload-sentry)
+            UPLOAD_SENTRY=true
+            ;;
     esac
     shift # past argument
 done
+
+# No Sentry uploading if not a release build and not directly specified.
+if [ $UPLOAD_SENTRY = false ]; then
+    DO_NATIVE_SENTRY=false
+fi
 
 readonly BUILD_LMLAYER
 readonly BUILD_UI
@@ -402,12 +411,14 @@ if [ $BUILD_EMBED = true ]; then
         echo KMEA/KMEI version $VERSION compiled and saved under $EMBED_OUTPUT
         echo
 
-        # We always publish "embedded" mode to Sentry when minifying.
-        pushd $EMBED_OUTPUT
-        echo "Uploading to Sentry..."
-        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/embedded --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
-        echo "Upload successful."
-        popd
+        if [ $UPLOAD_SENTRY = true ]; then
+            # We always publish "embedded" mode to Sentry when minifying.
+            pushd $EMBED_OUTPUT
+            echo "Uploading to Sentry..."
+            npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/embedded --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+            echo "Upload successful."
+            popd
+        fi
     fi
 fi
 
