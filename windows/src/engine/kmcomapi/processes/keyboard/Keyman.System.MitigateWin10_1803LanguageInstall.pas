@@ -45,9 +45,10 @@ const
 const
   WINDOWS_10_MAJORVERSION = 10;
   WINDOWS_10_MINORVERSION = 0;
-  WINDOWS_10_BUILDNUMBER = 17134;
+  WINDOWS_10_BUILDNUMBER_WithFailure = 17134;
+  WINDOWS_10_BUILDNUMBER_Fixed = 19597;
 
-function IsWindows10_1803_OrGreater: BOOL; inline;
+function IsWindows10_OrGreater_Build(Build: DWORD): BOOL; inline;
 var
   osvi: OSVERSIONINFOEXW;
   dwlConditionMask: DWORDLONG;
@@ -66,7 +67,7 @@ begin
 
   osvi.dwMajorVersion := WINDOWS_10_MAJORVERSION;
   osvi.dwMinorVersion := WINDOWS_10_MINORVERSION;
-  osvi.dwBuildNumber := WINDOWS_10_BUILDNUMBER;
+  osvi.dwBuildNumber := Build;
 
   Result := VerifyVersionInfoW(osvi, VER_MAJORVERSION or VER_MINORVERSION or VER_BUILDNUMBER, dwlConditionMask) <> False;
 end;
@@ -75,7 +76,10 @@ class function TMitigateWin10_1803.IsMitigationRequired(Code: LANGID; var lang: 
 var
   I: Integer;
 begin
-  if not IsWindows10_1803_OrGreater then
+  if not IsWindows10_OrGreater_Build(WINDOWS_10_BUILDNUMBER_WithFailure) then
+    Exit(False);
+
+  if IsWindows10_OrGreater_Build(WINDOWS_10_BUILDNUMBER_Fixed) then
     Exit(False);
 
   Code := PRIMARYLANGID(Code);
