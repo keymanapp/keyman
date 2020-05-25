@@ -1,5 +1,12 @@
 # Keyman for Android Version History
 
+## 2020-05-25 13.0.6212 stable
+* Bug fix:
+  * Fix system keyboard globe button override (#3161)
+
+## 2020-05-08 13.0.6211 stable
+* no change to Keyman for Android (rebuild FV app)
+
 ## 2020-05-07 13.0.6210 stable
 * Bug fix:
   * Back button dismisses system keyboard (#3094)
