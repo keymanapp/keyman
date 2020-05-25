@@ -44,7 +44,10 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
     CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
-    LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
+    PackageProcessor kbdKMPProcessor = new PackageProcessor(resourceRoot);
+    List<Map<String, String>> installedKeyboards = null;
+
+    LexicalModelPackageProcessor lmKMPProcessor = new LexicalModelPackageProcessor(resourceRoot);
     List<Map<String, String>> installedLexicalModels = null;
 
     int _result = FileUtils.DOWNLOAD_SUCCESS;
@@ -54,18 +57,31 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
       {
 
         try {
+          if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.KeyboardPackage) {
+            installedKeyboards = new LinkedList<>();
+            // Extract the kmp.
+            File kmpFile = new File(cacheDir, FileUtils.getFilename(_d.getCloudParams().url));
 
-          if (_d.getCloudParams().target== CloudApiTypes.ApiTarget.LexicalModelPackage) {
+            FileUtils.copy(_d.getDestinationFile(), kmpFile);
+
+            String pkgTarget = kbdKMPProcessor.getPackageTarget(kmpFile);
+            if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+              File unzipPath = kbdKMPProcessor.unzipKMP(kmpFile);
+              installedKeyboards.addAll(kbdKMPProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_KEYBOARDS_KEY));
+            }
+          }
+
+          if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.LexicalModelPackage) {
             installedLexicalModels = new LinkedList<>();
             // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
             File kmpFile = new File(cacheDir, FileUtils.getFilename(_d.getCloudParams().url));
 
             FileUtils.copy(_d.getDestinationFile(), kmpFile);
 
-            String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
+            String pkgTarget = lmKMPProcessor.getPackageTarget(kmpFile);
             if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-              File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-              installedLexicalModels.addAll(kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY));
+              File unzipPath = lmKMPProcessor.unzipKMP(kmpFile);
+              installedLexicalModels.addAll(lmKMPProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY));
             }
           }
         }

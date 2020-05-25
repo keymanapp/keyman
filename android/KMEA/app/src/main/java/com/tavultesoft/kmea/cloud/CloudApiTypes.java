@@ -57,6 +57,10 @@ public class CloudApiTypes {
      */
     KeyboardData,
     /**
+     * Keyboard package download:
+     */
+    KeyboardPackage,
+    /**
      *  Lexical download: download lexical model package
      *  Used for single lexical model download and
      *  automatic lexical model download during keyboard download

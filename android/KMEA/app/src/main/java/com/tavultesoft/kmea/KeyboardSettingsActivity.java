@@ -79,14 +79,9 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String kbID = kbd.getKeyboardID();
     final String kbName = kbd.getKeyboardName();
     final String kbVersion = kbd.getVersion();
-    String latestKbdCloudVersion = kbVersion;
 
     // Determine if keyboard update is available from the cloud
-    Dataset dataset = CloudRepository.shared.fetchDataset(this);
-    final Keyboard latestKbd = dataset.keyboards.findMatch(kbd);
-    if (latestKbd != null) {
-      latestKbdCloudVersion = latestKbd.getVersion();
-    }
+    final String kmp = kbd.getKMP();
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
@@ -100,8 +95,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    // Display notification to download update if latestKbdCloudVersion > kbVersion (installed)
-    if (FileUtils.compareVersions(latestKbdCloudVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+    // Display notification to download update if there's a link to an updated kmp
+    if (kmp != null && !kmp.isEmpty()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }
@@ -162,7 +157,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
         // "Version" link clicked to download latest keyboard version from cloud
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
-          Bundle args = latestKbd.buildDownloadBundle();
+          Bundle args = kbd.buildDownloadBundle();
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);

@@ -1127,10 +1127,9 @@ public final class KMManager {
       if (kbInfo != null) {
         kbVersion = kbInfo.getVersion();
         if (kbVersion != null) {
-          // Compare with the cloud package to see if update is available
-          String latestCloudPackageVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID); // fix this
-
-          if (FileUtils.compareVersions(latestCloudPackageVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+          // See if update is available
+          String kmp = kbInfo.getKMP();
+          if (kmp != null && !kmp.isEmpty()) {
             kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
           } else {
             kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;

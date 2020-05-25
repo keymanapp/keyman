@@ -37,6 +37,7 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   public static final String ARG_MODEL_NAME = "KMKeyboardActivity.modelName";
   public static final String ARG_MODEL_URL = "KMKeyboardActivity.modelURL";
   public static final String ARG_CUSTOM_HELP_LINK = "KMKeyboardActivity.customHelpLink";
+  public static final String ARG_KMP_LINK = "KMKeyboardActivity.kmpLink";
 
   public static final String kKeymanApiBaseURL = "https://api.keyman.com/package-version?platform=android";
   //public static final String kKeymanApiBaseURL = "https://api.keyman.com/cloud/4.0/languages";
@@ -99,11 +100,12 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     if (downloadOnlyLexicalModel) {
       modelID = bundle.getString(ARG_MODEL_ID);
       modelName = bundle.getString(ARG_MODEL_NAME);
-      url = bundle.getString(ARG_MODEL_URL);
+      url = bundle.getString(ARG_MODEL_URL); // sort this out
     } else {
 
       kbID = bundle.getString(ARG_KB_ID);
       kbName = bundle.getString(ARG_KB_NAME);
+      url = bundle.getString(ARG_KMP_LINK);
     }
 
     // Download keyboard from cloud server
@@ -124,6 +126,13 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
     }
 
     dialog.show(getFragmentManager(), "dialog");
+  }
+
+  private ArrayList<CloudApiTypes.CloudApiParam> prepareCloudApiParamsForKeyboardPackageDownload() {
+    ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
+    _params.add(new CloudApiTypes.CloudApiParam(
+      CloudApiTypes.ApiTarget.KeyboardPackage, url));
+    return _params;
   }
 
   /**

@@ -13,6 +13,7 @@ import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LanguageResource;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -145,7 +146,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       return;
     }
 
-    List<Keyboard> keyboardsArrayList = CloudDataJsonUtil.processKeyboardJSON(jsonTuple.keyboardJSON, false);
+    //List<Keyboard> keyboardsArrayList = CloudDataJsonUtil.processKeyboardJSON(jsonTuple.keyboardJSON, false);
     List<LexicalModel> lexicalModelsArrayList = CloudDataJsonUtil.processLexicalModelJSON(jsonTuple.lexicalModelJSON);
 
     Dataset installedData = KeyboardPickerActivity.getInstalledDataset(context);
@@ -154,6 +155,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     // We're about to do a big batch of edits.
     aDataSet.setNotifyOnChange(false);
 
+    /*
     // Filter out any duplicates from KMP keyboards, properly merging the lists.
     for (int i = 0; i < keyboardsArrayList.size(); i++) {
       Keyboard keyboard = keyboardsArrayList.get(i);
@@ -171,9 +173,18 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       } // else no match == no special handling.
     }
 
-    // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
-    aDataSet.keyboards.addAll(keyboardsArrayList);
+*/
 
+    // The actual update check
+    CloudDataJsonUtil.processKeyboardPackageUpdateJSON(context, jsonTuple.packagesJSON, updateBundles);
+
+    // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
+    //aDataSet.keyboards.addAll(keyboardsArrayList);
+    aDataSet.keyboards.clear();
+    aDataSet.keyboards.addAll(KeyboardController.getInstance().get());
+
+
+    /*
     // The actual update check.
     for (int i = 0; i < installedData.keyboards.getCount(); i++) {
       Keyboard keyboard = installedData.keyboards.getItem(i);
@@ -205,7 +216,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
         }
       } // else no match == no special handling.
     }
-
+*/
     // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
     aDataSet.lexicalModels.addAll(lexicalModelsArrayList);
 

@@ -1,6 +1,7 @@
 package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -180,7 +181,8 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
         JSONObject pkgData = _r.returnjson.jsonObject;
 
         if (pkgData != null) {
-          CloudDataJsonUtil.processKeyboardPackageUpdateJSON(aContext, pkgData);
+          List<Bundle> updateBundles = new ArrayList<>();
+          CloudDataJsonUtil.processKeyboardPackageUpdateJSON(aContext, pkgData, updateBundles);
           CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData);
         }
       }

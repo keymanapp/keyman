@@ -2,6 +2,7 @@ package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.tavultesoft.kmea.JSONParser;
@@ -19,8 +20,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
@@ -38,6 +41,13 @@ public class CloudDataJsonUtil {
 
   public static final String JSON_Lexical_Models_Cache_Filename = "jsonLexicalModelsCache.dat";
   public static final String JSON_Resources_Cache_Filename = "jsonResourcesCache.json";
+
+  // keys for api.keyman.com/package-version
+  private static final String CDKey_Keyboards = "keyboards";
+  private static final String CDKey_Models = "models";
+  private static final String CDKey_KMP = "kmp";
+  private static final String CDKey_Version = "version";
+  private static final String CDKey_Error = "error";
 
   private CloudDataJsonUtil()
   {
@@ -125,19 +135,25 @@ public class CloudDataJsonUtil {
     return modelList;
   }
 
-  public static void processKeyboardPackageUpdateJSON(Context aContext, JSONObject pkgData) {
+  /**
+   * Process the "keyboards" JSON Object to determine keyboard updates
+   * @param aContext Context
+   * @param pkgData JSONObject from the package-version API
+   * @param updateBundles - List of keyboard bundle updates
+   */
+  public static void processKeyboardPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
     boolean saveKeyboardList = false;
     // Parse for the keyboard package updates
-    if (pkgData.has("keyboards")) {
+    if (pkgData.has(CDKey_Keyboards)) {
       try {
-        JSONObject cloudKeyboardPackages = pkgData.getJSONObject("keyboards");
+        JSONObject cloudKeyboardPackages = pkgData.getJSONObject(CDKey_Keyboards);
         Iterator<String> keyboardIDs = cloudKeyboardPackages.keys();
         while (keyboardIDs.hasNext()) {
           String keyboardID = keyboardIDs.next();
           JSONObject cloudKeyboardObj = cloudKeyboardPackages.getJSONObject(keyboardID);
-          if (!cloudKeyboardObj.has("error")) {
-            String cloudVersion = cloudKeyboardObj.getString("version");
-            String cloudKMP = cloudKeyboardObj.getString("kmp");
+          if (!cloudKeyboardObj.has(CDKey_Error)) {
+            String cloudVersion = cloudKeyboardObj.getString(CDKey_Version);
+            String cloudKMP = cloudKeyboardObj.getString(CDKey_KMP);
             // Valid keyboard package exists. See if keyboard list needs to be updated
             for (int i = 0; i < KeyboardController.getInstance().get().size(); i++) {
               Keyboard kbd = KeyboardController.getInstance().getKeyboardInfo(i);
@@ -147,6 +163,11 @@ public class CloudDataJsonUtil {
                 // Update keyboard with the KMP link
                 kbd.setKMP(cloudKMP);
                 KeyboardController.getInstance().add(kbd);
+
+                // Update bundle list
+                Bundle bundle = new Bundle(kbd.buildDownloadBundle());
+                updateBundles.add(bundle);
+
                 saveKeyboardList = true;
               }
             }
@@ -164,9 +185,9 @@ public class CloudDataJsonUtil {
 
   public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData) {
     // Parse for lexical model package updates
-    if (pkgData.has("models")) {
+    if (pkgData.has(CDKey_Models)) {
       try {
-        JSONArray modelPackages = pkgData.getJSONArray("models");
+        JSONArray modelPackages = pkgData.getJSONArray(CDKey_Models);
       } catch (JSONException | NullPointerException e) {
         Log.e(TAG, "processPackageUpdateJSON Error processing models: " + e);
       }
@@ -195,8 +216,14 @@ public class CloudDataJsonUtil {
     try {
       // Read from cache file
       if (file.exists()) {
-        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
-        kbData = new JSONObject(objInput.readObject().toString());
+        StringBuilder sb = new StringBuilder(0);
+        String line;
+        BufferedReader objInput = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        while ((line = objInput.readLine()) != null) {
+          sb.append(line);
+        }
+        //ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
+        kbData = new JSONObject(sb.toString());
         objInput.close();
       }
     } catch (Exception e) {

@@ -76,7 +76,8 @@ public class Keyboard extends LanguageResource implements Serializable {
                   boolean isNewKeyboard, String font, String oskFont) {
     super(packageID, keyboardID, keyboardName, languageID, languageName, version,
       (FileUtils.isWelcomeFile(helpLink)) ? helpLink :
-        String.format(HELP_URL_FORMATSTR, keyboardID, version), kmp);
+        String.format(HELP_URL_FORMATSTR, keyboardID, version),
+      kmp);
 
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
@@ -103,6 +104,7 @@ public class Keyboard extends LanguageResource implements Serializable {
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, languageName);
 
     bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, helpLink);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KMP_LINK, kmp);
 
     return bundle;
   }
