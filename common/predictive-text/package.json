@@ -45,6 +45,7 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "@keymanapp/models-templates": "^14.0.79",
     "@keymanapp/models-wordbreakers": "^14.0.80",
     "@keymanapp/web-utils": "^14.0.80",
     "es6-shim": "^0.35.5",

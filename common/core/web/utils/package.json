@@ -3,7 +3,7 @@
   "version": "14.0.80",
   "description": "Common utility functions used throughout other Keyman packages",
   "main": "./dist/index.js",
-  "types:": "./dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "node ../../../../resources/gosh.js ./build.sh",
     "prepare": "npm run build -- -skip-package-install",

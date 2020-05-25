@@ -3,7 +3,7 @@
  */
 
 var assert = require('chai').assert;
-var TrieModel = require('../../build/intermediate').models.TrieModel;
+var TrieModel = require('../').models.TrieModel;
 
 describe('LMLayerWorker trie model for word lists', function() {
   describe('instantiation', function () {
