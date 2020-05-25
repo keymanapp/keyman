@@ -1121,19 +1121,18 @@ public final class KMManager {
     int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
     if (index != KeyboardController.INDEX_NOT_FOUND) {
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
-      kbVersion = kbInfo.getVersion();
-      if (kbVersion != null) {
-        // Version exists, so keyboard is up to date
-        kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
-      }
-    }
+      if (kbInfo != null) {
+        kbVersion = kbInfo.getVersion();
+        if (kbVersion != null) {
+          // Compare with the cloud package to see if update is available
+          String latestCloudPackageVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID); // fix this
 
-    if (kbInfo != null) {
-      // Compare with the cloud package to see if update is available
-      String latestCloudPackageVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID); // fix this
-
-      if (kbVersion != null && (FileUtils.compareVersions(latestCloudPackageVersion, kbVersion) == FileUtils.VERSION_GREATER)) {
-        kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
+          if (FileUtils.compareVersions(latestCloudPackageVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+            kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
+          } else {
+            kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
+          }
+        }
       }
     }
 
