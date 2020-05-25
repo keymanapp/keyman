@@ -5,6 +5,8 @@ Maintainer: Daniel Glassey <wdg@debian.org>
 Build-Depends: debhelper (>= 9), autotools-dev, dh-autoreconf, pkg-config,
  libkmflcomp-dev (>=10.99.1), libkmfl-dev (>=10.99.1), libibus-1.0-dev (>= 1.2), x11proto-core-dev, libx11-dev
 Standards-Version: 3.9.8
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
 Homepage: https://www.keyman.com
 
 Package: ibus-kmfl

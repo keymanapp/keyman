@@ -6,6 +6,8 @@ Build-Depends: debhelper (>= 9), autotools-dev, dh-autoreconf, pkg-config,
  libkmnkbp-dev (>=0.0.0~), libibus-1.0-dev (>= 1.2), libjson-glib-dev (>= 1.4.0) <!pkg.keyman-config.xenial>,
  libjson-glib-dev (= 1.1.2) <pkg.keyman-config.xenial>, libgtk-3-dev
 Standards-Version: 4.5.0
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
 Homepage: https://www.keyman.com
 
 Package: ibus-keyman

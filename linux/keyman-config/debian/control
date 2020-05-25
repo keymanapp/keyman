@@ -6,6 +6,8 @@ Build-Depends: dh-python, python3-setuptools, python3-all, python3-pip, debhelpe
  python3-magic, python3-qrcode <!pkg.keyman-config.xenial>,
  python-qrcode <pkg.keyman-config.xenial>
 Standards-Version: 4.5.0
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
 Homepage: https://www.keyman.com/
 
 Package: python3-keyman-config
