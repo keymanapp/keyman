@@ -61,7 +61,7 @@ public class Keyboard extends LanguageResource implements Serializable {
 
       this.oskFont = keyboardJSON.optString(KMManager.KMKey_OskFont, "");
 
-      this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
+      this.version = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, null);
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
         String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
