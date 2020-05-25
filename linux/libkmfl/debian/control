@@ -2,7 +2,7 @@ Source: libkmfl
 Priority: optional
 Section: libs
 Maintainer: Daniel Glassey <wdg@debian.org>
-Homepage: http://www.keyman.com/
+Homepage: https://www.keyman.com/
 Build-Depends: cdbs (>= 0.4.27), debhelper (>= 9), dh-autoreconf, libkmflcomp-dev (>=10.99.0)
 Standards-Version: 3.9.7
 
