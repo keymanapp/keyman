@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "node ../../../../resources/gosh.js ./build.sh",
+    "build": "gosh ./build.sh",
     "prepare": "npm run build -- -skip-package-install",
     "tsc": "tsc"
   },
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
+    "@keymanapp/resources-gosh": "^14.0.80",
     "typescript": "^3.7.2"
   }
 }
