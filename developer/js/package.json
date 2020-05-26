@@ -39,7 +39,7 @@
   "dependencies": {
     "@keymanapp/models-types": "^14.0.0",
     "commander": "^3.0.0",
-    "typescript": "^3.2.4",
+    "typescript": "^3.8.3",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
