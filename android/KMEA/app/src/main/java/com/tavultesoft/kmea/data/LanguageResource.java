@@ -91,7 +91,7 @@ public abstract class LanguageResource implements Serializable {
     this.languageID = languageID.toLowerCase();
     // If language name not provided, fallback to re-use language ID
     this.languageName = (languageName != null && !languageName.isEmpty()) ? languageName : this.languageID;
-    this.version = (version != null) ? version : "1.0";
+    this.version = version;
     this.helpLink = helpLink;
   }
 

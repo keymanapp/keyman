@@ -1,11 +1,11 @@
 {
   "name": "@keymanapp/web-utils",
-  "version": "14.0.80",
+  "version": "14.0.81",
   "description": "Common utility functions used throughout other Keyman packages",
   "main": "./dist/index.js",
-  "types:": "./dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "node ../../../../resources/gosh.js ./build.sh",
+    "build": "gosh ./build.sh",
     "prepare": "npm run build -- -skip-package-install",
     "tsc": "tsc"
   },
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@types/node": "^14.0.5",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "@keymanapp/resources-gosh": "^14.0.80"
   }
 }

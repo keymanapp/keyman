@@ -1103,33 +1103,35 @@ public final class KMManager {
 
   public static KeyboardState getKeyboardState(Context context, String packageID, String keyboardID, String languageID) {
     KeyboardState kbState = KeyboardState.KEYBOARD_STATE_UNDEFINED;
-    if (packageID == null || keyboardID == null || languageID == null)
+    if (packageID == null || keyboardID == null || languageID == null) {
       return kbState;
+    }
 
     packageID = packageID.trim();
     keyboardID = keyboardID.trim();
     languageID = languageID.trim();
-    if (keyboardID.isEmpty() || languageID.isEmpty())
+    if (keyboardID.isEmpty() || languageID.isEmpty()) {
       return kbState;
+    }
 
-    String latestVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
-    if (latestVersion == null) {
-      kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
-    } else {
-      kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
+    // Check latest installed keyboard version
+    Keyboard kbInfo = null;
+    String kbVersion = null;
+    kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
+    int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
+    if (index != KeyboardController.INDEX_NOT_FOUND) {
+      kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
+      if (kbInfo != null) {
+        kbVersion = kbInfo.getVersion();
+        if (kbVersion != null) {
+          // Compare with the cloud package to see if update is available
+          String latestCloudPackageVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID); // fix this
 
-      HashMap<String, HashMap<String, String>> keyboardsInfo = LanguageListUtil.getKeyboardsInfo(context);
-      if (keyboardsInfo != null) {
-        // Check version
-        String kbKey = String.format("%s_%s", languageID, keyboardID);
-        HashMap<String, String> kbInfo = keyboardsInfo.get(kbKey);
-        String kbVersion = "1.0";
-        if (kbInfo != null) {
-          kbVersion = kbInfo.get(KMManager.KMKey_KeyboardVersion);
-        }
-
-        if (kbVersion != null && (FileUtils.compareVersions(kbVersion, latestVersion) == FileUtils.VERSION_GREATER)) {
-          kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
+          if (FileUtils.compareVersions(latestCloudPackageVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+            kbState = KeyboardState.KEYBOARD_STATE_NEEDS_UPDATE;
+          } else {
+            kbState = KeyboardState.KEYBOARD_STATE_UP_TO_DATE;
+          }
         }
       }
     }
