@@ -1,7 +1,7 @@
 Source: libkmfl
 Priority: optional
 Section: libs
-Maintainer: Daniel Glassey <wdg@debian.org>
+Maintainer: Keyman team <support@keyman.com>
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman
 Homepage: https://www.keyman.com/

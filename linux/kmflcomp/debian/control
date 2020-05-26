@@ -1,7 +1,7 @@
 Source: kmflcomp
 Priority: optional
 Section: utils
-Maintainer: Daniel Glassey <wdg@debian.org>
+Maintainer: Keyman team <support@keyman.com>
 Uploaders: Torsten Werner <twerner@debian.org>
 Vcs-Git: https://github.com/keymanapp/keyman.git
 Vcs-Browser: https://github.com/keymanapp/keyman

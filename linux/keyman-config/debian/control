@@ -1,5 +1,5 @@
 Source: keyman-config
-Maintainer: Daniel Glassey <wdg@debian.org>
+Maintainer: Keyman team <support@keyman.com>
 Section: python
 Priority: optional
 Build-Depends: dh-python, python3-setuptools, python3-all, python3-pip, debhelper (>= 9), bash-completion,
