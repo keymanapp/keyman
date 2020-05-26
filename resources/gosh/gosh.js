@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  gosh.js: launch bash script from any environment from within our package.json builds
 
@@ -5,13 +7,21 @@
  on Windows platforms, and execute it within the current console. On *nix environments, it
  will simply launch /bin/bash.
 
- Usage: in package.json, define scripts like this:
+ Usage:
 
-  "foo": "node path/to/gosh.js foo.sh ..."
+ Make sure gosh is installed with lerna, e.g.:
+
+     npx lerna add @keymanapp/resources-gosh path/to/your/package
+
+ Then, in package.json, define scripts like this:
+
+     "scripts": {
+       "foo": "gosh ./foo.sh ..."
+     }
 
  For example, in common/core/web/utils/package.json, npm run build is defined as:
 
-   "build": "node ../../../../resources/gosh.js build.sh -skip-package-install"
+     "build": "gosh ./build.sh -skip-package-install"
 
  Windows launch strategy:
 
