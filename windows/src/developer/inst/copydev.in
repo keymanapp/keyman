@@ -115,7 +115,9 @@ heat-model-compiler:
     # Step 3 - install just the bare essentials by using our packed local dependency, followed by
     # all external production dependencies.
     cd $(KEYMAN_WIX_TEMP_MODELCOMPILER)
-    npm install kmtypes.tgz
+    # package-lock.json wasn't bundled; this is needed to keep dependency versions consistent.
+    copy $(KEYMAN_MODELCOMPILER_ROOT)\package-lock.json $(KEYMAN_WIX_TEMP_MODELCOMPILER)
+    npm install kmtypes.tgz --production --no-optional
     npm install --production --no-optional
 
     # We don't need the unit tests
