@@ -84,7 +84,7 @@
         trieData['totalWeight'],
         options.searchTermToKey as Wordform2Key || defaultSearchTermToKey
       );
-      this.breakWords = options.wordBreaker || wordBreakers['default'];
+      this.breakWords = options.wordBreaker || getDefaultWordBreaker();
       this.punctuation = options.punctuation;
     }
 
@@ -450,5 +450,17 @@
       // common to Latin-orthographies.
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase() as SearchKey;
+  }
+
+  function getDefaultWordBreaker() {
+    let namespace: {};
+    // @ts-ignore
+    if (typeof wordBreakers !== 'undefined') {
+      // @ts-ignore
+      namespace = wordBreakers;
+    } else {
+      namespace = require('@keymanapp/models-wordBreakers').wordBreakers;
+    }
+    return namespace['default'];
   }
 }

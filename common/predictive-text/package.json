@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/lexical-model-layer",
-  "version": "14.0.80",
+  "version": "14.0.81",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
   "scripts": {
@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/models-types": "^14.0.80",
-    "@keymanapp/resources-gosh": "^14.0.80",
+    "@keymanapp/models-types": "^14.0.81",
+    "@keymanapp/resources-gosh": "^14.0.81",
     "@types/node": "^10.17.21",
     "chai": "^4.2.0",
     "karma": "^4.2.0",
@@ -46,8 +46,9 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@keymanapp/models-wordbreakers": "^14.0.80",
-    "@keymanapp/web-utils": "^14.0.80",
+    "@keymanapp/models-templates": "^14.0.81",
+    "@keymanapp/models-wordbreakers": "^14.0.81",
+    "@keymanapp/web-utils": "^14.0.81",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",
     "string.prototype.startswith": "^0.2.0"
