@@ -21,7 +21,7 @@
     "@keymanapp/resources-gosh": "^14.0.80",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "lerna": "cd ../ && npm run lerna --",
