@@ -251,3 +251,5 @@
 
 # Atom/Nuclide
 compile_flags.txt
+
+**/node_modules/
