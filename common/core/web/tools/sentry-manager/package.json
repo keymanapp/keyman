@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/web-sentry-manager",
-  "version": "14.0.82",
+  "version": "14.0.83",
   "description": "Common setup for KeymanWeb's Sentry-based error reporting",
   "main": "dist/index.js",
   "scripts": {

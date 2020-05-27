@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.82 alpha 2020-05-27
+
+* fix(ios): fixes build warning on Error coersion, fixes logged error for intermediate embedded state (#3173)
+* fix(linux): Don't fail (un-)install if running multiple ibus (#3169)
+* chore(linux): Update maintainer in package metadata (#3168)
+* feat(linux): Improve appstream metadata (#3176)
+
 ## 14.0.81 alpha 2020-05-27
 
 * refactor(resources): convert gosh into npm package 🙃 (#3159)
