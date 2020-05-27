@@ -27,9 +27,7 @@ class HTTPDownloader: NSObject {
   init(_ handler: HTTPDownloadDelegate?) {
     super.init()
     self.handler = handler
-
-    let config = URLSessionConfiguration.default
-    downloadSession = URLSession(configuration: config)
+    downloadSession = URLSession.shared
   }
 
   func addRequest(_ request: HTTPDownloadRequest) {
