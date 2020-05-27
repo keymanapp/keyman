@@ -327,7 +327,7 @@ public class ResourceDownloadManager {
     //get list of lexical models for this languageID  /?q=bcp47:en
     func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
       if let error = error {
-        log.info("Failed to fetch lexical model list for "+languageID+". error: "+(error as! String))
+        log.info("Failed to fetch lexical model list for "+languageID+". error: "+error.localizedDescription)
         downloader.downloadFailed(forLanguageID: languageID, error: error)
       } else if nil == lexicalModels {
         //TODO: put up an alert instead

@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.81 alpha 2020-05-27
+
+* refactor(resources): convert gosh into npm package 🙃 (#3159)
+* chore(common,web): use consistent TypeScript dep on all packages (#3158)
+* chore(common/resources): add `common/models` to build trigger definitions (#3144)
+* fix(common): adds package-lock.json for gosh package (#3171)
+
+## 14.0.80 alpha 2020-05-25
+
+* fix(android/engine): Remove LanguageListUtil (#3155)
+* refactor(common/lmlayer): create package: @keymanapp/models-templates (#3128)
+
 ## 14.0.79 alpha 2020-05-22
 
 * fix(android): Fix system keyboard globe button override (#3140)

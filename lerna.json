@@ -7,7 +7,12 @@
     "common/core/web/utils",
     "common/models/*",
     "common/predictive-text",
+    "resources/gosh",
     "web"
   ],
-  "version": "14.0.80"
+  "hoist": [
+    "lerna",
+    "typescript"
+  ],
+  "version": "14.0.82"
 }
