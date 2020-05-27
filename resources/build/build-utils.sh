@@ -142,28 +142,15 @@ function printVersionUtilsDebug() {
 }
 
 function findShouldSentryRelease() {
-    # Default, in case $VERSION_ENVIRONMENT is improperly specified.
+    # Default, for 'test' or 'local' environment, or in case $VERSION_ENVIRONMENT is improperly specified.
+    # (May be overridden by -upload-sentry in supporting build scripts.)
     UPLOAD_SENTRY=false
 
-    # Dynamically configure whether or not to upload Sentry symbols.
+    # Default: override to `true` for release builds.
     case $VERSION_ENVIRONMENT in
     # Actual release tiers
-    alpha)
+    alpha | beta | stable)
         UPLOAD_SENTRY=true
-        ;;
-    beta)
-        UPLOAD_SENTRY=true
-        ;;
-    stable)
-        UPLOAD_SENTRY=true
-        ;;
-
-    # Development builds; do not release (by default).
-    local)
-        UPLOAD_SENTRY=false
-        ;;
-    test)
-        UPLOAD_SENTRY=false
         ;;
     esac
 }
