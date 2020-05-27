@@ -150,12 +150,13 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
 
   /**
    * process the meta data result and prepare the additional downloads.
+   * @param aContext the context
    * @param aMetaDataResult the meta data results
    */
   private void processCloudResults(Context aContext, List<MetaDataResult> aMetaDataResult) {
     for(MetaDataResult _r:aMetaDataResult) {
       if (_r.returnjson.target== CloudApiTypes.ApiTarget.Keyboard) {
-        handleKeyboardMetaData(_r);
+        //handleKeyboardMetaData(_r);
       }
       if(_r.returnjson.target== CloudApiTypes.ApiTarget.KeyboardLexicalModels) {
         JSONArray lmData = _r.returnjson.jsonArray;

@@ -500,9 +500,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         lmMap.get(KMManager.KMKey_LanguageName),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
-        "",
-        "" // TODO: add model URL
-      );
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_KMPLink, ""));
       lexList.add(m);
     }
 
@@ -541,9 +539,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         lmMap.get(KMManager.KMKey_LanguageName),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_LexicalModelVersion, "1.0"),
         MapCompat.getOrDefault(lmMap, KMManager.KMKey_CustomHelpLink, ""),
-        "", // latest kmp link
-        ""  // model URL
-      );
+        MapCompat.getOrDefault(lmMap, KMManager.KMKey_KMPLink, ""));
       lexList.add(m);
     }
     storage.lexicalModels.addAll(lexList);

@@ -19,14 +19,6 @@ import java.io.Serializable;
 public class LexicalModel extends LanguageResource implements Serializable {
   private static final String TAG = "lexicalModel";
 
-  // Only used to build download bundle from cloud.
-  // This is for the initial download of the lexical model.
-  // "kmp" is used for downloading newer versions of the lexical model package.
-  private String modelURL;
-
-  // JSON key
-  private static String LM_MODEL_URL_KEY = "modelURL";
-
   /**
    * Constructor using JSON Object from installed lexical models list
    * @param installedObj
@@ -42,13 +34,13 @@ public class LexicalModel extends LanguageResource implements Serializable {
    */
   public LexicalModel(JSONObject lexicalModelJSON, boolean fromCloud) {
     try {
-      this.modelURL = lexicalModelJSON.optString("packageFilename", "");
+      this.kmp = lexicalModelJSON.optString("packageFilename", "");
 
       if (lexicalModelJSON.has(KMManager.KMKey_PackageID)) {
         this.packageID = lexicalModelJSON.getString(KMManager.KMKey_PackageID);
-      } else if (this.modelURL != null && FileUtils.hasLexicalModelPackageExtension(this.modelURL)) {
+      } else if (this.kmp != null && FileUtils.hasLexicalModelPackageExtension(this.kmp)) {
         // Extract package ID from packageFilename
-        String filename = FileUtils.getFilename(this.modelURL);
+        String filename = FileUtils.getFilename(this.kmp);
         // Truncate .model.kmp file extension
         this.packageID = filename.replace(FileUtils.MODELPACKAGE, "");
       } else {
@@ -77,7 +69,6 @@ public class LexicalModel extends LanguageResource implements Serializable {
       this.version = lexicalModelJSON.optString(KMManager.KMKey_LexicalModelVersion, version);
 
       this.helpLink = ""; // TOODO: Handle help links
-      this.modelURL = modelURL;
     } catch (JSONException e) {
       Log.e(TAG, "Lexical model exception parsing JSON: " + e);
     }
@@ -85,13 +76,15 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
   public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,
                       String languageID, String languageName,  String version,
-                      String helpLink, String kmp,
-                      String modelURL) {
+                      String helpLink, String kmp) {
     // TODO: handle help links
     super(packageID, lexicalModelID, lexicalModelName, languageID, languageName,
         version, "", kmp);
+  }
 
-    this.modelURL = modelURL;
+  @Override
+  public String getKey() {
+    return String.format("%s_%s_%s", packageID, languageID, resourceID);
   }
 
   public String getLexicalModelID() { return getResourceID(); }
@@ -102,9 +95,9 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
     // Make sure we have an actual download URL.  If not, we can't build a proper download bundle -
     // the downloader conditions on this URL's existence in 12.0!
-    if(modelURL == null) {
+    if(kmp == null) {
       return null;
-    } else if (modelURL.equals("")) {
+    } else if (kmp.equals("")) {
       return null;
     }
 
@@ -113,9 +106,9 @@ public class LexicalModel extends LanguageResource implements Serializable {
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_ID, languageID);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_NAME, resourceName);
     bundle.putString(KMKeyboardDownloaderActivity.ARG_LANG_NAME, languageName);
-    bundle.putString(KMKeyboardDownloaderActivity.ARG_MODEL_URL, modelURL);
 
     bundle.putString(KMKeyboardDownloaderActivity.ARG_CUSTOM_HELP_LINK, helpLink);
+    bundle.putString(KMKeyboardDownloaderActivity.ARG_KMP_LINK, kmp);
 
     return bundle;
   }
@@ -133,24 +126,10 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
   protected void fromJSON(JSONObject installedObj) {
     super.fromJSON(installedObj);
-    try {
-      this.modelURL = installedObj.getString(LM_MODEL_URL_KEY);
-    } catch (JSONException e) {
-      Log.e(TAG, "fromJSON() exception: " + e);
-    }
   }
 
   public JSONObject toJSON() {
-    JSONObject o = super.toJSON();
-    if (o != null) {
-      try {
-        o.put(LM_MODEL_URL_KEY, this.modelURL);
-      } catch (JSONException e) {
-        Log.e(TAG, "toJSON() exception: " + e);
-      }
-    }
-
-    return o;
+    return super.toJSON();
   }
 
   // default nrc.en.mtnt English dictionary
@@ -161,7 +140,6 @@ public class LexicalModel extends LanguageResource implements Serializable {
     KMManager.KMDefault_LanguageID,
     KMManager.KMDefault_LanguageName,
     KMManager.KMDefault_DictionaryVersion,
-    "",
-    "",
-    "");
+    "", // help link
+    ""); // kmp link
 }

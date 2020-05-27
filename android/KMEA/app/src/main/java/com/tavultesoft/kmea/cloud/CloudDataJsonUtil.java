@@ -83,31 +83,18 @@ public class CloudDataJsonUtil {
     }
 
     try {
-      if (fromKMP) {
-        JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
-        for (int i = 0; i < languages.length(); i++) {
-          JSONObject languageJSON = languages.getJSONObject(i);
-          JSONArray langKeyboards = languageJSON.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
+      // Thank you, Cloud API format
+      JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
+      for (int i = 0; i < languages.length(); i++) {
+        JSONObject languageJSON = languages.getJSONObject(i);
+        JSONArray langKeyboards = languageJSON.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
 
-          // Can't foreach a JSONArray
-          int kbLength = langKeyboards.length();
-          for (int j = 0; j < kbLength; j++) {
-            JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
-            keyboardsList.add(new Keyboard(languageJSON, keyboardJSON));
-          }
+        // Can't foreach a JSONArray
+        int kbLength = langKeyboards.length();
+        for (int j = 0; j < kbLength; j++) {
+          JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
+          keyboardsList.add(new Keyboard(languageJSON, keyboardJSON));
         }
-      } else {
-        // Thank you, Cloud API format.
-        JSONObject keyboardsJSON = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-        String keyboardID = keyboardsJSON.keys().next();
-        JSONObject keyboardJSON = keyboardsJSON.getJSONObject(keyboardID);
-        String version = keyboardJSON.getString(KMManager.KMKey_Version);
-        String kmp = keyboardJSON.getString("kmp");
-        String packageID = FileUtils.getFilename(kmp).substring(0, kmp.indexOf(FileUtils.KEYMANPACKAGE));
-
-        //keyboardsList.add(new Keyboard(packageID,))
-
-
       }
     } catch (JSONException | NullPointerException e) {
       Log.e(TAG, "JSONParse Error: " + e);
@@ -159,8 +146,9 @@ public class CloudDataJsonUtil {
               Keyboard kbd = KeyboardController.getInstance().getKeyboardInfo(i);
               String version = kbd.getVersion();
               if (keyboardID.equalsIgnoreCase(kbd.getKeyboardID()) &&
-                FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) {
-                // Update keyboard with the KMP link
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
+                  (!kbd.getKMP().equalsIgnoreCase(cloudKMP))) {
+                // Update keyboard with the latest KMP link
                 kbd.setKMP(cloudKMP);
                 KeyboardController.getInstance().add(kbd);
 
@@ -188,6 +176,7 @@ public class CloudDataJsonUtil {
     if (pkgData.has(CDKey_Models)) {
       try {
         JSONArray modelPackages = pkgData.getJSONArray(CDKey_Models);
+        // TODO: continue to process this (similar to processKeyboardPackageUpdateJSON) for lexical model updates
       } catch (JSONException | NullPointerException e) {
         Log.e(TAG, "processPackageUpdateJSON Error processing models: " + e);
       }
@@ -204,7 +193,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "getCachedJSONArray failed to read from cache file. Error: " + e);
       lmData = null;
     }
 
@@ -222,12 +211,11 @@ public class CloudDataJsonUtil {
         while ((line = objInput.readLine()) != null) {
           sb.append(line);
         }
-        //ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
         kbData = new JSONObject(sb.toString());
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "getCachedJSONObject failed to read from cache file. Error: " + e);
       kbData = null;
     }
 

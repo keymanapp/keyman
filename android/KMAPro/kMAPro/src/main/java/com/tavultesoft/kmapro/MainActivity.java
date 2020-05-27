@@ -1074,16 +1074,14 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         hashMap.get(KMManager.KMKey_LanguageName),
         hashMap.get(KMManager.KMKey_Version),
         hashMap.get(KMManager.KMKey_HelpLink),
-        "", // kmp link
+        hashMap.get(KMManager.KMKey_KMPLink),
         true,
         hashMap.get(KMManager.KMKey_Font),
         hashMap.get(KMManager.KMKey_OskFont));
 
       if (i == 0) {
         if (KMManager.addKeyboard(this, keyboardInfo)) {
-          //KMManager.setKeyboard(keyboardInfo);
-          KMManager.setKeyboard(keyboardInfo.getPackageID(), keyboardInfo.getKeyboardID(), keyboardInfo.getLanguageID());
-          KMManager.getKeyboardState(this, keyboardInfo.getPackageID(), keyboardInfo.getKeyboardID(), keyboardInfo.getLanguageID()); // For testing: do not commit
+          KMManager.setKeyboard(keyboardInfo);
         }
       } else {
         KMManager.addKeyboard(this, keyboardInfo);

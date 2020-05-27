@@ -221,10 +221,10 @@ public final class FileUtils {
   }
 
   /**
-   * Write arr Object to filepath
+   * Write obj Object to filepath
    * @param File path to filename to write
    * @param obj JSONObject or JSONArray to save
-   * @return boolean if the save was successfull
+   * @return boolean if the save was successful
    */
   public static boolean saveList(File filepath, Object obj) {
     boolean result = false;

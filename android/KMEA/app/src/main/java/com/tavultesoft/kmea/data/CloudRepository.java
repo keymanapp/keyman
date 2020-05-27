@@ -57,6 +57,19 @@ public class CloudRepository {
     void onUpdateDetection(List<Bundle> updateBundles);
   }
 
+  /**
+   * Get the validity for cached resources (lexical model cache and package-version)
+   * @param context the main activity of the application
+   * @return boolean of the cache validity
+   */
+  public boolean getCacheValidity(@NonNull Context context) {
+    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
+    boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
+
+    boolean cacheValid = loadLexicalModelsFromCache && loadResourcesFromCache;
+    return cacheValid;
+  }
+
   public boolean hasCache(Context context) {
     if(DEBUG_DISABLE_CACHE) {
       return false;
@@ -65,7 +78,7 @@ public class CloudRepository {
     if(shouldUseMemCache(context)) {
       return true;
     } else {
-      return shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
+      return getCacheValidity(context);
     }
   }
 
@@ -144,7 +157,7 @@ public class CloudRepository {
     }
 
     String queryURL = String.format("%s%s%s",
-      KMKeyboardDownloaderActivity.kKeymanApiBaseURL, keyboardQuery, lexicalModelQuery);
+      KMKeyboardDownloaderActivity.kKeymanApiPackageVersionURL, keyboardQuery, lexicalModelQuery);
     return new CloudApiTypes.CloudApiParam(
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }
@@ -184,19 +197,6 @@ public class CloudRepository {
     preCacheDataSet(context,updateHandler,onSuccess,onFailure);
 
     downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
-  }
-
-  /**
-   * Get the validity for a cached resource. Previously was a union of keyboard and lexical model cache validity
-   * @param context the main activity of the application
-   * @return boolean of the cache validity
-   */
-  public boolean getCacheValidity(@NonNull Context context) {
-    boolean loadResourcesFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getResourcesCacheFile(context));
-    boolean loadLexicalModelsFromCache = this.shouldUseCache(context, CloudDataJsonUtil.getLexicalModelCacheFile(context));
-
-    boolean cacheValid = loadLexicalModelsFromCache;
-    return cacheValid;
   }
 
   /**
@@ -282,6 +282,7 @@ public class CloudRepository {
       // Get the lexical model info
       lexData = CloudDataJsonUtil.getCachedJSONArray(CloudDataJsonUtil.getLexicalModelCacheFile(context));
 
+      // In case something went wrong with the last cache attempt, which can cause a null return
       if (lexData == null) {
         lexData = new JSONArray();
         cacheValid = false;
@@ -292,7 +293,10 @@ public class CloudRepository {
       if (pkgData == null) {
         pkgData = new JSONObject();
       }
-      // Reuse any valid parts of the cache.
+    }
+
+    // Reuse any valid parts of the cache.
+    if (cacheValid) {
       CloudCatalogDownloadReturns jsonData = new CloudCatalogDownloadReturns(kbdData, lexData, pkgData);
 
       // Call the processor method directly with the cached API data.
@@ -348,10 +352,10 @@ public class CloudRepository {
     //    CloudApiParam[] cloudQueries = new CloudApiParam[2];
     //    int cloudQueryEntries = 0;
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
-    cloudQueries.add(prepareResourcesUpdateQuerty(context));
 
     if (!cacheValid) {
       cloudQueries.add(prepareLexicalModellUpdateQuery(context));
+      cloudQueries.add(prepareResourcesUpdateQuerty(context));
     }
 
     int cloudQueryEntries = cloudQueries.size();
