@@ -47,6 +47,15 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     kbInfo.put(KMManager.KMKey_Font, "aava1.ttf");
     //kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont); // Use the default font
     KMManager.addKeyboard(this, kbInfo);
+
+    // Add a dictionary
+    HashMap<String, String>lexicalModelInfo = new HashMap<String, String>();
+    lexicalModelInfo.put(KMManager.KMKey_PackageID, "example.ta.wordlist");
+    lexicalModelInfo.put(KMManager.KMKey_LanguageID, "ta");
+    lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, "example.ta.wordlist");
+    lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, "1.0");
+    KMManager.addLexicalModel(this, lexicalModelInfo);
+    KMManager.registerAssociatedLexicalModel("ta");
   }
 
   @Override
@@ -153,8 +162,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (inputView != null)
       inputViewHeight = inputView.getHeight();
 
+    int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);
-    outInsets.contentTopInsets = inputViewHeight - kbHeight;
+    outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
     outInsets.touchableInsets = InputMethodService.Insets.TOUCHABLE_INSETS_REGION;
     outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
   }

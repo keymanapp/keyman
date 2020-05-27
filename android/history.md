@@ -1,5 +1,9 @@
 # Keyman for Android Version History
 
+## 2020-05-26 13.0.6213 stable
+* Changes:
+  * Add Tamil lexical model to KMSample2 (#3165)
+
 ## 2020-05-25 13.0.6212 stable
 * Bug fix:
   * Fix system keyboard globe button override (#3161)
