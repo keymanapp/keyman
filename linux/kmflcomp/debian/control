@@ -1,9 +1,11 @@
 Source: kmflcomp
 Priority: optional
 Section: utils
-Maintainer: Daniel Glassey <wdg@debian.org>
+Maintainer: Keyman team <support@keyman.com>
 Uploaders: Torsten Werner <twerner@debian.org>
-Homepage: http://www.keyman.com
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
+Homepage: https://www.keyman.com
 Build-Depends: cdbs (>= 0.4.27), debhelper (>= 9), libx11-dev, dh-autoreconf
 Standards-Version: 3.9.8.0
 
@@ -35,5 +37,5 @@ Description: KMFL (Keyboard Mapping for Linux) compiler library
  The kmfl library is a multilingual text processing library that implements
  the Keyman(C) text processing language.
  .
- Library to compile Keyman layout files to a binary format for use by the 
+ Library to compile Keyman layout files to a binary format for use by the
  KMFL keystroke interpreter.
