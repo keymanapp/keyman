@@ -21,6 +21,7 @@ public abstract class LanguageResource implements Serializable {
   protected String languageName;
   protected String version;
   protected String helpLink;
+  protected String kmp; // link to latest kmp from the cloud vs what is currently installed
 
   // JSON keys
   private static String LR_PACKAGE_ID_KEY = "packageID";
@@ -30,6 +31,7 @@ public abstract class LanguageResource implements Serializable {
   private static String LR_LANGUAGE_NAME_KEY = "languageName";
   private static String LR_VERSION_KEY = "version";
   private static String LR_HELP_LINK_KEY = "helpLink";
+  private static String LR_KMP_KEY = "kmp";
 
   private static final String TAG = "LanguageResource";
 
@@ -52,6 +54,17 @@ public abstract class LanguageResource implements Serializable {
   public String getPackage() { return packageID; }
 
   public String getHelpLink() { return helpLink; }
+
+  public String getUpdateKMP() { return kmp; }
+  public void setUpdateKMP(String kmp) { this.kmp = kmp; }
+
+  /**
+   * Helper method if the language resource has an updated kmp package available to download from the cloud
+   * @return boolean true if an updated kmp package is available
+   */
+  public boolean hasUpdateAvailable() {
+    return (kmp != null && !kmp.isEmpty());
+  }
 
   public int hashCode() {
     String id = getResourceID();
@@ -81,10 +94,11 @@ public abstract class LanguageResource implements Serializable {
    * @param languageName
    * @param version
    * @param helpLink
+   * @param kmp
    */
   public LanguageResource(String packageID, String resourceID, String resourceName,
                           String languageID, String languageName, String version,
-                          String helpLink) {
+                          String helpLink, String kmp) {
     this.packageID = (packageID != null) ? packageID : KMManager.KMDefault_UndefinedPackageID;
     this.resourceID = resourceID;
     this.resourceName = resourceName;
@@ -93,6 +107,7 @@ public abstract class LanguageResource implements Serializable {
     this.languageName = (languageName != null && !languageName.isEmpty()) ? languageName : this.languageID;
     this.version = version;
     this.helpLink = helpLink;
+    this.kmp = kmp;
   }
 
   protected void fromJSON(JSONObject installedObj) {
@@ -104,6 +119,11 @@ public abstract class LanguageResource implements Serializable {
       this.languageName = installedObj.getString(LanguageResource.LR_LANGUAGE_NAME_KEY);
       this.version = installedObj.getString(LanguageResource.LR_VERSION_KEY);
       this.helpLink = installedObj.getString(LanguageResource.LR_HELP_LINK_KEY);
+      if (installedObj.has(LanguageResource.LR_KMP_KEY)) {
+        this.kmp = installedObj.getString(LanguageResource.LR_KMP_KEY);
+      } else {
+        this.kmp = "";
+      }
     } catch (JSONException e) {
       Log.e(TAG, "fromJSON() exception: " + e);
     }
@@ -119,6 +139,7 @@ public abstract class LanguageResource implements Serializable {
       o.put(LR_LANGUAGE_NAME_KEY, this.languageName);
       o.put(LR_VERSION_KEY, this.version);
       o.put(LR_HELP_LINK_KEY, this.helpLink);
+      o.put(LR_KMP_KEY, this.kmp);
     } catch (JSONException e) {
       Log.e(TAG, "toJSON() exception: " + e);
     }

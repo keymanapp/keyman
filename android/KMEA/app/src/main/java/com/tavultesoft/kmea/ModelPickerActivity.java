@@ -165,10 +165,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
                 preInstalledModelMap.get(KMManager.KMKey_LanguageName),
                 preInstalledModelMap.get(KMManager.KMKey_LexicalModelVersion),
                 preInstalledModelMap.get(KMManager.KMKey_HelpLink),
-                "" // String modelURL
-                );
-              String itemKey = String.format("%s_%s_%s",
-                  preInstalled.getPackageID(), preInstalled.getLanguageCode(), preInstalled.getResourceID());
+                MapCompat.getOrDefault(preInstalledModelMap, KMManager.KMKey_KMPLink, ""));
+              String itemKey = preInstalled.getKey();
               int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);
               KeyboardPickerActivity.deleteLexicalModel(context, modelIndex, true);
             }

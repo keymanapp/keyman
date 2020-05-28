@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.DialogFragment;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +33,10 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
+import com.tavultesoft.kmea.cloud.impl.CloudKeyboardPackageDownloadCallback;
+import com.tavultesoft.kmea.cloud.impl.CloudLexicalPackageDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -79,14 +84,6 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String kbID = kbd.getKeyboardID();
     final String kbName = kbd.getKeyboardName();
     final String kbVersion = kbd.getVersion();
-    String latestKbdCloudVersion = kbVersion;
-
-    // Determine if keyboard update is available from the cloud
-    Dataset dataset = CloudRepository.shared.fetchDataset(this);
-    final Keyboard latestKbd = dataset.keyboards.findMatch(kbd);
-    if (latestKbd != null) {
-      latestKbdCloudVersion = latestKbd.getVersion();
-    }
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
@@ -100,8 +97,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    // Display notification to download update if latestKbdCloudVersion > kbVersion (installed)
-    if (FileUtils.compareVersions(latestKbdCloudVersion, kbVersion) == FileUtils.VERSION_GREATER) {
+    // Display notification to download update if available
+    if (kbd.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }
@@ -162,10 +159,11 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
 
         // "Version" link clicked to download latest keyboard version from cloud
         if (itemTitle.equals(getString(R.string.keyboard_version))) {
-          Bundle args = latestKbd.buildDownloadBundle();
+          Bundle args = kbd.buildDownloadBundle();
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);
+          finish();
 
         // "Help" link clicked
         } else if (itemTitle.equals(getString(R.string.help_link))) {
