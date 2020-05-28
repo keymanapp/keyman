@@ -19,7 +19,7 @@ cd "$(dirname "$THIS_SCRIPT")"
 verify_on_mac
 
 display_usage ( ) {
-    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-no-build]"
+    echo "build.sh [-clean] [-no-kmw] [-only-framework] [-no-codesign] [-no-archive] [-no-build] [-upload-sentry]"
     echo
     echo "  -clean                  Removes all previously-existing build products for KMEI and the Keyman app before building."
     echo "  -no-kmw                 Uses existing keyman.js, doesn't try to build"
@@ -29,6 +29,7 @@ display_usage ( ) {
     echo "                          Will not construct the archive and .ipa.  (includes -no-archive)"
     echo "  -no-archive             Bypasses the archive and .ipa preparation stage."
     echo "  -no-build               Cancels the build entirely.  Useful with 'build.sh -clean -no-build'."
+    echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
     echo "  -debug                  Sets the configuration to debug mode instead of release."
 exit 1
 }
@@ -78,9 +79,15 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-build)
             CLEAN_ONLY=true
+            # Overrides default set by build-utils.sh.
+            UPLOAD_SENTRY=false
             ;;
         -no-carthage)
             DO_CARTHAGE=false
+            ;;
+        -upload-sentry)
+            # Overrides default set by build-utils.sh.
+            UPLOAD_SENTRY=true
             ;;
         -debug)
             CONFIG=Debug
@@ -166,6 +173,7 @@ echo "Build products will be set with the following version metadata:"
 echo "  * VERSION=$VERSION"
 echo "  * VERSION_WITH_TAG=$VERSION_WITH_TAG"
 echo "  * VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT"
+echo "  * UPLOAD_SENTRY=$UPLOAD_SENTRY"
 echo
 echo "Building KMEI..."
 
@@ -173,7 +181,8 @@ rm -r $BUILD_PATH/$CONFIG-universal 2>/dev/null
 xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme KME-universal \
            VERSION=$VERSION \
            VERSION_WITH_TAG=$VERSION_WITH_TAG \
-           VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT
+           VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+           UPLOAD_SENTRY=$UPLOAD_SENTRY
 
 if [ $? -ne 0 ]; then
   fail "KMEI build failed."
@@ -193,7 +202,8 @@ if [ $DO_KEYMANAPP = true ]; then
       xcodebuild $XCODEFLAGS_EXT $CODE_SIGN -scheme Keyman \
                  VERSION=$VERSION \
                  VERSION_WITH_TAG=$VERSION_WITH_TAG \
-                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT
+                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+                 UPLOAD_SENTRY=$UPLOAD_SENTRY
 
       if [ $? -ne 0 ]; then
         fail "Keyman app build failed."
@@ -208,7 +218,8 @@ if [ $DO_KEYMANAPP = true ]; then
                  archive -allowProvisioningUpdates \
                  VERSION=$VERSION \
                  VERSION_WITH_TAG=$VERSION_WITH_TAG \
-                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT
+                 VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+                 UPLOAD_SENTRY=$UPLOAD_SENTRY
 
       assertDirExists "$ARCHIVE_PATH"
 
