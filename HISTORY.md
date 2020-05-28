@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.83 alpha 2020-05-28
+
+* change(ios): Selective Sentry uploads (#3162)
+* Fix/android/package updates (#3175)
+* fix(common/models/types): fixes models-types build script, sets std header (#3182)
+
 ## 14.0.82 alpha 2020-05-27
 
 * fix(ios): fixes build warning on Error coersion, fixes logged error for intermediate embedded state (#3173)
