@@ -313,7 +313,7 @@ else
 fi
 
 # `./build.sh` and `./build.sh -web` calls may upload 'web' / 'native' artifacts to Sentry.
-if [[ $UPLOAD_SENTRY = true]] && [[ $BUILD_FULLWEB = true ]] && [[ DO_MINIFY = true ]]; then
+if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_FULLWEB = true ]] && [[ DO_MINIFY = true ]]; then
     UPLOAD_WEB_SENTRY=true
 else
     UPLOAD_WEB_SENTRY=false
