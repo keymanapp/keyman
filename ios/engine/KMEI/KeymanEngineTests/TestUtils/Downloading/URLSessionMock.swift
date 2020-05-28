@@ -19,6 +19,9 @@ extension TestUtils.Downloading {
     }
   }
 
+  /**
+   * Many thanks to https://www.swiftbysundell.com/articles/mocking-in-swift/ for the approach used here.
+   */
   class URLSessionMock: URLSession {
     private var mockedResultQueue: [DownloadMockResult]
 

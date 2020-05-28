@@ -9,6 +9,9 @@
 import Foundation
 
 extension TestUtils.Downloading {
+  /**
+   * Many thanks to https://www.swiftbysundell.com/articles/mocking-in-swift/ for the approach used here.
+   */
   class URLSessionDownloadTaskMock: URLSessionDownloadTask {
     private let closure: () -> Void
 
