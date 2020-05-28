@@ -16,6 +16,11 @@ import Foundation
  * It's a common Swift pattern, used because enums can't be instantiated.
  */
 enum TestUtils {
+  // Sets up an internally-nested "namespace".
+  enum Downloading {
+
+  }
+  
   static let mainBundle = Bundle(for: FileManagementTests.self)  // Can't use TestUtils, as it's an enum
 
   static func findSubBundle(forResource resource: String, ofType type: String) -> Bundle {

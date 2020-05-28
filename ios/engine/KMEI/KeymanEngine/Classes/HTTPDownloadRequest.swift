@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum DownloadType {
+enum DownloadType: String {
   case downloadFile
 }
 

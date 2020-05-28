@@ -24,10 +24,10 @@ class HTTPDownloader: NSObject {
   var downloadSession: URLSession!
   public var userInfo: [String: Any] = [:]
 
-  init(_ handler: HTTPDownloadDelegate?) {
+  init(_ handler: HTTPDownloadDelegate?, session: URLSession = .shared) {
     super.init()
     self.handler = handler
-    downloadSession = URLSession.shared
+    downloadSession = session
   }
 
   func addRequest(_ request: HTTPDownloadRequest) {
