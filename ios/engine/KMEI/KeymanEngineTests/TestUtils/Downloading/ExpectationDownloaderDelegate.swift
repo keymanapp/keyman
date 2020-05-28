@@ -56,8 +56,10 @@ extension TestUtils.Downloading {
     }
 
     private var expectationQueue: [ExpectationQueueEntry] = []
+    private var expectedAbsences: [ExpectationQueueEntry] = []
 
     private func doExpectationMatch(method: Method, request: HTTPDownloadRequest? = nil, queue: HTTPDownloader? = nil) {
+
       if expectationQueue.count == 0 {
         return
       } else {
@@ -106,15 +108,15 @@ extension TestUtils.Downloading {
     }
 
     func expectAbsence(method: Method, request: HTTPDownloadRequest, completion: ExpectationMetBlock? = nil) {
-      var entry = ExpectationQueueEntry(method: method, request: request, completion: completion)
+      let entry = ExpectationQueueEntry(method: method, request: request, completion: completion)
       entry.expectation.isInverted = true
-      expectationQueue.append(entry)
+      expectedAbsences.append(entry)
     }
 
     func expectAbsence(method: Method, queue: HTTPDownloader, completion: ExpectationMetBlock? = nil) {
-      var entry = ExpectationQueueEntry(method: method, queue: queue, completion: completion)
+      let entry = ExpectationQueueEntry(method: method, queue: queue, completion: completion)
       entry.expectation.isInverted = true
-      expectationQueue.append(entry)
+      expectedAbsences.append(entry)
     }
 
     func sequentialWait(testCase: XCTestCase, timeout: TimeInterval = 10) {
@@ -125,6 +127,11 @@ extension TestUtils.Downloading {
         return entry.expectation
       }
 
+      let absenceList: [XCTestExpectation] = expectedAbsences.map { entry in
+        return entry.expectation
+      }
+
+      expectationList.append(contentsOf: absenceList)
       testCase.wait(for: expectationList, timeout: timeout, enforceOrder: true)
     }
   }

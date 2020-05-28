@@ -121,12 +121,18 @@ class HTTPDownloaderTests: XCTestCase {
     // `cancelAllOperations` call below to complete.
     testDelegate.expect(method: .RequestFinished, request: request1, completion: { response in
       // Force a delay so that our `cancelAllOperations` call has a chance to execute;
-      // our mocking structure is otherwise completely synchronous!
+      // our mocking structure is otherwise synchronous!
       log.debug("DEBUG: Expectation callback detected!")
       sleep(2) // 2 seconds.
       response.expectation.fulfill()
       return false
     })
+
+    // Ideally, we could add this... but because of how things are currently mocked,
+    // it actually does trigger - we have a .RequestFinished processing after .QueueCancelled,
+    // which then notes the empty queue.
+    //
+    // testDelegate.expectAbsence(method: .QueueFinished, queue: downloader!)
 
     XCTAssertEqual(downloader!.requestsCount, 2)
     downloader!.run()
