@@ -45,6 +45,11 @@ public class CloudApiTypes {
      */
     LexicalModels,
     /**
+     * Catalog download: available keyboard and lexical model packages and the most current version.
+     * Used to determine if keyboard/lexical model updates are available
+     */
+    PackageVersion,
+    /**
      * Keyboard download: keyboard meta data for the selected keyboard.
      */
     Keyboard,
@@ -57,7 +62,8 @@ public class CloudApiTypes {
      */
     KeyboardData,
     /**
-     * Keyboard package download:
+     * Keyboard package download: download keyboard package
+     * Used for single keyboard download
      */
     KeyboardPackage,
     /**
@@ -65,11 +71,7 @@ public class CloudApiTypes {
      *  Used for single lexical model download and
      *  automatic lexical model download during keyboard download
      */
-    LexicalModelPackage,
-    /**
-     * Package version download: download package version information for keyboards and lexical models
-     */
-    PackageVersion
+    LexicalModelPackage
   }
 
   public enum JSONType {
