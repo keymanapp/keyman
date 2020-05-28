@@ -79,12 +79,14 @@ while [[ $# -gt 0 ]] ; do
             ;;
         -no-build)
             CLEAN_ONLY=true
+            # Overrides default set by build-utils.sh.
             UPLOAD_SENTRY=false
             ;;
         -no-carthage)
             DO_CARTHAGE=false
             ;;
         -upload-sentry)
+            # Overrides default set by build-utils.sh.
             UPLOAD_SENTRY=true
             ;;
         -debug)

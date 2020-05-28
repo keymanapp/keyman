@@ -12,6 +12,8 @@
 #   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
 #   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
+#   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
+#                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
