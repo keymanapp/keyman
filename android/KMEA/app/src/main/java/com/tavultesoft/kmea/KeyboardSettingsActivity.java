@@ -85,9 +85,6 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     final String kbName = kbd.getKeyboardName();
     final String kbVersion = kbd.getVersion();
 
-    // Determine if keyboard update is available from the cloud
-    final String kmp = kbd.getKMP();
-
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(kbName);
     if (titleFont != null)
@@ -100,8 +97,8 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.keyboard_version));
     hashMap.put(subtitleKey, kbVersion);
-    // Display notification to download update if there's a link to an updated kmp
-    if (kmp != null && !kmp.isEmpty()) {
+    // Display notification to download update if available
+    if (kbd.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, kbVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }

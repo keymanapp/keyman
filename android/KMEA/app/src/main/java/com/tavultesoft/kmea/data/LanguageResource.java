@@ -21,7 +21,7 @@ public abstract class LanguageResource implements Serializable {
   protected String languageName;
   protected String version;
   protected String helpLink;
-  protected String kmp; // link to latest kmp from the cloud
+  protected String kmp; // link to latest kmp from the cloud vs what is currently installed
 
   // JSON keys
   private static String LR_PACKAGE_ID_KEY = "packageID";
@@ -55,8 +55,16 @@ public abstract class LanguageResource implements Serializable {
 
   public String getHelpLink() { return helpLink; }
 
-  public String getKMP() { return kmp; }
-  public void setKMP(String kmp) { this.kmp = kmp; }
+  public String getUpdateKMP() { return kmp; }
+  public void setUpdateKMP(String kmp) { this.kmp = kmp; }
+
+  /**
+   * Helper method if the language resource has an updated kmp package available to download from the cloud
+   * @return boolean true if an updated kmp package is available
+   */
+  public boolean hasUpdateAvailable() {
+    return (kmp != null && !kmp.isEmpty());
+  }
 
   public int hashCode() {
     String id = getResourceID();
