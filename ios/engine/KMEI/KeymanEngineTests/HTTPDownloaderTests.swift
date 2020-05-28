@@ -122,8 +122,7 @@ class HTTPDownloaderTests: XCTestCase {
     testDelegate.expect(method: .RequestFinished, request: request1, completion: { response in
       // Force a delay so that our `cancelAllOperations` call has a chance to execute;
       // our mocking structure is otherwise synchronous!
-      log.debug("DEBUG: Expectation callback detected!")
-      sleep(2) // 2 seconds.
+      sleep(1) // in seconds.
       response.expectation.fulfill()
       return false
     })
@@ -139,6 +138,6 @@ class HTTPDownloaderTests: XCTestCase {
     downloader!.cancelAllOperations()
     // This is currently safe, as all downloads are sequential.  If we ever
     // enable parallel downloads, this will obviously need to change
-    testDelegate.sequentialWait(testCase: self, timeout: 10)
+    testDelegate.sequentialWait(testCase: self, timeout: 5)
   }
 }
