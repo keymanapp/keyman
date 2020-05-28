@@ -85,14 +85,14 @@ public final class ModelPickerActivity extends AppCompatActivity {
       repo = CloudRepository.shared.fetchDataset(context);
 
       // Initialize the dataset of installed lexical models
-      listView.setAdapter(new FilteredLexicalModelAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), languageID));
+      //listView.setAdapter(new FilteredLexicalModelAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), languageID));
+      listView.setAdapter(new FilteredLexicalModelAdapter(context, repo, languageID));
       listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           int selectedIndex = position;
           LexicalModel model = ((FilteredLexicalModelAdapter) listView.getAdapter()).getItem(position);
-          //Map<String, String> modelInfo = model.map;
           String packageID = model.getPackageID();
           String languageID = model.getLanguageID();
           String modelID = model.getLexicalModelID();
@@ -103,7 +103,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
           // File check to see if lexical model already exists locally
           File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
 
-          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+          String modelKey = model.getKey();
           boolean modelInstalled = KeyboardPickerActivity.containsLexicalModel(context, modelKey);
           boolean immediateRegister = false;
           HashMap<String, String> preInstalledModelMap = KMManager.getAssociatedLexicalModel(languageID);
@@ -250,21 +250,17 @@ public final class ModelPickerActivity extends AppCompatActivity {
       }
 
       // Needed for the check below.
-      String packageID = model.getPackageID();
-      String languageID = model.getLanguageID();
-      String modelID = model.getLexicalModelID();
-      String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      String modelKey = model.getKey();
 
       // TODO:  Refactor this check - we should instead test against the installed models listing
       //        once it has its own backing Dataset instance.
       // Is this an installed model or not?
 
+      holder.imgDetails.setImageResource(R.drawable.ic_arrow_forward);
       if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
         holder.imgInstalled.setImageResource(R.drawable.ic_check);
-        holder.imgDetails.setImageResource(R.drawable.ic_arrow_forward);
       } else {
         holder.imgInstalled.setImageResource(0);
-        holder.imgDetails.setImageResource(0);
       }
 
       holder.text.setText(model.getLexicalModelName());

@@ -162,7 +162,7 @@ public class CloudRepository {
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }
 
-  private CloudApiTypes.CloudApiParam prepareLexicalModellUpdateQuery(Context aContext)
+  private CloudApiTypes.CloudApiParam prepareLexicalModelUpdateQuery(Context aContext)
   {
     // This allows us to directly get the full lexical model catalog.
     // TODO:  Remove and replace with commented-out code below once the proper multi-language
@@ -265,7 +265,7 @@ public class CloudRepository {
         memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
       }
       if (kmpLexicalModelsArray.length() > 0) {
-        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray));
+        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, true));
       }
     } catch (Exception e) {
       Log.e(TAG, "preCacheDataSet error " + e);
@@ -296,7 +296,7 @@ public class CloudRepository {
     }
 
     // Reuse any valid parts of the cache.
-    if (cacheValid) {
+    if (!cacheValid) {
       CloudCatalogDownloadReturns jsonData = new CloudCatalogDownloadReturns(kbdData, lexData, pkgData);
 
       // Call the processor method directly with the cached API data.
@@ -354,7 +354,7 @@ public class CloudRepository {
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
     if (!cacheValid) {
-      cloudQueries.add(prepareLexicalModellUpdateQuery(context));
+      cloudQueries.add(prepareLexicalModelUpdateQuery(context));
       cloudQueries.add(prepareResourcesUpdateQuerty(context));
     }
 
