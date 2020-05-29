@@ -16,8 +16,7 @@ protocol HTTPDownloadDelegate: class {
   func downloadQueueCancelled(_ queue: HTTPDownloader)
 }
 
-class HTTPDownloader: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate,
-URLSessionDataDelegate {
+class HTTPDownloader: NSObject {
   var queue: [HTTPDownloadRequest] = []
   // TODO: Make unowned
   weak var handler: HTTPDownloadDelegate?
@@ -28,9 +27,7 @@ URLSessionDataDelegate {
   init(_ handler: HTTPDownloadDelegate?) {
     super.init()
     self.handler = handler
-
-    let config = URLSessionConfiguration.default
-    downloadSession = URLSession(configuration: config, delegate: self, delegateQueue: nil)
+    downloadSession = URLSession.shared
   }
 
   func addRequest(_ request: HTTPDownloadRequest) {
@@ -59,7 +56,7 @@ URLSessionDataDelegate {
       currentRequest = req
 
       if req.typeCode == .downloadFile {
-        req.task = downloadSession.downloadTask(with: req.url)
+        req.task = downloadSession.downloadTask(with: req.url, completionHandler: self.downloadCompletionHandler)
         handler?.downloadRequestStarted(req)
       }
       req?.task?.resume()
@@ -70,12 +67,25 @@ URLSessionDataDelegate {
     // which calls this method.  Thus, this method may serve as the single source of the 'queue finished' message.
   }
 
-  // This is triggered before the 'didCompleteWithError' delegate method.
-  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
-                  didFinishDownloadingTo location: URL) {
+  func downloadCompletionHandler(location: URL?, response: URLResponse?, error: Error?) -> Void {
     guard let currentRequest = currentRequest else {
       return
     }
+
+    // If it's an error case
+    guard let location = location else {
+      // If location is `nil`, we have an error.
+      // See docs at https://developer.apple.com/documentation/foundation/urlsession/1411511-downloadtask
+      //
+      // Force the callback onto the main thread.
+      DispatchQueue.main.async {
+        self.handler?.downloadRequestFailed(currentRequest)
+        self.runRequest()
+      }
+      return
+    }
+
+    // Successful download.
     log.debug("Downloaded file \(currentRequest.url) as \(location), " +
       "to be copied to \(currentRequest.destinationFile ?? "nil")")
 
@@ -95,31 +105,31 @@ URLSessionDataDelegate {
         log.error("Error saving the download: \(error)")
       }
     }
-  }
 
-  func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
-                  willCacheResponse proposedResponse: CachedURLResponse,
-                  completionHandler: @escaping (CachedURLResponse?) -> Void) {
-    // We only evaluate one at a time, so the 'current request' holds the data task's original request data.
-    currentRequest?.rawResponseData = proposedResponse.data
-    completionHandler(proposedResponse)
-    // With current internal settings, this will cache the data as we desire.
-  }
-
-  func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-    let req = currentRequest
-    currentRequest = nil
-    if task.error != nil {
-      //Force the callback onto the main thread.
-      DispatchQueue.main.async {
-        self.handler?.downloadRequestFailed(req!)
-      }
-    } else {
-      DispatchQueue.main.async {
-        self.handler?.downloadRequestFinished(req!)
-      }
-    }
     DispatchQueue.main.async {
+      self.handler?.downloadRequestFinished(currentRequest)
+      self.runRequest()
+    }
+  }
+
+  func dataCompletionHandler(data: Data?, response: URLResponse?, error: Error?) -> Void {
+    guard let currentRequest = currentRequest else {
+      return
+    }
+
+    guard let data = data else {
+      DispatchQueue.main.async {
+        self.handler?.downloadRequestFailed(currentRequest)
+        self.runRequest()
+      }
+      return
+    }
+    // We only evaluate one at a time, so the 'current request' holds the data task's original request data.
+    currentRequest.rawResponseData = data
+    // With current internal settings, this will cache the data as we desire.
+
+    DispatchQueue.main.async {
+      self.handler?.downloadRequestFinished(currentRequest)
       self.runRequest()
     }
   }
