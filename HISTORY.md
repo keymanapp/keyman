@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.84 alpha 2020-05-29
+
+* change(web): Selective Sentry uploads (#3163)
+* refactor(ios/engine): Polishes HTTPDownloader to prep for unit testing (#3179)
+* feat(ios/engine): HTTPDownloader unit testing (#3180)
+*  fix(linux): Disable buttons if no keyboard installed (#3184)
+* change(ios/engine):  Removes unused, deprecated JS/JSON-based adhoc install code (#3186)
+* change(common/lmlayer): move joiner from LMLayer to model compiler (#3071)
+
 ## 14.0.83 alpha 2020-05-28
 
 * change(ios): Selective Sentry uploads (#3162)
