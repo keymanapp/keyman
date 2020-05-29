@@ -1074,6 +1074,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         hashMap.get(KMManager.KMKey_LanguageName),
         hashMap.get(KMManager.KMKey_Version),
         hashMap.get(KMManager.KMKey_HelpLink),
+        hashMap.get(KMManager.KMKey_KMPLink),
         true,
         hashMap.get(KMManager.KMKey_Font),
         hashMap.get(KMManager.KMKey_OskFont));

@@ -276,9 +276,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
   private void addOpenUpdate(Bundle theResourceBundle) {
 
     String langid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
-    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
-      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
-      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_ID) &&
+      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID) != null &&
+      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID).isEmpty();
 
     if (downloadOnlyLexicalModel) {
       String modelid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID);
@@ -379,9 +379,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
     String langid = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_ID);
     String langName = theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_LANG_NAME);
-    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_URL) &&
-      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL) != null &&
-      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_URL).isEmpty();
+    boolean downloadOnlyLexicalModel = theResourceBundle.containsKey(KMKeyboardDownloaderActivity.ARG_MODEL_ID) &&
+      theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID) != null &&
+      !theResourceBundle.getString(KMKeyboardDownloaderActivity.ARG_MODEL_ID).isEmpty();
 
     int  notification_id = this.notificationid.incrementAndGet();
 

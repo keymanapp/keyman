@@ -2,6 +2,7 @@ package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.tavultesoft.kmea.JSONParser;
@@ -10,6 +11,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 
@@ -18,18 +20,35 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class CloudDataJsonUtil {
 
   private static final String TAG = "CloudDataJsonUtil";
+
+  // Deprecated
+  public static final String JSON_Keyboards_Cache_Filename = "jsonKeyboardsCache.dat";
+
+  public static final String JSON_Lexical_Models_Cache_Filename = "jsonLexicalModelsCache.dat";
+  public static final String JSON_Resources_Cache_Filename = "jsonResourcesCache.json";
+
+  // keys for api.keyman.com/package-version
+  private static final String CDKey_Keyboards = "keyboards";
+  private static final String CDKey_Models = "models";
+  private static final String CDKey_KMP = "kmp";
+  private static final String CDKey_Version = "version";
+  private static final String CDKey_Error = "error";
+
   private CloudDataJsonUtil()
   {
     //no instances
@@ -64,7 +83,7 @@ public class CloudDataJsonUtil {
     }
 
     try {
-      // Thank you, Cloud API format.
+      // Thank you, Cloud API format
       JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
       for (int i = 0; i < languages.length(); i++) {
         JSONObject languageJSON = languages.getJSONObject(i);
@@ -103,7 +122,68 @@ public class CloudDataJsonUtil {
     return modelList;
   }
 
-   public static JSONArray getCachedJSONArray(File file) {
+  /**
+   * Process the "keyboards" JSON Object to determine keyboard updates
+   * @param aContext Context
+   * @param pkgData JSONObject from the package-version API
+   * @param updateBundles - List of keyboard bundle updates
+   */
+  public static void processKeyboardPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
+    boolean saveKeyboardList = false;
+    // Parse for the keyboard package updates
+    if (pkgData.has(CDKey_Keyboards)) {
+      try {
+        JSONObject cloudKeyboardPackages = pkgData.getJSONObject(CDKey_Keyboards);
+        Iterator<String> keyboardIDs = cloudKeyboardPackages.keys();
+        while (keyboardIDs.hasNext()) {
+          String keyboardID = keyboardIDs.next();
+          JSONObject cloudKeyboardObj = cloudKeyboardPackages.getJSONObject(keyboardID);
+          if (!cloudKeyboardObj.has(CDKey_Error)) {
+            String cloudVersion = cloudKeyboardObj.getString(CDKey_Version);
+            String cloudKMP = cloudKeyboardObj.getString(CDKey_KMP);
+            // Valid keyboard package exists. See if keyboard list needs to be updated
+            for (int i = 0; i < KeyboardController.getInstance().get().size(); i++) {
+              Keyboard kbd = KeyboardController.getInstance().getKeyboardInfo(i);
+              String version = kbd.getVersion();
+              if (keyboardID.equalsIgnoreCase(kbd.getKeyboardID()) &&
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
+                  (!kbd.getUpdateKMP().equalsIgnoreCase(cloudKMP))) {
+                // Update keyboard with the latest KMP link
+                kbd.setUpdateKMP(cloudKMP);
+                KeyboardController.getInstance().add(kbd);
+
+                // Update bundle list
+                Bundle bundle = new Bundle(kbd.buildDownloadBundle());
+                updateBundles.add(bundle);
+
+                saveKeyboardList = true;
+              }
+            }
+          }
+        }
+      } catch (JSONException | NullPointerException e) {
+        Log.e(TAG, "processPackageUpdateJSON Error process keyboards: " + e);
+      }
+    }
+
+    if (saveKeyboardList) {
+      KeyboardController.getInstance().save(aContext);
+    }
+  }
+
+  public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData) {
+    // Parse for lexical model package updates
+    if (pkgData.has(CDKey_Models)) {
+      try {
+        JSONArray modelPackages = pkgData.getJSONArray(CDKey_Models);
+        // TODO: continue to process this (similar to processKeyboardPackageUpdateJSON) for lexical model updates
+      } catch (JSONException | NullPointerException e) {
+        Log.e(TAG, "processPackageUpdateJSON Error processing models: " + e);
+      }
+    }
+  }
+
+  public static JSONArray getCachedJSONArray(File file) {
     JSONArray lmData = null;
     try {
       // Read from cache file
@@ -113,7 +193,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "getCachedJSONArray failed to read from cache file. Error: " + e);
       lmData = null;
     }
 
@@ -125,12 +205,17 @@ public class CloudDataJsonUtil {
     try {
       // Read from cache file
       if (file.exists()) {
-        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
-        kbData = new JSONObject(objInput.readObject().toString());
+        StringBuilder sb = new StringBuilder(0);
+        String line;
+        BufferedReader objInput = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        while ((line = objInput.readLine()) != null) {
+          sb.append(line);
+        }
+        kbData = new JSONObject(sb.toString());
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      Log.e(TAG, "getCachedJSONObject failed to read from cache file. Error: " + e);
       kbData = null;
     }
 
@@ -155,32 +240,20 @@ public class CloudDataJsonUtil {
     }
   }
 
-  /**
-   * Save the JSON catalog data that's available from the cloud.
-   * The catalog is saved to a unique file.  Separate files should
-   * be used for each API call, such as for keyboards vs lexical models.
-   * @param json - JSON object containing API return info
-   */
-  public static void saveJSONObjectToCache(File file, JSONObject json) {
-    ObjectOutput objOutput;
-    try {
-      // Save to cache file
-      objOutput = new ObjectOutputStream(new FileOutputStream(file));
-      objOutput.writeObject(json.toString());
-      objOutput.close();
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to save to cache file. Error: " + e);
-    }
-  }
-
+  // Deprecated
   public static File getKeyboardCacheFile(Context context) {
-    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
+    final String jsonCacheFilename = JSON_Keyboards_Cache_Filename;
     return new File(context.getCacheDir(), jsonCacheFilename);
   }
 
   public static File getLexicalModelCacheFile(Context context) {
-    final String jsonLexicalCacheFilename = "jsonLexicalModelsCache.dat";
+    final String jsonLexicalCacheFilename = JSON_Lexical_Models_Cache_Filename;
     return new File(context.getCacheDir(), jsonLexicalCacheFilename);
+  }
+
+  public static File getResourcesCacheFile(Context context) {
+    final String jsonCacheFilename = JSON_Resources_Cache_Filename;
+    return new File(context.getCacheDir(), jsonCacheFilename);
   }
 
   /**

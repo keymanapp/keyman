@@ -22,16 +22,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Install lexical model.
+ * Install Keyboard package
  */
-public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallback<
+public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallback<
   Void, CloudKeyboardDownloadReturns>
 {
 
-  private static final String TAG = "CloudLexModelPKGDldCb";
+  private static final String TAG = "CloudKbdPKGDldCb";
 
   private File resourceRoot;
   private File cacheDir;
+  private String languageID;
+
+  public void setLanguageID(String languageID) {
+    this.languageID = languageID;
+  }
 
   @Override
   public void initializeContext(Context context)
@@ -44,8 +49,8 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   public CloudKeyboardDownloadReturns extractCloudResultFromDownloadSet(
     CloudApiTypes.CloudDownloadSet<Void, CloudKeyboardDownloadReturns> aDownload)
   {
-    LexicalModelPackageProcessor kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
-    List<Map<String, String>> installedLexicalModels = null;
+    PackageProcessor kbdKMPProcessor = new PackageProcessor(resourceRoot);
+    List<Map<String, String>> installedKeyboards = null;
 
     int _result = FileUtils.DOWNLOAD_SUCCESS;
     for(CloudApiTypes.SingleCloudDownload _d:aDownload.getSingleDownloads())
@@ -54,17 +59,17 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
       {
 
         try {
-          if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.LexicalModelPackage) {
-            installedLexicalModels = new LinkedList<>();
-            // Extract the kmp. Validate it contains only lexical models, and then process the lexical model package
+          if (_d.getCloudParams().target == CloudApiTypes.ApiTarget.KeyboardPackage) {
+            installedKeyboards = new LinkedList<>();
+            // Extract the kmp.
             File kmpFile = new File(cacheDir, FileUtils.getFilename(_d.getCloudParams().url));
 
             FileUtils.copy(_d.getDestinationFile(), kmpFile);
 
-            String pkgTarget = kmpProcessor.getPackageTarget(kmpFile);
-            if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
-              File unzipPath = kmpProcessor.unzipKMP(kmpFile);
-              installedLexicalModels.addAll(kmpProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_LEXICAL_MODELS_KEY));
+            String pkgTarget = kbdKMPProcessor.getPackageTarget(kmpFile);
+            if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+              File unzipPath = kbdKMPProcessor.unzipKMP(kmpFile);
+              installedKeyboards.addAll(kbdKMPProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_KEYBOARDS_KEY, languageID));
             }
           }
         }
@@ -75,10 +80,10 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
       }
       else
       {
-          _result = FileUtils.DOWNLOAD_ERROR;
+        _result = FileUtils.DOWNLOAD_ERROR;
       }
     }
-    return new CloudKeyboardDownloadReturns(_result,installedLexicalModels);
+    return new CloudKeyboardDownloadReturns(_result, installedKeyboards);
   }
 
 
@@ -87,24 +92,25 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   public void applyCloudDownloadToModel(Context aContext, Void aModel, CloudKeyboardDownloadReturns aCloudResult)
   {
     Toast.makeText(aContext,
-      aContext.getString(R.string.dictionary_download_finished),
+      aContext.getString(R.string.keyboard_download_finished),
       Toast.LENGTH_SHORT).show();
 
     if(aCloudResult.installedResource != null)
     {
       KeyboardEventHandler.notifyListeners(KMKeyboardDownloaderActivity.getKbDownloadEventListeners(),
-        KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
+        KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
         aCloudResult.installedResource, aCloudResult.kbdResult);
     }
   }
 
   /**
    * create a download id for the model.
-   * @param aModelId the lexical model id
+   * @param languageID the language ID
+   * @param keyboardID the keyboard ID
    * @return the result
    */
-  public static String createDownloadId(String aModelId)
+  public static String createDownloadId(String languageID, String keyboardID)
   {
-    return "dictionary_" + aModelId;
+    return String.format("keyboard_%s_%s", languageID, keyboardID);
   }
 }

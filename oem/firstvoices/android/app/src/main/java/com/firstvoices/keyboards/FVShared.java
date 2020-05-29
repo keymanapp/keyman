@@ -247,6 +247,7 @@ final class FVShared {
                       keyboard.name,
                       "1.0", //TODO: use keyboard version from kmp.json
                       String.format("%s%s", FVKeyboardHelpLink, keyboard.id),
+                      "", // kmp link
                       false,
                       "NotoSansCanadianAboriginal.ttf",
                       "NotoSansCanadianAboriginal.ttf");

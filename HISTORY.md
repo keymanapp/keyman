@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 14.0.83 alpha 2020-05-28
+
+* change(ios): Selective Sentry uploads (#3162)
+* Fix/android/package updates (#3175)
+* fix(common/models/types): fixes models-types build script, sets std header (#3182)
+
+## 14.0.82 alpha 2020-05-27
+
+* fix(ios): fixes build warning on Error coersion, fixes logged error for intermediate embedded state (#3173)
+* fix(linux): Don't fail (un-)install if running multiple ibus (#3169)
+* chore(linux): Update maintainer in package metadata (#3168)
+* feat(linux): Improve appstream metadata (#3176)
+
+## 14.0.81 alpha 2020-05-27
+
+* refactor(resources): convert gosh into npm package 🙃 (#3159)
+* chore(common,web): use consistent TypeScript dep on all packages (#3158)
+* chore(common/resources): add `common/models` to build trigger definitions (#3144)
+* fix(common): adds package-lock.json for gosh package (#3171)
+
 ## 14.0.80 alpha 2020-05-25
 
 * fix(android/engine): Remove LanguageListUtil (#3155)

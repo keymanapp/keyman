@@ -5,10 +5,18 @@
   <metadata_license>FSFAP</metadata_license>
   <project_license>MIT</project_license>
   <project_group>Keyman</project_group>
+  <developer_name>SIL International</developer_name>
+  <icon type="remote" width="96" height="96">https://keyman.com/cdn/dev/img/keyman-logo.png</icon>
   <name>Keyman Keyboards</name>
-  <summary>Configure keyboards for Keyman for Linux</summary>
+  <summary>Keyman makes it possible for you to type in over 1,000 languages</summary>
 
   <description>
+    <p>
+Keyman makes it possible for you to type in over 1,000 languages on Windows, macOS, Linux,
+iPhone, iPad, Android tablets and phones, and even instantly in your web browser. With the
+world’s most powerful keyboarding engine, intuitive and rapid text input is now possible in
+your language, and for over 99% of the global population’s mother tongues!
+</p>
     <p>
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
 open source keyboarding platform which allows anyone to write a keyboard layout
@@ -38,5 +46,8 @@ and mobile platforms.
 
   <url type="homepage">https://keyman.com/linux/</url>
   <url type="bugtracker">https://github.com/keymanapp/keyman/issues</url>
-  <url type="contact">https://community.software.sil.org/c/keyman</url>
+  <url type="help">https://help.keyman.com/</url>
+  <url type="faq">https://community.software.sil.org/c/keyman</url>
+  <url type="contact">https://keyman.com/contact/</url>
+  <url type="donation">https://donate.keyman.com/</url>
 </component>

@@ -1,11 +1,13 @@
 Source: ibus-kmfl
 Section: utils
 Priority: optional
-Maintainer: Daniel Glassey <wdg@debian.org>
+Maintainer: Keyman team <support@keyman.com>
 Build-Depends: debhelper (>= 9), autotools-dev, dh-autoreconf, pkg-config,
  libkmflcomp-dev (>=10.99.1), libkmfl-dev (>=10.99.1), libibus-1.0-dev (>= 1.2), x11proto-core-dev, libx11-dev
 Standards-Version: 3.9.8
-Homepage: http://www.keyman.com
+Vcs-Git: https://github.com/keymanapp/keyman.git
+Vcs-Browser: https://github.com/keymanapp/keyman
+Homepage: https://www.keyman.com
 
 Package: ibus-kmfl
 Architecture: any
@@ -14,6 +16,5 @@ Description: kmfl engine for IBus
  IBus-kmfl is a IM Engine for multiple languages, based on IBus.
  .
  This package provides the KMFL (Keyboard Mapping for Linux) IM engine for
- IBus. With this module, you can use keyboard layouts designed for Tavultesoft 
+ IBus. With this module, you can use keyboard layouts designed for Tavultesoft
  Keyman for Windows under the IBus platform.
- 

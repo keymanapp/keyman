@@ -1017,20 +1017,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
    * the data for apps built on older versions of KMEI, though.
    */
 
-  public func downloadKeyboard(from url: URL) {
-    ResourceDownloadManager.shared.downloadKeyboard(from: url)
-  }
-
   public func downloadKeyboard(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
     ResourceDownloadManager.shared.downloadKeyboard(withID: withID,
                                                     languageID: languageID,
                                                     isUpdate: isUpdate,
                                                     fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
-  }
-
-  // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
-  public func downloadLexicalModel(from url: URL) {
-    ResourceDownloadManager.shared.downloadLexicalModel(from: url)
   }
 
   // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.

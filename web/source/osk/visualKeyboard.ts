@@ -657,6 +657,11 @@ namespace com.keyman.osk {
      * @return      {Object}                          fully formatted OSK object
      */
     deviceDependentLayout(keyboard: keyboards.Keyboard, formFactor: utils.FormFactor): HTMLDivElement {
+      if(!keyboard) {
+        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
+        // keyboard height during change of keyboards.
+        keyboard = new keyboards.Keyboard(null);
+      }
       let layout = keyboard.layout(formFactor);
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;

@@ -1,9 +1,9 @@
 Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?view=markup&pathrev=174
 Upstream-Name: keyman-config
-Upstream-Contact: Daniel Glassey <wdg@debian.org>
+Upstream-Contact: Keyman team <support@keyman.com>
 
 Files: *
-Copyright: Copyright (C) 2018 SIL International
+Copyright: Copyright (C) 2018-2020 SIL International
 License: MIT
 
 License: MIT
