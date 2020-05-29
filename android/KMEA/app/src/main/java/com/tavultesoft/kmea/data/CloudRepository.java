@@ -272,6 +272,7 @@ public class CloudRepository {
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
+    boolean fromKMP = true;
 
     try {
       if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
@@ -279,7 +280,7 @@ public class CloudRepository {
         memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
       }
       if (kmpLexicalModelsArray.length() > 0) {
-        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, true));
+        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, fromKMP));
       }
     } catch (Exception e) {
       Log.e(TAG, "preCacheDataSet error " + e);
@@ -310,7 +311,7 @@ public class CloudRepository {
     }
 
     // Reuse any valid parts of the cache.
-    if (!cacheValid) {
+    if (cacheValid) {
       CloudCatalogDownloadReturns jsonData = new CloudCatalogDownloadReturns(kbdData, lexData, pkgData);
 
       // Call the processor method directly with the cached API data.
