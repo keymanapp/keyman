@@ -1025,11 +1025,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
 
   // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
-  public func downloadLexicalModel(from url: URL) {
-    ResourceDownloadManager.shared.downloadLexicalModel(from: url)
-  }
-
-  // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
   public func downloadLexicalModel(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
     ResourceDownloadManager.shared.downloadLexicalModel(withID: withID,
                                                         languageID: languageID,
