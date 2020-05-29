@@ -163,64 +163,6 @@ public class ResourceDownloadManager {
       .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
   
-  /// Downloads a custom keyboard from the URL (old ad-hoc method)
-  /// - Parameters:
-  ///   - url: URL to a JSON description of the keyboard
-  public func downloadKeyboard(from url: URL) {
-    guard downloader.hasConnection() else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No connection"])
-      downloader.downloadFailed(forKeyboards: [], error: error)
-      return
-    }
-
-    guard let data = try? Data(contentsOf: url) else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch JSON file"])
-      downloader.downloadFailed(forKeyboards: [], error: error)
-      return
-    }
-    
-    decodeKeyboardData(data, decodingStrategy: .ios8601WithFallback)
-  }
-
-  // Step 2 of old ad-hoc process.  May be worth preserving for use with .kmp packages.
-  private func decodeKeyboardData(_ data: Data, decodingStrategy : JSONDecoder.DateDecodingStrategy) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = decodingStrategy
-  
-    if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
-      downloadKeyboard(keyboard)
-    } else {
-      decoder.dateDecodingStrategy = .iso8601WithoutTimezone
-      if let keyboard = try? decoder.decode(KeyboardAPICall.self, from: data) {
-        downloadKeyboard(keyboard)
-      } else {
-        decoder.dateDecodingStrategy = .ios8601WithMilliseconds
-        do {
-          let keyboard = try decoder.decode(KeyboardAPICall.self, from: data)
-          downloadKeyboard(keyboard)
-        } catch {
-          downloader.downloadFailed(forKeyboards: [], error: error)
-        }
-      }
-    }
-  }
-  
-  // Step 3 of the old ad-hoc process.
-  /// Assumes that Keyboard has font and oskFont set and ignores fonts contained in Language.
-  private func downloadKeyboard(_ keyboardAPI: KeyboardAPICall) {
-    let keyboard = keyboardAPI.keyboard
-    let installableKeyboards = keyboard.languages!.map { language in
-      InstallableKeyboard(keyboard: keyboard, language: language, isCustom: true)
-    }
-
-    let filename = keyboard.filename
-    let isUpdate = Storage.active.userDefaults.userKeyboards?.contains { $0.id == keyboard.id } ?? false
-
-    _ = downloadKeyboardCore(withMetadata: installableKeyboards, asActivity: isUpdate ? .update : .download, withFilename: filename, withOptions: keyboardAPI.options)
-  }
-  
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // Needs validation - I don't think this if-condition can be met in Keyman's current state

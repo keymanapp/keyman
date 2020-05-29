@@ -837,27 +837,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
 
     let params = self.params(of: query)
-    if let urlString = params["url"] {
-      // Download and set custom keyboard
-      guard let url = URL(string: urlString) else {
-        let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Custom Keyboard",
-                                    message: "The keyboard could not be installed: Invalid Url")
-        self.present(alert, animated: true, completion: nil)
-        launchUrl = nil
-        return
-      }
-
-      Manager.shared.dismissKeyboardPicker(self)
-      if !infoView.view.isHidden {
-        perform(#selector(self.infoButtonClick), with: nil)
-      }
-
-      customKeyboardToDownload = url
-      let title = "Custom Keyboard: \(url.lastPathComponent)"
-      confirmInstall(withTitle: title, message: "Would you like to install this keyboard?",
-                cancelButtonHandler: showGetStartedIfNeeded,
-                installButtonHandler: proceedWithCustomKeyboardDownload)
-    } else if let kbID = params["keyboard"], let langID = params["language"] {
+    if let kbID = params["keyboard"], let langID = params["language"] {
       // Query should include keyboard and language IDs to set the keyboard (first download if not available)
       guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
                                                                                     languageID: langID) else {
@@ -968,13 +948,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       }
       self.profileName = nil
     }
-  }
-
-  private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
-    if let url = customKeyboardToDownload {
-      ResourceDownloadManager.shared.downloadKeyboard(from: url)
-    }
-    showGetStartedIfNeeded(withAction: action)
   }
 
   private func showGetStartedIfNeeded(withAction action: UIAlertAction) {
