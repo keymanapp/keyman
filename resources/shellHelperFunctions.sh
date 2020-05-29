@@ -303,7 +303,15 @@ verify_npm_setup () {
     # therein will not be affected by `lerna` commands.
     #
     # Calls repo's base package 'bootstrap' script, performing the needed `lerna bootstrap -- --no-optional` command.
-    npm run bootstrap
+    get_builder_OS
+
+    # https://github.com/lerna/lerna/issues/789 - there seems to sometimes be a concurrency issue when
+    # bootstrapping on macOS.
+    if [ ${os_id} == 'mac' ]; then
+      npm run bootstrap -- --concurrency=1
+    else
+      npm run bootstrap
+    fi
 
     # Alternatively, without the specific script:
     #   npx lerna bootstrap -- --no-optional             # ONLY SAFE AT REPO'S BASE (otherwise, temporarily re-downloads `lerna`!)

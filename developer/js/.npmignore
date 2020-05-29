@@ -2,5 +2,4 @@
 build.sh
 source/*
 tests/*
-*.js.map
 tsconfig.json
