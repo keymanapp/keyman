@@ -102,7 +102,10 @@ heat-model-compiler:
 
     # Creates the directory referenced by $(KEYMAN_WIX_TEMP_MODELCOMPILER).
     move package ModelCompiler
-    del kmlmc.*
+
+    # Cleans up the npm pack artifacts, which are no longer needed.
+    del kmlmc.tgz
+    del kmlmc.tar
 
     # Step 2 - the model compiler has one in-repo dependency that will also need to be packed.
     # Managing other in-repo dependencies will be simpler; they install into ModelCompiler's
@@ -119,6 +122,9 @@ heat-model-compiler:
     copy $(KEYMAN_MODELCOMPILER_ROOT)\package-lock.json $(KEYMAN_WIX_TEMP_MODELCOMPILER)
     npm install kmtypes.tgz --production --no-optional
     npm install --production --no-optional
+
+    # Clean up the npm pack artifacts for the dependencies.
+    del kmtypes.tgz
 
     # We don't need the unit tests
     -rmdir /s/q $(KEYMAN_WIX_TEMP_MODELCOMPILER)\tests
