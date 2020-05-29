@@ -37,6 +37,7 @@ class KeyboardDetailsView(Gtk.Window):
         Gtk.Window.__init__(self, title=wintitle)
         init_accel(self)
 
+        hbox_outer = Gtk.Box(spacing = 12)
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
 
         packageDir = os.path.join(kmp['areapath'], kmp['packageID'])
@@ -288,10 +289,10 @@ class KeyboardDetailsView(Gtk.Window):
                         # label.set_halign(Gtk.Align.START)
                         # label.set_selectable(True)
                         # grid.attach_next_to(label, label9, Gtk.PositionType.RIGHT, 1, 1)
-        vbox.pack_start(box, True, True, 0)
+        vbox.pack_start(box, True, True, 12)
 
-        hbox = Gtk.Box(spacing=6)
-        vbox.pack_start(hbox, False, False, 0)
+        hbox = Gtk.Box(spacing = 6)
+        vbox.pack_start(hbox, False, False, 12)
 
         # Add an entire row of padding
         lbl_pad = Gtk.Label()
@@ -335,7 +336,8 @@ class KeyboardDetailsView(Gtk.Window):
         hbox.pack_end(button, False, False, 0)
         bind_accelerator(self.accelerators, button, '<Control>w')
 
-        self.add(vbox)
+        hbox_outer.pack_start(vbox, True, True, 12)
+        self.add(hbox_outer)
         self.resize(635, 270)
 
     def on_close_clicked(self, button):

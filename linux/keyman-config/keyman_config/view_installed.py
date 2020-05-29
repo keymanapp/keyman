@@ -126,16 +126,19 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.uninstall_button = Gtk.Button.new_with_mnemonic("_Uninstall")
         self.uninstall_button.set_tooltip_text("Uninstall keyboard package")
         self.uninstall_button.connect("clicked", self.on_uninstall_clicked)
+        self.uninstall_button.set_sensitive(False)
         bbox_top.add(self.uninstall_button)
 
         self.about_button = Gtk.Button.new_with_mnemonic("_About")
         self.about_button.set_tooltip_text("About keyboard package")
         self.about_button.connect("clicked", self.on_about_clicked)
+        self.about_button.set_sensitive(False)
         bbox_top.add(self.about_button)
 
         self.help_button = Gtk.Button.new_with_mnemonic("_Help")
         self.help_button.set_tooltip_text("Help for keyboard package")
         self.help_button.connect("clicked", self.on_help_clicked)
+        self.help_button.set_sensitive(False)
         bbox_top.add(self.help_button)
 
         self.options_button = Gtk.Button.new_with_mnemonic("_Options")
@@ -246,12 +249,13 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             self.about_button.set_tooltip_text("About keyboard package " + model[treeiter][1])
             self.options_button.set_tooltip_text("Settings for keyboard package " + model[treeiter][1])
             logging.debug("You selected %s version %s", model[treeiter][1], model[treeiter][2])
+            self.about_button.set_sensitive(True)
             if model[treeiter][4] == InstallArea.IA_USER:
                 logging.debug("Enabling uninstall button for %s in %s", model[treeiter][3], model[treeiter][4])
                 self.uninstall_button.set_sensitive(True)
             else:
                 self.uninstall_button.set_sensitive(False)
-                logging.debug("Disabling uninstall button for %s in %s  ", model[treeiter][3], model[treeiter][4])
+                logging.debug("Disabling uninstall button for %s in %s", model[treeiter][3], model[treeiter][4])
             # welcome file if it exists
             if model[treeiter][5]:
                 self.help_button.set_sensitive(True)
@@ -262,6 +266,15 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 self.options_button.set_sensitive(True)
             else:
                 self.options_button.set_sensitive(False)
+        else:
+            self.uninstall_button.set_tooltip_text("Uninstall keyboard package")
+            self.help_button.set_tooltip_text("Help for keyboard package")
+            self.about_button.set_tooltip_text("About keyboard package")
+            self.options_button.set_tooltip_text("Settings for keyboard package")
+            self.uninstall_button.set_sensitive(False)
+            self.about_button.set_sensitive(False)
+            self.help_button.set_sensitive(False)
+            self.options_button.set_sensitive(False)
 
     def on_help_clicked(self, button):
         model, treeiter = self.tree.get_selection().get_selected()
@@ -270,7 +283,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             welcome_file = model[treeiter][5]
             if welcome_file and os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
-                logging.info("opening" + uri_path)
+                logging.info("opening " + uri_path)
                 w = WelcomeView(uri_path, model[treeiter][3])
                 w.resize(800, 600)
                 w.show_all()
@@ -284,7 +297,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
           options_file = model[treeiter][6]
           if options_file and os.path.isfile(options_file):
               uri_path = pathlib.Path(options_file).as_uri()
-              logging.info("opening" + uri_path)
+              logging.info("opening " + uri_path)
               # TODO: Determine keyboardID
               info = { "optionurl": uri_path, "packageID": model[treeiter][3], "keyboardID": model[treeiter][3] }
               w = OptionsView(info)
