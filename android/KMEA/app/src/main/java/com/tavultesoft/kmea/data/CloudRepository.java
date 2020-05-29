@@ -124,6 +124,20 @@ public class CloudRepository {
     }
   }
 
+  public boolean hasAssociatedLexicalModel(@NonNull Context context, String languageID) {
+    boolean status = false;
+
+    if (memCachedDataset != null) {
+      for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
+        LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
+        if (lm.getLanguageID().equalsIgnoreCase(languageID)) {
+          return true;
+        }
+      }
+    }
+    return status;
+  }
+
   // Should be called whenever a new language code starts being managed in order to help signal
   // retrieval of the language code's lexical models.
   public void invalidateLexicalModelCache(@NonNull Context context) {

@@ -304,9 +304,11 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     List<Keyboard> keyboardsList = KeyboardController.getInstance().get();
 
     if (keyboardInfo != null) {
-      // TODO:  Possible optimization - do we have anything with this language code already?
-      //        Only invalidate the lexical cache if not.
-      CloudRepository.shared.invalidateLexicalModelCache(context);
+      String languageID = keyboardInfo.getLanguageID();
+      if (!CloudRepository.shared.hasAssociatedLexicalModel(context, languageID)) {
+        // Only invalidate the lexical cache if there's no associated lexical model
+        CloudRepository.shared.invalidateLexicalModelCache(context);
+      }
 
       keyboardInfo.setNewKeyboard(true);
       KeyboardController.getInstance().add(keyboardInfo);
