@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.85 alpha 2020-05-30
+
+* modify(android/engine): Clean up naming for formatting QR code URL (#3187)
+
 ## 14.0.84 alpha 2020-05-29
 
 * change(web): Selective Sentry uploads (#3163)
