@@ -1,6 +1,10 @@
 # Keyman for Android Version History
 
-## 2020-05-26 13.0.6213 stable
+## 2020-05-29 13.0.6214 stable
+* Bug fix:
+  * Fix format string of QR code for sharing keyboards (#3188)
+
+## 2020-05-27 13.0.6213 stable
 * Changes:
   * Add Tamil lexical model to KMSample2 (#3165)
 
