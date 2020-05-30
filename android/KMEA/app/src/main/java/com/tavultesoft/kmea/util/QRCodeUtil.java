@@ -11,7 +11,7 @@ import net.glxn.qrgen.android.QRCode;
 public final class QRCodeUtil {
   public static final int DEFAULT_HEIGHT = 800;
   public static final int DEFAULT_WIDTH = 800;
-  public static final String QR_BASE = "https://keyman.com/go/keyboard/%s/share";
+  public static final String QR_CODE_URL_FORMATSTR = "https://keyman.com/go/keyboard/%s/share";
 
   /**
    * Generate QR Code as a Bitmap

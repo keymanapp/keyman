@@ -146,7 +146,7 @@ public final class KeyboardInfoActivity extends AppCompatActivity {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
       listView.addFooterView(qrLayout);
 
-      String url = String.format(QRCodeUtil.QR_BASE, kbID);
+      String url = String.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);
       Bitmap myBitmap = QRCodeUtil.toBitmap(url);
       ImageView imageView = (ImageView) findViewById(R.id.qrCode);
       imageView.setImageBitmap(myBitmap);
