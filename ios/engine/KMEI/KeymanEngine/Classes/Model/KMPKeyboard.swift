@@ -8,9 +8,14 @@
 
 import Foundation
 
-public struct KMPLanguage {
-  public var name: String!
-  public var languageId: String!
+public struct KMPLanguage: Codable {
+  public var name: String
+  public var languageId: String
+
+  enum CodingKeys: String, CodingKey {
+    case name
+    case languageId = "id"
+  }
 }
 
 public class KMPKeyboard
