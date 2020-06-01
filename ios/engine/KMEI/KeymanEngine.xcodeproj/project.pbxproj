@@ -753,7 +753,6 @@
 				1645D5942036C6FF0076C51B /* KeymanPackage.swift */,
 				9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */,
 				9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */,
-				9A079E362238680700581263 /* KMPLexicalModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -856,6 +855,7 @@
 			children = (
 				1645D5962036C9F80076C51B /* KMPKeyboard.swift */,
 				CE973D862484BBC200F66045 /* KMPLanguage.swift */,
+				9A079E362238680700581263 /* KMPLexicalModel.swift */,
 			);
 			name = "KMP Packaging";
 			sourceTree = "<group>";
