@@ -15,5 +15,7 @@ extension TestUtils {
     // place entries here.
     static let language_en = jsonBundle.url(forResource: "language-en", withExtension: "json")!
     static let language_km = jsonBundle.url(forResource: "language-km", withExtension: "json")!
+
+    static let keyboard_khmer_angkor = jsonBundle.url(forResource: "keyboard-khmer_angkor", withExtension: "json")!
   }
 }
