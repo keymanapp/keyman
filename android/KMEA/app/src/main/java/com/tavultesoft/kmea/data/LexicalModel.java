@@ -4,17 +4,19 @@
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+
+import io.sentry.core.Sentry;
 
 public class LexicalModel extends LanguageResource implements Serializable {
   private static final String TAG = "lexicalModel";
@@ -45,7 +47,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
         this.packageID = filename.replace(FileUtils.MODELPACKAGE, "");
       } else {
         // Invalid Package ID
-        Log.e(TAG, "Invalid package ID");
+        KMLog.LogError(TAG, "Invalid package ID");
       }
 
       this.resourceID = lexicalModelJSON.getString(KMManager.KMKey_ID);
@@ -70,7 +72,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
       this.helpLink = ""; // TOODO: Handle help links
     } catch (JSONException e) {
-      Log.e(TAG, "Lexical model exception parsing JSON: " + e);
+      KMLog.LogException(TAG, "Lexical model exception parsing JSON: ", e);
     }
   }
 

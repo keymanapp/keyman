@@ -6,6 +6,7 @@ package com.tavultesoft.kmapro;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.FormFactor;
+import com.tavultesoft.kmea.util.KMLog;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,7 +25,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 
 public class InfoActivity extends AppCompatActivity {
-
+  private final static String TAG = "InfoActivity";
   private WebView webView;
   private final String kmHelpBaseUrl = "https://help.keyman.com/products/android";
   private String kmUrl = "";
@@ -61,6 +62,8 @@ public class InfoActivity extends AppCompatActivity {
       pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
       versionStr = pInfo.versionName;
     } catch (NameNotFoundException e) {
+      KMLog.LogException(TAG, "", e);
+
       // Fallback to a "current" version. This does not need to be maintained
       versionStr = "12.0.0.0";
     }
