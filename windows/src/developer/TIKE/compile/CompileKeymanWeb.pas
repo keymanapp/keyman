@@ -1704,11 +1704,9 @@ begin
         end;
       end;
 
-      if not FDebug then   // I4139
-      begin
-        // This strips out formatting for a big saving in file size
-        sLayoutFile := Save(False);
-      end;
+      // If not debugging, then this strips out formatting for a big saving in file size
+      // This also normalises any values such as Pad or Width which should be strings
+      sLayoutFile := Write(FDebug);
     finally
       Free;
     end;
