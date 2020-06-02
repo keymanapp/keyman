@@ -308,7 +308,9 @@ verify_npm_setup () {
     # https://github.com/lerna/lerna/issues/789 - there seems to sometimes be a concurrency issue when
     # bootstrapping on macOS.
     if [ ${os_id} == 'mac' ]; then
-      npm run bootstrap -- --concurrency=1
+      # --concurrency=1 is a modification on the lerna command, not for forwarding through the bootstrap command.
+      # It's a bit tricky.
+      npm run lerna -- bootstrap --concurrency=1 -- --no-optional
     else
       npm run bootstrap
     fi

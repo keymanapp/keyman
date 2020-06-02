@@ -104,7 +104,13 @@ public class CloudDataJsonUtil {
     return keyboardsList;
   }
 
-  public static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
+  /**
+   * Parse a JSONArray of models to create a list of LexicalModel
+   * @param models
+   * @param fromKMP - boolean. If true, only  the first language in an array is processed
+   * @return List of LexicalModel
+   */
+  public static List<LexicalModel> processLexicalModelJSON(JSONArray models, boolean fromKMP) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
@@ -112,7 +118,7 @@ public class CloudDataJsonUtil {
       int modelsLength = models.length();
       for (int i = 0; i < modelsLength; i++) {
         JSONObject modelJSON = models.getJSONObject(i);
-        modelList.add(new LexicalModel(modelJSON, true));
+        modelList.addAll(LexicalModel.LexicalModelList(modelJSON, fromKMP));
       }
     } catch (JSONException | NullPointerException e) {
       KMLog.LogException(TAG, "JSONParse Error: ", e);

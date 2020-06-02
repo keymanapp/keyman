@@ -144,7 +144,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
     // Button - download custom keyboard
     let downloadButton = UIButton(type: .roundedRect)
     downloadButton.setTitle("Download custom keyboard", for: .normal)
-    downloadButton.addTarget(self, action: #selector(self.downloadButtonTapped), for: .touchUpInside)
     downloadButton.sizeToFit()
     downloadButton.center = CGPoint(x: contentWidth / 2.0, y: dismissButton.frame.maxY + 30.0)
     downloadButton.frame = downloadButton.frame.integral
@@ -212,10 +211,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
                       self.view.frame = newFrame
       }, completion: nil)
     }
-  }
-
-  @objc func downloadButtonTapped(_ sender: UIButton) {
-    downloadCustomKeyboard()
   }
 
   // MARK: - Responding to Keyman notifications
