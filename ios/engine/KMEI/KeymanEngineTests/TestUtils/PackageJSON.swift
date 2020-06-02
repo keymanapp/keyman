@@ -19,5 +19,8 @@ extension TestUtils {
     static let keyboard_khmer_angkor = jsonBundle.url(forResource: "keyboard-khmer_angkor", withExtension: "json")!
 
     static let model_nrc_en_mtnt = jsonBundle.url(forResource: "model-nrc.en.mtnt", withExtension: "json")!
+
+    static let kmp_json_khmer_angkor = jsonBundle.url(forResource: "kmp-json-khmer_angkor", withExtension: "json")!
+    static let kmp_json_nrc_en_mtnt = jsonBundle.url(forResource: "kmp-json-nrc.en.mtnt", withExtension: "json")!
   }
 }
