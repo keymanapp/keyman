@@ -25,10 +25,13 @@ public class KeyboardKeymanPackage : KeymanPackage
           let keyboard = try decoder.decode(KMPKeyboard.self, from: jsonData)
           if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
             keyboards.append(keyboard)
+          } else {
+            log.debug("\(keyboard.name) not valid / corresponding file not found")
           }
         } catch {
           // Simply... don't append a keyboard, like with the .isValid check above.
           // Denotes original behavior of this method; isn't exactly optimal.
+          log.debug("Error occurred when processing keyboards: \(String(describing: error))")
           continue
         }
       }
