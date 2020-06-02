@@ -1,7 +1,5 @@
 package com.tavultesoft.kmea.util;
 
-import android.util.Log;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;

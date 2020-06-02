@@ -18,8 +18,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.sentry.core.Sentry;
-
 public class LexicalModel extends LanguageResource implements Serializable {
   private static final String TAG = "lexicalModel";
 

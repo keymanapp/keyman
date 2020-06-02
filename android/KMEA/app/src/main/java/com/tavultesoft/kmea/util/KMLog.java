@@ -33,12 +33,15 @@ public final class KMLog {
    */
   public static void LogException(String tag, String msg, Throwable e) {
     if (msg != null && !msg.isEmpty()) {
-      Log.e(tag, msg + e);
+      Log.e(tag, msg + "\n" + e);
     } else if (e != null) {
       Log.e(tag, e.getMessage(), e);
     }
 
     if (Sentry.isEnabled()) {
+      if (msg != null && !msg.isEmpty()) {
+        Sentry.addBreadcrumb(msg);
+      }
       Sentry.captureException(e);
     }
   }
