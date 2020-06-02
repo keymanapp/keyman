@@ -1,0 +1,13 @@
+{
+  "name": "Khmer Angkor",
+  "id": "khmer_angkor",
+  "version": "1.0.6",
+  "oskFont": "Mondulkiri-R.ttf",
+  "displayFont": "Mondulkiri-R.ttf",
+  "languages": [
+    {
+      "name": "Central Khmer (Khmer, Cambodia)",
+      "id": "km"
+    }
+  ]
+}

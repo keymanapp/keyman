@@ -17,11 +17,22 @@ public class KeyboardKeymanPackage : KeymanPackage
     
     if let packagedKeyboards = json["keyboards"] as? [[String:AnyObject]] {
       for keyboardJson in packagedKeyboards {
-        let keyboard = KMPKeyboard.init(kmp: self)
-        keyboard.parse(json: keyboardJson, version: version)
-        
-        if(keyboard.isValid) {
-          keyboards.append(keyboard)
+        do {
+          // A temporary hybrid state; we now transition to using a Decoder-based strategy.
+          let jsonData = try JSONSerialization.data(withJSONObject: keyboardJson, options: .prettyPrinted)
+          let decoder = JSONDecoder()
+
+          let keyboard = try decoder.decode(KMPKeyboard.self, from: jsonData)
+          if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
+            keyboards.append(keyboard)
+          } else {
+            log.debug("\(keyboard.name) not valid / corresponding file not found")
+          }
+        } catch {
+          // Simply... don't append a keyboard, like with the .isValid check above.
+          // Denotes original behavior of this method; isn't exactly optimal.
+          log.debug("Error occurred when processing keyboards: \(String(describing: error))")
+          continue
         }
       }
     }
@@ -30,7 +41,7 @@ public class KeyboardKeymanPackage : KeymanPackage
   public override func defaultInfoHtml() -> String {
     var str = "Found Keyboards in package:<br/>"
     for keyboard in keyboards {
-      str += keyboard.keyboardId! + "<br/>"
+      str += keyboard.keyboardId + "<br/>"
     }
     return str
   }
