@@ -41,5 +41,22 @@ class PackageJSONTests: XCTestCase {
     XCTAssertEqual(khmer_angkor.version, "1.0.6")
     XCTAssertEqual(khmer_angkor.font, "Mondulkiri-R.ttf")
     XCTAssertEqual(khmer_angkor.osk, "Mondulkiri-R.ttf")
+    XCTAssertEqual(khmer_angkor.isRTL, false)
+  }
+
+  func testLexicalModelDecoding() throws {
+    let nrc_en_mtnt: KMPLexicalModel = try loadObjectFromJSON(at: TestUtils.PackageJSON.model_nrc_en_mtnt)
+
+    XCTAssertEqual(nrc_en_mtnt.name, "English dictionary (MTNT)")
+    XCTAssertEqual(nrc_en_mtnt.lexicalModelId, "nrc.en.mtnt")
+    // Our example case does not define either of these two values.
+    // One (isRTL), we assume a default value for.
+    XCTAssertEqual(nrc_en_mtnt.version, nil)
+    XCTAssertEqual(nrc_en_mtnt.isRTL, false)
+
+    XCTAssertEqual(nrc_en_mtnt.languages.count, 3)
+    XCTAssertEqual(nrc_en_mtnt.languages[0].languageId, "en")
+    XCTAssertEqual(nrc_en_mtnt.languages[1].languageId, "en-us")
+    XCTAssertEqual(nrc_en_mtnt.languages[2].languageId, "en-ca")
   }
 }
