@@ -8,28 +8,17 @@
 
 import Foundation
 
-public class KeyboardKeymanPackage : KeymanPackage
-{
+public class KeyboardKeymanPackage : KeymanPackage {
   private var keyboards: [KMPKeyboard]!
-  
-  public override func parse(json: [String:AnyObject], version: String) {
+
+  override init(metadata: KMPMetadata, folder: URL) {
+    super.init(metadata: metadata, folder: folder)
     self.keyboards = []
     
-    if let packagedKeyboards = json["keyboards"] as? [[String:AnyObject]] {
-      for keyboardJson in packagedKeyboards {
-        do {
-          // A temporary hybrid state; we now transition to using a Decoder-based strategy.
-          let jsonData = try JSONSerialization.data(withJSONObject: keyboardJson, options: .prettyPrinted)
-          let decoder = JSONDecoder()
-
-          let keyboard = try decoder.decode(KMPKeyboard.self, from: jsonData)
-          if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
-            keyboards.append(keyboard)
-          }
-        } catch {
-          // Simply... don't append a keyboard, like with the .isValid check above.
-          // Denotes original behavior of this method; isn't exactly optimal.
-          continue
+    if let packagedKeyboards = metadata.keyboards {
+      for keyboard in packagedKeyboards {
+        if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
+          keyboards.append(keyboard)
         }
       }
     }

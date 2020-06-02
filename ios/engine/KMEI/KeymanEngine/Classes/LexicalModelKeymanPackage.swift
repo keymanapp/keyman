@@ -19,30 +19,18 @@ public class LexicalModelKeymanPackage : KeymanPackage {
     }
     return str
   }
-  
-  // may be called parse()
-  // returns a dictionary mapping language ID to lexical model ID
-  override public func parse(json: [String:AnyObject], version: String) {
+
+  override init(metadata: KMPMetadata, folder: URL) {
+    super.init(metadata: metadata, folder: folder)
     self.models = []
     
-    if let packagedModels = json["lexicalModels"] as? [[String:AnyObject]] {
-      for modelJson in packagedModels {
-      // A temporary hybrid state; we now transition to using a Decoder-based strategy.
-        do {
-          let jsonData = try JSONSerialization.data(withJSONObject: modelJson, options: .prettyPrinted)
-          let decoder = JSONDecoder()
-
-          let model = try decoder.decode(KMPLexicalModel.self, from: jsonData)
-          if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {
-            models.append(model)
-          }
-        } catch {
-          // Append no models.  Not the greatest strategy, but it's the one that had always
-          // been taken here.
+    if let packagedModels = metadata.lexicalModels {
+      for model in packagedModels {
+        if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {
+          models.append(model)
         }
       }
     }
   }
-  
 }
 
