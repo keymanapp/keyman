@@ -103,6 +103,7 @@ public final class KMManager {
     GLOBE_KEY_ACTION_SHOW_MENU,
     GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
     GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
+    GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS,
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
@@ -1512,7 +1513,8 @@ public final class KMManager {
   }
 
   public static void setGlobeKeyAction(KeyboardType kbType, GlobeKeyAction action) {
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+        action != GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD) {
       inappKbGlobeKeyAction = action;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       sysKbGlobeKeyAction = action;
@@ -1849,6 +1851,10 @@ public final class KMManager {
                 break;
               case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
                 advanceToNextInputMode();
+                break;
+              case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showInputMethodPicker();
                 break;
               default:
                 // Do nothing
