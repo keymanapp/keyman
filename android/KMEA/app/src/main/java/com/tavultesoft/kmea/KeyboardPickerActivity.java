@@ -322,7 +322,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return result;
   }
 
-  protected static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
+  public static boolean addLexicalModel(Context context, HashMap<String, String> lexicalModelInfo) {
     boolean result = false;
 
     if (lexicalModelsList == null) {
@@ -582,7 +582,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
    * @param lexicalModelKey - key of "{package ID}_{language ID}_{lexical model ID}"
    * @return Index >= 0 if the lexical model key exists. Otherwise -1
    */
-  protected static int getLexicalModelIndex(Context context, String lexicalModelKey) {
+  public static int getLexicalModelIndex(Context context, String lexicalModelKey) {
     int index = -1;
 
     if (lexicalModelsList == null) {
@@ -607,7 +607,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
     return index;
   }
 
-  protected static HashMap<String, String> getLexicalModelInfo(Context context,int index) {
+  public static HashMap<String, String> getLexicalModelInfo(Context context,int index) {
     if (index < 0) {
       return null;
     }
