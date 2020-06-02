@@ -760,9 +760,6 @@
 				C042ED5C1FC6A65A001D82F4 /* Version.swift */,
 				C08E69901FDA6F6F0026056B /* FullKeyboardID.swift */,
 				9A079E42223B61AE00581263 /* FullLexicalModelID.swift */,
-				1645D5942036C6FF0076C51B /* KeymanPackage.swift */,
-				9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */,
-				9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -878,6 +875,9 @@
 		CE973D7F2484A07300F66045 /* KMP Packaging */ = {
 			isa = PBXGroup;
 			children = (
+				1645D5942036C6FF0076C51B /* KeymanPackage.swift */,
+				9A079E39223AFF3C00581263 /* KeyboardKeymanPackage.swift */,
+				9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */,
 				CE867FF22485F38300B2EAED /* kmp.json */,
 			);
 			name = "KMP Packaging";
