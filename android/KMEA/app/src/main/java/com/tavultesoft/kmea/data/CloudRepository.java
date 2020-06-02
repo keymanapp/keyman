@@ -124,9 +124,14 @@ public class CloudRepository {
     }
   }
 
+  /**
+   * Search the available lexical models list and see there's an associated model for a
+   * given language ID. Available models are from the cloud catalog and locally installed models
+   * @param context Context
+   * @param languageID String of the language ID to search
+   * @return boolean true if an associated lexical model exists
+   */
   public boolean hasAssociatedLexicalModel(@NonNull Context context, String languageID) {
-    boolean status = false;
-
     if (memCachedDataset != null) {
       for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
         LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
@@ -135,7 +140,7 @@ public class CloudRepository {
         }
       }
     }
-    return status;
+    return false;
   }
 
   // Should be called whenever a new language code starts being managed in order to help signal
@@ -272,7 +277,7 @@ public class CloudRepository {
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
-    boolean fromKMP = true;
+    final boolean fromKMP = true;
 
     try {
       if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
