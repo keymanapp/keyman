@@ -35,10 +35,14 @@ public class LexicalModelKeymanPackage : KeymanPackage {
           let model = try decoder.decode(KMPLexicalModel.self, from: jsonData)
           if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {
             models.append(model)
+          } else {
+            log.debug("\(model.name) not valid / corresponding file not found")
           }
         } catch {
           // Append no models.  Not the greatest strategy, but it's the one that had always
           // been taken here.
+          log.debug("Error occurred when processing lexical models: \(String(describing: error))")
+          continue
         }
       }
     }
