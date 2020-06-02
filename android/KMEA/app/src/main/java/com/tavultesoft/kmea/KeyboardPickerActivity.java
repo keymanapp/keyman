@@ -20,6 +20,7 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -252,7 +253,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save " + listName + ". Error: " + e);
+      KMLog.LogException(TAG, "Failed to save " + listName + ". Error: ", e);
       result = false;
     }
 
@@ -314,7 +315,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
       KeyboardController.getInstance().add(keyboardInfo);
       result = KeyboardController.getInstance().save(context);
       if (!result) {
-        Log.e(TAG, "addKeyboard failed to save");
+        KMLog.LogError(TAG, "addKeyboard failed to save");
       }
     }
     notifyKeyboardsUpdate(context);
@@ -473,7 +474,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e(TAG, "Failed to read " + filename + ". Error: " + e);
+        KMLog.LogException(TAG, "Failed to read " + filename + ". Error: ", e);
         list = null;
       }
     }

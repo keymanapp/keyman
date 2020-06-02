@@ -4,11 +4,11 @@
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +50,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
         packageID = filename.replace(FileUtils.MODELPACKAGE, "");
       } else {
         // Invalid Package ID
-        Log.e(TAG, "Invalid package ID");
+        KMLog.LogError(TAG, "Invalid package ID");
       }
 
       String resourceID = lexicalModelJSON.getString(KMManager.KMKey_ID);
@@ -83,7 +83,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
           languageID, languageName, version, helpLink, kmp));
       }
     } catch (JSONException e) {
-      Log.e(TAG, "Lexical model exception parsing JSON: " + e);
+      KMLog.LogException(TAG, "Lexical model exception parsing JSON: ", e);
     }
     return lexicalModelList;
   }

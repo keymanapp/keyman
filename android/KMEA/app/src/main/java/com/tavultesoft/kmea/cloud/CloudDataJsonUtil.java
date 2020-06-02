@@ -3,7 +3,6 @@ package com.tavultesoft.kmea.cloud;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -14,6 +13,7 @@ import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +97,7 @@ public class CloudDataJsonUtil {
         }
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(TAG, "JSONParse Error: " + e);
+      KMLog.LogException(TAG, "JSONParse Error: ", e);
       return new ArrayList<Keyboard>();  // Is this ideal?
     }
 
@@ -121,7 +121,7 @@ public class CloudDataJsonUtil {
         modelList.addAll(LexicalModel.LexicalModelList(modelJSON, fromKMP));
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(TAG, "JSONParse Error: " + e);
+      KMLog.LogException(TAG, "JSONParse Error: ", e);
       return new ArrayList<LexicalModel>();  // Is this ideal?
     }
 
@@ -168,7 +168,7 @@ public class CloudDataJsonUtil {
           }
         }
       } catch (JSONException | NullPointerException e) {
-        Log.e(TAG, "processPackageUpdateJSON Error process keyboards: " + e);
+        KMLog.LogException(TAG, "processPackageUpdateJSON Error process keyboards: ", e);
       }
     }
 
@@ -184,7 +184,7 @@ public class CloudDataJsonUtil {
         JSONArray modelPackages = pkgData.getJSONArray(CDKey_Models);
         // TODO: continue to process this (similar to processKeyboardPackageUpdateJSON) for lexical model updates
       } catch (JSONException | NullPointerException e) {
-        Log.e(TAG, "processPackageUpdateJSON Error processing models: " + e);
+        KMLog.LogException(TAG, "processPackageUpdateJSON Error processing models: ", e);
       }
     }
   }
@@ -199,7 +199,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "getCachedJSONArray failed to read from cache file. Error: " + e);
+      KMLog.LogException(TAG, "getCachedJSONArray failed to read from cache file. Error: ", e);
       lmData = null;
     }
 
@@ -221,7 +221,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "getCachedJSONObject failed to read from cache file. Error: " + e);
+      KMLog.LogException(TAG, "getCachedJSONObject failed to read from cache file. Error: ", e);
       kbData = null;
     }
 
@@ -242,7 +242,7 @@ public class CloudDataJsonUtil {
       objOutput.writeObject(json.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save to cache file. Error: " + e);
+      KMLog.LogException(TAG, "Failed to save to cache file. Error: ", e);
     }
   }
 
@@ -282,7 +282,7 @@ public class CloudDataJsonUtil {
             dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
           }
         } catch (Exception e) {
-          Log.d(TAG, e.getMessage(),e);
+          KMLog.LogException(TAG, "", e);
         } finally {
           aDownload.getDestinationFile().delete();
         }
@@ -330,7 +330,7 @@ public class CloudDataJsonUtil {
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "findTTF exception" + e);
+      KMLog.LogException(TAG, "findTTF exception", e);
     }
   }
 
@@ -345,7 +345,7 @@ public class CloudDataJsonUtil {
       }
       return false;
     } catch (JSONException e) {
-      Log.e(TAG, "hasTTFFont exception" + e);
+      KMLog.LogException(TAG, "hasTTFFont exception", e);
       return false;
     }
   }
@@ -385,6 +385,7 @@ public class CloudDataJsonUtil {
             urls.add(baseUri + fontFilename);
           }
         } catch (JSONException e) {
+          KMLog.LogException(TAG, "", e);
           return null;
         }
       }
@@ -399,6 +400,7 @@ public class CloudDataJsonUtil {
           urls.add(baseUri + fontFilename);
         }
       } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
         return null;
       }
     }

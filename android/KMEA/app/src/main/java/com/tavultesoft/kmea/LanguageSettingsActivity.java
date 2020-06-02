@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +30,7 @@ import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.HashMap;
 
@@ -118,7 +118,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     Bundle bundle = getIntent().getExtras();
     if (bundle == null) {
       // Should never actually happen.
-      Log.e(TAG, "Language data not specified for LanguageSettingsActivity!");
+      KMLog.LogError(TAG, "Language data not specified for LanguageSettingsActivity!");
       finish();
 
       if(KMManager.isDebugMode()) {

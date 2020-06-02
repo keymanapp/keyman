@@ -8,9 +8,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.TextView;
 
+import com.tavultesoft.kmea.util.KMLog;
+
 import java.util.Calendar;
 
 public class SplashScreenActivity extends Activity {
+  private final static String TAG = "Splash";
 
   // For now, disable this Activity so app is not delayed showing version/copyright text
   private static int SPLASH_TIME_OUT = 0; // msec
@@ -27,6 +30,7 @@ public class SplashScreenActivity extends Activity {
       pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
       ver = String.format("%s: %s", version.getText(), pInfo.versionName);
     } catch (PackageManager.NameNotFoundException e) {
+      KMLog.LogException(TAG, "", e);
       // Could not get version number
     }
     // TODO: Add version and copyright info when Android supports TextViews in the splash screen
