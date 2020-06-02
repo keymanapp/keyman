@@ -15,6 +15,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LexicalModel extends LanguageResource implements Serializable {
   private static final String TAG = "lexicalModel";
@@ -28,50 +30,62 @@ public class LexicalModel extends LanguageResource implements Serializable {
   }
 
   /**
-   * Constructor using JSON Object from lexical model cloud catalog
+   * Construct a list of LexicalModel using JSON Object (from either installed KMP or lexical model cloud catalog).
+   * Adds a model for each language found
    * @param lexicalModelJSON
-   * @param fromCloud boolean - only really used to make a unique prototype
+   * @param fromKMP boolean - if true, only the first language in an array is processed
    */
-  public LexicalModel(JSONObject lexicalModelJSON, boolean fromCloud) {
+  public static List<LexicalModel> LexicalModelList(JSONObject lexicalModelJSON, boolean fromKMP) {
+    List<LexicalModel> lexicalModelList = new ArrayList<>();
     try {
-      this.kmp = lexicalModelJSON.optString("packageFilename", "");
+      String kmp = lexicalModelJSON.optString("packageFilename", "");
 
+      String packageID = "";
       if (lexicalModelJSON.has(KMManager.KMKey_PackageID)) {
-        this.packageID = lexicalModelJSON.getString(KMManager.KMKey_PackageID);
-      } else if (this.kmp != null && FileUtils.hasLexicalModelPackageExtension(this.kmp)) {
+        packageID = lexicalModelJSON.getString(KMManager.KMKey_PackageID);
+      } else if (kmp != null && FileUtils.hasLexicalModelPackageExtension(kmp)) {
         // Extract package ID from packageFilename
-        String filename = FileUtils.getFilename(this.kmp);
+        String filename = FileUtils.getFilename(kmp);
         // Truncate .model.kmp file extension
-        this.packageID = filename.replace(FileUtils.MODELPACKAGE, "");
+        packageID = filename.replace(FileUtils.MODELPACKAGE, "");
       } else {
         // Invalid Package ID
         Log.e(TAG, "Invalid package ID");
       }
 
-      this.resourceID = lexicalModelJSON.getString(KMManager.KMKey_ID);
+      String resourceID = lexicalModelJSON.getString(KMManager.KMKey_ID);
 
-      this.resourceName = lexicalModelJSON.getString(KMManager.KMKey_Name);
-
-      // language ID and language name from lexicalModelJSON
-      Object obj = lexicalModelJSON.getJSONArray("languages");
-      if (((JSONArray) obj).get(0) instanceof String) {
-        // language name not provided so re-use language ID
-        this.languageID = lexicalModelJSON.getJSONArray("languages").getString(0).toLowerCase();
-        this.languageName = languageID;
-      } else if (((JSONArray) obj).get(0) instanceof JSONObject) {
-        JSONObject languageObj = lexicalModelJSON.getJSONArray("languages").getJSONObject(0);
-        this.languageID = languageObj.getString(KMManager.KMKey_ID).toLowerCase();
-        this.languageName = languageObj.getString(KMManager.KMKey_Name);
-      }
+      String resourceName = lexicalModelJSON.getString(KMManager.KMKey_Name);
 
       // Cloud data may not contain lexical model version, so fallback to (package) version
       String version = lexicalModelJSON.optString(KMManager.KMKey_Version, "1.0");
-      this.version = lexicalModelJSON.optString(KMManager.KMKey_LexicalModelVersion, version);
+      version = lexicalModelJSON.optString(KMManager.KMKey_LexicalModelVersion, version);
 
-      this.helpLink = ""; // TOODO: Handle help links
+      String helpLink = ""; // TOODO: Handle help links
+
+      // language ID and language name from lexicalModelJSON. Iterate through language array
+      String languageID = "", languageName = "";
+      Object obj = lexicalModelJSON.getJSONArray("languages");
+      // If processing JSONObject from kmp file, only handle the first language.
+      int itemsToProcess = (fromKMP) ? 1 : ((JSONArray)obj).length();
+      for (int i=0; i<itemsToProcess; i++) {
+        if (((JSONArray) obj).get(i) instanceof String) {
+          // language name not provided so re-use language ID
+          languageID = lexicalModelJSON.getJSONArray("languages").getString(i).toLowerCase();
+          languageName = languageID;
+        } else if (((JSONArray) obj).get(i) instanceof JSONObject) {
+          JSONObject languageObj = lexicalModelJSON.getJSONArray("languages").getJSONObject(i);
+          languageID = languageObj.getString(KMManager.KMKey_ID).toLowerCase();
+          languageName = languageObj.getString(KMManager.KMKey_Name);
+        }
+
+        lexicalModelList.add(new LexicalModel(packageID, resourceID, resourceName,
+          languageID, languageName, version, helpLink, kmp));
+      }
     } catch (JSONException e) {
       Log.e(TAG, "Lexical model exception parsing JSON: " + e);
     }
+    return lexicalModelList;
   }
 
   public LexicalModel(String packageID, String lexicalModelID, String lexicalModelName,

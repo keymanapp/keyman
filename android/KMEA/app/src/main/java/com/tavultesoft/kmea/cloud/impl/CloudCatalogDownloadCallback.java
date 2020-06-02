@@ -146,7 +146,8 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       return;
     }
 
-    List<LexicalModel> lexicalModelsArrayList = CloudDataJsonUtil.processLexicalModelJSON(jsonTuple.lexicalModelJSON);
+    final boolean fromKMP = false;
+    List<LexicalModel> lexicalModelsArrayList = CloudDataJsonUtil.processLexicalModelJSON(jsonTuple.lexicalModelJSON, fromKMP);
 
     Dataset installedData = KeyboardPickerActivity.getInstalledDataset(context);
     final List<Bundle> updateBundles = new ArrayList<>();
