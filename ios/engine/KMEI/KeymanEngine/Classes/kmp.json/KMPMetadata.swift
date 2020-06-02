@@ -8,6 +8,14 @@
 
 import Foundation
 
+/**
+ * This class serializes to and deserializes from JSON following the schema found here for every package's kmp.json:
+ * - https://api.keyman.com/schemas/package/1.1.0/package.json
+ *
+ * It should be kept updated to match the latest schema version whenever updates occur.
+ *
+ * Documentation link: https://help.keyman.com/developer/current-version/reference/file-types/metadata
+ */
 public class KMPMetadata: Codable {
   var system: KMPSystem
   var options: KMPOptions

@@ -19,6 +19,8 @@ public class KeyboardKeymanPackage : KeymanPackage {
       for keyboard in packagedKeyboards {
         if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
           keyboards.append(keyboard)
+        } else {
+          log.debug("\(keyboard.name) not valid / corresponding file not found")
         }
       }
     }

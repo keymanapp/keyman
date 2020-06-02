@@ -28,6 +28,8 @@ public class LexicalModelKeymanPackage : KeymanPackage {
       for model in packagedModels {
         if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {
           models.append(model)
+        } else {
+          log.debug("\(model.name) not valid / corresponding file not found")
         }
       }
     }
