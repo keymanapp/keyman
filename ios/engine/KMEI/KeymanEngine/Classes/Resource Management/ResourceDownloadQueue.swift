@@ -414,8 +414,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         // The request has succeeded.
         if downloader!.requestsCount == 0 { // Download queue finished.
           let keyboards = batch.resources as! [InstallableKeyboard]
-
-          FontManager.shared.registerCustomFonts()
           log.info("Downloaded keyboard: \(keyboards[0].id).")
 
           if(!isUpdate) {

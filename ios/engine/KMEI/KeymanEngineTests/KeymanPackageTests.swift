@@ -55,7 +55,10 @@ class KeymanPackageTests: XCTestCase {
           // Run assertions on the package's kmp.info.
           // Assumes the KMP used for testing here has the same kmp.info used for those tests.
           let kmp_json_testcase = KMPJSONTests()
-          kmp_json_testcase.kmp_info_nrc_en_mtnt_assertions(kmp.metadata)
+
+          // As this test takes place after construction of the LexicalModelPackage,
+          // the version will be set accordingly, unlike in the other JSON-related tests.
+          kmp_json_testcase.kmp_info_nrc_en_mtnt_assertions(kmp.metadata, version: "0.1.4")
 
           XCTAssertNotNil(kmp as? LexicalModelKeymanPackage, "Lexical model KMP test extraction yielded a keyboard package!")
           XCTAssertTrue(!kmp.isKeyboard(), "Lexical model KMP test extraction yielded a keyboard package!")

@@ -49,12 +49,12 @@ class KMPJSONTests: XCTestCase {
   }
 
   // A helper method, since these are useful in two separate tests.
-  func lexical_model_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPLexicalModel) {
+  func lexical_model_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPLexicalModel, version: String? = nil) {
     XCTAssertEqual(nrc_en_mtnt.name, "English dictionary (MTNT)")
     XCTAssertEqual(nrc_en_mtnt.lexicalModelId, "nrc.en.mtnt")
     // Our example case does not define either of these two values.
     // One (isRTL), we assume a default value for.
-    XCTAssertEqual(nrc_en_mtnt.version, nil)
+    XCTAssertEqual(nrc_en_mtnt.version, version)
     XCTAssertEqual(nrc_en_mtnt.isRTL, false)
 
     XCTAssertEqual(nrc_en_mtnt.languages.count, 3)
@@ -98,13 +98,13 @@ class KMPJSONTests: XCTestCase {
     kmp_info_khmer_angkor_assertions(khmer_angkor)
   }
 
-  func kmp_info_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPMetadata) {
+  func kmp_info_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPMetadata, version: String? = nil) {
     XCTAssertTrue(nrc_en_mtnt.isValid)
     XCTAssertEqual(nrc_en_mtnt.packageType, KMPMetadata.PackageType.LexicalModel)
 
     XCTAssertNotNil(nrc_en_mtnt.lexicalModels)
     XCTAssertEqual(nrc_en_mtnt.lexicalModels!.count, 1)
-    lexical_model_nrc_en_mtnt_assertions(nrc_en_mtnt.lexicalModels![0])
+    lexical_model_nrc_en_mtnt_assertions(nrc_en_mtnt.lexicalModels![0], version: version)
 
     XCTAssertNil(nrc_en_mtnt.keyboards)
 
