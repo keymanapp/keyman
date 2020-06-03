@@ -613,102 +613,56 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
   // MARK: - Adhoc keyboards
   public func parseKbdKMP(_ folder: URL, isCustom: Bool) throws -> Void {
-    do {
-      var path = folder
-      path.appendPathComponent("kmp.json")
-      let data = try Data(contentsOf: path, options: .mappedIfSafe)
-      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-      if let jsonResult = jsonResult as? [String:AnyObject] {
-        if let keyboards = jsonResult["keyboards"] as? [[String:AnyObject]] {
-          for k in keyboards {
-            let name = k["name"] as! String
-            let keyboardID = k["id"] as! String
-            let version = k["version"] as! String
-            //true if the keyboard targets a right-to-left script. false if absent.
-            let isrtl: Bool =  k["rtl"] as? Bool ?? false
+    guard let kmp = KeymanPackage.parse(folder) as? KeyboardKeymanPackage else {
+      throw KMPError.wrongPackageType
+    }
 
-            var oskFont: Font?
-            let osk = k["oskFont"] as? String
-            if let _ = osk {
-              oskFont = Font(filename: osk!)
+    for k in kmp.keyboards {
+      let installableKeyboards : [InstallableKeyboard] = k.installableKeyboards
+      let keyboardID = k.keyboardId
+
+      do {
+        try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+                                                withIntermediateDirectories: true)
+      } catch {
+        log.error("Could not create dir for download: \(error)")
+        throw KMPError.fileSystem
+      }
+
+      var haveInstalledOne = false
+      for keyboard in installableKeyboards {
+        let storedPath = Storage.active.keyboardURL(for: keyboard)
+
+        var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
+        if let osk = k.osk {
+          let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
+          installableFiles.append([osk, oskPath])
+        }
+
+        if let font = k.font {
+          let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
+          installableFiles.append([font, displayPath])
+        }
+        do {
+          for item in installableFiles {
+            var filePath = folder
+            if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+              try FileManager.default.removeItem(at: item[1] as! URL)
             }
-            var displayFont: Font?
-            let font = k["displayFont"] as? String
-            if let _ = font {
-              displayFont = Font(filename: font!)
-            }
-            
-            //TODO: handle errors if languages do not exist
-            var languageName = ""
-            var languageId = ""
-            
-            var installableKeyboards : [InstallableKeyboard] = []
-            if let langs = k["languages"] as? [[String:String]] {
-              for l in langs {
-                languageName = l["name"]!
-                languageId = l["id"]!
-                
-                installableKeyboards.append( InstallableKeyboard(
-                  id: keyboardID,
-                  name: name,
-                  languageID: languageId,
-                  languageName: languageName,
-                  version: version,
-                  isRTL: isrtl,
-                  font: displayFont,
-                  oskFont: oskFont,
-                  isCustom: isCustom))
-              }
-            }
-            
-            do {
-              try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
-                                                      withIntermediateDirectories: true)
-            } catch {
-              log.error("Could not create dir for download: \(error)")
-              throw KMPError.fileSystem
-            }
-            
-            var haveInstalledOne = false
-            for keyboard in installableKeyboards {
-              let storedPath = Storage.active.keyboardURL(for: keyboard)
-              
-              var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-              if let osk = osk {
-                let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
-                installableFiles.append([osk, oskPath])
-              }
-              
-              if let font = font {
-                let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
-                installableFiles.append([font, displayPath])
-              }
-              do {
-                for item in installableFiles {
-                  var filePath = folder
-                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-                    try FileManager.default.removeItem(at: item[1] as! URL)
-                  }
-                  filePath.appendPathComponent(item[0] as! String)
-                  try FileManager.default.copyItem(at: filePath,
-                                                   to: item[1] as! URL)
-                  
-                }
-              } catch {
-                log.error("Error saving the download: \(error)")
-                throw KMPError.copyFiles
-              }
-              if !haveInstalledOne {
-                Manager.shared.addKeyboard(keyboard)
-                haveInstalledOne = true
-              }
-            }
+            filePath.appendPathComponent(item[0] as! String)
+            try FileManager.default.copyItem(at: filePath,
+                                             to: item[1] as! URL)
+
           }
+        } catch {
+          log.error("Error saving the download: \(error)")
+          throw KMPError.copyFiles
+        }
+        if !haveInstalledOne {
+          Manager.shared.addKeyboard(keyboard)
+          haveInstalledOne = true
         }
       }
-    } catch {
-      log.error("error parsing keyboard kmp: \(error)")
-      throw KMPError.invalidPackage
     }
   }
     

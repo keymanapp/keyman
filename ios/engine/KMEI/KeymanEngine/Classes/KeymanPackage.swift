@@ -14,6 +14,7 @@ public enum KMPError : String, Error {
   case invalidPackage = "Invalid Keyman Package."
   case fileSystem = "Unable to create directory structure in file system."
   case copyFiles = "Unable to copy keyboard files to file system."
+  case wrongPackageType = "Package provided does not match the type expected by this method"
 }
 
 public class KeymanPackage {

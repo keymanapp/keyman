@@ -9,7 +9,7 @@
 import Foundation
 
 public class KeyboardKeymanPackage : KeymanPackage {
-  private var keyboards: [KMPKeyboard]!
+  public var keyboards: [KMPKeyboard]!
 
   override init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
