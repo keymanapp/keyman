@@ -1,5 +1,8 @@
 # Keyman Developer Version History
 
+## 2020-06-03 13.0.109 stable
+* Bug Fix(Keyboard Editor): Touch Layout Compiler fixes invalidly formatted strings during compile (#3204)
+
 ## 2020-02-24 13.0.101 stable
 * Bug Fix(Keyboard Editor): Touch Layout Editor could crash switching templates (#2721)
 * Bug Fix(Keyboard Editor): Touch Layout Editor would not always accept character map insertions (#2736)
