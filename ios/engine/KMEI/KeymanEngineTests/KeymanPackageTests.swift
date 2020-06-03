@@ -74,4 +74,16 @@ class KeymanPackageTests: XCTestCase {
       XCTFail("KeymanPackage.extract failed with error \(error)")
     }
   }
+
+  func testPackageContainsResource() {
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, _ in
+      XCTAssertTrue(kmp!.contains(TestUtils.Keyboards.khmer_angkor))
+      XCTAssertFalse(kmp!.contains(TestUtils.LexicalModels.mtnt))
+    }
+
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, _ in
+      XCTAssertTrue(kmp!.contains(TestUtils.LexicalModels.mtnt))
+      XCTAssertFalse(kmp!.contains(TestUtils.Keyboards.khmer_angkor))
+    }
+  }
 }

@@ -15,6 +15,7 @@ public enum KMPError : String, Error {
   case fileSystem = "Unable to create directory structure in file system."
   case copyFiles = "Unable to copy keyboard files to file system."
   case wrongPackageType = "Package provided does not match the type expected by this method"
+  case resourceNotInPackage = "Resource cannot be found in specified package"
 }
 
 public class KeymanPackage {
@@ -117,5 +118,25 @@ public class KeymanPackage {
                           complete()
                         }
                       })
+  }
+
+  public func contains(_ resource: LanguageResource) -> Bool {
+    let matchesFound: [[LanguageResource]] = self.installableResourceSets.compactMap { set in
+      let setMatches: [LanguageResource] = set.compactMap { other in
+        if resource.id == other.id && resource.languageID == other.languageID {
+          return other
+        } else {
+          return nil
+        }
+      }
+
+      if setMatches.count > 0 {
+        return setMatches
+      } else {
+        return nil
+      }
+    }
+
+    return matchesFound.count > 0
   }
 }
