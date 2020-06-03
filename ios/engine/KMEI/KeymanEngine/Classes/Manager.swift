@@ -697,7 +697,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
             filePath.appendPathComponent(item[0] as! String)
             try FileManager.default.copyItem(at: filePath,
                                              to: item[1] as! URL)
-
           }
         } catch {
           log.error("Error saving the lexical model download: \(error)")

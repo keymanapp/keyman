@@ -26,8 +26,7 @@ public class KeymanPackage {
     sourceFolder = folder
     self.metadata = metadata
   }
-    
-  // to be overridden by subclasses
+
   public func isKeyboard() -> Bool {
     return metadata.packageType == .Keyboard
   }
