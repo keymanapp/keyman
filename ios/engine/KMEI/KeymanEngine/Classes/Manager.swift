@@ -668,90 +668,43 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
   // MARK: - Adhoc lexical models
   static public func parseLMKMP(_ folder: URL, isCustom: Bool) throws -> Void {
-    do {
-      var path = folder
-      path.appendPathComponent("kmp.json")
-      let data = try Data(contentsOf: path, options: .mappedIfSafe)
-      let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-      if let jsonResult = jsonResult as? [String:AnyObject] {
-        var version: String = "1.0"
+    guard let kmp = KeymanPackage.parse(folder) as? LexicalModelKeymanPackage else {
+      throw KMPError.wrongPackageType
+    }
 
-        if let info = jsonResult["info"] as? [String:AnyObject] {
-          if let versionEntry = info["version"] as? [String:AnyObject] {
-            if let description = versionEntry["description"] as? String {
-              version = description;
-            }
-          }
-        }
+    for m in kmp.models {
+      let installableLexicalModels : [InstallableLexicalModel] = m.installableLexicalModels
+      let lexicalModelID = m.lexicalModelId
 
-        // Version uses a 'conditional initializer'.  If it fails, the version info is invalid.
-        if let _ = Version(version) {
-          // No problem
-        } else {
-          // Lazy-handle the error and replace version with 1.0.  Legacy decision from 2005.
-          version = "1.0"
-        }
-
-        if let lexicalModels = jsonResult["lexicalModels"] as? [[String:AnyObject]] {
-          for k in lexicalModels {
-            let name = k["name"] as! String
-            let lexicalModelID = k["id"] as! String
-            
-            //TODO: handle errors if languages do not exist
-            //var languageName = ""
-            var languageId = ""
-            
-            var installableLexicalModels : [InstallableLexicalModel] = []
-            if let langs = k["languages"] as? [[String:String]] {
-              for l in langs {
-                //languageName = l["name"]!
-                languageId = l["id"]!
-                
-                installableLexicalModels.append( InstallableLexicalModel(
-                  id: lexicalModelID,
-                  name: name,
-                  languageID: languageId,
-//                  languageName: languageName,
-                  version: version,
-                  isCustom: isCustom))
-              }
-            }
-            
-            do {
-              try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
-                                                      withIntermediateDirectories: true)
-            } catch {
-              log.error("Could not create dir for download: \(error)")
-              throw KMPError.fileSystem
-            }
-            
-            for lexicalModel in installableLexicalModels {
-              let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
-              
-              let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
-              do {
-                for item in installableFiles {
-                  var filePath = folder
-                  if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-                    try FileManager.default.removeItem(at: item[1] as! URL)
-                  }
-                  filePath.appendPathComponent(item[0] as! String)
-                  try FileManager.default.copyItem(at: filePath,
-                                                   to: item[1] as! URL)
-                  
-                }
-              } catch {
-                log.error("Error saving the lexical model download: \(error)")
-                throw KMPError.copyFiles
-              }
-              Manager.addLexicalModel(lexicalModel)
-            }
-          }
-        }
+      do {
+        try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
+                                                withIntermediateDirectories: true)
+      } catch {
+        log.error("Could not create dir for download: \(error)")
+        throw KMPError.fileSystem
       }
-    } catch {
-      log.error("error parsing lexical model kmp: \(error)")
-      throw KMPError.invalidPackage
+
+      for lexicalModel in installableLexicalModels {
+        let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
+
+        let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
+        do {
+          for item in installableFiles {
+            var filePath = folder
+            if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
+              try FileManager.default.removeItem(at: item[1] as! URL)
+            }
+            filePath.appendPathComponent(item[0] as! String)
+            try FileManager.default.copyItem(at: filePath,
+                                             to: item[1] as! URL)
+
+          }
+        } catch {
+          log.error("Error saving the lexical model download: \(error)")
+          throw KMPError.copyFiles
+        }
+        Manager.addLexicalModel(lexicalModel)
+      }
     }
   }
   
