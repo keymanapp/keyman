@@ -632,12 +632,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       for keyboard in installableKeyboards {
         let storedPath = Storage.active.resourceURL(for: keyboard)!
 
-        var installableFiles: [[Any]] = [[keyboard.sourceFilename, storedPath]]
-        let installableFonts: [[Any]] = keyboard.fonts.map { font in
+        var installableFiles: [(String, URL)] = [(keyboard.sourceFilename, storedPath)]
+        let installableFonts: [(String, URL)] = keyboard.fonts.map { font in
           // KMPs only list a single font file for each entry whenever one is included.
           // A pre-existing assumption.
           let fontFile = font.source[0]
-          return [fontFile, Storage.active.fontURL(forResource: k, filename: fontFile)!]
+          return (fontFile, Storage.active.fontURL(forResource: k, filename: fontFile)!)
         }
 
         installableFiles.append(contentsOf: installableFonts)
@@ -645,15 +645,14 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         do {
           for item in installableFiles {
             var filePath = folder
-            filePath.appendPathComponent(item[0] as! String)
+            filePath.appendPathComponent(item.0)
 
             // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
             //        once this method is fully abstracted and its core is placed within said class.
-            if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-              try FileManager.default.removeItem(at: item[1] as! URL)
+            if(FileManager.default.fileExists(atPath: (item.1).path)) {
+              try FileManager.default.removeItem(at: item.1)
             }
-            try FileManager.default.copyItem(at: filePath,
-                                             to: item[1] as! URL)
+            try FileManager.default.copyItem(at: filePath, to: item.1)
 
           }
         } catch {
@@ -688,19 +687,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       for lexicalModel in installableLexicalModels {
         let storedPath = Storage.active.resourceURL(for: lexicalModel)!
 
-        let installableFiles: [[Any]] = [[lexicalModel.sourceFilename, storedPath]]
+        let installableFiles: [(String, URL)] = [(lexicalModel.sourceFilename, storedPath)]
         do {
           for item in installableFiles {
             var filePath = folder
-            filePath.appendPathComponent(item[0] as! String)
+            filePath.appendPathComponent(item.0)
 
             // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
             //        once this method is fully abstracted and its core is placed within said class.
-            if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-              try FileManager.default.removeItem(at: item[1] as! URL)
+            if(FileManager.default.fileExists(atPath: (item.1).path)) {
+              try FileManager.default.removeItem(at: item.1)
             }
-            try FileManager.default.copyItem(at: filePath,
-                                             to: item[1] as! URL)
+            try FileManager.default.copyItem(at: filePath, to: item.1)
           }
         } catch {
           log.error("Error saving the lexical model download: \(error)")
