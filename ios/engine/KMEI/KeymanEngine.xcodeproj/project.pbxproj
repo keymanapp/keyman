@@ -179,6 +179,7 @@
 		CE867FEF2485E97A00B2EAED /* KMPMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */; };
 		CE867FF12485EE1500B2EAED /* KMPInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FF02485EE1500B2EAED /* KMPInfo.swift */; };
 		CE88042F247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */; };
+		CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */; };
 		CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* FileManagementTests.swift */; };
 		CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */; };
 		CE973D812484A56500F66045 /* PackageJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE973D802484A56500F66045 /* PackageJSON.swift */; };
@@ -460,6 +461,7 @@
 		CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPMetadata.swift; sourceTree = "<group>"; };
 		CE867FF02485EE1500B2EAED /* KMPInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPInfo.swift; sourceTree = "<group>"; };
 		CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectationDownloaderDelegate.swift; sourceTree = "<group>"; };
+		CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanPackageTests.swift; sourceTree = "<group>"; };
 		CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionTests.swift; sourceTree = "<group>"; };
 		CE973D802484A56500F66045 /* PackageJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageJSON.swift; sourceTree = "<group>"; };
 		CE973D822484A5DB00F66045 /* PackageJSON.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PackageJSON.bundle; sourceTree = "<group>"; };
@@ -708,6 +710,7 @@
 				CE9CD88123FCC4C7002BF2F8 /* TestUtils */,
 				CE37C38923FCC9AF007031C6 /* resources */,
 				9A079DD1223194B100581263 /* FileManagementTests.swift */,
+				CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */,
 				CE07E3D1247E3FB100DFA9D2 /* HTTPDownloaderTests.swift */,
 				9A079DD3223194B100581263 /* Info.plist */,
 				CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */,
@@ -1390,6 +1393,7 @@
 				CE37C39123FCD617007031C6 /* LexicalModels.swift in Sources */,
 				CE37C38D23FCD41E007031C6 /* Keyboards.swift in Sources */,
 				CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */,
+				CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */,
 				CE973D852484A71700F66045 /* KMPJSONTests.swift in Sources */,
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
