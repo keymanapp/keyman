@@ -68,9 +68,7 @@ class KMPJSONTests: XCTestCase {
     lexical_model_nrc_en_mtnt_assertions(nrc_en_mtnt)
   }
 
-  func testKeyboardPackageInfoDecoding() throws {
-    let khmer_angkor: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_khmer_angkor)
-
+  func kmp_info_khmer_angkor_assertions(_ khmer_angkor: KMPMetadata) {
     XCTAssertTrue(khmer_angkor.isValid)
     XCTAssertEqual(khmer_angkor.packageType, KMPMetadata.PackageType.Keyboard)
 
@@ -95,9 +93,12 @@ class KMPJSONTests: XCTestCase {
     XCTAssertNil(khmer_angkor.options.readmeFile)
   }
 
-  func testLexicalModelPackageInfoDecoding() throws {
-    let nrc_en_mtnt: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_nrc_en_mtnt)
+  func testKeyboardPackageInfoDecoding() throws {
+    let khmer_angkor: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_khmer_angkor)
+    kmp_info_khmer_angkor_assertions(khmer_angkor)
+  }
 
+  func kmp_info_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPMetadata) {
     XCTAssertTrue(nrc_en_mtnt.isValid)
     XCTAssertEqual(nrc_en_mtnt.packageType, KMPMetadata.PackageType.LexicalModel)
 
@@ -111,7 +112,7 @@ class KMPJSONTests: XCTestCase {
     XCTAssertEqual(nrc_en_mtnt.files!.count, 1)
 
     XCTAssertNotNil(nrc_en_mtnt.info)
-    XCTAssertEqual(nrc_en_mtnt.info!.version!.description, "0.1.3")
+    XCTAssertEqual(nrc_en_mtnt.info!.version!.description, "0.1.4")
     XCTAssertNil(nrc_en_mtnt.info!.version!.url)
     XCTAssertEqual(nrc_en_mtnt.info!.author!.description, "Eddie Antonio Santos")
     XCTAssertEqual(nrc_en_mtnt.info!.author!.url, "mailto:easantos@ualberta.ca")
@@ -120,5 +121,10 @@ class KMPJSONTests: XCTestCase {
 
     XCTAssertNil(nrc_en_mtnt.options.graphicFile)
     XCTAssertNil(nrc_en_mtnt.options.readmeFile)
+  }
+
+  func testLexicalModelPackageInfoDecoding() throws {
+    let nrc_en_mtnt: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_nrc_en_mtnt)
+    kmp_info_nrc_en_mtnt_assertions(nrc_en_mtnt)
   }
 }
