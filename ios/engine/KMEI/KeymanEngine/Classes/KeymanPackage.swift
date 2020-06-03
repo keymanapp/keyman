@@ -20,7 +20,7 @@ public enum KMPError : String, Error {
 public class KeymanPackage {
   static private let kmpFile = "kmp.json"
   public let sourceFolder: URL
-  public let metadata: KMPMetadata
+  internal let metadata: KMPMetadata
 
   init(metadata: KMPMetadata, folder: URL) {
     sourceFolder = folder
@@ -50,6 +50,10 @@ public class KeymanPackage {
 
   public var version: String? {
     return metadata.version
+  }
+
+  var resources: [KMPResource] {
+    fatalError("abstract base method went uninplemented by derived class")
   }
   
   static public func parse(_ folder: URL) -> KeymanPackage? {

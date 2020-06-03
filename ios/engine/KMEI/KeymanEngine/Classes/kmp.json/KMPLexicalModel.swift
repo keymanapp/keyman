@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class KMPLexicalModel: Codable, KMPResource {
+class KMPLexicalModel: Codable, KMPResource {
   public var name: String
   public var lexicalModelId: String
   public var version: String?
@@ -42,7 +42,7 @@ public class KMPLexicalModel: Codable, KMPResource {
     self.version = self.version ?? version
   }
 
-  public var installableLexicalModels: [InstallableLexicalModel] {
+  internal var installableLexicalModels: [InstallableLexicalModel] {
     var installableLexicalModels : [InstallableLexicalModel] = []
 
     for language in self.languages {
@@ -54,6 +54,10 @@ public class KMPLexicalModel: Codable, KMPResource {
       installableLexicalModels.append( model )
     }
 
+    return installableLexicalModels
+  }
+
+  public var installableResources: [LanguageResource] {
     return installableLexicalModels
   }
 

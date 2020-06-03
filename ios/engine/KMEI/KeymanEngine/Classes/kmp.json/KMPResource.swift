@@ -11,4 +11,6 @@ import Foundation
 protocol KMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
+
+  var installableResources: [LanguageResource] { get }
 }

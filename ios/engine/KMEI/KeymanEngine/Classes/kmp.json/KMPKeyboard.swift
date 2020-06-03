@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class KMPKeyboard: Codable, KMPResource {
+class KMPKeyboard: Codable, KMPResource {
   public var name: String
   public var keyboardId: String
   public var version: String
@@ -41,7 +41,7 @@ public class KMPKeyboard: Codable, KMPResource {
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
   }
 
-  public var installableKeyboards: [InstallableKeyboard] {
+  internal var installableKeyboards: [InstallableKeyboard] {
     var installableKeyboards : [InstallableKeyboard] = []
 
     for language in self.languages {
@@ -57,6 +57,10 @@ public class KMPKeyboard: Codable, KMPResource {
       installableKeyboards.append( keyboard )
     }
 
+    return installableKeyboards
+  }
+
+  public var installableResources: [LanguageResource] {
     return installableKeyboards
   }
 

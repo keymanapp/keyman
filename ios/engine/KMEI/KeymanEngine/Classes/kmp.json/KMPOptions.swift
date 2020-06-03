@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct KMPOptions: Codable {
+struct KMPOptions: Codable {
   public var readmeFile: String?
   public var graphicFile: String?
 

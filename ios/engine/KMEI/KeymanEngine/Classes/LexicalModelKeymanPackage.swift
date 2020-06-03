@@ -9,7 +9,7 @@
 import Foundation
 
 public class LexicalModelKeymanPackage : KeymanPackage {
-  public var models : [KMPLexicalModel]!
+  internal var models : [KMPLexicalModel]!
 
   override init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
@@ -35,6 +35,10 @@ public class LexicalModelKeymanPackage : KeymanPackage {
       str += model.lexicalModelId + "<br/>"
     }
     return str
+  }
+
+  override var resources: [KMPResource] {
+    return models
   }
 }
 
