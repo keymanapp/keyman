@@ -618,14 +618,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
 
     for r in kmp.resources {
-      do {
-        try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: r)!,
-                                                withIntermediateDirectories: true)
-      } catch {
-        log.error("Could not create dir for download: \(error)")
-        throw KMPError.fileSystem
-      }
-
       let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
         // (source file, destination file)
         var set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
@@ -633,7 +625,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
           // KMPs only list a single font file for each entry whenever one is included.
           // A pre-existing assumption.
           let fontFile = font.source[0]
-          return (fontFile, Storage.active.fontURL(forResource: r, filename: fontFile)!)
+          return (fontFile, Storage.active.fontURL(forResource: resource, filename: fontFile)!)
         }
 
         set.append(contentsOf: installableFonts)
@@ -646,6 +638,15 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       for set in installableFiles {
         let resource = set.0
         let files = set.1
+
+        do {
+          try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
+                                                  withIntermediateDirectories: true)
+        } catch {
+          log.error("Could not create dir for download: \(error)")
+          throw KMPError.fileSystem
+        }
+
         do {
           for item in files {
             var filePath = folder
@@ -681,14 +682,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
 
     for r in kmp.resources {
-      do {
-        try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: r)!,
-                                                withIntermediateDirectories: true)
-      } catch {
-        log.error("Could not create dir for download: \(error)")
-        throw KMPError.fileSystem
-      }
-
       let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
         // (source file, destination file)
         let set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
@@ -699,8 +692,17 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
 
       for set in installableFiles {
-        let lexicalModel = set.0
+        let resource = set.0
         let files = set.1
+
+        do {
+          try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
+                                                  withIntermediateDirectories: true)
+        } catch {
+          log.error("Could not create dir for download: \(error)")
+          throw KMPError.fileSystem
+        }
+
         do {
           for item in files {
             var filePath = folder
@@ -720,7 +722,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
         // All pairings are installed for lexical models.
         // Also, all models within the KMP
-        Manager.addLexicalModel(lexicalModel as! InstallableLexicalModel)
+        Manager.addLexicalModel(resource as! InstallableLexicalModel)
       }
     }
   }
