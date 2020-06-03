@@ -55,6 +55,20 @@ public class KeymanPackage {
   var resources: [KMPResource] {
     fatalError("abstract base method went uninplemented by derived class")
   }
+
+  /**
+   * Returns an array of arrays corresponding to the available permutations of resource + language for each resource
+   * specified by the package.
+   *
+   * Example:  nrc.en.mtnt supports three languages.  A package containing only said lexical model would return an array
+   * with 1 entry:  an array with three InstallableLexicalModel entries, one for each supported language of the model, identical
+   * aside from language-specific metadata.
+   */
+  public var installableResourceSets: [[LanguageResource]] {
+    return resources.map { resource in
+      return resource.installableResources
+    }
+  }
   
   static public func parse(_ folder: URL) -> KeymanPackage? {
     do {
