@@ -69,4 +69,62 @@ class FileManagementTests: XCTestCase {
       }
     }
   }
+
+  func testInstallKeyboardFromPackage() throws {
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
+      XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
+      XCTAssertNil(error, "Error occurred while preparing KMP for installation")
+      XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
+
+      do {
+        try ResourceFileManager.shared.install(TestUtils.Keyboards.khmer_angkor, from: kmp!)
+      } catch {
+        XCTFail("Unexpected error during KeyboardPackage install")
+      }
+
+      let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
+
+      XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                    "Could not find installed keyboard file")
+
+      let keyboards = Storage.active.userDefaults.userKeyboards!
+
+      XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
+      XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
+
+      // While the KMP's version of the specified InstallableKeyboard does specify Fonts,
+      // the literal-based testing version does NOT.  Since we're installing from the predefined,
+      // test-copy instance, we expect NOT to see the font from this test's install!
+      //
+      // Yes, the KeymanPackage.contains check isn't exhaustive - it just does a pair of
+      // id checks.  This version of events couldn't happen if we thorough enough there.
+      let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
+      XCTAssertFalse(FileManager.default.fileExists(atPath: fontURL.path))
+    }
+  }
+
+  func testInstallLexicalModelFromPackage() {
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, error in
+      XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
+      XCTAssertNil(error, "Error occurred while preparing KMP for installation")
+      XCTAssertNotNil(kmp as? LexicalModelKeymanPackage, "KMP resource type improperly recognized - expected a lexical model package!")
+
+      do {
+        try ResourceFileManager.shared.install(TestUtils.LexicalModels.mtnt, from: kmp!)
+      } catch {
+        XCTFail("Unexpected error during LexicalModelPackage install")
+      }
+
+      let installURL = Storage.active.lexicalModelURL(forID: "nrc.en.mtnt", version: "0.1.4")
+
+      XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                    "Could not find installed lexical model file")
+
+      let models = Storage.active.userDefaults.userLexicalModels!
+
+      // This variant is selective - only a single pairing should be installed for the model.
+      XCTAssertEqual(models.count, 1, "Unexpected number of models were installed")
+      XCTAssertEqual(models[0].id, "nrc.en.mtnt", "Installed lexical model ID mismatch")
+    }
+  }
 }

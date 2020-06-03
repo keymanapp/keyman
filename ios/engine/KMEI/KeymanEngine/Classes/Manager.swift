@@ -617,60 +617,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for r in kmp.resources {
-      let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
-        // (source file, destination file)
-        var set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
-        let installableFonts: [(String, URL)] = resource.fonts.map { font in
-          // KMPs only list a single font file for each entry whenever one is included.
-          // A pre-existing assumption.
-          let fontFile = font.source[0]
-          return (fontFile, Storage.active.fontURL(forResource: resource, filename: fontFile)!)
-        }
-
-        set.append(contentsOf: installableFonts)
-
-        // (resource, source-destination file mapping)
-        return (resource, set)
-      }
-
-      var haveInstalledOne = false
-      for set in installableFiles {
-        let resource = set.0
-        let files = set.1
-
-        do {
-          try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
-                                                  withIntermediateDirectories: true)
-        } catch {
-          log.error("Could not create dir for download: \(error)")
-          throw KMPError.fileSystem
-        }
-
-        do {
-          for item in files {
-            var filePath = folder
-            filePath.appendPathComponent(item.0)
-
-            // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
-            //        once this method is fully abstracted and its core is placed within said class.
-            if(FileManager.default.fileExists(atPath: (item.1).path)) {
-              try FileManager.default.removeItem(at: item.1)
-            }
-            try FileManager.default.copyItem(at: filePath, to: item.1)
-
-          }
-        } catch {
-          log.error("Error saving the download: \(error)")
-          throw KMPError.copyFiles
-        }
-
-        // Only one keyboard is installed by default from a KMP.
-        // Also, only the first language-pairing it contains
-        if !haveInstalledOne {
-          Manager.shared.addKeyboard(resource as! InstallableKeyboard)
-          haveInstalledOne = true
-        }
+    for resourceSet in kmp.installableResourceSets {
+      for resource in resourceSet {
+        try ResourceFileManager.shared.install(resource, from: kmp)
+        // Install the keyboard for only the first language pairing defined in the package.
+        break
       }
     }
   }
@@ -681,48 +632,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for r in kmp.resources {
-      let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
-        // (source file, destination file)
-        let set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
-        // no fonts for lexical models
-
-        // (resource, source-destination file mapping)
-        return (resource, set)
-      }
-
-      for set in installableFiles {
-        let resource = set.0
-        let files = set.1
-
-        do {
-          try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
-                                                  withIntermediateDirectories: true)
-        } catch {
-          log.error("Could not create dir for download: \(error)")
-          throw KMPError.fileSystem
-        }
-
-        do {
-          for item in files {
-            var filePath = folder
-            filePath.appendPathComponent(item.0)
-
-            // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
-            //        once this method is fully abstracted and its core is placed within said class.
-            if(FileManager.default.fileExists(atPath: (item.1).path)) {
-              try FileManager.default.removeItem(at: item.1)
-            }
-            try FileManager.default.copyItem(at: filePath, to: item.1)
-          }
-        } catch {
-          log.error("Error saving the lexical model download: \(error)")
-          throw KMPError.copyFiles
-        }
-
-        // All pairings are installed for lexical models.
-        // Also, all models within the KMP
-        Manager.addLexicalModel(resource as! InstallableLexicalModel)
+    try kmp.installableResourceSets.forEach { resourceSet in
+      try resourceSet.forEach { resource in
+        try ResourceFileManager.shared.install(resource, from: kmp)
       }
     }
   }
