@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class KMPLexicalModel: Codable {
+public class KMPLexicalModel: Codable, KMPResource {
   public var name: String
   public var lexicalModelId: String
   public var version: String?
@@ -63,6 +63,10 @@ public class KMPLexicalModel: Codable {
     // which knows the containing package's root folder.
     return installableLexicalModels.count > 0
       && self.languages.count > 0
+  }
+
+  public var id: String {
+    return lexicalModelId
   }
 }
 

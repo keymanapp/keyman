@@ -86,4 +86,22 @@ public struct InstallableKeyboard: Codable, LanguageResource {
     self.oskFont = keyboard.oskFont
     self.isCustom = isCustom
   }
+
+  public var fonts: [Font] {
+    var fonts: [Font] = []
+
+    if let displayFont = self.font {
+      fonts.append(displayFont)
+    }
+
+    if let oskFont = self.oskFont {
+      fonts.append(oskFont)
+    }
+
+    return fonts
+  }
+
+  public var sourceFilename: String {
+    return "\(id).js"
+  }
 }

@@ -92,6 +92,16 @@ class Storage {
   func lexicalModelDir(forID lexicalModelID: String) -> URL {
     return lexicalModelDir.appendingPathComponent(lexicalModelID)
   }
+
+  func resourceDir(for resource: KMPResource) -> URL? {
+    if let keyboard = resource as? KMPKeyboard {
+      return keyboardDir(forID: keyboard.id)
+    } else if let lexicalModel = resource as? KMPLexicalModel {
+      return lexicalModelDir(forID: lexicalModel.id)
+    } else {
+      return nil
+    }
+  }
   
   func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
     return keyboardURL(forID: keyboard.id, version: keyboard.version)
@@ -99,6 +109,17 @@ class Storage {
   
   func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
     return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
+  }
+
+  // Facilitates abstractions based on the LanguageResource protocol.
+  func resourceURL(for resource: LanguageResource) -> URL? {
+    if let keyboard = resource as? InstallableKeyboard {
+      return keyboardURL(for: keyboard)
+    } else if let lexicalModel = resource as? InstallableLexicalModel {
+      return lexicalModelURL(for: lexicalModel)
+    } else {
+      return nil
+    }
   }
   
   func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
@@ -130,6 +151,15 @@ class Storage {
 
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
     return keyboardDir(forID: keyboardID).appendingPathComponent(filename)
+  }
+
+  func fontURL(forResource resource: KMPResource, filename: String) -> URL? {
+    if let keyboard = resource as? KMPKeyboard {
+      return fontURL(forKeyboardID: keyboard.id, filename: filename)
+    } else {
+      // Lexical models do not yet support fonts.
+      return nil
+    }
   }
 
   var keyboardDirs: [URL]? {

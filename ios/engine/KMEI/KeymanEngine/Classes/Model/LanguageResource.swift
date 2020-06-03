@@ -19,4 +19,8 @@ public protocol LanguageResource {
 
   // Used for generating QR codes.
   var sharableURL: String? { get }
+
+  // Used during resource installation
+  var fonts: [Font] { get }
+  var sourceFilename: String { get }
 }

@@ -619,10 +619,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
     for k in kmp.keyboards {
       let installableKeyboards : [InstallableKeyboard] = k.installableKeyboards
-      let keyboardID = k.keyboardId
 
       do {
-        try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
+        try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: k)!,
                                                 withIntermediateDirectories: true)
       } catch {
         log.error("Could not create dir for download: \(error)")
@@ -631,25 +630,28 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
       var haveInstalledOne = false
       for keyboard in installableKeyboards {
-        let storedPath = Storage.active.keyboardURL(for: keyboard)
+        let storedPath = Storage.active.resourceURL(for: keyboard)!
 
-        var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-        if let osk = k.osk {
-          let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
-          installableFiles.append([osk, oskPath])
+        var installableFiles: [[Any]] = [[keyboard.sourceFilename, storedPath]]
+        let installableFonts: [[Any]] = keyboard.fonts.map { font in
+          // KMPs only list a single font file for each entry whenever one is included.
+          // A pre-existing assumption.
+          let fontFile = font.source[0]
+          return [fontFile, Storage.active.fontURL(forResource: k, filename: fontFile)!]
         }
 
-        if let font = k.font {
-          let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
-          installableFiles.append([font, displayPath])
-        }
+        installableFiles.append(contentsOf: installableFonts)
+
         do {
           for item in installableFiles {
             var filePath = folder
+            filePath.appendPathComponent(item[0] as! String)
+
+            // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
+            //        once this method is fully abstracted and its core is placed within said class.
             if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
               try FileManager.default.removeItem(at: item[1] as! URL)
             }
-            filePath.appendPathComponent(item[0] as! String)
             try FileManager.default.copyItem(at: filePath,
                                              to: item[1] as! URL)
 
@@ -674,10 +676,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
     for m in kmp.models {
       let installableLexicalModels : [InstallableLexicalModel] = m.installableLexicalModels
-      let lexicalModelID = m.lexicalModelId
 
       do {
-        try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
+        try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: m)!,
                                                 withIntermediateDirectories: true)
       } catch {
         log.error("Could not create dir for download: \(error)")
@@ -685,16 +686,19 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
 
       for lexicalModel in installableLexicalModels {
-        let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
+        let storedPath = Storage.active.resourceURL(for: lexicalModel)!
 
-        let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
+        let installableFiles: [[Any]] = [[lexicalModel.sourceFilename, storedPath]]
         do {
           for item in installableFiles {
             var filePath = folder
+            filePath.appendPathComponent(item[0] as! String)
+
+            // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
+            //        once this method is fully abstracted and its core is placed within said class.
             if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
               try FileManager.default.removeItem(at: item[1] as! URL)
             }
-            filePath.appendPathComponent(item[0] as! String)
             try FileManager.default.copyItem(at: filePath,
                                              to: item[1] as! URL)
           }
