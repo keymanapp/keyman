@@ -25,7 +25,7 @@ class FileManagementTests: XCTestCase {
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")
-      XCTAssertTrue(kmp!.isKeyboard(), "KMP resource type improperly recognized - expected a keyboard package!")
+      XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
 
       ResourceFileManager.shared.finalizePackageInstall(kmp!, isCustom: true) { innerError in
         XCTAssertNil(innerError, "Error occurred while finalizing KMP installation")
@@ -47,7 +47,7 @@ class FileManagementTests: XCTestCase {
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")
-      XCTAssertFalse(kmp!.isKeyboard(), "KMP resource type improperly recognized - expected a lexical model package!")
+      XCTAssertNotNil(kmp as? LexicalModelKeymanPackage, "KMP resource type improperly recognized - expected a lexical model package!")
 
       ResourceFileManager.shared.finalizePackageInstall(kmp!, isCustom: true) { innerError in
         XCTAssertNil(innerError, "Error occurred while finalizing KMP installation")

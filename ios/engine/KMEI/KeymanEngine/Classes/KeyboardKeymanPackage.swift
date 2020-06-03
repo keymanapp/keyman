@@ -33,10 +33,5 @@ public class KeyboardKeymanPackage : KeymanPackage {
     }
     return str
   }
-  
-  public override func isKeyboard() -> Bool {
-    return true
-  }
-  
 }
 

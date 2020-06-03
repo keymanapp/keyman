@@ -10,15 +10,6 @@ import Foundation
 
 public class LexicalModelKeymanPackage : KeymanPackage {
   public var models : [KMPLexicalModel]!
-  
-  public override func defaultInfoHtml() -> String {
-    let count = models.count
-    var str = "Found "+(count > 1 ? "\(count) dictionaries" : "dictionary")+" in package:<br/>"
-    for model in models {
-      str += model.lexicalModelId + "<br/>"
-    }
-    return str
-  }
 
   override init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
@@ -33,6 +24,15 @@ public class LexicalModelKeymanPackage : KeymanPackage {
         }
       }
     }
+  }
+
+  public override func defaultInfoHtml() -> String {
+    let count = models.count
+    var str = "Found "+(count > 1 ? "\(count) dictionaries" : "dictionary")+" in package:<br/>"
+    for model in models {
+      str += model.lexicalModelId + "<br/>"
+    }
+    return str
   }
 }
 

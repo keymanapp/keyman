@@ -28,7 +28,7 @@ public class KeymanPackage {
     
   // to be overridden by subclasses
   public func isKeyboard() -> Bool {
-    return false
+    return metadata.packageType == .Keyboard
   }
 
   // to be overridden by subclasses
