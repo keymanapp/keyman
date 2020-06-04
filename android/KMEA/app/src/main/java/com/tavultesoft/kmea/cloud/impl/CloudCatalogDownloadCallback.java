@@ -162,20 +162,25 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     aDataSet.keyboards.clear();
     aDataSet.keyboards.addAll(KeyboardController.getInstance().get());
 
-    // Filter out any duplicates from already-installed models, properly merging the lists.
-    for (int i = 0; i < lexicalModelsArrayList.size(); i++) {
-      LexicalModel model = lexicalModelsArrayList.get(i);
+    // Keep already-installed models and remove duplicate entries in cloud catalog.
+    // Then properly merge the lists. This way, we display installed model info.
+    // Doing reverse order to remove items in lexicalModelsArrayList
+    for (int i = lexicalModelsArrayList.size()-1; i>=0; i--) {
+      LexicalModel model = lexicalModelsArrayList.get(i); // cloud catalog
+      LexicalModel match = aDataSet.lexicalModels.findMatch(model); // installed model
 
-      // Check for duplicates / possible updates.
-      LexicalModel match = aDataSet.lexicalModels.findMatch(model);
-
+      // Check for model update information before removing duplicate
       if (match != null) {
-        if (compareVersions(model, match) == FileUtils.VERSION_GREATER) {
-          aDataSet.lexicalModels.remove(match);
-        } else {
-          lexicalModelsArrayList.remove(model);
-          i--; // Decrement our index to reflect the removal.
+        Bundle bundle = updateCheck(model, match);
+        if (bundle != null) {
+          String kmp = model.getUpdateKMP();
+          if (kmp != null && !kmp.isEmpty()) {
+            match.setUpdateKMP(kmp);
+          }
+          updateBundles.add(bundle);
         }
+
+        lexicalModelsArrayList.remove(model);
       } // else no match == no special handling.
     }
 
@@ -183,6 +188,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     aDataSet.lexicalModels.addAll(lexicalModelsArrayList);
 
     // Do the actual update checks.
+    /*
     for (int i = 0; i < installedData.lexicalModels.getCount(); i++) {
       LexicalModel model = installedData.lexicalModels.getItem(i);
 
@@ -195,7 +201,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
           updateBundles.add(bundle);
         }
       } // else no match == no special handling.
-    }
+    }*/
 
     if (updateBundles.size() > 0 && !(DEBUG_SIMULATE_UPDATES && !executeCallbacks)) {
       // Time for updates!

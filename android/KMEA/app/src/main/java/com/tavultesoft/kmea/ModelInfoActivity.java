@@ -67,14 +67,6 @@ public final class ModelInfoActivity extends AppCompatActivity {
     final String modelID = lm.getLexicalModelID();
     final String modelName = lm.getLexicalModelName();
     final String modelVersion = lm.getVersion();
-    String latestModelCloudVersion = modelVersion;
-
-    // Determine if model update is available from the cloud
-    Dataset dataset = CloudRepository.shared.fetchDataset(this);
-    final LexicalModel latestLM = dataset.lexicalModels.findMatch(lm);
-    if (latestLM != null) {
-      latestModelCloudVersion = latestLM.getVersion();
-    }
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(String.format(getString(R.string.model_info_header), modelName));
@@ -86,8 +78,8 @@ public final class ModelInfoActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.model_version));
     hashMap.put(subtitleKey, modelVersion);
-    // Display notification to download update if latestModelCloudVersion > modelVersion (installed)
-    if (FileUtils.compareVersions(latestModelCloudVersion, modelVersion) == FileUtils.VERSION_GREATER) {
+    // Display notification to download update if available
+    if (lm.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, modelVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }
@@ -148,10 +140,11 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
         // "Version" link clicked to download latest model version from cloud
         if (itemTitle.equals(getString(R.string.model_version))) {
-          Bundle args = latestLM.buildDownloadBundle();
+          Bundle args = lm.buildDownloadBundle();
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);
+          finish();
 
         // "Help" link clicked
         } else if (itemTitle.equals(getString(R.string.help_link))) {
