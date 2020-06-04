@@ -254,6 +254,10 @@ class InstallKmpWindow(Gtk.Dialog):
         self.resize(800, 450)
         self.show_all()
 
+    def run(self):
+        if self.checkcontinue:
+            Gtk.Dialog.run(self)
+
     def doc_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
         logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))

@@ -67,6 +67,12 @@ class ViewInstalledWindowBase(Gtk.Window):
         installDlg.run()
         installDlg.destroy()
 
+    def run(self):
+        self.resize(576, 324)
+        self.connect("destroy", Gtk.main_quit)
+        self.show_all()
+        Gtk.main()
+
 class ViewInstalledWindow(ViewInstalledWindowBase):
     def __init__(self):
         ViewInstalledWindowBase.__init__(self)
