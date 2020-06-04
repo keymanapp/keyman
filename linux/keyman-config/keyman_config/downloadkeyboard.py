@@ -17,42 +17,36 @@ from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.get_info import GetInfo
 from keyman_config import __releaseversion__
 
-class DownloadKmpWindow(Gtk.Window):
+class DownloadKmpWindow(Gtk.Dialog):
 
-    def __init__(self, view=None):
+    def __init__(self, parent=None):
         self.accelerators = None
-        Gtk.Window.__init__(self, title="Download Keyman keyboards")
-        self.endonclose = False
-        self.viewwindow = view
+        Gtk.Dialog.__init__(self, "Download Keyman keyboards", parent)
+        self.parentWindow = parent
+        self.downloadfile = None
         init_accel(self)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-
         s = Gtk.ScrolledWindow()
-        webview = WebKit2.WebView()
-        webview.connect("decide-policy", self.keyman_policy)
-        webview.load_uri("https://keyman.com/go/linux/"+__releaseversion__+"/download-keyboards")
-        s.add(webview)
-        vbox.pack_start(s, True, True, 0)
+        self.webview = WebKit2.WebView()
+        self.webview.connect("decide-policy", self.keyman_policy)
+        self.webview.load_uri("https://keyman.com/go/linux/" + __releaseversion__+"/download-keyboards")
+        s.add(self.webview)
 
-        bbox = Gtk.ButtonBox(spacing=12, orientation=Gtk.Orientation.HORIZONTAL)
+        self.get_content_area().pack_start(s, True, True, 0)
 
-        button = Gtk.Button.new_with_mnemonic("_Close")
-        button.connect("clicked", self.on_close_clicked)
-        bbox.pack_end(button, False, False, 12)
-        bind_accelerator(self.accelerators, button, '<Control>w')
-        vbox.pack_start(bbox, False, False, 12)
+        self.add_button("_Close", Gtk.ResponseType.CLOSE)
+        self.getinfo = GetInfo(self.parentWindow.incomplete_kmp)
 
-        self.add(vbox)
-        self.getinfo = GetInfo(self.viewwindow.incomplete_kmp)
+        self.resize(800, 450)
+        self.show_all()
 
     def process_kmp(self, url, downloadfile):
         logging.info("Downloading kmp file to %s", downloadfile)
         if download_kmp_file(url, downloadfile):
             logging.info("File downloaded")
-            w = InstallKmpWindow(downloadfile, online=True, viewkmp=self.viewwindow, downloadwindow=self)
-            if w.checkcontinue:
-                w.show_all()
+            self.downloadfile = downloadfile
+            self.response(Gtk.ResponseType.OK)
+            self.close()
             return True
         return False
 
@@ -80,21 +74,17 @@ class DownloadKmpWindow(Gtk.Window):
                     return True
         return False
 
-    def on_close_clicked(self, button):
-        logging.debug("Closing download window")
-        if self.endonclose:
-            Gtk.main_quit()
-        else:
-            self.close()
-
-    def connectdestroy(self):
-        self.connect("destroy", Gtk.main_quit)
-        self.endonclose = True
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     w = DownloadKmpWindow()
-    w.connectdestroy()
-    w.resize(800, 450)
-    w.show_all()
-    Gtk.main()
+    result = w.run()
+    file = None
+    if result == Gtk.ResponseType.OK:
+        file = w.downloadfile
+    w.destroy()
+
+    if file != None:
+        installDlg = InstallKmpWindow(file)
+        installDlg.run()
+        installDlg.destroy()
