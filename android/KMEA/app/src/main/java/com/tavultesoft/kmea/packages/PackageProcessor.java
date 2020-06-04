@@ -1,11 +1,11 @@
 package com.tavultesoft.kmea.packages;
 
 import androidx.annotation.NonNull;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.ZipUtils;
 
 import java.io.File;
@@ -128,7 +128,7 @@ public class PackageProcessor {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
-      Log.e(TAG, "kmp.json does not exist");
+      KMLog.LogError(TAG, "kmp.json does not exist");
       return null;
     }
   }
@@ -211,6 +211,7 @@ public class PackageProcessor {
     try {
       return json.getJSONObject("info").getJSONObject("name").getString("description");
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return "";
     }
   }
@@ -225,6 +226,7 @@ public class PackageProcessor {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return PP_DEFAULT_VERSION;
     }
   }
@@ -245,6 +247,7 @@ public class PackageProcessor {
         return PP_TARGET_INVALID;
       }
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return PP_TARGET_INVALID;
     }
   }
@@ -262,6 +265,7 @@ public class PackageProcessor {
       FileUtils.deleteDirectory(tempPath);
       return target;
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return PP_TARGET_INVALID;
     }
   }
@@ -460,7 +464,7 @@ public class PackageProcessor {
         }
       }
     }  else {
-      Log.e(TAG, path.getName() + " must contain \"" + key + "\"");
+      KMLog.LogError(TAG, path.getName() + " must contain \"" + key + "\"");
     }
     return specs;
   }

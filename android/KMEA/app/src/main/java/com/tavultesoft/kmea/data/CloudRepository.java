@@ -2,7 +2,6 @@ package com.tavultesoft.kmea.data;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +17,7 @@ import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -288,7 +288,7 @@ public class CloudRepository {
         memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, fromKMP));
       }
     } catch (Exception e) {
-      Log.e(TAG, "preCacheDataSet error " + e);
+      KMLog.LogException(TAG, "preCacheDataSet error ", e);
     }
     CloudCatalogDownloadCallback _download_callback = new CloudCatalogDownloadCallback(
       context, updateHandler, onSuccess, onFailure);
@@ -407,7 +407,7 @@ public class CloudRepository {
       JSONObject json = new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, languagesArray);
       return new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, json);
     } catch (JSONException e) {
-      Log.e(TAG, "Failed to properly handle KMP JSON.  Error: " + e);
+      KMLog.LogException(TAG, "Failed to properly handle KMP JSON.  Error: ", e);
       return null;
     }
   }

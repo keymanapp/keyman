@@ -15,7 +15,7 @@ public class LexicalModelKeymanPackage : KeymanPackage {
     let count = models.count
     var str = "Found "+(count > 1 ? "\(count) dictionaries" : "dictionary")+" in package:<br/>"
     for model in models {
-      str += model.lexicalModelId! + "<br/>"
+      str += model.lexicalModelId + "<br/>"
     }
     return str
   }
@@ -27,11 +27,22 @@ public class LexicalModelKeymanPackage : KeymanPackage {
     
     if let packagedModels = json["lexicalModels"] as? [[String:AnyObject]] {
       for modelJson in packagedModels {
-        let model = KMPLexicalModel.init(kmp: self)
-        model.parse(json: modelJson, version: version)
-        
-        if(model.isValid) {
-          models.append(model)
+      // A temporary hybrid state; we now transition to using a Decoder-based strategy.
+        do {
+          let jsonData = try JSONSerialization.data(withJSONObject: modelJson, options: .prettyPrinted)
+          let decoder = JSONDecoder()
+
+          let model = try decoder.decode(KMPLexicalModel.self, from: jsonData)
+          if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {
+            models.append(model)
+          } else {
+            log.debug("\(model.name) not valid / corresponding file not found")
+          }
+        } catch {
+          // Append no models.  Not the greatest strategy, but it's the one that had always
+          // been taken here.
+          log.debug("Error occurred when processing lexical models: \(String(describing: error))")
+          continue
         }
       }
     }

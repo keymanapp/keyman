@@ -71,6 +71,7 @@ import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
@@ -294,7 +295,8 @@ public final class KMManager {
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       initSystemKeyboard(appContext);
     } else {
-      Log.e(TAG, "Cannot initialize: Invalid keyboard type");
+      String msg = "Cannot initialize: Invalid keyboard type";
+      KMLog.LogError(TAG, msg);
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
@@ -572,7 +574,7 @@ public final class KMManager {
         }
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to copy assets. Error: " + e);
+      KMLog.LogException(TAG, "Failed to copy assets. Error: ", e);
     }
   }
 
@@ -604,7 +606,7 @@ public final class KMManager {
         result = 0;
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to copy asset. Error: " + e);
+      KMLog.LogException(TAG, "Failed to copy asset. Error: ", e);
       result = -1;
     }
     return result;
@@ -712,7 +714,7 @@ public final class KMManager {
       }
 
     } catch (IOException e) {
-      Log.e(TAG, "Failed to migrate assets. Error: " + e);
+      KMLog.LogException(TAG, "Failed to migrate assets. Error: ", e);
     }
   }
 
@@ -753,7 +755,7 @@ public final class KMManager {
         }
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to create Typeface: " + fontFilename);
+      KMLog.LogException(TAG, "Failed to create Typeface: " + fontFilename, e);
     }
     return font;
   }
@@ -785,7 +787,7 @@ public final class KMManager {
       modelObj.put("path", path);
       modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
-      Log.e(TAG, "Invalid lexical model to register");
+      KMLog.LogException(TAG, "Invalid lexical model to register", e);
       return false;
     }
 
@@ -1084,7 +1086,8 @@ public final class KMManager {
       return SystemKeyboard;
     } else {
       // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
-      Log.e("KMManager", "Invalid keyboard");
+      String msg = "Keyboard type undefined";
+      KMLog.LogError(TAG, msg);
       return null;
     }
   }
@@ -1206,6 +1209,7 @@ public final class KMManager {
 
         return PackageProcessor.getKeyboardVersion(kmpObject, keyboardID);
       } catch (Exception e) {
+        KMLog.LogException(TAG, "", e);
         return null;
       }
     }
@@ -1232,6 +1236,7 @@ public final class KMManager {
 
       return LexicalModelPackageProcessor.getPackageVersion(kmpObject);
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return null;
     }
   }

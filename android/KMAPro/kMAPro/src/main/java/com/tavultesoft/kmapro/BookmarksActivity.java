@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,8 +37,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-public class BookmarksActivity extends AppCompatActivity {
+import com.tavultesoft.kmea.util.KMLog;
 
+public class BookmarksActivity extends AppCompatActivity {
+  private static final String TAG = "BookmarksActivity";
   private static ListView listView;
   private static ArrayList<HashMap<String, String>> list = null;
   private static String bookmarksFilename = "bookmarks.dat";
@@ -186,7 +187,7 @@ public class BookmarksActivity extends AppCompatActivity {
         list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
         inputStream.close();
       } catch (Exception e) {
-        Log.e("KMAPro", "Failed to read bookmarks list: " + e.getMessage());
+        KMLog.LogException(TAG, "Failed to read bookmarks list: ", e);
         list = null;
       }
     } else {
@@ -206,7 +207,7 @@ public class BookmarksActivity extends AppCompatActivity {
       outputStream.close();
       result = true;
     } catch (Exception e) {
-      Log.e("KMAPro", "Failed to save bookmarks list: " + e.getMessage());
+      KMLog.LogException(TAG, "Failed to save bookmarks list: ", e);
       result = false;
     }
 
