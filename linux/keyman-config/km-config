@@ -29,13 +29,9 @@ if __name__ == '__main__':
         if os.path.isfile(args.install):
             from keyman_config.install_window import InstallKmpWindow
             w = InstallKmpWindow(args.install)
-            w.resize(800, 450)
-            w.connect("destroy", Gtk.main_quit)
             if w.checkcontinue:
-                w.show_all()
-                Gtk.main()
-            else:
-                w.destroy()
+                w.run()
+            w.destroy()
         else:
             logging.error("Can't find file " + args.install)
     else:
