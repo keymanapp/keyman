@@ -69,6 +69,7 @@ import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
@@ -879,7 +880,7 @@ public final class KMManager {
       int length = lexicalModelsList.size();
       for (int i = 0; i < length; i++) {
         HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
+        if (BCP47.languageEquals(langId, lmInfo.get(KMManager.KMKey_LanguageID))) {
           return lmInfo;
         }
       }

@@ -4,7 +4,6 @@ package com.tavultesoft.kmea;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import java.io.File;
@@ -168,7 +168,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
             // Register associated lexical model if it matches the active keyboard's language code;
             // it's safe since we're on the same thread.  Needs to be called AFTER deinstalling the old one.
             String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
-            if(kbdLgCode.equals(languageID)) {
+            if(BCP47.languageEquals(kbdLgCode, languageID)) {
               KMManager.registerAssociatedLexicalModel(languageID);
             }
           }

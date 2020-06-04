@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
@@ -129,7 +130,7 @@ public class LexicalModel extends LanguageResource implements Serializable {
 
   public boolean equals(Object obj) {
     if(obj instanceof LexicalModel) {
-      boolean lgCodeMatch = ((LexicalModel) obj).getLanguageID().equals(this.getLanguageID());
+      boolean lgCodeMatch = BCP47.languageEquals(((LexicalModel) obj).getLanguageID(), this.getLanguageID());
       boolean idMatch = ((LexicalModel) obj).getLexicalModelID().equals(this.getLexicalModelID());
 
       return lgCodeMatch && idMatch;

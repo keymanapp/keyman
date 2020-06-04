@@ -17,6 +17,7 @@ import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
@@ -135,7 +136,7 @@ public class CloudRepository {
     if (memCachedDataset != null) {
       for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
         LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
-        if (lm.getLanguageID().equalsIgnoreCase(languageID)) {
+        if (BCP47.languageEquals(lm.getLanguageID(), languageID)) {
           return true;
         }
       }
