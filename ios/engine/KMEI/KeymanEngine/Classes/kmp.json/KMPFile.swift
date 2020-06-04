@@ -17,4 +17,10 @@ struct KMPFile: Codable {
     case description
     // case copyLocation // deliberately omitted
   }
+
+  init(_ name: String, description: String? = nil) {
+    let desc = description ?? name
+    self.name = name
+    self.description = desc
+  }
 }

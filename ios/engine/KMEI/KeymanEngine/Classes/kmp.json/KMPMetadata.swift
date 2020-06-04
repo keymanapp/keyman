@@ -42,6 +42,32 @@ class KMPMetadata: Codable {
     case Unsupported
   }
 
+  init(from resource: LanguageResource) {
+    // First, the standard defaults.
+    system = KMPSystem()
+    options = KMPOptions()
+    info = KMPInfo()
+    keyboards = nil
+    lexicalModels = nil
+
+    // Now to process the resource.
+    var fileSet = [ KMPFile(resource.sourceFilename) ]
+    resource.fonts.forEach {font in
+      fileSet.append(KMPFile(font.source[0]))
+    }
+    files = fileSet
+
+    if var keyboard = resource as? InstallableKeyboard {
+      keyboard.version = "0.0.0"
+      keyboards = [KMPKeyboard(from: keyboard)!]
+    } else if var lexicalModel = resource as? InstallableLexicalModel {
+      lexicalModel.version = "0.0.0"
+      lexicalModels = [KMPLexicalModel(from: lexicalModel)!]
+    } else {
+      fatalError("Cannot utilize unexpected subclass of LanguageResource")
+    }
+  }
+
   var isValid: Bool {
     if keyboards != nil && lexicalModels != nil {
       return false

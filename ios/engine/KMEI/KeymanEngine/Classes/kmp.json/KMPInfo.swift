@@ -11,14 +11,21 @@ import Foundation
 class KMPInfoItem: Codable {
   var description: String
   var url: String?
+
+  init(description: String, url: String? = nil) {
+    self.description = description
+    self.url = url
+  }
 }
 
 class KMPInfo: Codable {
-  var name: KMPInfoItem?
-  var author: KMPInfoItem?
-  var copyright: KMPInfoItem?
-  var website: KMPInfoItem?
-  var version: KMPInfoItem?
+  var name: KMPInfoItem? = nil
+  var author: KMPInfoItem? = nil
+  var copyright: KMPInfoItem? = nil
+  var website: KMPInfoItem? = nil
+  // If we're constructing one from scratch, set to the absolute minimal version.
+  // This will automatically signal that the 'package' needs to be updated.
+  var version: KMPInfoItem? = KMPInfoItem(description: "0.0.0")
 
   enum CodingKeys: String, CodingKey {
     case name
