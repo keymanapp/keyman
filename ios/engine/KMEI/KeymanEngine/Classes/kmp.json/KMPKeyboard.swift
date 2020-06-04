@@ -28,6 +28,22 @@ class KMPKeyboard: Codable, KMPResource {
     case isRTL = "rtl"
     case languages
   }
+
+  internal required init?(from resource: LanguageResource) {
+    guard let keyboard = resource as? InstallableKeyboard else {
+      return nil
+    }
+
+    self.name = keyboard.name
+    self.keyboardId = keyboard.id
+    self.version = keyboard.version
+    self.isRTL = keyboard.isRTL
+
+    self.font = keyboard.font?.source[0]
+    self.osk = keyboard.oskFont?.source[0]
+
+    self.languages = [KMPLanguage(name: keyboard.languageName, languageId: keyboard.languageID)]
+  }
   
   required public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -39,6 +55,27 @@ class KMPKeyboard: Codable, KMPResource {
     font = try values.decodeIfPresent(String.self, forKey: .font)
     isRTL = try values.decodeIfPresent(Bool.self, forKey: .isRTL) ?? false
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
+  }
+
+  func matches(installable resource: LanguageResource, requireLanguageMatch: Bool = true) -> Bool {
+    guard let resource = resource as? InstallableKeyboard else {
+      return false
+    }
+
+    if id != resource.id {
+      return false
+    } else if version != resource.version {
+      return false
+    }
+
+    if requireLanguageMatch {
+      let resourceMetadata = KMPKeyboard(from: resource)!
+      return languages.contains(where: { language in
+        return language.languageId == resourceMetadata.languages[0].languageId
+      })
+    }
+
+    return true
   }
 
   internal var installableKeyboards: [InstallableKeyboard] {

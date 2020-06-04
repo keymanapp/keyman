@@ -23,6 +23,20 @@ class KMPLexicalModel: Codable, KMPResource {
     case languages
   }
 
+  internal required init?(from resource: LanguageResource) {
+    guard let lexicalModel = resource as? InstallableLexicalModel else {
+      return nil
+    }
+
+    self.name = lexicalModel.name
+    self.lexicalModelId = lexicalModel.id
+    self.version = lexicalModel.version
+
+    // InstallableLexicalModel doesn't store the language name, so we use the id as a fill-in.
+    // The 'name' part isn't used for matching, anyway.
+    self.languages = [KMPLanguage(name: lexicalModel.languageID, languageId: lexicalModel.languageID)]
+  }
+
   required public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -40,6 +54,27 @@ class KMPLexicalModel: Codable, KMPResource {
    */
   public func setNilVersion(to version: String) {
     self.version = self.version ?? version
+  }
+
+  func matches(installable resource: LanguageResource, requireLanguageMatch: Bool = true) -> Bool {
+    guard let resource = resource as? InstallableLexicalModel else {
+      return false
+    }
+
+    if id != resource.id {
+      return false
+    } else if version != resource.version {
+      return false
+    }
+
+    if requireLanguageMatch {
+      let resourceMetadata = KMPLexicalModel(from: resource)!
+      return languages.contains(where: { language in
+        return language.languageId == resourceMetadata.languages[0].languageId
+      })
+    }
+
+    return true
   }
 
   internal var installableLexicalModels: [InstallableLexicalModel] {

@@ -8,9 +8,14 @@
 
 import Foundation
 
-protocol KMPResource {
+internal protocol KMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
 
   var installableResources: [LanguageResource] { get }
+
+  // Used to convert old cloud resources into the extracted KMP format for 14.0+ file management.
+  init?(from resource: LanguageResource)
+
+  func matches(installable resource: LanguageResource, requireLanguageMatch: Bool) -> Bool
 }
