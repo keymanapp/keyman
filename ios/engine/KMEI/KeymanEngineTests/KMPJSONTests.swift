@@ -127,4 +127,87 @@ class KMPJSONTests: XCTestCase {
     let nrc_en_mtnt: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_nrc_en_mtnt)
     kmp_info_nrc_en_mtnt_assertions(nrc_en_mtnt)
   }
+
+  func testKMPKeyboardFrom() throws {
+    guard let constructedMetadata = KMPKeyboard(from: TestUtils.Keyboards.khmer_angkor) else {
+      XCTFail("Could not construct KMPKeyboard from InstallableKeyboard")
+      return
+    }
+
+    if let _ = KMPKeyboard(from: TestUtils.LexicalModels.mtnt) {
+      XCTFail("Constructed KMPKeyboard from InstallableLexicalModel")
+    }
+
+    // The original version extracted from a KMP.
+    let kmpMetadata: KMPKeyboard = try loadObjectFromJSON(at: TestUtils.PackageJSON.keyboard_khmer_angkor)!
+
+    XCTAssertEqual(constructedMetadata.id, kmpMetadata.id)
+    XCTAssertEqual(constructedMetadata.name, kmpMetadata.name)
+    XCTAssertEqual(constructedMetadata.version, kmpMetadata.version)
+    // The pre-extracted version currently does not have fonts set, so the following two lines will fail.
+//    XCTAssertEqual(constructedMetadata.font, kmpMetadata.font)
+//    XCTAssertEqual(constructedMetadata.osk, kmpMetadata.osk)
+    XCTAssertEqual(constructedMetadata.isRTL, kmpMetadata.isRTL)
+
+    // Language assertions are not as easy.
+    XCTAssertTrue(kmpMetadata.languages.contains(where: { language in
+      // There will only be a single language in our 'constructed' version, since it's built
+      // from a single LanguageResource.
+      let constructedLanguage = constructedMetadata.languages[0]
+      return constructedLanguage.languageId == language.languageId &&
+             constructedLanguage.name == language.name
+    }))
+  }
+
+  func testKMPLexicalModelFrom() throws {
+    guard let constructedMetadata = KMPLexicalModel(from: TestUtils.LexicalModels.mtnt) else {
+      XCTFail("Could not construct KMPLexicalModel from InstallableLexicalModel")
+      return
+    }
+
+    if let _ = KMPLexicalModel(from: TestUtils.Keyboards.khmer_angkor) {
+      XCTFail("Constructed KMPLexicalModel from InstallableKeyboard")
+    }
+
+    // The original version extracted from a KMP.
+    let kmpMetadata: KMPLexicalModel = try loadObjectFromJSON(at: TestUtils.PackageJSON.model_nrc_en_mtnt)!
+
+    XCTAssertEqual(constructedMetadata.id, kmpMetadata.id)
+    XCTAssertEqual(constructedMetadata.name, kmpMetadata.name)
+    // The following line will fail because kmpMetadata.version was only set on the package level,
+    // not directly within the KMPLexicalModel definition.
+    //XCTAssertEqual(constructedMetadata.version, kmpMetadata.version)
+    XCTAssertEqual(constructedMetadata.isRTL, kmpMetadata.isRTL)
+
+    // Language assertions are not as easy.
+    XCTAssertTrue(kmpMetadata.languages.contains(where: { language in
+      // There will only be a single language in our 'constructed' version, since it's built
+      // from a single LanguageResource.  We can't reconstruct the original language name
+      // for lexical models at this time.
+      let constructedLanguage = constructedMetadata.languages[0]
+      return constructedLanguage.languageId == language.languageId
+    }))
+  }
+
+  func testKMPResourceMatches() throws {
+    let kmp_khmer_angkor: KMPKeyboard = try loadObjectFromJSON(at: TestUtils.PackageJSON.keyboard_khmer_angkor)!
+
+    //let wrappedKeyboard = KMPKeyboard(from: TestUtils.Keyboards.khmer_angkor)!
+
+    XCTAssertTrue(kmp_khmer_angkor.matches(installable: TestUtils.Keyboards.khmer_angkor))
+    XCTAssertFalse(kmp_khmer_angkor.matches(installable: TestUtils.LexicalModels.mtnt))
+
+    let kmp_mtnt: KMPLexicalModel = try loadObjectFromJSON(at: TestUtils.PackageJSON.model_nrc_en_mtnt)!
+    kmp_mtnt.setNilVersion(to: "0.1.4")
+
+    XCTAssertTrue(kmp_mtnt.matches(installable: TestUtils.LexicalModels.mtnt))
+    XCTAssertFalse(kmp_mtnt.matches(installable: TestUtils.Keyboards.khmer_angkor))
+
+    // Three models are listed; we choose the second variant since it uses a different language
+    // code than specified under TestUtils.LexicalModels.mtnt.
+    let constructed_mtnt: KMPLexicalModel = KMPLexicalModel(from: kmp_mtnt.installableResources[1])!
+
+    XCTAssertFalse(constructed_mtnt.matches(installable: TestUtils.LexicalModels.mtnt))
+    XCTAssertTrue(constructed_mtnt.matches(installable: TestUtils.LexicalModels.mtnt, requireLanguageMatch: false))
+  }
 }

@@ -15,7 +15,7 @@ extension TestUtils {
     static let khmer_angkor =  InstallableKeyboard(id: "khmer_angkor",
                                                    name: "Khmer Angkor",
                                                    languageID: "km",
-                                                   languageName: "Khmer (Central)",
+                                                   languageName: "Central Khmer (Khmer, Cambodia)",
                                                    version: "1.0.6",
                                                    isRTL: false,
                                                    font: nil,
