@@ -187,22 +187,6 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
     aDataSet.lexicalModels.addAll(lexicalModelsArrayList);
 
-    // Do the actual update checks.
-    /*
-    for (int i = 0; i < installedData.lexicalModels.getCount(); i++) {
-      LexicalModel model = installedData.lexicalModels.getItem(i);
-
-      // Check for duplicates / possible updates.
-      LexicalModel match = aDataSet.lexicalModels.findMatch(model);
-
-      if (match != null) {
-        Bundle bundle = updateCheck(match, model);
-        if (bundle != null) {
-          updateBundles.add(bundle);
-        }
-      } // else no match == no special handling.
-    }*/
-
     if (updateBundles.size() > 0 && !(DEBUG_SIMULATE_UPDATES && !executeCallbacks)) {
       // Time for updates!
       Log.v(TAG, "Performing keyboard and model updates for " + updateBundles.size() + " resources.");

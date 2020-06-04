@@ -353,6 +353,9 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
               lexicalModelsList.remove(lexicalModelsList.size() - 1);
             }
           }
+
+          // Invalidate cache to rebuild the list
+          CloudRepository.shared.invalidateLexicalModelCache(context);
         }
       }
     }
