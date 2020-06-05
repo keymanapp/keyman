@@ -39,6 +39,9 @@ class FileManagementTests: XCTestCase {
 
         XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
         XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
+
+        let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
       }
     }
   }

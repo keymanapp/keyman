@@ -63,5 +63,14 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
     self.version = lexicalModel.version ?? InstallableConstants.defaultVersion
     self.isCustom = isCustom
   }
+
+  // Lexical models don't bundle fonts.  At least, not yet?
+  public var fonts: [Font] {
+    return []
+  }
+
+  public var sourceFilename: String {
+    return "\(id).model.js"
+  }
 }
 

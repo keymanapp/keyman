@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct KMPFile: Codable {
+struct KMPFile: Codable {
   var name: String
   var description: String
 

@@ -617,49 +617,58 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for k in kmp.keyboards {
-      let installableKeyboards : [InstallableKeyboard] = k.installableKeyboards
-      let keyboardID = k.keyboardId
+    for r in kmp.resources {
+      let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
+        // (source file, destination file)
+        var set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
+        let installableFonts: [(String, URL)] = resource.fonts.map { font in
+          // KMPs only list a single font file for each entry whenever one is included.
+          // A pre-existing assumption.
+          let fontFile = font.source[0]
+          return (fontFile, Storage.active.fontURL(forResource: resource, filename: fontFile)!)
+        }
 
-      do {
-        try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboardID),
-                                                withIntermediateDirectories: true)
-      } catch {
-        log.error("Could not create dir for download: \(error)")
-        throw KMPError.fileSystem
+        set.append(contentsOf: installableFonts)
+
+        // (resource, source-destination file mapping)
+        return (resource, set)
       }
 
       var haveInstalledOne = false
-      for keyboard in installableKeyboards {
-        let storedPath = Storage.active.keyboardURL(for: keyboard)
+      for set in installableFiles {
+        let resource = set.0
+        let files = set.1
 
-        var installableFiles: [[Any]] = [["\(keyboardID).js", storedPath]]
-        if let osk = k.osk {
-          let oskPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: osk)
-          installableFiles.append([osk, oskPath])
-        }
-
-        if let font = k.font {
-          let displayPath = Storage.active.fontURL(forKeyboardID: keyboardID, filename: font)
-          installableFiles.append([font, displayPath])
-        }
         do {
-          for item in installableFiles {
+          try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
+                                                  withIntermediateDirectories: true)
+        } catch {
+          log.error("Could not create dir for download: \(error)")
+          throw KMPError.fileSystem
+        }
+
+        do {
+          for item in files {
             var filePath = folder
-            if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-              try FileManager.default.removeItem(at: item[1] as! URL)
+            filePath.appendPathComponent(item.0)
+
+            // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
+            //        once this method is fully abstracted and its core is placed within said class.
+            if(FileManager.default.fileExists(atPath: (item.1).path)) {
+              try FileManager.default.removeItem(at: item.1)
             }
-            filePath.appendPathComponent(item[0] as! String)
-            try FileManager.default.copyItem(at: filePath,
-                                             to: item[1] as! URL)
+            try FileManager.default.copyItem(at: filePath, to: item.1)
 
           }
         } catch {
           log.error("Error saving the download: \(error)")
           throw KMPError.copyFiles
         }
+
+        // Only one keyboard is installed by default from a KMP.
+        // Also, only the first language-pairing it contains
         if !haveInstalledOne {
-          Manager.shared.addKeyboard(keyboard)
+          Manager.shared.addKeyboard(resource as! InstallableKeyboard)
           haveInstalledOne = true
         }
       }
@@ -672,37 +681,48 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for m in kmp.models {
-      let installableLexicalModels : [InstallableLexicalModel] = m.installableLexicalModels
-      let lexicalModelID = m.lexicalModelId
+    for r in kmp.resources {
+      let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
+        // (source file, destination file)
+        let set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
+        // no fonts for lexical models
 
-      do {
-        try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModelID),
-                                                withIntermediateDirectories: true)
-      } catch {
-        log.error("Could not create dir for download: \(error)")
-        throw KMPError.fileSystem
+        // (resource, source-destination file mapping)
+        return (resource, set)
       }
 
-      for lexicalModel in installableLexicalModels {
-        let storedPath = Storage.active.lexicalModelURL(for: lexicalModel)
+      for set in installableFiles {
+        let resource = set.0
+        let files = set.1
 
-        let installableFiles: [[Any]] = [["\(lexicalModelID).model.js", storedPath]]
         do {
-          for item in installableFiles {
+          try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
+                                                  withIntermediateDirectories: true)
+        } catch {
+          log.error("Could not create dir for download: \(error)")
+          throw KMPError.fileSystem
+        }
+
+        do {
+          for item in files {
             var filePath = folder
-            if(FileManager.default.fileExists(atPath: (item[1] as! URL).path)) {
-              try FileManager.default.removeItem(at: item[1] as! URL)
+            filePath.appendPathComponent(item.0)
+
+            // TODO:  The rest of this block may be replaced with ResourceFileManager.copyWithOverwrite
+            //        once this method is fully abstracted and its core is placed within said class.
+            if(FileManager.default.fileExists(atPath: (item.1).path)) {
+              try FileManager.default.removeItem(at: item.1)
             }
-            filePath.appendPathComponent(item[0] as! String)
-            try FileManager.default.copyItem(at: filePath,
-                                             to: item[1] as! URL)
+            try FileManager.default.copyItem(at: filePath, to: item.1)
           }
         } catch {
           log.error("Error saving the lexical model download: \(error)")
           throw KMPError.copyFiles
         }
-        Manager.addLexicalModel(lexicalModel)
+
+        // All pairings are installed for lexical models.
+        // Also, all models within the KMP
+        Manager.addLexicalModel(resource as! InstallableLexicalModel)
       }
     }
   }

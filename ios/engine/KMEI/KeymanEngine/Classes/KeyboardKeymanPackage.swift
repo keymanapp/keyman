@@ -9,7 +9,7 @@
 import Foundation
 
 public class KeyboardKeymanPackage : KeymanPackage {
-  public var keyboards: [KMPKeyboard]!
+  internal var keyboards: [KMPKeyboard]!
 
   override init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
@@ -32,6 +32,10 @@ public class KeyboardKeymanPackage : KeymanPackage {
       str += keyboard.keyboardId + "<br/>"
     }
     return str
+  }
+
+  override var resources: [KMPResource] {
+    return keyboards
   }
 }
 
