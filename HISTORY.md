@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.87 alpha 2020-06-05
+
+* fix(developer/compilers): normalise touch layout on compile (#3203)
+* feat(android): Add utility to check BCP47 equivalence (#3210)
+* refactor(ios/engine): KMP installation now relies on KeymanPackage class, parses (#3205)
+* refactor(ios/engine): Abstraction of KMP installation methods (#3206)
+* feat(linux): Make two windows modal dialogs (#3211)
+
 ## 14.0.86 alpha 2020-06-02
 
 * fix(ios): fixes lerna concurrency workaround and missing func reference (#3192)
