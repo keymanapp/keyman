@@ -27,6 +27,13 @@ class KMPJSONTests: XCTestCase {
 
     XCTAssertEqual(lang_km.name, "Central Khmer (Khmer, Cambodia)")
     XCTAssertEqual(lang_km.languageId, "km")
+
+    let lang_str_latn: KMPLanguage = try loadObjectFromJSON(at: TestUtils.PackageJSON.language_str_latn)
+
+    XCTAssertEqual(lang_str_latn.name, "SENĆOŦEN")
+    // Is upper-cased in the .json, but should be lower-cased on deserialization.
+    // Our language-tag matching is case-insensitive.
+    XCTAssertEqual(lang_str_latn.languageId, "str-latn")
   }
 
   // A helper method, since these are useful in two separate tests.
@@ -49,12 +56,12 @@ class KMPJSONTests: XCTestCase {
   }
 
   // A helper method, since these are useful in two separate tests.
-  func lexical_model_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPLexicalModel) {
+  func lexical_model_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPLexicalModel, version: String? = nil) {
     XCTAssertEqual(nrc_en_mtnt.name, "English dictionary (MTNT)")
     XCTAssertEqual(nrc_en_mtnt.lexicalModelId, "nrc.en.mtnt")
     // Our example case does not define either of these two values.
     // One (isRTL), we assume a default value for.
-    XCTAssertEqual(nrc_en_mtnt.version, nil)
+    XCTAssertEqual(nrc_en_mtnt.version, version)
     XCTAssertEqual(nrc_en_mtnt.isRTL, false)
 
     XCTAssertEqual(nrc_en_mtnt.languages.count, 3)
@@ -68,9 +75,7 @@ class KMPJSONTests: XCTestCase {
     lexical_model_nrc_en_mtnt_assertions(nrc_en_mtnt)
   }
 
-  func testKeyboardPackageInfoDecoding() throws {
-    let khmer_angkor: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_khmer_angkor)
-
+  func kmp_info_khmer_angkor_assertions(_ khmer_angkor: KMPMetadata) {
     XCTAssertTrue(khmer_angkor.isValid)
     XCTAssertEqual(khmer_angkor.packageType, KMPMetadata.PackageType.Keyboard)
 
@@ -95,15 +100,18 @@ class KMPJSONTests: XCTestCase {
     XCTAssertNil(khmer_angkor.options.readmeFile)
   }
 
-  func testLexicalModelPackageInfoDecoding() throws {
-    let nrc_en_mtnt: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_nrc_en_mtnt)
+  func testKeyboardPackageInfoDecoding() throws {
+    let khmer_angkor: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_khmer_angkor)
+    kmp_info_khmer_angkor_assertions(khmer_angkor)
+  }
 
+  func kmp_info_nrc_en_mtnt_assertions(_ nrc_en_mtnt: KMPMetadata, version: String? = nil) {
     XCTAssertTrue(nrc_en_mtnt.isValid)
     XCTAssertEqual(nrc_en_mtnt.packageType, KMPMetadata.PackageType.LexicalModel)
 
     XCTAssertNotNil(nrc_en_mtnt.lexicalModels)
     XCTAssertEqual(nrc_en_mtnt.lexicalModels!.count, 1)
-    lexical_model_nrc_en_mtnt_assertions(nrc_en_mtnt.lexicalModels![0])
+    lexical_model_nrc_en_mtnt_assertions(nrc_en_mtnt.lexicalModels![0], version: version)
 
     XCTAssertNil(nrc_en_mtnt.keyboards)
 
@@ -111,7 +119,7 @@ class KMPJSONTests: XCTestCase {
     XCTAssertEqual(nrc_en_mtnt.files!.count, 1)
 
     XCTAssertNotNil(nrc_en_mtnt.info)
-    XCTAssertEqual(nrc_en_mtnt.info!.version!.description, "0.1.3")
+    XCTAssertEqual(nrc_en_mtnt.info!.version!.description, "0.1.4")
     XCTAssertNil(nrc_en_mtnt.info!.version!.url)
     XCTAssertEqual(nrc_en_mtnt.info!.author!.description, "Eddie Antonio Santos")
     XCTAssertEqual(nrc_en_mtnt.info!.author!.url, "mailto:easantos@ualberta.ca")
@@ -120,5 +128,10 @@ class KMPJSONTests: XCTestCase {
 
     XCTAssertNil(nrc_en_mtnt.options.graphicFile)
     XCTAssertNil(nrc_en_mtnt.options.readmeFile)
+  }
+
+  func testLexicalModelPackageInfoDecoding() throws {
+    let nrc_en_mtnt: KMPMetadata = try loadObjectFromJSON(at: TestUtils.PackageJSON.kmp_json_nrc_en_mtnt)
+    kmp_info_nrc_en_mtnt_assertions(nrc_en_mtnt)
   }
 }

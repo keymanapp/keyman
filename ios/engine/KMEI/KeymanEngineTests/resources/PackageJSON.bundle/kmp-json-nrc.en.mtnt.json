@@ -4,7 +4,7 @@
     "fileVersion": "12.0"
   },
   "options": {
-    "followKeyboardVersion": true
+    "followKeyboardVersion": false
   },
   "info": {
     "author": {
@@ -18,7 +18,7 @@
       "description": "English language model mined from MTNT"
     },
     "version": {
-      "description": "0.1.3"
+      "description": "0.1.4"
     }
   },
   "files": [

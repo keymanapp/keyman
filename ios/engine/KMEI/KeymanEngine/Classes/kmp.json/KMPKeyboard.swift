@@ -18,7 +18,6 @@ public class KMPKeyboard: Codable {
   // Technically, the schema says that this doesn't have to be specified.
   // However, it's a requirement for KeymanEngine for iOS.
   public var languages: [KMPLanguage]
-  public var installableKeyboards: [InstallableKeyboard]! = []
 
   enum CodingKeys: String, CodingKey {
     case name
@@ -40,8 +39,9 @@ public class KMPKeyboard: Codable {
     font = try values.decodeIfPresent(String.self, forKey: .font)
     isRTL = try values.decodeIfPresent(Bool.self, forKey: .isRTL) ?? false
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
+  }
 
-    // Now to build the InstallableKeyboard list.
+  public var installableKeyboards: [InstallableKeyboard] {
     var installableKeyboards : [InstallableKeyboard] = []
 
     for language in self.languages {
@@ -57,7 +57,7 @@ public class KMPKeyboard: Codable {
       installableKeyboards.append( keyboard )
     }
 
-    self.installableKeyboards = installableKeyboards
+    return installableKeyboards
   }
 
   public var displayFont: Font? {

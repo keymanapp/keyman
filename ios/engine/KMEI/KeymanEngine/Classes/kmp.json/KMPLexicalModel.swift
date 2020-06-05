@@ -14,7 +14,6 @@ public class KMPLexicalModel: Codable {
   public var version: String?
   public var isRTL: Bool = false
   public var languages: [KMPLanguage]
-  public var installableLexicalModels: [InstallableLexicalModel]! = []
 
   enum CodingKeys: String, CodingKey {
     case name
@@ -35,8 +34,15 @@ public class KMPLexicalModel: Codable {
     version = try values.decodeIfPresent(String.self, forKey: .version)
     isRTL = try values.decodeIfPresent(Bool.self, forKey: .isRTL) ?? false
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
+  }
 
-    // Now to build the InstallableKeyboard list.
+  /** This function will set the value for version only when a lexical model doesn't have a value for it specified directly in its definition.
+   */
+  public func setNilVersion(to version: String) {
+    self.version = self.version ?? version
+  }
+
+  public var installableLexicalModels: [InstallableLexicalModel] {
     var installableLexicalModels : [InstallableLexicalModel] = []
 
     for language in self.languages {
@@ -48,7 +54,7 @@ public class KMPLexicalModel: Codable {
       installableLexicalModels.append( model )
     }
 
-    self.installableLexicalModels = installableLexicalModels
+    return installableLexicalModels
   }
 
   public var isValid: Bool {

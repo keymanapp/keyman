@@ -65,4 +65,8 @@ public class KMPMetadata: Codable {
       return .Unsupported
     }
   }
+
+  var version: String? {
+    return self.info?.version?.description
+  }
 }

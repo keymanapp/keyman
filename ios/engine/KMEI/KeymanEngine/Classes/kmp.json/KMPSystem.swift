@@ -11,4 +11,9 @@ import Foundation
 public struct KMPSystem: Codable {
   public var keymanDeveloperVersion: String?
   public var fileVersion: String
+
+  enum CodingKeys: String, CodingKey {
+    case keymanDeveloperVersion
+    case fileVersion
+  }
 }

@@ -12,6 +12,10 @@ import Foundation
 extension TestUtils {
   enum LexicalModels {
     static let mtntKMP = TestUtils.lexicalModelsBundle.url(forResource: "nrc.en.mtnt.model", withExtension: "kmp")!
-    static let mtnt = Defaults.lexicalModel
+    static let mtnt = InstallableLexicalModel(id: "nrc.en.mtnt",
+                                              name: "English dictionary (MTNT)",
+                                              languageID: "en",
+                                              version: "0.1.4",
+                                              isCustom: false)
   }
 }
