@@ -38,9 +38,15 @@ class ViewInstalledWindowBase(Gtk.Window):
 
     def on_download_clicked(self, button):
         logging.debug("Download clicked")
-        w = DownloadKmpWindow(self)
-        w.resize(800, 450)
-        w.show_all()
+        downloadDlg = DownloadKmpWindow(self)
+        response = downloadDlg.run()
+        file = None
+        if response == Gtk.ResponseType.OK:
+            file = downloadDlg.downloadfile
+        downloadDlg.destroy()
+
+        if file != None:
+            self.install_file(file)
 
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
@@ -53,14 +59,19 @@ class ViewInstalledWindowBase(Gtk.Window):
         dlg.add_filter(filter_text)
         response = dlg.run()
         if response == Gtk.ResponseType.OK:
-            kmpfile = dlg.get_filename()
-            w = InstallKmpWindow(kmpfile, viewkmp=self)
-            w.resize(800, 450)
-            if w.checkcontinue:
-                w.show_all()
-            else:
-                w.destroy()
+            self.install_file(dlg.get_filename())
         dlg.destroy()
+
+    def install_file(self, kmpfile):
+        installDlg = InstallKmpWindow(kmpfile, viewkmp=self)
+        installDlg.run()
+        installDlg.destroy()
+
+    def run(self):
+        self.resize(576, 324)
+        self.connect("destroy", Gtk.main_quit)
+        self.show_all()
+        Gtk.main()
 
 class ViewInstalledWindow(ViewInstalledWindowBase):
     def __init__(self):
