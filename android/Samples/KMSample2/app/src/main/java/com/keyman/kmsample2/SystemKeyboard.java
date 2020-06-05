@@ -1,5 +1,6 @@
 package com.keyman.kmsample2;
 
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
@@ -37,15 +38,22 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
     // Add a custom keyboard
-    HashMap<String, String> kbInfo = new HashMap<String, String>();
-    kbInfo.put(KMManager.KMKey_PackageID, "basic_kbdtam99");
-    kbInfo.put(KMManager.KMKey_KeyboardID, "basic_kbdtam99");
-    kbInfo.put(KMManager.KMKey_LanguageID, "ta");
-    kbInfo.put(KMManager.KMKey_KeyboardName, "Tamil 99 Basic");
-    kbInfo.put(KMManager.KMKey_LanguageName, "Tamil");
-    kbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    //kbInfo.put(KMManager.KMKey_Font, "aava1.ttf");
-    kbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont); // Use the default font
+    Keyboard kbInfo = new Keyboard(
+      "basic_kbdtam99", // Package ID - filename of the .kmp file
+      "basic_kbdtam99", // Keyboard ID
+      "Tamil 99 Basic", // Keyboard Name
+      "ta",             // Language ID
+      "Tamil",          // Language Name
+      "1.0",            // Keyboard Version
+      null,             // URL to help documentation if available
+      "",               // URL to latest .kmp file
+      true,             // Boolean to show this is a new keyboard in the keyboard picker
+
+      // Font information of the .ttf font to use in KMSample2 (for example "aava1.ttf").
+      // basic_kbdtam99 doesn't include a font. Can set blank "" or KMManager.KMDefault_KeyboardFont
+      // KMEA will use the font for the OSK, but the Android device determines the system font used for keyboard output
+      KMManager.KMDefault_KeyboardFont,  // Font for KMSample2
+      KMManager.KMDefault_KeyboardFont); // Font for OSK
     KMManager.addKeyboard(this, kbInfo);
 
     // Add a dictionary
