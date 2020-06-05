@@ -13,6 +13,9 @@ from gi.repository import Gtk, WebKit2
 from keyman_config.check_mime_type import check_mime_type
 from keyman_config.accelerators import bind_accelerator, init_accel
 
+# NOTE: WebKit2 is not able to load XHTML files nor files with an encoding other
+# than ASCII or UTF-8
+
 class WelcomeView(Gtk.Window):
 
     def __init__(self, welcomeurl, keyboardname):
