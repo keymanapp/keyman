@@ -75,15 +75,15 @@ class KeymanPackageTests: XCTestCase {
     }
   }
 
-  func testPackageContainsResource() {
+  func testPackageFindResourceMatch() {
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, _ in
-      XCTAssertTrue(kmp!.contains(TestUtils.Keyboards.khmer_angkor))
-      XCTAssertFalse(kmp!.contains(TestUtils.LexicalModels.mtnt))
+      XCTAssertNotNil(kmp!.findMatch(TestUtils.Keyboards.khmer_angkor))
+      XCTAssertNil(kmp!.findMatch(TestUtils.LexicalModels.mtnt))
     }
 
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, _ in
-      XCTAssertTrue(kmp!.contains(TestUtils.LexicalModels.mtnt))
-      XCTAssertFalse(kmp!.contains(TestUtils.Keyboards.khmer_angkor))
+      XCTAssertNotNil(kmp!.findMatch(TestUtils.LexicalModels.mtnt))
+      XCTAssertNil(kmp!.findMatch(TestUtils.Keyboards.khmer_angkor))
     }
   }
 }

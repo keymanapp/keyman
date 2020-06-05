@@ -71,6 +71,7 @@ class FileManagementTests: XCTestCase {
   }
 
   func testInstallKeyboardFromPackage() throws {
+    // Standard installation
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")
@@ -92,12 +93,39 @@ class FileManagementTests: XCTestCase {
       XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
       XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
 
+      // While the LanguageResource definition we provided lacks font definitions, the
+      // KMP's definition has that data.  By default, the KMP's definition takes precedence.
+      let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
+      XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
+    }
+  }
+
+  func testInstallKeyboardFromPackageCustomDefinition() throws {
+    // Modified installation - KeymanEngine user supplies external/literal definition for LanguageResource.
+    // Separate test method b/c "tearDown()" cleans out installation artifacts from the other version.
+    ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
+      XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
+      XCTAssertNil(error, "Error occurred while preparing KMP for installation")
+      XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
+
+      do {
+        try ResourceFileManager.shared.install(TestUtils.Keyboards.khmer_angkor, from: kmp!, usePackageDefinition: false)
+      } catch {
+        XCTFail("Unexpected error during KeyboardPackage install")
+      }
+
+      let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
+
+      XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                    "Could not find installed keyboard file")
+
+      let keyboards = Storage.active.userDefaults.userKeyboards!
+
+      XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
+      XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
+
       // While the KMP's version of the specified InstallableKeyboard does specify Fonts,
-      // the literal-based testing version does NOT.  Since we're installing from the predefined,
-      // test-copy instance, we expect NOT to see the font from this test's install!
-      //
-      // Yes, the KeymanPackage.contains check isn't exhaustive - it just does a pair of
-      // id checks.  This version of events couldn't happen if we thorough enough there.
+      // the literal-based testing version does NOT.  Since in this test, we're installing from the predefined, test-copy instance, we expect NOT to see the font from this test's install!
       let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
       XCTAssertFalse(FileManager.default.fileExists(atPath: fontURL.path))
     }

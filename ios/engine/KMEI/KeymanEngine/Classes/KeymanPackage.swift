@@ -120,8 +120,8 @@ public class KeymanPackage {
                       })
   }
 
-  public func contains(_ resource: LanguageResource) -> Bool {
-    let matchesFound: [[LanguageResource]] = self.installableResourceSets.compactMap { set in
+  public func findMatch(_ resource: LanguageResource) -> LanguageResource? {
+    let matchesFound: [LanguageResource] = self.installableResourceSets.compactMap { set in
       let setMatches: [LanguageResource] = set.compactMap { other in
         if resource.id == other.id && resource.languageID == other.languageID {
           return other
@@ -130,13 +130,9 @@ public class KeymanPackage {
         }
       }
 
-      if setMatches.count > 0 {
-        return setMatches
-      } else {
-        return nil
-      }
+      return setMatches.count > 0 ? setMatches[0] : nil
     }
 
-    return matchesFound.count > 0
+    return matchesFound.count > 0 ? matchesFound[0] : nil
   }
 }
