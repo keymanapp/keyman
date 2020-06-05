@@ -5,15 +5,18 @@ namespace com.keyman {
    * Controls whether or not the generated Sentry event is logged to the console (true)
    * or sent to our Sentry server (false).
    */
-  let DEBUG = false;
+  let DEBUG = true;
 
-  type Options = typeof KeymanSentryManager.DEFAULT_OPTIONS;
+  type Options = {
+    hostPlatform: "native-web" | "ios" | "android"
+  };
 
   export class KeymanSentryManager {
     keymanPlatform: string;
 
     static STANDARD_ALIASABLE_FILES = {
       'keymanweb.js':    'keymanweb.js',
+      'keymanios.js':    'keyman.js',      // iOS's embedded name -> embedded compilation
       'kmwuibutton.js':  'kmwuibutton.js',
       'kmwuifloat.js':   'kmwuifloat.js',
       'kmwuitoggle.js':  'kmwuitoggle.js',
@@ -21,7 +24,7 @@ namespace com.keyman {
       // Also add entries for the naming system used by Android and iOS - and map them to the EMBEDDED upload, not the std 'native' one.
     }
 
-    static DEFAULT_OPTIONS = {
+    static DEFAULT_OPTIONS: Options = {
       hostPlatform: "native-web"
     }
 

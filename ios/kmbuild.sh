@@ -155,6 +155,10 @@ update_bundle ( ) {
           rm                               "$base_dir/$BUNDLE_PATH/keyman.js.map"
         fi
 
+        cd ../../node_modules/@keymanapp/web-sentry-manager/dist/
+        
+        cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
+
         cd $base_dir
     fi
 }
