@@ -24,21 +24,20 @@ from keyman_config.kmpmetadata import parsemetadata
 # there is data in kmp.inf/kmp.json
 # there is possibly data in kbid.json (downloaded from api)
 
-class KeyboardDetailsView(Gtk.Window):
+class KeyboardDetailsView(Gtk.Dialog):
     # TODO Display all the information that is available
     #    especially what is displayed for Keyman on Windows
     # TODO clean up file once have what we want
-    def __init__(self, kmp):
+    def __init__(self, parent, kmp):
         #kmp has name, version, packageID, area
         if "keyboard" in kmp["name"].lower():
             wintitle = kmp["name"]
         else:
             wintitle = kmp["name"] + " keyboard"
-        Gtk.Window.__init__(self, title=wintitle)
+        Gtk.Dialog.__init__(self, wintitle, parent)
         init_accel(self)
 
-        hbox_outer = Gtk.Box(spacing = 12)
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.set_border_width(6)
 
         packageDir = os.path.join(kmp['areapath'], kmp['packageID'])
         kmp_json = os.path.join(packageDir, "kmp.json")
@@ -289,10 +288,6 @@ class KeyboardDetailsView(Gtk.Window):
                         # label.set_halign(Gtk.Align.START)
                         # label.set_selectable(True)
                         # grid.attach_next_to(label, label9, Gtk.PositionType.RIGHT, 1, 1)
-        vbox.pack_start(box, True, True, 12)
-
-        hbox = Gtk.Box(spacing = 6)
-        vbox.pack_start(hbox, False, False, 12)
 
         # Add an entire row of padding
         lbl_pad = Gtk.Label()
@@ -329,17 +324,8 @@ class KeyboardDetailsView(Gtk.Window):
         grid.attach_next_to(lbl_share_kbd, image, Gtk.PositionType.BOTTOM, 2, 1)
         prevlabel = lbl_share_kbd
 
-        button = Gtk.Button.new_with_mnemonic("_Close")
-        button.set_tooltip_text("Close window")
-        button.connect("clicked", self.on_close_clicked)
+        self.add_button("_Close", Gtk.ResponseType.CLOSE)
 
-        hbox.pack_end(button, False, False, 0)
-        bind_accelerator(self.accelerators, button, '<Control>w')
-
-        hbox_outer.pack_start(vbox, True, True, 12)
-        self.add(hbox_outer)
-        self.resize(635, 270)
-
-    def on_close_clicked(self, button):
-        logging.debug("Closing keyboard details window")
-        self.close()
+        self.get_content_area().pack_start(box, True, True, 12)
+        self.resize(800, 450)
+        self.show_all()

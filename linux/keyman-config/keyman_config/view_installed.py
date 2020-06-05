@@ -299,9 +299,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             if welcome_file and os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.info("opening " + uri_path)
-                w = WelcomeView(uri_path, model[treeiter][3])
-                w.resize(800, 600)
-                w.show_all()
+                w = WelcomeView(self, uri_path, model[treeiter][3])
+                w.run()
+                w.destroy()
             else:
                 logging.info("welcome.htm not available")
 
@@ -346,9 +346,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             logging.info("Show keyboard details of " + model[treeiter][1])
             areapath = get_install_area_path(model[treeiter][4])
             kmp = { "name" : model[treeiter][1], "version" : model[treeiter][2], "packageID" : model[treeiter][3],  "areapath" : areapath}
-            w = KeyboardDetailsView(kmp)
-            w.resize(800, 450)
-            w.show_all()
+            w = KeyboardDetailsView(self, kmp)
+            w.run()
+            w.destroy()
 
 if __name__ == '__main__':
     w = ViewInstalledWindow()
