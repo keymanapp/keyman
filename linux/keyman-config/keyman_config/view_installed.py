@@ -3,6 +3,8 @@
 import logging
 import os.path
 import pathlib
+import subprocess
+import sys
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -47,6 +49,8 @@ class ViewInstalledWindowBase(Gtk.Window):
 
         if file != None:
             self.install_file(file)
+            subprocess.Popen(sys.argv)
+            self.close()
 
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
