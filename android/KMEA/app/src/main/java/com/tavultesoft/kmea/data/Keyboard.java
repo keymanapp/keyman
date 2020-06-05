@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 
@@ -111,7 +112,7 @@ public class Keyboard extends LanguageResource implements Serializable {
 
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
-      boolean lgCodeMatch = ((Keyboard) obj).getLanguageID().equals(this.getLanguageID());
+      boolean lgCodeMatch = BCP47.languageEquals(((Keyboard) obj).getLanguageID(), this.getLanguageID());
       boolean idMatch = ((Keyboard) obj).getKeyboardID().equals(this.getKeyboardID());
 
       return lgCodeMatch && idMatch;
