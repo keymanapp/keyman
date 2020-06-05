@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import Reachability
+
 @testable import KeymanEngine
 
 class KMPJSONTests: XCTestCase {
@@ -209,5 +211,75 @@ class KMPJSONTests: XCTestCase {
 
     XCTAssertFalse(constructed_mtnt.matches(installable: TestUtils.LexicalModels.mtnt))
     XCTAssertTrue(constructed_mtnt.matches(installable: TestUtils.LexicalModels.mtnt, requireLanguageMatch: false))
+  }
+
+  func testKMPMetadataFromResource() throws {
+    // https://assertible.com/json-schema-validation#api
+    // - Note:  they "do not make any guarantees about the uptime and availability
+    //          of the Free JSON Schema Validation API."
+    let API_ENDPOINT = URL(string: "https://assertible.com/json")!
+
+    // So, first let's make sure that the API endpoint actually IS available.
+    // If not, skip this test.
+    let reachable = try Reachability(hostname: "https://assertible.com/json")
+    try XCTSkipIf(reachable.connection == .unavailable, "API endpoint for test not available")
+
+    // - build the arguments for the API call
+
+    let constructedMetadata_khmer_angkor = KMPMetadata(from: TestUtils.Keyboards.khmer_angkor)
+
+    let coder = JSONEncoder()
+    let codedJSON = try coder.encode(constructedMetadata_khmer_angkor)
+
+    // Does not follow "draft 4" due to an empty array in a 'required' entry.
+    // let schemaURL = URL(string: "https://api.keyman.com/schemas/package/1.1.0/package.json")!
+
+    // An appropriately-tweaked version of the above link.  (Just removes the lone, problematic line.)
+    let schemaURL = TestUtils.PackageJSON.jsonBundle.url(forResource: "package-schema", withExtension: "json")!
+    let schemaData = try Data(contentsOf: schemaURL)
+
+    // - arguments ready, time to build the POST-based request
+
+    // This section brought to you by: https://stackoverflow.com/questions/41997641/how-to-make-nsurlsession-post-request-in-swift
+    var request = URLRequest(url: API_ENDPOINT)
+    request.httpMethod = "POST"
+    request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
+
+    let parameterDictionary = [
+      "schema": try JSONSerialization.jsonObject(with: schemaData, options: []),
+      "json": try JSONSerialization.jsonObject(with: codedJSON, options: [])
+    ]
+    request.httpBody = try? JSONSerialization.data(withJSONObject: parameterDictionary, options: [])
+
+    // - and NOW to finally make the API call for the test.
+
+    let expectation = XCTestExpectation(description: "API call return and analysis expected")
+
+    let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+      guard let data = data else {
+        XCTFail("Could not complete API call due to error: \(String(describing: error))")
+        expectation.fulfill()
+        return
+      }
+
+      do {
+        if let results: [String: Any] = try JSONSerialization.jsonObject(with: data, options: [.allowFragments]) as? [String : Any] {
+          if let valid = results["valid"] as? Bool, let errors = results["errors"] as? [String] {
+            XCTAssert(valid, "Errors returned from schema validation API call: \(String(describing: errors))")
+          } else {
+            XCTFail("Unexpected format in return object from API")
+          }
+        } else {
+          XCTFail("Unexpected format in return object from API")
+        }
+      } catch {
+        XCTFail("Error occurred processing returned data - may not be JSON")
+      }
+
+      expectation.fulfill()
+    }
+
+    task.resume()
+    wait(for: [expectation], timeout: 10)
   }
 }
