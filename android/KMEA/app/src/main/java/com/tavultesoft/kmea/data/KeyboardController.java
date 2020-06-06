@@ -63,27 +63,7 @@ public class KeyboardController {
           ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(keyboards_dat));
           ArrayList<HashMap<String, String>> dat_list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
           inputStream.close();
-
-          for(HashMap<String, String> kbdMap : dat_list) {
-            boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
-              kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
-
-            Keyboard k = new Keyboard(
-              kbdMap.get(KMManager.KMKey_PackageID),
-              kbdMap.get(KMManager.KMKey_KeyboardID),
-              kbdMap.get(KMManager.KMKey_KeyboardName),
-              kbdMap.get(KMManager.KMKey_LanguageID),
-              kbdMap.get(KMManager.KMKey_LanguageName),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Version, "1.0"),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_KMPLink, ""),
-              isNewKeyboard,
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
-              MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
-            );
-            list.add(k);
-          }
-
+          KMManager.updateOldKeyboardsList(context, dat_list, list);
         } catch (Exception e) {
           KMLog.LogException(TAG, "Exception migrating installed_keyboards.dat", e);
           list.add(Keyboard.DEFAULT_KEYBOARD);
@@ -117,9 +97,12 @@ public class KeyboardController {
       // We'd prefer not to overwrite a file if it exists
       if (!keyboards_json.exists() && list != null && list.size() > 0) {
         save(context);
-      }
 
-      // TODO when feature stabilized: Delete legacy keyboards_list.dat (KMManager.KMFilename_KeyboardsList)
+        // Now we can delete legacy keyboards list
+        if (keyboards_dat.exists()) {
+          keyboards_dat.delete();
+        }
+      }
     }
     isInitialized = true;
   }
