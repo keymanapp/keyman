@@ -741,8 +741,7 @@ public final class KMManager {
 
     boolean defaultKeyboardInstalled = false;
     for(HashMap<String, String> kbdMap : dat_list) {
-      boolean isNewKeyboard = kbdMap.containsKey(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD) &&
-        kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
+      final boolean isNewKeyboard = false;
       String packageID = MapCompat.getOrDefault(kbdMap, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       String keyboardID = kbdMap.get(KMManager.KMKey_KeyboardID);
       if (keyboardID == null) {
