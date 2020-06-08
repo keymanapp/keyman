@@ -5,7 +5,7 @@ namespace com.keyman {
    * Controls whether or not the generated Sentry event is logged to the console (true)
    * or sent to our Sentry server (false).
    */
-  let DEBUG = true;
+  let DEBUG = false;
 
   type Options = {
     hostPlatform: "native-web" | "ios" | "android"
@@ -63,6 +63,12 @@ namespace com.keyman {
 
       // Iterate through all wrapped exceptions.
       for(let e of exception.values) {
+        // If Sentry was unable to generate a stacktrace, there's no path filtering to
+        // perform on its stack frames.
+        if(!e.stacktrace) {
+          continue;
+        }
+
         for(let frame of e.stacktrace.frames) {
           let URL = frame.filename as string;
           let filename: string = '';
