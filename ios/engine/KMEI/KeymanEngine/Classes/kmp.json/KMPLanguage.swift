@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct KMPLanguage: Codable {
+struct KMPLanguage: Codable {
   public var name: String
   public var languageId: String
 

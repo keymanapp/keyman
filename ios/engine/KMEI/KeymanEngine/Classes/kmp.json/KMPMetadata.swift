@@ -16,7 +16,7 @@ import Foundation
  *
  * Documentation link: https://help.keyman.com/developer/current-version/reference/file-types/metadata
  */
-public class KMPMetadata: Codable {
+class KMPMetadata: Codable {
   var system: KMPSystem
   var options: KMPOptions
   var info: KMPInfo?

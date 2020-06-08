@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class KMPLexicalModel: Codable {
+class KMPLexicalModel: Codable, KMPResource {
   public var name: String
   public var lexicalModelId: String
   public var version: String?
@@ -42,7 +42,7 @@ public class KMPLexicalModel: Codable {
     self.version = self.version ?? version
   }
 
-  public var installableLexicalModels: [InstallableLexicalModel] {
+  internal var installableLexicalModels: [InstallableLexicalModel] {
     var installableLexicalModels : [InstallableLexicalModel] = []
 
     for language in self.languages {
@@ -57,12 +57,20 @@ public class KMPLexicalModel: Codable {
     return installableLexicalModels
   }
 
+  public var installableResources: [LanguageResource] {
+    return installableLexicalModels
+  }
+
   public var isValid: Bool {
     // Ensures that our 'optional' members are properly instantiated.
     // Any file-based checks will be performed by the object's owner,
     // which knows the containing package's root folder.
     return installableLexicalModels.count > 0
       && self.languages.count > 0
+  }
+
+  public var id: String {
+    return lexicalModelId
   }
 }
 
