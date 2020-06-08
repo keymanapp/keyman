@@ -28,6 +28,7 @@ function Keyboard_chirality() {
   };
   this.KH = '';
   this.KM = 0;
+  this.KBVER = "1.0";
 
   this.dfltCodes = ["K_BKQUOTE","K_1","K_2","K_3","K_4","K_5","K_6","K_7","K_8","K_9","K_0",
       "K_HYPHEN","K_EQUAL","K_*","K_*","K_*","K_Q","K_W","K_E","K_R","K_T",
