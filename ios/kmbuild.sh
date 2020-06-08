@@ -138,6 +138,13 @@ update_bundle ( ) {
           KMWFLAGS="-embed"
         fi
 
+        # Local development optimization - cross-target Sentry uploading when requested
+        # by developer.  As it's not CI, the Web artifacts won't exist otherwise...
+        # unless the developer manually runs the correct build configuration accordingly.
+        if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
+          KMWFLAGS="$KMWFLAGS -upload-sentry"
+        fi
+
         ./build.sh $KMWFLAGS
         if [ $? -ne 0 ]; then
             fail "ERROR:  KeymanWeb's build.sh failed."
