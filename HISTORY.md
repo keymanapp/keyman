@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.88 alpha 2020-06-08
+
+* modify(android/samples): Update addKeyboard syntax for Sample and Test apps (#3213)
+* fix(linux): Restart km-config after installing keyboard (#3214)
+
 ## 14.0.87 alpha 2020-06-05
 
 * fix(developer/compilers): normalise touch layout on compile (#3203)
