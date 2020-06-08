@@ -256,7 +256,8 @@ class InstallKmpWindow(Gtk.Dialog):
 
     def run(self):
         if self.checkcontinue:
-            Gtk.Dialog.run(self)
+            return Gtk.Dialog.run(self)
+        return Gtk.ResponseType.CANCEL
 
     def doc_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
@@ -284,9 +285,9 @@ class InstallKmpWindow(Gtk.Dialog):
             if os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.debug(uri_path)
-                w = WelcomeView(uri_path, self.kbname)
-                w.resize(800, 600)
-                w.show_all()
+                w = WelcomeView(self, uri_path, self.kbname)
+                w.run()
+                w.destroy()
             else:
                 dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
                     Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")

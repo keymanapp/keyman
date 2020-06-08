@@ -3,6 +3,8 @@
 import logging
 import os.path
 import pathlib
+import subprocess
+import sys
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -40,13 +42,13 @@ class ViewInstalledWindowBase(Gtk.Window):
         logging.debug("Download clicked")
         downloadDlg = DownloadKmpWindow(self)
         response = downloadDlg.run()
-        file = None
-        if response == Gtk.ResponseType.OK:
-            file = downloadDlg.downloadfile
-        downloadDlg.destroy()
+        if response != Gtk.ResponseType.OK:
+            downloadDlg.destroy()
+            return
 
-        if file != None:
-            self.install_file(file)
+        file = downloadDlg.downloadfile
+        downloadDlg.destroy()
+        self.restart(self.install_file(file))
 
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
@@ -58,14 +60,24 @@ class ViewInstalledWindowBase(Gtk.Window):
         filter_text.add_pattern("*.kmp")
         dlg.add_filter(filter_text)
         response = dlg.run()
-        if response == Gtk.ResponseType.OK:
-            self.install_file(dlg.get_filename())
+        if response != Gtk.ResponseType.OK:
+            dlg.destroy()
+            return
+
+        file = dlg.get_filename()
         dlg.destroy()
+        self.restart(self.install_file(file))
 
     def install_file(self, kmpfile):
         installDlg = InstallKmpWindow(kmpfile, viewkmp=self)
-        installDlg.run()
+        result = installDlg.run()
         installDlg.destroy()
+        return result
+
+    def restart(self, response = Gtk.ResponseType.OK):
+        if response != Gtk.ResponseType.CANCEL:
+            subprocess.Popen(sys.argv)
+            self.close()
 
     def run(self):
         self.resize(576, 324)
@@ -295,9 +307,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             if welcome_file and os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.info("opening " + uri_path)
-                w = WelcomeView(uri_path, model[treeiter][3])
-                w.resize(800, 600)
-                w.show_all()
+                w = WelcomeView(self, uri_path, model[treeiter][3])
+                w.run()
+                w.destroy()
             else:
                 logging.info("welcome.htm not available")
 
@@ -331,8 +343,8 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
                 logging.info("Uninstalling keyboard" + model[treeiter][1])
                 # can only uninstall with the gui from user area
                 uninstall_kmp(model[treeiter][3])
-                logging.info("need to refresh window after uninstalling a keyboard")
-                self.refresh_installed_kmp()
+                logging.info("need to restart window after uninstalling a keyboard")
+                self.restart()
             elif response == Gtk.ResponseType.NO:
                 logging.info("Not uninstalling keyboard " + model[treeiter][1])
 
@@ -342,9 +354,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             logging.info("Show keyboard details of " + model[treeiter][1])
             areapath = get_install_area_path(model[treeiter][4])
             kmp = { "name" : model[treeiter][1], "version" : model[treeiter][2], "packageID" : model[treeiter][3],  "areapath" : areapath}
-            w = KeyboardDetailsView(kmp)
-            w.resize(800, 450)
-            w.show_all()
+            w = KeyboardDetailsView(self, kmp)
+            w.run()
+            w.destroy()
 
 if __name__ == '__main__':
     w = ViewInstalledWindow()
