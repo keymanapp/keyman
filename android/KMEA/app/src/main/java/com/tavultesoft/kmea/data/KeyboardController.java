@@ -63,7 +63,7 @@ public class KeyboardController {
           ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(keyboards_dat));
           ArrayList<HashMap<String, String>> dat_list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
           inputStream.close();
-          KMManager.updateOldKeyboardsList(context, dat_list, list);
+          list = KMManager.updateOldKeyboardsList(context, dat_list);
         } catch (Exception e) {
           KMLog.LogException(TAG, "Exception migrating installed_keyboards.dat", e);
           list.add(Keyboard.DEFAULT_KEYBOARD);

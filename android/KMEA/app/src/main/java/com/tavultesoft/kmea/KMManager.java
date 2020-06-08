@@ -731,12 +731,12 @@ public final class KMManager {
    * unit test.
    * @param context Context
    * @param dat_list ArrayList<HashMap<String, String>> Old keyboards list
-   * @param list List<Keyboard> Migrated keyboards list
+   * @return List<Keyboard> Migrated keyboards list
    */
-  public static void updateOldKeyboardsList(Context context, ArrayList<HashMap<String, String>> dat_list,
-                                            List<Keyboard> list) {
-    if (dat_list == null || list == null) {
-      return;
+  public static List<Keyboard> updateOldKeyboardsList(Context context, ArrayList<HashMap<String, String>> dat_list) {
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    if (dat_list == null) {
+      return list;
     }
 
     boolean defaultKeyboardInstalled = false;
@@ -745,6 +745,10 @@ public final class KMManager {
         kbdMap.get(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD).equals(KeyboardPickerActivity.KMKEY_INTERNAL_NEW_KEYBOARD);
       String packageID = MapCompat.getOrDefault(kbdMap, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
       String keyboardID = kbdMap.get(KMManager.KMKey_KeyboardID);
+      if (keyboardID == null) {
+        KMLog.LogError(TAG, "updateOldKeyboardsList: skipping keyboard with undefined keyboard ID");
+        continue;
+      }
       String kbVersion = kbdMap.get(KMManager.KMKey_Version);
       if (kbVersion == null) {
         String latestKbVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
@@ -778,6 +782,8 @@ public final class KMManager {
         list.add(k);
       }
     }
+
+    return list;
   }
 
   /**

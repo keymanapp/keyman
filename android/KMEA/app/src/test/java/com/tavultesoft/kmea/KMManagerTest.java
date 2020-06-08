@@ -140,8 +140,7 @@ public class KMManagerTest {
     Assert.assertEquals("sil_euro_latin", kbInfo.get(KMManager.KMKey_KeyboardID));
 
     // Migrate list
-    List<Keyboard> migratedList = new ArrayList<Keyboard>();
-    KMManager.updateOldKeyboardsList(ApplicationProvider.getApplicationContext(), dat_list, migratedList);
+    List<Keyboard> migratedList = KMManager.updateOldKeyboardsList(ApplicationProvider.getApplicationContext(), dat_list);
 
     // Verify migrated keyboard list size
     int migratedKeyboardListSize = migratedList.size();
