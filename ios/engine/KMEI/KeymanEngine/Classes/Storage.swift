@@ -194,6 +194,10 @@ extension Storage {
                      resourceName: "keymanios.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "keyman-sentry.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
     // For debug compilations - IF we have a sourcemap file, copy that over too.
     if bundle.url(forResource: "keyman.js.map", withExtension: nil) != nil {
       try Storage.copy(from: bundle,
