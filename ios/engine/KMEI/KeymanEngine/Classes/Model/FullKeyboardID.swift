@@ -9,9 +9,17 @@
 import Foundation
 
 /// A complete identifier for an `InstallableKeyboard`. Keyboards must have unique `FullKeyboardID`s.
-public struct FullKeyboardID: Codable {
+public struct FullKeyboardID: Codable, LanguageResourceFullID {
   public var keyboardID: String
   public var languageID: String
+
+  public var id: String {
+    return keyboardID
+  }
+
+  public var type: LanguageResourceType {
+    return .keyboard
+  }
 }
 
 // MARK: - Equatable
