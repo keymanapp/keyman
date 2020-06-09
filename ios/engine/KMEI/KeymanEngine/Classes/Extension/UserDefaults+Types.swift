@@ -134,12 +134,12 @@ public extension UserDefaults {
     }
   }
 
-  var userResources: [LanguageResource]? {
+  var userResources: [AnyLanguageResource]? {
     get {
       let keyboards = userKeyboards ?? []
       let lexicalModels = userLexicalModels ?? []
       
-      let resources: [LanguageResource] = keyboards + lexicalModels
+      let resources: [AnyLanguageResource] = keyboards + lexicalModels
       if resources.count == 0 {
         return nil
       } else {
