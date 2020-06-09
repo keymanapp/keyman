@@ -617,8 +617,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for r in kmp.resources {
-      let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
+    for r in kmp.resources as! [KMPKeyboard] {
+      let installableFiles: [(InstallableKeyboard, [(String, URL)])] = r.typedInstallableResources.map { resource in
         // (source file, destination file)
         var set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
         let installableFonts: [(String, URL)] = resource.fonts.map { font in
@@ -668,7 +668,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         // Only one keyboard is installed by default from a KMP.
         // Also, only the first language-pairing it contains
         if !haveInstalledOne {
-          Manager.shared.addKeyboard(resource as! InstallableKeyboard)
+          Manager.shared.addKeyboard(resource)
           haveInstalledOne = true
         }
       }
@@ -681,8 +681,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for r in kmp.resources {
-      let installableFiles: [(LanguageResource, [(String, URL)])] = r.installableResources.map { resource in
+    for r in kmp.resources as! [KMPLexicalModel] {
+      let installableFiles: [(InstallableLexicalModel, [(String, URL)])] = r.installableResources.map { resource in
         // (source file, destination file)
         let set: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
         // no fonts for lexical models
@@ -722,7 +722,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
         // All pairings are installed for lexical models.
         // Also, all models within the KMP
-        Manager.addLexicalModel(resource as! InstallableLexicalModel)
+        Manager.addLexicalModel(resource)
       }
     }
   }

@@ -8,9 +8,20 @@
 
 import Foundation
 
-protocol KMPResource {
+protocol AnyKMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
 
-  var installableResources: [LanguageResource] { get }
+  var installableResources: [AnyLanguageResource] { get }
+}
+
+protocol KMPResource: AnyKMPResource {
+  associatedtype LanguageResourceType: LanguageResource
+  var typedInstallableResources: [LanguageResourceType] { get }
+}
+
+extension KMPResource {
+  var installableResources: [AnyLanguageResource] {
+    return typedInstallableResources
+  }
 }

@@ -65,10 +65,10 @@ extension TestUtils {
       }
     }
 
-    static func getVersionHistory(for version: Version) -> [LanguageResource] {
+    static func getVersionHistory(for version: Version) -> [AnyLanguageResource] {
       let resourceHistory = KeymanEngine.Migrations.resourceHistory
 
-      let match: [[LanguageResource]] = resourceHistory.compactMap() { entry in
+      let match: [[AnyLanguageResource]] = resourceHistory.compactMap() { entry in
         if entry.version == version {
           return entry.resources
         } else {

@@ -60,7 +60,15 @@ class KMPKeyboard: Codable, KMPResource {
     return installableKeyboards
   }
 
-  public var installableResources: [LanguageResource] {
+  // Needed to properly support AnyKMPResource.installableResources
+  // because of weird, weird Swift rules.
+  public var typedInstallableResources: [InstallableKeyboard] {
+    return installableKeyboards
+  }
+
+  // Provides our class's method of the same signature, but with
+  // the local type signature we know is available.
+  public var installableResources: [InstallableKeyboard] {
     return installableKeyboards
   }
 
