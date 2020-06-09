@@ -288,6 +288,7 @@ public final class KMManager {
       copyAssets(appContext);
 
       migrateOldKeyboardFiles(appContext);
+      // UpdateOldKeyboardsList() handled with KeyboardController later
       didCopyAssets = true;
     }
 
@@ -717,6 +718,71 @@ public final class KMManager {
     } catch (IOException e) {
       KMLog.LogException(TAG, "Failed to migrate assets. Error: ", e);
     }
+  }
+
+  /**
+   * Migrate keyboards list from the legacy dat file (HashMap) and returns a list of keyboards.
+   * 1. These deprecated keyboards: "us", "european", "european2" are also removed
+   * and replaced with "sil_euro_latin".
+   * 2. Undefined package ID set to "cloud"
+   * 3. Undefined version set to the latest file version
+   * 4. Check sil_euro_latin only added once
+   * Using the old keyboards list as paramter instead of keyboards file so this can be
+   * unit test.
+   * @param context Context
+   * @param dat_list ArrayList<HashMap<String, String>> Old keyboards list
+   * @return List<Keyboard> Migrated keyboards list
+   */
+  public static List<Keyboard> updateOldKeyboardsList(Context context, ArrayList<HashMap<String, String>> dat_list) {
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    if (dat_list == null) {
+      return list;
+    }
+
+    boolean defaultKeyboardInstalled = false;
+    for(HashMap<String, String> kbdMap : dat_list) {
+      final boolean isNewKeyboard = false;
+      String packageID = MapCompat.getOrDefault(kbdMap, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      String keyboardID = kbdMap.get(KMManager.KMKey_KeyboardID);
+      if (keyboardID == null) {
+        KMLog.LogError(TAG, "updateOldKeyboardsList: skipping keyboard with undefined keyboard ID");
+        continue;
+      }
+      String kbVersion = kbdMap.get(KMManager.KMKey_Version);
+      if (kbVersion == null) {
+        String latestKbVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
+        if (latestKbVersion != null) {
+          kbVersion = latestKbVersion;
+        }
+      }
+      Keyboard k = new Keyboard(
+        packageID,
+        keyboardID,
+        kbdMap.get(KMManager.KMKey_KeyboardName),
+        kbdMap.get(KMManager.KMKey_LanguageID),
+        kbdMap.get(KMManager.KMKey_LanguageName),
+        kbVersion,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_KMPLink, ""),
+        isNewKeyboard,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
+      );
+
+      // Check that sil_euro_latin and its deprecated keyboards only get added once
+      if (keyboardID.equals("us") || keyboardID.equals("european") || keyboardID.equals("european2") ||
+          keyboardID.equals("sil_euro_latin")) {
+        if (!defaultKeyboardInstalled) {
+          list.add(Keyboard.DEFAULT_KEYBOARD);
+          defaultKeyboardInstalled = true;
+        }
+      } else {
+        // Otherwise add the keyboard
+        list.add(k);
+      }
+    }
+
+    return list;
   }
 
   /**
