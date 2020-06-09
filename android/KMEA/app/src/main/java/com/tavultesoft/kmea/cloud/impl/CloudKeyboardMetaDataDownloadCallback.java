@@ -184,7 +184,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
         if (pkgData != null) {
           List<Bundle> updateBundles = new ArrayList<>();
           CloudDataJsonUtil.processKeyboardPackageUpdateJSON(aContext, pkgData, updateBundles);
-          CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData);
+          CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData, updateBundles);
         }
       }
     }

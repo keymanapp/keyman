@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.data.Keyboard;
@@ -14,6 +15,7 @@ import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -177,12 +179,50 @@ public class CloudDataJsonUtil {
     }
   }
 
-  public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData) {
+  public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
+    boolean saveModelsList = false;
     // Parse for lexical model package updates
     if (pkgData.has(CDKey_Models)) {
       try {
-        JSONArray modelPackages = pkgData.getJSONArray(CDKey_Models);
-        // TODO: continue to process this (similar to processKeyboardPackageUpdateJSON) for lexical model updates
+        JSONObject cloudModelPackages = pkgData.getJSONObject(CDKey_Models);
+        Iterator<String> lexicalModelIDs = cloudModelPackages.keys();
+        while (lexicalModelIDs.hasNext()) {
+          String lexicalModelID = lexicalModelIDs.next();
+          JSONObject cloudModelObj = cloudModelPackages.getJSONObject(lexicalModelID);
+          if (!cloudModelObj.has(CDKey_Error)) {
+            String cloudVersion = cloudModelObj.getString(CDKey_Version);
+            String cloudKMP = cloudModelObj.getString(CDKey_KMP);
+            // Valid lexical model package exists. See if lexical model list needs to be updated
+            // Valid keyboard package exists. See if keyboard list needs to be updated
+            int index = KeyboardPickerActivity.getLexicalModelIndex(aContext, lexicalModelID);
+            if (index != -1) {
+              HashMap<String, String> lmInfo = KeyboardPickerActivity.getLexicalModelInfo(aContext, index);
+              String version = lmInfo.get(KMManager.KMKey_Version);
+              if (lexicalModelID.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LexicalModelID)) &&
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
+                  (!MapCompat.getOrDefault(lmInfo, KMManager.KMKey_KMPLink, "").equalsIgnoreCase(cloudKMP))) {
+                // Update keyboard with the latest KMP link
+                lmInfo.put(KMManager.KMKey_KMPLink, cloudKMP);
+                KeyboardPickerActivity.addLexicalModel(aContext, lmInfo);
+
+                // Update bundle list
+                LexicalModel lm = new LexicalModel(
+                  lmInfo.get(KMManager.KMKey_PackageID),
+                  lmInfo.get(KMManager.KMKey_LexicalModelID),
+                  lmInfo.get(KMManager.KMKey_LexicalModelName),
+                  lmInfo.get(KMManager.KMKey_LanguageID),
+                  lmInfo.get(KMManager.KMKey_LanguageName),
+                  lmInfo.get(KMManager.KMKey_Version),
+                  lmInfo.get(KMManager.KMKey_CustomHelpLink),
+                  lmInfo.get(KMManager.KMKey_KMPLink));
+                Bundle bundle = new Bundle(lm.buildDownloadBundle());
+                updateBundles.add(bundle);
+
+                saveModelsList = true;
+              }
+            }
+          }
+        }
       } catch (JSONException | NullPointerException e) {
         KMLog.LogException(TAG, "processPackageUpdateJSON Error processing models: ", e);
       }
