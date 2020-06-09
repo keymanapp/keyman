@@ -142,7 +142,7 @@ public class KeyboardController {
       }
     }
 
-    KMLog.LogError(TAG, "getKeyboardInfo failed with index " + index);
+    Log.w(TAG, "getKeyboardInfo failed with index " + index);
     return null;
   }
 
@@ -171,7 +171,7 @@ public class KeyboardController {
       }
     }
 
-    KMLog.LogError(TAG, "getKeyboardIndex failed for key " + key);
+    Log.w(TAG, "getKeyboardIndex failed for key " + key);
     return index;
   }
 
