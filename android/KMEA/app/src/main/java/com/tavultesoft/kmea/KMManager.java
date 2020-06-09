@@ -786,6 +786,38 @@ public final class KMManager {
   }
 
   /**
+   * Remove all the keyboard files in the "cloud" directory for a specified keyboard ID
+   * @param keyboardID String of the keyboard ID
+   */
+  public static void removeCloudKeyboard(final String keyboardID) {
+    String path = getCloudDir();
+    File dir = new File(path);
+
+    FileFilter keyboardFilter = new FileFilter() {
+      @Override
+      /**
+       * Filter for JS keyboards that match keyboardID and have a non-zero length
+       */
+      public boolean accept(File pathname) {
+        String name = pathname.getName();
+        if (pathname.isFile() && name.startsWith(keyboardID) && FileUtils.hasJavaScriptExtension(name) && pathname.length() > 0) {
+          return true;
+        }
+        return false;
+      }
+    };
+
+    File[] files = dir.listFiles(keyboardFilter);
+    if (files.length == 0) {
+      return;
+    }
+
+    for (File file : files) {
+      file.delete();
+    }
+  }
+
+  /**
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)

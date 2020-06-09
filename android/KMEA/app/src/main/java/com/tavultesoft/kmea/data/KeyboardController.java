@@ -197,9 +197,12 @@ public class KeyboardController {
   }
 
   /**
-   * Add a new keyboard to the keyboard list. If the keyboard already exists, the keyboard
-   * information is updated.
-   * @param newKeyboard
+   * Add a new keyboard to the keyboard list, or update existing keyboard.
+   * If an existing keyboard is an exact match (language ID and keyboard ID), update the keyboard info.
+   * If the new keyboard package ID is not "cloud", then loop through the keyboard list for matching keyboard ID's:
+   *   1. If the existing keyboard package ID is "cloud", migrate it to the new package ID
+   *   2. Remove the existing keyboard files from "cloud/"
+   * @param newKeyboard Keyboard to be added/updated
    */
   public void add(Keyboard newKeyboard) {
     if (!isInitialized || list == null) {
@@ -208,13 +211,41 @@ public class KeyboardController {
     }
 
     synchronized (list) {
-      for (int i = 0; i < list.size(); i++) {
-        // Update existing keyboard entry
-        if (newKeyboard.equals(list.get(i))) {
-          Log.d(TAG, "Updating keyboard with newKeyboard");
-          list.set(i, newKeyboard);
-          return;
+      String packageID = newKeyboard.getPackageID();
+      String keyboardID = newKeyboard.getKeyboardID();
+      String key = newKeyboard.getKey();
+      if (keyboardExists(key)) {
+        boolean shouldRemoveCloudKeyboard = false;
+        int existingKeyboardIndex = getKeyboardIndex(key);
+        Keyboard existingKeyboard = list.get(existingKeyboardIndex);
+        if (!newKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID) &&
+            existingKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
+          shouldRemoveCloudKeyboard = true;
         }
+
+        // Update existing keyboard entry
+        Log.d(TAG, "Updating keyboard with newKeyboard");
+        list.set(existingKeyboardIndex, newKeyboard);
+
+        // Check if other existing cloud keyboard info needs to be migrated
+        if (!newKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
+          for (int i = 0; i < list.size(); i++) {
+            Keyboard currentKeyboard = list.get(i);
+            if (currentKeyboard.getKeyboardID().equals(keyboardID) &&
+                currentKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
+              // Migrate existing keyboard package ID
+              currentKeyboard.packageID = packageID;
+              list.set(i, currentKeyboard);
+              shouldRemoveCloudKeyboard = true;
+            }
+          }
+        }
+
+        if (shouldRemoveCloudKeyboard) {
+          KMManager.removeCloudKeyboard(keyboardID);
+        }
+
+        return;
       }
 
       // Add new keyboard
