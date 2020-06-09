@@ -166,7 +166,7 @@ update_bundle ( ) {
         
         cp index.js                        "$base_dir/$BUNDLE_PATH/keyman-sentry.js"
 
-        cd $base_dir
+        cd "$base_dir"
     fi
 }
 
