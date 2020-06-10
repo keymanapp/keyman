@@ -40,9 +40,6 @@ public abstract class LanguageResource implements Serializable {
   public String getResourceName() { return resourceName; }
 
   public String getLanguageID() { return languageID; }
-  public void setLanguageID(String languageID) {
-    this.languageID = languageID;
-  }
 
   // Deprecated in Keyman 14.0 by getLanguageID();
   public String getLanguageCode() { return languageID; }
@@ -52,9 +49,6 @@ public abstract class LanguageResource implements Serializable {
   public String getVersion() { return version; }
 
   public String getPackageID() { return packageID; }
-  public void setPackageID(String packageID) {
-    this.packageID = packageID;
-  }
 
   // Deprecated in Keyman 14.0 by getPackageID()
   public String getPackage() { return packageID; }

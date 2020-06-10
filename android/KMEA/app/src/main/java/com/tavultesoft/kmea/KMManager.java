@@ -787,20 +787,43 @@ public final class KMManager {
    * @param context
    */
   public static void migrateCloudKeyboards(Context context) {
+    boolean keyboardMigrated = false;
     for(int i=0; i<KeyboardController.getInstance().get().size(); i++) {
       Keyboard k = KeyboardController.getInstance().getKeyboardInfo(i);
       String packageID = k.getPackageID();
       String keyboardID = k.getKeyboardID();
       String languageID = k.getLanguageID();
+      String languageName = k.getLanguageName();
       // See if packageID=keyboardID exists (blank language ID),
       int keyboardIndex = KeyboardController.getInstance().getKeyboardIndex(
         keyboardID, keyboardID, "");
       if (packageID.equals(KMManager.KMDefault_UndefinedPackageID) &&
         (keyboardIndex != KeyboardController.INDEX_NOT_FOUND)) {
-        Keyboard migratedKeyboard = KeyboardController.getInstance().getKeyboardInfo(keyboardIndex);
-        migratedKeyboard.setLanguageID(languageID);
+        Keyboard keyboardFromPackage = KeyboardController.getInstance().getKeyboardInfo(keyboardIndex);
+        Keyboard migratedKeyboard = new Keyboard(
+          keyboardFromPackage.getPackageID(),
+          keyboardFromPackage.getKeyboardID(),
+          keyboardFromPackage.getKeyboardName(),
+          languageID,
+          languageName,
+          keyboardFromPackage.getVersion(),
+          keyboardFromPackage.getHelpLink(),
+          keyboardFromPackage.getUpdateKMP(),
+          false,
+          keyboardFromPackage.getFont(),
+          keyboardFromPackage.getOSKFont());
+        // migratedKeyboard already contains the correct packageID. Just update language
+        migratedKeyboard.setLanguage(languageID, languageName);
         KeyboardController.getInstance().set(i, migratedKeyboard);
+
+        // Remove the cloud keyboard file
+        removeCloudKeyboard(keyboardID);
+        keyboardMigrated = true;
       }
+    }
+
+    if (keyboardMigrated) {
+      KeyboardController.getInstance().save(context);
     }
   }
 
