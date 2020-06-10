@@ -10,6 +10,7 @@ import android.util.Log;
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.MapCompat;
 import com.tavultesoft.kmea.KMManager;
@@ -182,9 +183,48 @@ public class KeyboardController {
    * @param keyboardID - String of the keyboard ID
    * @return int - Index of the matching keyboard
    */
+  /*
   public int getKeyboardIndex(String languageID, String keyboardID) {
     String key = String.format("%s_%s", languageID, keyboardID);
     return getKeyboardIndex(key);
+  }
+ */
+
+  /**
+   * Given a packageID, keyboardID, and languageID, return the index of the matching keyboard.
+   * If language ID not specified, only the package ID and keyboard ID are matched
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @param languageID - String of the language ID (optional)
+   * @return int - Index of the matching keyboard
+   */
+  public int getKeyboardIndex(String packageID, String keyboardID, String languageID) {
+    int index = INDEX_NOT_FOUND;
+    if (!isInitialized || list == null) {
+      KMLog.LogError(TAG, "getIndexOfKey while KeyboardController() not initialized");
+      return index;
+    }
+    if (packageID == null || packageID.isEmpty() || keyboardID == null || keyboardID.isEmpty()) {
+      return index;
+    }
+
+    boolean matchLanguage = (languageID != null && !languageID.isEmpty());
+
+    synchronized (list) {
+      for (int i=0; i<list.size(); i++) {
+        Keyboard k = list.get(i);
+        if (k.getPackageID().equals(packageID) && k.getKeyboardID().equals(keyboardID)) {
+          if ( (matchLanguage && BCP47.languageEquals(k.getLanguageID(), languageID)) ||
+              !matchLanguage ) {
+            return i;
+          }
+        }
+      }
+    }
+
+    Log.w(TAG, "getKeyboardIndex failed for packageID: " + packageID +
+      ", keyboardID: " + keyboardID + ", languageID: " + languageID);
+    return index;
   }
 
   /**
@@ -197,12 +237,21 @@ public class KeyboardController {
   }
 
   /**
-   * Add a new keyboard to the keyboard list, or update existing keyboard.
-   * If an existing keyboard is an exact match (language ID and keyboard ID), update the keyboard info.
-   * If the new keyboard package ID is not "cloud", then loop through the keyboard list for matching keyboard ID's:
-   *   1. If the existing keyboard package ID is "cloud", migrate it to the new package ID
-   *   2. Remove the existing keyboard files from "cloud/"
-   * @param newKeyboard Keyboard to be added/updated
+   * Given a package ID, keyboard ID, and language ID, return if the keyboard exists
+   * in the installed keyboards list
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @param languageID - String of the language ID
+   * @return boolean whether the matching keyboard exists
+   */
+  public boolean keyboardExists(String packageID, String keyboardID, String languageID) {
+    return getKeyboardIndex(packageID, keyboardID, languageID) != INDEX_NOT_FOUND;
+  }
+
+  /**
+   * Add a new keyboard to the keyboard list. If the keyboard already exists, the keyboard
+   * information is updated.
+   * @param newKeyboard
    */
   public void add(Keyboard newKeyboard) {
     if (!isInitialized || list == null) {
@@ -211,45 +260,38 @@ public class KeyboardController {
     }
 
     synchronized (list) {
-      String packageID = newKeyboard.getPackageID();
-      String keyboardID = newKeyboard.getKeyboardID();
-      String key = newKeyboard.getKey();
-      if (keyboardExists(key)) {
-        boolean shouldRemoveCloudKeyboard = false;
-        int existingKeyboardIndex = getKeyboardIndex(key);
-        Keyboard existingKeyboard = list.get(existingKeyboardIndex);
-        if (!newKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID) &&
-            existingKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
-          shouldRemoveCloudKeyboard = true;
-        }
-
+      for (int i = 0; i < list.size(); i++) {
         // Update existing keyboard entry
-        Log.d(TAG, "Updating keyboard with newKeyboard");
-        list.set(existingKeyboardIndex, newKeyboard);
-
-        // Check if other existing cloud keyboard info needs to be migrated
-        if (!newKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
-          for (int i = 0; i < list.size(); i++) {
-            Keyboard currentKeyboard = list.get(i);
-            if (currentKeyboard.getKeyboardID().equals(keyboardID) &&
-                currentKeyboard.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
-              // Migrate existing keyboard package ID
-              currentKeyboard.packageID = packageID;
-              list.set(i, currentKeyboard);
-              shouldRemoveCloudKeyboard = true;
-            }
-          }
+        if (newKeyboard.equals(list.get(i))) {
+          Log.d(TAG, "Updating keyboard with newKeyboard");
+          list.set(i, newKeyboard);
+          return;
         }
-
-        if (shouldRemoveCloudKeyboard) {
-          KMManager.removeCloudKeyboard(keyboardID);
-        }
-
-        return;
       }
 
       // Add new keyboard
       list.add(newKeyboard);
+    }
+  }
+
+  /**
+   * Update a keyboard entry at a specified index
+   * @param index int of the keyboard index to update
+   * @param currentKeyboard Keyboard info
+   */
+  public void set(int index, Keyboard currentKeyboard) {
+    if (!isInitialized || list == null) {
+      KMLog.LogError(TAG, "set while KeyboardController() not initialized");
+      return;
+    }
+
+    if (index < 0 || index >= list.size()) {
+      KMLog.LogError(TAG, "set with index: " + index + " out of bounds");
+      return;
+    }
+
+    synchronized (list) {
+      list.set(index, currentKeyboard);
     }
   }
 

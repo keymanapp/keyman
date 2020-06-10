@@ -401,7 +401,7 @@ final class KMKeyboard extends WebView {
 
     boolean retVal = true;
 
-    int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
+    int index = KeyboardController.getInstance().getKeyboardIndex(packageID, languageID, keyboardID);
     Keyboard kbInfo = null;
     if (index != KeyboardController.INDEX_NOT_FOUND) {
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);

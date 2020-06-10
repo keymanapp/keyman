@@ -304,6 +304,7 @@ public final class KMManager {
     JSONUtils.initialize(new File(getPackagesDir()));
 
     KeyboardController.getInstance().initialize(appContext);
+    migrateCloudKeyboards(appContext);
 
     CloudDownloadMgr.getInstance().initialize(appContext);
   }
@@ -707,13 +708,7 @@ public final class KMManager {
       // TODO: Investigate how to migrate cloud/ keyboards to packages/ ?
       // Would need to query what associated files get moved
       // For now, can delete sil_euro_latin because it will be in packages/
-      File[] files = migratedDir.listFiles(keyboardFilter);
-      for (File file: files) {
-        String filename = file.getName();
-        if (filename.startsWith(KMDefault_KeyboardID)) {
-          file.delete();
-        }
-      }
+      removeCloudKeyboard(KMDefault_KeyboardID);
 
     } catch (IOException e) {
       KMLog.LogException(TAG, "Failed to migrate assets. Error: ", e);
@@ -786,7 +781,33 @@ public final class KMManager {
   }
 
   /**
-   * Remove all the keyboard files in the "cloud" directory for a specified keyboard ID
+   * Loop through the installed keyboards list:
+   * If the keyboard exists in cloud/ and packages/, migrate keyboard entry to packages/
+   * Then remove the keyboard files in cloud/
+   * @param context
+   */
+  public static void migrateCloudKeyboards(Context context) {
+    for(int i=0; i<KeyboardController.getInstance().get().size(); i++) {
+      Keyboard k = KeyboardController.getInstance().getKeyboardInfo(i);
+      String packageID = k.getPackageID();
+      String keyboardID = k.getKeyboardID();
+      String languageID = k.getLanguageID();
+      // See if packageID=keyboardID exists (blank language ID),
+      int keyboardIndex = KeyboardController.getInstance().getKeyboardIndex(
+        keyboardID, keyboardID, "");
+      if (packageID.equals(KMManager.KMDefault_UndefinedPackageID) &&
+        (keyboardIndex != KeyboardController.INDEX_NOT_FOUND)) {
+        Keyboard migratedKeyboard = KeyboardController.getInstance().getKeyboardInfo(keyboardIndex);
+        migratedKeyboard.setLanguageID(languageID);
+        KeyboardController.getInstance().set(i, migratedKeyboard);
+      }
+    }
+  }
+
+  /**
+   * Remove all the keyboard files in the "cloud" directory matching a pattern
+   * [keyboard ID]-[version].js
+   *
    * @param keyboardID String of the keyboard ID
    */
   public static void removeCloudKeyboard(final String keyboardID) {
@@ -796,11 +817,15 @@ public final class KMManager {
     FileFilter keyboardFilter = new FileFilter() {
       @Override
       /**
-       * Filter for JS keyboards that match keyboardID and have a non-zero length
+       * Filter for JS keyboards that match [keyboardID]-[version].js
        */
       public boolean accept(File pathname) {
         String name = pathname.getName();
-        if (pathname.isFile() && name.startsWith(keyboardID) && FileUtils.hasJavaScriptExtension(name) && pathname.length() > 0) {
+
+        String patternStr = String.format("^(%s)-([0-9.]+)(\\.js)$", keyboardID);
+        Pattern pattern = Pattern.compile(patternStr);
+        Matcher matcher = pattern.matcher(name);
+        if (matcher.matches() && (matcher.group(1) != null)) {
           return true;
         }
         return false;
@@ -1224,7 +1249,7 @@ public final class KMManager {
     Keyboard kbInfo = null;
     String kbVersion = null;
     kbState = KeyboardState.KEYBOARD_STATE_NEEDS_DOWNLOAD;
-    int index = KeyboardController.getInstance().getKeyboardIndex(languageID, keyboardID);
+    int index = KeyboardController.getInstance().getKeyboardIndex(packageID, languageID, keyboardID);
     if (index != KeyboardController.INDEX_NOT_FOUND) {
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(index);
       if (kbInfo != null) {
@@ -1536,8 +1561,9 @@ public final class KMManager {
     boolean result = false;
 
     if (packageID != null && keyboardID != null && languageID != null) {
-      String kbKey = String.format("%s_%s", languageID, keyboardID);
-      result = KeyboardController.getInstance().keyboardExists(kbKey);
+      File keyboardFile = new File(getPackagesDir(), packageID + File.separator + String.format("%s.js", keyboardID));
+      result = KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID) &&
+        keyboardFile.exists();
     }
 
     return result;
