@@ -42,7 +42,7 @@ class KMPMetadata: Codable {
     case Unsupported
   }
 
-  init(from resource: LanguageResource) {
+  init(from resource: AnyLanguageResource) {
     // First, the standard defaults.
     system = KMPSystem()
     options = KMPOptions()

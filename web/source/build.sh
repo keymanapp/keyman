@@ -306,14 +306,14 @@ done
 # Defaults (that "release build" part) set by resources/build_utils.sh
 
 # `./build.sh` and `./build.sh -embed` calls may upload 'embedded' artifacts to Sentry.
-if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_EMBED = true ]] && [[ DO_MINIFY = true ]]; then
+if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_EMBED = true ]] && [[ $DO_MINIFY = true ]]; then
     UPLOAD_EMBED_SENTRY=true
 else
     UPLOAD_EMBED_SENTRY=false
 fi
 
 # `./build.sh` and `./build.sh -web` calls may upload 'web' / 'native' artifacts to Sentry.
-if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_FULLWEB = true ]] && [[ DO_MINIFY = true ]]; then
+if [[ $UPLOAD_SENTRY = true ]] && [[ $BUILD_FULLWEB = true ]] && [[ $DO_MINIFY = true ]]; then
     UPLOAD_WEB_SENTRY=true
 else
     UPLOAD_WEB_SENTRY=false
@@ -425,22 +425,28 @@ if [ $BUILD_EMBED = true ]; then
         echo
     fi
 
+    if [ $BUILD_DEBUG_EMBED = true ]; then
+        # We currently have an issue with sourcemaps for minified versions in embedded contexts.
+        # We should use the unminified one instead for now.
+        cp $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js
+        # Copy the sourcemap.
+        cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
+        echo Uncompiled embedded application saved as keyman.js
+    fi
+
     if [ $UPLOAD_EMBED_SENTRY = true ]; then
-        pushd $EMBED_OUTPUT
+        if [ $BUILD_DEBUG_EMBED = true ]; then
+            ARTIFACT_FOLDER="release/unminified/embedded"
+            pushd $EMBED_OUTPUT_NO_MINI
+        else
+            ARTIFACT_FOLDER="release/embedded"
+            pushd $EMBED_OUTPUT
+        fi
         echo "Uploading to Sentry..."
-        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix release/embedded --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
+        npm run sentry-cli -- releases files "$SENTRY_RELEASE_VERSION" upload-sourcemaps --strip-common-prefix $ARTIFACT_FOLDER --rewrite --ext js --ext map --ext ts || fail "Sentry upload failed."
         echo "Upload successful."
         popd
     fi
-fi
-
-if [ $BUILD_DEBUG_EMBED = true ]; then
-    # We currently have an issue with sourcemaps for minified versions in embedded contexts.
-    # We should use the unminified one instead for now.
-    cp $EMBED_OUTPUT_NO_MINI/keyman.js $EMBED_OUTPUT/keyman.js
-    # Copy the sourcemap.
-    cp $EMBED_OUTPUT_NO_MINI/keyman.js.map $EMBED_OUTPUT/keyman.js.map
-    echo Uncompiled embedded application saved as keyman.js
 fi
 
 ### -embed section complete.

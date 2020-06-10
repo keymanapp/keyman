@@ -11,7 +11,12 @@ import Foundation
 struct KMPSystem: Codable {
   public var keymanDeveloperVersion: String?
   public var fileVersion: String
-
+  
+  enum CodingKeys: String, CodingKey {
+    case keymanDeveloperVersion
+    case fileVersion
+  }
+  
   init() {
     keymanDeveloperVersion = nil
 
@@ -20,4 +25,5 @@ struct KMPSystem: Codable {
     // don't actually use this value within KeymanEngine, anyway.
     fileVersion = "1.1.0"
   }
+
 }

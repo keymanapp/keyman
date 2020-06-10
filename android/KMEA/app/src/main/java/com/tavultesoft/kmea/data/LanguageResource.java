@@ -4,9 +4,9 @@
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,7 +70,7 @@ public abstract class LanguageResource implements Serializable {
     String id = getResourceID();
     String lgCode = getLanguageID();
     if (id == null || lgCode == null) {
-      Log.e("LanguageResource", "Invalid hashCode");
+      KMLog.LogError("LanguageResource", "Invalid hashCode");
     }
     return id.hashCode() * lgCode.hashCode();
   }
@@ -125,7 +125,7 @@ public abstract class LanguageResource implements Serializable {
         this.kmp = "";
       }
     } catch (JSONException e) {
-      Log.e(TAG, "fromJSON() exception: " + e);
+      KMLog.LogException(TAG, "fromJSON() exception: ", e);
     }
   }
 
@@ -141,7 +141,7 @@ public abstract class LanguageResource implements Serializable {
       o.put(LR_HELP_LINK_KEY, this.helpLink);
       o.put(LR_KMP_KEY, this.kmp);
     } catch (JSONException e) {
-      Log.e(TAG, "toJSON() exception: " + e);
+      KMLog.LogException(TAG, "toJSON() exception: ", e);
     }
 
     return o;

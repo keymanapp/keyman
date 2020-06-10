@@ -4,12 +4,13 @@
 package com.tavultesoft.kmea.data;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,7 +67,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
         String.format(HELP_URL_FORMATSTR, this.resourceID, this.version));
     } catch (JSONException e) {
-      Log.e(TAG, "Keyboard exception parsing JSON: " + e);
+      KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
   }
 
@@ -111,7 +112,7 @@ public class Keyboard extends LanguageResource implements Serializable {
 
   public boolean equals(Object obj) {
     if(obj instanceof Keyboard) {
-      boolean lgCodeMatch = ((Keyboard) obj).getLanguageID().equals(this.getLanguageID());
+      boolean lgCodeMatch = BCP47.languageEquals(((Keyboard) obj).getLanguageID(), this.getLanguageID());
       boolean idMatch = ((Keyboard) obj).getKeyboardID().equals(this.getKeyboardID());
 
       return lgCodeMatch && idMatch;
@@ -127,7 +128,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.font = installedObj.getString(KB_FONT_KEY);
       this.oskFont = installedObj.getString(KB_OSK_FONT_KEY);
     } catch (JSONException e) {
-      Log.e(TAG, "fromJSON exception: " + e);
+      KMLog.LogException(TAG, "fromJSON exception: ", e);
     }
   }
 
@@ -139,7 +140,7 @@ public class Keyboard extends LanguageResource implements Serializable {
         o.put(KB_FONT_KEY, this.font);
         o.put(KB_OSK_FONT_KEY, this.oskFont);
       } catch (JSONException e) {
-        Log.e(TAG, "toJSON exception: " + e);
+        KMLog.LogException(TAG, "toJSON exception: ", e);
       }
     }
     return o;

@@ -617,9 +617,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    for resourceSet in kmp.installableResourceSets {
+    for resourceSet in kmp.installables {
       for resource in resourceSet {
-        try ResourceFileManager.shared.install(resource, from: kmp)
+        try ResourceFileManager.shared.install(resourceWithID: resource.fullID, from: kmp)
         // Install the keyboard for only the first language pairing defined in the package.
         break
       }
@@ -632,9 +632,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       throw KMPError.wrongPackageType
     }
 
-    try kmp.installableResourceSets.forEach { resourceSet in
+    try kmp.installables.forEach { resourceSet in
       try resourceSet.forEach { resource in
-        try ResourceFileManager.shared.install(resource, from: kmp)
+        try ResourceFileManager.shared.install(resourceWithID: resource.fullID, from: kmp)
       }
     }
   }

@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 14.0.89 alpha 2020-06-09
+
+* fix(android/engine): Revise updateOldKeyboardsList (#3216)
+* feat(ios/engine): embedded KeymanWeb engine Sentry use (#3218)
+* feat(android): Handle model picker updates (#3209)
+
+## 14.0.88 alpha 2020-06-08
+
+* modify(android/samples): Update addKeyboard syntax for Sample and Test apps (#3213)
+* fix(linux): Restart km-config after installing keyboard (#3214)
+
+## 14.0.87 alpha 2020-06-05
+
+* fix(developer/compilers): normalise touch layout on compile (#3203)
+* feat(android): Add utility to check BCP47 equivalence (#3210)
+* refactor(ios/engine): KMP installation now relies on KeymanPackage class, parses (#3205)
+* refactor(ios/engine): Abstraction of KMP installation methods (#3206)
+* feat(linux): Make two windows modal dialogs (#3211)
+
+## 14.0.86 alpha 2020-06-02
+
+* fix(ios): fixes lerna concurrency workaround and missing func reference (#3192)
+* fix(android/engine): Use available models for ModelPickerActivity() (#3191)
+* feat(android): Add system globe action to show system keyboards (#3197)
+* feat(linux): Open a .kmp file in km-config (#3183)
+* refactor(ios/engine): kmp.json - Keyboard info deserialization (#3193)
+* refactor(ios/engine): kmp.json - Lexical model info deserialization  (#3195)
+* feat(ios/engine): kmp.json - full deserialization (#3198)
+* fix(android): Add wrapper for logging errors & exceptions (#3196)
+* fix(oem/fv/ios): new certificate (#3201)
+
 ## 14.0.85 alpha 2020-05-30
 
 * modify(android/engine): Clean up naming for formatting QR code URL (#3187)

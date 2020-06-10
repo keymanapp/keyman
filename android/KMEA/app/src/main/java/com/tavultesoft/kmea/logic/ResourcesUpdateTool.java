@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -27,6 +26,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -40,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownloadEventListener, CloudRepository.UpdateHandler{
   private static final String TAG = "ResourceUpdateTool";
@@ -325,7 +324,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           }
         }
       } catch (JSONException e) {
-        Log.e(TAG, "JSON Exception parsing ignoreNotifications preference");
+        KMLog.LogException(TAG, "JSON Exception parsing ignoreNotifications preference", e);
       }
     }
 
@@ -366,7 +365,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       editor.putString(PREF_KEY_IGNORE_NOTIFICATIONS, ignoredNotificationsObj.toString());
       editor.commit();
     } catch (JSONException e) {
-      Log.e(TAG, "JSON Exception updating ignoreNotifications preference");
+      KMLog.LogException(TAG, "JSON Exception updating ignoreNotifications preference", e);
     }
   }
 

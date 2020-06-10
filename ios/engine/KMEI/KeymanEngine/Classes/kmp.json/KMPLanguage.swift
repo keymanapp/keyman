@@ -16,4 +16,16 @@ struct KMPLanguage: Codable {
     case name
     case languageId = "id"
   }
+
+  public init(from decoder: Decoder) throws {
+    let values = try decoder.container(keyedBy: CodingKeys.self)
+
+    name = try values.decode(String.self, forKey: .name)
+    languageId = try values.decode(String.self, forKey: .languageId).lowercased()
+  }
+
+  public init(name: String, languageId: String) {
+    self.name = name
+    self.languageId = languageId
+  }
 }

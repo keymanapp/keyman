@@ -93,7 +93,7 @@ class Storage {
     return lexicalModelDir.appendingPathComponent(lexicalModelID)
   }
 
-  func resourceDir(for resource: LanguageResource) -> URL? {
+  func resourceDir(for resource: AnyLanguageResource) -> URL? {
     if let keyboard = resource as? InstallableKeyboard {
       return keyboardDir(forID: keyboard.id)
     } else if let lexicalModel = resource as? InstallableLexicalModel {
@@ -112,7 +112,7 @@ class Storage {
   }
 
   // Facilitates abstractions based on the LanguageResource protocol.
-  func resourceURL(for resource: LanguageResource) -> URL? {
+  func resourceURL(for resource: AnyLanguageResource) -> URL? {
     if let keyboard = resource as? InstallableKeyboard {
       return keyboardURL(for: keyboard)
     } else if let lexicalModel = resource as? InstallableLexicalModel {
@@ -153,7 +153,7 @@ class Storage {
     return keyboardDir(forID: keyboardID).appendingPathComponent(filename)
   }
 
-  func fontURL(forResource resource: LanguageResource, filename: String) -> URL? {
+  func fontURL(forResource resource: AnyLanguageResource, filename: String) -> URL? {
     if let keyboard = resource as? InstallableKeyboard {
       return fontURL(forKeyboardID: keyboard.id, filename: filename)
     } else {
@@ -192,6 +192,10 @@ extension Storage {
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "keymanios.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "keyman-sentry.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     // For debug compilations - IF we have a sourcemap file, copy that over too.

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 
 public class DownloadIntentService extends IntentService {
-
+  private static final String TAG = "DownloadIntentSvc";
 
   public DownloadIntentService() {
     super(DownloadIntentService.class.getName());
@@ -33,6 +33,7 @@ public class DownloadIntentService extends IntentService {
       }
     } catch (Exception e) {
       receiver.send(FileUtils.DOWNLOAD_ERROR, Bundle.EMPTY);
+      KMLog.LogException(TAG, "", e);
     }
   }
 }

@@ -75,15 +75,29 @@ class KeymanPackageTests: XCTestCase {
     }
   }
 
-  func testPackageContainsResource() {
+  func testPackageFindResourceMatch() {
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, _ in
-      XCTAssertTrue(kmp!.contains(TestUtils.Keyboards.khmer_angkor))
-      XCTAssertFalse(kmp!.contains(TestUtils.LexicalModels.mtnt))
+      guard let kmp = kmp as? KeyboardKeymanPackage else {
+        XCTFail("Incorrect package type loaded for test")
+        return
+      }
+      XCTAssertNotNil(kmp.findResource(withID: TestUtils.Keyboards.khmer_angkor.fullID))
+      // This keyboard's not in the specified testing package.
+      XCTAssertNil(kmp.findResource(withID: TestUtils.Keyboards.khmer10.fullID))
+
+      // Thanks to our package typing hierarchy, it's impossible to even TRY finding
+      // a FullLexicalModelID within a KeyboardKeymanPackage!
     }
 
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, _ in
-      XCTAssertTrue(kmp!.contains(TestUtils.LexicalModels.mtnt))
-      XCTAssertFalse(kmp!.contains(TestUtils.Keyboards.khmer_angkor))
+      guard let kmp = kmp as? LexicalModelKeymanPackage else {
+        XCTFail("Incorrect package type loaded for test")
+        return
+      }
+      XCTAssertNotNil(kmp.findResource(withID: TestUtils.LexicalModels.mtnt.fullID))
+
+      // Thanks to our package typing hierarchy, it's impossible to even TRY finding
+      // a FullKeyboardID within a LexicalModelKeymanPackage!
     }
   }
 }

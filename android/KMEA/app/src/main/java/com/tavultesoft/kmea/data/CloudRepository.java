@@ -2,7 +2,6 @@ package com.tavultesoft.kmea.data;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +17,8 @@ import com.tavultesoft.kmea.cloud.impl.CloudCatalogDownloadReturns;
 import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
 import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.packages.JSONUtils;
+import com.tavultesoft.kmea.util.BCP47;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,6 +125,25 @@ public class CloudRepository {
     }
   }
 
+  /**
+   * Search the available lexical models list and see there's an associated model for a
+   * given language ID. Available models are from the cloud catalog and locally installed models
+   * @param context Context
+   * @param languageID String of the language ID to search
+   * @return boolean true if an associated lexical model exists
+   */
+  public boolean hasAssociatedLexicalModel(@NonNull Context context, String languageID) {
+    if (memCachedDataset != null) {
+      for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
+        LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
+        if (BCP47.languageEquals(lm.getLanguageID(), languageID)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   // Should be called whenever a new language code starts being managed in order to help signal
   // retrieval of the language code's lexical models.
   public void invalidateLexicalModelCache(@NonNull Context context) {
@@ -162,7 +182,7 @@ public class CloudRepository {
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }
 
-  private CloudApiTypes.CloudApiParam prepareLexicalModellUpdateQuery(Context aContext)
+  private CloudApiTypes.CloudApiParam prepareLexicalModelUpdateQuery(Context aContext)
   {
     // This allows us to directly get the full lexical model catalog.
     // TODO:  Remove and replace with commented-out code below once the proper multi-language
@@ -258,6 +278,7 @@ public class CloudRepository {
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
+    final boolean fromKMP = true;
 
     try {
       if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
@@ -265,10 +286,10 @@ public class CloudRepository {
         memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
       }
       if (kmpLexicalModelsArray.length() > 0) {
-        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray));
+        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, fromKMP));
       }
     } catch (Exception e) {
-      Log.e(TAG, "preCacheDataSet error " + e);
+      KMLog.LogException(TAG, "preCacheDataSet error ", e);
     }
     CloudCatalogDownloadCallback _download_callback = new CloudCatalogDownloadCallback(
       context, updateHandler, onSuccess, onFailure);
@@ -354,7 +375,7 @@ public class CloudRepository {
     List<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>(2);
 
     if (!cacheValid) {
-      cloudQueries.add(prepareLexicalModellUpdateQuery(context));
+      cloudQueries.add(prepareLexicalModelUpdateQuery(context));
       cloudQueries.add(prepareResourcesUpdateQuerty(context));
     }
 
@@ -387,7 +408,7 @@ public class CloudRepository {
       JSONObject json = new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, languagesArray);
       return new JSONObject().put(KMKeyboardDownloaderActivity.KMKey_Languages, json);
     } catch (JSONException e) {
-      Log.e(TAG, "Failed to properly handle KMP JSON.  Error: " + e);
+      KMLog.LogException(TAG, "Failed to properly handle KMP JSON.  Error: ", e);
       return null;
     }
   }

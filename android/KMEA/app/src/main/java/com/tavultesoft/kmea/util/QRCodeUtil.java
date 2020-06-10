@@ -29,6 +29,7 @@ public final class QRCodeUtil {
       Class.forName("net.glxn.qrgen.android.QRCode");
       return true;
     } catch (ClassNotFoundException e) {
+      // Intentionally not sending to Sentry because 3rd party apps may not include this library
       return false;
     }
   }

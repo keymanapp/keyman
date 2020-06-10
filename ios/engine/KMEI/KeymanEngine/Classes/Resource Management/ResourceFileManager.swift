@@ -179,9 +179,12 @@ public class ResourceFileManager {
     }
   }
 
-  public func install(_ resource: LanguageResource, from package: KeymanPackage) throws {
-    // Ideally, we wouldn't need the guard... but it's best to check just in case.
-    guard package.contains(resource) else {
+  public func install<ResourceType: LanguageResource,
+                      PackageType: TypedKeymanPackage<ResourceType>> (
+                        resourceWithID fullID: ResourceType.FullID,
+                        from package: PackageType) throws {
+
+    guard let resource = package.findResource(withID: fullID) else {
       throw KMPError.resourceNotInPackage
     }
 

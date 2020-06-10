@@ -71,13 +71,17 @@ class FileManagementTests: XCTestCase {
   }
 
   func testInstallKeyboardFromPackage() throws {
+    // Standard installation
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")
-      XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
+      guard let kmp = kmp as? KeyboardKeymanPackage else {
+        XCTFail("KMP resource type improperly recognized - expected a keyboard package!")
+        return
+      }
 
       do {
-        try ResourceFileManager.shared.install(TestUtils.Keyboards.khmer_angkor, from: kmp!)
+        try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.khmer_angkor.fullID, from: kmp)
       } catch {
         XCTFail("Unexpected error during KeyboardPackage install")
       }
@@ -92,14 +96,10 @@ class FileManagementTests: XCTestCase {
       XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
       XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
 
-      // While the KMP's version of the specified InstallableKeyboard does specify Fonts,
-      // the literal-based testing version does NOT.  Since we're installing from the predefined,
-      // test-copy instance, we expect NOT to see the font from this test's install!
-      //
-      // Yes, the KeymanPackage.contains check isn't exhaustive - it just does a pair of
-      // id checks.  This version of events couldn't happen if we thorough enough there.
+      // While the LanguageResource definition we provided lacks font definitions, the
+      // KMP's definition has that data.  By default, the KMP's definition takes precedence.
       let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
-      XCTAssertFalse(FileManager.default.fileExists(atPath: fontURL.path))
+      XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
     }
   }
 
@@ -107,10 +107,13 @@ class FileManagementTests: XCTestCase {
     ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) { kmp, error in
       XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
       XCTAssertNil(error, "Error occurred while preparing KMP for installation")
-      XCTAssertNotNil(kmp as? LexicalModelKeymanPackage, "KMP resource type improperly recognized - expected a lexical model package!")
+      guard let kmp = kmp as? LexicalModelKeymanPackage else {
+        XCTFail("KMP resource type improperly recognized - expected a lexical model package!")
+        return
+      }
 
       do {
-        try ResourceFileManager.shared.install(TestUtils.LexicalModels.mtnt, from: kmp!)
+        try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.mtnt.fullID, from: kmp)
       } catch {
         XCTFail("Unexpected error during LexicalModelPackage install")
       }

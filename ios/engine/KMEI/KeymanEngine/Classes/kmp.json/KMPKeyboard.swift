@@ -29,7 +29,7 @@ class KMPKeyboard: Codable, KMPResource {
     case languages
   }
 
-  internal required init?(from resource: LanguageResource) {
+  internal required init?(from resource: AnyLanguageResource) {
     guard let keyboard = resource as? InstallableKeyboard else {
       return nil
     }
@@ -57,7 +57,7 @@ class KMPKeyboard: Codable, KMPResource {
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
   }
 
-  func matches(installable resource: LanguageResource, requireLanguageMatch: Bool = true) -> Bool {
+  func matches(installable resource: AnyLanguageResource, requireLanguageMatch: Bool = true) -> Bool {
     guard let resource = resource as? InstallableKeyboard else {
       return false
     }
@@ -97,7 +97,15 @@ class KMPKeyboard: Codable, KMPResource {
     return installableKeyboards
   }
 
-  public var installableResources: [LanguageResource] {
+  // Needed to properly support AnyKMPResource.installableResources
+  // because of weird, weird Swift rules.
+  public var typedInstallableResources: [InstallableKeyboard] {
+    return installableKeyboards
+  }
+
+  // Provides our class's method of the same signature, but with
+  // the local type signature we know is available.
+  public var installableResources: [InstallableKeyboard] {
     return installableKeyboards
   }
 

@@ -28,6 +28,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONObject;
 
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PackageActivity extends AppCompatActivity {
-
+  private final static String TAG = "PackageActivity";
   private Toolbar toolbar;
   private WebView webView;
   private AlertDialog alertDialog;
@@ -78,6 +79,7 @@ public class PackageActivity extends AppCompatActivity {
       tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
 
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       showErrorToast(context, getString(R.string.failed_to_extract));
       return;
     }
@@ -236,7 +238,7 @@ public class PackageActivity extends AppCompatActivity {
         FileUtils.deleteDirectory(tempPackagePath);
       }
     } catch (Exception e) {
-      Log.e("PackageActivity", "cleanup() failed with error " + e);
+      KMLog.LogException(TAG, "cleanup() failed with error ", e);
     } finally {
       finish();
     }
@@ -367,7 +369,7 @@ public class PackageActivity extends AppCompatActivity {
         }
       }
     } catch (Exception e) {
-      Log.e("PackageActivity", "Error " + e);
+      KMLog.LogException(TAG, "", e);
       showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
     }
   }

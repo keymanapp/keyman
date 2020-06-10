@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMTextView;
@@ -35,36 +36,48 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     // Add custom keyboards
 
     // Chirality test keyboard
-    HashMap<String, String> chiralityKBInfo = new HashMap<String, String>();
-    chiralityKBInfo.put(KMManager.KMKey_PackageID, "keyboardharness");
-    chiralityKBInfo.put(KMManager.KMKey_KeyboardID, "chirality");
-    chiralityKBInfo.put(KMManager.KMKey_LanguageID, "en");
-    chiralityKBInfo.put(KMManager.KMKey_KeyboardName, "Chirality Keyboard");
-    chiralityKBInfo.put(KMManager.KMKey_LanguageName, "English");
-    chiralityKBInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    chiralityKBInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+    Keyboard chiralityKBInfo = new Keyboard(
+      "keyboardharness",
+      "chirality",
+      "Chirality Keyboard",
+      "en",
+      "English",
+      "1.0",
+      "", // help link
+      "", // kmp
+      true,
+      KMManager.KMDefault_KeyboardFont,
+      KMManager.KMDefault_KeyboardFont);
     KMManager.addKeyboard(this, chiralityKBInfo);
 
     // Longpress test keyboard
-    HashMap<String, String> longpressKBbInfo = new HashMap<String, String>();
-    longpressKBbInfo.put(KMManager.KMKey_PackageID, "keyboardharness");
-    longpressKBbInfo.put(KMManager.KMKey_KeyboardID, "longpress");
-    longpressKBbInfo.put(KMManager.KMKey_LanguageID, "en");
-    longpressKBbInfo.put(KMManager.KMKey_KeyboardName, "Longpress Keyboard");
-    longpressKBbInfo.put(KMManager.KMKey_LanguageName, "English");
-    longpressKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    longpressKBbInfo.put(KMManager.KMKey_Font, "code2001.ttf");
+    Keyboard longpressKBbInfo = new Keyboard(
+      "keyboardharness",
+      "longpress",
+      "Longpress Keyboard",
+      "en",
+      "English",
+      "1.0",
+      "",
+      "",
+      true,
+      "code2001.ttf",
+      "code2001.ttf");
     KMManager.addKeyboard(this, longpressKBbInfo);
 
     // Platform test keyboard
-    HashMap<String, String> platformtestKBbInfo = new HashMap<String, String>();
-    platformtestKBbInfo.put(KMManager.KMKey_PackageID, "keyboardharness");
-    platformtestKBbInfo.put(KMManager.KMKey_KeyboardID, "platformtest");
-    platformtestKBbInfo.put(KMManager.KMKey_LanguageID, "en");
-    platformtestKBbInfo.put(KMManager.KMKey_KeyboardName, "platformtest Keyboard");
-    platformtestKBbInfo.put(KMManager.KMKey_LanguageName, "English");
-    platformtestKBbInfo.put(KMManager.KMKey_KeyboardVersion, "1.0");
-    platformtestKBbInfo.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
+    Keyboard platformtestKBbInfo = new Keyboard(
+      "keyboardharness",
+      "platformtest",
+      "platformtest Keyboard",
+      "en",
+      "English",
+      "1.0",
+      "",
+      "",
+      true,
+      KMManager.KMDefault_KeyboardFont,
+      KMManager.KMDefault_KeyboardFont);
     KMManager.addKeyboard(this, platformtestKBbInfo);
   }
 
