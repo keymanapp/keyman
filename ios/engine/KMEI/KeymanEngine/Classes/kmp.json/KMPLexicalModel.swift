@@ -23,10 +23,7 @@ class KMPLexicalModel: Codable, KMPResource {
     case languages
   }
 
-  internal required init?(from resource: AnyLanguageResource) {
-    guard let lexicalModel = resource as? InstallableLexicalModel else {
-      return nil
-    }
+  internal required init?(from lexicalModel: InstallableLexicalModel) {
 
     self.name = lexicalModel.name
     self.lexicalModelId = lexicalModel.id

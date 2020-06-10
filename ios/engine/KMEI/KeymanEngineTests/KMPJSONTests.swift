@@ -143,10 +143,6 @@ class KMPJSONTests: XCTestCase {
       return
     }
 
-    if let _ = KMPKeyboard(from: TestUtils.LexicalModels.mtnt) {
-      XCTFail("Constructed KMPKeyboard from InstallableLexicalModel")
-    }
-
     // The original version extracted from a KMP.
     let kmpMetadata: KMPKeyboard = try loadObjectFromJSON(at: TestUtils.PackageJSON.keyboard_khmer_angkor)!
 
@@ -172,10 +168,6 @@ class KMPJSONTests: XCTestCase {
     guard let constructedMetadata = KMPLexicalModel(from: TestUtils.LexicalModels.mtnt) else {
       XCTFail("Could not construct KMPLexicalModel from InstallableLexicalModel")
       return
-    }
-
-    if let _ = KMPLexicalModel(from: TestUtils.Keyboards.khmer_angkor) {
-      XCTFail("Constructed KMPLexicalModel from InstallableKeyboard")
     }
 
     // The original version extracted from a KMP.

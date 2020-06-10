@@ -29,11 +29,7 @@ class KMPKeyboard: Codable, KMPResource {
     case languages
   }
 
-  internal required init?(from resource: AnyLanguageResource) {
-    guard let keyboard = resource as? InstallableKeyboard else {
-      return nil
-    }
-
+  internal required init?(from keyboard: InstallableKeyboard) {
     self.name = keyboard.name
     self.keyboardId = keyboard.id
     self.version = keyboard.version

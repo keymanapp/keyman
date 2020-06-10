@@ -11,17 +11,17 @@ import Foundation
 internal protocol AnyKMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
-
   var installableResources: [AnyLanguageResource] { get }
-
-  // Used to convert old cloud resources into the extracted KMP format for 14.0+ file management.
-  init?(from resource: AnyLanguageResource)
 
   func matches(installable resource: AnyLanguageResource, requireLanguageMatch: Bool) -> Bool
 }
 
 protocol KMPResource: AnyKMPResource {
   associatedtype LanguageResourceType: LanguageResource
+
+  // Used to convert old cloud resources into the extracted KMP format for 14.0+ file management.
+  init?(from resource: LanguageResourceType)
+
   var typedInstallableResources: [LanguageResourceType] { get }
 }
 
