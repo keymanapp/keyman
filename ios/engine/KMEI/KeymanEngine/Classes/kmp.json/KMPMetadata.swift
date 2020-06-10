@@ -42,9 +42,19 @@ class KMPMetadata: Codable {
     case Unsupported
   }
 
-  init(from resource: AnyLanguageResource) {
+  /**
+   * This constructor is designed for use in resource migration needed for the 13.0 -> 14.0
+   * cloud resource -> KMP-backed transition.  The result of this constructor is designed to provide
+   * a kmp.json "wrapper" for pre-existing cloud resources as if it had come from an actual KMP.
+   *
+   * Since it's not actually KMP-backed, all resource versions are set to 0.0.0 by default; this will ensure
+   * that the resources are updated to actual KMP-backed versions if possible.
+   *
+   * Also, as this is constructed from a single instance of LanguageResource, only
+   * one language pairing will exist in the newly-constructed KMPMetadata instance.
+   */
+  internal init(from resource: AnyLanguageResource) {
     // First, the standard defaults.
-    system = KMPSystem()
     options = KMPOptions()
     info = KMPInfo()
     keyboards = nil
@@ -60,9 +70,11 @@ class KMPMetadata: Codable {
     if var keyboard = resource as? InstallableKeyboard {
       keyboard.version = "0.0.0"
       keyboards = [KMPKeyboard(from: keyboard)!]
+      system = KMPSystem(forPackageType: .Keyboard)!
     } else if var lexicalModel = resource as? InstallableLexicalModel {
       lexicalModel.version = "0.0.0"
       lexicalModels = [KMPLexicalModel(from: lexicalModel)!]
+      system = KMPSystem(forPackageType: .LexicalModel)!
     } else {
       fatalError("Cannot utilize unexpected subclass of LanguageResource")
     }

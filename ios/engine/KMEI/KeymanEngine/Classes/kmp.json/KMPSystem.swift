@@ -17,13 +17,18 @@ struct KMPSystem: Codable {
     case fileVersion
   }
   
-  init() {
+  init?(forPackageType packageType: KMPMetadata.PackageType) {
     keymanDeveloperVersion = nil
 
-    // Serves as a simple-enough default.  Not sure what the actual
-    // rules that compiled packages follow for this are... but we
-    // don't actually use this value within KeymanEngine, anyway.
-    fileVersion = "1.1.0"
+    switch packageType {
+      case .Keyboard:
+        fileVersion = "7.0"
+        return
+      case .LexicalModel:
+        fileVersion = "12.0"
+        return
+      default:
+        return nil
+    }
   }
-
 }
