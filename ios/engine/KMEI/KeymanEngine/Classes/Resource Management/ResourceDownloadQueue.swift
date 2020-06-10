@@ -10,7 +10,7 @@ import Foundation
 import Reachability
 
 protocol DownloadNode {
-  var resources: [LanguageResource]? { get }
+  var resources: [AnyLanguageResource]? { get }
 }
 
 class DownloadTask: DownloadNode {
@@ -19,10 +19,10 @@ class DownloadTask: DownloadNode {
   }
   
   public final var type: Resource
-  public final var resources: [LanguageResource]?
+  public final var resources: [AnyLanguageResource]?
   public final var request: HTTPDownloadRequest
   
-  public init(do request: HTTPDownloadRequest, for resources: [LanguageResource]?, type: DownloadTask.Resource) {
+  public init(do request: HTTPDownloadRequest, for resources: [AnyLanguageResource]?, type: DownloadTask.Resource) {
     self.request = request
     self.type = type
     self.resources = resources
@@ -80,9 +80,9 @@ class DownloadBatch: DownloadNode {
     self.errors = Array(repeating: nil, count: tasks.count)
   }
   
-  public var resources: [LanguageResource]? {
+  public var resources: [AnyLanguageResource]? {
     get {
-      var resArray: [LanguageResource] = []
+      var resArray: [AnyLanguageResource] = []
       
       tasks.forEach{ task in
         resArray.append(contentsOf: task.resources ?? [])
@@ -376,8 +376,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
   
   public func updateBatchFinished(_ batch: DownloadBatch) {
-    var successes: [[LanguageResource]] = []
-    var failures: [[LanguageResource]] = []
+    var successes: [[AnyLanguageResource]] = []
+    var failures: [[AnyLanguageResource]] = []
     var errors: [Error] = []
     
     // Remember, since this is for .composite batches, batch.tasks is of type [DownloadBatch].

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class LexicalModelKeymanPackage : KeymanPackage {
+public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalModel> {
   internal var models : [KMPLexicalModel]!
 
   override init(metadata: KMPMetadata, folder: URL) {
@@ -26,6 +26,8 @@ public class LexicalModelKeymanPackage : KeymanPackage {
         }
       }
     }
+
+    self.setInstallableResourceSets(for: models)
   }
 
   public override func defaultInfoHtml() -> String {
@@ -37,7 +39,7 @@ public class LexicalModelKeymanPackage : KeymanPackage {
     return str
   }
 
-  override var resources: [KMPResource] {
+  override var resources: [AnyKMPResource] {
     return models
   }
 }

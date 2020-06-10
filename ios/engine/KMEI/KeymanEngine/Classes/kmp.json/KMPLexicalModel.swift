@@ -57,7 +57,15 @@ class KMPLexicalModel: Codable, KMPResource {
     return installableLexicalModels
   }
 
-  public var installableResources: [LanguageResource] {
+  // Needed to properly support AnyKMPResource.installableResources
+  // because of weird, weird Swift rules.
+  public var typedInstallableResources: [InstallableLexicalModel] {
+    return installableLexicalModels
+  }
+
+  // Provides our class's method of the same signature, but with
+  // the local type signature we know is available.
+  public var installableResources: [InstallableLexicalModel] {
     return installableLexicalModels
   }
 
