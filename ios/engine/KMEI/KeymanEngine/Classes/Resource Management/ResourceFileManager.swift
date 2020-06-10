@@ -179,22 +179,14 @@ public class ResourceFileManager {
     }
   }
 
-  public func install(_ resourceToMatch: AnyLanguageResource, from package: KeymanPackage, usePackageDefinition: Bool = true) throws {
+  public func install<ResourceType: LanguageResource,
+                      PackageType: TypedKeymanPackage<ResourceType>> (
+                        resourceWithID fullID: ResourceType.FullID,
+                        from package: PackageType) throws {
 
-    var res: AnyLanguageResource
-    guard let r = package.findMatch(resourceToMatch) else {
+    guard let resource = package.findResource(withID: fullID) else {
       throw KMPError.resourceNotInPackage
     }
-
-    if(usePackageDefinition) {
-      res = r
-    } else {
-      // In case a KeymanEngine user wants a different definition than is in the source KMP.
-      res = resourceToMatch
-    }
-
-    // Now to lock down the reference, using 'let' to make it read-only.
-    let resource = res
 
     // (source, destination)
     var installableFiles: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
