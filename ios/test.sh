@@ -21,11 +21,13 @@ function run_test() {
   # auto-pick what's most current if we don't.  Makes CI maintenance
   # much less problematic.
   xcodebuild \
+    -quiet \
     -workspace keymanios.xcworkspace \
     -scheme Keyman \
     -sdk iphonesimulator \
     -destination "platform=iOS Simulator,name=$DEVICE" \
     -only-testing KeymanEngineTests \
+    SKIP_UNSTABLE_TESTS=true \
     test
 }
 

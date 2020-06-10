@@ -212,6 +212,13 @@ class KMPJSONTests: XCTestCase {
   }
 
   func testKMPMetadataFromResource() throws {
+    guard let skipTest = ProcessInfo.processInfo.environment["SKIP_UNSTABLE_TESTS"] else {
+      XCTFail("Test environment not configured properly")
+      return
+    }
+
+    try XCTSkipIf(Bool.init(skipTest) ?? false)
+
     // https://assertible.com/json-schema-validation#api
     // - Note:  they "do not make any guarantees about the uptime and availability
     //          of the Free JSON Schema Validation API."
