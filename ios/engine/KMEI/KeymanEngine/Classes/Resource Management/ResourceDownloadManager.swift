@@ -365,7 +365,7 @@ public class ResourceDownloadManager {
     }
   }
   
-  public func getAvailableUpdates() -> [LanguageResource]? {
+  public func getAvailableUpdates() -> [AnyLanguageResource]? {
     // Relies upon KMManager's preload; this was the case before the rework.
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
       return nil
@@ -373,7 +373,7 @@ public class ResourceDownloadManager {
 
     isDidUpdateCheck = true
     
-    var updatables: [LanguageResource] = []
+    var updatables: [AnyLanguageResource] = []
 
     // Gets the list of current, local keyboards in need of an update.
     // Version matches the current version, not the updated version.
@@ -391,7 +391,7 @@ public class ResourceDownloadManager {
     }
   }
   
-  public func performUpdates(forResources resources: [LanguageResource]) {
+  public func performUpdates(forResources resources: [AnyLanguageResource]) {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
     var batches: [DownloadBatch] = []

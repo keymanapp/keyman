@@ -19,6 +19,7 @@ import com.tavultesoft.kmea.KMManager.KeyboardType;
 import com.tavultesoft.kmea.KeyboardEventHandler.EventType;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -57,6 +58,7 @@ import io.sentry.core.Sentry;
 import io.sentry.core.SentryLevel;
 
 final class KMKeyboard extends WebView {
+  private static final String TAG = "KMKeyboard";
   private final Context context;
   private KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   private String packageID;
@@ -135,10 +137,10 @@ final class KMKeyboard extends WebView {
 
     setWebChromeClient(new WebChromeClient() {
       public boolean onConsoleMessage(ConsoleMessage cm) {
+        String msg = String.format("KMW JS Log: Line %d, %s:%s", cm.lineNumber(), cm.sourceId(), cm.message());
         if (KMManager.isDebugMode()) {
-          Log.d("KMEA", "Keyman JS Log: Line " + cm.lineNumber() + ", " + cm.sourceId() + ":" + cm.message());
           if (cm.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-            Log.e("KMEA", "Keyman JS Log: ERROR");
+            Log.d(TAG, msg);
           }
         }
 
@@ -329,6 +331,7 @@ final class KMKeyboard extends WebView {
       if (subKeysWindow != null && subKeysWindow.isShowing())
         subKeysWindow.dismiss();
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
     }
   }
 
@@ -338,6 +341,7 @@ final class KMKeyboard extends WebView {
         suggestionMenuWindow.dismiss();
       }
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
     }
   }
 
@@ -670,6 +674,9 @@ final class KMKeyboard extends WebView {
    */
   private String getFontFilename(String jsonString) {
     String font = "";
+    if (jsonString == null || jsonString.isEmpty()) {
+      return font;
+    }
     try {
       JSONObject fontObj = new JSONObject(jsonString);
       JSONArray sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontSource);
@@ -692,6 +699,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
       font = "";
     }
 
@@ -1053,6 +1061,7 @@ final class KMKeyboard extends WebView {
         }
       }
     } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
       return "''";
     }
 
@@ -1157,6 +1166,7 @@ final class KMKeyboard extends WebView {
           if (keyPreviewWindow != null && keyPreviewWindow.isShowing())
             keyPreviewWindow.dismiss();
         } catch (Exception e) {
+          KMLog.LogException(TAG, "", e);
         }
       }
     }, delay);
@@ -1269,6 +1279,7 @@ final class KMKeyboard extends WebView {
         return false;
       }
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return true;
     }
   }

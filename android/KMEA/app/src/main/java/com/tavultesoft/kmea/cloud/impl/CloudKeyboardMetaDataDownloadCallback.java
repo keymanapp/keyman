@@ -2,7 +2,6 @@ package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -15,6 +14,7 @@ import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
 import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -174,7 +174,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
               _r.additionalDownloads= urls;
             }
           } catch (JSONException e) {
-            Log.e(TAG, "Error parsing lexical model from api.keyman.com. " + e);
+            KMLog.LogException(TAG, "Error parsing lexical model from api.keyman.com. ", e);
           }
         }
       }
@@ -184,7 +184,7 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
         if (pkgData != null) {
           List<Bundle> updateBundles = new ArrayList<>();
           CloudDataJsonUtil.processKeyboardPackageUpdateJSON(aContext, pkgData, updateBundles);
-          CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData);
+          CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(aContext, pkgData, updateBundles);
         }
       }
     }
@@ -277,9 +277,8 @@ public class CloudKeyboardMetaDataDownloadCallback implements ICloudDownloadCall
           _pkgID, _lang_id, _langName, _key_id, _kbName, _kbVersion, _font, _oskFont, _customHelpLink);
       theKbData.additionalDownloads = urls;
     }
-    catch(JSONException _e)
-    {
-      Log.e(TAG,_e.getLocalizedMessage(),_e);
+    catch(JSONException e) {
+      KMLog.LogException(TAG, "", e);
     }
   }
 

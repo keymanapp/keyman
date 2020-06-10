@@ -374,7 +374,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     self.present(alertController, animated: true, completion: nil)
   }
   
-  private func batchUpdateStarted(_: [LanguageResource]) {
+  private func batchUpdateStarted(_: [AnyLanguageResource]) {
     log.info("batchUpdateStarted: InstalledLanguagesViewController")
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)

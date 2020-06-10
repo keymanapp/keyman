@@ -43,6 +43,8 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tavultesoft.kmea.util.KMLog;
+
 public class WebBrowserActivity extends AppCompatActivity {
   private static final String TAG = "WebBrowserActivity";
   private WebView webView;
@@ -321,6 +323,8 @@ public class WebBrowserActivity extends AppCompatActivity {
           try {
             new URL(urlStr);
           } catch (MalformedURLException e) {
+            KMLog.LogException(TAG, "", e);
+
             if (Patterns.WEB_URL.matcher(String.format("%s%s", "http://", urlStr)).matches()) {
               urlStr = String.format("%s%s", "http://", urlStr);
             } else {

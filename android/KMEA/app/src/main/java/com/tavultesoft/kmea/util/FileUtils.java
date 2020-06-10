@@ -2,7 +2,6 @@ package com.tavultesoft.kmea.util;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
 
@@ -116,8 +115,8 @@ public final class FileUtils {
         ret = DOWNLOAD_SUCCESS;
       }
     } catch (Exception e) {
+      KMLog.LogException(TAG, "Download failed! Error: ", e);
       ret = -1;
-      Log.e("FileUtils", "Download failed! Error: " + e);
     } finally {
       if (ret > 0) {
         if (tmpFile.exists() && tmpFile.length() > 0) {
@@ -137,7 +136,7 @@ public final class FileUtils {
         if (tmpFile != null && tmpFile.exists()) {
           tmpFile.delete();
         }
-        Log.e("FileUtils", "Could not download filename " + filename);
+        KMLog.LogError(TAG, "Could not download filename " + filename);
       }
 
       Connection.disconnect();
@@ -238,12 +237,12 @@ public final class FileUtils {
         outputStream.write(((JSONArray) obj).toString(INDENT));
         result = true;
       } else {
-        Log.e(TAG, "saveList failed. arr not JSONObject or JSONArray");
+        KMLog.LogError(TAG, "saveList failed. arr not JSONObject or JSONArray");
       }
       outputStream.flush();
       outputStream.close();
     } catch (Exception e) {
-      Log.e(TAG, "saveList failed to save " + filepath.getName() + ". Error: " + e);
+      KMLog.LogException(TAG, "saveList failed to save " + filepath.getName() + ". Error: ", e);
       result = false;
     }
 
@@ -432,7 +431,7 @@ public final class FileUtils {
       int i = Integer.parseInt(s);
       retVal = new Integer(i);
     } catch (Exception e) {
-      Log.e("FileUtils", "parseInteger Error: " + e);
+      KMLog.LogException(TAG, "parseInteger Error: ", e);
       retVal = null;
     }
 

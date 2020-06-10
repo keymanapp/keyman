@@ -3,17 +3,19 @@ package com.tavultesoft.kmea.cloud;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,14 +99,20 @@ public class CloudDataJsonUtil {
         }
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(TAG, "JSONParse Error: " + e);
+      KMLog.LogException(TAG, "JSONParse Error: ", e);
       return new ArrayList<Keyboard>();  // Is this ideal?
     }
 
     return keyboardsList;
   }
 
-  public static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
+  /**
+   * Parse a JSONArray of models to create a list of LexicalModel
+   * @param models
+   * @param fromKMP - boolean. If true, only  the first language in an array is processed
+   * @return List of LexicalModel
+   */
+  public static List<LexicalModel> processLexicalModelJSON(JSONArray models, boolean fromKMP) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
@@ -112,10 +120,10 @@ public class CloudDataJsonUtil {
       int modelsLength = models.length();
       for (int i = 0; i < modelsLength; i++) {
         JSONObject modelJSON = models.getJSONObject(i);
-        modelList.add(new LexicalModel(modelJSON, true));
+        modelList.addAll(LexicalModel.LexicalModelList(modelJSON, fromKMP));
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(TAG, "JSONParse Error: " + e);
+      KMLog.LogException(TAG, "JSONParse Error: ", e);
       return new ArrayList<LexicalModel>();  // Is this ideal?
     }
 
@@ -162,7 +170,7 @@ public class CloudDataJsonUtil {
           }
         }
       } catch (JSONException | NullPointerException e) {
-        Log.e(TAG, "processPackageUpdateJSON Error process keyboards: " + e);
+        KMLog.LogException(TAG, "processPackageUpdateJSON Error process keyboards: ", e);
       }
     }
 
@@ -171,14 +179,52 @@ public class CloudDataJsonUtil {
     }
   }
 
-  public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData) {
+  public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
+    boolean saveModelsList = false;
     // Parse for lexical model package updates
     if (pkgData.has(CDKey_Models)) {
       try {
-        JSONArray modelPackages = pkgData.getJSONArray(CDKey_Models);
-        // TODO: continue to process this (similar to processKeyboardPackageUpdateJSON) for lexical model updates
+        JSONObject cloudModelPackages = pkgData.getJSONObject(CDKey_Models);
+        Iterator<String> lexicalModelIDs = cloudModelPackages.keys();
+        while (lexicalModelIDs.hasNext()) {
+          String lexicalModelID = lexicalModelIDs.next();
+          JSONObject cloudModelObj = cloudModelPackages.getJSONObject(lexicalModelID);
+          if (!cloudModelObj.has(CDKey_Error)) {
+            String cloudVersion = cloudModelObj.getString(CDKey_Version);
+            String cloudKMP = cloudModelObj.getString(CDKey_KMP);
+            // Valid lexical model package exists. See if lexical model list needs to be updated
+            // Valid keyboard package exists. See if keyboard list needs to be updated
+            int index = KeyboardPickerActivity.getLexicalModelIndex(aContext, lexicalModelID);
+            if (index != -1) {
+              HashMap<String, String> lmInfo = KeyboardPickerActivity.getLexicalModelInfo(aContext, index);
+              String version = lmInfo.get(KMManager.KMKey_Version);
+              if (lexicalModelID.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LexicalModelID)) &&
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
+                  (!MapCompat.getOrDefault(lmInfo, KMManager.KMKey_KMPLink, "").equalsIgnoreCase(cloudKMP))) {
+                // Update keyboard with the latest KMP link
+                lmInfo.put(KMManager.KMKey_KMPLink, cloudKMP);
+                KeyboardPickerActivity.addLexicalModel(aContext, lmInfo);
+
+                // Update bundle list
+                LexicalModel lm = new LexicalModel(
+                  lmInfo.get(KMManager.KMKey_PackageID),
+                  lmInfo.get(KMManager.KMKey_LexicalModelID),
+                  lmInfo.get(KMManager.KMKey_LexicalModelName),
+                  lmInfo.get(KMManager.KMKey_LanguageID),
+                  lmInfo.get(KMManager.KMKey_LanguageName),
+                  lmInfo.get(KMManager.KMKey_Version),
+                  lmInfo.get(KMManager.KMKey_CustomHelpLink),
+                  lmInfo.get(KMManager.KMKey_KMPLink));
+                Bundle bundle = new Bundle(lm.buildDownloadBundle());
+                updateBundles.add(bundle);
+
+                saveModelsList = true;
+              }
+            }
+          }
+        }
       } catch (JSONException | NullPointerException e) {
-        Log.e(TAG, "processPackageUpdateJSON Error processing models: " + e);
+        KMLog.LogException(TAG, "processPackageUpdateJSON Error processing models: ", e);
       }
     }
   }
@@ -193,7 +239,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "getCachedJSONArray failed to read from cache file. Error: " + e);
+      KMLog.LogException(TAG, "getCachedJSONArray failed to read from cache file. Error: ", e);
       lmData = null;
     }
 
@@ -215,7 +261,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "getCachedJSONObject failed to read from cache file. Error: " + e);
+      KMLog.LogException(TAG, "getCachedJSONObject failed to read from cache file. Error: ", e);
       kbData = null;
     }
 
@@ -236,7 +282,7 @@ public class CloudDataJsonUtil {
       objOutput.writeObject(json.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save to cache file. Error: " + e);
+      KMLog.LogException(TAG, "Failed to save to cache file. Error: ", e);
     }
   }
 
@@ -276,7 +322,7 @@ public class CloudDataJsonUtil {
             dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
           }
         } catch (Exception e) {
-          Log.d(TAG, e.getMessage(),e);
+          KMLog.LogException(TAG, "", e);
         } finally {
           aDownload.getDestinationFile().delete();
         }
@@ -324,7 +370,7 @@ public class CloudDataJsonUtil {
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "findTTF exception" + e);
+      KMLog.LogException(TAG, "findTTF exception", e);
     }
   }
 
@@ -339,7 +385,7 @@ public class CloudDataJsonUtil {
       }
       return false;
     } catch (JSONException e) {
-      Log.e(TAG, "hasTTFFont exception" + e);
+      KMLog.LogException(TAG, "hasTTFFont exception", e);
       return false;
     }
   }
@@ -379,6 +425,7 @@ public class CloudDataJsonUtil {
             urls.add(baseUri + fontFilename);
           }
         } catch (JSONException e) {
+          KMLog.LogException(TAG, "", e);
           return null;
         }
       }
@@ -393,6 +440,7 @@ public class CloudDataJsonUtil {
           urls.add(baseUri + fontFilename);
         }
       } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
         return null;
       }
     }

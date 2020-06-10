@@ -24,7 +24,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
   private var infoArray = [[String: String]]()
 
-  let resource: LanguageResource
+  let resource: AnyLanguageResource
 
   @IBOutlet weak var scrollView: UIScrollView!
   @IBOutlet weak var contentView: UIView!
@@ -35,7 +35,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
   @IBOutlet weak var labelHeightConstraint: NSLayoutConstraint!
 
-  init(for resource: LanguageResource) {
+  init(for resource: AnyLanguageResource) {
     self.resource = resource
 
     super.init(nibName: "ResourceInfoView", bundle: Bundle.init(for: ResourceInfoViewController.self))

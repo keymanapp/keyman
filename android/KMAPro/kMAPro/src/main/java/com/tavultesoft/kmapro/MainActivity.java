@@ -30,6 +30,7 @@ import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
+import com.tavultesoft.kmea.util.KMLog;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -251,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         Intent getUserdataIntent = new Intent("keyman.ACTION_GET_USERDATA");
         startActivityForResult(getUserdataIntent, 0);
       } catch (Exception e) {
+        KMLog.LogException(TAG, "", e);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(MainActivity.didCheckUserDataKey, true);
         editor.commit();
@@ -301,8 +303,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             inputStream.close();
           }
         } catch (Exception e) {
+          KMLog.LogException(TAG, "", e);
           didFail = true;
-          Log.e(TAG, e.getMessage());
         }
       }
 
@@ -365,11 +367,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
             data = Uri.parse(builder.build().toString());
             downloadKMP(scheme);
           } else {
-            Log.e(TAG, "Unrecognized scheme: " + scheme);
+            String msg = "Unrecognized scheme: " + scheme;
+            KMLog.LogError(TAG, msg);
           }
           break;
         default :
-          Log.e(TAG, "Unrecognized scheme: " + scheme);
+          String msg = "Unrecognized scheme: " + scheme;
+          KMLog.LogError(TAG, msg);
       }
     }
     intent.setData(null);
@@ -632,6 +636,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
 
             startService(downloadIntent);
           } catch (Exception e) {
+            KMLog.LogException(TAG, "", e);
             if (progressDialog != null && progressDialog.isShowing()) {
               progressDialog.dismiss();
             }
@@ -646,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       }
     } catch (UnsupportedOperationException e) {
       String message = "Download failed. Invalid URL.";
+      KMLog.LogException(TAG,  message, e);
       Toast.makeText(getApplicationContext(), message,
         Toast.LENGTH_SHORT).show();
     }
@@ -956,8 +962,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     } catch (Exception e) {
       String message = "Access denied to " + filename +
         ".\nCheck Android Settings --> Apps --> Keyman to grant storage permissions";
+      KMLog.LogException(TAG, "Unable to copy " + filename + " to app cache ", e);
       Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-      Log.e(TAG, "Unable to copy " + filename + " to app cache");
       return;
     }
 

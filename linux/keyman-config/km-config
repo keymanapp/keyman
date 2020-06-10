@@ -3,6 +3,8 @@
 import argparse
 import logging
 import gi
+import os
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -13,6 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+    parser.add_argument('-i', '--install', action='store', nargs='?', help='install .kmp package')
 
     args = parser.parse_args()
     if args.verbose:
@@ -22,9 +25,16 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
-    from keyman_config.view_installed import ViewInstalledWindow
-    w = ViewInstalledWindow()
-    w.resize(576, 324)
-    w.connect("destroy", Gtk.main_quit)
-    w.show_all()
-    Gtk.main()
+    if args.install:
+        if os.path.isfile(args.install):
+            from keyman_config.install_window import InstallKmpWindow
+            w = InstallKmpWindow(args.install)
+            w.run()
+            w.destroy()
+        else:
+            logging.error("Can't find file " + args.install)
+    else:
+        from keyman_config.view_installed import ViewInstalledWindow
+        w = ViewInstalledWindow()
+        w.run()
+        w.destroy()

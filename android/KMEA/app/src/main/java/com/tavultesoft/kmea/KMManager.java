@@ -69,8 +69,10 @@ import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.JSONUtils;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.CharSequenceUtil;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
@@ -103,6 +105,7 @@ public final class KMManager {
     GLOBE_KEY_ACTION_SHOW_MENU,
     GLOBE_KEY_ACTION_SWITCH_TO_NEXT_KEYBOARD,         // Switch to next Keyman keyboard
     GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD, // Advance to next system keyboard
+    GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS,
     GLOBE_KEY_ACTION_DO_NOTHING,
   }
 
@@ -285,6 +288,7 @@ public final class KMManager {
       copyAssets(appContext);
 
       migrateOldKeyboardFiles(appContext);
+      // UpdateOldKeyboardsList() handled with KeyboardController later
       didCopyAssets = true;
     }
 
@@ -293,7 +297,8 @@ public final class KMManager {
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       initSystemKeyboard(appContext);
     } else {
-      Log.e(TAG, "Cannot initialize: Invalid keyboard type");
+      String msg = "Cannot initialize: Invalid keyboard type";
+      KMLog.LogError(TAG, msg);
     }
 
     JSONUtils.initialize(new File(getPackagesDir()));
@@ -571,7 +576,7 @@ public final class KMManager {
         }
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to copy assets. Error: " + e);
+      KMLog.LogException(TAG, "Failed to copy assets. Error: ", e);
     }
   }
 
@@ -603,7 +608,7 @@ public final class KMManager {
         result = 0;
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to copy asset. Error: " + e);
+      KMLog.LogException(TAG, "Failed to copy asset. Error: ", e);
       result = -1;
     }
     return result;
@@ -711,8 +716,73 @@ public final class KMManager {
       }
 
     } catch (IOException e) {
-      Log.e(TAG, "Failed to migrate assets. Error: " + e);
+      KMLog.LogException(TAG, "Failed to migrate assets. Error: ", e);
     }
+  }
+
+  /**
+   * Migrate keyboards list from the legacy dat file (HashMap) and returns a list of keyboards.
+   * 1. These deprecated keyboards: "us", "european", "european2" are also removed
+   * and replaced with "sil_euro_latin".
+   * 2. Undefined package ID set to "cloud"
+   * 3. Undefined version set to the latest file version
+   * 4. Check sil_euro_latin only added once
+   * Using the old keyboards list as paramter instead of keyboards file so this can be
+   * unit test.
+   * @param context Context
+   * @param dat_list ArrayList<HashMap<String, String>> Old keyboards list
+   * @return List<Keyboard> Migrated keyboards list
+   */
+  public static List<Keyboard> updateOldKeyboardsList(Context context, ArrayList<HashMap<String, String>> dat_list) {
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    if (dat_list == null) {
+      return list;
+    }
+
+    boolean defaultKeyboardInstalled = false;
+    for(HashMap<String, String> kbdMap : dat_list) {
+      final boolean isNewKeyboard = false;
+      String packageID = MapCompat.getOrDefault(kbdMap, KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+      String keyboardID = kbdMap.get(KMManager.KMKey_KeyboardID);
+      if (keyboardID == null) {
+        KMLog.LogError(TAG, "updateOldKeyboardsList: skipping keyboard with undefined keyboard ID");
+        continue;
+      }
+      String kbVersion = kbdMap.get(KMManager.KMKey_Version);
+      if (kbVersion == null) {
+        String latestKbVersion = getLatestKeyboardFileVersion(context, packageID, keyboardID);
+        if (latestKbVersion != null) {
+          kbVersion = latestKbVersion;
+        }
+      }
+      Keyboard k = new Keyboard(
+        packageID,
+        keyboardID,
+        kbdMap.get(KMManager.KMKey_KeyboardName),
+        kbdMap.get(KMManager.KMKey_LanguageID),
+        kbdMap.get(KMManager.KMKey_LanguageName),
+        kbVersion,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_CustomHelpLink, ""),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_KMPLink, ""),
+        isNewKeyboard,
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_Font, null),
+        MapCompat.getOrDefault(kbdMap, KMManager.KMKey_OskFont, null)
+      );
+
+      // Check that sil_euro_latin and its deprecated keyboards only get added once
+      if (keyboardID.equals("us") || keyboardID.equals("european") || keyboardID.equals("european2") ||
+          keyboardID.equals("sil_euro_latin")) {
+        if (!defaultKeyboardInstalled) {
+          list.add(Keyboard.DEFAULT_KEYBOARD);
+          defaultKeyboardInstalled = true;
+        }
+      } else {
+        // Otherwise add the keyboard
+        list.add(k);
+      }
+    }
+
+    return list;
   }
 
   /**
@@ -752,7 +822,7 @@ public final class KMManager {
         }
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to create Typeface: " + fontFilename);
+      KMLog.LogException(TAG, "Failed to create Typeface: " + fontFilename, e);
     }
     return font;
   }
@@ -784,7 +854,7 @@ public final class KMManager {
       modelObj.put("path", path);
       modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
-      Log.e(TAG, "Invalid lexical model to register");
+      KMLog.LogException(TAG, "Invalid lexical model to register", e);
       return false;
     }
 
@@ -876,7 +946,7 @@ public final class KMManager {
       int length = lexicalModelsList.size();
       for (int i = 0; i < length; i++) {
         HashMap<String, String> lmInfo = lexicalModelsList.get(i);
-        if (langId.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LanguageID))) {
+        if (BCP47.languageEquals(langId, lmInfo.get(KMManager.KMKey_LanguageID))) {
           return lmInfo;
         }
       }
@@ -1083,7 +1153,8 @@ public final class KMManager {
       return SystemKeyboard;
     } else {
       // What should we do if KeyboardType.KEYBOARD_TYPE_UNDEFINED?
-      Log.e("KMManager", "Invalid keyboard");
+      String msg = "Keyboard type undefined";
+      KMLog.LogError(TAG, msg);
       return null;
     }
   }
@@ -1205,6 +1276,7 @@ public final class KMManager {
 
         return PackageProcessor.getKeyboardVersion(kmpObject, keyboardID);
       } catch (Exception e) {
+        KMLog.LogException(TAG, "", e);
         return null;
       }
     }
@@ -1231,6 +1303,7 @@ public final class KMManager {
 
       return LexicalModelPackageProcessor.getPackageVersion(kmpObject);
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return null;
     }
   }
@@ -1512,7 +1585,8 @@ public final class KMManager {
   }
 
   public static void setGlobeKeyAction(KeyboardType kbType, GlobeKeyAction action) {
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+        action != GlobeKeyAction.GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD) {
       inappKbGlobeKeyAction = action;
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       sysKbGlobeKeyAction = action;
@@ -1849,6 +1923,10 @@ public final class KMManager {
                 break;
               case GLOBE_KEY_ACTION_ADVANCE_TO_NEXT_SYSTEM_KEYBOARD:
                 advanceToNextInputMode();
+                break;
+              case GLOBE_KEY_ACTION_SHOW_SYSTEM_KEYBOARDS:
+                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showInputMethodPicker();
                 break;
               default:
                 // Do nothing

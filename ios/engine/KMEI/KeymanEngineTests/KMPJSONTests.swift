@@ -27,6 +27,13 @@ class KMPJSONTests: XCTestCase {
 
     XCTAssertEqual(lang_km.name, "Central Khmer (Khmer, Cambodia)")
     XCTAssertEqual(lang_km.languageId, "km")
+
+    let lang_str_latn: KMPLanguage = try loadObjectFromJSON(at: TestUtils.PackageJSON.language_str_latn)
+
+    XCTAssertEqual(lang_str_latn.name, "SENĆOŦEN")
+    // Is upper-cased in the .json, but should be lower-cased on deserialization.
+    // Our language-tag matching is case-insensitive.
+    XCTAssertEqual(lang_str_latn.languageId, "str-latn")
   }
 
   // A helper method, since these are useful in two separate tests.

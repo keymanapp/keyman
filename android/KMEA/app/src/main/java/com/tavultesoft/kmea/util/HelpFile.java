@@ -5,7 +5,6 @@ import android.content.ClipDescription;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
@@ -16,7 +15,6 @@ import com.tavultesoft.kmea.util.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;
-
 
 public final class HelpFile {
   private static final String TAG = "HelpFile";
@@ -78,7 +76,7 @@ public final class HelpFile {
       } catch (NullPointerException e) {
         String message = "FileProvider undefined in app to load" + customHelp.toString();
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-        Log.e(TAG, message);
+        KMLog.LogException(TAG, message, e);
       }
     } else {
       i.setData(Uri.parse(helpFile));

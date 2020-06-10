@@ -10,6 +10,8 @@ import Foundation
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
 public struct InstallableKeyboard: Codable, LanguageResource {
+  public typealias FullID = FullKeyboardID
+  
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
@@ -51,8 +53,13 @@ public struct InstallableKeyboard: Codable, LanguageResource {
     return lgCode.lowercased()
   }
 
-  public var fullID: FullKeyboardID {
+  // Weird scheme due to https://stackoverflow.com/a/58774558.
+  public var typedFullID: FullKeyboardID {
     return FullKeyboardID(keyboardID: id, languageID: languageID)
+  }
+
+  public var fullID: FullKeyboardID {
+    return typedFullID
   }
 
   public init(id: String,

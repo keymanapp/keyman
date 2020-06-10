@@ -91,10 +91,10 @@ def change_to_keyboard(bus, keyboard_id):
     try:
         contextname = bus.current_input_context()
         ic = IBus.InputContext.get_input_context(contextname, bus.get_connection())
-        if bus_has_engine(bus, name) <= 0:
-            logging.warning("Could not find engine %s"%name)
+        if bus_has_engine(bus, keyboard_id) <= 0:
+            logging.warning("Could not find engine %s" % keyboard_id)
         else:
-            ic.set_engine(name)
+            ic.set_engine(keyboard_id)
     except Exception as e:
         logging.warning("Failed to change keyboard")
         logging.warning(e)

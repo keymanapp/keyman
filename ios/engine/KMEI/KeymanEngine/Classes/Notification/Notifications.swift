@@ -20,11 +20,11 @@ public struct LexicalModelDownloadFailedNotification {
   public let lmOrLanguageID: String
   public let error: Error
 }
-public typealias BatchUpdateStartedNotification = [LanguageResource]
+public typealias BatchUpdateStartedNotification = [AnyLanguageResource]
 
 public struct BatchUpdateCompletedNotification {
-  public let successes: [[LanguageResource]]
-  public let failures: [[LanguageResource]]
+  public let successes: [[AnyLanguageResource]]
+  public let failures: [[AnyLanguageResource]]
   public let errors: [Error]
 }
 

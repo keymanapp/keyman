@@ -1,7 +1,5 @@
 package com.tavultesoft.kmea.util;
 
-import android.util.Log;
-
 import java.lang.CharSequence;
 
 public final class CharSequenceUtil {
@@ -31,7 +29,7 @@ public final class CharSequenceUtil {
       } while ((lastIndex - counter >= 0) && (counter < dn) && (numPairs < dn));
       return numPairs;
     } catch (Exception e) {
-      Log.e(TAG, "Error in countSurrogatePairs: " + e);
+      KMLog.LogException(TAG, "Error in countSurrogatePairs: ", e);
       return numPairs;
     }
   }
@@ -60,7 +58,7 @@ public final class CharSequenceUtil {
       }
       return charsToRestore;
     } catch (Exception e) {
-      Log.e(TAG, "Error in restoreChars: " + e);
+      KMLog.LogException(TAG, "Error in restoreChars: ", e);
       return charsToRestore;
     }
   }

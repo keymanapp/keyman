@@ -39,9 +39,14 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
       return nil
     }
   }
-  
-  public var fullID: FullLexicalModelID {
+
+  // Weird scheme due to https://stackoverflow.com/a/58774558
+  public var typedFullID: FullLexicalModelID {
     return FullLexicalModelID(lexicalModelID: id, languageID: languageID)
+  }
+
+  public var fullID: FullLexicalModelID {
+    return typedFullID
   }
   
   public init(id: String,

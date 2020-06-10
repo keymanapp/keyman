@@ -16,10 +16,10 @@ private enum MigrationLevel {
 
 struct VersionResourceSet {
   var version: Version
-  var resources: [LanguageResource]
+  var resources: [AnyLanguageResource]
   // but how to handle deprecation?
 
-  init(version: Version, resources: [LanguageResource]) {
+  init(version: Version, resources: [AnyLanguageResource]) {
     self.version = version
     self.resources = resources
   }

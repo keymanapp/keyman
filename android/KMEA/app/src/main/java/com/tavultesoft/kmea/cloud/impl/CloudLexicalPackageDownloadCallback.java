@@ -1,7 +1,6 @@
 package com.tavultesoft.kmea.cloud.impl;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -12,6 +11,7 @@ import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONException;
 
@@ -68,9 +68,8 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
             }
           }
         }
-        catch (IOException | JSONException _e)
-        {
-          Log.e(TAG,_e.getLocalizedMessage(),_e);
+        catch (IOException | JSONException e) {
+          KMLog.LogException(TAG, "", e);
         }
       }
       else
