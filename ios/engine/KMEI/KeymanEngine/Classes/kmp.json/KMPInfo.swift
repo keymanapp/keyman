@@ -19,13 +19,16 @@ class KMPInfoItem: Codable {
 }
 
 class KMPInfo: Codable {
+  static let DEFAULT_VERSION = KMPInfoItem(description: "1.0.0")
+  static let AUTOGEN_VERSION = KMPInfoItem(description: "0.0.0")
+
   var name: KMPInfoItem? = nil
   var author: KMPInfoItem? = nil
   var copyright: KMPInfoItem? = nil
   var website: KMPInfoItem? = nil
   // If we're constructing one from scratch, set to the absolute minimal version.
   // This will automatically signal that the 'package' needs to be updated.
-  var version: KMPInfoItem? = KMPInfoItem(description: "0.0.0")
+  var version: KMPInfoItem? = KMPInfo.DEFAULT_VERSION
 
   enum CodingKeys: String, CodingKey {
     case name
@@ -33,5 +36,13 @@ class KMPInfo: Codable {
     case copyright
     case website
     case version
+  }
+
+  convenience init(version: String) {
+    self.init(version: KMPInfoItem(description: version))
+  }
+
+  init(version: KMPInfoItem) {
+    self.version = version
   }
 }

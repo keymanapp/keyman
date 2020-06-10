@@ -12,8 +12,6 @@ internal protocol AnyKMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
   var installableResources: [AnyLanguageResource] { get }
-
-  func matches(installable resource: AnyLanguageResource, requireLanguageMatch: Bool) -> Bool
 }
 
 protocol KMPResource: AnyKMPResource {
@@ -23,6 +21,12 @@ protocol KMPResource: AnyKMPResource {
   init?(from resource: LanguageResourceType)
 
   var typedInstallableResources: [LanguageResourceType] { get }
+
+  /**
+   * Designed to facilitate de-duplication of KMPResources when migrating cloud resources into the extracted KMP format
+   * for 14.0+ file management.
+   */
+  func hasMatchingMetadata(for resource: LanguageResourceType, ignoreLanguage: Bool) -> Bool
 }
 
 extension KMPResource {

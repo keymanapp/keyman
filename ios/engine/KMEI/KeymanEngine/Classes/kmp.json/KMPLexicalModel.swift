@@ -53,18 +53,14 @@ class KMPLexicalModel: Codable, KMPResource {
     self.version = self.version ?? version
   }
 
-  func matches(installable resource: AnyLanguageResource, requireLanguageMatch: Bool = true) -> Bool {
-    guard let resource = resource as? InstallableLexicalModel else {
-      return false
-    }
-
+  func hasMatchingMetadata(for resource: InstallableLexicalModel, ignoreLanguage: Bool = false) -> Bool {
     if id != resource.id {
       return false
     } else if version != resource.version {
       return false
     }
 
-    if requireLanguageMatch {
+    if !ignoreLanguage {
       let resourceMetadata = KMPLexicalModel(from: resource)!
       return languages.contains(where: { language in
         return language.languageId == resourceMetadata.languages[0].languageId
