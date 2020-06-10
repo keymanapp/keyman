@@ -26,8 +26,7 @@ class KMPInfo: Codable {
   var author: KMPInfoItem? = nil
   var copyright: KMPInfoItem? = nil
   var website: KMPInfoItem? = nil
-  // If we're constructing one from scratch, set to the absolute minimal version.
-  // This will automatically signal that the 'package' needs to be updated.
+  // If a package doesn't have this set, we default to 1.0.0.
   var version: KMPInfoItem? = KMPInfo.DEFAULT_VERSION
 
   enum CodingKeys: String, CodingKey {

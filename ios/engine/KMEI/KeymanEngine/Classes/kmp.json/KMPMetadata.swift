@@ -56,9 +56,12 @@ class KMPMetadata: Codable {
   internal init(from resource: AnyLanguageResource) {
     // First, the standard defaults.
     options = KMPOptions()
-    info = KMPInfo(version: KMPInfo.AUTOGEN_VERSION)
     keyboards = nil
     lexicalModels = nil
+
+    // If we're constructing one from scratch, set to the absolute minimal version.
+    // This will automatically signal that the 'package' needs to be updated.
+    info = KMPInfo(version: KMPInfo.AUTOGEN_VERSION)
 
     // Now to process the resource.
     var fileSet = [ KMPFile(resource.sourceFilename) ]
