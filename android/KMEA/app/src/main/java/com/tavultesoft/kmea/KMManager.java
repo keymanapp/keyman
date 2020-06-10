@@ -705,8 +705,7 @@ public final class KMManager {
         FileUtils.deleteDirectory(legacyFontsDir);
       }
 
-      // TODO: Investigate how to migrate cloud/ keyboards to packages/ ?
-      // Would need to query what associated files get moved
+      // cloud/ keyboards migrated to packages/ in migrateCloudKeyboards()
       // For now, can delete sil_euro_latin because it will be in packages/
       removeCloudKeyboard(KMDefault_KeyboardID);
 
@@ -800,6 +799,7 @@ public final class KMManager {
       if (packageID.equals(KMManager.KMDefault_UndefinedPackageID) &&
         (keyboardIndex != KeyboardController.INDEX_NOT_FOUND)) {
         Keyboard keyboardFromPackage = KeyboardController.getInstance().getKeyboardInfo(keyboardIndex);
+        // Create a copy of keyboardFromPackage, updating the language ID and language Name
         Keyboard migratedKeyboard = new Keyboard(
           keyboardFromPackage.getPackageID(),
           keyboardFromPackage.getKeyboardID(),
@@ -812,8 +812,6 @@ public final class KMManager {
           false,
           keyboardFromPackage.getFont(),
           keyboardFromPackage.getOSKFont());
-        // migratedKeyboard already contains the correct packageID. Just update language
-        migratedKeyboard.setLanguage(languageID, languageName);
         KeyboardController.getInstance().set(i, migratedKeyboard);
 
         // Remove the cloud keyboard file
