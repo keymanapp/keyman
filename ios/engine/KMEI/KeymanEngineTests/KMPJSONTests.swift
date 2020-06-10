@@ -238,10 +238,7 @@ class KMPJSONTests: XCTestCase {
     let codedJSON = try coder.encode(constructedMetadata_khmer_angkor)
 
     // Does not follow "draft 4" due to an empty array in a 'required' entry.
-    // let schemaURL = URL(string: "https://api.keyman.com/schemas/package.json")!
-
-    // An appropriately-tweaked version of the above link.  (Just removes the lone, problematic line.)
-    let schemaURL = TestUtils.PackageJSON.jsonBundle.url(forResource: "package-schema", withExtension: "json")!
+    let schemaURL = URL(string: "https://api.keyman.com/schemas/package.json")!
     let schemaData = try Data(contentsOf: schemaURL)
 
     // - arguments ready, time to build the POST-based request
