@@ -11,7 +11,7 @@ import Foundation
 public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalModel> {
   internal var models : [KMPLexicalModel]!
 
-  override init(metadata: KMPMetadata, folder: URL) {
+  override internal init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
     self.models = []
     

@@ -178,4 +178,54 @@ public class ResourceFileManager {
       completionHandler(error)
     }
   }
+
+  public func install<ResourceType: LanguageResource,
+                      PackageType: TypedKeymanPackage<ResourceType>> (
+                        resourceWithID fullID: ResourceType.FullID,
+                        from package: PackageType) throws {
+
+    guard let resource = package.findResource(withID: fullID) else {
+      throw KMPError.resourceNotInPackage
+    }
+
+    // (source, destination)
+    var installableFiles: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
+    let installableFonts: [(String, URL)] = resource.fonts.map { font in
+      // KMPs only list a single font file for each entry whenever one is included.
+      // A pre-existing assumption.
+      let fontFile = font.source[0]
+      return (fontFile, Storage.active.fontURL(forResource: resource, filename: fontFile)!)
+    }
+
+    installableFiles.append(contentsOf: installableFonts)
+
+    do {
+      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
+                                              withIntermediateDirectories: true)
+    } catch {
+      log.error("Could not create installation directory: \(error)")
+      throw KMPError.fileSystem
+    }
+
+    do {
+      for item in installableFiles {
+        var filePath = package.sourceFolder
+        filePath.appendPathComponent(item.0)
+        try copyWithOverwrite(from: filePath, to: item.1)
+      }
+    } catch {
+      log.error("Error installing the resource: \(error)")
+      throw KMPError.copyFiles
+    }
+
+    // There's no generalized method for this quite yet.  Manager doesn't need even
+    // more of these.
+    if let keyboard = resource as? InstallableKeyboard {
+      Manager.shared.addKeyboard(keyboard)
+    } else if let lexicalModel = resource as? InstallableLexicalModel {
+      Manager.addLexicalModel(lexicalModel)
+    } else {
+      fatalError("Cannot install instance of unexpected LanguageResource subclass")
+    }
+  }
 }

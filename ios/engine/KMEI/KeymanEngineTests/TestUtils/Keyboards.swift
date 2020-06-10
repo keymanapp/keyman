@@ -14,7 +14,7 @@ extension TestUtils {
     static let khmerAngkorKMP = TestUtils.keyboardsBundle.url(forResource: "khmer_angkor", withExtension: "kmp")!
     static let khmer_angkor =  InstallableKeyboard(id: "khmer_angkor",
                                                    name: "Khmer Angkor",
-                                                   languageID: "kh",
+                                                   languageID: "km",
                                                    languageName: "Khmer (Central)",
                                                    version: "1.0.6",
                                                    isRTL: false,
@@ -23,7 +23,7 @@ extension TestUtils {
                                                    isCustom: false)
     static let khmer10 =  InstallableKeyboard(id: "khmer10",
                                               name: "Khmer (NiDA)",
-                                              languageID: "kh",
+                                              languageID: "km",
                                               languageName: "Khmer (Central)",
                                               version: "1.3",
                                               isRTL: false,

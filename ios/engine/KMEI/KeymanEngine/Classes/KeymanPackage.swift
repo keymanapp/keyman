@@ -15,20 +15,39 @@ public enum KMPError : String, Error {
   case fileSystem = "Unable to create directory structure in file system."
   case copyFiles = "Unable to copy keyboard files to file system."
   case wrongPackageType = "Package provided does not match the type expected by this method"
+  case resourceNotInPackage = "Resource cannot be found in specified package"
 }
 
+/**
+ * Common base class for the different KeymanPackage types.
+ */
 public class KeymanPackage {
   static private let kmpFile = "kmp.json"
   public let sourceFolder: URL
   internal let metadata: KMPMetadata
 
-  init(metadata: KMPMetadata, folder: URL) {
+  internal init(metadata: KMPMetadata, folder: URL) {
     sourceFolder = folder
     self.metadata = metadata
   }
 
   public func isKeyboard() -> Bool {
     return metadata.packageType == .Keyboard
+  }
+
+  /**
+   * Returns the type of LanguageResource contained within the parsed Package.
+   */
+  public func resourceType() -> LanguageResourceType {
+    switch metadata.packageType {
+      case .Keyboard:
+        return .keyboard
+      case .LexicalModel:
+        return .lexicalModel
+      default:
+        // See KeymanPackage.parse below; an error is thrown there for case .Unsupported.
+        fatalError("KeymanPackage.parse failed to block construction of unsupported KeymanPackage instance")
+    }
   }
 
   // to be overridden by subclasses
@@ -67,7 +86,13 @@ public class KeymanPackage {
   public var installableResourceSets: [[AnyLanguageResource]] {
     fatalError("abstract base method went unimplemented by derived class")
   }
-  
+
+  /**
+   * Parses a decompressed KMP's metadata file, producing the typed KeymanPackage instance corresponding to it.
+   *
+   * Typecast the return value to either KeyboardKeymanPackage or LexicalModelKeymanPackage for richly-typed
+   * information about the package's contents.
+   */
   static public func parse(_ folder: URL) -> KeymanPackage? {
     do {
       var path = folder
@@ -132,5 +157,21 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
   // See https://forums.swift.org/t/confusing-limitations-on-covariant-overriding/16252
   public override var installableResourceSets: [[AnyLanguageResource]] {
     return installables
+  }
+
+  public func findResource(withID fullID: TypedLanguageResource.FullID) -> TypedLanguageResource? {
+    let matchesFound: [TypedLanguageResource] = self.installables.compactMap { set in
+      let setMatches: [TypedLanguageResource] = set.compactMap { other in
+        if fullID.id == other.id && fullID.languageID == other.languageID {
+          return other
+        } else {
+          return nil
+        }
+      }
+
+      return setMatches.count > 0 ? setMatches[0] : nil
+    }
+
+    return matchesFound.count > 0 ? matchesFound[0] : nil
   }
 }
