@@ -237,7 +237,6 @@ class KMPJSONTests: XCTestCase {
     let coder = JSONEncoder()
     let codedJSON = try coder.encode(constructedMetadata_khmer_angkor)
 
-    // Does not follow "draft 4" due to an empty array in a 'required' entry.
     let schemaURL = URL(string: "https://api.keyman.com/schemas/package.json")!
     let schemaData = try Data(contentsOf: schemaURL)
 
