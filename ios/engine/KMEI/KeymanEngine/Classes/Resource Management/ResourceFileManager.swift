@@ -179,9 +179,9 @@ public class ResourceFileManager {
     }
   }
 
-  public func install(_ resourceToMatch: LanguageResource, from package: KeymanPackage, usePackageDefinition: Bool = true) throws {
+  public func install(_ resourceToMatch: AnyLanguageResource, from package: KeymanPackage, usePackageDefinition: Bool = true) throws {
 
-    var res: LanguageResource
+    var res: AnyLanguageResource
     guard let r = package.findMatch(resourceToMatch) else {
       throw KMPError.resourceNotInPackage
     }

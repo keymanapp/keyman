@@ -118,9 +118,9 @@ public class KeymanPackage {
                       })
   }
 
-  public func findMatch(_ resource: LanguageResource) -> LanguageResource? {
-    let matchesFound: [LanguageResource] = self.installableResourceSets.compactMap { set in
-      let setMatches: [LanguageResource] = set.compactMap { other in
+  public func findMatch(_ resource: AnyLanguageResource) -> AnyLanguageResource? {
+    let matchesFound: [AnyLanguageResource] = self.installableResourceSets.compactMap { set in
+      let setMatches: [AnyLanguageResource] = set.compactMap { other in
         if resource.id == other.id && resource.languageID == other.languageID {
           return other
         } else {
