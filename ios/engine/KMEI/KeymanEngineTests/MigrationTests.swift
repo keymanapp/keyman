@@ -27,6 +27,11 @@ class MigrationTests: XCTestCase {
 
     // TODO:  Actual migration unit testing.  So far, this is really more of a
     //        TestUtils.Migrations.applyBundleToFileSystem unit test.
+    do {
+      try Migrations.migrateCloudResourcesToKMPFormat()
+    } catch {
+      // TODO:
+    }
   }
 
   func testVersion12ResourceMigration() {

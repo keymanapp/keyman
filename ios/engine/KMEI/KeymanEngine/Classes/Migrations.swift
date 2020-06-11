@@ -490,4 +490,30 @@ public enum Migrations {
       }
     }
   }
+
+  static func migrateCloudResourcesToKMPFormat() throws {
+    let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+
+    do {
+      let files = try FileManager.default.contentsOfDirectory(atPath: cachedKMPsDirectory.path)
+      let kmpFiles = files.filter { $0.suffix(4) == ".kmp" }
+
+      // Step 1 - analyze all locally-cached KMPs for possible resource sources.
+      let cachedPackages: [KeymanPackage] = kmpFiles.compactMap { file in
+        let filePath = cachedKMPsDirectory.appendingPathComponent(file)
+        do {
+          return try ResourceFileManager.shared.prepareKMPInstall(from: filePath)
+        } catch {
+          log.debug("Error occurred when processing existing packages during cloud -> KMP migration: \(String(describing: error))")
+          return nil as KeymanPackage?
+        }
+      }
+
+      let userDefaults = Storage.active.userDefaults
+//      let userKeyboards = userDefaults.userKeyboards
+//      let userLexicalModels = userDefaults.userLexicalModels
+    } catch {
+      // TODO:
+    }
+  }
 }
