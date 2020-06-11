@@ -26,22 +26,20 @@ class FileManagementTests: XCTestCase {
     XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
     XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
 
-    ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true) { innerError in
-      XCTAssertNil(innerError, "Error occurred while finalizing KMP installation")
+    try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true)
 
-      let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
+    let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
 
-      XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
-                    "Could not find installed keyboard file")
+    XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                  "Could not find installed keyboard file")
 
-      let keyboards = Storage.active.userDefaults.userKeyboards!
+    let keyboards = Storage.active.userDefaults.userKeyboards!
 
-      XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
-      XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
+    XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
+    XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
 
-      let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
-      XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
-    }
+    let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
+    XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
   }
 
   func testLexicalModelInstallation() throws {
@@ -49,21 +47,19 @@ class FileManagementTests: XCTestCase {
     XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
     XCTAssertNotNil(kmp as? LexicalModelKeymanPackage, "KMP resource type improperly recognized - expected a lexical model package!")
 
-    ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true) { innerError in
-      XCTAssertNil(innerError, "Error occurred while finalizing KMP installation")
+    try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true)
 
-      let installURL = Storage.active.lexicalModelURL(forID: "nrc.en.mtnt", version: "0.1.4")
+    let installURL = Storage.active.lexicalModelURL(forID: "nrc.en.mtnt", version: "0.1.4")
 
-      XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
-                    "Could not find installed lexical model file")
+    XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
+                  "Could not find installed lexical model file")
 
-      let models = Storage.active.userDefaults.userLexicalModels!
+    let models = Storage.active.userDefaults.userLexicalModels!
 
-      // Yep, the model auto-installs for all language ids, even when there's no matching keyboard.
-      // That's the current state of affairs in Keyman Engine for iOS.
-      XCTAssertEqual(models.count, 3, "Unexpected number of models were installed")
-      XCTAssertEqual(models[0].id, "nrc.en.mtnt", "Installed lexical model ID mismatch")
-    }
+    // Yep, the model auto-installs for all language ids, even when there's no matching keyboard.
+    // That's the current state of affairs in Keyman Engine for iOS.
+    XCTAssertEqual(models.count, 3, "Unexpected number of models were installed")
+    XCTAssertEqual(models[0].id, "nrc.en.mtnt", "Installed lexical model ID mismatch")
   }
 
   func testInstallKeyboardFromPackage() throws {

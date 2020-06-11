@@ -59,7 +59,12 @@ public class PackageInstallViewController: UIViewController {
 
   @objc func installBtnHandler() {
     dismiss(animated: true, completion: {
-      ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom, completionHandler: self.completionHandler)
+      do {
+        try ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom)
+        self.completionHandler(nil)
+      } catch {
+        self.completionHandler(error)
+      }
     })
   }
 }

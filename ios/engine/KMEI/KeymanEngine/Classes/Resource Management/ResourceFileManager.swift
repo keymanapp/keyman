@@ -119,6 +119,9 @@ public class ResourceFileManager {
     }
   }
 
+  /**
+   * A  utility version of `prepareKMPInstall` that displays default UI alerts if errors occur when preparing a KMP for installation.
+   */
   public func prepareKMPInstall(from url: URL, alertHost: UIViewController) -> KeymanPackage? {
     do {
       return try self.prepareKMPInstall(from: url)
@@ -177,26 +180,26 @@ public class ResourceFileManager {
   /**
    * Performs the actual installation of a package's resources once confirmation has been received from the user.
    */
-  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool, completionHandler: (Error?) -> Void) {
-    do {
-      // Time to pass the package off to the final installers - the parse__KMP methods.
-      // TODO: (14.0+) These functions should probably be refactored to within this class eventually.
-      if package.isKeyboard() {
-        try Manager.shared.parseKbdKMP(package.sourceFolder, isCustom: isCustom)
-      } else {
-        try Manager.parseLMKMP(package.sourceFolder, isCustom: isCustom)
-      }
-      completionHandler(nil)
-    } catch {
-      log.error(error as! KMPError)
-      completionHandler(error)
+  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool) throws {
+    // Time to pass the package off to the final installers - the parse__KMP methods.
+    // TODO: (14.0+) These functions should probably be refactored to within this class eventually.
+    if package.isKeyboard() {
+      try Manager.shared.parseKbdKMP(package.sourceFolder, isCustom: isCustom)
+    } else {
+      try Manager.parseLMKMP(package.sourceFolder, isCustom: isCustom)
     }
 
-    //this can fail gracefully and not show errors to users
+    // Note:  package.sourceFolder is a temporary directory, as set by preparePackageInstall.
+    try FileManager.default.removeItem(at: package.sourceFolder)
+  }
+
+  @available(*, deprecated)
+  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool, completionHandler: (Error?) -> Void) {
     do {
-      try FileManager.default.removeItem(at: package.sourceFolder)
+      try finalizePackageInstall(package, isCustom: isCustom)
+      completionHandler(nil)
     } catch {
-      log.error("unable to delete temp files: \(error)")
+      log.error(error)
       completionHandler(error)
     }
   }
