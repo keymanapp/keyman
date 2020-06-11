@@ -26,6 +26,7 @@ public struct InstallableKeyboard: Codable, LanguageResource {
   }
 
   public private(set) var id: String
+  public internal(set) var packageID: String? = nil
   public var name: String
   public private(set) var lgCode: String
   public var languageName: String

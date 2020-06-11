@@ -25,6 +25,8 @@ public protocol LanguageResourceFullID {
 public protocol AnyLanguageResource {
   var id: String { get }
   var languageID: String { get }
+  // Was not always tracked within KeymanEngine - is optional for legacy reasons.
+  var packageID: String? { get }
   var fullID: LanguageResourceFullID { get }
   var version: String { get }
 
