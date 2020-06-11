@@ -15,6 +15,20 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
+  func testVersion13CloudToKMPMigration() {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
+
+    let userKeyboards = Storage.active.userDefaults.userKeyboards!
+    let userModels = Storage.active.userDefaults.userLexicalModels!
+
+    // A baseline load-check; confirms we have the correct resource count at the start.
+    XCTAssertEqual(userKeyboards.count, 7)
+    XCTAssertEqual(userModels.count, 6)
+
+    // TODO:  Actual migration unit testing.  So far, this is really more of a
+    //        TestUtils.Migrations.applyBundleToFileSystem unit test.
+  }
+
   func testVersion12ResourceMigration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_12)
 
