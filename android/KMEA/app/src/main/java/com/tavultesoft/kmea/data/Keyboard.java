@@ -85,6 +85,15 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.oskFont = (oskFont != null) ? oskFont : "";
   }
 
+  public Keyboard(Keyboard k) {
+    super(k.getPackageID(), k.getKeyboardID(), k.getKeyboardName(),
+      k.getLanguageID(), k.getLanguageName(), k.getVersion(),
+      k.getHelpLink(), k.getUpdateKMP());
+    this.isNewKeyboard = false;
+    this.font = k.getFont();
+    this.oskFont = k.getOSKFont();
+  }
+
   public String getKeyboardID() { return getResourceID(); }
   public String getKeyboardName() { return getResourceName(); }
 

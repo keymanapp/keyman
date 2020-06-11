@@ -788,35 +788,35 @@ public final class KMManager {
   public static void migrateCloudKeyboards(Context context) {
     boolean keyboardMigrated = false;
     for(int i=0; i<KeyboardController.getInstance().get().size(); i++) {
+      // Cloud keyboard info
       Keyboard k = KeyboardController.getInstance().getKeyboardInfo(i);
-      String packageID = k.getPackageID();
-      String keyboardID = k.getKeyboardID();
-      String languageID = k.getLanguageID();
-      String languageName = k.getLanguageName();
-      // See if packageID=keyboardID exists (blank language ID),
-      int keyboardIndex = KeyboardController.getInstance().getKeyboardIndex(
-        keyboardID, keyboardID, "");
-      if (packageID.equals(KMManager.KMDefault_UndefinedPackageID) &&
-        (keyboardIndex != KeyboardController.INDEX_NOT_FOUND)) {
-        Keyboard keyboardFromPackage = KeyboardController.getInstance().getKeyboardInfo(keyboardIndex);
-        // Create a copy of keyboardFromPackage, updating the language ID and language Name
-        Keyboard migratedKeyboard = new Keyboard(
-          keyboardFromPackage.getPackageID(),
-          keyboardFromPackage.getKeyboardID(),
-          keyboardFromPackage.getKeyboardName(),
-          languageID,
-          languageName,
-          keyboardFromPackage.getVersion(),
-          keyboardFromPackage.getHelpLink(),
-          keyboardFromPackage.getUpdateKMP(),
-          false,
-          keyboardFromPackage.getFont(),
-          keyboardFromPackage.getOSKFont());
-        KeyboardController.getInstance().set(i, migratedKeyboard);
+      if (k.getPackageID().equals(KMManager.KMDefault_UndefinedPackageID)) {
+        String keyboardID = k.getKeyboardID();
+        // We'll want to preserve language fields
+        String languageID = k.getLanguageID();
+        String languageName = k.getLanguageName();
 
-        // Remove the cloud keyboard file
-        removeCloudKeyboard(keyboardID);
-        keyboardMigrated = true;
+        // Look for a non-cloud packageID. See if there's one from the updateKMP field,
+        // otherwise fall back to keyboardID
+        String packageID = keyboardID;
+        if (k.getUpdateKMP() != null && !k.getUpdateKMP().isEmpty()) {
+          packageID = FileUtils.getFilename(k.getUpdateKMP()).replace(FileUtils.KEYMANPACKAGE, "");
+        }
+
+        // See if there's a matching keyboard of (package ID, keyboardID, ignoring language ID)
+        int keyboardIndex = KeyboardController.getInstance().getKeyboardIndex(
+          packageID, keyboardID, "");
+        if (keyboardIndex != KeyboardController.INDEX_NOT_FOUND) {
+          Keyboard keyboardFromPackage = KeyboardController.getInstance().getKeyboardInfo(keyboardIndex);
+          // Create a copy of keyboardFromPackage, updating the language ID and language Name
+          Keyboard migratedKeyboard = new Keyboard(keyboardFromPackage);
+          migratedKeyboard.setLanguage(languageID, languageName);
+          KeyboardController.getInstance().set(i, migratedKeyboard);
+
+          // Remove the cloud keyboard files
+          removeCloudKeyboard(keyboardID);
+          keyboardMigrated = true;
+        }
       }
     }
 

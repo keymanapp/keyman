@@ -46,6 +46,11 @@ public abstract class LanguageResource implements Serializable {
 
   public String getLanguageName() { return languageName; }
 
+  public void setLanguage(String languageID, String languageName) {
+    this.languageID = languageID;
+    this.languageName = languageName;
+  }
+
   public String getVersion() { return version; }
 
   public String getPackageID() { return packageID; }
