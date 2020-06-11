@@ -154,7 +154,21 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
     b. If you choose to use your own build of the Keyman Engine, get the library from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
-4. After the `android {}` object, include the following:
+4. Check that the `android{}` object, includes the following:
+```gradle
+android {
+    compileSdkVersion 29
+
+    // Don't compress kmp files so they can be copied via AssetManager
+    aaptOptions {
+        noCompress "kmp"
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+```
+5. After the `android {}` object, include the following:
 ````gradle
 repositories {
     flatDir {
@@ -165,15 +179,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.1'
-    implementation 'com.google.android.material:material:1.0.0'
-    api (name:'keyman-engine', ext:'aar')
-    implementation "com.google.firebase:firebase-analytics:17.2.1"
-    implementation "com.google.firebase:firebase-messaging:20.0.1"
-    implementation "com.google.firebase:firebase-crash:16.2.1"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
+    implementation 'androidx.appcompat:appcompat:1.2.0-alpha03'
+    implementation 'com.google.android.material:material:1.1.0'
+    api(name: 'keyman-engine', ext: 'aar')
+    implementation 'io.sentry:sentry-android:2.0.1'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:2.6.0') {
