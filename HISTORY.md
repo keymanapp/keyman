@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.91 alpha 2020-06-11
+
+* chore(android): Remove google-services and update readme (#3228)
+
 ## 14.0.90 alpha 2020-06-10
 
 * refactor(ios/engine): Language resource + keying polymorphism (#3220)
