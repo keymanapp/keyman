@@ -20,18 +20,6 @@ android {
         minSdkVersion 21
         targetSdkVersion 29
 
-        String env_services_json_file = System.getenv('oem_firstvoices_services_json_file')
-
-        if (env_services_json_file != null) {
-            env_services_json_file = String.valueOf(env_services_json_file)
-            println "Copying production google-services.json and using for firstvoices"
-            copy {
-                from env_services_json_file
-                include '*.json'
-                into './'
-            }
-        }
-
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
@@ -125,5 +113,4 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.0'
 }
 
-apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.android.application'

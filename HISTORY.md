@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.90 alpha 2020-06-10
+
+* refactor(ios/engine): Language resource + keying polymorphism (#3220)
+* refactor(ios): Selective resource installation via abstraction (#3207)
+* feat(ios/engine): Generation of kmp.json for non-package resources (#3212)
+
+## 14.0.89 alpha 2020-06-09
+
+* fix(android/engine): Revise updateOldKeyboardsList (#3216)
+* feat(ios/engine): embedded KeymanWeb engine Sentry use (#3218)
+* feat(android): Handle model picker updates (#3209)
+
 ## 14.0.88 alpha 2020-06-08
 
 * modify(android/samples): Update addKeyboard syntax for Sample and Test apps (#3213)

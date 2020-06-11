@@ -11,14 +11,23 @@ import Foundation
 class KMPInfoItem: Codable {
   var description: String
   var url: String?
+
+  init(description: String, url: String? = nil) {
+    self.description = description
+    self.url = url
+  }
 }
 
 class KMPInfo: Codable {
-  var name: KMPInfoItem?
-  var author: KMPInfoItem?
-  var copyright: KMPInfoItem?
-  var website: KMPInfoItem?
-  var version: KMPInfoItem?
+  static let DEFAULT_VERSION = KMPInfoItem(description: "1.0.0")
+  static let AUTOGEN_VERSION = KMPInfoItem(description: "0.0.0")
+
+  var name: KMPInfoItem? = nil
+  var author: KMPInfoItem? = nil
+  var copyright: KMPInfoItem? = nil
+  var website: KMPInfoItem? = nil
+  // If a package doesn't have this set, we default to 1.0.0.
+  var version: KMPInfoItem? = KMPInfo.DEFAULT_VERSION
 
   enum CodingKeys: String, CodingKey {
     case name
@@ -26,5 +35,13 @@ class KMPInfo: Codable {
     case copyright
     case website
     case version
+  }
+
+  convenience init(version: String) {
+    self.init(version: KMPInfoItem(description: version))
+  }
+
+  init(version: KMPInfoItem) {
+    self.version = version
   }
 }

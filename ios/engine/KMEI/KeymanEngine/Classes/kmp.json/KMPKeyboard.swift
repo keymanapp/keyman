@@ -28,6 +28,18 @@ class KMPKeyboard: Codable, KMPResource {
     case isRTL = "rtl"
     case languages
   }
+
+  internal required init?(from keyboard: InstallableKeyboard) {
+    self.name = keyboard.name
+    self.keyboardId = keyboard.id
+    self.version = keyboard.version
+    self.isRTL = keyboard.isRTL
+
+    self.font = keyboard.font?.source[0]
+    self.osk = keyboard.oskFont?.source[0]
+
+    self.languages = [KMPLanguage(name: keyboard.languageName, languageId: keyboard.languageID)]
+  }
   
   required public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -39,6 +51,23 @@ class KMPKeyboard: Codable, KMPResource {
     font = try values.decodeIfPresent(String.self, forKey: .font)
     isRTL = try values.decodeIfPresent(Bool.self, forKey: .isRTL) ?? false
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
+  }
+
+  func hasMatchingMetadata(for resource: InstallableKeyboard, ignoreLanguage: Bool = false) -> Bool {
+    if id != resource.id {
+      return false
+    } else if version != resource.version {
+      return false
+    }
+
+    if !ignoreLanguage {
+      let resourceMetadata = KMPKeyboard(from: resource)!
+      return languages.contains(where: { language in
+        return language.languageId == resourceMetadata.languages[0].languageId
+      })
+    }
+
+    return true
   }
 
   internal var installableKeyboards: [InstallableKeyboard] {
@@ -60,7 +89,15 @@ class KMPKeyboard: Codable, KMPResource {
     return installableKeyboards
   }
 
-  public var installableResources: [LanguageResource] {
+  // Needed to properly support AnyKMPResource.installableResources
+  // because of weird, weird Swift rules.
+  public var typedInstallableResources: [InstallableKeyboard] {
+    return installableKeyboards
+  }
+
+  // Provides our class's method of the same signature, but with
+  // the local type signature we know is available.
+  public var installableResources: [InstallableKeyboard] {
     return installableKeyboards
   }
 

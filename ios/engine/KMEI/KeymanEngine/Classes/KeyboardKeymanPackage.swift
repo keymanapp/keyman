@@ -8,10 +8,10 @@
 
 import Foundation
 
-public class KeyboardKeymanPackage : KeymanPackage {
+public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
   internal var keyboards: [KMPKeyboard]!
 
-  override init(metadata: KMPMetadata, folder: URL) {
+  override internal init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
     self.keyboards = []
     
@@ -24,6 +24,8 @@ public class KeyboardKeymanPackage : KeymanPackage {
         }
       }
     }
+
+    self.setInstallableResourceSets(for: keyboards)
   }
   
   public override func defaultInfoHtml() -> String {
@@ -34,7 +36,7 @@ public class KeyboardKeymanPackage : KeymanPackage {
     return str
   }
 
-  override var resources: [KMPResource] {
+  override var resources: [AnyKMPResource] {
     return keyboards
   }
 }
