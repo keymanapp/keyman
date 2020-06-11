@@ -16,10 +16,10 @@ extension TestUtils {
     // Important locations within Migration-test .bundles
     // Generate these from the Application folder.
     static let documentsFolder = "Documents"
-    static let baseFolder = "Library/keyman"
 
     // Generate these from the AppGroup.
-    //static let userDefaults = "Library/Preferences/Tavultesoft.Keyman.plist"
+    static let baseFolder = "Library/keyman"  // in the AppGroup context, 'keyman' may be a sibling
+                                              // folder to 'Library'.
     static let userDefaults = "Library/Preferences/group.KM4I.plist"
 
     // Bundle references
