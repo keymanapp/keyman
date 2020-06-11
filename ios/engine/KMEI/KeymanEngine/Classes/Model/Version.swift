@@ -33,6 +33,10 @@ public class Version: NSObject, Comparable {
   public static let fileBrowserImplemented = Version("13.0")!
   public static let defaultsNeedBackup = Version("13.0.65")!
 
+  // A major shift in where resources are installed occurred during
+  // the 14.0 alpha.
+  public static let packageBasedFileReorg = Version("14.0")!
+
   private let components: [Int]
   public let plainString: String
   public let fullString: String

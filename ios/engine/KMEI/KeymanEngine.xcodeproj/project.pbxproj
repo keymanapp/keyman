@@ -181,6 +181,7 @@
 		CE88042F247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */; };
 		CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */; };
 		CE8B0BBF248764ED0045EB2E /* KMPResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBE248764ED0045EB2E /* KMPResource.swift */; };
+		CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */; };
 		CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* FileManagementTests.swift */; };
 		CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */; };
 		CE973D812484A56500F66045 /* PackageJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE973D802484A56500F66045 /* PackageJSON.swift */; };
@@ -464,6 +465,7 @@
 		CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectationDownloaderDelegate.swift; sourceTree = "<group>"; };
 		CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanPackageTests.swift; sourceTree = "<group>"; };
 		CE8B0BBE248764ED0045EB2E /* KMPResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPResource.swift; sourceTree = "<group>"; };
+		CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "13.0 Cloud to Package Migration.bundle"; sourceTree = "<group>"; };
 		CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionTests.swift; sourceTree = "<group>"; };
 		CE973D802484A56500F66045 /* PackageJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageJSON.swift; sourceTree = "<group>"; };
 		CE973D822484A5DB00F66045 /* PackageJSON.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PackageJSON.bundle; sourceTree = "<group>"; };
@@ -831,6 +833,7 @@
 		CE37C38923FCC9AF007031C6 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */,
 				CE973D822484A5DB00F66045 /* PackageJSON.bundle */,
 				CEF888D023FE6ADE00667693 /* No-defaults 10.0 Migration.bundle */,
 				CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */,
@@ -858,6 +861,7 @@
 				CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */,
 				CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */,
 				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
+				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
 			);
 			path = "Resource Management";
 			sourceTree = "<group>";
@@ -1018,7 +1022,6 @@
 				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
 				CE7A26DA23CEEF640005955C /* Colors.swift */,
 				C0B09EAD1FCFD10F002F39AF /* FontManager.swift */,
-				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
 				C05B14321FD914870082A316 /* Log.swift */,
 				C08E698C1FDA392D0026056B /* Migrations.swift */,
@@ -1255,6 +1258,7 @@
 				CE973D832484A5DC00F66045 /* PackageJSON.bundle in Resources */,
 				CEF888D223FE6ADF00667693 /* No-defaults 10.0 Migration.bundle in Resources */,
 				CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */,
+				CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
 				CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */,
 				CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */,
