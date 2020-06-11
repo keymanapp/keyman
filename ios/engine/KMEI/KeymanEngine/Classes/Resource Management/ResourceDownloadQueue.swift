@@ -544,8 +544,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
     var installedLexicalModel: InstallableLexicalModel? = nil
 
-    ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile, completionHandler: { kmp, error in
-      if let kmp = kmp as! LexicalModelKeymanPackage? {
+    do {
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile)
+      if let kmp = package as? LexicalModelKeymanPackage {
         do {
           ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false, completionHandler: { error in
               if error != nil {
@@ -562,9 +563,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           log.error("Error installing the lexical model: \(error)")
         }
       } else {
-        log.error("Error extracting the lexical model from the package: \(String(describing: error))")
+        log.error("Provided package did not contain lexical models.")
       }
-    })
+    } catch {
+      log.error("Error extracting the lexical model from the package: \(String(describing: error))")
+    }
     return installedLexicalModel
   }
 }
