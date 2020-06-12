@@ -843,10 +843,11 @@ public final class KMManager {
       public boolean accept(File pathname) {
         String name = pathname.getName();
 
-        String patternStr = String.format("^(%s)-([0-9.]+)(\\.js)$", keyboardID);
+        String patternStr = String.format("^([A-Za-z0-9-_]+)-([0-9.]+)(\\.js)$");
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(name);
-        if (matcher.matches() && (matcher.group(1) != null)) {
+        if (matcher.matches() && (matcher.groupCount() == 3) &&
+            (matcher.group(1).equals(keyboardID)) && (matcher.group(2) != null)) {
           return true;
         }
         return false;
