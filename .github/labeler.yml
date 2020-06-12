@@ -12,7 +12,9 @@ android/engine/: android/KMEA/**
 #android/resources/:
 android/samples/: android/Samples/**
 
-common/: common/**
+common/:
+  - common/**
+  - resources/**
 common/core/: common/core/**
 common/core/desktop/: common/core/desktop/**
 common/core/web/: common/core/web/**
