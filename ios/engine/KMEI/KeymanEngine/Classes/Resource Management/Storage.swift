@@ -259,7 +259,7 @@ extension Storage {
     // Since we only want to do this installation the first time (rather than constantly force-reinstalling
     // the resource), we don't want this excluded from backup.
     try Storage.copy(from: bundle,
-                     resourceName: "\(Defaults.keyboard.id)-\(Defaults.keyboard.version).js",
+                     resourceName: "\(Defaults.keyboard.id).js",
                      dstDir: defaultKeyboardDir,
                      excludeFromBackup: false)
     try Storage.copy(from: bundle,
@@ -276,25 +276,17 @@ extension Storage {
     // Since we only want to do this installation the first time (rather than constantly force-reinstalling
     // the resource), we don't want this excluded from backup.
     try Storage.copy(from: bundle,
-                     resourceName: "\(Defaults.lexicalModel.id)-\(Defaults.lexicalModel.version).model.kmp",
+                     resourceName: "\(Defaults.lexicalModel.id).model.kmp",
                      dstDir: defaultLexicalModelDir,
                      excludeFromBackup: false)
 
     // Perform an auto-install of the lexical model's KMP if not already installed.
-    let lexicalModelURLasZIP = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
-                                                                    asZip: true)
     let lexicalModelURL = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
                                                                 asZip: false)
 
-    // Because of how our .zip dependency works, we need to make the .kmp look like a .zip.  A simple rename will do.
     do {
-      try Storage.copy(at: lexicalModelURL, to: lexicalModelURLasZIP, excludeFromBackup: true)
-      let downloader = ResourceDownloadQueue()
-
-      // Hijacking the download queue's KMP installer.
-      // Issue - requests DL confirmation
-      // Issue - in a roundabout way, results in attempted access to Manager.shared during Manager.init, causing crash.
-      _ = downloader.installLexicalModelPackage(downloadedPackageFile: lexicalModelURLasZIP)
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: lexicalModelURL)
+      try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
     }

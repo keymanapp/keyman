@@ -53,6 +53,7 @@ class MigrationTests: XCTestCase {
 
   func testVersion12AdhocMigration() throws {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.adhoc_12)
+    Storage.active.userDefaults.lastEngineVersion = Version.firstTracked
     Migrations.migrate(storage: Storage.active)
 
     // The files in the .documents directory should be erased after this method is run.
@@ -69,6 +70,7 @@ class MigrationTests: XCTestCase {
 
   func testVersion10ResourceMigration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_10)
+    Storage.active.userDefaults.lastEngineVersion = nil
     Migrations.updateResources(storage: Storage.active)
 
     let userDefaults = Storage.active.userDefaults
@@ -98,6 +100,7 @@ class MigrationTests: XCTestCase {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.noDefault_10)
     Migrations.updateResources(storage: Storage.active)
 
+    Storage.active.userDefaults.lastEngineVersion = nil
     let userDefaults = Storage.active.userDefaults
 
     // No new resources should be installed - only what was originally present should be there.
