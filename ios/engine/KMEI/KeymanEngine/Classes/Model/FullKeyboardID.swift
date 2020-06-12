@@ -9,7 +9,7 @@
 import Foundation
 
 /// A complete identifier for an `InstallableKeyboard`. Keyboards must have unique `FullKeyboardID`s.
-public struct FullKeyboardID: Codable, LanguageResourceFullID {
+public struct FullKeyboardID: Codable, LanguageResourceFullID, Equatable {
   public var keyboardID: String
   public var languageID: String
 
@@ -19,13 +19,6 @@ public struct FullKeyboardID: Codable, LanguageResourceFullID {
 
   public var type: LanguageResourceType {
     return .keyboard
-  }
-}
-
-// MARK: - Equatable
-extension FullKeyboardID: Equatable {
-  public static func ==(lhs: FullKeyboardID, rhs: FullKeyboardID) -> Bool {
-    return lhs.keyboardID == rhs.keyboardID && lhs.languageID == rhs.languageID
   }
 }
 

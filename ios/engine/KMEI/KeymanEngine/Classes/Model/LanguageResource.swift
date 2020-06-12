@@ -12,10 +12,17 @@ public enum LanguageResourceType {
   case keyboard, lexicalModel
 }
 
+// Subclasses must implement Equatable; Swift doesn't like it directly on the root protocol.
 public protocol LanguageResourceFullID {
   var id: String { get }
   var languageID: String { get }
   var type: LanguageResourceType { get }
+}
+
+extension LanguageResourceFullID where Self: Equatable {
+  public static func ==(lhs: Self, rhs: Self) -> Bool {
+    return lhs.id == rhs.id && lhs.languageID == rhs.languageID && lhs.type == rhs.type
+  }
 }
 
 // Alas, 'associatedtype' stuff isn't exactly generic, and it's impossible to wildcard.
@@ -41,7 +48,7 @@ public protocol AnyLanguageResource {
 // Necessary due to Swift details 'documented' at
 // https://stackoverflow.com/questions/42561685/why-cant-a-get-only-property-requirement-in-a-protocol-be-satisfied-by-a-proper
 public protocol LanguageResource: AnyLanguageResource {
-  associatedtype FullID: LanguageResourceFullID
+  associatedtype FullID: LanguageResourceFullID where FullID: Equatable
   var typedFullID: FullID { get }
 }
 
