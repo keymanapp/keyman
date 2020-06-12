@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.92 alpha 2020-06-12
+
+* change(ios/engine): Package migration prep (#3229)
+* chore: labeler (#3233)
+* feat(android/engine): Migrate cloud keyboards when updating keyboard package (#3221)
+* refactor(ios/engine): explicitly synchronous Package processing (#3230)
+* feat(ios/engine): KeymanPackage now parses its ID (#3234)
+* fix(windows): sentry exception reports (#3235)
+
 ## 14.0.91 alpha 2020-06-11
 
 * chore(android): Remove google-services and update readme (#3228)
