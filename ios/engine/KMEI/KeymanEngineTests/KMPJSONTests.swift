@@ -205,6 +205,7 @@ class KMPJSONTests: XCTestCase {
 
     // Three models are listed; we choose the second variant since it uses a different language
     // code than specified under TestUtils.LexicalModels.mtnt.
+    kmp_mtnt.packageId = "nrc.en.mtnt" // We didn't load the full package, so the id's unset.
     let constructed_mtnt: KMPLexicalModel = KMPLexicalModel(from: kmp_mtnt.installableResources[1])!
 
     XCTAssertFalse(constructed_mtnt.hasMatchingMetadata(for: TestUtils.LexicalModels.mtnt))

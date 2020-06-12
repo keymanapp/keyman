@@ -9,8 +9,9 @@
 import Foundation
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
-public struct InstallableKeyboard: Codable, LanguageResource {
+public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
   public typealias FullID = FullKeyboardID
+  internal typealias Metadata = KMPKeyboard
   
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
@@ -26,7 +27,7 @@ public struct InstallableKeyboard: Codable, LanguageResource {
   }
 
   public private(set) var id: String
-  public internal(set) var packageID: String? = nil
+  public private(set) var packageID: String? = nil
   public var name: String
   public private(set) var lgCode: String
   public var languageName: String
@@ -93,6 +94,25 @@ public struct InstallableKeyboard: Codable, LanguageResource {
     self.font = keyboard.font
     self.oskFont = keyboard.oskFont
     self.isCustom = isCustom
+  }
+
+  internal init?(from metadata: KMPKeyboard, packageID: String, lgCode: String) {
+    self.id = metadata.id
+    self.name = metadata.name
+    self.lgCode = lgCode
+
+    let languageMatches = metadata.languages.compactMap { return $0.languageId == lgCode ? $0.name : nil }
+    guard languageMatches.count == 1 else {
+      return nil
+    }
+
+    self.languageName = languageMatches[0]
+    self.version = metadata.version
+    self.isRTL = metadata.isRTL
+    self.font = metadata.displayFont
+    self.oskFont = metadata.oskFont
+    self.packageID = packageID
+    self.isCustom = false
   }
 
   public var fonts: [Font] {

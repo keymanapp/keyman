@@ -11,6 +11,7 @@ import Foundation
 class KMPKeyboard: Codable, KMPResource {
   public var name: String
   public var keyboardId: String
+  public var packageId: String?
   public var version: String
   public var osk: String?
   public var font: String?
@@ -32,6 +33,7 @@ class KMPKeyboard: Codable, KMPResource {
   internal required init?(from keyboard: InstallableKeyboard) {
     self.name = keyboard.name
     self.keyboardId = keyboard.id
+    self.packageId = keyboard.packageID ?? keyboard.id
     self.version = keyboard.version
     self.isRTL = keyboard.isRTL
 
@@ -74,15 +76,7 @@ class KMPKeyboard: Codable, KMPResource {
     var installableKeyboards : [InstallableKeyboard] = []
 
     for language in self.languages {
-      let keyboard = InstallableKeyboard(id: keyboardId, name: name,
-                                         languageID: language.languageId,
-                                         languageName: language.name,
-                                         version: version,
-                                         isRTL: isRTL,
-                                         font: displayFont,
-                                         oskFont: oskFont,
-                                         isCustom: true) //update this based on adhoc vs api
-
+      let keyboard = InstallableKeyboard(from: self, packageID: packageId!, lgCode: language.languageId)!
       installableKeyboards.append( keyboard )
     }
 
