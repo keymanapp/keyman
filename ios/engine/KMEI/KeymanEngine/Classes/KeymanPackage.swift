@@ -162,6 +162,18 @@ public class KeymanPackage {
     try Zip.unzipFile(fileUrl, destination: destination, overwrite: true, password: nil)
     complete()
   }
+
+  internal static func forMigration<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(of resource: Resource, at location: URL) -> Package? {
+    let metadata = KMPMetadata(from: resource)
+
+    if let _ = resource as? InstallableKeyboard {
+      return (KeyboardKeymanPackage(metadata: metadata, folder: location) as! Package)
+    } else if let _ = resource as? InstallableLexicalModel {
+      return (LexicalModelKeymanPackage(metadata: metadata, folder: location) as! Package)
+    } else {
+      return nil
+    }
+  }
 }
 
 public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: KeymanPackage {
@@ -194,5 +206,25 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     }
 
     return matchesFound.count > 0 ? matchesFound[0] : nil
+  }
+
+  // Designed for use in cloud JS -> KMP migrations as needed for 13.0 -> 14.0 upgrades.
+  internal func findMetadataMatchFor<Metadata>(resource: TypedLanguageResource, ignoreLanguage: Bool) -> Metadata?
+    where TypedLanguageResource: KMPInitializableLanguageResource,
+          TypedLanguageResource.Metadata == Metadata,
+          Metadata.LanguageResourceType == TypedLanguageResource {
+
+    var metadataList: [Metadata]
+    if self is KeyboardKeymanPackage {
+      metadataList = self.metadata.keyboards! as! [Metadata]
+    } else if self is LexicalModelKeymanPackage {
+      metadataList = self.metadata.lexicalModels! as! [Metadata]
+    } else {
+      return nil
+    }
+
+    return metadataList.first(where: { kbdMetadata in
+      kbdMetadata.hasMatchingMetadata(for: resource, ignoreLanguage: ignoreLanguage)
+    })
   }
 }

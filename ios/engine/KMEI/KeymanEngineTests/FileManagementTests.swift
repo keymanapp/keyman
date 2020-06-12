@@ -28,7 +28,7 @@ class FileManagementTests: XCTestCase {
 
     try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true)
 
-    let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
+    let installURL = Storage.active.keyboardURL(for: TestUtils.Keyboards.khmer_angkor)
 
     XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
                   "Could not find installed keyboard file")
@@ -49,7 +49,7 @@ class FileManagementTests: XCTestCase {
 
     try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true)
 
-    let installURL = Storage.active.lexicalModelURL(forID: "nrc.en.mtnt", version: "0.1.4")
+    let installURL = Storage.active.lexicalModelURL(for: TestUtils.LexicalModels.mtnt)
 
     XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
                   "Could not find installed lexical model file")
@@ -77,7 +77,7 @@ class FileManagementTests: XCTestCase {
       XCTFail("Unexpected error during KeyboardPackage install")
     }
 
-    let installURL = Storage.active.keyboardURL(forID: "khmer_angkor", version: "1.0.6")
+    let installURL = Storage.active.keyboardURL(for: TestUtils.Keyboards.khmer_angkor)
 
     XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
                   "Could not find installed keyboard file")
@@ -107,7 +107,7 @@ class FileManagementTests: XCTestCase {
       XCTFail("Unexpected error during LexicalModelPackage install")
     }
 
-    let installURL = Storage.active.lexicalModelURL(forID: "nrc.en.mtnt", version: "0.1.4")
+    let installURL = Storage.active.lexicalModelURL(for: TestUtils.LexicalModels.mtnt)
 
     XCTAssertTrue(FileManager.default.fileExists(atPath: installURL.path),
                   "Could not find installed lexical model file")

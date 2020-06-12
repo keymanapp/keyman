@@ -85,7 +85,7 @@ public class ResourceDownloadManager {
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
 
     do {
-      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
+      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: keyboard)!,
                                               withIntermediateDirectories: true)
     } catch {
       log.error("Could not create dir for download: \(error)")
@@ -93,7 +93,8 @@ public class ResourceDownloadManager {
     }
 
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
-    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
+    // TODO:  Ensure that the downloaded keyboard is immediately KMP-wrapped!
+    request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
     request.tag = 0
 
     let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
@@ -230,7 +231,7 @@ public class ResourceDownloadManager {
   private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel, withFilename path: URL,
       asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
     do {
-      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
+      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
                                               withIntermediateDirectories: true)
     } catch {
       log.error("Could not create dir for download: \(error)")
@@ -238,7 +239,8 @@ public class ResourceDownloadManager {
     }
 
     let request = HTTPDownloadRequest(url: path, userInfo: [:])
-    request.destinationFile = Storage.active.lexicalModelPackageURL(forID: lexicalModel.id, version: lexicalModel.version).path
+    // TODO:  redirect to store in the Documents directory.
+    request.destinationFile = Storage.active.lexicalModelPackageURL(forID: lexicalModel.id).path
     request.tag = 0
 
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)

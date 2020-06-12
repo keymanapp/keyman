@@ -528,9 +528,25 @@ public enum Migrations {
     }
   }
 
-  static private func migrateToKMPFormat<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
-        _ resources: [Resource], matchLocal localPackages: [Package]) -> [Resource] {
-    // Step 2 - determine which resources were installed from our locally-available KMPs,
+  static private func migrateToKMPFormat<Resource, Package: TypedKeymanPackage<Resource>>(
+        _ resources: [Resource], matchLocal localPackages: [Package]) -> [Resource]
+        where Resource: KMPInitializableLanguageResource,
+              Resource == Resource.Metadata.LanguageResourceType {
+    // Step 2 - drop version numbers from all filenames.  KMP installations don't include them, and
+    // the version numbered filenames will actually interfere with migration.
+    resources.forEach { resource in
+      let srcLocation = Storage.active.legacyResourceURL(for: resource)!
+      let dstLocation = Storage.active.resourceURL(for: resource)!
+
+      do {
+        try FileManager.default.moveItem(at: srcLocation, to: dstLocation)
+      } catch {
+        log.error("Could not remove version number from filename for resource \(resource.packageID ?? "<no package>").\(resource.id)")
+        log.error("Source: \(srcLocation)")
+      }
+    }
+
+    // Step 3 - determine which resources were installed from our locally-available KMPs,
     //          then migrate by reinstalling the KMP.
     var matched: [Resource] = []
 
@@ -553,26 +569,48 @@ public enum Migrations {
       matched.append(contentsOf: packageMatches)
     }
 
-    // Step 3 - anything unmatched is a cloud resource.  Autogenerate a kmp.json for it
+    // Step 4 - anything unmatched is a cloud resource.  Autogenerate a kmp.json for it
     //          so that it becomes its own package.  (Is already installed in own subdir.)
     let unmatched: [Resource] = resources.compactMap { resource in
       // Return the resource only if it isn't in the 'matched' array,
       return matched.contains(where: { $0.typedFullID == resource.typedFullID }) ? nil : resource
     }
 
-    let processedUnmatched: [Resource] = unmatched.compactMap { resource in
-      // TODO:  Migrate 'em by generating kmp.json files in their folders.
-      //        Generated 'package' id:  the resource's own ID, since that's where it's stored.
-
-
-
-      // This can't be done directly.  BUT, once the kmp.json is written and loaded as a package,
-      // we can parse the KMP to get the version with a package ID.
-      var processedResource = resource
-      //processedResource.packageID = resource.id
-      return processedResource
+    var wrapperPackages: [Package] = []
+    for resource in unmatched {
+      // Did we already build a matching wrapper package?
+      let packageMatches = wrapperPackages.compactMap { package in
+        return package.findMetadataMatchFor(resource: resource, ignoreLanguage: true)
+      }
+      if packageMatches.count > 0 {
+        // We did!  Add this resource to the existing metadata object.
+        var resourceMetadata = packageMatches[0]
+        resourceMetadata.languages.append(KMPLanguage(from: resource)!)
+      } else {
+        // Time for a new wrapper package!
+        let location = Storage.active.resourceDir(for: resource)!
+        let migrationPackage = KeymanPackage.forMigration(of: resource, at: location)!
+        wrapperPackages.append(migrationPackage as! Package)
+      }
     }
 
-    return matched + unmatched
+    // Step 5 - write out the finalized metadata for the new 'wrapper' Packages
+    for package in wrapperPackages {
+      let folderURL = Storage.active.packageDir(for: package)
+      let metadataFile = folderURL!.appendingPathComponent("kmp.json")
+      let encoder = JSONEncoder()
+      do {
+        let metadataJSON = try encoder.encode(package.metadata)
+        FileManager.default.createFile(atPath: metadataFile.path, contents: metadataJSON, attributes: .none)
+        // write to location.
+      } catch {
+        log.error("Could not generate kmp.json for legacy resource!")
+      }
+    }
+
+    // Each wrapper package contains only a single resource.  .installables[0] returns all
+    // LanguageResource pairings for that script resource.
+    let wrappedResources = wrapperPackages.flatMap { return $0.installables[0] }
+    return matched + wrappedResources
   }
 }

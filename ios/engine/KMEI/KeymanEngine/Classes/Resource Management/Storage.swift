@@ -84,31 +84,46 @@ class Storage {
       return nil
     }
   }
-    
+
+  @available(*, deprecated)
   func keyboardDir(forID keyboardID: String) -> URL {
     return keyboardDir.appendingPathComponent(keyboardID)
   }
-  
+
+  @available(*, deprecated)
   func lexicalModelDir(forID lexicalModelID: String) -> URL {
     return lexicalModelDir.appendingPathComponent(lexicalModelID)
   }
 
+  func packageDir(forID packageID: String, ofType resourceType: LanguageResourceType) -> URL {
+    switch resourceType {
+      case .keyboard:
+        return keyboardDir.appendingPathComponent(packageID)
+      case .lexicalModel:
+        return lexicalModelDir.appendingPathComponent(packageID)
+    }
+  }
+
+  func packageDir(for package: KeymanPackage) -> URL? {
+    return packageDir(forID: package.id, ofType: package.resourceType())
+  }
+
   func resourceDir(for resource: AnyLanguageResource) -> URL? {
     if let keyboard = resource as? InstallableKeyboard {
-      return keyboardDir(forID: keyboard.id)
+      return packageDir(forID: keyboard.packageID ?? keyboard.id, ofType: .keyboard)
     } else if let lexicalModel = resource as? InstallableLexicalModel {
-      return lexicalModelDir(forID: lexicalModel.id)
+      return packageDir(forID: lexicalModel.packageID ?? lexicalModel.id, ofType: .lexicalModel)
     } else {
       return nil
     }
   }
   
   func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
-    return keyboardURL(forID: keyboard.id, version: keyboard.version)
+    return resourceDir(for: keyboard)!.appendingPathComponent("\(keyboard.id).js")
   }
   
   func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
-    return lexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
+    return resourceDir(for: lexicalModel)!.appendingPathComponent("\(lexicalModel.id).model.js")
   }
 
   // Facilitates abstractions based on the LanguageResource protocol.
@@ -121,12 +136,29 @@ class Storage {
       return nil
     }
   }
-  
-  func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
-    return lexicalModelPackageURL(forID: lexicalModel.id, version: lexicalModel.version)
+
+  // Facilitates abstractions based on the LanguageResource protocol.
+  func legacyResourceURL(for resource: AnyLanguageResource) -> URL? {
+    if let keyboard = resource as? InstallableKeyboard {
+      return legacyKeyboardURL(forID: keyboard.id, version: keyboard.version)
+    } else if let lexicalModel = resource as? InstallableLexicalModel {
+      return legacyLexicalModelURL(forID: lexicalModel.id, version: lexicalModel.version)
+    } else {
+      return nil
+    }
   }
   
-  func keyboardURL(forID keyboardID: String, version: String) -> URL {
+  func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
+    return resourceDir(for: lexicalModel)!.appendingPathComponent("\(lexicalModel.id).model.kmp")
+  }
+
+  // TODO:  Once we drop cloud-keyboard downloads, remove this function.
+  func cloudKeyboardURL(forID keyboardID: String) -> URL {
+    // For now, we treat cloud keyboards as KMP-less packages, generating a kmp.json after download.
+    return packageDir(forID: keyboardID, ofType: .keyboard).appendingPathComponent("\(keyboardID).js")
+  }
+
+  func legacyKeyboardURL(forID keyboardID: String, version: String) -> URL {
     // We no longer embed version numbers into filenames
     // This allows us to support existing installs and OEM products that
     // still include the version string, at reasonable cost
@@ -140,15 +172,20 @@ class Storage {
     return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
   
-  func lexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
+  func legacyLexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
     return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
+
+  func lexicalModelPackageURL(forID lexicalModelID: String, asZip: Bool = false) -> URL {
+    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID).model.kmp\(asZip ? ".zip" : "")")
+  }
   
-  func lexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
+  func legacyLexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
     // Our unzipping dependency requires a .zip extension to function, so we append that here.
     return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
   }
 
+  // TODO:  should be based on the package, not on ids.
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
     return keyboardDir(forID: keyboardID).appendingPathComponent(filename)
   }
@@ -216,7 +253,7 @@ extension Storage {
   }
 
   func installDefaultKeyboard(from bundle: Bundle) throws {
-    let defaultKeyboardDir = self.keyboardDir(forID: Defaults.keyboard.id)
+    let defaultKeyboardDir = self.resourceDir(for: Defaults.keyboard)!
     try FileManager.default.createDirectory(at: defaultKeyboardDir, withIntermediateDirectories: true)
 
     // Since we only want to do this installation the first time (rather than constantly force-reinstalling
@@ -232,7 +269,7 @@ extension Storage {
   }
 
   func installDefaultLexicalModel(from bundle: Bundle) throws {
-    let defaultLexicalModelDir = self.lexicalModelDir(forID: Defaults.lexicalModel.id)
+    let defaultLexicalModelDir = self.resourceDir(for: Defaults.lexicalModel)!
 
     try FileManager.default.createDirectory(at: defaultLexicalModelDir, withIntermediateDirectories: true)
 
@@ -245,10 +282,8 @@ extension Storage {
 
     // Perform an auto-install of the lexical model's KMP if not already installed.
     let lexicalModelURLasZIP = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
-                                                                     version: Defaults.lexicalModel.version,
                                                                     asZip: true)
     let lexicalModelURL = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
-                                                                version: Defaults.lexicalModel.version,
                                                                 asZip: false)
 
     // Because of how our .zip dependency works, we need to make the .kmp look like a .zip.  A simple rename will do.

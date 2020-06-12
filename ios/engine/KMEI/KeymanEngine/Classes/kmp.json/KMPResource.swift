@@ -11,6 +11,7 @@ import Foundation
 internal protocol AnyKMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
+  var languages: [KMPLanguage] { get set } // set is for adding languages during 13.0 -> 14.0 migration
   var installableResources: [AnyLanguageResource] { get }
 }
 
