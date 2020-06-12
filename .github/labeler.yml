@@ -5,7 +5,7 @@
 # folder names and labels; consider this documentation of that ;-)
 #
 
-andrdoid/: android/**
+android/: android/**
 android/app/: android/KMAPro/**
 #android/browser/:
 android/engine/: android/KMEA/**
@@ -77,7 +77,7 @@ web/samples/: web/samples/**
 
 # Somewhat messy since we try and exclude Developer :)
 windows/:
-  - any: ['windows/**', '!windows/src/developer/**']
+- any: ['windows/**', '!windows/src/developer/**']
 
 windows/config/: windows/src/desktop/**
 windows/engine/: windows/src/engine/**
