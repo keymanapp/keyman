@@ -65,7 +65,7 @@ public class ResourceFileManager {
    * Note that we don't request permissions to support opening/modifying files "in place," so  .kmps should already be
    * located in app-space (by use of `importFile`)  before unzipping them.
    */
-  public func prepareKMPInstall(from url: URL, completionHandler: @escaping (KeymanPackage?, Error?) -> Void) {
+  public func prepareKMPInstall(from url: URL) throws -> KeymanPackage {
     // Once selected, start the standard install process.
     log.info("Installing KMP from \(url)")
 
@@ -78,39 +78,64 @@ public class ResourceFileManager {
       try copyWithOverwrite(from: url, to: archiveUrl)
     } catch {
       log.error(error)
-      completionHandler(nil, KMPError.copyFiles)
-      return
+      throw KMPError.copyFiles
     }
 
     var extractionFolder = cacheDirectory
     extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
 
+    if let kmp = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
+      return kmp
+    } else {
+      throw KMPError.invalidPackage
+    }
+  }
+
+  /**
+   * Use this function to "install" external KMP files to within the Keyman app's alloted iOS file management domain.
+   * Note that we don't request permissions to support opening/modifying files "in place," so  .kmps should already be
+   * located in app-space (by use of `importFile`)  before unzipping them.
+   */
+  @available(*, deprecated)
+  public func prepareKMPInstall(from url: URL, completionHandler: @escaping (KeymanPackage?, Error?) -> Void) {
     do {
-      try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder, complete: { kmp in
-        if let kmp = kmp {
-          completionHandler(kmp, nil)
-        } else {
-          log.error(KMPError.invalidPackage)
-          completionHandler(nil, KMPError.invalidPackage)
-        }
-      })
+      let kmp = try prepareKMPInstall(from: url)
+      completionHandler(kmp, nil)
     } catch {
       log.error(error)
+      completionHandler(nil, error)
+    }
+  }
+
+  /**
+   * A  utility version of `prepareKMPInstall` that displays default UI alerts if errors occur when preparing a KMP for installation.
+   *
+   * The completion handler will only be called when a package is successfully "prepared".
+   */
+  @available(*, deprecated)
+  public func prepareKMPInstall(from url: URL, alertHost: UIViewController, completionHandler: @escaping (KeymanPackage) -> Void) {
+    if let package = prepareKMPInstall(from: url, alertHost: alertHost) {
+      completionHandler(package)
     }
   }
 
   /**
    * A  utility version of `prepareKMPInstall` that displays default UI alerts if errors occur when preparing a KMP for installation.
    */
-  public func prepareKMPInstall(from url: URL, alertHost: UIViewController, completionHandler: @escaping (KeymanPackage) -> Void) {
-    self.prepareKMPInstall(from: url, completionHandler: { package, error in
-      if error != nil {
-        let alert = self.buildKMPError(KMPError.copyFiles)
-        alertHost.present(alert, animated: true, completion: nil)
+  public func prepareKMPInstall(from url: URL, alertHost: UIViewController) -> KeymanPackage? {
+    do {
+      return try self.prepareKMPInstall(from: url)
+    } catch {
+      let alert: UIAlertController
+      if let kmpError = error as? KMPError {
+        alert = self.buildKMPError(kmpError)
       } else {
-        completionHandler(package!)
+        alert = self.buildKMPError(KMPError.copyFiles)
       }
-    })
+
+      alertHost.present(alert, animated: true, completion: nil)
+      return nil
+    }
   }
 
   public func promptPackageInstall(of package: KeymanPackage,
@@ -155,26 +180,26 @@ public class ResourceFileManager {
   /**
    * Performs the actual installation of a package's resources once confirmation has been received from the user.
    */
-  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool, completionHandler: (Error?) -> Void) {
-    do {
-      // Time to pass the package off to the final installers - the parse__KMP methods.
-      // TODO: (14.0+) These functions should probably be refactored to within this class eventually.
-      if package.isKeyboard() {
-        try Manager.shared.parseKbdKMP(package.sourceFolder, isCustom: isCustom)
-      } else {
-        try Manager.parseLMKMP(package.sourceFolder, isCustom: isCustom)
-      }
-      completionHandler(nil)
-    } catch {
-      log.error(error as! KMPError)
-      completionHandler(error)
+  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool) throws {
+    // Time to pass the package off to the final installers - the parse__KMP methods.
+    // TODO: (14.0+) These functions should probably be refactored to within this class eventually.
+    if package.isKeyboard() {
+      try Manager.shared.parseKbdKMP(package.sourceFolder, isCustom: isCustom)
+    } else {
+      try Manager.parseLMKMP(package.sourceFolder, isCustom: isCustom)
     }
 
-    //this can fail gracefully and not show errors to users
+    // Note:  package.sourceFolder is a temporary directory, as set by preparePackageInstall.
+    try FileManager.default.removeItem(at: package.sourceFolder)
+  }
+
+  @available(*, deprecated)
+  public func finalizePackageInstall(_ package: KeymanPackage, isCustom: Bool, completionHandler: (Error?) -> Void) {
     do {
-      try FileManager.default.removeItem(at: package.sourceFolder)
+      try finalizePackageInstall(package, isCustom: isCustom)
+      completionHandler(nil)
     } catch {
-      log.error("unable to delete temp files: \(error)")
+      log.error(error)
       completionHandler(error)
     }
   }

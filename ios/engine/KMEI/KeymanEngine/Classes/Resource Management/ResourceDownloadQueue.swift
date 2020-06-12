@@ -544,27 +544,26 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
     var installedLexicalModel: InstallableLexicalModel? = nil
 
-    ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile, completionHandler: { kmp, error in
-      if let kmp = kmp as! LexicalModelKeymanPackage? {
+    do {
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile)
+      if let kmp = package as? LexicalModelKeymanPackage {
         do {
-          ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false, completionHandler: { error in
-              if error != nil {
-                log.error("Error installing the lexical model: \(String(describing: error))")
-              } else {
-                log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
-                installedLexicalModel = kmp.models[0].installableLexicalModels[0]
-              }
-            })
+          try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false)
+          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
+          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
 
           //this can fail gracefully and not show errors to users
           try FileManager.default.removeItem(at: downloadedPackageFile)
         } catch {
-          log.error("Error installing the lexical model: \(error)")
+          log.error("Error installing the lexical model: \(String(describing: error))")
         }
       } else {
-        log.error("Error extracting the lexical model from the package: \(String(describing: error))")
+        log.error("Provided package did not contain lexical models.")
       }
-    })
+    } catch {
+      log.error("Error extracting the lexical model from the package: \(String(describing: error))")
+    }
+    
     return installedLexicalModel
   }
 }
