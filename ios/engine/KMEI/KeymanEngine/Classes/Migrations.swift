@@ -532,7 +532,6 @@ public enum Migrations {
         _ resources: [Resource], matchLocal localPackages: [Package]) -> [Resource] {
     // Step 2 - determine which resources were installed from our locally-available KMPs,
     //          then migrate by reinstalling the KMP.
-    var processedResources: [Resource] = []
     var matched: [Resource] = []
 
     localPackages.forEach { package in
@@ -561,9 +560,17 @@ public enum Migrations {
       return matched.contains(where: { $0.typedFullID == resource.typedFullID }) ? nil : resource
     }
 
-    unmatched.forEach { resource in
+    let processedUnmatched: [Resource] = unmatched.compactMap { resource in
       // TODO:  Migrate 'em by generating kmp.json files in their folders.
       //        Generated 'package' id:  the resource's own ID, since that's where it's stored.
+
+
+
+      // This can't be done directly.  BUT, once the kmp.json is written and loaded as a package,
+      // we can parse the KMP to get the version with a package ID.
+      var processedResource = resource
+      //processedResource.packageID = resource.id
+      return processedResource
     }
 
     return matched + unmatched
