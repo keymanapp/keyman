@@ -8,6 +8,7 @@ This folder contains definitions for valid scopes and commit types for Keyman.
 
 * A tree structured JSON object, with root node `"scopes"`.
 * Keys must have lower case alpha names; leaf nodes must always be `null`.
+* If you change scopes here, please update /.github/labeler.yml accordingly.
 
 ## commit-types.json
 
