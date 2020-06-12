@@ -510,10 +510,62 @@ public enum Migrations {
       }
 
       let userDefaults = Storage.active.userDefaults
-//      let userKeyboards = userDefaults.userKeyboards
-//      let userLexicalModels = userDefaults.userLexicalModels
+
+      // The other steps are contained within the method call below, which is a private helper.
+      let kbdPackages = cachedPackages.compactMap { return $0 as? KeyboardKeymanPackage }
+      if var userKeyboards = userDefaults.userKeyboards {
+        userKeyboards = migrateToKMPFormat(userKeyboards, matchLocal: kbdPackages)
+        userDefaults.userKeyboards = userKeyboards
+      }
+
+      let lmPackages = cachedPackages.compactMap { return $0 as? LexicalModelKeymanPackage }
+      if var userLexicalModels = userDefaults.userLexicalModels {
+        userLexicalModels = migrateToKMPFormat(userLexicalModels, matchLocal: lmPackages)
+        userDefaults.userLexicalModels = userLexicalModels
+      }
     } catch {
       // TODO:
     }
+  }
+
+  static private func migrateToKMPFormat<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+        _ resources: [Resource], matchLocal localPackages: [Package]) -> [Resource] {
+    // Step 2 - determine which resources were installed from our locally-available KMPs,
+    //          then migrate by reinstalling the KMP.
+    var processedResources: [Resource] = []
+    var matched: [Resource] = []
+
+    localPackages.forEach { package in
+      let packageMatches: [Resource] = resources.compactMap { resource in
+        if let possibleMatch = package.findResource(withID: resource.typedFullID) {
+          if possibleMatch.version == resource.version {
+            return resource
+          }
+        }
+        // else, for either if-condition.
+        return nil
+      }
+
+      // All resources within packageMatches were sourced from the current package.
+      // Time to set migrate these.
+
+      // TODO:  Migrate 'em based on their source packages.
+
+      matched.append(contentsOf: packageMatches)
+    }
+
+    // Step 3 - anything unmatched is a cloud resource.  Autogenerate a kmp.json for it
+    //          so that it becomes its own package.  (Is already installed in own subdir.)
+    let unmatched: [Resource] = resources.compactMap { resource in
+      // Return the resource only if it isn't in the 'matched' array,
+      return matched.contains(where: { $0.typedFullID == resource.typedFullID }) ? nil : resource
+    }
+
+    unmatched.forEach { resource in
+      // TODO:  Migrate 'em by generating kmp.json files in their folders.
+      //        Generated 'package' id:  the resource's own ID, since that's where it's stored.
+    }
+
+    return matched + unmatched
   }
 }
