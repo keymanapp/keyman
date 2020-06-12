@@ -15,18 +15,25 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
+  func testVersion13CloudToKMPMigration() {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
+
+    let userKeyboards = Storage.active.userDefaults.userKeyboards!
+    let userModels = Storage.active.userDefaults.userLexicalModels!
+
+    // A baseline load-check; confirms we have the correct resource count at the start.
+    XCTAssertEqual(userKeyboards.count, 7)
+    XCTAssertEqual(userModels.count, 6)
+
+    // TODO:  Actual migration unit testing.  So far, this is really more of a
+    //        TestUtils.Migrations.applyBundleToFileSystem unit test.
+  }
+
   func testVersion12ResourceMigration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_12)
+    Migrations.updateResources(storage: Storage.active)
 
     let userDefaults = Storage.active.userDefaults
-    userDefaults.lastEngineVersion = Version("12.0")!
-
-    let versionResources = TestUtils.Migrations.getVersionHistory(for: Version("12.0")!)
-    TestUtils.UserDefaults.addKeyboard(versionResources[0] as! InstallableKeyboard)
-    TestUtils.UserDefaults.addKeyboard(TestUtils.Keyboards.khmer_angkor)
-    TestUtils.UserDefaults.addLexicalModel(versionResources[1] as! InstallableLexicalModel)
-
-    Migrations.updateResources(storage: Storage.active)
 
     // The two keyboards should remain in the same location, while the lexical model should be upgraded.
     // v 0.1.2 -> 0.1.4.
@@ -41,11 +48,6 @@ class MigrationTests: XCTestCase {
 
   func testVersion12AdhocMigration() throws {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.adhoc_12)
-
-    let userDefaults = Storage.active.userDefaults
-    userDefaults.lastEngineVersion = Version("12.0")!
-    TestUtils.UserDefaults.addKeyboard(TestUtils.Keyboards.khmer10)
-
     Migrations.migrate(storage: Storage.active)
 
     // The files in the .documents directory should be erased after this method is run.
@@ -62,11 +64,9 @@ class MigrationTests: XCTestCase {
 
   func testVersion10ResourceMigration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_10)
+    Migrations.updateResources(storage: Storage.active)
 
     let userDefaults = Storage.active.userDefaults
-    TestUtils.UserDefaults.addKeyboard(TestUtils.Migrations.european2)
-
-    Migrations.updateResources(storage: Storage.active)
 
     // The old keyboard should be gone entirely, replaced by the current version's default resources.
     // There should only be one default resource per type (at least, as of 13.0.)
@@ -91,11 +91,9 @@ class MigrationTests: XCTestCase {
 
   func testNoDefaultVersion10ResourceMigration() {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.noDefault_10)
+    Migrations.updateResources(storage: Storage.active)
 
     let userDefaults = Storage.active.userDefaults
-    TestUtils.UserDefaults.addKeyboard(TestUtils.Keyboards.khmer_angkor)
-
-    Migrations.updateResources(storage: Storage.active)
 
     // No new resources should be installed - only what was originally present should be there.
     XCTAssertEqual(userDefaults.userKeyboards!.count, 1, "Unexpected keyboard count after migration!")

@@ -257,6 +257,11 @@ extension KeymanWebViewController {
       "KL": keyboard.languageName,
       "KF": storage.keyboardURL(for: keyboard).absoluteString
     ]
+
+    if let packageID = keyboard.packageID {
+      stub["KP"] = packageID
+    }
+
     let displayFont = fontObject(from: keyboard.font, keyboardID: keyboard.id, isOsk: false)
     let oskFont = fontObject(from: keyboard.oskFont, keyboardID: keyboard.id, isOsk: true) ?? displayFont
     if let displayFont = displayFont {

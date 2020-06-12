@@ -24,6 +24,7 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
   }
 
   public private(set) var id: String
+  public internal(set) var packageID: String? = nil
   public var name: String
   private var lgCode: String
   public var version: String

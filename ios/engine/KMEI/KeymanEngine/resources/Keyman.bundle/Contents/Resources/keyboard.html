@@ -121,7 +121,17 @@
                 var kmw = window.keyman;
 
                 KeymanWeb.registerStub(stub);
-                kmw.setActiveKeyboard(stub.KI, stub.KLC);
+
+                var kbdID;
+                /* TODO:  Once 14.0 file reorganization/migration is completed,
+                 *        remove if-check and assume stub.KP exists.
+                 */
+                if(stub.KP) {
+                  kbdID = stub.KP + "::" + stub.KI;
+                } else {
+                  kbdID = stub.KI;
+                }
+                kmw.setActiveKeyboard(kbdID, stub.KLC);
                 kmw.osk.show(true);
             }
             
