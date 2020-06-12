@@ -73,7 +73,7 @@ type
       EventType: TSentryClientEventType);
     procedure DoTerminate;
     function EventIDToString(AGuid: PByte): String;
-    function ConvertRawStackToSentryStack: sentry_value_t;
+    function ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
   public
     constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); virtual;
     destructor Destroy; override;
@@ -323,7 +323,7 @@ begin
   end;
 end;
 
-function TSentryClient.ConvertRawStackToSentryStack: sentry_value_t;
+function TSentryClient.ConvertRawStackToSentryStack(wrapWithThread: Boolean): sentry_value_t;
 var
   frames, s_frame, stacktrace, thread, threads: sentry_value_t;
   s: AnsiString;
@@ -343,19 +343,24 @@ begin
   stacktrace := sentry_value_new_object;
   sentry_value_set_by_key(stacktrace, 'frames', frames);
 
-  threads := sentry_value_new_list;
-  thread := sentry_value_new_object;
-  sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
-  sentry_value_append(threads, thread);
+  if wrapWithThread then
+  begin
+    threads := sentry_value_new_list;
+    thread := sentry_value_new_object;
+    sentry_value_set_by_key(thread, 'stacktrace', stacktrace);
+    sentry_value_append(threads, thread);
 
-  Result := threads;
+    Result := threads;
+  end
+  else
+    Result := stacktrace;
 end;
 
 function TSentryClient.ExceptionEvent(const ExceptionClassName, Message: string; AExceptAddr: Pointer = nil): String;
 var
-  event: sentry_value_t;
+  exc, event: sentry_value_t;
   uuid: sentry_uuid_t;
-  threads: sentry_value_t;
+  stacktrace: sentry_value_t;
 begin
   if FReportExceptions then
   begin
@@ -363,29 +368,20 @@ begin
 
     DoBeforeEvent(event, ExceptionClassName, Message, scetException);
 
-  (*
-    When we set exception information, the report is corrupted. Not sure why. So
-    for now we won't create as an exception event. We still get all the information
-    we want from this.
-
-    Investigating this further at https://forum.sentry.io/t/corrupted-display-when-exception-data-is-set-using-native-sdk/9167/2
-
     exc := sentry_value_new_object;
     sentry_value_set_by_key(exc, 'type', sentry_value_new_string(PAnsiChar(UTF8Encode(ExceptionClassName))));
     sentry_value_set_by_key(exc, 'value', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
-    sentry_value_set_by_key(event, 'exception', exc);
-  *)
-
-    sentry_value_set_by_key(event, 'message', sentry_value_new_string(PAnsiChar(UTF8Encode(Message))));
-    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
     if raw_frame_count > 0 then
     begin
-      threads := ConvertRawStackToSentryStack;
-      if threads <> 0 then
-        sentry_value_set_by_key(event, 'threads', threads);
+      stacktrace := ConvertRawStackToSentryStack(false);
+      if stacktrace <> 0 then
+        sentry_value_set_by_key(exc, 'stacktrace', stacktrace);
       raw_frame_count := 0;
     end;
+
+    sentry_value_set_by_key(event, 'exception', exc);
+    sentry_value_set_by_key(event, 'logger', sentry_value_new_string(PAnsiChar(UTF8Encode(FLogger))));
 
     // We will rebuild the module list at time of event in order to ensure we
     // don't lose dynamically loaded modules, as far as possible. This is
@@ -434,7 +430,7 @@ begin
       CaptureStackTrace(nil, FRAMES_TO_SKIP);
       if raw_frame_count > 0 then
       begin
-        threads := ConvertRawStackToSentryStack;
+        threads := ConvertRawStackToSentryStack(true);
         if threads <> 0 then
           sentry_value_set_by_key(event, 'threads', threads);
         raw_frame_count := 0;
