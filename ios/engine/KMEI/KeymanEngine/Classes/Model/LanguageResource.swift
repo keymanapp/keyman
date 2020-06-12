@@ -52,3 +52,8 @@ extension LanguageResource {
     return typedFullID
   }
 }
+
+internal protocol KMPInitializableLanguageResource: LanguageResource {
+  associatedtype Metadata: KMPResource
+  init?(from metadata: Metadata, packageID: String, lgCode: String)
+}

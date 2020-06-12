@@ -11,6 +11,7 @@ import Foundation
 class KMPLexicalModel: Codable, KMPResource {
   public var name: String
   public var lexicalModelId: String
+  public var packageId: String?
   public var version: String?
   public var isRTL: Bool = false
   public var languages: [KMPLanguage]
@@ -28,6 +29,7 @@ class KMPLexicalModel: Codable, KMPResource {
     self.name = lexicalModel.name
     self.lexicalModelId = lexicalModel.id
     self.version = lexicalModel.version
+    self.packageId = lexicalModel.packageID ?? lexicalModel.id
 
     // InstallableLexicalModel doesn't store the language name, so we use the id as a fill-in.
     // The 'name' part isn't used for matching, anyway.
@@ -74,11 +76,7 @@ class KMPLexicalModel: Codable, KMPResource {
     var installableLexicalModels : [InstallableLexicalModel] = []
 
     for language in self.languages {
-      let model = InstallableLexicalModel(id: lexicalModelId, name: name,
-                                              languageID: language.languageId,
-                                              version: version ?? "",
-                                              isCustom: true) //update this based on adhoc vs api
-
+      let model = InstallableLexicalModel(from: self, packageID: packageId!, lgCode: language.languageId)!
       installableLexicalModels.append( model )
     }
 

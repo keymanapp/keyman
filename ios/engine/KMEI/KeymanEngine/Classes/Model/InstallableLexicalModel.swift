@@ -13,7 +13,7 @@ struct InstallableConstants {
 }
 
 /// Mainly differs from the API `LexicalModel` by having an associated language.
-public struct InstallableLexicalModel: Codable, LanguageResource {
+public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource {
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
@@ -68,6 +68,15 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
     self.lgCode = languageID
     self.version = lexicalModel.version ?? InstallableConstants.defaultVersion
     self.isCustom = isCustom
+  }
+
+  internal init?(from metadata: KMPLexicalModel, packageID: String, lgCode: String) {
+    self.id = metadata.id
+    self.name = metadata.name
+    self.lgCode = lgCode
+    self.version = metadata.version!
+    self.isCustom = false
+    self.packageID = packageID
   }
 
   // Lexical models don't bundle fonts.  At least, not yet?

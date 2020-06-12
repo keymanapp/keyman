@@ -17,6 +17,8 @@ public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalMo
     
     if let packagedModels = metadata.lexicalModels {
       for model in packagedModels {
+        model.packageId = self.id
+        
         // If completely missing, we set the version to 1.0.  Legacy decision from 2005.
         model.setNilVersion(to: metadata.info?.version?.description ?? "1.0")
         if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {

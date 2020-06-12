@@ -17,6 +17,8 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
     
     if let packagedKeyboards = metadata.keyboards {
       for keyboard in packagedKeyboards {
+        keyboard.packageId = self.id
+
         if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
           keyboards.append(keyboard)
         } else {

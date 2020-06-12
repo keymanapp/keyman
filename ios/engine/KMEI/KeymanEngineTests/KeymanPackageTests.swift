@@ -27,7 +27,7 @@ class KeymanPackageTests: XCTestCase {
 
         XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "Keyboard KMP test extraction did not yield a keyboard package!")
         XCTAssertTrue(kmp.isKeyboard(), "Keyboard KMP test extraction did not yield a keyboard package!")
-
+        XCTAssertEqual(kmp.id, "khmer_angkor", "Incorrect package ID")
         // extracted ok, test kmp
         XCTAssert(kmp.sourceFolder == destinationFolderURL,
                   "The KMP's reported 'source folder' should match the specified destination folder")
@@ -41,10 +41,10 @@ class KeymanPackageTests: XCTestCase {
 
   func testLexicalModelPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    let mtntZip = cacheDirectory.appendingPathComponent("mtnt.zip")
+    let mtntZip = cacheDirectory.appendingPathComponent("nrc.en.mtnt.zip")
     try FileManager.default.copyItem(at: TestUtils.LexicalModels.mtntKMP, to: mtntZip)
 
-    let destinationFolderURL = cacheDirectory.appendingPathComponent("mtnt.model")
+    let destinationFolderURL = cacheDirectory.appendingPathComponent("nrc.en.mtnt.model")
 
     // Requires that the source file is already .zip, not .kmp.  It's a ZipUtils limitation.
     do {
@@ -59,6 +59,7 @@ class KeymanPackageTests: XCTestCase {
 
         XCTAssertNotNil(kmp as? LexicalModelKeymanPackage, "Lexical model KMP test extraction yielded a keyboard package!")
         XCTAssertTrue(!kmp.isKeyboard(), "Lexical model KMP test extraction yielded a keyboard package!")
+        XCTAssertEqual(kmp.id, "nrc.en.mtnt")
 
         // extracted ok, test kmp
         XCTAssert(kmp.sourceFolder == destinationFolderURL,
@@ -76,7 +77,9 @@ class KeymanPackageTests: XCTestCase {
       XCTFail("Incorrect package type loaded for test")
       return
     }
-    XCTAssertNotNil(kmp1.findResource(withID: TestUtils.Keyboards.khmer_angkor.fullID))
+    let kbd = kmp1.findResource(withID: TestUtils.Keyboards.khmer_angkor.fullID)
+    XCTAssertNotNil(kbd)
+    XCTAssertEqual(kbd?.packageID, "khmer_angkor", "Keyboard package ID not properly set")
     // This keyboard's not in the specified testing package.
     XCTAssertNil(kmp1.findResource(withID: TestUtils.Keyboards.khmer10.fullID))
 
@@ -87,7 +90,9 @@ class KeymanPackageTests: XCTestCase {
       XCTFail("Incorrect package type loaded for test")
       return
     }
-    XCTAssertNotNil(kmp2.findResource(withID: TestUtils.LexicalModels.mtnt.fullID))
+    let lm = kmp2.findResource(withID: TestUtils.LexicalModels.mtnt.fullID)
+    XCTAssertNotNil(lm)
+    XCTAssertEqual(lm?.packageID, "nrc.en.mtnt", "Lexical model ID not properly set")
 
     // Thanks to our package typing hierarchy, it's impossible to even TRY finding
     // a FullKeyboardID within a LexicalModelKeymanPackage!

@@ -24,11 +24,32 @@ public enum KMPError : String, Error {
 public class KeymanPackage {
   static private let kmpFile = "kmp.json"
   public let sourceFolder: URL
+  public let id: String
   internal let metadata: KMPMetadata
+  internal let isTemp: Bool
 
   internal init(metadata: KMPMetadata, folder: URL) {
     sourceFolder = folder
     self.metadata = metadata
+
+    let folderName = folder.lastPathComponent
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    var nameComponents = folderName.components(separatedBy: ".")
+
+    // Have we parsed a temporary extraction site?
+    // This case arises during package installation.
+    isTemp = folderName.hasSuffix(".kmp.zip") && folder.path.contains(cacheDirectory.path)
+    if isTemp {
+      nameComponents.removeLast() // .zip
+      nameComponents.removeLast() // .kmp
+    }
+
+    // Lexical model packages use .model.kmp, so we remove the final 'model' bit.
+    if nameComponents.last == "model" {
+      nameComponents.removeLast()
+    }
+
+    self.id = nameComponents.joined(separator: ".")
   }
 
   public func isKeyboard() -> Bool {
