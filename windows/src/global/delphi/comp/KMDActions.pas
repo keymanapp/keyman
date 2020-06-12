@@ -283,9 +283,16 @@ function TKMDEditAction.GetInterface(Target: TObject): IKMDEditActions;
 begin
   if IsTextEditor(Target) then
     Result := GetEditController(Target)
-  else if not Supports(TWinControl(Target), IKMDEditActions, Result) then
-    if not Supports(TWinControl(Target).Owner, IKMDEditActions, Result) then
+  else
+  begin
+    Result := nil;
+    while Assigned(Target) and not Supports(TWinControl(Target), IKMDEditActions, Result) do
+    begin
+      Target := TWinControl(Target).Parent;
+    end;
+    if not Assigned(Result) then
       raise Exception.Create('Unable to get interface for edit actions');
+  end;
 end;
 
 function TKMDEditAction.HandlesTarget(Target: TObject): Boolean;
@@ -294,10 +301,21 @@ begin
     Result := True
   else if IsTextEditor(Target) then
     Result := True
-  else if (Control = nil) and (Target is TWinControl) and TWinControl(Target).Focused then
+  else if (Control = nil) and (Target is TWinControl) and TWinControl(Target).HandleAllocated and
+    ((GetFocus = TWinControl(Target).Handle) or
+    IsChild(TWinControl(Target).Handle, GetFocus)) then
   begin
     if (Target is TCustomEdit) then Result := True
-    else Result := Supports(TWinControl(Target), IKMDEditActions) or Supports(TWinControl(Target).Owner, IKMDEditActions);
+    else
+    begin
+      while Target <> nil do
+      begin
+        if Supports(TWinControl(Target), IKMDEditActions) then
+          Exit(True);
+        Target := TWinControl(Target).Parent;
+      end;
+      Result := False;
+    end;
   end
   else
     Result := False;
