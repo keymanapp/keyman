@@ -492,46 +492,46 @@ public enum Migrations {
   }
 
   static func migrateCloudResourcesToKMPFormat() throws {
-    let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    let userDefaults = Storage.active.userDefaults
 
+    if var userKeyboards = userDefaults.userKeyboards {
+      userKeyboards = migrateToKMPFormat(userKeyboards)
+      userDefaults.userKeyboards = userKeyboards
+    }
+
+    if var userLexicalModels = userDefaults.userLexicalModels {
+      userLexicalModels = migrateToKMPFormat(userLexicalModels)
+      userDefaults.userLexicalModels = userLexicalModels
+    }
+  }
+
+  static func migrateToKMPFormat<Resource, Package: TypedKeymanPackage<Resource>>(
+        _ resources: [Resource]) -> [Resource]
+        where Resource: KMPInitializableLanguageResource,
+              Resource == Resource.Metadata.LanguageResourceType {
+    // Step 1 - analyze all locally-cached KMPs for possible resource sources.
+    var allLocalPackages: [KeymanPackage] = []
     do {
+      let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
       let files = try FileManager.default.contentsOfDirectory(atPath: cachedKMPsDirectory.path)
       let kmpFiles = files.filter { $0.suffix(4) == ".kmp" }
 
-      // Step 1 - analyze all locally-cached KMPs for possible resource sources.
-      let cachedPackages: [KeymanPackage] = kmpFiles.compactMap { file in
+      allLocalPackages = kmpFiles.compactMap { file in
         let filePath = cachedKMPsDirectory.appendingPathComponent(file)
         do {
           return try ResourceFileManager.shared.prepareKMPInstall(from: filePath)
         } catch {
-          log.debug("Error occurred when processing existing packages during cloud -> KMP migration: \(String(describing: error))")
+          log.error("Error occurred when processing existing packages during cloud -> KMP migration: \(String(describing: error))")
           return nil as KeymanPackage?
         }
       }
-
-      let userDefaults = Storage.active.userDefaults
-
-      // The other steps are contained within the method call below, which is a private helper.
-      let kbdPackages = cachedPackages.compactMap { return $0 as? KeyboardKeymanPackage }
-      if var userKeyboards = userDefaults.userKeyboards {
-        userKeyboards = migrateToKMPFormat(userKeyboards, matchLocal: kbdPackages)
-        userDefaults.userKeyboards = userKeyboards
-      }
-
-      let lmPackages = cachedPackages.compactMap { return $0 as? LexicalModelKeymanPackage }
-      if var userLexicalModels = userDefaults.userLexicalModels {
-        userLexicalModels = migrateToKMPFormat(userLexicalModels, matchLocal: lmPackages)
-        userDefaults.userLexicalModels = userLexicalModels
-      }
     } catch {
-      // TODO:
+      log.error("Could not check contents of Documents directory for resource-migration assist")
     }
-  }
 
-  static private func migrateToKMPFormat<Resource, Package: TypedKeymanPackage<Resource>>(
-        _ resources: [Resource], matchLocal localPackages: [Package]) -> [Resource]
-        where Resource: KMPInitializableLanguageResource,
-              Resource == Resource.Metadata.LanguageResourceType {
+    // Filters out Packages that don't contain the matching resource type.
+    let localPackages = allLocalPackages.compactMap { return $0 as? Package }
+
     // Step 2 - drop version numbers from all filenames.  KMP installations don't include them, and
     // the version numbered filenames will actually interfere with migration.
     resources.forEach { resource in
@@ -539,7 +539,9 @@ public enum Migrations {
       let dstLocation = Storage.active.resourceURL(for: resource)!
 
       do {
-        try FileManager.default.moveItem(at: srcLocation, to: dstLocation)
+        if FileManager.default.fileExists(atPath: srcLocation.path) {
+          try FileManager.default.moveItem(at: srcLocation, to: dstLocation)
+        }
       } catch {
         log.error("Could not remove version number from filename for resource \(resource.packageID ?? "<no package>").\(resource.id)")
         log.error("Source: \(srcLocation)")
@@ -576,12 +578,28 @@ public enum Migrations {
       return matched.contains(where: { $0.typedFullID == resource.typedFullID }) ? nil : resource
     }
 
-    var wrapperPackages: [Package] = []
+    // Temporary:  this method may be called after the initial migration to 'migrate'
+    //             freshly-downloaded resources.  We should double-check our wrapper
+    //             kmp.jsons and reuse them if appropriate.
+    //
+    //             Once the cloud-JS => KMP conversion is done, a simple `[]` initialization
+    //             will suffice.
+    var wrapperPackages: [Package] = localPackages.compactMap { package in
+      // We only consider appending resources to existing kmp.jsons if the kmp.jsons were
+      // produced during resource migration.  We don't alter Developer-compiled kmp.jsons.
+      if package.metadata.isAutogeneratedWrapper {
+        return package
+      } else {
+        return nil
+      }
+    }
+
     for resource in unmatched {
       // Did we already build a matching wrapper package?
       let packageMatches = wrapperPackages.compactMap { package in
         return package.findMetadataMatchFor(resource: resource, ignoreLanguage: true)
       }
+
       if packageMatches.count > 0 {
         // We did!  Add this resource to the existing metadata object.
         var resourceMetadata = packageMatches[0]
