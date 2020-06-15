@@ -416,12 +416,16 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           let keyboards = batch.resources as! [InstallableKeyboard]
           log.info("Downloaded keyboard: \(keyboards[0].id).")
 
+          // TEMP:  wrap the newly-downloaded resources with a kmp.json.
+          //        Serves as a bridge until we're downloading actual .kmps for keyboards.
+          let wrappedKeyboards = Migrations.migrateToKMPFormat(keyboards)
+
           if(!isUpdate) {
-            downloadSucceeded(forKeyboards: keyboards)
+            downloadSucceeded(forKeyboards: wrappedKeyboards)
           } else {
             // Since we don't generate the notification as above, we need to manually update
             // the keyboards' metadata.
-            keyboards.forEach { keyboard in
+            wrappedKeyboards.forEach { keyboard in
               Manager.shared.addKeyboard(keyboard)
             }
           }

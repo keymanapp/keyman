@@ -55,10 +55,10 @@ class KMPKeyboard: Codable, KMPResource {
     languages = try values.decode([KMPLanguage].self, forKey: .languages)
   }
 
-  func hasMatchingMetadata(for resource: InstallableKeyboard, ignoreLanguage: Bool = false) -> Bool {
+  func hasMatchingMetadata(for resource: InstallableKeyboard, ignoreLanguage: Bool = false, ignoreVersion: Bool = true) -> Bool {
     if id != resource.id {
       return false
-    } else if version != resource.version {
+    } else if !ignoreVersion, version != resource.version {
       return false
     }
 

@@ -211,7 +211,7 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
   }
 
   // Designed for use in cloud JS -> KMP migrations as needed for 13.0 -> 14.0 upgrades.
-  internal func findMetadataMatchFor<Metadata>(resource: TypedLanguageResource, ignoreLanguage: Bool) -> Metadata?
+  internal func findMetadataMatchFor<Metadata>(resource: TypedLanguageResource, ignoreLanguage: Bool, ignoreVersion: Bool) -> Metadata?
     where TypedLanguageResource: KMPInitializableLanguageResource,
           TypedLanguageResource.Metadata == Metadata,
           Metadata.LanguageResourceType == TypedLanguageResource {
@@ -226,7 +226,7 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     }
 
     return metadataList.first(where: { kbdMetadata in
-      kbdMetadata.hasMatchingMetadata(for: resource, ignoreLanguage: ignoreLanguage)
+      kbdMetadata.hasMatchingMetadata(for: resource, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
     })
   }
 }

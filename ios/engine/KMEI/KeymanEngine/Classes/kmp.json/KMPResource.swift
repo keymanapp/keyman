@@ -27,7 +27,7 @@ protocol KMPResource: AnyKMPResource {
    * Designed to facilitate de-duplication of KMPResources when migrating cloud resources into the extracted KMP format
    * for 14.0+ file management.
    */
-  func hasMatchingMetadata(for resource: LanguageResourceType, ignoreLanguage: Bool) -> Bool
+  func hasMatchingMetadata(for resource: LanguageResourceType, ignoreLanguage: Bool, ignoreVersion: Bool) -> Bool
 }
 
 extension KMPResource {

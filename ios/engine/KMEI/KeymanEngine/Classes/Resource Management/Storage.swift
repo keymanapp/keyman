@@ -270,7 +270,8 @@ extension Storage {
 
     do {
       // Perform an auto-install of the lexical model's KMP if not already installed.
-      let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultLexicalModelDir)
+      let defaultKMPFile = defaultLexicalModelDir.appendingPathComponent("\(Defaults.lexicalModel.id).model.kmp")
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile)
       try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")

@@ -93,7 +93,6 @@ public class ResourceDownloadManager {
     }
 
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
-    // TODO:  Ensure that the downloaded keyboard is immediately KMP-wrapped!
     request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
     request.tag = 0
 

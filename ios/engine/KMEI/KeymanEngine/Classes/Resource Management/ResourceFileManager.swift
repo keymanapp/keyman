@@ -19,6 +19,22 @@ public class ResourceFileManager {
   fileprivate init() {
   }
 
+  public var installedPackages: [KeymanPackage] {
+    let userResources = Storage.active.userDefaults.userResources ?? []
+
+    var backingPackages: [KeymanPackage] = []
+    for resource in userResources {
+      if let package = KeymanPackage.parse(Storage.active.resourceDir(for: resource)!) {
+        // On successful parse, just ensure that we haven't already listed the package.
+        if !backingPackages.contains(where: { $0.id == package.id }) {
+          backingPackages.append(package)
+        }
+      }
+    }
+
+    return backingPackages
+  }
+
   /**
    * Apple doesn't provide a method that performs copy-and-overwrite functionality.  This function fills in that gap.
    */
@@ -84,6 +100,7 @@ public class ResourceFileManager {
     var extractionFolder = cacheDirectory
     extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
 
+    log.info("\(extractionFolder)")
     if let kmp = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
       return kmp
     } else {
@@ -230,6 +247,8 @@ public class ResourceFileManager {
       throw KMPError.resourceNotInPackage
     }
 
+    // TODO:  for all items in package, not 'in installableFiles'.
+    //
     // (source, destination)
     var installableFiles: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
     let installableFonts: [(String, URL)] = resource.fonts.map { font in

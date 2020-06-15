@@ -570,7 +570,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
           if let kb = Storage.active.userDefaults.userKeyboard(withFullID: id) {
             newKb = kb
           }
-        } else if let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
+        }
+
+        // Failsafe in case the previous lookup fails - at least load A keyboard.
+        if newKb == nil, let userKbs = Storage.active.userDefaults.userKeyboards, !userKbs.isEmpty {
           newKb = userKbs[0]
         }
       }
