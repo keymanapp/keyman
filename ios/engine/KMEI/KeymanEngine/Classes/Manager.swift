@@ -302,10 +302,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     currentKeyboardID = kb.fullID
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: fontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: fontFilename)!)
     }
     if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: oskFontFilename)!)
     }
 
     inputViewController.setKeyboard(kb)
@@ -591,9 +591,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
   public func fontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
-    if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.font?.source.first(where: { $0.hasFontExtension }) {
+      let fontURL = Storage.active.fontURL(forResource: kb, filename: filename)!
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -603,9 +603,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
   func oskFontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
-    if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
+      let fontURL = Storage.active.fontURL(forResource: kb, filename: filename)!
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil

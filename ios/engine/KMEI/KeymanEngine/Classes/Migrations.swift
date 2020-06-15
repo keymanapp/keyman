@@ -364,6 +364,7 @@ public enum Migrations {
     return Font(family: family, source: files)
   }
 
+  // OLD legacy migration.
   static func migrateForKMP(storage: Storage) {
     let languageDir = storage.baseDir.appendingPathComponent("languages")
     let fontDir = storage.baseDir.appendingPathComponent("fonts")
@@ -406,7 +407,7 @@ public enum Migrations {
 
     // Copy files
     for (keyboardID, urls) in urlsForKeyboard {
-      let keyboardDir = storage.keyboardDir(forID: keyboardID)
+      let keyboardDir = storage.legacyKeyboardDir(forID: keyboardID)
       do {
         try FileManager.default.createDirectory(at: keyboardDir,
                                                 withIntermediateDirectories: true,

@@ -238,14 +238,14 @@ extension KeymanWebViewController {
     webView!.evaluateJavaScript("setDeviceType('\(type)');", completionHandler: nil)
   }
 
-  private func fontObject(from font: Font?, keyboardID: String, isOsk: Bool) -> [String: Any]? {
+  private func fontObject(from font: Font?, keyboard: InstallableKeyboard, isOsk: Bool) -> [String: Any]? {
     guard let font = font else {
       return nil
     }
     // family does not have to match the name in the font file. It only has to be unique.
     return [
-      "family": "\(keyboardID)__\(isOsk ? "osk" : "display")",
-      "files": font.source.map { storage.fontURL(forKeyboardID: keyboardID, filename: $0).absoluteString }
+      "family": "\(keyboard.id)__\(isOsk ? "osk" : "display")",
+      "files": font.source.map { storage.fontURL(forResource: keyboard, filename: $0)!.absoluteString }
     ]
   }
 
@@ -262,8 +262,8 @@ extension KeymanWebViewController {
       stub["KP"] = packageID
     }
 
-    let displayFont = fontObject(from: keyboard.font, keyboardID: keyboard.id, isOsk: false)
-    let oskFont = fontObject(from: keyboard.oskFont, keyboardID: keyboard.id, isOsk: true) ?? displayFont
+    let displayFont = fontObject(from: keyboard.font, keyboard: keyboard, isOsk: false)
+    let oskFont = fontObject(from: keyboard.oskFont, keyboard: keyboard, isOsk: true) ?? displayFont
     if let displayFont = displayFont {
       stub["KFont"] = displayFont
     }

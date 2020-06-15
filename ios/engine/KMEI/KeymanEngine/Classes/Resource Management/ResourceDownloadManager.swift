@@ -102,7 +102,7 @@ public class ResourceDownloadManager {
     
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: [:])
-      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
+      request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
       request.tag = i + 1
       
       let fontTask = DownloadTask(do: request, for: nil, type: .other)

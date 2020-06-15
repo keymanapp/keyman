@@ -90,8 +90,16 @@ class Storage {
     return keyboardDir.appendingPathComponent(keyboardID)
   }
 
+  func legacyKeyboardDir(forID keyboardID: String) -> URL {
+    return keyboardDir.appendingPathComponent(keyboardID)
+  }
+
   @available(*, deprecated)
   func lexicalModelDir(forID lexicalModelID: String) -> URL {
+    return lexicalModelDir.appendingPathComponent(lexicalModelID)
+  }
+
+  func legacyLexicalModelDir(forID lexicalModelID: String) -> URL {
     return lexicalModelDir.appendingPathComponent(lexicalModelID)
   }
 
@@ -165,15 +173,15 @@ class Storage {
     // Note, that for installing a keyboard, it will no longer perform this
     // rename with this model, as the target file will obviously not already
     // exist.
-    let filename = keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID).js")
+    let filename = legacyKeyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID).js")
     if FileManager.default.fileExists(atPath: filename.path) {
       return filename
     }
-    return keyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
+    return legacyKeyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
   
   func legacyLexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
-    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
+    return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
 
   func lexicalModelPackageURL(forID lexicalModelID: String, asZip: Bool = false) -> URL {
@@ -182,10 +190,11 @@ class Storage {
   
   func legacyLexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
     // Our unzipping dependency requires a .zip extension to function, so we append that here.
-    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
+    return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
   }
 
   // TODO:  should be based on the package, not on ids.
+  @available(*, deprecated)
   func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
     return keyboardDir(forID: keyboardID).appendingPathComponent(filename)
   }
