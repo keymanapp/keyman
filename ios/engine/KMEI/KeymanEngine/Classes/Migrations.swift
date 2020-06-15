@@ -602,13 +602,15 @@ public enum Migrations {
     for resource in unmatched {
       // Did we already build a matching wrapper package?
       let packageMatches = wrapperPackages.compactMap { package in
-        return package.findMetadataMatchFor(resource: resource, ignoreLanguage: true)
+        return package.findMetadataMatchFor(resource: resource, ignoreLanguage: true) != nil ? package : nil
       }
 
       if packageMatches.count > 0 {
         // We did!  Add this resource to the existing metadata object.
-        var resourceMetadata = packageMatches[0]
+        var resourceMetadata = packageMatches[0].findMetadataMatchFor(resource: resource, ignoreLanguage: true)!
         resourceMetadata.languages.append(KMPLanguage(from: resource)!)
+        // Update the installable resources listing!
+        packageMatches[0].setInstallableResourceSets(for: [resourceMetadata])
       } else {
         // Time for a new wrapper package!
         let location = Storage.active.resourceDir(for: resource)!
@@ -633,7 +635,7 @@ public enum Migrations {
 
     // Each wrapper package contains only a single resource.  .installables[0] returns all
     // LanguageResource pairings for that script resource.
-    let wrappedResources = wrapperPackages.flatMap { return $0.installables[0] }
+    let wrappedResources: [Resource] = wrapperPackages.flatMap { $0.installables[0] }
     return matched + wrappedResources
   }
 }

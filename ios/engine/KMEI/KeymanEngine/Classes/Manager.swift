@@ -660,7 +660,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Preloads the JS and font files required for a keyboard.
   @available(*, deprecated, message: "Use ResourceFileManager's methods to install resources from KMPs.")
   public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
-    let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
+    let keyboardDir = Storage.active.legacyKeyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
       try Storage.copy(at: url,

@@ -240,7 +240,7 @@ public class ResourceDownloadManager {
 
     let request = HTTPDownloadRequest(url: path, userInfo: [:])
     // TODO:  redirect to store in the Documents directory.
-    request.destinationFile = Storage.active.lexicalModelPackageURL(forID: lexicalModel.id).path
+    request.destinationFile = Storage.active.lexicalModelPackageURL(for: lexicalModel).path
     request.tag = 0
 
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)

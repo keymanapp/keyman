@@ -38,7 +38,7 @@ class FileManagementTests: XCTestCase {
     XCTAssertEqual(keyboards.count, 1, "Unexpected number of keyboards were installed")
     XCTAssertEqual(keyboards[0].id, "khmer_angkor", "Installed keyboard ID mismatch")
 
-    let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
+    let fontURL = Storage.active.fontURL(forResource: TestUtils.Keyboards.khmer_angkor, filename: "Mondulkiri-R.ttf")!
     XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
   }
 
@@ -89,7 +89,7 @@ class FileManagementTests: XCTestCase {
 
     // While the LanguageResource definition we provided lacks font definitions, the
     // KMP's definition has that data.  By default, the KMP's definition takes precedence.
-    let fontURL = Storage.active.fontURL(forKeyboardID: "khmer_angkor", filename: "Mondulkiri-R.ttf")
+    let fontURL = Storage.active.fontURL(forResource: TestUtils.Keyboards.khmer_angkor, filename: "Mondulkiri-R.ttf")!
     XCTAssertTrue(FileManager.default.fileExists(atPath: fontURL.path))
   }
 
