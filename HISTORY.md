@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.93 alpha 2020-06-15
+
+* fix(developer/ide): double click to change layer update combo (#3240)
+* fix(developer/ide): fix copy and paste in touch editor (#3238)
+
 ## 14.0.92 alpha 2020-06-12
 
 * change(ios/engine): Package migration prep (#3229)
