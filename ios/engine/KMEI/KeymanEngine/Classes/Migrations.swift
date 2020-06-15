@@ -544,7 +544,13 @@ public enum Migrations {
 
       allLocalPackages = kmpFiles.compactMap { file in
         let filePath = cachedKMPsDirectory.appendingPathComponent(file)
-        return (ResourceFileManager.shared.getPackageInfo(for: filePath)!, filePath)
+        do {
+          let tuple = try (ResourceFileManager.shared.prepareKMPInstall(from: filePath), filePath)
+          return tuple
+        } catch {
+          log.error("Could not load kmp.info for \(filePath)")
+          return nil
+        }
       }
     } catch {
       log.error("Could not check contents of Documents directory for resource-migration assist")
@@ -579,12 +585,9 @@ public enum Migrations {
       // the decompressed KMP's contents.
       do {
         // We've already parsed the metadata, but now we need to have the files ready for install.
-        let package = try ResourceFileManager.shared.prepareKMPInstall(from: kmpFile) as! Package
         try packageMatches.forEach { resource in
           try ResourceFileManager.shared.install(resourceWithID: resource.typedFullID, from: package)
         }
-        // Post-install cleanup.
-        try FileManager.default.removeItem(at: package.sourceFolder)
       } catch {
         log.error("Could not install resource from locally-cached package: \(String(describing: error))")
       }

@@ -155,23 +155,6 @@ public class ResourceFileManager {
     }
   }
 
-  /**
-   * Similar to `preparePackageInstall`, but the resuting `KeymanPackage` cannot be used for installation.  Use when you
-   * want information about a package's contents when not immediately looking to install its resources.
-   */
-  public func getPackageInfo(for url: URL) -> KeymanPackage? {
-    // Facilitates clean retrieval of a package's metadata by temporarily extracting
-    // its contents just long enough to parse the kmp.json.
-    do {
-      let package = try self.prepareKMPInstall(from: url)
-      try FileManager.default.removeItem(at: package.sourceFolder)
-      return package
-    } catch {
-      log.error("Error occurred attempting to extract metadata for KMP at \(String(describing: url)): \(String(describing: error))")
-      return nil
-    }
-  }
-
   public func promptPackageInstall(of package: KeymanPackage,
                                    in rootVC: UIViewController,
                                    isCustom: Bool,
@@ -222,9 +205,6 @@ public class ResourceFileManager {
     } else {
       try Manager.parseLMKMP(package.sourceFolder, isCustom: isCustom)
     }
-
-    // Note:  package.sourceFolder is a temporary directory, as set by preparePackageInstall.
-    try FileManager.default.removeItem(at: package.sourceFolder)
   }
 
   @available(*, deprecated)
@@ -282,10 +262,10 @@ public class ResourceFileManager {
 
     // Use the func we just declared while performing proper Swift type coersion.
     if resource is InstallableKeyboard {
-      let resourceList = addOrAppend(resource, to: userDefaults.userKeyboards as! [Resource])
+      let resourceList = addOrAppend(resource, to: userDefaults.userKeyboards as? [Resource] ?? [])
       userDefaults.userKeyboards = (resourceList as! [InstallableKeyboard])
     } else if resource is InstallableLexicalModel {
-      let resourceList = addOrAppend(resource, to: userDefaults.userLexicalModels as! [Resource])
+      let resourceList = addOrAppend(resource, to: userDefaults.userLexicalModels as? [Resource] ?? [])
       userDefaults.userLexicalModels = (resourceList as! [InstallableLexicalModel])
     } else {
       fatalError("Cannot install instance of unexpected LanguageResource subclass")

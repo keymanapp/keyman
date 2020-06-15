@@ -54,6 +54,19 @@ public class KeymanPackage {
     self.id = nameComponents.joined(separator: ".")
   }
 
+  deinit {
+    // Temporary packages should clean up after themselves when they go out of scope.
+    if isTemp {
+      do {
+        if FileManager.default.fileExists(atPath: self.sourceFolder.path) {
+          try FileManager.default.removeItem(at: self.sourceFolder)
+        }
+      } catch {
+        log.debug("Could not remove temporary extraction site on package deinit")
+      }
+    }
+  }
+
   public func isKeyboard() -> Bool {
     return metadata.packageType == .Keyboard
   }
