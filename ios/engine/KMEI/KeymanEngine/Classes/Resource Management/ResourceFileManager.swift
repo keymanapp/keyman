@@ -247,46 +247,52 @@ public class ResourceFileManager {
       throw KMPError.resourceNotInPackage
     }
 
-    // TODO:  for all items in package, not 'in installableFiles'.
-    //
-    // (source, destination)
-    var installableFiles: [(String, URL)] = [(resource.sourceFilename, Storage.active.resourceURL(for: resource)!)]
-    let installableFonts: [(String, URL)] = resource.fonts.map { font in
-      // KMPs only list a single font file for each entry whenever one is included.
-      // A pre-existing assumption.
-      let fontFile = font.source[0]
-      return (fontFile, Storage.active.fontURL(forResource: resource, filename: fontFile)!)
-    }
-
-    installableFiles.append(contentsOf: installableFonts)
-
     do {
-      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: resource)!,
-                                              withIntermediateDirectories: true)
+      try copyWithOverwrite(from: package.sourceFolder,
+                            to: Storage.active.resourceDir(for: resource)!)
     } catch {
-      log.error("Could not create installation directory: \(error)")
+      log.error("Could not create installation directory and/or copy resources: \(error)")
       throw KMPError.fileSystem
     }
 
-    do {
-      for item in installableFiles {
-        var filePath = package.sourceFolder
-        filePath.appendPathComponent(item.0)
-        try copyWithOverwrite(from: filePath, to: item.1)
-      }
-    } catch {
-      log.error("Error installing the resource: \(error)")
-      throw KMPError.copyFiles
+    addResource(resource)
+  }
+
+  internal func addResource<Resource: LanguageResource>(_ resource: Resource) {
+    let path = Storage.active.resourceURL(for: resource)!.path
+    if !FileManager.default.fileExists(atPath: path) {
+      log.error("Could not add resource of type: \(resource.fullID.type) with ID: \(resource.id) because the resource file does not exist")
+      return
     }
 
-    // There's no generalized method for this quite yet.  Manager doesn't need even
-    // more of these.
-    if let keyboard = resource as? InstallableKeyboard {
-      Manager.shared.addKeyboard(keyboard)
-    } else if let lexicalModel = resource as? InstallableLexicalModel {
-      Manager.addLexicalModel(lexicalModel)
+    // Get keyboards list if it exists in user defaults, otherwise create a new one
+    let userDefaults = Storage.active.userDefaults
+
+    // Local, inline func used by the block following it.
+    func addOrAppend(_ resource: Resource, to resourceList: [Resource]) -> [Resource] {
+      var list = resourceList
+      // Update resource if it exists
+      if let index = resourceList.firstIndex(where: { $0.typedFullID == resource.typedFullID }) {
+        list[index] = resource
+      } else {
+        list.append(resource)
+      }
+      return list
+    }
+
+    // Use the func we just declared while performing proper Swift type coersion.
+    if resource is InstallableKeyboard {
+      let resourceList = addOrAppend(resource, to: userDefaults.userKeyboards as! [Resource])
+      userDefaults.userKeyboards = (resourceList as! [InstallableKeyboard])
+    } else if resource is InstallableLexicalModel {
+      let resourceList = addOrAppend(resource, to: userDefaults.userLexicalModels as! [Resource])
+      userDefaults.userLexicalModels = (resourceList as! [InstallableLexicalModel])
     } else {
       fatalError("Cannot install instance of unexpected LanguageResource subclass")
     }
+
+    userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
+    userDefaults.synchronize()
+    log.info("Added \(resource.fullID.type) with ID: \(resource.id) and language code: \(resource.languageID)")
   }
 }

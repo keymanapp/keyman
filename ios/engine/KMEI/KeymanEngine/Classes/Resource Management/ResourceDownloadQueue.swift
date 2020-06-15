@@ -426,7 +426,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
             // Since we don't generate the notification as above, we need to manually update
             // the keyboards' metadata.
             wrappedKeyboards.forEach { keyboard in
-              Manager.shared.addKeyboard(keyboard)
+              ResourceFileManager.shared.addResource(keyboard)
             }
           }
 

@@ -342,27 +342,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   /// Adds a new keyboard to the list in the keyboard picker if it doesn't already exist.
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
+  @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
-    let keyboardPath = Storage.active.keyboardURL(for: keyboard).path
-    if !FileManager.default.fileExists(atPath: keyboardPath) {
-      log.error("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist")
-      return
-    }
-
-    // Get keyboards list if it exists in user defaults, otherwise create a new one
-    let userDefaults = Storage.active.userDefaults
-    var userKeyboards = userDefaults.userKeyboards ?? []
-
-    // Update keyboard if it exists
-    if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
-      userKeyboards[index] = keyboard
-    } else {
-      userKeyboards.append(keyboard)
-    }
-
-    userDefaults.userKeyboards = userKeyboards
-    userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-    userDefaults.synchronize()
+    ResourceFileManager.shared.addResource(keyboard)
   }
     
     
@@ -407,29 +389,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
   *   I believe this is background-thread-safe (no UI done)
   */
+  @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   static public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
-    if !FileManager.default.fileExists(atPath: lexicalModelPath) {
-      log.error("Could not add lexical model with ID: \(lexicalModel.id) because the lexical model file does not exist")
-      return
-    }
-    
-    // Get lexical models list if it exists in user defaults, otherwise create a new one
-    let userDefaults = Storage.active.userDefaults
-    var userLexicalModels = userDefaults.userLexicalModels ?? []
-    
-    // Update lexical model if it exists
-    if let index = userLexicalModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
-      userLexicalModels[index] = lexicalModel
-    } else {
-      userLexicalModels.append(lexicalModel)
-    }
-    
-    userDefaults.userLexicalModels = userLexicalModels
-    userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-    userDefaults.synchronize()
-    log.info("Added lexical model ID: \(lexicalModel.id) name: \(lexicalModel.name)")
-}
+    ResourceFileManager.shared.addResource(lexicalModel)
+  }
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed

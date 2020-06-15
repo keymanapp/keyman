@@ -330,7 +330,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     
     // Add keyboard.
     for keyboard in keyboards {
-      Manager.shared.addKeyboard(keyboard)
+      ResourceFileManager.shared.addResource(keyboard)
       _ = Manager.shared.setKeyboard(keyboard)
     }
     
@@ -341,7 +341,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
     // Add models.
     for lexicalModel in lexicalModels {
-      Manager.addLexicalModel(lexicalModel)
+      ResourceFileManager.shared.addResource(lexicalModel)
       _ = Manager.shared.registerLexicalModel(lexicalModel)
     }
     
