@@ -470,7 +470,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
 
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
-      let keyboardDir = Storage.active.keyboardDir(forID: kb.id)
+      // TODO:  should make sure that there are no resources in the package,
+      //        rather than just 'no matching keyboards'.
+      let keyboardDir = Storage.active.resourceDir(for: kb)!
       FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
       log.info("Deleting directory \(keyboardDir)")
       if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
@@ -552,7 +554,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
-      let lexicalModelDir = Storage.active.lexicalModelDir(forID: lm.id)
+      let lexicalModelDir = Storage.active.resourceDir(for: lm)!
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
       log.info("Deleting directory \(lexicalModelDir)")
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
@@ -656,6 +658,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   // MARK: - Loading custom keyboards
   /// Preloads the JS and font files required for a keyboard.
+  @available(*, deprecated, message: "Use ResourceFileManager's methods to install resources from KMPs.")
   public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
     let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)

@@ -107,6 +107,15 @@ public enum Migrations {
       }
     }
 
+    // TODO:  uncomment the following if-check.
+    //if version < Version.packageBasedFileReorg {
+      do {
+        try migrateCloudResourcesToKMPFormat()
+      } catch {
+        log.error("Could not migrate pre-existing resources to KMP-style file organization")
+      }
+    //}
+
     storage.userDefaults.synchronize()
   }
 

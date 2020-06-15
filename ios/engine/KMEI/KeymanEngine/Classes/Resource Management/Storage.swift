@@ -85,18 +85,12 @@ class Storage {
     }
   }
 
-  @available(*, deprecated)
-  func keyboardDir(forID keyboardID: String) -> URL {
-    return keyboardDir.appendingPathComponent(keyboardID)
-  }
+  // Note:  legacy* methods are utilized for migrations through 14.0, at which point
+  //        KeymanEngine transitioned entirely to using LanguageResource instances
+  //        for path lookups.
 
   func legacyKeyboardDir(forID keyboardID: String) -> URL {
     return keyboardDir.appendingPathComponent(keyboardID)
-  }
-
-  @available(*, deprecated)
-  func lexicalModelDir(forID lexicalModelID: String) -> URL {
-    return lexicalModelDir.appendingPathComponent(lexicalModelID)
   }
 
   func legacyLexicalModelDir(forID lexicalModelID: String) -> URL {
@@ -183,29 +177,14 @@ class Storage {
   func legacyLexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
     return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
-
-  func lexicalModelPackageURL(forID lexicalModelID: String, asZip: Bool = false) -> URL {
-    return lexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID).model.kmp\(asZip ? ".zip" : "")")
-  }
   
   func legacyLexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
     // Our unzipping dependency requires a .zip extension to function, so we append that here.
     return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
   }
 
-  // TODO:  should be based on the package, not on ids.
-  @available(*, deprecated)
-  func fontURL(forKeyboardID keyboardID: String, filename: String) -> URL {
-    return keyboardDir(forID: keyboardID).appendingPathComponent(filename)
-  }
-
   func fontURL(forResource resource: AnyLanguageResource, filename: String) -> URL? {
-    if let keyboard = resource as? InstallableKeyboard {
-      return fontURL(forKeyboardID: keyboard.id, filename: filename)
-    } else {
-      // Lexical models do not yet support fonts.
-      return nil
-    }
+    return resourceDir(for: resource)?.appendingPathComponent(filename)
   }
 
   var keyboardDirs: [URL]? {
@@ -289,12 +268,9 @@ extension Storage {
                      dstDir: defaultLexicalModelDir,
                      excludeFromBackup: false)
 
-    // Perform an auto-install of the lexical model's KMP if not already installed.
-    let lexicalModelURL = Storage.active.lexicalModelPackageURL(forID: Defaults.lexicalModel.id,
-                                                                asZip: false)
-
     do {
-      let package = try ResourceFileManager.shared.prepareKMPInstall(from: lexicalModelURL)
+      // Perform an auto-install of the lexical model's KMP if not already installed.
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultLexicalModelDir)
       try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
