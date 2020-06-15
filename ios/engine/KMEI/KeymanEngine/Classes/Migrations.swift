@@ -519,25 +519,7 @@ public enum Migrations {
         _ resources: [Resource]) -> [Resource]
         where Resource: KMPInitializableLanguageResource,
               Resource == Resource.Metadata.LanguageResourceType {
-    // Step 1 - analyze all locally-cached KMPs for possible resource sources.
-    var allLocalPackages: [KeymanPackage] = []
-    do {
-      let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      let files = try FileManager.default.contentsOfDirectory(atPath: cachedKMPsDirectory.path)
-      let kmpFiles = files.filter { $0.suffix(4) == ".kmp" }
-
-      allLocalPackages = kmpFiles.compactMap { file in
-        let filePath = cachedKMPsDirectory.appendingPathComponent(file)
-        return ResourceFileManager.shared.getPackageInfo(for: filePath)
-      }
-    } catch {
-      log.error("Could not check contents of Documents directory for resource-migration assist")
-    }
-
-    // Filters out Packages that don't contain the matching resource type.
-    let localPackages = allLocalPackages.compactMap { return $0 as? Package }
-
-    // Step 2 - drop version numbers from all filenames.  KMP installations don't include them, and
+    // Step 1 - drop version numbers from all filenames.  KMP installations don't include them, and
     // the version numbered filenames will actually interfere with migration.
     resources.forEach { resource in
       let srcLocation = Storage.active.legacyResourceURL(for: resource)!
@@ -553,11 +535,35 @@ public enum Migrations {
       }
     }
 
+    // Step 2 - analyze all locally-cached KMPs for possible resource sources.
+    var allLocalPackages: [(KeymanPackage, URL)] = []
+    do {
+      let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      let files = try FileManager.default.contentsOfDirectory(atPath: cachedKMPsDirectory.path)
+      let kmpFiles = files.filter { $0.suffix(4) == ".kmp" }
+
+      allLocalPackages = kmpFiles.compactMap { file in
+        let filePath = cachedKMPsDirectory.appendingPathComponent(file)
+        return (ResourceFileManager.shared.getPackageInfo(for: filePath)!, filePath)
+      }
+    } catch {
+      log.error("Could not check contents of Documents directory for resource-migration assist")
+    }
+
+    // Filters out Packages that don't contain the matching resource type.
+    let localPackages: [(Package, URL)] = allLocalPackages.compactMap { tuple in
+      if let package = tuple.0 as? Package {
+        return (package, tuple.1)
+      } else {
+        return nil
+      }
+    }
+
     // Step 3 - determine which resources were installed from our locally-available KMPs,
     //          then migrate by reinstalling the KMP.
     var matched: [Resource] = []
 
-    localPackages.forEach { package in
+    localPackages.forEach { (package, kmpFile) in
       let packageMatches: [Resource] = resources.compactMap { resource in
         if let possibleMatch = package.findResource(withID: resource.typedFullID) {
           if possibleMatch.version == resource.version {
@@ -569,9 +575,19 @@ public enum Migrations {
       }
 
       // All resources within packageMatches were sourced from the current package.
-      // Time to set migrate these.
-
-      // TODO:  Migrate 'em based on their source packages.
+      // Time to set migrate these.  Overwrites any obstructing files with the
+      // the decompressed KMP's contents.
+      do {
+        // We've already parsed the metadata, but now we need to have the files ready for install.
+        let package = try ResourceFileManager.shared.prepareKMPInstall(from: kmpFile) as! Package
+        try packageMatches.forEach { resource in
+          try ResourceFileManager.shared.install(resourceWithID: resource.typedFullID, from: package)
+        }
+        // Post-install cleanup.
+        try FileManager.default.removeItem(at: package.sourceFolder)
+      } catch {
+        log.error("Could not install resource from locally-cached package: \(String(describing: error))")
+      }
 
       matched.append(contentsOf: packageMatches)
     }
