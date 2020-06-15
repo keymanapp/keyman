@@ -518,12 +518,7 @@ public enum Migrations {
 
       allLocalPackages = kmpFiles.compactMap { file in
         let filePath = cachedKMPsDirectory.appendingPathComponent(file)
-        do {
-          return try ResourceFileManager.shared.prepareKMPInstall(from: filePath)
-        } catch {
-          log.error("Error occurred when processing existing packages during cloud -> KMP migration: \(String(describing: error))")
-          return nil as KeymanPackage?
-        }
+        return ResourceFileManager.shared.getPackageInfo(for: filePath)
       }
     } catch {
       log.error("Could not check contents of Documents directory for resource-migration assist")

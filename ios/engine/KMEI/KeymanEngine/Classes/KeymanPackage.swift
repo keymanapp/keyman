@@ -26,6 +26,8 @@ public class KeymanPackage {
   public let sourceFolder: URL
   public let id: String
   internal let metadata: KMPMetadata
+
+  // Used to denote Packages pending installation; referenced by ResourceFileManager.
   internal let isTemp: Bool
 
   internal init(metadata: KMPMetadata, folder: URL) {

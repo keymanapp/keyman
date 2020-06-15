@@ -55,6 +55,14 @@ public class PackageInstallViewController: UIViewController {
 
   @objc func cancelBtnHandler() {
     dismiss(animated: true, completion: nil)
+    // Note:  package.sourceFolder is a temporary directory, as set by preparePackageInstall.
+    do {
+      try FileManager.default.removeItem(at: package.sourceFolder)
+    } catch {
+      // Our attempt to clean up the temporarily-extracted contents failed.
+      // At least we extracted to a temp (cache) folder; we'll let iOS
+      // handle it, then.
+    }
   }
 
   @objc func installBtnHandler() {

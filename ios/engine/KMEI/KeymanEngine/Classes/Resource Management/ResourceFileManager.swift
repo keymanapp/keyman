@@ -138,6 +138,23 @@ public class ResourceFileManager {
     }
   }
 
+  /**
+   * Similar to `preparePackageInstall`, but the resuting `KeymanPackage` cannot be used for installation.  Use when you
+   * want information about a package's contents when not immediately looking to install its resources.
+   */
+  public func getPackageInfo(for url: URL) -> KeymanPackage? {
+    // Facilitates clean retrieval of a package's metadata by temporarily extracting
+    // its contents just long enough to parse the kmp.json.
+    do {
+      let package = try self.prepareKMPInstall(from: url)
+      try FileManager.default.removeItem(at: package.sourceFolder)
+      return package
+    } catch {
+      log.error("Error occurred attempting to extract metadata for KMP at \(String(describing: url)): \(String(describing: error))")
+      return nil
+    }
+  }
+
   public func promptPackageInstall(of package: KeymanPackage,
                                    in rootVC: UIViewController,
                                    isCustom: Bool,
