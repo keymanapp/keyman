@@ -115,10 +115,8 @@ public class GetStartedActivity extends AppCompatActivity {
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 0) {
           if (KMManager.hasConnection(context)) {
-            // Scenario 1: Connection to keyman.com catalog
-            Intent i = new Intent(context, KMPBrowserActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            // Keyman Settings install activity
+            Intent i = new Intent(context, KeymanSettingsInstallActivity.class);
             context.startActivity(i);
           }
         } else if (position == 1) {
