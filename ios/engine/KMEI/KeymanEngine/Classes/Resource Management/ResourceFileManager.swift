@@ -38,7 +38,7 @@ public class ResourceFileManager {
   /**
    * Apple doesn't provide a method that performs copy-and-overwrite functionality.  This function fills in that gap.
    */
-  private func copyWithOverwrite(from source: URL, to destination: URL) throws {
+  internal func copyWithOverwrite(from source: URL, to destination: URL) throws {
     let fileManager = FileManager.default
 
     // For now, we'll always allow overwriting.

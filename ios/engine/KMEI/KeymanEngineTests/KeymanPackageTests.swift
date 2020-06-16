@@ -13,7 +13,7 @@ class KeymanPackageTests: XCTestCase {
   func testKeyboardPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.kmp.zip")
-    try FileManager.default.copyItem(at: TestUtils.Keyboards.khmerAngkorKMP, to: khmerPackageZip)
+    try ResourceFileManager.shared.copyWithOverwrite(from: TestUtils.Keyboards.khmerAngkorKMP, to: khmerPackageZip)
 
     let destinationFolderURL = cacheDirectory.appendingPathComponent("khmer_angkor")
 
@@ -42,7 +42,7 @@ class KeymanPackageTests: XCTestCase {
   func testLexicalModelPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let mtntZip = cacheDirectory.appendingPathComponent("nrc.en.mtnt.kmp.zip")
-    try FileManager.default.copyItem(at: TestUtils.LexicalModels.mtntKMP, to: mtntZip)
+    try ResourceFileManager.shared.copyWithOverwrite(from: TestUtils.LexicalModels.mtntKMP, to: mtntZip)
 
     let destinationFolderURL = cacheDirectory.appendingPathComponent("nrc.en.mtnt.model")
 
