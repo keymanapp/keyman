@@ -15,6 +15,29 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
+  func testComplexVersion13Migration() {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
+    Migrations.migrate(storage: Storage.active)
+    Migrations.updateResources(storage: Storage.active)
+
+    // TODO: test things.
+  }
+
+  func testVersion13ResourceMigration() {
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.simple_13)
+    Migrations.updateResources(storage: Storage.active)
+
+    let userDefaults = Storage.active.userDefaults
+
+    // SIL EuroLatin should be updated to 1.9.1.  The lexical model version should be unchanged.
+
+    let defaultKbd = userDefaults.userKeyboards![0]
+    XCTAssertEqual(defaultKbd.id, Defaults.keyboard.id)
+    XCTAssertEqual(defaultKbd.version, Defaults.keyboard.version)
+    let keyboardURL = Storage.active.resourceURL(for: Defaults.keyboard)!
+    XCTAssert(FileManager.default.fileExists(atPath: keyboardURL.path))
+  }
+
   func testVersion13CloudToKMPMigration() throws {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
 

@@ -247,13 +247,18 @@ extension Storage {
     // Since we only want to do this installation the first time (rather than constantly force-reinstalling
     // the resource), we don't want this excluded from backup.
     try Storage.copy(from: bundle,
-                     resourceName: "\(Defaults.keyboard.id).js",
+                     resourceName: "\(Defaults.keyboard.id).kmp",
                      dstDir: defaultKeyboardDir,
                      excludeFromBackup: false)
-    try Storage.copy(from: bundle,
-                     resourceName: "DejaVuSans.ttf",
-                     dstDir: defaultKeyboardDir,
-                     excludeFromBackup: false)
+
+    do {
+      // Perform an auto-install of the keyboard's KMP if not already installed.
+      let defaultKMPFile = defaultKeyboardDir.appendingPathComponent("\(Defaults.keyboard.id).kmp")
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile) as! KeyboardKeymanPackage
+      try ResourceFileManager.shared.install(resourceWithID: Defaults.keyboard.fullID, from: package)
+    } catch {
+      log.error("Failed to install the default keyboard from the bundled KMP: \(error)")
+    }
   }
 
   func installDefaultLexicalModel(from bundle: Bundle) throws {
@@ -271,8 +276,8 @@ extension Storage {
     do {
       // Perform an auto-install of the lexical model's KMP if not already installed.
       let defaultKMPFile = defaultLexicalModelDir.appendingPathComponent("\(Defaults.lexicalModel.id).model.kmp")
-      let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile)
-      try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile) as! LexicalModelKeymanPackage
+      try ResourceFileManager.shared.install(resourceWithID: Defaults.lexicalModel.fullID, from: package)
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
     }

@@ -50,32 +50,53 @@ public enum Migrations {
                                          oskFont: nil,
                                          isCustom: false)
 
+    let sil_euro_latin_1_8_1 = InstallableKeyboard(id: "sil_euro_latin",
+                                                   name: "EuroLatin (SIL)",
+                                                   languageID: "en",
+                                                   languageName: "English",
+                                                   version: "1.8.1",
+                                                   isRTL: false,
+                                                   font: font,
+                                                   oskFont: nil,
+                                                   isCustom: false)
+
+    let sil_euro_latin_1_9_1 = InstallableKeyboard(id: "sil_euro_latin",
+                                                   name: "EuroLatin (SIL)",
+                                                   languageID: "en",
+                                                   languageName: "English",
+                                                   version: "1.9.1",
+                                                   isRTL: false,
+                                                   font: font,
+                                                   oskFont: nil,
+                                                   isCustom: false)
+
     let nrc_en_mtnt_0_1_2 = InstallableLexicalModel(id: "nrc.en.mtnt",
                                                     name: "English dictionary (MTNT)",
                                                     languageID: "en",
                                                     version: "0.1.2",
                                                     isCustom: false)
 
-    let sil_euro_latin = Defaults.keyboard  // We're already storing the exact metadata needed.
     let nrc_en_mtnt = Defaults.lexicalModel
 
     // Unknown transition point:  european
     // Before v11:  european2
-    // Before v12:  sil_euro_latin
-    // At v12:      sil_euro_latin + nrc.en.mtnt (lex model)
+    // Before v12:  sil_euro_latin 1.8.1
+    // At v12:      sil_euro_latin 1.8.1 + nrc.en.mtnt (lex model)
     var timeline: [VersionResourceSet] = []
 
     let legacy_resources = VersionResourceSet(version: Version.fallback, resources: [european])
     let v10_resources = VersionResourceSet(version: Version("10.0")!, resources: [european2])
-    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin])
-    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin, nrc_en_mtnt_0_1_2])
-    let v13_resources = VersionResourceSet(version: Version("13.0.65")!, resources: [sil_euro_latin, nrc_en_mtnt])
+    let v11_resources = VersionResourceSet(version: Version("11.0")!, resources: [sil_euro_latin_1_8_1])
+    let v12_resources = VersionResourceSet(version: Version("12.0")!, resources: [sil_euro_latin_1_8_1, nrc_en_mtnt_0_1_2])
+    let v13_resources = VersionResourceSet(version: Version("13.0.65")!, resources: [sil_euro_latin_1_8_1, nrc_en_mtnt])
+    let v14_resources = VersionResourceSet(version: Version("14.0.0")!, resources: [sil_euro_latin_1_9_1, nrc_en_mtnt])
 
     timeline.append(legacy_resources)
     timeline.append(v10_resources)
     timeline.append(v11_resources)
     timeline.append(v12_resources)
     timeline.append(v13_resources)
+    timeline.append(v14_resources)
 
     return timeline
   }()
