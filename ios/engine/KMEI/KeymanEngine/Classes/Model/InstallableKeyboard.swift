@@ -16,6 +16,7 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
+    case packageID
     case name
     case lgCode = "languageID" // The original name of the property, which we maintain for serialization.
     case languageName

@@ -15,23 +15,43 @@ class MigrationTests: XCTestCase {
     TestUtils.standardTearDown()
   }
 
-  func testVersion13CloudToKMPMigration() {
+  func testVersion13CloudToKMPMigration() throws {
     TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
+
+    let initialUserKeyboards = Storage.active.userDefaults.userKeyboards!
+    let initialUserModels = Storage.active.userDefaults.userLexicalModels!
+
+    // A baseline load-check; confirms we have the correct resource count at the start.
+    XCTAssertEqual(initialUserKeyboards.count, 7)
+    XCTAssertEqual(initialUserModels.count, 6)
+
+    // TODO:  Actual migration unit testing.  So far, this is really more of a
+    //        TestUtils.Migrations.applyBundleToFileSystem unit test.
+    try Migrations.migrateCloudResourcesToKMPFormat()
+
+    // Now that migration has completed, it's time to check the results.
 
     let userKeyboards = Storage.active.userDefaults.userKeyboards!
     let userModels = Storage.active.userDefaults.userLexicalModels!
 
-    // A baseline load-check; confirms we have the correct resource count at the start.
+    // Pass 1:  do we have a matching set of resources after the migration?
     XCTAssertEqual(userKeyboards.count, 7)
     XCTAssertEqual(userModels.count, 6)
 
-    // TODO:  Actual migration unit testing.  So far, this is really more of a
-    //        TestUtils.Migrations.applyBundleToFileSystem unit test.
-    do {
-      try Migrations.migrateCloudResourcesToKMPFormat()
-    } catch {
-      // TODO:
+    userKeyboards.forEach{ kbd in
+      XCTAssertTrue(initialUserKeyboards.contains(where: { $0.fullID == kbd.fullID }))
+      XCTAssertEqual(kbd.packageID, kbd.id)
     }
+
+    userModels.forEach{ lm in
+      XCTAssertTrue(initialUserModels.contains(where: { $0.fullID == lm.fullID }))
+      XCTAssertEqual(lm.packageID, lm.id)
+    }
+
+    // TODO:  If sil_sahu has actually-extracted KMP contents
+    // TODO:  If the synthetic metadata flag is correct for all entries
+        // TODO:  And version is set appropriately based on flag.
+    // TODO:  If sil_eurolatin has two language members, others have one
   }
 
   func testVersion12ResourceMigration() {

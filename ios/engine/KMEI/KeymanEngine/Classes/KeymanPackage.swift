@@ -179,7 +179,7 @@ public class KeymanPackage {
   }
 
   internal static func forMigration<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(of resource: Resource, at location: URL) -> Package? {
-    let metadata = KMPMetadata(from: resource)
+    let metadata = KMPMetadata(from: resource, packageId: resource.id)
 
     if let _ = resource as? InstallableKeyboard {
       return (KeyboardKeymanPackage(metadata: metadata, folder: location) as! Package)

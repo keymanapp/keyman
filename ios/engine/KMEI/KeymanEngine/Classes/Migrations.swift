@@ -587,12 +587,11 @@ public enum Migrations {
         // We've already parsed the metadata, but now we need to have the files ready for install.
         try packageMatches.forEach { resource in
           try ResourceFileManager.shared.install(resourceWithID: resource.typedFullID, from: package)
+          matched.append(package.findResource(withID: resource.typedFullID)!)
         }
       } catch {
         log.error("Could not install resource from locally-cached package: \(String(describing: error))")
       }
-
-      matched.append(contentsOf: packageMatches)
     }
 
     // Step 4 - anything unmatched is a cloud resource.  Autogenerate a kmp.json for it
