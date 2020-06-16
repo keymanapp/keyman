@@ -277,7 +277,9 @@ extension Storage {
       // Perform an auto-install of the lexical model's KMP if not already installed.
       let defaultKMPFile = defaultLexicalModelDir.appendingPathComponent("\(Defaults.lexicalModel.id).model.kmp")
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile) as! LexicalModelKeymanPackage
-      try ResourceFileManager.shared.install(resourceWithID: Defaults.lexicalModel.fullID, from: package)
+      
+      // Install all languages for the model, not just the default-listed one.
+      try ResourceFileManager.shared.install(resourcesWithIDs: package.installables[0].map { $0.fullID }, from: package)
     } catch {
       log.error("Failed to install the default lexical model from the bundled KMP: \(error)")
     }

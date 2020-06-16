@@ -25,6 +25,12 @@ extension LanguageResourceFullID where Self: Equatable {
   }
 }
 
+extension LanguageResourceFullID {
+  var description: String {
+    return "{\(type): {id = \(id), languageID=\(languageID)}}"
+  }
+}
+
 // Alas, 'associatedtype' stuff isn't exactly generic, and it's impossible to wildcard.
 // So, this supports Swift's "type erasure" pattern, acting as a "wildcarded"
 // LanguageResource that doesn't care about the specific associatedtype(s) that

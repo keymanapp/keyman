@@ -134,6 +134,16 @@ public extension UserDefaults {
     }
   }
 
+  func userResources<Resource: LanguageResource>(ofType: Resource.Type) -> [Resource]? {
+    if ofType == InstallableKeyboard.self {
+      return (userKeyboards as? [Resource])
+    } else if ofType == InstallableLexicalModel.self {
+      return (userLexicalModels as? [Resource])
+    } else {
+      return nil
+    }
+  }
+
   var userResources: [AnyLanguageResource]? {
     get {
       let keyboards = userKeyboards ?? []
