@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.94 alpha 2020-06-16
+
+* feat(linux): Add onboard as recommended package (#3241)
+
 ## 14.0.93 alpha 2020-06-15
 
 * fix(developer/ide): double click to change layer update combo (#3240)
