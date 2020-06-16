@@ -11,7 +11,7 @@ import Foundation
 /// Dotted-decimal version.
 public class Version: NSObject, Comparable {
   public static let fallback = Version("1.0")!
-  public static let latestFeature = Version("13.0.65")!
+  public static let latestFeature = packageBasedFileReorg
 
   public static var current: Version {
     let engineInfo = Bundle(for: Manager.self).infoDictionary

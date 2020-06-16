@@ -105,16 +105,17 @@ public enum Migrations {
       } else {
         log.info("Documents directory structure compatible with \(Version.fileBrowserImplemented)")
       }
-    }
 
-    // TODO:  uncomment the following if-check.
-    //if version < Version.packageBasedFileReorg {
-      do {
-        try migrateCloudResourcesToKMPFormat()
-      } catch {
-        log.error("Could not migrate pre-existing resources to KMP-style file organization")
+      if version < Version.packageBasedFileReorg {
+        do {
+          try migrateCloudResourcesToKMPFormat()
+        } catch {
+          log.error("Could not migrate pre-existing resources to KMP-style file organization")
+        }
+      } else {
+        log.info("Resource directories already migrated to package-based format; kmp.jsons already exist.")
       }
-    //}
+    }
 
     storage.userDefaults.synchronize()
   }

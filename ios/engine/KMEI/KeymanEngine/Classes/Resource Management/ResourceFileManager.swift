@@ -100,7 +100,6 @@ public class ResourceFileManager {
     var extractionFolder = cacheDirectory
     extractionFolder.appendPathComponent("temp/\(archiveUrl.lastPathComponent)")
 
-    log.info("\(extractionFolder)")
     if let kmp = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
       return kmp
     } else {
