@@ -23,6 +23,7 @@ extension TestUtils {
     static let userDefaults = "Library/Preferences/group.KM4I.plist"
 
     // Bundle references
+    static let simple_13 = TestUtils.findSubBundle(forResource: "Simple 13.0 Migration", ofType: ".bundle")
     static let cloud_to_kmp_13 = TestUtils.findSubBundle(forResource: "13.0 Cloud to Package Migration", ofType: ".bundle")
     static let simple_12 = TestUtils.findSubBundle(forResource: "Simple 12.0 Migration", ofType: ".bundle")
     static let adhoc_12 = TestUtils.findSubBundle(forResource: "12.0 Ad-hoc Migration", ofType: ".bundle")

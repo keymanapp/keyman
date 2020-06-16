@@ -198,6 +198,7 @@
 		CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */; };
 		CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */; };
 		CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */; };
+		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
 		CEC0C66C2410AC9A003E1BCD /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; };
 		CEC0C6772410E049003E1BCD /* SentryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC0C6762410E049003E1BCD /* SentryManager.swift */; };
 		CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */; };
@@ -479,6 +480,7 @@
 		CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 12.0 Migration.bundle"; sourceTree = "<group>"; };
 		CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEC0C66B2410AC9A003E1BCD /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
@@ -833,6 +835,7 @@
 		CE37C38923FCC9AF007031C6 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */,
 				CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */,
 				CE973D822484A5DB00F66045 /* PackageJSON.bundle */,
 				CEF888D023FE6ADE00667693 /* No-defaults 10.0 Migration.bundle */,
@@ -1260,6 +1263,7 @@
 				CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */,
 				CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
+				CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */,
 				CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */,
 				CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */,
 			);
