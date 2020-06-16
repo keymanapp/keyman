@@ -12,7 +12,7 @@ import XCTest
 class KeymanPackageTests: XCTestCase {
   func testKeyboardPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.zip")
+    let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.kmp.zip")
     try FileManager.default.copyItem(at: TestUtils.Keyboards.khmerAngkorKMP, to: khmerPackageZip)
 
     let destinationFolderURL = cacheDirectory.appendingPathComponent("khmer_angkor")
@@ -41,7 +41,7 @@ class KeymanPackageTests: XCTestCase {
 
   func testLexicalModelPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    let mtntZip = cacheDirectory.appendingPathComponent("nrc.en.mtnt.zip")
+    let mtntZip = cacheDirectory.appendingPathComponent("nrc.en.mtnt.kmp.zip")
     try FileManager.default.copyItem(at: TestUtils.LexicalModels.mtntKMP, to: mtntZip)
 
     let destinationFolderURL = cacheDirectory.appendingPathComponent("nrc.en.mtnt.model")
@@ -96,5 +96,45 @@ class KeymanPackageTests: XCTestCase {
 
     // Thanks to our package typing hierarchy, it's impossible to even TRY finding
     // a FullKeyboardID within a LexicalModelKeymanPackage!
+  }
+
+  func testInstalledPackageDeinit() throws {
+    let kmp = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP)
+    XCTAssertNotNil(kmp, "Failed to prepare KMP for installation")
+    XCTAssertNotNil(kmp as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
+
+    try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: true)
+
+    let installedDir = Storage.active.resourceDir(for: TestUtils.Keyboards.khmer_angkor)!
+    let installedURL = Storage.active.resourceURL(for: TestUtils.Keyboards.khmer_angkor)!
+
+    // Intentionally scopes the `package` variable
+    do {
+      let package = KeymanPackage.parse(installedDir)!
+      XCTAssertTrue(FileManager.default.fileExists(atPath: installedURL.path))
+      XCTAssertEqual(package.id, "khmer_angkor")
+    }
+
+    // Deinit should have triggered - is everything still in place?
+    XCTAssertTrue(FileManager.default.fileExists(atPath: installedURL.path))
+    XCTAssertTrue(FileManager.default.fileExists(atPath: installedDir.path))
+  }
+
+  func testTempPackageDeinit() throws {
+    var tempDir: URL
+
+    // Intentionally scopes the `package` variable.
+    do {
+      let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP)
+      XCTAssertNotNil(package, "Failed to prepare KMP for installation")
+      XCTAssertNotNil(package as? KeyboardKeymanPackage, "KMP resource type improperly recognized - expected a keyboard package!")
+
+      tempDir = package.sourceFolder
+
+      XCTAssertTrue(FileManager.default.fileExists(atPath: tempDir.path))
+    }
+
+    // Deinit should have triggered - were the files automatically cleaned up?
+    XCTAssertFalse(FileManager.default.fileExists(atPath: tempDir.path))
   }
 }
