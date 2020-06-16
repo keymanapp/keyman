@@ -261,3 +261,5 @@ resources/environment.sh
 
 **/node_modules/
 lerna-debug.log
+
+*.pyc
