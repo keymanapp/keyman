@@ -1,0 +1,44 @@
+{
+  "folders": [
+    {
+      "path": "android"
+    },
+    {
+      "path": "common"
+    },
+    {
+      "path": "developer"
+    },
+    {
+      "path": "docs"
+    },
+    {
+      "path": "ios"
+    },
+    {
+      "path": "linux"
+    },
+    {
+      "path": "mac"
+    },
+    {
+      "path": "oem"
+    },
+    {
+      "path": "resources"
+    },
+    {
+      "path": "web"
+    },
+    {
+      "path": "windows"
+    },
+    {
+      "name": "root",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "workbench.settings.openDefaultSettings": true
+  }
+}

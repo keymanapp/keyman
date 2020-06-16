@@ -1,0 +1,16 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "android/": true,
+    "common/": true,
+    "developer/": true,
+    "docs/": true,
+    "ios/": true,
+    "linux/": true,
+    "mac/": true,
+    "oem/": true,
+    "resources/": true,
+    "web/": true,
+    "windows/": true
+  }
+}

@@ -238,8 +238,6 @@
 
 # /test/wm_unichar/
 
-# VS Code
-.vscode/
 .vs/
 
 # IDE files

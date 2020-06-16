@@ -1,0 +1,13 @@
+{
+  // Settings for keyman-config unit tests. You'll have to change these if you want
+  // to run other tests.
+  "python.envFile": "${workspaceFolder}/keyman-config/tests/python.env",
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s", "keyman-config/tests",
+    "-p", "test_*.py"
+  ],
+  "python.testing.unittestEnabled": true,
+  "python.testing.pytestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+}
