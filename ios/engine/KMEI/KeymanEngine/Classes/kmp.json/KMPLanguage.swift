@@ -24,6 +24,18 @@ struct KMPLanguage: Codable {
     languageId = try values.decode(String.self, forKey: .languageId).lowercased()
   }
 
+  public init?<Resource: KMPInitializableLanguageResource>(from resource: Resource) {
+    if let kbd = resource as? InstallableKeyboard {
+      self.name = kbd.languageName
+      self.languageId = kbd.languageID
+    } else if let lm = resource as? InstallableLexicalModel {
+      self.name = lm.languageID // We never stored the language name for lexical models.
+      self.languageId = lm.languageID
+    } else {
+      return nil
+    }
+  }
+
   public init(name: String, languageId: String) {
     self.name = name
     self.languageId = languageId

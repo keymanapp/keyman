@@ -53,7 +53,7 @@ class KMPMetadata: Codable {
    * Use of KMPResource.hasMatchingMetadata may help to de-duplicate resources during
    * the migration process.
    */
-  internal init(from resource: AnyLanguageResource) {
+  internal init(from resource: AnyLanguageResource, packageId: String? = nil) {
     // First, the standard defaults.
     options = KMPOptions()
     keyboards = nil
@@ -72,9 +72,11 @@ class KMPMetadata: Codable {
 
     if let keyboard = resource as? InstallableKeyboard {
       keyboards = [KMPKeyboard(from: keyboard)!]
+      keyboards![0].packageId = packageId
       system = KMPSystem(forPackageType: .Keyboard)!
     } else if let lexicalModel = resource as? InstallableLexicalModel {
       lexicalModels = [KMPLexicalModel(from: lexicalModel)!]
+      lexicalModels![0].packageId = packageId
       system = KMPSystem(forPackageType: .LexicalModel)!
     } else {
       fatalError("Cannot utilize unexpected subclass of LanguageResource")

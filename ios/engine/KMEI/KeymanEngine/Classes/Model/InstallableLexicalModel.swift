@@ -17,6 +17,7 @@ public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
+    case packageID
     case name
     case lgCode = "languageID"  // Redirects the old plain-property to something we can wrap with accessors.
     case version

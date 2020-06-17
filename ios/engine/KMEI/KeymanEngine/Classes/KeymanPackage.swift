@@ -26,6 +26,8 @@ public class KeymanPackage {
   public let sourceFolder: URL
   public let id: String
   internal let metadata: KMPMetadata
+
+  // Used to denote Packages pending installation; referenced by ResourceFileManager.
   internal let isTemp: Bool
 
   internal init(metadata: KMPMetadata, folder: URL) {
@@ -38,18 +40,31 @@ public class KeymanPackage {
 
     // Have we parsed a temporary extraction site?
     // This case arises during package installation.
-    isTemp = folderName.hasSuffix(".kmp.zip") && folder.path.contains(cacheDirectory.path)
+    isTemp = folderName.lowercased().hasSuffix(".kmp.zip") && folder.path.contains(cacheDirectory.path)
     if isTemp {
       nameComponents.removeLast() // .zip
       nameComponents.removeLast() // .kmp
     }
 
     // Lexical model packages use .model.kmp, so we remove the final 'model' bit.
-    if nameComponents.last == "model" {
+    if nameComponents.last?.lowercased() == "model" {
       nameComponents.removeLast()
     }
 
     self.id = nameComponents.joined(separator: ".")
+  }
+
+  deinit {
+    // Temporary packages should clean up after themselves when they go out of scope.
+    if isTemp {
+      do {
+        if FileManager.default.fileExists(atPath: self.sourceFolder.path) {
+          try FileManager.default.removeItem(at: self.sourceFolder)
+        }
+      } catch {
+        log.debug("Could not remove temporary extraction site on package deinit")
+      }
+    }
   }
 
   public func isKeyboard() -> Bool {
@@ -162,6 +177,18 @@ public class KeymanPackage {
     try Zip.unzipFile(fileUrl, destination: destination, overwrite: true, password: nil)
     complete()
   }
+
+  internal static func forMigration<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(of resource: Resource, at location: URL) -> Package? {
+    let metadata = KMPMetadata(from: resource, packageId: resource.id)
+
+    if let _ = resource as? InstallableKeyboard {
+      return (KeyboardKeymanPackage(metadata: metadata, folder: location) as! Package)
+    } else if let _ = resource as? InstallableLexicalModel {
+      return (LexicalModelKeymanPackage(metadata: metadata, folder: location) as! Package)
+    } else {
+      return nil
+    }
+  }
 }
 
 public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: KeymanPackage {
@@ -194,5 +221,25 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     }
 
     return matchesFound.count > 0 ? matchesFound[0] : nil
+  }
+
+  // Designed for use in cloud JS -> KMP migrations as needed for 13.0 -> 14.0 upgrades.
+  internal func findMetadataMatchFor<Metadata>(resource: TypedLanguageResource, ignoreLanguage: Bool, ignoreVersion: Bool) -> Metadata?
+    where TypedLanguageResource: KMPInitializableLanguageResource,
+          TypedLanguageResource.Metadata == Metadata,
+          Metadata.LanguageResourceType == TypedLanguageResource {
+
+    var metadataList: [Metadata]
+    if self is KeyboardKeymanPackage {
+      metadataList = self.metadata.keyboards! as! [Metadata]
+    } else if self is LexicalModelKeymanPackage {
+      metadataList = self.metadata.lexicalModels! as! [Metadata]
+    } else {
+      return nil
+    }
+
+    return metadataList.first(where: { kbdMetadata in
+      kbdMetadata.hasMatchingMetadata(for: resource, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
+    })
   }
 }

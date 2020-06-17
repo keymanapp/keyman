@@ -85,7 +85,7 @@ public class ResourceDownloadManager {
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
 
     do {
-      try FileManager.default.createDirectory(at: Storage.active.keyboardDir(forID: keyboard.id),
+      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: keyboard)!,
                                               withIntermediateDirectories: true)
     } catch {
       log.error("Could not create dir for download: \(error)")
@@ -93,7 +93,7 @@ public class ResourceDownloadManager {
     }
 
     var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
-    request.destinationFile = Storage.active.keyboardURL(forID: keyboard.id, version: keyboard.version).path
+    request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
     request.tag = 0
 
     let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
@@ -101,7 +101,7 @@ public class ResourceDownloadManager {
     
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: [:])
-      request.destinationFile = Storage.active.fontURL(forKeyboardID: keyboard.id, filename: url.lastPathComponent).path
+      request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
       request.tag = i + 1
       
       let fontTask = DownloadTask(do: request, for: nil, type: .other)
@@ -230,7 +230,7 @@ public class ResourceDownloadManager {
   private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel, withFilename path: URL,
       asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
     do {
-      try FileManager.default.createDirectory(at: Storage.active.lexicalModelDir(forID: lexicalModel.id),
+      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
                                               withIntermediateDirectories: true)
     } catch {
       log.error("Could not create dir for download: \(error)")
@@ -238,7 +238,8 @@ public class ResourceDownloadManager {
     }
 
     let request = HTTPDownloadRequest(url: path, userInfo: [:])
-    request.destinationFile = Storage.active.lexicalModelPackageURL(forID: lexicalModel.id, version: lexicalModel.version).path
+    // TODO:  redirect to store in the Documents directory.
+    request.destinationFile = Storage.active.lexicalModelPackageURL(for: lexicalModel).path
     request.tag = 0
 
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)

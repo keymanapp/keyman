@@ -11,6 +11,7 @@ import Foundation
 internal protocol AnyKMPResource {
   // Returns the represented resource's ID.
   var id: String { get }
+  var languages: [KMPLanguage] { get set } // set is for adding languages during 13.0 -> 14.0 migration
   var installableResources: [AnyLanguageResource] { get }
 }
 
@@ -26,7 +27,7 @@ protocol KMPResource: AnyKMPResource {
    * Designed to facilitate de-duplication of KMPResources when migrating cloud resources into the extracted KMP format
    * for 14.0+ file management.
    */
-  func hasMatchingMetadata(for resource: LanguageResourceType, ignoreLanguage: Bool) -> Bool
+  func hasMatchingMetadata(for resource: LanguageResourceType, ignoreLanguage: Bool, ignoreVersion: Bool) -> Bool
 }
 
 extension KMPResource {

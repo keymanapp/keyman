@@ -302,10 +302,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     currentKeyboardID = kb.fullID
 
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: fontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: fontFilename)!)
     }
     if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forKeyboardID: kb.id, filename: oskFontFilename))
+      _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: oskFontFilename)!)
     }
 
     inputViewController.setKeyboard(kb)
@@ -342,27 +342,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   /// Adds a new keyboard to the list in the keyboard picker if it doesn't already exist.
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
+  @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
-    let keyboardPath = Storage.active.keyboardURL(for: keyboard).path
-    if !FileManager.default.fileExists(atPath: keyboardPath) {
-      log.error("Could not add keyboard with ID: \(keyboard.id) because the keyboard file does not exist")
-      return
-    }
-
-    // Get keyboards list if it exists in user defaults, otherwise create a new one
-    let userDefaults = Storage.active.userDefaults
-    var userKeyboards = userDefaults.userKeyboards ?? []
-
-    // Update keyboard if it exists
-    if let index = userKeyboards.firstIndex(where: { $0.fullID == keyboard.fullID }) {
-      userKeyboards[index] = keyboard
-    } else {
-      userKeyboards.append(keyboard)
-    }
-
-    userDefaults.userKeyboards = userKeyboards
-    userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-    userDefaults.synchronize()
+    ResourceFileManager.shared.addResource(keyboard)
   }
     
     
@@ -407,29 +389,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
   *   I believe this is background-thread-safe (no UI done)
   */
+  @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   static public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    let lexicalModelPath = Storage.active.lexicalModelURL(for: lexicalModel).path
-    if !FileManager.default.fileExists(atPath: lexicalModelPath) {
-      log.error("Could not add lexical model with ID: \(lexicalModel.id) because the lexical model file does not exist")
-      return
-    }
-    
-    // Get lexical models list if it exists in user defaults, otherwise create a new one
-    let userDefaults = Storage.active.userDefaults
-    var userLexicalModels = userDefaults.userLexicalModels ?? []
-    
-    // Update lexical model if it exists
-    if let index = userLexicalModels.firstIndex(where: { $0.fullID == lexicalModel.fullID }) {
-      userLexicalModels[index] = lexicalModel
-    } else {
-      userLexicalModels.append(lexicalModel)
-    }
-    
-    userDefaults.userLexicalModels = userLexicalModels
-    userDefaults.set([Date()], forKey: Key.synchronizeSWLexicalModel)
-    userDefaults.synchronize()
-    log.info("Added lexical model ID: \(lexicalModel.id) name: \(lexicalModel.name)")
-}
+    ResourceFileManager.shared.addResource(lexicalModel)
+  }
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
@@ -470,7 +433,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
 
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
-      let keyboardDir = Storage.active.keyboardDir(forID: kb.id)
+      // TODO:  should make sure that there are no resources in the package,
+      //        rather than just 'no matching keyboards'.
+      let keyboardDir = Storage.active.resourceDir(for: kb)!
       FontManager.shared.unregisterFonts(in: keyboardDir, fromSystemOnly: false)
       log.info("Deleting directory \(keyboardDir)")
       if (try? FileManager.default.removeItem(at: keyboardDir)) == nil {
@@ -552,7 +517,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     
     if !userLexicalModels.contains(where: { $0.id == lm.id }) {
-      let lexicalModelDir = Storage.active.lexicalModelDir(forID: lm.id)
+      let lexicalModelDir = Storage.active.resourceDir(for: lm)!
       FontManager.shared.unregisterFonts(in: lexicalModelDir, fromSystemOnly: false)
       log.info("Deleting directory \(lexicalModelDir)")
       if (try? FileManager.default.removeItem(at: lexicalModelDir)) == nil {
@@ -591,9 +556,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
   public func fontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
-    if let filename = kb?.font?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.font?.source.first(where: { $0.hasFontExtension }) {
+      let fontURL = Storage.active.fontURL(forResource: kb, filename: filename)!
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -603,9 +568,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
   func oskFontNameForKeyboard(withFullID fullID: FullKeyboardID) -> String? {
-    let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID)
-    if let filename = kb?.oskFont?.source.first(where: { $0.hasFontExtension }) {
-      let fontURL = Storage.active.fontURL(forKeyboardID: fullID.keyboardID, filename: filename)
+    if let kb = Storage.active.userDefaults.userKeyboard(withFullID: fullID),
+       let filename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
+      let fontURL = Storage.active.fontURL(forResource: kb, filename: filename)!
       return FontManager.shared.fontName(at: fontURL)
     }
     return nil
@@ -656,8 +621,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
   // MARK: - Loading custom keyboards
   /// Preloads the JS and font files required for a keyboard.
+  @available(*, deprecated, message: "Use ResourceFileManager's methods to install resources from KMPs.")
   public func preloadFiles(forKeyboardID keyboardID: String, at urls: [URL], shouldOverwrite: Bool) throws {
-    let keyboardDir = Storage.active.keyboardDir(forID: keyboardID)
+    let keyboardDir = Storage.active.legacyKeyboardDir(forID: keyboardID)
     try FileManager.default.createDirectory(at: keyboardDir, withIntermediateDirectories: true)
     for url in urls {
       try Storage.copy(at: url,

@@ -196,7 +196,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     // Add lexicalModel.
     for lexicalModel in lexicalModels {
       if lexicalModel.languageID == language?.id {
-        Manager.addLexicalModel(lexicalModel)
+        ResourceFileManager.shared.addResource(lexicalModel)
         switchLexicalModel(lexicalModel)
       }
     }

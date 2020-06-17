@@ -55,10 +55,10 @@ class KMPLexicalModel: Codable, KMPResource {
     self.version = self.version ?? version
   }
 
-  func hasMatchingMetadata(for resource: InstallableLexicalModel, ignoreLanguage: Bool = false) -> Bool {
+  func hasMatchingMetadata(for resource: InstallableLexicalModel, ignoreLanguage: Bool = false, ignoreVersion: Bool = true) -> Bool {
     if id != resource.id {
       return false
-    } else if version != resource.version {
+    } else if !ignoreVersion, version != resource.version {
       return false
     }
 
