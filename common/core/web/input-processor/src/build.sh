@@ -50,9 +50,6 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-# Generates a linkable TS file; defined in resources/build-utils.sh.
-exportEnvironmentDefinitionTS
-
 if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
 fi

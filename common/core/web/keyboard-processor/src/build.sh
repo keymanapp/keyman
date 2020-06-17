@@ -46,8 +46,5 @@ if [ $FETCH_DEPS = true ]; then
     verify_npm_setup
 fi
 
-# Generates a linkable TS file; defined in resources/build-utils.sh.
-exportEnvironmentDefinitionTS
-
 # Compile web's `keyboard-processor` module.
 npm run tsc -- -p src/tsconfig.json || fail "Failed to compile the core/web/keyboard-processor module."
