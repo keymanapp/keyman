@@ -92,7 +92,12 @@ for details on building Linux packages for Keyman.
 
 ### Testing
 
-Tests to be created as there are no current tests
+The unit tests can be running with the following command:
+
+```bash
+cd linux/keyman-config
+./run-tests.sh
+```
 
 ### Running Keyman for Linux
 
