@@ -378,9 +378,6 @@ if [ $BUILD_CORE = true ]; then
     echo ""
 fi
 
-# Generates a linkable TS file; defined in resources/build-utils.sh.
-exportEnvironmentDefinitionTS
-
 if [ $FULL_BUILD = true ]; then
     echo Compiling version $VERSION
     echo ""
