@@ -40,15 +40,23 @@
 
 
   <!-- Keyman Settings menu strings -->
-  <string name="keyman_settings"  comment="Settings menu title">Settings</string>
+  <string name="keyman_settings" comment="Settings menu title">Settings</string>
   <plurals name="installed_languages">
     <item quantity="zero">Installed languages</item>
     <item quantity="other">Installed languages (%1$d)</item>
   </plurals>
+  <string name="install_keyboard_or_dictionary">Install Keyboard or Dictionary</string>
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
   <string name="show_banner_on" comment="Description when toggle is on">To be implemented</string>
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
   <!-- reuse show_get_started -->
+
+  <!-- Keyman Settings Install Keyboard or Dictionary menu strings -->
+  <string name="install_from_keyman_dot_com">Install from keyman.com</string>
+  <string name="install_from_local_file">Install from local file</string>
+  <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
+  <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
+  <string name="add_language_subtext">(from keyboard package)</string>
 
   <!-- Web Browser strings -->
   <string name="hint_text">Search or type URL</string>
