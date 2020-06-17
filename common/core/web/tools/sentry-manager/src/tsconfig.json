@@ -10,7 +10,7 @@
   "outFile": "../dist/index.js"
   },
   "files": [
-    "environment.inc.ts",
+    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
 		"index.ts"
   ]
 }

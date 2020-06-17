@@ -48,6 +48,7 @@
   "dependencies": {
     "@keymanapp/models-templates": "^14.0.95",
     "@keymanapp/models-wordbreakers": "^14.0.95",
+    "@keymanapp/web-environment": "^14.0.95",
     "@keymanapp/web-utils": "^14.0.95",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",

@@ -12,6 +12,7 @@
   "outFile": "../dist/index.js"
   },
   "files": [
+    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
     "../node_modules/@keymanapp/web-utils/src/index.ts",
     "../node_modules/@keymanapp/lexical-model-layer/node-defaultWorker.ts",
 		"text/inputProcessor.ts"
