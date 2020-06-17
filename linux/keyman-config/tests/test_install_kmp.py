@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import unittest
 from unittest.mock import create_autospec, patch, ANY
 
@@ -65,8 +66,9 @@ class InstallKmpTests(unittest.TestCase):
         # Execute
         install_keyboards_to_ibus(keyboards, 'fooDir')
         # Verify
-        self.mockInstallToIbus.assert_called_once_with(
-            ANY, 'en:fooDir/foo1.kmx')
+        self.mockInstallToIbus.assert_called_once()
+        self.mockInstallToIbus.assert_called_with(ANY, 'en:fooDir/foo1.kmx')
+        # self.mockInstallToIbus.assert_not_called_with(ANY, 'fr:fooDir/foo1.kmx')
         self.mockRestartIbus.assert_called_once()
         bus.destroy.assert_called_once()
 
