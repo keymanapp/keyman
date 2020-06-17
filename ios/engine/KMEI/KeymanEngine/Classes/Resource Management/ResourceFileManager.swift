@@ -217,6 +217,12 @@ public class ResourceFileManager {
     }
   }
 
+  /**
+   * Searches the specified package for a language resource with the indicated resource-language-code "full ID" key,
+   * importing the package's files and installing the indicated resource-language pairing upon success.
+   *
+   * The`resourcesWithIDs:` variant is better optimized for installing multiple resources from the same package.
+   */
   public func install<ResourceType: LanguageResource,
                       PackageType: TypedKeymanPackage<ResourceType>> (
                         resourceWithID fullID: ResourceType.FullID,
@@ -225,6 +231,10 @@ public class ResourceFileManager {
     try install(resourcesWithIDs: [fullID], from: package)
   }
 
+  /**
+   * Searches the specified package for language resources with the indicated resource-language-code "full ID" keys
+   * importing the package's files and installing the indicated resource-language pairings upon success.
+   */
   public func install<Resource: LanguageResource,
                       Package: TypedKeymanPackage<Resource>> (
                         resourcesWithIDs fullIDs: [Resource.FullID], from package: Package) throws {

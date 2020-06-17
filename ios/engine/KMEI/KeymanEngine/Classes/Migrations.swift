@@ -698,4 +698,10 @@ public enum Migrations {
 
     return matched + mappedResources
   }
+
+  internal static func resourceHasPackageMetadata<Resource: LanguageResource>(_ resource: Resource) -> Bool {
+    var resourceDir = Storage.active.resourceDir(for: resource)!
+    resourceDir.appendPathComponent("kmp.json")
+    return FileManager.default.fileExists(atPath: resourceDir.path)
+  }
 }

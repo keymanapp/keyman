@@ -344,7 +344,24 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
   @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
-    ResourceFileManager.shared.addResource(keyboard)
+    var kbdToInstall = keyboard
+
+    // 3rd party installation of keyboards (13.0 and before):
+    // - Manager.shared.preloadFiles was called first to import the file resources
+    // - Then Manager.shared.addKeyboard installs the keyboard.
+    //
+    // Since 3rd-party uses never provided kmp.json files, we need to instant-migrate
+    // them here.
+    if !Migrations.resourceHasPackageMetadata(keyboard) {
+      let wrappedKbds = Migrations.migrateToKMPFormat([keyboard])
+      guard wrappedKbds.count == 1 else {
+        log.error("Could not properly import keyboard")
+        return
+      }
+      kbdToInstall = wrappedKbds[0]
+    } else {
+      ResourceFileManager.shared.addResource(kbdToInstall)
+    }
   }
     
     
@@ -391,7 +408,24 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   */
   @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   static public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
-    ResourceFileManager.shared.addResource(lexicalModel)
+    var modelToInstall = lexicalModel
+
+    // Potential 3rd party installation of lexical models (12.0, 13.0):
+    // - Manager.shared.preloadFiles was called first to import the file resources
+    // - Then Manager.addLexicalModel installs the lexical model.
+    //
+    // Since 3rd-party uses never provided kmp.json files, we need to instant-migrate
+    // them here.
+    if !Migrations.resourceHasPackageMetadata(lexicalModel) {
+      let wrappedModels = Migrations.migrateToKMPFormat([lexicalModel])
+      guard wrappedModels.count == 1 else {
+        log.error("Could not properly import lexical model")
+        return
+      }
+      modelToInstall = wrappedModels[0]
+    } else {
+      ResourceFileManager.shared.addResource(modelToInstall)
+    }
   }
 
   /// Removes a keyboard from the list in the keyboard picker if it exists.
