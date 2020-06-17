@@ -21,6 +21,7 @@
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
     "@keymanapp/resources-gosh": "^14.0.95",
+    "@keymanapp/web-environment": "^14.0.95",
     "@types/node": "^14.0.5",
     "typescript": "^3.8.3"
   }
