@@ -222,19 +222,52 @@ public class ResourceFileManager {
                         resourceWithID fullID: ResourceType.FullID,
                         from package: PackageType) throws {
 
-    guard let resource = package.findResource(withID: fullID) else {
+    try install(resourcesWithIDs: [fullID], from: package)
+  }
+
+  public func install<Resource: LanguageResource,
+                      Package: TypedKeymanPackage<Resource>> (
+                        resourcesWithIDs fullIDs: [Resource.FullID], from package: Package) throws {
+    if fullIDs.contains(where: { package.findResource(withID: $0) == nil }) {
+      let missingResource = fullIDs.first(where: { package.findResource(withID: $0) == nil })!
+      log.error("Resource with full ID \(missingResource.description) not in package")
       throw KMPError.resourceNotInPackage
     }
 
     do {
       try copyWithOverwrite(from: package.sourceFolder,
-                            to: Storage.active.resourceDir(for: resource)!)
+                            to: Storage.active.packageDir(for: package)!)
     } catch {
       log.error("Could not create installation directory and/or copy resources: \(error)")
       throw KMPError.fileSystem
     }
 
-    addResource(resource)
+    let updatables = findPotentialUpdates(in: package).map { return $0.typedFullID }
+    let fullList = fullIDs + updatables
+
+    fullList.forEach { addResource(package.findResource(withID: $0)!) }
+  }
+
+  internal func findPotentialUpdates<Resource: LanguageResource,
+                                     Package: TypedKeymanPackage<Resource>> (
+                                       in package: Package,
+                                       ignoring resourcesToIgnore: [Resource] = []) -> [Resource] {
+    let installedResources = Storage.active.userDefaults.userResources(ofType: Resource.self) ?? []
+    var updatableResources: [Resource] = []
+
+    installedResources.forEach { resource in
+      // If there's no package ID, default to the resource's ID.
+      // If the package ID matches the resource's package ID and we're not ignoring the resource,
+      // check to ensure that the package does contain the resource.
+      if (resource.packageID ?? resource.id) == package.id,
+         !resourcesToIgnore.contains(where: { $0.typedFullID == resource.typedFullID }) {
+        if let updatable = package.findResource(withID: resource.typedFullID) {
+          updatableResources.append(updatable)
+        }
+      }
+    }
+
+    return updatableResources
   }
 
   internal func addResource<Resource: LanguageResource>(_ resource: Resource) {

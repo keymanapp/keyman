@@ -118,4 +118,16 @@ class FileManagementTests: XCTestCase {
     XCTAssertEqual(models.count, 1, "Unexpected number of models were installed")
     XCTAssertEqual(models[0].id, "nrc.en.mtnt", "Installed lexical model ID mismatch")
   }
+
+  func testInstallUpdateCheck() throws {
+    // Has a resource in need of updates (sil_euro_latin)
+    TestUtils.Migrations.applyBundleToFileSystem(TestUtils.Migrations.cloud_to_kmp_13)
+
+    let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as! KeyboardKeymanPackage
+    let updatables = ResourceFileManager.shared.findPotentialUpdates(in: package)
+
+    XCTAssertEqual(updatables.count, 2)
+    XCTAssertTrue(updatables.contains(where: { $0.languageID == "en" }))
+    XCTAssertTrue(updatables.contains(where: { $0.languageID == "fr" }))
+  }
 }

@@ -69,7 +69,7 @@ public enum Defaults {
                                                    name: "EuroLatin (SIL)",
                                                    languageID: "en",
                                                    languageName: "English",
-                                                   version: "1.8.1",
+                                                   version: "1.9.1",
                                                    isRTL: false,
                                                    font: font,
                                                    oskFont: nil,
