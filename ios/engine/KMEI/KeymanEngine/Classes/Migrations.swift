@@ -541,7 +541,7 @@ public enum Migrations {
     do {
       let cachedKMPsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
       let files = try FileManager.default.contentsOfDirectory(atPath: cachedKMPsDirectory.path)
-      let kmpFiles = files.filter { $0.suffix(4) == ".kmp" }
+      let kmpFiles = files.filter { $0.suffix(4).lowercased() == ".kmp" }
 
       allLocalPackages = kmpFiles.compactMap { file in
         let filePath = cachedKMPsDirectory.appendingPathComponent(file)

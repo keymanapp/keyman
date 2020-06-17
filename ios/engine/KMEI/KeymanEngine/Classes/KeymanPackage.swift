@@ -40,14 +40,14 @@ public class KeymanPackage {
 
     // Have we parsed a temporary extraction site?
     // This case arises during package installation.
-    isTemp = folderName.hasSuffix(".kmp.zip") && folder.path.contains(cacheDirectory.path)
+    isTemp = folderName.lowercased().hasSuffix(".kmp.zip") && folder.path.contains(cacheDirectory.path)
     if isTemp {
       nameComponents.removeLast() // .zip
       nameComponents.removeLast() // .kmp
     }
 
     // Lexical model packages use .model.kmp, so we remove the final 'model' bit.
-    if nameComponents.last == "model" {
+    if nameComponents.last?.lowercased() == "model" {
       nameComponents.removeLast()
     }
 
