@@ -16,16 +16,12 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMPBrowserActivity;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.MapCompat;
 
 import java.util.ArrayList;
 import java.util.HashMap;

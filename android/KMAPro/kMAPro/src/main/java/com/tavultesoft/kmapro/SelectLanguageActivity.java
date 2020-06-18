@@ -4,54 +4,29 @@
 
 package com.tavultesoft.kmapro;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMPBrowserActivity;
-import com.tavultesoft.kmea.cloud.CloudDataJsonUtil;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.data.adapters.AdapterFilter;
-import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.logic.ResourcesUpdateTool;
 import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.MapCompat;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Keyman Settings --> KeymanInstallActivity --> SelectPackageActivity --> SelectLanguageActivity
@@ -60,7 +35,6 @@ import java.util.Map;
 public final class SelectLanguageActivity extends AppCompatActivity {
   private static final String TAG = "SelectLanguageActivity";
   private static ArrayList<HashMap<String, String>> list = null;
-  private static KMListAdapter listAdapter = null;
   private static Typeface titleFont = null;
   private static final String titleKey = "title";
   private static final String subtitleKey = "subtitle";
