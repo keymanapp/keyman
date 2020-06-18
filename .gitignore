@@ -262,4 +262,5 @@ resources/environment.sh
 **/node_modules/
 lerna-debug.log
 
+# Cached/auto-compiled Python bytecode
 *.pyc
