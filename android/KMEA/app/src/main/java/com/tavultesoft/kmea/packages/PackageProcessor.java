@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.ZipUtils;
@@ -406,6 +408,52 @@ public class PackageProcessor {
     }
 
     return false;
+  }
+
+  /**
+   * Get a list of available keyboard and language pairings that are available to add
+   * (parses the kmp.json for the languagae list)
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @return List of keyboards that haven't been added yet
+   */
+  public List<Keyboard> getLanguageList(String packageID, String keyboardID) {
+    File packagePath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID);
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    JSONObject infoJSON = loadPackageInfo(packagePath);
+    try {
+      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+
+      for (int i = 0; i < keyboards.length(); i++) {
+        JSONObject keyboard = keyboards.getJSONObject(i);
+        if (keyboardID.equals(keyboard.getString("id"))) {
+          // Find the keyboard already installed. We'll use it as the base
+          // for creating new keyboards
+          int baseKeyboardIndex =  KeyboardController.getInstance().getKeyboardIndex(packageID, keyboardID, "");
+          if (baseKeyboardIndex == KeyboardController.INDEX_NOT_FOUND) {
+            continue;
+          }
+          Keyboard baseKeyboard = KeyboardController.getInstance().getKeyboardInfo(baseKeyboardIndex);
+
+          JSONArray languages = keyboard.getJSONArray("languages");
+          for (int j=0; j < languages.length(); j++) {
+            JSONObject language = languages.getJSONObject(j);
+            String languageID = language.getString("id");
+            String languageName = language.getString("name");
+            if (!KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID)) {
+              Keyboard newKeyboard = new Keyboard(baseKeyboard);
+              newKeyboard.setLanguage(languageID, languageName);
+              list.add(newKeyboard);
+            }
+          }
+          // no need to continue processing
+          return list;
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getLanguageList() ", e);
+    }
+    return list;
   }
 
   /**

@@ -226,6 +226,18 @@
       android:parentActivityName=".KeymanSettingsActivity"
       android:launchMode="singleTask"
       android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".SelectPackageActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".KeymanSettingsInstallActivity"
+      android:launchMode="singleTask"
+      android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".SelectLanguageActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".SelectPackageActivity"
+      android:launchMode="singleTask"
+      android:theme="@style/AppTheme.Base" />
 
     <provider
       android:name="androidx.core.content.FileProvider"
