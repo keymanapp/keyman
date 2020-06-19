@@ -15,9 +15,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   var textView2: TextField!
   var textView3: UITextView!
 
-  private var keyboardDownloadStartedObserver: NotificationObserver?
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
-  private var keyboardDownloadFailedObserver: NotificationObserver?
   private var keyboardPickerDismissedObserver: NotificationObserver?
 
   deinit {
