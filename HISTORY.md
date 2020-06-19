@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.95 alpha 2020-06-19
+
+* feat(android/app): Consolidate install menus (#3245)
+* change(ios/engine): migrates legacy cloud resources to KMP format (#3237)
+* change(ios/engine): Default resource update (#3244)
+* fix(ios/engine): migration of preload-sourced resources (#3247)
+* refactor(common/resources): web-environment package (#3248)
+* chore(linux): Add some unit tests for keyman_config (#3250)
+* chore(linux): Update automatically installed dependencies (#3254)
+* fix(common/resources): web-environment package-lock.json (#3256)
+
 ## 14.0.94 alpha 2020-06-16
 
 * feat(linux): Add onboard as recommended package (#3241)
