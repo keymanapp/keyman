@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 
 import java.io.File;
@@ -35,11 +34,14 @@ import java.util.List;
 public final class SelectLanguageActivity extends AppCompatActivity {
   private static final String TAG = "SelectLanguageActivity";
   private static ArrayList<HashMap<String, String>> list = null;
+  private static KMListAdapter adapter = null;
   private static Typeface titleFont = null;
   private static final String titleKey = "title";
   private static final String subtitleKey = "subtitle";
   private static final String iconKey = "icon";
+  private static final String isEnabledKey = "isEnabled";
   private static Context context;
+  private static final boolean excludeInstalledLanguages = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -68,27 +70,34 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       textView.setTypeface(titleFont, Typeface.BOLD);
     }
 
-    // Get the list of available languages from kmp.json
+    // Get the list of available Keyboards from kmp.json
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
-    List<Keyboard> availableKeyboardsList = kmpProcessor.getLanguageList(packageID, keyboardID);
+    List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
+      packageID, keyboardID, excludeInstalledLanguages);
 
+    final String noIcon = "0";
     list = new ArrayList<HashMap<String, String>>();
     for (Keyboard k : availableKeyboardsList) {
-      final String noIcon = "0";
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, k.getLanguageName());
       hashMap.put(subtitleKey, k.getLanguageID());
+      String enable = "true";
       String icon = String.valueOf(R.drawable.ic_arrow_forward);
+      if (!excludeInstalledLanguages && KeyboardController.getInstance().keyboardExists(
+          k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
+        icon = String.valueOf(R.drawable.ic_check);
+        enable = "false";
+      }
       hashMap.put(iconKey, icon);
+      hashMap.put(isEnabledKey, enable);
       list.add(hashMap);
     }
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
-    int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.text2, com.tavultesoft.kmea.R.id.image1};
+    int[] to = new int[]{R.id.text1, R.id.text2, com.tavultesoft.kmea.R.id.image1};
 
-    ListAdapter adapter = new SimpleAdapter(context, list, com.tavultesoft.kmea.R.layout.list_row_layout2, from, to) {
-    };
+    adapter = new KMListAdapter(context, list, R.layout.list_row_layout2, from, to);
     listView.setAdapter(adapter);
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -97,7 +106,9 @@ public final class SelectLanguageActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         Keyboard k = availableKeyboardsList.get(position);
         KMManager.addKeyboard(context, k);
-        Toast.makeText(context, "Keyboard added", Toast.LENGTH_LONG).show();
+        String confirmation = String.format(getString(R.string.added_language_to_keyboard),
+          k.getLanguageName(), k.getKeyboardName());
+        Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
         finish();
       }
     });
