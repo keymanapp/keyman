@@ -420,14 +420,12 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           //        Serves as a bridge until we're downloading actual .kmps for keyboards.
           let wrappedKeyboards = Migrations.migrateToKMPFormat(keyboards)
 
+          wrappedKeyboards.forEach { keyboard in
+            ResourceFileManager.shared.addResource(keyboard)
+          }
+
           if(!isUpdate) {
             downloadSucceeded(forKeyboards: wrappedKeyboards)
-          } else {
-            // Since we don't generate the notification as above, we need to manually update
-            // the keyboards' metadata.
-            wrappedKeyboards.forEach { keyboard in
-              ResourceFileManager.shared.addResource(keyboard)
-            }
           }
 
           let userDefaults = Storage.active.userDefaults
