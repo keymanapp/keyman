@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.96 alpha 2020-06-19
+
+* fix(ios/engine): fixes keyboard swapping (#3259)
+* fix(common/resources): shebang for lerna-based Linux builds (#3260)
+* refactor(ios/engine): Notification rework prep, simplification (#3261)
+
 ## 14.0.95 alpha 2020-06-19
 
 * feat(android/app): Consolidate install menus (#3245)
