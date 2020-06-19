@@ -53,7 +53,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var portRightMargin: CGFloat = 0.0
   private var lscpeLeftMargin: CGFloat = 0.0
   private var lscpeRightMargin: CGFloat = 0.0
-  private var didDownload = false
   private var didKeyboardLoad = false
 
   private var keyboardLoadedObserver: NotificationObserver?
@@ -61,8 +60,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var languagesDownloadFailedObserver: NotificationObserver?
   private var keyboardPickerDismissedObserver: NotificationObserver?
   private var keyboardChangedObserver: NotificationObserver?
-  private var keyboardDownloadStartedObserver: NotificationObserver?
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
   private var keyboardRemovedObserver: NotificationObserver?
 
   var appDelegate: AppDelegate! {
@@ -103,10 +100,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardPickerDismissed,
       observer: self,
       function: MainViewController.keyboardPickerDismissed)
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
-      observer: self,
-      function: MainViewController.keyboardDownloadCompleted)
     keyboardRemovedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardRemoved,
       observer: self,
@@ -423,17 +416,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    var listCheck: Bool = true
-    if didDownload {
-      listCheck = false
-      didDownload = false
-    }
-
-    checkProfile(forFullID: kb.fullID, doListCheck: listCheck)
-  }
-
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    didDownload = true
+    checkProfile(forFullID: kb.fullID, doListCheck: true)
   }
 
   private func keyboardPickerDismissed() {
