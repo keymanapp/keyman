@@ -62,6 +62,7 @@
   <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
   <string name="title_select_language_for_package">Select language for %1$s</string>
   <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
+  <string name="all_languages_installed">All languages already installed</string>
 
   <!-- Web Browser strings -->
   <string name="hint_text">Search or type URL</string>

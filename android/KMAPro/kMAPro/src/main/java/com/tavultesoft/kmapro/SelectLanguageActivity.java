@@ -63,9 +63,10 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     final String packageID = keyboard.getPackageID();
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
-    String title = String.format(getString(R.string.title_select_language_for_package), keyboardName);
+    String title_install = String.format(getString(R.string.title_select_language_for_package), keyboardName);
+    String title_no_install = getString(R.string.all_languages_installed);
     final TextView textView = findViewById(R.id.bar_title);
-    textView.setText(title);
+    textView.setText(title_no_install);
     if (titleFont != null) {
       textView.setTypeface(titleFont, Typeface.BOLD);
     }
@@ -88,6 +89,9 @@ public final class SelectLanguageActivity extends AppCompatActivity {
           k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
         icon = String.valueOf(R.drawable.ic_check);
         enable = "false";
+      } else {
+        // Update title
+        textView.setText(title_install);
       }
       hashMap.put(iconKey, icon);
       hashMap.put(isEnabledKey, enable);
