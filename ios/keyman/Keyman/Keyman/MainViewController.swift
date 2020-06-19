@@ -43,7 +43,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var profilesToInstall: [String] = []
   private var checkedProfiles: [String] = []
   private var profileName: String?
-  private var launchUrl: URL?
   private var keyboardToDownload: InstallableKeyboard?
   private var customKeyboardToDownload: URL?
   private var wasKeyboardVisible: Bool = false
@@ -64,7 +63,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var keyboardChangedObserver: NotificationObserver?
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadCompletedObserver: NotificationObserver?
-  private var keyboardDownloadFailedObserver: NotificationObserver?
   private var keyboardRemovedObserver: NotificationObserver?
 
   var appDelegate: AppDelegate! {
@@ -105,18 +103,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardPickerDismissed,
       observer: self,
       function: MainViewController.keyboardPickerDismissed)
-    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
-      observer: self,
-      function: MainViewController.keyboardDownloadStarted)
     keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardDownloadCompleted,
       observer: self,
       function: MainViewController.keyboardDownloadCompleted)
-    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
-      observer: self,
-      function: MainViewController.keyboardDownloadFailed)
     keyboardRemovedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardRemoved,
       observer: self,
@@ -427,12 +417,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     didKeyboardLoad = true
     dismissActivityIndicator()
     textView.becomeFirstResponder()
-    if let launchUrl = launchUrl {
-      performAction(from: launchUrl)
-    } else {
-      if shouldShowGetStarted {
-        perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
-      }
+    if shouldShowGetStarted {
+      perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
 
@@ -446,42 +432,8 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     checkProfile(forFullID: kb.fullID, doListCheck: listCheck)
   }
 
-  private func keyboardDownloadStarted() {
-    if launchUrl != nil {
-      showActivityIndicator()
-    }
-  }
-
   private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
     didDownload = true
-    if launchUrl == nil {
-      return
-    }
-
-    let userData = AppDelegate.activeUserDefaults()
-    let userKeyboards = userData.userKeyboards
-    if userKeyboards == nil || userKeyboards!.isEmpty {
-      Manager.shared.addKeyboard(Defaults.keyboard)
-    }
-
-    perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-
-    for keyboard in keyboards {
-      _ = Manager.shared.setKeyboard(keyboard)
-    }
-
-    launchUrl = nil
-  }
-
-  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
-    if launchUrl != nil {
-      perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-      let error = notification.error
-      let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Keyboard Download Error",
-                                                              message: error.localizedDescription)
-      self.present(alert, animated: true, completion: nil)
-      launchUrl = nil
-    }
   }
 
   private func keyboardPickerDismissed() {
@@ -827,7 +779,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
   private func performAction(from url: URL) {
     guard let query = url.query else {
-      launchUrl = nil
       return
     }
 
@@ -852,8 +803,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         Manager.shared.addKeyboard(keyboard)
         _ = Manager.shared.setKeyboard(keyboard)
       }
-    } else {
-      launchUrl = nil
     }
   }
 
