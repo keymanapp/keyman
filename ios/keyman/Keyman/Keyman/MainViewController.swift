@@ -467,7 +467,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
 
     for keyboard in keyboards {
-      Manager.shared.addKeyboard(keyboard)
       _ = Manager.shared.setKeyboard(keyboard)
     }
 

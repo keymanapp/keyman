@@ -223,7 +223,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
     //   - for a list of all events, see KMManager.h
 
     for keyboard in keyboards {
-      Manager.shared.addKeyboard(keyboard)
       Manager.shared.setKeyboard(keyboard)
     }
     perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
