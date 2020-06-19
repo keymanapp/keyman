@@ -32,18 +32,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
                                            name: .UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.resizeView),
                                            name: .UIKeyboardWillHide, object: nil)
-    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
-      observer: self,
-      function: MainViewController.keyboardDownloadStarted)
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
-      observer: self,
-      function: MainViewController.keyboardDownloadCompleted)
-    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
-      observer: self,
-      function: MainViewController.keyboardDownloadFailed)
     keyboardPickerDismissedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardPickerDismissed,
       observer: self,
@@ -214,29 +202,6 @@ class MainViewController: UIViewController, UIAlertViewDelegate, TextViewDelegat
   }
 
   // MARK: - Responding to Keyman notifications
-  private func keyboardDownloadStarted() {
-    showActivityIndicator()
-  }
-
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    // This is an example of responding to a Keyman event.
-    //   - for a list of all events, see KMManager.h
-
-    for keyboard in keyboards {
-      Manager.shared.setKeyboard(keyboard)
-    }
-    perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-  }
-
-  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
-    let error = notification.error
-    if error.localizedDescription != "Download queue is busy" {
-      perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-      perform(#selector(self.showAlert), with: error.localizedDescription, afterDelay: 1.1)
-    } else {
-      showAlert(error.localizedDescription)
-    }
-  }
 
   private func keyboardPickerDismissed() {
     textView1.becomeFirstResponder()
