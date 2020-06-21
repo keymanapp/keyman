@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.ZipUtils;
@@ -406,6 +408,75 @@ public class PackageProcessor {
     }
 
     return false;
+  }
+
+  /**
+   * Generates a list of Keyboards from the keyboard JSONObject. baseKeyboard contains
+   * keyboard information that's already installed.
+   * @param keyboardJSON JSONObject - Keyboard JSONObject from kmp.json (entry for keyboardID)
+   * @param baseKeyboard Keyboard - information of the keyboard that's already installed
+   * @param excludeInstalledLanguages - boolean whether to exclude languages that are already installed
+   * @return List<Keyboard>
+   */
+  private List<Keyboard> getKeyboards(JSONObject keyboardJSON, Keyboard baseKeyboard,
+      boolean excludeInstalledLanguages ) {
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    String packageID = baseKeyboard.getPackageID();
+    String keyboardID = baseKeyboard.getKeyboardID();
+    try {
+      JSONArray languages = keyboardJSON.getJSONArray("languages");
+      for (int j = 0; j < languages.length(); j++) {
+        JSONObject language = languages.getJSONObject(j);
+        String languageID = language.getString("id");
+        String languageName = language.getString("name");
+        if (!excludeInstalledLanguages ||
+          !(KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID))) {
+          // Copy keyboard info and update language
+          Keyboard newKeyboard = new Keyboard(baseKeyboard);
+          newKeyboard.setLanguage(languageID, languageName);
+          list.add(newKeyboard);
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getKeyboards() ", e);
+    }
+    return list;
+  }
+
+  /**
+   * Get a list of available keyboard and language pairings that are available to add
+   * (parses the kmp.json for the language list)
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @param excludeInstalledLanguages - Boolean whether to exclude
+   *        installed languages from the returned list.
+   * @return List of <Keyboard> based on kmp.json. If excludeInstalledLanguages is true, this list
+   *         excludes languages already installed
+   */
+  public List<Keyboard> getKeyboardList(String packageID, String keyboardID, boolean excludeInstalledLanguages) {
+    File packagePath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID);
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    JSONObject infoJSON = loadPackageInfo(packagePath);
+    try {
+      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+
+      for (int i = 0; i < keyboards.length(); i++) {
+        JSONObject keyboard = keyboards.getJSONObject(i);
+        if (keyboardID.equals(keyboard.getString("id"))) {
+          // Find the keyboard already installed. We'll use it as the base
+          // for creating new keyboards
+          int baseKeyboardIndex =  KeyboardController.getInstance().getKeyboardIndex(packageID, keyboardID, "");
+          if (baseKeyboardIndex == KeyboardController.INDEX_NOT_FOUND) {
+            continue;
+          }
+          Keyboard baseKeyboard = KeyboardController.getInstance().getKeyboardInfo(baseKeyboardIndex);
+          return getKeyboards(keyboard, baseKeyboard, excludeInstalledLanguages);
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getKeyboardList() ", e);
+    }
+    return list;
   }
 
   /**

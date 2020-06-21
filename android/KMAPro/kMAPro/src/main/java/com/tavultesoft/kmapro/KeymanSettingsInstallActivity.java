@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMPBrowserActivity;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.MapCompat;
 
 public class KeymanSettingsInstallActivity extends AppCompatActivity {
@@ -107,6 +108,11 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
         if (itemTitle.equals(getString(R.string.install_from_other_device))) {
           // Scan QR code not implemented yet
           return false;
+        } else if (itemTitle.equals(getString(R.string.add_language_to_installed_keyboard))) {
+          if (KeyboardController.getInstance().getInstalledPackagesList() == null) {
+            // Disable if no keyboard packages installed
+            return false;
+          }
         }
 
         return super.isEnabled(position);
@@ -150,7 +156,8 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
 
         // Add language from keyboard package already installed
         } else if (itemTitle.equals(getString(R.string.add_language_to_installed_keyboard))) {
-          // TODO
+          Intent intent = new Intent(context, SelectPackageActivity.class);
+          context.startActivity(intent);
         }
       }
     });

@@ -123,6 +123,37 @@ public class KeyboardController {
   }
 
   /**
+   * Returns the list of installed keyboards with unique packageID/keyboardID
+   */
+  public List<Keyboard> getInstalledPackagesList() {
+    if (!isInitialized) {
+      KMLog.LogError(TAG, "getInstalledPackagesList while KeyboardController() not initialized");
+      return null;
+    }
+    synchronized (list) {
+      List<Keyboard> packagesList = new ArrayList<Keyboard>();
+      // Iterate through the installed keyboards list to find unique packageID/keyboardID
+      for (int i=0; i<list.size(); i++) {
+        Keyboard k = list.get(i);
+        String pkgID = k.getPackageID();
+        String keyboardID = k.getKeyboardID();
+        // Ignore "cloud" keyboards"
+        if (pkgID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+          continue;
+        }
+
+        // If we search getKeyboardIndex with blank languageID, it will give us the first
+        // unique pkgID/keyboardID keyboard in the list
+        int firstMatchingIndex = getKeyboardIndex(pkgID, keyboardID, "");
+        if (firstMatchingIndex != KeyboardController.INDEX_NOT_FOUND && (firstMatchingIndex == i)) {
+          packagesList.add(k);
+        }
+      }
+      return packagesList;
+    }
+  }
+
+  /**
    * Return the keyboard info at index
    * @param index - int
    * @return Keyboard
@@ -175,20 +206,6 @@ public class KeyboardController {
     Log.w(TAG, "getKeyboardIndex failed for key " + key);
     return index;
   }
-
-  /**
-   * Given a languageID and keyboardID, return the index of the matching keyboard.
-   * If no match, returns INDEX_NOT_FOUND
-   * @param languageID - String of the language ID
-   * @param keyboardID - String of the keyboard ID
-   * @return int - Index of the matching keyboard
-   */
-  /*
-  public int getKeyboardIndex(String languageID, String keyboardID) {
-    String key = String.format("%s_%s", languageID, keyboardID);
-    return getKeyboardIndex(key);
-  }
- */
 
   /**
    * Given a packageID, keyboardID, and languageID, return the index of the matching keyboard.

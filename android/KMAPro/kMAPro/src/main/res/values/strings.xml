@@ -58,6 +58,12 @@
   <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
   <string name="add_language_subtext">(from keyboard package)</string>
 
+  <!-- Select Package and Select Language menu strings -->
+  <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
+  <string name="title_select_language_for_package">Select language for %1$s</string>
+  <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
+  <string name="all_languages_installed">All languages already installed</string>
+
   <!-- Web Browser strings -->
   <string name="hint_text">Search or type URL</string>
   <string name="title_bookmarks">Bookmarks</string>
