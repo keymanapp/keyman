@@ -12,7 +12,7 @@ Package: libkmfl-dev
 Section: libdevel
 Architecture: any
 Depends: libkmfl0 (= ${binary:Version}), ${misc:Depends}
-Description: This package provides Keyman(C) services to Linux - development
+Description: KMFL library - development
  The kmfl library is a multilingual text processing library that implements
  the Keyman(C) text processing language.
  .
@@ -22,7 +22,7 @@ Description: This package provides Keyman(C) services to Linux - development
 Package: libkmfl0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: This package provides Keyman(C) services to Linux - runtime
+Description: KMFL library - runtime
  The kmfl library is a multilingual text processing library that implements
  the Keyman(C) text processing language.
  .
