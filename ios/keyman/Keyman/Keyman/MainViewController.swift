@@ -760,35 +760,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  private func performAction(from url: URL) {
-    guard let query = url.query else {
-      return
-    }
-
-    if url.lastPathComponent != "open" {
-      return
-    }
-
-    let params = self.params(of: query)
-    if let kbID = params["keyboard"], let langID = params["language"] {
-      // Query should include keyboard and language IDs to set the keyboard (first download if not available)
-      guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
-                                                                                    languageID: langID) else {
-        return
-      }
-
-      if ResourceDownloadManager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
-        keyboardToDownload = keyboard
-        confirmInstall(withTitle: "\(keyboard.languageName): \(keyboard.name)",
-          message: "Would you like to install this keyboard?",
-          installButtonHandler: proceedWithKeyboardDownload)
-      } else {
-        Manager.shared.addKeyboard(keyboard)
-        _ = Manager.shared.setKeyboard(keyboard)
-      }
-    }
-  }
-
   private func profileName(withFullID fullID: FullKeyboardID) -> String? {
     guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID),
           let font = keyboard.font else {
@@ -857,14 +828,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                               handler: installHandler))
 
     self.present(alertController, animated: true, completion: nil)
-  }
-
-  private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
-    if let keyboard = keyboardToDownload {
-      ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id,
-                                                      languageID: keyboard.languageID,
-                                                      isUpdate: false)
-    }
   }
 
   private func handleUserDecisionAboutInstallingProfile(withAction action: UIAlertAction) {
