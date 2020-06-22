@@ -277,12 +277,6 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     }
   }
   
-  func downloadHandler(_ keyboardIndex: Int) {
-    let language = languages[selectedSection]
-    let keyboard = language.keyboards![keyboardIndex]
-    ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id, languageID: language.id, isUpdate: false)
-  }
-  
   private func restoreNavigation() {
     view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
