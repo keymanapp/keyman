@@ -830,14 +830,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     self.present(alertController, animated: true, completion: nil)
   }
 
-  private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
-    if let keyboard = keyboardToDownload {
-      ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id,
-                                                      languageID: keyboard.languageID,
-                                                      isUpdate: false)
-    }
-  }
-
   private func handleUserDecisionAboutInstallingProfile(withAction action: UIAlertAction) {
     if let profileName = profileName {
       checkedProfiles.append(profileName)
