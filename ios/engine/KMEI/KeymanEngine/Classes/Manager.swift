@@ -169,9 +169,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   //private var downloadQueue: HTTPDownloader?
   private var reachability: Reachability!
   var didSynchronize = false
-  
-  
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
 
   // MARK: - Object Admin
 
@@ -224,11 +221,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         log.error("failed to start Reachability notifier: \(error)")
       }
     }
-    
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
-      observer: self,
-      function: Manager.keyboardDownloadCompleted)
 
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
@@ -834,16 +826,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     } else {
       return .none
     }
-  }
-  
-  // Keyboard download notification observers
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    // There's little harm in reloading the keyboard (and thus, KMW) for a clean reset
-    // after resource downloads or updates.  That said, we should avoid *directly*
-    // triggering an immediate reset, as an extra reset will occur once we leave the
-    // settings menu.  The delay also helps any chained downloads (keyboard > lexical model)
-    // to fully complete first.
-    shouldReloadKeyboard = true
   }
 
   /*-----------------------------
