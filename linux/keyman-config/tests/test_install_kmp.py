@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 import unittest
-from unittest.mock import create_autospec, patch, ANY
+from unittest.mock import patch, ANY
 
-from keyman_config.install_kmp import install_keyboards_to_ibus
+from keyman_config.install_kmp import install_keyboards_to_ibus, install_keyboards_to_gnome
+
 
 class InstallKmpTests(unittest.TestCase):
 
@@ -16,6 +17,9 @@ class InstallKmpTests(unittest.TestCase):
         patcher3 = patch('keyman_config.install_kmp.get_ibus_bus')
         self.mockGetIbusBus = patcher3.start()
         self.addCleanup(patcher3.stop)
+        patcher4 = patch('keyman_config.install_kmp.GnomeKeyboardsUtil')
+        self.mockGnomeKeyboardsUtilClass = patcher4.start()
+        self.addCleanup(patcher4.stop)
 
     def test_InstallKeyboardsToIbus_NoIbus(self):
         # Setup
@@ -71,6 +75,55 @@ class InstallKmpTests(unittest.TestCase):
         # self.mockInstallToIbus.assert_not_called_with(ANY, 'fr:fooDir/foo1.kmx')
         self.mockRestartIbus.assert_called_once()
         bus.destroy.assert_called_once()
+
+    def test_InstallKeyboardsToGnome_SingleKbNoLanguages(self):
+        # Setup
+        mockGnomeKeyboardsUtilInstance = self.mockGnomeKeyboardsUtilClass.return_value
+        mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
+        keyboards = [{'id': 'foo1'}]
+        # Execute
+        install_keyboards_to_gnome(keyboards, 'fooDir')
+        # Verify
+        mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
+            [('xkb', 'en'), ('ibus', 'fooDir/foo1.kmx')])
+        self.mockRestartIbus.assert_not_called()
+
+    def test_InstallKeyboardsToGnome_MultipleKbsNoLanguages(self):
+        # Setup
+        mockGnomeKeyboardsUtilInstance = self.mockGnomeKeyboardsUtilClass.return_value
+        mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
+        keyboards = [{'id': 'foo1'}, {'id': 'foo2'}]
+        # Execute
+        install_keyboards_to_gnome(keyboards, 'fooDir')
+        # Verify
+        mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
+            [('xkb', 'en'), ('ibus', 'fooDir/foo1.kmx'), ('ibus', 'fooDir/foo2.kmx')])
+        self.mockRestartIbus.assert_not_called()
+
+    def test_InstallKeyboardsToGnome_SingleKbSingleLanguage(self):
+        # Setup
+        mockGnomeKeyboardsUtilInstance = self.mockGnomeKeyboardsUtilClass.return_value
+        mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
+        keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}]}]
+        # Execute
+        install_keyboards_to_gnome(keyboards, 'fooDir')
+        # Verify
+        mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
+            [('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx')])
+        self.mockRestartIbus.assert_not_called()
+
+    def test_InstallKeyboardsToGnome_SingleKbMultipleLanguages(self):
+        # Setup
+        mockGnomeKeyboardsUtilInstance = self.mockGnomeKeyboardsUtilClass.return_value
+        mockGnomeKeyboardsUtilInstance.read_input_sources.return_value = [('xkb', 'en')]
+        keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}, {'id': 'fr'}]}]
+        # Execute
+        install_keyboards_to_gnome(keyboards, 'fooDir')
+        # Verify
+        mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
+            [('xkb', 'en'), ('ibus', 'en:fooDir/foo1.kmx')])
+        self.mockRestartIbus.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()

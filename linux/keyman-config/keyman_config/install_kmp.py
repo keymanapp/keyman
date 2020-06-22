@@ -6,17 +6,14 @@ import os.path
 import zipfile
 from os import listdir
 from shutil import rmtree
-# from ast import literal_eval
 from enum import Enum
 
-from gi.repository import Gio
-
-from keyman_config.get_kmp import get_keyboard_data, get_kmp, user_keyboard_dir, user_keyman_dir, user_keyman_font_dir
-from keyman_config.kmpmetadata import parseinfdata, parsemetadata, get_metadata, infmetadata_to_json, KMFileTypes
-from keyman_config.uninstall_kmp import uninstall_kmp
+from keyman_config.get_kmp import get_keyboard_data, user_keyboard_dir, user_keyman_font_dir
+from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 from keyman_config.ibus_util import install_to_ibus, restart_ibus, get_ibus_bus
+from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_keyboard_id, is_gnome_shell
 
 # TODO userdir install
 # special processing for kmn if needed
@@ -184,6 +181,7 @@ def install_kmp_shared(inputfile, online=False):
         message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
+
 def install_kmp_user(inputfile, online=False):
     packageID = extract_package_id(inputfile)
     packageDir = user_keyboard_dir(packageID)
@@ -191,8 +189,10 @@ def install_kmp_user(inputfile, online=False):
         os.makedirs(packageDir)
 
     extract_kmp(inputfile, packageDir)
-    #restart IBus so it knows about the keyboards being installed
-    restart_ibus()
+    if not is_gnome_shell():
+        # restart IBus so it knows about the keyboards being installed
+        restart_ibus()
+
     info, system, options, keyboards, files = get_metadata(packageDir)
 
     if keyboards:
@@ -240,7 +240,7 @@ def install_kmp_user(inputfile, online=False):
                         fpath = os.path.join(packageDir, kb['id'] + '.kmx')
                 extractico(fpath)
 
-        install_keyboards_to_ibus(keyboards, packageDir)
+        install_keyboards(keyboards, packageDir)
     else:
         logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
         logging.info("Contents of %s:", inputfile)
@@ -250,22 +250,37 @@ def install_kmp_user(inputfile, online=False):
         message = "install_kmp.py: error: No kmp.json or kmp.inf found in %s" % (inputfile)
         raise InstallError(InstallStatus.Abort, message)
 
+
+def install_keyboards(keyboards, packageDir):
+    if is_gnome_shell():
+        install_keyboards_to_gnome(keyboards, packageDir)
+    else:
+        install_keyboards_to_ibus(keyboards, packageDir)
+
+
 def install_keyboards_to_ibus(keyboards, packageDir):
     bus = get_ibus_bus()
     if bus:
         # install all kmx for first lang not just packageID
         for kb in keyboards:
-            kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
-            if "languages" in kb and len(kb["languages"]) > 0:
-                logging.debug(kb["languages"][0])
-                keyboard_id = "%s:%s" % (kb["languages"][0]['id'], kmx_file)
-            else:
-                keyboard_id = kmx_file
+            keyboard_id = get_keyboard_id(kb, packageDir)
             install_to_ibus(bus, keyboard_id)
         restart_ibus(bus)
         bus.destroy()
     else:
         logging.debug("could not install keyboards to IBus")
+
+
+def install_keyboards_to_gnome(keyboards, packageDir):
+    gnomeKeyboardsUtil = GnomeKeyboardsUtil()
+    sources = gnomeKeyboardsUtil.read_input_sources()
+
+    # install all kmx for first lang not just packageID
+    for kb in keyboards:
+        keyboard_id = get_keyboard_id(kb, packageDir)
+        sources.append(('ibus', keyboard_id))
+
+    gnomeKeyboardsUtil.write_input_sources(sources)
 
 
 def install_kmp(inputfile, online=False, sharedarea=False):
