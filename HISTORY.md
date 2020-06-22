@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.97 alpha 2020-06-22
+
+* feat(android): Implement menu to add language for installed keyboard pkg (#3255)
+* fix(mac/resources): altool is failing but we lose the log in CI (#3264)
+* refactor(ios/engine): more notification rework prep (#3262)
+* fix(mac): altool second call report ci errors (#3265)
+* refactor(ios/engine): more dead code removal (#3266)
+
 ## 14.0.96 alpha 2020-06-19
 
 * fix(ios/engine): fixes keyboard swapping (#3259)
