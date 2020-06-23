@@ -485,6 +485,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
                                    userInfo: [NSLocalizedDescriptionKey: "installError"])
         downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError)
         currentFrame.batch?.errors[currentFrame.index] = installError
+        batch.completionBlock?(nil, installError)
       }
     }
     
@@ -495,7 +496,13 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
-    //
+    if case .simpleBatch(let batch) = self.currentBatch {
+      if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
+        batch.completionBlock?(nil, nil)
+      } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
+        batch.completionBlock?(nil, nil)
+      }
+    }
     
     // In case we're part of a 'composite' operation, we should still keep the queue moving.
     finalizeCurrentBatch()
@@ -553,7 +560,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
     let isUpdate = batch.activity == .update
     
-    if let task = task as? DownloadTask<InstallableKeyboard> {
+    if let task = task as? DownloadTask<InstallableKeyboard>, let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
       log.error("Keyboard download failed: \(error).")
       let keyboards = task.resources
 
@@ -563,7 +570,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
         downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
       }
-    } else if let task = task as? DownloadTask<InstallableLexicalModel> {
+      batch.completionBlock?(nil, error)
+    } else if let task = task as? DownloadTask<InstallableLexicalModel>, let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
       log.error("Lexical model download failed: \(error).")
       let lexicalModels = task.resources
       
@@ -572,6 +580,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
         downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
       }
+
+      batch.completionBlock?(nil, error)
     }
     
     downloader!.cancelAllOperations()
