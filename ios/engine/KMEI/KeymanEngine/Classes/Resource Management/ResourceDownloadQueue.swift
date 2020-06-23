@@ -69,7 +69,13 @@ protocol AnyDownloadBatch {
   var type: LanguageResourceType? { get }
   var tasks: [AnyDownloadTask] { get }
   var resources: [AnyLanguageResource] { get }
+
+  var startBlock: (() -> Void)? { get }
   var errors: [Error?] { get set }
+
+  func completeWithCancellation() -> Void
+  func completeWithError(error: Error) -> Void
+  func completeWithPackage(fromKMP file: URL) -> Void
 }
 
 /**
@@ -81,9 +87,14 @@ class DownloadBatch<Resource: LanguageResource, Package: TypedKeymanPackage<Reso
   
   public final var downloadTasks: [DownloadTask<Resource>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
+  public final var startBlock: (() -> Void)? = nil
   public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil
   
-  public init?(do tasks: [DownloadTask<Resource>], as activity: DownloadActivityType, ofType type: LanguageResourceType, completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil) {
+  public init?(do tasks: [DownloadTask<Resource>],
+               as activity: DownloadActivityType,
+               ofType type: LanguageResourceType,
+               startBlock: (() -> Void)? = nil,
+               completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil) {
     self.activity = activity
     self.type = type
     self.downloadTasks = tasks
@@ -105,6 +116,26 @@ class DownloadBatch<Resource: LanguageResource, Package: TypedKeymanPackage<Reso
       }
       
       return resArray
+    }
+  }
+
+  public func completeWithCancellation() {
+    completionBlock?(nil, nil)
+  }
+
+  public func completeWithError(error: Error) {
+    completionBlock?(nil, error)
+  }
+
+  public func completeWithPackage(fromKMP file: URL) {
+    do {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Package {
+        completionBlock?(package, nil)
+      } else {
+        completionBlock?(nil, KMPError.invalidPackage)
+      }
+    } catch {
+      completionBlock?(nil, error)
     }
   }
 }
@@ -288,6 +319,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           downloader!.addRequest(task.request)
         }
 
+        // Signal that we've started processing this batch.
+        batch.startBlock?()
         downloader!.run()
       case .compositeBatch(let batch):
         // It's the top level of an update operation.  Time to make a correpsonding notification.
@@ -440,6 +473,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let isUpdate = batch.activity == .update
 
     if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
+      // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
+      // Once downlading KMPs, will be the downloaded .kmp.
+      
       // The request has succeeded.
       if downloader!.requestsCount == 0 { // Download queue finished.
         let keyboards = batch.resources as! [InstallableKeyboard]
@@ -485,7 +521,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
                                    userInfo: [NSLocalizedDescriptionKey: "installError"])
         downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError)
         currentFrame.batch?.errors[currentFrame.index] = installError
-        batch.completionBlock?(nil, installError)
+        batch.completeWithError(error: installError)
       }
     }
     
@@ -497,11 +533,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
     if case .simpleBatch(let batch) = self.currentBatch {
-      if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
-        batch.completionBlock?(nil, nil)
-      } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
-        batch.completionBlock?(nil, nil)
-      }
+      batch.completeWithCancellation()
     }
     
     // In case we're part of a 'composite' operation, we should still keep the queue moving.
@@ -560,7 +592,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
     let isUpdate = batch.activity == .update
     
-    if let task = task as? DownloadTask<InstallableKeyboard>, let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
+    if let task = task as? DownloadTask<InstallableKeyboard> {
       log.error("Keyboard download failed: \(error).")
       let keyboards = task.resources
 
@@ -570,8 +602,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
         downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
       }
-      batch.completionBlock?(nil, error)
-    } else if let task = task as? DownloadTask<InstallableLexicalModel>, let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
+    } else if let task = task as? DownloadTask<InstallableLexicalModel> {
       log.error("Lexical model download failed: \(error).")
       let lexicalModels = task.resources
       
@@ -580,10 +611,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
         downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
       }
-
-      batch.completionBlock?(nil, error)
     }
-    
+
+    batch.completeWithError(error: error)
     downloader!.cancelAllOperations()
   }
   
