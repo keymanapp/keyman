@@ -16,6 +16,8 @@ import Foundation
 public class ResourceDownloadManager {
   private var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
+
+  public typealias CompletionHandler<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>> = (Package?, Error?) -> Void
   
   public static let shared = ResourceDownloadManager()
   
@@ -25,7 +27,7 @@ public class ResourceDownloadManager {
   
   // MARK: - Common functionality
   
-  private func fetchHandler(for resourceType: DownloadTask.Resource, _ completionHandler: @escaping () -> Void)
+  private func fetchHandler(for resourceType: LanguageResourceType?, _ completionHandler: @escaping () -> Void)
                             -> (_ error: Error?) -> Void {
     return { error in
       if let error = error {
@@ -56,11 +58,14 @@ public class ResourceDownloadManager {
   
   // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
   // since this will expose the generated Promise for the caller's use.
-  private func downloadKeyboardCore(withMetadata keyboards: [InstallableKeyboard], asActivity activity: DownloadBatch.Activity,
-      withFilename filename: String, withOptions options: Options) -> DownloadBatch? {
+  private func downloadKeyboardCore(withMetadata keyboards: [InstallableKeyboard],
+                                    asActivity activity: DownloadActivityType,
+                                    withFilename filename: String,
+                                    withOptions options: Options,
+                                    completionBlock: CompletionHandler<InstallableKeyboard, KeyboardKeymanPackage>? = nil) -> DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage>? {
 
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options) {
-      let tasks = dlBatch.tasks as! [DownloadTask]
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, completionBlock: completionBlock) {
+      let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
         task.resources = keyboards
@@ -68,18 +73,21 @@ public class ResourceDownloadManager {
       
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
       // The parameter facilitates error logging.
-      if !downloader.canExecute(dlBatch) {
+      if !downloader.canExecute(.simpleBatch(dlBatch)) {
         return nil
       }
       
-      downloader.queue(dlBatch)
+      downloader.queue(.simpleBatch(dlBatch))
       return dlBatch
     }
     return nil
   }
   
-  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard, withFilename filename: String,
-                                          asActivity activity: DownloadBatch.Activity, withOptions options: Options) -> DownloadBatch? {
+  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard,
+                                          withFilename filename: String,
+                                          asActivity activity: DownloadActivityType,
+                                          withOptions options: Options,
+                                          completionBlock: CompletionHandler<InstallableKeyboard, KeyboardKeymanPackage>? = nil) -> DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage>? {
     let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
@@ -97,18 +105,18 @@ public class ResourceDownloadManager {
     request.tag = 0
 
     let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
-    var batchTasks: [DownloadTask] = [ keyboardTask ]
+    var batchTasks: [DownloadTask<InstallableKeyboard>] = [ keyboardTask ]
     
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: [:])
       request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
       request.tag = i + 1
       
-      let fontTask = DownloadTask(do: request, for: nil, type: .other)
+      let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil, type: nil)
       batchTasks.append(fontTask)
     }
     
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard)
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -125,14 +133,15 @@ public class ResourceDownloadManager {
   public func downloadKeyboard(withID keyboardID: String,
                                languageID: String,
                                isUpdate: Bool,
-                               fetchRepositoryIfNeeded: Bool = true) {
+                               fetchRepositoryIfNeeded: Bool = true,
+                               completionBlock: CompletionHandler<InstallableKeyboard, KeyboardKeymanPackage>? = nil) {
     guard let _ = Manager.shared.apiKeyboardRepository.keyboards,
       let options = Manager.shared.apiKeyboardRepository.options
     else {
       if fetchRepositoryIfNeeded {
         log.info("Fetching repository from API for keyboard download")
         Manager.shared.apiKeyboardRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
-          self.downloadKeyboard(withID: keyboardID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
+          self.downloadKeyboard(withID: keyboardID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false, completionBlock: completionBlock)
         })
         return
       } else {
@@ -205,11 +214,13 @@ public class ResourceDownloadManager {
   
   // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
   // since this will expose the generated Promise for the caller's use.
-  private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel], asActivity activity: DownloadBatch.Activity,
-      fromPath path: URL) -> DownloadBatch? {
+  private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel],
+                                        asActivity activity: DownloadActivityType,
+                                        fromPath path: URL,
+                                        completionBlock: CompletionHandler<InstallableLexicalModel, LexicalModelKeymanPackage>? = nil) -> DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage>? {
 
-    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity) {
-      let tasks = dlBatch.tasks as! [DownloadTask]
+    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, completionBlock: completionBlock) {
+      let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
         task.resources = lexicalModels
@@ -217,18 +228,20 @@ public class ResourceDownloadManager {
       
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
       // The parameter facilitates error logging.
-      if !downloader.canExecute(dlBatch) {
+      if !downloader.canExecute(.simpleBatch(dlBatch)) {
         return nil
       }
       
-      downloader.queue(dlBatch)
+      downloader.queue(.simpleBatch(dlBatch))
       return dlBatch
     }
     return nil
   }
   
-  private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel, withFilename path: URL,
-      asActivity activity: DownloadBatch.Activity) -> DownloadBatch? {
+  private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel,
+                                              withFilename path: URL,
+                                              asActivity activity: DownloadActivityType,
+                                              completionBlock: CompletionHandler<InstallableLexicalModel, LexicalModelKeymanPackage>? = nil) -> DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage>? {
     do {
       try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
                                               withIntermediateDirectories: true)
@@ -243,9 +256,9 @@ public class ResourceDownloadManager {
     request.tag = 0
 
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
-    let batchTasks: [DownloadTask] = [ lexicalModelTask ]
+    let batchTasks: [DownloadTask<InstallableLexicalModel>] = [ lexicalModelTask ]
     
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel)
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -303,7 +316,8 @@ public class ResourceDownloadManager {
   public func downloadLexicalModel(withID lexicalModelID: String,
                                    languageID: String,
                                    isUpdate: Bool,
-                                   fetchRepositoryIfNeeded: Bool = true) {
+                                   fetchRepositoryIfNeeded: Bool = true,
+                                   completionBlock: CompletionHandler<InstallableLexicalModel, LexicalModelKeymanPackage>? = nil) {
     
     // TODO:  We should always force a refetch after new keyboards are installed so we can redo our language queries.
     //        That should probably be done on successful keyboard installs, not here, though.
@@ -316,7 +330,7 @@ public class ResourceDownloadManager {
       if fetchRepositoryIfNeeded {
         log.info("Fetching repository from API for lexicalModel download")
         Manager.shared.apiLexicalModelRepository.fetch(completionHandler: fetchHandler(for: .lexicalModel) {
-          self.downloadLexicalModel(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false)
+          self.downloadLexicalModel(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false, completionBlock: completionBlock)
         })
         return
       } else {
@@ -334,7 +348,7 @@ public class ResourceDownloadManager {
       return
     }
     
-    _ = downloadLexicalModelCore(withMetadata: [lexicalModel], asActivity: isUpdate ? .update : .download, fromPath: URL.init(string: filename)!)
+    _ = downloadLexicalModelCore(withMetadata: [lexicalModel], asActivity: isUpdate ? .update : .download, fromPath: URL.init(string: filename)!, completionBlock: completionBlock)
   }
   
   /// - Returns: The current state for a lexical model
@@ -395,7 +409,7 @@ public class ResourceDownloadManager {
   public func performUpdates(forResources resources: [AnyLanguageResource]) {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
-    var batches: [DownloadBatch] = []
+    var batches: [AnyDownloadBatch] = []
     
     resources.forEach { res in
       if let kbd = res as? InstallableKeyboard {
@@ -417,8 +431,8 @@ public class ResourceDownloadManager {
       }
     }
     
-    let batchUpdate = DownloadBatch(queue: batches)
-    downloader.queue(batchUpdate)
+    let batchUpdate = CompositeBatch(queue: batches.map { return DownloadNode.simpleBatch($0) })
+    downloader.queue(.compositeBatch(batchUpdate))
   }
   
   private func getUpdatableKeyboards() -> [InstallableKeyboard] {
