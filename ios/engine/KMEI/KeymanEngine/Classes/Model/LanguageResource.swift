@@ -55,6 +55,7 @@ public protocol AnyLanguageResource {
 // https://stackoverflow.com/questions/42561685/why-cant-a-get-only-property-requirement-in-a-protocol-be-satisfied-by-a-proper
 public protocol LanguageResource: AnyLanguageResource {
   associatedtype FullID: LanguageResourceFullID where FullID: Equatable
+  associatedtype Package: KeymanPackage
   var typedFullID: FullID { get }
 }
 
