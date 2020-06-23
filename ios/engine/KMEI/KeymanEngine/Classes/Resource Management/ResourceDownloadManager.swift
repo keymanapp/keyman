@@ -63,8 +63,8 @@ public class ResourceDownloadManager {
                                     withFilename filename: String,
                                     withOptions options: Options,
                                     completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
-
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, completionBlock: completionBlock) {
+    let startHandler = { self.defaultKeyboardStartBlock(for: keyboards) }
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, startBlock: startHandler, completionBlock: completionBlock) {
       let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
@@ -87,6 +87,7 @@ public class ResourceDownloadManager {
                                           withFilename filename: String,
                                           asActivity activity: DownloadActivityType,
                                           withOptions options: Options,
+                                          startBlock: (() -> Void)? = nil,
                                           completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
     let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
@@ -116,8 +117,7 @@ public class ResourceDownloadManager {
       batchTasks.append(fontTask)
     }
 
-    let startHandler = { self.defaultKeyboardStartBlock(for: keyboard) }
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, startBlock: startHandler, completionBlock: completionBlock)
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -126,10 +126,10 @@ public class ResourceDownloadManager {
     return batch
   }
 
-  internal func defaultKeyboardStartBlock(for keyboard: InstallableKeyboard) {
+  internal func defaultKeyboardStartBlock(for keyboards: [InstallableKeyboard]) {
     NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
                                         object: self,
-                                        value: [keyboard])
+                                        value: keyboards)
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
@@ -225,8 +225,8 @@ public class ResourceDownloadManager {
                                         asActivity activity: DownloadActivityType,
                                         fromPath path: URL,
                                         completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
-
-    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, completionBlock: completionBlock) {
+    let startHandler = { self.defaultLexicalModelStartBlock(for: lexicalModels) }
+    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, startBlock: startHandler, completionBlock: completionBlock) {
       let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
@@ -248,6 +248,7 @@ public class ResourceDownloadManager {
   private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel,
                                               withFilename path: URL,
                                               asActivity activity: DownloadActivityType,
+                                              startBlock: (()-> Void)? = nil,
                                               completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
     do {
       try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
@@ -265,8 +266,7 @@ public class ResourceDownloadManager {
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
     let batchTasks: [DownloadTask<InstallableLexicalModel>] = [ lexicalModelTask ]
 
-    let startHandler = { self.defaultLexicalModelStartBlock(for: lexicalModel) }
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, startBlock: startHandler, completionBlock: completionBlock)
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -275,10 +275,10 @@ public class ResourceDownloadManager {
     return batch
   }
 
-  internal func defaultLexicalModelStartBlock(for lexicalModel: InstallableLexicalModel) {
+  internal func defaultLexicalModelStartBlock(for lexicalModels: [InstallableLexicalModel]) {
     NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
                                         object: self,
-                                        value: [lexicalModel])
+                                        value: lexicalModels)
   }
   
   // Can be called by the cloud keyboard downloader and utilized.

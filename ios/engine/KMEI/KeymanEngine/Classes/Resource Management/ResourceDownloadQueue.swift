@@ -547,6 +547,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // The extra check is there to filter out other potential request types in the future.
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
+    // TODO:  remove the != .update check - that should be handled when startBlocks are assigned.
     if batch.activity != .update {
       batch.startBlock?()
     }
