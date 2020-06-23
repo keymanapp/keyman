@@ -17,7 +17,7 @@ public class ResourceDownloadManager {
   private var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
 
-  public typealias CompletionHandler<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>> = (Package?, Error?) -> Void
+  public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void
   
   public static let shared = ResourceDownloadManager()
   
@@ -62,7 +62,7 @@ public class ResourceDownloadManager {
                                     asActivity activity: DownloadActivityType,
                                     withFilename filename: String,
                                     withOptions options: Options,
-                                    completionBlock: CompletionHandler<InstallableKeyboard, KeyboardKeymanPackage>? = nil) -> DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage>? {
+                                    completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
 
     if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, completionBlock: completionBlock) {
       let tasks = dlBatch.downloadTasks
@@ -87,7 +87,7 @@ public class ResourceDownloadManager {
                                           withFilename filename: String,
                                           asActivity activity: DownloadActivityType,
                                           withOptions options: Options,
-                                          completionBlock: CompletionHandler<InstallableKeyboard, KeyboardKeymanPackage>? = nil) -> DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage>? {
+                                          completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
     let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
@@ -134,7 +134,7 @@ public class ResourceDownloadManager {
                                languageID: String,
                                isUpdate: Bool,
                                fetchRepositoryIfNeeded: Bool = true,
-                               completionBlock: CompletionHandler<InstallableKeyboard, KeyboardKeymanPackage>? = nil) {
+                               completionBlock: CompletionHandler<InstallableKeyboard>? = nil) {
     guard let _ = Manager.shared.apiKeyboardRepository.keyboards,
       let options = Manager.shared.apiKeyboardRepository.options
     else {
@@ -217,7 +217,7 @@ public class ResourceDownloadManager {
   private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel],
                                         asActivity activity: DownloadActivityType,
                                         fromPath path: URL,
-                                        completionBlock: CompletionHandler<InstallableLexicalModel, LexicalModelKeymanPackage>? = nil) -> DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage>? {
+                                        completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
 
     if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, completionBlock: completionBlock) {
       let tasks = dlBatch.downloadTasks
@@ -241,7 +241,7 @@ public class ResourceDownloadManager {
   private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel,
                                               withFilename path: URL,
                                               asActivity activity: DownloadActivityType,
-                                              completionBlock: CompletionHandler<InstallableLexicalModel, LexicalModelKeymanPackage>? = nil) -> DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage>? {
+                                              completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
     do {
       try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
                                               withIntermediateDirectories: true)
@@ -317,7 +317,7 @@ public class ResourceDownloadManager {
                                    languageID: String,
                                    isUpdate: Bool,
                                    fetchRepositoryIfNeeded: Bool = true,
-                                   completionBlock: CompletionHandler<InstallableLexicalModel, LexicalModelKeymanPackage>? = nil) {
+                                   completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) {
     
     // TODO:  We should always force a refetch after new keyboards are installed so we can redo our language queries.
     //        That should probably be done on successful keyboard installs, not here, though.

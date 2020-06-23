@@ -81,20 +81,20 @@ protocol AnyDownloadBatch {
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>: AnyDownloadBatch {
+class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch {
   public final var activity: DownloadActivityType
   public final var type: LanguageResourceType?
   
   public final var downloadTasks: [DownloadTask<Resource>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
-  public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil
+  public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil
   
   public init?(do tasks: [DownloadTask<Resource>],
                as activity: DownloadActivityType,
                ofType type: LanguageResourceType,
                startBlock: (() -> Void)? = nil,
-               completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil) {
+               completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil) {
     self.activity = activity
     self.type = type
     self.downloadTasks = tasks
@@ -129,7 +129,7 @@ class DownloadBatch<Resource: LanguageResource, Package: TypedKeymanPackage<Reso
 
   public func completeWithPackage(fromKMP file: URL) {
     do {
-      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Package {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Resource.Package {
         completionBlock?(package, nil)
       } else {
         completionBlock?(nil, KMPError.invalidPackage)
@@ -388,12 +388,12 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   // MARK - notification methods
   
   private func downloadFailed(forBatch batch: AnyDownloadBatch, error: Error) {
-    if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
+    if let batch = batch as? DownloadBatch<InstallableKeyboard> {
       let keyboards = batch.downloadTasks.compactMap { task in
         return task.resources
       }.flatMap {$0}
       downloadFailed(forKeyboards: keyboards, error: error)
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
+    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel> {
       let lexModels = batch.downloadTasks.compactMap { task in
         return task.resources
       }.flatMap {$0}
@@ -472,10 +472,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
     let isUpdate = batch.activity == .update
 
-    if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
+    if let batch = batch as? DownloadBatch<InstallableKeyboard> {
       // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
       // Once downlading KMPs, will be the downloaded .kmp.
-      
+
       // The request has succeeded.
       if downloader!.requestsCount == 0 { // Download queue finished.
         let keyboards = batch.resources as! [InstallableKeyboard]
@@ -503,7 +503,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           log.error("Could not load metadata for newly-installed keyboard")
         }
       }
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
+    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel> {
       let task = batch.downloadTasks[0] // It's always at this index.
       let (lm, package) = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!))
       if let lm = lm, let package = package {
@@ -630,6 +630,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile)
       kmp = package as? LexicalModelKeymanPackage
       if let kmp = kmp {
+        // Now that we have the package, we do the actual lexical model installation
+        // Marked here as prep for the next stage.
+
         do {
           try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false)
           log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
@@ -637,6 +640,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         } catch {
           log.error("Error installing the lexical model: \(String(describing: error))")
         }
+
+        // End of block to be spun off.
       } else {
         log.error("Provided package did not contain lexical models.")
       }
