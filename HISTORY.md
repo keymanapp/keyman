@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.98 alpha 2020-06-23
+
+* refactor(ios/engine): reworks download queue objects (#3267)
+* feat(linux): Improve Linux package description (#3268)
+
 ## 14.0.97 alpha 2020-06-22
 
 * feat(android): Implement menu to add language for installed keyboard pkg (#3255)
