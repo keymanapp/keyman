@@ -5,6 +5,7 @@ import threading
 from keyman_config.install_kmp import process_keyboard_data
 from keyman_config.kmpmetadata import parsemetadata
 
+
 class GetInfo(object):
     """ Get information about kmp packages and keyboards
     The run() method will be started and it will run in the background.

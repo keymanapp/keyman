@@ -11,7 +11,7 @@ Image.LOAD_TRUNCATED_IMAGES = True
 
 def changeblacktowhite(im):
     data = np.array(im)   # "data" is a height x width x 4 numpy array
-    red, green, blue, alpha = data.T # Temporarily unpack the bands for readability
+    red, green, blue, alpha = data.T  # Temporarily unpack the bands for readability
 
     # Replace black with white... (leaves alpha values alone...)
     white_areas = (red == 0) & (blue == 0) & (green == 0)
@@ -37,7 +37,7 @@ def checkandsaveico(icofile):
         im = Image.open(icofile)
         im = im.convert('RGBA')
         im2 = im
-        num, colour = max(im.getcolors(im.size[0]*im.size[1]))
+        num, colour = max(im.getcolors(im.size[0] * im.size[1]))
         logging.debug("checkandsaveico maxcolour: num {0}: colour {1}".format(num, colour))
         if num > 160 and colour == (0, 0, 0, 0):
             logging.info("checkandsaveico:" + icofile + " mostly black so changing black to white")
@@ -68,7 +68,7 @@ def extractico(kmxfile):
     """
     name, ext = os.path.splitext(kmxfile)
     imagefilename = name
-    with open(kmxfile, mode='rb') as file: # b is important -> binary
+    with open(kmxfile, mode='rb') as file:  # b is important -> binary
         fileContent = file.read()
 
         kmxstart = struct.unpack_from("<16I", fileContent, 0)
@@ -81,7 +81,7 @@ def extractico(kmxfile):
         logging.debug("bitmap size is %d", bitmapSize)
         file.seek(bitmapOffset, 0)
         bitmap = file.read(bitmapSize)
-        if not bitmap or file.tell() != bitmapOffset+bitmapSize:
+        if not bitmap or file.tell() != bitmapOffset + bitmapSize:
             logging.debug("unreadable bitmap in kmx")
             return False
 

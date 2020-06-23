@@ -2,19 +2,17 @@
 
 import gi
 import logging
-import subprocess
 import webbrowser
-import urllib.parse
 
-import webbrowser
+from gi.repository import Gtk, WebKit2
+from keyman_config.accelerators import bind_accelerator, init_accel
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
-from gi.repository import Gtk, WebKit2
-from keyman_config.check_mime_type import check_mime_type
-from keyman_config.accelerators import bind_accelerator, init_accel
 
 # NOTE: WebKit2 is not able to load XHTML files nor files with an encoding other
 # than ASCII or UTF-8
+
 
 class WelcomeView(Gtk.Dialog):
 
@@ -52,12 +50,13 @@ class WelcomeView(Gtk.Dialog):
     def doc_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
         logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
-        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION or decision_type == WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION:
+        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION or \
+                decision_type == WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION:
             nav_action = decision.get_navigation_action()
             request = nav_action.get_request()
             uri = request.get_uri()
             logging.debug("nav request is for uri %s", uri)
-            if not "welcome.htm" in uri:
+            if "welcome.htm" not in uri:
                 logging.debug("opening uri %s in webbrowser")
                 webbrowser.open(uri)
                 decision.ignore()

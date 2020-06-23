@@ -5,13 +5,10 @@
 import logging
 import os.path
 import pathlib
-import subprocess
 import sys
 import webbrowser
 import tempfile
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
@@ -19,9 +16,11 @@ from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.kmpmetadata import get_fonts
 from keyman_config.welcome import WelcomeView
 from keyman_config.uninstall_kmp import uninstall_kmp
-from keyman_config.get_kmp import get_download_folder, user_keyboard_dir
-from keyman_config.check_mime_type import check_mime_type
+from keyman_config.get_kmp import user_keyboard_dir
 from keyman_config.accelerators import bind_accelerator, init_accel
+gi.require_version('Gtk', '3.0')
+gi.require_version('WebKit2', '4.0')
+
 
 def find_keyman_image(image_file):
     img_path = os.path.join("/usr/share/keyman/icons", image_file)
@@ -34,6 +33,7 @@ def find_keyman_image(image_file):
                 if not os.path.isfile(img_path):
                     img_path = os.path.join("icons", image_file)
     return img_path
+
 
 class InstallKmpWindow(Gtk.Dialog):
 
@@ -64,11 +64,12 @@ class InstallKmpWindow(Gtk.Dialog):
 
             if installed_kmp_ver:
                 if info['version']['description'] == installed_kmp_ver:
-                    dialog = Gtk.MessageDialog(viewkmp, 0, Gtk.MessageType.QUESTION,
+                    dialog = Gtk.MessageDialog(
+                        viewkmp, 0, Gtk.MessageType.QUESTION,
                         Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
                     dialog.format_secondary_text(
                         "The " + self.kbname + " keyboard is already installed at version " + installed_kmp_ver +
-                            ". Do you want to uninstall then reinstall it?")
+                        ". Do you want to uninstall then reinstall it?")
                     response = dialog.run()
                     dialog.destroy()
                     if response == Gtk.ResponseType.YES:
@@ -83,11 +84,14 @@ class InstallKmpWindow(Gtk.Dialog):
                         logging.info("package version %s", info['version']['description'])
                         logging.info("installed kmp version %s", installed_kmp_ver)
                         if StrictVersion(info['version']['description']) <= StrictVersion(installed_kmp_ver):
-                            dialog = Gtk.MessageDialog(viewkmp, 0, Gtk.MessageType.QUESTION,
+                            dialog = Gtk.MessageDialog(
+                                viewkmp, 0, Gtk.MessageType.QUESTION,
                                 Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
                             dialog.format_secondary_text(
-                                "The " + self.kbname + " keyboard is already installed with a newer version " + installed_kmp_ver +
-                                    ". Do you want to uninstall it and install the older version" + info['version']['description'] + "?")
+                                "The " + self.kbname + " keyboard is already installed with a newer version " +
+                                installed_kmp_ver +
+                                ". Do you want to uninstall it and install the older version" +
+                                info['version']['description'] + "?")
                             response = dialog.run()
                             dialog.destroy()
                             if response == Gtk.ResponseType.YES:
@@ -97,7 +101,7 @@ class InstallKmpWindow(Gtk.Dialog):
                                 logging.debug("QUESTION dialog closed by clicking NO button")
                                 self.checkcontinue = False
                                 return
-                    except:
+                    except:  # noqa: E722
                         logging.warning("Exception uninstalling an old kmp, continuing")
                         pass
 
@@ -174,13 +178,14 @@ class InstallKmpWindow(Gtk.Dialog):
                 prevlabel = label4
                 label = Gtk.Label()
                 if 'url' in info['author']:
-                    label.set_markup("<a href=\"" + info['author']['url'] + "\" title=\"" + info['author']['url'] + "\">" + info['author']['description'] + "</a>")
+                    label.set_markup(
+                        "<a href=\"" + info['author']['url'] + "\" title=\"" +
+                        info['author']['url'] + "\">" + info['author']['description'] + "</a>")
                 else:
                     label.set_text(info['author']['description'])
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label4, Gtk.PositionType.RIGHT, 1, 1)
-
 
             if info and 'website' in info:
                 label5 = Gtk.Label()
@@ -190,7 +195,9 @@ class InstallKmpWindow(Gtk.Dialog):
                 grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label5
                 label = Gtk.Label()
-                label.set_markup("<a href=\"" + info['website']['description'] + "\">" + info['website']['description'] + "</a>")
+                label.set_markup(
+                    "<a href=\"" + info['website']['description'] + "\">" +
+                    info['website']['description'] + "</a>")
                 label.set_halign(Gtk.Align.START)
                 label.set_selectable(True)
                 grid.attach_next_to(label, label5, Gtk.PositionType.RIGHT, 1, 1)
@@ -267,7 +274,7 @@ class InstallKmpWindow(Gtk.Dialog):
             request = nav_action.get_request()
             uri = request.get_uri()
             logging.debug("nav request is for uri %s", uri)
-            if not self.readme in uri:
+            if self.readme not in uri:
                 logging.debug("opening uri %s in webbrowser")
                 webbrowser.open(uri)
                 decision.ignore()
@@ -289,7 +296,8 @@ class InstallKmpWindow(Gtk.Dialog):
                 w.run()
                 w.destroy()
             else:
-                dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
+                dialog = Gtk.MessageDialog(
+                    self, 0, Gtk.MessageType.INFO,
                     Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
                 dialog.run()
                 dialog.destroy()
@@ -299,10 +307,12 @@ class InstallKmpWindow(Gtk.Dialog):
                 logging.error(message)
                 message_type = Gtk.MessageType.ERROR
             else:
-                message = "Keyboard " + self.kbname + " could not be installed fully.\n\nWarning Message:\n%s" % (e.message)
+                message = "Keyboard " + self.kbname + " could not be installed fully.\n\nWarning Message:\n%s" % (
+                    e.message)
                 logging.warning(message)
                 message_type = Gtk.MessageType.WARNING
-            dialog = Gtk.MessageDialog(self, 0, message_type,
+            dialog = Gtk.MessageDialog(
+                self, 0, message_type,
                 Gtk.ButtonsType.OK, message)
             dialog.run()
             dialog.destroy()
@@ -311,6 +321,7 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_cancel_clicked(self, button):
         logging.info("Cancel install keyboard")
         self.response(Gtk.ResponseType.CANCEL)
+
 
 def main(argv):
     if len(sys.argv) != 2:
@@ -332,5 +343,6 @@ def main(argv):
     w.run()
     w.destroy()
 
+
 if __name__ == "__main__":
-	main(sys.argv[1:])
+    main(sys.argv[1:])
