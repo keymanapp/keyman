@@ -100,6 +100,7 @@ class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch {
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
+    self.startBlock = startBlock
     self.completionBlock = completionBlock
   }
 
@@ -546,19 +547,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // The extra check is there to filter out other potential request types in the future.
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    if request.tag == 0 && batch.activity != .update {
-      let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
-      if task.type == .keyboard {
-        let task = task as! DownloadTask<InstallableKeyboard>
-        NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
-                                        object: self,
-                                        value: task.resources!)
-      } else if task.type == .lexicalModel {
-        let task = task as! DownloadTask<InstallableLexicalModel>
-        NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
-                                        object: self,
-                                        value: task.resources!)
-      }
+    if batch.activity != .update {
+      batch.startBlock?()
     }
   }
 

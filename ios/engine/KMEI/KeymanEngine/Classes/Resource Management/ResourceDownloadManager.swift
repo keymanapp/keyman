@@ -115,14 +115,21 @@ public class ResourceDownloadManager {
       let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil, type: nil)
       batchTasks.append(fontTask)
     }
-    
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, completionBlock: completionBlock)
+
+    let startHandler = { self.defaultKeyboardStartBlock(for: keyboard) }
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, startBlock: startHandler, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
     
     return batch
+  }
+
+  internal func defaultKeyboardStartBlock(for keyboard: InstallableKeyboard) {
+    NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
+                                        object: self,
+                                        value: [keyboard])
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
@@ -257,14 +264,21 @@ public class ResourceDownloadManager {
 
     let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
     let batchTasks: [DownloadTask<InstallableLexicalModel>] = [ lexicalModelTask ]
-    
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, completionBlock: completionBlock)
+
+    let startHandler = { self.defaultLexicalModelStartBlock(for: lexicalModel) }
+    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, startBlock: startHandler, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
     }
     
     return batch
+  }
+
+  internal func defaultLexicalModelStartBlock(for lexicalModel: InstallableLexicalModel) {
+    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
+                                        object: self,
+                                        value: [lexicalModel])
   }
   
   // Can be called by the cloud keyboard downloader and utilized.
