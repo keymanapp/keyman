@@ -193,13 +193,6 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       navigationItem.rightBarButtonItem?.isEnabled = true
     }
     
-    // Add lexicalModel.
-    for lexicalModel in lexicalModels {
-      if lexicalModel.languageID == language?.id {
-        switchLexicalModel(lexicalModel)
-      }
-    }
-    
     navigationController?.popToRootViewController(animated: true)
   }
   
@@ -315,7 +308,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
         DispatchQueue.main.async {
           let button: UIButton? = (self.navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
           button?.isEnabled = false
-          let vc = LanguageLMDetailViewController(language: self.language)
+          let vc = LanguageLMDetailViewController(language: self.language, onSuccess: { lm in
+            self.switchLexicalModel(lm)
+          })
           vc.lexicalModels = lexicalModels!
           self.navigationController?.pushViewController(vc, animated: true)
         }

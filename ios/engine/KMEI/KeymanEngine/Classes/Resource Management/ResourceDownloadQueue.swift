@@ -411,8 +411,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   func downloadQueueFinished(_ queue: HTTPDownloader) {
     // We can use the properties of the current "batch" to generate specialized notifications.
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
-    let isUpdate = batch.activity == .update
 
+    // Really, "if resource is installed from the cloud, only packaged locally"
     if let batch = batch as? DownloadBatch<InstallableKeyboard> {
       // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
       // Once downlading KMPs, will be the downloaded .kmp.
@@ -424,11 +424,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
         // TEMP:  wrap the newly-downloaded resources with a kmp.json.
         //        Serves as a bridge until we're downloading actual .kmps for keyboards.
-        let wrappedKeyboards = Migrations.migrateToKMPFormat(keyboards)
-
-        wrappedKeyboards.forEach { keyboard in
-          ResourceFileManager.shared.addResource(keyboard)
-        }
+        let _ = Migrations.migrateToKMPFormat(keyboards)
 
         if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
           batch.completionBlock?(package, nil)
@@ -436,18 +432,12 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           log.error("Could not load metadata for newly-installed keyboard")
         }
       }
+      // else "if resource is installed from an actual KMP"
+      // - in other words, the long-term target.
     } else if let batch = batch as? DownloadBatch<InstallableLexicalModel> {
       let task = batch.downloadTasks[0] // It's always at this index.
-      let (lm, package) = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!))
-      if let lm = lm, let package = package {
-        if !isUpdate {
-          // Since we don't generate the notification as above, we need to manually update
-          // the lexical model's metadata.
-          Manager.shared.updateUserLexicalModels(with: lm)
-        }
-
-        batch.completionBlock?(package, nil)
-      }
+      let packagePath = URL(fileURLWithPath: task.request.destinationFile!)
+      batch.completeWithPackage(fromKMP: packagePath)
     }
     
     // Completing the queue means having completed a batch.  We should only move forward in this class's
@@ -506,40 +496,5 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
     batch.completeWithError(error: error)
     downloader!.cancelAllOperations()
-  }
-  
-  // MARK - Language resource installation methods
-  
-  // Processes fetched lexical models.
-  // return a lexical model so caller can use it in a downloadSucceeded call
-  // is called by other class funcs
-  public func installLexicalModelPackage(downloadedPackageFile: URL) -> (InstallableLexicalModel?, LexicalModelKeymanPackage?) {
-    var installedLexicalModel: InstallableLexicalModel? = nil
-    var kmp: LexicalModelKeymanPackage?
-
-    do {
-      let package = try ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile)
-      kmp = package as? LexicalModelKeymanPackage
-      if let kmp = kmp {
-        // Now that we have the package, we do the actual lexical model installation
-        // Marked here as prep for the next stage.
-
-        do {
-          try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false)
-          log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
-          installedLexicalModel = kmp.models[0].installableLexicalModels[0]
-        } catch {
-          log.error("Error installing the lexical model: \(String(describing: error))")
-        }
-
-        // End of block to be spun off.
-      } else {
-        log.error("Provided package did not contain lexical models.")
-      }
-    } catch {
-      log.error("Error extracting the lexical model from the package: \(String(describing: error))")
-    }
-    
-    return (installedLexicalModel, kmp)
   }
 }

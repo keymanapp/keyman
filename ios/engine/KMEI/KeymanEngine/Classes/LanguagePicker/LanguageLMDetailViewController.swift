@@ -23,9 +23,12 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   //NOTE: there is no need for a CompletedObserver, as our parent LexicalModelPickerViewController
   //  is registered for that and deals with it by popping us out to root.
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
+
+  private var onSuccessClosure: ((InstallableLexicalModel) -> Void)?
   
-  init(language: Language) {
+  init(language: Language, onSuccess: ((InstallableLexicalModel) -> Void)?) {
     self.language = language
+    self.onSuccessClosure = onSuccess
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -138,7 +141,15 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   
   func downloadHandler(_ lexicalModelIndex: Int) {
     let lexicalModel = lexicalModels![lexicalModelIndex]
-    ResourceDownloadManager.shared.downloadLexicalModel(withID: lexicalModel.id, languageID: language.id, isUpdate: false)
+    let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModel.id, languageID: language.id)
+    let completionClosure: ResourceDownloadManager.CompletionHandler<InstallableLexicalModel> = { package, error in
+      ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)(package, error)
+
+      if let lm = package?.findResource(withID: lmFullID) {
+        self.onSuccessClosure?(lm)
+      }
+    }
+    ResourceDownloadManager.shared.downloadLexicalModel(withID: lexicalModel.id, languageID: language.id, isUpdate: false, completionBlock: completionClosure)
   }
   
   private func lexicalModelDownloadStarted() {

@@ -163,10 +163,12 @@ public class ResourceDownloadManager {
     else {
       return
     }
-    
-    if let _ = downloadKeyboardCore(withMetadata: [keyboard], asActivity: isUpdate ? .update : .download, withFilename: filename, withOptions: options) {
-      self.downloadLexicalModelsForLanguageIfExists(languageID: languageID)
-    }
+
+    let _ = downloadKeyboardCore(withMetadata: [keyboard],
+                                 asActivity: isUpdate ? .update : .download,
+                                 withFilename: filename,
+                                 withOptions: options,
+                                 completionBlock: completionBlock)
   }
 
   private func keyboardFontURLs(forFont font: Font?, options: Options) -> [URL] {
@@ -310,7 +312,13 @@ public class ResourceDownloadManager {
         if let lexicalModel = lexicalModels?[chosenIndex] {
           //downloadLexicalModelPackage(url: URL.init(string: lexicalModel.packageFilename)!)
           // We've already fetched part of the repository to do this.
-          downloadLexicalModel(withID: lexicalModel.id, languageID: languageID, isUpdate: false, fetchRepositoryIfNeeded: false)
+          let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModel.id, languageID: languageID)
+          let completionClosure = standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
+          downloadLexicalModel(withID: lexicalModel.id,
+                               languageID: languageID,
+                               isUpdate: false,
+                               fetchRepositoryIfNeeded: false,
+                               completionBlock: completionClosure)
         } else {
           log.info("no error, but no lexical model in list, either!")
         }
@@ -360,7 +368,10 @@ public class ResourceDownloadManager {
       return
     }
     
-    _ = downloadLexicalModelCore(withMetadata: [lexicalModel], asActivity: isUpdate ? .update : .download, fromPath: URL.init(string: filename)!, completionBlock: completionBlock)
+    _ = downloadLexicalModelCore(withMetadata: [lexicalModel],
+                                 asActivity: isUpdate ? .update : .download,
+                                 fromPath: URL.init(string: filename)!,
+                                 completionBlock: completionBlock)
   }
   
   /// - Returns: The current state for a lexical model
@@ -483,9 +494,21 @@ public class ResourceDownloadManager {
     return updateQueue
   }
 
+  @available(*, deprecated)
   public func installLexicalModelPackage(at packageURL: URL) -> InstallableLexicalModel? {
-    let (lm, _) = downloader.installLexicalModelPackage(downloadedPackageFile: packageURL)
-    return lm
+    do {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: packageURL) as? LexicalModelKeymanPackage {
+        try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
+        // The reason we're deprecating it; only returns the first model, even if more language pairings are installed.
+        return package.installables[0][0]
+      } else {
+        log.error("Specified package (at \(packageURL)) does not contain lexical models: \(KMPError.invalidPackage)")
+        return nil
+      }
+    } catch {
+      log.error("Error occurred while attempting to install package from \(packageURL): \(String(describing: error))")
+      return nil
+    }
   }
 
   // MARK - Completion handlers.
@@ -530,12 +553,21 @@ public class ResourceDownloadManager {
     return { package, error in
       if let package = package {
         // Do not send notifications for individual resource updates.
-//        let resourceIDs: [Resource.FullID] = resources.map { $0.typedFullID }
-//        do {
-//          try ResourceFileManager.shared.install(resourcesWithIDs: resourceIDs, from: package)
-//        } catch {
-//          log.error("Error updating resources from package \(package.id)")
-//        }
+        let resourceIDs: [Resource.FullID] = resources.map { $0.typedFullID }
+        do {
+          if let keyboards = resources as? [InstallableKeyboard], let package = package as? KeyboardKeymanPackage {
+            // TEMP:  currently required because downloaded keyboards aren't actually in packages.
+            keyboards.forEach { keyboard in
+              if let updatedKbd = package.findResource(withID: keyboard.typedFullID) {
+                Manager.shared.updateUserKeyboards(with: updatedKbd)
+              }
+            }
+          } else if let _ = resources as? [InstallableLexicalModel] {
+            try ResourceFileManager.shared.install(resourcesWithIDs: resourceIDs, from: package)
+          }
+        } catch {
+          log.error("Error updating resources from package \(package.id)")
+        }
 
         // After the custom handler operates, ensure that any changes it made are synchronized for use
         // with the app extension, too.
@@ -545,6 +577,57 @@ public class ResourceDownloadManager {
       }
     }
   }
+
+  public func standardKeyboardInstallCompletionBlock(forFullID fullID: FullKeyboardID, withModel: Bool = true) -> CompletionHandler<InstallableKeyboard> {
+    return { package, error in
+      if let package = package {
+        // The "keyboard package" is actually a cloud resource that was already directly installed.
+        // So, we don't 'install it from the package'; we just note that it's already present.
+        let fullID = FullKeyboardID(keyboardID: fullID.keyboardID, languageID: fullID.languageID)
+
+        // Since we're installing from a cloud resource, the files are already appropriately placed.
+        // We just need to actually add the resource.
+        if let keyboard = package.findResource(withID: fullID) {
+          ResourceFileManager.shared.addResource(keyboard)
+          _ = Manager.shared.setKeyboard(keyboard)
+
+          if withModel {
+            // TODO:  Adapt as appropriate.
+            self.downloadLexicalModelsForLanguageIfExists(languageID: fullID.languageID)
+          }
+        } else {
+          log.error("Expected resource \(fullID.description) download failed; resource unexpectedly missing")
+        }
+      } else if let error = error {
+        log.error("Installation failed: \(String(describing: error))")
+      }
+    }
+  }
+
+  public func standardLexicalModelInstallCompletionBlock(forFullID fullID: FullLexicalModelID) -> CompletionHandler<InstallableLexicalModel> {
+    return { package, error in
+      if let package = package {
+        do {
+          // A raw port of the queue's old installation method for lexical models.
+          try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
+          log.info("successfully parsed the lexical model in: \(package.sourceFolder)")
+
+          if let installedLexicalModel = package.findResource(withID: fullID) {
+            _ = Manager.shared.registerLexicalModel(installedLexicalModel)
+
+            // Also, the 'switch'.
+          }
+        } catch {
+          log.error("Error installing the lexical model: \(String(describing: error))")
+        }
+      } else {
+        //
+      }
+    }
+  }
+
+  // standardLexicalModel (from model picker)
+  // daisychainedLexicalModel (you know the context)
 
   // MARK - Notifications
   internal func resourceDownloadStarted<Resource: LanguageResource>(for resources: [Resource]) {
