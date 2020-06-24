@@ -461,13 +461,16 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
         userDefaults.synchronize()
 
-//        // TODO:  get package for keyboards.
-//        var package: KeyboardKeymanPackage
-//        batch.completionBlock?(package, nil)
+        if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
+          batch.completionBlock?(package, nil)
+        } else {
+          log.error("Could not load metadata for newly-installed keyboard")
+        }
       }
     } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
       let task = batch.downloadTasks[0] // It's always at this index.
-      if let lm = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!)) {
+      let (lm, package) = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!))
+      if let lm = lm, let package = package {
         if !isUpdate {
           downloadSucceeded(forLexicalModel: lm)
         } else {
@@ -476,9 +479,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           Manager.shared.updateUserLexicalModels(with: lm)
         }
 
-//        // TODO:  get package for lexical models
-//        var package: LexicalModelKeymanPackage
-//        batch.completionBlock?(package, nil)
+        batch.completionBlock?(package, nil)
       } else if !isUpdate {
         let installError = NSError(domain: "Keyman", code: 0,
                                    userInfo: [NSLocalizedDescriptionKey: "installError"])
@@ -581,12 +582,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   // Processes fetched lexical models.
   // return a lexical model so caller can use it in a downloadSucceeded call
   // is called by other class funcs
-  public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
+  public func installLexicalModelPackage(downloadedPackageFile: URL) -> (InstallableLexicalModel?, LexicalModelKeymanPackage?) {
     var installedLexicalModel: InstallableLexicalModel? = nil
+    var kmp: LexicalModelKeymanPackage?
 
     do {
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile)
-      if let kmp = package as? LexicalModelKeymanPackage {
+      kmp = package as? LexicalModelKeymanPackage
+      if let kmp = kmp {
         do {
           try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false)
           log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
@@ -601,6 +604,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       log.error("Error extracting the lexical model from the package: \(String(describing: error))")
     }
     
-    return installedLexicalModel
+    return (installedLexicalModel, kmp)
   }
 }

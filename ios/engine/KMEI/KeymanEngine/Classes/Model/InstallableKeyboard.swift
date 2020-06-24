@@ -12,6 +12,7 @@ import Foundation
 public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
   public typealias FullID = FullKeyboardID
   internal typealias Metadata = KMPKeyboard
+  public typealias Package = KeyboardKeymanPackage
   
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {

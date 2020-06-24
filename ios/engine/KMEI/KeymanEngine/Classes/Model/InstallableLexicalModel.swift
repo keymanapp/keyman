@@ -14,6 +14,9 @@ struct InstallableConstants {
 
 /// Mainly differs from the API `LexicalModel` by having an associated language.
 public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource {
+  typealias Metadata = KMPLexicalModel
+  public typealias Package = LexicalModelKeymanPackage
+
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id

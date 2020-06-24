@@ -472,6 +472,7 @@ public class ResourceDownloadManager {
   }
 
   public func installLexicalModelPackage(at packageURL: URL) -> InstallableLexicalModel? {
-    return downloader.installLexicalModelPackage(downloadedPackageFile: packageURL)
+    let (lm, _) = downloader.installLexicalModelPackage(downloadedPackageFile: packageURL)
+    return lm
   }
 }

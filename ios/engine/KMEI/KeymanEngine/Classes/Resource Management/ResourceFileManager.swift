@@ -35,6 +35,14 @@ public class ResourceFileManager {
     return backingPackages
   }
 
+  public func getInstalledPackage<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(for resource: Resource) -> Package? where Package == Resource.Package {
+    if let packageDir = Storage.active.resourceDir(for: resource) {
+      return KeymanPackage.parse(packageDir) as? Package
+    } else {
+      return nil
+    }
+  }
+
   /**
    * Apple doesn't provide a method that performs copy-and-overwrite functionality.  This function fills in that gap.
    */
