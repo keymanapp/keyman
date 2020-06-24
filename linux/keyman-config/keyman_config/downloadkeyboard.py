@@ -3,19 +3,19 @@
 import logging
 import os.path
 import urllib.parse
-import pathlib
-import subprocess
 import webbrowser
 
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, WebKit2
 from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from keyman_config.install_window import InstallKmpWindow
-from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.accelerators import init_accel
 from keyman_config.get_info import GetInfo
 from keyman_config import __releaseversion__
+
+gi.require_version('Gtk', '3.0')
+gi.require_version('WebKit2', '4.0')
+
 
 class DownloadKmpWindow(Gtk.Dialog):
 
@@ -29,7 +29,7 @@ class DownloadKmpWindow(Gtk.Dialog):
         s = Gtk.ScrolledWindow()
         self.webview = WebKit2.WebView()
         self.webview.connect("decide-policy", self.keyman_policy)
-        self.webview.load_uri("https://keyman.com/go/linux/" + __releaseversion__+"/download-keyboards")
+        self.webview.load_uri("https://keyman.com/go/linux/" + __releaseversion__ + "/download-keyboards")
         s.add(self.webview)
 
         self.get_content_area().pack_start(s, True, True, 0)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         file = w.downloadfile
     w.destroy()
 
-    if file != None:
+    if file is not None:
         installDlg = InstallKmpWindow(file)
         installDlg.run()
         installDlg.destroy()

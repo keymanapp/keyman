@@ -4,8 +4,10 @@ import gi
 import logging
 import subprocess
 
-gi.require_version('IBus', '1.0')
 from gi.repository import IBus, Gio
+
+gi.require_version('IBus', '1.0')
+
 
 def get_ibus_bus():
     try:
@@ -19,6 +21,7 @@ def get_ibus_bus():
         logging.warning(e)
     logging.warning("could not find connected IBus.Bus")
     return None
+
 
 def install_to_ibus(bus, keyboard_id):
     try:
@@ -39,8 +42,9 @@ def install_to_ibus(bus, keyboard_id):
         logging.warning("Failed to set up install %s to IBus", keyboard_id)
         logging.warning(e)
 
+
 def uninstall_from_ibus(bus, keyboard_id):
-# need to uninstall for all installed langs
+    # need to uninstall for all installed langs
     try:
         # logging.debug("getting bus")
         # bus = IBus.Bus()
@@ -56,9 +60,11 @@ def uninstall_from_ibus(bus, keyboard_id):
         logging.warning("Failed to uninstall keyboard %s", keyboard_id)
         logging.warning(e)
 
+
 def restart_ibus_subp():
     logging.info("restarting IBus by subprocess")
     subprocess.run(["ibus", "restart"])
+
 
 def restart_ibus(bus=None):
     try:
@@ -71,9 +77,11 @@ def restart_ibus(bus=None):
         logging.warning("Failed to restart IBus")
         logging.warning(e)
 
+
 def bus_has_engine(bus, name):
     engines = bus.get_engines_by_names([name])
     return len(engines)
+
 
 def get_current_engine(bus):
     try:
