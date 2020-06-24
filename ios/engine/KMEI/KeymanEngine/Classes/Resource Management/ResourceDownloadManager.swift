@@ -528,12 +528,7 @@ public class ResourceDownloadManager {
   internal func resourceUpdateCompletionClosure<Resource: LanguageResource>(for resources: [Resource], handler: CompletionHandler<Resource>?) -> CompletionHandler<Resource> {
     // Updates should not generate notifications per resource.
     return { package, error in
-      if let _ = package {
-        // successful download
-        // Problem:  this uses the lookup-version of the resources, which may not be perfect matches
-        // for what lies within the newly-downloaded package.
-        self.resourceDownloadCompleted(for: resources)
-      } // No special handling if errors exist.
+      // Do not send notifications for individual resource updates.
 
       handler?(package, error)
 
