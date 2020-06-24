@@ -11,10 +11,10 @@ from lxml import etree
 # Magic   4 bytes 'KVKF'
 # Version 4 bytes 0x600
 # Flags   1 byte bitmask: [102key?, DisplayUnderlying?, UseUnderlying?, AltGr?]
-kvkk102key =              b'\x01'  # noqa: E222 - multiple spaces after operator
-kvkkDisplayUnderlying =   b'\x02'  # noqa: E222 - multiple spaces after operator
-kvkkUseUnderlying =       b'\x04'  # noqa: E222 - multiple spaces after operator
-kvkkAltGr =               b'\x08'  # noqa: E222 - multiple spaces after operator
+kvkk102key = b'\x01'
+kvkkDisplayUnderlying = b'\x02'
+kvkkUseUnderlying = b'\x04'
+kvkkAltGr = b'\x08'
 # AssociatedKeyboard NSTRING
 # AnsiFont NFONT
 # UnicodeFont NFONT
@@ -90,14 +90,14 @@ class NKey:
 #   KVKS_RCTRL  = 16;
 #   KVKS_LALT   = 32;
 #   KVKS_RALT   = 64;
-KVKS_NORMAL =             b'\x00'  # noqa: E222 - multiple spaces after operator
-KVKS_SHIFT =              b'\x01'  # noqa: E222 - multiple spaces after operator
-KVKS_CTRL =               b'\x02'  # noqa: E222 - multiple spaces after operator
-KVKS_ALT =                b'\x04'  # noqa: E222 - multiple spaces after operator
-KVKS_LCTRL =              b'\x08'  # noqa: E222 - multiple spaces after operator
-KVKS_RCTRL =              b'\x10'  # noqa: E222 - multiple spaces after operator
-KVKS_LALT =               b'\x20'  # noqa: E222 - multiple spaces after operator
-KVKS_RALT =               b'\x40'  # noqa: E222 - multiple spaces after operator
+KVKS_NORMAL = b'\x00'
+KVKS_SHIFT = b'\x01'
+KVKS_CTRL = b'\x02'
+KVKS_ALT = b'\x04'
+KVKS_LCTRL = b'\x08'
+KVKS_RCTRL = b'\x10'
+KVKS_LALT = b'\x20'
+KVKS_RALT = b'\x40'
 
 
 # from web/source/kmwosk.ts
