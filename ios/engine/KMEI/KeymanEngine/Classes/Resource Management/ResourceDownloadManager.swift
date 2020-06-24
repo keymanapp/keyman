@@ -560,6 +560,12 @@ public class ResourceDownloadManager {
             keyboards.forEach { keyboard in
               if let updatedKbd = package.findResource(withID: keyboard.typedFullID) {
                 Manager.shared.updateUserKeyboards(with: updatedKbd)
+
+                if Manager.shared.currentKeyboard?.fullID == keyboard.fullID {
+                  // Issue:  does not actually trigger a reload if the user isn't within the Settings view hierarchy
+                  // Fixing this requires a refactor of `shouldReloadKeyboard`.
+                  Manager.shared.shouldReloadKeyboard = true
+                }
               }
             }
           } else if let _ = resources as? [InstallableLexicalModel] {
@@ -592,7 +598,6 @@ public class ResourceDownloadManager {
           _ = Manager.shared.setKeyboard(keyboard)
 
           if withModel {
-            // TODO:  Adapt as appropriate.
             self.downloadLexicalModelsForLanguageIfExists(languageID: fullID.languageID)
           }
         } else {
@@ -600,6 +605,8 @@ public class ResourceDownloadManager {
         }
       } else if let error = error {
         log.error("Installation failed: \(String(describing: error))")
+      } else {
+        log.error("Unknown error when attempting to install \(fullID.description))")
       }
     }
   }
@@ -614,20 +621,17 @@ public class ResourceDownloadManager {
 
           if let installedLexicalModel = package.findResource(withID: fullID) {
             _ = Manager.shared.registerLexicalModel(installedLexicalModel)
-
-            // Also, the 'switch'.
           }
         } catch {
           log.error("Error installing the lexical model: \(String(describing: error))")
         }
+      } else if let error = error {
+        log.error("Error downloading the lexical model \(String(describing: error))")
       } else {
-        //
+        log.error("Unknown error when attempting to install \(fullID.description)")
       }
     }
   }
-
-  // standardLexicalModel (from model picker)
-  // daisychainedLexicalModel (you know the context)
 
   // MARK - Notifications
   internal func resourceDownloadStarted<Resource: LanguageResource>(for resources: [Resource]) {
