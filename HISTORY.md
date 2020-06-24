@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.99 alpha 2020-06-24
+
+* feat(ios/engine): adds getInstalledPackage(for:) (#3270)
+* refactor(linux): address code review comments of #3272 (#3275)
+
 ## 14.0.98 alpha 2020-06-23
 
 * refactor(ios/engine): reworks download queue objects (#3267)
