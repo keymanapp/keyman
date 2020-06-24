@@ -35,9 +35,9 @@ public class ResourceFileManager {
     return backingPackages
   }
 
-  public func getInstalledPackage<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(for resource: Resource) -> Package? where Package == Resource.Package {
+  public func getInstalledPackage<Resource: LanguageResource>(for resource: Resource) -> Resource.Package? {
     if let packageDir = Storage.active.resourceDir(for: resource) {
-      return KeymanPackage.parse(packageDir) as? Package
+      return KeymanPackage.parse(packageDir) as? Resource.Package
     } else {
       return nil
     }
@@ -231,11 +231,10 @@ public class ResourceFileManager {
    *
    * The`resourcesWithIDs:` variant is better optimized for installing multiple resources from the same package.
    */
-  public func install<ResourceType: LanguageResource,
-                      PackageType: TypedKeymanPackage<ResourceType>> (
-                        resourceWithID fullID: ResourceType.FullID,
-                        from package: PackageType) throws {
-
+  public func install<FullID: LanguageResourceFullID> (
+                        resourceWithID fullID: FullID,
+                        from package: FullID.Resource.Package) throws
+                        where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
     try install(resourcesWithIDs: [fullID], from: package)
   }
 
@@ -243,9 +242,9 @@ public class ResourceFileManager {
    * Searches the specified package for language resources with the indicated resource-language-code "full ID" keys
    * importing the package's files and installing the indicated resource-language pairings upon success.
    */
-  public func install<Resource: LanguageResource,
-                      Package: TypedKeymanPackage<Resource>> (
-                        resourcesWithIDs fullIDs: [Resource.FullID], from package: Package) throws {
+  public func install<FullID: LanguageResourceFullID> (
+                        resourcesWithIDs fullIDs: [FullID], from package: FullID.Resource.Package) throws
+                        where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
     if fullIDs.contains(where: { package.findResource(withID: $0) == nil }) {
       let missingResource = fullIDs.first(where: { package.findResource(withID: $0) == nil })!
       log.error("Resource with full ID \(missingResource.description) not in package")
@@ -260,7 +259,7 @@ public class ResourceFileManager {
       throw KMPError.fileSystem
     }
 
-    let updatables = findPotentialUpdates(in: package).map { return $0.typedFullID }
+    let updatables: [FullID] = findPotentialUpdates(in: package, ignoring: [] as [FullID.Resource]).map { return $0.typedFullID }
     let fullList = fullIDs + updatables
 
     fullList.forEach { addResource(package.findResource(withID: $0)!) }

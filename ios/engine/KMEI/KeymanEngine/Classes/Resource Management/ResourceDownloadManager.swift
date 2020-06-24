@@ -17,7 +17,7 @@ public class ResourceDownloadManager {
   private var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
 
-  public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void
+  public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
   
   public static let shared = ResourceDownloadManager()
   
@@ -525,18 +525,24 @@ public class ResourceDownloadManager {
     }
   }
 
-  internal func resourceUpdateCompletionClosure<Resource: LanguageResource>(for resources: [Resource], handler: CompletionHandler<Resource>?) -> CompletionHandler<Resource> {
+  internal func resourceUpdateCompletionClosure<Resource: LanguageResource>(for resources: [Resource]) -> CompletionHandler<Resource> {
     // Updates should not generate notifications per resource.
     return { package, error in
-      // Do not send notifications for individual resource updates.
+      if let package = package {
+        // Do not send notifications for individual resource updates.
+//        let resourceIDs: [Resource.FullID] = resources.map { $0.typedFullID }
+//        do {
+//          try ResourceFileManager.shared.install(resourcesWithIDs: resourceIDs, from: package)
+//        } catch {
+//          log.error("Error updating resources from package \(package.id)")
+//        }
 
-      handler?(package, error)
-
-      // After the custom handler operates, ensure that any changes it made are synchronized for use
-      // with the app extension, too.
-      let userDefaults = Storage.active.userDefaults
-      userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-      userDefaults.synchronize()
+        // After the custom handler operates, ensure that any changes it made are synchronized for use
+        // with the app extension, too.
+        let userDefaults = Storage.active.userDefaults
+        userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
+        userDefaults.synchronize()
+      }
     }
   }
 
