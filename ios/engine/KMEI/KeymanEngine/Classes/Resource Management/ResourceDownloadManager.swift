@@ -32,7 +32,7 @@ public class ResourceDownloadManager {
     return { error in
       if let error = error {
         // TODO:  Connect to an error handler (or just render appropriate text) based on the resource type.
-        self.downloader.downloadFailed(forKeyboards: [], error: error)
+        self.resourceDownloadFailed(for: [] as [InstallableKeyboard], with: error)
       } else {
         log.info("Fetched repository. Continuing with download.")
         completionHandler()
@@ -49,7 +49,7 @@ public class ResourceDownloadManager {
       let message = "Keyboard not found with id: \(keyboardID), languageID: \(languageID)"
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: message])
-      downloader.downloadFailed(forKeyboards: [], error: error)
+      self.resourceDownloadFailed(for: [] as [InstallableKeyboard], with: error)
       return nil
     }
     
@@ -63,8 +63,9 @@ public class ResourceDownloadManager {
                                     withFilename filename: String,
                                     withOptions options: Options,
                                     completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
-    let startHandler = { self.defaultKeyboardStartBlock(for: keyboards) }
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, startBlock: startHandler, completionBlock: completionBlock) {
+    let startClosure = self.resourceDownloadStartClosure(for: keyboards)
+    let completionClosure = self.resourceDownloadCompletionClosure(for: keyboards, handler: completionBlock)
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, startBlock: startClosure, completionBlock: completionClosure) {
       let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
@@ -74,6 +75,9 @@ public class ResourceDownloadManager {
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
       // The parameter facilitates error logging.
       if !downloader.canExecute(.simpleBatch(dlBatch)) {
+        let error = NSError(domain: "Keyman", code: 0,
+                  userInfo: [NSLocalizedDescriptionKey: "Download queue is either busy or lacks internet connection"])
+        resourceDownloadFailed(for: keyboards, with: error)
         return nil
       }
       
@@ -126,12 +130,6 @@ public class ResourceDownloadManager {
     return batch
   }
 
-  internal func defaultKeyboardStartBlock(for keyboards: [InstallableKeyboard]) {
-    NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
-                                        object: self,
-                                        value: keyboards)
-  }
-
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
   /// See `Notifications` for notification on success/failiure.
   /// - Parameters:
@@ -154,7 +152,7 @@ public class ResourceDownloadManager {
       } else {
         let message = "Keyboard repository not yet fetched"
         let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-        downloader.downloadFailed(forKeyboards: [], error: error)
+        self.resourceDownloadFailed(for: [] as [InstallableKeyboard], with: error)
         return
       }
     }
@@ -211,8 +209,9 @@ public class ResourceDownloadManager {
       let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: message])
-      // TODO: better error target.
-      downloader.downloadFailed(forLanguageID: "", error: error)
+
+      // Ideal - use a LexicalModelFullID instead.  But, that's a API shift.
+      self.resourceDownloadFailed(for: [] as [InstallableLexicalModel], with: error)
       return nil
     }
     
@@ -225,8 +224,9 @@ public class ResourceDownloadManager {
                                         asActivity activity: DownloadActivityType,
                                         fromPath path: URL,
                                         completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
-    let startHandler = { self.defaultLexicalModelStartBlock(for: lexicalModels) }
-    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, startBlock: startHandler, completionBlock: completionBlock) {
+    let startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
+    let completionClosure = self.resourceDownloadCompletionClosure(for: lexicalModels, handler: completionBlock)
+    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, startBlock: startClosure, completionBlock: completionClosure) {
       let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
@@ -236,6 +236,9 @@ public class ResourceDownloadManager {
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
       // The parameter facilitates error logging.
       if !downloader.canExecute(.simpleBatch(dlBatch)) {
+        let error = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Download queue is either busy or lacks internet connection"])
+        resourceDownloadFailed(for: lexicalModels, with: error)
         return nil
       }
       
@@ -274,12 +277,6 @@ public class ResourceDownloadManager {
     
     return batch
   }
-
-  internal func defaultLexicalModelStartBlock(for lexicalModels: [InstallableLexicalModel]) {
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
-                                        object: self,
-                                        value: lexicalModels)
-  }
   
   // Can be called by the cloud keyboard downloader and utilized.
   
@@ -298,7 +295,8 @@ public class ResourceDownloadManager {
     func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
       if let error = error {
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+error.localizedDescription)
-        downloader.downloadFailed(forLanguageID: languageID, error: error)
+        let installables = lexicalModels?.map { InstallableLexicalModel(lexicalModel: $0, languageID: languageID, isCustom: false)}
+        self.resourceDownloadFailed(for: installables ?? [] as [InstallableLexicalModel], with: error)
       } else if nil == lexicalModels {
         //TODO: put up an alert instead
         log.info("No lexical models available for language \(languageID) (nil)")
@@ -350,7 +348,7 @@ public class ResourceDownloadManager {
       } else {
         let message = "Lexical model repository not yet fetched"
         let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-        downloader.downloadFailed(forKeyboards: [], error: error)
+        self.resourceDownloadFailed(for: [] as [InstallableLexicalModel], with: error)
         return
       }
     }
@@ -488,5 +486,105 @@ public class ResourceDownloadManager {
   public func installLexicalModelPackage(at packageURL: URL) -> InstallableLexicalModel? {
     let (lm, _) = downloader.installLexicalModelPackage(downloadedPackageFile: packageURL)
     return lm
+  }
+
+  // MARK - Completion handlers.
+
+  internal func resourceDownloadStartClosure<Resource: LanguageResource>(for resources: [Resource]) -> (() -> Void) {
+    return { self.resourceDownloadStarted(for: resources) }
+  }
+
+  // Only for use with individual downloads.  Updates should have different completion handling.
+  internal func resourceDownloadCompletionClosure<Resource: LanguageResource>(for resources: [Resource], handler: CompletionHandler<Resource>?) -> CompletionHandler<Resource> {
+    return { package, error in
+      if let error = error {
+        resources.forEach { resource in
+          do {
+            let resourcePath = Storage.active.resourceURL(for: resource)!
+            if FileManager.default.fileExists(atPath: resourcePath.path) {
+              try? FileManager.default.removeItem(at: resourcePath)
+            }
+          }
+        }
+
+        self.resourceDownloadFailed(for: resources, with: error)
+      } else if let _ = package {
+        // successful download
+        // Problem:  this uses the lookup-version of the resources, which may not be perfect matches
+        // for what lies within the newly-downloaded package.
+        self.resourceDownloadCompleted(for: resources)
+      }
+
+      handler?(package, error)
+
+      // After the custom handler operates, ensure that any changes it made are synchronized for use
+      // with the app extension, too.
+      let userDefaults = Storage.active.userDefaults
+      userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
+      userDefaults.synchronize()
+    }
+  }
+
+  internal func resourceUpdateCompletionClosure<Resource: LanguageResource>(for resources: [Resource], handler: CompletionHandler<Resource>?) -> CompletionHandler<Resource> {
+    // Updates should not generate notifications per resource.
+    return { package, error in
+      if let _ = package {
+        // successful download
+        // Problem:  this uses the lookup-version of the resources, which may not be perfect matches
+        // for what lies within the newly-downloaded package.
+        self.resourceDownloadCompleted(for: resources)
+      } // No special handling if errors exist.
+
+      handler?(package, error)
+
+      // After the custom handler operates, ensure that any changes it made are synchronized for use
+      // with the app extension, too.
+      let userDefaults = Storage.active.userDefaults
+      userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
+      userDefaults.synchronize()
+    }
+  }
+
+  // MARK - Notifications
+  internal func resourceDownloadStarted<Resource: LanguageResource>(for resources: [Resource]) {
+    if let keyboards = resources as? [InstallableKeyboard] {
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
+                                          object: self,
+                                          value: keyboards)
+    } else if let lexicalModels = resources as? [InstallableLexicalModel] {
+      NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
+                                              object: self,
+                                              value: lexicalModels)
+    }
+  }
+
+  internal func resourceDownloadCompleted<Resource: LanguageResource>(for resources: [Resource]) {
+    if let keyboards = resources as? [InstallableKeyboard] {
+      let notification = KeyboardDownloadCompletedNotification(keyboards)
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
+                                      object: self,
+                                      value: notification)
+    } else if let lexicalModels = resources as? [InstallableLexicalModel] {
+      let notification = LexicalModelDownloadCompletedNotification(lexicalModels)
+      NotificationCenter.default.post(name: Notifications.lexicalModelDownloadCompleted,
+                                      object: self,
+                                      value: notification)
+    }
+  }
+
+  internal func resourceDownloadFailed<Resource: LanguageResource>(for resources: [Resource], with error: Error) {
+    if let keyboards = resources as? [InstallableKeyboard] {
+      let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
+                                      object: self,
+                                      value: notification)
+    } else if let lexicalModels = resources as? [InstallableLexicalModel] {
+      // Sadly, this notification reports with a different format.
+      let languageID = lexicalModels.count > 0 ? lexicalModels[0].languageID : ""
+      let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
+      NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
+                                      object: self,
+                                      value: notification)
+    }
   }
 }
