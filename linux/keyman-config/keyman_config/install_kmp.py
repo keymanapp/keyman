@@ -189,9 +189,7 @@ def install_kmp_user(inputfile, online=False):
         os.makedirs(packageDir)
 
     extract_kmp(inputfile, packageDir)
-    if not is_gnome_shell():
-        # restart IBus so it knows about the keyboards being installed
-        restart_ibus()
+    restart_ibus()
 
     info, system, options, keyboards, files = get_metadata(packageDir)
 
