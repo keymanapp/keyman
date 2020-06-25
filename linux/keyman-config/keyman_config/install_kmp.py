@@ -13,7 +13,7 @@ from keyman_config.kmpmetadata import get_metadata, KMFileTypes
 from keyman_config.convertico import extractico, checkandsaveico
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
 from keyman_config.ibus_util import install_to_ibus, restart_ibus, get_ibus_bus
-from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_keyboard_id, is_gnome_shell
+from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
 
 # TODO userdir install
 # special processing for kmn if needed
@@ -263,8 +263,8 @@ def install_keyboards_to_ibus(keyboards, packageDir):
     if bus:
         # install all kmx for first lang not just packageID
         for kb in keyboards:
-            keyboard_id = get_keyboard_id(kb, packageDir)
-            install_to_ibus(bus, keyboard_id)
+            ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
+            install_to_ibus(bus, ibus_keyboard_id)
         restart_ibus(bus)
         bus.destroy()
     else:
@@ -277,8 +277,8 @@ def install_keyboards_to_gnome(keyboards, packageDir):
 
     # install all kmx for first lang not just packageID
     for kb in keyboards:
-        keyboard_id = get_keyboard_id(kb, packageDir)
-        sources.append(('ibus', keyboard_id))
+        ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
+        sources.append(('ibus', ibus_keyboard_id))
 
     gnomeKeyboardsUtil.write_input_sources(sources)
 
