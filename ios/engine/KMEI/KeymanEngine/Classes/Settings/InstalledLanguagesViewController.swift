@@ -312,30 +312,16 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     log.info("keyboardDownloadCompleted: InstalledLanguagesViewController")
     Manager.shared.shouldReloadKeyboard = true
     
-    // Update keyboard version
-    for keyboard in keyboards {
-      Manager.shared.updateUserKeyboards(with: keyboard)
-    }
-    
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
       toolbar.displayStatus("Keyboard successfully downloaded!", withIndicator: false, duration: 3.0)
     }
     restoreNavigation()
-    
-    // Add keyboard.
-    for keyboard in keyboards {
-      _ = Manager.shared.setKeyboard(keyboard)
-    }
     
     navigationController?.popToRootViewController(animated: true)
   }
   
   private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
     log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
-    // Add models.
-    for lexicalModel in lexicalModels {
-      _ = Manager.shared.registerLexicalModel(lexicalModel)
-    }
     
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
       toolbar.displayStatus("Dictionary successfully downloaded!", withIndicator: false, duration: 3.0)

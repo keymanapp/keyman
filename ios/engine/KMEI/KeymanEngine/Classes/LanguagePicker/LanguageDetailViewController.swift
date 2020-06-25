@@ -164,8 +164,12 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   }
 
   func downloadHandler(_ keyboardIndex: Int) {
-    ResourceDownloadManager.shared.downloadKeyboard(withID: language.keyboards![keyboardIndex].id,
-                                      languageID: language.id, isUpdate: isUpdate)
+    let fullID = FullKeyboardID(keyboardID: language.keyboards![keyboardIndex].id, languageID: language.id)
+    let installClosure = ResourceDownloadManager.shared.standardKeyboardInstallCompletionBlock(forFullID: fullID, withModel: true)
+    ResourceDownloadManager.shared.downloadKeyboard(withID: fullID.keyboardID,
+                                                    languageID: fullID.languageID,
+                                                    isUpdate: isUpdate,
+                                                    completionBlock: installClosure)
   }
   
   func showActivityView() {

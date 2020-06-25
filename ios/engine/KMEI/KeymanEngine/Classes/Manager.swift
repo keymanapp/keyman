@@ -838,18 +838,24 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
    */
 
   public func downloadKeyboard(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
+    let kbdFullID = FullKeyboardID(keyboardID: withID, languageID: languageID)
+    let completionBlock = ResourceDownloadManager.shared.standardKeyboardInstallCompletionBlock(forFullID: kbdFullID, withModel: true)
     ResourceDownloadManager.shared.downloadKeyboard(withID: withID,
                                                     languageID: languageID,
                                                     isUpdate: isUpdate,
-                                                    fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
+                                                    fetchRepositoryIfNeeded: fetchRepositoryIfNeeded,
+                                                    completionBlock: completionBlock)
   }
 
   // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
   public func downloadLexicalModel(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
+    let lmFullID = FullLexicalModelID(lexicalModelID: withID, languageID: languageID)
+    let completionBlock = ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
     ResourceDownloadManager.shared.downloadLexicalModel(withID: withID,
                                                         languageID: languageID,
                                                         isUpdate: isUpdate,
-                                                        fetchRepositoryIfNeeded: fetchRepositoryIfNeeded)
+                                                        fetchRepositoryIfNeeded: fetchRepositoryIfNeeded,
+                                                        completionBlock: completionBlock)
   }
 
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
