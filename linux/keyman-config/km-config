@@ -2,17 +2,14 @@
 
 import argparse
 import logging
-import gi
 import os
-
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 
 from keyman_config import __version__
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Keyman keyboards installation and information')
-    parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
     parser.add_argument('-i', '--install', action='store', nargs='?', help='install .kmp package')
