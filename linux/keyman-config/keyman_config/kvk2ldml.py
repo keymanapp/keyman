@@ -322,9 +322,10 @@ def convert_ldml(kvkData):
 
     for vkey in VKey_to_Iso:
         alreadyused = False
-        for key in keymaps["None"]:
-            if key.VKey == vkey:
-                alreadyused = True
+        if "None" in keymaps:
+            for key in keymaps["None"]:
+                if key.VKey == vkey:
+                    alreadyused = True
         if not alreadyused and vkey != 226:
             uskey = NKey()
             uskey.VKey = vkey
@@ -334,9 +335,10 @@ def convert_ldml(kvkData):
             else:
                 keymaps["None"] = (uskey,)
         alreadyused = False
-        for key in keymaps["shift"]:
-            if key.VKey == vkey:
-                alreadyused = True
+        if "shift" in keymaps:
+            for key in keymaps["shift"]:
+                if key.VKey == vkey:
+                    alreadyused = True
         if not alreadyused and vkey != 226:
             uskey = NKey()
             uskey.VKey = vkey
