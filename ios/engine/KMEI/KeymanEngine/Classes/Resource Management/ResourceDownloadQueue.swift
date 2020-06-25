@@ -69,26 +69,38 @@ protocol AnyDownloadBatch {
   var type: LanguageResourceType? { get }
   var tasks: [AnyDownloadTask] { get }
   var resources: [AnyLanguageResource] { get }
+
+  var startBlock: (() -> Void)? { get }
   var errors: [Error?] { get set }
+
+  func completeWithCancellation() -> Void
+  func completeWithError(error: Error) -> Void
+  func completeWithPackage(fromKMP file: URL) -> Void
 }
 
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>: AnyDownloadBatch {
+class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch {
   public final var activity: DownloadActivityType
   public final var type: LanguageResourceType?
   
   public final var downloadTasks: [DownloadTask<Resource>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
-  public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil
+  public final var startBlock: (() -> Void)? = nil
+  public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil
   
-  public init?(do tasks: [DownloadTask<Resource>], as activity: DownloadActivityType, ofType type: LanguageResourceType, completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil) {
+  public init?(do tasks: [DownloadTask<Resource>],
+               as activity: DownloadActivityType,
+               ofType type: LanguageResourceType,
+               startBlock: (() -> Void)? = nil,
+               completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil) {
     self.activity = activity
     self.type = type
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
+    self.startBlock = startBlock
     self.completionBlock = completionBlock
   }
 
@@ -105,6 +117,26 @@ class DownloadBatch<Resource: LanguageResource, Package: TypedKeymanPackage<Reso
       }
       
       return resArray
+    }
+  }
+
+  public func completeWithCancellation() {
+    completionBlock?(nil, nil)
+  }
+
+  public func completeWithError(error: Error) {
+    completionBlock?(nil, error)
+  }
+
+  public func completeWithPackage(fromKMP file: URL) {
+    do {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Resource.Package {
+        completionBlock?(package, nil)
+      } else {
+        completionBlock?(nil, KMPError.invalidPackage)
+      }
+    } catch {
+      completionBlock?(nil, error)
     }
   }
 }
@@ -158,6 +190,23 @@ private class DownloadQueueFrame {
 // The other half of ResourceDownloadManager, this class is responsible for executing the downloads
 // and handling the results.
 class ResourceDownloadQueue: HTTPDownloadDelegate {
+  enum QueueState: String {
+    case clear
+    case busy
+    case noConnection
+
+    var error: Error? {
+      switch(self) {
+        case .clear:
+          return nil
+        case .busy:
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+        case .noConnection:
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+      }
+    }
+  }
+
   private var queueRoot: DownloadQueueFrame
   private var queueStack: [DownloadQueueFrame]
   
@@ -179,29 +228,18 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   public func hasConnection() -> Bool {
     return reachability?.connection != Reachability.Connection.unavailable
   }
-  
-  // Might should add a "withNotification: Bool" option for clarity.
-  public func canExecute(_ batch: DownloadNode) -> Bool {
+
+  public var state: QueueState {
     guard hasConnection() else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      if let batch = batch as? AnyDownloadBatch {
-        downloadFailed(forBatch: batch, error: error)
-      }
-      return false
+      return .noConnection
     }
     
     // At this stage, we now have everything needed to generate download requests.
     guard currentBatch == nil else { // Original behavior - only one download operation is permitted at a time.
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      if let batch = batch as? AnyDownloadBatch {
-        downloadFailed(forBatch: batch, error: error)
-      }
-      return false
+      return .busy
     }
     
-    return true
+    return .clear
   }
   
   public var currentBatch: DownloadNode? {
@@ -288,6 +326,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           downloader!.addRequest(task.request)
         }
 
+        // Signal that we've started processing this batch.
+        batch.startBlock?()
         downloader!.run()
       case .compositeBatch(let batch):
         // It's the top level of an update operation.  Time to make a correpsonding notification.
@@ -354,56 +394,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   // MARK - notification methods
   
-  private func downloadFailed(forBatch batch: AnyDownloadBatch, error: Error) {
-    if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
-      let keyboards = batch.downloadTasks.compactMap { task in
-        return task.resources
-      }.flatMap {$0}
-      downloadFailed(forKeyboards: keyboards, error: error)
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
-      let lexModels = batch.downloadTasks.compactMap { task in
-        return task.resources
-      }.flatMap {$0}
-      downloadFailed(forLanguageID: lexModels[0].languageID, error: error)
-    }
-  }
-  
-  public func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
-    let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
-    NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadFailed(forLanguageID languageID: String, error: Error) {
-    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadFailed(forLexicalModelPackage packageURL: String, error: Error) {
-    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: packageURL, error: error)
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadSucceeded(forKeyboards keyboards: [InstallableKeyboard]) {
-    let notification = KeyboardDownloadCompletedNotification(keyboards)
-    NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadSucceeded(forLexicalModel lm: InstallableLexicalModel) {
-    let notification = LexicalModelDownloadCompletedNotification([lm])
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadCompleted,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  
   public func updateBatchStarted(_ batch: CompositeBatch) {
     let notification = BatchUpdateStartedNotification(batch.resources)
     NotificationCenter.default.post(name: Notifications.batchUpdateStarted,
@@ -439,7 +429,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
     let isUpdate = batch.activity == .update
 
-    if let batch = batch as? DownloadBatch<InstallableKeyboard, KeyboardKeymanPackage> {
+    if let batch = batch as? DownloadBatch<InstallableKeyboard> {
+      // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
+      // Once downlading KMPs, will be the downloaded .kmp.
+
       // The request has succeeded.
       if downloader!.requestsCount == 0 { // Download queue finished.
         let keyboards = batch.resources as! [InstallableKeyboard]
@@ -453,38 +446,23 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
           ResourceFileManager.shared.addResource(keyboard)
         }
 
-        if(!isUpdate) {
-          downloadSucceeded(forKeyboards: wrappedKeyboards)
-        }
-
-        let userDefaults = Storage.active.userDefaults
-        userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-        userDefaults.synchronize()
-
         if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
           batch.completionBlock?(package, nil)
         } else {
           log.error("Could not load metadata for newly-installed keyboard")
         }
       }
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel, LexicalModelKeymanPackage> {
+    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel> {
       let task = batch.downloadTasks[0] // It's always at this index.
       let (lm, package) = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!))
       if let lm = lm, let package = package {
         if !isUpdate {
-          downloadSucceeded(forLexicalModel: lm)
-        } else {
           // Since we don't generate the notification as above, we need to manually update
           // the lexical model's metadata.
           Manager.shared.updateUserLexicalModels(with: lm)
         }
 
         batch.completionBlock?(package, nil)
-      } else if !isUpdate {
-        let installError = NSError(domain: "Keyman", code: 0,
-                                   userInfo: [NSLocalizedDescriptionKey: "installError"])
-        downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError)
-        currentFrame.batch?.errors[currentFrame.index] = installError
       }
     }
     
@@ -495,7 +473,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
-    //
+    if case .simpleBatch(let batch) = self.currentBatch {
+      batch.completeWithCancellation()
+    }
     
     // In case we're part of a 'composite' operation, we should still keep the queue moving.
     finalizeCurrentBatch()
@@ -507,19 +487,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // The extra check is there to filter out other potential request types in the future.
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    if request.tag == 0 && batch.activity != .update {
-      let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
-      if task.type == .keyboard {
-        let task = task as! DownloadTask<InstallableKeyboard>
-        NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
-                                        object: self,
-                                        value: task.resources!)
-      } else if task.type == .lexicalModel {
-        let task = task as! DownloadTask<InstallableLexicalModel>
-        NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
-                                        object: self,
-                                        value: task.resources!)
-      }
+    // TODO:  remove the != .update check - that should be handled when startBlocks are assigned.
+    if batch.activity != .update {
+      batch.startBlock?()
     }
   }
 
@@ -548,32 +518,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error) {
     currentFrame.batch?.errors[currentFrame.index] = error
-
-    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
-    let isUpdate = batch.activity == .update
-    
-    if let task = task as? DownloadTask<InstallableKeyboard> {
-      log.error("Keyboard download failed: \(error).")
-      let keyboards = task.resources
 
-      if !isUpdate {
-        // Clean up keyboard file if anything fails
-        // TODO: Also clean up remaining fonts
-        try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
-        downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
-      }
-    } else if let task = task as? DownloadTask<InstallableLexicalModel> {
-      log.error("Lexical model download failed: \(error).")
-      let lexicalModels = task.resources
-      
-      if !isUpdate {
-        // Clean up model file if anything fails
-        try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
-        downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
-      }
-    }
-    
+    batch.completeWithError(error: error)
     downloader!.cancelAllOperations()
   }
   
@@ -590,6 +537,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile)
       kmp = package as? LexicalModelKeymanPackage
       if let kmp = kmp {
+        // Now that we have the package, we do the actual lexical model installation
+        // Marked here as prep for the next stage.
+
         do {
           try ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false)
           log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
@@ -597,6 +547,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         } catch {
           log.error("Error installing the lexical model: \(String(describing: error))")
         }
+
+        // End of block to be spun off.
       } else {
         log.error("Provided package did not contain lexical models.")
       }
