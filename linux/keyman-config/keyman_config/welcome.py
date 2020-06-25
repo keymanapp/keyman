@@ -4,11 +4,10 @@ import gi
 import logging
 import webbrowser
 
-from gi.repository import Gtk, WebKit2
-from keyman_config.accelerators import bind_accelerator, init_accel
-
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
+from gi.repository import Gtk, WebKit2
+from keyman_config.accelerators import bind_accelerator, init_accel
 
 # NOTE: WebKit2 is not able to load XHTML files nor files with an encoding other
 # than ASCII or UTF-8

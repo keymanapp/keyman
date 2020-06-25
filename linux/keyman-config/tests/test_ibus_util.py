@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 import unittest
-from unittest.mock import create_autospec, patch
+from unittest.mock import patch
 
-from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, uninstall_from_ibus, IBus, Gio
+from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, uninstall_from_ibus
+
 
 @patch('keyman_config.ibus_util.IBus.Bus')
 class IbusUtilTests(unittest.TestCase):
@@ -41,7 +42,7 @@ class IbusUtilTests(unittest.TestCase):
     def test_installToIbus_AlreadyInstalled(self, MockSettingsClass, MockIbusBusClass):
         # Setup
         mock_settingsInstance = MockSettingsClass.return_value
-        mock_settingsInstance.get_strv.return_value = [ 'k1', 'k2', 'k3' ]
+        mock_settingsInstance.get_strv.return_value = ['k1', 'k2', 'k3']
         mock_ibusBusInstance = MockIbusBusClass.return_value
         # Execute
         install_to_ibus(mock_ibusBusInstance, 'k3')
@@ -92,6 +93,7 @@ class IbusUtilTests(unittest.TestCase):
             "preload-engines", ['k1', 'k2', 'k3'])
         mock_ibusBusInstance.preload_engines.assert_called_once_with(
             ['k1', 'k2', 'k3'])
+
 
 if __name__ == '__main__':
     unittest.main()
