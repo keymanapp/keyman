@@ -194,9 +194,10 @@ public class KeymanPackage {
 public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: KeymanPackage {
   public private(set) var installables: [[TypedLanguageResource]] = []
 
-  internal func setInstallableResourceSets<Resource: KMPResource>(for kmpResources: [Resource]) where Resource.LanguageResourceType == TypedLanguageResource {
+  internal func setInstallableResourceSets<Resource: KMPResource>(for kmpResources: [Resource]) where
+      TypedLanguageResource: KMPInitializableLanguageResource {
     self.installables = kmpResources.map { resource in
-      return resource.typedInstallableResources
+      return resource.typedInstallableResources as! [TypedLanguageResource]
     } as [[TypedLanguageResource]]
   }
 
@@ -224,10 +225,8 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
   }
 
   // Designed for use in cloud JS -> KMP migrations as needed for 13.0 -> 14.0 upgrades.
-  internal func findMetadataMatchFor<Metadata>(resource: TypedLanguageResource, ignoreLanguage: Bool, ignoreVersion: Bool) -> Metadata?
-    where TypedLanguageResource: KMPInitializableLanguageResource,
-          TypedLanguageResource.Metadata == Metadata,
-          Metadata.LanguageResourceType == TypedLanguageResource {
+  internal func findMetadataMatchFor<Metadata: KMPResource>(resource: TypedLanguageResource, ignoreLanguage: Bool, ignoreVersion: Bool) -> Metadata?
+    where TypedLanguageResource: KMPInitializableLanguageResource {
 
     var metadataList: [Metadata]
     if self is KeyboardKeymanPackage {
@@ -239,7 +238,8 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     }
 
     return metadataList.first(where: { kbdMetadata in
-      kbdMetadata.hasMatchingMetadata(for: resource, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
+      // For some reason, Swift just won't recognize that it's the same type in the line below.
+      kbdMetadata.hasMatchingMetadata(for: resource as! Metadata.LanguageResourceType, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
     })
   }
 }

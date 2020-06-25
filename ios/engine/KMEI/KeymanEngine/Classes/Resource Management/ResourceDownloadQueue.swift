@@ -81,7 +81,7 @@ protocol AnyDownloadBatch {
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch {
+class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource.Package: TypedKeymanPackage<Resource> {
   public final var activity: DownloadActivityType
   public final var type: LanguageResourceType?
   

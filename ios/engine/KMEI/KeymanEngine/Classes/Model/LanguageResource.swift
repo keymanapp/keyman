@@ -13,22 +13,26 @@ public enum LanguageResourceType {
 }
 
 // Subclasses must implement Equatable; Swift doesn't like it directly on the root protocol.
-public protocol LanguageResourceFullID {
+public protocol AnyLanguageResourceFullID {
   var id: String { get }
   var languageID: String { get }
   var type: LanguageResourceType { get }
 }
 
-extension LanguageResourceFullID where Self: Equatable {
+extension AnyLanguageResourceFullID where Self: Equatable {
   public static func ==(lhs: Self, rhs: Self) -> Bool {
     return lhs.id == rhs.id && lhs.languageID == rhs.languageID && lhs.type == rhs.type
   }
 }
 
-extension LanguageResourceFullID {
+extension AnyLanguageResourceFullID {
   var description: String {
     return "{\(type): {id = \(id), languageID=\(languageID)}}"
   }
+}
+
+public protocol LanguageResourceFullID: AnyLanguageResourceFullID {
+  associatedtype Resource: LanguageResource where Resource.FullID == Self
 }
 
 // Alas, 'associatedtype' stuff isn't exactly generic, and it's impossible to wildcard.
@@ -40,7 +44,7 @@ public protocol AnyLanguageResource {
   var languageID: String { get }
   // Was not always tracked within KeymanEngine - is optional for legacy reasons.
   var packageID: String? { get }
-  var fullID: LanguageResourceFullID { get }
+  var fullID: AnyLanguageResourceFullID { get }
   var version: String { get }
 
   // Used for generating QR codes.
@@ -54,7 +58,7 @@ public protocol AnyLanguageResource {
 // Necessary due to Swift details 'documented' at
 // https://stackoverflow.com/questions/42561685/why-cant-a-get-only-property-requirement-in-a-protocol-be-satisfied-by-a-proper
 public protocol LanguageResource: AnyLanguageResource {
-  associatedtype FullID: LanguageResourceFullID where FullID: Equatable
+  associatedtype FullID: LanguageResourceFullID where FullID: Equatable, FullID.Resource == Self
   associatedtype Package: KeymanPackage
   var typedFullID: FullID { get }
 }
@@ -62,12 +66,12 @@ public protocol LanguageResource: AnyLanguageResource {
 extension LanguageResource {
   // Thanks to https://stackoverflow.com/a/58774558 (on same thread mentioned above)
   // for this approach.
-  public var fullID: LanguageResourceFullID {
-    return typedFullID
+  public var fullID: AnyLanguageResourceFullID {
+    return typedFullID as AnyLanguageResourceFullID
   }
 }
 
 internal protocol KMPInitializableLanguageResource: LanguageResource {
-  associatedtype Metadata: KMPResource
+  associatedtype Metadata: KMPResource where Metadata.LanguageResourceType == Self
   init?(from metadata: Metadata, packageID: String, lgCode: String)
 }
