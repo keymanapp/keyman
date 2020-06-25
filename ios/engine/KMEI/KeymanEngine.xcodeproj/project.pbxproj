@@ -179,6 +179,9 @@
 		CE867FEF2485E97A00B2EAED /* KMPMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */; };
 		CE867FF12485EE1500B2EAED /* KMPInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FF02485EE1500B2EAED /* KMPInfo.swift */; };
 		CE88042F247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */; };
+		CE89641F24A4686000D5EB8E /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89641E24A4686000D5EB8E /* Queries.swift */; };
+		CE89642124A468B200D5EB8E /* Queries+PackageVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */; };
+		CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */; };
 		CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */; };
 		CE8B0BBF248764ED0045EB2E /* KMPResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBE248764ED0045EB2E /* KMPResource.swift */; };
 		CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */; };
@@ -464,6 +467,9 @@
 		CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPMetadata.swift; sourceTree = "<group>"; };
 		CE867FF02485EE1500B2EAED /* KMPInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPInfo.swift; sourceTree = "<group>"; };
 		CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectationDownloaderDelegate.swift; sourceTree = "<group>"; };
+		CE89641E24A4686000D5EB8E /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
+		CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+PackageVersion.swift"; sourceTree = "<group>"; };
+		CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPackageVersionTests.swift; sourceTree = "<group>"; };
 		CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanPackageTests.swift; sourceTree = "<group>"; };
 		CE8B0BBE248764ED0045EB2E /* KMPResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPResource.swift; sourceTree = "<group>"; };
 		CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "13.0 Cloud to Package Migration.bundle"; sourceTree = "<group>"; };
@@ -724,6 +730,7 @@
 				CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */,
 				CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */,
 				CE973D842484A71700F66045 /* KMPJSONTests.swift */,
+				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
 			);
 			path = KeymanEngineTests;
 			sourceTree = "<group>";
@@ -885,6 +892,15 @@
 			path = kmp.json;
 			sourceTree = "<group>";
 		};
+		CE89641B24A4665700D5EB8E /* Queries */ = {
+			isa = PBXGroup;
+			children = (
+				CE89641E24A4686000D5EB8E /* Queries.swift */,
+				CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */,
+			);
+			path = Queries;
+			sourceTree = "<group>";
+		};
 		CE973D7F2484A07300F66045 /* KMP Packaging */ = {
 			isa = PBXGroup;
 			children = (
@@ -1008,6 +1024,7 @@
 				C0452BA91F9F1CAF0064431A /* Model */,
 				C024C9921FA6EB340060583B /* Notification */,
 				C07A9D881FD1760800828ADD /* KeyboardRepository */,
+				CE89641B24A4665700D5EB8E /* Queries */,
 				9A60763E22892495003BCFBA /* Settings */,
 				CE25CCBB1F1DA72A005AA2BC /* HTTPRequest */,
 				987F00041AB8FCB700998116 /* KeyboardMenuView */,
@@ -1406,6 +1423,7 @@
 				CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */,
 				CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */,
 				CE973D852484A71700F66045 /* KMPJSONTests.swift in Sources */,
+				CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */,
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
@@ -1452,6 +1470,7 @@
 				C0B901AA1FA1AFC200764EB8 /* UserDefaults+Types.swift in Sources */,
 				CE1F67A32304EB3800FF6972 /* ResourceDownloadManager.swift in Sources */,
 				9A079E372238680700581263 /* KMPLexicalModel.swift in Sources */,
+				CE89641F24A4686000D5EB8E /* Queries.swift in Sources */,
 				9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
 				C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */,
 				C0B09EAE1FCFD10F002F39AF /* FontManager.swift in Sources */,
@@ -1495,6 +1514,7 @@
 				CE22DFBA230B94DB00A4551C /* ResourceDownloadQueue.swift in Sources */,
 				CE973D872484BBC200F66045 /* KMPLanguage.swift in Sources */,
 				9A9CB084224170F700231FB9 /* LexicalModelRepository.swift in Sources */,
+				CE89642124A468B200D5EB8E /* Queries+PackageVersion.swift in Sources */,
 				C06D37461F81F5C400F61AE0 /* PopoverView.swift in Sources */,
 				9A4609992242047400B0BFD1 /* LexicalModelAPICall.swift in Sources */,
 				C007C4651F9F52D8006461B9 /* LanguagesAPICall.swift in Sources */,
