@@ -88,7 +88,7 @@ def uninstall_keyboards_from_gnome(keyboards, packageDir):
             sources.remove(tuple)
 
         toRemove = []
-        match_id = ":%s" % get_ibus_keyboard_id(kb, packageDir, True)
+        match_id = ":%s" % get_ibus_keyboard_id(kb, packageDir, ignore_language=True)
         for (type, id) in sources:
             if type == 'ibus' and id.endswith(match_id):
                 toRemove.append((type, id))

@@ -49,8 +49,9 @@ class ViewInstalledWindowBase(Gtk.Window):
             return
 
         file = downloadDlg.downloadfile
+        language = downloadDlg.language
         downloadDlg.destroy()
-        self.restart(self.install_file(file))
+        self.restart(self.install_file(file, language))
 
     def on_installfile_clicked(self, button):
         logging.debug("Install from file clicked")
@@ -71,8 +72,8 @@ class ViewInstalledWindowBase(Gtk.Window):
         dlg.destroy()
         self.restart(self.install_file(file))
 
-    def install_file(self, kmpfile):
-        installDlg = InstallKmpWindow(kmpfile, viewkmp=self)
+    def install_file(self, kmpfile, language=None):
+        installDlg = InstallKmpWindow(kmpfile, viewkmp=self, language=language)
         result = installDlg.run()
         installDlg.destroy()
         return result
