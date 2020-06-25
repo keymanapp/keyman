@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.100 alpha 2020-06-25
+
+* refactor(ios/engine): Download notifications via completion blocks (#3274)
+* refactor(ios/engine): better resource type links (#3276)
+* refactor(ios/engine): Resource-download installation closures (#3277)
+* feat(linux): Install keyboard on Gnome (#3278)
+
 ## 14.0.99 alpha 2020-06-24
 
 * feat(ios/engine): adds getInstalledPackage(for:) (#3270)
