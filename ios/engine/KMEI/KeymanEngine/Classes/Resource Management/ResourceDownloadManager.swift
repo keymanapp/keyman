@@ -65,7 +65,12 @@ public class ResourceDownloadManager {
                                     completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
     let startClosure = self.resourceDownloadStartClosure(for: keyboards)
     let completionClosure = self.resourceDownloadCompletionClosure(for: keyboards, handler: completionBlock)
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0], withFilename: filename, asActivity: activity, withOptions: options, startBlock: startClosure, completionBlock: completionClosure) {
+    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0],
+                                                withFilename: filename,
+                                                asActivity: activity,
+                                                withOptions: options,
+                                                startBlock: startClosure,
+                                                completionBlock: completionClosure) {
       let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
@@ -73,11 +78,9 @@ public class ResourceDownloadManager {
       }
       
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      // The parameter facilitates error logging.
-      if !downloader.canExecute(.simpleBatch(dlBatch)) {
-        let error = NSError(domain: "Keyman", code: 0,
-                  userInfo: [NSLocalizedDescriptionKey: "Download queue is either busy or lacks internet connection"])
-        resourceDownloadFailed(for: keyboards, with: error)
+      let queueState = downloader.state
+      if queueState != .clear {
+        resourceDownloadFailed(for: keyboards, with: queueState.error!)
         return nil
       }
       
@@ -226,7 +229,11 @@ public class ResourceDownloadManager {
                                         completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
     let startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
     let completionClosure = self.resourceDownloadCompletionClosure(for: lexicalModels, handler: completionBlock)
-    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0], withFilename: path, asActivity: activity, startBlock: startClosure, completionBlock: completionClosure) {
+    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0],
+                                                    withFilename: path,
+                                                    asActivity: activity,
+                                                    startBlock: startClosure,
+                                                    completionBlock: completionClosure) {
       let tasks = dlBatch.downloadTasks
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
@@ -234,11 +241,9 @@ public class ResourceDownloadManager {
       }
       
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      // The parameter facilitates error logging.
-      if !downloader.canExecute(.simpleBatch(dlBatch)) {
-        let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is either busy or lacks internet connection"])
-        resourceDownloadFailed(for: lexicalModels, with: error)
+      let queueState = downloader.state
+      if queueState != .clear {
+        resourceDownloadFailed(for: lexicalModels, with: queueState.error!)
         return nil
       }
       

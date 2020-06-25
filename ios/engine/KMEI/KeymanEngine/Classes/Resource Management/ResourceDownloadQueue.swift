@@ -190,6 +190,23 @@ private class DownloadQueueFrame {
 // The other half of ResourceDownloadManager, this class is responsible for executing the downloads
 // and handling the results.
 class ResourceDownloadQueue: HTTPDownloadDelegate {
+  enum QueueState: String {
+    case clear
+    case busy
+    case noConnection
+
+    var error: Error? {
+      switch(self) {
+        case .clear:
+          return nil
+        case .busy:
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+        case .noConnection:
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+      }
+    }
+  }
+
   private var queueRoot: DownloadQueueFrame
   private var queueStack: [DownloadQueueFrame]
   
@@ -211,19 +228,18 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   public func hasConnection() -> Bool {
     return reachability?.connection != Reachability.Connection.unavailable
   }
-  
-  // Might should add a "withNotification: Bool" option for clarity.
-  public func canExecute(_ batch: DownloadNode) -> Bool {
+
+  public var state: QueueState {
     guard hasConnection() else {
-      return false
+      return .noConnection
     }
     
     // At this stage, we now have everything needed to generate download requests.
     guard currentBatch == nil else { // Original behavior - only one download operation is permitted at a time.
-      return false
+      return .busy
     }
     
-    return true
+    return .clear
   }
   
   public var currentBatch: DownloadNode? {
