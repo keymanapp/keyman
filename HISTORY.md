@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.101 alpha 2020-06-26
+
+* feat(linux): address code review comments of #3278 (#3281)
+* fix(linux): Always restart IBus when installing keyboard (#3284)
+* refactor(linux): cleanup code (#3286)
+* fix(linux): Fix crash converting kvk into LDML (#3288)
+* feat(ios/engine): package-version query implementation (#3280)
+
 ## 14.0.100 alpha 2020-06-25
 
 * refactor(ios/engine): Download notifications via completion blocks (#3274)
