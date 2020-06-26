@@ -1,0 +1,24 @@
+{
+    "keyboards": {
+        "khmer_angkor": {
+            "version": "1.0.6",
+            "kmp": "https://downloads.keyman.com/keyboards/khmer_angkor/1.0.6/khmer_angkor.kmp"
+        },
+        "sil_euro_latin": {
+            "version": "1.9.1",
+            "kmp": "https://downloads.keyman.com/keyboards/sil_euro_latin/1.9.1/sil_euro_latin.kmp"
+        },
+        "foo": {
+            "error": "not found"
+        }
+    },
+    "models": {
+        "nrc.en.mtnt": {
+            "version": "0.1.4",
+            "kmp": "https://downloads.keyman.com/models/nrc.en.mtnt/0.1.4/nrc.en.mtnt.model.kmp"
+        },
+        "bar": {
+            "error": "not found"
+        }
+    }
+}

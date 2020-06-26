@@ -32,8 +32,8 @@ class HTTPDownloaderTests: XCTestCase {
 
   func testSingleRequestSuccess() throws {
     // Simple, easy case:  our local testing copy of the Khmer Angkor KMP file.
-    let mockedResult = TestUtils.Downloading.DownloadMockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
-    mockedURLSession?.queueMockResult(mockedResult)
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession?.queueMockResult(.download(mockedResult))
 
     let testDelegate = TestUtils.Downloading.ExpectationDownloaderDelegate()
     downloader!.handler = testDelegate
@@ -51,8 +51,8 @@ class HTTPDownloaderTests: XCTestCase {
 
   func testSingleRequestFailure() throws {
     // A twist on the previous version - the 'download' fails.
-    let mockedResult = TestUtils.Downloading.DownloadMockResult(location: nil, error: NSError(domain: "KeymanTests", code: 1, userInfo: nil))
-    mockedURLSession?.queueMockResult(mockedResult)
+    let mockedResult = TestUtils.Downloading.MockResult(location: nil, error: NSError(domain: "KeymanTests", code: 1, userInfo: nil))
+    mockedURLSession?.queueMockResult(.download(mockedResult))
 
     let testDelegate = TestUtils.Downloading.ExpectationDownloaderDelegate()
     downloader!.handler = testDelegate
@@ -69,12 +69,12 @@ class HTTPDownloaderTests: XCTestCase {
   }
 
   func testSequentialRequests() {
-    let mockedResult1 = TestUtils.Downloading.DownloadMockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
-    mockedURLSession?.queueMockResult(mockedResult1)
+    let mockedResult1 = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession?.queueMockResult(.download(mockedResult1))
 
-    let mockedResult2 = TestUtils.Downloading.DownloadMockResult(location:
+    let mockedResult2 = TestUtils.Downloading.MockResult(location:
         TestUtils.LexicalModels.mtntKMP, error: nil)
-    mockedURLSession?.queueMockResult(mockedResult2)
+    mockedURLSession?.queueMockResult(.download(mockedResult2))
 
     let testDelegate = TestUtils.Downloading.ExpectationDownloaderDelegate()
     downloader!.handler = testDelegate
@@ -98,8 +98,8 @@ class HTTPDownloaderTests: XCTestCase {
   }
 
   func testRequestCancellation() {
-    let mockedResult1 = TestUtils.Downloading.DownloadMockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
-    mockedURLSession?.queueMockResult(mockedResult1)
+    let mockedResult1 = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession?.queueMockResult(.download(mockedResult1))
 
     // No second mocked result - its call should be cancelled.
 

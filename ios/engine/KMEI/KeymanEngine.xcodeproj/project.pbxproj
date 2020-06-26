@@ -125,6 +125,9 @@
 		C0D3F3601F9F3AD80055C7CF /* InstallableKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F35F1F9F3AD80055C7CF /* InstallableKeyboard.swift */; };
 		C0E30C8C1FC40D0400C80416 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0E30C8B1FC40D0400C80416 /* Storage.swift */; };
 		C0EF3E7B1F95B65300CE9BD4 /* KeymanWebDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */; };
+		CE02EE0C24A5863100D58F92 /* Queries.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE02EE0B24A5863100D58F92 /* Queries.bundle */; };
+		CE02EE0E24A5869500D58F92 /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE02EE0D24A5869500D58F92 /* Queries.swift */; };
+		CE02EE1024A5892200D58F92 /* URLSessionDataTaskMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE02EE0F24A5892200D58F92 /* URLSessionDataTaskMock.swift */; };
 		CE07E3D2247E3FB100DFA9D2 /* HTTPDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE07E3D1247E3FB100DFA9D2 /* HTTPDownloaderTests.swift */; };
 		CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE07E3D5247E41DB00DFA9D2 /* URLSessionMock.swift */; };
 		CE07E3D8247E43CB00DFA9D2 /* URLSessionDownloadTaskMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE07E3D7247E43CB00DFA9D2 /* URLSessionDownloadTaskMock.swift */; };
@@ -438,6 +441,9 @@
 		C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloadRequest.swift; sourceTree = "<group>"; };
 		C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPDownloader.swift; sourceTree = "<group>"; };
 		C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanWebDelegate.swift; sourceTree = "<group>"; };
+		CE02EE0B24A5863100D58F92 /* Queries.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Queries.bundle; sourceTree = "<group>"; };
+		CE02EE0D24A5869500D58F92 /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
+		CE02EE0F24A5892200D58F92 /* URLSessionDataTaskMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionDataTaskMock.swift; sourceTree = "<group>"; };
 		CE07E3D1247E3FB100DFA9D2 /* HTTPDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPDownloaderTests.swift; sourceTree = "<group>"; };
 		CE07E3D5247E41DB00DFA9D2 /* URLSessionMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionMock.swift; sourceTree = "<group>"; };
 		CE07E3D7247E43CB00DFA9D2 /* URLSessionDownloadTaskMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionDownloadTaskMock.swift; sourceTree = "<group>"; };
@@ -824,6 +830,7 @@
 			isa = PBXGroup;
 			children = (
 				CE07E3D5247E41DB00DFA9D2 /* URLSessionMock.swift */,
+				CE02EE0F24A5892200D58F92 /* URLSessionDataTaskMock.swift */,
 				CE07E3D7247E43CB00DFA9D2 /* URLSessionDownloadTaskMock.swift */,
 				CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */,
 			);
@@ -842,6 +849,7 @@
 		CE37C38923FCC9AF007031C6 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				CE02EE0B24A5863100D58F92 /* Queries.bundle */,
 				CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */,
 				CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */,
 				CE973D822484A5DB00F66045 /* PackageJSON.bundle */,
@@ -920,6 +928,7 @@
 				CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */,
 				CE973D802484A56500F66045 /* PackageJSON.swift */,
 				CE37C38C23FCD41E007031C6 /* Keyboards.swift */,
+				CE02EE0D24A5869500D58F92 /* Queries.swift */,
 				CE37C39023FCD617007031C6 /* LexicalModels.swift */,
 				CE9B440B23FE49F000499CAB /* Migrations.swift */,
 			);
@@ -1280,6 +1289,7 @@
 				CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */,
 				CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
+				CE02EE0C24A5863100D58F92 /* Queries.bundle in Resources */,
 				CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */,
 				CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */,
 				CE37C38F23FCD52F007031C6 /* Lexical Models.bundle in Resources */,
@@ -1422,7 +1432,9 @@
 				CE37C38D23FCD41E007031C6 /* Keyboards.swift in Sources */,
 				CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */,
 				CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */,
+				CE02EE0E24A5869500D58F92 /* Queries.swift in Sources */,
 				CE973D852484A71700F66045 /* KMPJSONTests.swift in Sources */,
+				CE02EE1024A5892200D58F92 /* URLSessionDataTaskMock.swift in Sources */,
 				CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */,
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
