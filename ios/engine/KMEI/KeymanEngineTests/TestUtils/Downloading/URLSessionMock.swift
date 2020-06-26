@@ -7,9 +7,10 @@
 //
 
 import Foundation
+import XCGLogger
 
 extension TestUtils.Downloading {
-  class DownloadMockResult {
+  class MockResult {
     let location: URL?
     let error: Error?
 
@@ -23,13 +24,25 @@ extension TestUtils.Downloading {
    * Many thanks to https://www.swiftbysundell.com/articles/mocking-in-swift/ for the approach used here.
    */
   class URLSessionMock: URLSession {
-    private var mockedResultQueue: [DownloadMockResult]
+    enum Task {
+      case data(MockResult)
+      case download(MockResult)
+    }
+
+    enum URLSessionMockError: Error {
+      case unexpectedTaskType
+      case mockedFileNotFound
+      case dataInitializationError
+      case mockQueueEmpty
+    }
+
+    private var mockedResultQueue: [Task]
 
     override init() {
       mockedResultQueue = []
     }
 
-    func queueMockResult(_ result: DownloadMockResult) {
+    func queueMockResult(_ result: Task) {
       mockedResultQueue.append(result)
     }
 
@@ -42,14 +55,50 @@ extension TestUtils.Downloading {
     override func downloadTask(with url: URL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
 
       if(mockedResultQueue.count <= 0) {
-        fatalError("No mocked results have been provided for this downloadTask call!")
+        return URLSessionDownloadTaskMock {
+          completionHandler(nil, nil, URLSessionMockError.mockQueueEmpty)
+        }
       } else {
         return URLSessionDownloadTaskMock {
-          let response = self.mockedResultQueue.removeFirst()
+          if case .download(let response) = self.mockedResultQueue.removeFirst() {
+            // A bit of white-box testing - we know that HTTPDownloader doesn't actually examine
+            // the URLResponse headers, so we don't provide any.
+            completionHandler(response.location, nil, response.error)
+          } else {
+            completionHandler(nil, nil, URLSessionMockError.unexpectedTaskType)
+          }
+        }
+      }
+    }
 
-          // A bit of white-box testing - we know that HTTPDownloader doesn't actually examine
-          // the URLResponse headers, so we don't provide any.
-          completionHandler(response.location, nil, response.error)
+    override func dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+      if(mockedResultQueue.count <= 0) {
+        return URLSessionDataTaskMock {
+          completionHandler(nil, nil, URLSessionMockError.mockQueueEmpty)
+        }
+      } else {
+        return URLSessionDataTaskMock {
+          if case .data(let response) = self.mockedResultQueue.removeFirst() {
+            if !FileManager.default.fileExists(atPath: response.location!.path) {
+              // TODO:  Properly mock HTTPURLSession for 404 errors?
+              completionHandler(nil, nil, URLSessionMockError.mockedFileNotFound)
+            }
+
+            do {
+              let data = try Data(contentsOf: response.location!, options: .mappedIfSafe)
+              if(data.isEmpty) {
+                completionHandler(nil, nil, URLSessionMockError.dataInitializationError)
+              }
+
+              // A bit of white-box testing - we know that HTTPDownloader doesn't actually examine
+              // the URLResponse headers, so we don't provide any.
+              completionHandler(data, nil, response.error)
+            } catch {
+              completionHandler(nil, nil, URLSessionMockError.dataInitializationError)
+            }
+          } else {
+            completionHandler(nil, nil, URLSessionMockError.unexpectedTaskType)
+          }
         }
       }
     }
