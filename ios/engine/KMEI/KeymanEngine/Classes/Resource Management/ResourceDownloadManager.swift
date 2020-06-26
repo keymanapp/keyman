@@ -21,10 +21,11 @@ public class ResourceDownloadManager {
   
   public static let shared = ResourceDownloadManager()
 
-  public init() {
+  internal init() {
     downloader = ResourceDownloadQueue()
   }
 
+  // Intended only for use in testing!
   internal init(session: URLSession, autoExecute: Bool) {
     downloader = ResourceDownloadQueue(session: session, autoExecute: autoExecute)
   }
@@ -191,16 +192,18 @@ public class ResourceDownloadManager {
   
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
-    // Needs validation - I don't think this if-condition can be met in Keyman's current state
-    // (as of 2019-08-16)
-    if downloader.keyboardIdForCurrentRequest() == keyboardID {
+    // For this call, we don't actually need the language ID to be correct.
+    let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
+    if downloader.containsResourceInQueue(matchingID: fullKeyboardID) {
       return .downloading
     }
+
     let userKeyboards = Storage.active.userDefaults.userKeyboards
     guard let userKeyboard = userKeyboards?.first(where: { $0.id == keyboardID }) else {
       return .needsDownload
     }
 
+    // TODO:  convert to use of package-version API.
     // Check version
     if let repositoryVersionString = Manager.shared.apiKeyboardRepository.keyboards?[keyboardID]?.version {
       let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
@@ -394,14 +397,18 @@ public class ResourceDownloadManager {
   /// - Returns: The current state for a lexical model
   //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
-    if downloader.lexicalModelIdForCurrentRequest() == lexicalModelID {
+    // For this call, we don't actually need the language ID to be correct.
+    let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
+    if downloader.containsResourceInQueue(matchingID: fullLexicalModelID) {
       return .downloading
     }
+
     let userLexicalModels = Storage.active.userDefaults.userLexicalModels
     guard let userLexicalModel = userLexicalModels?.first(where: { $0.id == lexicalModelID }) else {
       return .needsDownload
     }
-    
+
+    // TODO:  Convert to use of package-version API.
     // Check version
     if let repositoryVersionString = Manager.shared.apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.version {
       let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback

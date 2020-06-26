@@ -362,37 +362,13 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  // TODO: Needs validation.
-  func keyboardIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasJavaScriptExtension {
-        return String(tmpStr.dropLast(3))
+  func containsResourceInQueue(matchingID: AnyLanguageResourceFullID) -> Bool {
+    return queueRoot.nodes.contains { node in
+      node.resources.contains { resource in
+        // We don't actually care about the language ID when downloading - just the resource's ID and type.
+        return resource.fullID.type == matchingID.type && resource.fullID.id == matchingID.id
       }
-    } else {
-      // TODO:  search the queue instead.
-//      let kbInfo = downloader!.userInfo[Key.keyboardInfo]
-//      if let keyboards = kbInfo as? [InstallableKeyboard], let keyboard = keyboards.first {
-//        return keyboard.id
-//      }
     }
-    return nil
-  }
-  
-  func lexicalModelIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasJavaScriptExtension {
-        return String(tmpStr.dropLast(3))
-      }
-    } else {
-      // TODO: search the queue instead.
-//      let kbInfo = downloader!.userInfo[Key.lexicalModelInfo]
-//      if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
-//        return lexicalModel.id
-//      }
-    }
-    return nil
   }
 
   // MARK - notification methods
