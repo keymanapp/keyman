@@ -20,9 +20,13 @@ public class ResourceDownloadManager {
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
   
   public static let shared = ResourceDownloadManager()
-  
-  internal init(session: URLSession = URLSession.shared) {
-    downloader = ResourceDownloadQueue(session: session)
+
+  public init() {
+    downloader = ResourceDownloadQueue()
+  }
+
+  internal init(session: URLSession, autoExecute: Bool) {
+    downloader = ResourceDownloadQueue(session: session, autoExecute: autoExecute)
   }
   
   // MARK: - Common functionality
@@ -63,7 +67,10 @@ public class ResourceDownloadManager {
                                     withFilename filename: String,
                                     withOptions options: Options,
                                     completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
-    let startClosure = self.resourceDownloadStartClosure(for: keyboards)
+    var startClosure: (() -> Void)? = nil
+    if activity != .update {
+      startClosure = self.resourceDownloadStartClosure(for: keyboards)
+    }
     let completionClosure = self.resourceDownloadCompletionClosure(for: keyboards, handler: completionBlock)
     if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0],
                                                 withFilename: filename,
@@ -112,7 +119,7 @@ public class ResourceDownloadManager {
     request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
     request.tag = 0
 
-    let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
+    let keyboardTask = DownloadTask(do: request, for: [keyboard])
     var batchTasks: [DownloadTask<InstallableKeyboard>] = [ keyboardTask ]
     
     for (i, url) in fontURLs.enumerated() {
@@ -120,11 +127,11 @@ public class ResourceDownloadManager {
       request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
       request.tag = i + 1
       
-      let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil, type: nil)
+      let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil)
       batchTasks.append(fontTask)
     }
 
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, startBlock: startBlock, completionBlock: completionBlock)
+    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -229,7 +236,10 @@ public class ResourceDownloadManager {
                                         asActivity activity: DownloadActivityType,
                                         fromPath path: URL,
                                         completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
-    let startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
+    var startClosure: (() -> Void)? = nil
+    if activity != .update {
+      startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
+    }
     let completionClosure = self.resourceDownloadCompletionClosure(for: lexicalModels, handler: completionBlock)
     if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0],
                                                     withFilename: path,
@@ -273,10 +283,10 @@ public class ResourceDownloadManager {
     request.destinationFile = Storage.active.lexicalModelPackageURL(for: lexicalModel).path
     request.tag = 0
 
-    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
+    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel])
     let batchTasks: [DownloadTask<InstallableLexicalModel>] = [ lexicalModelTask ]
 
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, startBlock: startBlock, completionBlock: completionBlock)
+    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task

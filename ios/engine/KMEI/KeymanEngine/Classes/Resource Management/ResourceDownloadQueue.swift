@@ -44,18 +44,15 @@ enum DownloadNode {
 }
 
 protocol AnyDownloadTask {
-  var type: LanguageResourceType? { get }
   var request: HTTPDownloadRequest { get }
 }
 
 class DownloadTask<Resource: LanguageResource>: AnyDownloadTask {
-  public final var type: LanguageResourceType?
   public final var resources: [Resource]?
   public final var request: HTTPDownloadRequest
   
-  public init(do request: HTTPDownloadRequest, for resources: [Resource]?, type: LanguageResourceType?) {
+  public init(do request: HTTPDownloadRequest, for resources: [Resource]?) {
     self.request = request
-    self.type = type
     self.resources = resources
   }
 }
@@ -65,8 +62,6 @@ enum DownloadActivityType {
 }
 
 protocol AnyDownloadBatch {
-  var activity: DownloadActivityType { get }
-  var type: LanguageResourceType? { get }
   var tasks: [AnyDownloadTask] { get }
   var resources: [AnyLanguageResource] { get }
 
@@ -82,21 +77,14 @@ protocol AnyDownloadBatch {
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
 class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource.Package: TypedKeymanPackage<Resource> {
-  public final var activity: DownloadActivityType
-  public final var type: LanguageResourceType?
-  
   public final var downloadTasks: [DownloadTask<Resource>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
   public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil
   
   public init?(do tasks: [DownloadTask<Resource>],
-               as activity: DownloadActivityType,
-               ofType type: LanguageResourceType,
                startBlock: (() -> Void)? = nil,
                completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil) {
-    self.activity = activity
-    self.type = type
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
@@ -494,12 +482,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
-    // If we're downloading a new keyboard.
-    // The extra check is there to filter out other potential request types in the future.
-    let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
-
-    // TODO:  remove the != .update check - that should be handled when startBlocks are assigned.
-    if batch.activity != .update {
+    if let batch = request.userInfo[Key.downloadBatch] as? AnyDownloadBatch {
       batch.startBlock?()
     }
   }
