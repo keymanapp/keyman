@@ -21,8 +21,8 @@ public class ResourceDownloadManager {
   
   public static let shared = ResourceDownloadManager()
   
-  private init() {
-    downloader = ResourceDownloadQueue()
+  internal init(session: URLSession = URLSession.shared) {
+    downloader = ResourceDownloadQueue(session: session)
   }
   
   // MARK: - Common functionality
@@ -378,6 +378,8 @@ public class ResourceDownloadManager {
                                  fromPath: URL.init(string: filename)!,
                                  completionBlock: completionBlock)
   }
+
+
   
   /// - Returns: The current state for a lexical model
   //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion

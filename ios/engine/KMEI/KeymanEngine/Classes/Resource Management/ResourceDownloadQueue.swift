@@ -213,14 +213,26 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
   private let keymanHostName = "api.keyman.com"
+
+  private let session: URLSession
+
+  // Designed for use with testing.
+  internal var autoExecute: Bool = true
   
-  public init() {
+  public convenience init() {
+    self.init(session: URLSession.shared, autoExecute: true)
+  }
+
+  internal init(session: URLSession, autoExecute: Bool) {
     do {
       try reachability = Reachability(hostname: keymanHostName)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }
-    
+
+    self.session = session
+    self.autoExecute = autoExecute
+
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
   }
@@ -302,7 +314,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         
         // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
         finalizeCurrentBatch()
-        executeNext()
+
+        if autoExecute {
+          executeNext()
+        }
         return
       } else {
         // We've got more batches left within this stack frame.  Continue.
@@ -317,7 +332,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       case .simpleBatch(let batch):
         // Make a separate one for each batch; this simplifies event handling when multiple batches are in queue,
         // as the old downloader will have a final event left to trigger at this point.  (downloadQueueFinished)
-        downloader = HTTPDownloader(self)
+        downloader = HTTPDownloader(self, session: self.session)
         let tasks = batch.tasks
 
         downloader!.userInfo = [Key.downloadBatch: batch]
@@ -344,7 +359,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     queueRoot.nodes.append(node)
     
     // If the queue was empty before this...
-    if queueRoot.nodes.count == 1 {
+    if queueRoot.nodes.count == 1 && autoExecute {
       executeNext()
     }
   }
@@ -459,7 +474,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // Completing the queue means having completed a batch.  We should only move forward in this class's
     // queue at this time, once a batch's task queue is complete.
     finalizeCurrentBatch()
-    executeNext()
+
+    if autoExecute {
+      executeNext()
+    }
   }
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
@@ -469,7 +487,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     
     // In case we're part of a 'composite' operation, we should still keep the queue moving.
     finalizeCurrentBatch()
-    executeNext()
+
+    if autoExecute {
+      executeNext()
+    }
   }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
