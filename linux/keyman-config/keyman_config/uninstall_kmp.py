@@ -7,7 +7,7 @@ from shutil import rmtree
 from keyman_config.get_kmp import user_keyboard_dir, user_keyman_font_dir
 from keyman_config.kmpmetadata import get_metadata
 from keyman_config.ibus_util import uninstall_from_ibus, get_ibus_bus, restart_ibus
-from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_keyboard_id, is_gnome_shell
+from keyman_config.gnome_keyboards_util import GnomeKeyboardsUtil, get_ibus_keyboard_id, is_gnome_shell
 
 
 def uninstall_kmp_shared(packageID):
@@ -69,8 +69,8 @@ def uninstall_keyboards_from_ibus(keyboards, packageDir):
     if bus:
         # install all kmx for first lang not just packageID
         for kb in keyboards:
-            keyboard_id = get_keyboard_id(kb, packageDir)
-            uninstall_from_ibus(bus, keyboard_id)
+            ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
+            uninstall_from_ibus(bus, ibus_keyboard_id)
         restart_ibus(bus)
     else:
         logging.warning("could not uninstall keyboards from IBus")
@@ -82,13 +82,13 @@ def uninstall_keyboards_from_gnome(keyboards, packageDir):
 
     # uninstall all kmx for all languages
     for kb in keyboards:
-        keyboard_id = get_keyboard_id(kb, packageDir)
-        tuple = ('ibus', keyboard_id)
+        ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
+        tuple = ('ibus', ibus_keyboard_id)
         if tuple in sources:
             sources.remove(tuple)
 
         toRemove = []
-        match_id = ":%s" % get_keyboard_id(kb, packageDir, True)
+        match_id = ":%s" % get_ibus_keyboard_id(kb, packageDir, True)
         for (type, id) in sources:
             if type == 'ibus' and id.endswith(match_id):
                 toRemove.append((type, id))

@@ -24,10 +24,10 @@ class GnomeKeyboardsUtil():
             return []
 
         values = []
-        # a(ss)
+        # Process variant of type "a(ss)" (array of tuples with two strings)
         nChildren = variant.n_children()
         for i in range(nChildren):
-            # (ss)
+            # Process variant of type "(ss)" (tuple with two strings)
             val = variant.get_child_value(i)
             typeVariant = val.get_child_value(0)
             type = typeVariant.get_string()
@@ -68,7 +68,7 @@ def _reset_gnome_shell():
     __is_gnome_shell = None
 
 
-def get_keyboard_id(keyboard, packageDir, ignore_language=False):
+def get_ibus_keyboard_id(keyboard, packageDir, ignore_language=False):
     kmx_file = os.path.join(packageDir, keyboard['id'] + ".kmx")
     if not ignore_language and "languages" in keyboard and len(keyboard["languages"]) > 0:
         logging.debug(keyboard["languages"][0])
