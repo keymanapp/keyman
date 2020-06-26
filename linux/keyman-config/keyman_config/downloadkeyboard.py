@@ -28,7 +28,7 @@ class DownloadKmpWindow(Gtk.Dialog):
 
         s = Gtk.ScrolledWindow()
         self.webview = WebKit2.WebView()
-        self.webview.connect("decide-policy", self.keyman_policy)
+        self.webview.connect("decide-policy", self._keyman_policy)
         self.webview.load_uri("https://keyman.com/go/linux/" + __releaseversion__ + "/download-keyboards")
         s.add(self.webview)
 
@@ -40,7 +40,7 @@ class DownloadKmpWindow(Gtk.Dialog):
         self.resize(800, 450)
         self.show_all()
 
-    def process_kmp(self, url, downloadfile):
+    def _process_kmp(self, url, downloadfile):
         logging.info("Downloading kmp file to %s", downloadfile)
         if download_kmp_file(url, downloadfile):
             logging.info("File downloaded")
@@ -50,7 +50,7 @@ class DownloadKmpWindow(Gtk.Dialog):
             return True
         return False
 
-    def keyman_policy(self, web_view, decision, decision_type):
+    def _keyman_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
         logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
         if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION:
@@ -64,7 +64,7 @@ class DownloadKmpWindow(Gtk.Dialog):
                 if parsed.path == "download":
                     qs = urllib.parse.parse_qs(parsed.query)
                     downloadfile = os.path.join(get_download_folder(), qs['filename'][0])
-                    if self.process_kmp(qs['url'][0], downloadfile):
+                    if self._process_kmp(qs['url'][0], downloadfile):
                         decision.ignore()
                         return True
                 elif parsed.path == "link":
