@@ -45,14 +45,27 @@ enum DownloadNode {
 
 protocol AnyDownloadTask {
   var request: HTTPDownloadRequest { get }
+  var file: URL { get }
+  var downloadFinalizationBlock: ((Bool) throws -> Void)? { get }
 }
 
 class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
   public final var resourceIDs: [FullID]?
   public final var request: HTTPDownloadRequest
+  public var file: URL {
+    if let file = finalFile {
+      return file
+    } else {
+      return URL(fileURLWithPath: request.destinationFile!)
+    }
+  }
+
+  public var finalFile: URL?
 
   // TEMPORARY:  needed to support Cloud JS downloads.
   public final var resources: [FullID.Resource]?
+
+  public final var downloadFinalizationBlock: ((Bool) throws -> Void)? = nil
   
   public init(do request: HTTPDownloadRequest, for resourceIDs: [FullID]?, resources: [FullID.Resource]? = nil) {
     self.request = request
@@ -62,14 +75,36 @@ class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
 
   public init(forPackageWithID fullID: FullID,
                from url: URL,
-               at destURL: URL) {
+               as destURL: URL, tempURL: URL) {
     resourceIDs = [fullID]
 
     let request = HTTPDownloadRequest(url: url, userInfo: [:])
-    request.destinationFile = destURL.path
+    request.destinationFile = tempURL.path
     request.tag = 0
 
+    self.finalFile = destURL
     self.request = request
+
+    self.downloadFinalizationBlock = DownloadTask.resourceDownloadFinalizationClosure(tempURL: url, finalURL: destURL)
+  }
+
+
+  /**
+   * Supports downloading to a 'temp' file that is renamed once the download completes.
+   */
+  internal static func resourceDownloadFinalizationClosure(tempURL: URL,
+                                                       finalURL: URL) -> ((Bool) throws -> Void) {
+    return { success in
+      // How to check for download failure
+      if !success {
+        if FileManager.default.fileExists(atPath: tempURL.path) {
+          try? FileManager.default.removeItem(at: tempURL)
+        }
+      } else {
+        try ResourceFileManager.shared.copyWithOverwrite(from: tempURL, to: finalURL)
+        try? FileManager.default.removeItem(at: tempURL)
+      }
+    }
   }
 }
 
@@ -118,41 +153,17 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
     let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forID: fullID)
     let finalFile = ResourceFileManager.shared.cachedPackagePath(forID: fullID)
 
-    let task = DownloadTask(forPackageWithID: fullID, from: url, at: finalFile)
+    let task = DownloadTask(forPackageWithID: fullID, from: url, as: finalFile, tempURL: tempArtifact)
 
 
     self.downloadTasks = [task]
     self.errors = Array(repeating: nil, count: 1) // We only build the one task.
 
     self.startBlock = startBlock
+    self.completionBlock = completionBlock
 
-    self.completionBlock = DownloadBatch.resourceDownloadFinalizeClosure(tempURL: tempArtifact, finalURL: finalFile, closure: completionBlock)
-  }
-
-  /**
-   * Supports downloading to a 'temp' file that is renamed once the download completes.
-   */
-  internal static func resourceDownloadFinalizeClosure(tempURL: URL,
-                                                finalURL: URL,
-                                                closure: CompletionHandler<FullID.Resource>?)
-                                                 -> CompletionHandler<FullID.Resource> {
-    return { package, error in
-      if let error = error {
-        if FileManager.default.fileExists(atPath: tempURL.path) {
-          try? FileManager.default.removeItem(at: tempURL)
-        }
-
-        closure?(nil, error)
-      } else {
-        do {
-          try ResourceFileManager.shared.copyWithOverwrite(from: tempURL, to: finalURL)
-          try? FileManager.default.removeItem(at: tempURL)
-          closure?(package, nil)
-        } catch {
-          closure?(nil, error)
-        }
-      }
-    }
+    task.request.userInfo[Key.downloadTask] = task
+    task.request.userInfo[Key.downloadBatch] = self
   }
 
   public var tasks: [AnyDownloadTask] {
@@ -382,6 +393,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
+  internal func step() {
+    executeNext()
+  }
+
   private func innerExecute(_ node: DownloadNode) {
     switch(node) {
       case .simpleBatch(let batch):
@@ -467,8 +482,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       // else "if resource is installed from an actual KMP"
       // - in other words, the long-term target.
     } else if let batch = batch as? DownloadBatch<InstallableLexicalModel.FullID> {
-      let task = batch.downloadTasks[0] // It's always at this index.
-      let packagePath = URL(fileURLWithPath: task.request.destinationFile!)
+      let task = batch.downloadTasks[0]
+      let packagePath = task.file
       batch.completeWithPackage(fromKMP: packagePath)
     }
     
@@ -501,6 +516,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
 
   func downloadRequestFinished(_ request: HTTPDownloadRequest) {
+    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     // Did we finish, but with an request error code?
     if request.responseStatusCode != 200 {
       // Possible request error (400 Bad Request, 404 Not Found, etc.)
@@ -513,8 +529,16 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       // Now that we've synthesized an appropriate error instance, use the same handler
       // as for HTTPDownloader's 'failed' condition.
       downloadRequestFailed(request, with: error)
-    } // else - handled once the entire queue is completed without errors.
-      //        This particularly matters for keyboards.
+
+      // If we used a temp filename during download, resolve it.
+      try? task.downloadFinalizationBlock?(false)
+    } else {
+      do {
+        try task.downloadFinalizationBlock?(true)
+      } catch {
+        downloadRequestFailed(request, with: error)
+      }
+    }
   }
   
   func downloadRequestFailed(_ request: HTTPDownloadRequest) {
@@ -525,8 +549,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error) {
     currentFrame.batch?.errors[currentFrame.index] = error
+    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
+    try? task.downloadFinalizationBlock?(false)
     batch.completeWithError(error: error)
     downloader!.cancelAllOperations()
   }

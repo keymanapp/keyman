@@ -14,7 +14,8 @@ import Foundation
 // This will be the public face of resource download management in KMEI, while the other half is private and
 // only accessible within the library.
 public class ResourceDownloadManager {
-  private var downloader: ResourceDownloadQueue
+  // internal b/c testing access.
+  internal var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
 
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>

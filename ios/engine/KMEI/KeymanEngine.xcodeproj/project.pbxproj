@@ -208,6 +208,7 @@
 		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
 		CEC0C66C2410AC9A003E1BCD /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; };
 		CEC0C6772410E049003E1BCD /* SentryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC0C6762410E049003E1BCD /* SentryManager.swift */; };
+		CED8B63224A9C2400054E300 /* ResourceDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */; };
 		CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */; };
 		CEF888D223FE6ADF00667693 /* No-defaults 10.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEF888D023FE6ADE00667693 /* No-defaults 10.0 Migration.bundle */; };
 		CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */; };
@@ -499,6 +500,7 @@
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
 		CECB38941F2199BC0098882F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = KeymanEngine/lib/Reachability/Reachability.m; sourceTree = SOURCE_ROOT; };
+		CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadManagerTests.swift; sourceTree = "<group>"; };
 		CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
 		CEF888D023FE6ADE00667693 /* No-defaults 10.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "No-defaults 10.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 10.0 Migration.bundle"; sourceTree = "<group>"; };
@@ -739,6 +741,7 @@
 				CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */,
 				CE973D842484A71700F66045 /* KMPJSONTests.swift */,
 				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
+				CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */,
 				CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */,
 			);
 			path = KeymanEngineTests;
@@ -1443,6 +1446,7 @@
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
 				CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */,
+				CED8B63224A9C2400054E300 /* ResourceDownloadManagerTests.swift in Sources */,
 				CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */,
 				CE973D812484A56500F66045 /* PackageJSON.swift in Sources */,
 				CE88143A24A9B7F4002809C3 /* ResourceDownloadQueueTests.swift in Sources */,

@@ -13,10 +13,12 @@ extension TestUtils.Downloading {
   class MockResult {
     let location: URL?
     let error: Error?
+    let statusCode: Int
 
-    init(location: URL?, error: Error?) {
+    init(location: URL?, error: Error?, statusCode: Int = 200) {
       self.location = location
       self.error = error
+      self.statusCode = statusCode
     }
   }
 
@@ -59,12 +61,13 @@ extension TestUtils.Downloading {
           completionHandler(nil, nil, URLSessionMockError.mockQueueEmpty)
         }
       } else {
-        return URLSessionDownloadTaskMock {
-          if case .download(let response) = self.mockedResultQueue.removeFirst() {
-            // A bit of white-box testing - we know that HTTPDownloader doesn't actually examine
-            // the URLResponse headers, so we don't provide any.
-            completionHandler(response.location, nil, response.error)
-          } else {
+        if case .download(let response) = self.mockedResultQueue.removeFirst() {
+          let mockedURLResponse = HTTPURLResponse(url: response.location!, statusCode: 200, httpVersion: nil, headerFields: nil)
+          return URLSessionDownloadTaskMock(response: mockedURLResponse) {
+            completionHandler(response.location, mockedURLResponse, response.error)
+          }
+        } else {
+          return URLSessionDownloadTaskMock {
             completionHandler(nil, nil, URLSessionMockError.unexpectedTaskType)
           }
         }
