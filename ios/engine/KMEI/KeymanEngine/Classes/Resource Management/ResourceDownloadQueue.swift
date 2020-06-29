@@ -13,12 +13,12 @@ enum DownloadNode {
   case simpleBatch(AnyDownloadBatch)
   case compositeBatch(CompositeBatch)
 
-  var resources: [AnyLanguageResource] {
+  var resourceIDs: [AnyLanguageResourceFullID] {
     switch(self) {
       case .simpleBatch(let batch):
-        return batch.resources
+        return batch.resourceIDs
       case .compositeBatch(let node):
-        return node.resources
+        return node.resourceIDs
     }
   }
 
@@ -47,12 +47,16 @@ protocol AnyDownloadTask {
   var request: HTTPDownloadRequest { get }
 }
 
-class DownloadTask<Resource: LanguageResource>: AnyDownloadTask {
-  public final var resources: [Resource]?
+class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
+  public final var resourceIDs: [FullID]?
   public final var request: HTTPDownloadRequest
+
+  // TEMPORARY:  needed to support Cloud JS downloads.
+  public final var resources: [FullID.Resource]?
   
-  public init(do request: HTTPDownloadRequest, for resources: [Resource]?) {
+  public init(do request: HTTPDownloadRequest, for resourceIDs: [FullID]?, resources: [FullID.Resource]? = nil) {
     self.request = request
+    self.resourceIDs = resourceIDs
     self.resources = resources
   }
 }
@@ -63,7 +67,7 @@ enum DownloadActivityType {
 
 protocol AnyDownloadBatch {
   var tasks: [AnyDownloadTask] { get }
-  var resources: [AnyLanguageResource] { get }
+  var resourceIDs: [AnyLanguageResourceFullID] { get }
 
   var startBlock: (() -> Void)? { get }
   var errors: [Error?] { get set }
@@ -76,15 +80,15 @@ protocol AnyDownloadBatch {
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource.Package: TypedKeymanPackage<Resource> {
-  public final var downloadTasks: [DownloadTask<Resource>]
+class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+  public final var downloadTasks: [DownloadTask<FullID>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
-  public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil
+  public final var completionBlock: ResourceDownloadManager.CompletionHandler<FullID.Resource>? = nil
   
-  public init?(do tasks: [DownloadTask<Resource>],
+  public init?(do tasks: [DownloadTask<FullID>],
                startBlock: (() -> Void)? = nil,
-               completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil) {
+               completionBlock: ResourceDownloadManager.CompletionHandler<FullID.Resource>? = nil) {
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
@@ -96,12 +100,12 @@ class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource
     return downloadTasks
   }
   
-  public var resources: [AnyLanguageResource] {
+  public var resourceIDs: [AnyLanguageResourceFullID] {
     get {
-      var resArray: [AnyLanguageResource] = []
+      var resArray: [AnyLanguageResourceFullID] = []
       
       downloadTasks.forEach{ task in
-        resArray.append(contentsOf: task.resources ?? [])
+        resArray.append(contentsOf: task.resourceIDs ?? [])
       }
       
       return resArray
@@ -118,7 +122,7 @@ class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource
 
   public func completeWithPackage(fromKMP file: URL) {
     do {
-      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Resource.Package {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? FullID.Resource.Package {
         completionBlock?(package, nil)
       } else {
         completionBlock?(nil, KMPError.invalidPackage)
@@ -132,20 +136,25 @@ class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource
 class CompositeBatch {
   public final var batches: [DownloadNode]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
-  // TODO:  Figure out typing, etc for a proper composite completion handler.  If we want one.
-  //public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource, Package>? = nil
+  public final var startBlock: (() -> Void)? = nil
+  public final var completionBlock: ResourceDownloadManager.InternalBatchCompletionHandler? = nil
 
-  public init(queue: [DownloadNode]) {
+  public init(queue: [DownloadNode],
+              startBlock: (() -> Void)? = nil,
+              completionBlock: ResourceDownloadManager.InternalBatchCompletionHandler? = nil) {
     self.batches = queue
     self.errors = Array(repeating: nil, count: batches.count)
+
+    self.startBlock = startBlock
+    self.completionBlock = completionBlock
   }
 
   public var tasks: [DownloadNode] {
     return batches
   }
 
-  public var resources: [AnyLanguageResource] {
-    return batches.flatMap { $0.resources }
+  public var resourceIDs: [AnyLanguageResourceFullID] {
+    return batches.flatMap { $0.resourceIDs }
   }
 }
 
@@ -293,15 +302,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         // We've hit the end of this stack frame's commands; time to pop and continue from the previous frame's perspective.
         _ = queueStack.popLast()
         
-        // In the current state of the app, this is only the case for batch updates.
-        // if-check below:  "if the current stack-frame came from a composite batch, let node = that 'composite batch'"
-        if case .compositeBatch(let node) = frame.batch {
-          updateBatchFinished(node)
-          // TODO:  call completion handler, should we decide to support them for composite batches.
-        }
-        
         // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
         finalizeCurrentBatch()
+
+        // if-check below:  "if the current stack-frame came from a composite batch, let node = that 'composite batch'"
+        if case .compositeBatch(let node) = frame.batch {
+          // The base handler requires access to the batch's tracked success/failure data.
+          node.completionBlock?(node)
+        }
 
         if autoExecute {
           executeNext()
@@ -334,7 +342,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         downloader!.run()
       case .compositeBatch(let batch):
         // It's the top level of an update operation.  Time to make a correpsonding notification.
-        updateBatchStarted(batch)
+        batch.startBlock?()
         // We're a batch composed of multiple sub-batches.  Time to set that up on the queue!
         let frame = DownloadQueueFrame(from: batch)!
         queueStack.append(frame)
@@ -364,47 +372,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   func containsResourceInQueue(matchingID: AnyLanguageResourceFullID, requireLanguageMatch: Bool = true) -> Bool {
     return queueRoot.nodes.contains { node in
-      node.resources.contains { resource in
-        // We don't actually care about the language ID when dowßΩnloading - just the resource's ID and type.
-        let result = resource.fullID.type == matchingID.type && resource.fullID.id == matchingID.id
-
-        if requireLanguageMatch {
-          return result && resource.fullID.languageID == matchingID.languageID
-        } else {
-          return result
-        }
+      node.resourceIDs.contains { fullID in
+        return fullID.matches(matchingID, requireLanguageMatch: requireLanguageMatch)
       }
     }
-  }
-
-  // MARK - notification methods
-  
-  public func updateBatchStarted(_ batch: CompositeBatch) {
-    let notification = BatchUpdateStartedNotification(batch.resources)
-    NotificationCenter.default.post(name: Notifications.batchUpdateStarted,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func updateBatchFinished(_ batch: CompositeBatch) {
-    var successes: [[AnyLanguageResource]] = []
-    var failures: [[AnyLanguageResource]] = []
-    var errors: [Error] = []
-    
-    // Remember, since this is for .composite batches, batch.tasks is of type [DownloadBatch].
-    for (index, res) in batch.tasks.enumerated() {
-      if batch.errors[index] == nil {
-        successes.append(res.resources)
-      } else {
-        failures.append(res.resources)
-        errors.append(batch.errors[index]!)
-      }
-    }
-    
-    let notification = BatchUpdateCompletedNotification(successes: successes, failures: failures, errors: errors)
-    NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
-                                    object: self,
-                                    value: notification)
   }
 
   //MARK: - HTTPDownloadDelegate methods
@@ -414,13 +385,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
     // Really, "if resource is installed from the cloud, only packaged locally"
-    if let batch = batch as? DownloadBatch<InstallableKeyboard> {
+    if let batch = batch as? DownloadBatch<InstallableKeyboard.FullID> {
       // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
       // Once downlading KMPs, will be the downloaded .kmp.
 
       // The request has succeeded.
       if downloader!.requestsCount == 0 { // Download queue finished.
-        let keyboards = batch.resources as! [InstallableKeyboard]
+        // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
+        let keyboards = batch.downloadTasks[0].resources!
         log.info("Downloaded keyboard: \(keyboards[0].id).")
 
         // TEMP:  wrap the newly-downloaded resources with a kmp.json.
@@ -435,7 +407,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       }
       // else "if resource is installed from an actual KMP"
       // - in other words, the long-term target.
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel> {
+    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel.FullID> {
       let task = batch.downloadTasks[0] // It's always at this index.
       let packagePath = URL(fileURLWithPath: task.request.destinationFile!)
       batch.completeWithPackage(fromKMP: packagePath)
