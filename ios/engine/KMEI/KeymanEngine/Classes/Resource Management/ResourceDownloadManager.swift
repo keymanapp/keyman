@@ -18,6 +18,8 @@ public class ResourceDownloadManager {
   private var isDidUpdateCheck = false
 
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
+  public typealias BatchCompletionHandler = () -> Void
+  internal typealias InternalBatchCompletionHandler = (CompositeBatch) -> Void
   
   public static let shared = ResourceDownloadManager()
 
@@ -67,7 +69,7 @@ public class ResourceDownloadManager {
                                     asActivity activity: DownloadActivityType,
                                     withFilename filename: String,
                                     withOptions options: Options,
-                                    completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
+                                    completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard.FullID>? {
     var startClosure: (() -> Void)? = nil
     if activity != .update {
       startClosure = self.resourceDownloadStartClosure(for: keyboards)
@@ -83,6 +85,7 @@ public class ResourceDownloadManager {
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
         task.resources = keyboards
+        task.resourceIDs = keyboards.map { $0.fullID }
       }
       
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
@@ -103,7 +106,7 @@ public class ResourceDownloadManager {
                                           asActivity activity: DownloadActivityType,
                                           withOptions options: Options,
                                           startBlock: (() -> Void)? = nil,
-                                          completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
+                                          completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard.FullID>? {
     let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
     let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
                              keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
@@ -120,15 +123,15 @@ public class ResourceDownloadManager {
     request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
     request.tag = 0
 
-    let keyboardTask = DownloadTask(do: request, for: [keyboard])
-    var batchTasks: [DownloadTask<InstallableKeyboard>] = [ keyboardTask ]
+    let keyboardTask = DownloadTask(do: request, for: [keyboard.fullID], resources: [keyboard])
+    var batchTasks: [DownloadTask<InstallableKeyboard.FullID>] = [ keyboardTask ]
     
     for (i, url) in fontURLs.enumerated() {
       request = HTTPDownloadRequest(url: url, userInfo: [:])
       request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
       request.tag = i + 1
       
-      let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil)
+      let fontTask = DownloadTask<InstallableKeyboard.FullID>(do: request, for: nil)
       batchTasks.append(fontTask)
     }
 
@@ -238,7 +241,7 @@ public class ResourceDownloadManager {
   private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel],
                                         asActivity activity: DownloadActivityType,
                                         fromPath path: URL,
-                                        completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
+                                        completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel.FullID>? {
     var startClosure: (() -> Void)? = nil
     if activity != .update {
       startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
@@ -253,6 +256,7 @@ public class ResourceDownloadManager {
       // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
       tasks.forEach { task in
         task.resources = lexicalModels
+        task.resourceIDs = lexicalModels.map { $0.fullID }
       }
       
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
@@ -272,7 +276,7 @@ public class ResourceDownloadManager {
                                               withFilename path: URL,
                                               asActivity activity: DownloadActivityType,
                                               startBlock: (()-> Void)? = nil,
-                                              completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
+                                              completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel.FullID>? {
     do {
       try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
                                               withIntermediateDirectories: true)
@@ -286,8 +290,8 @@ public class ResourceDownloadManager {
     request.destinationFile = Storage.active.lexicalModelPackageURL(for: lexicalModel).path
     request.tag = 0
 
-    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel])
-    let batchTasks: [DownloadTask<InstallableLexicalModel>] = [ lexicalModelTask ]
+    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel.fullID])
+    let batchTasks: [DownloadTask<InstallableLexicalModel.FullID>] = [ lexicalModelTask ]
 
     let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
@@ -478,7 +482,9 @@ public class ResourceDownloadManager {
       }
     }
     
-    let batchUpdate = CompositeBatch(queue: batches.map { return DownloadNode.simpleBatch($0) })
+    let batchUpdate = CompositeBatch(queue: batches.map { return DownloadNode.simpleBatch($0) },
+                                     startBlock: resourceBatchUpdateStartClosure(for: resources),
+                                     completionBlock: resourceBatchUpdateCompletionClosure(for: resources))
     downloader.queue(.compositeBatch(batchUpdate))
   }
   
@@ -605,6 +611,51 @@ public class ResourceDownloadManager {
         userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
         userDefaults.synchronize()
       }
+    }
+  }
+
+  internal func resourceBatchUpdateStartClosure(for resources: [AnyLanguageResource]) -> (() -> Void) {
+    return {
+      let notification = BatchUpdateStartedNotification(resources)
+      NotificationCenter.default.post(name: Notifications.batchUpdateStarted,
+                                      object: self,
+                                      value: notification)
+    }
+  }
+
+  internal func resourceBatchUpdateCompletionClosure(for resources: [AnyLanguageResource],
+                                                     completionBlock: BatchCompletionHandler? = nil)
+                                                     -> InternalBatchCompletionHandler {
+    return { batch in
+      var successes: [[AnyLanguageResource]] = []
+      var failures: [[AnyLanguageResource]] = []
+      var errors: [Error] = []
+
+      // Remember, since this is for .composite batches, batch.tasks is of type [DownloadBatch].
+      for (index, res) in batch.tasks.enumerated() {
+        if batch.errors[index] == nil {
+          let successSet: [AnyLanguageResource] = res.resourceIDs.compactMap { fullID in
+            return resources.first(where: { resource in
+              resource.fullID.matches(fullID)
+            })
+          }
+          successes.append(successSet)
+        } else {
+          let failureSet: [AnyLanguageResource] = res.resourceIDs.compactMap { fullID in
+            return resources.first(where: { resource in
+              resource.fullID.matches(fullID)
+            })
+          }
+          failures.append(failureSet)
+          errors.append(batch.errors[index]!)
+        }
+      }
+
+      let notification = BatchUpdateCompletedNotification(successes: successes, failures: failures, errors: errors)
+      NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
+                                      object: self,
+                                      value: notification)
+      completionBlock?()
     }
   }
 

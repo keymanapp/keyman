@@ -17,8 +17,22 @@ public protocol AnyLanguageResourceFullID {
   var id: String { get }
   var languageID: String { get }
   var type: LanguageResourceType { get }
+
+  func matches(_ other: AnyLanguageResourceFullID, requireLanguageMatch: Bool) -> Bool
 }
 
+extension AnyLanguageResourceFullID {
+  // For matching when we're not sure if the underlying types actually match.
+  public func matches(_ other: AnyLanguageResourceFullID, requireLanguageMatch: Bool = true) -> Bool {
+    if requireLanguageMatch {
+      return id == other.id && type == other.type && languageID == other.languageID
+    } else {
+      return id == other.id && type == other.type
+    }
+  }
+}
+
+// Equatable only really makes sense when the types are identical.
 extension AnyLanguageResourceFullID where Self: Equatable {
   public static func ==(lhs: Self, rhs: Self) -> Bool {
     return lhs.id == rhs.id && lhs.languageID == rhs.languageID && lhs.type == rhs.type
