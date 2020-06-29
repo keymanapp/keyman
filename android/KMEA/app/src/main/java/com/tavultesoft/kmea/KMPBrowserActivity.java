@@ -32,7 +32,7 @@ public class KMPBrowserActivity extends AppCompatActivity {
   private WebView webView;
   private static final String KMP_PRODUCTION_HOST = "https://keyman.com";
   private static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
-  private static final String KMP_SEARCH_URL_FORMATSTR = "%s/keyboards%s?embed=linux&version=%s"; // TODO: Update to Android
+  private static final String KMP_SEARCH_URL_FORMATSTR = "%s/keyboards%s?embed=android&version=%s";
   private static final String KMP_LANGUAGE_FORMATSTR = "/languages/%s";
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
