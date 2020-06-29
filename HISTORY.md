@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.102 alpha 2020-06-29
+
+* fix(android): Use tier to determine keyboard search host (#3296)
+* refactor(ios/engine): Resource download cleanup and mocking prep (#3292)
+* refactor(ios/engine): ID-based download tracking, update notification rework (#3295)
+
 ## 14.0.101 alpha 2020-06-26
 
 * feat(linux): address code review comments of #3278 (#3281)
