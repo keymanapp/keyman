@@ -182,6 +182,7 @@
 		CE867FEF2485E97A00B2EAED /* KMPMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */; };
 		CE867FF12485EE1500B2EAED /* KMPInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FF02485EE1500B2EAED /* KMPInfo.swift */; };
 		CE88042F247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */; };
+		CE88143A24A9B7F4002809C3 /* ResourceDownloadQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */; };
 		CE89641F24A4686000D5EB8E /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89641E24A4686000D5EB8E /* Queries.swift */; };
 		CE89642124A468B200D5EB8E /* Queries+PackageVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */; };
 		CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */; };
@@ -473,6 +474,7 @@
 		CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPMetadata.swift; sourceTree = "<group>"; };
 		CE867FF02485EE1500B2EAED /* KMPInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPInfo.swift; sourceTree = "<group>"; };
 		CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectationDownloaderDelegate.swift; sourceTree = "<group>"; };
+		CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadQueueTests.swift; sourceTree = "<group>"; };
 		CE89641E24A4686000D5EB8E /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
 		CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+PackageVersion.swift"; sourceTree = "<group>"; };
 		CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryPackageVersionTests.swift; sourceTree = "<group>"; };
@@ -737,6 +739,7 @@
 				CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */,
 				CE973D842484A71700F66045 /* KMPJSONTests.swift */,
 				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
+				CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */,
 			);
 			path = KeymanEngineTests;
 			sourceTree = "<group>";
@@ -1442,6 +1445,7 @@
 				CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */,
 				CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */,
 				CE973D812484A56500F66045 /* PackageJSON.swift in Sources */,
+				CE88143A24A9B7F4002809C3 /* ResourceDownloadQueueTests.swift in Sources */,
 				CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

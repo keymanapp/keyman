@@ -126,13 +126,13 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
 
     self.startBlock = startBlock
 
-    self.completionBlock = resourceDownloadFinalizeClosure(tempURL: tempArtifact, finalURL: finalFile, closure: completionBlock)
+    self.completionBlock = DownloadBatch.resourceDownloadFinalizeClosure(tempURL: tempArtifact, finalURL: finalFile, closure: completionBlock)
   }
 
   /**
    * Supports downloading to a 'temp' file that is renamed once the download completes.
    */
-  internal func resourceDownloadFinalizeClosure(tempURL: URL,
+  internal static func resourceDownloadFinalizeClosure(tempURL: URL,
                                                 finalURL: URL,
                                                 closure: CompletionHandler<FullID.Resource>?)
                                                  -> CompletionHandler<FullID.Resource> {
