@@ -59,6 +59,18 @@ class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
     self.resourceIDs = resourceIDs
     self.resources = resources
   }
+
+  public init(forPackageWithID fullID: FullID,
+               from url: URL,
+               at destURL: URL) {
+    resourceIDs = [fullID]
+
+    let request = HTTPDownloadRequest(url: url, userInfo: [:])
+    request.destinationFile = destURL.path
+    request.tag = 0
+
+    self.request = request
+  }
 }
 
 enum DownloadActivityType {
@@ -81,19 +93,66 @@ protocol AnyDownloadBatch {
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
 class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+  typealias CompletionHandler = ResourceDownloadManager.CompletionHandler
+
   public final var downloadTasks: [DownloadTask<FullID>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
-  public final var completionBlock: ResourceDownloadManager.CompletionHandler<FullID.Resource>? = nil
+  public final var completionBlock: CompletionHandler<FullID.Resource>? = nil
   
   public init?(do tasks: [DownloadTask<FullID>],
                startBlock: (() -> Void)? = nil,
-               completionBlock: ResourceDownloadManager.CompletionHandler<FullID.Resource>? = nil) {
+               completionBlock: CompletionHandler<FullID.Resource>? = nil) {
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
     self.startBlock = startBlock
     self.completionBlock = completionBlock
+  }
+
+  public init(forPackageWithID fullID: FullID,
+              from url: URL,
+              startBlock: (() -> Void)?,
+              completionBlock: CompletionHandler<FullID.Resource>?) {
+    // If we can't build a proper DownloadTask, we can't build the batch.
+    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forID: fullID)
+    let finalFile = ResourceFileManager.shared.cachedPackagePath(forID: fullID)
+
+    let task = DownloadTask(forPackageWithID: fullID, from: url, at: finalFile)
+
+
+    self.downloadTasks = [task]
+    self.errors = Array(repeating: nil, count: 1) // We only build the one task.
+
+    self.startBlock = startBlock
+
+    self.completionBlock = resourceDownloadFinalizeClosure(tempURL: tempArtifact, finalURL: finalFile, closure: completionBlock)
+  }
+
+  /**
+   * Supports downloading to a 'temp' file that is renamed once the download completes.
+   */
+  internal func resourceDownloadFinalizeClosure(tempURL: URL,
+                                                finalURL: URL,
+                                                closure: CompletionHandler<FullID.Resource>?)
+                                                 -> CompletionHandler<FullID.Resource> {
+    return { package, error in
+      if let error = error {
+        if FileManager.default.fileExists(atPath: tempURL.path) {
+          try? FileManager.default.removeItem(at: tempURL)
+        }
+
+        closure?(nil, error)
+      } else {
+        do {
+          try ResourceFileManager.shared.copyWithOverwrite(from: tempURL, to: finalURL)
+          try? FileManager.default.removeItem(at: tempURL)
+          closure?(package, nil)
+        } catch {
+          closure?(nil, error)
+        }
+      }
+    }
   }
 
   public var tasks: [AnyDownloadTask] {

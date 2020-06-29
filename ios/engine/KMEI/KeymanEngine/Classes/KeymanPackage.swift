@@ -201,6 +201,21 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     } as [[TypedLanguageResource]]
   }
 
+  internal static func baseFilename(for fullID: TypedLanguageResource.FullID) -> String {
+    var ext: String
+
+    switch(TypedLanguageResource.self) {
+      case is InstallableKeyboard.Type:
+        ext = "kmp"
+      case is InstallableLexicalModel.Type:
+        ext = "model.kmp"
+      default:
+        fatalError("Unsupported language resource type")
+    }
+
+    return "\(fullID.id).\(ext)"
+  }
+
   // Cannot directly override base class's installableResourceSets with more specific type,
   // despite covariance.  So, we have to provide two separate properties.  Joy.
   // See https://forums.swift.org/t/confusing-limitations-on-covariant-overriding/16252

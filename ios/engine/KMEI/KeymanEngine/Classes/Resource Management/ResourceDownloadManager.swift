@@ -423,6 +423,28 @@ public class ResourceDownloadManager {
     }
     return .upToDate
   }
+
+  /**
+   * A nice, centralized function designed to cleanly handle package-oriented downloads once the package's URL is known.
+   */
+  public func downloadPackage<FullID: LanguageResourceFullID>(forFullID fullID: FullID,
+                                                              from url: URL,
+                                                              withNotifications: Bool = false,
+                                                              completionBlock: @escaping CompletionHandler<FullID.Resource>)
+  where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+    var startClosure: (() -> Void)? = nil
+    var completionClosure: CompletionHandler<FullID.Resource>? = completionBlock
+
+    if withNotifications {
+      // We don't have the full metadata available, but we can at least signal which resource type this way.
+      startClosure = resourceDownloadStartClosure(for: [] as [FullID.Resource])
+      completionClosure = resourceDownloadCompletionClosure(for: [] as [FullID.Resource], handler: completionBlock)
+    }
+
+    // build batch for package
+    let batch = DownloadBatch(forPackageWithID: fullID, from: url, startBlock: startClosure, completionBlock: completionClosure)
+    downloader.queue(.simpleBatch(batch))
+  }
   
   // MARK: Update checks + management
   public var updatesAvailable: Bool {
