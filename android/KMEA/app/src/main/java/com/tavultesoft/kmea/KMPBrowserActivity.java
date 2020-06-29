@@ -24,11 +24,15 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMManager.Tier;
 
 public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
   private WebView webView;
-  private static final String KMP_SEARCH_URL_FORMATSTR = "https://keyman.com/keyboards%s?embed=linux&version=%s"; // TODO: Update to Android
+  private static final String KMP_PRODUCTION_HOST = "https://keyman.com";
+  private static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
+  private static final String KMP_SEARCH_URL_FORMATSTR = "%s/keyboards%s?embed=linux&version=%s"; // TODO: Update to Android
   private static final String KMP_LANGUAGE_FORMATSTR = "/languages/%s";
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
@@ -99,11 +103,14 @@ public class KMPBrowserActivity extends AppCompatActivity {
       }
     });
 
+    // Tier determines the keyboard search host
+    String host = (KMManager.getTier(BuildConfig.VERSION_NAME) == Tier.STABLE) ?
+      KMP_PRODUCTION_HOST : KMP_STAGING_HOST;
     // If language ID is provided, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
     String languageStr = (languageID != null) ? String.format(KMP_LANGUAGE_FORMATSTR, languageID) : "";
     String appVersion = KMManager.getVersion();
-    String kmpSearchUrl = String.format(KMP_SEARCH_URL_FORMATSTR, languageStr, appVersion);
+    String kmpSearchUrl = String.format(KMP_SEARCH_URL_FORMATSTR, host, languageStr, appVersion);
     webView.loadUrl(kmpSearchUrl);
   }
 

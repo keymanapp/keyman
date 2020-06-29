@@ -114,6 +114,12 @@ public final class KMManager {
     TABLET;
   }
 
+  public enum Tier {
+    ALPHA,
+    BETA,
+    STABLE
+  }
+
   private static InputMethodService IMService;
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
@@ -256,8 +262,37 @@ public final class KMManager {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
 
+  public static FormFactor getFormFactor() {
+    String device_type = appContext.getResources().getString(R.string.device_type);
+
+    return device_type.equals("AndroidMobile") ? FormFactor.PHONE : FormFactor.TABLET;
+  }
+
   /**
-   * Extract app version #.#.# from VERSION_NAME
+   * Extract KMEA tier from versionName. Uses parameter so we can unit test.
+   * @param versionName String - If not provided, determine tier from
+   *                    com.tavultesoft.kmea.BuildConfig.VERSION_NAME
+   * @return Tier (ALPHA, BETA, STABLE)
+   */
+  public static Tier getTier(String versionName) {
+    if (versionName == null || versionName.isEmpty()) {
+      versionName = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    }
+    Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+)-(alpha|beta|stable)-.*");
+    Matcher matcher = pattern.matcher(versionName);
+    if (matcher.matches() && matcher.groupCount() >= 2) {
+      switch (matcher.group(2)) {
+        case "alpha": return Tier.ALPHA;
+        case "beta": return Tier.BETA;
+        default:
+          return Tier.STABLE;
+      }
+    }
+    return Tier.STABLE;
+  }
+
+  /**
+   * Extract KMEA version #.#.# from VERSION_NAME
    * @return String
    */
   public static String getVersion() {
@@ -1600,12 +1635,6 @@ public final class KMManager {
     }
 
     return result;
-  }
-
-  public static FormFactor getFormFactor() {
-    String device_type = appContext.getResources().getString(R.string.device_type);
-
-    return device_type.equals("AndroidMobile") ? FormFactor.PHONE : FormFactor.TABLET;
   }
 
   public static boolean isHelpBubbleEnabled() {

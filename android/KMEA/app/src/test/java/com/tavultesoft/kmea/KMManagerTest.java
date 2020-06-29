@@ -44,6 +44,29 @@ public class KMManagerTest {
     }
   }
 
+  @Test
+  public void test_getTier() {
+    String versionName = "14.0.248-alpha-local";
+    KMManager.Tier tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.ALPHA, tier);
+
+    versionName = "14.0.248-beta-local";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.BETA, tier);
+
+    versionName = "14.0.248-stable-local";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
+
+    // If versionName is null or blank, tier based on com.tavultesoft.kmea.BuildConfig.VERSION_NAME
+    // But we can't test for it.
+
+    // If regex fails, tier is stable
+    versionName = "14.0.248";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
+  }
+
   /*
   * This test is manually run to edit/regenerate the old keyboards list
   */
