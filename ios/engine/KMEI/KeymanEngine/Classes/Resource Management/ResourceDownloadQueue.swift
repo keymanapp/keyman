@@ -44,18 +44,15 @@ enum DownloadNode {
 }
 
 protocol AnyDownloadTask {
-  var type: LanguageResourceType? { get }
   var request: HTTPDownloadRequest { get }
 }
 
 class DownloadTask<Resource: LanguageResource>: AnyDownloadTask {
-  public final var type: LanguageResourceType?
   public final var resources: [Resource]?
   public final var request: HTTPDownloadRequest
   
-  public init(do request: HTTPDownloadRequest, for resources: [Resource]?, type: LanguageResourceType?) {
+  public init(do request: HTTPDownloadRequest, for resources: [Resource]?) {
     self.request = request
-    self.type = type
     self.resources = resources
   }
 }
@@ -65,8 +62,6 @@ enum DownloadActivityType {
 }
 
 protocol AnyDownloadBatch {
-  var activity: DownloadActivityType { get }
-  var type: LanguageResourceType? { get }
   var tasks: [AnyDownloadTask] { get }
   var resources: [AnyLanguageResource] { get }
 
@@ -82,21 +77,14 @@ protocol AnyDownloadBatch {
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
 class DownloadBatch<Resource: LanguageResource>: AnyDownloadBatch where Resource.Package: TypedKeymanPackage<Resource> {
-  public final var activity: DownloadActivityType
-  public final var type: LanguageResourceType?
-  
   public final var downloadTasks: [DownloadTask<Resource>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
   public final var completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil
   
   public init?(do tasks: [DownloadTask<Resource>],
-               as activity: DownloadActivityType,
-               ofType type: LanguageResourceType,
                startBlock: (() -> Void)? = nil,
                completionBlock: ResourceDownloadManager.CompletionHandler<Resource>? = nil) {
-    self.activity = activity
-    self.type = type
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
@@ -213,14 +201,26 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
   private let keymanHostName = "api.keyman.com"
+
+  private let session: URLSession
+
+  // Designed for use with testing.
+  internal var autoExecute: Bool = true
   
-  public init() {
+  public convenience init() {
+    self.init(session: URLSession.shared, autoExecute: true)
+  }
+
+  internal init(session: URLSession, autoExecute: Bool) {
     do {
       try reachability = Reachability(hostname: keymanHostName)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }
-    
+
+    self.session = session
+    self.autoExecute = autoExecute
+
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
   }
@@ -302,7 +302,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         
         // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
         finalizeCurrentBatch()
-        executeNext()
+
+        if autoExecute {
+          executeNext()
+        }
         return
       } else {
         // We've got more batches left within this stack frame.  Continue.
@@ -317,7 +320,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       case .simpleBatch(let batch):
         // Make a separate one for each batch; this simplifies event handling when multiple batches are in queue,
         // as the old downloader will have a final event left to trigger at this point.  (downloadQueueFinished)
-        downloader = HTTPDownloader(self)
+        downloader = HTTPDownloader(self, session: self.session)
         let tasks = batch.tasks
 
         downloader!.userInfo = [Key.downloadBatch: batch]
@@ -344,7 +347,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     queueRoot.nodes.append(node)
     
     // If the queue was empty before this...
-    if queueRoot.nodes.count == 1 {
+    if queueRoot.nodes.count == 1 && autoExecute {
       executeNext()
     }
   }
@@ -359,37 +362,19 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  // TODO: Needs validation.
-  func keyboardIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasJavaScriptExtension {
-        return String(tmpStr.dropLast(3))
+  func containsResourceInQueue(matchingID: AnyLanguageResourceFullID, requireLanguageMatch: Bool = true) -> Bool {
+    return queueRoot.nodes.contains { node in
+      node.resources.contains { resource in
+        // We don't actually care about the language ID when dowßΩnloading - just the resource's ID and type.
+        let result = resource.fullID.type == matchingID.type && resource.fullID.id == matchingID.id
+
+        if requireLanguageMatch {
+          return result && resource.fullID.languageID == matchingID.languageID
+        } else {
+          return result
+        }
       }
-    } else {
-      // TODO:  search the queue instead.
-//      let kbInfo = downloader!.userInfo[Key.keyboardInfo]
-//      if let keyboards = kbInfo as? [InstallableKeyboard], let keyboard = keyboards.first {
-//        return keyboard.id
-//      }
     }
-    return nil
-  }
-  
-  func lexicalModelIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasJavaScriptExtension {
-        return String(tmpStr.dropLast(3))
-      }
-    } else {
-      // TODO: search the queue instead.
-//      let kbInfo = downloader!.userInfo[Key.lexicalModelInfo]
-//      if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
-//        return lexicalModel.id
-//      }
-    }
-    return nil
   }
 
   // MARK - notification methods
@@ -459,7 +444,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // Completing the queue means having completed a batch.  We should only move forward in this class's
     // queue at this time, once a batch's task queue is complete.
     finalizeCurrentBatch()
-    executeNext()
+
+    if autoExecute {
+      executeNext()
+    }
   }
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
@@ -469,16 +457,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     
     // In case we're part of a 'composite' operation, we should still keep the queue moving.
     finalizeCurrentBatch()
-    executeNext()
+
+    if autoExecute {
+      executeNext()
+    }
   }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
-    // If we're downloading a new keyboard.
-    // The extra check is there to filter out other potential request types in the future.
-    let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
-
-    // TODO:  remove the != .update check - that should be handled when startBlocks are assigned.
-    if batch.activity != .update {
+    if let batch = request.userInfo[Key.downloadBatch] as? AnyDownloadBatch {
       batch.startBlock?()
     }
   }

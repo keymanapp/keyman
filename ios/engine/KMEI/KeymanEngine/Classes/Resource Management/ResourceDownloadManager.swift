@@ -20,9 +20,14 @@ public class ResourceDownloadManager {
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
   
   public static let shared = ResourceDownloadManager()
-  
-  private init() {
+
+  internal init() {
     downloader = ResourceDownloadQueue()
+  }
+
+  // Intended only for use in testing!
+  internal init(session: URLSession, autoExecute: Bool) {
+    downloader = ResourceDownloadQueue(session: session, autoExecute: autoExecute)
   }
   
   // MARK: - Common functionality
@@ -63,7 +68,10 @@ public class ResourceDownloadManager {
                                     withFilename filename: String,
                                     withOptions options: Options,
                                     completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard>? {
-    let startClosure = self.resourceDownloadStartClosure(for: keyboards)
+    var startClosure: (() -> Void)? = nil
+    if activity != .update {
+      startClosure = self.resourceDownloadStartClosure(for: keyboards)
+    }
     let completionClosure = self.resourceDownloadCompletionClosure(for: keyboards, handler: completionBlock)
     if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0],
                                                 withFilename: filename,
@@ -112,7 +120,7 @@ public class ResourceDownloadManager {
     request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
     request.tag = 0
 
-    let keyboardTask = DownloadTask(do: request, for: [keyboard], type: .keyboard)
+    let keyboardTask = DownloadTask(do: request, for: [keyboard])
     var batchTasks: [DownloadTask<InstallableKeyboard>] = [ keyboardTask ]
     
     for (i, url) in fontURLs.enumerated() {
@@ -120,11 +128,11 @@ public class ResourceDownloadManager {
       request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
       request.tag = i + 1
       
-      let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil, type: nil)
+      let fontTask = DownloadTask<InstallableKeyboard>(do: request, for: nil)
       batchTasks.append(fontTask)
     }
 
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .keyboard, startBlock: startBlock, completionBlock: completionBlock)
+    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -184,16 +192,18 @@ public class ResourceDownloadManager {
   
   /// - Returns: The current state for a keyboard
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
-    // Needs validation - I don't think this if-condition can be met in Keyman's current state
-    // (as of 2019-08-16)
-    if downloader.keyboardIdForCurrentRequest() == keyboardID {
+    // For this call, we don't actually need the language ID to be correct.
+    let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
+    if downloader.containsResourceInQueue(matchingID: fullKeyboardID, requireLanguageMatch: false) {
       return .downloading
     }
+
     let userKeyboards = Storage.active.userDefaults.userKeyboards
     guard let userKeyboard = userKeyboards?.first(where: { $0.id == keyboardID }) else {
       return .needsDownload
     }
 
+    // TODO:  convert to use of package-version API.
     // Check version
     if let repositoryVersionString = Manager.shared.apiKeyboardRepository.keyboards?[keyboardID]?.version {
       let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
@@ -229,7 +239,10 @@ public class ResourceDownloadManager {
                                         asActivity activity: DownloadActivityType,
                                         fromPath path: URL,
                                         completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel>? {
-    let startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
+    var startClosure: (() -> Void)? = nil
+    if activity != .update {
+      startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
+    }
     let completionClosure = self.resourceDownloadCompletionClosure(for: lexicalModels, handler: completionBlock)
     if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0],
                                                     withFilename: path,
@@ -273,10 +286,10 @@ public class ResourceDownloadManager {
     request.destinationFile = Storage.active.lexicalModelPackageURL(for: lexicalModel).path
     request.tag = 0
 
-    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel], type: .lexicalModel)
+    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel])
     let batchTasks: [DownloadTask<InstallableLexicalModel>] = [ lexicalModelTask ]
 
-    let batch = DownloadBatch(do: batchTasks, as: activity, ofType: .lexicalModel, startBlock: startBlock, completionBlock: completionBlock)
+    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
     batchTasks.forEach { task in
       task.request.userInfo[Key.downloadBatch] = batch
       task.request.userInfo[Key.downloadTask] = task
@@ -378,18 +391,24 @@ public class ResourceDownloadManager {
                                  fromPath: URL.init(string: filename)!,
                                  completionBlock: completionBlock)
   }
+
+
   
   /// - Returns: The current state for a lexical model
   //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
-    if downloader.lexicalModelIdForCurrentRequest() == lexicalModelID {
+    // For this call, we don't actually need the language ID to be correct.
+    let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
+    if downloader.containsResourceInQueue(matchingID: fullLexicalModelID, requireLanguageMatch: false) {
       return .downloading
     }
+
     let userLexicalModels = Storage.active.userDefaults.userLexicalModels
     guard let userLexicalModel = userLexicalModels?.first(where: { $0.id == lexicalModelID }) else {
       return .needsDownload
     }
-    
+
+    // TODO:  Convert to use of package-version API.
     // Check version
     if let repositoryVersionString = Manager.shared.apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.version {
       let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
