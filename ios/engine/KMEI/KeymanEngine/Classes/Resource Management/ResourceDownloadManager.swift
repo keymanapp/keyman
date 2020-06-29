@@ -194,7 +194,7 @@ public class ResourceDownloadManager {
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
-    if downloader.containsResourceInQueue(matchingID: fullKeyboardID) {
+    if downloader.containsResourceInQueue(matchingID: fullKeyboardID, requireLanguageMatch: false) {
       return .downloading
     }
 
@@ -399,7 +399,7 @@ public class ResourceDownloadManager {
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
-    if downloader.containsResourceInQueue(matchingID: fullLexicalModelID) {
+    if downloader.containsResourceInQueue(matchingID: fullLexicalModelID, requireLanguageMatch: false) {
       return .downloading
     }
 

@@ -362,11 +362,17 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  func containsResourceInQueue(matchingID: AnyLanguageResourceFullID) -> Bool {
+  func containsResourceInQueue(matchingID: AnyLanguageResourceFullID, requireLanguageMatch: Bool = true) -> Bool {
     return queueRoot.nodes.contains { node in
       node.resources.contains { resource in
-        // We don't actually care about the language ID when downloading - just the resource's ID and type.
-        return resource.fullID.type == matchingID.type && resource.fullID.id == matchingID.id
+        // We don't actually care about the language ID when dowßΩnloading - just the resource's ID and type.
+        let result = resource.fullID.type == matchingID.type && resource.fullID.id == matchingID.id
+
+        if requireLanguageMatch {
+          return result && resource.fullID.languageID == matchingID.languageID
+        } else {
+          return result
+        }
       }
     }
   }
