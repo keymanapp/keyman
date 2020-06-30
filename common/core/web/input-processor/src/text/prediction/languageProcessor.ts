@@ -92,7 +92,7 @@ namespace com.keyman.text.prediction {
     private _mayPredict: boolean = true;
     private _mayCorrect: boolean = true;
 
-    private static readonly TRANSCRIPTION_BUFFER: 10;
+    private static readonly TRANSCRIPTION_BUFFER: 10 = 10;
 
     public init(supportsRightDeletions: boolean = false) {
       // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
