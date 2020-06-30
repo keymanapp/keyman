@@ -15,7 +15,7 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 echo Build KMAPro
 
@@ -38,8 +38,8 @@ NO_DAEMON=false
 ONLY_DEBUG=false
 DO_DOWNLOAD=false
 
-export ASSETS_KEYBOARD="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp"
-export ASSETS_MODEL="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/nrc.en.mtnt.model.kmp"
+export KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp"
+export MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/nrc.en.mtnt.model.kmp"
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -75,32 +75,7 @@ fi
 
 # Download default keyboard and dictionary
 if [ $DO_DOWNLOAD = true ]; then
-  echo "Downloading default keyboard & dictionary from downloads.keyman.com"
-
-  SCRIPT_ROOT=`pwd`
-  URL_DOWNLOAD=https://downloads.keyman.com
-  URL_API_KEYBOARD_VERSION=${URL_DOWNLOAD}/api/keyboard/
-  URL_API_MODEL_VERSION=${URL_DOWNLOAD}/api/model/
-
-  # Default Keyboard
-  id="sil_euro_latin"
-  echo "Downloading $id"
-  URL_DOWNLOAD_FILE=`curl -s "$URL_API_KEYBOARD_VERSION/$id" | "$JQ" -r .kmp`
-  curl -f -s "$URL_DOWNLOAD_FILE" -o "$ASSETS_KEYBOARD"
-
-  if [ $? -ne 0 ]; then
-      die "Downloading $ASSETS_KEYBOARD failed"
-  fi
-
-  # Default Model
-  id="nrc.en.mtnt"
-  echo "Downloading $id"
-  URL_DOWNLOAD_FILE=`curl -s "$URL_API_MODEL_VERSION/$id" | "$JQ" -r .kmp`
-  curl -f -s "$URL_DOWNLOAD_FILE" -o "$ASSETS_MODEL"
-
-  if [ $? -ne 0 ]; then
-      die "Downloading $ASSETS_MODEL failed"
-  fi
+  downloadPackages
 fi
 
 # Verify default keyboard and dictionary exist
