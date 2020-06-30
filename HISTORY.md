@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.103 alpha 2020-06-30
+
+* fix(common/core/web): fixes transcription buffer cap (#3301)
+
 ## 14.0.102 alpha 2020-06-29
 
 * fix(android): Use tier to determine keyboard search host (#3296)
