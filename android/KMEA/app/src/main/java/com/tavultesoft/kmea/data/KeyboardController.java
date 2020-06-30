@@ -67,7 +67,7 @@ public class KeyboardController {
           list = KMManager.updateOldKeyboardsList(context, dat_list);
         } catch (Exception e) {
           KMLog.LogException(TAG, "Exception migrating installed_keyboards.dat", e);
-          list.add(Keyboard.DEFAULT_KEYBOARD);
+          list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else if (keyboards_json.exists()) {
         try {
@@ -86,12 +86,12 @@ public class KeyboardController {
           }
         } catch (Exception e) {
           KMLog.LogException(TAG, "Exception reading installed_keyboards.json", e);
-          list.add(Keyboard.DEFAULT_KEYBOARD);
+          list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else {
         // No installed keyboards lists
         // 3rd-party OEM may not have sil_euro_latin, so don't assign a default keyboard
-        //list.add(Keyboard.DEFAULT_KEYBOARD);
+        //list.add(Keyboard.getDefaultKeyboard(context));
         Log.w(TAG, "initialize with no default keyboard");
       }
 

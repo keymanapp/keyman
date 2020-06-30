@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.FileProviderUtils;
@@ -199,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (!installDefaultKeyboard) {
       if (!KMManager.keyboardExists(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
           KMManager.KMDefault_LanguageID)) {
-        KMManager.addKeyboard(this, Keyboard.DEFAULT_KEYBOARD);
+        KMManager.addKeyboard(this, Keyboard.getDefaultKeyboard(getApplicationContext()));
       }
       SharedPreferences.Editor editor = prefs.edit();
       editor.putBoolean(defaultKeyboardInstalled, true);
@@ -209,13 +210,13 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     // Add default dictionary
     boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
     if (!installDefaultDictionary) {
+      LexicalModel defaultLexicalModel = LexicalModel.getDefaultLexicalModel(context);
       HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
-      lexicalModelInfo.put(KMManager.KMKey_PackageID, KMManager.KMDefault_DictionaryPackageID);
-      lexicalModelInfo.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, KMManager.KMDefault_DictionaryModelID);
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, KMManager.KMDefault_DictionaryModelName);
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion,
-        KMManager.getLexicalModelPackageVersion(context, KMManager.KMDefault_DictionaryPackageID));
+      lexicalModelInfo.put(KMManager.KMKey_PackageID, defaultLexicalModel.getPackageID());
+      lexicalModelInfo.put(KMManager.KMKey_LanguageID, defaultLexicalModel.getLanguageID());
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, defaultLexicalModel.getLexicalModelID());
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, defaultLexicalModel.getLexicalModelName());
+      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, defaultLexicalModel.getVersion());
       /*
       // If welcome.htm exists, add custom help link
       welcomeFile = new File(KMManager.getLexicalModelsDir(), KMManager.KMDefault_DictionaryPackageID + File.separator + FileUtils.WELCOME_HTM);
