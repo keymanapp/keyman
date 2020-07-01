@@ -3,7 +3,7 @@
 
 # Set sensible script defaults:
 # set -e: Terminate script if a command returns an error
-#set -e
+set -e
 # set -u: Terminate script if an unset variable is used
 set -u
 # set -x: Debugging use, print each statement
@@ -36,10 +36,8 @@ display_usage ( ) {
 
 NO_DAEMON=false
 ONLY_DEBUG=false
-DO_DOWNLOAD=false
-
-export KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp"
-export MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/nrc.en.mtnt.model.kmp"
+DO_KEYBOARDS_DOWNLOAD=false
+DO_MODELS_DOWNLOAD=false
 
 # Parse args
 while [[ $# -gt 0 ]] ; do
@@ -52,7 +50,8 @@ while [[ $# -gt 0 ]] ; do
             ONLY_DEBUG=true
             ;;
         -download-resources)
-            DO_DOWNLOAD=true
+            DO_KEYBOARDS_DOWNLOAD=true
+            DO_MODELS_DOWNLOAD=true
             ;;
         -h|-?)
             display_usage
@@ -61,10 +60,25 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
+KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp"
+MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/nrc.en.mtnt.model.kmp"
+
+# Verify default keyboard and dictionary exist
+if [[ ! -f "$KEYBOARDS_TARGET" ]]; then
+  echo "$KEYBOARDS_TARGET doesn't exist. Will download the latest version"
+  DO_KEYBOARDS_DOWNLOAD=true
+fi
+
+if [[ ! -f "$MODELS_TARGET" ]]; then
+  echo "$MODELS_TARGET doesn't exist. Will download the latest version"
+  DO_MODELS_DOWNLOAD=true
+fi
+
 echo
 echo "NO_DAEMON: $NO_DAEMON"
 echo "ONLY_DEBUG: $ONLY_DEBUG"
-echo "DO_DOWNLOAD: $DO_DOWNLOAD"
+echo "DO_KEYBOARDS_DOWNLOAD: $DO_KEYBOARDS_DOWNLOAD"
+echo "DO_MODELS_DOWNLOAD: $DO_MODELS_DOWNLOAD"
 echo
 
 if [ "$NO_DAEMON" = true ]; then
@@ -73,18 +87,14 @@ else
   DAEMON_FLAG=
 fi
 
+
 # Download default keyboard and dictionary
-if [ $DO_DOWNLOAD = true ]; then
-  downloadPackages
+if [ $DO_KEYBOARDS_DOWNLOAD = true ]; then
+  downloadKeyboardPackage "$KEYBOARDS_TARGET"
 fi
 
-# Verify default keyboard and dictionary exist
-if [[ ! -f "$KEYBOARDS_TARGET" ]]; then
-  die "$KEYBOARDS_TARGET doesn't exist. Build with -download-resources"
-fi
-
-if [[ ! -f "$MODELS_TARGET" ]]; then
-  die "$MODELS_TARGET doesn't exist. Build with -download-resources"
+if [ $DO_MODELS_DOWNLOAD = true ]; then
+  downloadModelPackage "$MODELS_TARGET"
 fi
 
 if [ "$ONLY_DEBUG" = true ]; then

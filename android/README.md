@@ -65,11 +65,11 @@ To validate your configuration, from the `android/` folder run `sentry-cli info`
  
 ### Compiling From Command Line
 1. Launch a command prompt and cd to the directory **keyman/android**
-2. Run the top level build script `./build.sh -debug -download-resources` which will:
+2. Run the top level build script `./build.sh -debug` which will:
     * Compile KMEA (and its KMW dependency)
-    * Download default keyboard and dictionary resources
+    * Download default keyboard and dictionary resources as needed
     * Compile KMAPro
-    * Note: If you've already downloaded resources before, you can skip the `-download-resources` flag.
+    * Note: to force an update to the latest keyboard and dictionary packages, use the `-download-resources` flag.
 
 3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
 
