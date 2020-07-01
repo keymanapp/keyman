@@ -45,23 +45,41 @@ unit UfrmRunDesktop;  // I3306   // I4099
 interface
 
 uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.Classes,
+  System.SysUtils,
   System.UITypes,
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, jpeg, ExtCtrls, StdCtrls, ComCtrls, RunTools,
-  UfrmDownloadProgress, Vcl.Imaging.pngimage;
+  System.Variants,
+  Vcl.ComCtrls,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.Imaging.jpeg,
+  Vcl.Imaging.pngimage,
+  Vcl.StdCtrls,
+
+  Keyman.Setup.System.InstallInfo,
+  RunTools,
+  UfrmDownloadProgress, Vcl.CheckLst;
 
 type
   TfrmRunDesktop = class(TForm)
     imgTitle: TImage;
     panContent: TPanel;
     lblLicense: TLabel;
-    lblOptions: TLabel;
-    lblStatus: TLabel;
     lblFree: TLabel;
+    panBottom: TPanel;
+    lblOptions: TLabel;
+    progress: TProgressBar;
+    lblStatus: TLabel;
+    panAction: TPanel;
     cmdInstall: TButton;
     cmdExit: TButton;
-    progress: TProgressBar;
-    memoPackages: TMemo;
+    panText: TPanel;
+    lblActions: TLabel;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -75,7 +93,6 @@ type
     g_iCurPos, g_iProgress, g_iProgressTotal: Integer;
     g_bCancelInstall, g_bScriptInProgress, g_bForwardProgress, g_bFirstTime, g_bEnableActionData: Boolean;
     StatusMax: Integer;
-    FOfflineByRequest: Boolean;
     FContinueSetup: Boolean;
     FRunUpgrade6: Boolean;
     FRunUpgrade7: Boolean;
@@ -88,28 +105,25 @@ type
     FCanUpgrade9: Boolean;
     FCanUpgrade10: Boolean;
     FCheckForUpdates: Boolean;
-    FCheckForUpdatesInstall: Boolean;
     FStartAfterInstall: Boolean;
     FStartWithWindows: Boolean;
     FAutomaticallyReportUsage: Boolean;
-    FDisableUpgradeFrom6Or7Or8: Boolean;  // I2847   // I4293
-    procedure SetOfflineByRequest(const Value: Boolean);
-    procedure Rewrap;
+    FDisableUpgradeFrom6Or7Or8: Boolean;
     procedure CheckVersion6Upgrade;
     procedure CheckVersion7Upgrade;
     procedure CheckVersion8Upgrade;   // I4293
     procedure CheckVersion9Upgrade;
     procedure CheckVersion10Upgrade;
-    procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
+    procedure WMUserFormShown(var Message: TMessage); message WM_USER;
     procedure Status(const Text: WideString = '');
     procedure SetupMSI;  // I2644
     procedure BackupKey(Root: HKEY; Path: WideString);  // I2642
     procedure GetDefaultSettings;
+    procedure FillActionText;
     { Private declarations }
   public
     procedure DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
     property ContinueSetup: Boolean read FContinueSetup write FContinueSetup;
-    property Offline: Boolean read FOfflineByRequest write SetOfflineByRequest;
     property StartAfterInstall: Boolean read FStartAfterInstall write FStartAfterInstall;  // I2738
     property DisableUpgradeFrom6Or7Or8: Boolean read FDisableUpgradeFrom6Or7Or8 write FDisableUpgradeFrom6Or7Or8; // I2847   // I4293
   end;
@@ -130,6 +144,7 @@ uses
   ErrorControlledRegistry,
   UfrmHTML,
   UfrmInstallOptions,
+  versioninfo,
   RegistryKeys;
 
 {$R *.dfm}
@@ -152,7 +167,7 @@ end;
 
 procedure TfrmRunDesktop.cmdInstallClick(Sender: TObject);
 begin
-  DoInstall(False, False, True);  // I3355   // I3500
+  DoInstall(not FInstallInfo.ShouldInstallKeyman, False, True);  // I3355   // I3500
 end;
 
 function MsiUIHandler(pvContext: Pointer; iMessageType: UINT; szMessage: PWideChar): Integer; stdcall; // I2644
@@ -461,7 +476,7 @@ begin
   MsiSetExternalUIW(MSIUIHandler, INSTALLLOGMODE_PROGRESS, Self);
 end;
 
-procedure TfrmRunDesktop.DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
+procedure TfrmRunDesktop.DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);
 begin
   if FDisableUpgradeFrom6Or7Or8 then // I2847   // I4293
   begin
@@ -479,7 +494,6 @@ begin
   //InstallPackages; Exit;
   SetCursor(LoadCursor(0, IDC_WAIT));
   try
-    memoPackages.Enabled := False;
     cmdExit.Caption := FInstallInfo.Text(ssCancelButton); // I2644
     cmdInstall.Enabled := False;
     lblOptions.Enabled := False;
@@ -494,7 +508,7 @@ begin
 
     SetupMSI; // I2644
 
-    if GetRunTools.DoInstall(Handle, PackagesOnly, FCheckForUpdatesInstall, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
+    if GetRunTools.DoInstall(Handle, PackagesOnly, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
       FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FAutomaticallyReportUsage) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
@@ -502,7 +516,6 @@ begin
       ModalResult := mrOk;
     end;
   finally
-    memoPackages.Enabled := True;
     cmdExit.Caption := FInstallInfo.Text(ssExitButton); // I2644
     cmdExit.Visible := True;
     cmdInstall.Enabled := True;
@@ -516,17 +529,14 @@ end;
 
 procedure TfrmRunDesktop.FormCreate(Sender: TObject);
 var
-  i: Integer;
   oldHeight: Integer;
 begin
-
   FAutomaticallyReportUsage := True;
 
   Application.Title := FInstallInfo.Text(ssApplicationTitle);
   Caption := FInstallInfo.Text(ssTitle);
   cmdInstall.Caption := FInstallInfo.Text(ssInstallButton);
   cmdExit.Caption := FInstallInfo.Text(ssExitButton);
-  memoPackages.Text := FInstallInfo.Text(ssWelcome_Keyboards);
   lblLicense.Caption := FInstallInfo.Text(ssLicenseLink);
   lblOptions.Caption := FInstallInfo.Text(ssInstallOptionsLink);
   lblFree.Caption := FInstallInfo.Text(ssFreeCaption);
@@ -538,15 +548,6 @@ begin
     ClientHeight := ClientHeight - oldHeight + imgTitle.Height;
   end;
 
-  if FInstallInfo.Packages.Count > 0 then
-  begin
-    for i := 0 to FInstallInfo.Packages.Count - 1 do
-      memoPackages.Lines.Add('• '+FInstallInfo.Packages.ValueFromIndex[i]);
-    Rewrap;
-  end
-  else
-    memoPackages.Visible := False;
-
   CheckVersion6Upgrade;
   CheckVersion7Upgrade;
   CheckVersion8Upgrade;   // I4293
@@ -555,11 +556,51 @@ begin
 
   GetDefaultSettings;  // I2651
 
-  GetRunTools.CheckInternetConnectedState;
-  //FCheckForUpdates := GetRunTools.Online and not FOfflineByRequest;
+  FillActionText;
 end;
 
-procedure TfrmRunDesktop.FormKeyDown(Sender: TObject; var Key: Word; 
+procedure TfrmRunDesktop.FillActionText;
+var
+  s: string;
+  pack: TInstallInfoPackage;
+  FLocationType: TInstallInfoLocationType;
+  Found: Boolean;
+begin
+  Found := False;
+  s := '';
+  if FInstallInfo.ShouldInstallKeyman then // TODO: refactor with PackagesOnly parameter
+  begin
+  // TODO: i18n
+    FLocationType := FInstallInfo.BestMsi.LocationType;
+    s := s + '• Keyman Desktop '+FInstallInfo.BestMsi.Version+#13#10;
+    Found := True;
+  end
+  else
+    FLocationType := iilLocal;
+
+  for pack in FInstallInfo.Packages do
+    if pack.ShouldInstall then
+    begin
+      s := s + '• '+pack.GetBestLocation.Name.Trim+' '+pack.GetBestLocation.Version.Trim+#13#10;
+      if pack.GetBestLocation.LocationType = iilOnline then
+        FLocationType := iilOnline;
+      Found := True;
+    end;
+
+  cmdInstall.Enabled := Found;
+  // TODO: i18n
+  if not Found then
+    s := 'There is nothing to install.'
+  else if FLocationType = iilOnline then
+    s := 'Setup will download and install:'#13#10+s
+  else
+    s := 'Setup will install:'#13#10+s;
+
+  lblActions.Caption := s.Trim;
+  lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
+end;
+
+procedure TfrmRunDesktop.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState); // I2647
 begin
   if Key = Ord('R') then lblLicenseClick(Self)
@@ -570,28 +611,16 @@ end;
 
 procedure TfrmRunDesktop.FormShow(Sender: TObject);
 begin
-  PostMessage(Handle, WM_USER_FormShown, 0, 0);
-end;
-
-procedure TfrmRunDesktop.Rewrap;
-var
-  I: Integer;
-begin
-  I := 1;
-  while I < memoPackages.Lines.Count do
-  begin
-    // Use a while loop so that if edit triggers another wrap, we can catch it and still format the last line
-    if Copy(memoPackages.Lines[I], 1, 1) <> '•' then
-      memoPackages.Lines[I] := #13#10'   '+memoPackages.Lines[I];
-    Inc(I);
-  end;
+  PostMessage(Handle, WM_USER, 0, 0);
 end;
 
 procedure TfrmRunDesktop.lblLicenseClick(Sender: TObject);
 begin
   with TfrmHTML.Create(Self) do  // I2606
   try
-    ShowFile(ExtPath + FInstallInfo.LicenseFileName);  // I3476
+    Assert(FALSE, 'TODO: show linked in license content');
+    // TODO:
+//    ShowFile(ExtPath + FInstallInfo.LicenseFileName);  // I3476
     ShowModal;
   finally
     Free;
@@ -606,7 +635,6 @@ begin
     StartWithWindows := FStartWithWindows;
     StartAfterInstall := FStartAfterInstall;
     CheckForUpdates := FCheckForUpdates;
-    CheckForUpdatesInstall := FCheckForUpdatesInstall;
     UpgradeKeyman := FRunUpgrade6 or FRunUpgrade7 or FRunUpgrade8 or FRunUpgrade9 or FRunUpgrade10;   // I4293
     CanUpgradeKeyman := FCanUpgrade6 or FCanUpgrade7 or FCanUpgrade8 or FCanUpgrade9 or FCanUpgrade10;   // I4293
     if ShowModal = mrOk then
@@ -614,22 +642,16 @@ begin
       FStartWithWindows := StartWithWindows;
       FStartAfterInstall := StartAfterInstall;
       FCheckForUpdates := CheckForUpdates;
-      FCheckForUpdatesInstall := CheckForUpdatesInstall;
       FRunUpgrade6 := FCanUpgrade6 and UpgradeKeyman;
       FRunUpgrade7 := FCanUpgrade7 and UpgradeKeyman;
       FRunUpgrade8 := FCanUpgrade8 and UpgradeKeyman;
       FRunUpgrade9 := FCanUpgrade9 and UpgradeKeyman;   // I4293
       FRunUpgrade10 := FCanUpgrade10 and UpgradeKeyman;
+      FillActionText;
     end;
   finally
     Free;
   end;
-end;
-
-procedure TfrmRunDesktop.SetOfflineByRequest(const Value: Boolean);
-begin
-  FOfflineByRequest := Value;
-  FCheckForUpdatesInstall := GetRunTools.Online and not FOfflineByRequest;
 end;
 
 procedure TfrmRunDesktop.URLLabelMouseEnter(Sender: TObject);

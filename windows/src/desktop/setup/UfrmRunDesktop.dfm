@@ -1,10 +1,11 @@
 object frmRunDesktop: TfrmRunDesktop
   Left = 0
   Top = 0
+  ActiveControl = cmdInstall
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'ssTitle'
-  ClientHeight = 340
+  ClientHeight = 371
   ClientWidth = 699
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
@@ -603,35 +604,106 @@ object frmRunDesktop: TfrmRunDesktop
     Left = 0
     Top = 103
     Width = 699
-    Height = 237
-    Align = alBottom
+    Height = 208
+    Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = 107
-    ExplicitHeight = 230
-    object lblLicense: TLabel
-      Left = 239
-      Top = 44
-      Width = 85
-      Height = 18
-      Cursor = crHandPoint
-      Caption = 'ssLicenseLink'
-      Color = clBlue
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlue
-      Font.Height = -15
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-      Transparent = True
-      OnClick = lblLicenseClick
-      OnMouseEnter = URLLabelMouseEnter
-      OnMouseLeave = URLLabelMouseLeave
+    ExplicitHeight = 146
+    DesignSize = (
+      699
+      208)
+    object lblActions: TLabel
+      Left = 20
+      Top = 189
+      Width = 149
+      Height = 13
+      Anchors = [akLeft, akBottom]
+      Caption = 'Setup will download and install:'
     end
+    object panAction: TPanel
+      Left = 0
+      Top = 89
+      Width = 699
+      Height = 57
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 0
+      ExplicitTop = 228
+      object cmdInstall: TButton
+        Left = 200
+        Top = 14
+        Width = 298
+        Height = 40
+        Caption = 'ssInstallButton'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 2640557
+        Font.Height = -18
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        OnClick = cmdInstallClick
+      end
+    end
+    object panText: TPanel
+      Left = 0
+      Top = 0
+      Width = 699
+      Height = 89
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 1
+      object lblFree: TLabel
+        Left = 112
+        Top = 28
+        Width = 91
+        Height = 18
+        Caption = 'ssFreeCaption'
+        Color = clBlue
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -15
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentColor = False
+        ParentFont = False
+        Transparent = True
+      end
+      object lblLicense: TLabel
+        Left = 112
+        Top = 48
+        Width = 85
+        Height = 18
+        Cursor = crHandPoint
+        Caption = 'ssLicenseLink'
+        Color = clBlue
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -15
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentColor = False
+        ParentFont = False
+        Transparent = True
+        OnClick = lblLicenseClick
+        OnMouseEnter = URLLabelMouseEnter
+        OnMouseLeave = URLLabelMouseLeave
+      end
+    end
+  end
+  object panBottom: TPanel
+    Left = 0
+    Top = 311
+    Width = 699
+    Height = 60
+    Align = alBottom
+    BevelOuter = bvNone
+    ParentBackground = False
+    TabOrder = 1
+    ExplicitTop = 394
     object lblOptions: TLabel
-      Left = 24
-      Top = 184
+      Left = 20
+      Top = 24
       Width = 101
       Height = 18
       Cursor = crHandPoint
@@ -650,66 +722,27 @@ object frmRunDesktop: TfrmRunDesktop
       OnMouseLeave = URLLabelMouseLeave
     end
     object lblStatus: TLabel
-      Left = 239
-      Top = 165
-      Width = 3
+      Left = 247
+      Top = 9
+      Width = 122
       Height = 13
     end
-    object lblFree: TLabel
-      Left = 239
-      Top = 20
-      Width = 91
-      Height = 18
-      Caption = 'ssFreeCaption'
-      Color = clBlue
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clBlack
-      Font.Height = -15
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-      Transparent = True
-    end
-    object cmdInstall: TButton
-      Left = 239
-      Top = 101
-      Width = 298
-      Height = 40
-      Caption = 'ssInstallButton'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = 2640557
-      Font.Height = -18
-      Font.Name = 'Tahoma'
-      Font.Style = [fsBold]
-      ParentFont = False
+    object progress: TProgressBar
+      Left = 247
+      Top = 28
+      Width = 226
+      Height = 17
       TabOrder = 0
-      OnClick = cmdInstallClick
+      Visible = False
     end
     object cmdExit: TButton
-      Left = 606
-      Top = 183
+      Left = 622
+      Top = 19
       Width = 69
       Height = 25
       Caption = 'ssExitButton'
       TabOrder = 1
       OnClick = cmdExitClick
-    end
-    object progress: TProgressBar
-      Left = 239
-      Top = 184
-      Width = 226
-      Height = 17
-      TabOrder = 2
-      Visible = False
-    end
-    object memoPackages: TMemo
-      Left = 24
-      Top = 56
-      Width = 151
-      Height = 122
-      BorderStyle = bsNone
-      TabOrder = 3
     end
   end
 end

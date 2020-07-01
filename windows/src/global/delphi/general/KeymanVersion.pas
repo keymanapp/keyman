@@ -25,6 +25,8 @@ interface
 {$I KeymanVersionInfo.inc}
 
 const
+  SKeymanMinEvergreenVersion = '14.0'; // Major upgrades are always supported from this version on
+
   SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';
   SKeymanVersion110 = '11.0';

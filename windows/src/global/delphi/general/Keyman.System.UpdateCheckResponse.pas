@@ -18,6 +18,7 @@ type
     OldVersion, NewVersion: string;
     DownloadURL: string;
     SavePath: string;
+    FileName: string;
     DownloadSize: Integer;
     Install: Boolean;
   end;
@@ -33,12 +34,14 @@ type
     FErrorMessage: string;
     FCurrentVersion: string;
     FPackages: TUpdateCheckResponsePackages;
+    FFileName: string;
     function ParseKeyboards(nodes: TJSONObject): Boolean;
   public
     function Parse(const message: AnsiString; const app, currentVersion: string): Boolean;
 
     property CurrentVersion: string read FCurrentVersion;
     property NewVersion: string read FNewVersion;
+    property FileName: string read FFileName;
     property InstallURL: string read FInstallURL;
     property InstallSize: Int64 read FInstallSize;
     property ErrorMessage: string read FErrorMessage;
@@ -72,9 +75,10 @@ begin
   if doc.Values[app] is TJSONObject then
   begin
     node := doc.Values[app] as TJSONObject;
-    if CompareVersions(node.Values['version'].Value, FCurrentVersion) < 0 then
+    if CompareVersions(node.Values['version'].Value, FCurrentVersion) > 0 then
     begin
       FNewVersion := node.Values['version'].Value;
+      FFileName := node.Values['file'].Value;
       FInstallURL := node.Values['url'].Value;
       FInstallSize := (node.Values['size'] as TJSONNumber).AsInt64;
       FStatus := ucrsUpdateReady;
@@ -112,6 +116,7 @@ begin
     FPackages[i].NewVersion := node.Values['version'].Value;
     FPackages[i].DownloadSize := (node.Values['packageFileSize'] as TJSONNumber).AsInt64;
     FPackages[i].DownloadURL := node.Values['url'].Value;
+    FPackages[i].FileName := node.Values['packageFilename'].Value;
   end;
 
   Result := True;

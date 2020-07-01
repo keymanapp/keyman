@@ -34,7 +34,18 @@ uses
   KeymanPaths in '..\..\global\delphi\general\KeymanPaths.pas',
   SFX in '..\..\global\delphi\setup\SFX.pas',
   Keyman.System.UpdateCheckResponse in '..\..\global\delphi\general\Keyman.System.UpdateCheckResponse.pas',
-  Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas';
+  Keyman.System.UpgradeRegistryKeys in '..\..\global\delphi\general\Keyman.System.UpgradeRegistryKeys.pas',
+  Keyman.Setup.System.InstallInfo in 'Keyman.Setup.System.InstallInfo.pas',
+  Keyman.Setup.System.OnlineResourceCheck in 'Keyman.Setup.System.OnlineResourceCheck.pas',
+  PackageInfo in '..\..\global\delphi\general\PackageInfo.pas',
+  utilstr in '..\..\global\delphi\general\utilstr.pas',
+  utilfiletypes in '..\..\global\delphi\general\utilfiletypes.pas',
+  StockFileNames in '..\..\global\delphi\cust\StockFileNames.pas',
+  utildir in '..\..\global\delphi\general\utildir.pas',
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
+  kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
+  PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
+  Keyman.Setup.System.ResourceDownloader in 'Keyman.Setup.System.ResourceDownloader.pas';
 
 {$R icons.res}
 {$R version.res}
