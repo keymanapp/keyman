@@ -79,12 +79,12 @@ if [ $DO_DOWNLOAD = true ]; then
 fi
 
 # Verify default keyboard and dictionary exist
-if [[ ! -f "$ASSETS_KEYBOARD" ]]; then
-  die "$ASSETS_KEYBOARD doesn't exist. Build with -download-resources"
+if [[ ! -f "$KEYBOARDS_TARGET" ]]; then
+  die "$KEYBOARDS_TARGET doesn't exist. Build with -download-resources"
 fi
 
-if [[ ! -f "$ASSETS_MODEL" ]]; then
-  die "$ASSETS_MODEL doesn't exist. Build with -download-resources"
+if [[ ! -f "$MODELS_TARGET" ]]; then
+  die "$MODELS_TARGET doesn't exist. Build with -download-resources"
 fi
 
 if [ "$ONLY_DEBUG" = true ]; then
