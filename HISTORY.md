@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.104 alpha 2020-07-01
+
+* fix(android): Resize PackageActivity title text (#3297)
+
 ## 14.0.103 alpha 2020-06-30
 
 * fix(common/core/web): fixes transcription buffer cap (#3301)
