@@ -9,11 +9,7 @@ set -u
 # set -x: Debugging use, print each statement
 # set -x
 
-## START STANDARD BUILD SCRIPT INCLUDE
-# adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/./build-utils.sh"
-## END STANDARD BUILD SCRIPT INCLUDE
+# Assumption: parent script that sources this already has START STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
@@ -57,5 +53,5 @@ function downloadModelPackage() {
   local URL_DOWNLOAD_FILE=`curl -s "$URL_API_MODEL_VERSION/${id}" | "$JQ" -r .kmp`
   curl -f -s "$URL_DOWNLOAD_FILE" -o "$MODELS_TARGET" || {
       die "Downloading $MODELS_TARGET failed with error $?"
-  }  
+  }
 }

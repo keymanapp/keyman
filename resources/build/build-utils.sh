@@ -40,25 +40,12 @@ function findRepositoryRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
-
-    # Return if readonly vars already set
-    if [ -v KEYMAN_ROOT ]; then
-        return 0;
-    fi
-
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly KEYMAN_ROOT
 }
 
 function findVersion() {
-    # Return if readonly vars already set
-    if [[ -v VERSION ]] && [[ -v VERSION_MAJOR ]] && [[ -v VERSION_MINOR ]] && \
-       [[ -v VERSION_PATCH ]] && [[ -v VERSION_RELEASE ]] && [[ -v VERSION_WIN ]] && \
-       [[ -v VERSION_TAG ]]&& [[ -v VERSION_WITH_TAG ]] && [[ -v VERSION_ENVIRONMENT ]]; then
-         return 0;
-    fi
-
     local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
     VERSION=`cat $VERSION_MD | tr -d "[:space:]"`
     [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
