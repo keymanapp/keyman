@@ -127,21 +127,21 @@ public class CloudRepository {
 
   /**
    * Search the available lexical models list and see there's an associated model for a
-   * given language ID. Available models are from the cloud catalog and locally installed models
+   * given language ID. Available models are from the cloud catalog and locally installed models.
    * @param context Context
    * @param languageID String of the language ID to search
-   * @return boolean true if an associated lexical model exists
+   * @return LexicalModel of an associated lexical model. Null if no match found
    */
-  public boolean hasAssociatedLexicalModel(@NonNull Context context, String languageID) {
+  public LexicalModel getAssociatedLexicalModel(@NonNull Context context, String languageID) {
     if (memCachedDataset != null) {
       for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
         LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
         if (BCP47.languageEquals(lm.getLanguageID(), languageID)) {
-          return true;
+          return lm;
         }
       }
     }
-    return false;
+    return null;
   }
 
   // Should be called whenever a new language code starts being managed in order to help signal
