@@ -40,7 +40,6 @@ function findRepositoryRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
-
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly KEYMAN_ROOT

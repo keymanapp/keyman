@@ -6,6 +6,14 @@
 # KMEA - Keyman Engine Android
 # KMW  - Keyman Web
 
+# Set sensible script defaults:
+# set -e: Terminate script if a command returns an error
+set -e
+# set -u: Terminate script if an unset variable is used
+set -u
+# set -x: Debugging use, print each statement
+# set -x
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"

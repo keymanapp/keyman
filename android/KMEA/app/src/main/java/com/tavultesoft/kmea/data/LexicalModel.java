@@ -3,6 +3,7 @@
  */
 package com.tavultesoft.kmea.data;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -148,13 +149,18 @@ public class LexicalModel extends LanguageResource implements Serializable {
   }
 
   // default nrc.en.mtnt English dictionary
-  public static final LexicalModel DEFAULT_LEXICAL_MODEL = new LexicalModel(
-    KMManager.KMDefault_DictionaryPackageID,
-    KMManager.KMDefault_DictionaryModelID,
-    KMManager.KMDefault_DictionaryModelName,
-    KMManager.KMDefault_LanguageID,
-    KMManager.KMDefault_LanguageName,
-    KMManager.KMDefault_DictionaryVersion,
-    "", // help link
-    ""); // kmp link
+  public static final LexicalModel getDefaultLexicalModel(Context context) {
+    String version = KMManager.getLexicalModelPackageVersion(
+      context, KMManager.KMDefault_DictionaryPackageID);
+
+    return new LexicalModel(
+      KMManager.KMDefault_DictionaryPackageID,
+      KMManager.KMDefault_DictionaryModelID,
+      KMManager.KMDefault_DictionaryModelName,
+      KMManager.KMDefault_LanguageID,
+      KMManager.KMDefault_LanguageName,
+      version,
+      "", // help link
+      ""); // kmp link
+  }
 }

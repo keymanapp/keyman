@@ -31,6 +31,8 @@ public class KMManagerTest {
 
   @Before
   public void loadOldKeyboardsList() throws FileNotFoundException {
+    KMManager.initialize(ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
+
     File keyboards_dat = new File(TEST_RESOURCE_ROOT, OLD_KEYBOARDS_LIST);
     if (keyboards_dat == null || !keyboards_dat.exists()) {
       throw new FileNotFoundException();
@@ -179,7 +181,9 @@ public class KMManagerTest {
 
     // Verify first keyboard is now default keyboard
     Keyboard k = migratedList.get(0);
-    Assert.assertEquals(Keyboard.DEFAULT_KEYBOARD.getKey(), k.getKey());
+    Assert.assertEquals(KMManager.KMDefault_PackageID, k.getPackageID());
+    Assert.assertEquals(KMManager.KMDefault_KeyboardID, k.getKeyboardID());
+    Assert.assertEquals(KMManager.KMDefault_LanguageID, k.getLanguageID());
 
     // Verify last keyboard no longer sil_euro_latin
     k = migratedList.get(migratedKeyboardListSize-1);
