@@ -47,10 +47,26 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
         List<HashMap<String, String>> kbdMapList = KeyboardPickerActivity.getKeyboardsList(context);
         List<Keyboard> kbdList = new ArrayList<>(kbdMapList.size());
 
-        for(HashMap<String, String> kbdMap: kbdMapList) {
+        int kbdListSize = (kbdMapList != null) ? kbdMapList.size() : 1;
+        List<Keyboard> kbdList = new ArrayList<>(kbdListSize);
+
+        if (kbdMapList != null) {
+          for (HashMap<String, String> kbdMap : kbdMapList) {
+            kbdList.add(new Keyboard(kbdMap));
+          }
+        } else {
+          // Couldn't access keyboard list so just return default keyboard
+          HashMap<String, String> kbdMap = new HashMap<String, String>();
+          kbdMap.put(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
+          kbdMap.put(KMManager.KMKey_KeyboardID, KMManager.KMDefault_KeyboardID);
+          kbdMap.put(KMManager.KMKey_LanguageID, KMManager.KMDefault_LanguageID);
+          kbdMap.put(KMManager.KMKey_KeyboardName, KMManager.KMDefault_KeyboardName);
+          kbdMap.put(KMManager.KMKey_LanguageName, KMManager.KMDefault_LanguageName);
+          kbdMap.put(KMManager.KMKey_KeyboardVersion, KMManager.getLatestKeyboardFileVersion(
+            context, KMManager.KMDefault_UndefinedPackageID, KMManager.KMDefault_KeyboardID));
+          kbdMap.put(KMManager.KMKey_Font, KMManager.KMDefault_KeyboardFont);
           kbdList.add(new Keyboard(kbdMap));
         }
-
         return kbdList;
       }
     }, null);
