@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.105 alpha 2020-07-03
+
+* feat(android): Download default resources at build time (#3300)
+* fix(android/engine): Fix unbound variable in build script (#3308)
+
 ## 14.0.104 alpha 2020-07-01
 
 * fix(android): Resize PackageActivity title text (#3297)
