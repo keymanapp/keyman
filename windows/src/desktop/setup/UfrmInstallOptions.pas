@@ -245,7 +245,7 @@ begin
     begin
       case packLocation.LocationType of
         iilLocal:  Text := 'Install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version; // TODO: localize
-        iilOnline: Text := 'Download and install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'; // TODO: localize; fixup size string
+        iilOnline: Text := 'Download and install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version+' ('+FormatFileSize(packLocation.Size)+')'; // TODO: localize; fixup size string
       end;
 
       pan := TPanel.Create(Self);
