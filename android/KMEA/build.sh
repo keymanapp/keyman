@@ -63,6 +63,7 @@ DO_BUILD=true
 DO_COPY=true
 DO_TEST=true
 NO_DAEMON=false
+DEBUG_BUILD=false
 EMBED_BUILD=-embed
 KMW_PATH=
 
