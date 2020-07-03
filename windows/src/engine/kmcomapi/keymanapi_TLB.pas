@@ -12,10 +12,10 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 21/02/2018 8:54:26 PM from Type Library described below.
+// File generated on 3/07/2020 11:34:55 AM from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: C:\Projects\keyman\open\windows\src\engine\kmcomapi\kmcomapi (1)
+// Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
 // LIBID: {F16E2A9A-DA46-4EA3-BFF3-BA46B480C961}
 // LCID: 0
 // Helpfile:
@@ -496,6 +496,7 @@ type
     function GetKeyboardFromFile(const Filename: WideString): IKeymanKeyboardFile; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     procedure Apply; safecall;
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
     property Items[Index: OleVariant]: IKeymanKeyboardInstalled read Get_Items; default;
   end;
 
@@ -510,6 +511,7 @@ type
     function GetKeyboardFromFile(const Filename: WideString): IKeymanKeyboardFile; dispid 16;
     procedure Install(const Filename: WideString; Force: WordBool); dispid 17;
     procedure Apply; dispid 18;
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; dispid 501;
     function IndexOf(const ID: WideString): Integer; dispid 5;
     property Count: Integer readonly dispid 1;
     property _NewEnum: IUnknown readonly dispid -4;
@@ -670,6 +672,7 @@ type
     function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     function IndexOf(const ID: WideString): Integer; safecall;
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
     property Items[Index: OleVariant]: IKeymanPackageInstalled read Get_Items; default;
   end;
 
@@ -684,6 +687,7 @@ type
     function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; dispid 16;
     procedure Install(const Filename: WideString; Force: WordBool); dispid 17;
     function IndexOf(const ID: WideString): Integer; dispid 18;
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; dispid 402;
     property Count: Integer readonly dispid 1;
     property _NewEnum: IUnknown readonly dispid -4;
     procedure Refresh; dispid 2;
@@ -890,6 +894,7 @@ type
     ['{80959B80-C7A9-4EB1-AB46-3762F8E5315B}']
     procedure Install(Force: WordBool); safecall;
     function Get_Languages: IKeymanKeyboardLanguagesFile; safecall;
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
     property Languages: IKeymanKeyboardLanguagesFile read Get_Languages;
   end;
 
@@ -902,6 +907,7 @@ type
     ['{80959B80-C7A9-4EB1-AB46-3762F8E5315B}']
     procedure Install(Force: WordBool); dispid 256;
     property Languages: IKeymanKeyboardLanguagesFile readonly dispid 402;
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; dispid 403;
     property Bitmap: IPicture readonly dispid 1;
     property Copyright: WideString readonly dispid 2;
     property DefaultBCP47Languages: WideString readonly dispid 3;
@@ -1204,6 +1210,7 @@ type
   IKeymanPackageFile = interface(IKeymanPackage)
     ['{9B67EB6C-5288-4E28-943C-F2981208D64A}']
     procedure Install(Force: WordBool); safecall;
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
   end;
 
 // *********************************************************************//
@@ -1214,6 +1221,7 @@ type
   IKeymanPackageFileDisp = dispinterface
     ['{9B67EB6C-5288-4E28-943C-F2981208D64A}']
     procedure Install(Force: WordBool); dispid 256;
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; dispid 402;
     property Author: WideString readonly dispid 1;
     property AuthorEmail: WideString readonly dispid 2;
     property Copyright: WideString readonly dispid 3;

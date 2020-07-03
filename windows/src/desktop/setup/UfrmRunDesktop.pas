@@ -565,6 +565,8 @@ var
   pack: TInstallInfoPackage;
   FLocationType: TInstallInfoLocationType;
   Found: Boolean;
+  langname: string;
+  packLocation: TInstallInfoPackageFileLocation;
 begin
   Found := False;
   s := '';
@@ -579,14 +581,26 @@ begin
     FLocationType := iilLocal;
 
   for pack in FInstallInfo.Packages do
+  begin
     if pack.ShouldInstall then
     begin
-      s := s + '• '+pack.GetBestLocation.Name.Trim+' '+pack.GetBestLocation.Version.Trim+#13#10;
-      if pack.GetBestLocation.LocationType = iilOnline then
-        FLocationType := iilOnline;
-      Found := True;
+      packLocation := pack.GetBestLocation;
+      if Assigned(packLocation) then
+      begin
+        s := s + '• '+packLocation.Name.Trim+' '+packLocation.Version.Trim;
+        if pack.BCP47 <> '' then
+        begin
+          langname := packLocation.GetLanguageNameFromBCP47(pack.BCP47);
+          if langname <> '' then
+            s := s + ' for '+langname; // todo: localization
+        end;
+        s := s + #13#10;
+        if packLocation.LocationType = iilOnline then
+          FLocationType := iilOnline;
+        Found := True;
+      end;
     end;
-
+  end;
   cmdInstall.Enabled := Found;
   // TODO: i18n
   if not Found then

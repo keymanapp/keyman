@@ -46,6 +46,7 @@ type
     sbTargets: TScrollBox;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
@@ -182,6 +183,7 @@ var
   pan: TPanel;
   n: Integer;
   Text: string;
+  selectedLang, lang: TInstallInfoPackageLanguage;
 begin
   pt.x := 0;
   pt.y := 0;
@@ -272,12 +274,26 @@ begin
       cb.Width := pan.ClientWidth div 3;
       cb.Style := csDropDownList;
       cb.OnClick := cbInstallKeyboardClick;
+      cb.Hint := 'Select the language that you wish to associate with '+Text+' keyboard'; // TODO: Localize
+      cb.ShowHint := True;
 
       pan.InsertControl(chk);
       pan.InsertControl(cb);
 
-      // TODO: add the languages here
-      cb.Items.Add('Language X');
+      selectedLang := nil;
+      for lang in packLocation.Languages do
+      begin
+        cb.Items.AddObject(lang.Name + ' ('+lang.BCP47+')', lang);
+        if SameText(pack.BCP47, lang.BCP47) then selectedLang := lang;
+      end;
+
+      if cb.Items.Count = 0 then
+        cb.Items.AddObject('Default language', nil); // TODO: Localize
+
+      cb.Sorted := True;
+      cb.ItemIndex := cb.Items.IndexOfObject(selectedLang);
+      if cb.ItemIndex < 0 then
+        cb.ItemIndex := 0;
 
       Inc(pt.Y, pan.Height - 2);
 
@@ -289,6 +305,7 @@ begin
       Inc(n);
     end;
   end;
+  EnableControls;
 end;
 
 procedure TfrmInstallOptions.cmdOKClick(Sender: TObject);
@@ -301,7 +318,12 @@ begin
     if pack.IsValid then
     begin
       pack.Package.ShouldInstall := pack.CheckBox.Checked;
-      //TODO: pack.Location.SelectedLanguage := pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex];
+      if (pack.ComboBox.ItemIndex < 0) or
+          not Assigned(pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex])
+        then pack.Package.BCP47 := ''
+        else pack.Package.BCP47 := (
+          pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex]
+          as TInstallInfoPackageLanguage).BCP47;
     end;
 
   ModalResult := mrOk;
@@ -332,7 +354,7 @@ begin
   begin
     if FPackages[i].IsValid then
     begin
-      FPackages[i].ComboBox.Enabled := FPackages[i].CheckBox.Checked and (FPackages[i].ComboBox.Items.Count > 1);
+      FPackages[i].ComboBox.Enabled := FPackages[i].CheckBox.Checked;
       e := e or FPackages[i].CheckBox.Checked;
     end;
   end;

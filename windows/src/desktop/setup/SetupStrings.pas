@@ -103,7 +103,7 @@ const
   {ssInstallOptionsLink}                      'Install &options',
 
   {ssOkButton}                                'OK',
-  {ssInstallButton}                           '&Install $APPNAME',
+  {ssInstallButton}                           '&Install',
   {ssCancelButton}                            'Cancel',
   {ssExitButton}                              'E&xit',
 

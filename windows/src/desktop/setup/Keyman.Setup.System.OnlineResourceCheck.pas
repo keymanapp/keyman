@@ -17,6 +17,7 @@ uses
   httpuploader,
   Keyman.System.UpdateCheckResponse,
   KeymanVersion,
+  PackageInfo,
   Upload_Settings,
   versioninfo;
 
@@ -29,8 +30,10 @@ var
   location: TInstallInfoFileLocation;
   packLocation: TInstallInfoPackageFileLocation;
   currentVersion: string;
+  lang: TUpdateCheckResponseLanguage;
+  iipl: TInstallInfoPackageLanguage;
 begin
-  currentVersion := AInstallInfo.MsiLocations.LatestVersion(SKeymanMinEvergreenVersion);
+  currentVersion := AInstallInfo.MsiLocations.LatestVersion(SKeymanVersion_Min_Evergreen);
 
   http := THTTPUploader.Create(nil);
   try
@@ -70,7 +73,12 @@ begin
           packLocation.URL := ucrpack.DownloadURL;
           packLocation.Version := ucrpack.NewVersion;
           packLocation.Size := ucrpack.DownloadSize;
-          // TODO: packLocation.Languages.Assign(pack.Languages);
+
+          for lang in ucrpack.Languages do
+          begin
+            iipl := TInstallInfoPackageLanguage.Create(lang.ID, lang.displayName);
+            packLocation.Languages.Add(iipl);
+          end;
         end;
       end;
 

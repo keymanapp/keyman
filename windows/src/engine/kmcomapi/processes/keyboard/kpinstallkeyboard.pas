@@ -52,7 +52,7 @@ uses
   kpbase;
 
 type
-  TKPInstallKeyboardOptions = set of (ikPartOfPackage);
+  TKPInstallKeyboardOptions = set of (ikPartOfPackage, ikInstallDefaultLanguage);
 
   TKPInstallKeyboard = class(TKPBase)
     procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
@@ -239,25 +239,28 @@ begin
         //
         if Assigned(Languages) and (Languages.Count > 0) then
         begin
-          // Use language data from package to install; we only install
-          // the first language now and add the rest to the registry for
-          // future addition by the user
-
-          FLanguageInstalled := False;
-          for i := 0 to Languages.Count - 1 do
+          if ikInstallDefaultLanguage in FInstallOptions then
           begin
-            FLanguageInstalled := RegisterLanguageProfile(Languages[i].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[i].Name);
-            if FLanguageInstalled then
-              Break;
-          end;
+            // Use language data from package to install; we only install
+            // the first language now and add the rest to the registry for
+            // future addition by the user
 
-          if not FLanguageInstalled then
-          begin
-            // All languages failed to install, so add to the default language.
-            // This is most likely to happen on Win7 where custom BCP 47 tags
-            // are not allowed
-            AddLanguage(HKLToLanguageID(FDefaultHKL));
-            RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+            FLanguageInstalled := False;
+            for i := 0 to Languages.Count - 1 do
+            begin
+              FLanguageInstalled := RegisterLanguageProfile(Languages[i].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[i].Name);
+              if FLanguageInstalled then
+                Break;
+            end;
+
+            if not FLanguageInstalled then
+            begin
+              // All languages failed to install, so add to the default language.
+              // This is most likely to happen on Win7 where custom BCP 47 tags
+              // are not allowed
+              AddLanguage(HKLToLanguageID(FDefaultHKL));
+              RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+            end;
           end;
 
           // Save the list of preferred languages for the keyboard, to the registry, for future installation.
@@ -303,8 +306,11 @@ begin
           if Length(FLanguages) = 0 then
             AddLanguage(HKLToLanguageID(FDefaultHKL));
 
-          // Registers only the first language
-          RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+          if ikInstallDefaultLanguage in FInstallOptions then
+          begin
+            // Registers only the first language
+            RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
+          end;
 
           // Save the list of preferred languages for the keyboard, translated to BCP47 tags
           // to the registry, for future installation.

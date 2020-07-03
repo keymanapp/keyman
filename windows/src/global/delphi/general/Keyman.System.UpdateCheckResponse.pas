@@ -11,6 +11,13 @@ type
 
   TUpdateCheckResponseStatus = (ucrsNoUpdate, ucrsUpdateReady);
 
+  TUpdateCheckResponseLanguage = record
+    ID: string;
+    displayName: string;
+  end;
+
+  TUpdateCheckResponseLanguages = TArray<TUpdateCheckResponseLanguage>;
+
   TUpdateCheckResponsePackage = record
     ID: string;
     NewID: string;
@@ -21,6 +28,7 @@ type
     FileName: string;
     DownloadSize: Integer;
     Install: Boolean;
+    Languages: TUpdateCheckResponseLanguages;
   end;
 
   TUpdateCheckResponsePackages = TArray<TUpdateCheckResponsePackage>;
@@ -36,6 +44,7 @@ type
     FPackages: TUpdateCheckResponsePackages;
     FFileName: string;
     function ParseKeyboards(nodes: TJSONObject): Boolean;
+    function ParseLanguages(i: Integer; v: TJSONValue): Boolean;
   public
     function Parse(const message: AnsiString; const app, currentVersion: string): Boolean;
 
@@ -117,8 +126,31 @@ begin
     FPackages[i].DownloadSize := (node.Values['packageFileSize'] as TJSONNumber).AsInt64;
     FPackages[i].DownloadURL := node.Values['url'].Value;
     FPackages[i].FileName := node.Values['packageFilename'].Value;
+    if not ParseLanguages(i, node.Values['languages']) then
+      Exit(False);
   end;
 
+  Result := True;
+end;
+
+function TUpdateCheckResponse.ParseLanguages(i: Integer; v: TJSONValue): Boolean;
+var
+  nodes, node: TJSONObject;
+  pair: TJSONPair;
+  j: Integer;
+begin
+  if not Assigned(v) then
+    Exit(True);
+
+  nodes := v.AsType<TJSONObject>;
+  SetLength(FPackages[i].Languages, nodes.Count);
+  for j := 0 to nodes.Count - 1 do
+  begin
+    pair := nodes.Pairs[j];
+    node := pair.JsonValue as TJSONObject;
+    FPackages[i].Languages[j].ID := pair.JsonString.Value;
+    FPackages[i].Languages[j].displayName := node.Values['displayName'].Value;
+  end;
   Result := True;
 end;
 

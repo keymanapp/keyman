@@ -135,6 +135,7 @@ uses
   Keyman.Setup.System.ResourceDownloader,
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
+  KeymanVersion,
   OnlineConstants,
   RegistryHelpers,
   RegistryKeys,
@@ -569,6 +570,7 @@ var
   FKMShellPath: WideString;
   FExitCode: Cardinal;
   msiLocation: TInstallInfoFileLocation;
+  FKMShellVersion: string;
 begin
   //if FInstallInfo.Packages.Count = 0 then Exit;  I879
 
@@ -580,6 +582,8 @@ begin
     RunVersion8Upgrade(FKMShellPath);  // I4293
     RunVersion9Upgrade(FKMShellPath);
     RunVersion10Upgrade(FKMShellPath);
+
+    FKMShellVersion := GetFileVersionString(FKMShellPath);
 
     { Install packages for all users }
     s := '-nowelcome -s -i '; //"'+ExtPath+'" ';
@@ -600,7 +604,13 @@ begin
               //Assert(FALSE, 'TODO: implement download of this resource');
             end;
 
-          s := s + '"'+packLocation.Path+'" ';  // I3476
+          // Need to check kmshell version >= 14.0 for support for non-default
+          // language installation; if installing into an older version, then
+          // the default language for the keyboard will be installed and the
+          // user's language selection will be ignored (sadface).
+          if CompareVersions(SKeymanVersion_Min_SpecifyLanguage, FKMShellVersion) >= 0
+            then s := s + '"'+packLocation.Path+'='+pack.BCP47+'" '
+            else s := s + '"'+packLocation.Path+'" ';  // I3476
         end;
       end;
     end;

@@ -191,7 +191,7 @@ begin
   end;
 end;
 
-function Init(var FMode: TKMShellMode; KeyboardFileNames: TWideStrings; var FSilent, FForce, FNoWelcome: Boolean;
+function Init(var FMode: TKMShellMode; KeyboardFileNames: TStrings; var FSilent, FForce, FNoWelcome: Boolean;
   var FLogFile, FQuery: string; var FDisablePackages: string; var FStartWithConfiguration: Boolean; var FParentWindow: THandle): Boolean;
 var
   s: string;
@@ -289,12 +289,12 @@ begin
   RegisterClasses([TImage, TCheckBox, TLabel, TButton, TPanel, TGroupBox, TPageControl, TTabSheet]);
 end;
 
-procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean;
+procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
   FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean; FParentWindow: THandle); forward;
 
 procedure Run;
 var
-  KeyboardFileNames: TWideStrings;
+  KeyboardFileNames: TStrings;
   FQuery: string;
   FSilent: Boolean;
   FNoWelcome: Boolean;
@@ -317,7 +317,7 @@ begin
     Free;
   end;
 
-  KeyboardFileNames := TWideStringList.Create;
+  KeyboardFileNames := TStringList.Create;
   try
     FParentWindow := 0;
     if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration, FParentWindow) then
@@ -337,7 +337,7 @@ begin
   end;
 end;
 
-procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TWideStrings; FSilent, FForce, FNoWelcome: Boolean;
+procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
   FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean; FParentWindow: THandle);
 var
   FIcon: string;

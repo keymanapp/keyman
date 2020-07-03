@@ -102,7 +102,7 @@ begin
         Result := True;
       end
       else
-        // TODO: Deal with recursive dependency
+        // TODO: Deal with circular dependency
         GetRunTools.LogError(FInstallInfo.Text(ssErrorDownloadingUpdate, [Response.StatusCode]));
     finally
       Free;
@@ -110,7 +110,7 @@ begin
   except
     on E:EHTTPUploader do
     begin
-      // TODO: Deal with recursive dependency
+      // TODO: Deal with circular dependency
       if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
         then GetRunTools.LogError(FInstallInfo.Text(ssErrorUnableToContactServer))
         else GetRunTools.LogError(FInstallInfo.Text(ssErrorUnableToContactServerDetailed, [E.Message]));

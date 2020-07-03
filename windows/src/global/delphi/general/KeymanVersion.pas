@@ -25,8 +25,7 @@ interface
 {$I KeymanVersionInfo.inc}
 
 const
-  SKeymanMinEvergreenVersion = '14.0'; // Major upgrades are always supported from this version on
-
+  SKeymanVersion140 = '14.0';
   SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';
   SKeymanVersion110 = '11.0';
@@ -42,6 +41,20 @@ const
   SKeymanKeyboardVersion = SKeymanVersion100;
 
   SKeymanInstallerComponentCode = '{C289B903-7EE8-49C7-B186-BE98259EC540}';
+
+  //
+  // Minimum Keyman versions for specific features
+  //
+
+  // Evergreen: major upgrades will be offered through online update; the
+  // upgrade policy for Keyman will become more enthusiastic over time.
+  SKeymanVersion_Min_Evergreen       = '14.0';
+
+  // When the user specifies a language through the bootstrap installer
+  // (for example, by choosing it in Install Options, or having it provided
+  // via filename or parameter), then this option will only be applied if
+  // the installed Keyman version is this version or later.
+  SKeymanVersion_Min_SpecifyLanguage = '14.0.104';
 
 const
   SKeymanDeveloperName = 'Keyman Developer';

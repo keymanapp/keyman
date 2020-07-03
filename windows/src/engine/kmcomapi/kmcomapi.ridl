@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 21/02/2018 8:54:28 PM (- $Rev: 12980 $, 726708000).
+// File generated on 3/07/2020 11:34:56 AM (- $Rev: 12980 $, 591307750).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -337,6 +337,8 @@ library keymanapi
     HRESULT _stdcall Install([in] BSTR Filename, [in] VARIANT_BOOL Force);
     [id(0x00000012)]
     HRESULT _stdcall Apply(void);
+    [id(0x000001F5)]
+    HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
   };
 
   [
@@ -431,6 +433,8 @@ library keymanapi
     HRESULT _stdcall Install([in] BSTR Filename, [in] VARIANT_BOOL Force);
     [id(0x00000012)]
     HRESULT _stdcall IndexOf([in] BSTR ID, [out, retval] long* Index);
+    [id(0x00000192)]
+    HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanPackageInstalled** PackageResult);
   };
 
   [
@@ -582,6 +586,8 @@ library keymanapi
     HRESULT _stdcall Install([in] VARIANT_BOOL Force);
     [propget, id(0x00000192)]
     HRESULT _stdcall Languages([out, retval] IKeymanKeyboardLanguagesFile** Value);
+    [id(0x00000193)]
+    HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
   };
 
   [
@@ -763,6 +769,8 @@ library keymanapi
   {
     [id(0x00000100)]
     HRESULT _stdcall Install([in] VARIANT_BOOL Force);
+    [id(0x00000192)]
+    HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanPackageInstalled** PackageResult);
   };
 
   [

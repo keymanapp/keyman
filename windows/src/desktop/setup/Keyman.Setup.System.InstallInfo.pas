@@ -15,8 +15,6 @@ type
 
   TMSIInfo = record
     Version, ProductCode: string;
-//    Filename: string;
-//    InstallSize: Integer;  // I1917
   end;
 
   TInstallInfoLocationType = (iilLocal, iilOnline);
@@ -67,6 +65,7 @@ type
     constructor Create(ALocationType: TInstallInfoLocationType); override;
     destructor Destroy; override;
     function GetNameOrID(const id: string): string;
+    function GetLanguageNameFromBCP47(const bcp47: string): string;
     property Name: string read FName write FName;
     property Languages: TInstallInfoPackageLanguages read FLanguages;
     property LocalPackage: TPackage read FLocalPackage;
@@ -81,7 +80,6 @@ type
   private
     FID: string;
     FBCP47: string;
-//    FSelectedLanguage: TInstallInfoPackageLanguage;
     FLocations: TInstallInfoPackageFileLocations;
     FShouldInstall: Boolean;
   public
@@ -92,7 +90,6 @@ type
     property BCP47: string read FBCP47 write FBCP47;
     property ShouldInstall: Boolean read FShouldInstall write FShouldInstall;
     property Locations: TInstallInfoPackageFileLocations read FLocations;
-//    property SelectedLanguage: TInstallInfoPackageLanguage read FSelectedLanguage write FSelectedLanguage;
   end;
 
   TInstallInfoPackages = class(TObjectList<TInstallInfoPackage>)
@@ -102,12 +99,9 @@ type
   TInstallInfo = class
   private
     FAppName: WideString;
-//    FMSIFileName: WideString;
     FMSIOptions: string;  // I3126
-//    FVersion: WideString;
     FPackages: TInstallInfoPackages;
     FStrings: TStrings;
-//    FLicenseFileName: WideString;  // I2562
     FTitleImageFilename: string;
     FStartDisabled: Boolean;
     FStartWithConfiguration: Boolean;
@@ -147,11 +141,8 @@ type
     property IsInstalled: Boolean read FIsInstalled;
     property IsNewerAvailable: Boolean read FIsNewerAvailable;
 
-//    property MSIFileName: WideString read FMSIFileName;
     property MSIOptions: string read FMSIOptions;  // I3126
-//    property Version: WideString read FVersion write FVersion;
     property Packages: TInstallInfoPackages read FPackages;
-//    property LicenseFileName: WideString read FLicenseFileName;  // I2562
     property TitleImageFilename: string read FTitleImageFilename;
     property StartDisabled: Boolean read FStartDisabled;
     property StartWithConfiguration: Boolean read FStartWithConfiguration;
@@ -297,10 +288,10 @@ begin
     if (FVersion = '') then
       raise EInstallInfo.Create('setup.inf is corrupt (code 1).  Setup cannot continue.');
 
-    if System.SysUtils.FileExists(SetupInfPath + FMSIFileName) then  // I3476
+    if System.SysUtils.FileExists(FMSIFileName) then  // I3476
     begin
       location := TInstallInfoFileLocation.Create(iilLocal);
-      location.Path := SetupInfPath + FMSIFileName;
+      location.Path := FMSIFileName;
       location.Version := FVersion;
       FMsiLocations.Add(location);
     end;
@@ -358,6 +349,8 @@ var
   id, p: string;
   pack: TInstallInfoPackage;
   packLocation: TInstallInfoPackageFileLocation;
+  lang: TPackageKeyboardLanguage;
+  iipl: TInstallInfoPackageLanguage;
 begin
   p := IncludeTrailingPathDelimiter(path);
   if FindFirst(p+'*.kmp', 0, f) = 0 then  // TODO: fix constant
@@ -367,7 +360,7 @@ begin
       begin
         packLocation := TInstallInfoPackageFileLocation.Create(iilLocal);
         if GetPackageMetadata(p + f.Name, packLocation.LocalPackage) then
-        begin //TODO:, Languages);
+        begin
           id := ChangeFileExt(f.Name, '').ToLower;
 
           pack := FPackages.FindById(id, True);
@@ -375,6 +368,18 @@ begin
           packLocation.Name := packLocation.LocalPackage.Info.Desc[PackageInfo_Name];
           packLocation.Version := packLocation.LocalPackage.Info.Desc[PackageInfo_Version];
           packLocation.Path := p + f.Name;
+
+          if packLocation.LocalPackage.Keyboards.Count = 1 then
+          begin
+            // We only populate the language list if there is a single keyboard
+            // in the package. Otherwise, we let Keyman install default lang
+            // for each keyboard in the package.
+            for lang in packLocation.LocalPackage.Keyboards[0].Languages do
+            begin
+              iipl := TInstallInfoPackageLanguage.Create(lang.ID, lang.Name);
+              packLocation.Languages.Add(iipl);
+            end;
+          end;
           pack.Locations.Add(packLocation);
         end
         else
@@ -386,16 +391,11 @@ begin
 end;
 
 function TInstallInfo.GetPackageMetadata(const KmpFilename: string; p: TPackage): Boolean;
-//TODO: language metadata
 var
   zip: TZipFile;
   ms: TStream;
   h: TZipHeader;
 begin
-  // TODO: we need the version and description from metadata here
-  // Alternative, we don't try and get name and version from the .kmp
-  // as it adds a burden to the installer; instead we just query the
-  // server...
   try
     zip := TZipFile.Create;
     try
@@ -580,6 +580,17 @@ begin
   FreeAndNil(FLanguages);
   FreeAndNil(FLocalPackage);
   inherited Destroy;
+end;
+
+function TInstallInfoPackageFileLocation.GetLanguageNameFromBCP47(
+  const bcp47: string): string;
+var
+  lang: TInstallInfoPackageLanguage;
+begin
+  Result := '';
+  for lang in FLanguages do
+    if SameText(lang.BCP47, bcp47) then
+      Exit(lang.Name);
 end;
 
 function TInstallInfoPackageFileLocation.GetNameOrID(const id: string): string;
