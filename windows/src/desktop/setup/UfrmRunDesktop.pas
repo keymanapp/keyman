@@ -567,14 +567,21 @@ var
   Found: Boolean;
   langname: string;
   packLocation: TInstallInfoPackageFileLocation;
+  downloadSize: string;
 begin
   Found := False;
   s := '';
   if FInstallInfo.ShouldInstallKeyman then // TODO: refactor with PackagesOnly parameter
   begin
-  // TODO: i18n
     FLocationType := FInstallInfo.BestMsi.LocationType;
-    s := s + '• Keyman Desktop '+FInstallInfo.BestMsi.Version+#13#10;
+
+    if FLocationType = iilOnline
+      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')' // TODO: localize?
+      else downloadSize := '';
+
+    s := s + Format(Char($2022)+' %0:s %1:s %2:s'#13#10,
+      ['Keyman Desktop', FInstallInfo.BestMsi.Version, downloadSize]);
+
     Found := True;
   end
   else
@@ -587,14 +594,20 @@ begin
       packLocation := pack.GetBestLocation;
       if Assigned(packLocation) then
       begin
-        s := s + '• '+packLocation.Name.Trim+' '+packLocation.Version.Trim;
-        if pack.BCP47 <> '' then
-        begin
-          langname := packLocation.GetLanguageNameFromBCP47(pack.BCP47);
-          if langname <> '' then
-            s := s + ' for '+langname; // todo: localization
-        end;
+        if pack.BCP47 <> ''
+          then langname := packLocation.GetLanguageNameFromBCP47(pack.BCP47)
+          else langname := '';
+
+        if packLocation.LocationType = iilOnline
+          then downloadSize := '('+FormatFileSize(packLocation.Size)+')' // TODO: localize?
+          else downloadSize := '';
+
+        if langname <> ''
+          then s := s + Format(Char($2022)+' %0:s %1:s for %2:s %3:s', [packLocation.Name.Trim, packLocation.Version.Trim, langname, downloadSize]) // TODO: localize
+          else s := s + Format(Char($2022)+' %0:s %1:s %2:s', [packLocation.Name.Trim, packLocation.Version.Trim, downloadSize]); // TODO: localize
+
         s := s + #13#10;
+
         if packLocation.LocationType = iilOnline then
           FLocationType := iilOnline;
         Found := True;

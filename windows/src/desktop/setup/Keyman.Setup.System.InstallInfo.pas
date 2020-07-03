@@ -166,9 +166,10 @@ uses
 
 { TInstallInfo }
 
-constructor TInstallInfo.Create;
+constructor TInstallInfo.Create(const ATempPath: string);
 begin
   inherited Create;
+  FTempPath := ATempPath;
   FAppName := SKeymanDesktopName;
   FMsiLocations := TInstallInfoFileLocations.Create;
   FPackages := TInstallInfoPackages.Create;

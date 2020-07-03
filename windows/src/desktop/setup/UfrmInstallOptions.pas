@@ -47,6 +47,7 @@ type
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
@@ -193,12 +194,12 @@ begin
     if not FInstallInfo.IsInstalled then
       case FInstallInfo.BestMsi.LocationType of
         iilLocal:  Text := 'Install Keyman Desktop '+FInstallInfo.BestMsi.Version;
-        iilOnline: Text := 'Download and install Keyman Desktop '+FInstallInfo.BestMsi.Version+' ('+IntToStr(FInstallInfo.BestMsi.Size div 1024 div 1024)+' MB)';
+        iilOnline: Text := 'Download and install Keyman Desktop '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
       end
     else
       case FInstallInfo.BestMsi.LocationType of
         iilLocal:  Text := 'Upgrade Keyman Desktop '+FInstallInfo.BestMsi.Version;
-        iilOnline: Text := 'Download and upgrade Keyman Desktop to '+FInstallInfo.BestMsi.Version+' ('+IntToStr(FInstallInfo.BestMsi.Size div 1024 div 1024)+' MB)';
+        iilOnline: Text := 'Download and upgrade Keyman Desktop to '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
       end;
   end
   else if FInstallInfo.IsInstalled then
@@ -244,7 +245,7 @@ begin
     begin
       case packLocation.LocationType of
         iilLocal:  Text := 'Install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version; // TODO: localize
-        iilOnline: Text := 'Download and install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version+' ('+IntToStr(packLocation.Size div 1024 div 1024)+' MB)'; // TODO: localize; fixup size string
+        iilOnline: Text := 'Download and install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'; // TODO: localize; fixup size string
       end;
 
       pan := TPanel.Create(Self);
@@ -274,7 +275,7 @@ begin
       cb.Width := pan.ClientWidth div 3;
       cb.Style := csDropDownList;
       cb.OnClick := cbInstallKeyboardClick;
-      cb.Hint := 'Select the language that you wish to associate with '+Text+' keyboard'; // TODO: Localize
+      cb.Hint := 'Select the language that you wish to associate with '+packLocation.GetNameOrID(pack.ID)+' keyboard'; // TODO: Localize
       cb.ShowHint := True;
 
       pan.InsertControl(chk);

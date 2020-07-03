@@ -31,10 +31,11 @@ uses
 
 const
   // https://api.keyman.com/ - programmatic endpoints
-  API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';
+  API_Path_UpdateCheck_Windows = '/windows/14.0/update'; // version will only update when the api changes
+
+  API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';  // TODO: use updatecheck_windows
   API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
   API_Path_DownloadLocale = '/desktop/'+SKeymanVersion+'/locale';
-  API_Path_Crash = '/desktop/'+SKeymanVersion+'/exception'; // also used for Developer and Engine
   API_Path_SubmitDiag = '/desktop/'+SKeymanVersion+'/submitdiag';
   API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
 

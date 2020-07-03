@@ -58,6 +58,8 @@ var
 
 procedure Run;
 
+function FormatFileSize(Size: Integer): string;
+
 implementation
 
 uses
@@ -88,9 +90,8 @@ uses
 function CheckForOldVersionScenario: Boolean; forward;
 procedure InstallKeyboardsInOldVersion(const ShellPath: string); forward;
 procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forward;
-procedure CreateTempDir; forward;
-procedure DeletePath(const path: WideString); forward;
-procedure RemoveTempDir; forward;
+function CreateTempDir: string; forward;
+procedure RemoveTempDir(const path: string); forward;
 procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string); forward;
 procedure LogError(const s: WideString); forward;
 procedure SetExitVal(c: Integer); forward;
@@ -105,11 +106,11 @@ const
 
 
 var
-  TempPath: string = '';
   ProgramPath: string = '';
 
 procedure Run;
 var
+  FTempPath: string;
   FExtractOnly: Boolean;
   FContinueSetup: Boolean;
   FStartAfterInstall: Boolean;  // I2738
@@ -125,11 +126,11 @@ BEGIN
       Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
 
       try
-        CreateTempDir;
+        FTempPath := CreateTempDir;
         try
           InitCommonControl(ICC_PROGRESS_CLASS);
 
-          FInstallInfo := TInstallInfo.Create(TempPath);
+          FInstallInfo := TInstallInfo.Create(FTempPath);
 
           if ParamStr(1) = '--test-dialog' then   // I4099
           begin
@@ -178,7 +179,7 @@ BEGIN
 
           FInstallInfo.LocatePackagesFromFilename(ParamStr(0));
           FInstallInfo.LocatePackagesFromParameter(FPackages);
-          FInstallInfo.LocatePackagesInPath(TempPath);
+          FInstallInfo.LocatePackagesInPath(FInstallInfo.TempPath);
           FInstallInfo.LocatePackagesInPath(ProgramPath);
 
           GetRunTools.CheckInternetConnectedState;
@@ -189,8 +190,8 @@ BEGIN
 
           // This loads setup.inf, if present, for various additional strings and settings
           // The bundled installer usually contains a setup.inf.
-          if FileExists(TempPath + 'setup.inf') then
-            FInstallInfo.LoadSetupInf(TempPath)
+          if FileExists(FInstallInfo.TempPath + 'setup.inf') then
+            FInstallInfo.LoadSetupInf(FInstallInfo.TempPath)
           else if FileExists(ProgramPath + 'setup.inf') then
             FInstallInfo.LoadSetupInf(ProgramPath);
 
@@ -231,7 +232,7 @@ BEGIN
             Free;
           end;
         finally
-          RemoveTempDir;
+          RemoveTempDir(FTempPath);
         end;
 
         SetExitVal(ERROR_SUCCESS);
@@ -342,7 +343,7 @@ begin
   SetExitVal(ERROR_SUCCESS);
 end;
 
-procedure CreateTempDir;
+function CreateTempDir: string;
 var
   buf: array[0..260] of WideChar;
 begin
@@ -353,7 +354,7 @@ begin
   if FileExists(buf) then DeleteFile(buf);  // I3476
   // NOTE: race condition here...
   CreateDirectory(buf, nil);  // I3476
-  TempPath := IncludeTrailingPathDelimiter(ExtPath);
+  Result := IncludeTrailingPathDelimiter(ExtPath);
 end;
 
 procedure DeletePath(const path: WideString);
@@ -370,10 +371,10 @@ begin
   RemoveDirectory(PWideChar(path));
 end;
 
-procedure RemoveTempDir;
+procedure RemoveTempDir(const path: string);
 begin
-  if TempPath <> '' then
-    DeletePath(ExcludeTrailingPathDelimiter(TempPath));  // I3476
+  if path <> '' then
+    DeletePath(ExcludeTrailingPathDelimiter(path));  // I3476
 end;
 
 procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string);  // I2847  // I3355   // I3500   // I4293
@@ -468,6 +469,18 @@ begin
   finally
     Free;
   end;
+end;
+
+function FormatFileSize(Size: Integer): string;
+begin
+  if Size > 1024*1024 then
+    Result := Format('%.1fMB', [Size/1024/1024])
+  else if Size > 1024 then
+    Result := Format('%dKB',[Size div 1024])
+  else if Size = 1 then
+    Result := '1 byte'
+  else
+    Result := Format('%d bytes', [Size]);
 end;
 
 end.

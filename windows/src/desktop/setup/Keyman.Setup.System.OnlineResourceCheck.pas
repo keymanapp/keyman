@@ -38,9 +38,11 @@ begin
   http := THTTPUploader.Create(nil);
   try
     http.ShowUI := not ASilent;
-    http.Fields.Add('Version', ansistring(currentVersion));
+    http.Fields.Add('version', ansistring(currentVersion));
+    // TODO: allow override of this tier with a command line parameter or filename rename
+    http.Fields.Add('tier', ansistring(KeymanVersion.CKeymanVersionInfo.Tier));
     for pack in AInstallInfo.Packages do
-      http.Fields.Add(ansistring('Package_'+pack.ID), ansistring(pack.Locations.LatestVersion));
+      http.Fields.Add(ansistring('package_'+pack.ID), ansistring(pack.Locations.LatestVersion));
 
     http.Proxy.Server := GetProxySettings.Server;
     http.Proxy.Port := GetProxySettings.Port;
@@ -49,7 +51,7 @@ begin
 
     http.Request.HostName := API_Server;
     http.Request.Protocol := API_Protocol;
-    http.Request.UrlPath := API_Path_UpdateCheck_Desktop;
+    http.Request.UrlPath := API_Path_UpdateCheck_Windows;
 
     http.Upload;
     if http.Response.StatusCode <> 200 then
@@ -59,7 +61,7 @@ begin
       Exit;
     end;
 
-    if ucr.Parse(http.Response.MessageBodyAsString, 'windows', currentVersion) then
+    if ucr.Parse(http.Response.MessageBodyAsString, 'msi', currentVersion) then
     begin
       for ucrpack in ucr.Packages do
       begin

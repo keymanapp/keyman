@@ -608,7 +608,6 @@ object frmRunDesktop: TfrmRunDesktop
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 146
     DesignSize = (
       699
       208)
@@ -628,7 +627,6 @@ object frmRunDesktop: TfrmRunDesktop
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      ExplicitTop = 228
       object cmdInstall: TButton
         Left = 200
         Top = 14
@@ -700,7 +698,6 @@ object frmRunDesktop: TfrmRunDesktop
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 394
     object lblOptions: TLabel
       Left = 20
       Top = 24
@@ -724,7 +721,7 @@ object frmRunDesktop: TfrmRunDesktop
     object lblStatus: TLabel
       Left = 247
       Top = 9
-      Width = 122
+      Width = 3
       Height = 13
     end
     object progress: TProgressBar

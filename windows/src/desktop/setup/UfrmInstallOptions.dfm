@@ -5,7 +5,7 @@ object frmInstallOptions: TfrmInstallOptions
   BorderStyle = bsDialog
   Caption = 'ssOptionsTitle'
   ClientHeight = 386
-  ClientWidth = 505
+  ClientWidth = 646
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,6 +15,9 @@ object frmInstallOptions: TfrmInstallOptions
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  DesignSize = (
+    646
+    386)
   PixelsPerInch = 96
   TextHeight = 16
   object Label1: TLabel
@@ -46,9 +49,24 @@ object frmInstallOptions: TfrmInstallOptions
   object Label3: TLabel
     Left = 8
     Top = 172
-    Width = 113
+    Width = 233
     Height = 16
-    Caption = 'Modules to install'
+    Caption = 'Select modules to install or upgrade'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label4: TLabel
+    Left = 404
+    Top = 172
+    Width = 205
+    Height = 16
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight]
+    Caption = 'Associated Keyboard Language'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -89,7 +107,7 @@ object frmInstallOptions: TfrmInstallOptions
     TabOrder = 3
   end
   object cmdOK: TButton
-    Left = 180
+    Left = 242
     Top = 353
     Width = 73
     Height = 25
@@ -99,7 +117,7 @@ object frmInstallOptions: TfrmInstallOptions
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
-    Left = 268
+    Left = 330
     Top = 353
     Width = 73
     Height = 25
@@ -118,8 +136,8 @@ object frmInstallOptions: TfrmInstallOptions
   end
   object sbTargets: TScrollBox
     Left = 6
-    Top = 196
-    Width = 491
+    Top = 192
+    Width = 619
     Height = 151
     BorderStyle = bsNone
     ParentBackground = True
