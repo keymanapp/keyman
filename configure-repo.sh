@@ -6,6 +6,13 @@
 # Run this script once to configure your system to work with our Git workflow.
 #
 
+if [[ -n "$WINDIR" ]]; then
+  # https://stackoverflow.com/a/39160850/1836776
+  SCRIPT_DIR=$(cmd //C cd)
+else
+  SCRIPT_DIR="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
+fi
+
 case $1 in
   --global)
     # Requires Git 2.9 or later.
@@ -13,8 +20,8 @@ case $1 in
     if [[ -z "$coreHooksPath" ]]; then coreHooksPath="(not set)"; fi
     echo "Current Git core.hooksPath is: $coreHooksPath"
 
-    git config --global core.hooksPath $PWD/resources/git-hooks
-    echo "Git is now configured to use $PWD/resources/git-hooks for all repositories"
+    git config --global core.hooksPath $SCRIPT_DIR/resources/git-hooks
+    echo "Git is now configured to use $SCRIPT_DIR/resources/git-hooks for all repositories"
 
     ;;
   --local)
@@ -24,11 +31,9 @@ case $1 in
       cmd //C "mklink $WinPWD\\.git\\hooks\\commit-msg $WinPWD\\resources\\git-hooks\\commit-msg"
       cmd //C "mklink $WinPWD\\.git\\hooks\\prepare-commit-msg $WinPWD\\resources\\git-hooks\\prepare-commit-msg"
     else
-      ln -sf "$PWD/resources/git-hooks/commit-msg" "$PWD/.git/hooks/commit-msg"
-      ln -sf "$PWD/resources/git-hooks/prepare-commit-msg" "$PWD/.git/hooks/prepare-commit-msg"
-
-      # For Linux
-      ln -sf "$PWD/resources/git-hooks/commit-msg-defs" "$PWD/.git/hooks/commit-msg-defs"
+      HOOKSDIR=$(git rev-parse --git-path hooks)
+      ln -sf "$SCRIPT_DIR/resources/git-hooks/commit-msg" "$HOOKSDIR/commit-msg"
+      ln -sf "$SCRIPT_DIR/resources/git-hooks/prepare-commit-msg" "$HOOKSDIR/prepare-commit-msg"
     fi
     ;;
   *)

@@ -12,17 +12,24 @@
 # Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 #
 
-# Step 1 - resolve the source directory of the hook, ALSO resolving any symlinks.
-# From https://stackoverflow.com/a/246128.
-SCRIPT_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
-  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
-  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$DIR/$SCRIPT_SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-HOOK_DIRECTORY="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" >/dev/null 2>&1 && pwd )"
+# Get the directory where this script lives, i.e. resources/git-hooks
+HOOK_DIRECTORY="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
 
-. $HOOK_DIRECTORY/commit-msg-defs
+if [ -f $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs ]; then
+  # This script was run from a symlink and the repo in question has its own commit-msg-defs.
+  . $(dirname "${BASH_SOURCE[0]}")/commit-msg-defs
+else
+  # We'll grab the settings from the keymanapp/keyman repository.
+  . "$HOOK_DIRECTORY/../build/jq.inc.sh"
+
+  # Configurable options for message length.
+  min_length=4
+  max_length=128
+
+  # Read from our globally shared JSON-formatted scopes and types
+  scopes=( $("$JQ" -r '[.scopes | paths | reduce .[] as $item (""; if . == "" then $item else . + "/" + $item end)] | join(" ")' < "$HOOK_DIRECTORY/../scopes/scopes.json") )
+  types=( $("$JQ" -r '.commitTypes | join(" ")' < "$HOOK_DIRECTORY/../scopes/commit-types.json") )
+fi
 
 #
 # Define terminal colours.
@@ -98,6 +105,8 @@ function print_error() {
   echo -e "Optionally, append ${t_grn}Fixes #1234${t_end}\n"
   echo -e "${t_cyn}Example:${t_end} fix(windows): Re-attaches the widget plug which had fallen out. Fixes #1111"
   echo -e "${t_cyn}Reference${t_end}: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes"
+  echo -e ""
+  echo -e "Tips: Don't include a period at the end of the first line; best to put 'Fixes #1111' on a line of its own."
   echo -e ""
   echo -e "This script: $0"
 }
