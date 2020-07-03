@@ -29,9 +29,7 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 
@@ -39,8 +37,6 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.net.Uri.Builder;
@@ -76,7 +72,6 @@ import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Html;
@@ -97,8 +92,6 @@ import android.widget.Toast;
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
-import static com.tavultesoft.kmea.KMKeyboardDownloaderActivity.kKeymanApiModelURL;
-
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
@@ -115,8 +108,6 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private int textSize = minTextSize;
   private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
-  private static final String defaultKeyboardPath = "sil_euro_latin.kmp";
-  private static final String defaultDictionaryPath = "nrc.en.mtnt.model.kmp";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
@@ -158,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
 
-          // Determine if associated lexical model should be downloaded
+          // Determine if associated lexical model for languageID should be downloaded
           if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
               && (languageID != null) && !languageID.isEmpty()) {
 
