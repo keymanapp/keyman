@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.106 alpha 2020-07-04
+
+* fix(android/app) Download associated dictionary when installing cloud keyboard package (#3307)
+
 ## 14.0.105 alpha 2020-07-03
 
 * feat(android): Download default resources at build time (#3300)
