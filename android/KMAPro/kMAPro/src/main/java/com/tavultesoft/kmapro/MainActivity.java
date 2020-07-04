@@ -25,11 +25,11 @@ import com.tavultesoft.kmea.KMTextView;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
+import com.tavultesoft.kmea.data.CloudRepository;
+import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.FileProviderUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
 
@@ -37,8 +37,6 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.net.Uri.Builder;
@@ -74,7 +72,6 @@ import android.os.ResultReceiver;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Html;
@@ -95,8 +92,6 @@ import android.widget.Toast;
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
-import static com.tavultesoft.kmea.KMKeyboardDownloaderActivity.kKeymanApiModelURL;
-
 public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener,
     ActivityCompat.OnRequestPermissionsResultCallback {
   public static Context context;
@@ -113,14 +108,15 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
   private int textSize = minTextSize;
   private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
   private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
-  private static final String defaultKeyboardPath = "sil_euro_latin.kmp";
-  private static final String defaultDictionaryPath = "nrc.en.mtnt.model.kmp";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   protected static final String didCheckUserDataKey = "DidCheckUserData";
   private Toolbar toolbar;
   private Menu menu;
   private Uri data;
+
+  private static Dataset repo;
+  private boolean didExecuteParser = false;
 
   DownloadResultReceiver resultReceiver;
   private ProgressDialog progressDialog;
@@ -153,18 +149,28 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           packageIntent.putExtras(bundle);
           startActivity(packageIntent);
 
-          // Determine if associated lexical model should be downloaded
+          // Determine if associated lexical model for languageID should be downloaded
           if (FileUtils.hasKeymanPackageExtension(kmpFilename) && !FileUtils.hasLexicalModelPackageExtension(kmpFilename)
               && (languageID != null) && !languageID.isEmpty()) {
-            String keyboardID = kmpFilename.substring(0, kmpFilename.lastIndexOf(FileUtils.KEYMANPACKAGE));
-            ArrayList<CloudApiTypes.CloudApiParam> cloudQueries = new ArrayList<>();
-            String _remoteLexicalModelUrl = String.format("%s?q=bcp47:%s", kKeymanApiModelURL, languageID);
-            cloudQueries.add(new CloudApiTypes.CloudApiParam(
-              CloudApiTypes.ApiTarget.KeyboardLexicalModels, _remoteLexicalModelUrl)
-              .setType(CloudApiTypes.JSONType.Array));
-            // Keyboard package already downloaded, so this will just download associated lexical model.
-            // Can't call downloadLexicalModel() because it needs to already know the model ID
-            KMKeyboardDownloaderActivity.downloadKeyboard(context, languageID, keyboardID, cloudQueries);
+
+            // Force the cloud catalog to update
+            if (!didExecuteParser) {
+              didExecuteParser = true;
+              repo = CloudRepository.shared.fetchDataset(context);
+            }
+
+            // Check if associated model is available in the cloud, and that it's not already installed
+            LexicalModel modelInfo = CloudRepository.shared.getAssociatedLexicalModel(context, languageID);
+            if ((modelInfo != null) && (KMManager.getAssociatedLexicalModel(languageID) == null)) {
+              String modelID = modelInfo.getLexicalModelID();
+              String url = modelInfo.getUpdateKMP();
+              if (url != null) {
+                ArrayList<CloudApiTypes.CloudApiParam> _params = new ArrayList<>();
+                _params.add(new CloudApiTypes.CloudApiParam(
+                    CloudApiTypes.ApiTarget.LexicalModelPackage, url));
+                KMKeyboardDownloaderActivity.downloadLexicalModel(context, modelID, _params);
+              }
+            }
           }
 
           break;
@@ -609,9 +615,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           FileUtils.getFilename(url);
         }
 
-        // Parse the url for the BCP 47 language ID
-        Uri uri = Uri.parse(url);
-        String languageID = uri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
+        // Parse data for the BCP 47 language ID
+        String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
+        // TODO: Using "tag" for now, but production will be KMKeyboardDownloaderActivity.KMKey_BCP47
+        if (languageID == null) {
+          languageID = data.getQueryParameter("tag");
+        }
 
         // Keyboard download endpoint:
         // download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]

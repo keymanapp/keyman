@@ -306,7 +306,7 @@ public final class KeyboardPickerActivity extends AppCompatActivity {
 
     if (keyboardInfo != null) {
       String languageID = keyboardInfo.getLanguageID();
-      if (!CloudRepository.shared.hasAssociatedLexicalModel(context, languageID)) {
+      if (CloudRepository.shared.getAssociatedLexicalModel(context, languageID) == null) {
         // Only invalidate the lexical cache if there's no associated lexical model
         CloudRepository.shared.invalidateLexicalModelCache(context);
       }
