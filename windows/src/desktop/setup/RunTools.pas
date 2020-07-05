@@ -92,7 +92,8 @@ type
     procedure RunVersion10Upgrade(const KMShellPath: WideString);
     procedure CloseKeymanApplications;  // I2740
     procedure DeleteBackupPath; // I2747
-    procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
+    procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);
+    procedure WriteToLog(const msg: string);  // I3349
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
@@ -100,6 +101,7 @@ type
       StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
       StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
+    procedure LogInfo(const msg: string);
 
     class procedure CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
 
@@ -223,13 +225,18 @@ begin
 end;
 
 procedure TRunTools.LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
+begin
+  WriteToLog('ERROR: '+msg);
+  if not FSilent and ShowDialogIfNotSilent then
+    ShowMessageW(msg);
+end;
+
+procedure TRunTools.WriteToLog(const msg: string);
 const
   nl: WideString = #13#10;
 var
   path: WideString;
 begin
-  if not FSilent and ShowDialogIfNotSilent then
-    ShowMessageW(msg);
   if not Assigned(FErrorLog) then
   begin
     path := TKeymanPaths.ErrorLogPath + 'setup.log'; // I2314
@@ -244,6 +251,11 @@ begin
   end;
 
   FErrorLog.Write(PWideChar(msg+nl)^, Length(msg+nl)*2);
+end;
+
+procedure TRunTools.LogInfo(const msg: string);
+begin
+  WriteToLog('INFO: '+msg);
 end;
 
 function TRunTools.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
@@ -451,7 +463,7 @@ var
 begin
   if not Assigned(msiLocation) or (msiLocation.LocationType = iilOnline) then
   begin
-    UpgradeCode := '{c70af17c-8b9e-47a1-a099-b65aee3dc8b4}'; // Keyman 11+
+    UpgradeCode := '{c70af17c-8b9e-47a1-a099-b65aee3dc8b4}'; // Keyman 11+         // TODO: move constant somewhere else
   end
   else
   begin
@@ -595,6 +607,7 @@ begin
         if Assigned(packLocation) then
         begin
           // TODO: need to make sure remote file is downloaded before this
+          LogInfo('Downloading '+packLocation.Url);
           if packLocation.LocationType = iilOnline then
             if not TResourceDownloader.Execute(FInstallInfo, packLocation) then
             begin

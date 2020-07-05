@@ -26,7 +26,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, httpuploader;
+  Dialogs, StdCtrls, ComCtrls;
 
 type
   TfrmDownloadProgress = class;
@@ -46,9 +46,8 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER;
   public
 
-    procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
-    //procedure HTTPFileProgress(Sender: THTTPUploader; const FileName: string; dwFileBytesSent, dwLocalFileSize, dwSecondsToFileCompletion, dwOverallBytesSent, dwOverallBytesTotal, dwSecondsToOverallCompletion, dwBytesPerSecond: DWord);
-    procedure HTTPStatus(Sender: THTTPUploader; const Message: string; Position, Total: Int64);  // I2855
+    procedure HTTPCheckCancel(Sender: TObject; var Cancel: Boolean);
+    procedure HTTPStatus(Sender: TObject; const Message: string; Position, Total: Int64);  // I2855
     property Callback: TDownloadProgressCallback read FCallback write FCallback;
     property Cancel: Boolean read FCancel;
   end;
@@ -74,12 +73,12 @@ begin
   PostMessage(Handle, WM_USER, 0, 0); // Starts process after form displays
 end;
 
-procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
+procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: TObject; var Cancel: Boolean);
 begin
   Cancel := FCancel;
 end;
 
-procedure TfrmDownloadProgress.HTTPStatus(Sender: THTTPUploader;
+procedure TfrmDownloadProgress.HTTPStatus(Sender: TObject;
   const Message: string; Position, Total: Int64);  // I2855
 begin
   if Total = 0
@@ -105,8 +104,7 @@ begin
       then ModalResult := mrOk
       else ModalResult := mrCancel;
   except
-    on EHTTPUploaderCancel do ModalResult := mrCancel;
-    on E:EHTTPUploader do
+    on E:Exception do
     begin
       ShowMessage(E.Message);
       ModalResult := mrCancel;

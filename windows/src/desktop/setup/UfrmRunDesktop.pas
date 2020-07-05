@@ -156,6 +156,7 @@ end;
 
 procedure TfrmRunDesktop.cmdExitClick(Sender: TObject);
 begin
+  // TODO: we should use a boolean flag here rather than comparing caption
   if cmdExit.Caption = FInstallInfo.Text(ssCancelButton) then // I2644
   begin
     if MessageDlg(FInstallInfo.Text(ssCancelQuery), mtConfirmation, mbOkCancel, 0) = mrCancel then Exit;
