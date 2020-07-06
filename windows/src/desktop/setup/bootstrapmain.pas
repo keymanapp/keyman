@@ -105,11 +105,10 @@ const
   ICC_PROGRESS_CLASS     = $00000020; // progress
 
 
-var
-  ProgramPath: string = '';
 
 procedure Run;
 var
+  ProgramPath: string;
   FTempPath: string;
   FExtractOnly: Boolean;
   FContinueSetup: Boolean;
@@ -142,25 +141,21 @@ BEGIN
             Exit;
           end;
 
-          // We will now work with a missing setup.inf: if it is not present,
-          // we assume that we are in Keyman Desktop mode
-
           // There are two possible paths for files: ProgramPath and TempPath,
-          // and also files that can be downloaded during the installation into TempPath.
-
-          // TODO: deprecate ExtPath usage for one of TempPath or ProgramPath
+          // and also files that can be downloaded during the installation
+          // (into TempPath).
 
           ProgramPath := ExtractFilePath(ParamStr(0));
 
-          if not ProcessArchive then
-          begin
-            { The files must be in the current directory.  Use them instead }
-            ExtPath := ExtractFilePath(ParamStr(0));  // I3476
-          end;
+          // Extract SFX archive into temp path
 
-          ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3476
+          ProcessArchive(FInstallInfo.TempPath);
 
-          // Get the list of anticipated packages from the filename.
+          // Get the list of anticipated packages from:
+          // 1. the program filename
+          // 2. parameters
+          // 3. files extracted from the archive
+          // 4. files in the same folder as this program
 
           FInstallInfo.LocatePackagesFromFilename(ParamStr(0));
           FInstallInfo.LocatePackagesFromParameter(FPackages);
@@ -285,7 +280,7 @@ procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
       if location.LocationType = iilOnline then
         Assert(FALSE, 'TODO: implement download of this resource');
         //TODO:
-      TUtilExecute.WaitForProcess('"' + ShellPath + '" '+silentFlag+' -i "'+location.Path+'"', ExtPath);
+      TUtilExecute.WaitForProcess('"' + ShellPath + '" '+silentFlag+' -i "'+location.Path+'"', FInstallInfo.TempPath);
     end;
   end;
 var
@@ -304,23 +299,25 @@ begin
 end;
 
 procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
+var
+  path: string;
 begin
-  ExtPath := FExtractOnly_Path;  // I3476
+  path := FExtractOnly_Path;  // I3476
 
-  if ExtPath = '' then
-    ExtPath := '.';
+  if path = '' then
+    path := '.';
 
-  if (ExtPath <> '.') and (ExtPath <> '.\') and not DirectoryExists(ExtPath) then  // I3081  // I3476
+  if (path <> '.') and (path <> '.\') and not DirectoryExists(path) then  // I3081  // I3476
   begin
-    if not CreateDir(ExtPath) then  // I3476
+    if not CreateDir(path) then  // I3476
     begin
-      LogError('Setup could not create the target folder '+ExtPath);  // I3476
+      LogError('Setup could not create the target folder '+path);  // I3476
       SetExitVal(Integer(GetLastError));
       Exit;
     end;
   end;
 
-  if not ProcessArchive then
+  if not ProcessArchive(path) then
   begin
     LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
     SetExitVal(ERROR_BAD_FORMAT);
@@ -328,22 +325,23 @@ begin
   end;
 
   if not FSilent then
-    LogError('All files extracted from the archive to '+ExtPath+'\.');  // I3476
+    LogError('All files extracted from the archive to '+path+'\.');  // I3476
   SetExitVal(ERROR_SUCCESS);
 end;
 
 function CreateTempDir: string;
 var
   buf: array[0..260] of WideChar;
+  path: string;
 begin
   GetTempPath(MAX_PATH-1, buf);
-  ExtPath := ExcludeTrailingPathDelimiter(buf);  // I3476
-  GetTempFileName(PWideChar(ExtPath), 'kmt', 0, buf);  // I3476
-  ExtPath := buf;  // I3476
+  path := ExcludeTrailingPathDelimiter(buf);  // I3476
+  GetTempFileName(PWideChar(path), 'kmt', 0, buf);  // I3476
+  path := buf;  // I3476
   if FileExists(buf) then DeleteFile(buf);  // I3476
   // NOTE: race condition here...
   CreateDirectory(buf, nil);  // I3476
-  Result := IncludeTrailingPathDelimiter(ExtPath);
+  Result := IncludeTrailingPathDelimiter(path);
 end;
 
 procedure DeletePath(const path: WideString);

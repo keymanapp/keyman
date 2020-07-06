@@ -589,7 +589,7 @@ begin
     FKMShellVersion := GetFileVersionString(FKMShellPath);
 
     { Install packages for all users }
-    s := '-nowelcome -s -i '; //"'+ExtPath+'" ';
+    s := '-nowelcome -s -i ';
     for pack in FInstallInfo.Packages do
     begin
       if pack.ShouldInstall then

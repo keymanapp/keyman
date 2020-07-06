@@ -545,7 +545,7 @@ begin
   if FInstallInfo.TitleImageFilename <> '' then
   begin
     oldHeight := imgTitle.Height;
-    imgTitle.Picture.LoadFromFile(ExtPath + FInstallInfo.TitleImageFilename);
+    imgTitle.Picture.LoadFromFile(FInstallInfo.TitleImageFilename);
     ClientHeight := ClientHeight - oldHeight + imgTitle.Height;
   end;
 
@@ -648,7 +648,7 @@ begin
   try
     Assert(FALSE, 'TODO: show linked in license content');
     // TODO:
-//    ShowFile(ExtPath + FInstallInfo.LicenseFileName);  // I3476
+//    ShowFile(FInstallInfo.LicenseFileName);  // I3476
     ShowModal;
   finally
     Free;
