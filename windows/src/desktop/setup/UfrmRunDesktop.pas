@@ -63,7 +63,7 @@ uses
 
   Keyman.Setup.System.InstallInfo,
   RunTools,
-  UfrmDownloadProgress, Vcl.CheckLst;
+  UfrmDownloadProgress;
 
 type
   TfrmRunDesktop = class(TForm)
@@ -108,7 +108,7 @@ type
     FStartAfterInstall: Boolean;
     FStartWithWindows: Boolean;
     FAutomaticallyReportUsage: Boolean;
-    FDisableUpgradeFrom6Or7Or8: Boolean;
+    FDisableUpgradeFrom6Or7Or8: Boolean;  // I2847   // I4293
     procedure CheckVersion6Upgrade;
     procedure CheckVersion7Upgrade;
     procedure CheckVersion8Upgrade;   // I4293
@@ -477,7 +477,7 @@ begin
   MsiSetExternalUIW(MSIUIHandler, INSTALLLOGMODE_PROGRESS, Self);
 end;
 
-procedure TfrmRunDesktop.DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);
+procedure TfrmRunDesktop.DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
 begin
   if FDisableUpgradeFrom6Or7Or8 then // I2847   // I4293
   begin

@@ -1,3 +1,6 @@
+{**
+ * Wrapper for THttpClient for downloading resources with progress.
+ *}
 unit Keyman.Setup.System.ResourceDownloader;
 
 interface

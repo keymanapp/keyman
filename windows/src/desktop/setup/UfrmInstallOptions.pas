@@ -44,18 +44,16 @@ type
     cmdCancel: TButton;
     chkAutomaticallyReportUsage: TCheckBox;
     sbTargets: TScrollBox;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
+    lblInstallOptions: TLabel;
+    lblDefaultKeymanSettings: TLabel;
+    lblSelectModulesToInstall: TLabel;
+    lblAssociatedKeyboardLanguage: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
     type TPackageControl = record
-  //      PackageLanguage: ;
       Package: TInstallInfoPackage;
       Location: TInstallInfoPackageFileLocation;
-      Panel: TPanel;
       CheckBox: TCheckBox;
       ComboBox: TComboBox;
       function IsValid: Boolean;
@@ -80,6 +78,8 @@ type
     procedure chkInstallKeyboardClick(Sender: TObject);
     procedure chkInstallKeymanClick(Sender: TObject);
     procedure EnableControls;
+    procedure AddCheckboxPanel(const Text: string; AddCombo: Boolean;
+      var pt: TPoint; var chk: TCheckBox; var cb: TComboBox);
     { Private declarations }
   public
     { Public declarations }
@@ -174,6 +174,44 @@ begin
   chkUpgradeKeyman7.Checked := Value;
 end;
 
+procedure TfrmInstallOptions.AddCheckboxPanel(const Text: string; AddCombo: Boolean; var pt: TPoint; var chk: TCheckBox; var cb: TComboBox);
+var
+  pan: TPanel;
+begin
+  pan := TPanel.Create(Self);
+  chk := TCheckBox.Create(Self);
+  cb := TComboBox.Create(Self);
+
+  pan.Left := pt.X;
+  pan.Top := pt.Y;
+  pan.Width := sbTargets.ClientWidth - GetSystemMetrics(SM_CXVSCROLL);
+  pan.Height := cb.Height + 4;
+  pan.BevelKind := bkTile;
+  pan.BevelOuter := bvNone;
+  pan.Caption := '';
+
+  sbTargets.InsertControl(pan);
+
+  chk.Left := 2;
+  chk.Top := 4;
+  chk.Width := 2 * sbTargets.ClientWidth div 3 + 1;
+  chk.Caption := Text;
+  pan.InsertControl(chk);
+
+  if AddCombo then
+  begin
+    cb.Left := pan.ClientWidth - pan.ClientWidth div 3 - 1;
+    cb.Top := 0;
+    cb.Width := pan.ClientWidth div 3;
+    cb.Style := csDropDownList;
+    pan.InsertControl(cb);
+  end
+  else
+    FreeAndNil(cb);
+
+  Inc(pt.Y, pan.Height - 2);
+end;
+
 procedure TfrmInstallOptions.SetupDynamicOptions;
 var
   pack: TInstallInfoPackage;
@@ -181,7 +219,6 @@ var
   chk: TCheckBox;
   pt: TPoint;
   cb: TComboBox;
-  pan: TPanel;
   n: Integer;
   Text: string;
   selectedLang, lang: TInstallInfoPackageLanguage;
@@ -193,18 +230,18 @@ begin
   begin
     if not FInstallInfo.IsInstalled then
       case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := 'Install Keyman Desktop '+FInstallInfo.BestMsi.Version;
-        iilOnline: Text := 'Download and install Keyman Desktop '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
+        iilLocal:  Text := 'Install Keyman for Windows '+FInstallInfo.BestMsi.Version;
+        iilOnline: Text := 'Download and install Keyman for Windows '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
       end
     else
       case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := 'Upgrade Keyman Desktop '+FInstallInfo.BestMsi.Version;
-        iilOnline: Text := 'Download and upgrade Keyman Desktop to '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
+        iilLocal:  Text := 'Upgrade Keyman for Windows '+FInstallInfo.BestMsi.Version;
+        iilOnline: Text := 'Download and upgrade Keyman for Windows to '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
       end;
   end
   else if FInstallInfo.IsInstalled then
   begin
-    Text := 'Keyman Desktop '+FInstallInfo.InstalledVersion.Version+' is already installed'; //TODO: Localize?
+    Text := 'Keyman for Windows '+FInstallInfo.InstalledVersion.Version+' is already installed'; //TODO: Localize?
   end
   else
   begin
@@ -212,29 +249,10 @@ begin
     Assert(False, 'Offline, Keyman is not installed, and no msi is available');
   end;
 
-  cb := TComboBox.Create(Self);
-  pan := TPanel.Create(Self);
-  pan.Left := pt.X;
-  pan.Top := pt.Y;
-  pan.Width := sbTargets.ClientWidth - GetSystemMetrics(SM_CXVSCROLL);
-  pan.Height := cb.Height + 1;
-  pan.BevelKind := bkNone; //bkTile;
-  pan.BevelOuter := bvNone;
-
-  sbTargets.InsertControl(pan);
-  cb.Free; // Just to get the height ... todo: clean this up?
-
-  chkInstallKeyman := TCheckBox.Create(Self);
-  chkInstallKeyman.Left := 2;
-  chkInstallKeyman.Top := 4;
-  chkInstallKeyman.Width := pan.ClientWidth - 2;
-  chkInstallKeyman.Caption := Text;
+  AddCheckboxPanel(Text, False, pt, chkInstallKeyman, cb);
   chkInstallKeyman.Checked := FInstallInfo.ShouldInstallKeyman;
   chkInstallKeyman.Enabled := FInstallInfo.IsNewerAvailable and FInstallInfo.IsInstalled;
   chkInstallKeyman.OnClick := chkInstallKeymanClick;
-  pan.InsertControl(chkInstallKeyman);
-
-  Inc(pt.Y, pan.Height - 2);
 
   n := 0;
   SetLength(FPackages, FInstallInfo.Packages.Count);
@@ -248,38 +266,12 @@ begin
         iilOnline: Text := 'Download and install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version+' ('+FormatFileSize(packLocation.Size)+')'; // TODO: localize; fixup size string
       end;
 
-      pan := TPanel.Create(Self);
-      chk := TCheckBox.Create(Self);
-      cb := TComboBox.Create(Self);
-
-      pan.Left := pt.X;
-      pan.Top := pt.Y;
-      pan.Width := sbTargets.ClientWidth - GetSystemMetrics(SM_CXVSCROLL);
-      pan.Height := cb.Height + 1;
-      pan.BevelKind := bkNone; // bkTile;
-      pan.BevelOuter := bvNone;
-
-      sbTargets.InsertControl(pan);
-
-      chk.Tag := n;
-      chk.Left := 2;
-      chk.Top := 4;
-      chk.Width := 2 * sbTargets.ClientWidth div 3 + 1;
-      chk.Caption := Text;
+      AddCheckboxPanel(Text, True, pt, chk, cb);
       chk.Checked := pack.ShouldInstall;
       chk.OnClick := chkInstallKeyboardClick;
-
-      cb.Tag := n;
-      cb.Left := pan.ClientWidth - pan.ClientWidth div 3 - 1;
-      cb.Top := 0;
-      cb.Width := pan.ClientWidth div 3;
-      cb.Style := csDropDownList;
       cb.OnClick := cbInstallKeyboardClick;
       cb.Hint := 'Select the language that you wish to associate with '+packLocation.GetNameOrID(pack.ID)+' keyboard'; // TODO: Localize
       cb.ShowHint := True;
-
-      pan.InsertControl(chk);
-      pan.InsertControl(cb);
 
       selectedLang := nil;
       for lang in packLocation.Languages do
@@ -296,11 +288,8 @@ begin
       if cb.ItemIndex < 0 then
         cb.ItemIndex := 0;
 
-      Inc(pt.Y, pan.Height - 2);
-
       FPackages[n].Package := pack;
       FPackages[n].Location := packLocation;
-      FPackages[n].Panel := pan;
       FPackages[n].CheckBox := chk;
       FPackages[n].ComboBox := cb;
       Inc(n);
@@ -322,9 +311,7 @@ begin
       if (pack.ComboBox.ItemIndex < 0) or
           not Assigned(pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex])
         then pack.Package.BCP47 := ''
-        else pack.Package.BCP47 := (
-          pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex]
-          as TInstallInfoPackageLanguage).BCP47;
+        else pack.Package.BCP47 := (pack.ComboBox.Items.Objects[pack.ComboBox.ItemIndex] as TInstallInfoPackageLanguage).BCP47;
     end;
 
   ModalResult := mrOk;
@@ -359,7 +346,6 @@ begin
       e := e or FPackages[i].CheckBox.Checked;
     end;
   end;
-//  cmdInstall.Enabled := e;
 end;
 
 { TfrmInstallOptions.TPackageControl }

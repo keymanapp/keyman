@@ -1,3 +1,8 @@
+{**
+ * Provides environmental and configuration parameters for the installation.
+ * Includes functionality for querying online API for extra metadata such as
+ * version and location of .msi to be installed.
+ *}
 unit Keyman.Setup.System.InstallInfo;
 
 interface

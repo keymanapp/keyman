@@ -53,9 +53,9 @@ uses
   Vcl.Controls,
   Winapi.Messages,
   Winapi.Windows,
-  UfrmDownloadProgress,
 
-  Keyman.Setup.System.InstallInfo;
+  Keyman.Setup.System.InstallInfo,
+  UfrmDownloadProgress;
 
 type
   TStatusEvent = procedure(const Status: WideString) of object;
@@ -92,8 +92,8 @@ type
     procedure RunVersion10Upgrade(const KMShellPath: WideString);
     procedure CloseKeymanApplications;  // I2740
     procedure DeleteBackupPath; // I2747
-    procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);
-    procedure WriteToLog(const msg: string);  // I3349
+    procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
+    procedure WriteToLog(const msg: string);
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
@@ -146,7 +146,6 @@ uses
   TntDialogHelp,
   ErrorControlledRegistry,
   UCreateProcessAsShellUser,
-//  Upload_Settings,
   utilsystem,
   utilexecute,
   VersionInfo;
@@ -189,8 +188,6 @@ function TRunTools.DoInstall(Handle: THandle; PackagesOnly,
 var
   msiLocation: TInstallInfoFileLocation;
 begin
-  Result := False;
-
   if PackagesOnly
     then StatusMax := FInstallInfo.Packages.Count
     else StatusMax := 6 + FInstallInfo.Packages.Count;
@@ -198,30 +195,24 @@ begin
   msiLocation := FInstallInfo.BestMsi;
   if Assigned(msiLocation) and not PackagesOnly then
   begin
-    // TODO: need to download the online msi if it is online!
     if msiLocation.LocationType = iilOnline then
+    begin
       if not TResourceDownloader.Execute(FInstallInfo, msiLocation) then
         Exit(False);
-//      Assert(FALSE, 'TODO: implement download of this resource');
+    end;
 
     Status(FInstallInfo.Text(ssStatusInstalling));
 
     CloseKeymanApplications;  // I2740
 
-    if InstallMSI(msiLocation) then
-    begin
-      InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
-        StartDisabled,StartWithConfiguration,AutomaticallyReportUsage);
-      Result := True;
-    end
-  end
-  else
-  begin
-    InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
-      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration,
-      AutomaticallyReportUsage);
-    Result := True;
+    if not InstallMSI(msiLocation) then
+      Exit(False);
   end;
+
+  InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
+    StartDisabled,StartWithConfiguration,AutomaticallyReportUsage);
+
+  Result := True;
 end;
 
 procedure TRunTools.LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
@@ -606,15 +597,12 @@ begin
         packLocation := pack.GetBestLocation;
         if Assigned(packLocation) then
         begin
-          // TODO: need to make sure remote file is downloaded before this
           LogInfo('Downloading '+packLocation.Url);
           if packLocation.LocationType = iilOnline then
             if not TResourceDownloader.Execute(FInstallInfo, packLocation) then
             begin
-              //TODO: log
+              LogInfo('Failed to download '+packLocation.Url); // TODO: can we get more detail?
               Continue; //
-              //Exit(False);
-              //Assert(FALSE, 'TODO: implement download of this resource');
             end;
 
           // Need to check kmshell version >= 14.0 for support for non-default

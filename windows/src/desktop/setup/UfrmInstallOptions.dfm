@@ -20,7 +20,7 @@ object frmInstallOptions: TfrmInstallOptions
     386)
   PixelsPerInch = 96
   TextHeight = 16
-  object Label1: TLabel
+  object lblInstallOptions: TLabel
     Left = 8
     Top = 8
     Width = 125
@@ -33,7 +33,7 @@ object frmInstallOptions: TfrmInstallOptions
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label2: TLabel
+  object lblDefaultKeymanSettings: TLabel
     Left = 8
     Top = 78
     Width = 159
@@ -46,7 +46,7 @@ object frmInstallOptions: TfrmInstallOptions
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label3: TLabel
+  object lblSelectModulesToInstall: TLabel
     Left = 8
     Top = 172
     Width = 233
@@ -59,7 +59,7 @@ object frmInstallOptions: TfrmInstallOptions
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Label4: TLabel
+  object lblAssociatedKeyboardLanguage: TLabel
     Left = 404
     Top = 172
     Width = 205
@@ -80,7 +80,7 @@ object frmInstallOptions: TfrmInstallOptions
     Width = 473
     Height = 17
     Caption = 'ssOptionsStartWithWindows'
-    TabOrder = 0
+    TabOrder = 2
   end
   object chkStartAfterInstall: TCheckBox
     Left = 8
@@ -88,7 +88,7 @@ object frmInstallOptions: TfrmInstallOptions
     Width = 473
     Height = 17
     Caption = 'ssOptionsStartAfterInstall'
-    TabOrder = 1
+    TabOrder = 0
   end
   object chkCheckForUpdates: TCheckBox
     Left = 8
@@ -96,7 +96,7 @@ object frmInstallOptions: TfrmInstallOptions
     Width = 473
     Height = 17
     Caption = 'ssOptionsCheckForUpdates'
-    TabOrder = 2
+    TabOrder = 4
   end
   object chkUpgradeKeyman7: TCheckBox
     Left = 8
@@ -104,7 +104,7 @@ object frmInstallOptions: TfrmInstallOptions
     Width = 473
     Height = 17
     Caption = 'ssOptionsUpgradeKeyboards'
-    TabOrder = 3
+    TabOrder = 1
   end
   object cmdOK: TButton
     Left = 242
@@ -113,7 +113,7 @@ object frmInstallOptions: TfrmInstallOptions
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 4
+    TabOrder = 6
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
@@ -124,7 +124,7 @@ object frmInstallOptions: TfrmInstallOptions
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 5
+    TabOrder = 7
   end
   object chkAutomaticallyReportUsage: TCheckBox
     Left = 8
@@ -132,7 +132,7 @@ object frmInstallOptions: TfrmInstallOptions
     Width = 473
     Height = 17
     Caption = 'ssOptionsAutomaticallyReportUsage'
-    TabOrder = 6
+    TabOrder = 3
   end
   object sbTargets: TScrollBox
     Left = 6
@@ -141,6 +141,6 @@ object frmInstallOptions: TfrmInstallOptions
     Height = 151
     BorderStyle = bsNone
     ParentBackground = True
-    TabOrder = 7
+    TabOrder = 5
   end
 end

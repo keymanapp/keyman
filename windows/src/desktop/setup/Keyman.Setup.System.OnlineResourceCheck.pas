@@ -1,3 +1,7 @@
+{**
+ * Wrapper for checking api.keyman.com for latest version of resources to be
+ * installed. Uses the /windows/14.0/update endpoints.
+ *}
 unit Keyman.Setup.System.OnlineResourceCheck;
 
 interface

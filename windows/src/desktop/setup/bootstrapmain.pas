@@ -132,21 +132,6 @@ BEGIN
 
           FInstallInfo := TInstallInfo.Create(FTempPath);
 
-          if ParamStr(1) = '--test-dialog' then   // I4099
-          begin
-            with TfrmRunDesktop.Create(nil) do    // I2562
-            try
-              ContinueSetup := False;
-              StartAfterInstall := True;
-              DisableUpgradeFrom6Or7Or8 := False;   // I4293
-              ShowModal;
-            finally
-              Free;
-            end;
-            Exit;
-          end;
-
-
           { Display the dialog }
 
           ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path);  // I2738, I2847  // I3355   // I3500   // I4293
@@ -285,6 +270,10 @@ begin
   Exit(True);
 end;
 
+// TODO: move this into a separate unit: it deals with installing keyboards into
+// an existing Keyman install on downlevel versions of Windows (e.g. Vista). So
+// we are constrained in how we do this -- no ability to do language associations
+// etc.
 procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
   procedure DoInstall(pack: TInstallInfoPackage; const silentFlag: string);
   var
@@ -431,7 +420,8 @@ end;
 
 procedure LogError(const s: WideString);
 begin
-  // TODO: FSilent mode, log error to logfile instead
+  // TODO: refactor with RunTools.LogError
+  // TODO: FSilent mode, log error to logfile instead;
   ShowMessageW(s);
 end;
 
