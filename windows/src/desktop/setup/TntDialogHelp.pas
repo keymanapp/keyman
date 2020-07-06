@@ -82,7 +82,7 @@ begin
   else if Buttons = [mbRetry, mbCancel] then FButtons := MB_RETRYCANCEL
   else FButtons := MB_OK;
 
-  case Tnt_MessageBoxW(GetActiveWindow, PWideChar(Msg), 'Keyman Desktop Setup', MBFlags[DlgType] or FButtons) of
+  case Tnt_MessageBoxW(GetActiveWindow, PWideChar(Msg), 'Keyman Desktop Setup', MBFlags[DlgType] or FButtons) of //TODO: localize
     IDOK: Result := mrOk;
     IDCANCEL: Result := mrCancel;
     IDYES: Result := mrYes;
@@ -93,7 +93,7 @@ end;
 
 procedure ShowMessageW(const Message: WideString);
 begin
-  Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), 'Keyman Desktop Setup', MB_OK);
+  Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), 'Keyman Desktop Setup', MB_OK); //TODO: localize
 end;
 
 end.

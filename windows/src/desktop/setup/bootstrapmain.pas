@@ -190,7 +190,7 @@ BEGIN
           begin
             // TODO: this should be refactored together with the retry strategy for online check above
             // TODO: Delineate between log messages and dialogs.
-            // TODO: Consider Sentry?
+            // TODO: localize
             GetRunTools.LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
             SetExitVal(ERROR_NO_MORE_FILES);
             Exit;
@@ -223,7 +223,11 @@ BEGIN
     except
       on e:Exception do
       begin
-        //TODO: handle exceptions with Sentry?
+        // For the future, we may consider logging exceptions with Sentry.
+        // However, Sentry adds a 400kb library to the bootstrap which we
+        // would need to embed and extract at startup in order to do this
+        // capture. That's a bit of a downer for this project, which we are
+        // trying (somewhat unsuccessfully) to keep as lightweight as we can.
         GetRunTools.LogError('Exception '+e.ClassName+': '+e.Message);
       end;
     end;
@@ -413,13 +417,6 @@ begin
     end;
     Inc(i);
   end;
-end;
-
-procedure LogError(const s: WideString);
-begin
-  // TODO: refactor with RunTools.LogError
-  // TODO: FSilent mode, log error to logfile instead;
-  ShowMessageW(s);
 end;
 
 procedure SetExitVal(c: Integer);

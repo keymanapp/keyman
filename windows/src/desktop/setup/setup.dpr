@@ -6,7 +6,6 @@ uses
   CommonControls in 'CommonControls.pas',
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   RegistryKeys in '..\..\global\delphi\general\RegistryKeys.pas',
-  klog in '..\..\global\delphi\general\klog.pas',
   Upload_Settings in '..\..\global\delphi\general\Upload_Settings.pas',
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
@@ -50,9 +49,5 @@ uses
 {$R manifest.res}
 
 begin
-  try
-    Run;
-  except
-    //TODO: Handle exceptions with JCL
-  end;
+  Run;
 end.
