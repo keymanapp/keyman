@@ -101,7 +101,7 @@ type
       StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
       StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
-    procedure LogInfo(const msg: string);
+    procedure LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
 
     class procedure CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
 
@@ -244,9 +244,11 @@ begin
   FErrorLog.Write(PWideChar(msg+nl)^, Length(msg+nl)*2);
 end;
 
-procedure TRunTools.LogInfo(const msg: string);
+procedure TRunTools.LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
 begin
   WriteToLog('INFO: '+msg);
+  if not FSilent and ShowDialogIfNotSilent then
+    ShowMessageW(msg);
 end;
 
 function TRunTools.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;

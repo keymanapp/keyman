@@ -489,7 +489,6 @@ begin
   end;
 
   GetRunTools.PromptForReboot := PromptForReboot;  // I3355   // I3500
-  GetRunTools.Silent := Silent;
   GetRunTools.OnStatus := Status;
 
   //InstallPackages; Exit;
