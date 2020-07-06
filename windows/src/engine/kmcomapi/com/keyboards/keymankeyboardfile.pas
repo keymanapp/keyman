@@ -37,7 +37,7 @@ uses
   keymankeyboard, keymancontext, Classes, PackageInfo, keymankeyboardlanguagesfile;
 
 type
-  TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile)
+  TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile, IKeymanKeyboardFile2)
   private
     FFileName: WideString;
     FError: Boolean;

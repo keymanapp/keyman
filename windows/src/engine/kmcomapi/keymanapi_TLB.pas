@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 3/07/2020 11:34:55 AM from Type Library described below.
+// File generated on 6/07/2020 3:15:46 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -86,6 +86,10 @@ const
   IID_IKeymanKeyboardLanguageInstalled: TGUID = '{2162FBDF-A165-4460-B99A-BF1FA3C96B76}';
   IID_IKeymanKeyboardLanguagesInstalled: TGUID = '{7DC22BC0-85BB-45C0-8EDB-A2F4BD1D500B}';
   IID_IKeymanKeyboardLanguagesFile: TGUID = '{5F90BCDA-F1C1-433A-8FD0-B498299D3C30}';
+  IID_IKeymanKeyboardsInstalled2: TGUID = '{EA57C94F-C140-485E-941A-3F1D5A229024}';
+  IID_IKeymanPackagesInstalled2: TGUID = '{F23B9848-2AEF-4A2B-BC3A-292E3A00D691}';
+  IID_IKeymanKeyboardFile2: TGUID = '{EDE4326B-51F4-42D5-8251-B20B71993EC8}';
+  IID_IKeymanPackageFile2: TGUID = '{9B43B6BC-C622-47EF-915E-6780CF53BAAA}';
 
 // *********************************************************************//
 // Declaration of Enumerations defined in Type Library
@@ -230,6 +234,14 @@ type
   IKeymanKeyboardLanguagesInstalledDisp = dispinterface;
   IKeymanKeyboardLanguagesFile = interface;
   IKeymanKeyboardLanguagesFileDisp = dispinterface;
+  IKeymanKeyboardsInstalled2 = interface;
+  IKeymanKeyboardsInstalled2Disp = dispinterface;
+  IKeymanPackagesInstalled2 = interface;
+  IKeymanPackagesInstalled2Disp = dispinterface;
+  IKeymanKeyboardFile2 = interface;
+  IKeymanKeyboardFile2Disp = dispinterface;
+  IKeymanPackageFile2 = interface;
+  IKeymanPackageFile2Disp = dispinterface;
 
 // *********************************************************************//
 // Declaration of CoClasses defined in Type Library
@@ -496,7 +508,6 @@ type
     function GetKeyboardFromFile(const Filename: WideString): IKeymanKeyboardFile; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     procedure Apply; safecall;
-    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
     property Items[Index: OleVariant]: IKeymanKeyboardInstalled read Get_Items; default;
   end;
 
@@ -511,7 +522,6 @@ type
     function GetKeyboardFromFile(const Filename: WideString): IKeymanKeyboardFile; dispid 16;
     procedure Install(const Filename: WideString; Force: WordBool); dispid 17;
     procedure Apply; dispid 18;
-    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; dispid 501;
     function IndexOf(const ID: WideString): Integer; dispid 5;
     property Count: Integer readonly dispid 1;
     property _NewEnum: IUnknown readonly dispid -4;
@@ -672,7 +682,6 @@ type
     function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     function IndexOf(const ID: WideString): Integer; safecall;
-    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
     property Items[Index: OleVariant]: IKeymanPackageInstalled read Get_Items; default;
   end;
 
@@ -687,7 +696,6 @@ type
     function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; dispid 16;
     procedure Install(const Filename: WideString; Force: WordBool); dispid 17;
     function IndexOf(const ID: WideString): Integer; dispid 18;
-    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; dispid 402;
     property Count: Integer readonly dispid 1;
     property _NewEnum: IUnknown readonly dispid -4;
     procedure Refresh; dispid 2;
@@ -894,7 +902,6 @@ type
     ['{80959B80-C7A9-4EB1-AB46-3762F8E5315B}']
     procedure Install(Force: WordBool); safecall;
     function Get_Languages: IKeymanKeyboardLanguagesFile; safecall;
-    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
     property Languages: IKeymanKeyboardLanguagesFile read Get_Languages;
   end;
 
@@ -907,7 +914,6 @@ type
     ['{80959B80-C7A9-4EB1-AB46-3762F8E5315B}']
     procedure Install(Force: WordBool); dispid 256;
     property Languages: IKeymanKeyboardLanguagesFile readonly dispid 402;
-    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; dispid 403;
     property Bitmap: IPicture readonly dispid 1;
     property Copyright: WideString readonly dispid 2;
     property DefaultBCP47Languages: WideString readonly dispid 3;
@@ -1210,7 +1216,6 @@ type
   IKeymanPackageFile = interface(IKeymanPackage)
     ['{9B67EB6C-5288-4E28-943C-F2981208D64A}']
     procedure Install(Force: WordBool); safecall;
-    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
   end;
 
 // *********************************************************************//
@@ -1221,7 +1226,6 @@ type
   IKeymanPackageFileDisp = dispinterface
     ['{9B67EB6C-5288-4E28-943C-F2981208D64A}']
     procedure Install(Force: WordBool); dispid 256;
-    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; dispid 402;
     property Author: WideString readonly dispid 1;
     property AuthorEmail: WideString readonly dispid 2;
     property Copyright: WideString readonly dispid 3;
@@ -1508,6 +1512,143 @@ type
     property Count: Integer readonly dispid 1;
     property _NewEnum: IUnknown readonly dispid -4;
     procedure Refresh; dispid 2;
+    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
+                          out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanKeyboardsInstalled2
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {EA57C94F-C140-485E-941A-3F1D5A229024}
+// *********************************************************************//
+  IKeymanKeyboardsInstalled2 = interface(IKeymanKeyboardsInstalled)
+    ['{EA57C94F-C140-485E-941A-3F1D5A229024}']
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanKeyboardsInstalled2Disp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {EA57C94F-C140-485E-941A-3F1D5A229024}
+// *********************************************************************//
+  IKeymanKeyboardsInstalled2Disp = dispinterface
+    ['{EA57C94F-C140-485E-941A-3F1D5A229024}']
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; dispid 19;
+    property Items[Index: OleVariant]: IKeymanKeyboardInstalled readonly dispid 0; default;
+    function GetKeyboardFromFile(const Filename: WideString): IKeymanKeyboardFile; dispid 16;
+    procedure Install(const Filename: WideString; Force: WordBool); dispid 17;
+    procedure Apply; dispid 18;
+    function IndexOf(const ID: WideString): Integer; dispid 5;
+    property Count: Integer readonly dispid 1;
+    property _NewEnum: IUnknown readonly dispid -4;
+    procedure Refresh; dispid 2;
+    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
+                          out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanPackagesInstalled2
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {F23B9848-2AEF-4A2B-BC3A-292E3A00D691}
+// *********************************************************************//
+  IKeymanPackagesInstalled2 = interface(IKeymanPackagesInstalled)
+    ['{F23B9848-2AEF-4A2B-BC3A-292E3A00D691}']
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanPackagesInstalled2Disp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {F23B9848-2AEF-4A2B-BC3A-292E3A00D691}
+// *********************************************************************//
+  IKeymanPackagesInstalled2Disp = dispinterface
+    ['{F23B9848-2AEF-4A2B-BC3A-292E3A00D691}']
+    function Install2(const Filename: WideString; Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; dispid 19;
+    property Items[Index: OleVariant]: IKeymanPackageInstalled readonly dispid 0; default;
+    function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; dispid 16;
+    procedure Install(const Filename: WideString; Force: WordBool); dispid 17;
+    function IndexOf(const ID: WideString): Integer; dispid 18;
+    property Count: Integer readonly dispid 1;
+    property _NewEnum: IUnknown readonly dispid -4;
+    procedure Refresh; dispid 2;
+    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
+                          out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanKeyboardFile2
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {EDE4326B-51F4-42D5-8251-B20B71993EC8}
+// *********************************************************************//
+  IKeymanKeyboardFile2 = interface(IKeymanKeyboardFile)
+    ['{EDE4326B-51F4-42D5-8251-B20B71993EC8}']
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanKeyboardFile2Disp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {EDE4326B-51F4-42D5-8251-B20B71993EC8}
+// *********************************************************************//
+  IKeymanKeyboardFile2Disp = dispinterface
+    ['{EDE4326B-51F4-42D5-8251-B20B71993EC8}']
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; dispid 403;
+    procedure Install(Force: WordBool); dispid 256;
+    property Languages: IKeymanKeyboardLanguagesFile readonly dispid 402;
+    property Bitmap: IPicture readonly dispid 1;
+    property Copyright: WideString readonly dispid 2;
+    property DefaultBCP47Languages: WideString readonly dispid 3;
+    property DefaultPrimaryLanguage: Integer readonly dispid 4;
+    property DefaultWindowsLanguages: WideString readonly dispid 5;
+    property DefaultHotkey: IKeymanHotkey readonly dispid 6;
+    property Encodings: KeymanKeyboardEncodings readonly dispid 7;
+    property Filename: WideString readonly dispid 8;
+    function GetCharsUsed: WideString; dispid 9;
+    property ID: WideString readonly dispid 10;
+    property LayoutType: KeymanKeyboardLayoutType readonly dispid 11;
+    property Message: WideString readonly dispid 12;
+    property Name: WideString readonly dispid 13;
+    property Version: WideString readonly dispid 14;
+    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
+                          out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanPackageFile2
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {9B43B6BC-C622-47EF-915E-6780CF53BAAA}
+// *********************************************************************//
+  IKeymanPackageFile2 = interface(IKeymanPackageFile)
+    ['{9B43B6BC-C622-47EF-915E-6780CF53BAAA}']
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanPackageFile2Disp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {9B43B6BC-C622-47EF-915E-6780CF53BAAA}
+// *********************************************************************//
+  IKeymanPackageFile2Disp = dispinterface
+    ['{9B43B6BC-C622-47EF-915E-6780CF53BAAA}']
+    function Install2(Force: WordBool; InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; dispid 257;
+    procedure Install(Force: WordBool); dispid 256;
+    property Author: WideString readonly dispid 1;
+    property AuthorEmail: WideString readonly dispid 2;
+    property Copyright: WideString readonly dispid 3;
+    property Filename: WideString readonly dispid 4;
+    property Files: IKeymanPackageContentFiles readonly dispid 5;
+    property Fonts: IKeymanPackageContentFonts readonly dispid 6;
+    property Graphic: IPicture readonly dispid 7;
+    property GraphicFile: IKeymanPackageContentFile readonly dispid 8;
+    property ID: WideString readonly dispid 9;
+    property KeyboardOptionsFile: IKeymanPackageContentFile readonly dispid 10;
+    property Keyboards: IKeymanPackageContentKeyboards readonly dispid 11;
+    property Name: WideString readonly dispid 12;
+    property ReadmeFile: IKeymanPackageContentFile readonly dispid 13;
+    property UsageFile: IKeymanPackageContentFile readonly dispid 14;
+    property Version: WideString readonly dispid 15;
+    property WelcomeFile: IKeymanPackageContentFile readonly dispid 16;
+    property Website: WideString readonly dispid 17;
     function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
                           out References: OleVariant): WideString; dispid 401;
   end;

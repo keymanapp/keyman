@@ -37,9 +37,8 @@ uses
   keymanpackagecontentfiles, StdVcl, kmpinffile, KeymanContext, Graphics, Classes, internalinterfaces;
 
 type
-  TKeymanPackageFile = class(TKeymanAutoObject, IKeymanPackage, IKeymanPackageFile)
+  TKeymanPackageFile = class(TKeymanAutoObject, IKeymanPackage, IKeymanPackageFile, IKeymanPackageFile2)
   private
-
     FSourcePath: string;
     FSubFiles: IKeymanPackageContentFiles;
     FKeyboards: IKeymanPackageContentKeyboards;

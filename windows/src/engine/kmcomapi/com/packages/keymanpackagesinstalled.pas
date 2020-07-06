@@ -38,7 +38,7 @@ type
     property Items[Index: Integer]: IIntKeymanPackageInstalled read GetItem write SetItem; default;
   end;
 
-  TKeymanPackagesInstalled = class(TKeymanAutoCollectionObject, IKeymanPackagesInstalled)
+  TKeymanPackagesInstalled = class(TKeymanAutoCollectionObject, IKeymanPackagesInstalled, IKeymanPackagesInstalled2)
   private
     FPackages: TPackageList;
   protected

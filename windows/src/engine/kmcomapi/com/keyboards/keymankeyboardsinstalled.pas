@@ -37,7 +37,7 @@ uses
   keymanerrorcodes, keymankeyboardinstalled, keymankeyboard, internalinterfaces;
 
 type
-  TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled, IIntKeymanKeyboardsInstalled)   // I4376
+  TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled, IKeymanKeyboardsInstalled2, IIntKeymanKeyboardsInstalled)   // I4376
   private
     FKeyboards: TKeyboardList;
   protected
