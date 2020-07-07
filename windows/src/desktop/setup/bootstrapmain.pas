@@ -160,11 +160,26 @@ BEGIN
 
           ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3476
 
-          // Get the list of anticipated packages from the filename.
+          // Get the list of anticipated packages from the filename
 
+
+          // The filename of this executable can be changed to tell it which
+          // packages to download, e.g. keyman-setup.khmer_angkor.km.exe tells
+          // it to download khmer_angkor from the Keyman cloud and install it
+          // for bcp47 tag km. See the setup documentation for more
+          // examples.
           FInstallInfo.LocatePackagesFromFilename(ParamStr(0));
+
+          // Additionally, packages can be specified on the command line, with
+          // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
           FInstallInfo.LocatePackagesFromParameter(FPackages);
+
+          // Packages that have been extracted from the SFX archive are in
+          // the TempPath
           FInstallInfo.LocatePackagesInPath(FInstallInfo.TempPath);
+
+          // Finally, look also for any .kmp packages in the same folder as
+          // this executable
           FInstallInfo.LocatePackagesInPath(ProgramPath);
 
           GetRunTools.CheckInternetConnectedState;
