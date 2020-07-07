@@ -70,10 +70,11 @@ public class KeyboardController {
           list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else if (keyboards_json.exists()) {
+        JSONArray json_list = null;
         try {
           // Get installed keyboards from installed_keyboards.json
           JSONParser jsonParser = new JSONParser();
-          JSONArray json_list = jsonParser.getJSONObjectFromFile(keyboards_json, JSONArray.class);
+          json_list = jsonParser.getJSONObjectFromFile(keyboards_json, JSONArray.class);
           if (json_list != null) {
             // Can't foreach JSONArray
             for (int i=0; i<json_list.length(); i++) {
@@ -83,9 +84,11 @@ public class KeyboardController {
                 list.add(k);
               }
             }
+          } else {
+            KMLog.LogError(TAG, "installed_keyboards.json is null");
           }
         } catch (Exception e) {
-          KMLog.LogException(TAG, "Exception reading installed_keyboards.json", e);
+          KMLog.LogJSONException(TAG, "Exception reading installed_keyboards.json", json_list, e);
           list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else {

@@ -8,6 +8,8 @@ import android.util.Log;
 import io.sentry.core.Sentry;
 import io.sentry.core.SentryLevel;
 
+import org.json.JSONArray;
+
 public final class KMLog {
 
   /**
@@ -43,6 +45,29 @@ public final class KMLog {
         Sentry.addBreadcrumb(msg);
       }
       Sentry.captureException(e);
+    }
+  }
+
+  /**
+   * Utility to include JSONArray in the log exception sent to Sentry
+   * @param tag String of the caller
+   * @param msg String of the exception message
+   * @param array JSONArray of the installed keyboards_list.json file
+   * @param e Throwable exception
+   */
+  public static void LogJSONException(String tag, String msg, JSONArray array, Throwable e) {
+    if (array != null && Sentry.isEnabled()) {
+      String formattedList = null;
+      try {
+        // Try to pretty-print the installed keyboards list
+        final int indentSpaces = 2;
+        formattedList = array.toString(indentSpaces);
+        Sentry.setExtra("keyboards_list.json", formattedList);
+      } catch (Exception innerE) {
+        // Throwaway the formatting exception and just report the original one
+        Sentry.setExtra("keyboards_list.json", array.toString());
+      }
+      LogException(tag, msg, e);
     }
   }
 }
