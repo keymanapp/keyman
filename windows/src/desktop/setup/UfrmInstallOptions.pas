@@ -110,6 +110,12 @@ begin
   // Keyman 11 and later version keyboards will always automatically update
   chkUpgradeKeyman7.Caption := FInstallInfo.Text(ssOptionsUpgradeKeyboards);
   chkAutomaticallyReportUsage.Caption := FInstallInfo.Text(ssOptionsAutomaticallyReportUsage);
+  cmdOK.Caption := FInstallInfo.Text(ssOkButton);
+  cmdCancel.Caption := FInstallInfo.Text(ssCancelButton);
+  lblInstallOptions.Caption := FInstallInfo.Text(ssOptionsTitleInstallOptions);
+  lblDefaultKeymanSettings.Caption := FInstallInfo.Text(ssOptionsTitleDefaultKeymanSettings);
+  lblSelectModulesToInstall.Caption := FInstallInfo.Text(ssOptionsTitleSelectModulesToInstall);
+  lblAssociatedKeyboardLanguage.Caption := FInstallInfo.Text(ssOptionsTitleAssociatedKeyboardLanguage);
 
   SetupDynamicOptions;
 end;
@@ -230,18 +236,18 @@ begin
   begin
     if not FInstallInfo.IsInstalled then
       case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := 'Install Keyman for Windows '+FInstallInfo.BestMsi.Version;
-        iilOnline: Text := 'Download and install Keyman for Windows '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
+        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallKeyman, [FInstallInfo.BestMsi.Version]);
+        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
       end
     else
       case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := 'Upgrade Keyman for Windows '+FInstallInfo.BestMsi.Version;
-        iilOnline: Text := 'Download and upgrade Keyman for Windows to '+FInstallInfo.BestMsi.Version+' ('+FormatFileSize(FInstallInfo.BestMsi.Size)+')';
+        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallKeyman, [FInstallInfo.BestMsi.Version]);
+        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
       end;
   end
   else if FInstallInfo.IsInstalled then
   begin
-    Text := 'Keyman for Windows '+FInstallInfo.InstalledVersion.Version+' is already installed'; //TODO: Localize?
+    Text := FInstallInfo.Text(ssOptionsKeymanAlreadyInstalled, [FInstallInfo.InstalledVersion.Version]);
   end
   else
   begin
@@ -262,15 +268,15 @@ begin
     if Assigned(packLocation) then
     begin
       case packLocation.LocationType of
-        iilLocal:  Text := 'Install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version; // TODO: localize
-        iilOnline: Text := 'Download and install '+packLocation.GetNameOrID(pack.ID)+' '+packLocation.Version+' ('+FormatFileSize(packLocation.Size)+')'; // TODO: localize; fixup size string
+        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallPackage, [packLocation.GetNameOrID(pack.ID), packLocation.Version]);
+        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallPackage, [packLocation.GetNameOrID(pack.ID), packLocation.Version, FormatFileSize(packLocation.Size)]);
       end;
 
       AddCheckboxPanel(Text, True, pt, chk, cb);
       chk.Checked := pack.ShouldInstall;
       chk.OnClick := chkInstallKeyboardClick;
       cb.OnClick := cbInstallKeyboardClick;
-      cb.Hint := 'Select the language that you wish to associate with '+packLocation.GetNameOrID(pack.ID)+' keyboard'; // TODO: Localize
+      cb.Hint := FInstallInfo.Text(ssOptionsPackageLanguageAssociation, [packLocation.GetNameOrID(pack.ID)]);
       cb.ShowHint := True;
 
       selectedLang := nil;
@@ -281,7 +287,7 @@ begin
       end;
 
       if cb.Items.Count = 0 then
-        cb.Items.AddObject('Default language', nil); // TODO: Localize
+        cb.Items.AddObject(FInstallInfo.Text(ssOptionsDefaultLanguage), nil);
 
       cb.Sorted := True;
       cb.ItemIndex := cb.Items.IndexOfObject(selectedLang);

@@ -58,7 +58,8 @@ const
 
 const
   SKeymanDeveloperName = 'Keyman Developer';
-  SKeymanDesktopName = 'Keyman Desktop';
+  SKeymanDesktopName = 'Keyman';
+  // Keyman Desktop was renamed to Keyman [for Windows] in 14.0
 
 implementation
 

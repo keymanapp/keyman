@@ -23,9 +23,9 @@ object frmInstallOptions: TfrmInstallOptions
   object lblInstallOptions: TLabel
     Left = 8
     Top = 8
-    Width = 125
+    Width = 179
     Height = 16
-    Caption = 'Installation options'
+    Caption = 'ssOptionsTitleInstallOptions'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -36,9 +36,9 @@ object frmInstallOptions: TfrmInstallOptions
   object lblDefaultKeymanSettings: TLabel
     Left = 8
     Top = 78
-    Width = 159
+    Width = 242
     Height = 16
-    Caption = 'Default Keyman settings'
+    Caption = 'ssOptionsTitleDefaultKeymanSettings'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -49,9 +49,9 @@ object frmInstallOptions: TfrmInstallOptions
   object lblSelectModulesToInstall: TLabel
     Left = 8
     Top = 172
-    Width = 233
+    Width = 238
     Height = 16
-    Caption = 'Select modules to install or upgrade'
+    Caption = 'ssOptionsTitleSelectModulesToInstall'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -60,13 +60,13 @@ object frmInstallOptions: TfrmInstallOptions
     ParentFont = False
   end
   object lblAssociatedKeyboardLanguage: TLabel
-    Left = 404
+    Left = 322
     Top = 172
-    Width = 205
+    Width = 287
     Height = 16
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
-    Caption = 'Associated Keyboard Language'
+    Caption = 'ssOptionsTitleAssociatedKeyboardLanguage'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
@@ -111,7 +111,7 @@ object frmInstallOptions: TfrmInstallOptions
     Top = 353
     Width = 73
     Height = 25
-    Caption = 'OK'
+    Caption = 'ssOkButton'
     Default = True
     TabOrder = 6
     OnClick = cmdOKClick
@@ -122,7 +122,7 @@ object frmInstallOptions: TfrmInstallOptions
     Width = 73
     Height = 25
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'ssCancelButton'
     ModalResult = 2
     TabOrder = 7
   end

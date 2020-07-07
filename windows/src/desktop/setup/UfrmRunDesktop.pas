@@ -576,11 +576,10 @@ begin
     FLocationType := FInstallInfo.BestMsi.LocationType;
 
     if FLocationType = iilOnline
-      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')' // TODO: localize?
+      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'
       else downloadSize := '';
 
-    s := s + Format(Char($2022)+' %0:s %1:s %2:s'#13#10,
-      ['Keyman Desktop', FInstallInfo.BestMsi.Version, downloadSize]);
+    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.BestMsi.Version, downloadSize]) + #13#10;
 
     Found := True;
   end
@@ -599,12 +598,12 @@ begin
           else langname := '';
 
         if packLocation.LocationType = iilOnline
-          then downloadSize := '('+FormatFileSize(packLocation.Size)+')' // TODO: localize?
+          then downloadSize := '('+FormatFileSize(packLocation.Size)+')'
           else downloadSize := '';
 
         if langname <> ''
-          then s := s + Format(Char($2022)+' %0:s %1:s for %2:s %3:s', [packLocation.Name.Trim, packLocation.Version.Trim, langname, downloadSize]) // TODO: localize
-          else s := s + Format(Char($2022)+' %0:s %1:s %2:s', [packLocation.Name.Trim, packLocation.Version.Trim, downloadSize]); // TODO: localize
+          then s := s + FInstallInfo.Text(ssActionInstallPackageLanguage, [packLocation.Name.Trim, packLocation.Version.Trim, langname, downloadSize])
+          else s := s + FInstallInfo.Text(ssActionInstallPackage, [packLocation.Name.Trim, packLocation.Version.Trim, downloadSize]);
 
         s := s + #13#10;
 
@@ -615,13 +614,13 @@ begin
     end;
   end;
   cmdInstall.Enabled := Found;
-  // TODO: i18n
+
   if not Found then
-    s := 'There is nothing to install.'
+    s := FInstallInfo.Text(ssActionNothingToInstall)
   else if FLocationType = iilOnline then
-    s := 'Setup will download and install:'#13#10+s
+    s := FInstallInfo.Text(ssActionDownloadAndInstall)+#13#10+s
   else
-    s := 'Setup will install:'#13#10+s;
+    s := FInstallInfo.Text(ssActionInstall)+#13#10+s;
 
   lblActions.Caption := s.Trim;
   lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
