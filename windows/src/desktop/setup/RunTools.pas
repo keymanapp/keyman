@@ -515,7 +515,6 @@ begin
       // because we've backed up the relevant keys for reapplication post-install
       // Version 11 and later do not need this treatment as they are upgraded in-place
       // with the file and registry locations remaining static
-      // TODO: make these codes constants somewhere
       if (MsiGetProductCode(ProductCode_Keyman7_1Light, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
          (MsiGetProductCode(ProductCode_Keyman7_1Pro, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
          (MsiGetProductCode(ProductCode_Keyman8, pcode) = ERROR_SUCCESS) or // Keyman 8.0
