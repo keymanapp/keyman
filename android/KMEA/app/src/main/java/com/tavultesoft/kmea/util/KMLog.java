@@ -11,6 +11,7 @@ import io.sentry.core.SentryLevel;
 import org.json.JSONArray;
 
 public final class KMLog {
+  private static final String TAG = "KMLog";
 
   /**
    * Utility to log error and send to Sentry
@@ -49,24 +50,24 @@ public final class KMLog {
   }
 
   /**
-   * Utility to include JSONArray in the log exception sent to Sentry
+   * Utility to print an Object in the log exception sent to Sentry
    * @param tag String of the caller
    * @param msg String of the exception message
-   * @param array JSONArray of the installed keyboards_list.json file
+   * @param objName String of the object name
+   * @param obj Object which will be formatted as a string
    * @param e Throwable exception
    */
-  public static void LogJSONException(String tag, String msg, JSONArray array, Throwable e) {
-    if (array != null && Sentry.isEnabled()) {
-      String formattedList = null;
+  public static void LogExceptionWithData(String tag, String msg,
+                                          String objName, Object obj, Throwable e) {
+    if (obj != null && Sentry.isEnabled()) {
+      String objStr = null;
       try {
-        // Try to pretty-print the installed keyboards list
-        final int indentSpaces = 2;
-        formattedList = array.toString(indentSpaces);
-        Sentry.setExtra("keyboards_list.json", formattedList);
+        objStr = obj.toString();
+        Sentry.setExtra(objName, objStr);
       } catch (Exception innerE) {
-        // Throwaway the formatting exception and just report the original one
-        Sentry.setExtra("keyboards_list.json", array.toString());
+        LogException(TAG, "Sentry.setExtra failed for " + objName, innerE);
       }
+      // Report the original exception
       LogException(tag, msg, e);
     }
   }
