@@ -32,6 +32,30 @@ class ResourceDownloadManagerTests: XCTestCase {
     }
   }
 
+  func testDownloadPackageForKeyboard() throws {
+    let expectation = XCTestExpectation(description: "Mocked \"download\" should complete successfully.")
+    let mtnt_id = TestUtils.Keyboards.khmer_angkor.fullID
+
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession?.queueMockResult(.download(mockedResult))
+
+    downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
+
+      // TODO:  Add assertion:  file exists in the documents directory, where we expect it
+      XCTAssertNil(error)
+      XCTAssertNotNil(package)
+
+      // TODO:  Add assertions: it really is the khmer_angkor keyboard package.
+
+      expectation.fulfill()
+    }
+
+    let downloadQueue = downloadManager!.downloader
+    downloadQueue.step()
+
+    wait(for: [expectation], timeout: 5)
+  }
+
   func testDownloadPackageForLexicalModel() throws {
     let expectation = XCTestExpectation(description: "Mocked \"download\" should complete successfully.")
     let mtnt_id = TestUtils.LexicalModels.mtnt.fullID

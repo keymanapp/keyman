@@ -458,32 +458,36 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // We can use the properties of the current "batch" to generate specialized notifications.
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    // Really, "if resource is installed from the cloud, only packaged locally"
     if let batch = batch as? DownloadBatch<InstallableKeyboard.FullID> {
-      // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
-      // Once downlading KMPs, will be the downloaded .kmp.
+      let packagePath = batch.downloadTasks[0].file
 
-      // The request has succeeded.
-      if downloader!.requestsCount == 0 { // Download queue finished.
-        // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
-        let keyboards = batch.downloadTasks[0].resources!
-        log.info("Downloaded keyboard: \(keyboards[0].id).")
+      // Check - is it a cloud resource or a KMP?
+      let file = packagePath.lastPathComponent
+      if file.hasSuffix(".kmp") {
+        // It is a keyboard package!
+        batch.completeWithPackage(fromKMP: packagePath)
+      } else {
+        // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
+        // Once downlading KMPs, will be the downloaded .kmp.
 
-        // TEMP:  wrap the newly-downloaded resources with a kmp.json.
-        //        Serves as a bridge until we're downloading actual .kmps for keyboards.
-        let _ = Migrations.migrateToKMPFormat(keyboards)
+        // The request has succeeded.
+        if downloader!.requestsCount == 0 { // Download queue finished.
+          // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
+          let keyboards = batch.downloadTasks[0].resources!
+          log.info("Downloaded keyboard: \(keyboards[0].id).")
+          // TEMP:  wrap the newly-downloaded resources with a kmp.json.
+          //        Serves as a bridge until we're downloading actual .kmps for keyboards.
+          let _ = Migrations.migrateToKMPFormat(keyboards)
 
-        if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
-          batch.completionBlock?(package, nil)
-        } else {
-          log.error("Could not load metadata for newly-installed keyboard")
+          if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
+            batch.completionBlock?(package, nil)
+          } else {
+            log.error("Could not load metadata for newly-installed keyboard")
+          }
         }
       }
-      // else "if resource is installed from an actual KMP"
-      // - in other words, the long-term target.
     } else if let batch = batch as? DownloadBatch<InstallableLexicalModel.FullID> {
-      let task = batch.downloadTasks[0]
-      let packagePath = task.file
+      let packagePath = batch.downloadTasks[0].file
       batch.completeWithPackage(fromKMP: packagePath)
     }
     
