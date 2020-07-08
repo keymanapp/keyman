@@ -11,7 +11,7 @@ import Foundation
 protocol HTTPDownloadDelegate: class {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
-  func downloadRequestFailed(_ request: HTTPDownloadRequest)
+  func downloadRequestFailed(_ request: HTTPDownloadRequest, with: Error?)
   func downloadQueueFinished(_ queue: HTTPDownloader)
   func downloadQueueCancelled(_ queue: HTTPDownloader)
 }
@@ -79,7 +79,16 @@ class HTTPDownloader: NSObject {
       //
       // Force the callback onto the main thread.
       DispatchQueue.main.async {
-        self.handler?.downloadRequestFailed(currentRequest)
+        self.handler?.downloadRequestFailed(currentRequest, with: nil)
+        self.runRequest()
+      }
+      return
+    }
+
+    guard error == nil else {
+      // The download process itself encountered an error.
+      DispatchQueue.main.async {
+        self.handler?.downloadRequestFailed(currentRequest, with: error)
         self.runRequest()
       }
       return
@@ -119,7 +128,7 @@ class HTTPDownloader: NSObject {
 
     guard let data = data else {
       DispatchQueue.main.async {
-        self.handler?.downloadRequestFailed(currentRequest)
+        self.handler?.downloadRequestFailed(currentRequest, with: nil)
         self.runRequest()
       }
       return

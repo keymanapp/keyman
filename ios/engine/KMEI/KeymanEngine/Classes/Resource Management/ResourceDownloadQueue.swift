@@ -540,20 +540,22 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       }
     }
   }
-  
-  func downloadRequestFailed(_ request: HTTPDownloadRequest) {
-    // We should never be in a state to return 'Unknown error", but better safe than sorry.
-    downloadRequestFailed(request, with: request.error ?? NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"]))
-  }
 
-  func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error) {
+  func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
     currentFrame.batch?.errors[currentFrame.index] = error
     let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
+    var err: Error
+    if let error = error {
+      err = error
+    } else {
+      err = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
+    }
+
     try? task.downloadFinalizationBlock?(false)
-    batch.completeWithError(error: error)
+    batch.completeWithError(error: err)
     downloader!.cancelAllOperations()
   }
 }

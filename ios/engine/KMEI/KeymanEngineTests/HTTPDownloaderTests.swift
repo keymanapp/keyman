@@ -51,7 +51,7 @@ class HTTPDownloaderTests: XCTestCase {
 
   func testSingleRequestFailure() throws {
     // A twist on the previous version - the 'download' fails.
-    let mockedResult = TestUtils.Downloading.MockResult(location: nil, error: NSError(domain: "KeymanTests", code: 1, userInfo: nil))
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: NSError(domain: "KeymanTests", code: 1, userInfo: nil))
     mockedURLSession?.queueMockResult(.download(mockedResult))
 
     let testDelegate = TestUtils.Downloading.ExpectationDownloaderDelegate()
