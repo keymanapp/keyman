@@ -122,7 +122,7 @@ type
     procedure FillActionText;
     { Private declarations }
   public
-    procedure DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
+    procedure DoInstall(Silent, PromptForReboot: Boolean);  // I3355   // I3500
     property ContinueSetup: Boolean read FContinueSetup write FContinueSetup;
     property StartAfterInstall: Boolean read FStartAfterInstall write FStartAfterInstall;  // I2738
     property DisableUpgradeFrom6Or7Or8: Boolean read FDisableUpgradeFrom6Or7Or8 write FDisableUpgradeFrom6Or7Or8; // I2847   // I4293
@@ -168,7 +168,7 @@ end;
 
 procedure TfrmRunDesktop.cmdInstallClick(Sender: TObject);
 begin
-  DoInstall(not FInstallInfo.ShouldInstallKeyman, False, True);  // I3355   // I3500
+  DoInstall(False, True);  // I3355   // I3500
 end;
 
 function MsiUIHandler(pvContext: Pointer; iMessageType: UINT; szMessage: PWideChar): Integer; stdcall; // I2644
@@ -477,7 +477,7 @@ begin
   MsiSetExternalUIW(MSIUIHandler, INSTALLLOGMODE_PROGRESS, Self);
 end;
 
-procedure TfrmRunDesktop.DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
+procedure TfrmRunDesktop.DoInstall(Silent, PromptForReboot: Boolean);  // I3355   // I3500
 begin
   if FDisableUpgradeFrom6Or7Or8 then // I2847   // I4293
   begin
@@ -508,7 +508,7 @@ begin
 
     SetupMSI; // I2644
 
-    if GetRunTools.DoInstall(Handle, PackagesOnly, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
+    if GetRunTools.DoInstall(Handle, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
       FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FAutomaticallyReportUsage) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
@@ -571,16 +571,15 @@ var
 begin
   Found := False;
   s := '';
-  if FInstallInfo.ShouldInstallKeyman then // TODO: refactor with PackagesOnly parameter
+  if FInstallInfo.ShouldInstallKeyman then
   begin
     FLocationType := FInstallInfo.BestMsi.LocationType;
 
     if FLocationType = iilOnline
-      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')' // TODO: localize?
+      then downloadSize := '('+FormatFileSize(FInstallInfo.BestMsi.Size)+')'
       else downloadSize := '';
 
-    s := s + Format(Char($2022)+' %0:s %1:s %2:s'#13#10,
-      ['Keyman Desktop', FInstallInfo.BestMsi.Version, downloadSize]);
+    s := s + FInstallInfo.Text(ssActionInstallKeyman, [FInstallInfo.BestMsi.Version, downloadSize]) + #13#10;
 
     Found := True;
   end
@@ -599,12 +598,12 @@ begin
           else langname := '';
 
         if packLocation.LocationType = iilOnline
-          then downloadSize := '('+FormatFileSize(packLocation.Size)+')' // TODO: localize?
+          then downloadSize := '('+FormatFileSize(packLocation.Size)+')'
           else downloadSize := '';
 
         if langname <> ''
-          then s := s + Format(Char($2022)+' %0:s %1:s for %2:s %3:s', [packLocation.Name.Trim, packLocation.Version.Trim, langname, downloadSize]) // TODO: localize
-          else s := s + Format(Char($2022)+' %0:s %1:s %2:s', [packLocation.Name.Trim, packLocation.Version.Trim, downloadSize]); // TODO: localize
+          then s := s + FInstallInfo.Text(ssActionInstallPackageLanguage, [packLocation.Name.Trim, packLocation.Version.Trim, langname, downloadSize])
+          else s := s + FInstallInfo.Text(ssActionInstallPackage, [packLocation.Name.Trim, packLocation.Version.Trim, downloadSize]);
 
         s := s + #13#10;
 
@@ -615,13 +614,13 @@ begin
     end;
   end;
   cmdInstall.Enabled := Found;
-  // TODO: i18n
+
   if not Found then
-    s := 'There is nothing to install.'
+    s := FInstallInfo.Text(ssActionNothingToInstall)
   else if FLocationType = iilOnline then
-    s := 'Setup will download and install:'#13#10+s
+    s := FInstallInfo.Text(ssActionDownloadAndInstall)+#13#10+s
   else
-    s := 'Setup will install:'#13#10+s;
+    s := FInstallInfo.Text(ssActionInstall)+#13#10+s;
 
   lblActions.Caption := s.Trim;
   lblActions.Top := panContent.ClientHeight - lblActions.Height - 4;
@@ -955,7 +954,7 @@ end;
 procedure TfrmRunDesktop.WMUserFormShown(var Message: TMessage);
 begin
   if FContinueSetup then
-    DoInstall(True, False, True);  // I3355   // I3500
+    DoInstall(False, True);  // I3355   // I3500
 end;
 
 procedure TfrmRunDesktop.Status(const Text: WideString = '');

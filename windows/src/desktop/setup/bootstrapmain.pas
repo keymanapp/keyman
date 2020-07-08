@@ -206,7 +206,7 @@ BEGIN
             StartAfterInstall := FStartAfterInstall; // I2738
             DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
             if FSilent
-              then DoInstall(False, True, FPromptForReboot)  // I3355   // I3500
+              then DoInstall(True, FPromptForReboot)  // I3355   // I3500
               else ShowModal;
           finally
             Free;

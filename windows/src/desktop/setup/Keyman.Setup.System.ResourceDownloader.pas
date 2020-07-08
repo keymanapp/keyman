@@ -36,7 +36,6 @@ uses
   Vcl.Controls,
   Winapi.Windows,
 
-  RunTools,
   SetupStrings,
   Upload_Settings;
 
@@ -77,7 +76,7 @@ begin
   { Download the redistributable }
   frmDownloadProgress := TfrmDownloadProgress.Create(nil);
   try
-    frmDownloadProgress.Caption := 'Downloading '+ExtractFileName(ADownloadFilename); // TODO: localize
+    frmDownloadProgress.Caption := FInstallInfo.Text(ssDownloadingTitle, [ExtractFileName(ADownloadFilename)]);
     frmDownloadProgress.Callback := DownloadFileCallback;
     Result := frmDownloadProgress.ShowModal = mrOk;
   finally
@@ -88,7 +87,7 @@ end;
 procedure TResourceDownloader.HttpReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
 begin
   // TODO: stop using this form and report back to main form instead
-  frmDownloadProgress.HTTPStatus(nil, 'Downloading '+ExtractFileName(FDownloadFilename), AReadCount, AContentLength);
+  frmDownloadProgress.HTTPStatus(nil, FInstallInfo.Text(ssDownloadingText,[ExtractFileName(FDownloadFilename)]), AReadCount, AContentLength);
   frmDownloadProgress.HTTPCheckCancel(nil, Abort);
 end;
 

@@ -97,7 +97,7 @@ type
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
-    function DoInstall(Handle: THandle; PackagesOnly,
+    function DoInstall(Handle: THandle;
       StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
       StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
@@ -153,6 +153,13 @@ uses
 var
   FRunTools: TRunTools = nil;
 
+const
+ UpgradeCode_Keyman11Plus =   '{c70af17c-8b9e-47a1-a099-b65aee3dc8b4}'; // Keyman 11+
+ ProductCode_Keyman7_1Light = '{35E06B45-17C0-406C-B94F-70EFF1EC9278}'; // Keyman 7.1 Light
+ ProductCode_Keyman7_1Pro =   '{04C8710E-3D29-4A25-80A2-A56853A4267D}'; // Keyman 7.1 Pro
+ ProductCode_Keyman8 =        '{18E9B728-8E4E-48DF-9E9F-6F3086A1FE04}'; // Keyman 8.0
+ ProductCode_Keyman9 =        '{E6806190-7B09-4A8C-8C95-25982589D919}'; // Keyman 9.0
+ ProductCode_Keyman10 =       '{A20AFB02-7581-4019-9229-5312308FBA1E}'; // Keyman 10.0
 
 function GetRunTools: TRunTools;
 begin
@@ -182,18 +189,18 @@ begin
   inherited;
 end;
 
-function TRunTools.DoInstall(Handle: THandle; PackagesOnly,
+function TRunTools.DoInstall(Handle: THandle;
   StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
   StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
 var
   msiLocation: TInstallInfoFileLocation;
 begin
-  if PackagesOnly
-    then StatusMax := FInstallInfo.Packages.Count
-    else StatusMax := 6 + FInstallInfo.Packages.Count;
+  if FInstallInfo.ShouldInstallKeyman
+    then StatusMax := 6 + FInstallInfo.Packages.Count
+    else StatusMax := FInstallInfo.Packages.Count;
 
   msiLocation := FInstallInfo.BestMsi;
-  if Assigned(msiLocation) and not PackagesOnly then
+  if Assigned(msiLocation) and FInstallInfo.ShouldInstallKeyman then
   begin
     if msiLocation.LocationType = iilOnline then
     begin
@@ -456,7 +463,7 @@ var
 begin
   if not Assigned(msiLocation) or (msiLocation.LocationType = iilOnline) then
   begin
-    UpgradeCode := '{c70af17c-8b9e-47a1-a099-b65aee3dc8b4}'; // Keyman 11+         // TODO: move constant somewhere else
+    UpgradeCode := UpgradeCode_Keyman11Plus
   end
   else
   begin
@@ -508,12 +515,11 @@ begin
       // because we've backed up the relevant keys for reapplication post-install
       // Version 11 and later do not need this treatment as they are upgraded in-place
       // with the file and registry locations remaining static
-      // TODO: make these codes constants somewhere
-      if (MsiGetProductCode('{35E06B45-17C0-406C-B94F-70EFF1EC9278}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
-         (MsiGetProductCode('{04C8710E-3D29-4A25-80A2-A56853A4267D}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
-         (MsiGetProductCode('{18E9B728-8E4E-48DF-9E9F-6F3086A1FE04}', pcode) = ERROR_SUCCESS) or // Keyman 8.0
-         (MsiGetProductCode('{E6806190-7B09-4A8C-8C95-25982589D919}', pcode) = ERROR_SUCCESS) or // Keyman 9.0
-         (MsiGetProductCode('{A20AFB02-7581-4019-9229-5312308FBA1E}', pcode) = ERROR_SUCCESS) then // Keyman 10.0
+      if (MsiGetProductCode(ProductCode_Keyman7_1Light, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
+         (MsiGetProductCode(ProductCode_Keyman7_1Pro, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
+         (MsiGetProductCode(ProductCode_Keyman8, pcode) = ERROR_SUCCESS) or // Keyman 8.0
+         (MsiGetProductCode(ProductCode_Keyman9, pcode) = ERROR_SUCCESS) or // Keyman 9.0
+         (MsiGetProductCode(ProductCode_Keyman10, pcode) = ERROR_SUCCESS) then // Keyman 10.0
       begin
         MsiConfigureProduct(pcode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT);
         // We'll ignore errors ...
