@@ -237,72 +237,6 @@ public class ResourceDownloadManager {
     return keyboard
   }
   
-  // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
-  // since this will expose the generated Promise for the caller's use.
-  private func downloadLexicalModelCore(withMetadata lexicalModels: [InstallableLexicalModel],
-                                        asActivity activity: DownloadActivityType,
-                                        fromPath path: URL,
-                                        completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel.FullID>? {
-    var startClosure: (() -> Void)? = nil
-    if activity != .update {
-      startClosure = self.resourceDownloadStartClosure(for: lexicalModels)
-    }
-    let completionClosure = self.resourceDownloadCompletionClosure(for: lexicalModels, handler: completionBlock)
-    if let dlBatch = buildLexicalModelDownloadBatch(for: lexicalModels[0],
-                                                    withFilename: path,
-                                                    asActivity: activity,
-                                                    startBlock: startClosure,
-                                                    completionBlock: completionClosure) {
-      let tasks = dlBatch.downloadTasks
-      // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
-      tasks.forEach { task in
-        task.resources = lexicalModels
-        task.resourceIDs = lexicalModels.map { $0.fullID }
-      }
-      
-      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      let queueState = downloader.state
-      if queueState != .clear {
-        resourceDownloadFailed(for: lexicalModels, with: queueState.error!)
-        return nil
-      }
-      
-      downloader.queue(.simpleBatch(dlBatch))
-      return dlBatch
-    }
-    return nil
-  }
-  
-  private func buildLexicalModelDownloadBatch(for lexicalModel: InstallableLexicalModel,
-                                              withFilename path: URL,
-                                              asActivity activity: DownloadActivityType,
-                                              startBlock: (()-> Void)? = nil,
-                                              completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) -> DownloadBatch<InstallableLexicalModel.FullID>? {
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: lexicalModel)!,
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
-      return nil
-    }
-
-    let request = HTTPDownloadRequest(url: path, userInfo: [:])
-    // TODO:  redirect to store in the Documents directory.
-    request.destinationFile = Storage.active.lexicalModelPackageURL(for: lexicalModel).path
-    request.tag = 0
-
-    let lexicalModelTask = DownloadTask(do: request, for: [lexicalModel.fullID])
-    let batchTasks: [DownloadTask<InstallableLexicalModel.FullID>] = [ lexicalModelTask ]
-
-    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
-    batchTasks.forEach { task in
-      task.request.userInfo[Key.downloadBatch] = batch
-      task.request.userInfo[Key.downloadTask] = task
-    }
-    
-    return batch
-  }
-  
   // Can be called by the cloud keyboard downloader and utilized.
   
   /// Starts the process of fetching the package file of the lexical model for the given language ID
@@ -390,11 +324,27 @@ public class ResourceDownloadManager {
     else {
       return
     }
-    
-    _ = downloadLexicalModelCore(withMetadata: [lexicalModel],
-                                 asActivity: isUpdate ? .update : .download,
-                                 fromPath: URL.init(string: filename)!,
-                                 completionBlock: completionBlock)
+
+    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+    let queueState = downloader.state
+    guard queueState == .clear else {
+      resourceDownloadFailed(for: [lexicalModel], with: queueState.error ?? NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"]))
+      return
+    }
+
+    let batch = self.buildPackageBatch(forFullID: FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID),
+                                       from: URL.init(string: filename)!,
+                                       withNotifications: !isUpdate,
+                                       withResource: lexicalModel,
+                                       completionBlock: completionBlock ?? { package, error in
+      // If the caller doesn't specify a completion block, this will carry out a default installation.
+      if let package = package {
+        try? ResourceFileManager.shared.install(resourceWithID: FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID), from: package)
+      }
+      // else error:  already handled by wrapping closure set within buildPackageBatch.
+    })
+
+    downloader.queue(.simpleBatch(batch))
   }
 
 
@@ -433,18 +383,30 @@ public class ResourceDownloadManager {
                                                               withNotifications: Bool = false,
                                                               completionBlock: @escaping CompletionHandler<FullID.Resource>)
   where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+    let batch = buildPackageBatch(forFullID: fullID, from: url, withNotifications: withNotifications, completionBlock: completionBlock)
+    downloader.queue(.simpleBatch(batch))
+  }
+
+  // Facilitates re-use of the downloadPackage core for updates.
+  // Also allows specifying LanguageResource instances for use in notifications.
+  internal func buildPackageBatch<FullID: LanguageResourceFullID>(forFullID fullID: FullID,
+                                                                  from url: URL,
+                                                                  withNotifications: Bool = false,
+                                                                  withResource resource: FullID.Resource? = nil,
+                                                                  completionBlock: @escaping CompletionHandler<FullID.Resource>) -> DownloadBatch<FullID>
+  where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
     var startClosure: (() -> Void)? = nil
     var completionClosure: CompletionHandler<FullID.Resource>? = completionBlock
 
     if withNotifications {
+      let resources = resource != nil ? [resource!] : [] as [FullID.Resource]
       // We don't have the full metadata available, but we can at least signal which resource type this way.
-      startClosure = resourceDownloadStartClosure(for: [] as [FullID.Resource])
-      completionClosure = resourceDownloadCompletionClosure(for: [] as [FullID.Resource], handler: completionBlock)
+      startClosure = resourceDownloadStartClosure(for: resources)
+      completionClosure = resourceDownloadCompletionClosure(for: resources, handler: completionBlock)
     }
 
     // build batch for package
-    let batch = DownloadBatch(forPackageWithID: fullID, from: url, startBlock: startClosure, completionBlock: completionClosure)
-    downloader.queue(.simpleBatch(batch))
+    return DownloadBatch(forPackageWithID: fullID, from: url, startBlock: startClosure, completionBlock: completionClosure)
   }
   
   // MARK: Update checks + management
@@ -496,11 +458,14 @@ public class ResourceDownloadManager {
         }
       } else if let lex = res as? InstallableLexicalModel {
         if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
-           let lexUpdate = Manager.shared.apiLexicalModelRepository.installableLexicalModel(withID: lex.id, languageID: lex.languageID),
            let path = URL.init(string: filename) {
-          if let batch = self.buildLexicalModelDownloadBatch(for: lexUpdate, withFilename: path, asActivity: .update) {
-            batches.append(batch)
+          let batch = self.buildPackageBatch(forFullID: lex.fullID, from: path, withResource: lex) { package, error in
+            if let package = package {
+              try? ResourceFileManager.shared.install(resourceWithID: lex.fullID, from: package)
+            }
+            // else error:  already handled by wrapping closure set within buildPackageBatch.
           }
+          batches.append(batch)
         }
       }
     }
