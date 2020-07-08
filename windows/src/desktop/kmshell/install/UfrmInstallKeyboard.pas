@@ -167,9 +167,18 @@ begin
     (FPackage.Keyboards[0] as IKeymanKeyboardInstalled).Languages.Install(BCP47);
 end;
 
+/// <summary>
+/// Takes a list of filename + bcp47 pairs (in filename=bcp47 format) and
+/// installs each package / keyboard with the associated bcp47 language. If a
+/// bcp47 value is not provided, then the default language for the package is
+/// installed. If a package contains multiple keyboards, then bcp47 should not
+/// be provided, and will be ignored if it is.
+/// This is the handler for the `-i` parameter, e.g.
+///   kmshell -i khmer_angkor.kmp c:\temp\sil_euro_latin.kmp=fr
+/// </summary>
 function InstallFiles(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
 var
-  I, J: Integer;
+  i, j: Integer;
   FPackage: IKeymanPackageInstalled;
   FKeyboard: IKeymanKeyboardInstalled;
   Filename: string;
@@ -180,33 +189,33 @@ begin
   FPackage := nil;
   FKeyboard := nil;
 
-  for I := 0 to FileNames.Count - 1 do
+  for i := 0 to FileNames.Count - 1 do
   begin
     try
       kmcom.Keyboards.Refresh;
 
-      FilenameBCP47 := Filenames[I].Split(['=']);
+      FilenameBCP47 := Filenames[i].Split(['=']);
       Filename := FilenameBCP47[0];
-      IsPackage := AnsiSameText(ExtractFileExt(FileNames[i]), '.kmp');
+      IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
 
       if (Length(FilenameBCP47) > 1) and (FilenameBCP47[1] <> '') then
       begin
         if IsPackage then
         begin
-          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileNames[i], True, False);
+          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True, False);
           InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[2]);
         end
         else
         begin
-          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileNames[i], True, False);
+          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True, False);
           FKeyboard.Languages.Install(FilenameBCP47[2]);
         end;
       end
       else
       begin
-        if AnsiSameText(ExtractFileExt(FileNames[i]), '.kmp')
-          then kmcom.Packages.Install(FileNames[i], True)
-          else kmcom.Keyboards.Install(FileNames[i], True);
+        if AnsiSameText(ExtractFileExt(FileName), '.kmp')
+          then kmcom.Packages.Install(FileName, True)
+          else kmcom.Keyboards.Install(FileName, True);
       end;
       CheckForMitigationWarningFor_Win10_1803(ASilent, '');
     except

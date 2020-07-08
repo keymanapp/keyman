@@ -61,7 +61,7 @@ begin
       Exit;
     end;
 
-    u := UTF8Encode(Response.ContentAsString(TEncoding.UTF8));
+    u := UTF8Encode(response.ContentAsString(TEncoding.UTF8));
   finally
     http.Free;
   end;
