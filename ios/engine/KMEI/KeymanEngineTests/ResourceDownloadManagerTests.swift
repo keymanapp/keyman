@@ -41,10 +41,12 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
 
-      // Assertion:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
-      let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      let cachedDocumentsKMP = documentsDir.appendingPathComponent(
-        TypedKeymanPackage<InstallableKeyboard>.baseFilename(for: TestUtils.Keyboards.khmer_angkor.fullID))
+
+      let tempDownloadKMP = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
+      XCTAssertFalse(FileManager.default.fileExists(atPath: tempDownloadKMP.path))
+      
+      // Assertions:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
+      let cachedDocumentsKMP = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
 
       XCTAssertTrue(FileManager.default.fileExists(atPath: cachedDocumentsKMP.path))
 
@@ -75,10 +77,11 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.LexicalModels.mtntKMP, withNotifications: false) { package, error in
 
+      let tempDownloadKMP = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.LexicalModels.mtnt.fullID)
+      XCTAssertFalse(FileManager.default.fileExists(atPath: tempDownloadKMP.path))
+
       // Assertion:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
-      let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      let cachedDocumentsKMP = documentsDir.appendingPathComponent(
-        TypedKeymanPackage<InstallableLexicalModel>.baseFilename(for: TestUtils.LexicalModels.mtnt.fullID))
+      let cachedDocumentsKMP = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.LexicalModels.mtnt.fullID)
 
       XCTAssertTrue(FileManager.default.fileExists(atPath: cachedDocumentsKMP.path))
 
@@ -109,10 +112,11 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
 
+      let tempDownloadKMP = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
+      XCTAssertFalse(FileManager.default.fileExists(atPath: tempDownloadKMP.path))
+
       // Assertion:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
-      let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      let cachedDocumentsKMP = documentsDir.appendingPathComponent(
-        TypedKeymanPackage<InstallableKeyboard>.baseFilename(for: TestUtils.Keyboards.khmer_angkor.fullID))
+      let cachedDocumentsKMP = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
 
       // On download failure, we shouldn't be producing a file here.
       XCTAssertFalse(FileManager.default.fileExists(atPath: cachedDocumentsKMP.path))
