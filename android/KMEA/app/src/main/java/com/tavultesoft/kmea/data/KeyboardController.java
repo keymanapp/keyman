@@ -60,7 +60,7 @@ public class KeyboardController {
       list = new ArrayList<Keyboard>();
       if (keyboards_dat.exists() && !keyboards_json.exists()) {
         try {
-          // Migrate installed_keyboards.dat to installed_keyboards.json
+          // Migrate installed_keyboards.dat to keyboards_list.json
           ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(keyboards_dat));
           ArrayList<HashMap<String, String>> dat_list = (ArrayList<HashMap<String, String>>) inputStream.readObject();
           inputStream.close();
@@ -70,10 +70,11 @@ public class KeyboardController {
           list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else if (keyboards_json.exists()) {
+        JSONArray json_list = null;
         try {
-          // Get installed keyboards from installed_keyboards.json
+          // Get installed keyboards from keyboards_list.json
           JSONParser jsonParser = new JSONParser();
-          JSONArray json_list = jsonParser.getJSONObjectFromFile(keyboards_json, JSONArray.class);
+          json_list = jsonParser.getJSONObjectFromFile(keyboards_json, JSONArray.class);
           if (json_list != null) {
             // Can't foreach JSONArray
             for (int i=0; i<json_list.length(); i++) {
@@ -83,9 +84,12 @@ public class KeyboardController {
                 list.add(k);
               }
             }
+          } else {
+            KMLog.LogError(TAG, KMFilename_Installed_KeyboardsList + " is null");
           }
         } catch (Exception e) {
-          KMLog.LogException(TAG, "Exception reading installed_keyboards.json", e);
+          KMLog.LogExceptionWithData(TAG, "Exception reading " + KMFilename_Installed_KeyboardsList,
+            KMFilename_Installed_KeyboardsList, json_list, e);
           list.add(Keyboard.getDefaultKeyboard(context));
         }
       } else {
