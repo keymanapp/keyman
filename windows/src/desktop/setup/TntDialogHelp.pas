@@ -59,6 +59,10 @@ function MessageDlgW(const Msg: WideString; DlgType: TMsgDlgType;
 
 implementation
 
+uses
+  bootstrapmain,
+  SetupStrings; // for localization
+
 function Tnt_MessageBoxW(hWnd: HWND; lpText, lpCaption: PWideChar; uType: UINT): Integer;
 begin
   Result := MessageBoxW{TNT-ALLOW MessageBoxW}(hWnd, lpText, lpCaption, uType);
@@ -82,7 +86,7 @@ begin
   else if Buttons = [mbRetry, mbCancel] then FButtons := MB_RETRYCANCEL
   else FButtons := MB_OK;
 
-  case Tnt_MessageBoxW(GetActiveWindow, PWideChar(Msg), 'Keyman Desktop Setup', MBFlags[DlgType] or FButtons) of
+  case Tnt_MessageBoxW(GetActiveWindow, PWideChar(Msg), PChar(FInstallInfo.Text(ssMessageBoxTitle)), MBFlags[DlgType] or FButtons) of
     IDOK: Result := mrOk;
     IDCANCEL: Result := mrCancel;
     IDYES: Result := mrYes;
@@ -93,7 +97,7 @@ end;
 
 procedure ShowMessageW(const Message: WideString);
 begin
-  Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), 'Keyman Desktop Setup', MB_OK);
+  Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), PChar(FInstallInfo.Text(ssMessageBoxTitle)), MB_OK);
 end;
 
 end.

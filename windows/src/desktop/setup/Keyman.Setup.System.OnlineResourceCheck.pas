@@ -48,6 +48,7 @@ begin
   url := TURI.Create(MakeAPIURL(API_Path_UpdateCheck_Windows));
   url.AddParameter('version', currentVersion);
   url.AddParameter('tier', KeymanVersion.CKeymanVersionInfo.Tier);
+  url.AddParameter('update', '0'); // This is probably a fresh install of a package, not an update
   for pack in AInstallInfo.Packages do
     url.AddParameter('package_'+pack.ID, pack.Locations.LatestVersion);
   http := THTTPClient.Create;

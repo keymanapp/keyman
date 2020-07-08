@@ -93,7 +93,6 @@ procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forw
 function CreateTempDir: string; forward;
 procedure RemoveTempDir(const path: string); forward;
 procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string); forward;
-procedure LogError(const s: WideString); forward;
 procedure SetExitVal(c: Integer); forward;
 function IsKeymanDesktop7Installed: string; forward;
 function IsKeymanDesktop8Installed: string; forward;
@@ -105,11 +104,10 @@ const
   ICC_PROGRESS_CLASS     = $00000020; // progress
 
 
-var
-  ProgramPath: string = '';
 
 procedure Run;
 var
+  ProgramPath: string;
   FTempPath: string;
   FExtractOnly: Boolean;
   FContinueSetup: Boolean;
@@ -135,6 +133,7 @@ BEGIN
           { Display the dialog }
 
           ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path);  // I2738, I2847  // I3355   // I3500   // I4293
+          GetRunTools.Silent := FSilent;
 
           if FExtractOnly then
           begin
@@ -142,26 +141,21 @@ BEGIN
             Exit;
           end;
 
-          // We will now work with a missing setup.inf: if it is not present,
-          // we assume that we are in Keyman Desktop mode
-
           // There are two possible paths for files: ProgramPath and TempPath,
-          // and also files that can be downloaded during the installation into TempPath.
-
-          // TODO: deprecate ExtPath usage for one of TempPath or ProgramPath
+          // and also files that can be downloaded during the installation
+          // (into TempPath).
 
           ProgramPath := ExtractFilePath(ParamStr(0));
 
-          if not ProcessArchive then
-          begin
-            { The files must be in the current directory.  Use them instead }
-            ExtPath := ExtractFilePath(ParamStr(0));  // I3476
-          end;
+          // Extract SFX archive into temp path
 
-          ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3476
+          ProcessArchive(FInstallInfo.TempPath);
 
-          // Get the list of anticipated packages from the filename
-
+          // Get the list of anticipated packages from:
+          // 1. the program filename
+          // 2. parameters
+          // 3. files extracted from the archive
+          // 4. files in the same folder as this program
 
           // The filename of this executable can be changed to tell it which
           // packages to download, e.g. keyman-setup.khmer_angkor.km.exe tells
@@ -210,8 +204,8 @@ BEGIN
           begin
             // TODO: this should be refactored together with the retry strategy for online check above
             // TODO: Delineate between log messages and dialogs.
-            // TODO: Consider Sentry?
-            LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
+            // TODO: localize
+            GetRunTools.LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
             SetExitVal(ERROR_NO_MORE_FILES);
             Exit;
           end;
@@ -226,7 +220,7 @@ BEGIN
             StartAfterInstall := FStartAfterInstall; // I2738
             DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
             if FSilent
-              then DoInstall(False, True, FPromptForReboot)  // I3355   // I3500
+              then DoInstall(True, FPromptForReboot)  // I3355   // I3500
               else ShowModal;
           finally
             Free;
@@ -243,8 +237,12 @@ BEGIN
     except
       on e:Exception do
       begin
-        //TODO: handle exceptions with JCL
-        ShowMessageW(e.message);
+        // For the future, we may consider logging exceptions with Sentry.
+        // However, Sentry adds a 400kb library to the bootstrap which we
+        // would need to embed and extract at startup in order to do this
+        // capture. That's a bit of a downer for this project, which we are
+        // trying (somewhat unsuccessfully) to keep as lightweight as we can.
+        GetRunTools.LogError('Exception '+e.ClassName+': '+e.Message);
       end;
     end;
   finally
@@ -300,7 +298,7 @@ procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
       if location.LocationType = iilOnline then
         Assert(FALSE, 'TODO: implement download of this resource');
         //TODO:
-      TUtilExecute.WaitForProcess('"' + ShellPath + '" '+silentFlag+' -i "'+location.Path+'"', ExtPath);
+      TUtilExecute.WaitForProcess('"' + ShellPath + '" '+silentFlag+' -i "'+location.Path+'"', FInstallInfo.TempPath);
     end;
   end;
 var
@@ -319,46 +317,48 @@ begin
 end;
 
 procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
+var
+  path: string;
 begin
-  ExtPath := FExtractOnly_Path;  // I3476
+  path := FExtractOnly_Path;  // I3476
 
-  if ExtPath = '' then
-    ExtPath := '.';
+  if path = '' then
+    path := '.';
 
-  if (ExtPath <> '.') and (ExtPath <> '.\') and not DirectoryExists(ExtPath) then  // I3081  // I3476
+  if (path <> '.') and (path <> '.\') and not DirectoryExists(path) then  // I3081  // I3476
   begin
-    if not CreateDir(ExtPath) then  // I3476
+    if not CreateDir(path) then  // I3476
     begin
-      LogError('Setup could not create the target folder '+ExtPath);  // I3476
+      GetRunTools.LogError('Setup could not create the target folder '+path);  // I3476
       SetExitVal(Integer(GetLastError));
       Exit;
     end;
   end;
 
-  if not ProcessArchive then
+  if not ProcessArchive(path) then
   begin
-    LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
+    GetRunTools.LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
     SetExitVal(ERROR_BAD_FORMAT);
     Exit;
   end;
 
-  if not FSilent then
-    LogError('All files extracted from the archive to '+ExtPath+'\.');  // I3476
+  GetRunTools.LogInfo('All files extracted from the archive to '+path+'\.', True);  // I3476
   SetExitVal(ERROR_SUCCESS);
 end;
 
 function CreateTempDir: string;
 var
   buf: array[0..260] of WideChar;
+  path: string;
 begin
   GetTempPath(MAX_PATH-1, buf);
-  ExtPath := ExcludeTrailingPathDelimiter(buf);  // I3476
-  GetTempFileName(PWideChar(ExtPath), 'kmt', 0, buf);  // I3476
-  ExtPath := buf;  // I3476
+  path := ExcludeTrailingPathDelimiter(buf);  // I3476
+  GetTempFileName(PWideChar(path), 'kmt', 0, buf);  // I3476
+  path := buf;  // I3476
   if FileExists(buf) then DeleteFile(buf);  // I3476
   // NOTE: race condition here...
   CreateDirectory(buf, nil);  // I3476
-  Result := IncludeTrailingPathDelimiter(ExtPath);
+  Result := IncludeTrailingPathDelimiter(path);
 end;
 
 procedure DeletePath(const path: WideString);
@@ -431,13 +431,6 @@ begin
     end;
     Inc(i);
   end;
-end;
-
-procedure LogError(const s: WideString);
-begin
-  // TODO: refactor with RunTools.LogError
-  // TODO: FSilent mode, log error to logfile instead;
-  ShowMessageW(s);
 end;
 
 procedure SetExitVal(c: Integer);
