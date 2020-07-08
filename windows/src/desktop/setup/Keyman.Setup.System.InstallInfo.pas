@@ -167,6 +167,7 @@ uses
 
   KeymanVersion,
   kmpinffile,
+  utilfiletypes,
   versioninfo;
 
 { TInstallInfo }
@@ -359,10 +360,10 @@ var
   iipl: TInstallInfoPackageLanguage;
 begin
   p := IncludeTrailingPathDelimiter(path);
-  if FindFirst(p+'*.kmp', 0, f) = 0 then  // TODO: fix constant
+  if FindFirst(p+'*'+Ext_PackageFile, 0, f) = 0 then
   begin
     repeat
-      if SameText(ExtractFileExt(f.Name), '.kmp') then // TODO: fix constant
+      if SameText(ExtractFileExt(f.Name), Ext_PackageFile) then
       begin
         packLocation := TInstallInfoPackageFileLocation.Create(iilLocal);
         if GetPackageMetadata(p + f.Name, packLocation.LocalPackage) then

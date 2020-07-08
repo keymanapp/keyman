@@ -36,7 +36,6 @@ uses
   Vcl.Controls,
   Winapi.Windows,
 
-  RunTools,
   SetupStrings,
   Upload_Settings;
 
