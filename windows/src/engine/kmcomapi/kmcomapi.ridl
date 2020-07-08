@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 21/02/2018 8:54:28 PM (- $Rev: 12980 $, 726708000).
+// File generated on 6/07/2020 3:15:47 PM (- $Rev: 12980 $, 863754125).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -59,6 +59,10 @@ library keymanapi
   interface IKeymanKeyboardLanguage;
   interface IKeymanKeyboardLanguagesInstalled;
   interface IKeymanKeyboardLanguagesFile;
+  interface IKeymanKeyboardsInstalled2;
+  interface IKeymanPackagesInstalled2;
+  interface IKeymanKeyboardFile2;
+  interface IKeymanPackageFile2;
 
 
   [
@@ -903,6 +907,58 @@ library keymanapi
   {
     [propget, id(0x00000000), defaultcollelem]
     HRESULT _stdcall Items([in] int Index, [out, retval] IKeymanKeyboardLanguage** Value);
+  };
+
+  [
+    uuid(EA57C94F-C140-485E-941A-3F1D5A229024),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanKeyboardsInstalled2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardsInstalled2: IKeymanKeyboardsInstalled
+  {
+    [id(0x00000013)]
+    HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
+  };
+
+  [
+    uuid(F23B9848-2AEF-4A2B-BC3A-292E3A00D691),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanPackagesInstalled2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanPackagesInstalled2: IKeymanPackagesInstalled
+  {
+    [id(0x00000013)]
+    HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanPackageInstalled** PackageResult);
+  };
+
+  [
+    uuid(EDE4326B-51F4-42D5-8251-B20B71993EC8),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanKeyboardFile2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardFile2: IKeymanKeyboardFile
+  {
+    [id(0x00000193)]
+    HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
+  };
+
+  [
+    uuid(9B43B6BC-C622-47EF-915E-6780CF53BAAA),
+    version(14.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanPackageFile2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanPackageFile2: IKeymanPackageFile
+  {
+    [id(0x00000101)]
+    HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [in] VARIANT_BOOL InstallDefaultLanguage, [out, retval] IKeymanPackageInstalled** PackageResult);
   };
 
   [

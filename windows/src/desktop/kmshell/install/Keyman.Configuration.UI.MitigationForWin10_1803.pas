@@ -20,10 +20,11 @@ implementation
 uses
   kmcomapi_errors,
   kmint,
+  Upload_Settings,
   utilexecute;
 
 const
-  SLearnMoreURL = 'https://keyman.com/go/desktop/10.0/issue-1285';
+  SLearnMoreURLPath = '/go/desktop/10.0/issue-1285';
 
 
 procedure CheckForMitigationWarningFor_Win10_1803(ASilent: Boolean; const ALogFile: string);
@@ -65,7 +66,7 @@ begin
         (frm.Controls[i] as TButton).Caption := 'Learn more';
 
     if frm.ShowModal = mrYes then
-      TUtilExecute.URL(SLearnMoreURL);
+      TUtilExecute.URL(MakeKeymanURL(SLearnMoreURLPath));
   finally
     frm.Free;
   end;

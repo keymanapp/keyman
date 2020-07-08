@@ -5,10 +5,7 @@ interface
 uses
   Winapi.Windows;
 
-var
-  ExtPath: string = '';
-
-function ProcessArchive: Boolean;
+function ProcessArchive(const ExtPath: string): Boolean;
 
 implementation
 
@@ -77,7 +74,10 @@ end;
 // All this is due to RSP-17889. If this gets fixed, we can eliminate the
 // copy to TMemoryStream - and probably even the FindFirstHeader call
 //
-function ProcessArchive: Boolean;
+// 2020-07-07: RSP-17889 checked against Delphi 10.4 Sydney and not yet fixed.
+// https://quality.embarcadero.com/browse/RSP-17889
+
+function ProcessArchive(const ExtPath: string): Boolean;
 var
   fs: TFileStream;
   ms: TMemoryStream;

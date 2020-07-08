@@ -170,3 +170,5 @@ exports
 begin
     // I1642 move GetErrLogPath out of DllMain - causes memory issues later due to COM calls.  Now in TavultesoftKeyman:Initialize
 end.
+
+

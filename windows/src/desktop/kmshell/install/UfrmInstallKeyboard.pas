@@ -106,7 +106,7 @@ type
 
 function InstallKeyboardFromFile(Owner: TComponent): Boolean;
 function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile: string): Boolean;
-function InstallFiles(Owner: TComponent; const FileNames: TWideStrings; ASilent: Boolean): Boolean;
+function InstallFiles(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
 
 implementation
 
@@ -144,26 +144,79 @@ begin
 
 end;}
 
-function InstallFiles(Owner: TComponent; const FileNames: TWideStrings; ASilent: Boolean): Boolean;
+procedure InstallKeyboardPackageLanguage(FPackage: IKeymanPackageInstalled; const BCP47: string);
 var
-  I: Integer;
-  //FLanguageEnvironmentManager: TLanguageEnvironmentManager;
-  FPackage: IKeymanPackageFile;
-  FKeyboard: IKeymanKeyboardFile;
-  j: Integer;
+  DefaultBCP47Language: string;
+  i: Integer;
+begin
+  if FPackage.Keyboards.Count > 1 then
+  begin
+    // We don't attempt to propagate the language association preference
+    // when there is more than one keyboard in the package. This means a
+    // little bit of nasty hoop jumping in order to get the default
+    // language code for each keyboard.
+    for i := 0 to FPackage.Keyboards.Count - 1 do
+    begin
+      DefaultBCP47Language := FPackage.Keyboards[i].DefaultBCP47Languages;
+      if DefaultBCP47Language.Contains(' ') then
+        DefaultBCP47Language := DefaultBCP47Language.Split([' '])[0];
+      (FPackage.Keyboards[i] as IKeymanKeyboardInstalled).Languages.Install(DefaultBCP47Language);
+    end;
+  end
+  else if FPackage.Keyboards.Count > 0 then
+    (FPackage.Keyboards[0] as IKeymanKeyboardInstalled).Languages.Install(BCP47);
+end;
+
+/// <summary>
+/// Takes a list of filename + bcp47 pairs (in filename=bcp47 format) and
+/// installs each package / keyboard with the associated bcp47 language. If a
+/// bcp47 value is not provided, then the default language for the package is
+/// installed. If a package contains multiple keyboards, then bcp47 should not
+/// be provided, and will be ignored if it is.
+/// This is the handler for the `-i` parameter, e.g.
+///   kmshell -i khmer_angkor.kmp c:\temp\sil_euro_latin.kmp=fr
+/// </summary>
+function InstallFiles(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
+var
+  i, j: Integer;
+  FPackage: IKeymanPackageInstalled;
+  FKeyboard: IKeymanKeyboardInstalled;
+  Filename: string;
+  FilenameBCP47: TArray<string>;
+  IsPackage: Boolean;
 begin
   Result := False;
   FPackage := nil;
   FKeyboard := nil;
 
-  for I := 0 to FileNames.Count - 1 do
+  for i := 0 to FileNames.Count - 1 do
   begin
     try
       kmcom.Keyboards.Refresh;
 
-      if AnsiSameText(ExtractFileExt(FileNames[i]), '.kmp')
-        then kmcom.Packages.Install(FileNames[i], True)
-        else kmcom.Keyboards.Install(FileNames[i], True);
+      FilenameBCP47 := Filenames[i].Split(['=']);
+      Filename := FilenameBCP47[0];
+      IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
+
+      if (Length(FilenameBCP47) > 1) and (FilenameBCP47[1] <> '') then
+      begin
+        if IsPackage then
+        begin
+          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True, False);
+          InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[2]);
+        end
+        else
+        begin
+          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True, False);
+          FKeyboard.Languages.Install(FilenameBCP47[2]);
+        end;
+      end
+      else
+      begin
+        if AnsiSameText(ExtractFileExt(FileName), '.kmp')
+          then kmcom.Packages.Install(FileName, True)
+          else kmcom.Keyboards.Install(FileName, True);
+      end;
       CheckForMitigationWarningFor_Win10_1803(ASilent, '');
     except
       on E:EOleException do

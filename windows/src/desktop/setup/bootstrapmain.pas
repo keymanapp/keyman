@@ -47,48 +47,18 @@ interface
 
 uses
   System.Classes,
+  System.Generics.Collections,
   System.SysUtils,
+
+  Keyman.Setup.System.InstallInfo,
   SetupStrings;
-
-type
-  EInstallInfo = class(Exception);
-
-
-  TInstallInfo = class
-  private
-    FAppName: WideString;
-    FMSIFileName: WideString;
-    FMSIOptions: string;  // I3126
-    FVersion: WideString;
-    FPackages: TStrings;
-    FStrings: TStrings;
-    FLicenseFileName: WideString;  // I2562
-    FTitleImageFilename: string;
-    FStartDisabled: Boolean;
-    FStartWithConfiguration: Boolean;
-  public
-    constructor Create;
-    destructor Destroy; override;
-    procedure Load;
-    function Text(const Name: TInstallInfoText): WideString; overload;
-    function Text(const Name: TInstallInfoText; const Args: array of const): WideString; overload;
-    property Strings: TStrings read FStrings;
-    property EditionTitle: WideString read FAppName;
-    property MSIFileName: WideString read FMSIFileName;
-    property MSIOptions: string read FMSIOptions;  // I3126
-    property Version: WideString read FVersion write FVersion;
-    property Packages: TStrings read FPackages;
-    property LicenseFileName: WideString read FLicenseFileName;  // I2562
-    property TitleImageFilename: string read FTitleImageFilename;
-    property StartDisabled: Boolean read FStartDisabled;
-    property StartWithConfiguration: Boolean read FStartWithConfiguration;
-  end;
 
 var
   FInstallInfo: TInstallInfo = nil;
 
 procedure Run;
-//function ExecuteApp(const cmdline, curdir: WideString; sw: Integer): Boolean;
+
+function FormatFileSize(Size: Integer): string;
 
 implementation
 
@@ -102,12 +72,14 @@ uses
   CommonControls,
   ErrorControlledRegistry,
   GetOsVersion,
+  Keyman.Setup.System.OnlineResourceCheck,
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
   OnlineConstants,
   RegistryHelpers,
   RegistryKeys,
+  RunTools,
   SetupForm,
   SFX,
   TntDialogHelp,
@@ -115,28 +87,278 @@ uses
   Upload_Settings,
   utilexecute;
 
+function CheckForOldVersionScenario: Boolean; forward;
+procedure InstallKeyboardsInOldVersion(const ShellPath: string); forward;
+procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forward;
+function CreateTempDir: string; forward;
+procedure RemoveTempDir(const path: string); forward;
+procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string); forward;
+procedure SetExitVal(c: Integer); forward;
+function IsKeymanDesktop7Installed: string; forward;
+function IsKeymanDesktop8Installed: string; forward;
+
 var
-  FNiceExitCodes: Boolean = False;
+  FNiceExitCodes: Boolean = True; // always, now
 
 const
   ICC_PROGRESS_CLASS     = $00000020; // progress
 
 
-var
-  TempPath: string = '';
 
-procedure CreateTempDir;
+procedure Run;
+var
+  ProgramPath: string;
+  FTempPath: string;
+  FExtractOnly: Boolean;
+  FContinueSetup: Boolean;
+  FStartAfterInstall: Boolean;  // I2738
+  FDisableUpgradeFrom6Or7Or8: Boolean; // I2847   // I4293
+  FPromptForReboot: Boolean;  // I3355   // I3500
+  FSilent: Boolean;
+  FForceOffline: Boolean;
+  FPackages, FExtractOnly_Path: string;
+BEGIN
+  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
+  try
+    try
+      Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
+
+      try
+        FTempPath := CreateTempDir;
+        try
+          InitCommonControl(ICC_PROGRESS_CLASS);
+
+          FInstallInfo := TInstallInfo.Create(FTempPath);
+
+          { Display the dialog }
+
+          ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path);  // I2738, I2847  // I3355   // I3500   // I4293
+          GetRunTools.Silent := FSilent;
+
+          if FExtractOnly then
+          begin
+            DoExtractOnly(FSilent, FExtractOnly_Path);
+            Exit;
+          end;
+
+          // There are two possible paths for files: ProgramPath and TempPath,
+          // and also files that can be downloaded during the installation
+          // (into TempPath).
+
+          ProgramPath := ExtractFilePath(ParamStr(0));
+
+          // Extract SFX archive into temp path
+
+          ProcessArchive(FInstallInfo.TempPath);
+
+          // Get the list of anticipated packages from:
+          // 1. the program filename
+          // 2. parameters
+          // 3. files extracted from the archive
+          // 4. files in the same folder as this program
+
+          // The filename of this executable can be changed to tell it which
+          // packages to download, e.g. keyman-setup.khmer_angkor.km.exe tells
+          // it to download khmer_angkor from the Keyman cloud and install it
+          // for bcp47 tag km. See the setup documentation for more
+          // examples.
+          FInstallInfo.LocatePackagesFromFilename(ParamStr(0));
+
+          // Additionally, packages can be specified on the command line, with
+          // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
+          FInstallInfo.LocatePackagesFromParameter(FPackages);
+
+          // Packages that have been extracted from the SFX archive are in
+          // the TempPath
+          FInstallInfo.LocatePackagesInPath(FInstallInfo.TempPath);
+
+          // Finally, look also for any .kmp packages in the same folder as
+          // this executable
+          FInstallInfo.LocatePackagesInPath(ProgramPath);
+
+          GetRunTools.CheckInternetConnectedState;
+
+          if not FForceOffline and GetRunTools.Online then
+            // TODO: retry strategies (and prompt around firewall etc)
+            TOnlineResourceCheck.QueryServer(FSilent, FInstallInfo);
+
+          // This loads setup.inf, if present, for various additional strings and settings
+          // The bundled installer usually contains a setup.inf.
+          if FileExists(FInstallInfo.TempPath + 'setup.inf') then
+            FInstallInfo.LoadSetupInf(FInstallInfo.TempPath)
+          else if FileExists(ProgramPath + 'setup.inf') then
+            FInstallInfo.LoadSetupInf(ProgramPath);
+
+          // If the user is trying to install on downlevel version of Windows (Vista or earlier),
+          // we can simplify their life by installing the packages into an existing Keyman
+          // install, or point them to the old version of Keyman otherwise.
+          if CheckForOldVersionScenario then   // I4460
+            Exit;
+
+          TRunTools.CheckInstalledVersion(FInstallInfo.BestMsi);
+
+          // Looks for installation state for Keyman, and determines best packages for installation.
+          // If no .msi can be found, and Keyman is not installed, this will show/log an error and
+          // abort installation.
+          if not FInstallInfo.CheckMsiAndPackageUpgradeScenarios then
+          begin
+            // TODO: this should be refactored together with the retry strategy for online check above
+            // TODO: Delineate between log messages and dialogs.
+            // TODO: localize
+            GetRunTools.LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
+            SetExitVal(ERROR_NO_MORE_FILES);
+            Exit;
+          end;
+
+          // Default scenario is that if any newer installer is available, then
+          // Setup should install it.
+          FInstallInfo.ShouldInstallKeyman := FInstallInfo.IsNewerAvailable;
+
+          with TfrmRunDesktop.Create(nil) do    // I2562
+          try
+            ContinueSetup := FContinueSetup;
+            StartAfterInstall := FStartAfterInstall; // I2738
+            DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
+            if FSilent
+              then DoInstall(True, FPromptForReboot)  // I3355   // I3500
+              else ShowModal;
+          finally
+            Free;
+          end;
+        finally
+          RemoveTempDir(FTempPath);
+        end;
+
+        SetExitVal(ERROR_SUCCESS);
+
+      finally
+        FInstallInfo.Free;
+      end;
+    except
+      on e:Exception do
+      begin
+        // For the future, we may consider logging exceptions with Sentry.
+        // However, Sentry adds a 400kb library to the bootstrap which we
+        // would need to embed and extract at startup in order to do this
+        // capture. That's a bit of a downer for this project, which we are
+        // trying (somewhat unsuccessfully) to keep as lightweight as we can.
+        GetRunTools.LogError('Exception '+e.ClassName+': '+e.Message);
+      end;
+    end;
+  finally
+    CoUninitialize;
+  end;
+end;
+
+function CheckForOldVersionScenario: Boolean;   // I4460
+var
+  OldKMShellPath: string;
+begin
+  if not (GetOS in [osLegacy, osVista]) then   // I4365
+    Exit(False);
+
+  if FInstallInfo.Packages.Count = 0 then
+  begin
+    // No keyboards installed, so we determine install based on Windows version
+    if MessageDlgW(FInstallInfo.Text(ssOldOsVersionDownload), mtConfirmation, mbOkCancel, 0) = mrOk then
+      TUtilExecute.URL(MakeKeymanURL(URLPath_ArchivedDownloads));
+    SetExitVal(ERROR_OLD_WIN_VERSION);
+    Exit(True);
+  end;
+
+  OldKMShellPath := IsKeymanDesktop8Installed;
+  if OldKMShellPath = '' then OldKMShellPath := IsKeymanDesktop7Installed;
+
+  if OldKMShellPath <> '' then
+  begin
+    if MessageDlgW(FInstallInfo.Text(ssOldOsVersionInstallKeyboards), mtConfirmation, mbYesNoCancel, 0) = mrYes then
+      InstallKeyboardsInOldVersion(OldKMShellPath);
+  end
+  else
+  begin
+    if MessageDlgW(FInstallInfo.Text(ssOldOsVersionDownload), mtConfirmation, mbOkCancel, 0) = mrOk then
+      TUtilExecute.URL(MakeKeymanURL(URLPath_ArchivedDownloads));
+  end;
+  SetExitVal(ERROR_OLD_WIN_VERSION);
+  Exit(True);
+end;
+
+// TODO: move this into a separate unit: it deals with installing keyboards into
+// an existing Keyman install on downlevel versions of Windows (e.g. Vista). So
+// we are constrained in how we do this -- no ability to do language associations
+// etc.
+procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
+  procedure DoInstall(pack: TInstallInfoPackage; const silentFlag: string);
+  var
+    location: TInstallInfoPackageFileLocation;
+  begin
+    location := pack.GetBestLocation;
+    if Assigned(location) and pack.ShouldInstall then
+    begin
+      if location.LocationType = iilOnline then
+        Assert(FALSE, 'TODO: implement download of this resource');
+        //TODO:
+      TUtilExecute.WaitForProcess('"' + ShellPath + '" '+silentFlag+' -i "'+location.Path+'"', FInstallInfo.TempPath);
+    end;
+  end;
+var
+  pack: TInstallInfoPackage;
+begin
+  if FInstallInfo.Packages.Count = 1 then
+  begin
+    DoInstall(FInstallInfo.Packages[0], '');
+  end
+  else
+  begin
+    for pack in FInstallInfo.Packages do
+      DoInstall(pack, '-s');
+    ShowMessageW('All packages have been installed');
+  end;
+end;
+
+procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
+var
+  path: string;
+begin
+  path := FExtractOnly_Path;  // I3476
+
+  if path = '' then
+    path := '.';
+
+  if (path <> '.') and (path <> '.\') and not DirectoryExists(path) then  // I3081  // I3476
+  begin
+    if not CreateDir(path) then  // I3476
+    begin
+      GetRunTools.LogError('Setup could not create the target folder '+path);  // I3476
+      SetExitVal(Integer(GetLastError));
+      Exit;
+    end;
+  end;
+
+  if not ProcessArchive(path) then
+  begin
+    GetRunTools.LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
+    SetExitVal(ERROR_BAD_FORMAT);
+    Exit;
+  end;
+
+  GetRunTools.LogInfo('All files extracted from the archive to '+path+'\.', True);  // I3476
+  SetExitVal(ERROR_SUCCESS);
+end;
+
+function CreateTempDir: string;
 var
   buf: array[0..260] of WideChar;
+  path: string;
 begin
   GetTempPath(MAX_PATH-1, buf);
-  ExtPath := ExcludeTrailingPathDelimiter(buf);  // I3476
-  GetTempFileName(PWideChar(ExtPath), 'kmt', 0, buf);  // I3476
-  ExtPath := buf;  // I3476
+  path := ExcludeTrailingPathDelimiter(buf);  // I3476
+  GetTempFileName(PWideChar(path), 'kmt', 0, buf);  // I3476
+  path := buf;  // I3476
   if FileExists(buf) then DeleteFile(buf);  // I3476
   // NOTE: race condition here...
   CreateDirectory(buf, nil);  // I3476
-  TempPath := ExtPath;
+  Result := IncludeTrailingPathDelimiter(path);
 end;
 
 procedure DeletePath(const path: WideString);
@@ -153,19 +375,19 @@ begin
   RemoveDirectory(PWideChar(path));
 end;
 
-procedure RemoveTempDir;
+procedure RemoveTempDir(const path: string);
 begin
-  if TempPath <> '' then
-    DeletePath(TempPath);  // I3476
+  if path <> '' then
+    DeletePath(ExcludeTrailingPathDelimiter(path));  // I3476
 end;
 
-procedure ProcessCommandLine(var FPromptForReboot, FSilent, FOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FExtractPath: WideString);  // I2847  // I3355   // I3500   // I4293
+procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string);  // I2847  // I3355   // I3500   // I4293
 var
   i: Integer;
 begin
   FPromptForReboot := True;  // I3355   // I3500
   FSilent := False;
-  FOffline := False;
+  FForceOffline := False;
   FExtractOnly := False;
   FContinueSetup := False;
   FDisableUpgradeFrom6Or7Or8 := False; // I2847   // I4293
@@ -185,37 +407,36 @@ begin
     begin
       // auto update - options for more flexibility later...
       FSilent := True;
-      FOffline := True;
+      FForceOffline := True;
       FStartAfterInstall := True;
       FDisableUpgradeFrom6Or7Or8 := True;  // I2847   // I4293
     end
     else if WideSameText(ParamStr(i), '-o') then
-      FOffline := True
+      FForceOffline := True
     else if WideSameText(ParamStr(i), '-r') then
-      FNiceExitCodes := True
+      // previously, 'nice exit codes'
     else if WideSameText(ParamStr(i), '-x') then
     begin
       Inc(i);
       FExtractOnly := True;
       FExtractPath := ParamStr(i);
+      if FExtractPath = '' then
+        FExtractPath := ExtractFilePath(ParamStr(0));
+    end
+    else if SameText(ParamStr(i), '-p') then
+    begin
+      // e.g. -p khmer_angkor=km,sil_euro_latin=fr
+      Inc(i);
+      FPackages := ParamStr(i);
     end;
     Inc(i);
   end;
 end;
 
-procedure LogError(const s: WideString);
-begin
-  ShowMessageW(s);
-end;
-
 procedure SetExitVal(c: Integer);
 begin
-  if FNiceExitCodes then
-    ExitCode := c
-  else if c = 0 then
-    ExitCode := 1
-  else
-    ExitCode := 0;
+  // TODO: write the exit code to the logfile
+  ExitCode := c;
 end;
 
 function IsKeymanDesktop7Installed: string;   // I4460
@@ -248,316 +469,16 @@ begin
   end;
 end;
 
-procedure InstallKeyboardsInOldVersion(const ShellPath: string);   // I4460
-var
-  I: Integer;
+function FormatFileSize(Size: Integer): string;
 begin
-  if FInstallInfo.Packages.Count = 1 then
-  begin
-    TUtilExecute.WaitForProcess('"' + ShellPath + '" -i "'+ExtPath+FInstallInfo.Packages.Names[0]+'"', ExtPath);
-  end
+  if Size > 1024*1024 then
+    Result := Format('%.1fMB', [Size/1024/1024])
+  else if Size > 1024 then
+    Result := Format('%dKB',[Size div 1024])
+  else if Size = 1 then
+    Result := '1 byte'
   else
-  begin
-    for I := 0 to FInstallInfo.Packages.Count - 1 do
-      TUtilExecute.WaitForProcess('"' + ShellPath + '" -s -i "'+ExtPath+FInstallInfo.Packages.Names[i]+'"', ExtPath);
-    ShowMessageW('All packages have been installed');
-  end;
+    Result := Format('%d bytes', [Size]);
 end;
-
-function CheckForOldVersionScenario: Boolean;   // I4460
-var
-  OldKMShellPath: string;
-begin
-  if FInstallInfo.Packages.Count = 0 then
-  begin
-    // No keyboards installed, so we determine install based on Windows version
-    if GetOS in [osLegacy, osVista] then   // I4365
-    begin
-      if MessageDlgW(FInstallInfo.Text(ssOldOsVersionDownload), mtConfirmation, mbOkCancel, 0) = mrOk then
-        TUtilExecute.URL(MakeKeymanURL(URLPath_ArchivedDownloads));
-      SetExitVal(ERROR_OLD_WIN_VERSION);
-      Exit(True);
-    end;
-    Exit(False);
-  end;
-
-  OldKMShellPath := IsKeymanDesktop8Installed;
-  if OldKMShellPath = '' then OldKMShellPath := IsKeymanDesktop7Installed;
-
-  if GetOS in [osLegacy, osVista] then
-  begin
-    if OldKMShellPath <> '' then
-    begin
-      if MessageDlgW(FInstallInfo.Text(ssOldOsVersionInstallKeyboards), mtConfirmation, mbYesNoCancel, 0) = mrYes then
-        InstallKeyboardsInOldVersion(OldKMShellPath);
-    end
-    else
-    begin
-      if MessageDlgW(FInstallInfo.Text(ssOldOsVersionDownload), mtConfirmation, mbOkCancel, 0) = mrOk then
-        TUtilExecute.URL(MakeKeymanURL(URLPath_ArchivedDownloads));
-    end;
-    SetExitVal(ERROR_OLD_WIN_VERSION);
-    Exit(True);
-  end;
-
-  if OldKMShellPath <> '' then
-  begin
-    case MessageDlgW(FInstallInfo.Text(ssOldKeymanVersionInstallKeyboards), mtConfirmation, mbYesNoCancel, 0) of
-      mrYes: Exit(False);
-      mrNo: begin InstallKeyboardsInOldVersion(OldKMShellPath); SetExitVal(ERROR_OLD_WIN_VERSION); Exit(True); end;
-      mrCancel: begin SetExitVal(ERROR_OLD_WIN_VERSION); Exit(True); end;
-    end;
-  end;
-
-  Result := False;
-end;
-
-procedure Run;
-var
-  FExtractOnly: Boolean;
-  FContinueSetup: Boolean;
-  FStartAfterInstall: Boolean;  // I2738
-  FDisableUpgradeFrom6Or7Or8: Boolean; // I2847   // I4293
-  FPromptForReboot: Boolean;  // I3355   // I3500
-  FSilent: Boolean;
-  FOffline: Boolean;
-  FExtractOnly_Path: WideString;
-BEGIN
-  CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
-  try
-    try
-
-    Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
-
-    FInstallInfo := TInstallInfo.Create;
-
-    if ParamStr(1) = '--test-dialog' then   // I4099
-    begin
-      with TfrmRunDesktop.Create(nil) do    // I2562
-      try
-        ContinueSetup := False;
-        Offline := False;
-        StartAfterInstall := True;
-        DisableUpgradeFrom6Or7Or8 := False;   // I4293
-        ShowModal;
-      finally
-        Free;
-      end;
-      Exit;
-    end;
-
-    try
-      CreateTempDir;
-      try
-        InitCommonControl(ICC_PROGRESS_CLASS);
-
-        { Display the dialog }
-
-        ProcessCommandLine(FPromptForReboot, FSilent, FOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FExtractOnly_Path);  // I2738, I2847  // I3355   // I3500   // I4293
-
-        if FExtractOnly then
-        begin
-          ExtPath := FExtractOnly_Path;  // I3476
-          if ExtPath = '' then
-            ExtPath := '.';
-          if (ExtPath <> '.') and (ExtPath <> '.\') and not DirectoryExists(ExtPath) then  // I3081  // I3476
-          begin
-            if not CreateDir(ExtPath) then  // I3476
-            begin
-              LogError('Setup could not create the target folder '+ExtPath);  // I3476
-              SetExitVal(Integer(GetLastError));
-              Exit;
-            end;
-          end;
-        end;
-
-        if not ProcessArchive then
-        begin
-          if FExtractOnly then
-          begin
-            LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
-            SetExitVal(ERROR_BAD_FORMAT);
-            Exit;
-          end;
-          { The files must be in the current directory.  Use them instead }
-          ExtPath := ExtractFilePath(ParamStr(0));  // I3476
-        end
-        else if FExtractOnly then
-        begin
-          if not FSilent then
-            LogError('All files extracted from the archive to '+ExtPath+'\.');  // I3476
-          SetExitVal(ERROR_SUCCESS);
-          Exit;
-        end;
-
-        ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3476
-
-        if not System.SysUtils.FileExists(ExtPath + 'setup.inf') then  // I3476
-        begin
-          LogError('The file "setup.inf" is missing.  Setup cannot continue.');
-          SetExitVal(ERROR_FILE_NOT_FOUND);
-          Exit;
-        end;
-
-        FInstallInfo.Load;
-        {TESTING CODE: ExtPath := 'c:\keyman\5.1\devel\kmredist';
-        SFXDetails.Flags := [sdfRegistered, sdfGraphicDialog];}
-
-        if CheckForOldVersionScenario then   // I4460
-          Exit;
-
-        with TfrmRunDesktop.Create(nil) do    // I2562
-        try
-          ContinueSetup := FContinueSetup;
-          Offline := FOffline;
-          StartAfterInstall := FStartAfterInstall; // I2738
-          DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
-          if FSilent
-              then DoInstall(False, True, FPromptForReboot)  // I3355   // I3500
-            else ShowModal;
-        finally
-          Free;
-        end;
-      finally
-        RemoveTempDir;
-      end;
-    finally
-      SetExitVal(ERROR_SUCCESS);
-      FInstallInfo.Free;
-    end;
-    except
-      on e:Exception do
-      begin
-        //TODO: handle exceptions with JCL
-        ShowMessageW(e.message);
-      end;
-    end;
-  finally
-    CoUninitialize;
-  end;
-end;
-
-{ TInstallInfo }
-
-constructor TInstallInfo.Create;
-begin
-  inherited Create;
-  FAppName := SKeymanDesktopName;
-  FPackages := TStringList.Create;
-  FStrings := TStringList.Create;
-end;
-
-destructor TInstallInfo.Destroy;
-begin
-  FPackages.Free;
-  FStrings.Free;
-  inherited Destroy;
-end;
-
-function TInstallInfo.Text(const Name: TInstallInfoText): WideString;
-var
-  s: WideString;
-begin
-  s := GetEnumName(TypeInfo(TInstallInfoText), Ord(Name));
-  Result := FStrings.Values[s];
-  if Result = '' then
-    Result := FDefaultStrings[Name];
-
-  Result := ReplaceText(Result, '$VERSION', SKeymanVersion);
-  Result := ReplaceText(Result, '$APPNAME', FAppName);
-end;
-
-procedure TInstallInfo.Load;
-var
-  i: Integer;
-  FInSetup: Boolean;
-  FInPackages: Boolean;
-  FInStrings: Boolean;
-  val, nm: WideString;
-begin
-  FInSetup := False;
-  FInPackages := False;
-  FInStrings := False;
-
-  with TStringList.Create do
-  try
-    LoadFromFile(ExtPath + 'setup.inf');  // We'll just use the preamble for encoding  // I3476
-
-    for i := 0 to Count - 1 do
-    begin
-      if Trim(Strings[i]) = '' then Continue;
-
-      if Copy(Strings[i], 1, 1) = '[' then
-      begin
-        FInSetup := WideSameText(Strings[i], '[Setup]');
-        FInPackages := WideSameText(Strings[i], '[Packages]');
-        FInStrings := WideSameText(Strings[i], '[Strings]');
-      end
-      else if FInSetup then
-      begin
-        nm := Names[i]; val := ValueFromIndex[i];
-        if WideSameText(nm, 'Version') then FVersion := val
-        else if WideSameText(nm, 'AppName') then FAppName := val
-        else if WideSameText(nm, 'MSIFileName') then FMSIFileName := val
-        else if WideSameText(nm, 'TitleImage') then FTitleImageFileName := val
-        else if WideSameText(nm, 'License') then FLicenseFileName := val  // I2562
-        else if WideSameText(nm, 'MSIOptions') then FMSIOptions := val   // I3126
-        else if WideSameText(nm, 'StartWithConfiguration') then FStartWithConfiguration := StrToBoolDef(val, False)
-        else if WideSameText(nm, 'StartDisabled') then FStartDisabled := StrToBoolDef(val, False);
-      end
-      else if FInPackages then
-        FPackages.Add(Strings[i])
-      else if FInStrings then
-        FStrings.Add(Strings[i]);
-    end;
-
-    if (FVersion = '') then
-      raise EInstallInfo.Create('setup.inf is corrupt (code 1).  Setup cannot continue.');
-
-    if not System.SysUtils.FileExists(ExtPath + FMSIFileName) then  // I3476
-      raise EInstallInfo.Create('Installer '+FMSIFileName+' does not exist (code 3).  Setup cannot continue.');
-
-    if not System.SysUtils.FileExists(ExtPath + FTitleImageFileName) then  // I3476
-      FTitleImageFileName := '';
-
-//    ReadSectionValues('Packages', FPackages);
-//    ReadSectionValues('Strings', FStrings);
-
-    for i := FPackages.Count - 1 downto 0 do
-      if not System.SysUtils.FileExists(ExtPath + FPackages.Names[i]) then  // I3476
-      begin
-        ShowMessageW(Self.Text(ssPackageMissing, [FPackages.ValueFromIndex[i], FPackages.Names[i]]));
-        FPackages.Delete(i);
-      end;
-  finally
-    Free;
-  end;
-end;
-
-function TInstallInfo.Text(const Name: TInstallInfoText;
-  const Args: array of const): WideString;
-begin
-  Result := WideFormat(Text(Name), Args);
-end;
-
-{
-////ExecuteApp insertion
-      case MsgWaitForMultipleObjects(1, pi.hProcess, FALSE, INFINITE, QS_ALLINPUT) of
-        WAIT_OBJECT_0 + 1:
-          while PeekMessage(Msg, 0, 0, 0, PM_REMOVE) do
-          begin
-            if not IsDialogMessage(MainWin, Msg) then
-            begin
-              TranslateMessage(Msg);
-              DispatchMessage(Msg);
-            end;
-          end;
-        WAIT_OBJECT_0, WAIT_ABANDONED_0:
-          Waiting := False;
-          //if GetExitCodeProcess(pi.hProcess, ec)
-          //  then Waiting := ec <> STILL_ACTIVE
-          //  else Waiting := False;
-      end;
-}
 
 end.
