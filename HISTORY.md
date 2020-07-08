@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.107 alpha 2020-07-08
+
+* feat(android): Add additional info on installed keyboards exceptions (#3319)
+
 ## 14.0.106 alpha 2020-07-04
 
 * fix(android/app) Download associated dictionary when installing cloud keyboard package (#3307)
