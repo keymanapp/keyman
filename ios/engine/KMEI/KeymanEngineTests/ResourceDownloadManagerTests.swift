@@ -99,4 +99,33 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     wait(for: [expectation], timeout: 5)
   }
+
+  func testDownloadPackageFailure() throws {
+    let expectation = XCTestExpectation(description: "Mocked \"download\" should complete, though with an error.")
+    let mtnt_id = TestUtils.Keyboards.khmer_angkor.fullID
+
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: TestUtils.mockedError)
+    mockedURLSession?.queueMockResult(.download(mockedResult))
+
+    downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
+
+      // Assertion:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
+      let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      let cachedDocumentsKMP = documentsDir.appendingPathComponent(
+        TypedKeymanPackage<InstallableKeyboard>.baseFilename(for: TestUtils.Keyboards.khmer_angkor.fullID))
+
+      // On download failure, we shouldn't be producing a file here.
+      XCTAssertFalse(FileManager.default.fileExists(atPath: cachedDocumentsKMP.path))
+
+      XCTAssertNotNil(error)
+      XCTAssertNil(package)
+
+      expectation.fulfill()
+    }
+
+    let downloadQueue = downloadManager!.downloader
+    downloadQueue.step()
+
+    wait(for: [expectation], timeout: 5)
+  }
 }

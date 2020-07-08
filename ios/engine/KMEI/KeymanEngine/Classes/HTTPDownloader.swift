@@ -23,6 +23,7 @@ class HTTPDownloader: NSObject {
   var currentRequest: HTTPDownloadRequest?
   var downloadSession: URLSession!
   public var userInfo: [String: Any] = [:]
+  var isCancelled: Bool = false
 
   init(_ handler: HTTPDownloadDelegate?, session: URLSession = .shared) {
     super.init()
@@ -31,6 +32,7 @@ class HTTPDownloader: NSObject {
   }
 
   func addRequest(_ request: HTTPDownloadRequest) {
+    isCancelled = false
     queue.append(request)
   }
 
@@ -43,6 +45,7 @@ class HTTPDownloader: NSObject {
 
   // Starts the queue.  The queue is managed via event messages in order to process them sequentially.
   func run() {
+    isCancelled = false
     if !queue.isEmpty {
       runRequest()
     }
@@ -60,7 +63,7 @@ class HTTPDownloader: NSObject {
         handler?.downloadRequestStarted(req)
       }
       req?.task?.resume()
-    } else {
+    } else if !isCancelled {
       handler?.downloadQueueFinished(self)
     }
     // The next step in the queue, should it exist, will be triggered by urlSession(_, task:, didCompleteWithError:)
@@ -154,6 +157,7 @@ class HTTPDownloader: NSObject {
     }
     
     self.handler?.downloadQueueCancelled(self)
+    self.isCancelled = true
   }
 
   var requestsCount: Int {

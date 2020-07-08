@@ -30,6 +30,8 @@ enum TestUtils {
   static let keyboardsBundle = findSubBundle(forResource: "Keyboards", ofType: "bundle")
   static let lexicalModelsBundle = findSubBundle(forResource: "Lexical Models", ofType: "bundle")
 
+  static let mockedError = NSError(domain: "KeymanTests", code: 1, userInfo: nil)
+
   static func clearDirectory(at url: URL) {
     do {
       // We'll run into problems if we delete the cache directory.  Instead, we delete all the items within it.

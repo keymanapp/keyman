@@ -85,7 +85,7 @@ class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
     self.finalFile = destURL
     self.request = request
 
-    self.downloadFinalizationBlock = DownloadTask.resourceDownloadFinalizationClosure(tempURL: url, finalURL: destURL)
+    self.downloadFinalizationBlock = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempURL, finalURL: destURL)
   }
 
 
@@ -183,22 +183,29 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
   }
 
   public func completeWithCancellation() {
-    completionBlock?(nil, nil)
+    let complete = completionBlock
+    completionBlock = nil
+    complete?(nil, nil)
   }
 
   public func completeWithError(error: Error) {
-    completionBlock?(nil, error)
+    let complete = completionBlock
+    completionBlock = nil
+    complete?(nil, error)
   }
 
   public func completeWithPackage(fromKMP file: URL) {
+    let complete = completionBlock
+    completionBlock = nil
+
     do {
       if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? FullID.Resource.Package {
-        completionBlock?(package, nil)
+        complete?(package, nil)
       } else {
-        completionBlock?(nil, KMPError.invalidPackage)
+        complete?(nil, KMPError.invalidPackage)
       }
     } catch {
-      completionBlock?(nil, error)
+      complete?(nil, error)
     }
   }
 }
