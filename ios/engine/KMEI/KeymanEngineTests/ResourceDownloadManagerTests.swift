@@ -41,11 +41,21 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
 
-      // TODO:  Add assertion:  file exists in the documents directory, where we expect it
+      // Assertion:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
+      let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      let cachedDocumentsKMP = documentsDir.appendingPathComponent(
+        TypedKeymanPackage<InstallableKeyboard>.baseFilename(for: TestUtils.Keyboards.khmer_angkor.fullID))
+
+      XCTAssertTrue(FileManager.default.fileExists(atPath: cachedDocumentsKMP.path))
+
       XCTAssertNil(error)
       XCTAssertNotNil(package)
 
-      // TODO:  Add assertions: it really is the khmer_angkor keyboard package.
+      // Basic verification that it really is the khmer_angkor keyboard package.
+      if let package = package {
+        XCTAssertEqual(package.id, TestUtils.Keyboards.khmer_angkor.id)
+        XCTAssertNotNil(package.findResource(withID: TestUtils.Keyboards.khmer_angkor.fullID))
+      }
 
       expectation.fulfill()
     }
@@ -65,11 +75,21 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.LexicalModels.mtntKMP, withNotifications: false) { package, error in
 
-      // TODO:  Add assertion:  file exists in the documents directory, where we expect it
+      // Assertion:  a copy of the KMP file exists in the documents directory, facilitating user sharing.
+      let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      let cachedDocumentsKMP = documentsDir.appendingPathComponent(
+        TypedKeymanPackage<InstallableLexicalModel>.baseFilename(for: TestUtils.LexicalModels.mtnt.fullID))
+
+      XCTAssertTrue(FileManager.default.fileExists(atPath: cachedDocumentsKMP.path))
+
       XCTAssertNil(error)
       XCTAssertNotNil(package)
 
-      // TODO:  Add assertions: it really is the MTNT lexical model package.
+      // Basic verification that it really is the khmer_angkor keyboard package.
+      if let package = package {
+        XCTAssertEqual(package.id, TestUtils.LexicalModels.mtnt.id)
+        XCTAssertNotNil(package.findResource(withID: TestUtils.LexicalModels.mtnt.fullID))
+      }
 
       expectation.fulfill()
     }
