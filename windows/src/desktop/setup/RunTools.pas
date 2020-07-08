@@ -97,7 +97,7 @@ type
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
-    function DoInstall(Handle: THandle; PackagesOnly,
+    function DoInstall(Handle: THandle;
       StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
       StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
@@ -189,18 +189,18 @@ begin
   inherited;
 end;
 
-function TRunTools.DoInstall(Handle: THandle; PackagesOnly,
+function TRunTools.DoInstall(Handle: THandle;
   StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
   StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
 var
   msiLocation: TInstallInfoFileLocation;
 begin
-  if PackagesOnly
-    then StatusMax := FInstallInfo.Packages.Count
-    else StatusMax := 6 + FInstallInfo.Packages.Count;
+  if FInstallInfo.ShouldInstallKeyman
+    then StatusMax := 6 + FInstallInfo.Packages.Count
+    else StatusMax := FInstallInfo.Packages.Count;
 
   msiLocation := FInstallInfo.BestMsi;
-  if Assigned(msiLocation) and not PackagesOnly then
+  if Assigned(msiLocation) and FInstallInfo.ShouldInstallKeyman then
   begin
     if msiLocation.LocationType = iilOnline then
     begin

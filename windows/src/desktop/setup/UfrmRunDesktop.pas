@@ -122,7 +122,7 @@ type
     procedure FillActionText;
     { Private declarations }
   public
-    procedure DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
+    procedure DoInstall(Silent, PromptForReboot: Boolean);  // I3355   // I3500
     property ContinueSetup: Boolean read FContinueSetup write FContinueSetup;
     property StartAfterInstall: Boolean read FStartAfterInstall write FStartAfterInstall;  // I2738
     property DisableUpgradeFrom6Or7Or8: Boolean read FDisableUpgradeFrom6Or7Or8 write FDisableUpgradeFrom6Or7Or8; // I2847   // I4293
@@ -168,7 +168,7 @@ end;
 
 procedure TfrmRunDesktop.cmdInstallClick(Sender: TObject);
 begin
-  DoInstall(not FInstallInfo.ShouldInstallKeyman, False, True);  // I3355   // I3500
+  DoInstall(False, True);  // I3355   // I3500
 end;
 
 function MsiUIHandler(pvContext: Pointer; iMessageType: UINT; szMessage: PWideChar): Integer; stdcall; // I2644
@@ -477,7 +477,7 @@ begin
   MsiSetExternalUIW(MSIUIHandler, INSTALLLOGMODE_PROGRESS, Self);
 end;
 
-procedure TfrmRunDesktop.DoInstall(PackagesOnly, Silent, PromptForReboot: Boolean);  // I3355   // I3500
+procedure TfrmRunDesktop.DoInstall(Silent, PromptForReboot: Boolean);  // I3355   // I3500
 begin
   if FDisableUpgradeFrom6Or7Or8 then // I2847   // I4293
   begin
@@ -508,7 +508,7 @@ begin
 
     SetupMSI; // I2644
 
-    if GetRunTools.DoInstall(Handle, PackagesOnly, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
+    if GetRunTools.DoInstall(Handle, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
       FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FAutomaticallyReportUsage) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
@@ -571,7 +571,7 @@ var
 begin
   Found := False;
   s := '';
-  if FInstallInfo.ShouldInstallKeyman then // TODO: refactor with PackagesOnly parameter
+  if FInstallInfo.ShouldInstallKeyman then
   begin
     FLocationType := FInstallInfo.BestMsi.LocationType;
 
@@ -954,7 +954,7 @@ end;
 procedure TfrmRunDesktop.WMUserFormShown(var Message: TMessage);
 begin
   if FContinueSetup then
-    DoInstall(True, False, True);  // I3355   // I3500
+    DoInstall(False, True);  // I3355   // I3500
 end;
 
 procedure TfrmRunDesktop.Status(const Text: WideString = '');
