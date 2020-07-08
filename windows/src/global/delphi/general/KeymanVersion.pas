@@ -25,6 +25,11 @@ interface
 {$I KeymanVersionInfo.inc}
 
 const
+  TIER_ALPHA = 'alpha';
+  TIER_BETA = 'beta';
+  TIER_STABLE = 'stable';
+
+const
   SKeymanVersion140 = '14.0';
   SKeymanVersion130 = '13.0';
   SKeymanVersion120 = '12.0';

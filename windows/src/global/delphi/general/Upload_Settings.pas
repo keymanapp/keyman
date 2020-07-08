@@ -80,6 +80,12 @@ const
   S_APIProtocol = 'https';
   S_APIServer = 'api.keyman.com';
 
+  // Alpha versions will work against the staging server so that they
+  // can access new APIs etc that will only be available there. The staging
+  // servers have resource constraints but should be okay for limited use.
+  S_KeymanCom_Alpha = 'https://staging-keyman-com.azurewebsites.net';
+  S_APIServer_Alpha = 'staging-api-keyman-com.azurewebsites.net';
+
 function API_UserAgent: string;
 begin
   Result := S_UserAgent + '/' + GetVersionString;
@@ -103,7 +109,10 @@ end;
 
 function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';
 begin
-  Result := GetDebugPath('Debug_KeymanCom', S_KeymanCom, False);
+  if CKeymanVersionInfo.Tier = TIER_ALPHA
+    then Result := S_KeymanCom_Alpha
+    else Result := S_KeymanCom;
+  Result := GetDebugPath('Debug_KeymanCom', Result, False);
 end;
 
 function API_Protocol: string; // = 'https';
@@ -113,7 +122,10 @@ end;
 
 function API_Server: string; // = 'api.keyman.com';
 begin
-  Result := GetDebugPath('Debug_APIServer', S_APIServer, False);
+  if CKeymanVersionInfo.Tier = TIER_ALPHA
+    then Result := S_APIServer_Alpha
+    else Result := S_APIServer;
+  Result := GetDebugPath('Debug_APIServer', Result, False);
 end;
 
 function MakeAPIURL(path: string): string;
