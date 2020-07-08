@@ -31,6 +31,8 @@ public class Keyboard extends LanguageResource implements Serializable {
   private static String KB_FONT_KEY = "font";
   private static String KB_OSK_FONT_KEY = "oskFont";
 
+  private static Keyboard FALLBACK_KEYBOARD;
+
   /**
    * Constructor using JSON Objects from installed keyboards list
    * @param installedObj
@@ -156,22 +158,39 @@ public class Keyboard extends LanguageResource implements Serializable {
     return o;
   }
 
-  // Default sil_euro_latin keyboard
+  /**
+   * Get the fallback keyboard. If never specified, use sil_euro_latin
+   * @param context Context
+   * @return Keyboard - the fallback keyboard
+   */
   public static Keyboard getDefaultKeyboard(Context context) {
-    String version = KMManager.getLatestKeyboardFileVersion(
-      context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
+    if (FALLBACK_KEYBOARD == null && context != null) {
+      String version = KMManager.getLatestKeyboardFileVersion(
+        context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
 
-    return new Keyboard(
-      KMManager.KMDefault_PackageID,
-      KMManager.KMDefault_KeyboardID,
-      KMManager.KMDefault_KeyboardName,
-      KMManager.KMDefault_LanguageID,
-      KMManager.KMDefault_LanguageName,
-      version,
-      null, // will use help.keyman.com link because context required to determine local welcome.htm path,
-      "",
-      false,
-      KMManager.KMDefault_KeyboardFont,
-      KMManager.KMDefault_KeyboardFont);
+      FALLBACK_KEYBOARD = new Keyboard(
+        KMManager.KMDefault_PackageID,
+        KMManager.KMDefault_KeyboardID,
+        KMManager.KMDefault_KeyboardName,
+        KMManager.KMDefault_LanguageID,
+        KMManager.KMDefault_LanguageName,
+        version,
+        null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+        "",
+        false,
+        KMManager.KMDefault_KeyboardFont,
+        KMManager.KMDefault_KeyboardFont);
+    }
+    return FALLBACK_KEYBOARD;
+  }
+
+  /**
+   * Set the fallback keyboard
+   * @param k Keyboard to set as the fallback keyboard
+   */
+  public static void setDefaultKeyboard(Keyboard k) {
+    if (k != null) {
+      FALLBACK_KEYBOARD = k;
+    }
   }
 }

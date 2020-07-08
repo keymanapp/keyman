@@ -1733,15 +1733,21 @@ public final class KMManager {
             index = 0;
           }
           Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId;
+          String langId = null;
           if (keyboardInfo != null) {
             langId = keyboardInfo.getLanguageID();
             InAppKeyboard.setKeyboard(keyboardInfo);
           } else {
-            // Revert to default (index 0)
+            // Revert to default (index 0) or fallback keyboard
             keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            langId = keyboardInfo.getLanguageID();
-            InAppKeyboard.setKeyboard(keyboardInfo);
+            if (keyboardInfo == null) {
+              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+              keyboardInfo = Keyboard.getDefaultKeyboard(context);
+            }
+            if (keyboardInfo != null) {
+              langId = keyboardInfo.getLanguageID();
+              InAppKeyboard.setKeyboard(keyboardInfo);
+            }
           }
 
           registerAssociatedLexicalModel(langId);
@@ -1956,15 +1962,21 @@ public final class KMManager {
             index = 0;
           }
           Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-          String langId;
+          String langId = null;
           if (keyboardInfo != null) {
             langId  = keyboardInfo.getLanguageID();
             SystemKeyboard.setKeyboard(keyboardInfo);
           } else {
-            // Revert to default (index 0)
+            // Revert to default (index 0) or fallback keyboard
             keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-            langId = keyboardInfo.getLanguageID();
-            SystemKeyboard.setKeyboard(keyboardInfo);
+            if (keyboardInfo == null) {
+              KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
+              keyboardInfo = Keyboard.getDefaultKeyboard(context);
+            }
+            if (keyboardInfo != null) {
+              langId = keyboardInfo.getLanguageID();
+              SystemKeyboard.setKeyboard(keyboardInfo);
+            }
           }
 
           registerAssociatedLexicalModel(langId);

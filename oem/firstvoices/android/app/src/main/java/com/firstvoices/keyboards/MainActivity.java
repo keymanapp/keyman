@@ -16,6 +16,7 @@ import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
 import com.tavultesoft.kmea.*;
+import com.tavultesoft.kmea.data.Keyboard;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,7 +43,25 @@ public class MainActivity extends AppCompatActivity {
         KMManager.initialize(getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
 
         final Context context = this;
-        final String htmlPath = "file:///android_asset/setup/main.html";
+
+        String version = KMManager.getLatestKeyboardFileVersion(
+            context, "fv_all", KMManager.KMDefault_KeyboardID);
+        Keyboard.setDefaultKeyboard(
+            new Keyboard(
+               "fv_all",
+                KMManager.KMDefault_KeyboardID,
+                KMManager.KMDefault_KeyboardName,
+                KMManager.KMDefault_LanguageID,
+                KMManager.KMDefault_LanguageName,
+                version,
+                null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+                "",
+                false,
+                KMManager.KMDefault_KeyboardFont,
+                KMManager.KMDefault_KeyboardFont)
+        );
+
+      final String htmlPath = "file:///android_asset/setup/main.html";
         WebView webView = findViewById(R.id.webView);
         webView.addJavascriptInterface(new JSHandler(context), "jsInterface");
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
