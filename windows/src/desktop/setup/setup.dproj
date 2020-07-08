@@ -101,7 +101,6 @@
         <DCCReference Include="CommonControls.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VersionInfo.pas"/>
         <DCCReference Include="..\..\global\delphi\general\RegistryKeys.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Upload_Settings.pas"/>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
         <DCCReference Include="..\..\global\delphi\general\GetOsVersion.pas"/>

@@ -93,7 +93,6 @@ procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forw
 function CreateTempDir: string; forward;
 procedure RemoveTempDir(const path: string); forward;
 procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string); forward;
-procedure LogError(const s: WideString); forward;
 procedure SetExitVal(c: Integer); forward;
 function IsKeymanDesktop7Installed: string; forward;
 function IsKeymanDesktop8Installed: string; forward;
@@ -134,6 +133,7 @@ BEGIN
           { Display the dialog }
 
           ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path);  // I2738, I2847  // I3355   // I3500   // I4293
+          GetRunTools.Silent := FSilent;
 
           if FExtractOnly then
           begin
@@ -190,8 +190,8 @@ BEGIN
           begin
             // TODO: this should be refactored together with the retry strategy for online check above
             // TODO: Delineate between log messages and dialogs.
-            // TODO: Consider Sentry?
-            LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
+            // TODO: localize
+            GetRunTools.LogError('A valid Keyman install could not be found offline. Please connect to the Internet or allow this installer through your firewall in order to install Keyman.');
             SetExitVal(ERROR_NO_MORE_FILES);
             Exit;
           end;
@@ -206,7 +206,7 @@ BEGIN
             StartAfterInstall := FStartAfterInstall; // I2738
             DisableUpgradeFrom6Or7Or8 := FDisableUpgradeFrom6Or7Or8;  // I2847   // I4293
             if FSilent
-              then DoInstall(False, True, FPromptForReboot)  // I3355   // I3500
+              then DoInstall(True, FPromptForReboot)  // I3355   // I3500
               else ShowModal;
           finally
             Free;
@@ -223,8 +223,12 @@ BEGIN
     except
       on e:Exception do
       begin
-        //TODO: handle exceptions with JCL
-        ShowMessageW(e.message);
+        // For the future, we may consider logging exceptions with Sentry.
+        // However, Sentry adds a 400kb library to the bootstrap which we
+        // would need to embed and extract at startup in order to do this
+        // capture. That's a bit of a downer for this project, which we are
+        // trying (somewhat unsuccessfully) to keep as lightweight as we can.
+        GetRunTools.LogError('Exception '+e.ClassName+': '+e.Message);
       end;
     end;
   finally
@@ -311,7 +315,7 @@ begin
   begin
     if not CreateDir(path) then  // I3476
     begin
-      LogError('Setup could not create the target folder '+path);  // I3476
+      GetRunTools.LogError('Setup could not create the target folder '+path);  // I3476
       SetExitVal(Integer(GetLastError));
       Exit;
     end;
@@ -319,13 +323,12 @@ begin
 
   if not ProcessArchive(path) then
   begin
-    LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
+    GetRunTools.LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
     SetExitVal(ERROR_BAD_FORMAT);
     Exit;
   end;
 
-  if not FSilent then
-    LogError('All files extracted from the archive to '+path+'\.');  // I3476
+  GetRunTools.LogInfo('All files extracted from the archive to '+path+'\.', True);  // I3476
   SetExitVal(ERROR_SUCCESS);
 end;
 
@@ -414,13 +417,6 @@ begin
     end;
     Inc(i);
   end;
-end;
-
-procedure LogError(const s: WideString);
-begin
-  // TODO: refactor with RunTools.LogError
-  // TODO: FSilent mode, log error to logfile instead;
-  ShowMessageW(s);
 end;
 
 procedure SetExitVal(c: Integer);
