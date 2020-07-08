@@ -8,8 +8,6 @@ import android.util.Log;
 import io.sentry.core.Sentry;
 import io.sentry.core.SentryLevel;
 
-import org.json.JSONArray;
-
 public final class KMLog {
   private static final String TAG = "KMLog";
 
