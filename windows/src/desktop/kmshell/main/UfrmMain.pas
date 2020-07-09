@@ -276,7 +276,7 @@ procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
 var
   sharedDataIntf: IConfigMainSharedData;
   sharedData: TConfigMainSharedData;
-  DefaultServersTag, s: string;
+  s: string;
 begin
   if FPageTag > 0 then
   begin

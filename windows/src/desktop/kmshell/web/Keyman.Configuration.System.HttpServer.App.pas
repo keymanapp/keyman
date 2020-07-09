@@ -238,7 +238,6 @@ procedure TAppHttpResponder.ProcessXMLPage(const s: string);
 var
   FXML: string;
   PageTag: string;
-  DefaultServersTag: string;
 begin
   PageTag := RequestInfo.Params.Values['tag'];
   if PageTag <> '' then
