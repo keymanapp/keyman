@@ -211,7 +211,7 @@ begin
   cef.ShouldOpenRemoteUrlsInBrowser := False;
   FRenderPage := 'downloadkeyboard';
 
-  Content_Render(False);
+  Content_Render;
   inherited;
 end;
 
