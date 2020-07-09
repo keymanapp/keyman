@@ -210,7 +210,8 @@ begin
   // Ensures keyman.com hosted site opens locally
   cef.ShouldOpenRemoteUrlsInBrowser := False;
   FRenderPage := 'downloadkeyboard';
-  Content_Render;
+
+  Content_Render(False);
   inherited;
 end;
 

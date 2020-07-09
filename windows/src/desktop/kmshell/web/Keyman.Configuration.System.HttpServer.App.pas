@@ -73,6 +73,7 @@ uses
   LanguagesXMLRenderer,
   OptionsXMLRenderer,
   SupportXMLRenderer,
+  Upload_Settings,
   utilxml;
 
 { THttpServerApp }
@@ -237,12 +238,13 @@ procedure TAppHttpResponder.ProcessXMLPage(const s: string);
 var
   FXML: string;
   PageTag: string;
+  DefaultServersTag: string;
 begin
   PageTag := RequestInfo.Params.Values['tag'];
   if PageTag <> '' then
     PageTag := '<PageTag>'+PageTag+'</PageTag>';
 
-  FXML := FXMLRenderers.RenderToString(False, s + PageTag);
+  FXML := FXMLRenderers.RenderToString(False, s + PageTag + DefaultServersXMLTags + DefaultVersionXMLTags);
 
   FResponseInfo.ContentStream := TStringStream.Create(FXML, TEncoding.UTF8);
   FResponseInfo.FreeContentStream := True;

@@ -160,8 +160,6 @@ implementation
 {$R *.DFM}
 
 uses
-  axctrls,
-  ActiveX,
   BaseKeyboards,
   ComObj,
   GetOSVersion,
@@ -171,6 +169,7 @@ uses
   initprog,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
+  KeymanVersion,
   KeyNames,
   custinterfaces,
   KLog,
@@ -277,7 +276,7 @@ procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
 var
   sharedDataIntf: IConfigMainSharedData;
   sharedData: TConfigMainSharedData;
-  s: string;
+  DefaultServersTag, s: string;
 begin
   if FPageTag > 0 then
   begin
@@ -300,7 +299,7 @@ begin
     XMLEncode(sharedDataIntf.State),
     Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
-  ]);
+  ]) + DefaultServersXMLTags + DefaultVersionXMLTags;
 
   sharedData.Init(
     FXMLRenderers.TempPath,
