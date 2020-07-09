@@ -74,6 +74,7 @@ uses
   OptionsXMLRenderer,
   SupportXMLRenderer,
   Upload_Settings,
+  utilkmshell,
   utilxml;
 
 { THttpServerApp }

@@ -105,11 +105,22 @@ function GetLongFileName(const fname: string): string;
 
 function WaitForElevatedConfiguration(WindowHandle: THandle; const Parameters: WideString; FWait: Boolean = True): Cardinal;
 function RunConfiguration(WindowHandle: THandle; const Parameters: WideString): Boolean;
+function DefaultServersXMLTags: string;
+function DefaultVersionXMLTags: string;
 
 implementation
 
-uses ShellApi, KLog, Forms, ActiveX, getosversion, ErrorControlledRegistry,
-  utilexecute;
+uses
+  ShellApi,
+  KLog,
+  Forms,
+  ActiveX,
+  getosversion,
+  ErrorControlledRegistry,
+  KeymanVersion,
+  utilexecute,
+  Upload_Settings,
+  utilxml;
 
 function IsKeyboardPackage(const FileName: string): Boolean;
 begin
@@ -664,6 +675,24 @@ begin
   end
   else
     ShowMessage(SysErrorMessage(GetLastError));
+end;
+
+function DefaultServersXMLTags: string;
+begin
+  Result := Format('<keyman-com>%s</keyman-com><api-keyman-com>%s</api-keyman-com>', [
+    XMLEncode(KeymanCom_Protocol_Server),
+    XMLEncode(MakeAPIURL(''))
+  ]);
+end;
+
+function DefaultVersionXMLTags: string;
+begin
+  with CKeymanVersionInfo do
+    Result := Format(
+      '<version-info version="%s" versionWin="%s" versionRelease="%s" versionMajor="%d" versionMinor="%d" '+
+        'versionPatch="%d" tier="%s" tag="%s" versionWithTag="%s" environment="%s" />',
+    [Version, VersionWin, VersionRelease, VersionMajor, VersionMinor,
+    VersionPatch, Tier, Tag, VersionWithTag, Environment]);
 end;
 
 end.

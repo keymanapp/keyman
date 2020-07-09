@@ -67,8 +67,6 @@ function MakeAPIURL(path: string): string;
 
 function MakeKeymanURL(const path: string): string;
 
-function DefaultServersXMLTags: string;
-
 implementation
 
 uses
@@ -77,7 +75,6 @@ uses
   DebugPaths,
   ErrorControlledRegistry,
   RegistryKeys,
-  utilxml,
   VersionInfo;
 
 const
@@ -140,14 +137,6 @@ end;
 function MakeAPIURL(path: string): string;
 begin
   Result := API_Protocol + '://' + API_Server + path;
-end;
-
-function DefaultServersXMLTags: string;
-begin
-  Result := Format('<keyman-com>%s</keyman-com><api-keyman-com>%s</api-keyman-com>', [
-    XMLEncode(KeymanCom_Protocol_Server),
-    XMLEncode(MakeAPIURL(''))
-  ]);
 end;
 
 end.
