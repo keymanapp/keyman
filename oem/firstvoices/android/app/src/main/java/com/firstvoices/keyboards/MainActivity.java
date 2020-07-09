@@ -16,8 +16,10 @@ import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
 
 import com.tavultesoft.kmea.*;
+import com.tavultesoft.kmea.data.Keyboard;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String FVDefault_PackageID = "fv_all";
 
     @SuppressWarnings("SetJavascriptEnabled")
     @Override
@@ -42,7 +44,31 @@ public class MainActivity extends AppCompatActivity {
         KMManager.initialize(getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
 
         final Context context = this;
-        final String htmlPath = "file:///android_asset/setup/main.html";
+
+        /**
+         * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package
+         * rather than the normal default of sil_euro_latin inside the sil_euro_latin package.
+         * Fallback keyboard needed in case the user never selects a FV keyboard to add
+         * as a system keyboard.
+        */
+        String version = KMManager.getLatestKeyboardFileVersion(
+            context, FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
+        KMManager.setDefaultKeyboard(
+            new Keyboard(
+                FVDefault_PackageID,
+                KMManager.KMDefault_KeyboardID,
+                KMManager.KMDefault_KeyboardName,
+                KMManager.KMDefault_LanguageID,
+                KMManager.KMDefault_LanguageName,
+                version,
+                null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+                "",
+                false,
+                KMManager.KMDefault_KeyboardFont,
+                KMManager.KMDefault_KeyboardFont)
+        );
+
+      final String htmlPath = "file:///android_asset/setup/main.html";
         WebView webView = findViewById(R.id.webView);
         webView.addJavascriptInterface(new JSHandler(context), "jsInterface");
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
