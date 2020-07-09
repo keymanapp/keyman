@@ -19,6 +19,7 @@ import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String FVDefault_PackageID = "fv_all";
 
     @SuppressWarnings("SetJavascriptEnabled")
     @Override
@@ -44,11 +45,17 @@ public class MainActivity extends AppCompatActivity {
 
         final Context context = this;
 
+        /**
+         * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package
+         * rather than the normal default of sil_euro_latin inside the sil_euro_latin package.
+         * Fallback keyboard needed in case the user never selects a FV keyboard to add
+         * as a system keyboard.
+        */
         String version = KMManager.getLatestKeyboardFileVersion(
-            context, "fv_all", KMManager.KMDefault_KeyboardID);
+            context, FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
         Keyboard.setDefaultKeyboard(
             new Keyboard(
-               "fv_all",
+                FVDefault_PackageID,
                 KMManager.KMDefault_KeyboardID,
                 KMManager.KMDefault_KeyboardName,
                 KMManager.KMDefault_LanguageID,

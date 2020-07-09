@@ -6,6 +6,8 @@ package com.tavultesoft.kmea.data;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardPickerActivity;
@@ -163,8 +165,11 @@ public class Keyboard extends LanguageResource implements Serializable {
    * @param context Context
    * @return Keyboard - the fallback keyboard
    */
-  public static Keyboard getDefaultKeyboard(Context context) {
-    if (FALLBACK_KEYBOARD == null && context != null) {
+  public static Keyboard getDefaultKeyboard(@NonNull Context context) {
+    if (context == null) {
+      KMLog.LogError(TAG, "getDefaultKeyboard with null context");
+    }
+    if (FALLBACK_KEYBOARD == null) {
       String version = KMManager.getLatestKeyboardFileVersion(
         context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
 
@@ -185,12 +190,12 @@ public class Keyboard extends LanguageResource implements Serializable {
   }
 
   /**
-   * Set the fallback keyboard
+   * Set the fallback keyboard. If keyboard is null, the fallback keyboard will
+   * revert to sil_euro_latin
    * @param k Keyboard to set as the fallback keyboard
    */
   public static void setDefaultKeyboard(Keyboard k) {
-    if (k != null) {
-      FALLBACK_KEYBOARD = k;
-    }
+    // If k is null, getDefaultKeyboard() will regenerate fallback keyboard sil_euro_latin
+    FALLBACK_KEYBOARD = k;
   }
 }
