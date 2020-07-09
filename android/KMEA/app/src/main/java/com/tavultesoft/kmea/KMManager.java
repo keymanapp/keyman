@@ -801,7 +801,7 @@ public final class KMManager {
       if (keyboardID.equals("us") || keyboardID.equals("european") || keyboardID.equals("european2") ||
           keyboardID.equals("sil_euro_latin")) {
         if (!defaultKeyboardInstalled) {
-          list.add(Keyboard.getDefaultKeyboard(context));
+          list.add(KMManager.getDefaultKeyboard(context));
           defaultKeyboardInstalled = true;
         }
       } else {
@@ -1118,6 +1118,25 @@ public final class KMManager {
 
   public static boolean removeKeyboard(Context context, int position) {
     return KeyboardPickerActivity.removeKeyboard(context, position);
+  }
+
+  /**
+   * Some apps have the user select which keyboard to add. To ensure there's always a fallback
+   * system keyboard when the keyboard list is empty, use this method.
+   * If setDefaultKeyboard() is never used, this will return default sil_euro_latin.
+   * @param context Context
+   * @return Keyboard Default fallback keyboard
+   */
+  public static Keyboard getDefaultKeyboard(Context context) {
+    return Keyboard.getDefaultKeyboard(context);
+  }
+
+  /**
+   * Set a default fallback keyboard. If null, getDefaultKeyboard() will return sil_euro_latin.
+   * @param k Keyboard info for the fallback keyboard.
+   */
+  public static void setDefaultKeyboard(Keyboard k) {
+    Keyboard.setDefaultKeyboard(k);
   }
 
   public static boolean setKeyboard(String packageID, String keyboardID, String languageID) {
@@ -1742,7 +1761,7 @@ public final class KMManager {
             keyboardInfo = KMManager.getKeyboardInfo(context, 0);
             if (keyboardInfo == null) {
               KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-              keyboardInfo = Keyboard.getDefaultKeyboard(context);
+              keyboardInfo = KMManager.getDefaultKeyboard(context);
             }
             if (keyboardInfo != null) {
               langId = keyboardInfo.getLanguageID();
@@ -1971,7 +1990,7 @@ public final class KMManager {
             keyboardInfo = KMManager.getKeyboardInfo(context, 0);
             if (keyboardInfo == null) {
               KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-              keyboardInfo = Keyboard.getDefaultKeyboard(context);
+              keyboardInfo = KMManager.getDefaultKeyboard(context);
             }
             if (keyboardInfo != null) {
               langId = keyboardInfo.getLanguageID();

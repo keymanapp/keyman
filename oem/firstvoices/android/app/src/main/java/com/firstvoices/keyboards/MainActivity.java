@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         */
         String version = KMManager.getLatestKeyboardFileVersion(
             context, FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
-        Keyboard.setDefaultKeyboard(
+        KMManager.setDefaultKeyboard(
             new Keyboard(
                 FVDefault_PackageID,
                 KMManager.KMDefault_KeyboardID,
