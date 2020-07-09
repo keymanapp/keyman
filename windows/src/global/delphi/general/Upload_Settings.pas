@@ -54,6 +54,13 @@ const
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
 
+  // Keyboard download and installation
+  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://[^/]+/keyboards/install/([^?/]+)(?:\?(.+))?$';
+
+  URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
+
+function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
+
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';
 
@@ -148,6 +155,15 @@ begin
     XMLEncode(KeymanCom_Protocol_Server),
     XMLEncode(MakeAPIURL(''))
   ]);
+end;
+
+function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
+var
+  IsUpdateInt: Integer;
+begin
+  if IsUpdate then IsUpdateInt := 1 else IsUpdateInt := 0;
+
+  Result := Format(URLPath_PackageDownload_Format, [PackageID, CKeymanVersionInfo.Tier, BCP47, IsUpdateInt]);
 end;
 
 end.

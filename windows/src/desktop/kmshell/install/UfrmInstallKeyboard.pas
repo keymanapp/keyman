@@ -105,7 +105,7 @@ type
   end;
 
 function InstallKeyboardFromFile(Owner: TComponent): Boolean;
-function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile: string): Boolean;
+function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string): Boolean;
 function InstallFiles(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
 
 implementation
@@ -263,7 +263,7 @@ begin
     AddDefaultLanguageHotkey(InstalledKeyboards[i]);
 end;
 
-function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile: string): Boolean;
+function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string): Boolean;
 var
   n: Integer;
   InstalledKeyboards: array of IKeymanKeyboardInstalled;
@@ -274,6 +274,7 @@ begin
   try
     Silent := ASilent;
     InstallFile := FileName;
+//TODO:    DefaultBCP47 := BCP47;
     if ModalResult = mrCancel then
       // failed to start install
       Result := False
@@ -635,7 +636,7 @@ begin
     dlgOpen.Title := 'Install Keyman Keyboard';
 
     if dlgOpen.Execute then
-      Result := InstallFile(Owner, dlgOpen.FileName, False, False, '')
+      Result := InstallFile(Owner, dlgOpen.FileName, False, False, '', '')
     else
       Result := False;
   finally

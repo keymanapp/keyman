@@ -470,7 +470,8 @@ begin
           then ExitCode := 0
           else ExitCode := 1;
       end
-      else if InstallFile(nil, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
+      // TODO: support bare package ids from command line (if it does not include a file extension, assume it is a .kmp and try and download it)
+      else if InstallFile(nil, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile, '') // TODO: support BCP 47 from command line
         then ExitCode := 0
         else ExitCode := 1;
 
