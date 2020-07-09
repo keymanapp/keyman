@@ -33,6 +33,7 @@ const
   // https://api.keyman.com/ - programmatic endpoints
   API_Path_UpdateCheck_Windows = '/windows/14.0/update'; // version will only update when the api changes
 
+  // TODO: use /windows/ instead of /desktop/
   API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';  // TODO: use updatecheck_windows
   API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
   API_Path_DownloadLocale = '/desktop/'+SKeymanVersion+'/locale';
@@ -40,14 +41,15 @@ const
   API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
 
   // https://www.keyman.com/ - web pages
-  URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
-  URLPath_CreateTranslation = '/go/desktop/'+SKeymanVersion+'/create-locale';
-  URLPath_KeepInTouch = '/go/desktop/'+SKeymanVersion+'/keep-in-touch';
-  URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
+  URLPath_CreateTranslation = '/go/windows/'+SKeymanVersion+'/create-locale'; //TODO: i18n
+  URLPath_KeepInTouch = '/go/windows/'+SKeymanVersion+'/keep-in-touch';
+  URLPath_KeymanHome = '/go/windows/'+SKeymanVersion+'/home';
+  URLPath_ArchivedDownloads = '/go/windows/'+SKeymanVersion+'/archived-downloads';
 
+  URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
+  URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
   URLPath_KeymanDeveloperHome = '/go/developer/'+SKeymanVersion+'/home';
-  URLPath_KeymanHome = '/go/desktop/'+SKeymanVersion+'/home';
-  URLPath_ArchivedDownloads = '/go/desktop/'+SKeymanVersion+'/archived-downloads';
+
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
@@ -65,10 +67,17 @@ function MakeAPIURL(path: string): string;
 
 function MakeKeymanURL(const path: string): string;
 
+function DefaultServersXMLTags: string;
+
 implementation
 
 uses
-  DebugPaths, ErrorControlledRegistry, RegistryKeys, Windows,
+  System.SysUtils,
+  Winapi.Windows,
+  DebugPaths,
+  ErrorControlledRegistry,
+  RegistryKeys,
+  utilxml,
   VersionInfo;
 
 const
@@ -131,6 +140,14 @@ end;
 function MakeAPIURL(path: string): string;
 begin
   Result := API_Protocol + '://' + API_Server + path;
+end;
+
+function DefaultServersXMLTags: string;
+begin
+  Result := Format('<keyman-com>%s</keyman-com><api-keyman-com>%s</api-keyman-com>', [
+    XMLEncode(KeymanCom_Protocol_Server),
+    XMLEncode(MakeAPIURL(''))
+  ]);
 end;
 
 end.

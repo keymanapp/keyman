@@ -5,7 +5,7 @@
   
     <script>
       window['menuframe_activate_keepintouch'] = function() {
-        document.getElementById('keepintouch_frame').src = 'https://keyman.com/go/desktop/10.0/keep-in-touch?embed=1';
+        document.getElementById('keepintouch_frame').src = '<xsl:value-of select='/Keyman/keyman-com' />/go/windows/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/keep-in-touch?embed=1';
       }
     </script>
   

@@ -66,6 +66,21 @@ const
   SKeymanDesktopName = 'Keyman';
   // Keyman Desktop was renamed to Keyman [for Windows] in 14.0
 
+function DefaultVersionXMLTags: string;
+
 implementation
+
+uses
+  System.SysUtils;
+
+function DefaultVersionXMLTags: string;
+begin
+  with CKeymanVersionInfo do
+    Result := Format(
+      '<version-info version="%s" versionWin="%s" versionRelease="%s" versionMajor="%d" versionMinor="%d" '+
+        'versionPatch="%d" tier="%s" tag="%s" versionWithTag="%s" environment="%s" />',
+    [Version, VersionWin, VersionRelease, VersionMajor, VersionMinor,
+    VersionPatch, Tier, Tag, VersionWithTag, Environment]);
+end;
 
 end.
