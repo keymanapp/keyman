@@ -210,9 +210,8 @@ public class ResourceDownloadManager {
       return .needsDownload
     }
 
-    // TODO:  convert to use of package-version API.
     // Check version
-    if let repositoryVersionString = Manager.shared.apiKeyboardRepository.keyboards?[keyboardID]?.version {
+    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: fullKeyboardID)?.version {
       let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
       let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
       if downloadedVersion < repositoryVersion {
@@ -333,9 +332,8 @@ public class ResourceDownloadManager {
       return .needsDownload
     }
 
-    // TODO:  Convert to use of package-version API.
     // Check version
-    if let repositoryVersionString = Manager.shared.apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.version {
+    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: fullLexicalModelID)?.version {
       let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
       let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
       if downloadedVersion < repositoryVersion {

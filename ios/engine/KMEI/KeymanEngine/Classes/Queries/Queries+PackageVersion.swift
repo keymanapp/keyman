@@ -10,7 +10,7 @@ import Foundation
 
 extension Queries {
   class PackageVersion {
-    internal static var cachedResults: [AnyHashable : ResultEntry] = [:]
+    private static var cachedResults: [LanguageResourceType : [String:ResultEntry]] = [.keyboard: [:], .lexicalModel: [:]]
 
     class ResultComponent {}
 
@@ -121,31 +121,39 @@ extension Queries {
 
       // Step 2:  configure the completion closure.
       let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self) { result, error in
-        // Cache the results for future lookup.
-        if let result = result {
-          if let keyboards = result.keyboards {
-            fullIDs.compactMap { $0 as? FullKeyboardID }.forEach { kbd in
-              if let entry = keyboards[kbd.id] as? ResultEntry {
-                self.cachedResults[kbd] = entry
+          // Cache the results for future lookup.
+          if let result = result {
+            if let keyboards = result.keyboards {
+              keyboards.keys.forEach { id in
+                if let entry = keyboards[id] as? ResultEntry {
+                  self.cachedResults[.keyboard]![id] = entry
               }
             }
           }
 
           if let models = result.models {
-            fullIDs.compactMap { $0 as? FullLexicalModelID }.forEach { lm in
-              if let entry = models[lm.id] as? ResultEntry {
-                self.cachedResults[lm] = entry
+            models.keys.forEach { id in
+              if let entry = models[id] as? ResultEntry {
+                self.cachedResults[.lexicalModel]![id] = entry
               }
             }
           }
-        }
 
-        fetchCompletion(result, error)
+          fetchCompletion(result, error)
+        }
       }
 
       // Step 3:  run the actual query, letting the prepared completion closure take care of the rest.
       let task = session.dataTask(with: urlComponents.url!, completionHandler: completionClosure)
       task.resume()
+    }
+
+    public static func resetCache() {
+      self.cachedResults = [.keyboard: [:], .lexicalModel: [:]]
+    }
+
+    static func cachedResult<FullID: AnyLanguageResourceFullID>(for fullID: FullID) -> ResultEntry? {
+      return cachedResults[fullID.type]![fullID.id]
     }
   }
 }

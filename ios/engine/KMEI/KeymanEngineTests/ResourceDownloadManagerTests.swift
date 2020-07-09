@@ -34,12 +34,12 @@ class ResourceDownloadManagerTests: XCTestCase {
 
   func testDownloadPackageForKeyboard() throws {
     let expectation = XCTestExpectation(description: "Mocked \"download\" should complete successfully.")
-    let mtnt_id = TestUtils.Keyboards.khmer_angkor.fullID
+    let khmer_angkor_id = TestUtils.Keyboards.khmer_angkor.fullID
 
     let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
     mockedURLSession?.queueMockResult(.download(mockedResult))
 
-    downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
+    downloadManager?.downloadPackage(forFullID: khmer_angkor_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
 
 
       let tempDownloadKMP = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
@@ -161,5 +161,56 @@ class ResourceDownloadManagerTests: XCTestCase {
     }
 
     wait(for: [expectation], timeout: 5)
+  }
+
+  func testStateForKeyboard() {
+    let baseInstallation = XCTestExpectation(description: "Mocked \"download\" should complete successfully.")
+    let khmer_angkor_id = TestUtils.Keyboards.khmer_angkor.fullID
+
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession?.queueMockResult(.download(mockedResult))
+
+    XCTAssertEqual(downloadManager!.stateForKeyboard(withID: khmer_angkor_id.id), .needsDownload)
+
+    downloadManager!.downloadPackage(forFullID: khmer_angkor_id,
+                                                   from: TestUtils.Keyboards.khmerAngkorKMP,
+                                                   withNotifications: false) { package, error in
+      if let _ = error {
+        XCTFail()
+        baseInstallation.fulfill()
+        return
+      } else if let package = package {
+        do {
+          try ResourceFileManager.shared.install(resourceWithID: khmer_angkor_id, from: package)
+          baseInstallation.fulfill()
+        } catch {
+          XCTFail()
+          baseInstallation.fulfill()
+        }
+      }
+    }
+
+    XCTAssertEqual(downloadManager!.stateForKeyboard(withID: khmer_angkor_id.id), .downloading)
+
+    downloadManager!.downloader.step()
+
+    wait(for: [baseInstallation], timeout: 5)
+
+    XCTAssertEqual(downloadManager!.stateForKeyboard(withID: khmer_angkor_id.id), .upToDate)
+
+    // Now, to test the update-check part of the function...
+    // This fixture was hand-altered.  At the time of this test's creation, this version did not exist.
+    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_km_updated, error: nil)
+    mockedURLSession?.queueMockResult(.data(mockedQuery))
+
+    let versionQuery = XCTestExpectation()
+
+    // Now to do a package-version check.
+    Queries.PackageVersion.fetch(for: [khmer_angkor_id], withSession: downloadManager!.session) { _, _ in
+      XCTAssertEqual(self.downloadManager!.stateForKeyboard(withID: khmer_angkor_id.id), .needsUpdate)
+      versionQuery.fulfill()
+    }
+
+    wait(for: [versionQuery], timeout: 5)
   }
 }

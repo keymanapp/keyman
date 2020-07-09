@@ -18,7 +18,7 @@ class QueryPackageVersionTests: XCTestCase {
 
   override func tearDownWithError() throws {
     let queueWasCleared = mockedURLSession!.queueIsEmpty
-    Queries.PackageVersion.cachedResults = [:]
+    Queries.PackageVersion.resetCache()
     mockedURLSession = nil
 
     if !queueWasCleared {
@@ -134,13 +134,13 @@ class QueryPackageVersionTests: XCTestCase {
       XCTAssertNotNil(results)
 
       // Check to see that the results were appropriately cached.
-      XCTAssertNotNil(Queries.PackageVersion.cachedResults[TestUtils.Keyboards.khmer_angkor.fullID])
-      XCTAssertNotNil(Queries.PackageVersion.cachedResults[TestUtils.Keyboards.sil_euro_latin.fullID])
-      XCTAssertNotNil(Queries.PackageVersion.cachedResults[TestUtils.LexicalModels.mtnt.fullID])
+      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: TestUtils.Keyboards.khmer_angkor.fullID))
+      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: TestUtils.Keyboards.sil_euro_latin.fullID))
+      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: TestUtils.LexicalModels.mtnt.fullID))
 
       // Error results are not cached.
-      XCTAssertNil(Queries.PackageVersion.cachedResults[badKbdFullID])
-      XCTAssertNil(Queries.PackageVersion.cachedResults[badLexFullID])
+      XCTAssertNil(Queries.PackageVersion.cachedResult(for: badKbdFullID))
+      XCTAssertNil(Queries.PackageVersion.cachedResult(for: badLexFullID))
 
       expectation.fulfill()
     }
