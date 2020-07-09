@@ -133,7 +133,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Pre-load for use in update checks.
     Manager.shared.apiKeyboardRepository.fetch()
-    Manager.shared.apiLexicalModelRepository.fetch()
 
     // Implement a default color...
     var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)

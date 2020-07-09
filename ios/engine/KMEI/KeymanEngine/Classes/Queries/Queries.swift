@@ -10,7 +10,7 @@ import Foundation
 
 // The core `Queries` definition provides common utility methods, handlers, etc across our API queries.
 class Queries {
-  public enum FetchError: Error {
+  public enum FetchError: LocalizedError {
     case networkError(Error)
     case noData
     case parsingError(Error)
@@ -23,6 +23,17 @@ class Queries {
           return "network error occurred - \(String(describing: baseError))"
         case .parsingError(let baseError):
           return "failure occurred when parsing results - \(String(describing: baseError))"
+      }
+    }
+  }
+
+  public enum ResultError: LocalizedError {
+    case unqueried
+
+    var localizedDescription: String {
+      switch self {
+        case .unqueried:
+          return "Query was not run against specified parameter"
       }
     }
   }

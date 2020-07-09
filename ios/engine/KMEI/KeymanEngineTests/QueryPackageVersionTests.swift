@@ -42,10 +42,13 @@ class QueryPackageVersionTests: XCTestCase {
                    TestUtils.LexicalModels.mtnt.fullID,
                    badLexFullID]
 
+    let expectation = XCTestExpectation(description: "Query complete and results analyzed")
+
     // As it's a mocked fetch, it happens synchronously.
     Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))
+        expectation.fulfill()
         return
       }
       XCTAssertNotNil(results)
@@ -94,6 +97,60 @@ class QueryPackageVersionTests: XCTestCase {
           }
         }
       }
+      expectation.fulfill()
     }
+
+    wait(for: [expectation], timeout: 5)
+  }
+
+  func testResultEntryFor() throws {
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_1, error: nil)
+    mockedURLSession?.queueMockResult(.data(mockedResult))
+
+    let badKbdFullID = FullKeyboardID(keyboardID: "foo", languageID: "en")
+    let badLexFullID = FullLexicalModelID(lexicalModelID: "bar", languageID: "km")
+    let fullIDs = [TestUtils.Keyboards.khmer_angkor.fullID,
+                   TestUtils.Keyboards.sil_euro_latin.fullID,
+                   badKbdFullID,
+                   TestUtils.LexicalModels.mtnt.fullID,
+                   badLexFullID]
+
+    let expectation = XCTestExpectation(description: "Query complete and results analyzed")
+
+    // As it's a mocked fetch, it happens synchronously.
+    Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
+      if let _ = error {
+        XCTFail(String(describing: error))
+        expectation.fulfill()
+        return
+      }
+      XCTAssertNotNil(results)
+
+      if let results = results {
+        XCTAssertNotNil(results.keyboards)
+        XCTAssertNotNil(results.models)
+
+        let khmer_angkor = results.entryFor(TestUtils.Keyboards.khmer_angkor.fullID)
+        if case .failure(_) = khmer_angkor {
+          XCTFail("API result object reported error for khmer_angkor, not a version entry")
+        }
+
+
+        let foo = results.entryFor(badKbdFullID)
+        if case .success(_) = foo {
+          XCTFail("API result object reported a version entry for foo, not an error")
+        }
+
+
+        let foobar = results.entryFor(FullKeyboardID(keyboardID: "foobar", languageID: "en"))
+        if case .success(_) = foobar {
+          XCTFail("Query should not have results data for unqueried resource")
+        }
+      }
+
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
   }
 }

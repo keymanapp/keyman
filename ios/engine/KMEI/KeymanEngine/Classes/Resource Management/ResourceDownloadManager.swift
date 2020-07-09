@@ -15,6 +15,7 @@ import Foundation
 // only accessible within the library.
 public class ResourceDownloadManager {
   // internal b/c testing access.
+  internal var session: URLSession
   internal var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
 
@@ -25,11 +26,13 @@ public class ResourceDownloadManager {
   public static let shared = ResourceDownloadManager()
 
   internal init() {
+    session = URLSession.shared
     downloader = ResourceDownloadQueue()
   }
 
   // Intended only for use in testing!
   internal init(session: URLSession, autoExecute: Bool) {
+    self.session = session
     downloader = ResourceDownloadQueue(session: session, autoExecute: autoExecute)
   }
   
@@ -220,24 +223,8 @@ public class ResourceDownloadManager {
   }
 
   // MARK - Lexical models
-
-  private func getInstallableLexicalModelMetadata(withID lexicalModelID: String, languageID: String) -> InstallableLexicalModel? {
-    // Grab info for the relevant API version of the keyboard.
-    guard let keyboard = Manager.shared.apiLexicalModelRepository.installableLexicalModel(withID: lexicalModelID, languageID: languageID)
-    else {
-      let message = "Lexical model not found with id: \(lexicalModelID), languageID: \(languageID)"
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: message])
-
-      // Ideal - use a LexicalModelFullID instead.  But, that's a API shift.
-      self.resourceDownloadFailed(for: [] as [InstallableLexicalModel], with: error)
-      return nil
-    }
-    
-    return keyboard
-  }
   
-  // Can be called by the cloud keyboard downloader and utilized.
+  // Can be called by the keyboard downloader and utilized.
   
   /// Starts the process of fetching the package file of the lexical model for the given language ID
   ///   first it fetches the list of lexical models for the given language
@@ -282,56 +269,47 @@ public class ResourceDownloadManager {
                                    isUpdate: Bool,
                                    fetchRepositoryIfNeeded: Bool = true,
                                    completionBlock: CompletionHandler<InstallableLexicalModel>? = nil) {
-    
-    // TODO:  We should always force a refetch after new keyboards are installed so we can redo our language queries.
-    //        That should probably be done on successful keyboard installs, not here, though.
-    if fetchRepositoryIfNeeded {
-      // A temp measure to make sure things aren't totally broken.  Definitely not optimal.
-      Manager.shared.apiLexicalModelRepository.fetch(completionHandler: nil)
-    }
-    
-    guard let _ = Manager.shared.apiLexicalModelRepository.lexicalModels else {
-      if fetchRepositoryIfNeeded {
-        log.info("Fetching repository from API for lexicalModel download")
-        Manager.shared.apiLexicalModelRepository.fetch(completionHandler: fetchHandler(for: .lexicalModel) {
-          self.downloadLexicalModel(withID: lexicalModelID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false, completionBlock: completionBlock)
-        })
-        return
-      } else {
-        let message = "Lexical model repository not yet fetched"
-        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-        self.resourceDownloadFailed(for: [] as [InstallableLexicalModel], with: error)
+    // Note:  in this case, someone knows the "full ID" of the model already, but NOT its location.
+    //        For lexical models, we can use either the LexicalModel query or the PackageVersion query.
+    //        For consistency with keyboard download behavior, we use the PackageVersion query here.
+
+    let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID)
+    Queries.PackageVersion.fetch(for: [lmFullID], withSession: session) { result, error in
+      guard let result = result, error == nil else {
+        log.info("Error occurred requesting location for \(lmFullID.description)")
+        self.resourceDownloadFailed(forFullID: lmFullID, with: error ?? .noData)
         return
       }
-    }
 
-    // Grab info for the relevant API version of the keyboard.
-    guard let lexicalModel = getInstallableLexicalModelMetadata(withID: lexicalModelID, languageID: languageID),
-      let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.packageFilename
-    else {
-      return
-    }
-
-    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-    let queueState = downloader.state
-    guard queueState == .clear else {
-      resourceDownloadFailed(for: [lexicalModel], with: queueState.error ?? NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"]))
-      return
-    }
-
-    let batch = self.buildPackageBatch(forFullID: FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID),
-                                       from: URL.init(string: filename)!,
-                                       withNotifications: !isUpdate,
-                                       withResource: lexicalModel,
-                                       completionBlock: completionBlock ?? { package, error in
-      // If the caller doesn't specify a completion block, this will carry out a default installation.
-      if let package = package {
-        try? ResourceFileManager.shared.install(resourceWithID: FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID), from: package)
+      guard case let .success(data) = result.entryFor(lmFullID) else {
+        if case let .failure(errorEntry) = result.entryFor(lmFullID) {
+          if let errorEntry = errorEntry {
+            log.info("Query reported error: \(String(describing: errorEntry.error))")
+          }
+        }
+        self.resourceDownloadFailed(forFullID: lmFullID, with: Queries.ResultError.unqueried)
+        return
       }
-      // else error:  already handled by wrapping closure set within buildPackageBatch.
-    })
 
-    downloader.queue(.simpleBatch(batch))
+      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+      guard self.downloader.state == .clear else {
+        self.resourceDownloadFailed(forFullID: lmFullID, with: self.downloader.state.error ??
+          NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"]))
+        return
+      }
+
+      let completionClosure: CompletionHandler<InstallableLexicalModel> = completionBlock ?? { package, error in
+        // If the caller doesn't specify a completion block, this will carry out a default installation.
+        if let package = package {
+          try? ResourceFileManager.shared.install(resourceWithID: FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID), from: package)
+        }
+      }
+
+      self.downloadPackage(forFullID: lmFullID,
+                           from: URL.init(string: data.packageURL)!,
+                           withNotifications: !isUpdate,
+                           completionBlock: completionClosure)
+    }
   }
 
 
@@ -738,6 +716,20 @@ public class ResourceDownloadManager {
       // Sadly, this notification reports with a different format.
       let languageID = lexicalModels.count > 0 ? lexicalModels[0].languageID : ""
       let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
+      NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
+                                      object: self,
+                                      value: notification)
+    }
+  }
+
+  internal func resourceDownloadFailed<FullID: LanguageResourceFullID>(forFullID fullID: FullID, with error: Error) {
+    if let _ = fullID as? FullKeyboardID {
+      let notification = KeyboardDownloadFailedNotification(keyboards: [], error: error)
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
+                                      object: self,
+                                      value: notification)
+    } else if let _ = fullID as? FullLexicalModelID {
+      let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: fullID.languageID, error: error)
       NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
                                       object: self,
                                       value: notification)

@@ -30,6 +30,11 @@ extension Queries {
       }
     }
 
+    enum Entry {
+      case success(ResultEntry)
+      case failure(ResultError?)
+    }
+
     struct Result: Decodable {
       let keyboards: [String : ResultComponent]?
       let models: [String : ResultComponent]?
@@ -61,6 +66,21 @@ extension Queries {
 
         let modelValueSet = try rootValues.nestedContainer(keyedBy: IDCodingKey.self, forKey: .models)
         models = try modelValueSet.allKeys.reduce([String: ResultComponent](), dictionaryReducer(container: modelValueSet, category: "lexical model"))
+      }
+
+      func entryFor<FullID: LanguageResourceFullID>(_ fullID: FullID) -> Entry {
+        var result: ResultComponent?
+        if let fullID = fullID as? FullKeyboardID, let keyboards = self.keyboards {
+          result = keyboards[fullID.keyboardID]
+        } else if let fullID = fullID as? FullLexicalModelID, let models = self.models {
+          result = models[fullID.lexicalModelID]
+        }
+
+        if let entry = result as? ResultEntry {
+          return .success(entry)
+        } else {
+          return .failure(result as? ResultError)
+        }
       }
     }
 

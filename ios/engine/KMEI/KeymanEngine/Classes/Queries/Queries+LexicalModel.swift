@@ -45,7 +45,12 @@ extension Queries {
     private static let MODEL_ENDPOINT = URLComponents(string: "https://api.keyman.com/model")!
 
     public static func fetch(forLanguageCode bcp47: String,
-                               withSession session: URLSession = .shared,
+                             fetchCompletion: @escaping JSONQueryCompletionBlock<[Result]>) {
+      fetch(forLanguageCode: bcp47, withSession: URLSession.shared, fetchCompletion: fetchCompletion)
+    }
+
+    internal static func fetch(forLanguageCode bcp47: String,
+                               withSession session: URLSession,
                                fetchCompletion: @escaping JSONQueryCompletionBlock<[Result]>) {
       // Step 1:  build the query
       var urlComponents = MODEL_ENDPOINT
