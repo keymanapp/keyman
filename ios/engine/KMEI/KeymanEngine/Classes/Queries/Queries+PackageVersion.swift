@@ -10,6 +10,8 @@ import Foundation
 
 extension Queries {
   class PackageVersion {
+    internal static var cachedResults: [AnyHashable : ResultEntry] = [:]
+
     class ResultComponent {}
 
     class ResultEntry: ResultComponent, Decodable {
@@ -118,7 +120,28 @@ extension Queries {
       log.info("Querying package versions through API endpoint: \(urlComponents.url!)")
 
       // Step 2:  configure the completion closure.
-      let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self, completionBlock: fetchCompletion)
+      let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self) { result, error in
+        // Cache the results for future lookup.
+        if let result = result {
+          if let keyboards = result.keyboards {
+            fullIDs.compactMap { $0 as? FullKeyboardID }.forEach { kbd in
+              if let entry = keyboards[kbd.id] as? ResultEntry {
+                self.cachedResults[kbd] = entry
+              }
+            }
+          }
+
+          if let models = result.models {
+            fullIDs.compactMap { $0 as? FullLexicalModelID }.forEach { lm in
+              if let entry = models[lm.id] as? ResultEntry {
+                self.cachedResults[lm] = entry
+              }
+            }
+          }
+        }
+
+        fetchCompletion(result, error)
+      }
 
       // Step 3:  run the actual query, letting the prepared completion closure take care of the rest.
       let task = session.dataTask(with: urlComponents.url!, completionHandler: completionClosure)
