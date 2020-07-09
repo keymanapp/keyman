@@ -31,6 +31,8 @@ public class KMManagerTest {
 
   @Before
   public void loadOldKeyboardsList() throws FileNotFoundException {
+    KMManager.initialize(ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
+
     File keyboards_dat = new File(TEST_RESOURCE_ROOT, OLD_KEYBOARDS_LIST);
     if (keyboards_dat == null || !keyboards_dat.exists()) {
       throw new FileNotFoundException();
@@ -42,6 +44,29 @@ public class KMManagerTest {
     } catch (Exception e) {
       Log.e(TAG, "Exception reading keyboards list");
     }
+  }
+
+  @Test
+  public void test_getTier() {
+    String versionName = "14.0.248-alpha-local";
+    KMManager.Tier tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.ALPHA, tier);
+
+    versionName = "14.0.248-beta-local";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.BETA, tier);
+
+    versionName = "14.0.248-stable-local";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
+
+    // If versionName is null or blank, tier based on com.tavultesoft.kmea.BuildConfig.VERSION_NAME
+    // But we can't test for it.
+
+    // If regex fails, tier is stable
+    versionName = "14.0.248";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
   }
 
   /*
@@ -156,7 +181,9 @@ public class KMManagerTest {
 
     // Verify first keyboard is now default keyboard
     Keyboard k = migratedList.get(0);
-    Assert.assertEquals(Keyboard.DEFAULT_KEYBOARD.getKey(), k.getKey());
+    Assert.assertEquals(KMManager.KMDefault_PackageID, k.getPackageID());
+    Assert.assertEquals(KMManager.KMDefault_KeyboardID, k.getKeyboardID());
+    Assert.assertEquals(KMManager.KMDefault_LanguageID, k.getLanguageID());
 
     // Verify last keyboard no longer sil_euro_latin
     k = migratedList.get(migratedKeyboardListSize-1);

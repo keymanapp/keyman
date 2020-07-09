@@ -1,5 +1,47 @@
 # Keyman Version History
 
+## 14.0.107 alpha 2020-07-08
+
+* feat(android): Add additional info on installed keyboards exceptions (#3319)
+
+## 14.0.106 alpha 2020-07-04
+
+* fix(android/app) Download associated dictionary when installing cloud keyboard package (#3307)
+
+## 14.0.105 alpha 2020-07-03
+
+* feat(android): Download default resources at build time (#3300)
+* fix(android/engine): Fix unbound variable in build script (#3308)
+
+## 14.0.104 alpha 2020-07-01
+
+* fix(android): Resize PackageActivity title text (#3297)
+
+## 14.0.103 alpha 2020-06-30
+
+* fix(common/core/web): fixes transcription buffer cap (#3301)
+
+## 14.0.102 alpha 2020-06-29
+
+* fix(android): Use tier to determine keyboard search host (#3296)
+* refactor(ios/engine): Resource download cleanup and mocking prep (#3292)
+* refactor(ios/engine): ID-based download tracking, update notification rework (#3295)
+
+## 14.0.101 alpha 2020-06-26
+
+* feat(linux): address code review comments of #3278 (#3281)
+* fix(linux): Always restart IBus when installing keyboard (#3284)
+* refactor(linux): cleanup code (#3286)
+* fix(linux): Fix crash converting kvk into LDML (#3288)
+* feat(ios/engine): package-version query implementation (#3280)
+
+## 14.0.100 alpha 2020-06-25
+
+* refactor(ios/engine): Download notifications via completion blocks (#3274)
+* refactor(ios/engine): better resource type links (#3276)
+* refactor(ios/engine): Resource-download installation closures (#3277)
+* feat(linux): Install keyboard on Gnome (#3278)
+
 ## 14.0.99 alpha 2020-06-24
 
 * feat(ios/engine): adds getInstalledPackage(for:) (#3270)

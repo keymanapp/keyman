@@ -38,7 +38,7 @@ type
     property Items[Index: Integer]: IIntKeymanPackageInstalled read GetItem write SetItem; default;
   end;
 
-  TKeymanPackagesInstalled = class(TKeymanAutoCollectionObject, IKeymanPackagesInstalled)
+  TKeymanPackagesInstalled = class(TKeymanAutoCollectionObject, IKeymanPackagesInstalled, IKeymanPackagesInstalled2)
   private
     FPackages: TPackageList;
   protected
@@ -50,6 +50,7 @@ type
     function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; safecall;
     function IndexOf(const ID: WideString): Integer; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
+    function Install2(const Filename: WideString; Force, InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
@@ -112,11 +113,28 @@ begin
   KL.MethodEnter(Self, 'Install', [Filename, Force]);
   with TKPInstallPackage.Create(Context) do
   try
-    Execute(Filename, Force);
+    Execute(Filename, Force, True);
   finally
     Free;
   end;
   KL.MethodExit(Self, 'Install');
+end;
+
+function TKeymanPackagesInstalled.Install2(const Filename: WideString; Force,
+  InstallDefaultLanguage: WordBool): IKeymanPackageInstalled;
+begin
+  KL.MethodEnter(Self, 'Install2', [Filename, Force, InstallDefaultLanguage]);
+  with TKPInstallPackage.Create(Context) do
+  try
+    Execute(Filename, Force, InstallDefaultLanguage);
+  finally
+    Free;
+  end;
+
+  DoRefresh;
+  Result := Get_Items(Filename);
+
+  KL.MethodExit(Self, 'Install2');
 end;
 
 { TPackageList }

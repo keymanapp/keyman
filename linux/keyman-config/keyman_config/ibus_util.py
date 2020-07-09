@@ -4,9 +4,8 @@ import gi
 import logging
 import subprocess
 
-from gi.repository import IBus, Gio
-
 gi.require_version('IBus', '1.0')
+from gi.repository import IBus, Gio
 
 
 def get_ibus_bus():

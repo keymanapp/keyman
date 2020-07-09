@@ -6,15 +6,15 @@ import urllib.parse
 import webbrowser
 
 import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('WebKit2', '4.0')
+
 from gi.repository import Gtk, WebKit2
 from keyman_config.get_kmp import get_download_folder, download_kmp_file
 from keyman_config.install_window import InstallKmpWindow
 from keyman_config.accelerators import init_accel
 from keyman_config.get_info import GetInfo
 from keyman_config import __releaseversion__
-
-gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
 
 
 class DownloadKmpWindow(Gtk.Dialog):

@@ -8,8 +8,16 @@ set -u
 # set -x: Debugging use, print each statement
 # set -x
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+
 display_usage ( ) {
-  echo "build.sh [-no-daemon] [-debug] [-no-update] [-lib-build|-no-lib-build] [-copy-keyboards] [-clean-keyboards] [-h|-?]"
+  echo "build.sh [-no-daemon] [-debug] [-no-update] [-lib-build|-no-lib-build] [-download-keyboards] [-h|-?]"
   echo "Build $TARGET"
   echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
   echo "  -debug                  Compile only Debug variant"
@@ -17,27 +25,19 @@ display_usage ( ) {
   echo "  -lib-build              Force rebuild of the Keyman Engine library"
   echo "  -no-lib-build           Only rebuild the Keyman Engine library if it doesn't exist in /android"
   echo "  -download-keyboards     Download keyboards from downloads.keyman.com"
-  echo "  -copy-keyboards         Only copy the keyboards; don't rebuild them"
-  echo "  -clean-keyboards        Clean the keyboards from this repo"
   echo ""
-  echo "This build script assumes that the https://github.com/keymanapp/keyboards repo is in the same parent"
-  echo "folder as this repo, with the default name 'keyboards'"
   exit 1
 }
 
 export TARGET=FirstVoices
-# If building/copying keyboards, KEYBOARDS_TARGET=app/src/main/assets/packages
-export KEYBOARDS_TARGET=app/src/main/assets
-export KEYBOARDS_CSV_TARGET=app/src/main/assets/keyboards.csv
+KEYBOARD_PACKAGE_ID="fv_all"
+KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
 
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'
 
-export KEYBOARDS_ROOT=../../../../keyboards
-
 PARAM_DOWNLOAD_KEYBOARDS=
-PARAM_COPY_KEYBOARDS=
-PARAM_CLEAN_KEYBOARDS=
 PARAM_DEBUG=
 PARAM_NO_DAEMON=
 PARAM_NO_UPDATE=
@@ -50,14 +50,8 @@ while [[ $# -gt 0 ]] ; do
     -download-keyboards)
       PARAM_DOWNLOAD_KEYBOARDS=-download-keyboards
       ;;
-    -copy-keyboards)
-      PARAM_COPY_KEYBOARDS=-copy-keyboards
-      ;;
     -h|-?)
       display_usage
-      ;;
-    -clean-keyboards)
-      PARAMS_CLEAN_KEYBOARDS=-clean-keyboards
       ;;
     -debug)
       PARAM_DEBUG=-debug
@@ -78,12 +72,23 @@ while [[ $# -gt 0 ]] ; do
   shift
 done
 
+# Verify default keyboard package exists
+if [[ ! -f "$KEYBOARDS_TARGET" || ! -f "$KEYBOARDS_CSV_TARGET" ]]; then
+  echo "$KEYBOARDS_TARGET and $KEYBOARDS_CSV_TARGET required. Will download the latest version"
+  PARAM_DOWNLOAD_KEYBOARDS=-download-keyboards
+fi
+
 if [ ! -z "$PARAM_LIB_BUILD" ] && [ ! -z "$PARAM_NO_LIB_BUILD" ]; then
   echo "ERROR: Cannot set both -lib-build and -no-lib-build"
   exit 1
 fi
 
-../common/build_keyboards.sh $PARAM_DOWNLOAD_KEYBOARDS $PARAM_COPY_KEYBOARDS $PARAM_CLEAN_KEYBOARDS $PARAM_DEBUG
+if [ "$PARAM_DOWNLOAD_KEYBOARDS" == "-download-keyboards" ]; then
+  echo "Copying keyboards.csv"
+  cp "$KEYMAN_ROOT/oem/firstvoices/keyboards.csv" "$KEYBOARDS_CSV_TARGET"
+
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
+fi
 
 # TODO: in the future build_common.sh should probably be shared with all oem products?
 ./build_common.sh $PARAM_DEBUG $PARAM_NO_DAEMON $PARAM_NO_UPDATE $PARAM_LIB_BUILD $PARAM_NO_LIB_BUILD

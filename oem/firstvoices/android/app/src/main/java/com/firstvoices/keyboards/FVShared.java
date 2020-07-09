@@ -104,7 +104,7 @@ final class FVShared {
 
     static FVShared getInstance() {
         // This 'singleton' requires initialization, so
-        // we cannot lazily instanatiate.
+        // we cannot lazily instantiate.
         assert(instance != null);
         return instance;
     }
@@ -341,7 +341,7 @@ final class FVShared {
         }
     }
 
-    /// Upgrades from an earlier vesion, converting data structures
+    /// Upgrades from an earlier version, converting data structures
     /// The data structures in earlier versions were a bit messy
     @SuppressWarnings("unchecked")
     void upgradeTo12() {

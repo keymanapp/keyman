@@ -3,6 +3,7 @@
  */
 package com.tavultesoft.kmea.data;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
@@ -156,16 +157,21 @@ public class Keyboard extends LanguageResource implements Serializable {
   }
 
   // Default sil_euro_latin keyboard
-  public static final Keyboard DEFAULT_KEYBOARD = new Keyboard(
-    KMManager.KMDefault_PackageID,
-    KMManager.KMDefault_KeyboardID,
-    KMManager.KMDefault_KeyboardName,
-    KMManager.KMDefault_LanguageID,
-    KMManager.KMDefault_LanguageName,
-    KMManager.KMDefault_KeyboardVersion,
-    null, // will use help.keyman.com link because context required to determine local welcome.htm path,
-    "",
-    false,
-    KMManager.KMDefault_KeyboardFont,
-    KMManager.KMDefault_KeyboardFont);
+  public static Keyboard getDefaultKeyboard(Context context) {
+    String version = KMManager.getLatestKeyboardFileVersion(
+      context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID);
+
+    return new Keyboard(
+      KMManager.KMDefault_PackageID,
+      KMManager.KMDefault_KeyboardID,
+      KMManager.KMDefault_KeyboardName,
+      KMManager.KMDefault_LanguageID,
+      KMManager.KMDefault_LanguageName,
+      version,
+      null, // will use help.keyman.com link because context required to determine local welcome.htm path,
+      "",
+      false,
+      KMManager.KMDefault_KeyboardFont,
+      KMManager.KMDefault_KeyboardFont);
+  }
 }

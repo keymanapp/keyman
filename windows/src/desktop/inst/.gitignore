@@ -1,3 +1,4 @@
 # These files generated during release build should not be committed
 desktop_resources.res
 desktopui.wxs
+cef.wxs

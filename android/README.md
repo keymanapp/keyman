@@ -15,7 +15,7 @@ https://github.com/ojdkbuild/ojdkbuild
 3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
 
 ## Minimum Android Requirements
-Keyman for Android has a minSdkVersion of 16 for [Android 4.1 Jelly Bean](https://developer.android.com/about/versions/android-4.1)
+Keyman for Android has a minSdkVersion of 21 for [Android 5.0 Lollipop](https://developer.android.com/about/versions/lollipop)
 
 ## Setup Android Studio
 
@@ -64,12 +64,14 @@ export SENTRY_PROJECT=keyman-android
 To validate your configuration, from the `android/` folder run `sentry-cli info`.
  
 ### Compiling From Command Line
-1. Launch a command prompt
-2. Change to one of these directories depending on what you want to compile:
-    * For compiling KMEA and KMAPro, cd to the directory **keyman/android**
-    * For compiling only KMAPro, cd to the directory **keyman/android/KMAPro**
-3. `./build.sh -debug`
-4. The APK will be found in **KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
+1. Launch a command prompt and cd to the directory **keyman/android**
+2. Run the top level build script `./build.sh -debug` which will:
+    * Compile KMEA (and its KMW dependency)
+    * Download default keyboard and dictionary resources as needed
+    * Compile KMAPro
+    * Note: to force an update to the latest keyboard and dictionary packages, use the `-download-resources` flag.
+
+3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/kMAPro-debug.apk**
 
 ### Compiling From Android Studio
 1. Ensure that [Keyman Engine for Android](#how-to-build-keyman-engine-for-android) is built.
@@ -128,16 +130,14 @@ Building these projects follow the same steps as KMAPro:
 
 **android/Tests/KeyboardHarness** app is a test harness for developers to troubleshoot keyboards.
 
-1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/cloud/*.
-
-   For users of Keyman Engine pre 10.0, use the folders
-*android/Tests/KeyboardHarness/app/src/main/assets/languages/* and
-*android/Tests/KeyboardHarness/app/src/main/assets/fonts/* respectively.
-
-2. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
-3. cd to android/Tests/KeyboardHarness/
-4. `./build.sh`
-5. Open Android Studio to run the app
+1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/*.
+2. In Keyman Developer
+  * Open the `keyboardharness.kpj` project and add your keyboard files to the keyboard package.
+  * Build the keyboardharness.kmp keyboard package
+3. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
+4. cd to android/Tests/KeyboardHarness/
+5. `./build.sh`
+6. Open Android Studio to run the app
 
 --------------------------------------------------------------
 
