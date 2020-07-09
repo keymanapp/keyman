@@ -25,54 +25,36 @@ interface
 
 type
   TInstallInfoText = (
-    ssFontSize_Dialog,
-    ssFontSize_Title,
-    ssFontSize_InstallButton,
-    ssFontName_Dialog,
-    ssFontName_Title,
-    ssFontName_InstallButton,
-
     ssApplicationTitle,
     ssTitle,
-    ssWelcome_Keyboards,
     ssInstallSuccess,
     ssCancelQuery,
+
+    ssActionInstallKeyman,
+    ssActionInstallPackage,
+    ssActionInstallPackageLanguage,
+    ssActionNothingToInstall,
+    ssActionDownloadAndInstall,
+    ssActionInstall,
 
     ssFreeCaption,
     ssLicenseLink,
     ssInstallOptionsLink,
 
+    ssMessageBoxTitle,
     ssOkButton,
     ssInstallButton,
     ssCancelButton,
     ssExitButton,
 
-    ssPackageMissing,
-
-    ssErrorDownloadingUpdate,
-    ssErrorUnableToContactServer,
-    ssErrorUnableToContactServerDetailed,
-
-    ssStatusCheckingInternetExplorer,
-    ssStatusCheckingForUpdates,
     ssStatusInstalling,
-    ssStatusInstallingPackage,
     ssStatusComplete,
-
-    ssQueryUpdateInternetExplorer,
-
-    ssQueryUpdateVersion,
-    ssQueryUpdatePackage,
 
     ssQueryRestart,
     ssErrorUnableToAutomaticallyRestart,
-
-    ssRedistIEUpdateRequired,
     ssMustRestart,
-    ssRedistRequired,
 
     ssOldOsVersionInstallKeyboards,
-    ssOldKeymanVersionInstallKeyboards,
 
     ssOldOsVersionDownload,
 
@@ -80,70 +62,70 @@ type
 
     ssOptionsTitle,
 
+    ssOptionsTitleInstallOptions,
+    ssOptionsTitleDefaultKeymanSettings,
+    ssOptionsTitleSelectModulesToInstall,
+    ssOptionsTitleAssociatedKeyboardLanguage,
+
     ssOptionsStartWithWindows,
     ssOptionsStartAfterInstall,
     ssOptionsCheckForUpdates,
-    ssOptionsCheckForUpdatesBeforeInstall,
     ssOptionsUpgradeKeyboards,
-    ssOptionsAutomaticallyReportUsage
+    ssOptionsAutomaticallyReportUsage,
+
+    ssOptionsInstallKeyman,
+    ssOptionsDownloadInstallKeyman,
+    ssOptionsUpgradeKeyman,
+    ssOptionsDownloadUpgradeKeyman,
+    ssOptionsKeymanAlreadyInstalled,
+
+    ssOptionsInstallPackage,
+    ssOptionsDownloadInstallPackage,
+    ssOptionsPackageLanguageAssociation,
+    ssOptionsDefaultLanguage,
+
+    { Download dialog }
+
+    ssDownloadingTitle,
+    ssDownloadingText
   );
 
 const
   FDefaultStrings: array[TInstallInfoText] of WideString = (
-    '16', '24', '18',
-    '', '', '',
-
   {ssApplicationTitle}                        '$APPNAME $VERSION Setup',
   {ssTitle}                                   'Install $APPNAME $VERSION',
-  {ssWelcome_Keyboards}                       'This install includes:'#13#10+'• $APPNAME $VERSION',
   {ssInstallSuccess}                          '$APPNAME $VERSION has been installed successfully.',
   {ssCancelQuery}                             'Are you sure you want to cancel the installation of $APPNAME?',
+
+  {ssActionInstallKeyman}                     Char($2022)+' $APPNAME %0:s %1:s', // %0:s: version, %1:s: (size)
+  {ssActionInstallPackage}                    Char($2022)+' %0:s %1:s %2:s',     // %0:s: package name %1:s: version %2:s: (size)
+  {ssActionInstallPackageLanguage}            Char($2022)+' %0:s %1:s for %2:s %3:s', // %0:s: package name %1:s: version %2:s: language %3:s: (size)
+  {ssActionNothingToInstall}                  'There is nothing to install.',
+  {ssActionDownloadAndInstall}                'Setup will download and install:',
+  {ssActionInstall}                           'Setup will install:',
 
   {ssFreeCaption}                             '$APPNAME $VERSION is free and open source',
   {ssLicenseLink}                             '&Read the license',
   {ssInstallOptionsLink}                      'Install &options',
 
+  {ssMessageBoxTitle}                         '$APPNAME Setup',
   {ssOkButton}                                'OK',
-  {ssInstallButton}                           '&Install $APPNAME',
+  {ssInstallButton}                           '&Install',
   {ssCancelButton}                            'Cancel',
   {ssExitButton}                              'E&xit',
 
-  {ssPackageMissing}                          'Package %0:s (%1:s) is missing.  Setup can continue but will not install this package.',
-
-  {ssErrorDownloadingUpdate}                  'Error %0:d downloading update from server',
-  {ssErrorUnableToContactServer}              'Unable to contact server',
-  {ssErrorUnableToContactServerDetailed}      'Unable to contact server, error was: %0:s',
-
-  {ssStatusCheckingInternetExplorer}          'Checking Internet Explorer version',
-  {ssStatusCheckingForUpdates}                'Checking for updates online',
   {ssStatusInstalling}                        'Installing $APPNAME',
-  {ssStatusInstallingPackage}                 'Installing package %0:s',
   {ssStatusComplete}                          'Installation Complete',
-
-  {ssQueryUpdateInternetExplorer}             'Internet Explorer 9.0 or later is required to install $APPNAME.  '+
-                                              'Please use Windows Update to update your system before installing $APPNAME.',   // I4470
-
-  {ssQueryUpdateVersion}                      'Version %1:s of $APPNAME has been released and is available for download.  This update is %0:dKB.  '+
-                                              'Do you want to download and install the updated version (recommended)?',
-  {ssQueryUpdatePackage}                      'The package %0:s is already installed.  Do you wish to update it now?',
 
   {ssQueryRestart}                            'You must restart Windows before Setup can complete.  When you restart Windows, Setup will continue.'+
                                               #13#10#13#10'Restart now?',
   {ssErrorUnableToAutomaticallyRestart}       'Windows was not able to be automatically restarted.  You should restart Windows before you try and start Keyman.',
-  {ssRedistIEUpdateRequired}                  'Internet Explorer 9.0 or later is required to install $APPNAME.',   // I4470
   {ssMustRestart}                             'You must restart Windows to complete Setup.  When you restart Windows, Setup will finish.',
-  {ssRedistRequired}                          'A redistributable %0:s is required but is not available in the install path.  '+
-                                              'This redistributable can be downloaded from the Keyman website.',
 
   {ssOldOsVersionInstallKeyboards}            '$APPNAME $VERSION requires Windows 7 or later to install.  '+
                                               'However, Keyman Desktop 7, 8 or 9 has been detected.  '+
                                               'Do you want to install the keyboards included in this installer '+
                                               'into the installed Keyman Desktop version?',   // I4460
-  {ssOldKeymanVersionInstallKeyboards}        'This installer includes $APPNAME $VERSION.  '+
-                                              'However, an earlier version of Keyman Desktop has been detected.  '+
-                                              'Do you want to upgrade to $APPNAME $VERSION as well as installing '+
-                                              'the keyboards in this package?  '+
-                                              '(Selecting No will install the keyboards without upgrading $APPNAME)',
 
   {ssOldOsVersionDownload}                    'This product requires Windows 7 or later to install.  '+
                                               'Do you want to download Keyman Desktop 8?',
@@ -152,12 +134,31 @@ const
 
   {ssOptionsTitle}                            'Install Options',
 
+  {ssOptionsTitleInstallOptions}              'Installation options',
+  {ssOptionsTitleDefaultKeymanSettings}       'Default Keyman settings',
+  {ssOptionsTitleSelectModulesToInstall}      'Select modules to install or upgrade',
+  {ssOptionsTitleAssociatedKeyboardLanguage}  'Associated Keyboard Language',
+
   {ssOptionsStartWithWindows}                 'Start $APPNAME when Windows starts',
   {ssOptionsStartAfterInstall}                'Start $APPNAME when installation completes',
   {ssOptionsCheckForUpdates}                  'Check for updates online periodically',
-  {ssOptionsCheckForUpdatesBeforeInstall}     'Check for updates before installing',
   {ssOptionsUpgradeKeyboards}                 'Upgrade keyboards installed with older versions to version $VERSION',
-  {ssOptionsAutomaticallyReportUsage}         'Share anonymous usage statistics with keyman.com'
+  {ssOptionsAutomaticallyReportUsage}         'Share anonymous usage statistics with keyman.com',
+
+  {ssOptionsInstallKeyman}                    'Install $APPNAME %0:s', // %0:s: version
+  {ssOptionsDownloadInstallKeyman}            'Download and install $APPNAME %0:s (%1:s)', // %0:s: version, %1:s: size
+  {ssOptionsUpgradeKeyman}                    'Upgrade $APPNAME to %0:s', // %0:s: version
+  {ssOptionsDownloadUpgradeKeyman}            'Download and upgrade $APPNAME to %0:s (%1:s)',  // %0:s: version, %1:s: size
+  {ssOptionsKeymanAlreadyInstalled}           '$APPNAME %0:s is already installed.', // %0:s: installed version
+
+  {ssOptionsInstallPackage}                   'Install %0:s %1:s',  // %0:s: package name %1:s: package version
+  {ssOptionsDownloadInstallPackage}           'Download and install %0:s %1:s (%2:s)', // %0:s: package name %1:s: package version %2:s package size
+  {ssOptionsPackageLanguageAssociation}       'Select the language that you wish to associate with %0:s keyboard', // %0:s package name
+  {ssOptionsDefaultLanguage}                  'Default language',
+
+  {ssDownloadingTitle}                        'Downloading %0:s',    // %0:s: filename
+  {ssDownloadingText}                         'Downloading %0:s'     // %0:s: filename
+
 );
 
 implementation

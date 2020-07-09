@@ -16,8 +16,7 @@
   History:          04 Dec 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Localize caption
                     15 Jan 2007 - mcdurdin - Use font from locale.xml
-                    04 Jun 2007 - mcdurdin - Initial version - for setup
-                    19 Jun 2007 - mcdurdin - I817 - Translate to Unicode and remove Forms dependence
+                    27 Mar 2008 - mcdurdin - Use TfrmKeymanBase
                     31 Mar 2011 - mcdurdin - I2855 - Keyman Developer online update crashes with Integer Overflow
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
 *)
@@ -26,39 +25,36 @@ unit UfrmDownloadProgress;  // I3306
 interface
 
 uses
-  CommCtrl, resource,
-  SetupForm, TntDialogHelp, Windows, Messages, SysUtils, Variants, Classes, httpuploader;
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, ComCtrls;
 
-const
-  WM_USER_FormShown = WM_USER+100;
 type
   TfrmDownloadProgress = class;
 
   TDownloadProgressCallback = procedure(Owner: TfrmDownloadProgress; var Result: Boolean) of object;
 
-  TfrmDownloadProgress = class(TSetupForm)
-    procedure FormShow(Sender: TObject); override;
+  TfrmDownloadProgress = class(TForm)
+    progress: TProgressBar;
+    cmdCancel: TButton;
+    lblStatus: TLabel;
     procedure cmdCancelClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     FCallback: TDownloadProgressCallback;
     FCancel: Boolean;
-    Max: Int64;  // I2855
-    procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
+    procedure WMUserFormShown(var Message: TMessage); message WM_USER;
   public
-    function DialogID: Integer; override;
-    procedure DlgMain(var Message: TMessage); override;
-    function ProcessCommand(ID, NotificationCode: Integer; hControl: HWND): Boolean; override;
 
-    procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
-    //procedure HTTPFileProgress(Sender: THTTPUploader; const FileName: string; dwFileBytesSent, dwLocalFileSize, dwSecondsToFileCompletion, dwOverallBytesSent, dwOverallBytesTotal, dwSecondsToOverallCompletion, dwBytesPerSecond: DWord);
-    procedure HTTPStatus(Sender: THTTPUploader; const Message: string; Position, Total: Int64);  // I2855
+    procedure HTTPCheckCancel(Sender: TObject; var Cancel: Boolean);
+    procedure HTTPStatus(Sender: TObject; const Message: string; Position, Total: Int64);  // I2855
     property Callback: TDownloadProgressCallback read FCallback write FCallback;
     property Cancel: Boolean read FCancel;
   end;
 
 implementation
 
-{R *.dfm}
+{$R *.dfm}
 
 procedure TfrmDownloadProgress.cmdCancelClick(Sender: TObject);
 begin
@@ -66,77 +62,33 @@ begin
   FCancel := True;
 end;
 
-procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
+procedure TfrmDownloadProgress.FormCreate(Sender: TObject);
 begin
-  Cancel := FCancel;
-end;
-
-{procedure TfrmDownloadProgress.HTTPFileProgress(
-  Sender: THTTPUploader; const FileName: string; dwFileBytesSent,
-  dwLocalFileSize, dwSecondsToFileCompletion, dwOverallBytesSent,
-  dwOverallBytesTotal, dwSecondsToOverallCompletion, dwBytesPerSecond: DWord);
-begin
-  progress.Max := dwOverallBytesTotal;
-  progress.Position := dwOverallBytesSent;
-  progress.Update;
-  Application.ProcessMessages;
-end;}
-
-procedure TfrmDownloadProgress.HTTPStatus(Sender: THTTPUploader;
-  const Message: string; Position, Total: Int64);  // I2855
-var
-  msg: TMsg;
-begin
-  Max := Total;
-  if Max = 0 then
-  begin
-    Max := 100;
-    SendDlgItemMessage(Handle, IDC_PROGRESS1, PBM_SETRANGE, 0, MAKELONG(0, 100));
-  end;
-
-  SendDlgItemMessage(Handle, IDC_PROGRESS1, PBM_SETPOS, Position * 100 div Max, 0);
-  UpdateWindow(GetDlgItem(Handle, IDC_STATUS));
-  UpdateWindow(GetDlgItem(Handle, IDC_PROGRESS1));
-  Tnt_SetDlgItemText(IDC_STATUS, Message);
-
-  while PeekMessage(msg, 0, 0, 0, PM_REMOVE) do
-  begin
-    if not IsDialogMessage(Handle, msg) then
-    begin
-      TranslateMessage(msg);
-      DispatchMessage(msg);
-    end;
-  end;
-end;
-
-function TfrmDownloadProgress.ProcessCommand(ID, NotificationCode: Integer;
-  hControl: HWND): Boolean;
-begin
-  Result := True;
-  case ID of
-    IDCANCEL: cmdCancelClick(Self);
-    else Result := False;
-  end;
-end;
-
-function TfrmDownloadProgress.DialogID: Integer;
-begin
-  Result := 101;
-end;
-
-procedure TfrmDownloadProgress.DlgMain(var Message: TMessage);
-begin
-  case Message.Msg of
-    WM_USER_FormShown:
-      WMUserFormShown(Message);
-  else inherited;
-  end;
+//  cmdCancel.Caption := MsgFromId(SKButtonCancel);
+//  Caption := MsgFromId(SKDownloadProgress_Title);
 end;
 
 procedure TfrmDownloadProgress.FormShow(Sender: TObject);
 begin
-  inherited;
-  PostMessage(Handle, WM_USER_FormShown, 0, 0);
+  PostMessage(Handle, WM_USER, 0, 0); // Starts process after form displays
+end;
+
+procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: TObject; var Cancel: Boolean);
+begin
+  Cancel := FCancel;
+end;
+
+procedure TfrmDownloadProgress.HTTPStatus(Sender: TObject;
+  const Message: string; Position, Total: Int64);  // I2855
+begin
+  if Total = 0
+    then progress.Max := 100
+    else progress.Max := Total;
+  progress.Position := Position;
+  progress.Update;
+  lblStatus.Caption := Message;
+  lblStatus.Update;
+  Application.ProcessMessages;
 end;
 
 procedure TfrmDownloadProgress.WMUserFormShown(var Message: TMessage);
@@ -145,7 +97,6 @@ var
 begin
   Result := False;
   FCancel := False;
-  UpdateWindow(Handle);
   try
     if Assigned(FCallback) then
       FCallback(Self, Result);
@@ -153,10 +104,9 @@ begin
       then ModalResult := mrOk
       else ModalResult := mrCancel;
   except
-    on EHTTPUploaderCancel do ModalResult := mrCancel;
-    on E:EHTTPUploader do
+    on E:Exception do
     begin
-      ShowMessageW(E.Message);
+      ShowMessage(E.Message);
       ModalResult := mrCancel;
     end;
   end;

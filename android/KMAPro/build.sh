@@ -60,8 +60,10 @@ while [[ $# -gt 0 ]] ; do
     shift # past argument
 done
 
-KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp"
-MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/nrc.en.mtnt.model.kmp"
+KEYBOARD_PACKAGE_ID="sil_euro_latin"
+KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+MODEL_PACKAGE_ID="nrc.en.mtnt"
+MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
 
 # Verify default keyboard and dictionary exist
 if [[ ! -f "$KEYBOARDS_TARGET" ]]; then
@@ -90,11 +92,11 @@ fi
 
 # Download default keyboard and dictionary
 if [ $DO_KEYBOARDS_DOWNLOAD = true ]; then
-  downloadKeyboardPackage "$KEYBOARDS_TARGET"
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 fi
 
 if [ $DO_MODELS_DOWNLOAD = true ]; then
-  downloadModelPackage "$MODELS_TARGET"
+  downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
 fi
 
 if [ "$ONLY_DEBUG" = true ]; then
