@@ -426,7 +426,14 @@ public class ResourceDownloadManager {
   }
 
   /**
-   * A nice, centralized function designed to cleanly handle package-oriented downloads once the package's URL is known.
+   * Downloads a package for the specified `LanguageResourceFullID` (`FullKeyboardID` / `FullLexicalModelID`)
+   * and parses it automatically, given a pre-known URL.  The fully parsed package (`KeyboardKeymanPackage` /
+   * `LexicalModelKeymanPackage`) or `Error` that results is available upon completion.
+   *
+   * Actual installation of the resource is left to calling code; consider use of `ResourceFileManager`'s `install` methods
+   * with the returned package.
+   *
+   * `withNotifications` specifies whether or not any of KeymanEngine's `NotificationCenter` notifications should be generated.
    */
   public func downloadPackage<FullID: LanguageResourceFullID>(forFullID fullID: FullID,
                                                               from url: URL,
