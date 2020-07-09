@@ -39,13 +39,21 @@ extension AnyLanguageResourceFullID where Self: Equatable {
   }
 }
 
+extension AnyLanguageResourceFullID where Self: Hashable {
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(self.id)
+    hasher.combine(self.languageID)
+    hasher.combine(self.type)
+  }
+}
+
 extension AnyLanguageResourceFullID {
   var description: String {
     return "{\(type): {id = \(id), languageID=\(languageID)}}"
   }
 }
 
-public protocol LanguageResourceFullID: AnyLanguageResourceFullID {
+public protocol LanguageResourceFullID: AnyLanguageResourceFullID, Hashable {
   associatedtype Resource: LanguageResource where Resource.FullID == Self
 }
 
@@ -79,7 +87,7 @@ extension AnyLanguageResource {
 // Necessary due to Swift details 'documented' at
 // https://stackoverflow.com/questions/42561685/why-cant-a-get-only-property-requirement-in-a-protocol-be-satisfied-by-a-proper
 public protocol LanguageResource: AnyLanguageResource {
-  associatedtype FullID: LanguageResourceFullID where FullID: Equatable, FullID.Resource == Self
+  associatedtype FullID: LanguageResourceFullID where FullID.Resource == Self
   associatedtype Package: KeymanPackage
   var typedFullID: FullID { get }
 }
