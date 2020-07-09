@@ -245,44 +245,31 @@ public class ResourceDownloadManager {
   /// - Parameters:
   ///   - languageID: the bcp47 string of the desired language
   public func downloadLexicalModelsForLanguageIfExists(languageID: String) {
-    // TODO:  This fetch will conflict with the fetch in the next method; we need some scheme to reset
-    //        the other's fetch after this completes.
-    //
-    //        It _may_ be better to retool how this looks up the lexical model for a language.  Not sure yet.
-  
-    //get list of lexical models for this languageID  /?q=bcp47:en
-    func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
+    // Note:  we aren't caching the result of this query in any way.
+    // TODO:  There's no check to ensure we don't already have a model installed for the language.
+    //        The original lacked this check, as well, and it's a bit of an edge case right now.
+    Queries.LexicalModel.fetch(forLanguageCode: languageID) { result, error in
       if let error = error {
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+error.localizedDescription)
-        let installables = lexicalModels?.map { InstallableLexicalModel(lexicalModel: $0, languageID: languageID, isCustom: false)}
-        self.resourceDownloadFailed(for: installables ?? [] as [InstallableLexicalModel], with: error)
-      } else if nil == lexicalModels {
+        self.resourceDownloadFailed(for: [] as [InstallableLexicalModel], with: error)
+        return
+      }
+
+      guard let result = result else {
         //TODO: put up an alert instead
         log.info("No lexical models available for language \(languageID) (nil)")
-      } else if 0 == lexicalModels?.count {
+        return
+      }
+
+      if result.count == 0 {
         log.info("No lexical models available for language \(languageID) (empty)")
-      } else {
+        // We automatically use the first model in the list.
+      } else if let lmFullID = result[0].modelFor(languageID: languageID)?.fullID {
         log.info("Fetched lexical model list for "+languageID+".")
-        // choose which of the lexical models to download
-        //  for now, this just downloads the first one
-        let chosenIndex = 0
-        if let lexicalModel = lexicalModels?[chosenIndex] {
-          //downloadLexicalModelPackage(url: URL.init(string: lexicalModel.packageFilename)!)
-          // We've already fetched part of the repository to do this.
-          let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModel.id, languageID: languageID)
-          let completionClosure = standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
-          downloadLexicalModel(withID: lexicalModel.id,
-                               languageID: languageID,
-                               isUpdate: false,
-                               fetchRepositoryIfNeeded: false,
-                               completionBlock: completionClosure)
-        } else {
-          log.info("no error, but no lexical model in list, either!")
-        }
+        let completionClosure = self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
+        self.downloadPackage(forFullID: lmFullID, from: URL.init(string: result[0].packageFilename)!, completionBlock: completionClosure)
       }
     }
-    
-    Manager.shared.apiLexicalModelRepository.fetchList(languageID: languageID, completionHandler: listCompletionHandler)
   }
 
   /// Asynchronously fetches the .js file for the lexical model with given IDs.
