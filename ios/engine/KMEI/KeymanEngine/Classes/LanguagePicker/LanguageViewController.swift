@@ -22,31 +22,14 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
   private var isUpdate = false
   private var languages: [Language] = []
   private let keyboardRepository: KeyboardRepository?
-  private let lexicalModelRepository: LexicalModelRepository?
 
   private var keyboardDownloadStartedObserver: NotificationObserver?
   private var keyboardDownloadFailedObserver: NotificationObserver?
 
   init(_ keyboardRepository: KeyboardRepository) {
     self.keyboardRepository = keyboardRepository
-    self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
     keyboardRepository.delegate = self
-  }
-
-  init(_ lexicalModelRepository: LexicalModelRepository) {
-    self.lexicalModelRepository = lexicalModelRepository
-    self.keyboardRepository = nil
-    super.init(nibName: nil, bundle: nil)
-    lexicalModelRepository.delegate = self
-  }
-  
-  init(keyboardRep keyboardRepository: KeyboardRepository, modelRep lexicalModelRepository: LexicalModelRepository) {
-    self.keyboardRepository = keyboardRepository
-    self.lexicalModelRepository = lexicalModelRepository
-    super.init(nibName: nil, bundle: nil)
-    keyboardRepository.delegate = self
-    lexicalModelRepository.delegate = self
   }
 
   required init?(coder aDecoder: NSCoder) {

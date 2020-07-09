@@ -459,30 +459,7 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
   }
 }
 
-// MARK: - LexicalModelRepositoryDelegate
-
-extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
-  /** lexicalModelRepositoryDidFetchList callback on successful fetching of list of lexical models for a language
-  *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
-  */
-  public func lexicalModelRepositoryDidFetchList(_ repository: LexicalModelRepository) {
-    if let languageDict = repository.languages {
-      languages = languageList(languageDict)
-    }
-    self.dismissActivityView()
-    self.tableView.reloadData()
-    if self.numberOfSections(in: self.tableView) == 0 {
-      self.showConnectionErrorAlert()
-    }
-  }
-  
-  /** lexicalModelRepository didFailFetch callback on failure to fetch list of lexical models for a language
-   *  caller should wrap in DispatchQueue.main.async {} if not already on main thread
-   */
-  public func lexicalModelRepository(_ repository: LexicalModelRepository, didFailFetch error: Error) {
-    dismissActivityView()
-    showConnectionErrorAlert()
-  }
+extension InstalledLanguagesViewController {
   
   @objc func addClicked(_ sender: Any) {
     showAddKeyboard()
@@ -490,7 +467,7 @@ extension InstalledLanguagesViewController: LexicalModelRepositoryDelegate {
   
   func showAddKeyboard() {
     navigationController?.setToolbarHidden(true, animated: true)
-    let vc = LanguageViewController(keyboardRep: Manager.shared.apiKeyboardRepository, modelRep: Manager.shared.apiLexicalModelRepository)
+    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
     navigationController?.pushViewController(vc, animated: true)
   }
 }
