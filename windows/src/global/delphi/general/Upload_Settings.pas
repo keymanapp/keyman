@@ -1,18 +1,18 @@
 (*
   Name:             Upload_Settings
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    15 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Add CRM callbacks
                     04 Dec 2006 - mcdurdin - Add Activate and ViewCustomer URLs
@@ -74,8 +74,6 @@ function MakeAPIURL(path: string): string;
 
 function MakeKeymanURL(const path: string): string;
 
-function DefaultServersXMLTags: string;
-
 implementation
 
 uses
@@ -84,7 +82,6 @@ uses
   DebugPaths,
   ErrorControlledRegistry,
   RegistryKeys,
-  utilxml,
   VersionInfo;
 
 const
