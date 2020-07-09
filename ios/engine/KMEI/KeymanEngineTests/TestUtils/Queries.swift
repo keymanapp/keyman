@@ -14,6 +14,8 @@ extension TestUtils {
 
     static let package_version_case_1 = query_bundle.url(forResource: "package-version-case-1", withExtension: "json")!
 
+    static let package_version_case_mtnt = query_bundle.url(forResource: "package-version-case-mtnt", withExtension: "json")!
+
     static let model_case_en = query_bundle.url(forResource: "model-case-en", withExtension: "json")!
   }
 }

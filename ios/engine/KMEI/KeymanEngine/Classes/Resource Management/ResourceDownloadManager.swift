@@ -278,6 +278,7 @@ public class ResourceDownloadManager {
       guard let result = result, error == nil else {
         log.info("Error occurred requesting location for \(lmFullID.description)")
         self.resourceDownloadFailed(forFullID: lmFullID, with: error ?? .noData)
+        completionBlock?(nil, error ?? .noData)
         return
       }
 
@@ -288,13 +289,16 @@ public class ResourceDownloadManager {
           }
         }
         self.resourceDownloadFailed(forFullID: lmFullID, with: Queries.ResultError.unqueried)
+        completionBlock?(nil, Queries.ResultError.unqueried)
         return
       }
 
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
       guard self.downloader.state == .clear else {
-        self.resourceDownloadFailed(forFullID: lmFullID, with: self.downloader.state.error ??
-          NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"]))
+        let err = self.downloader.state.error ??
+          NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
+        self.resourceDownloadFailed(forFullID: lmFullID, with: err)
+        completionBlock?(nil, err)
         return
       }
 

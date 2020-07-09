@@ -30,7 +30,7 @@ class QueryPackageVersionTests: XCTestCase {
   /**
    * A rigorous test of our package-version query code that runs against a fixture copied from an actual api.keyman.com query return (26 Jun 2020).
    */
-  func testMockedFetchParse() throws {
+  func testMockedBatchFetchParse() throws {
     let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_1, error: nil)
     mockedURLSession?.queueMockResult(.data(mockedResult))
 
@@ -44,7 +44,6 @@ class QueryPackageVersionTests: XCTestCase {
 
     let expectation = XCTestExpectation(description: "Query complete and results analyzed")
 
-    // As it's a mocked fetch, it happens synchronously.
     Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))
@@ -103,6 +102,33 @@ class QueryPackageVersionTests: XCTestCase {
     wait(for: [expectation], timeout: 5)
   }
 
+  // Tests a fetch against a single resource.
+  func testLexicalModelFetch() throws {
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_mtnt, error: nil)
+    mockedURLSession?.queueMockResult(.data(mockedResult))
+
+    let expectation = XCTestExpectation(description: "Query complete and results analyzed")
+
+    // As it's a mocked fetch, it happens synchronously.
+    Queries.PackageVersion.fetch(for: [TestUtils.LexicalModels.mtnt.fullID], withSession: mockedURLSession!) { results, error in
+      if let _ = error {
+        XCTFail(String(describing: error))
+        expectation.fulfill()
+        return
+      }
+
+      XCTAssertNotNil(results)
+
+      if let results = results {
+        XCTAssertNotNil(results.models)
+      }
+
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
+  }
+
   func testResultEntryFor() throws {
     let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_1, error: nil)
     mockedURLSession?.queueMockResult(.data(mockedResult))
@@ -117,7 +143,6 @@ class QueryPackageVersionTests: XCTestCase {
 
     let expectation = XCTestExpectation(description: "Query complete and results analyzed")
 
-    // As it's a mocked fetch, it happens synchronously.
     Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))

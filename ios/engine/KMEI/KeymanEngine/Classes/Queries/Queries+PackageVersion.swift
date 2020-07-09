@@ -61,11 +61,19 @@ extension Queries {
           }
         }
 
-        let keyboardValueSet = try rootValues.nestedContainer(keyedBy: IDCodingKey.self, forKey: .keyboards)
-        keyboards = try keyboardValueSet.allKeys.reduce([String: ResultComponent](), dictionaryReducer(container: keyboardValueSet, category: "keyboard"))
+        if rootValues.contains(.keyboards) {
+          let keyboardValueSet = try rootValues.nestedContainer(keyedBy: IDCodingKey.self, forKey: .keyboards)
+          keyboards = try keyboardValueSet.allKeys.reduce([String: ResultComponent](), dictionaryReducer(container: keyboardValueSet, category: "keyboard"))
+        } else {
+          keyboards = nil
+        }
 
-        let modelValueSet = try rootValues.nestedContainer(keyedBy: IDCodingKey.self, forKey: .models)
-        models = try modelValueSet.allKeys.reduce([String: ResultComponent](), dictionaryReducer(container: modelValueSet, category: "lexical model"))
+        if rootValues.contains(.models) {
+          let modelValueSet = try rootValues.nestedContainer(keyedBy: IDCodingKey.self, forKey: .models)
+          models = try modelValueSet.allKeys.reduce([String: ResultComponent](), dictionaryReducer(container: modelValueSet, category: "lexical model"))
+        } else {
+          models = nil
+        }
       }
 
       func entryFor<FullID: LanguageResourceFullID>(_ fullID: FullID) -> Entry {

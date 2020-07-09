@@ -105,12 +105,12 @@ class ResourceDownloadManagerTests: XCTestCase {
 
   func testDownloadPackageFailure() throws {
     let expectation = XCTestExpectation(description: "Mocked \"download\" should complete, though with an error.")
-    let mtnt_id = TestUtils.Keyboards.khmer_angkor.fullID
+    let khmer_angkor_id = TestUtils.Keyboards.khmer_angkor.fullID
 
     let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: TestUtils.mockedError)
     mockedURLSession?.queueMockResult(.download(mockedResult))
 
-    downloadManager?.downloadPackage(forFullID: mtnt_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
+    downloadManager?.downloadPackage(forFullID: khmer_angkor_id, from: TestUtils.Keyboards.khmerAngkorKMP, withNotifications: false) { package, error in
 
       let tempDownloadKMP = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
       XCTAssertFalse(FileManager.default.fileExists(atPath: tempDownloadKMP.path))
@@ -129,6 +129,36 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     let downloadQueue = downloadManager!.downloader
     downloadQueue.step()
+
+    wait(for: [expectation], timeout: 5)
+  }
+
+  func testLegacyDownloadLexicalModel() throws {
+    let expectation = XCTestExpectation(description: "Mocked package \"download\" should complete successfully.")
+
+    // For this test, we actually want the downloader to run automatically.  It's... a bit tricky to
+    // run this integration test otherwise.
+    downloadManager = ResourceDownloadManager(session: mockedURLSession!, autoExecute: true)
+    
+    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_mtnt, error: nil)
+    let mockedDownload = TestUtils.Downloading.MockResult(location: TestUtils.LexicalModels.mtntKMP, error: nil)
+
+    mockedURLSession?.queueMockResult(.data(mockedQuery))
+    mockedURLSession?.queueMockResult(.download(mockedDownload))
+
+    let mtnt_id = TestUtils.LexicalModels.mtnt.fullID
+
+    downloadManager?.downloadLexicalModel(withID: mtnt_id.id, languageID: mtnt_id.languageID, isUpdate: false, fetchRepositoryIfNeeded: false) { package, error in
+      if let error = error {
+        XCTFail("Mocked query and download should both succeed; reported error: \(error.localizedDescription)")
+      } else if let package = package {
+        // Double-check it!
+        XCTAssertEqual(package.id, "nrc.en.mtnt")
+        XCTAssertNotNil(package.findResource(withID: mtnt_id))
+      }
+
+      expectation.fulfill()
+    }
 
     wait(for: [expectation], timeout: 5)
   }
