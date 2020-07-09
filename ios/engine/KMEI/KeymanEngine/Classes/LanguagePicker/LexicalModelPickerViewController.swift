@@ -292,32 +292,36 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   func showAddLexicalModel() {
     //get list of lexical models for this languageID and show it
-    func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
+    Queries.LexicalModel.fetch(forLanguageCode: language.id) { result, error in
       if let error = error {
-        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error.localizedDescription))
+        log.info("Failed to fetch lexical model list for "+self.language.id+". error: "+error.localizedDescription)
         DispatchQueue.main.async {
           self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
         }
-      } else if nil == lexicalModels {
-        noModelsAvailable(cause: "nil")
-      } else if 0 == lexicalModels?.count {
-        noModelsAvailable(cause: "empty")
+        return
+      }
+
+      guard let result = result else {
+        self.noModelsAvailable(cause: "nil")
+        return
+      }
+
+      if result.count == 0 {
+        self.noModelsAvailable(cause: "empty")
       } else {
-        log.info("Fetched lexical model list for "+language.id+".")
+        log.info("Fetched lexical model list for "+self.language.id+".")
+        let packages: [(InstallableLexicalModel, URL)] = result.map { ($0.modelFor(languageID: self.language.id)!, URL.init(string: $0.packageFilename)!) }
         // show the list of lexical models (on the main thread)
         DispatchQueue.main.async {
           let button: UIButton? = (self.navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
           button?.isEnabled = false
-          let vc = LanguageLMDetailViewController(language: self.language, onSuccess: { lm in
+          let vc = LanguageLMDetailViewController(language: self.language, packages: packages, onSuccess: { lm in
             self.switchLexicalModel(lm)
           })
-          vc.lexicalModels = lexicalModels!
           self.navigationController?.pushViewController(vc, animated: true)
         }
       }
     }
-    
-    Manager.shared.apiLexicalModelRepository.fetchList(languageID: language.id, completionHandler: listCompletionHandler)
   }
 
   func noModelsAvailable(cause: String = "nil") {

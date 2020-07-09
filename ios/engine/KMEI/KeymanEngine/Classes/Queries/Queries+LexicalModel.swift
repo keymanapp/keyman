@@ -29,7 +29,7 @@ extension Queries {
         case description
       }
 
-      var models: [(InstallableLexicalModel)] {
+      var models: [InstallableLexicalModel] {
         return languages.map { modelFor(languageID: $0)! }
       }
 

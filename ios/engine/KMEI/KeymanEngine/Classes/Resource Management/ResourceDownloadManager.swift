@@ -388,7 +388,7 @@ public class ResourceDownloadManager {
     if withNotifications {
       let resources = resource != nil ? [resource!] : [] as [FullID.Resource]
       // We don't have the full metadata available, but we can at least signal which resource type this way.
-      startClosure = resourceDownloadStartClosure(for: resources)
+      startClosure = resourceDownloadStartClosure(forFullID: fullID)
       completionClosure = resourceDownloadCompletionClosure(for: resources, handler: completionBlock)
     }
 
@@ -520,6 +520,10 @@ public class ResourceDownloadManager {
 
   internal func resourceDownloadStartClosure<Resource: LanguageResource>(for resources: [Resource]) -> (() -> Void) {
     return { self.resourceDownloadStarted(for: resources) }
+  }
+
+  internal func resourceDownloadStartClosure<FullID: LanguageResourceFullID>(forFullID fullID: FullID) -> (() -> Void) {
+    return { self.resourceDownloadStarted(forFullID: fullID) }
   }
 
   // Only for use with individual downloads.  Updates should have different completion handling.
@@ -693,6 +697,20 @@ public class ResourceDownloadManager {
       NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
                                               object: self,
                                               value: lexicalModels)
+    }
+  }
+
+  internal func resourceDownloadStarted<FullID: LanguageResourceFullID>(forFullID id: FullID) {
+    // Note:  when all is said and done, we may want to rework notifications to report the FullID, not
+    //        the full LanguageResource.
+    if let _ = id as? FullKeyboardID {
+      NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
+                                          object: self,
+                                          value: [])
+    } else if let _ = id as? FullLexicalModelID {
+      NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
+                                              object: self,
+                                              value: [])
     }
   }
 
