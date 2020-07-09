@@ -11,7 +11,7 @@ import Foundation
 protocol HTTPDownloadDelegate: class {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
-  func downloadRequestFailed(_ request: HTTPDownloadRequest)
+  func downloadRequestFailed(_ request: HTTPDownloadRequest, with: Error?)
   func downloadQueueFinished(_ queue: HTTPDownloader)
   func downloadQueueCancelled(_ queue: HTTPDownloader)
 }
@@ -23,6 +23,7 @@ class HTTPDownloader: NSObject {
   var currentRequest: HTTPDownloadRequest?
   var downloadSession: URLSession!
   public var userInfo: [String: Any] = [:]
+  var isCancelled: Bool = false
 
   init(_ handler: HTTPDownloadDelegate?, session: URLSession = .shared) {
     super.init()
@@ -31,6 +32,7 @@ class HTTPDownloader: NSObject {
   }
 
   func addRequest(_ request: HTTPDownloadRequest) {
+    isCancelled = false
     queue.append(request)
   }
 
@@ -43,6 +45,7 @@ class HTTPDownloader: NSObject {
 
   // Starts the queue.  The queue is managed via event messages in order to process them sequentially.
   func run() {
+    isCancelled = false
     if !queue.isEmpty {
       runRequest()
     }
@@ -60,7 +63,7 @@ class HTTPDownloader: NSObject {
         handler?.downloadRequestStarted(req)
       }
       req?.task?.resume()
-    } else {
+    } else if !isCancelled {
       handler?.downloadQueueFinished(self)
     }
     // The next step in the queue, should it exist, will be triggered by urlSession(_, task:, didCompleteWithError:)
@@ -79,7 +82,16 @@ class HTTPDownloader: NSObject {
       //
       // Force the callback onto the main thread.
       DispatchQueue.main.async {
-        self.handler?.downloadRequestFailed(currentRequest)
+        self.handler?.downloadRequestFailed(currentRequest, with: nil)
+        self.runRequest()
+      }
+      return
+    }
+
+    guard error == nil else {
+      // The download process itself encountered an error.
+      DispatchQueue.main.async {
+        self.handler?.downloadRequestFailed(currentRequest, with: error)
         self.runRequest()
       }
       return
@@ -119,7 +131,7 @@ class HTTPDownloader: NSObject {
 
     guard let data = data else {
       DispatchQueue.main.async {
-        self.handler?.downloadRequestFailed(currentRequest)
+        self.handler?.downloadRequestFailed(currentRequest, with: nil)
         self.runRequest()
       }
       return
@@ -145,6 +157,7 @@ class HTTPDownloader: NSObject {
     }
     
     self.handler?.downloadQueueCancelled(self)
+    self.isCancelled = true
   }
 
   var requestsCount: Int {

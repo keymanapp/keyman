@@ -14,7 +14,8 @@ import Foundation
 // This will be the public face of resource download management in KMEI, while the other half is private and
 // only accessible within the library.
 public class ResourceDownloadManager {
-  private var downloader: ResourceDownloadQueue
+  // internal b/c testing access.
+  internal var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
 
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
@@ -422,6 +423,35 @@ public class ResourceDownloadManager {
       }
     }
     return .upToDate
+  }
+
+  /**
+   * Downloads a package for the specified `LanguageResourceFullID` (`FullKeyboardID` / `FullLexicalModelID`)
+   * and parses it automatically, given a pre-known URL.  The fully parsed package (`KeyboardKeymanPackage` /
+   * `LexicalModelKeymanPackage`) or `Error` that results is available upon completion.
+   *
+   * Actual installation of the resource is left to calling code; consider use of `ResourceFileManager`'s `install` methods
+   * with the returned package.
+   *
+   * `withNotifications` specifies whether or not any of KeymanEngine's `NotificationCenter` notifications should be generated.
+   */
+  public func downloadPackage<FullID: LanguageResourceFullID>(forFullID fullID: FullID,
+                                                              from url: URL,
+                                                              withNotifications: Bool = false,
+                                                              completionBlock: @escaping CompletionHandler<FullID.Resource>)
+  where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+    var startClosure: (() -> Void)? = nil
+    var completionClosure: CompletionHandler<FullID.Resource>? = completionBlock
+
+    if withNotifications {
+      // We don't have the full metadata available, but we can at least signal which resource type this way.
+      startClosure = resourceDownloadStartClosure(for: [] as [FullID.Resource])
+      completionClosure = resourceDownloadCompletionClosure(for: [] as [FullID.Resource], handler: completionBlock)
+    }
+
+    // build batch for package
+    let batch = DownloadBatch(forPackageWithID: fullID, from: url, startBlock: startClosure, completionBlock: completionClosure)
+    downloader.queue(.simpleBatch(batch))
   }
   
   // MARK: Update checks + management

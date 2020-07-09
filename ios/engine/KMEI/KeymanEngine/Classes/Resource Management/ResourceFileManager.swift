@@ -43,6 +43,20 @@ public class ResourceFileManager {
     }
   }
 
+  internal func packageDownloadTempPath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
+    let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    let tempFilename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
+    let url = documentDir.appendingPathComponent("\(tempFilename).partial") // marks it as a download in progress
+    return url
+  }
+
+  internal func cachedPackagePath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
+    let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    let filename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
+    let url = documentDir.appendingPathComponent(filename)
+    return url
+  }
+
   /**
    * Apple doesn't provide a method that performs copy-and-overwrite functionality.  This function fills in that gap.
    */
