@@ -152,8 +152,8 @@ extension Queries {
       self.cachedResults = [.keyboard: [:], .lexicalModel: [:]]
     }
 
-    static func cachedResult<FullID: AnyLanguageResourceFullID>(for fullID: FullID) -> ResultEntry? {
-      return cachedResults[fullID.type]![fullID.id]
+    static func cachedResult(for packageKey: KeymanPackage.Key) -> ResultEntry? {
+      return cachedResults[packageKey.type]![packageKey.id]
     }
   }
 }

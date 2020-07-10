@@ -196,8 +196,10 @@ public class ResourceDownloadManager {
     return font.source.filter({ $0.hasFontExtension })
       .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
-  
+
+  // Deprecating due to tricky assumption - a keyboard _can_ be installed from two separate packages.
   /// - Returns: The current state for a keyboard
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
@@ -211,7 +213,8 @@ public class ResourceDownloadManager {
     }
 
     // Check version
-    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: fullKeyboardID)?.version {
+    let packageKey = KeymanPackage.Key(forResource: userKeyboard)
+    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: packageKey)?.version {
       let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
       let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
       if downloadedVersion < repositoryVersion {
@@ -320,6 +323,7 @@ public class ResourceDownloadManager {
   
   /// - Returns: The current state for a lexical model
   //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
@@ -333,7 +337,8 @@ public class ResourceDownloadManager {
     }
 
     // Check version
-    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: fullLexicalModelID)?.version {
+    let packageKey = KeymanPackage.Key(forResource: userLexicalModel)
+    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: packageKey)?.version {
       let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
       let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
       if downloadedVersion < repositoryVersion {
@@ -397,14 +402,14 @@ public class ResourceDownloadManager {
   /**
    * Runs the package-version query against all installed resources to determine if any updates are available.
    */
-  public func fetchAvailableUpdates(completionBlock: (([AnyLanguageResourceFullID]?, Error?) -> Void)? = nil) {
+  public func fetchAvailableUpdates(completionBlock: (([KeymanPackage.Key]?, Error?) -> Void)? = nil) {
     let userDefaults = Storage.active.userDefaults
-    let kbdIDs = userDefaults.userKeyboards?.map { $0.fullID }
-    let modelIDs = userDefaults.userLexicalModels?.map { $0.fullID }
+    let keyboardPackages = userDefaults.userKeyboards?.map { $0.packageKey }
+    let lexicalModelPackages = userDefaults.userLexicalModels?.map { $0.packageKey }
 
-    let allIDs: [AnyLanguageResourceFullID] = (kbdIDs ?? []) + (modelIDs ?? [])
+    let packageKeys = (keyboardPackages ?? []) + (lexicalModelPackages ?? [])
 
-    Queries.PackageVersion.fetch(for: allIDs) { results, error in
+    Queries.PackageVersion.fetch(for: packageKeys) { results, error in
       guard error == nil else {
         completionBlock?(nil, error)
         return

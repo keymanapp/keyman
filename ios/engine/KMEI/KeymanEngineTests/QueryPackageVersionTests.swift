@@ -117,15 +117,15 @@ class QueryPackageVersionTests: XCTestCase {
 
     let badKbdFullID = FullKeyboardID(keyboardID: "foo", languageID: "en")
     let badLexFullID = FullLexicalModelID(lexicalModelID: "bar", languageID: "km")
-    let fullIDs = [TestUtils.Keyboards.khmer_angkor.fullID,
-                   TestUtils.Keyboards.sil_euro_latin.fullID,
-                   badKbdFullID,
-                   TestUtils.LexicalModels.mtnt.fullID,
-                   badLexFullID]
+    let packageKeys = [TestUtils.Keyboards.khmer_angkor.fullID,
+                       TestUtils.Keyboards.sil_euro_latin.fullID,
+                       badKbdFullID,
+                       TestUtils.LexicalModels.mtnt.fullID,
+                       badLexFullID].map { packageKey(for: $0) }
 
     let expectation = XCTestExpectation(description: "Query complete and results analyzed")
 
-    Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
+    Queries.PackageVersion.fetch(for: packageKeys, withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))
         expectation.fulfill()
@@ -134,13 +134,13 @@ class QueryPackageVersionTests: XCTestCase {
       XCTAssertNotNil(results)
 
       // Check to see that the results were appropriately cached.
-      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: TestUtils.Keyboards.khmer_angkor.fullID))
-      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: TestUtils.Keyboards.sil_euro_latin.fullID))
-      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: TestUtils.LexicalModels.mtnt.fullID))
+      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: self.packageKey(for: TestUtils.Keyboards.khmer_angkor.fullID)))
+      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: self.packageKey(for: TestUtils.Keyboards.sil_euro_latin.fullID)))
+      XCTAssertNotNil(Queries.PackageVersion.cachedResult(for: self.packageKey(for: TestUtils.LexicalModels.mtnt.fullID)))
 
       // Error results are not cached.
-      XCTAssertNil(Queries.PackageVersion.cachedResult(for: badKbdFullID))
-      XCTAssertNil(Queries.PackageVersion.cachedResult(for: badLexFullID))
+      XCTAssertNil(Queries.PackageVersion.cachedResult(for: self.packageKey(for: badKbdFullID)))
+      XCTAssertNil(Queries.PackageVersion.cachedResult(for: self.packageKey(for: badLexFullID)))
 
       expectation.fulfill()
     }

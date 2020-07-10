@@ -858,11 +858,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                                                         completionBlock: completionBlock)
   }
 
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForKeyboard(withID: keyboardID)
   }
 
   // Technically new, but it does closely parallel an old API point.
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForLexicalModel(withID modelID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
   }
