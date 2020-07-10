@@ -81,6 +81,50 @@ public class KeymanPackage {
     case custom
   }
 
+  public enum VersionState: String, Codable {
+    /**
+     * KeymanEngine can't track up-to-date versions for custom packages, and we simply don't know before the first update-check for
+     * any models installed from local files.
+     */
+    case unknown
+
+    /**
+     * The installed version of this package matches the latest distributed version.
+     */
+    case upToDate
+
+    /**
+     * There is a publicly-distributed version of the package that is newer than the one currently installed within KeymanEngine.
+     */
+    case needsUpdate
+  }
+
+  public enum InstallationState: String, Codable {
+    /**
+     * While a `KeymanPackage` instance will never return it, some functions that accept a `KeymanPackage.Key` might.
+     * This indicates that the package is neither installed nor being downloaded.
+     */
+     case none
+
+    /**
+     * While a `KeymanPackage` instance will never return it, some functions that accept a `KeymanPackage.Key` might.
+     * This indicates that the package is not yet installed or downloaded, but is _being_ downloaded via KeymanEngine's downloading queue.
+     */
+     case downloading
+
+     /**
+      * Indicates that this `KeymanPackage` instance was been temporarily extracted for installation from a KMP file, regardless
+      * of whether or not its contents have already been installed within KeymanEngine.
+      */
+     case pending
+
+     /**
+      * Indicates that this `KeymanPackage` instance corresponds has been fully installed and was loaded from its installed files, rather
+      * than its source KMP.
+      */
+     case installed
+  }
+
   /**
    * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the support state of a keyboard.
    */
@@ -164,6 +208,29 @@ public class KeymanPackage {
     return metadata.packageType == .Keyboard
   }
 
+  public var supportState: SupportState {
+    return Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)?.supportState ?? .unknown
+  }
+
+  public var installState: InstallationState {
+    // Other possible states are invalid for instantiated packages.
+    return isTemp ? .pending : .installed
+  }
+
+  public var versionState: VersionState {
+    if supportState == .unknown || supportState == .custom {
+      return .unknown
+    } else {
+      let cachedVersion = Version(Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)!.latestVersion!)!
+
+      if cachedVersion > self.version {
+        return .needsUpdate
+      } else {
+        return .upToDate
+      }
+    }
+  }
+
   /**
    * Returns the type of LanguageResource contained within the parsed Package.
    */
@@ -196,8 +263,12 @@ public class KeymanPackage {
     return defaultInfoHtml()
   }
 
-  public var version: String? {
-    return metadata.version
+  public var version: Version {
+    if let versionString = metadata.version, let version = Version(versionString) {
+      return version
+    } else {
+      return Version.packageBasedFileReorg
+    }
   }
 
   var resources: [AnyKMPResource] {
