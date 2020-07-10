@@ -266,9 +266,7 @@ public final class FileUtils {
   }
 
   /**
-   * Utility to parse a URL and determine if it's a valid keyman:<method>
-   * Currently, only "keyman" scheme with "download" path and query is supported.
-   * Legacy keyman:// protocol is deprecated and not supported.
+   * Utility to parse a URL and determine if it's a Keyman hosted keyboard download.
    * @param u String of the URL
    * @return boolean true if URL is a supported Keyman link
    */
@@ -278,20 +276,13 @@ public final class FileUtils {
       return ret;
     }
     String lowerU = u.toLowerCase();
-    Pattern pattern = Pattern.compile("^keyman:(\\w+)\\?(.+)");
+    Pattern pattern = Pattern.compile("^https://(staging-keyman-com.azurewebsites.net|keyman.com)/keyboard/download\\?(.+)");
     Matcher matcher = pattern.matcher(lowerU);
     // Check URL starts with "keyman"
     if (matcher.matches() && (matcher.group(1) != null)) {
-      // For now, only handle "download"
-      switch (matcher.group(1).toLowerCase()) {
-        case "download":
-          if (matcher.group(2) != null) {
-            // Contains query
-            ret = true;
-          }
-          break;
-        default:
-          ret = false;
+      if (matcher.group(2) != null) {
+        // Contains query
+        ret = true;
       }
     }
     return ret;

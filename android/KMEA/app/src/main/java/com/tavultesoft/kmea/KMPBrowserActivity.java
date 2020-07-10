@@ -32,8 +32,8 @@ public class KMPBrowserActivity extends AppCompatActivity {
   private WebView webView;
   private static final String KMP_PRODUCTION_HOST = "https://keyman.com";
   private static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
-  private static final String KMP_SEARCH_URL_FORMATSTR = "%s/keyboards%s?embed=android&version=%s";
-  private static final String KMP_LANGUAGE_FORMATSTR = "/languages/%s";
+  private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "%s/go/android/%s/download-keyboards%s";
+  private static final String KMP_DOWNLOAD_KEYBOARDS_LANGUAGES = "/languages/%s";
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
@@ -108,9 +108,9 @@ public class KMPBrowserActivity extends AppCompatActivity {
       KMP_PRODUCTION_HOST : KMP_STAGING_HOST;
     // If language ID is provided, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
-    String languageStr = (languageID != null) ? String.format(KMP_LANGUAGE_FORMATSTR, languageID) : "";
-    String appVersion = KMManager.getVersion();
-    String kmpSearchUrl = String.format(KMP_SEARCH_URL_FORMATSTR, host, languageStr, appVersion);
+    String languageStr = (languageID != null) ? String.format(KMP_DOWNLOAD_KEYBOARDS_LANGUAGES, languageID) : "";
+    String appMajorVersion = KMManager.getMajorVersion();
+    String kmpSearchUrl = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr);
     webView.loadUrl(kmpSearchUrl);
   }
 
