@@ -71,13 +71,16 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<HashMap<String, String>> modelsList = KMManager.getLexicalModelsList(context);
         if (modelsList == null || modelsList.size() == 0) {
+          String lexicalModelVersion = KMManager.getLexicalModelPackageVersion(
+            context, FVShared.FVDefault_DictionaryPackageID);
+
           // Add default dictionaries
           HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
           lexicalModelInfo.put(KMManager.KMKey_PackageID, FVShared.FVDefault_DictionaryPackageID);
           lexicalModelInfo.put(KMManager.KMKey_LanguageID, FVShared.FVDefault_DictionaryLanguageID);
           lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, FVShared.FVDefault_DictionaryModelID);
           lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, FVShared.FVDefault_DictionaryModelName);
-          lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, FVShared.FVDefault_DictionaryVersion);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, lexicalModelVersion);
           KMManager.addLexicalModel(context, lexicalModelInfo);
           KMManager.registerAssociatedLexicalModel(FVShared.FVDefault_DictionaryLanguageID);
         }

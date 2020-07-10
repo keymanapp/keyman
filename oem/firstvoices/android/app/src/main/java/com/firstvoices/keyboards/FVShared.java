@@ -47,7 +47,6 @@ final class FVShared {
     public static final String FVDefault_DictionaryModelName = "SENĆOŦEN (Saanich Dialect) Lexical Model";
     public static final String FVDefault_DictionaryLanguageID = "str-latn";
     public static final String FVDefault_DictionaryLanguageName = "SENĆOŦEN";
-    public static final String FVDefault_DictionaryVersion = "1.0.5";
     public static final String FVDefault_DictionaryKMP = FVDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
     /// Describes a keyboard used in FirstVoices Keyboards
@@ -245,7 +244,7 @@ final class FVShared {
                 KMManager.removeKeyboard(context, i);
         }
 
-        File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+        File resourceRoot =  new File(getResourceRoot());
         PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
 
         // Recreate active keyboards list
@@ -258,6 +257,7 @@ final class FVShared {
                       keyboard.id,
                       null); // get first associated language ID
                     if (kbd != null) {
+                      // TODO: Override fonts to NotoSansCanadianAboriginal.ttf
                       KMManager.addKeyboard(context, kbd);
                     }
                 }
