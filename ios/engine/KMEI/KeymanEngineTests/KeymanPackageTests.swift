@@ -10,6 +10,10 @@ import XCTest
 @testable import KeymanEngine
 
 class KeymanPackageTests: XCTestCase {
+  override func tearDown() {
+    TestUtils.standardTearDown()
+  }
+
   func testKeyboardPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.kmp.zip")
@@ -183,7 +187,25 @@ class KeymanPackageTests: XCTestCase {
       XCTAssertNotNil(results[badLexKey])
       XCTAssertEqual(results[badLexKey]?.supportState, .custom)
 
-      // TODO:  Test that this metadata is stored and persisted in UserDefaults.
+      // Test that this metadata is stored and persisted (cached) in UserDefaults.
+      let userDefaults = Storage.active.userDefaults
+
+      let cache_khmer_angkor = userDefaults.cachedPackageQueryResult(forPackageKey: khmer_angkor)
+      XCTAssertNotNil(cache_khmer_angkor)
+      XCTAssertEqual(cache_khmer_angkor?.supportState, results[khmer_angkor]?.supportState)
+      XCTAssertEqual(cache_khmer_angkor?.latestVersion, "1.0.6")
+      XCTAssertEqual(cache_khmer_angkor?.timestampForLastQuery, results[khmer_angkor]?.timestampForLastQuery)
+
+      let cache_mtnt = userDefaults.cachedPackageQueryResult(forPackageKey: mtnt)
+      XCTAssertNotNil(cache_mtnt)
+      XCTAssertEqual(cache_mtnt?.supportState, results[mtnt]?.supportState)
+      XCTAssertEqual(cache_mtnt?.latestVersion, "0.1.4")
+      XCTAssertEqual(cache_mtnt?.timestampForLastQuery, results[mtnt]?.timestampForLastQuery)
+
+      let cache_foo = userDefaults.cachedPackageQueryResult(forPackageKey: badKbdKey)
+      XCTAssertNotNil(cache_foo)
+      XCTAssertEqual(cache_foo?.supportState, results[badKbdKey]?.supportState)
+      XCTAssertNil(cache_foo?.latestVersion)
 
       expectation.fulfill()
     }

@@ -18,6 +18,9 @@ public enum Key {
   /// Array of user lexical models info list in UserDefaults
   static let userLexicalModelsList = "UserLexicalModelsList"
 
+  /// Dictionary of cached query results for a user's installed packages
+  static let userPackageQueryCacheDict = "UserQuerySupportStateCache"
+
   /// Currently/last selected keyboard info in UserDefaults
   static let userCurrentKeyboard = "UserCurrentKeyboard"
 

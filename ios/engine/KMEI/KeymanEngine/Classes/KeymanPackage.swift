@@ -30,7 +30,7 @@ public class KeymanPackage {
    *
    * Provides a unique, hashable key for use with package-oriented operations.
    */
-  public struct Key: Hashable {
+  public struct Key: Hashable, Codable {
     var id: String
     var type: LanguageResourceType
 
@@ -308,9 +308,16 @@ public class KeymanPackage {
         lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.SupportStateMetadata(from: value)
       }
 
-      // TODO:  Save these states to UserDefaults!
+      keyboardStates.forEach { result in
+        Storage.active.userDefaults.cachedPackageQueryMetadata[result.key] = result.value
+      }
 
-      // There will be no 'merge' conflicts, so we ignore them by simply selecting the original.
+      lexicalModelStates.forEach { result in
+        Storage.active.userDefaults.cachedPackageQueryMetadata[result.key] = result.value
+      }
+
+      // There will be no 'merge' conflicts, so we ignore them by simply selecting the original before
+      // passing them off to the completion block.
       if let completionBlock = completionBlock {
         let stateSet = keyboardStates.merging(lexicalModelStates, uniquingKeysWith: { lhs, _ in return lhs })
         completionBlock(stateSet, nil)
