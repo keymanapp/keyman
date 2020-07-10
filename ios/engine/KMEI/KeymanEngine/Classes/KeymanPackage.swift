@@ -54,6 +54,63 @@ public class KeymanPackage {
     }
   }
 
+  /**
+   * Indicates the distribution level and state of the package.
+   */
+  public enum SupportState: String, Codable {
+    /**
+     * Indicates that the support level for the package is unknown.  Generally occurs when a
+     * package is installed via file-sharing before KeymanEngine is able to perform a package-version check.
+     */
+    case unknown
+
+    /**
+     * Indicates that the package is publicly distributed but no longer maintained.  Indicates that other packages targetting
+     * the same targets are more favored.
+     */
+    case deprecated
+
+    /**
+     * Indicates that this package receives full support and maintenance from the resource development community at large.
+     */
+    case publiclyReleased = "publicly released"
+
+    /**
+     * Indicates that this package is known to not be publicly distributed.
+     */
+    case custom
+  }
+
+  /**
+   * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the support state of a keyboard.
+   */
+  public struct SupportStateMetadata: Codable {
+    var latestVersion: String?
+    var timestampForLastQuery: TimeInterval?
+
+    var supportState: SupportState
+
+    init(from queryResult: Queries.PackageVersion.ResultComponent) {
+      if let entry = queryResult as? Queries.PackageVersion.ResultEntry {
+        self.latestVersion = entry.version
+        self.supportState = .publiclyReleased
+      } else /* if queryResult is Queries.PackageVersion.ResultError */ {
+        self.latestVersion = nil
+        // The package-version query knows nothing about it - must be custom.
+        self.supportState = .custom
+      }
+
+      self.timestampForLastQuery = NSDate().timeIntervalSince1970
+    }
+
+    init(fromQuery: Bool = true) {
+      latestVersion = nil
+      timestampForLastQuery = nil
+
+      supportState = fromQuery ? .publiclyReleased : .unknown
+    }
+  }
+
   static private let kmpFile = "kmp.json"
   public let sourceFolder: URL
   public let id: String
@@ -223,6 +280,63 @@ public class KeymanPackage {
       return (LexicalModelKeymanPackage(metadata: metadata, folder: location) as! Package)
     } else {
       return nil
+    }
+  }
+
+  /**
+   * Runs the package-version query for the specified packages to determine their current support-state.
+   */
+  public static func querySupportStates(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : SupportStateMetadata]?, Error?)-> Void)? = nil) {
+    Queries.PackageVersion.fetch(for: keys, withSession: session) { results, error in
+      guard error == nil, let results = results else {
+        completionBlock?(nil, error)
+        return
+      }
+
+      var keyboardStates: [Key : SupportStateMetadata] = [:]
+      keyboardStates.reserveCapacity(results.keyboards?.count ?? 0)
+
+      // Sadly, Dictionaries do not support mapping to other dictionaries when considering the keys.
+      results.keyboards?.forEach { key, value in
+        keyboardStates[KeymanPackage.Key(id: key, type: .keyboard)] = KeymanPackage.SupportStateMetadata(from: value)
+      }
+
+      var lexicalModelStates: [Key : SupportStateMetadata] = [:]
+      lexicalModelStates.reserveCapacity(results.models?.count ?? 0)
+
+      results.models?.forEach { key, value in
+        lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.SupportStateMetadata(from: value)
+      }
+
+      // TODO:  Save these states to UserDefaults!
+
+      // There will be no 'merge' conflicts, so we ignore them by simply selecting the original.
+      if let completionBlock = completionBlock {
+        let stateSet = keyboardStates.merging(lexicalModelStates, uniquingKeysWith: { lhs, _ in return lhs })
+        completionBlock(stateSet, nil)
+      }
+    }
+  }
+
+  /**
+   * Runs the package-version query for the specified packages to determine if any updates are available.
+   */
+  public static func queryCurrentVersions(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : Version]?, Error?) -> Void)? = nil) {
+    querySupportStates(for: keys, withSession: session) { stateSet, error in
+      guard error == nil, let stateSet = stateSet else {
+        completionBlock?(nil, error)
+        return
+      }
+
+      let versionSet: [Key: Version] = stateSet.compactMapValues { value in
+        if let versionString = value.latestVersion, let version = Version(versionString) {
+          return version
+        } else {
+          return nil
+        }
+      }
+
+      completionBlock?(versionSet, nil)
     }
   }
 }
