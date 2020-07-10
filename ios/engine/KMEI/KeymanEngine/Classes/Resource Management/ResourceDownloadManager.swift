@@ -385,12 +385,44 @@ public class ResourceDownloadManager {
   }
   
   // MARK: Update checks + management
+  /**
+   * Given that an update-check query has already been run, returns whether or not any updates are available.
+   */
   public var updatesAvailable: Bool {
     get {
       return getAvailableUpdates() != nil
     }
   }
-  
+
+  /**
+   * Runs the package-version query against all installed resources to determine if any updates are available.
+   */
+  public func fetchAvailableUpdates(completionBlock: (([AnyLanguageResourceFullID]?, Error?) -> Void)? = nil) {
+    let userDefaults = Storage.active.userDefaults
+    let kbdIDs = userDefaults.userKeyboards?.map { $0.fullID }
+    let modelIDs = userDefaults.userLexicalModels?.map { $0.fullID }
+
+    let allIDs: [AnyLanguageResourceFullID] = (kbdIDs ?? []) + (modelIDs ?? [])
+
+    Queries.PackageVersion.fetch(for: allIDs) { results, error in
+      guard error == nil else {
+        completionBlock?(nil, error)
+        return
+      }
+
+      // If no completionBlock was specified, the caller simply wanted a prefetch.
+      // Any further processing we might try to do would go to waste, so stop here.
+      guard let completionBlock = completionBlock else {
+        return
+      }
+
+      // Check for updates among the returned versions IF a completion block is specified.
+      // This facilitates a more proactive update notification.
+
+      // TODO:  flesh out!
+    }
+  }
+
   public func getAvailableUpdates() -> [AnyLanguageResource]? {
     // Relies upon KMManager's preload; this was the case before the rework.
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
