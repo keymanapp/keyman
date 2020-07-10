@@ -140,6 +140,69 @@ class KeymanPackageTests: XCTestCase {
 
   // Analogous to QueryPackageVersionTests.testMockedBatchFetchParse, but with more analysis applied
   // and more integration.
+  func testQuerySupportStates() throws {
+    let mockedURLSession = TestUtils.Downloading.URLSessionMock()
+
+    let expectation = XCTestExpectation(description: "The query completes as expected.")
+
+    // Test setup
+
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_1, error: nil)
+    mockedURLSession.queueMockResult(.data(mockedResult))
+
+    let badKbdKey = KeymanPackage.Key(id: "foo", type: .keyboard)
+    let badLexKey = KeymanPackage.Key(id: "bar", type: .lexicalModel)
+    let packageKeys = [KeymanPackage.Key(forResource: TestUtils.Keyboards.khmer_angkor),
+                       KeymanPackage.Key(forResource: TestUtils.Keyboards.sil_euro_latin),
+                       KeymanPackage.Key(id: "foo", type: .keyboard),
+                       KeymanPackage.Key(forResource: TestUtils.LexicalModels.mtnt),
+                       KeymanPackage.Key(id: "bar", type: .lexicalModel)]
+
+    KeymanPackage.querySupportStates(for: packageKeys, withSession: mockedURLSession) { results, error in
+      guard error == nil, let results = results else {
+        XCTFail()
+        expectation.fulfill()
+        return
+      }
+
+      let khmer_angkor = KeymanPackage.Key(forResource: TestUtils.Keyboards.khmer_angkor)
+      let sil_euro_latin = KeymanPackage.Key(forResource: TestUtils.Keyboards.sil_euro_latin)
+      let mtnt = KeymanPackage.Key(forResource: TestUtils.LexicalModels.mtnt)
+      XCTAssertEqual(results[khmer_angkor]?.latestVersion, "1.0.6")
+      XCTAssertEqual(results[khmer_angkor]?.supportState, .publiclyReleased)
+
+      XCTAssertEqual(results[sil_euro_latin]?.latestVersion, "1.9.1")
+      XCTAssertEqual(results[sil_euro_latin]?.supportState, .publiclyReleased)
+
+      XCTAssertEqual(results[mtnt]?.latestVersion, "0.1.4")
+      XCTAssertEqual(results[mtnt]?.supportState, .publiclyReleased)
+
+      XCTAssertNotNil(results[badKbdKey])
+      XCTAssertEqual(results[badKbdKey]?.supportState, .custom)
+
+      XCTAssertNotNil(results[badLexKey])
+      XCTAssertEqual(results[badLexKey]?.supportState, .custom)
+
+      // TODO:  Test that this metadata is stored and persisted in UserDefaults.
+
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
+
+    // Post-execution cleanup
+    let queueWasCleared = mockedURLSession.queueIsEmpty
+    Queries.PackageVersion.resetCache()
+
+    if !queueWasCleared {
+      throw NSError(domain: "Keyman",
+                    code: 4,
+                    userInfo: [NSLocalizedDescriptionKey: "A test did not fully utilize its queued mock results!"])
+    }
+  }
+
+  // Analogous to QueryPackageVersionTests.testMockedBatchFetchParse, but with more analysis applied
+  // and more integration.
   func testQueryCurrentVersions() throws {
     let mockedURLSession = TestUtils.Downloading.URLSessionMock()
 
@@ -173,6 +236,7 @@ class KeymanPackageTests: XCTestCase {
       XCTAssertEqual(results[mtnt], Version("0.1.4"))
       XCTAssertNil(results[badKbdKey])
       XCTAssertNil(results[badLexKey])
+
       expectation.fulfill()
     }
 
