@@ -18,9 +18,10 @@ import io.sentry.core.Sentry;
 import com.tavultesoft.kmea.*;
 import com.tavultesoft.kmea.data.Keyboard;
 
-public class MainActivity extends AppCompatActivity {
-    public static final String FVDefault_PackageID = "fv_all";
+import java.util.ArrayList;
+import java.util.HashMap;
 
+public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("SetJavascriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +53,10 @@ public class MainActivity extends AppCompatActivity {
          * as a system keyboard.
         */
         String version = KMManager.getLatestKeyboardFileVersion(
-            context, FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
+            context, FVShared.FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
         KMManager.setDefaultKeyboard(
             new Keyboard(
-                FVDefault_PackageID,
+                FVShared.FVDefault_PackageID,
                 KMManager.KMDefault_KeyboardID,
                 KMManager.KMDefault_KeyboardName,
                 KMManager.KMDefault_LanguageID,
@@ -67,6 +68,19 @@ public class MainActivity extends AppCompatActivity {
                 KMManager.KMDefault_KeyboardFont,
                 KMManager.KMDefault_KeyboardFont)
         );
+
+        ArrayList<HashMap<String, String>> modelsList = KMManager.getLexicalModelsList(context);
+        if (modelsList == null || modelsList.size() == 0) {
+          // Add default dictionaries
+          HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
+          lexicalModelInfo.put(KMManager.KMKey_PackageID, FVShared.FVDefault_DictionaryPackageID);
+          lexicalModelInfo.put(KMManager.KMKey_LanguageID, FVShared.FVDefault_DictionaryLanguageID);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, FVShared.FVDefault_DictionaryModelID);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, FVShared.FVDefault_DictionaryModelName);
+          lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, FVShared.FVDefault_DictionaryVersion);
+          KMManager.addLexicalModel(context, lexicalModelInfo);
+          KMManager.registerAssociatedLexicalModel(FVShared.FVDefault_DictionaryLanguageID);
+        }
 
       final String htmlPath = "file:///android_asset/setup/main.html";
         WebView webView = findViewById(R.id.webView);
