@@ -124,7 +124,25 @@ public class Version: NSObject, Comparable {
    * (For example, 12.3.45 beta is considered equal to 12.3.45 stable.)
    */
   public static func ==(lhs: Version, rhs: Version) -> Bool {
-    return lhs.components == rhs.components
+    var left = lhs.components
+    while(left.last == 0 && left.count > 0) {
+      left.removeLast()
+    }
+
+    var right = rhs.components
+    while(right.last == 0 && right.count > 0) {
+      right.removeLast()
+    }
+
+    return left.elementsEqual(right)
+  }
+
+  public override func isEqual(_ object: Any?) -> Bool {
+    if let object = object as? Version {
+      return self == object
+    } else {
+      return false
+    }
   }
 
   // For nice logging output & debugger visibility.
