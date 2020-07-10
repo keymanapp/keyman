@@ -58,6 +58,7 @@ public protocol AnyLanguageResource {
   var languageID: String { get }
   // Was not always tracked within KeymanEngine - is optional for legacy reasons.
   var packageID: String? { get }
+  var packageKey: KeymanPackage.Key { get }
   var fullID: AnyLanguageResourceFullID { get }
   var version: String { get }
 
@@ -67,6 +68,12 @@ public protocol AnyLanguageResource {
   // Used during resource installation
   var fonts: [Font] { get }
   var sourceFilename: String { get }
+}
+
+extension AnyLanguageResource {
+  public var packageKey: KeymanPackage.Key {
+    return KeymanPackage.Key(forResource: self)
+  }
 }
 
 // Necessary due to Swift details 'documented' at
