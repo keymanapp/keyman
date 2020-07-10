@@ -399,35 +399,6 @@ public class ResourceDownloadManager {
     }
   }
 
-  /**
-   * Runs the package-version query against all installed resources to determine if any updates are available.
-   */
-  public func fetchAvailableUpdates(completionBlock: (([KeymanPackage.Key]?, Error?) -> Void)? = nil) {
-    let userDefaults = Storage.active.userDefaults
-    let keyboardPackages = userDefaults.userKeyboards?.map { $0.packageKey }
-    let lexicalModelPackages = userDefaults.userLexicalModels?.map { $0.packageKey }
-
-    let packageKeys = (keyboardPackages ?? []) + (lexicalModelPackages ?? [])
-
-    Queries.PackageVersion.fetch(for: packageKeys) { results, error in
-      guard error == nil else {
-        completionBlock?(nil, error)
-        return
-      }
-
-      // If no completionBlock was specified, the caller simply wanted a prefetch.
-      // Any further processing we might try to do would go to waste, so stop here.
-      guard let completionBlock = completionBlock else {
-        return
-      }
-
-      // Check for updates among the returned versions IF a completion block is specified.
-      // This facilitates a more proactive update notification.
-
-      // TODO:  flesh out!
-    }
-  }
-
   public func getAvailableUpdates() -> [AnyLanguageResource]? {
     // Relies upon KMManager's preload; this was the case before the rework.
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {

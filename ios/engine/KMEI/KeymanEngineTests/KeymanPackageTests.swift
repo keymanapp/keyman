@@ -137,4 +137,55 @@ class KeymanPackageTests: XCTestCase {
     // Deinit should have triggered - were the files automatically cleaned up?
     XCTAssertFalse(FileManager.default.fileExists(atPath: tempDir.path))
   }
+
+  // Analogous to QueryPackageVersionTests.testMockedBatchFetchParse, but with more analysis applied
+  // and more integration.
+  func testQueryCurrentVersions() throws {
+    let mockedURLSession = TestUtils.Downloading.URLSessionMock()
+
+    let expectation = XCTestExpectation(description: "The query completes as expected.")
+
+    // Test setup
+
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_1, error: nil)
+    mockedURLSession.queueMockResult(.data(mockedResult))
+
+    let badKbdKey = KeymanPackage.Key(id: "foo", type: .keyboard)
+    let badLexKey = KeymanPackage.Key(id: "bar", type: .lexicalModel)
+    let packageKeys = [KeymanPackage.Key(forResource: TestUtils.Keyboards.khmer_angkor),
+                       KeymanPackage.Key(forResource: TestUtils.Keyboards.sil_euro_latin),
+                       KeymanPackage.Key(id: "foo", type: .keyboard),
+                       KeymanPackage.Key(forResource: TestUtils.LexicalModels.mtnt),
+                       KeymanPackage.Key(id: "bar", type: .lexicalModel)]
+
+    KeymanPackage.queryCurrentVersions(for: packageKeys, withSession: mockedURLSession) { results, error in
+      guard error == nil, let results = results else {
+        XCTFail()
+        expectation.fulfill()
+        return
+      }
+
+      let khmer_angkor = KeymanPackage.Key(forResource: TestUtils.Keyboards.khmer_angkor)
+      let sil_euro_latin = KeymanPackage.Key(forResource: TestUtils.Keyboards.sil_euro_latin)
+      let mtnt = KeymanPackage.Key(forResource: TestUtils.LexicalModels.mtnt)
+      XCTAssertEqual(results[khmer_angkor], Version("1.0.6"))
+      XCTAssertEqual(results[sil_euro_latin], Version("1.9.1"))
+      XCTAssertEqual(results[mtnt], Version("0.1.4"))
+      XCTAssertNil(results[badKbdKey])
+      XCTAssertNil(results[badLexKey])
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
+
+    // Post-execution cleanup
+    let queueWasCleared = mockedURLSession.queueIsEmpty
+    Queries.PackageVersion.resetCache()
+
+    if !queueWasCleared {
+      throw NSError(domain: "Keyman",
+                    code: 4,
+                    userInfo: [NSLocalizedDescriptionKey: "A test did not fully utilize its queued mock results!"])
+    }
+  }
 }
