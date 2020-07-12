@@ -24,13 +24,14 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
 }
 
 /**
- * Parses a word list from its filename.
+ * Parses a word list from a file, merging duplicate entries.
  *
  * The word list may be encoded in:
  *
  *  - UTF-8, with or without BOM [exported by most software]
  *  - UTF-16, little endian, with BOM [exported by Microsoft Excel]
  *
+ * @param wordlist word list to merge entries into (may have existing entries)
  * @param filename filename of the word list
  */
 export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
@@ -41,7 +42,7 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
 /**
  * Reads a tab-separated values file into a word list. This function converts all
  * entries into NFC and merges duplicate entries across wordlists. Duplication is
- * on the basis of character-for-character equality after normalisation.
+ * on the basis of character-for-character equality after normalisation to NFC.
  *
  * Format specification:
  *
@@ -59,6 +60,10 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  *  - column 2 (optional): the count: a non-negative integer specifying how many
  *    times this entry has appeared in the corpus. Blank means 'indeterminate'.
  *  - column 3 (optional): comment: an informative comment, ignored by the tool.
+ *
+ * @param wordlist word list to merge entries into (may have existing entries)
+ * @param contents contents of the file to import
+ *
  */
 export function parseWordList(wordlist: WordList, contents: string): void {
   // Supports LF or CRLF line terminators.
