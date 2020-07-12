@@ -1,4 +1,4 @@
-import {parseWordList, parseWordListFromFilename} from '../dist/lexical-model-compiler/build-trie';
+import {parseWordList, parseWordListFromFilename, WordList} from '../dist/lexical-model-compiler/build-trie';
 import {assert} from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers';
@@ -25,16 +25,19 @@ describe('parseWordList', function () {
       [word, count]
     ];
     let file = `# this is a comment\n${word}\t${count}`;
-    let withoutBOM = parseWordList(file);
+    let withoutBOM: WordList = [];
+    parseWordList(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
-    let withBOM = parseWordList(`${BOM}${file}`)
+    let withBOM: WordList = [];
+    parseWordList(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
   });
 
   it('should read word lists in UTF-8', function () {
     // N.B.: this is the format exported by Google Drive when selecting "TSV".
     const filename = makePathToFixture('example.qaa.sencoten', 'wordlist.tsv');
-    let wordlist = parseWordListFromFilename(filename);
+    let wordlist: WordList = [];
+    parseWordListFromFilename(wordlist, filename);
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
   });
 
@@ -42,16 +45,44 @@ describe('parseWordList', function () {
     // N.B.: this is the format exported by MS Excel when selecting
     // "UTF-16" text (tested on Excel for macOS).
     const filename = makePathToFixture('example.qaa.utf16le', 'wordlist.txt');
-    let wordlist = parseWordListFromFilename(filename);
+    let wordlist: WordList = [];
+    parseWordListFromFilename(wordlist, filename);
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
   });
 
   it('should NOT read word lists in UTF-16 big-endian (with BOM)', function () {
     // N.B.: Does anything output this format...?
     const filename = makePathToFixture('example.qaa.utf16be', 'wordlist.txt');
+    let wordlist: WordList = [];
     assert.throws(() => {
-      parseWordListFromFilename(filename);
+      parseWordListFromFilename(wordlist, filename);
     }, 'UTF-16BE is unsupported');
+  });
+
+  it('should merge duplicate entries in a wordlist', function () {
+    // Tests that we merge NFC+NFD entries and identical entries, trimming whitespace
+    // Note building the wordlist from an array to make clear that we have unnormalised inputs
+    const words = [
+      'hello', //1
+      'hello'+String.fromCharCode(0x0301), //2, NFD helló
+      'hell'+String.fromCharCode(0x00F3), //3, NFC helló
+      ' hello ', //4, expect to trim whitespace
+      'hello']; //5
+
+    const expected = [
+      [ 'hello', 10 /* 1+4+5 trimmed and identical */ ],
+      [ 'hell'+String.fromCharCode(0x00F3), 5 /* 2+3 normalised to NFC */ ]
+    ];
+
+    // Build a wordlist from the array
+    let file = `# this is a comment\n`;
+    for(let i = 0; i < words.length; i++) {
+      file += `${words[i]}\t${i+1}\n`;
+    }
+    let repeatedWords: WordList = [];
+    parseWordList(repeatedWords, file);
+
+    assert.deepEqual(repeatedWords, expected);
   });
 });
 
