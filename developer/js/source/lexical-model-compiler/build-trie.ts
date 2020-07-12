@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
  * A word list is an array of pairs: the concrete word form itself, followed by
  * a non-negative count.
  */
-type WordList = [string, number][];
+export type WordList = [string, number][];
 
 /**
  * Returns a data structure that can be loaded by the TrieModel.
