@@ -159,6 +159,8 @@
 		CE4459F623FBBB8F003151FD /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
 		CE4459F723FBBB8F003151FD /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE46D65D247B93C9005FD506 /* ResourceInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE754A0123D151B90030CB79 /* ResourceInfoView.xib */; };
+		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
+		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
 		CE71705823A9C14D00A924A1 /* ResourceFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */; };
 		CE71705F23A9C97F00A924A1 /* PackageInstallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */; };
@@ -462,6 +464,8 @@
 		CE4459CD23FBBA8D003151FD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CE4459D323FBBB34003151FD /* KeymanEngineTestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineTestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE4459ED23FBBB7F003151FD /* Carthage */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Carthage; path = ../../Carthage; sourceTree = "<group>"; };
+		CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+LexicalModel.swift"; sourceTree = "<group>"; };
+		CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryModelTests.swift; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
@@ -741,6 +745,7 @@
 				CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */,
 				CE973D842484A71700F66045 /* KMPJSONTests.swift */,
 				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
+				CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */,
 				CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */,
 				CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */,
 			);
@@ -911,6 +916,7 @@
 			children = (
 				CE89641E24A4686000D5EB8E /* Queries.swift */,
 				CE89642024A468B200D5EB8E /* Queries+PackageVersion.swift */,
+				CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */,
 			);
 			path = Queries;
 			sourceTree = "<group>";
@@ -1442,6 +1448,7 @@
 				CE973D852484A71700F66045 /* KMPJSONTests.swift in Sources */,
 				CE02EE1024A5892200D58F92 /* URLSessionDataTaskMock.swift in Sources */,
 				CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */,
+				CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */,
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
@@ -1491,6 +1498,7 @@
 				CE1F67A32304EB3800FF6972 /* ResourceDownloadManager.swift in Sources */,
 				9A079E372238680700581263 /* KMPLexicalModel.swift in Sources */,
 				CE89641F24A4686000D5EB8E /* Queries.swift in Sources */,
+				CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */,
 				9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
 				C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */,
 				C0B09EAE1FCFD10F002F39AF /* FontManager.swift in Sources */,

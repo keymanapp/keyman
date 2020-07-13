@@ -15,6 +15,7 @@ public enum APILexicalModelFetchError: Error {
   case parsingError(Error)
 }
 
+@available(*, deprecated)
 public class APILexicalModelRepository: LexicalModelRepository {
   private let modelsAPIURL = URLComponents(string: "https://api.keyman.com/model")!
   
