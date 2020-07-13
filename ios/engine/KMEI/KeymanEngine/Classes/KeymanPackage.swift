@@ -209,7 +209,8 @@ public class KeymanPackage {
   }
 
   public var supportState: SupportState {
-    return Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)?.supportState ?? .unknown
+    let cachedQueryResult = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)
+    return cachedQueryResult?.supportState ?? .unknown
   }
 
   public var installState: InstallationState {

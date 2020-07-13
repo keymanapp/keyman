@@ -206,7 +206,7 @@ class ResourceDownloadManagerTests: XCTestCase {
     let versionQuery = XCTestExpectation()
 
     // Now to do a package-version check.
-    Queries.PackageVersion.fetch(for: [KeymanPackage.Key(id: khmer_angkor_id.id, type: .keyboard)], withSession: downloadManager!.session) { _, _ in
+    KeymanPackage.queryCurrentVersions(for: [KeymanPackage.Key(id: khmer_angkor_id.id, type: .keyboard)], withSession: downloadManager!.session) { result, _ in
       XCTAssertEqual(self.downloadManager!.stateForKeyboard(withID: khmer_angkor_id.id), .needsUpdate)
       versionQuery.fulfill()
     }

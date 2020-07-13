@@ -197,9 +197,31 @@ public class ResourceDownloadManager {
       .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
 
+  @available(*, deprecated) // Used to maintain deprecated methods stateForKeyboard, stateForLexicalModel.
+  private func keyboardState(for key: KeymanPackage.Key) -> KeyboardState {
+    switch(ResourceFileManager.shared.installState(forPackage: key)) {
+      case .none:
+        return .needsDownload
+      case .downloading:
+        return .downloading
+      case .pending:
+        return .downloading
+      case .installed:
+        let package = ResourceFileManager.shared.getInstalledPackage(withKey: key)!
+        switch(package.versionState) {
+          case .unknown:
+            return .upToDate
+          case .upToDate:
+            return .upToDate
+          case .needsUpdate:
+            return .needsUpdate
+        }
+    }
+  }
+
   // Deprecating due to tricky assumption - a keyboard _can_ be installed from two separate packages.
   /// - Returns: The current state for a keyboard
-  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
+  @available(*, deprecated, message: "")
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
@@ -214,14 +236,7 @@ public class ResourceDownloadManager {
 
     // Check version
     let packageKey = KeymanPackage.Key(forResource: userKeyboard)
-    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: packageKey)?.version {
-      let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
-      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
-      if downloadedVersion < repositoryVersion {
-        return .needsUpdate
-      }
-    }
-    return .upToDate
+    return keyboardState(for: packageKey)
   }
 
   // MARK - Lexical models
@@ -338,14 +353,7 @@ public class ResourceDownloadManager {
 
     // Check version
     let packageKey = KeymanPackage.Key(forResource: userLexicalModel)
-    if let repositoryVersionString = Queries.PackageVersion.cachedResult(for: packageKey)?.version {
-      let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
-      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
-      if downloadedVersion < repositoryVersion {
-        return .needsUpdate
-      }
-    }
-    return .upToDate
+    return keyboardState(for: packageKey)
   }
 
   /**

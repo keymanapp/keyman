@@ -35,6 +35,17 @@ public class ResourceFileManager {
     return backingPackages
   }
 
+  public func installState(forPackage key: KeymanPackage.Key) -> KeymanPackage.InstallationState {
+    if let package = ResourceFileManager.shared.getInstalledPackage(withKey: key) {
+      return package.installState
+    } else {
+      return .none
+    }
+
+    // TODO:  .downloading.  Requires a minor rework of ResourceDownloadQueue, which will require
+    //        reworking keyboard installations first.
+  }
+
   public func getInstalledPackage<Resource: LanguageResource>(for resource: Resource) -> Resource.Package? {
     if let packageDir = Storage.active.resourceDir(for: resource) {
       return KeymanPackage.parse(packageDir) as? Resource.Package
