@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     if (!installDefaultKeyboard) {
       if (!KMManager.keyboardExists(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
           KMManager.KMDefault_LanguageID)) {
-        KMManager.addKeyboard(this, Keyboard.getDefaultKeyboard(getApplicationContext()));
+        KMManager.addKeyboard(this, KMManager.getDefaultKeyboard(getApplicationContext()));
       }
       SharedPreferences.Editor editor = prefs.edit();
       editor.putBoolean(defaultKeyboardInstalled, true);

@@ -84,6 +84,11 @@ class VersionTests: XCTestCase {
 
     // Tests in "optional" mode.  Was trickier than it would appear!
     XCTAssertEqual(Version("12.0"), Version("12.0"))
+
+    // Some tests against major-version zero to ensure the edge case is covered.
+    XCTAssertEqual(Version("0"), Version("0"))
+    XCTAssertEqual(Version("0"), Version("0.0"))
+    XCTAssertNotEqual(Version("0"), Version("0.0.1"))
   }
 
   func testValidCurrentEngineVersion() {

@@ -160,7 +160,7 @@ final class KMKeyboard extends WebView {
             setKeyboard(firstKeyboard);
           } else {
             // Fallback to sil_euro_latin (though 3rd party keyboards wont have it)
-            setKeyboard(Keyboard.getDefaultKeyboard(context));
+            setKeyboard(KMManager.getDefaultKeyboard(context));
           }
         }
 
