@@ -66,87 +66,6 @@ public class ResourceDownloadManager {
     
     return keyboard
   }
-  
-  // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
-  // since this will expose the generated Promise for the caller's use.
-  private func downloadKeyboardCore(withMetadata keyboards: [InstallableKeyboard],
-                                    asActivity activity: DownloadActivityType,
-                                    withFilename filename: String,
-                                    withOptions options: Options,
-                                    completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard.FullID>? {
-    var startClosure: (() -> Void)? = nil
-    if activity != .update {
-      startClosure = self.resourceDownloadStartClosure(for: keyboards)
-    }
-    let completionClosure = self.resourceDownloadCompletionClosure(for: keyboards, handler: completionBlock)
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0],
-                                                withFilename: filename,
-                                                asActivity: activity,
-                                                withOptions: options,
-                                                startBlock: startClosure,
-                                                completionBlock: completionClosure) {
-      let tasks = dlBatch.downloadTasks
-      // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
-      tasks.forEach { task in
-        task.resources = keyboards
-        task.resourceIDs = keyboards.map { $0.fullID }
-      }
-      
-      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      let queueState = downloader.state
-      if queueState != .clear {
-        resourceDownloadFailed(for: keyboards, with: queueState.error!)
-        return nil
-      }
-      
-      downloader.queue(.simpleBatch(dlBatch))
-      return dlBatch
-    }
-    return nil
-  }
-  
-  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard,
-                                          withFilename filename: String,
-                                          asActivity activity: DownloadActivityType,
-                                          withOptions options: Options,
-                                          startBlock: (() -> Void)? = nil,
-                                          completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard.FullID>? {
-    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
-                             keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
-
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: keyboard)!,
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
-      return nil
-    }
-
-    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
-    request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
-    request.tag = 0
-
-    let keyboardTask = DownloadTask(do: request, for: [keyboard.fullID], resources: [keyboard])
-    var batchTasks: [DownloadTask<InstallableKeyboard.FullID>] = [ keyboardTask ]
-    
-    for (i, url) in fontURLs.enumerated() {
-      request = HTTPDownloadRequest(url: url, userInfo: [:])
-      request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
-      request.tag = i + 1
-      
-      let fontTask = DownloadTask<InstallableKeyboard.FullID>(do: request, for: nil)
-      batchTasks.append(fontTask)
-    }
-
-    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
-    batchTasks.forEach { task in
-      task.request.userInfo[Key.downloadBatch] = batch
-      task.request.userInfo[Key.downloadTask] = task
-    }
-    
-    return batch
-  }
 
   // Used to maintain legacy API:  downloadKeyboard and downloadLexicalModel (based on ID, language ID)
   private func downloadResource<FullID: LanguageResourceFullID>(withFullID fullID: FullID,
@@ -420,16 +339,21 @@ public class ResourceDownloadManager {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
     var batches: [AnyDownloadBatch] = []
-    
+
+    // TODO:  Keyboard update is broken, as apiKeyboardRepository will specify the wrong file.
+    // TODO:  Merge the keyboard and lexical model pathways; it's WET code.
     resources.forEach { res in
       if let kbd = res as? InstallableKeyboard {
-        if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
-          let kbdUpdate = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbd.id, languageID: kbd.languageID),
-           let options = Manager.shared.apiKeyboardRepository.options {
-          if let batch = self.buildKeyboardDownloadBatch(for: kbdUpdate, withFilename: filename, asActivity: .update, withOptions: options) {
-            batches.append(batch)
-          }
-        }
+//        if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
+//           let path = URL.init(string: filename) {
+//          let batch = self.buildPackageBatch(forFullID: kbd.fullID, from: path, withResource: kbd) { package, error in
+//            if let package = package {
+//              try? ResourceFileManager.shared.install(resourceWithID: kbd.fullID, from: package)
+//            }
+//            // else error:  already handled by wrapping closure set within buildPackageBatch.
+//          }
+//          batches.append(batch)
+//        }
       } else if let lex = res as? InstallableLexicalModel {
         if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
            let path = URL.init(string: filename) {
