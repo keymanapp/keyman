@@ -38,10 +38,10 @@ public class FileUtilsTest {
     Assert.assertFalse(FileUtils.isKeymanLink(""));
 
     // Valid Keyman links
-    Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone"));
-    Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone&bcp47=km"));
-    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam"));
-    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam?bcp47=ml"));
+    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone"));
+    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone&bcp47=km"));
+    Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam"));
+    Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam?bcp47=ml"));
     //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=malar_malayalam&platform=android&mode=standalone"));
     //Assert.assertTrue(FileUtils.isKeymanLink("https://keyman.com/keyboard/download?id=malar_malayalam&platform=android&mode=standalone"));
 

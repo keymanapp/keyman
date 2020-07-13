@@ -277,8 +277,8 @@ public final class FileUtils {
       return ret;
     }
     String lowerU = u.toLowerCase();
-    //String patternFormatStr = String.format("^(%s|%s)/keyboards/install/(\\w+)(\\?bcp47=)?(.+)?",
-    String patternFormatStr = String.format("^(%s|%s)(/keyboard/download\\?id=)(\\w+)(&platform=android&mode=standalone)(&bcp47=)?(.+)?",
+    String patternFormatStr = String.format("^(%s|%s)/keyboards/install/(\\w+)(\\?bcp47=)?(.+)?",
+    //String patternFormatStr = String.format("^(%s|%s)(/keyboard/download\\?id=)(\\w+)(&platform=android&mode=standalone)(&bcp47=)?(.+)?",
       KMPBrowserActivity.KMP_PRODUCTION_HOST,
       KMPBrowserActivity.KMP_STAGING_HOST);
     //Pattern pattern = Pattern.compile("^https://(staging-keyman-com.azurewebsites.net|keyman.com)/keyboard/download\\?(.+)");

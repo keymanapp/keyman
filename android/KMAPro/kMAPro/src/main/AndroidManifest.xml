@@ -193,7 +193,7 @@
       </intent-filter>
 
       <intent-filter>
-        <!-- keyboard download links -->
+        <!-- keyboard download links https://{HOST}/go/package/download/ -->
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
@@ -202,12 +202,12 @@
         <data
           android:host="staging-keyman-com.azurewebsites.net"
           android:scheme="https"
-          android:pathPattern="keyboard.*/download?id=.*" />
+          android:pathPrefix="/go/package/download" />
 
         <data
           android:host="keyman.com"
           android:scheme="https"
-          android:pathPattern="keyboard.*/download?id=.*" />
+          android:pathPrefix="/go/package/download" />
 
       </intent-filter>
     </activity>
