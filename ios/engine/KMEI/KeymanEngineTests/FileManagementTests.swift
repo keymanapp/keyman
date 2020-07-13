@@ -159,4 +159,47 @@ class FileManagementTests: XCTestCase {
       XCTAssertNotNil(kbdMetadata)
     }
   }
+
+  func testInstallStateForPackage() throws {
+    // State 1:  Not installed, no download or install pending.
+    let khmer_angkor_key = TestUtils.Keyboards.khmer_angkor.packageKey
+
+    // No downloads have even started.
+    XCTAssertEqual(ResourceFileManager.shared.installState(forPackage: khmer_angkor_key), .none)
+
+    // State 2:  Download requested.
+    //           Note - we don't need to actually run the queue.
+    let downloadManager = ResourceDownloadManager(session: TestUtils.Downloading.URLSessionMock(), autoExecute: false)
+    downloadManager.downloadPackage(forFullID: TestUtils.Keyboards.khmer_angkor.fullID,
+                                    withKey: khmer_angkor_key,
+                                    from: TestUtils.Keyboards.khmerAngkorKMP,
+                                    completionBlock: { _, _ in })
+
+    XCTAssertEqual(ResourceFileManager.shared.installState(forPackage: khmer_angkor_key, withManager: downloadManager), .downloading)
+
+    // State 3:  During install process.
+
+    // If it was just downloaded, that means it should exist within the Documents directory.
+    let documentsKMPURL = ResourceFileManager.shared.importFile(TestUtils.Keyboards.khmerAngkorKMP)!
+    guard let installPackage = try ResourceFileManager.shared.prepareKMPInstall(from: documentsKMPURL) as? KeyboardKeymanPackage else {
+      XCTFail("Could not load keyboard KMP for test")
+      return
+    }
+
+    XCTAssertEqual(installPackage.installState, .pending)
+    XCTAssertEqual(ResourceFileManager.shared.installState(forPackage: khmer_angkor_key), .pending)
+
+    // State 4:  package is fully installed.
+    try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.khmer_angkor.fullID, from: installPackage)
+
+    // Retrieve an instance for the installation.  We're currently using the temp version.
+    guard let package = ResourceFileManager.shared.getInstalledPackage(withKey: installPackage.key) else {
+      XCTFail("Could not load installed form of keyboard KMP for test")
+      return
+    }
+
+    XCTAssertEqual(installPackage.installState, .pending) // Reflects that the instance is a temporary extraction.
+    XCTAssertEqual(package.installState, .installed) // Reflects the actually-installed package
+    XCTAssertEqual(ResourceFileManager.shared.installState(forPackage: khmer_angkor_key), .installed)
+  }
 }

@@ -36,14 +36,22 @@ public class ResourceFileManager {
   }
 
   public func installState(forPackage key: KeymanPackage.Key) -> KeymanPackage.InstallationState {
-    if let package = ResourceFileManager.shared.getInstalledPackage(withKey: key) {
+    return installState(forPackage: key, withManager: ResourceDownloadManager.shared)
+  }
+
+  // For mocked test use.
+  internal func installState(forPackage key: KeymanPackage.Key, withManager downloadManager: ResourceDownloadManager) -> KeymanPackage.InstallationState {
+    let localCachePath = self.cachedPackagePath(forKey: key)
+
+    if let package = getInstalledPackage(withKey: key) {
       return package.installState
+    } else if downloadManager.downloader.containsPackageKeyInQueue(matchingKey: key) {
+      return .downloading
+    } else if FileManager.default.fileExists(atPath: localCachePath.path) {
+      return .pending
     } else {
       return .none
     }
-
-    // TODO:  .downloading.  Requires a minor rework of ResourceDownloadQueue, which will require
-    //        reworking keyboard installations first.
   }
 
   public func getInstalledPackage<Resource: LanguageResource>(for resource: Resource) -> Resource.Package? {

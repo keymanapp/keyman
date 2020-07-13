@@ -322,7 +322,7 @@ class KeymanPackageTests: XCTestCase {
     XCTAssertEqual(package.versionState, .needsUpdate)
   }
 
-    func testInstallState() throws {
+  func testInstallState() throws {
     // Step 1:  Install khmer_angkor.  Fixture:  version 1.0.6.
     guard let installPackage = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) as? KeyboardKeymanPackage else {
       XCTFail("Could not load keyboard KMP for test")
