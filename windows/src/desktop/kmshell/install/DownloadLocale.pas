@@ -128,7 +128,7 @@ var
               end;
             end;
 
-            if InstallFile(AOwner, FTempFileName, False, True, '') then Result := True;   // I4989
+            if InstallFile(AOwner, FTempFileName, False, True, '', '') then Result := True;   // I4989
           finally
             if FileExists(FTempFileName) then
               DeleteFile(FTempFileName);
