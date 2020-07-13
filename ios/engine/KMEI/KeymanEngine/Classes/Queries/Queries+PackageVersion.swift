@@ -117,10 +117,8 @@ extension Queries {
       urlComponents.queryItems = queryItems + [URLQueryItem(name: "platform", value: "ios")]
       log.info("Querying package versions through API endpoint: \(urlComponents.url!)")
 
-      // Step 2:  configure the completion closure - if naught else, it helps to 'adapt' the method signatures.
-      let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self) { result, error in
-        fetchCompletion(result, error)
-      }
+      // Step 2:  configure the completion closure.
+      let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self, completionBlock: fetchCompletion)
 
       // Step 3:  run the actual query, letting the prepared completion closure take care of the rest.
       let task = session.dataTask(with: urlComponents.url!, completionHandler: completionClosure)

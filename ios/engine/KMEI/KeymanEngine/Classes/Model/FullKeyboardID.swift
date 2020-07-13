@@ -9,7 +9,7 @@
 import Foundation
 
 /// A complete identifier for an `InstallableKeyboard`. Keyboards must have unique `FullKeyboardID`s.
-public struct FullKeyboardID: Codable, LanguageResourceFullID, Hashable {
+public struct FullKeyboardID: Codable, LanguageResourceFullID, Equatable {
   public typealias Resource = InstallableKeyboard
   
   public var keyboardID: String
