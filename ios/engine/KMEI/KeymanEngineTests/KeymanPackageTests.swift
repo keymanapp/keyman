@@ -323,4 +323,25 @@ class KeymanPackageTests: XCTestCase {
     wait(for: [expectationUpdate], timeout: 5)
     XCTAssertEqual(package.versionState, .needsUpdate)
   }
+
+    func testInstallState() throws {
+    // Step 1:  Install khmer_angkor.  Fixture:  version 1.0.6.
+    guard let installPackage = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.khmerAngkorKMP) as? KeyboardKeymanPackage else {
+      XCTFail("Could not load keyboard KMP for test")
+      return
+    }
+
+    XCTAssertEqual(installPackage.installState, .pending)
+
+    try ResourceFileManager.shared.install(resourceWithID: TestUtils.Keyboards.khmer_angkor.fullID, from: installPackage)
+
+    // Step 2:  retrieve an instance for the installation.  We're currently using the temp version.
+    guard let package = ResourceFileManager.shared.getInstalledPackage(withKey: installPackage.key) else {
+      XCTFail("Could not load installed form of keyboard KMP for test")
+      return
+    }
+
+    XCTAssertEqual(installPackage.installState, .pending) // Reflects that the instance is a temporary extraction.
+    XCTAssertEqual(package.installState, .installed) // Reflects the actually-installed package
+  }
 }
