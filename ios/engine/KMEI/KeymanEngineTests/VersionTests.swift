@@ -63,6 +63,34 @@ class VersionTests: XCTestCase {
     XCTAssertTrue(complex.majorMinor == Version("11.0")!, "Did not properly trim off excess version components")
   }
 
+  func testEquals() {
+    let simple = Version("12.0")!
+    let other = Version("12.0")!
+
+    XCTAssertTrue(simple == other)
+
+    let longer = Version("12.0.0.0")!
+
+    XCTAssertTrue(simple == longer)
+
+    let unequal_1 = Version("12.0.0.1")!
+
+    XCTAssertFalse(simple == unequal_1)
+    XCTAssertFalse(longer == unequal_1)
+
+    let diffMajor = Version("13.0")!
+
+    XCTAssertFalse(simple == diffMajor)
+
+    // Tests in "optional" mode.  Was trickier than it would appear!
+    XCTAssertEqual(Version("12.0"), Version("12.0"))
+
+    // Some tests against major-version zero to ensure the edge case is covered.
+    XCTAssertEqual(Version("0"), Version("0"))
+    XCTAssertEqual(Version("0"), Version("0.0"))
+    XCTAssertNotEqual(Version("0"), Version("0.0.1"))
+  }
+
   func testValidCurrentEngineVersion() {
     let version = Version.current
 
