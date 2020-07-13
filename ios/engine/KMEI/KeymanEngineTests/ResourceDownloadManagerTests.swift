@@ -163,6 +163,8 @@ class ResourceDownloadManagerTests: XCTestCase {
     wait(for: [expectation], timeout: 5)
   }
 
+  // This annotation prevents local deprecation warnings for what it tests.
+  @available(*, deprecated, message: "This method tests the deprecated ResourceDownloadManager.stateForKeyboard.")
   func testStateForKeyboard() {
     let baseInstallation = XCTestExpectation(description: "Mocked \"download\" should complete successfully.")
     let khmer_angkor_id = TestUtils.Keyboards.khmer_angkor.fullID
