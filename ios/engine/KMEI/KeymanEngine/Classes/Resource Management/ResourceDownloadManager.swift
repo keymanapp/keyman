@@ -274,7 +274,8 @@ public class ResourceDownloadManager {
     //        For consistency with keyboard download behavior, we use the PackageVersion query here.
 
     let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID)
-    Queries.PackageVersion.fetch(for: [lmFullID], withSession: session) { result, error in
+    let packageKey = KeymanPackage.Key(id: lexicalModelID, type: .lexicalModel)
+    Queries.PackageVersion.fetch(for: [packageKey], withSession: session) { result, error in
       guard let result = result, error == nil else {
         log.info("Error occurred requesting location for \(lmFullID.description)")
         self.resourceDownloadFailed(forFullID: lmFullID, with: error ?? .noData)
@@ -282,8 +283,8 @@ public class ResourceDownloadManager {
         return
       }
 
-      guard case let .success(data) = result.entryFor(lmFullID) else {
-        if case let .failure(errorEntry) = result.entryFor(lmFullID) {
+      guard case let .success(data) = result.entryFor(packageKey) else {
+        if case let .failure(errorEntry) = result.entryFor(packageKey) {
           if let errorEntry = errorEntry {
             log.info("Query reported error: \(String(describing: errorEntry.error))")
           }

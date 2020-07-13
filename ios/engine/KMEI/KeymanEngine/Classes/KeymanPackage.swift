@@ -19,9 +19,41 @@ public enum KMPError : String, Error {
 }
 
 /**
- * Common base class for the different KeymanPackage types.
+ * Common base class for the different KeymanPackage types.  If Swift had abstract classes, this would be one.
+ *
+ * Provides type-agnostic common operations on behalf of TypedKeymanPackage while otherwise providing "type erasure"
+ * services for it.
  */
 public class KeymanPackage {
+  /**
+   * Similar in role to LanguageResourceFullID, but for packages, rather than resource-languge pairings.
+   *
+   * Provides a unique, hashable key for use with package-oriented operations.
+   */
+  public struct Key: Hashable {
+    var id: String
+    var type: LanguageResourceType
+
+    internal init(for package: KeymanPackage) {
+      self.id = package.id
+      self.type = package.resourceType()
+    }
+
+    internal init(forResource resource: AnyLanguageResource) {
+      self.id = resource.packageID ?? resource.id
+      self.type = resource.fullID.type
+    }
+
+    internal init(id: String, type: LanguageResourceType) {
+      self.id = id
+      self.type = type
+    }
+
+    public static func == (lhs: KeymanPackage.Key, rhs: KeymanPackage.Key) -> Bool {
+      return lhs.id == rhs.id && lhs.type == rhs.type
+    }
+  }
+
   static private let kmpFile = "kmp.json"
   public let sourceFolder: URL
   public let id: String
@@ -65,6 +97,10 @@ public class KeymanPackage {
         log.debug("Could not remove temporary extraction site on package deinit")
       }
     }
+  }
+
+  public var key: Key {
+    return Key(for: self)
   }
 
   public func isKeyboard() -> Bool {
@@ -191,6 +227,9 @@ public class KeymanPackage {
   }
 }
 
+/**
+ * The actual base class for Keyman packages, which are only permitted to contain a single LanguageResource type at a time.
+ */
 public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: KeymanPackage {
   public private(set) var installables: [[TypedLanguageResource]] = []
 

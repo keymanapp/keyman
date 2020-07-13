@@ -76,12 +76,14 @@ extension Queries {
         }
       }
 
-      func entryFor<FullID: LanguageResourceFullID>(_ fullID: FullID) -> Entry {
+      func entryFor(_ key: KeymanPackage.Key) -> Entry {
         var result: ResultComponent?
-        if let fullID = fullID as? FullKeyboardID, let keyboards = self.keyboards {
-          result = keyboards[fullID.keyboardID]
-        } else if let fullID = fullID as? FullLexicalModelID, let models = self.models {
-          result = models[fullID.lexicalModelID]
+
+        switch(key.type) {
+          case .keyboard:
+            result = keyboards?[key.id]
+          case .lexicalModel:
+            result = models?[key.id]
         }
 
         if let entry = result as? ResultEntry {
@@ -94,22 +96,22 @@ extension Queries {
 
     private static let PACKAGE_VERSION_ENDPOINT = URLComponents(string: "https://api.keyman.com/package-version")!
 
-    public static func fetch(for fullIDs: [AnyLanguageResourceFullID],
+    public static func fetch(for packageKeys: [KeymanPackage.Key],
                              withSession session: URLSession = .shared,
                              fetchCompletion: @escaping JSONQueryCompletionBlock<Result>) {
       // Step 1:  build the query
       var urlComponents = PACKAGE_VERSION_ENDPOINT
 
-      let queryItems: [URLQueryItem] = fullIDs.map { fullID in
+      let queryItems: [URLQueryItem] = packageKeys.map { key in
         var resourceField: String
-        switch(fullID.type) {
+        switch(key.type) {
           case .keyboard:
             resourceField = "keyboard"
           case .lexicalModel:
             resourceField = "model"
         }
 
-        return URLQueryItem(name: resourceField, value: fullID.id)
+        return URLQueryItem(name: resourceField, value: key.id)
       }
 
       urlComponents.queryItems = queryItems + [URLQueryItem(name: "platform", value: "ios")]

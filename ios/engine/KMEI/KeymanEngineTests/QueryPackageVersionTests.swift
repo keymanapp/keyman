@@ -27,6 +27,11 @@ class QueryPackageVersionTests: XCTestCase {
     }
   }
 
+  // Makes a few assumptions that don't belong in the actual framework.
+  func packageKey(for fullID: AnyLanguageResourceFullID) -> KeymanPackage.Key {
+    return KeymanPackage.Key(id: fullID.id, type: fullID.type)
+  }
+
   /**
    * A rigorous test of our package-version query code that runs against a fixture copied from an actual api.keyman.com query return (26 Jun 2020).
    */
@@ -36,15 +41,15 @@ class QueryPackageVersionTests: XCTestCase {
 
     let badKbdFullID = FullKeyboardID(keyboardID: "foo", languageID: "en")
     let badLexFullID = FullLexicalModelID(lexicalModelID: "bar", languageID: "km")
-    let fullIDs = [TestUtils.Keyboards.khmer_angkor.fullID,
-                   TestUtils.Keyboards.sil_euro_latin.fullID,
-                   badKbdFullID,
-                   TestUtils.LexicalModels.mtnt.fullID,
-                   badLexFullID]
+    let packageKeys = [TestUtils.Keyboards.khmer_angkor.fullID,
+                       TestUtils.Keyboards.sil_euro_latin.fullID,
+                       badKbdFullID,
+                       TestUtils.LexicalModels.mtnt.fullID,
+                       badLexFullID].map { packageKey(for: $0) }
 
     let expectation = XCTestExpectation(description: "Query complete and results analyzed")
 
-    Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
+    Queries.PackageVersion.fetch(for: packageKeys, withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))
         expectation.fulfill()
@@ -110,7 +115,7 @@ class QueryPackageVersionTests: XCTestCase {
     let expectation = XCTestExpectation(description: "Query complete and results analyzed")
 
     // As it's a mocked fetch, it happens synchronously.
-    Queries.PackageVersion.fetch(for: [TestUtils.LexicalModels.mtnt.fullID], withSession: mockedURLSession!) { results, error in
+    Queries.PackageVersion.fetch(for: [packageKey(for: TestUtils.LexicalModels.mtnt.fullID)], withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))
         expectation.fulfill()
@@ -135,15 +140,15 @@ class QueryPackageVersionTests: XCTestCase {
 
     let badKbdFullID = FullKeyboardID(keyboardID: "foo", languageID: "en")
     let badLexFullID = FullLexicalModelID(lexicalModelID: "bar", languageID: "km")
-    let fullIDs = [TestUtils.Keyboards.khmer_angkor.fullID,
-                   TestUtils.Keyboards.sil_euro_latin.fullID,
-                   badKbdFullID,
-                   TestUtils.LexicalModels.mtnt.fullID,
-                   badLexFullID]
+    let packageKeys = [TestUtils.Keyboards.khmer_angkor.fullID,
+                       TestUtils.Keyboards.sil_euro_latin.fullID,
+                       badKbdFullID,
+                       TestUtils.LexicalModels.mtnt.fullID,
+                       badLexFullID].map { packageKey(for: $0) }
 
     let expectation = XCTestExpectation(description: "Query complete and results analyzed")
 
-    Queries.PackageVersion.fetch(for: fullIDs, withSession: mockedURLSession!) { results, error in
+    Queries.PackageVersion.fetch(for: packageKeys, withSession: mockedURLSession!) { results, error in
       if let _ = error {
         XCTFail(String(describing: error))
         expectation.fulfill()
@@ -155,19 +160,19 @@ class QueryPackageVersionTests: XCTestCase {
         XCTAssertNotNil(results.keyboards)
         XCTAssertNotNil(results.models)
 
-        let khmer_angkor = results.entryFor(TestUtils.Keyboards.khmer_angkor.fullID)
+        let khmer_angkor = results.entryFor(self.packageKey(for: TestUtils.Keyboards.khmer_angkor.fullID))
         if case .failure(_) = khmer_angkor {
           XCTFail("API result object reported error for khmer_angkor, not a version entry")
         }
 
 
-        let foo = results.entryFor(badKbdFullID)
+        let foo = results.entryFor(self.packageKey(for: badKbdFullID))
         if case .success(_) = foo {
           XCTFail("API result object reported a version entry for foo, not an error")
         }
 
 
-        let foobar = results.entryFor(FullKeyboardID(keyboardID: "foobar", languageID: "en"))
+        let foobar = results.entryFor(KeymanPackage.Key(id: "foobar", type: .keyboard))
         if case .success(_) = foobar {
           XCTFail("Query should not have results data for unqueried resource")
         }
