@@ -43,6 +43,10 @@ public class ResourceFileManager {
     }
   }
 
+  public func getInstalledPackage(withKey key: KeymanPackage.Key) -> KeymanPackage? {
+    return KeymanPackage.parse(Storage.active.packageDir(forKey: key))
+  }
+
   internal func packageDownloadTempPath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
     let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     let tempFilename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
