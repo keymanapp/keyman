@@ -191,6 +191,25 @@
           android:sspPrefix="download" />
 
       </intent-filter>
+
+      <intent-filter>
+        <!-- keyboard download links -->
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:host="staging-keyman-com.azurewebsites.net"
+          android:scheme="https"
+          android:pathPattern="keyboard.*/download?id=.*" />
+
+        <data
+          android:host="keyman.com"
+          android:scheme="https"
+          android:pathPattern="keyboard.*/download?id=.*" />
+
+      </intent-filter>
     </activity>
     <activity
       android:name=".InfoActivity"

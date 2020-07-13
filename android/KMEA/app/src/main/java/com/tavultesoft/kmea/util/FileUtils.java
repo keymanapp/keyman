@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMPBrowserActivity;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -266,7 +267,7 @@ public final class FileUtils {
   }
 
   /**
-   * Utility to parse a URL and determine if it's a Keyman hosted keyboard download.
+   * Utility to parse a URL and determine if it's a Keyman-hosted keyboard download.
    * @param u String of the URL
    * @return boolean true if URL is a supported Keyman link
    */
@@ -276,14 +277,16 @@ public final class FileUtils {
       return ret;
     }
     String lowerU = u.toLowerCase();
-    Pattern pattern = Pattern.compile("^https://(staging-keyman-com.azurewebsites.net|keyman.com)/keyboard/download\\?(.+)");
+    //String patternFormatStr = String.format("^(%s|%s)/keyboards/install/(\\w+)(\\?bcp47=)?(.+)?",
+    String patternFormatStr = String.format("^(%s|%s)(/keyboard/download\\?id=)(\\w+)(&platform=android&mode=standalone)(&bcp47=)?(.+)?",
+      KMPBrowserActivity.KMP_PRODUCTION_HOST,
+      KMPBrowserActivity.KMP_STAGING_HOST);
+    //Pattern pattern = Pattern.compile("^https://(staging-keyman-com.azurewebsites.net|keyman.com)/keyboard/download\\?(.+)");
+    Pattern pattern = Pattern.compile(patternFormatStr);
     Matcher matcher = pattern.matcher(lowerU);
-    // Check URL starts with "keyman"
-    if (matcher.matches() && (matcher.group(1) != null)) {
-      if (matcher.group(2) != null) {
-        // Contains query
-        ret = true;
-      }
+    // Check URL starts with a Keyman host and contains a keyboard ID (language ID optional)
+    if (matcher.matches() && matcher.group(2) != null) {
+      ret = true;
     }
     return ret;
   }

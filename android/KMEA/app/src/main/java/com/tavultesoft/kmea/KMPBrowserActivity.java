@@ -29,11 +29,12 @@ import com.tavultesoft.kmea.KMManager.Tier;
 
 public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
-  private WebView webView;
-  private static final String KMP_PRODUCTION_HOST = "https://keyman.com";
-  private static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
+  public static final String KMP_PRODUCTION_HOST = "https://keyman.com";
+  public static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
+  // String used to query for cloud keyboard downloads
   private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "%s/go/android/%s/download-keyboards%s";
   private static final String KMP_DOWNLOAD_KEYBOARDS_LANGUAGES = "/languages/%s";
+  private WebView webView;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
