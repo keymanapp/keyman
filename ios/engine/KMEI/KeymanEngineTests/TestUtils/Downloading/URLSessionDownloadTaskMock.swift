@@ -14,9 +14,15 @@ extension TestUtils.Downloading {
    */
   class URLSessionDownloadTaskMock: URLSessionDownloadTask {
     private let closure: () -> Void
+    private let _response: URLResponse?
 
-    init(closure: @escaping () -> Void) {
+    init(response: URLResponse? = nil, closure: @escaping () -> Void) {
       self.closure = closure
+      self._response = response
+    }
+
+    public override var response: URLResponse? {
+      return _response
     }
 
     /*

@@ -45,19 +45,66 @@ enum DownloadNode {
 
 protocol AnyDownloadTask {
   var request: HTTPDownloadRequest { get }
+  var file: URL { get }
+  var downloadFinalizationBlock: ((Bool) throws -> Void)? { get }
 }
 
 class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
   public final var resourceIDs: [FullID]?
   public final var request: HTTPDownloadRequest
+  public var file: URL {
+    if let file = finalFile {
+      return file
+    } else {
+      return URL(fileURLWithPath: request.destinationFile!)
+    }
+  }
+
+  public var finalFile: URL?
 
   // TEMPORARY:  needed to support Cloud JS downloads.
   public final var resources: [FullID.Resource]?
+
+  public final var downloadFinalizationBlock: ((Bool) throws -> Void)? = nil
   
   public init(do request: HTTPDownloadRequest, for resourceIDs: [FullID]?, resources: [FullID.Resource]? = nil) {
     self.request = request
     self.resourceIDs = resourceIDs
     self.resources = resources
+  }
+
+  public init(forPackageWithID fullID: FullID,
+               from url: URL,
+               as destURL: URL, tempURL: URL) {
+    resourceIDs = [fullID]
+
+    let request = HTTPDownloadRequest(url: url, userInfo: [:])
+    request.destinationFile = tempURL.path
+    request.tag = 0
+
+    self.finalFile = destURL
+    self.request = request
+
+    self.downloadFinalizationBlock = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempURL, finalURL: destURL)
+  }
+
+
+  /**
+   * Supports downloading to a 'temp' file that is renamed once the download completes.
+   */
+  internal static func resourceDownloadFinalizationClosure(tempURL: URL,
+                                                       finalURL: URL) -> ((Bool) throws -> Void) {
+    return { success in
+      // How to check for download failure
+      if !success {
+        if FileManager.default.fileExists(atPath: tempURL.path) {
+          try? FileManager.default.removeItem(at: tempURL)
+        }
+      } else {
+        try ResourceFileManager.shared.copyWithOverwrite(from: tempURL, to: finalURL)
+        try? FileManager.default.removeItem(at: tempURL)
+      }
+    }
   }
 }
 
@@ -81,19 +128,42 @@ protocol AnyDownloadBatch {
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
 class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+  typealias CompletionHandler = ResourceDownloadManager.CompletionHandler
+
   public final var downloadTasks: [DownloadTask<FullID>]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
-  public final var completionBlock: ResourceDownloadManager.CompletionHandler<FullID.Resource>? = nil
+  public final var completionBlock: CompletionHandler<FullID.Resource>? = nil
   
   public init?(do tasks: [DownloadTask<FullID>],
                startBlock: (() -> Void)? = nil,
-               completionBlock: ResourceDownloadManager.CompletionHandler<FullID.Resource>? = nil) {
+               completionBlock: CompletionHandler<FullID.Resource>? = nil) {
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
     self.startBlock = startBlock
     self.completionBlock = completionBlock
+  }
+
+  public init(forPackageWithID fullID: FullID,
+              from url: URL,
+              startBlock: (() -> Void)?,
+              completionBlock: CompletionHandler<FullID.Resource>?) {
+    // If we can't build a proper DownloadTask, we can't build the batch.
+    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forID: fullID)
+    let finalFile = ResourceFileManager.shared.cachedPackagePath(forID: fullID)
+
+    let task = DownloadTask(forPackageWithID: fullID, from: url, as: finalFile, tempURL: tempArtifact)
+
+
+    self.downloadTasks = [task]
+    self.errors = Array(repeating: nil, count: 1) // We only build the one task.
+
+    self.startBlock = startBlock
+    self.completionBlock = completionBlock
+
+    task.request.userInfo[Key.downloadTask] = task
+    task.request.userInfo[Key.downloadBatch] = self
   }
 
   public var tasks: [AnyDownloadTask] {
@@ -113,22 +183,29 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
   }
 
   public func completeWithCancellation() {
-    completionBlock?(nil, nil)
+    let complete = completionBlock
+    completionBlock = nil
+    complete?(nil, nil)
   }
 
   public func completeWithError(error: Error) {
-    completionBlock?(nil, error)
+    let complete = completionBlock
+    completionBlock = nil
+    complete?(nil, error)
   }
 
   public func completeWithPackage(fromKMP file: URL) {
+    let complete = completionBlock
+    completionBlock = nil
+
     do {
       if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? FullID.Resource.Package {
-        completionBlock?(package, nil)
+        complete?(package, nil)
       } else {
-        completionBlock?(nil, KMPError.invalidPackage)
+        complete?(nil, KMPError.invalidPackage)
       }
     } catch {
-      completionBlock?(nil, error)
+      complete?(nil, error)
     }
   }
 }
@@ -323,6 +400,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
+  internal func step() {
+    executeNext()
+  }
+
   private func innerExecute(_ node: DownloadNode) {
     switch(node) {
       case .simpleBatch(let batch):
@@ -384,32 +465,36 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // We can use the properties of the current "batch" to generate specialized notifications.
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    // Really, "if resource is installed from the cloud, only packaged locally"
     if let batch = batch as? DownloadBatch<InstallableKeyboard.FullID> {
-      // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
-      // Once downlading KMPs, will be the downloaded .kmp.
+      let packagePath = batch.downloadTasks[0].file
 
-      // The request has succeeded.
-      if downloader!.requestsCount == 0 { // Download queue finished.
-        // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
-        let keyboards = batch.downloadTasks[0].resources!
-        log.info("Downloaded keyboard: \(keyboards[0].id).")
+      // Check - is it a cloud resource or a KMP?
+      let file = packagePath.lastPathComponent
+      if file.hasSuffix(".kmp") {
+        // It is a keyboard package!
+        batch.completeWithPackage(fromKMP: packagePath)
+      } else {
+        // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
+        // Once downlading KMPs, will be the downloaded .kmp.
 
-        // TEMP:  wrap the newly-downloaded resources with a kmp.json.
-        //        Serves as a bridge until we're downloading actual .kmps for keyboards.
-        let _ = Migrations.migrateToKMPFormat(keyboards)
+        // The request has succeeded.
+        if downloader!.requestsCount == 0 { // Download queue finished.
+          // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
+          let keyboards = batch.downloadTasks[0].resources!
+          log.info("Downloaded keyboard: \(keyboards[0].id).")
+          // TEMP:  wrap the newly-downloaded resources with a kmp.json.
+          //        Serves as a bridge until we're downloading actual .kmps for keyboards.
+          let _ = Migrations.migrateToKMPFormat(keyboards)
 
-        if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
-          batch.completionBlock?(package, nil)
-        } else {
-          log.error("Could not load metadata for newly-installed keyboard")
+          if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
+            batch.completionBlock?(package, nil)
+          } else {
+            log.error("Could not load metadata for newly-installed keyboard")
+          }
         }
       }
-      // else "if resource is installed from an actual KMP"
-      // - in other words, the long-term target.
     } else if let batch = batch as? DownloadBatch<InstallableLexicalModel.FullID> {
-      let task = batch.downloadTasks[0] // It's always at this index.
-      let packagePath = URL(fileURLWithPath: task.request.destinationFile!)
+      let packagePath = batch.downloadTasks[0].file
       batch.completeWithPackage(fromKMP: packagePath)
     }
     
@@ -442,6 +527,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
 
   func downloadRequestFinished(_ request: HTTPDownloadRequest) {
+    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     // Did we finish, but with an request error code?
     if request.responseStatusCode != 200 {
       // Possible request error (400 Bad Request, 404 Not Found, etc.)
@@ -454,21 +540,33 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       // Now that we've synthesized an appropriate error instance, use the same handler
       // as for HTTPDownloader's 'failed' condition.
       downloadRequestFailed(request, with: error)
-    } // else - handled once the entire queue is completed without errors.
-      //        This particularly matters for keyboards.
-  }
-  
-  func downloadRequestFailed(_ request: HTTPDownloadRequest) {
-    // We should never be in a state to return 'Unknown error", but better safe than sorry.
-    downloadRequestFailed(request, with: request.error ?? NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"]))
+
+      // If we used a temp filename during download, resolve it.
+      try? task.downloadFinalizationBlock?(false)
+    } else {
+      do {
+        try task.downloadFinalizationBlock?(true)
+      } catch {
+        downloadRequestFailed(request, with: error)
+      }
+    }
   }
 
-  func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error) {
+  func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
     currentFrame.batch?.errors[currentFrame.index] = error
+    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    batch.completeWithError(error: error)
+    var err: Error
+    if let error = error {
+      err = error
+    } else {
+      err = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
+    }
+
+    try? task.downloadFinalizationBlock?(false)
+    batch.completeWithError(error: err)
     downloader!.cancelAllOperations()
   }
 }

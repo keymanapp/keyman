@@ -51,7 +51,7 @@ class HTTPDownloaderTests: XCTestCase {
 
   func testSingleRequestFailure() throws {
     // A twist on the previous version - the 'download' fails.
-    let mockedResult = TestUtils.Downloading.MockResult(location: nil, error: NSError(domain: "KeymanTests", code: 1, userInfo: nil))
+    let mockedResult = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: TestUtils.mockedError)
     mockedURLSession?.queueMockResult(.download(mockedResult))
 
     let testDelegate = TestUtils.Downloading.ExpectationDownloaderDelegate()
@@ -115,6 +115,7 @@ class HTTPDownloaderTests: XCTestCase {
     testDelegate.expectAbsence(method: .RequestStarted, request: request2)
     testDelegate.expectAbsence(method: .RequestFinished, request: request2)
     testDelegate.expect(method: .QueueCancelled, queue: downloader!)
+    testDelegate.expectAbsence(method: .QueueFinished, queue: downloader!)
 
     // Placed here for chronological ordering.  We expect the request to finish because of
     // our mocking structure, but want to delay its completion long enough for the

@@ -87,7 +87,7 @@ extension TestUtils.Downloading {
       doExpectationMatch(method: .RequestFinished, request: request)
     }
 
-    func downloadRequestFailed(_ request: HTTPDownloadRequest) {
+    func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
       doExpectationMatch(method: .RequestFailed, request: request)
     }
 
