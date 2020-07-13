@@ -20,7 +20,6 @@ class KeymanPackageTests: XCTestCase {
     TestUtils.standardTearDown()
 
     let queueWasCleared = mockedURLSession!.queueIsEmpty
-    Queries.PackageVersion.resetCache()
     mockedURLSession = nil
 
     if !queueWasCleared {
@@ -270,7 +269,6 @@ class KeymanPackageTests: XCTestCase {
 
     // Post-execution cleanup
     let queueWasCleared = mockedURLSession.queueIsEmpty
-    Queries.PackageVersion.resetCache()
 
     if !queueWasCleared {
       throw NSError(domain: "Keyman",

@@ -10,8 +10,6 @@ import Foundation
 
 extension Queries {
   class PackageVersion {
-    private static var cachedResults: [LanguageResourceType : [String:ResultEntry]] = [.keyboard: [:], .lexicalModel: [:]]
-
     class ResultComponent {}
 
     class ResultEntry: ResultComponent, Decodable {
@@ -119,41 +117,14 @@ extension Queries {
       urlComponents.queryItems = queryItems + [URLQueryItem(name: "platform", value: "ios")]
       log.info("Querying package versions through API endpoint: \(urlComponents.url!)")
 
-      // Step 2:  configure the completion closure.
+      // Step 2:  configure the completion closure - if naught else, it helps to 'adapt' the method signatures.
       let completionClosure = Queries.jsonDataTaskCompletionAdapter(resultType: Result.self) { result, error in
-          // Cache the results for future lookup.
-          if let result = result {
-            if let keyboards = result.keyboards {
-              keyboards.keys.forEach { id in
-                if let entry = keyboards[id] as? ResultEntry {
-                  self.cachedResults[.keyboard]![id] = entry
-              }
-            }
-          }
-
-          if let models = result.models {
-            models.keys.forEach { id in
-              if let entry = models[id] as? ResultEntry {
-                self.cachedResults[.lexicalModel]![id] = entry
-              }
-            }
-          }
-
-          fetchCompletion(result, error)
-        }
+        fetchCompletion(result, error)
       }
 
       // Step 3:  run the actual query, letting the prepared completion closure take care of the rest.
       let task = session.dataTask(with: urlComponents.url!, completionHandler: completionClosure)
       task.resume()
-    }
-
-    public static func resetCache() {
-      self.cachedResults = [.keyboard: [:], .lexicalModel: [:]]
-    }
-
-    static func cachedResult(for packageKey: KeymanPackage.Key) -> ResultEntry? {
-      return cachedResults[packageKey.type]![packageKey.id]
     }
   }
 }
