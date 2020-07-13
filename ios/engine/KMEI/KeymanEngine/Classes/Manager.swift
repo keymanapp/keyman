@@ -17,7 +17,7 @@ typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 // MARK: - Constants
 
 // Possible states that a keyboard or lexical model can be in
-@available(*, deprecated, message: "Version checks against keyboards and models are now based on their package.  Use KeymanPackage.VersionState instead.")
+@available(*, deprecated, message: "Version checks against keyboards and models are now based on their package.  Use `KeymanPackage.InstallationState` and `KeymanPackage.VersionState` instead.")
 public enum KeyboardState {
   case needsDownload
   case needsUpdate

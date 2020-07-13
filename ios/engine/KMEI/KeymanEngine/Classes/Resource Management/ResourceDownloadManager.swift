@@ -221,7 +221,7 @@ public class ResourceDownloadManager {
 
   // Deprecating due to tricky assumption - a keyboard _can_ be installed from two separate packages.
   /// - Returns: The current state for a keyboard
-  @available(*, deprecated, message: "")
+  @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Keyboard states are now tied to the state of their package.")
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
@@ -337,8 +337,7 @@ public class ResourceDownloadManager {
 
   
   /// - Returns: The current state for a lexical model
-  //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
-  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
+  @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Lexical model states are tied to the state of their package.")
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
