@@ -6,6 +6,7 @@ unit Keyman.Setup.System.ResourceDownloader;
 interface
 
 uses
+  httpuploader,
   Keyman.Setup.System.InstallInfo,
   UfrmDownloadProgress;
 
@@ -21,8 +22,9 @@ type
     procedure DownloadFileCallback(AOwner: TfrmDownloadProgress;
       var Result: Boolean);
     constructor Create(AInstallInfo: TInstallInfo);
-    procedure HttpReceiveData(const Sender: TObject; AContentLength,
-      AReadCount: Int64; var Abort: Boolean);
+    procedure HTTPCheckCancel(Sender: THttpUploader; var Cancel: Boolean);
+    procedure HTTPStatus(Sender: THttpUploader; const Message: string; Position,
+      Total: Int64);
   public
     class function Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation): Boolean;
   end;
@@ -31,7 +33,6 @@ implementation
 
 uses
   System.Classes,
-  System.Net.HttpClient,
   System.SysUtils,
   Vcl.Controls,
   Winapi.Windows,
@@ -84,35 +85,43 @@ begin
   end;
 end;
 
-procedure TResourceDownloader.HttpReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+procedure TResourceDownloader.HTTPCheckCancel(Sender: THttpUploader; var Cancel: Boolean);
 begin
-  // TODO: stop using this form and report back to main form instead
-  frmDownloadProgress.HTTPStatus(nil, FInstallInfo.Text(ssDownloadingText,[ExtractFileName(FDownloadFilename)]), AReadCount, AContentLength);
-  frmDownloadProgress.HTTPCheckCancel(nil, Abort);
+  frmDownloadProgress.HTTPCheckCancel(Sender, Cancel);
+end;
+
+procedure TResourceDownloader.HTTPStatus(Sender: THttpUploader;
+  const Message: string; Position, Total: Int64);  // I2855
+begin
+  frmDownloadProgress.HTTPStatus(Sender, Message, Position, Total);
 end;
 
 procedure TResourceDownloader.DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
 var
-  Client: THTTPClient;
+  http: THTTPUploader;
   Stream: TStream;
-  Response: IHTTPResponse;
   FTempFilename: string;
 begin
   Result := False;
   FTempFilename := FDownloadFilename + '.download';
-  Client := THTTPClient.Create;
+  http := THTTPUploader.Create(nil);
   try
-    Client.OnReceiveData := HttpReceiveData;
-
-    Stream := TFileStream.Create(FTempFilename, fmCreate);
-    try
-      Response := Client.Get(FDownloadURL, Stream);
-      Result := Response.StatusCode = 200;
-    finally
-      Stream.Free;
+    http.OnStatus := HTTPStatus;
+    http.OnCheckCancel := HTTPCheckCancel;
+    http.Request.SetURL(FDownloadURL);
+    http.Upload;
+    Result := http.Response.StatusCode = 200;
+    if Result then
+    begin
+      Stream := TFileStream.Create(FTempFilename, fmCreate);
+      try
+        Stream.Write(http.Response.PMessageBody^, http.Response.MessageBodyLength);
+      finally
+        Stream.Free;
+      end;
     end;
 
-    if FileExists(FTempFilename)  then
+    if FileExists(FTempFilename) then
     begin
       if Result then
       begin
@@ -124,7 +133,7 @@ begin
         System.SysUtils.DeleteFile(FTempFilename);
     end;
   finally
-    Client.Free;
+    http.Free;
   end;
 end;
 

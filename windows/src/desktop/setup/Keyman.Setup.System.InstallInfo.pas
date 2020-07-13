@@ -162,13 +162,14 @@ uses
   System.StrUtils,
   System.TypInfo,
   System.Zip,
-
-  IdGlobalProtocols, // for FileSizeByName
+  Winapi.Windows,
 
   KeymanVersion,
   kmpinffile,
   utilfiletypes,
   versioninfo;
+
+function FileSizeByName(const AFilename: string): Int64; forward;
 
 { TInstallInfo }
 
@@ -393,7 +394,7 @@ begin
           packLocation.Free;
       end;
     until FindNext(f) <> 0;
-    FindClose(f);
+    System.SysUtils.FindClose(f);
   end;
 end;
 
@@ -623,6 +624,28 @@ begin
   Assert(FileExists(ARootPath + FPath));
   FPath := ARootPath + FPath;
   FLocationType := iilLocal;
+end;
+
+
+
+// Pulled from IdGlobalProtocols so we don't have to import it
+// OS-independant version
+function FileSizeByName(const AFilename: string): Int64;
+var
+  LHandle : THandle;
+  LRec : TWin32FindData;
+begin
+  Result := -1;
+
+  LHandle := Winapi.Windows.FindFirstFile(PChar(AFileName), LRec);
+  if LHandle <> INVALID_HANDLE_VALUE then
+  begin
+    Winapi.Windows.FindClose(LHandle);
+    if (LRec.dwFileAttributes and Winapi.Windows.FILE_ATTRIBUTE_DIRECTORY) = 0 then
+    begin
+      Result := (Int64(LRec.nFileSizeHigh) shl 32) + LRec.nFileSizeLow;
+    end;
+  end;
 end;
 
 end.

@@ -57,7 +57,6 @@ uses
   Vcl.ExtCtrls,
   Vcl.Forms,
   Vcl.Graphics,
-  Vcl.Imaging.jpeg,
   Vcl.Imaging.pngimage,
   Vcl.StdCtrls,
 

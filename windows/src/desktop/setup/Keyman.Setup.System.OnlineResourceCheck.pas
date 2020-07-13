@@ -17,11 +17,10 @@ type
 implementation
 
 uses
-  System.Net.HttpClient,
-  System.Net.URLClient,
   System.SysUtils,
 
   GlobalProxySettings,
+  httpuploader,
   Keyman.System.UpdateCheckResponse,
   KeymanVersion,
   PackageInfo,
@@ -30,7 +29,7 @@ uses
 
 class procedure TOnlineResourceCheck.QueryServer(ASilent: Boolean; AInstallInfo: TInstallInfo);
 var
-  http: THTTPClient;
+  http: THTTPUploader;
   pack: TInstallInfoPackage;
   ucr: TUpdateCheckResponse;
   ucrpack: TUpdateCheckResponsePackage;
@@ -39,29 +38,28 @@ var
   currentVersion: string;
   lang: TUpdateCheckResponseLanguage;
   iipl: TInstallInfoPackageLanguage;
-  url: TURI;
-  response: IHTTPResponse;
   u: AnsiString;
 begin
   currentVersion := AInstallInfo.MsiLocations.LatestVersion(SKeymanVersion_Min_Evergreen);
 
-  url := TURI.Create(MakeAPIURL(API_Path_UpdateCheck_Windows));
-  url.AddParameter('version', currentVersion);
-  url.AddParameter('tier', KeymanVersion.CKeymanVersionInfo.Tier);
-  url.AddParameter('update', '0'); // This is probably a fresh install of a package, not an update
-  for pack in AInstallInfo.Packages do
-    url.AddParameter('package_'+pack.ID, pack.Locations.LatestVersion);
-  http := THTTPClient.Create;
+  http := THttpUploader.Create(nil);
   try
-    response := http.Get(url.ToString);
-    if response.StatusCode <> 200 then
+    http.Request.SetURL(MakeAPIURL(API_Path_UpdateCheck_Windows));
+    http.Fields.Add('version', AnsiString(currentVersion));
+    http.Fields.Add('tier', AnsiString(KeymanVersion.CKeymanVersionInfo.Tier));
+    http.Fields.Add('update', '0'); // This is probably a fresh install of a package, not an update
+    for pack in AInstallInfo.Packages do
+      http.Fields.Add(AnsiString('package_'+pack.ID), AnsiString(pack.Locations.LatestVersion));
+
+    http.Upload;
+    if http.Response.StatusCode <> 200 then
     begin
       // TODO: log failed response
       //raise EOnlineUpdateCheck.Create('Error '+IntToStr(Response.StatusCode));
       Exit;
     end;
 
-    u := UTF8Encode(response.ContentAsString(TEncoding.UTF8));
+    u := http.response.PMessageBody;
   finally
     http.Free;
   end;

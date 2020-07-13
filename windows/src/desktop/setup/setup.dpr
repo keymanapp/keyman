@@ -42,7 +42,8 @@ uses
   JsonUtil in '..\..\global\delphi\general\JsonUtil.pas',
   kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
-  Keyman.Setup.System.ResourceDownloader in 'Keyman.Setup.System.ResourceDownloader.pas';
+  Keyman.Setup.System.ResourceDownloader in 'Keyman.Setup.System.ResourceDownloader.pas',
+  httpuploader in '..\..\global\delphi\general\httpuploader.pas';
 
 {$R icons.res}
 {$R version.res}
