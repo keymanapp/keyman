@@ -112,6 +112,7 @@ public class ResourceDownloadManager {
       }
 
       self.downloadPackage(forFullID: fullID,
+                           withKey: packageKey,
                            from: URL.init(string: data.packageURL)!,
                            withNotifications: sendNotifications,
                            completionBlock: completionClosure)
@@ -166,20 +167,24 @@ public class ResourceDownloadManager {
   /// - Returns: The current state for a keyboard
   @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Keyboard states are now tied to the state of their package.")
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
-    // For this call, we don't actually need the language ID to be correct.
-    let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
-    if downloader.containsResourceInQueue(matchingID: fullKeyboardID, requireLanguageMatch: false) {
-      return .downloading
-    }
-
     let userKeyboards = Storage.active.userDefaults.userKeyboards
     guard let userKeyboard = userKeyboards?.first(where: { $0.id == keyboardID }) else {
-      return .needsDownload
+      // If we don't have a local installed copy, check if we're not downloading a package
+      // with matching ID.
+      if downloader.containsPackageKeyInQueue(matchingKey: KeymanPackage.Key(id: keyboardID, type: .keyboard)) {
+        return .downloading
+      } else {
+        return .needsDownload
+      }
     }
 
     // Check version
     let packageKey = KeymanPackage.Key(forResource: userKeyboard)
-    return keyboardState(for: packageKey)
+    if downloader.containsPackageKeyInQueue(matchingKey: packageKey) {
+      return .downloading
+    } else {
+      return keyboardState(for: packageKey)
+    }
   }
 
   // MARK - Lexical models
@@ -214,7 +219,10 @@ public class ResourceDownloadManager {
       } else if let lmFullID = result[0].modelFor(languageID: languageID)?.fullID {
         log.info("Fetched lexical model list for "+languageID+".")
         let completionClosure = self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
-        self.downloadPackage(forFullID: lmFullID, from: URL.init(string: result[0].packageFilename)!, completionBlock: completionClosure)
+        self.downloadPackage(forFullID: lmFullID,
+                             withKey: KeymanPackage.Key(id: lmFullID.id, type: .lexicalModel),
+                             from: URL.init(string: result[0].packageFilename)!,
+                             completionBlock: completionClosure)
       }
     }
   }
@@ -242,20 +250,24 @@ public class ResourceDownloadManager {
   /// - Returns: The current state for a lexical model
   @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Lexical model states are tied to the state of their package.")
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
-    // For this call, we don't actually need the language ID to be correct.
-    let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
-    if downloader.containsResourceInQueue(matchingID: fullLexicalModelID, requireLanguageMatch: false) {
-      return .downloading
-    }
-
     let userLexicalModels = Storage.active.userDefaults.userLexicalModels
     guard let userLexicalModel = userLexicalModels?.first(where: { $0.id == lexicalModelID }) else {
-      return .needsDownload
+      // If we don't have a local installed copy, check if we're not downloading a package
+      // with matching ID.
+      if downloader.containsPackageKeyInQueue(matchingKey: KeymanPackage.Key(id: lexicalModelID, type: .lexicalModel)) {
+        return .downloading
+      } else {
+        return .needsDownload
+      }
     }
 
     // Check version
     let packageKey = KeymanPackage.Key(forResource: userLexicalModel)
-    return keyboardState(for: packageKey)
+    if downloader.containsPackageKeyInQueue(matchingKey: packageKey) {
+      return .downloading
+    } else {
+      return keyboardState(for: packageKey)
+    }
   }
 
   /**
@@ -269,17 +281,23 @@ public class ResourceDownloadManager {
    * `withNotifications` specifies whether or not any of KeymanEngine's `NotificationCenter` notifications should be generated.
    */
   public func downloadPackage<FullID: LanguageResourceFullID>(forFullID fullID: FullID,
+                                                              withKey packageKey: KeymanPackage.Key,
                                                               from url: URL,
                                                               withNotifications: Bool = false,
                                                               completionBlock: @escaping CompletionHandler<FullID.Resource>)
   where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
-    let batch = buildPackageBatch(forFullID: fullID, from: url, withNotifications: withNotifications, completionBlock: completionBlock)
+    let batch = buildPackageBatch(forFullID: fullID,
+                                  withKey: packageKey,
+                                  from: url,
+                                  withNotifications: withNotifications,
+                                  completionBlock: completionBlock)
     downloader.queue(.simpleBatch(batch))
   }
 
   // Facilitates re-use of the downloadPackage core for updates.
   // Also allows specifying LanguageResource instances for use in notifications.
   internal func buildPackageBatch<FullID: LanguageResourceFullID>(forFullID fullID: FullID,
+                                                                  withKey packageKey: KeymanPackage.Key,
                                                                   from url: URL,
                                                                   withNotifications: Bool = false,
                                                                   withResource resource: FullID.Resource? = nil,
@@ -296,7 +314,7 @@ public class ResourceDownloadManager {
     }
 
     // build batch for package
-    return DownloadBatch(forPackageWithID: fullID, from: url, startBlock: startClosure, completionBlock: completionClosure)
+    return DownloadBatch(forPackageWithKey: packageKey, from: url, startBlock: startClosure, completionBlock: completionClosure)
   }
   
   // MARK: Update checks + management
@@ -357,7 +375,7 @@ public class ResourceDownloadManager {
       } else if let lex = res as? InstallableLexicalModel {
         if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
            let path = URL.init(string: filename) {
-          let batch = self.buildPackageBatch(forFullID: lex.fullID, from: path, withResource: lex) { package, error in
+          let batch = self.buildPackageBatch(forFullID: lex.fullID, withKey: lex.packageKey, from: path, withResource: lex) { package, error in
             if let package = package {
               try? ResourceFileManager.shared.install(resourceWithID: lex.fullID, from: package)
             }
@@ -517,31 +535,22 @@ public class ResourceDownloadManager {
                                                      completionBlock: BatchCompletionHandler? = nil)
                                                      -> InternalBatchCompletionHandler {
     return { batch in
-      var successes: [[AnyLanguageResource]] = []
-      var failures: [[AnyLanguageResource]] = []
+      var successes: [KeymanPackage.Key] = []
+      var failures: [KeymanPackage.Key] = []
       var errors: [Error] = []
 
       // Remember, since this is for .composite batches, batch.tasks is of type [DownloadBatch].
-      for (index, res) in batch.tasks.enumerated() {
+      for (index, _) in batch.tasks.enumerated() {
         if batch.errors[index] == nil {
-          let successSet: [AnyLanguageResource] = res.resourceIDs.compactMap { fullID in
-            return resources.first(where: { resource in
-              resource.fullID.matches(fullID)
-            })
-          }
-          successes.append(successSet)
+          successes.append(contentsOf: batch.batches[index].packageKeys)
         } else {
-          let failureSet: [AnyLanguageResource] = res.resourceIDs.compactMap { fullID in
-            return resources.first(where: { resource in
-              resource.fullID.matches(fullID)
-            })
-          }
-          failures.append(failureSet)
+          failures.append(contentsOf: batch.batches[index].packageKeys)
           errors.append(batch.errors[index]!)
         }
       }
 
-      let notification = BatchUpdateCompletedNotification(successes: successes, failures: failures, errors: errors)
+      // TODO:  Rework batch update notifications to return package keys.
+      let notification = BatchUpdateCompletedNotification(successes: [], failures: [], errors: errors)
       NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
                                       object: self,
                                       value: notification)

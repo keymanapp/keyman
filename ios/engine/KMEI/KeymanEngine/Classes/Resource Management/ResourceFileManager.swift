@@ -58,16 +58,16 @@ public class ResourceFileManager {
     return KeymanPackage.parse(Storage.active.packageDir(forKey: key))
   }
 
-  internal func packageDownloadTempPath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
+  internal func packageDownloadTempPath(forKey key: KeymanPackage.Key) -> URL {
     let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    let tempFilename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
+    let tempFilename = KeymanPackage.baseFilename(for: key)
     let url = documentDir.appendingPathComponent("\(tempFilename).partial") // marks it as a download in progress
     return url
   }
 
-  internal func cachedPackagePath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
+  internal func cachedPackagePath(forKey key: KeymanPackage.Key) -> URL {
     let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    let filename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
+    let filename = KeymanPackage.baseFilename(for: key)
     let url = documentDir.appendingPathComponent(filename)
     return url
   }
