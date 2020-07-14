@@ -35,14 +35,14 @@ public class KMPBrowserActivity extends AppCompatActivity {
   public static final String KMP_PRODUCTION_HOST = "https://keyman.com";
   public static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
 
-  // String used to query for cloud keyboard downloads
+  // URL for keyboard search web page presented to user when they add a keyboard in the app.
   private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "%s/go/android/%s/download-keyboards%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
   private WebView webView;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
-  // String used to parse for keyboard download link
+  // Keyman server URL for keyboard download links
   private static final String KMP_INSTALL_KEYBOARDS_FORMATSTR = "^(%s|%s)(/keyboards/install/)(\\w+)(&bcp47=)?(.+)?";
   private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "%s/go/package/download/%s?platform=android&tier=%s%s";
   private static final String KMP_DOWNLOAD_KEYBOARDS_LANGUAGE_FORMATSTR = "&bcp47=%s";
