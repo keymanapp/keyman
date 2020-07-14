@@ -17,23 +17,29 @@ public final class KMPLink {
   public static final String KMP_PRODUCTION_HOST = "https://keyman.com";
   public static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
 
-  private static final String KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR = "^(%s|%s)(/keyboards/install/)(\\w+)(&bcp47=)?(.+)?";
+  private static final String KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR = "^(%s|%s)(/keyboards/install/)(\\w+)(\\?bcp47=)?(.+)?";
   private static final String installPatternFormatStr = String.format(KMP_INSTALL_KEYBOARDS_PATTERN_FORMATSTR,
     KMP_PRODUCTION_HOST,
     KMP_STAGING_HOST);
   private static final Pattern installPattern = Pattern.compile(installPatternFormatStr);
 
+  // Keyman 14.0+ keyboard download links from Keyman server
   private static final String KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR = "^(%s|%s)(/go/package/download/)(\\w+)(\\?platform=android&tier=(alpha|beta|stable))(&bcp47=)?(.+)?";
   private static final String downloadPatternFormatStr = String.format(KMP_DOWNLOAD_KEYBOARDS_PATTERN_FORMATSTR,
     KMP_PRODUCTION_HOST,
     KMP_STAGING_HOST);
   private static final Pattern downloadPattern = Pattern.compile(downloadPatternFormatStr);
 
-  // Keyman server URL for keyboard download links
+  // Keyman 13.0 keyboard download links from Keyman server
+  // TODO: Remove this in 14.0 Beta  when keyboard search updated on live site
+  private static final String KMP_DOWNLOAD_KEYBOARDS_13_PATTERN_FORMATSTR = "(%s)(/keyboard/download\\?id=)(\\w+)(&platform=android&mode=standalone)(.+)?";
+  private static final String download13PatternFromatStr = String.format(KMP_DOWNLOAD_KEYBOARDS_13_PATTERN_FORMATSTR,
+    KMP_PRODUCTION_HOST);
+  private static final Pattern download13Pattern = Pattern.compile(download13PatternFromatStr);
+
+  // Keyman 14.0+ generated URL for keyboard download links
   private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "%s/go/package/download/%s?platform=android&tier=%s%s";
   private static final String KMP_DOWNLOAD_KEYBOARDS_LANGUAGE_FORMATSTR = "&bcp47=%s";
-
-
 
   /**
    * Check if a URL is a valid Keyman keyboard download link with a packageID
@@ -59,7 +65,8 @@ public final class KMPLink {
       return status;
     }
     Matcher matcher = downloadPattern.matcher(url);
-    if (matcher.matches()) {
+    Matcher matcher13 = download13Pattern.matcher(url);
+    if (matcher.matches() || matcher13.matches()) {
       status = true;
     }
 

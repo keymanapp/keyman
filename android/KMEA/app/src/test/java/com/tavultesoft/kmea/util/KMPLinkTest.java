@@ -44,6 +44,17 @@ public class KMPLinkTest {
     // Valid Keyman keyboard download links
     Assert.assertTrue(KMPLink.isKeymanDownloadLink("https://staging-keyman-com.azurewebsites.net/go/package/download/malar_malayalam?platform=android&tier=alpha"));
     Assert.assertTrue(KMPLink.isKeymanDownloadLink("https://staging-keyman-com.azurewebsites.net/go/package/download/malar_malayalam?platform=android&tier=alpha&bcp47=ml"));
+    Assert.assertTrue(KMPLink.isKeymanDownloadLink("https://keyman.com/go/package/download/malar_malayalam?platform=android&tier=alpha"));
+    Assert.assertTrue(KMPLink.isKeymanDownloadLink("https://keyman.com/go/package/download/malar_malayalam?platform=android&tier=alpha&bcp47=ml"));
 
+    // Valid Keyman 13.0 keyboard download links
+    Assert.assertTrue(KMPLink.isKeymanDownloadLink("https://keyman.com/keyboard/download?id=khmer_angkor&platform=android&mode=standalone&cid=335710037.1594761864"));
+
+    // Invalid Keyman 13.0 keyboard download links
+    Assert.assertFalse(KMPLink.isKeymanDownloadLink("https://keyman.com/keyboard/download?id="));
+    Assert.assertFalse(KMPLink.isKeymanDownloadLink("https://keyman.com/keyboard/download?id=khmer_angkor"));
+
+    // Staging host with Keyman 13.0 download link is invalid
+    Assert.assertFalse(KMPLink.isKeymanDownloadLink("https://staging-keyman.com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone&cid=335710037.1594761864"));
   }
 }

@@ -606,19 +606,25 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       return;
     }
     try {
-      String url = data.toString();
+      // Initial try with Keyman 13.0 download link
+      String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
+      if (url == null) {
+        url = data.toString();
+      }
       if (url != null) {
-
         String filename = "";
-        if (KMPLink.isKeymanDownloadLink(url)) {
-          // Create filename by extracting packageID from the Keyman download keyboard URL
-          String urlNoQuery = url.substring(0, url.indexOf(data.getQuery()) - 1);
-          filename = FileUtils.getFilename(urlNoQuery) + FileUtils.KEYMANPACKAGE;
-        } else {
-          // Otherwise, filename should be at the end of the URL
-          filename = FileUtils.getFilename(url);
+        String urlNoQuery = data.getPath();
+
+        // Create filename by extracting packageID from query or urlNoQuery
+        filename = data.getQueryParameter("id");
+        if (filename == null) {
+          filename = FileUtils.getFilename(urlNoQuery);
         }
-        // Parse data for the BCP 47 language ID
+        if (!filename.endsWith(FileUtils.KEYMANPACKAGE)) {
+          filename += FileUtils.KEYMANPACKAGE;
+        }
+
+        // Parse query for the BCP 47 language ID
         String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
         // TODO: Using "tag" for now, but production will be KMKeyboardDownloaderActivity.KMKey_BCP47
         if (languageID == null) {

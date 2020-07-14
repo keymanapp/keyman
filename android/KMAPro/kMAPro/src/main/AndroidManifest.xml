@@ -209,6 +209,12 @@
           android:scheme="https"
           android:pathPrefix="/go/package/download" />
 
+        <!-- Remove this one in Keyman 14.0 Beta -->
+        <data
+          android:host="keyman.com"
+          android:scheme="https"
+          android:pathPrefix="/keyboard/download" />
+
       </intent-filter>
     </activity>
     <activity
