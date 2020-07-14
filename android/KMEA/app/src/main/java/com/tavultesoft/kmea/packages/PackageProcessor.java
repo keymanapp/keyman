@@ -480,6 +480,52 @@ public class PackageProcessor {
   }
 
   /**
+   * Parses kmp.json to get a specified keyboard with an associated language. If languageID not
+   * provided, return the keyboard with the first associated language.
+   * This differs from getKeyboardList because this method doesn't search through
+   * KeyboardController (installed keyboards)
+   * @param packageID String of the package ID
+   * @param keyboardID String of the keyboard ID
+   * @param languageID String of the language ID
+   * @return <Keyboard> object
+   */
+  public Keyboard getKeyboard(String packageID, String keyboardID, String languageID) {
+    File packagePath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID);
+    Keyboard kbd = null;
+    JSONObject infoJSON = loadPackageInfo(packagePath);
+    String packageVersion = getPackageVersion(infoJSON);
+
+    try {
+      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+
+      for (int i=0; i < keyboards.length(); i++) {
+        JSONObject keyboard = keyboards.getJSONObject(i);
+        if (keyboardID.equals(keyboard.getString("id"))) {
+          Map<String, String>[] maps = processEntry(keyboard, packageID, packageVersion, languageID);
+          if (maps != null) {
+            // Only returning first keyboard map
+            kbd = new Keyboard(
+              maps[0].get(KMManager.KMKey_PackageID),
+              maps[0].get(KMManager.KMKey_KeyboardID),
+              maps[0].get(KMManager.KMKey_KeyboardName),
+              maps[0].get(KMManager.KMKey_LanguageID),
+              maps[0].get(KMManager.KMKey_LanguageName),
+              maps[0].get(KMManager.KMKey_KeyboardVersion),
+              maps[0].get(KMManager.KMKey_CustomHelpLink), // can be null
+              "",
+              false,
+              maps[0].get(KMManager.KMKey_Font),
+              maps[0].get(KMManager.KMKey_OskFont));
+          }
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getKeyboard() ", e);
+    }
+    return kbd;
+  }
+
+  /**
    * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
    * This will overwrite an existing package.
    * @param path Filepath of a newly downloaded .kmp file.
