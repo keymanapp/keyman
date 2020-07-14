@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.109 alpha 2020-07-14
+
+* refactor(ios/engine): lexical model query & download rework (#3327)
+* refactor(ios/engine): hashable package keys (#3333)
+* fix(ios/engine): version equality (#3334)
+* refactor(linux): make some methods protected (#3291)
+* feat(android/oem): Add nrc.str.sencoten model and update SystemKeyboard from KMAPro (#3332)
+
 ## 14.0.108 alpha 2020-07-09
 
 * chore: cleanup global ExtPath (#3315)
