@@ -236,9 +236,8 @@ namespace Trie {
      * @param words a list of word and count pairs.
      */
     buildFromWordList(words: WordList): Trie {
-      for (let wordform of Object.keys(words)) {
+      for (let [wordform, weight] of Object.entries(words)) {
         let key = this.toKey(wordform);
-        let weight = words[wordform];
         addUnsorted(this.root, { key, weight, content: wordform }, 0);
       }
       sortTrie(this.root);
