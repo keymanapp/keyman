@@ -32,6 +32,7 @@ import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -361,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           break;
         case "keyman" :
           // Only accept download links from Keyman browser activities
-          if (FileUtils.isKeymanLink(data.toString()) && caller != null &&
+          if (KMPLink.isKeymanDownloadLink(data.toString()) && caller != null &&
             (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
              caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
 
@@ -609,7 +610,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       if (url != null) {
 
         String filename = "";
-        if (FileUtils.isKeymanLink(url)) {
+        if (KMPLink.isKeymanDownloadLink(url)) {
           // Create filename by extracting packageID from the Keyman download keyboard URL
           String urlNoQuery = url.substring(0, url.indexOf(data.getQuery()) - 1);
           filename = FileUtils.getFilename(urlNoQuery) + FileUtils.KEYMANPACKAGE;

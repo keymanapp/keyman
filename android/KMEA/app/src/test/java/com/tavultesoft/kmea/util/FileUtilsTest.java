@@ -33,24 +33,6 @@ public class FileUtilsTest {
   }
 
   @Test
-  public void test_isKeymanLink() {
-    Assert.assertFalse(FileUtils.isKeymanLink(null));
-    Assert.assertFalse(FileUtils.isKeymanLink(""));
-
-    // Valid Keyman links
-    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone"));
-    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=khmer_angkor&platform=android&mode=standalone&bcp47=km"));
-    Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam"));
-    Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam?bcp47=ml"));
-    //Assert.assertTrue(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download?id=malar_malayalam&platform=android&mode=standalone"));
-    //Assert.assertTrue(FileUtils.isKeymanLink("https://keyman.com/keyboard/download?id=malar_malayalam&platform=android&mode=standalone"));
-
-    // link missing query
-    //Assert.assertFalse(FileUtils.isKeymanLink("https://staging-keyman-com.azurewebsites.net/keyboard/download"));
-    //Assert.assertFalse(FileUtils.isKeymanLink("https://keyman.com/keyboard/download"));
-  }
-
-  @Test
   public void test_compareVersions() {
     Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions(null, "1.0"));
     Assert.assertEquals(FileUtils.VERSION_INVALID, FileUtils.compareVersions("" , "1.0"));

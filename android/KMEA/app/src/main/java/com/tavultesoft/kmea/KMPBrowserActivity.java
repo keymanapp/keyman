@@ -26,14 +26,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.Tier;
+import com.tavultesoft.kmea.util.KMPLink;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.tavultesoft.kmea.util.KMPLink.KMP_PRODUCTION_HOST;
+import static com.tavultesoft.kmea.util.KMPLink.KMP_STAGING_HOST;
+
 public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
-  public static final String KMP_PRODUCTION_HOST = "https://keyman.com";
-  public static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
   private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "%s/go/android/%s/download-keyboards%s";
@@ -42,13 +44,6 @@ public class KMPBrowserActivity extends AppCompatActivity {
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
-  // Keyman server URL for keyboard download links
-  private static final String KMP_INSTALL_KEYBOARDS_FORMATSTR = "^(%s|%s)(/keyboards/install/)(\\w+)(&bcp47=)?(.+)?";
-  private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "%s/go/package/download/%s?platform=android&tier=%s%s";
-  private static final String KMP_DOWNLOAD_KEYBOARDS_LANGUAGE_FORMATSTR = "&bcp47=%s";
-  private static String patternFormatStr;
-  private static Pattern pattern;
-
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +51,6 @@ public class KMPBrowserActivity extends AppCompatActivity {
     final Context context = this;
 
     setContentView(R.layout.activity_kmp_browser);
-
-    patternFormatStr = String.format(KMP_INSTALL_KEYBOARDS_FORMATSTR,
-      KMPBrowserActivity.KMP_PRODUCTION_HOST,
-      KMPBrowserActivity.KMP_STAGING_HOST);
-    pattern = Pattern.compile(patternFormatStr);
 
     webView = (WebView) findViewById(R.id.kmpBrowserWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -88,19 +78,9 @@ public class KMPBrowserActivity extends AppCompatActivity {
         if (lowerURL.equals("about:blank")) {
           return true; // never load a blank page, e.g. when the component initializes
         }
-        Matcher matcher = pattern.matcher(url);
-        // Validate deep link with package ID and optional bcp47 tag
-        if (matcher.matches() && matcher.group(3) != null) {
-          String host = matcher.group(1);
-          String packageID = matcher.group(3);
-          String tier = KMManager.getTier(BuildConfig.VERSION_NAME).toString().toLowerCase();
-          String languageStr = (matcher.group(5) != null) ? String.format(KMP_DOWNLOAD_KEYBOARDS_LANGUAGE_FORMATSTR,
-            matcher.group(5)) : "";
-          String downloadURL = String.format(KMP_DOWNLOAD_KEYBOARDS_FORMATSTR,
-            host,
-            packageID,
-            tier,
-            languageStr);
+
+        if (KMPLink.isKeymanInstallLink(url)) {
+          String downloadURL = KMPLink.getKeyboardDownloadLink(url);
 
           // Create intent with keyboard download link for KMAPro main activity to handle
           Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(downloadURL));
