@@ -69,9 +69,10 @@ describe('parseWordList', function () {
       ' hello ', //4, expect to trim whitespace
       'hello']; //5
 
-    const expected: WordList = {};
-    expected['hello'] = 10; /* 1+4+5 trimmed and identical */
-    expected['hell'+String.fromCharCode(0x00F3)] = 5 /* 2+3 normalised to NFC */
+    const expected: WordList = {
+        'hello': 10, /* 1+4+5 trimmed and identical */
+        'hell\u00f3': 5, /* 2+3 normalised to NFC */
+    };
 
     // Build a wordlist from the array
     let file = `# this is a comment\n`;
@@ -84,4 +85,3 @@ describe('parseWordList', function () {
     assert.deepEqual(repeatedWords, expected);
   });
 });
-
