@@ -1,10 +1,13 @@
 import { readFileSync } from "fs";
 
 /**
- * A word list is an array of pairs: the concrete word form itself, followed by
- * a non-negative count.
+ * A word list is (conceptually) an array of pairs: the concrete word form itself + a
+ * non-negative count.
+ * 
+ * Since each word should only appear once within the list, we represent it with
+ * an associative array pattern keyed by the wordform.
  */
-export type WordList = [string, number][];
+export type WordList = {[wordform: string]: number};
 
 /**
  * Returns a data structure that can be loaded by the TrieModel.
@@ -19,7 +22,7 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
     throw new TypeError("searchTermToKey must be explicitly specified")
   }
   // Make one big word list out of all of the filenames provided.
-  let wordlist: WordList = [];
+  let wordlist: WordList = {};
   filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
 
   let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
@@ -101,17 +104,7 @@ export function parseWordList(wordlist: WordList, contents: string): void {
       count = 1;
     }
 
-    // TODO: this merge is very naive. We should consider whether the merge
-    // needs to be a little more aggressive. This may also be slow for large
-    // wordlists; probably O(n log n). We could improve this with a hash table
-    // if it becomes a performance problem.
-    const item = wordlist.find(value => value[0] === wordform);
-    if(item) {
-      item[1] += count;
-    }
-    else {
-      wordlist.push([wordform, count]);
-    }
+    wordlist[wordform] = (wordlist[wordform] || 0) + count;
   }
 }
 
@@ -243,7 +236,7 @@ namespace Trie {
      * @param words a list of word and count pairs.
      */
     buildFromWordList(words: WordList): Trie {
-      for (let [wordform, weight] of words) {
+      for (let [wordform, weight] of Object.entries(words)) {
         let key = this.toKey(wordform);
         addUnsorted(this.root, { key, weight, content: wordform }, 0);
       }
