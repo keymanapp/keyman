@@ -131,9 +131,9 @@ public class KeymanPackage {
   }
 
   /**
-   * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the support state of a keyboard.
+   * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the distribution state of a package.
    */
-  public struct SupportStateMetadata: Codable {
+  public struct DistributionStateMetadata: Codable {
     var latestVersion: String?
     var timestampForLastQuery: TimeInterval?
 
@@ -365,26 +365,26 @@ public class KeymanPackage {
   /**
    * Runs the package-version query for the specified packages to determine their current support-state.
    */
-  public static func querySupportStates(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : SupportStateMetadata]?, Error?)-> Void)? = nil) {
+  public static func queryDistributionStates(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : DistributionStateMetadata]?, Error?)-> Void)? = nil) {
     Queries.PackageVersion.fetch(for: keys, withSession: session) { results, error in
       guard error == nil, let results = results else {
         completionBlock?(nil, error)
         return
       }
 
-      var keyboardStates: [Key : SupportStateMetadata] = [:]
+      var keyboardStates: [Key : DistributionStateMetadata] = [:]
       keyboardStates.reserveCapacity(results.keyboards?.count ?? 0)
 
       // Sadly, Dictionaries do not support mapping to other dictionaries when considering the keys.
       results.keyboards?.forEach { key, value in
-        keyboardStates[KeymanPackage.Key(id: key, type: .keyboard)] = KeymanPackage.SupportStateMetadata(from: value)
+        keyboardStates[KeymanPackage.Key(id: key, type: .keyboard)] = KeymanPackage.DistributionStateMetadata(from: value)
       }
 
-      var lexicalModelStates: [Key : SupportStateMetadata] = [:]
+      var lexicalModelStates: [Key : DistributionStateMetadata] = [:]
       lexicalModelStates.reserveCapacity(results.models?.count ?? 0)
 
       results.models?.forEach { key, value in
-        lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.SupportStateMetadata(from: value)
+        lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.DistributionStateMetadata(from: value)
       }
 
       keyboardStates.forEach { result in
@@ -408,7 +408,7 @@ public class KeymanPackage {
    * Runs the package-version query for the specified packages to determine if any updates are available.
    */
   public static func queryCurrentVersions(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : Version]?, Error?) -> Void)? = nil) {
-    querySupportStates(for: keys, withSession: session) { stateSet, error in
+    queryDistributionStates(for: keys, withSession: session) { stateSet, error in
       guard error == nil, let stateSet = stateSet else {
         completionBlock?(nil, error)
         return

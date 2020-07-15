@@ -159,7 +159,7 @@ class KeymanPackageTests: XCTestCase {
 
   // Analogous to QueryPackageVersionTests.testMockedBatchFetchParse, but with more analysis applied
   // and more integration.
-  func testQuerySupportStates() throws {
+  func testQueryDistributionStates() throws {
     let expectation = XCTestExpectation(description: "The query completes as expected.")
 
     // Test setup
@@ -175,7 +175,7 @@ class KeymanPackageTests: XCTestCase {
                        KeymanPackage.Key(forResource: TestUtils.LexicalModels.mtnt),
                        KeymanPackage.Key(id: "bar", type: .lexicalModel)]
 
-    KeymanPackage.querySupportStates(for: packageKeys, withSession: mockedURLSession!) { results, error in
+    KeymanPackage.queryDistributionStates(for: packageKeys, withSession: mockedURLSession!) { results, error in
       guard error == nil, let results = results else {
         XCTFail()
         expectation.fulfill()
