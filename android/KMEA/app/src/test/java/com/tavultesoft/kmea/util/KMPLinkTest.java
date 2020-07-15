@@ -20,6 +20,7 @@ public class KMPLinkTest {
     // Valid Keyman keyboard install links
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam"));
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam?bcp47=ml"));
+    Assert.assertTrue(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/fv_sencoten?bcp47=str-Latn"));
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://keyman.com/keyboards/install/malar_malayalam"));
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://keyman.com/keyboards/install/malar_malayalam?bcp47=ml"));
 
