@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.110 alpha 2020-07-15
+
+* refactor(developer): hashmap-based wordlist compilation (#3340)
+* chore(linux): Add license details for kmpdetails.* (#3355)
+
 ## 14.0.109 alpha 2020-07-14
 
 * refactor(ios/engine): lexical model query & download rework (#3327)
