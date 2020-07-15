@@ -57,26 +57,27 @@ public class KeymanPackage {
   /**
    * Indicates the distribution level and state of the package.
    */
-  public enum SupportState: String, Codable {
+  public enum DistributionMethod: String, Codable {
     /**
-     * Indicates that the support level for the package is unknown.  Generally occurs when a
+     * Indicates that the distribution method for the package is currently unknown.  Generally occurs when a
      * package is installed via file-sharing before KeymanEngine is able to perform a package-version check.
      */
     case unknown
 
     /**
-     * Indicates that the package is publicly distributed but no longer maintained.  Indicates that other packages targetting
-     * the same targets are more favored.
+     * Indicates that the package is publicly distributed via Keyman's cloud API is is no longer maintained.
+     * Other, better-maintained packages targetting the same language exist and are more favored.
      */
-    case deprecated
+    case cloudDeprecated = "cloud-deprecated"
 
     /**
-     * Indicates that this package receives full support and maintenance from the resource development community at large.
+     * Indicates that this package is publicly distributed via Keyman's cloud API and is considered well-maintained.
      */
-    case publiclyReleased = "publicly released"
+    case cloud
 
     /**
-     * Indicates that this package is known to not be publicly distributed.
+     * Indicates that this package is distributed outside the Keyman cloud API network.  As a result, KeymanEngine
+     * cannot automatically validate or update this resource.
      */
     case custom
   }
@@ -101,19 +102,23 @@ public class KeymanPackage {
 
   public enum InstallationState: String, Codable {
     /**
-     * While a `KeymanPackage` instance will never return it, some functions that accept a `KeymanPackage.Key` might.
-     * This indicates that the package is neither installed nor being downloaded.
+     * Indicates that the package is neither installed nor being downloaded.
+     *
+     * While a `KeymanPackage` instance will never return it, external functions such as
+     * `ResourceFileManager.installState(for:)` that merely perform key-based lookups may..
      */
      case none
 
     /**
-     * While a `KeymanPackage` instance will never return it, some functions that accept a `KeymanPackage.Key` might.
-     * This indicates that the package is not yet installed or downloaded, but is _being_ downloaded via KeymanEngine's downloading queue.
+     * Indicates that the package not yet installed or downloaded, but is currently _being_ downloaded via KeymanEngine.
+     *
+     * While a `KeymanPackage` instance will never return it, external functions such as
+     * `ResourceFileManager.installState(for:)` that merely perform key-based lookups may..
      */
      case downloading
 
      /**
-      * Indicates that this `KeymanPackage` instance was been temporarily extracted for installation from a KMP file, regardless
+      * Indicates that this `KeymanPackage` instance has been temporarily extracted for installation from a KMP file, regardless
       * of whether or not its contents have already been installed within KeymanEngine.
       */
      case pending
@@ -126,22 +131,22 @@ public class KeymanPackage {
   }
 
   /**
-   * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the support state of a keyboard.
+   * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the distribution state of a package.
    */
-  public struct SupportStateMetadata: Codable {
+  public struct DistributionStateMetadata: Codable {
     var latestVersion: String?
     var timestampForLastQuery: TimeInterval?
 
-    var supportState: SupportState
+    var distributionMethod: DistributionMethod
 
     init(from queryResult: Queries.PackageVersion.ResultComponent) {
       if let entry = queryResult as? Queries.PackageVersion.ResultEntry {
         self.latestVersion = entry.version
-        self.supportState = .publiclyReleased
+        self.distributionMethod = .cloud
       } else /* if queryResult is Queries.PackageVersion.ResultError */ {
         self.latestVersion = nil
         // The package-version query knows nothing about it - must be custom.
-        self.supportState = .custom
+        self.distributionMethod = .custom
       }
 
       self.timestampForLastQuery = NSDate().timeIntervalSince1970
@@ -151,7 +156,9 @@ public class KeymanPackage {
       latestVersion = nil
       timestampForLastQuery = nil
 
-      supportState = fromQuery ? .publiclyReleased : .unknown
+      // Assumption: we cannot install a cloud-deprecated resource from
+      // in-app cloud-backed searches.
+      distributionMethod = fromQuery ? .cloud : .unknown
     }
   }
 
@@ -208,9 +215,9 @@ public class KeymanPackage {
     return metadata.packageType == .Keyboard
   }
 
-  public var supportState: SupportState {
+  public var distributionMethod: DistributionMethod {
     let cachedQueryResult = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)
-    return cachedQueryResult?.supportState ?? .unknown
+    return cachedQueryResult?.distributionMethod ?? .unknown
   }
 
   public var installState: InstallationState {
@@ -219,7 +226,7 @@ public class KeymanPackage {
   }
 
   public var versionState: VersionState {
-    if supportState == .unknown || supportState == .custom {
+    if distributionMethod == .unknown || distributionMethod == .custom {
       return .unknown
     } else {
       let cachedVersion = Version(Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)!.latestVersion!)!
@@ -358,26 +365,26 @@ public class KeymanPackage {
   /**
    * Runs the package-version query for the specified packages to determine their current support-state.
    */
-  public static func querySupportStates(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : SupportStateMetadata]?, Error?)-> Void)? = nil) {
+  public static func queryDistributionStates(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : DistributionStateMetadata]?, Error?)-> Void)? = nil) {
     Queries.PackageVersion.fetch(for: keys, withSession: session) { results, error in
       guard error == nil, let results = results else {
         completionBlock?(nil, error)
         return
       }
 
-      var keyboardStates: [Key : SupportStateMetadata] = [:]
+      var keyboardStates: [Key : DistributionStateMetadata] = [:]
       keyboardStates.reserveCapacity(results.keyboards?.count ?? 0)
 
       // Sadly, Dictionaries do not support mapping to other dictionaries when considering the keys.
       results.keyboards?.forEach { key, value in
-        keyboardStates[KeymanPackage.Key(id: key, type: .keyboard)] = KeymanPackage.SupportStateMetadata(from: value)
+        keyboardStates[KeymanPackage.Key(id: key, type: .keyboard)] = KeymanPackage.DistributionStateMetadata(from: value)
       }
 
-      var lexicalModelStates: [Key : SupportStateMetadata] = [:]
+      var lexicalModelStates: [Key : DistributionStateMetadata] = [:]
       lexicalModelStates.reserveCapacity(results.models?.count ?? 0)
 
       results.models?.forEach { key, value in
-        lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.SupportStateMetadata(from: value)
+        lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.DistributionStateMetadata(from: value)
       }
 
       keyboardStates.forEach { result in
@@ -401,7 +408,7 @@ public class KeymanPackage {
    * Runs the package-version query for the specified packages to determine if any updates are available.
    */
   public static func queryCurrentVersions(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : Version]?, Error?) -> Void)? = nil) {
-    querySupportStates(for: keys, withSession: session) { stateSet, error in
+    queryDistributionStates(for: keys, withSession: session) { stateSet, error in
       guard error == nil, let stateSet = stateSet else {
         completionBlock?(nil, error)
         return

@@ -36,7 +36,7 @@ public extension UserDefaults {
     }
   }
 
-  internal func cachedPackageQueryMetadata(forKey key: String) -> [KeymanPackage.Key: KeymanPackage.SupportStateMetadata]? {
+  internal func cachedPackageQueryMetadata(forKey key: String) -> [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata]? {
     guard let data = self.data(forKey: key) else {
       log.error("Error decoding cached package query results")
       return nil
@@ -44,7 +44,7 @@ public extension UserDefaults {
 
     // Since we're dealing with dictionaries & Codable, it's probably better to use JSON here.
     let decoder = JSONDecoder()
-    if let dict = try? decoder.decode([KeymanPackage.Key: KeymanPackage.SupportStateMetadata].self, from: data) {
+    if let dict = try? decoder.decode([KeymanPackage.Key: KeymanPackage.DistributionStateMetadata].self, from: data) {
       return dict
     } else {
       return nil
@@ -149,7 +149,7 @@ public extension UserDefaults {
     }
   }
 
-  internal var cachedPackageQueryMetadata: [KeymanPackage.Key: KeymanPackage.SupportStateMetadata] {
+  internal var cachedPackageQueryMetadata: [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata] {
     get {
       return cachedPackageQueryMetadata(forKey: Key.userPackageQueryCacheDict) ?? [:]
     }
@@ -250,7 +250,7 @@ public extension UserDefaults {
     }) ?? []
   }
 
-  internal func cachedPackageQueryResult(forPackageKey packageKey: KeymanPackage.Key) -> KeymanPackage.SupportStateMetadata? {
+  internal func cachedPackageQueryResult(forPackageKey packageKey: KeymanPackage.Key) -> KeymanPackage.DistributionStateMetadata? {
     return cachedPackageQueryMetadata[packageKey]
   }
 
