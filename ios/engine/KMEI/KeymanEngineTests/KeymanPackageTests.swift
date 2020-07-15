@@ -186,38 +186,38 @@ class KeymanPackageTests: XCTestCase {
       let sil_euro_latin = KeymanPackage.Key(forResource: TestUtils.Keyboards.sil_euro_latin)
       let mtnt = KeymanPackage.Key(forResource: TestUtils.LexicalModels.mtnt)
       XCTAssertEqual(results[khmer_angkor]?.latestVersion, "1.0.6")
-      XCTAssertEqual(results[khmer_angkor]?.supportState, .publiclyReleased)
+      XCTAssertEqual(results[khmer_angkor]?.distributionMethod, .cloud)
 
       XCTAssertEqual(results[sil_euro_latin]?.latestVersion, "1.9.1")
-      XCTAssertEqual(results[sil_euro_latin]?.supportState, .publiclyReleased)
+      XCTAssertEqual(results[sil_euro_latin]?.distributionMethod, .cloud)
 
       XCTAssertEqual(results[mtnt]?.latestVersion, "0.1.4")
-      XCTAssertEqual(results[mtnt]?.supportState, .publiclyReleased)
+      XCTAssertEqual(results[mtnt]?.distributionMethod, .cloud)
 
       XCTAssertNotNil(results[badKbdKey])
-      XCTAssertEqual(results[badKbdKey]?.supportState, .custom)
+      XCTAssertEqual(results[badKbdKey]?.distributionMethod, .custom)
 
       XCTAssertNotNil(results[badLexKey])
-      XCTAssertEqual(results[badLexKey]?.supportState, .custom)
+      XCTAssertEqual(results[badLexKey]?.distributionMethod, .custom)
 
       // Test that this metadata is stored and persisted (cached) in UserDefaults.
       let userDefaults = Storage.active.userDefaults
 
       let cache_khmer_angkor = userDefaults.cachedPackageQueryResult(forPackageKey: khmer_angkor)
       XCTAssertNotNil(cache_khmer_angkor)
-      XCTAssertEqual(cache_khmer_angkor?.supportState, results[khmer_angkor]?.supportState)
+      XCTAssertEqual(cache_khmer_angkor?.distributionMethod, results[khmer_angkor]?.distributionMethod)
       XCTAssertEqual(cache_khmer_angkor?.latestVersion, "1.0.6")
       XCTAssertEqual(cache_khmer_angkor?.timestampForLastQuery, results[khmer_angkor]?.timestampForLastQuery)
 
       let cache_mtnt = userDefaults.cachedPackageQueryResult(forPackageKey: mtnt)
       XCTAssertNotNil(cache_mtnt)
-      XCTAssertEqual(cache_mtnt?.supportState, results[mtnt]?.supportState)
+      XCTAssertEqual(cache_mtnt?.distributionMethod, results[mtnt]?.distributionMethod)
       XCTAssertEqual(cache_mtnt?.latestVersion, "0.1.4")
       XCTAssertEqual(cache_mtnt?.timestampForLastQuery, results[mtnt]?.timestampForLastQuery)
 
       let cache_foo = userDefaults.cachedPackageQueryResult(forPackageKey: badKbdKey)
       XCTAssertNotNil(cache_foo)
-      XCTAssertEqual(cache_foo?.supportState, results[badKbdKey]?.supportState)
+      XCTAssertEqual(cache_foo?.distributionMethod, results[badKbdKey]?.distributionMethod)
       XCTAssertNil(cache_foo?.latestVersion)
 
       expectation.fulfill()

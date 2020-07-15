@@ -57,26 +57,27 @@ public class KeymanPackage {
   /**
    * Indicates the distribution level and state of the package.
    */
-  public enum SupportState: String, Codable {
+  public enum DistributionMethod: String, Codable {
     /**
-     * Indicates that the support level for the package is unknown.  Generally occurs when a
+     * Indicates that the distribution method for the package is currently unknown.  Generally occurs when a
      * package is installed via file-sharing before KeymanEngine is able to perform a package-version check.
      */
     case unknown
 
     /**
-     * Indicates that the package is publicly distributed but no longer maintained.  Indicates that other packages targetting
-     * the same targets are more favored.
+     * Indicates that the package is publicly distributed via Keyman's cloud API is is no longer maintained.
+     * Other, better-maintained packages targetting the same language exist and are more favored.
      */
-    case deprecated
+    case cloudDeprecated = "cloud-deprecated"
 
     /**
-     * Indicates that this package receives full support and maintenance from the resource development community at large.
+     * Indicates that this package is publicly distributed via Keyman's cloud API and is considered well-maintained.
      */
-    case publiclyReleased = "publicly released"
+    case cloud
 
     /**
-     * Indicates that this package is known to not be publicly distributed.
+     * Indicates that this package is distributed outside the Keyman cloud API network.  As a result, KeymanEngine
+     * cannot automatically validate or update this resource.
      */
     case custom
   }
@@ -132,16 +133,16 @@ public class KeymanPackage {
     var latestVersion: String?
     var timestampForLastQuery: TimeInterval?
 
-    var supportState: SupportState
+    var distributionMethod: DistributionMethod
 
     init(from queryResult: Queries.PackageVersion.ResultComponent) {
       if let entry = queryResult as? Queries.PackageVersion.ResultEntry {
         self.latestVersion = entry.version
-        self.supportState = .publiclyReleased
+        self.distributionMethod = .cloud
       } else /* if queryResult is Queries.PackageVersion.ResultError */ {
         self.latestVersion = nil
         // The package-version query knows nothing about it - must be custom.
-        self.supportState = .custom
+        self.distributionMethod = .custom
       }
 
       self.timestampForLastQuery = NSDate().timeIntervalSince1970
@@ -151,7 +152,9 @@ public class KeymanPackage {
       latestVersion = nil
       timestampForLastQuery = nil
 
-      supportState = fromQuery ? .publiclyReleased : .unknown
+      // Assumption: we cannot install a cloud-deprecated resource from
+      // in-app cloud-backed searches.
+      distributionMethod = fromQuery ? .cloud : .unknown
     }
   }
 
@@ -208,9 +211,9 @@ public class KeymanPackage {
     return metadata.packageType == .Keyboard
   }
 
-  public var supportState: SupportState {
+  public var distributionMethod: DistributionMethod {
     let cachedQueryResult = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)
-    return cachedQueryResult?.supportState ?? .unknown
+    return cachedQueryResult?.distributionMethod ?? .unknown
   }
 
   public var installState: InstallationState {
@@ -219,7 +222,7 @@ public class KeymanPackage {
   }
 
   public var versionState: VersionState {
-    if supportState == .unknown || supportState == .custom {
+    if distributionMethod == .unknown || distributionMethod == .custom {
       return .unknown
     } else {
       let cachedVersion = Version(Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)!.latestVersion!)!
