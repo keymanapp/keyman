@@ -2,7 +2,7 @@
     "keyboards": {
         "khmer_angkor": {
             "version": "1.1.0",
-            "kmp": "https://downloads.keyman.com/keyboards/khmer_angkor/1.0.6/khmer_angkor.kmp"
+            "kmp": "https://downloads.keyman.com/keyboards/khmer_angkor/1.1.0/khmer_angkor.kmp"
         }
     }
 }

@@ -102,19 +102,23 @@ public class KeymanPackage {
 
   public enum InstallationState: String, Codable {
     /**
-     * While a `KeymanPackage` instance will never return it, some functions that accept a `KeymanPackage.Key` might.
-     * This indicates that the package is neither installed nor being downloaded.
+     * Indicates that the package is neither installed nor being downloaded.
+     *
+     * While a `KeymanPackage` instance will never return it, external functions such as
+     * `ResourceFileManager.installState(for:)` that merely perform key-based lookups may..
      */
      case none
 
     /**
-     * While a `KeymanPackage` instance will never return it, some functions that accept a `KeymanPackage.Key` might.
-     * This indicates that the package is not yet installed or downloaded, but is _being_ downloaded via KeymanEngine's downloading queue.
+     * Indicates that the package not yet installed or downloaded, but is currently _being_ downloaded via KeymanEngine.
+     *
+     * While a `KeymanPackage` instance will never return it, external functions such as
+     * `ResourceFileManager.installState(for:)` that merely perform key-based lookups may..
      */
      case downloading
 
      /**
-      * Indicates that this `KeymanPackage` instance was been temporarily extracted for installation from a KMP file, regardless
+      * Indicates that this `KeymanPackage` instance has been temporarily extracted for installation from a KMP file, regardless
       * of whether or not its contents have already been installed within KeymanEngine.
       */
      case pending
