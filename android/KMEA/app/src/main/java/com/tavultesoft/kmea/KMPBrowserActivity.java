@@ -38,7 +38,7 @@ public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
 
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
-  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "%s/go/android/%s/download-keyboards%s";
+  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
   private WebView webView;
   private boolean isLoading = false;
