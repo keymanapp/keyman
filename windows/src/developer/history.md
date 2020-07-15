@@ -1,5 +1,9 @@
 # Keyman Developer Version History
 
+## 2020-07-15 13.0.110 stable
+* Bug fix(Compiler): Lexical model compiler no longer attempts to form npm link when the package is installed (#3352)
+* Bug fix(Compiler): Lexical model compiler merges wordlist entries for duplicate words during compilation (#3351) 
+
 ## 2020-06-03 13.0.109 stable
 * Bug Fix(Keyboard Editor): Touch Layout Compiler fixes invalidly formatted strings during compile (#3204)
 
