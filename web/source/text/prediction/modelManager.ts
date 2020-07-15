@@ -101,7 +101,7 @@ namespace com.keyman.text.prediction {
     private languageModelMap: {[language:string]: ModelSpec} = {};
 
     private static EVENT_PREFIX: string = "kmw.mm.";
-    private static readonly TRANSCRIPTION_BUFFER: 10;
+    private static readonly TRANSCRIPTION_BUFFER: 10 = 10;
 
     init() {
       let keyman = com.keyman.singleton;
