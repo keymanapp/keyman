@@ -612,12 +612,10 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
         url = data.toString();
       }
       if (url != null) {
-        String filename = "";
-        String urlNoQuery = data.getPath();
-
         // Create filename by extracting packageID from query or urlNoQuery
-        filename = data.getQueryParameter("id");
+        String filename = data.getQueryParameter("id");
         if (filename == null) {
+          String urlNoQuery = data.getPath();
           filename = FileUtils.getFilename(urlNoQuery);
         }
         if (!filename.endsWith(FileUtils.KEYMANPACKAGE)) {
