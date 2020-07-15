@@ -1,6 +1,9 @@
 
 # Keyman for iPhone and iPad Version History
 
+## 2020-07-16 13.0.109 stable
+* Improve performance when typing long documents with predictive text (#3302)
+
 ## 2020-04-15 13.0.106 stable
 * Adds workaround for iOS 13.4 bug that breaks longpresses (#2960, #2970)
 * Mitigates bug where in-app keyboard would reset inappropriately (#2952)

@@ -1,5 +1,8 @@
 # Keyman for Android Version History
 
+## 2020-07-16 13.0.6215 stable
+* Improve performance when typing long documents with predictive text (#3302)
+
 ## 2020-05-29 13.0.6214 stable
 * Bug fix:
   * Fix format string of QR code for sharing keyboards (#3188)
@@ -159,7 +162,7 @@
 ## 2019-10-25 12.0.4205 stable
 * Bug fix:
   * Use lexical model package version for dataset (#2242)
-  
+
 ## 2019-10-14 12.0.4204 stable
 * Bug Fix:
   * FirstVoices app may crash if analytics is not present (#2204)
@@ -273,7 +276,7 @@
 
 ## 2019-02-15 11.0.2062 beta
 * No changes.
-  
+
 ## 2019-02-07 11.0.2061 beta
 * Bug fix:
   * Add notifications when keyboard or font fails to download from Keyman cloud (#1570)
@@ -387,7 +390,7 @@
 ## 2018-06-11 10.0.399 beta
 * Consolidate Info view (#972)
 * Platform tests (in keyboards) are now consistent across all platforms (#969)
- 
+
 ## 2018-06-05 10.0.398 beta
 * Fix globe button for system keyboard (#942)
 
@@ -456,7 +459,7 @@
 * Initial beta release of Keyman for Android 10.0
 
 ## 10.0 alpha
-* Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text 
+* Refactor how longpress keys on touch layout are processed in KMW engine. This prevents key text
   from being processed as key codes, and fixes the app crash when longpress with K_SPACE.
 * Added support for L/R Alt and Ctrl and Caps Lock modifiers for keyboards if specified by a keyboard designer
 * Add feature to reset keyboard to default layer when new input field focused (#288)
@@ -467,7 +470,7 @@
 * Add feature to install ad-hoc keyboards via .kmp packages
 * Add [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics/) for generating crash reports
 * Add Material Design [icons](https://material.io/icons/)
-* Fix path to special OSK font for longpress of special keys (#239) 
+* Fix path to special OSK font for longpress of special keys (#239)
 
 ## 2017-08-10 2.8.300 stable
 * No changes, just published latest beta as stable
