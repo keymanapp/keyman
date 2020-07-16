@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.111 alpha 2020-07-16
+
+* fix(android/engine): Update deprecated call to switch system keyboard for Android P (#3353)
+
 ## 14.0.110 alpha 2020-07-15
 
 * refactor(developer): hashmap-based wordlist compilation (#3340)
