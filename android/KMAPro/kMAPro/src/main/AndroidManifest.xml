@@ -179,7 +179,7 @@
       </intent-filter>
 
       <intent-filter>
-        <!-- keyman:download deep linking to https://keyman.com/keyboards/ -->
+        <!-- keyman:download// deep linking to https://keyman.com/keyboards/ -->
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
@@ -193,6 +193,7 @@
       </intent-filter>
 
       <intent-filter>
+        <!-- keyboard download links https://{HOST}/keyboards/install/ -->
         <!-- keyboard download links https://{HOST}/go/package/download/ -->
         <action android:name="android.intent.action.VIEW" />
 
@@ -202,12 +203,17 @@
         <data
           android:host="staging-keyman-com.azurewebsites.net"
           android:scheme="https"
+          android:pathPrefix="/keyboards/install" />
+
+        <!--data
+          android:host="staging-keyman-com.azurewebsites.net"
+          android:scheme="https"
           android:pathPrefix="/go/package/download" />
 
         <data
           android:host="keyman.com"
           android:scheme="https"
-          android:pathPrefix="/go/package/download" />
+          android:pathPrefix="/go/package/download" /-->
 
         <!-- Remove this one in Keyman 14.0 Beta -->
         <data

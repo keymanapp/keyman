@@ -21,14 +21,14 @@ public class KMPLinkTest {
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam"));
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/malar_malayalam?bcp47=ml"));
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install/fv_sencoten?bcp47=str-Latn"));
+    Assert.assertTrue(KMPLink.isKeymanInstallLink("https://keyman.com/keyboards/install/lao%20unicode"));  // legacy keyboard within download dialog
+    Assert.assertTrue(KMPLink.isKeymanInstallLink("https://keyman.com/keyboards/install/khmer_angkor?_gid=112233&bcp47=lo")); // other query params appearing
+
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://keyman.com/keyboards/install/malar_malayalam"));
     Assert.assertTrue(KMPLink.isKeymanInstallLink("https://keyman.com/keyboards/install/malar_malayalam?bcp47=ml"));
 
     // Keyboard link is wrong
     Assert.assertFalse(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboard/install/malar_malayalam"));
-    Assert.assertFalse(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboard/install/malar_malayalam?bcp47=ml"));
-    Assert.assertFalse(KMPLink.isKeymanInstallLink("https://keyman.com/keyboard/install/malar_malayalam"));
-    Assert.assertFalse(KMPLink.isKeymanInstallLink("https://keyman.com/keyboard/install/malar_malayalam?bcp47=ml"));
 
     // link missing packageID
     Assert.assertFalse(KMPLink.isKeymanInstallLink("https://staging-keyman-com.azurewebsites.net/keyboards/install"));

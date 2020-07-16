@@ -13,7 +13,9 @@ import com.tavultesoft.kmea.KMManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Utilities for parsing keyboard install and keyboard download URLs
+ */
 public final class KMPLink {
 
   public static final String KMP_PRODUCTION_HOST = "keyman.com";
