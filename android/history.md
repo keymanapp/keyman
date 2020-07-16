@@ -2,7 +2,7 @@
 
 ## 2020-07-17 13.0.6216 stable
 * Bug fix:
-  * Update deprecated call to switch system keyboard for Android P (#3358)
+  * Make sure switch to system keyboard works on lock screen for Android P (#3358)
 
 ## 2020-07-16 13.0.6215 stable
 * Improve performance when typing long documents with predictive text (#3302)
