@@ -356,6 +356,11 @@ public class ResourceDownloadManager {
     return timeDelta <= ResourceDownloadManager.DISTRIBUTION_CACHE_VALIDITY_THRESHOLD
   }
 
+  /**
+   * Indicates whether any packages are known to be updatable based on the most recently
+   * cached package-version query for each.  To bypass the cache and query for updated results,
+   * use `queryKeysForUpdatablePackages` instead.
+   */
   public var updatesAvailable: Bool {
     get {
       return getKeysForUpdatablePackages().count > 0
