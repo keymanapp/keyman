@@ -19,6 +19,8 @@ extension TestUtils {
     static let package_version_km = query_bundle.url(forResource: "package-version-km", withExtension: "json")!
     static let package_version_km_updated = query_bundle.url(forResource: "package-version-km-updated", withExtension: "json")!
 
+    static let package_version_post_migration = query_bundle.url(forResource: "package-version-post-migration", withExtension: "json")!
+
     static let model_case_en = query_bundle.url(forResource: "model-case-en", withExtension: "json")!
   }
 }
