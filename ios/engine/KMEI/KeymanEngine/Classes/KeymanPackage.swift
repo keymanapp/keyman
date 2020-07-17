@@ -252,9 +252,9 @@ public class KeymanPackage {
     }
   }
 
-  internal var versionQueryCache: DistributionStateMetadata? {
+  internal var versionQueryCache: DistributionStateMetadata {
     get {
-      return Storage.active.userDefaults.cachedPackageQueryMetadata[self.key]
+      return Storage.active.userDefaults.cachedPackageQueryMetadata[self.key] ?? DistributionStateMetadata(fromQuery: false)
     }
 
     set(value) {
