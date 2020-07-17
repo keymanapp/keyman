@@ -18,6 +18,9 @@ public class ResourceDownloadManager {
   internal var session: URLSession
   internal var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
+  internal var unitTestCurrentDate: Date?
+
+  public static let DISTRIBUTION_CACHE_VALIDITY_THRESHOLD = TimeInterval(60*24*7) // in seconds.  60 minutes, 24 hrs, 7 days.
 
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
   public typealias BatchCompletionHandler = () -> Void
@@ -321,6 +324,37 @@ public class ResourceDownloadManager {
   /**
    * Given that an update-check query has already been run, returns whether or not any updates are available.
    */
+  public var updateCacheIsCurrent: Bool {
+    let packages = ResourceFileManager.shared.installedPackages
+
+    let packageWithOldestCache = packages.min { lhs, rhs in
+      if let lhsTimestamp = lhs.versionQueryCache?.timestampForLastQuery,
+         let rhsTimestamp = rhs.versionQueryCache?.timestampForLastQuery {
+        return lhsTimestamp <= rhsTimestamp
+      } else {
+        return rhs.versionQueryCache != nil  // Ensure that the 'nil' is returned overall if it exists.
+      }
+    }
+
+    // If there are no packages, the cache is considered 'current' - there's nothing to update.
+    guard let package = packageWithOldestCache else {
+      return true
+    }
+
+    // If there is no timestamp for the 'oldest' entry, there's nothing cached for at least one package.
+    // We should run the query to initialize its distribution-state metadata.
+    guard let timestamp = package.versionQueryCache?.timestampForLastQuery else {
+      return false
+    }
+
+    // Every package has a cached entry... but are they recent enough?
+    let date = unitTestCurrentDate ?? Date()
+    let now = date.timeIntervalSince1970
+    let timeDelta = now - timestamp
+
+    return timeDelta <= ResourceDownloadManager.DISTRIBUTION_CACHE_VALIDITY_THRESHOLD
+  }
+
   public var updatesAvailable: Bool {
     get {
       return getAvailableUpdates() != nil

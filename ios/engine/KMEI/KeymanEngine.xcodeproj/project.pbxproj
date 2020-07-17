@@ -208,6 +208,10 @@
 		CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */; };
 		CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */; };
 		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
+		CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */; };
+		CEA9670B24BEC8030035AACF /* EngineStateBundler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */; };
+		CEA9670D24BEEFF80035AACF /* khmer_angkor update-base.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */; };
+		CEA9670F24BEF05A0035AACF /* Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670E24BEF05A0035AACF /* Updates.swift */; };
 		CEC0C66C2410AC9A003E1BCD /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC0C66B2410AC9A003E1BCD /* Sentry.framework */; };
 		CEC0C6772410E049003E1BCD /* SentryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC0C6762410E049003E1BCD /* SentryManager.swift */; };
 		CED8B63224A9C2400054E300 /* ResourceDownloadManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */; };
@@ -500,6 +504,10 @@
 		CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
+		CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUpdateTests.swift; sourceTree = "<group>"; };
+		CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineStateBundler.swift; sourceTree = "<group>"; };
+		CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "khmer_angkor update-base.bundle"; sourceTree = "<group>"; };
+		CEA9670E24BEF05A0035AACF /* Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updates.swift; sourceTree = "<group>"; };
 		CEC0C66B2410AC9A003E1BCD /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = ../../Carthage/Build/iOS/Sentry.framework; sourceTree = "<group>"; };
 		CEC0C6762410E049003E1BCD /* SentryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryManager.swift; sourceTree = "<group>"; };
 		CECB38931F2199BC0098882F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = KeymanEngine/lib/Reachability/Reachability.h; sourceTree = SOURCE_ROOT; };
@@ -747,6 +755,7 @@
 				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
 				CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */,
 				CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */,
+				CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */,
 				CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */,
 			);
 			path = KeymanEngineTests;
@@ -860,6 +869,7 @@
 		CE37C38923FCC9AF007031C6 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */,
 				CE02EE0B24A5863100D58F92 /* Queries.bundle */,
 				CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */,
 				CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */,
@@ -937,10 +947,12 @@
 			children = (
 				CE07E3D3247E418800DFA9D2 /* Downloading */,
 				CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */,
+				CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */,
 				CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */,
 				CE973D802484A56500F66045 /* PackageJSON.swift */,
 				CE37C38C23FCD41E007031C6 /* Keyboards.swift */,
 				CE02EE0D24A5869500D58F92 /* Queries.swift */,
+				CEA9670E24BEF05A0035AACF /* Updates.swift */,
 				CE37C39023FCD617007031C6 /* LexicalModels.swift */,
 				CE9B440B23FE49F000499CAB /* Migrations.swift */,
 			);
@@ -1301,6 +1313,7 @@
 				CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */,
 				CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */,
 				9A0FCA0922D7C58B00D33F86 /* Keyman.bundle in Resources */,
+				CEA9670D24BEEFF80035AACF /* khmer_angkor update-base.bundle in Resources */,
 				CE02EE0C24A5863100D58F92 /* Queries.bundle in Resources */,
 				CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */,
 				CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */,
@@ -1442,6 +1455,7 @@
 				CE07E3D8247E43CB00DFA9D2 /* URLSessionDownloadTaskMock.swift in Sources */,
 				CE37C39123FCD617007031C6 /* LexicalModels.swift in Sources */,
 				CE37C38D23FCD41E007031C6 /* Keyboards.swift in Sources */,
+				CEA9670B24BEC8030035AACF /* EngineStateBundler.swift in Sources */,
 				CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */,
 				CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */,
 				CE02EE0E24A5869500D58F92 /* Queries.swift in Sources */,
@@ -1449,7 +1463,9 @@
 				CE02EE1024A5892200D58F92 /* URLSessionDataTaskMock.swift in Sources */,
 				CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */,
 				CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */,
+				CEA9670F24BEF05A0035AACF /* Updates.swift in Sources */,
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
+				CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
 				CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */,

@@ -252,6 +252,16 @@ public class KeymanPackage {
     }
   }
 
+  internal var versionQueryCache: DistributionStateMetadata? {
+    get {
+      return Storage.active.userDefaults.cachedPackageQueryMetadata[self.key]
+    }
+
+    set(value) {
+      Storage.active.userDefaults.cachedPackageQueryMetadata[self.key] = value
+    }
+  }
+
   /**
    * Returns the type of LanguageResource contained within the parsed Package.
    */
