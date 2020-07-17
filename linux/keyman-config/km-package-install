@@ -4,7 +4,7 @@ import argparse
 import logging
 import sys
 import os
-from keyman_config import __version__
+from keyman_config import __version__, KeymanApiUrl
 from keyman_config.uninstall_kmp import uninstall_kmp
 
 import datetime
@@ -17,7 +17,7 @@ def get_languages():
     from keyman_config.get_kmp import keyman_cache_dir
 
     logging.info("Getting language list from search")
-    api_url = "https://api.keyman.com/search?q=l:*&platform=linux"
+    api_url = KeymanApiUrl + "/search?q=l:*&platform=linux"
     logging.debug("At URL %s", api_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
