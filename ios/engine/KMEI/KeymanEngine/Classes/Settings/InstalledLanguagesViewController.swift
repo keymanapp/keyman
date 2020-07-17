@@ -27,12 +27,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   
   private var isDidUpdateCheck = false
   
-  private var keyboardDownloadStartedObserver: NotificationObserver?
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
-  private var keyboardDownloadFailedObserver: NotificationObserver?
-  private var lexicalModelDownloadStartedObserver: NotificationObserver?
-  private var lexicalModelDownloadCompletedObserver: NotificationObserver?
-  private var lexicalModelDownloadFailedObserver: NotificationObserver?
+  private var packageDownloadStartedObserver: NotificationObserver?
+  private var packageDownloadCompletedObserver: NotificationObserver?
+  private var packageDownloadFailedObserver: NotificationObserver?
   private var batchUpdateStartedObserver: NotificationObserver?
   private var batchUpdateCompletedObserver: NotificationObserver?
 
@@ -62,31 +59,18 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     
     title = "Installed Languages"
     selectedSection = NSNotFound
-    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
+    packageDownloadStartedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.packageDownloadStarted,
       observer: self,
-      function: InstalledLanguagesViewController.keyboardDownloadStarted)
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
+      function: InstalledLanguagesViewController.packageDownloadStarted)
+    packageDownloadCompletedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.packageDownloadCompleted,
       observer: self,
-      function: InstalledLanguagesViewController.keyboardDownloadCompleted)
-    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
+      function: InstalledLanguagesViewController.packageDownloadCompleted)
+    packageDownloadFailedObserver = NotificationCenter.default.addObserver(
+      forName: Notifications.packageDownloadFailed,
       observer: self,
-      function: InstalledLanguagesViewController.keyboardDownloadFailed)
-    
-    lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadStarted,
-      observer: self,
-      function: InstalledLanguagesViewController.lexicalModelDownloadStarted)
-    lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadCompleted,
-      observer: self,
-      function: InstalledLanguagesViewController.lexicalModelDownloadCompleted)
-    lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadFailed,
-      observer: self,
-      function: InstalledLanguagesViewController.lexicalModelDownloadFailed)
+      function: InstalledLanguagesViewController.packageDownloadFailed)
     
     batchUpdateStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.batchUpdateStarted,
@@ -293,6 +277,37 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     
     toolbar.displayStatus("Downloading \(downloadLabel)\u{2026}", withIndicator: true)
   }
+
+  private func packageDownloadStarted(key: KeymanPackage.Key) {
+    switch(key.type) {
+      case .keyboard:
+        keyboardDownloadStarted()
+      case .lexicalModel:
+        lexicalModelDownloadStarted()
+    }
+  }
+
+  private func packageDownloadCompleted(package: KeymanPackage) {
+    switch(package.resourceType()) {
+      case .keyboard:
+        keyboardDownloadCompleted()
+      case .lexicalModel:
+        lexicalModelDownloadCompleted()
+    }
+  }
+
+  private func packageDownloadFailed(notification: PackageDownloadFailedNotification) {
+    guard let packageKey = notification.packageKey else {
+      return
+    }
+
+    switch(packageKey.type) {
+      case .keyboard:
+        keyboardDownloadFailed()
+      case .lexicalModel:
+        lexicalModelDownloadFailed()
+    }
+  }
   
   private func keyboardDownloadStarted() {
     log.info("keyboardDownloadStarted: InstalledLanguagesViewController")
@@ -301,14 +316,14 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     showDownloading("keyboard")
   }
   
-  private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+  private func lexicalModelDownloadStarted() {
     log.info("lexicalModelDownloadStarted")
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
     showDownloading("dictionary")
   }
   
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
+  private func keyboardDownloadCompleted() {
     log.info("keyboardDownloadCompleted: InstalledLanguagesViewController")
     Manager.shared.shouldReloadKeyboard = true
     
@@ -320,7 +335,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     navigationController?.popToRootViewController(animated: true)
   }
   
-  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
+  private func lexicalModelDownloadCompleted() {
     log.info("lexicalModelDownloadCompleted: InstalledLanguagesViewController")
     
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {

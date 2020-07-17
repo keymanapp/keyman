@@ -170,8 +170,7 @@ class FileManagementTests: XCTestCase {
     // State 2:  Download requested.
     //           Note - we don't need to actually run the queue.
     let downloadManager = ResourceDownloadManager(session: TestUtils.Downloading.URLSessionMock(), autoExecute: false)
-    downloadManager.downloadPackage(forFullID: TestUtils.Keyboards.khmer_angkor.fullID,
-                                    withKey: khmer_angkor_key,
+    downloadManager.downloadPackage(withKey: khmer_angkor_key,
                                     from: TestUtils.Keyboards.khmerAngkorKMP,
                                     completionBlock: { _, _ in })
 
