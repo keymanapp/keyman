@@ -131,12 +131,12 @@ end;
 
 function JSONDateToDateTime(const Value: string; var DateTime: TDateTime): Boolean;
 begin
-  Result := TryISO8601ToDate(Value, DateTime);
+  Result := TryISO8601ToDate(Value, DateTime, False);
 end;
 
 function DateTimeToJSONDate(ADateTime: TDateTime): string;
 begin
-  Result := DateToISO8601(ADateTime);
+  Result := DateToISO8601(ADateTime, False);
 end;
 
 function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObject;
