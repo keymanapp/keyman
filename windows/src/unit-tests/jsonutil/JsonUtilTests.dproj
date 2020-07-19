@@ -85,7 +85,7 @@
         </DelphiCompile>
         <DCCReference Include="..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas"/>
         <DCCReference Include="Keyman.System.Test.JsonUtilTest.pas"/>
-        <DCCReference Include="..\..\..\global\delphi\general\JsonUtil.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\JsonUtil.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
