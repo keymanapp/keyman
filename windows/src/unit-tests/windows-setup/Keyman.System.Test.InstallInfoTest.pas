@@ -12,7 +12,7 @@ type
   TInstallInfoTest = class(TObject)
   public
     [Test]
-    procedure TestLocatePackagesFromFilename;
+    procedure TestLocatePackagesAndTierFromFilename;
 
     [Test]
     procedure TestLocatePackagesFromParameter;
@@ -21,18 +21,56 @@ type
 implementation
 
 uses
+  KeymanVersion,
   Keyman.Setup.System.InstallInfo;
 
 { TInstallInfoTest }
 
-procedure TInstallInfoTest.TestLocatePackagesFromFilename;
+procedure TInstallInfoTest.TestLocatePackagesAndTierFromFilename;
 var
   ii: TInstallInfo;
 begin
   ii := TInstallInfo.Create('');
   try
     // It should match a standard pattern
-    ii.LocatePackagesFromFilename('c:\foo\keyman-setup.khmer_angkor.km.exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup.khmer_angkor.km.exe');
+    Assert.AreEqual(CKeymanVersionInfo.Tier, ii.Tier);
+    Assert.AreEqual(1, ii.Packages.Count);
+    Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
+    Assert.AreEqual('km', ii.Packages[0].BCP47);
+  finally
+    ii.Free;
+  end;
+
+  ii := TInstallInfo.Create('');
+  try
+    // It should match a standard pattern with a tier
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup-alpha.khmer_angkor.km.exe');
+    Assert.AreEqual(TIER_ALPHA, ii.Tier);
+    Assert.AreEqual(1, ii.Packages.Count);
+    Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
+    Assert.AreEqual('km', ii.Packages[0].BCP47);
+  finally
+    ii.Free;
+  end;
+
+  ii := TInstallInfo.Create('');
+  try
+    // It should match a standard pattern with a tier
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup-beta.khmer_angkor.km.exe');
+    Assert.AreEqual(TIER_BETA, ii.Tier);
+    Assert.AreEqual(1, ii.Packages.Count);
+    Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
+    Assert.AreEqual('km', ii.Packages[0].BCP47);
+  finally
+    ii.Free;
+  end;
+
+  ii := TInstallInfo.Create('');
+  try
+    // It should match a standard pattern with a tier
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup-stable.khmer_angkor.km.exe');
+    Assert.AreEqual(TIER_STABLE, ii.Tier);
     Assert.AreEqual(1, ii.Packages.Count);
     Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
     Assert.AreEqual('km', ii.Packages[0].BCP47);
@@ -43,7 +81,7 @@ begin
   ii := TInstallInfo.Create('');
   try
     // It should match a standard pattern
-    ii.LocatePackagesFromFilename('c:\foo\keyman-setup.khmer_angkor.km.sil_euro_latin.fr.exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup.khmer_angkor.km.sil_euro_latin.fr.exe');
     Assert.AreEqual(2, ii.Packages.Count);
     Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
     Assert.AreEqual('km', ii.Packages[0].BCP47);
@@ -56,7 +94,7 @@ begin
   ii := TInstallInfo.Create('');
   try
     // It should strip off " (1)" suffixes when these are added by web browser
-    ii.LocatePackagesFromFilename('c:\foo\keyman-setup.khmer_angkor.km (1).exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup.khmer_angkor.km (1).exe');
     Assert.AreEqual(1, ii.Packages.Count);
     Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
     Assert.AreEqual('km', ii.Packages[0].BCP47);
@@ -67,7 +105,7 @@ begin
   ii := TInstallInfo.Create('');
   try
     // It should give an empty BCP 47 tag if one is not provided
-    ii.LocatePackagesFromFilename('c:\foo\keyman-setup.khmer_angkor.exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup.khmer_angkor.exe');
     Assert.AreEqual(1, ii.Packages.Count);
     Assert.AreEqual('khmer_angkor', ii.Packages[0].ID);
     Assert.IsEmpty(ii.Packages[0].BCP47);
@@ -78,7 +116,7 @@ begin
   ii := TInstallInfo.Create('');
   try
     // It should only match on keyman-setup
-    ii.LocatePackagesFromFilename('c:\foo\setup.khmer_angkor.km.exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\setup.khmer_angkor.km.exe');
     Assert.AreEqual(0, ii.Packages.Count, 'setup.khmer_angkor.km.exe');
   finally
     ii.Free;
@@ -87,7 +125,7 @@ begin
   ii := TInstallInfo.Create('');
   try
     // It should match packages with less common characters in filename
-    ii.LocatePackagesFromFilename('c:\foo\keyman-setup.khmer angkor.km.exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup.khmer angkor.km.exe');
     Assert.AreEqual(1, ii.Packages.Count);
     Assert.AreEqual('khmer angkor', ii.Packages[0].ID);
     Assert.AreEqual('km', ii.Packages[0].BCP47);
@@ -98,7 +136,7 @@ begin
   ii := TInstallInfo.Create('');
   try
     // It should match packages with less common characters in filename
-    ii.LocatePackagesFromFilename('c:\foo\keyman-setup.khmer-angkor.km.exe');
+    ii.LocatePackagesAndTierFromFilename('c:\foo\keyman-setup.khmer-angkor.km.exe');
     Assert.AreEqual(1, ii.Packages.Count);
     Assert.AreEqual('khmer-angkor', ii.Packages[0].ID);
     Assert.AreEqual('km', ii.Packages[0].BCP47);

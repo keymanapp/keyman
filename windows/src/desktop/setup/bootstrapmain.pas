@@ -92,7 +92,7 @@ procedure InstallKeyboardsInOldVersion(const ShellPath: string); forward;
 procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forward;
 function CreateTempDir: string; forward;
 procedure RemoveTempDir(const path: string); forward;
-procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string); forward;
+procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath, FTier: string); forward;
 procedure SetExitVal(c: Integer); forward;
 function IsKeymanDesktop7Installed: string; forward;
 function IsKeymanDesktop8Installed: string; forward;
@@ -116,7 +116,7 @@ var
   FPromptForReboot: Boolean;  // I3355   // I3500
   FSilent: Boolean;
   FForceOffline: Boolean;
-  FPackages, FExtractOnly_Path: string;
+  FTier, FPackages, FExtractOnly_Path: string;
 BEGIN
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   try
@@ -132,7 +132,7 @@ BEGIN
 
           { Display the dialog }
 
-          ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path);  // I2738, I2847  // I3355   // I3500   // I4293
+          ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
           GetRunTools.Silent := FSilent;
 
           if FExtractOnly then
@@ -162,7 +162,7 @@ BEGIN
           // it to download khmer_angkor from the Keyman cloud and install it
           // for bcp47 tag km. See the setup documentation for more
           // examples.
-          FInstallInfo.LocatePackagesFromFilename(ParamStr(0));
+          FInstallInfo.LocatePackagesAndTierFromFilename(ParamStr(0));
 
           // Additionally, packages can be specified on the command line, with
           // the -p parameter, e.g. -p khmer_angkor=km,sil_euro_latin=fr
@@ -175,6 +175,10 @@ BEGIN
           // Finally, look also for any .kmp packages in the same folder as
           // this executable
           FInstallInfo.LocatePackagesInPath(ProgramPath);
+
+          // Lookup a tier from command line parameter
+          if FTier <> '' then
+            FInstallInfo.Tier := FTier;
 
           GetRunTools.CheckInternetConnectedState;
 
@@ -381,7 +385,7 @@ begin
     DeletePath(ExcludeTrailingPathDelimiter(path));  // I3476
 end;
 
-procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath: string);  // I2847  // I3355   // I3500   // I4293
+procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8: Boolean; var FPackages, FExtractPath, FTier: string);  // I2847  // I3355   // I3500   // I4293
 var
   i: Integer;
 begin
@@ -428,6 +432,15 @@ begin
       // e.g. -p khmer_angkor=km,sil_euro_latin=fr
       Inc(i);
       FPackages := ParamStr(i);
+    end
+    else if SameText(ParamStr(i), '-t') then
+    begin
+      Inc(i);
+      FTier := ParamStr(i).ToLower.Trim;
+      if not FTier.Equals(TIER_ALPHA) and not FTier.Equals(TIER_BETA) and not FTier.Equals(TIER_STABLE) then
+      begin
+        FTier := '';
+      end;
     end;
     Inc(i);
   end;
