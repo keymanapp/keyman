@@ -147,14 +147,6 @@ begin
   Result := API_Protocol + '://' + API_Server + path;
 end;
 
-function DefaultServersXMLTags: string;
-begin
-  Result := Format('<keyman-com>%s</keyman-com><api-keyman-com>%s</api-keyman-com>', [
-    XMLEncode(KeymanCom_Protocol_Server),
-    XMLEncode(MakeAPIURL(''))
-  ]);
-end;
-
 function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
 var
   IsUpdateInt: Integer;
