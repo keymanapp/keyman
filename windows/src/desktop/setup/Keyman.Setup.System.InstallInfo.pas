@@ -124,7 +124,7 @@ type
     destructor Destroy; override;
     procedure LoadSetupInf(const SetupInfPath: string);
 
-    procedure LocatePackagesFromFilename(const Filename: string);
+    procedure LocatePackagesFromFilename(Filename: string);
     procedure LocatePackagesFromParameter(const Param: string);
     procedure LocatePackagesInPath(const path: string);
 
@@ -328,13 +328,23 @@ begin
   end;
 end;
 
-procedure TInstallInfo.LocatePackagesFromFilename(const Filename: string);
+procedure TInstallInfo.LocatePackagesFromFilename(Filename: string);
 var
   n: Integer;
   res: TArray<string>;
   id, FBCP47: string;
+  m: TMatch;
 begin
-  res := TRegEx.Split(ExtractFileName(ChangeFileExt(Filename, '')), '\.');
+  // Get just the base filename
+  Filename := ExtractFileName(ChangeFileExt(Filename, ''));
+
+  // Strip " (1)" appended for multiple downloads of same file by most browsers
+  m := TRegEx.Match(Filename, '^(keyman-setup.+) \(\d+\)$');
+  if m.Success then
+    Filename := m.Groups[1].Value;
+
+  // Look for our recognised pattern of keyman-setup.package_id.bcp47...
+  res := TRegEx.Split(Filename, '\.');
   if (Length(res) < 2) or (res[0].ToLower <> 'keyman-setup') then
     // No packages embedded in filename
     Exit;
