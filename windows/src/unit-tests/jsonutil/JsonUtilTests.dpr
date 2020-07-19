@@ -13,7 +13,7 @@ uses
   DUnitX.TestFramework,
   DUnitX.Loggers.TeamCity in '..\..\global\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.System.Test.JsonUtilTest in 'Keyman.System.Test.JsonUtilTest.pas',
-  JsonUtil in '..\..\..\global\delphi\general\JsonUtil.pas';
+  JsonUtil in '..\..\global\delphi\general\JsonUtil.pas';
 
 {$R *.RES}
 
