@@ -91,13 +91,19 @@ begin
     IDCANCEL: Result := mrCancel;
     IDYES: Result := mrYes;
     IDNO: Result := mrNo;
+    IDABORT: Result := mrAbort;
+    IDIGNORE: Result := mrIgnore;
+    IDRETRY: Result := mrRetry;
     else Result := mrOk;
   end;
 end;
 
 procedure ShowMessageW(const Message: WideString);
 begin
-  Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), PChar(FInstallInfo.Text(ssMessageBoxTitle)), MB_OK);
+  if Assigned(FInstallInfo) then
+    Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), PChar(FInstallInfo.Text(ssMessageBoxTitle)), MB_OK)
+  else
+    Tnt_MessageBoxW(GetActiveWindow, PWideChar(Message), PChar('Setup'), MB_OK);
 end;
 
 end.

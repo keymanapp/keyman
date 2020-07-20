@@ -96,6 +96,7 @@ procedure ProcessCommandLine(var FPromptForReboot, FSilent, FForceOffline, FExtr
 procedure SetExitVal(c: Integer); forward;
 function IsKeymanDesktop7Installed: string; forward;
 function IsKeymanDesktop8Installed: string; forward;
+function GetResourcesFromOnline(FSilent: Boolean; var FForceOffline: Boolean): Boolean; forward;
 
 var
   FNiceExitCodes: Boolean = True; // always, now
@@ -122,14 +123,12 @@ BEGIN
   try
     try
       Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
+      InitCommonControl(ICC_PROGRESS_CLASS);
 
+      FTempPath := CreateTempDir;
       try
-        FTempPath := CreateTempDir;
+        FInstallInfo := TInstallInfo.Create(FTempPath);
         try
-          InitCommonControl(ICC_PROGRESS_CLASS);
-
-          FInstallInfo := TInstallInfo.Create(FTempPath);
-
           { Display the dialog }
 
           ProcessCommandLine(FPromptForReboot, FSilent, FForceOffline, FExtractOnly, FContinueSetup, FStartAfterInstall, FDisableUpgradeFrom6Or7Or8, FPackages, FExtractOnly_Path, FTier);  // I2738, I2847  // I3355   // I3500   // I4293
@@ -180,11 +179,12 @@ BEGIN
           if FTier <> '' then
             FInstallInfo.Tier := FTier;
 
-          GetRunTools.CheckInternetConnectedState;
-
-          if not FForceOffline and GetRunTools.Online then
-            // TODO: retry strategies (and prompt around firewall etc)
-            TOnlineResourceCheck.QueryServer(FSilent, FInstallInfo);
+          // Try and get information from online
+          if not GetResourcesFromOnline(FSilent, FForceOffline) then
+          begin
+            SetExitVal(ERROR_FILE_NOT_FOUND);
+            Exit;
+          end;
 
           // This loads setup.inf, if present, for various additional strings and settings
           // The bundled installer usually contains a setup.inf.
@@ -230,13 +230,13 @@ BEGIN
             Free;
           end;
         finally
-          RemoveTempDir(FTempPath);
+          FreeAndNil(FInstallInfo);
         end;
 
         SetExitVal(ERROR_SUCCESS);
 
       finally
-        FInstallInfo.Free;
+        RemoveTempDir(FTempPath);
       end;
     except
       on e:Exception do
@@ -252,6 +252,43 @@ BEGIN
   finally
     CoUninitialize;
   end;
+end;
+
+function GetResourcesFromOnline(FSilent: Boolean; var FForceOffline: Boolean): Boolean;
+begin
+  if FForceOffline then
+    Exit(True);
+  repeat
+    try
+      GetRunTools.CheckInternetConnectedState;
+
+      if GetRunTools.Online then
+        TOnlineResourceCheck.QueryServer(FSilent, FInstallInfo);
+
+      // We've succeeded.
+      Exit(True);
+    except
+      on E:Exception do
+      begin
+        GetRunTools.LogInfo('Could not connect to site: '+E.Message);
+        if FSilent then
+        begin
+          // We log and attempt to continue
+          FForceOffline := True;
+        end
+        else
+        begin
+          case MessageDlgW(FInstallInfo.Text(ssOffline), mtError, mbAbortRetryIgnore, 0) of
+            mrAbort: Exit(False);
+            mrRetry: Continue;
+            mrIgnore: FForceOffline := True;
+          end;
+        end;
+      end;
+    end;
+  until FForceOffline;
+
+  Result := True;
 end;
 
 function CheckForOldVersionScenario: Boolean;   // I4460
