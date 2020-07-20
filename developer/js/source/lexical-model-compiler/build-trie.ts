@@ -1,5 +1,8 @@
 import { readFileSync } from "fs";
 
+// Supports LF or CRLF line terminators.
+const NEWLINE_SEPARATOR = /\u000d?\u000a/;
+
 /**
  * A word list is (conceptually) an array of pairs: the concrete word form itself + a
  * non-negative count.
@@ -72,13 +75,11 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  *
  */
 export function parseWordList(wordlist: WordList, contents: string): void {
-  // Supports LF or CRLF line terminators.
-  const NEWLINE_SEPARATOR = /\u000d?\u000a/;
   const TAB = "\t";
-  // TODO: format validation.
-  let lines = contents.split(NEWLINE_SEPARATOR);
+  let source = new WordListFromMemory(contents);
 
-  for (let line of lines) {
+  // @ts-ignore: unused
+  for (let [lineno, line] of source.lines()) {
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
     // the BOM from every possible start of file -- i.e., beginning of every line.
@@ -105,6 +106,31 @@ export function parseWordList(wordlist: WordList, contents: string): void {
     }
 
     wordlist[wordform] = (wordlist[wordform] || 0) + count;
+  }
+}
+
+type LineNoAndText = [number, string];
+
+interface WordListSource {
+  readonly name: string;
+  lines(): Iterator<LineNoAndText>;
+}
+
+class WordListFromMemory implements WordListSource {
+  readonly name = '<memory>';
+  private readonly _contents: string;
+
+  constructor(contents: string) {
+    this._contents = contents;
+  }
+
+  *lines(): Generator<[number, string]> {
+    let lines = this._contents.split(NEWLINE_SEPARATOR);
+    let i = 1;
+    for (let line of lines) {
+      yield [i, line];
+      i++;
+    }
   }
 }
 
