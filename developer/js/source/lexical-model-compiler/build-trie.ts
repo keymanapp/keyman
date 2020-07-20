@@ -133,12 +133,7 @@ class WordListFromMemory implements WordListSource {
   }
 
   *lines(): Generator<[number, string]> {
-    let lines = this._contents.split(NEWLINE_SEPARATOR);
-    let i = 1;
-    for (let line of lines) {
-      yield [i, line];
-      i++;
-    }
+    yield *enumerateLines(this._contents.split(NEWLINE_SEPARATOR));
   }
 }
 
@@ -150,14 +145,19 @@ class WordListFromFilename {
 
   *lines(): Generator<[number, string]> {
     let contents = readFileSync(this.name, detectEncoding(this.name));
-    let lines = contents.split(NEWLINE_SEPARATOR);
+    yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
+  }
+}
 
+/**
+ * Yields pairs of [lineno, line], given an Array of lines.
+ */
+function* enumerateLines(lines: string[]): Generator<[number, string]> {
     let i = 1;
     for (let line of lines) {
       yield [i, line];
       i++;
     }
-  }
 }
 
 namespace Trie {
