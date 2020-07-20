@@ -13,12 +13,12 @@ enum DownloadNode {
   case simpleBatch(AnyDownloadBatch)
   case compositeBatch(CompositeBatch)
 
-  var resourceIDs: [AnyLanguageResourceFullID] {
+  var packageKeys: [KeymanPackage.Key] {
     switch(self) {
       case .simpleBatch(let batch):
-        return batch.resourceIDs
+        return batch.packageKeys
       case .compositeBatch(let node):
-        return node.resourceIDs
+        return node.packageKeys
     }
   }
 
@@ -49,8 +49,8 @@ protocol AnyDownloadTask {
   var downloadFinalizationBlock: ((Bool) throws -> Void)? { get }
 }
 
-class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
-  public final var resourceIDs: [FullID]?
+class DownloadTask: AnyDownloadTask {
+  public final var packageKey: KeymanPackage.Key?
   public final var request: HTTPDownloadRequest
   public var file: URL {
     if let file = finalFile {
@@ -62,21 +62,17 @@ class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
 
   public var finalFile: URL?
 
-  // TEMPORARY:  needed to support Cloud JS downloads.
-  public final var resources: [FullID.Resource]?
-
   public final var downloadFinalizationBlock: ((Bool) throws -> Void)? = nil
   
-  public init(do request: HTTPDownloadRequest, for resourceIDs: [FullID]?, resources: [FullID.Resource]? = nil) {
+  public init(do request: HTTPDownloadRequest, forPackage packageKey: KeymanPackage.Key?) {
     self.request = request
-    self.resourceIDs = resourceIDs
-    self.resources = resources
+    self.packageKey = packageKey
   }
 
-  public init(forPackageWithID fullID: FullID,
+  public init(forPackageWithKey packageKey: KeymanPackage.Key,
                from url: URL,
                as destURL: URL, tempURL: URL) {
-    resourceIDs = [fullID]
+    self.packageKey = packageKey
 
     let request = HTTPDownloadRequest(url: url, userInfo: [:])
     request.destinationFile = tempURL.path
@@ -114,7 +110,7 @@ enum DownloadActivityType {
 
 protocol AnyDownloadBatch {
   var tasks: [AnyDownloadTask] { get }
-  var resourceIDs: [AnyLanguageResourceFullID] { get }
+  var packageKeys: [KeymanPackage.Key] { get }
 
   var startBlock: (() -> Void)? { get }
   var errors: [Error?] { get set }
@@ -130,12 +126,12 @@ protocol AnyDownloadBatch {
 class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
   typealias CompletionHandler = ResourceDownloadManager.CompletionHandler
 
-  public final var downloadTasks: [DownloadTask<FullID>]
+  public final var downloadTasks: [DownloadTask]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
   public final var completionBlock: CompletionHandler<FullID.Resource>? = nil
   
-  public init?(do tasks: [DownloadTask<FullID>],
+  public init?(do tasks: [DownloadTask],
                startBlock: (() -> Void)? = nil,
                completionBlock: CompletionHandler<FullID.Resource>? = nil) {
     self.downloadTasks = tasks
@@ -145,15 +141,15 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
     self.completionBlock = completionBlock
   }
 
-  public init(forPackageWithID fullID: FullID,
+  public init(forPackageWithKey packageKey: KeymanPackage.Key,
               from url: URL,
               startBlock: (() -> Void)?,
               completionBlock: CompletionHandler<FullID.Resource>?) {
     // If we can't build a proper DownloadTask, we can't build the batch.
-    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forID: fullID)
-    let finalFile = ResourceFileManager.shared.cachedPackagePath(forID: fullID)
+    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forKey: packageKey)
+    let finalFile = ResourceFileManager.shared.cachedPackagePath(forKey: packageKey)
 
-    let task = DownloadTask(forPackageWithID: fullID, from: url, as: finalFile, tempURL: tempArtifact)
+    let task = DownloadTask(forPackageWithKey: packageKey, from: url, as: finalFile, tempURL: tempArtifact)
 
 
     self.downloadTasks = [task]
@@ -170,15 +166,9 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
     return downloadTasks
   }
   
-  public var resourceIDs: [AnyLanguageResourceFullID] {
+  public var packageKeys: [KeymanPackage.Key] {
     get {
-      var resArray: [AnyLanguageResourceFullID] = []
-      
-      downloadTasks.forEach{ task in
-        resArray.append(contentsOf: task.resourceIDs ?? [])
-      }
-      
-      return resArray
+      return downloadTasks.compactMap { $0.packageKey }
     }
   }
 
@@ -230,8 +220,8 @@ class CompositeBatch {
     return batches
   }
 
-  public var resourceIDs: [AnyLanguageResourceFullID] {
-    return batches.flatMap { $0.resourceIDs }
+  public var packageKeys: [KeymanPackage.Key] {
+    return batches.flatMap { $0.packageKeys }
   }
 }
 
@@ -451,10 +441,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  func containsResourceInQueue(matchingID: AnyLanguageResourceFullID, requireLanguageMatch: Bool = true) -> Bool {
+  func containsPackageKeyInQueue(matchingKey: KeymanPackage.Key) -> Bool {
     return queueRoot.nodes.contains { node in
-      node.resourceIDs.contains { fullID in
-        return fullID.matches(matchingID, requireLanguageMatch: requireLanguageMatch)
+      node.packageKeys.contains { fullID in
+        return fullID == matchingKey
       }
     }
   }
@@ -465,38 +455,8 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // We can use the properties of the current "batch" to generate specialized notifications.
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    if let batch = batch as? DownloadBatch<InstallableKeyboard.FullID> {
-      let packagePath = batch.downloadTasks[0].file
-
-      // Check - is it a cloud resource or a KMP?
-      let file = packagePath.lastPathComponent
-      if file.hasSuffix(".kmp") {
-        // It is a keyboard package!
-        batch.completeWithPackage(fromKMP: packagePath)
-      } else {
-        // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
-        // Once downlading KMPs, will be the downloaded .kmp.
-
-        // The request has succeeded.
-        if downloader!.requestsCount == 0 { // Download queue finished.
-          // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
-          let keyboards = batch.downloadTasks[0].resources!
-          log.info("Downloaded keyboard: \(keyboards[0].id).")
-          // TEMP:  wrap the newly-downloaded resources with a kmp.json.
-          //        Serves as a bridge until we're downloading actual .kmps for keyboards.
-          let _ = Migrations.migrateToKMPFormat(keyboards)
-
-          if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
-            batch.completionBlock?(package, nil)
-          } else {
-            log.error("Could not load metadata for newly-installed keyboard")
-          }
-        }
-      }
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel.FullID> {
-      let packagePath = batch.downloadTasks[0].file
-      batch.completeWithPackage(fromKMP: packagePath)
-    }
+    let packagePath = batch.tasks[0].file
+    batch.completeWithPackage(fromKMP: packagePath)
     
     // Completing the queue means having completed a batch.  We should only move forward in this class's
     // queue at this time, once a batch's task queue is complete.

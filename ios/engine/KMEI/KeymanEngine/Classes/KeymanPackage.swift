@@ -207,6 +207,19 @@ public class KeymanPackage {
     }
   }
 
+  internal static func baseFilename(for key: KeymanPackage.Key) -> String {
+    var ext: String
+
+    switch(key.type) {
+      case .keyboard:
+        ext = "kmp"
+      case .lexicalModel:
+        ext = "model.kmp"
+    }
+
+    return "\(key.id).\(ext)"
+  }
+
   public var key: Key {
     return Key(for: self)
   }
@@ -438,21 +451,6 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     self.installables = kmpResources.map { resource in
       return resource.typedInstallableResources as! [TypedLanguageResource]
     } as [[TypedLanguageResource]]
-  }
-
-  internal static func baseFilename(for fullID: TypedLanguageResource.FullID) -> String {
-    var ext: String
-
-    switch(TypedLanguageResource.self) {
-      case is InstallableKeyboard.Type:
-        ext = "kmp"
-      case is InstallableLexicalModel.Type:
-        ext = "model.kmp"
-      default:
-        fatalError("Unsupported language resource type")
-    }
-
-    return "\(fullID.id).\(ext)"
   }
 
   // Cannot directly override base class's installableResourceSets with more specific type,

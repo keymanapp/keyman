@@ -17,15 +17,17 @@ class ResourceDownloadQueueTests: XCTestCase {
 
   func testResourceDownloadFinalizeClosureNoOverwrite() throws {
     let khmer_angkor_src_url = TestUtils.Keyboards.khmerAngkorKMP
-    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
-    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
+    let key = TestUtils.Keyboards.khmer_angkor.packageKey
+
+    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forKey: key)
+    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forKey: key)
 
     try FileManager.default.copyItem(at: khmer_angkor_src_url, to: tempFileURL)
 
     XCTAssertTrue(FileManager.default.fileExists(atPath: tempFileURL.path))
     XCTAssertFalse(FileManager.default.fileExists(atPath: destFileURL.path))
 
-    let closure = DownloadTask<FullKeyboardID>.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
+    let closure = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
     try? closure(true)
 
     XCTAssertFalse(FileManager.default.fileExists(atPath: tempFileURL.path))
@@ -34,8 +36,10 @@ class ResourceDownloadQueueTests: XCTestCase {
 
   func testResourceDownloadFinalizeClosureWithOverwrite() throws {
     let khmer_angkor_src_url = TestUtils.Keyboards.khmerAngkorKMP
-    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
-    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
+    let key = TestUtils.Keyboards.khmer_angkor.packageKey
+
+    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forKey: key)
+    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forKey: key)
 
     try FileManager.default.copyItem(at: khmer_angkor_src_url, to: tempFileURL)
     try FileManager.default.copyItem(at: khmer_angkor_src_url, to: destFileURL)
@@ -43,7 +47,7 @@ class ResourceDownloadQueueTests: XCTestCase {
     XCTAssertTrue(FileManager.default.fileExists(atPath: tempFileURL.path))
     XCTAssertTrue(FileManager.default.fileExists(atPath: destFileURL.path))
 
-    let closure = DownloadTask<FullKeyboardID>.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
+    let closure = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
 
     // May need a stand-in empty package for the first parameter in the future.
     try? closure(true)
@@ -54,15 +58,17 @@ class ResourceDownloadQueueTests: XCTestCase {
 
   func testResourceDownloadFinalizeClosureWithError() throws {
     let khmer_angkor_src_url = TestUtils.Keyboards.khmerAngkorKMP
-    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
-    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
+    let key = TestUtils.Keyboards.khmer_angkor.packageKey
+
+    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forKey: key)
+    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forKey: key)
 
     try FileManager.default.copyItem(at: khmer_angkor_src_url, to: tempFileURL)
 
     XCTAssertTrue(FileManager.default.fileExists(atPath: tempFileURL.path))
     XCTAssertFalse(FileManager.default.fileExists(atPath: destFileURL.path))
 
-    let closure = DownloadTask<FullKeyboardID>.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
+    let closure = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
 
     // Error occurred; abort.
     try? closure(false)
@@ -73,8 +79,10 @@ class ResourceDownloadQueueTests: XCTestCase {
 
   func testResourceDownloadFinalizeClosurePreexistingWithError() throws {
     let khmer_angkor_src_url = TestUtils.Keyboards.khmerAngkorKMP
-    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
-    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forID: TestUtils.Keyboards.khmer_angkor.fullID)
+    let key = TestUtils.Keyboards.khmer_angkor.packageKey
+
+    let tempFileURL = ResourceFileManager.shared.packageDownloadTempPath(forKey: key)
+    let destFileURL = ResourceFileManager.shared.cachedPackagePath(forKey: key)
 
     try FileManager.default.copyItem(at: khmer_angkor_src_url, to: tempFileURL)
     try FileManager.default.copyItem(at: khmer_angkor_src_url, to: destFileURL)
@@ -82,7 +90,7 @@ class ResourceDownloadQueueTests: XCTestCase {
     XCTAssertTrue(FileManager.default.fileExists(atPath: tempFileURL.path))
     XCTAssertTrue(FileManager.default.fileExists(atPath: destFileURL.path))
 
-    let closure = DownloadTask<FullKeyboardID>.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
+    let closure = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempFileURL, finalURL: destFileURL)
 
     // Error occurred, abort.
     try? closure(false)

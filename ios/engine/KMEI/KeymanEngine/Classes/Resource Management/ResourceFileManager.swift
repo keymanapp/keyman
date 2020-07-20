@@ -36,14 +36,22 @@ public class ResourceFileManager {
   }
 
   public func installState(forPackage key: KeymanPackage.Key) -> KeymanPackage.InstallationState {
-    if let package = ResourceFileManager.shared.getInstalledPackage(withKey: key) {
+    return installState(forPackage: key, withManager: ResourceDownloadManager.shared)
+  }
+
+  // For mocked test use.
+  internal func installState(forPackage key: KeymanPackage.Key, withManager downloadManager: ResourceDownloadManager) -> KeymanPackage.InstallationState {
+    let localCachePath = self.cachedPackagePath(forKey: key)
+
+    if let package = getInstalledPackage(withKey: key) {
       return package.installState
+    } else if downloadManager.downloader.containsPackageKeyInQueue(matchingKey: key) {
+      return .downloading
+    } else if FileManager.default.fileExists(atPath: localCachePath.path) {
+      return .pending
     } else {
       return .none
     }
-
-    // TODO:  .downloading.  Requires a minor rework of ResourceDownloadQueue, which will require
-    //        reworking keyboard installations first.
   }
 
   public func getInstalledPackage<Resource: LanguageResource>(for resource: Resource) -> Resource.Package? {
@@ -58,16 +66,16 @@ public class ResourceFileManager {
     return KeymanPackage.parse(Storage.active.packageDir(forKey: key))
   }
 
-  internal func packageDownloadTempPath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
+  internal func packageDownloadTempPath(forKey key: KeymanPackage.Key) -> URL {
     let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    let tempFilename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
+    let tempFilename = KeymanPackage.baseFilename(for: key)
     let url = documentDir.appendingPathComponent("\(tempFilename).partial") // marks it as a download in progress
     return url
   }
 
-  internal func cachedPackagePath<FullID: LanguageResourceFullID>(forID fullID: FullID) -> URL {
+  internal func cachedPackagePath(forKey key: KeymanPackage.Key) -> URL {
     let documentDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    let filename = TypedKeymanPackage<FullID.Resource>.baseFilename(for: fullID)
+    let filename = KeymanPackage.baseFilename(for: key)
     let url = documentDir.appendingPathComponent(filename)
     return url
   }

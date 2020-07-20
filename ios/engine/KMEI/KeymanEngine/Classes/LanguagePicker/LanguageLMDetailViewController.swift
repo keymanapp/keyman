@@ -151,7 +151,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       }
     }
 
-    ResourceDownloadManager.shared.downloadPackage(forFullID: lmFullID, from: package.1, withNotifications: true, completionBlock: completionClosure)
+    ResourceDownloadManager.shared.downloadPackage(forFullID: lmFullID, withKey: package.0.packageKey, from: package.1, withNotifications: true, completionBlock: completionClosure)
   }
   
   private func lexicalModelDownloadStarted() {
