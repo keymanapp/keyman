@@ -38,9 +38,8 @@ public struct PackageDownloadFailedNotification {
 public typealias BatchUpdateStartedNotification = [AnyLanguageResource]
 
 public struct BatchUpdateCompletedNotification {
-  public let successes: [[AnyLanguageResource]]
-  public let failures: [[AnyLanguageResource]]
-  public let errors: [Error]
+  public let successes: [KeymanPackage.Key]
+  public let failures: [(KeymanPackage.Key, Error)]
 }
 
 public typealias KeyboardLoadedNotification = InstallableKeyboard
