@@ -63,14 +63,14 @@ describe('parseWordList', function () {
     // Tests that we merge NFC+NFD entries and identical entries, trimming whitespace
     // Note building the wordlist from an array to make clear that we have unnormalised inputs
     const words = [
-      'hello', //1
-      'hello'+String.fromCharCode(0x0301), //2, NFD helló
-      'hell'+String.fromCharCode(0x00F3), //3, NFC helló
-      ' hello ', //4, expect to trim whitespace
-      'hello']; //5
+      'hello',       //1
+      'hello\u0301', //2, NFD helló
+      'hell\u00f3',  //3, NFC helló
+      ' hello ',     //4, expect to trim whitespace
+      'hello'];      //5
 
     const expected: WordList = {
-        'hello': 10, /* 1+4+5 trimmed and identical */
+        'hello': 10,     /* 1+4+5 trimmed and identical */
         'hell\u00f3': 5, /* 2+3 normalised to NFC */
     };
 
