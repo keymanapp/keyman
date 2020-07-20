@@ -379,6 +379,11 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     executeNext()
   }
 
+  // Exposes useful information for runtime mocking.  Used by some automated tests.
+  internal func topLevelNodes() -> [DownloadNode] {
+    return queueRoot.nodes
+  }
+
   private func innerExecute(_ node: DownloadNode) {
     switch(node) {
       case .simpleBatch(let batch):
