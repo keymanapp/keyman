@@ -9,6 +9,7 @@ import qrcode
 import gi
 from gi.repository import Gtk
 
+from keyman_config import KeymanComUrl
 from keyman_config.accelerators import init_accel
 from keyman_config.kmpmetadata import parsemetadata
 
@@ -304,7 +305,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
                 box_size=4,
                 border=4)
-            url = "https://keyman.com/go/keyboard/" + kmp['packageID'] + "/share"
+            url = KeymanComUrl + "/go/keyboard/" + kmp['packageID'] + "/share"
             qr.add_data(url)
             qr.make(fit=True)
 
