@@ -57,8 +57,6 @@ const
   // Keyboard download and installation
   URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://[^/]+/keyboards/install/([^?/]+)(?:\?(.+))?$';
 
-  URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
-
 function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
 
 function API_Protocol: string; // = 'https';
@@ -98,6 +96,9 @@ const
   // servers have resource constraints but should be okay for limited use.
   S_KeymanCom_Alpha = 'https://staging-keyman-com.azurewebsites.net';
   S_APIServer_Alpha = 'staging-api-keyman-com.azurewebsites.net';
+
+const
+  URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
 
 function API_UserAgent: string;
 begin

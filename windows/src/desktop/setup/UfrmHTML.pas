@@ -51,13 +51,18 @@ type
     procedure cmdForwardClick(Sender: TObject);
     procedure webCommandStateChange(ASender: TObject; Command: Integer;
       Enable: WordBool);
+    procedure FormDestroy(Sender: TObject);
+  private
+    FFilename: string;
   public
     procedure ShowFile(const FileName: WideString);
+    procedure ShowText(const Text: string);
   end;
 
 implementation
 
 uses
+  utildir,
   utilexecute;
 
 {$R *.DFM}
@@ -68,6 +73,20 @@ procedure TfrmHTML.ShowFile(const FileName: WideString);
 begin
   if FileExists(FileName) and Assigned(web) then
     web.Navigate(FileName);
+end;
+
+procedure TfrmHTML.ShowText(const Text: string);
+var
+  stream: TStringStream;
+begin
+  FFilename := KGetTempFileName('.txt');
+  stream := TStringStream.Create(Text, TEncoding.UTF8);
+  try
+    stream.SaveToFile(FFilename);
+  finally
+    stream.Free;
+  end;
+  ShowFile(FFileName);
 end;
 
 procedure TfrmHTML.webCommandStateChange(ASender: TObject; Command: Integer;
@@ -100,6 +119,12 @@ end;
 procedure TfrmHTML.cmdPrintClick(Sender: TObject);
 begin
   web.ExecWB(OLECMDID_PRINT, 0);
+end;
+
+procedure TfrmHTML.FormDestroy(Sender: TObject);
+begin
+  if FFileName <> '' then
+    System.SysUtils.DeleteFile(FFileName);
 end;
 
 end.
