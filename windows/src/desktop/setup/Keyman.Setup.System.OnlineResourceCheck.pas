@@ -46,7 +46,7 @@ begin
   try
     http.Request.SetURL(MakeAPIURL(API_Path_UpdateCheck_Windows));
     http.Fields.Add('version', AnsiString(currentVersion));
-    http.Fields.Add('tier', AnsiString(KeymanVersion.CKeymanVersionInfo.Tier));
+    http.Fields.Add('tier', AnsiString(AInstallInfo.Tier));
     http.Fields.Add('update', '0'); // This is probably a fresh install of a package, not an update
     for pack in AInstallInfo.Packages do
       http.Fields.Add(AnsiString('package_'+pack.ID), AnsiString(pack.Locations.LatestVersion));
