@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.112 alpha 2020-07-20
+
+* refactor(ios/engine): package-version query caching + package state properties (#3335)
+* refactor(ios/engine): keyboard downloads now retrieve KMPs (#3341)
+* refactor(ios/engine):  download queue & download state detection cleanup (#3342)
+* chore(developer): cleanup test constants (#3350)
+* change(common/models/wordbreakers): update word boundary props to 13.0 (#3365)
+* feat(linux): Use staging URLs for alpha version (#3364)
+
 ## 14.0.111 alpha 2020-07-16
 
 * fix(android/engine): Update deprecated call to switch system keyboard for Android P (#3353)
