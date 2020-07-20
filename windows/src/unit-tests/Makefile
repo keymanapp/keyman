@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------
 
 TARGETS=keyboard-info keyboard-js-info keyboard-package-versions \
-        kmx-file-languages package-info new-tests jsonutil
+        kmx-file-languages package-info new-tests jsonutil windows-setup
 
 test:
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -36,6 +36,10 @@ package-info:
 
 jsonutil:
     cd $(ROOT)\src\unit-tests\jsonutil
+    $(MAKE) $(TARGET)
+
+windows-setup:
+    cd $(ROOT)\src\unit-tests\windows-setup
     $(MAKE) $(TARGET)
 
 new-tests:

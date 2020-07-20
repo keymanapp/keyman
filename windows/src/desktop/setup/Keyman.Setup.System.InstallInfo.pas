@@ -117,6 +117,7 @@ type
     FIsNewerAvailable: Boolean;
     FTempPath: string;
     FShouldInstallKeyman: Boolean;
+    FTier: string;
     function GetBestMsi: TInstallInfoFileLocation;
     function GetPackageMetadata(const KmpFilename: string; p: TPackage): Boolean;
   public
@@ -124,7 +125,7 @@ type
     destructor Destroy; override;
     procedure LoadSetupInf(const SetupInfPath: string);
 
-    procedure LocatePackagesFromFilename(const Filename: string);
+    procedure LocatePackagesAndTierFromFilename(Filename: string);
     procedure LocatePackagesFromParameter(const Param: string);
     procedure LocatePackagesInPath(const path: string);
 
@@ -151,6 +152,8 @@ type
     property TitleImageFilename: string read FTitleImageFilename;
     property StartDisabled: Boolean read FStartDisabled;
     property StartWithConfiguration: Boolean read FStartWithConfiguration;
+
+    property Tier: string read FTier write FTier;
 
     property ShouldInstallKeyman: Boolean read FShouldInstallKeyman write FShouldInstallKeyman;
   end;
@@ -181,6 +184,7 @@ begin
   FMsiLocations := TInstallInfoFileLocations.Create;
   FPackages := TInstallInfoPackages.Create;
   FStrings := TStringList.Create;
+  FTier := KeymanVersion.CKeymanVersionInfo.Tier;
   FShouldInstallKeyman := True;
 end;
 
@@ -328,16 +332,37 @@ begin
   end;
 end;
 
-procedure TInstallInfo.LocatePackagesFromFilename(const Filename: string);
+procedure TInstallInfo.LocatePackagesAndTierFromFilename(Filename: string);
+const
+  SKeymanSetupPrefix = 'keyman-setup';
+  SKeymanSetup_Alpha = SKeymanSetupPrefix+'-'+TIER_ALPHA;
+  SKeymanSetup_Beta = SKeymanSetupPrefix+'-'+TIER_BETA;
+  SKeymanSetup_Stable = SKeymanSetupPrefix+'-'+TIER_STABLE;
 var
   n: Integer;
   res: TArray<string>;
-  id, FBCP47: string;
+  p, id, FBCP47: string;
+  m: TMatch;
 begin
-  res := TRegEx.Split(ExtractFileName(ChangeFileExt(Filename, '')), '\.');
-  if (Length(res) < 2) or (res[0].ToLower <> 'keyman-setup') then
-    // No packages embedded in filename
+  // Get just the base filename
+  Filename := ExtractFileName(ChangeFileExt(Filename, ''));
+
+  // Strip " (1)" appended for multiple downloads of same file by most browsers
+  m := TRegEx.Match(Filename, '^('+SKeymanSetupPrefix+'.+) \(\d+\)$');
+  if m.Success then
+    Filename := m.Groups[1].Value;
+
+  // Look for our recognised pattern of keyman-setup.package_id.bcp47...
+  res := TRegEx.Split(Filename, '\.');
+  if (Length(res) < 1) or not res[0].ToLower.StartsWith(SKeymanSetupPrefix) then
+    // No packages embedded in filename, or not a recognised filename pattern
     Exit;
+
+  // Look for an embedded tier in the filename, if not set, use default
+  p := res[0].ToLower;
+  if p.Equals(SKeymanSetup_Stable) then FTier := TIER_STABLE
+  else if p.Equals(SKeymanSetup_Beta) then FTier := TIER_BETA
+  else if p.Equals(SKeymanSetup_Alpha) then FTier := TIER_ALPHA;
 
   n := 1;
   while n < Length(res) do

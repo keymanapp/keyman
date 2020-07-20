@@ -87,7 +87,9 @@ type
     { Download dialog }
 
     ssDownloadingTitle,
-    ssDownloadingText
+    ssDownloadingText,
+
+    ssOffline
   );
 
 const
@@ -157,7 +159,11 @@ const
   {ssOptionsDefaultLanguage}                  'Default language',
 
   {ssDownloadingTitle}                        'Downloading %0:s',    // %0:s: filename
-  {ssDownloadingText}                         'Downloading %0:s'     // %0:s: filename
+  {ssDownloadingText}                         'Downloading %0:s',    // %0:s: filename
+
+  {ssOffline}                                 'Keyman Setup could not connect to keyman.com to download additional resources.'#13#10#13#10+
+                                              'Please check that you are online, and give Keyman Setup permission to access the Internet in your firewall settings.'#13#10#13#10+
+                                              'Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.'
 
 );
 

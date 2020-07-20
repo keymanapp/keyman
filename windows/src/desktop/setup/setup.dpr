@@ -43,7 +43,8 @@ uses
   kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
   Keyman.Setup.System.ResourceDownloader in 'Keyman.Setup.System.ResourceDownloader.pas',
-  httpuploader in '..\..\global\delphi\general\httpuploader.pas';
+  httpuploader in '..\..\global\delphi\general\httpuploader.pas',
+  Keyman.System.MITLicense in '..\..\global\delphi\general\Keyman.System.MITLicense.pas';
 
 {$R icons.res}
 {$R version.res}
