@@ -66,86 +66,56 @@ public class ResourceDownloadManager {
     
     return keyboard
   }
-  
-  // We return the batch instance to indicate success.  Also, in case we decide to implement Promises based on batch completion,
-  // since this will expose the generated Promise for the caller's use.
-  private func downloadKeyboardCore(withMetadata keyboards: [InstallableKeyboard],
-                                    asActivity activity: DownloadActivityType,
-                                    withFilename filename: String,
-                                    withOptions options: Options,
-                                    completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard.FullID>? {
-    var startClosure: (() -> Void)? = nil
-    if activity != .update {
-      startClosure = self.resourceDownloadStartClosure(for: keyboards)
-    }
-    let completionClosure = self.resourceDownloadCompletionClosure(for: keyboards, handler: completionBlock)
-    if let dlBatch = buildKeyboardDownloadBatch(for: keyboards[0],
-                                                withFilename: filename,
-                                                asActivity: activity,
-                                                withOptions: options,
-                                                startBlock: startClosure,
-                                                completionBlock: completionClosure) {
-      let tasks = dlBatch.downloadTasks
-      // We want to denote ALL language variants of a keyboard as part of the batch's metadata, even if we only download a single time.
-      tasks.forEach { task in
-        task.resources = keyboards
-        task.resourceIDs = keyboards.map { $0.fullID }
+
+  // Used to maintain legacy API:  downloadKeyboard and downloadLexicalModel (based on ID, language ID)
+  private func downloadResource<FullID: LanguageResourceFullID>(withFullID fullID: FullID,
+                                                                sendNotifications: Bool,
+                                                                completionBlock: CompletionHandler<FullID.Resource>?)
+  where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+    // Note:  in this case, someone knows the "full ID" of the resource already, but NOT its location.
+    //        We can use the package-version query to attempt a lookup for a .kmp location
+    //        for download.
+    let packageKey = KeymanPackage.Key(id: fullID.id, type: fullID.type)
+    Queries.PackageVersion.fetch(for: [packageKey], withSession: session) { result, error in
+      guard let result = result, error == nil else {
+        log.info("Error occurred requesting location for \(fullID.description)")
+        self.resourceDownloadFailed(forFullID: fullID, with: error ?? .noData)
+        completionBlock?(nil, error ?? .noData)
+        return
       }
-      
+
+      guard case let .success(data) = result.entryFor(packageKey) else {
+        if case let .failure(errorEntry) = result.entryFor(packageKey) {
+          if let errorEntry = errorEntry {
+            log.info("Query reported error: \(String(describing: errorEntry.error))")
+          }
+        }
+        self.resourceDownloadFailed(forFullID: fullID, with: Queries.ResultError.unqueried)
+        completionBlock?(nil, Queries.ResultError.unqueried)
+        return
+      }
+
       // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      let queueState = downloader.state
-      if queueState != .clear {
-        resourceDownloadFailed(for: keyboards, with: queueState.error!)
-        return nil
+      guard self.downloader.state == .clear else {
+        let err = self.downloader.state.error ??
+          NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
+        self.resourceDownloadFailed(forFullID: fullID, with: err)
+        completionBlock?(nil, err)
+        return
       }
-      
-      downloader.queue(.simpleBatch(dlBatch))
-      return dlBatch
-    }
-    return nil
-  }
-  
-  private func buildKeyboardDownloadBatch(for keyboard: InstallableKeyboard,
-                                          withFilename filename: String,
-                                          asActivity activity: DownloadActivityType,
-                                          withOptions options: Options,
-                                          startBlock: (() -> Void)? = nil,
-                                          completionBlock: CompletionHandler<InstallableKeyboard>? = nil) -> DownloadBatch<InstallableKeyboard.FullID>? {
-    let keyboardURL = options.keyboardBaseURL.appendingPathComponent(filename)
-    let fontURLs = Array(Set(keyboardFontURLs(forFont: keyboard.font, options: options) +
-                             keyboardFontURLs(forFont: keyboard.oskFont, options: options)))
 
-    do {
-      try FileManager.default.createDirectory(at: Storage.active.resourceDir(for: keyboard)!,
-                                              withIntermediateDirectories: true)
-    } catch {
-      log.error("Could not create dir for download: \(error)")
-      return nil
-    }
+      let completionClosure: CompletionHandler<FullID.Resource> = completionBlock ?? { package, error in
+        // If the caller doesn't specify a completion block, this will carry out a default installation.
+        if let package = package {
+          try? ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
+        }
+      }
 
-    var request = HTTPDownloadRequest(url: keyboardURL, userInfo: [:])
-    request.destinationFile = Storage.active.cloudKeyboardURL(forID: keyboard.id).path
-    request.tag = 0
-
-    let keyboardTask = DownloadTask(do: request, for: [keyboard.fullID], resources: [keyboard])
-    var batchTasks: [DownloadTask<InstallableKeyboard.FullID>] = [ keyboardTask ]
-    
-    for (i, url) in fontURLs.enumerated() {
-      request = HTTPDownloadRequest(url: url, userInfo: [:])
-      request.destinationFile = Storage.active.fontURL(forResource: keyboard, filename: url.lastPathComponent)!.path
-      request.tag = i + 1
-      
-      let fontTask = DownloadTask<InstallableKeyboard.FullID>(do: request, for: nil)
-      batchTasks.append(fontTask)
+      self.downloadPackage(forFullID: fullID,
+                           from: URL.init(string: data.packageURL)!,
+                           withNotifications: sendNotifications,
+                           completionBlock: completionClosure)
     }
-
-    let batch = DownloadBatch(do: batchTasks, startBlock: startBlock, completionBlock: completionBlock)
-    batchTasks.forEach { task in
-      task.request.userInfo[Key.downloadBatch] = batch
-      task.request.userInfo[Key.downloadTask] = task
-    }
-    
-    return batch
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
@@ -158,35 +128,8 @@ public class ResourceDownloadManager {
                                isUpdate: Bool,
                                fetchRepositoryIfNeeded: Bool = true,
                                completionBlock: CompletionHandler<InstallableKeyboard>? = nil) {
-    guard let _ = Manager.shared.apiKeyboardRepository.keyboards,
-      let options = Manager.shared.apiKeyboardRepository.options
-    else {
-      if fetchRepositoryIfNeeded {
-        log.info("Fetching repository from API for keyboard download")
-        Manager.shared.apiKeyboardRepository.fetch(completionHandler: fetchHandler(for: .keyboard) {
-          self.downloadKeyboard(withID: keyboardID, languageID: languageID, isUpdate: isUpdate, fetchRepositoryIfNeeded: false, completionBlock: completionBlock)
-        })
-        return
-      } else {
-        let message = "Keyboard repository not yet fetched"
-        let error = NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
-        self.resourceDownloadFailed(for: [] as [InstallableKeyboard], with: error)
-        return
-      }
-    }
-
-    // Grab info for the relevant API version of the keyboard.
-    guard let keyboard = getInstallableKeyboardMetadata(withID: keyboardID, languageID: languageID),
-      let filename = Manager.shared.apiKeyboardRepository.keyboards?[keyboardID]?.filename
-    else {
-      return
-    }
-
-    let _ = downloadKeyboardCore(withMetadata: [keyboard],
-                                 asActivity: isUpdate ? .update : .download,
-                                 withFilename: filename,
-                                 withOptions: options,
-                                 completionBlock: completionBlock)
+    let kbdFullID = FullKeyboardID(keyboardID: keyboardID, languageID: languageID)
+    downloadResource(withFullID: kbdFullID, sendNotifications: !isUpdate, completionBlock: completionBlock)
   }
 
   private func keyboardFontURLs(forFont font: Font?, options: Options) -> [URL] {
@@ -291,47 +234,7 @@ public class ResourceDownloadManager {
     //        For consistency with keyboard download behavior, we use the PackageVersion query here.
 
     let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID)
-    let packageKey = KeymanPackage.Key(id: lexicalModelID, type: .lexicalModel)
-    Queries.PackageVersion.fetch(for: [packageKey], withSession: session) { result, error in
-      guard let result = result, error == nil else {
-        log.info("Error occurred requesting location for \(lmFullID.description)")
-        self.resourceDownloadFailed(forFullID: lmFullID, with: error ?? .noData)
-        completionBlock?(nil, error ?? .noData)
-        return
-      }
-
-      guard case let .success(data) = result.entryFor(packageKey) else {
-        if case let .failure(errorEntry) = result.entryFor(packageKey) {
-          if let errorEntry = errorEntry {
-            log.info("Query reported error: \(String(describing: errorEntry.error))")
-          }
-        }
-        self.resourceDownloadFailed(forFullID: lmFullID, with: Queries.ResultError.unqueried)
-        completionBlock?(nil, Queries.ResultError.unqueried)
-        return
-      }
-
-      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      guard self.downloader.state == .clear else {
-        let err = self.downloader.state.error ??
-          NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
-        self.resourceDownloadFailed(forFullID: lmFullID, with: err)
-        completionBlock?(nil, err)
-        return
-      }
-
-      let completionClosure: CompletionHandler<InstallableLexicalModel> = completionBlock ?? { package, error in
-        // If the caller doesn't specify a completion block, this will carry out a default installation.
-        if let package = package {
-          try? ResourceFileManager.shared.install(resourceWithID: FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID), from: package)
-        }
-      }
-
-      self.downloadPackage(forFullID: lmFullID,
-                           from: URL.init(string: data.packageURL)!,
-                           withNotifications: !isUpdate,
-                           completionBlock: completionClosure)
-    }
+    downloadResource(withFullID: lmFullID, sendNotifications: !isUpdate, completionBlock: completionBlock)
   }
 
 
@@ -436,16 +339,21 @@ public class ResourceDownloadManager {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
     var batches: [AnyDownloadBatch] = []
-    
+
+    // TODO:  Keyboard update is broken, as apiKeyboardRepository will specify the wrong file.
+    // TODO:  Merge the keyboard and lexical model pathways; it's WET code.
     resources.forEach { res in
       if let kbd = res as? InstallableKeyboard {
-        if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
-          let kbdUpdate = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbd.id, languageID: kbd.languageID),
-           let options = Manager.shared.apiKeyboardRepository.options {
-          if let batch = self.buildKeyboardDownloadBatch(for: kbdUpdate, withFilename: filename, asActivity: .update, withOptions: options) {
-            batches.append(batch)
-          }
-        }
+//        if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
+//           let path = URL.init(string: filename) {
+//          let batch = self.buildPackageBatch(forFullID: kbd.fullID, from: path, withResource: kbd) { package, error in
+//            if let package = package {
+//              try? ResourceFileManager.shared.install(resourceWithID: kbd.fullID, from: package)
+//            }
+//            // else error:  already handled by wrapping closure set within buildPackageBatch.
+//          }
+//          batches.append(batch)
+//        }
       } else if let lex = res as? InstallableLexicalModel {
         if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
            let path = URL.init(string: filename) {
@@ -644,21 +552,20 @@ public class ResourceDownloadManager {
   public func standardKeyboardInstallCompletionBlock(forFullID fullID: FullKeyboardID, withModel: Bool = true) -> CompletionHandler<InstallableKeyboard> {
     return { package, error in
       if let package = package {
-        // The "keyboard package" is actually a cloud resource that was already directly installed.
-        // So, we don't 'install it from the package'; we just note that it's already present.
-        let fullID = FullKeyboardID(keyboardID: fullID.keyboardID, languageID: fullID.languageID)
+        do {
+          try ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
+          log.info("succesfully parsed the keyboard in: \(package.sourceFolder)")
 
-        // Since we're installing from a cloud resource, the files are already appropriately placed.
-        // We just need to actually add the resource.
-        if let keyboard = package.findResource(withID: fullID) {
-          ResourceFileManager.shared.addResource(keyboard)
-          _ = Manager.shared.setKeyboard(keyboard)
+          // Maintains legacy behavior; automatically sets the newly-downloaded keyboard as active.
+          if let keyboard = package.findResource(withID: fullID) {
+            _ = Manager.shared.setKeyboard(keyboard)
+          }
 
           if withModel {
             self.downloadLexicalModelsForLanguageIfExists(languageID: fullID.languageID)
           }
-        } else {
-          log.error("Expected resource \(fullID.description) download failed; resource unexpectedly missing")
+        } catch {
+          log.error("Keyboard installation error: \(String(describing: error))")
         }
       } else if let error = error {
         log.error("Installation failed: \(String(describing: error))")

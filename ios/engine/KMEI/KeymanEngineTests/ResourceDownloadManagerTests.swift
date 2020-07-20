@@ -133,6 +133,36 @@ class ResourceDownloadManagerTests: XCTestCase {
     wait(for: [expectation], timeout: 5)
   }
 
+  func testLegacyDownloadKeyboard() throws {
+    let expectation = XCTestExpectation(description: "Mocked package \"download\" should complete successfully.")
+
+    // For this test, we actually want the downloader to run automatically.  It's... a bit tricky to
+    // run this integration test otherwise.
+    downloadManager = ResourceDownloadManager(session: mockedURLSession!, autoExecute: true)
+
+    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_km, error: nil)
+    let mockedDownload = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+
+    mockedURLSession?.queueMockResult(.data(mockedQuery))
+    mockedURLSession?.queueMockResult(.download(mockedDownload))
+
+    let khmer_angkor_id = TestUtils.Keyboards.khmer_angkor.fullID
+
+    downloadManager?.downloadKeyboard(withID: khmer_angkor_id.id, languageID: khmer_angkor_id.languageID, isUpdate: false, fetchRepositoryIfNeeded: false) { package, error in
+      if let error = error {
+        XCTFail("Mocked query and download should both succeed; reported error: \(error.localizedDescription)")
+      } else if let package = package {
+        // Double-check it!
+        XCTAssertEqual(package.id, "khmer_angkor")
+        XCTAssertNotNil(package.findResource(withID: khmer_angkor_id))
+      }
+
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
+  }
+
   func testLegacyDownloadLexicalModel() throws {
     let expectation = XCTestExpectation(description: "Mocked package \"download\" should complete successfully.")
 
