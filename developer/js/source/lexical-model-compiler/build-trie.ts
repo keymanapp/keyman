@@ -44,7 +44,30 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
  * @param filename filename of the word list
  */
 export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
-  parseWordList(wordlist, new WordListFromFilename(filename));
+  _parseWordList(wordlist, new WordListFromFilename(filename));
+}
+
+/**
+ * Parses a word list from a string. The string should have multiple lines
+ * with LF or CRLF line terminators.
+ *
+ * @param wordlist word list to merge entries into (may have existing entries)
+ * @param filename filename of the word list
+ */
+export function parseWordListFromContents(wordlist: WordList, contents: string): void {
+  _parseWordList(wordlist, new WordListFromMemory(contents));
+}
+
+/**
+ * @deprecated
+ * Please use parseWordListFromFilename or parseWordListFromContents instead.
+ */
+export function parseWordList(wordlist: WordList, contents: string | WordListSource): void {
+  let source = typeof contents == "string"
+    ? new WordListFromMemory(contents)
+    : contents;
+
+  _parseWordList(wordlist, source);
 }
 
 /**
@@ -71,13 +94,9 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  *
  * @param wordlist word list to merge entries into (may have existing entries)
  * @param contents contents of the file to import
- *
  */
-export function parseWordList(wordlist: WordList, contents: string | WordListSource): void {
+function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
-  let source = typeof contents == "string"
-    ? new WordListFromMemory(contents)
-    : contents;
 
   // @ts-ignore: unused
   for (let [lineno, line] of source.lines()) {
