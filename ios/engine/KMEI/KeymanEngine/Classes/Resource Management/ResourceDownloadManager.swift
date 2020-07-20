@@ -196,8 +196,32 @@ public class ResourceDownloadManager {
     return font.source.filter({ $0.hasFontExtension })
       .map({ options.fontBaseURL.appendingPathComponent($0) })
   }
-  
+
+  @available(*, deprecated) // Used to maintain deprecated methods stateForKeyboard, stateForLexicalModel.
+  private func keyboardState(for key: KeymanPackage.Key) -> KeyboardState {
+    switch(ResourceFileManager.shared.installState(forPackage: key)) {
+      case .none:
+        return .needsDownload
+      case .downloading:
+        return .downloading
+      case .pending:
+        return .downloading
+      case .installed:
+        let package = ResourceFileManager.shared.getInstalledPackage(withKey: key)!
+        switch(package.versionState) {
+          case .unknown:
+            return .upToDate
+          case .upToDate:
+            return .upToDate
+          case .needsUpdate:
+            return .needsUpdate
+        }
+    }
+  }
+
+  // Deprecating due to tricky assumption - a keyboard _can_ be installed from two separate packages.
   /// - Returns: The current state for a keyboard
+  @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Keyboard states are now tied to the state of their package.")
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullKeyboardID = FullKeyboardID(keyboardID: keyboardID, languageID: "")
@@ -210,16 +234,9 @@ public class ResourceDownloadManager {
       return .needsDownload
     }
 
-    // TODO:  convert to use of package-version API.
     // Check version
-    if let repositoryVersionString = Manager.shared.apiKeyboardRepository.keyboards?[keyboardID]?.version {
-      let downloadedVersion = Version(userKeyboard.version) ?? Version.fallback
-      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
-      if downloadedVersion < repositoryVersion {
-        return .needsUpdate
-      }
-    }
-    return .upToDate
+    let packageKey = KeymanPackage.Key(forResource: userKeyboard)
+    return keyboardState(for: packageKey)
   }
 
   // MARK - Lexical models
@@ -320,7 +337,7 @@ public class ResourceDownloadManager {
 
   
   /// - Returns: The current state for a lexical model
-  //TODO: rename KeyboardState to ResourceState? so it can be used with both keybaoards and lexical models without confusion
+  @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Lexical model states are tied to the state of their package.")
   public func stateForLexicalModel(withID lexicalModelID: String) -> KeyboardState {
     // For this call, we don't actually need the language ID to be correct.
     let fullLexicalModelID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: "")
@@ -333,16 +350,9 @@ public class ResourceDownloadManager {
       return .needsDownload
     }
 
-    // TODO:  Convert to use of package-version API.
     // Check version
-    if let repositoryVersionString = Manager.shared.apiLexicalModelRepository.lexicalModels?[lexicalModelID]?.version {
-      let downloadedVersion = Version(userLexicalModel.version) ?? Version.fallback
-      let repositoryVersion = Version(repositoryVersionString) ?? Version.fallback
-      if downloadedVersion < repositoryVersion {
-        return .needsUpdate
-      }
-    }
-    return .upToDate
+    let packageKey = KeymanPackage.Key(forResource: userLexicalModel)
+    return keyboardState(for: packageKey)
   }
 
   /**
@@ -387,12 +397,15 @@ public class ResourceDownloadManager {
   }
   
   // MARK: Update checks + management
+  /**
+   * Given that an update-check query has already been run, returns whether or not any updates are available.
+   */
   public var updatesAvailable: Bool {
     get {
       return getAvailableUpdates() != nil
     }
   }
-  
+
   public func getAvailableUpdates() -> [AnyLanguageResource]? {
     // Relies upon KMManager's preload; this was the case before the rework.
     if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {

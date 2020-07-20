@@ -106,6 +106,10 @@ class Storage {
     }
   }
 
+  func packageDir(forKey key: KeymanPackage.Key) -> URL {
+    return packageDir(forID: key.id, ofType: key.type)
+  }
+
   func packageDir(for package: KeymanPackage) -> URL? {
     return packageDir(forID: package.id, ofType: package.resourceType())
   }
