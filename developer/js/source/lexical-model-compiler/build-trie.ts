@@ -59,18 +59,6 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
 }
 
 /**
- * @deprecated
- * Please use parseWordListFromFilename or parseWordListFromContents instead.
- */
-export function parseWordList(wordlist: WordList, contents: string | WordListSource): void {
-  let source = typeof contents == "string"
-    ? new WordListFromMemory(contents)
-    : contents;
-
-  _parseWordList(wordlist, source);
-}
-
-/**
  * Reads a tab-separated values file into a word list. This function converts all
  * entries into NFC and merges duplicate entries across wordlists. Duplication is
  * on the basis of character-for-character equality after normalisation to NFC.
