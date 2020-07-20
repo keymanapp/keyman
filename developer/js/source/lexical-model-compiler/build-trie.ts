@@ -74,9 +74,11 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  * @param contents contents of the file to import
  *
  */
-export function parseWordList(wordlist: WordList, contents: string): void {
+export function parseWordList(wordlist: WordList, contents: string | WordListSource): void {
   const TAB = "\t";
-  let source = new WordListFromMemory(contents);
+  let source = typeof contents == "string"
+    ? new WordListFromMemory(contents)
+    : contents;
 
   // @ts-ignore: unused
   for (let [lineno, line] of source.lines()) {
