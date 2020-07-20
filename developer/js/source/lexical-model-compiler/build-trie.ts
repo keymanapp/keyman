@@ -44,8 +44,7 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
  * @param filename filename of the word list
  */
 export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
-  let contents = readFileSync(filename, detectEncoding(filename));
-  parseWordList(wordlist, contents);
+  parseWordList(wordlist, new WordListFromFilename(filename));
 }
 
 /**
@@ -128,6 +127,24 @@ class WordListFromMemory implements WordListSource {
 
   *lines(): Generator<[number, string]> {
     let lines = this._contents.split(NEWLINE_SEPARATOR);
+    let i = 1;
+    for (let line of lines) {
+      yield [i, line];
+      i++;
+    }
+  }
+}
+
+class WordListFromFilename {
+  readonly name: string;
+  constructor(filename: string) {
+    this.name = filename;
+  }
+
+  *lines(): Generator<[number, string]> {
+    let contents = readFileSync(this.name, detectEncoding(this.name));
+    let lines = contents.split(NEWLINE_SEPARATOR);
+
     let i = 1;
     for (let line of lines) {
       yield [i, line];
