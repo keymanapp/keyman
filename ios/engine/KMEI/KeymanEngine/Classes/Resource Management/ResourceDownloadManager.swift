@@ -396,7 +396,7 @@ public class ResourceDownloadManager {
       updatables = engineUpdatables
     } else {
       // Verify that KeymanEngine actually can update the entry.
-      updatables = engineUpdatables.union(keysToUpdate!)
+      updatables = engineUpdatables.intersection(keysToUpdate!)
 
       // Generate errors for any entries that KeymanEngine cannot update.
       keysToUpdate!.forEach { key in
@@ -405,6 +405,11 @@ public class ResourceDownloadManager {
           invalids.append( (key, NSError()) )
         }
       }
+    }
+
+    if updatables.count == 0 {
+      completionBlock?([], invalids)
+      return
     }
 
     var updateMapping: Dictionary<KeymanPackage.Key, AnyDownloadBatch> = [:]
@@ -436,9 +441,8 @@ public class ResourceDownloadManager {
 
     // Build the composite batch.
     let batchNodes: [DownloadNode] = updateMapping.values.map { .simpleBatch($0) }
-    let updateStartClosure: (() -> Void)? = nil
-    let updateCompletionClosure: InternalBatchCompletionHandler = resourceBatchUpdateCompletionClosure(withNotifications: withNotifications, completionBlock: completionBlock)
-    let updateBatch = CompositeBatch(queue: batchNodes, startBlock: updateStartClosure, completionBlock: updateCompletionClosure)
+    let updateCompletionClosure = resourceBatchUpdateCompletionClosure(withNotifications: withNotifications, completionBlock: completionBlock)
+    let updateBatch = CompositeBatch(queue: batchNodes, startBlock: nil, completionBlock: updateCompletionClosure)
 
     downloader.queue(.compositeBatch(updateBatch))
   }
