@@ -17,7 +17,7 @@ public enum APIKeyboardFetchError: Error {
 }
 
 public class APIKeyboardRepository: KeyboardRepository {
-  private let languagesAPIURL = URLComponents(string: "https://api.keyman.com/cloud/4.0/languages")!
+  private let languagesAPIURL = URLComponents(string: "\(KeymanHosts.API_KEYMAN_COM)/cloud/4.0/languages")!
 
   public weak var delegate: KeyboardRepositoryDelegate?
   public private(set) var languages: [String: Language]?
