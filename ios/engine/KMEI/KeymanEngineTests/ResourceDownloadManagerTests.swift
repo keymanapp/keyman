@@ -32,6 +32,50 @@ class ResourceDownloadManagerTests: XCTestCase {
     }
   }
 
+  func testDefaultDownloadURL() {
+    let tier = Version.currentTagged.tier ?? .stable
+    let root = "/go/package/download"
+
+    let basic_khmer_angkor_components = URLComponents(string: downloadManager!.defaultDownloadURL(forPackage: TestUtils.Packages.Keys.khmer_angkor).absoluteString)!
+
+    XCTAssertEqual(basic_khmer_angkor_components.path, "\(root)/khmer_angkor")
+    XCTAssertTrue(basic_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "platform" && item.value == "ios"
+    })
+    XCTAssertTrue(basic_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "tier" && item.value == tier.rawValue
+    })
+
+    let adv_khmer_angkor_url = downloadManager!.defaultDownloadURL(forPackage: TestUtils.Packages.Keys.khmer_angkor, andResource: TestUtils.Keyboards.khmer_angkor.fullID, withVersion: Version("1.0.6"), asUpdate: true)
+    let adv_khmer_angkor_components = URLComponents(string: adv_khmer_angkor_url.absoluteString)!
+    XCTAssertEqual(adv_khmer_angkor_components.path, "\(root)/khmer_angkor")
+    XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "platform" && item.value == "ios"
+    })
+    XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "tier" && item.value == tier.rawValue
+    })
+    XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "update" && item.value == "1"
+    })
+    XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "version" && item.value == "1.0.6"
+    })
+    XCTAssertTrue(adv_khmer_angkor_components.queryItems!.contains { item in
+      return item.name == "bcp47" && item.value == "km"
+    })
+
+    let basic_mtnt_components = URLComponents(string: downloadManager!.defaultDownloadURL(forPackage: TestUtils.Packages.Keys.nrc_en_mtnt).absoluteString)!
+
+    XCTAssertEqual(basic_mtnt_components.path, "\(root)/nrc.en.mtnt")
+    XCTAssertTrue(basic_mtnt_components.queryItems!.contains { item in
+      return item.name == "platform" && item.value == "ios"
+    })
+    XCTAssertTrue(basic_mtnt_components.queryItems!.contains { item in
+      return item.name == "tier" && item.value == tier.rawValue
+    })
+  }
+
   func testDownloadPackageForKeyboard() throws {
     let expectation = XCTestExpectation(description: "Mocked \"download\" should complete successfully.")
     let packageKey = TestUtils.Keyboards.khmer_angkor.packageKey
@@ -138,10 +182,8 @@ class ResourceDownloadManagerTests: XCTestCase {
     // run this integration test otherwise.
     downloadManager = ResourceDownloadManager(session: mockedURLSession!, autoExecute: true)
 
-    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_km, error: nil)
     let mockedDownload = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
 
-    mockedURLSession?.queueMockResult(.data(mockedQuery))
     mockedURLSession?.queueMockResult(.download(mockedDownload))
 
     let khmer_angkor_id = TestUtils.Keyboards.khmer_angkor.fullID
@@ -168,10 +210,8 @@ class ResourceDownloadManagerTests: XCTestCase {
     // run this integration test otherwise.
     downloadManager = ResourceDownloadManager(session: mockedURLSession!, autoExecute: true)
     
-    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.package_version_case_mtnt, error: nil)
     let mockedDownload = TestUtils.Downloading.MockResult(location: TestUtils.LexicalModels.mtntKMP, error: nil)
 
-    mockedURLSession?.queueMockResult(.data(mockedQuery))
     mockedURLSession?.queueMockResult(.download(mockedDownload))
 
     let mtnt_id = TestUtils.LexicalModels.mtnt.fullID
