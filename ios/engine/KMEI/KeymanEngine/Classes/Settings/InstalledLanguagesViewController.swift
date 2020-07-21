@@ -486,13 +486,14 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
 extension InstalledLanguagesViewController {
   
   @objc func addClicked(_ sender: Any) {
-    showAddKeyboard()
-  }
-  
-  func showAddKeyboard() {
-    navigationController?.setToolbarHidden(true, animated: true)
-    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
-    navigationController?.pushViewController(vc, animated: true)
+    let keyboardSearchVC = KeyboardSearchViewController { packageKey, resourceKey in
+      if let packageKey = packageKey {
+//        ResourceDownloadManager.shared.downloadPackage(withKey: packageKey, from: url) { package, error in
+//          //
+//        }
+      }
+    }
+    navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 }
 

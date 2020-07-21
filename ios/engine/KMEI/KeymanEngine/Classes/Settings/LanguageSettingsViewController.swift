@@ -39,12 +39,6 @@ class LanguageSettingsViewController: UITableViewController {
     super.viewDidLoad()
     title = "\(language.name) Settings"
     log.info("viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")")
-
-    if Manager.shared.canAddNewKeyboards {
-      let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
-                                      action: #selector(self.addClicked))
-      navigationItem.rightBarButtonItem = addButton
-    }
   }
   
   override func viewDidAppear(_ animated: Bool) {
