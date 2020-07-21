@@ -18,16 +18,16 @@ setup(
         'python-magic', 'qrcode'
     ],
 
-# metadata to display on PyPI
+    # metadata to display on PyPI
     author="Daniel Glassey",
     author_email="wdg@debian.org",
     description="Keyman for Linux configuration",
     license="MIT",
     keywords="keyman, keyman-config, keyboard",
-    url="http://www.keyman.com/",   # project home page, if any
+    url="https://keyman.com/",   # project home page, if any
     project_urls={
         "Bug Tracker": "https://github.com/keymanapp/issues",
-        "Source Code": "https://github.com/keymanapp/keyman/linux/tree/master/linux/keyman-config",
+        "Source Code": "https://github.com/keymanapp/keyman/tree/master/linux/keyman-config",
     },
     # include_package_data=True,
 )

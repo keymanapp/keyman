@@ -7,6 +7,9 @@ import subprocess
 import sys
 
 import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
+
 from gi.repository import Gtk, GdkPixbuf
 
 from keyman_config.list_installed_kmp import get_install_area_path, get_installed_kmp, InstallArea
@@ -18,9 +21,6 @@ from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.accelerators import bind_accelerator, init_accel
 from keyman_config.get_kmp import user_keyboard_dir
-
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
 
 
 class ViewInstalledWindowBase(Gtk.Window):
