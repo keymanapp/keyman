@@ -1,4 +1,4 @@
-import {parseWordList, parseWordListFromFilename, WordList} from '../dist/lexical-model-compiler/build-trie';
+import {parseWordListFromContents, parseWordListFromFilename, WordList} from '../dist/lexical-model-compiler/build-trie';
 import {assert} from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers';
@@ -17,7 +17,7 @@ const SENCOTEN_WORDLIST = {
   'I': 1884
 };
 
-describe('parseWordList', function () {
+describe('parsing a word list', function () {
   it('should remove the UTF-8 byte order mark from files', function () {
     let word = 'hello';
     let count = 1;
@@ -26,10 +26,10 @@ describe('parseWordList', function () {
 
     let file = `# this is a comment\n${word}\t${count}`;
     let withoutBOM: WordList = {};
-    parseWordList(withoutBOM, file);
+    parseWordListFromContents(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
     let withBOM: WordList = {};
-    parseWordList(withBOM, `${BOM}${file}`)
+    parseWordListFromContents(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
   });
 
@@ -80,7 +80,7 @@ describe('parseWordList', function () {
       file += `${words[i]}\t${i+1}\n`;
     }
     let repeatedWords: WordList = {};
-    parseWordList(repeatedWords, file);
+    parseWordListFromContents(repeatedWords, file);
 
     assert.deepEqual(repeatedWords, expected);
   });

@@ -1,5 +1,8 @@
 import { readFileSync } from "fs";
 
+// Supports LF or CRLF line terminators.
+const NEWLINE_SEPARATOR = /\u000d?\u000a/;
+
 /**
  * A word list is (conceptually) an array of pairs: the concrete word form itself + a
  * non-negative count.
@@ -41,8 +44,18 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
  * @param filename filename of the word list
  */
 export function parseWordListFromFilename(wordlist: WordList, filename: string): void {
-  let contents = readFileSync(filename, detectEncoding(filename));
-  parseWordList(wordlist, contents);
+  _parseWordList(wordlist, new WordListFromFilename(filename));
+}
+
+/**
+ * Parses a word list from a string. The string should have multiple lines
+ * with LF or CRLF line terminators.
+ *
+ * @param wordlist word list to merge entries into (may have existing entries)
+ * @param filename filename of the word list
+ */
+export function parseWordListFromContents(wordlist: WordList, contents: string): void {
+  _parseWordList(wordlist, new WordListFromMemory(contents));
 }
 
 /**
@@ -69,16 +82,12 @@ export function parseWordListFromFilename(wordlist: WordList, filename: string):
  *
  * @param wordlist word list to merge entries into (may have existing entries)
  * @param contents contents of the file to import
- *
  */
-export function parseWordList(wordlist: WordList, contents: string): void {
-  // Supports LF or CRLF line terminators.
-  const NEWLINE_SEPARATOR = /\u000d?\u000a/;
+function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
-  // TODO: format validation.
-  let lines = contents.split(NEWLINE_SEPARATOR);
 
-  for (let line of lines) {
+  // @ts-ignore: unused
+  for (let [lineno, line] of source.lines()) {
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
     // the BOM from every possible start of file -- i.e., beginning of every line.
@@ -106,6 +115,49 @@ export function parseWordList(wordlist: WordList, contents: string): void {
 
     wordlist[wordform] = (wordlist[wordform] || 0) + count;
   }
+}
+
+type LineNoAndText = [number, string];
+
+interface WordListSource {
+  readonly name: string;
+  lines(): Iterator<LineNoAndText>;
+}
+
+class WordListFromMemory implements WordListSource {
+  readonly name = '<memory>';
+  private readonly _contents: string;
+
+  constructor(contents: string) {
+    this._contents = contents;
+  }
+
+  *lines() {
+    yield *enumerateLines(this._contents.split(NEWLINE_SEPARATOR));
+  }
+}
+
+class WordListFromFilename {
+  readonly name: string;
+  constructor(filename: string) {
+    this.name = filename;
+  }
+
+  *lines() {
+    let contents = readFileSync(this.name, detectEncoding(this.name));
+    yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
+  }
+}
+
+/**
+ * Yields pairs of [lineno, line], given an Array of lines.
+ */
+function* enumerateLines(lines: string[]): Generator<LineNoAndText> {
+    let i = 1;
+    for (let line of lines) {
+      yield [i, line];
+      i++;
+    }
 }
 
 namespace Trie {
