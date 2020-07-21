@@ -144,7 +144,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
     let package = packages[lexicalModelIndex]
     let lmFullID = package.0.fullID
     let completionClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage> = { package, error in
-      ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)(package, error)
+      try? ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)(package, error)
 
       if let lm = package?.findResource(withID: lmFullID) {
         self.onSuccessClosure?(lm)

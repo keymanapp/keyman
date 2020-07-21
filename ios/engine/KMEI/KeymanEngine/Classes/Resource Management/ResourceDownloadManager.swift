@@ -22,7 +22,7 @@ public class ResourceDownloadManager {
 
   public static let DISTRIBUTION_CACHE_VALIDITY_THRESHOLD = TimeInterval(60*24*7) // in seconds.  60 minutes, 24 hrs, 7 days.
 
-  public typealias CompletionHandler<Package: KeymanPackage> = (Package?, Error?) -> Void
+  public typealias CompletionHandler<Package: KeymanPackage> = (Package?, Error?) throws -> Void
   public typealias BatchCompletionHandler = () -> Void
   internal typealias InternalBatchCompletionHandler = (CompositeBatch) -> Void
   
@@ -54,7 +54,7 @@ public class ResourceDownloadManager {
       guard let result = result, error == nil else {
         log.info("Error occurred requesting location for \(fullID.description)")
         self.resourceDownloadFailed(withKey: packageKey, with: error ?? .noData)
-        completionBlock?(nil, error ?? .noData)
+        try? completionBlock?(nil, error ?? .noData)
         return
       }
 
@@ -65,7 +65,7 @@ public class ResourceDownloadManager {
           }
         }
         self.resourceDownloadFailed(withKey: packageKey, with: Queries.ResultError.unqueried)
-        completionBlock?(nil, Queries.ResultError.unqueried)
+        try? completionBlock?(nil, Queries.ResultError.unqueried)
         return
       }
 
@@ -74,7 +74,7 @@ public class ResourceDownloadManager {
         let err = self.downloader.state.error ??
           NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
         self.resourceDownloadFailed(withKey: packageKey, with: err)
-        completionBlock?(nil, err)
+        try? completionBlock?(nil, err)
         return
       }
 
@@ -384,71 +384,72 @@ public class ResourceDownloadManager {
     }
   }
 
-  // Possibly worth not deprecating, as its continued existence doesn't exactly hurt anything.
-  // But its intended partner method will no longer exist, so... yeah.
-  @available(*, deprecated, message: "Deprecated in favor of `getKeysForUpdatablePackages`.")
-  public func getAvailableUpdates() -> [AnyLanguageResource]? {
-    let updatablePackages = getKeysForUpdatablePackages()
+  public func performBatchUpdate(forPackageKeys keysToUpdate: Set<KeymanPackage.Key>? = nil,
+                                 withNotifications: Bool = true,
+                                 completionBlock: (([KeymanPackage.Key], [(KeymanPackage.Key, Error)]) -> Void)? = nil) {
+    let engineUpdatables = getKeysForUpdatablePackages()
+    var updatables = Set<KeymanPackage.Key>()
 
-    // To maintain the original behavior.
-    guard updatablePackages.count > 0 else {
-      return nil
-    }
+    var invalids: [(KeymanPackage.Key, Error)] = []
 
-    // As updatablePackages is a Set (and keys are Hashable), the lookups are O(1).
-    let updatables: [AnyLanguageResource] = Storage.active.userDefaults.userResources?.compactMap { updatablePackages.contains($0.packageKey) ? $0 : nil } ?? []
-
-    if updatables.count > 0 {
-      return updatables
+    if keysToUpdate == nil {
+      updatables = engineUpdatables
     } else {
-      return nil
-    }
-  }
+      // Verify that KeymanEngine actually can update the entry.
+      updatables = engineUpdatables.intersection(keysToUpdate!)
 
-  @available(*, deprecated, message: "") // TODO:  Properly document once the target method is written.
-  public func performUpdates(forResources resources: [AnyLanguageResource]) {
-    // The plan is to create new notifications to handle batch updates here, rather than
-    // require a UI to manage the update queue.
-    var batches: [AnyDownloadBatch] = []
-
-    /* For fixing the TODOs: we can probably map the resources to a Set of their
-     * represented package keys, then just use the package-key based update method.
-     *
-     * You know, once it's written.
-     */
-
-    // TODO:  All package updates are currently broken, as apiKeyboardRepository will specify the wrong file.
-    // TODO:  Merge the keyboard and lexical model pathways; it's WET code.
-    resources.forEach { res in
-      if let kbd = res as? InstallableKeyboard {
-//        if let filename = Manager.shared.apiKeyboardRepository.keyboards?[kbd.id]?.filename,
-//           let path = URL.init(string: filename) {
-//          let batch = self.buildPackageBatch(forFullID: kbd.fullID, from: path, withResource: kbd) { package, error in
-//            if let package = package {
-//              try? ResourceFileManager.shared.install(resourceWithID: kbd.fullID, from: package)
-//            }
-//            // else error:  already handled by wrapping closure set within buildPackageBatch.
-//          }
-//          batches.append(batch)
-//        }
-      } else if let lex = res as? InstallableLexicalModel {
-//        if let filename = Manager.shared.apiLexicalModelRepository.lexicalModels?[lex.id]?.packageFilename,
-//           let path = URL.init(string: filename) {
-//          let batch = self.buildPackageBatch(withKey: lex.packageKey, from: path, withResource: lex) { package, error in
-//            if let package = package {
-//              try? ResourceFileManager.shared.install(resourceWithID: lex.fullID, from: package)
-//            }
-//            // else error:  already handled by wrapping closure set within buildPackageBatch.
-//          }
-//          batches.append(batch)
-//        }
+      // Generate errors for any entries that KeymanEngine cannot update.
+      keysToUpdate!.forEach { key in
+        if !updatables.contains(key) {
+          // TODO:  Better error definition
+          invalids.append( (key, NSError()) )
+        }
       }
     }
-    
-    let batchUpdate = CompositeBatch(queue: batches.map { return DownloadNode.simpleBatch($0) },
-                                     startBlock: resourceBatchUpdateStartClosure(for: resources),
-                                     completionBlock: resourceBatchUpdateCompletionClosure(for: resources))
-    downloader.queue(.compositeBatch(batchUpdate))
+
+    if updatables.count == 0 {
+      completionBlock?([], invalids)
+      return
+    }
+
+    var updateMapping: Dictionary<KeymanPackage.Key, AnyDownloadBatch> = [:]
+    updatables.forEach { key in
+      guard let downloadURL = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: key)!.downloadURL else {
+        // Note error - download URL missing.  Shouldn't be possible, but still.
+        // TODO:  Better error definition
+        invalids.append( (key, NSError()) )
+        return
+      }
+
+      updateMapping[key] = self.buildPackageBatch(withKey: key,
+                                                  from: downloadURL) { package, error in
+        guard let package = package, error == nil else {
+          let errString = error != nil ? String(describing: error!) : ""
+          log.error("Could not successfully download package \(key) for update: \(errString)")
+          return
+        }
+
+        if let kbdPackage = package as? KeyboardKeymanPackage {
+          let updatables = ResourceFileManager.shared.findPotentialUpdates(in: kbdPackage)
+          try ResourceFileManager.shared.install(resourcesWithIDs: updatables.map { $0.fullID }, from: kbdPackage)
+        } else if let lmPackage = package as? LexicalModelKeymanPackage {
+          let updatables = ResourceFileManager.shared.findPotentialUpdates(in: lmPackage)
+          try ResourceFileManager.shared.install(resourcesWithIDs: updatables.map { $0.fullID }, from: lmPackage)
+        }
+      }
+    }
+
+    // Build the composite batch.
+    let batchNodes: [DownloadNode] = updateMapping.values.map { .simpleBatch($0) }
+    let updateCompletionClosure = resourceBatchUpdateCompletionClosure(withNotifications: withNotifications, completionBlock: completionBlock)
+    let updateBatch = CompositeBatch(queue: batchNodes, startBlock: nil, completionBlock: updateCompletionClosure)
+
+    downloader.queue(.compositeBatch(updateBatch))
+  }
+
+  static func packageKeys(forResources resources: [AnyLanguageResource]) -> Set<KeymanPackage.Key> {
+    let keys = resources.map { $0.packageKey }
+    return Set(keys)
   }
 
   @available(*, deprecated)
@@ -484,7 +485,11 @@ public class ResourceDownloadManager {
         self.resourceDownloadCompleted(with: package)
       }
 
-      handler?(package, error)
+      do {
+        try handler?(package, error)
+      } catch {
+        log.error("Unhandled error occurred after resource successfully downloaded: \(String(describing: error))")
+      }
 
       // After the custom handler operates, ensure that any changes it made are synchronized for use
       // with the app extension, too.
@@ -503,30 +508,32 @@ public class ResourceDownloadManager {
     }
   }
 
-  internal func resourceBatchUpdateCompletionClosure(for resources: [AnyLanguageResource],
-                                                     completionBlock: BatchCompletionHandler? = nil)
+  internal func resourceBatchUpdateCompletionClosure(withNotifications: Bool,
+                                                     completionBlock: (([KeymanPackage.Key], [(KeymanPackage.Key, Error)]) -> Void)? = nil)
                                                      -> InternalBatchCompletionHandler {
     return { batch in
       var successes: [KeymanPackage.Key] = []
-      var failures: [KeymanPackage.Key] = []
-      var errors: [Error] = []
+      var failures: [(KeymanPackage.Key, Error)] = []
 
-      // Remember, since this is for .composite batches, batch.tasks is of type [DownloadBatch].
-      for (index, _) in batch.tasks.enumerated() {
-        if batch.errors[index] == nil {
-          successes.append(contentsOf: batch.batches[index].packageKeys)
-        } else {
-          failures.append(contentsOf: batch.batches[index].packageKeys)
-          errors.append(batch.errors[index]!)
+      batch.batchQueue.forEach{ tuple in
+        if case let .simpleBatch(node) = tuple.0 {
+          if let err = node.errors.first(where: { $0 != nil }), let error = err {
+            failures.append( (node.packageKey, error) )
+          } else {
+            successes.append(node.packageKey)
+          }
         }
       }
 
-      // TODO:  Rework batch update notifications to return package keys.
-      let notification = BatchUpdateCompletedNotification(successes: [], failures: [], errors: errors)
-      NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
-                                      object: self,
-                                      value: notification)
-      completionBlock?()
+      if withNotifications {
+        // Send update notification to the UI.
+        let notification = BatchUpdateCompletedNotification(successes: successes, failures: failures)
+        NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
+                                        object: self,
+                                        value: notification)
+      }
+
+      completionBlock?(successes, failures)
     }
   }
 

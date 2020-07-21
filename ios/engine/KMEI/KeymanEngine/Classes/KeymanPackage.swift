@@ -135,6 +135,8 @@ public class KeymanPackage {
    */
   public struct DistributionStateMetadata: Codable {
     var latestVersion: String?
+    var downloadURL: URL?
+
     var timestampForLastQuery: TimeInterval?
 
     var distributionMethod: DistributionMethod
@@ -143,22 +145,25 @@ public class KeymanPackage {
       if let entry = queryResult as? Queries.PackageVersion.ResultEntry {
         self.latestVersion = entry.version
         self.distributionMethod = .cloud
+        self.downloadURL = URL.init(string: entry.packageURL)
       } else /* if queryResult is Queries.PackageVersion.ResultError */ {
         self.latestVersion = nil
         // The package-version query knows nothing about it - must be custom.
         self.distributionMethod = .custom
+        self.downloadURL = nil
       }
 
       self.timestampForLastQuery = NSDate().timeIntervalSince1970
     }
 
-    init(fromQuery: Bool = true) {
+    init(downloadURL: URL?) {
       latestVersion = nil
       timestampForLastQuery = nil
 
       // Assumption: we cannot install a cloud-deprecated resource from
       // in-app cloud-backed searches.
-      distributionMethod = fromQuery ? .cloud : .unknown
+      distributionMethod = downloadURL != nil ? .cloud : .unknown
+      self.downloadURL = downloadURL
     }
   }
 
@@ -254,7 +259,7 @@ public class KeymanPackage {
 
   internal var versionQueryCache: DistributionStateMetadata {
     get {
-      return Storage.active.userDefaults.cachedPackageQueryMetadata[self.key] ?? DistributionStateMetadata(fromQuery: false)
+      return Storage.active.userDefaults.cachedPackageQueryMetadata[self.key] ?? DistributionStateMetadata(downloadURL: nil)
     }
 
     set(value) {

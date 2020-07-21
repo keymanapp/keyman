@@ -130,8 +130,13 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     // Do the actual updates!
     // TODO:  Consider prompting per resource, rather than wholesale as a group.
     // (This would be an enhancement, though.)
-    let availableUpdates = ResourceDownloadManager.shared.getAvailableUpdates()!
-    ResourceDownloadManager.shared.performUpdates(forResources: availableUpdates)
+    let availableUpdates = ResourceDownloadManager.shared.getKeysForUpdatablePackages()
+    ResourceDownloadManager.shared.performBatchUpdate(forPackageKeys: availableUpdates,
+                                                      withNotifications: true,
+                                                      completionBlock: { successes, failures in
+        // TODO:  future feature:  consider reworking the notification listener for use with this callback.
+        //        (See `batchUpdateCompleted` later in this file.)
+      })
   }
   
   override public func numberOfSections(in tableView: UITableView) -> Int {
@@ -378,10 +383,14 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     
     toolbar.displayStatus("Updating\u{2026}", withIndicator: true)
   }
-  
+
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-      toolbar.displayStatus("Updates successfully downloaded!", withIndicator: false, duration: 3.0)
+      if results.failures.count == 0 {
+        toolbar.displayStatus("\(results.successes.count) update(s) successfully downloaded!", withIndicator: false, duration: 3.0)
+      } else {
+        toolbar.displayStatus("Updates complete: \(results.successes.count) successful, \(results.failures.count) failed", withIndicator: false, duration: 3.0)
+      }
     }
     
     restoreNavigation()
