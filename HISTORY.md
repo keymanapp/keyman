@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 14.0.113 alpha 2020-07-21
+
+* refactor(ios/engine): update detection now based upon packages (#3362)
+* refactor(ios/engine): package download notifications (#3363)
+* refactor(ios/engine): package-based resource updates, cloud resource migration (#3372)
+* fix(ios/engine): engine tier enum, proper detection (#3373)
+* refactor(ios/engine): Centralized Keyman domain definitions (#3381)
+* fix(linux): Use language from search when installing keyboard (#3290)
+* refactor(linux): Small refactorings (#3376)
+* refactor(developer/compilers): reading from a wordlist (#3380)
+
 ## 14.0.112 alpha 2020-07-20
 
 * refactor(ios/engine): package-version query caching + package state properties (#3335)
