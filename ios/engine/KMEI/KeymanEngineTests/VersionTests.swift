@@ -28,7 +28,7 @@ class VersionTests: XCTestCase {
 
     XCTAssertNotNil(tagged, "Could not construct Verison instance from a text-tagged version string")
     XCTAssertTrue(tagged! == Version("14.0.18")!, "Did not produce expected version from text-tagged version string")
-    XCTAssertEqual(tagged!.tier, "alpha", "Did not properly store a tagged version's tier information")
+    XCTAssertEqual(tagged!.tier, .alpha, "Did not properly store a tagged version's tier information")
   }
 
   func testVersionComparison() {
