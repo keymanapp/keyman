@@ -1,5 +1,5 @@
 //
-//  ResourceDownloadManagement.swift
+//  ResourceDownloadManagerTests.swift
 //  KeymanEngineTests
 //
 //  Created by Joshua Horton on 6/29/20.

@@ -41,6 +41,10 @@ public class ResourceDownloadManager {
   
   // MARK - Downloading resources
 
+  /**
+   * Generates a download link for the specified package.  The resulting link is planned to be evergreen, with redirects as
+   * necessary to support it long, long into the future.
+   */
   public func defaultDownloadURL(forPackage packageKey: KeymanPackage.Key,
                                  andResource resourceKey: AnyLanguageResourceFullID? = nil,
                                  withVersion version: Version? = nil,
@@ -79,9 +83,6 @@ public class ResourceDownloadManager {
                                                                 asUpdate: Bool? = nil,
                                                                 completionBlock: CompletionHandler<FullID.Resource.Package>?)
   where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
-    // Note:  in this case, someone knows the "full ID" of the resource already, but NOT its location.
-    //        We can use the package-version query to attempt a lookup for a .kmp location
-    //        for download.
     let packageKey = KeymanPackage.Key(id: fullID.id, type: fullID.type)
     let packageURL = defaultDownloadURL(forPackage: KeymanPackage.Key(id: fullID.id, type: fullID.type),
                                         andResource: fullID,
