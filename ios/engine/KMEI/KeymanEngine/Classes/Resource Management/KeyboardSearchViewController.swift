@@ -9,6 +9,19 @@
 import UIKit
 import WebKit
 
+/*
+ * Minor design notes:
+ *
+ * This class is designed for use as a 'library component' of KeymanEngine that apps may choose
+ * whether or not to utilize.  It simply returns the specifications of any packages/resources
+ * to download, leaving control of their actual installation up to KeymanEngine's host app.
+ */
+
+/**
+ * Loads a WebView to Keyman's online keyboard search.  This WebView will intercept any package download links
+ * and return the specifications of such interceptions - the search results - to the instance's owner via a closure specified
+ * during initialization.
+ */
 class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   // Useful documentation regarding certain implementation details:
   // https://docs.google.com/document/d/1rhgMeJlCdXCi6ohPb_CuyZd0PZMoSzMqGpv1A8cMFHY/edit
@@ -16,6 +29,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   typealias SearchCompletionHandler = (KeymanPackage.Key?, FullKeyboardID?) -> Void
 
   private let completionClosure: SearchCompletionHandler!
+  private let languageCode: String?
 
   private static var ENDPOINT_ROOT: URL {
     var baseURL = KeymanHosts.KEYMAN_COM
@@ -30,7 +44,8 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
 
   private let REGEX_FOR_DOWNLOAD_INTERCEPT = try! NSRegularExpression(pattern: "^http(?:s)?:\\/\\/[^\\/]+\\/keyboards\\/install\\/([^?\\/]+)(?:\\?(.+))?$")
 
-  public init(searchCompletionBlock: @escaping SearchCompletionHandler) {
+  public init(languageCode: String? = nil, searchCompletionBlock: @escaping SearchCompletionHandler) {
+    self.languageCode = languageCode
     self.completionClosure = searchCompletionBlock
     super.init(nibName: nil, bundle: nil)
   }
@@ -42,7 +57,13 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   override func loadView() {
     let webView = WKWebView()
     webView.navigationDelegate = self
-    webView.load(URLRequest(url: KeyboardSearchViewController.ENDPOINT_ROOT))
+    if let languageCode = languageCode {
+      let baseURL = KeyboardSearchViewController.ENDPOINT_ROOT
+      let specificURL = URL.init(string: "\(baseURL)?q=l:id:\(languageCode)")!
+      webView.load(URLRequest(url: specificURL))
+    } else {
+      webView.load(URLRequest(url: KeyboardSearchViewController.ENDPOINT_ROOT))
+    }
 
     view = webView
   }
@@ -66,10 +87,9 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
         let packageKey = KeymanPackage.Key(id: keyboard_id, type: .keyboard)
         var resourceKey: FullKeyboardID? = nil
 
-        if match.numberOfRanges > 2 {
-          let lang_id_range = Range(match.range(at: 2), in: linkString)!
-          let lang_id = String(linkString[lang_id_range])
 
+        if match.numberOfRanges > 2, let lang_id_range = Range(match.range(at: 2), in: linkString) {
+          let lang_id = String(linkString[lang_id_range])
           resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
         }
 
@@ -83,5 +103,32 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
     }
 
     decisionHandler(.allow)
+  }
+
+  public static func defaultResultInstallationClosure() -> SearchCompletionHandler {
+    return { packageKey, resourceKey in
+      if let packageKey = packageKey {
+        let url = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: packageKey,
+                                                                    andResource: resourceKey,
+                                                                    asUpdate: false)
+
+        var closure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage>
+
+        if let resourceKey = resourceKey {
+          closure = ResourceDownloadManager.shared.standardKeyboardInstallCompletionBlock(forFullID: resourceKey)
+        } else {
+          closure = { package, error in
+            guard package == nil || error != nil else {
+              // TODO:  Show a proper alert
+              return
+            }
+
+            // TODO:  We don't know which resource the user actually wants.  Prompt them.
+          }
+        }
+
+        ResourceDownloadManager.shared.downloadPackage(withKey: packageKey, from: url, completionBlock: closure)
+      }
+    }
   }
 }

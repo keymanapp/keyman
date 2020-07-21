@@ -39,6 +39,12 @@ class LanguageSettingsViewController: UITableViewController {
     super.viewDidLoad()
     title = "\(language.name) Settings"
     log.info("viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")")
+
+    if Manager.shared.canAddNewKeyboards {
+      let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
+                                      action: #selector(self.addClicked))
+      navigationItem.rightBarButtonItem = addButton
+    }
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -302,16 +308,10 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   @objc func addClicked(_ sender: Any) {
-    showAddLanguageKeyboard()
+    let keyboardSearchVC = KeyboardSearchViewController(languageCode: self.language.id, searchCompletionBlock: KeyboardSearchViewController.defaultResultInstallationClosure())
+    navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
-  
-  func showAddLanguageKeyboard() {
-    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
-    button?.isEnabled = false
-    let vc = LanguageDetailViewController(keyboardRepository, language: language)
-    vc.title = "Add new \(language.name) keyboard"
-    navigationController?.pushViewController(vc, animated: true)
-  }
+
   
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
