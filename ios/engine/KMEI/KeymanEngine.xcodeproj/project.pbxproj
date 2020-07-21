@@ -183,6 +183,7 @@
 		CE808A532366980A00713E6B /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
 		CE867FEF2485E97A00B2EAED /* KMPMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */; };
 		CE867FF12485EE1500B2EAED /* KMPInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE867FF02485EE1500B2EAED /* KMPInfo.swift */; };
+		CE87751E24C68DA500B1475A /* KeyboardSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE87751D24C68DA500B1475A /* KeyboardSearchViewController.swift */; };
 		CE88042F247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */; };
 		CE88143A24A9B7F4002809C3 /* ResourceDownloadQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */; };
 		CE89641F24A4686000D5EB8E /* Queries.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89641E24A4686000D5EB8E /* Queries.swift */; };
@@ -485,6 +486,7 @@
 		CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		CE867FEE2485E97A00B2EAED /* KMPMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPMetadata.swift; sourceTree = "<group>"; };
 		CE867FF02485EE1500B2EAED /* KMPInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPInfo.swift; sourceTree = "<group>"; };
+		CE87751D24C68DA500B1475A /* KeyboardSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSearchViewController.swift; sourceTree = "<group>"; };
 		CE88042E247F4B97009BCA1A /* ExpectationDownloaderDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectationDownloaderDelegate.swift; sourceTree = "<group>"; };
 		CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceDownloadQueueTests.swift; sourceTree = "<group>"; };
 		CE89641E24A4686000D5EB8E /* Queries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queries.swift; sourceTree = "<group>"; };
@@ -904,6 +906,7 @@
 			isa = PBXGroup;
 			children = (
 				CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */,
+				CE87751D24C68DA500B1475A /* KeyboardSearchViewController.swift */,
 				CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */,
 				CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */,
 				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
@@ -1512,6 +1515,7 @@
 				C06D37361F81F5C300F61AE0 /* KeyboardMenuView.swift in Sources */,
 				CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */,
 				9A4609972241B39B00B0BFD1 /* LexicalModelInfoViewController.swift in Sources */,
+				CE87751E24C68DA500B1475A /* KeyboardSearchViewController.swift in Sources */,
 				CE8B0BBF248764ED0045EB2E /* KMPResource.swift in Sources */,
 				9AD4F53C229F85AC007992D3 /* LanguageSettingsViewController.swift in Sources */,
 				CE7A26DB23CEEF640005955C /* Colors.swift in Sources */,
