@@ -482,7 +482,8 @@ class ResourceUpdateTests: XCTestCase {
 
       if let folderContents = try? FileManager.default.contentsOfDirectory(atPath: package.sourceFolder.path) {
         if package.resourceType() == .keyboard {
-          // There is a 'desktop' keyboard file within the distributed package.
+          // At it turns out, all of the keyboard packages handled by this case also contain a
+          // 'desktop'-oriented keyboard!
           XCTAssertTrue(folderContents.contains(where: { $0.hasSuffix(".kmx") }))
           // As it turns out, all of the keyboard packages handled by this case have welcome.htm files!
           XCTAssertTrue(folderContents.contains(where: { $0.hasSuffix("welcome.htm") }))

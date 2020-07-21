@@ -387,7 +387,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
       if results.failures.count == 0 {
-        toolbar.displayStatus("\(results.successes.count) updates successfully downloaded!", withIndicator: false, duration: 3.0)
+        toolbar.displayStatus("\(results.successes.count) update(s) successfully downloaded!", withIndicator: false, duration: 3.0)
       } else {
         toolbar.displayStatus("Updates complete: \(results.successes.count) successful, \(results.failures.count) failed", withIndicator: false, duration: 3.0)
       }
