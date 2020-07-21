@@ -256,7 +256,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
-  private let keymanHostName = "api.keyman.com"
 
   private let session: URLSession
 
@@ -269,7 +268,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   internal init(session: URLSession, autoExecute: Bool) {
     do {
-      try reachability = Reachability(hostname: keymanHostName)
+      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }

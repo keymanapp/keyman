@@ -31,7 +31,7 @@ open class Alerts {
   public static func showDownloadErrorAlert(in vc: UIViewController, handler: @escaping AcceptanceHandler) {
     var networkReachable: Reachability?
     do {
-      try networkReachable = Reachability(hostname: "keyman.com")
+      try networkReachable = Reachability(hostname: KeymanHosts.KEYMAN_COM.host!)
     } catch {
       log.debug("reachability could not start")
     }

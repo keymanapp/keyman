@@ -17,7 +17,7 @@ public enum APILexicalModelFetchError: Error {
 
 @available(*, deprecated)
 public class APILexicalModelRepository: LexicalModelRepository {
-  private let modelsAPIURL = URLComponents(string: "https://api.keyman.com/model")!
+  private let modelsAPIURL = URLComponents(string: "\(KeymanHosts.API_KEYMAN_COM)/model")!
   
   public weak var delegate: LexicalModelRepositoryDelegate?
   public private(set) var languages: [String: Language]?

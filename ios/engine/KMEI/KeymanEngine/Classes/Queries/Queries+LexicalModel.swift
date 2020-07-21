@@ -42,7 +42,7 @@ extension Queries {
       }
     }
 
-    private static let MODEL_ENDPOINT = URLComponents(string: "https://api.keyman.com/model")!
+    private static let MODEL_ENDPOINT = URLComponents(string: "\(KeymanHosts.API_KEYMAN_COM)/model")!
 
     public static func fetch(forLanguageCode bcp47: String,
                              fetchCompletion: @escaping JSONQueryCompletionBlock<[Result]>) {

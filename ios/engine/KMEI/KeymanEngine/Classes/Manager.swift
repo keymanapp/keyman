@@ -36,9 +36,6 @@ public enum VibrationSupport {
 // Strings
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
-// URLs - used for reachability test
-private let keymanHostName = "api.keyman.com"
-
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
@@ -208,7 +205,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     updateUserKeyboards(with: Defaults.keyboard)
 
     do {
-      try reachability = Reachability(hostname: keymanHostName)
+      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }

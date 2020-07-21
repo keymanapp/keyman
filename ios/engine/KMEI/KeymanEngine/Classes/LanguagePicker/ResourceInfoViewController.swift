@@ -129,7 +129,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
-        let url = URL(string: "http://help.keyman.com/keyboard/\(resource.id)/\(resource.version)/")!
+        let url = URL(string: "\(KeymanHosts.HELP_KEYMAN_COM)/keyboard/\(resource.id)/\(resource.version)/")!
         if let openURL = Manager.shared.openURL {
           _ = openURL(url)
         } else {
