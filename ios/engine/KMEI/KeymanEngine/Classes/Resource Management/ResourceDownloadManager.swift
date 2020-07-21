@@ -18,6 +18,9 @@ public class ResourceDownloadManager {
   internal var session: URLSession
   internal var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
+  internal var unitTestCurrentDate: Date?
+
+  public static let DISTRIBUTION_CACHE_VALIDITY_THRESHOLD = TimeInterval(60*24*7) // in seconds.  60 minutes, 24 hrs, 7 days.
 
   public typealias CompletionHandler<Resource: LanguageResource> = (Resource.Package?, Error?) -> Void where Resource.Package: TypedKeymanPackage<Resource>
   public typealias BatchCompletionHandler = () -> Void
@@ -321,42 +324,136 @@ public class ResourceDownloadManager {
   /**
    * Given that an update-check query has already been run, returns whether or not any updates are available.
    */
+  public var updateCacheIsCurrent: Bool {
+    let packages = ResourceFileManager.shared.installedPackages
+
+    let packageWithOldestCache = packages.min { lhs, rhs in
+      if let lhsTimestamp = lhs.versionQueryCache.timestampForLastQuery,
+         let rhsTimestamp = rhs.versionQueryCache.timestampForLastQuery {
+        return lhsTimestamp <= rhsTimestamp
+      } else {
+        // Ensure that the 'nil' timestamp is returned overall if it exists.
+        return rhs.versionQueryCache.timestampForLastQuery != nil
+      }
+    }
+
+    // If there are no packages, the cache is considered 'current' - there's nothing to update.
+    guard let package = packageWithOldestCache else {
+      return true
+    }
+
+    // If there is no timestamp for the 'oldest' entry, there's nothing cached for at least one package.
+    // We should run the query to initialize its distribution-state metadata.
+    guard let timestamp = package.versionQueryCache.timestampForLastQuery else {
+      return false
+    }
+
+    // Every package has a cached entry... but are they recent enough?
+    let date = unitTestCurrentDate ?? Date()
+    let now = date.timeIntervalSince1970
+    let timeDelta = now - timestamp
+
+    return timeDelta <= ResourceDownloadManager.DISTRIBUTION_CACHE_VALIDITY_THRESHOLD
+  }
+
+  /**
+   * Indicates whether any packages are known to be updatable based on the most recently
+   * cached package-version query for each.  To bypass the cache and query for updated results,
+   * use `queryKeysForUpdatablePackages` instead.
+   */
   public var updatesAvailable: Bool {
     get {
-      return getAvailableUpdates() != nil
+      return getKeysForUpdatablePackages().count > 0
     }
   }
 
+  /**
+   * Returns a Set of package keys for packages known to be updatable,
+   * based upon the results of their most recently-run latest-version queries.
+   *
+   * If neither `KeymanPackage.queryCurrentVersions` nor `KeymanPackage.queryDistributionStates`
+   * has been run for a package, it is assumed to be current, as this is a synchronous method.
+   */
+  public func getKeysForUpdatablePackages() -> Set<KeymanPackage.Key> {
+    let packages = ResourceFileManager.shared.installedPackages
+
+    let keys: [KeymanPackage.Key] = packages.compactMap { package in
+      guard package.versionQueryCache.distributionMethod == .cloud,
+            let versionString = package.versionQueryCache.latestVersion,
+            let latestVersion = Version(versionString) else {
+        // We only update packages with full cloud support.
+        return nil
+      }
+
+      if package.version < latestVersion {
+        return package.key
+      } else {
+        return nil
+      }
+    }
+
+    return Set(keys)
+  }
+
+  /**
+   * Queries the cloud for the latest version of every installed package, returning a Set
+   * of keys for packages with available updates.  The results will also be cached for use
+   * with related `get`-prefixed methods, like `getKeysForUpdatablePackages`.
+   */
+  public func queryKeysForUpdatablePackages(completionBlock: @escaping (Set<KeymanPackage.Key>?, Error?) -> Void) {
+    let allPackages = ResourceFileManager.shared.installedPackages
+
+    // This call will automatically cache the results for future use / access by the 'get' equivalent.
+    KeymanPackage.queryCurrentVersions(for: allPackages.map { $0.key }, withSession: session) { results, error in
+      guard error == nil, let results = results else {
+        completionBlock(nil, error)
+        return
+      }
+
+      let updatables: [KeymanPackage.Key] = allPackages.compactMap { package in
+        guard let result = results[package.key] else {
+          return nil
+        }
+
+        return package.version < result ? package.key : nil
+      }
+
+      completionBlock(Set(updatables), nil)
+    }
+  }
+
+  // Possibly worth not deprecating, as its continued existence doesn't exactly hurt anything.
+  // But its intended partner method will no longer exist, so... yeah.
+  @available(*, deprecated, message: "Deprecated in favor of `getKeysForUpdatablePackages`.")
   public func getAvailableUpdates() -> [AnyLanguageResource]? {
-    // Relies upon KMManager's preload; this was the case before the rework.
-    if Manager.shared.apiKeyboardRepository.languages == nil && Manager.shared.apiLexicalModelRepository.languages == nil {
+    let updatablePackages = getKeysForUpdatablePackages()
+
+    // To maintain the original behavior.
+    guard updatablePackages.count > 0 else {
       return nil
     }
 
-    isDidUpdateCheck = true
-    
-    var updatables: [AnyLanguageResource] = []
+    // As updatablePackages is a Set (and keys are Hashable), the lookups are O(1).
+    let updatables: [AnyLanguageResource] = Storage.active.userDefaults.userResources?.compactMap { updatablePackages.contains($0.packageKey) ? $0 : nil } ?? []
 
-    // Gets the list of current, local keyboards in need of an update.
-    // Version matches the current version, not the updated version.
-    let kbds = getUpdatableKeyboards()
-    updatables.append(contentsOf: kbds)
-
-    // Likewise for lexical models.
-    let lexModels = getUpdatableLexicalModels()
-    updatables.append(contentsOf: lexModels)
-    
     if updatables.count > 0 {
       return updatables
     } else {
       return nil
     }
   }
-  
+
+  @available(*, deprecated, message: "") // TODO:  Properly document once the target method is written.
   public func performUpdates(forResources resources: [AnyLanguageResource]) {
     // The plan is to create new notifications to handle batch updates here, rather than
     // require a UI to manage the update queue.
     var batches: [AnyDownloadBatch] = []
+
+    /* For fixing the TODOs: we can probably map the resources to a Set of their
+     * represented package keys, then just use the package-key based update method.
+     *
+     * You know, once it's written.
+     */
 
     // TODO:  Keyboard update is broken, as apiKeyboardRepository will specify the wrong file.
     // TODO:  Merge the keyboard and lexical model pathways; it's WET code.
@@ -390,42 +487,6 @@ public class ResourceDownloadManager {
                                      startBlock: resourceBatchUpdateStartClosure(for: resources),
                                      completionBlock: resourceBatchUpdateCompletionClosure(for: resources))
     downloader.queue(.compositeBatch(batchUpdate))
-  }
-  
-  private func getUpdatableKeyboards() -> [InstallableKeyboard] {
-    var updateQueue: [InstallableKeyboard] = []
-    var kbIDs = Set<String>()
-    
-    // Build the keyboard update queue
-    Storage.active.userDefaults.userKeyboards?.forEach { kb in
-      let kbState = stateForKeyboard(withID: kb.id)
-      if kbState == .needsUpdate {
-        if(!kbIDs.contains(kb.id)) {
-          kbIDs.insert(kb.id)
-          updateQueue.append(kb)
-        }
-      }
-    }
-    
-    return updateQueue
-  }
-
-  private func getUpdatableLexicalModels() -> [InstallableLexicalModel] {
-    // Build the lexical model update queue
-    var updateQueue: [InstallableLexicalModel] = []
-    var lmIDs = Set<String>()
-    
-    Storage.active.userDefaults.userLexicalModels?.forEach { lm in
-      let lmState = stateForLexicalModel(withID: lm.id)
-      if lmState == .needsUpdate {
-        if !lmIDs.contains(lm.id) {
-          lmIDs.insert(lm.id)
-          updateQueue.append(lm)
-        }
-      }
-    }
-
-    return updateQueue
   }
 
   @available(*, deprecated)
