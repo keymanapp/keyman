@@ -91,6 +91,12 @@
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install" Type="string" Value="&amp;Install" />
                 <RegistryValue Root="HKCR" Key="Keyman.File.OnScreenKeyboard\Shell\install\Command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
 
+                <RegistryValue Root="HKCR" Key="keyman" Type="string" Value="URL:Keyman Protocol" />
+                <RegistryValue Root="HKCR" Key="keyman" Name="URL Protocol" Type="string" Value="" />
+                <RegistryValue Root="HKCR" Key="keyman\DefaultIcon" Type="string" Value="" />
+                <RegistryValue Root="HKCR" Key="Keyman\shell\open" Name="FriendlyAppName" Type="string" Value="Keyman Configuration" />
+                <RegistryValue Root="HKCR" Key="keyman\shell\open\command" Type="string" Value='"[#kmshell.exe]" -i "%1"' />
+
                 <RemoveFile Id="CachedInstallDirFiles" Property="CachedInstallDir" On="uninstall" Name="*" />
                 <RemoveFolder Id="CachedInstallDir" Property="CachedInstallDir" On="uninstall" />
                 <RemoveFolder Id="CachedInstallDirParent" Property="CachedInstallDirParent" On="uninstall" />
