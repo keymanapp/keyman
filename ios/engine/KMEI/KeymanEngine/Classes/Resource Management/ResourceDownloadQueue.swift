@@ -123,17 +123,17 @@ protocol AnyDownloadBatch {
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+class DownloadBatch<Package: KeymanPackage>: AnyDownloadBatch {
   typealias CompletionHandler = ResourceDownloadManager.CompletionHandler
 
   public final var downloadTasks: [DownloadTask]
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
-  public final var completionBlock: CompletionHandler<FullID.Resource>? = nil
+  public final var completionBlock: CompletionHandler<Package>? = nil
   
   public init?(do tasks: [DownloadTask],
                startBlock: (() -> Void)? = nil,
-               completionBlock: CompletionHandler<FullID.Resource>? = nil) {
+               completionBlock: CompletionHandler<Package>? = nil) {
     self.downloadTasks = tasks
 
     self.errors = Array(repeating: nil, count: tasks.count)
@@ -144,7 +144,7 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
   public init(forPackageWithKey packageKey: KeymanPackage.Key,
               from url: URL,
               startBlock: (() -> Void)?,
-              completionBlock: CompletionHandler<FullID.Resource>?) {
+              completionBlock: CompletionHandler<Package>?) {
     // If we can't build a proper DownloadTask, we can't build the batch.
     let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forKey: packageKey)
     let finalFile = ResourceFileManager.shared.cachedPackagePath(forKey: packageKey)
@@ -189,7 +189,7 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
     completionBlock = nil
 
     do {
-      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? FullID.Resource.Package {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Package {
         complete?(package, nil)
       } else {
         complete?(nil, KMPError.invalidPackage)

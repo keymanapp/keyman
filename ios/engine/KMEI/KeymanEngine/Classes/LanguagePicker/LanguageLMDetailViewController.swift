@@ -46,11 +46,11 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   override func viewDidLoad() {
     super.viewDidLoad()
     lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadStarted,
+      forName: Notifications.packageDownloadStarted,
       observer: self,
       function: LanguageLMDetailViewController.lexicalModelDownloadStarted)
     lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadFailed,
+      forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LanguageLMDetailViewController.lexicalModelDownloadFailed)
     log.info("viewDidLoad: LanguageLMDetailViewController (registered for lexicalModelDownloadStarted)")
@@ -143,7 +143,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   func downloadHandler(_ lexicalModelIndex: Int) {
     let package = packages[lexicalModelIndex]
     let lmFullID = package.0.fullID
-    let completionClosure: ResourceDownloadManager.CompletionHandler<InstallableLexicalModel> = { package, error in
+    let completionClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage> = { package, error in
       ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)(package, error)
 
       if let lm = package?.findResource(withID: lmFullID) {
@@ -151,7 +151,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       }
     }
 
-    ResourceDownloadManager.shared.downloadPackage(forFullID: lmFullID, withKey: package.0.packageKey, from: package.1, withNotifications: true, completionBlock: completionClosure)
+    ResourceDownloadManager.shared.downloadPackage(withKey: package.0.packageKey, from: package.1, withNotifications: true, completionBlock: completionClosure)
   }
   
   private func lexicalModelDownloadStarted() {

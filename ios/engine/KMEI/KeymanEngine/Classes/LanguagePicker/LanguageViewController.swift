@@ -65,11 +65,11 @@ class LanguageViewController: UITableViewController, UIAlertViewDelegate {
     title = "Add New Keyboard"
     selectedSection = NSNotFound
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
+      forName: Notifications.packageDownloadStarted,
       observer: self,
       function: LanguageViewController.keyboardDownloadStarted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
+      forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LanguageViewController.keyboardDownloadFailed)
   }

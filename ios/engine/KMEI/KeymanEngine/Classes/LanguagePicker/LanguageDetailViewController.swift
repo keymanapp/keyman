@@ -70,11 +70,11 @@ class LanguageDetailViewController: UITableViewController, UIAlertViewDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
     keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
+      forName: Notifications.packageDownloadStarted,
       observer: self,
       function: LanguageDetailViewController.keyboardDownloadStarted)
     keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
+      forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LanguageDetailViewController.keyboardDownloadFailed)
     log.info("viewDidLoad: LanguageDetailViewController (registered for keyboardDownloadStarted)")

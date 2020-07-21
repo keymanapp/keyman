@@ -44,15 +44,15 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
     
     lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadStarted,
+      forName: Notifications.packageDownloadStarted,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadStarted)
     lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadCompleted,
+      forName: Notifications.packageDownloadCompleted,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadCompleted)
     lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadFailed,
+      forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadFailed)
     
@@ -177,13 +177,13 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     return globalIndex
   }
   
-  private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+  private func lexicalModelDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
   
-  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
+  private func lexicalModelDownloadCompleted() {
     log.info("lexicalModelDownloadCompleted LexicalModelPicker")
     
     // Actually used now.
@@ -196,7 +196,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     navigationController?.popToRootViewController(animated: true)
   }
   
-  private func lexicalModelDownloadFailed(_ notification: LexicalModelDownloadFailedNotification) {
+  private func lexicalModelDownloadFailed(_ notification: PackageDownloadFailedNotification) {
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
     if let item = navigationItem.rightBarButtonItem {
@@ -296,7 +296,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       if let error = error {
         log.info("Failed to fetch lexical model list for "+self.language.id+". error: "+error.localizedDescription)
         DispatchQueue.main.async {
-          self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
+          self.lexicalModelDownloadFailed(PackageDownloadFailedNotification(packageKey: nil, error: error))
         }
         return
       }
