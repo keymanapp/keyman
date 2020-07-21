@@ -85,7 +85,7 @@ def extract_package_id(inputfile):
     return packageID.lower()
 
 
-def install_kmp_shared(inputfile, online=False):
+def install_kmp_shared(inputfile, online=False, language=None):
     """
     Install a kmp file to /usr/local/share/keyman
 
@@ -168,10 +168,7 @@ def install_kmp_shared(inputfile, online=False):
                         fpath = os.path.join(packageDir, kb['id'] + '.kmx')
                 extractico(fpath)
 
-        for kb in keyboards:
-            # install all kmx for first lang not just packageID
-            kmx_file = os.path.join(packageDir, kb['id'] + ".kmx")
-            install_to_ibus(lang, kmx_file)
+        install_keyboards_to_ibus(keyboards, packageDir, language)
     else:
         logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
         logging.info("Contents of %s:", inputfile)
@@ -182,7 +179,7 @@ def install_kmp_shared(inputfile, online=False):
         raise InstallError(InstallStatus.Abort, message)
 
 
-def install_kmp_user(inputfile, online=False):
+def install_kmp_user(inputfile, online=False, language=None):
     packageID = extract_package_id(inputfile)
     packageDir = user_keyboard_dir(packageID)
     if not os.path.isdir(packageDir):
@@ -238,7 +235,7 @@ def install_kmp_user(inputfile, online=False):
                         fpath = os.path.join(packageDir, kb['id'] + '.kmx')
                 extractico(fpath)
 
-        install_keyboards(keyboards, packageDir)
+        install_keyboards(keyboards, packageDir, language)
     else:
         logging.error("install_kmp.py: error: No kmp.json or kmp.inf found in %s", inputfile)
         logging.info("Contents of %s:", inputfile)
@@ -249,19 +246,19 @@ def install_kmp_user(inputfile, online=False):
         raise InstallError(InstallStatus.Abort, message)
 
 
-def install_keyboards(keyboards, packageDir):
+def install_keyboards(keyboards, packageDir, language=None):
     if is_gnome_shell():
-        install_keyboards_to_gnome(keyboards, packageDir)
+        install_keyboards_to_gnome(keyboards, packageDir, language)
     else:
-        install_keyboards_to_ibus(keyboards, packageDir)
+        install_keyboards_to_ibus(keyboards, packageDir, language)
 
 
-def install_keyboards_to_ibus(keyboards, packageDir):
+def install_keyboards_to_ibus(keyboards, packageDir, language=None):
     bus = get_ibus_bus()
     if bus:
         # install all kmx for first lang not just packageID
         for kb in keyboards:
-            ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
+            ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir, language)
             install_to_ibus(bus, ibus_keyboard_id)
         restart_ibus(bus)
         bus.destroy()
@@ -269,19 +266,19 @@ def install_keyboards_to_ibus(keyboards, packageDir):
         logging.debug("could not install keyboards to IBus")
 
 
-def install_keyboards_to_gnome(keyboards, packageDir):
+def install_keyboards_to_gnome(keyboards, packageDir, language=None):
     gnomeKeyboardsUtil = GnomeKeyboardsUtil()
     sources = gnomeKeyboardsUtil.read_input_sources()
 
     # install all kmx for first lang not just packageID
     for kb in keyboards:
-        ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir)
+        ibus_keyboard_id = get_ibus_keyboard_id(kb, packageDir, language)
         sources.append(('ibus', ibus_keyboard_id))
 
     gnomeKeyboardsUtil.write_input_sources(sources)
 
 
-def install_kmp(inputfile, online=False, sharedarea=False):
+def install_kmp(inputfile, online=False, sharedarea=False, language=None):
     """
     Install a kmp file
 
@@ -291,6 +288,6 @@ def install_kmp(inputfile, online=False, sharedarea=False):
         sharedarea(bool, default=False): whether install kmp to shared area or user directory
     """
     if sharedarea:
-        install_kmp_shared(inputfile, online)
+        install_kmp_shared(inputfile, online, language)
     else:
-        install_kmp_user(inputfile, online)
+        install_kmp_user(inputfile, online, language)
