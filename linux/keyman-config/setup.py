@@ -24,7 +24,7 @@ setup(
     description="Keyman for Linux configuration",
     license="MIT",
     keywords="keyman, keyman-config, keyboard",
-    url="https://www.keyman.com/",   # project home page, if any
+    url="https://keyman.com/",   # project home page, if any
     project_urls={
         "Bug Tracker": "https://github.com/keymanapp/issues",
         "Source Code": "https://github.com/keymanapp/keyman/tree/master/linux/keyman-config",
