@@ -46,18 +46,63 @@ interface FilenameAndLineNo {
  * @see https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L60-L77
  */
 export function log(code: KeymanCompilerError, message: string, source?: FilenameAndLineNo) {
-  let sourceStr = source ? `${source.filename} (${source.lineno}): ` : '';
-  let prefix = determineLogLevelTitle(code);
-  if (prefix)
-    prefix = `${prefix}: `;
+  let logMessage = source
+    ? new LogMessageFromSource(code, message, source)
+    : new LogMessage(code, message);
 
-  console.error(`${sourceStr}${prefix}${h(code)} ${message}`)
+  console.error(logMessage.format());
 }
 
 function determineLogLevelTitle(code: KeymanCompilerError): string {
   let level = code & 0xF000;
   return LOG_LEVEL_TITLE[level];
 }
+
+class LogMessage {
+  readonly code: KeymanCompilerError;
+  readonly message: string;
+
+  constructor(code: KeymanCompilerError, message: string) {
+    this.code = code;
+    this.message = message;
+  }
+
+  format(): string {
+    let prefix = determineLogLevelTitle(this.code);
+    if (prefix)
+      prefix = `${prefix}: `;
+
+    return `${prefix}${h(this.code)} ${this.message}`   
+  }
+
+  get logLevel(): KeymanCompilerError {
+    return this.code & 0xF000;
+  }
+}
+
+class LogMessageFromSource extends LogMessage {
+  readonly source: FilenameAndLineNo;
+
+  constructor(code: KeymanCompilerError, message: string, source: FilenameAndLineNo) {
+    super(code, message);
+    this.source = source;
+  }
+
+  format(): string {
+    let originalMessage = super.format();
+    return `${this.filename} (${this.lineno}): ${originalMessage}`;
+  }
+
+  get filename(): string {
+    return this.source.filename;
+  }
+
+  get lineno(): number {
+    return this.source.lineno;
+  }
+}
+
+
 
 /**
  * Format a number as a zero-padded 4 digit hexadecimal.
