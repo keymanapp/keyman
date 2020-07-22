@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.114 alpha 2020-07-22
+
+* chore(deps): bump lodash from 4.17.15 to 4.17.19 in /web/testing/regression-tests (#3360)
+
 ## 14.0.113 alpha 2020-07-21
 
 * refactor(ios/engine): update detection now based upon packages (#3362)
