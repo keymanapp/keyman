@@ -81,28 +81,20 @@ class LogMessage {
 }
 
 class LogMessageFromSource extends LogMessage {
-  readonly source: FilenameAndLineNo;
+  readonly filename: string;
+  readonly lineno: number;
 
   constructor(code: KeymanCompilerError, message: string, source: FilenameAndLineNo) {
     super(code, message);
-    this.source = source;
+    this.filename = source.filename;
+    this.lineno = source.lineno;
   }
 
   format(): string {
     let originalMessage = super.format();
     return `${this.filename} (${this.lineno}): ${originalMessage}`;
   }
-
-  get filename(): string {
-    return this.source.filename;
-  }
-
-  get lineno(): number {
-    return this.source.lineno;
-  }
 }
-
-
 
 /**
  * Format a number as a zero-padded 4 digit hexadecimal.
