@@ -1,4 +1,18 @@
 /**
+ * Log levels.
+ * 
+ * Note: Currently, this acts like a bit set, where the upper 4 bits of an
+ * unsigned 16 bit value are the log level flags.
+ */
+export enum LogLevel {
+  CERR_FATAL = 0x8000,
+  CERR_ERROR = 0x4000,
+  CERR_WARNING = 0x2000,
+  CERR_MEMORY = 0x1000,  // N.B., probably unused in TypeScript
+  CERR_INFO = 0x0000,  // N.B., not in widespread use
+};
+
+/**
  * Error codes. Use these when logging messages.
  * 
  * Extends https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/global/inc/Comperr.h
@@ -7,18 +21,13 @@ export enum KeymanCompilerError {
   CERR_LEXICAL_MODEL_MIN = 0x0800,
   CERR_LEXICAL_MODEL_MAX = 0x08FF,
 
-  CERR_FATAL = 0x8000,
-  CERR_ERROR = 0x4000,
-  CERR_WARNING = 0x2000,
-  CERR_MEMORY = 0x1000,  // N.B., probably unused in TypeScript
-
-  CERR_FATAL_LM = CERR_FATAL | CERR_LEXICAL_MODEL_MIN,
+  CERR_FATAL_LM = LogLevel.CERR_FATAL | CERR_LEXICAL_MODEL_MIN,
   /* Place all fatal LM compiler errors here! */
 
-  CERR_ERROR_LM = CERR_ERROR | CERR_LEXICAL_MODEL_MIN,
+  CERR_ERROR_LM = LogLevel.CERR_ERROR | CERR_LEXICAL_MODEL_MIN,
   /* Place all recoverable LM compiler errors here! */
 
-  CERR_WARN_LM = CERR_WARNING | CERR_LEXICAL_MODEL_MIN,
+  CERR_WARN_LM = LogLevel.CERR_WARNING | CERR_LEXICAL_MODEL_MIN,
   /* Place all LM compiler warnings here! */
   MixedNormalizationForms,
   DuplicateWordInSameFile,
@@ -29,11 +38,12 @@ export enum KeymanCompilerError {
  * 
  * Taken from https://github.com/keymanapp/keyman/blob/d83cfffe511ce65b781f919e89e3693146844849/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L39-L46
  */
-const LOG_LEVEL_TITLE = {
-  [0]: '',
-  [KeymanCompilerError.CERR_WARNING]: 'Warning',
-  [KeymanCompilerError.CERR_ERROR]: 'Error',
-  [KeymanCompilerError.CERR_FATAL]: 'Fatal Error',
+const LOG_LEVEL_TITLE: {[level in LogLevel]: string} = {
+  [LogLevel.CERR_INFO]: '',
+  [LogLevel.CERR_WARNING]: 'Warning',
+  [LogLevel.CERR_ERROR]: 'Error',
+  [LogLevel.CERR_FATAL]: 'Fatal Error',
+  [LogLevel.CERR_MEMORY]: '???',
 };
 
 /**
@@ -94,7 +104,7 @@ interface FilenameAndLineNo {
  */
 export interface LogMessage {
   readonly code: KeymanCompilerError;
-  readonly logLevel: KeymanCompilerError;
+  readonly level: LogLevel;
   readonly message: string;
 
   format(): string;
@@ -112,12 +122,12 @@ class OrdinaryLogMessage implements LogMessage {
     this.message = message;
   }
 
-  get logLevel(): KeymanCompilerError {
+  get level(): LogLevel {
     return this.code & 0xF000;
   }
 
   determineLogLevelTitle(): string {
-    return LOG_LEVEL_TITLE[this.logLevel] || '';
+    return LOG_LEVEL_TITLE[this.level] || '';
   }
 
   format(): string {

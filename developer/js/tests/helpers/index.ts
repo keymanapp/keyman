@@ -5,7 +5,7 @@
  */
 import * as path from 'path';
 import {assert} from 'chai';
-import {LogMessage, KeymanCompilerError, redirectLogMessagesTo, resetLogMessageHandler} from '../../dist/errors';
+import {LogMessage, KeymanCompilerError, redirectLogMessagesTo, resetLogMessageHandler, LogLevel} from '../../dist/errors';
 
 export interface CompilationResult {
   hasSyntaxError: boolean;
@@ -144,7 +144,7 @@ export class LogHoarder {
    * Has an error message with this code been witnessed?
    */
   hasSeenCode(code: KeymanCompilerError): boolean {
-    return !!this.messages.find(log => log.code === code);
+    return Boolean(this.messages.find(log => log.code === code));
   }
 
   /**
@@ -152,7 +152,7 @@ export class LogHoarder {
    */
   hasSeenWarnings(): boolean {
     return this.messages
-      .filter(log => log.logLevel === KeymanCompilerError.CERR_WARNING)
+      .filter(log => log.level === LogLevel.CERR_WARNING)
       .length > 0;
   }
 
