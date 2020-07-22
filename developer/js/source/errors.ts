@@ -24,17 +24,17 @@ export enum KeymanCompilerError {
   DuplicateWordInSameFile,
 }
 
+/**
+ * Human-readable titles for the various log levels.
+ * 
+ * Taken from https://github.com/keymanapp/keyman/blob/d83cfffe511ce65b781f919e89e3693146844849/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L39-L46
+ */
 const LOG_LEVEL_TITLE = {
   [0]: '',
   [KeymanCompilerError.CERR_WARNING]: 'Warning',
   [KeymanCompilerError.CERR_ERROR]: 'Error',
   [KeymanCompilerError.CERR_FATAL]: 'Fatal Error',
 };
-
-interface FilenameAndLineNo {
-  readonly filename: string;
-  readonly lineno: number;
-}
 
 /**
  * Logs compiler messages (warnings, errors, logs).
@@ -53,6 +53,17 @@ export function log(code: KeymanCompilerError, message: string, source?: Filenam
   console.error(logMessage.format());
 }
 
+/**
+ * Duct tapes together a filename and a line number of a log.
+ */
+interface FilenameAndLineNo {
+  readonly filename: string;
+  readonly lineno: number;
+}
+
+/**
+ * A log message that knows how to format itself.
+ */
 class LogMessage {
   readonly code: KeymanCompilerError;
   readonly message: string;
@@ -62,14 +73,6 @@ class LogMessage {
     this.message = message;
   }
 
-  format(): string {
-    let prefix = this.determineLogLevelTitle();
-    if (prefix)
-      prefix = `${prefix}: `;
-
-    return `${prefix}${h(this.code)} ${this.message}`   
-  }
-
   get logLevel(): KeymanCompilerError {
     return this.code & 0xF000;
   }
@@ -77,8 +80,19 @@ class LogMessage {
   determineLogLevelTitle(): string {
     return LOG_LEVEL_TITLE[this.logLevel] || '';
   }
+
+  format(): string {
+    let prefix = this.determineLogLevelTitle();
+    if (prefix)
+      prefix = `${prefix}: `;
+
+    return `${prefix}${h(this.code)} ${this.message}`   
+  }
 }
 
+/**
+ * A log message with a filename and line number.
+ */
 class LogMessageFromSource extends LogMessage {
   readonly filename: string;
   readonly lineno: number;
