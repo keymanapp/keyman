@@ -5,6 +5,7 @@
  */
 import * as path from 'path';
 import {assert} from 'chai';
+import {LogMessage, KeymanCompilerError, redirectLogMessagesTo, resetLogMessageHandler} from '../../dist/errors';
 
 export interface CompilationResult {
   hasSyntaxError: boolean;
@@ -117,6 +118,51 @@ export function compileModelSourceCode(code: string) {
   return {
     error, exportedModel, hasSyntaxError, modelConstructorName
   };
+}
+
+/**
+ * Keeps log messages
+ */
+export class LogHoarder {
+  readonly messages: LogMessage[] = [];
+  
+  /**
+   * Hoards a log message for later perusal
+   */
+  handleLog(log: LogMessage) {
+    this.messages.push(log);
+  }
+
+  /**
+   * Has an error message with this code been witnessed?
+   */
+  hasSeenCode(code: KeymanCompilerError): boolean {
+    return !!this.messages.find(log => log.code === code);
+  }
+
+  /**
+   * Have any warnings been logged?
+   */
+  hasSeenWarnings(): boolean {
+    return this.messages
+      .filter(log => log.logLevel === KeymanCompilerError.CERR_WARNING)
+      .length > 0;
+  }
+
+  /**
+   * Install the log hoarder.
+   */
+  install(): this {
+    redirectLogMessagesTo(this.handleLog.bind(this));
+    return this;
+  }
+
+  /**
+   * Return the log message handler to its default.
+   */
+  uninstall() {
+    resetLogMessageHandler()
+  }
 }
 
 type ModuleType = (a: LMLayerWorker, b: ModelsNamespace, c: WordBreakersNamespace) => any;

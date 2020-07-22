@@ -1,7 +1,8 @@
 import {parseWordListFromContents, parseWordListFromFilename, WordList} from '../dist/lexical-model-compiler/build-trie';
 import {assert} from 'chai';
 import 'mocha';
-import { makePathToFixture } from './helpers';
+import { makePathToFixture, LogHoarder } from './helpers';
+import { KeymanCompilerError } from '../dist/errors';
 
 const BOM = '\ufeff';
 const SENCOTEN_WORDLIST = {
@@ -18,6 +19,15 @@ const SENCOTEN_WORDLIST = {
 };
 
 describe('parsing a word list', function () {
+  beforeEach(function () {
+    this.logHoarder = (new LogHoarder).install()
+  })
+
+  afterEach(function () {
+    this.logHoarder.uninstall();
+    delete this.logHoarder;
+  })
+
   it('should remove the UTF-8 byte order mark from files', function () {
     let word = 'hello';
     let count = 1;
@@ -28,9 +38,12 @@ describe('parsing a word list', function () {
     let withoutBOM: WordList = {};
     parseWordListFromContents(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
+    assert.isFalse(this.logHoarder.hasSeenWarnings());
+
     let withBOM: WordList = {};
     parseWordListFromContents(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
+    assert.isFalse(this.logHoarder.hasSeenWarnings());
   });
 
   it('should read word lists in UTF-8', function () {
@@ -38,7 +51,9 @@ describe('parsing a word list', function () {
     const filename = makePathToFixture('example.qaa.sencoten', 'wordlist.tsv');
     let wordlist: WordList = {};
     parseWordListFromFilename(wordlist, filename);
+
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
+    assert.isFalse(this.logHoarder.hasSeenWarnings());
   });
 
   it('should read word lists in UTF-16 little-endian (with BOM)', function () {
@@ -47,7 +62,9 @@ describe('parsing a word list', function () {
     const filename = makePathToFixture('example.qaa.utf16le', 'wordlist.txt');
     let wordlist: WordList = {};
     parseWordListFromFilename(wordlist, filename);
+
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
+    assert.isFalse(this.logHoarder.hasSeenWarnings());
   });
 
   it('should NOT read word lists in UTF-16 big-endian (with BOM)', function () {
@@ -83,5 +100,11 @@ describe('parsing a word list', function () {
     parseWordListFromContents(repeatedWords, file);
 
     assert.deepEqual(repeatedWords, expected);
+    
+    assert.isTrue(this.logHoarder.hasSeenWarnings());
+    // hello has been seen multiple times:
+    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.DuplicateWordInSameFile));
+    // helló and hello + U+0301 have both been seen:
+    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.MixedNormalizationForms));
   });
 });
