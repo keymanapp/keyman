@@ -53,11 +53,6 @@ export function log(code: KeymanCompilerError, message: string, source?: Filenam
   console.error(logMessage.format());
 }
 
-function determineLogLevelTitle(code: KeymanCompilerError): string {
-  let level = code & 0xF000;
-  return LOG_LEVEL_TITLE[level];
-}
-
 class LogMessage {
   readonly code: KeymanCompilerError;
   readonly message: string;
@@ -68,7 +63,7 @@ class LogMessage {
   }
 
   format(): string {
-    let prefix = determineLogLevelTitle(this.code);
+    let prefix = this.determineLogLevelTitle();
     if (prefix)
       prefix = `${prefix}: `;
 
@@ -77,6 +72,10 @@ class LogMessage {
 
   get logLevel(): KeymanCompilerError {
     return this.code & 0xF000;
+  }
+
+  determineLogLevelTitle(): string {
+    return LOG_LEVEL_TITLE[this.logLevel] || '';
   }
 }
 
