@@ -64,9 +64,16 @@ public enum KeymanHosts {
     if useLocal {
       return URL.init(string: "http://keyman.com.local")!
     } else {
-      // TODO:  Once the staging-site changes are in place,
-      //        add switch-case here to select appropriate URL.
-      return URL.init(string: "https://keyman.com")!
+      // Necessary for development of the keyboard search, even though the staging site
+      // URL isn't quite stable yet.
+      switch forTier {
+        case .alpha:
+          fallthrough
+        case .beta:
+          return URL.init(string: "https://staging-keyman-com.azurewebsites.net")!
+        case .stable:
+          return URL.init(string: "https://keyman.com")!
+      }
     }
   }
 

@@ -284,4 +284,41 @@ class ResourceDownloadManagerTests: XCTestCase {
 
     wait(for: [versionQuery], timeout: 5)
   }
+
+  public func testDefaultLexicalModelForLanguage() {
+    let mockedQueryWithModel = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_en, error: nil)
+    let mockedModelDownload = TestUtils.Downloading.MockResult(location: TestUtils.LexicalModels.mtntKMP, error: nil)
+    let mockedQueryWithoutModel = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_km, error: nil)
+    mockedURLSession?.queueMockResult(.data(mockedQueryWithModel))
+    mockedURLSession?.queueMockResult(.download(mockedModelDownload))
+    mockedURLSession?.queueMockResult(.data(mockedQueryWithoutModel))
+
+    let foundExpectation = XCTestExpectation()
+    let noneExpectation = XCTestExpectation()
+
+    downloadManager?.downloader.autoExecute = true
+    downloadManager?.downloadLexicalModelsForLanguageIfExists(languageID: "en") { package, error in
+      if error != nil {
+        XCTFail()
+      }
+
+      XCTAssertNotNil(package)
+
+      foundExpectation.fulfill()
+    }
+
+    wait(for: [foundExpectation], timeout: 5)
+
+    downloadManager?.downloadLexicalModelsForLanguageIfExists(languageID: "km") { package, error in
+      if error != nil {
+        XCTFail()
+      }
+
+      XCTAssertNil(package)
+
+      noneExpectation.fulfill()
+    }
+
+    wait(for: [noneExpectation], timeout: 5)
+  }
 }
