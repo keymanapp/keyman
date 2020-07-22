@@ -84,10 +84,10 @@ export function resetLogMessageHandler() {
 }
 
 /**
- * Prints log messages to stderr. The default log action.
+ * Prints log messages to stdout. The default log action.
  */
 export function printLogs(log: LogMessage): void {
-  console.error(log.format());
+  console.log(log.format());
 }
 
 /**
