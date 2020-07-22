@@ -106,28 +106,53 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   }
 
   public static func defaultResultInstallationClosure() -> SearchCompletionHandler {
+    return defaultResultInstallationClosure(withDownloadManager: ResourceDownloadManager.shared)
+  }
+
+  // For unit testing.
+  internal static func defaultResultInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager) -> SearchCompletionHandler {
     return { packageKey, resourceKey in
       if let packageKey = packageKey {
-        let url = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: packageKey,
+        let url = downloadManager.defaultDownloadURL(forPackage: packageKey,
                                                                     andResource: resourceKey,
                                                                     asUpdate: false)
 
-        var closure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage>
+        var kbdInstallClosure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage>
 
         if let resourceKey = resourceKey {
-          closure = ResourceDownloadManager.shared.standardKeyboardInstallCompletionBlock(forFullID: resourceKey)
+          kbdInstallClosure = downloadManager.standardKeyboardInstallCompletionBlock(forFullID: resourceKey)
         } else {
-          closure = { package, error in
+          kbdInstallClosure = { package, error in
             guard package == nil || error != nil else {
               // TODO:  Show a proper alert
               return
             }
 
             // TODO:  We don't know which resource the user actually wants.  Prompt them.
+            // But for now, the old 'default' installation.
+            try ResourceFileManager.shared.finalizePackageInstall(package!, isCustom: false)
           }
         }
 
-        ResourceDownloadManager.shared.downloadPackage(withKey: packageKey, from: url, completionBlock: closure)
+        // Step 2:  don't forget to search + install a matching lexical model if possible!
+        //          We wrap the closure configured above to do so.
+        let closure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage> = { package, error in
+          guard package == nil || error != nil else {
+            // TODO:  Show a proper alert
+            return
+          }
+
+          do {
+            try kbdInstallClosure(package, error)
+            if let resourceKey = resourceKey {
+              downloadManager.downloadLexicalModelsForLanguageIfExists(languageID: resourceKey.languageID)
+            }
+          } catch {
+            // TODO:  Show a proper alert
+          }
+        }
+
+        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: closure)
       }
     }
   }
