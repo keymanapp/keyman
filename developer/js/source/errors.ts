@@ -53,7 +53,7 @@ let _logHandler: (log: LogMessage) => void = printLogs;
 export function log(code: KeymanCompilerError, message: string, source?: FilenameAndLineNo) {
   let logMessage = source
     ? new LogMessageFromSource(code, message, source)
-    : new LogMessage(code, message);
+    : new OrdinaryLogMessage(code, message);
 
   _logHandler(logMessage)
 }
@@ -92,7 +92,18 @@ interface FilenameAndLineNo {
 /**
  * A log message that knows how to format itself.
  */
-class LogMessage {
+export interface LogMessage {
+  readonly code: KeymanCompilerError;
+  readonly logLevel: KeymanCompilerError;
+  readonly message: string;
+
+  format(): string;
+}
+
+/**
+ * Concrete implementation of the log message.
+ */
+class OrdinaryLogMessage implements LogMessage {
   readonly code: KeymanCompilerError;
   readonly message: string;
 
@@ -121,7 +132,7 @@ class LogMessage {
 /**
  * A log message with a filename and line number.
  */
-class LogMessageFromSource extends LogMessage {
+class LogMessageFromSource extends OrdinaryLogMessage {
   readonly filename: string;
   readonly lineno: number;
 
