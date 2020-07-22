@@ -106,5 +106,22 @@ describe('parsing a word list', function () {
     assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.DuplicateWordInSameFile));
     // helló and hello + U+0301 have both been seen:
     assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.MixedNormalizationForms));
+
+    // Let's parse another file:
+
+    this.logHoarder.clear();
+    // Now, parse a DIFFERENT file, but with an NFD entry.
+    parseWordListFromContents(repeatedWords, "hello\u0301\t5\n");
+    assert.isTrue(this.logHoarder.hasSeenWarnings())
+    // hello + U+0301 (NFD) has been seen, but...
+    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.MixedNormalizationForms));
+    // BUT! We have not seen a duplicate **within the same file**
+    assert.isFalse(this.logHoarder.hasSeenCode(KeymanCompilerError.DuplicateWordInSameFile));
+
+    assert.deepEqual(repeatedWords, {
+      hello: expected['hello'],
+      // should have seen more of this entry:
+      "hell\u00f3": expected["hell\u00f3"] + 5,
+    });
   });
 });

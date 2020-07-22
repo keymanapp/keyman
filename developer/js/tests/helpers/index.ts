@@ -124,7 +124,14 @@ export function compileModelSourceCode(code: string) {
  * Enables one to query log messages after they have been logged.
  */
 export class LogHoarder {
-  readonly messages: LogMessage[] = [];
+  private messages: LogMessage[] = [];
+
+  /**
+   * Get rid of all log messages seen.
+   */
+  clear() {
+    this.messages = [];
+  }
   
   /**
    * Hoards a log message for later perusal.
