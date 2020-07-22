@@ -23,13 +23,21 @@ import WebKit
  * during initialization.
  */
 class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
+  enum DefaultInstallationResult {
+    case success(AnyLanguageResourceFullID)
+    case cancelled
+    case error(Error?)
+  }
+
   // Useful documentation regarding certain implementation details:
   // https://docs.google.com/document/d/1rhgMeJlCdXCi6ohPb_CuyZd0PZMoSzMqGpv1A8cMFHY/edit
 
-  typealias SearchCompletionHandler = (KeymanPackage.Key?, FullKeyboardID?) -> Void
+  typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (KeymanPackage.Key?, FullID?) -> Void
 
-  private let completionClosure: SearchCompletionHandler!
+  private let keyboardSelectionClosure: SelectionCompletedHandler<FullKeyboardID>!
+  private let lexicalModelSelectionClosure: SelectionCompletedHandler<FullLexicalModelID>!
   private let languageCode: String?
+  private let session: URLSession
 
   private static var ENDPOINT_ROOT: URL {
     var baseURL = KeymanHosts.KEYMAN_COM
@@ -44,9 +52,14 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
 
   private let REGEX_FOR_DOWNLOAD_INTERCEPT = try! NSRegularExpression(pattern: "^http(?:s)?:\\/\\/[^\\/]+\\/keyboards\\/install\\/([^?\\/]+)(?:\\?(.+))?$")
 
-  public init(languageCode: String? = nil, searchCompletionBlock: @escaping SearchCompletionHandler) {
+  public init(languageCode: String? = nil,
+              withSession session: URLSession = URLSession.shared,
+              keyboardSelectionBlock: @escaping SelectionCompletedHandler<FullKeyboardID>,
+              lexicalModelSelectionBlock: @escaping SelectionCompletedHandler<FullLexicalModelID>) {
     self.languageCode = languageCode
-    self.completionClosure = searchCompletionBlock
+    self.session = session
+    self.keyboardSelectionClosure = keyboardSelectionBlock
+    self.lexicalModelSelectionClosure = lexicalModelSelectionBlock
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -91,13 +104,31 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
         if match.numberOfRanges > 2, let lang_id_range = Range(match.range(at: 2), in: linkString) {
           let lang_id = String(linkString[lang_id_range])
           resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
+
+          Queries.LexicalModel.fetchModels(forLanguageCode: resourceKey!.languageID,
+                                           withSession: session) { results, error in
+            if let results = results {
+              if results.count == 0 {
+                self.lexicalModelSelectionClosure(nil, nil)
+              } else {
+                let lexicalModel = results[0].0
+                self.lexicalModelSelectionClosure(lexicalModel.packageKey, lexicalModel.fullID)
+              }
+            } else {
+              self.lexicalModelSelectionClosure(nil, nil)
+
+              if let error = error {
+                log.error("Could not find a lexical model for language id \"\(lang_id)\" due to error: \(String(describing: error))")
+              }
+            }
+          }
         }
 
         decisionHandler(.cancel)
 
         // Notify our caller of the search results.
         self.navigationController?.popViewController(animated: true) // Rewind UI
-        self.completionClosure(packageKey, resourceKey)
+        self.keyboardSelectionClosure(packageKey, resourceKey)
         return
       }
     }
@@ -105,54 +136,114 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
     decisionHandler(.allow)
   }
 
-  public static func defaultResultInstallationClosure() -> SearchCompletionHandler {
-    return defaultResultInstallationClosure(withDownloadManager: ResourceDownloadManager.shared)
+  public static func defaultKeyboardInstallationClosure(installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
+    return defaultKeyboardInstallationClosure(withDownloadManager: ResourceDownloadManager.shared,
+                                              installCompletionBlock: installCompletionBlock)
   }
 
   // For unit testing.
-  internal static func defaultResultInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager) -> SearchCompletionHandler {
+  internal static func defaultKeyboardInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager,
+                                                          installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
     return { packageKey, resourceKey in
       if let packageKey = packageKey {
         let url = downloadManager.defaultDownloadURL(forPackage: packageKey,
-                                                                    andResource: resourceKey,
-                                                                    asUpdate: false)
+                                                                 andResource: resourceKey,
+                                                                 asUpdate: false)
 
         var kbdInstallClosure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage>
 
-        if let resourceKey = resourceKey {
-          kbdInstallClosure = downloadManager.standardKeyboardInstallCompletionBlock(forFullID: resourceKey)
-        } else {
-          kbdInstallClosure = { package, error in
-            guard package == nil || error != nil else {
-              // TODO:  Show a proper alert
-              return
+        kbdInstallClosure = { package, error in
+          guard let package = package, error == nil else {
+            if let complete = installCompletionBlock {
+              complete(.error(error))
+            } else {
+              var message = "Could not download package \(packageKey): "
+              if let error = error {
+                message += " \(error)"
+              } else {
+                message += " <unknown error>"
+              }
+              log.error(message)
             }
-
-            // TODO:  We don't know which resource the user actually wants.  Prompt them.
-            // But for now, the old 'default' installation.
-            try ResourceFileManager.shared.finalizePackageInstall(package!, isCustom: false)
-          }
-        }
-
-        // Step 2:  don't forget to search + install a matching lexical model if possible!
-        //          We wrap the closure configured above to do so.
-        let closure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage> = { package, error in
-          guard package == nil || error != nil else {
-            // TODO:  Show a proper alert
             return
           }
 
           do {
-            try kbdInstallClosure(package, error)
             if let resourceKey = resourceKey {
-              downloadManager.downloadLexicalModelsForLanguageIfExists(languageID: resourceKey.languageID)
+              try ResourceFileManager.shared.install(resourceWithID: resourceKey, from: package)
+              installCompletionBlock?(.success(resourceKey))
+            } else {
+              // TODO:  We don't know which resource the user actually wants.  Prompt them.
+              // But for now, the old 'default' installation.
+              try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
+              // Yeah, it's ugly... but it's best to fix as part of resolution of the TODO above.
+              // That's "the first language pairing of the first keyboard in the package."
+              installCompletionBlock?(.success(package.installables.first!.first!.fullID))
             }
           } catch {
-            // TODO:  Show a proper alert
+            if let complete = installCompletionBlock {
+              complete(.error(error))
+            } else {
+              log.error("Could not install package \(packageKey): \(error)")
+            }
           }
         }
 
-        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: closure)
+        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: kbdInstallClosure)
+      } else {
+        installCompletionBlock?(.cancelled)
+      }
+    }
+  }
+
+  public static func defaultLexicalModelInstallationClosure(installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullLexicalModelID> {
+    return defaultLexicalModelInstallationClosure(withDownloadManager: ResourceDownloadManager.shared)
+  }
+
+  // For unit testing.
+  internal static func defaultLexicalModelInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager,
+                                                              installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullLexicalModelID> {
+    return { packageKey, resourceKey in
+      if let packageKey = packageKey, let resourceKey = resourceKey {
+        // TODO:  Does not currently work properly for lexical models.
+        //        That said, there are plans to remedy this.
+        let url = downloadManager.defaultDownloadURL(forPackage: packageKey,
+                                                                 andResource: resourceKey,
+                                                                 asUpdate: false)
+
+        var lmInstallClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage>
+        lmInstallClosure = { package, error in
+          if let package = package, error == nil {
+            //  perform the actual installation
+            do {
+              try ResourceFileManager.shared.install(resourceWithID: resourceKey, from: package)
+              installCompletionBlock?(.success(resourceKey))
+            } catch {
+              if let completion = installCompletionBlock {
+                completion(.error(error))
+              } else {
+                log.error("Could not install \(resourceKey) from package \(packageKey): \(error)")
+              }
+            }
+          } else {
+            if let complete = installCompletionBlock {
+              complete(.error(error))
+            } else {
+              var message = "Could not download package \(packageKey): "
+              if let error = error {
+                message += " \(error)"
+              } else {
+                message += " <unknown error>"
+              }
+              log.error(message)
+            }
+            return
+          }
+        }
+
+        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: lmInstallClosure)
+      } else {
+        installCompletionBlock?(.cancelled)
       }
     }
   }

@@ -486,7 +486,7 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
 extension InstalledLanguagesViewController {
   
   @objc func addClicked(_ sender: Any) {
-    let keyboardSearchVC = KeyboardSearchViewController(searchCompletionBlock: KeyboardSearchViewController.defaultResultInstallationClosure())
+    let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure(), lexicalModelSelectionBlock: KeyboardSearchViewController.defaultLexicalModelInstallationClosure())
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 }

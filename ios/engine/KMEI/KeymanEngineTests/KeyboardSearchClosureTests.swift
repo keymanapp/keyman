@@ -50,10 +50,12 @@ class KeyboardSearchClosureTests: XCTestCase {
        let modelQueryTask = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_km, error: nil)
 
        mockedURLSession!.queueMockResult(.download(packageDownloadTask))
-       //mockedURLSession!.queueMockResult(.data(modelQueryTask))
+       mockedURLSession!.queueMockResult(.data(modelQueryTask))
 
       // Step 2 - build closure
-      let closureToTest = KeyboardSearchViewController.defaultResultInstallationClosure(withDownloadManager: downloadManager)
+      let closureToTest = KeyboardSearchViewController.defaultResultInstallationClosure(withDownloadManager: downloadManager) //{ package, error in
+        //
+      //}
 
       let expectation = XCTestExpectation(description: "Keyboard package download & installation should complete")
 

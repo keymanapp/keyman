@@ -85,6 +85,9 @@ public class ResourceDownloadManager {
                                                                 completionBlock: CompletionHandler<FullID.Resource.Package>?)
   where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
     let packageKey = KeymanPackage.Key(id: fullID.id, type: fullID.type)
+    // TODO:  Currently invalid for model downloads.
+    //
+    //        Fortunately, this currently only affects legacy APIs.
     let packageURL = defaultDownloadURL(forPackage: KeymanPackage.Key(id: fullID.id, type: fullID.type),
                                         andResource: fullID,
                                         asUpdate: asUpdate)
