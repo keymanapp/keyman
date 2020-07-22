@@ -21,6 +21,7 @@ export enum KeymanCompilerError {
   CERR_WARN_LM = CERR_WARNING | CERR_LEXICAL_MODEL_MIN,
   /* Place all LM compiler warnings here! */
   MixedNormalizationForms,
+  DuplicateWordInSameFile,
 }
 
 const LOG_LEVEL_TITLE = {
@@ -45,12 +46,12 @@ interface FilenameAndLineNo {
  * @see https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L60-L77
  */
 export function log(code: KeymanCompilerError, message: string, source?: FilenameAndLineNo) {
-  let sourceStr = source ? `${source.filename} (${source.lineno}):` : '';
+  let sourceStr = source ? `${source.filename} (${source.lineno}): ` : '';
   let prefix = determineLogLevelTitle(code);
   if (prefix)
     prefix = `${prefix}: `;
 
-  console.error(`${sourceStr} ${prefix}${h(code)} ${message}`)
+  console.error(`${sourceStr}${prefix}${h(code)} ${message}`)
 }
 
 function determineLogLevelTitle(code: KeymanCompilerError): string {

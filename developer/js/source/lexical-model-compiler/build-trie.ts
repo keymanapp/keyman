@@ -87,6 +87,8 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
 function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
 
+  let wordsSeenInThisFile = new Set<string>();
+
   for (let [lineno, line] of source.lines()) {
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
@@ -124,6 +126,17 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
       // Treat it like a hapax legonmenom -- it exist, but only once.
       count = 1;
     }
+
+    if (wordsSeenInThisFile.has(wordform)) {
+      // The same word seen across multiple files is fine,
+      // but a word seen multiple times in one file is a problem!
+      log(
+        KeymanCompilerError.DuplicateWordInSameFile,
+        `duplicate word “${wordform}” found in same file; summing counts`,
+        {filename: source.name, lineno}
+      )
+    }
+    wordsSeenInThisFile.add(wordform);
 
     wordlist[wordform] = (wordlist[wordform] || 0) + count;
   }
