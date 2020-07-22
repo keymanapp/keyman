@@ -109,7 +109,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     if (original !== wordform) {
       // Mixed normalization forms are yucky! Warn about it.
       log(
-        KeymanCompilerError.MixedNormalizationForms,
+        KeymanCompilerError.CWARN_MixedNormalizationForms,
         `“${wordform}” is not in Unicode NFC. Automatically converting to NFC.`,
         {filename: source.name, lineno}
       )
@@ -131,7 +131,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
       // The same word seen across multiple files is fine,
       // but a word seen multiple times in one file is a problem!
       log(
-        KeymanCompilerError.DuplicateWordInSameFile,
+        KeymanCompilerError.CWARN_DuplicateWordInSameFile,
         `duplicate word “${wordform}” found in same file; summing counts`,
         {filename: source.name, lineno}
       )

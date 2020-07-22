@@ -8,7 +8,7 @@ export enum LogLevel {
   CERR_FATAL = 0x8000,
   CERR_ERROR = 0x4000,
   CERR_WARNING = 0x2000,
-  CERR_MEMORY = 0x1000,  // N.B., probably unused in TypeScript
+  // Note: 0x01000 is a memory error, but that is never raised in TypeScript
   CERR_INFO = 0x0000,  // N.B., not in widespread use
 };
 
@@ -29,8 +29,8 @@ export enum KeymanCompilerError {
 
   CERR_WARN_LM = LogLevel.CERR_WARNING | CERR_LEXICAL_MODEL_MIN,
   /* Place all LM compiler warnings here! */
-  MixedNormalizationForms,
-  DuplicateWordInSameFile,
+  CWARN_MixedNormalizationForms = 0x2801,
+  CWARN_DuplicateWordInSameFile = 0x2802,
 }
 
 /**
@@ -43,7 +43,6 @@ const LOG_LEVEL_TITLE: {[level in LogLevel]: string} = {
   [LogLevel.CERR_WARNING]: 'Warning',
   [LogLevel.CERR_ERROR]: 'Error',
   [LogLevel.CERR_FATAL]: 'Fatal Error',
-  [LogLevel.CERR_MEMORY]: '???',
 };
 
 /**

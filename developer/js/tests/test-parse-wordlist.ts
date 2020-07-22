@@ -103,9 +103,9 @@ describe('parsing a word list', function () {
     
     assert.isTrue(this.logHoarder.hasSeenWarnings());
     // hello has been seen multiple times:
-    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.DuplicateWordInSameFile));
+    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_DuplicateWordInSameFile));
     // helló and hello + U+0301 have both been seen:
-    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.MixedNormalizationForms));
+    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_MixedNormalizationForms));
 
     // Let's parse another file:
 
@@ -114,9 +114,9 @@ describe('parsing a word list', function () {
     parseWordListFromContents(repeatedWords, "hello\u0301\t5\n");
     assert.isTrue(this.logHoarder.hasSeenWarnings())
     // hello + U+0301 (NFD) has been seen, but...
-    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.MixedNormalizationForms));
+    assert.isTrue(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_MixedNormalizationForms));
     // BUT! We have not seen a duplicate **within the same file**
-    assert.isFalse(this.logHoarder.hasSeenCode(KeymanCompilerError.DuplicateWordInSameFile));
+    assert.isFalse(this.logHoarder.hasSeenCode(KeymanCompilerError.CWARN_DuplicateWordInSameFile));
 
     assert.deepEqual(repeatedWords, {
       hello: expected['hello'],
