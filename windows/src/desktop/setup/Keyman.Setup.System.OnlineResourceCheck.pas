@@ -44,6 +44,7 @@ begin
 
   http := THttpUploader.Create(nil);
   try
+    http.ShowUI := not ASilent;
     http.Request.SetURL(MakeAPIURL(API_Path_UpdateCheck_Windows));
     http.Fields.Add('version', AnsiString(currentVersion));
     http.Fields.Add('tier', AnsiString(AInstallInfo.Tier));
