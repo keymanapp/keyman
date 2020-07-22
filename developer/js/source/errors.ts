@@ -21,6 +21,7 @@ export enum KeymanCompilerError {
   CERR_LEXICAL_MODEL_MIN = 0x0800,
   CERR_LEXICAL_MODEL_MAX = 0x08FF,
 
+
   CERR_FATAL_LM = LogLevel.CERR_FATAL | CERR_LEXICAL_MODEL_MIN,
   /* Place all fatal LM compiler errors here! */
 
@@ -31,6 +32,9 @@ export enum KeymanCompilerError {
   /* Place all LM compiler warnings here! */
   CWARN_MixedNormalizationForms = 0x2801,
   CWARN_DuplicateWordInSameFile = 0x2802,
+
+  /* Errors that are not specific to the lexical model compiler: */
+  CWARN_TooManyErrorsOrWarnings = 0x20A7,
 }
 
 /**
@@ -46,9 +50,19 @@ const LOG_LEVEL_TITLE: {[level in LogLevel]: string} = {
 };
 
 /**
+ * How many errors or warnings are too many!
+ */
+export const MAX_MESSAGES = 100;
+
+/**
  * Direct where log messages go.
  */
 let _logHandler: (log: LogMessage) => void = printLogs;
+
+/**
+ * How many logs or warnings have been witnessed so far.
+ */
+let _messagesSeen = 0;
 
 /**
  * Logs compiler messages (warnings, errors, logs).
@@ -60,11 +74,23 @@ let _logHandler: (log: LogMessage) => void = printLogs;
  * @see https://github.com/keymanapp/keyman/blob/99db3c0d2448f448242e6397f9d72e9a7ccee4b9/windows/src/developer/TIKE/project/Keyman.Developer.System.Project.ProjectLog.pas#L60-L77
  */
 export function log(code: KeymanCompilerError, message: string, source?: FilenameAndLineNo) {
+  // Ignore the request if there are too many messages
+  if (_messagesSeen > MAX_MESSAGES)
+    return;
+
   let logMessage = source
     ? new LogMessageFromSource(code, message, source)
     : new OrdinaryLogMessage(code, message);
 
   _logHandler(logMessage)
+  _messagesSeen++;
+
+  if (_messagesSeen > MAX_MESSAGES) {
+      _logHandler(new OrdinaryLogMessage(
+        KeymanCompilerError.CWARN_TooManyErrorsOrWarnings,
+        `More than ${MAX_MESSAGES} warnings or errors received; suppressing further messages`
+      ));
+  }
 }
 
 /**
@@ -81,6 +107,7 @@ export function redirectLogMessagesTo(fn: (log: LogMessage) => void) {
  */
 export function resetLogMessageHandler() {
   _logHandler = printLogs;
+  _messagesSeen = 0;
 }
 
 /**
