@@ -121,13 +121,13 @@ export function compileModelSourceCode(code: string) {
 }
 
 /**
- * Keeps log messages
+ * Enables one to query log messages after they have been logged.
  */
 export class LogHoarder {
   readonly messages: LogMessage[] = [];
   
   /**
-   * Hoards a log message for later perusal
+   * Hoards a log message for later perusal.
    */
   handleLog(log: LogMessage) {
     this.messages.push(log);
@@ -150,7 +150,10 @@ export class LogHoarder {
   }
 
   /**
-   * Install the log hoarder.
+   * Overrides the global log handler, allowing one to browse log messages
+   * later.
+   * 
+   * Remember to uninstall the log handler afterwards!
    */
   install(): this {
     redirectLogMessagesTo(this.handleLog.bind(this));
@@ -159,6 +162,9 @@ export class LogHoarder {
 
   /**
    * Return the log message handler to its default.
+   * 
+   * Note: You MUST uninstall the hoarder after use!
+   * It's recommended you put this in an afterEach() callback.
    */
   uninstall() {
     resetLogMessageHandler()
