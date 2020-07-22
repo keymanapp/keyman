@@ -37,6 +37,11 @@ const LOG_LEVEL_TITLE = {
 };
 
 /**
+ * Direct where log messages go.
+ */
+let _logHandler: (log: LogMessage) => void = printLogs;
+
+/**
  * Logs compiler messages (warnings, errors, logs).
  * 
  * @param code Error code
@@ -50,7 +55,30 @@ export function log(code: KeymanCompilerError, message: string, source?: Filenam
     ? new LogMessageFromSource(code, message, source)
     : new LogMessage(code, message);
 
-  console.error(logMessage.format());
+  _logHandler(logMessage)
+}
+
+/**
+ * Override where log messages go.
+ * 
+ * @param fn The desired log message handler.
+ */
+export function redirectLogMessagesTo(fn: (log: LogMessage) => void) {
+  _logHandler = fn;
+}
+
+/**
+ * Reset the log message handler to the default.
+ */
+export function resetLogMessageHandler() {
+  _logHandler = printLogs;
+}
+
+/**
+ * Prints log messages to stderr. The default log action.
+ */
+export function printLogs(log: LogMessage): void {
+  console.error(log.format());
 }
 
 /**
