@@ -50,7 +50,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
     return baseURL
   }
 
-  private let REGEX_FOR_DOWNLOAD_INTERCEPT = try! NSRegularExpression(pattern: "^http(?:s)?:\\/\\/[^\\/]+\\/keyboards\\/install\\/([^?\\/]+)(?:\\?(.+))?$")
+  private static let REGEX_FOR_DOWNLOAD_INTERCEPT = try! NSRegularExpression(pattern: "^http(?:s)?:\\/\\/[^\\/]+\\/keyboards\\/install\\/([^?\\/]+)(?:\\?(.+))?$")
 
   public init(languageCode: String? = nil,
               withSession session: URLSession = URLSession.shared,
@@ -86,54 +86,67 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
                decidePolicyFor navigationAction: WKNavigationAction,
                decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     if navigationAction.navigationType == .linkActivated {
-      let link = navigationAction.request.url!
-      let linkString = link.absoluteString
-
-      // If it matches the format for the Keyboard Universal Link URL Pattern...
-      // (see https://docs.google.com/document/d/1rhgMeJlCdXCi6ohPb_CuyZd0PZMoSzMqGpv1A8cMFHY/edit?ts=5f11cb13#heading=h.qw7pas2adckj)
-      if let match = REGEX_FOR_DOWNLOAD_INTERCEPT.firstMatch(in: linkString,
-                                                             options: [],
-                                                             range: NSRange(location: 0, length: link.absoluteString.utf16.count)) {
-        let keyboard_id_range = Range(match.range(at: 1), in: linkString)!
-        let keyboard_id = String(linkString[keyboard_id_range])
-
-        let packageKey = KeymanPackage.Key(id: keyboard_id, type: .keyboard)
-        var resourceKey: FullKeyboardID? = nil
-
-
-        if match.numberOfRanges > 2, let lang_id_range = Range(match.range(at: 2), in: linkString) {
-          let lang_id = String(linkString[lang_id_range])
-          resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
-
-          Queries.LexicalModel.fetchModels(forLanguageCode: resourceKey!.languageID,
-                                           withSession: session) { results, error in
-            if let results = results {
-              if results.count == 0 {
-                self.lexicalModelSelectionClosure(nil, nil)
-              } else {
-                let lexicalModel = results[0].0
-                self.lexicalModelSelectionClosure(lexicalModel.packageKey, lexicalModel.fullID)
-              }
-            } else {
-              self.lexicalModelSelectionClosure(nil, nil)
-
-              if let error = error {
-                log.error("Could not find a lexical model for language id \"\(lang_id)\" due to error: \(String(describing: error))")
-              }
-            }
-          }
-        }
-
+      if let (keyboard_id, lang_id) = KeyboardSearchViewController.tryParseLink(navigationAction.request.url!) {
         decisionHandler(.cancel)
 
         // Notify our caller of the search results.
         self.navigationController?.popViewController(animated: true) // Rewind UI
-        self.keyboardSelectionClosure(packageKey, resourceKey)
+        finalize(with: keyboard_id, for: lang_id)
         return
       }
     }
 
     decisionHandler(.allow)
+  }
+
+  internal static func tryParseLink(_ link: URL) -> (String, String?)? {
+    let linkString = link.absoluteString
+
+    // If it matches the format for the Keyboard Universal Link URL Pattern...
+    // (see https://docs.google.com/document/d/1rhgMeJlCdXCi6ohPb_CuyZd0PZMoSzMqGpv1A8cMFHY/edit?ts=5f11cb13#heading=h.qw7pas2adckj)
+    if let match = REGEX_FOR_DOWNLOAD_INTERCEPT.firstMatch(in: linkString,
+                                                           options: [],
+                                                           range: NSRange(location: 0, length: linkString.utf16.count)) {
+      let keyboard_id_range = Range(match.range(at: 1), in: linkString)!
+      let keyboard_id = String(linkString[keyboard_id_range])
+
+      var lang_id: String? = nil
+      if match.numberOfRanges > 2, let lang_id_range = Range(match.range(at: 2), in: linkString) {
+        lang_id = String(linkString[lang_id_range])
+      }
+
+      return (keyboard_id, lang_id)
+    } else {
+      return nil
+    }
+  }
+
+  internal func finalize(with keyboard_id: String, for lang_id: String?) {
+    let packageKey = KeymanPackage.Key(id: keyboard_id, type: .keyboard)
+    var resourceKey: FullKeyboardID? = nil
+    if let lang_id = lang_id {
+      resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
+
+      Queries.LexicalModel.fetchModels(forLanguageCode: resourceKey!.languageID,
+                                       withSession: session) { results, error in
+        if let results = results {
+          if results.count == 0 {
+            self.lexicalModelSelectionClosure(nil, nil)
+          } else {
+            let lexicalModel = results[0].0
+            self.lexicalModelSelectionClosure(lexicalModel.packageKey, lexicalModel.fullID)
+          }
+        } else {
+          self.lexicalModelSelectionClosure(nil, nil)
+
+          if let error = error {
+            log.error("Could not find a lexical model for language id \"\(lang_id)\" due to error: \(String(describing: error))")
+          }
+        }
+      }
+    }
+
+    self.keyboardSelectionClosure(packageKey, resourceKey)
   }
 
   public static func defaultKeyboardInstallationClosure(installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
@@ -190,7 +203,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
 
-        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: downloadClosure)
+        downloadManager.downloadPackage(withKey: packageKey, from: url, withNotifications: true, completionBlock: downloadClosure)
       } else {
         finalize(as: .cancelled)
       }
@@ -246,7 +259,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
 
-        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: lmInstallClosure)
+        downloadManager.downloadPackage(withKey: packageKey, from: url, withNotifications: true, completionBlock: lmInstallClosure)
       } else {
         finalize(as: .cancelled)
       }
