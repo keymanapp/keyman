@@ -6,7 +6,7 @@ import logging
 import requests
 import requests_cache
 import os
-from keyman_config import KeymanApiUrl
+from keyman_config import KeymanComUrl, __tier__
 
 
 def get_package_download_data(packageID, weekCache=False):
@@ -52,8 +52,9 @@ def get_keyboard_data(keyboardID, weekCache=False):
         dict: Keyboard data
     """
     logging.info("Getting data for keyboard %s", keyboardID)
-    api_url = KeymanApiUrl + "/keyboard/" + keyboardID
-    logging.debug("At URL %s", api_url)
+    download_url = KeymanComUrl + '/go/package/download/' + keyboardID + \
+        '?platform=linux&tier=' + __tier__
+    logging.debug("At URL %s", download_url)
     cache_dir = keyman_cache_dir()
     current_dir = os.getcwd()
     if weekCache:
@@ -63,7 +64,7 @@ def get_keyboard_data(keyboardID, weekCache=False):
     os.chdir(cache_dir)
     requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
-    response = requests.get(api_url)
+    response = requests.get(download_url)
     logging.debug("Time: {0} / Used Cache: {1}".format(now, response.from_cache))
     os.chdir(current_dir)
     requests_cache.core.uninstall_cache()
