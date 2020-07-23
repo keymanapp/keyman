@@ -86,7 +86,8 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
                decidePolicyFor navigationAction: WKNavigationAction,
                decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     if navigationAction.navigationType == .linkActivated {
-      if let (keyboard_id, lang_id) = KeyboardSearchViewController.tryParseLink(navigationAction.request.url!) {
+      let link = navigationAction.request.url!
+      if let (keyboard_id, lang_id) = KeyboardSearchViewController.tryParseLink(link) {
         decisionHandler(.cancel)
 
         // Notify our caller of the search results.
@@ -111,8 +112,9 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
       let keyboard_id = String(linkString[keyboard_id_range])
 
       var lang_id: String? = nil
-      if match.numberOfRanges > 2, let lang_id_range = Range(match.range(at: 2), in: linkString) {
-        lang_id = String(linkString[lang_id_range])
+      let urlComponents = URLComponents(string: linkString)!
+      if let lang_id_component = urlComponents.queryItems?.first(where: { $0.name == "bcp47" }) {
+        lang_id = lang_id_component.value
       }
 
       return (keyboard_id, lang_id)
@@ -144,6 +146,8 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
       }
+    } else {
+      self.lexicalModelSelectionClosure(nil, nil)
     }
 
     self.keyboardSelectionClosure(packageKey, resourceKey)

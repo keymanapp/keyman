@@ -203,7 +203,7 @@
 		CE973D8D2484DD1900F66045 /* KMPFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE973D8C2484DD1900F66045 /* KMPFile.swift */; };
 		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CE97866224C7DD1A00C5DCBC /* KeyboardSearchClosureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE97866124C7DD1A00C5DCBC /* KeyboardSearchClosureTests.swift */; };
+		CE97866224C7DD1A00C5DCBC /* KeyboardSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */; };
 		CE9B440C23FE49F000499CAB /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B440B23FE49F000499CAB /* Migrations.swift */; };
 		CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440D23FE4E7400499CAB /* 12.0 Ad-hoc Migration.bundle */; };
 		CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */; };
@@ -504,7 +504,7 @@
 		CE973D882484DBA600F66045 /* KMPSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPSystem.swift; sourceTree = "<group>"; };
 		CE973D8A2484DCA300F66045 /* KMPOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPOptions.swift; sourceTree = "<group>"; };
 		CE973D8C2484DD1900F66045 /* KMPFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPFile.swift; sourceTree = "<group>"; };
-		CE97866124C7DD1A00C5DCBC /* KeyboardSearchClosureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSearchClosureTests.swift; sourceTree = "<group>"; };
+		CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSearchTests.swift; sourceTree = "<group>"; };
 		CE9B440B23FE49F000499CAB /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		CE9B440D23FE4E7400499CAB /* 12.0 Ad-hoc Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "12.0 Ad-hoc Migration.bundle"; sourceTree = "<group>"; };
 		CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 12.0 Migration.bundle"; sourceTree = "<group>"; };
@@ -761,7 +761,7 @@
 				CEB8276624C6811800F3D39C /* KeymanHostTests.swift */,
 				CE4459CD23FBBA8D003151FD /* AppDelegate.swift */,
 				CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */,
-				CE97866124C7DD1A00C5DCBC /* KeyboardSearchClosureTests.swift */,
+				CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */,
 				CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */,
 				CE973D842484A71700F66045 /* KMPJSONTests.swift */,
 				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
@@ -1480,7 +1480,7 @@
 				CE89642524A46D0000D5EB8E /* QueryPackageVersionTests.swift in Sources */,
 				CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */,
 				CEA9670F24BEF05A0035AACF /* Updates.swift in Sources */,
-				CE97866224C7DD1A00C5DCBC /* KeyboardSearchClosureTests.swift in Sources */,
+				CE97866224C7DD1A00C5DCBC /* KeyboardSearchTests.swift in Sources */,
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
 				CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
