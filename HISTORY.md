@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.115 alpha 2020-07-23
+
+* feat(windows): keyman: protocol handler (#3382)
+* feat(developer/compilers): logging errors and warnings in the lexical model compiler (#3385)
+
 ## 14.0.114 alpha 2020-07-22
 
 * chore(deps): bump lodash from 4.17.15 to 4.17.19 in /web/testing/regression-tests (#3360)
