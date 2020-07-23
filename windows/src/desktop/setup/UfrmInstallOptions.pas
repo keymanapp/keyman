@@ -309,6 +309,17 @@ begin
       Inc(n);
     end;
   end;
+
+  // Special case: if there are no options to change, don't present them
+  if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled then
+  begin
+    sbTargets.Visible := False;
+    lblSelectModulesToInstall.Visible := False;
+  end;
+
+  lblAssociatedKeyboardLanguage.Visible := FInstallInfo.Packages.Count > 0;
+
+
   EnableControls;
 end;
 

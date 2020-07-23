@@ -6,7 +6,6 @@ unit Keyman.Setup.System.ResourceDownloader;
 interface
 
 uses
-  httpuploader,
   Keyman.Setup.System.InstallInfo,
   UfrmDownloadProgress;
 
@@ -16,17 +15,12 @@ type
     FDownloadURL: string;
     FDownloadFilename: string;
     FInstallInfo: TInstallInfo;
-    frmDownloadProgress: TfrmDownloadProgress;
-    function DownloadFile(const ADownloadURL,
-      ADownloadFilename: string): Boolean;
-    procedure DownloadFileCallback(AOwner: TfrmDownloadProgress;
-      var Result: Boolean);
-    constructor Create(AInstallInfo: TInstallInfo);
-    procedure HTTPCheckCancel(Sender: THttpUploader; var Cancel: Boolean);
-    procedure HTTPStatus(Sender: THttpUploader; const Message: string; Position,
-      Total: Int64);
+    FSilent: Boolean;
+    function DownloadFile(const ADownloadURL, ADownloadFilename: string): Boolean;
+    procedure DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
+    constructor Create(AInstallInfo: TInstallInfo; ASilent: Boolean);
   public
-    class function Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation): Boolean;
+    class function Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation; ASilent: Boolean): Boolean;
   end;
 
 implementation
@@ -37,6 +31,7 @@ uses
   Vcl.Controls,
   Winapi.Windows,
 
+  httpuploader,
   SetupStrings,
   Upload_Settings;
 
@@ -47,11 +42,11 @@ uses
  * After installation, location will have its properties set to iilLocal;
  * the file is downloaded into TempPath, so will be removed post install.
  *}
-class function TResourceDownloader.Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation): Boolean;
+class function TResourceDownloader.Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation; ASilent: Boolean): Boolean;
 var
   rd: TResourceDownloader;
 begin
-  rd := TResourceDownloader.Create(AInstallInfo);
+  rd := TResourceDownloader.Create(AInstallInfo, ASilent);
   try
     Result := rd.DownloadFile(ALocation.Url, AInstallInfo.TempPath + ALocation.Path);
     if Result then
@@ -63,37 +58,34 @@ begin
   end;
 end;
 
-constructor TResourceDownloader.Create(AInstallInfo: TInstallInfo);
+constructor TResourceDownloader.Create(AInstallInfo: TInstallInfo; ASilent: Boolean);
 begin
   inherited Create;
   FInstallInfo := AInstallInfo;
+  FSilent := ASilent;
 end;
 
 function TResourceDownloader.DownloadFile(const ADownloadURL, ADownloadFilename: String): Boolean;
+var
+  frmDownloadProgress: TfrmDownloadProgress;
 begin
   FDownloadURL := ADownloadURL;
   FDownloadFilename := ADownloadFilename;
 
-  { Download the redistributable }
-  frmDownloadProgress := TfrmDownloadProgress.Create(nil);
-  try
-    frmDownloadProgress.Caption := FInstallInfo.Text(ssDownloadingTitle, [ExtractFileName(ADownloadFilename)]);
-    frmDownloadProgress.Callback := DownloadFileCallback;
-    Result := frmDownloadProgress.ShowModal = mrOk;
-  finally
-    frmDownloadProgress.Free;
+  if FSilent then
+    DownloadFileCallback(nil, Result)
+  else
+  begin
+    { Download the redistributable }
+    frmDownloadProgress := TfrmDownloadProgress.Create(nil);
+    try
+      frmDownloadProgress.Caption := FInstallInfo.Text(ssDownloadingTitle, [ExtractFileName(ADownloadFilename)]);
+      frmDownloadProgress.Callback := DownloadFileCallback;
+      Result := frmDownloadProgress.ShowModal = mrOk;
+    finally
+      frmDownloadProgress.Free;
+    end;
   end;
-end;
-
-procedure TResourceDownloader.HTTPCheckCancel(Sender: THttpUploader; var Cancel: Boolean);
-begin
-  frmDownloadProgress.HTTPCheckCancel(Sender, Cancel);
-end;
-
-procedure TResourceDownloader.HTTPStatus(Sender: THttpUploader;
-  const Message: string; Position, Total: Int64);  // I2855
-begin
-  frmDownloadProgress.HTTPStatus(Sender, Message, Position, Total);
 end;
 
 procedure TResourceDownloader.DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
@@ -106,8 +98,12 @@ begin
   FTempFilename := FDownloadFilename + '.download';
   http := THTTPUploader.Create(nil);
   try
-    http.OnStatus := HTTPStatus;
-    http.OnCheckCancel := HTTPCheckCancel;
+    http.ShowUI := not FSilent;
+    if Assigned(AOwner) then
+    begin
+      http.OnStatus := AOwner.HTTPStatus;
+      http.OnCheckCancel := AOwner.HTTPCheckCancel;
+    end;
     http.Request.SetURL(FDownloadURL);
     http.Upload;
     Result := http.Response.StatusCode = 200;

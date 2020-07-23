@@ -94,19 +94,15 @@ type
 
     procedure SetInstallFile(const Value: string);
     procedure DeleteFileReferences;
-    procedure InstallKeyboard(const ALogFile: string);
     procedure CheckLogFileForWarnings(const Filename: string; Silent: Boolean);
     function CleanupPaths(var xml: string): string;
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
+    procedure InstallKeyboard(const ALogFile: string);
     property InstallFile: string read FInstallFile write SetInstallFile;
     property Silent: Boolean read FSilent write FSilent;
   end;
-
-function InstallKeyboardFromFile(Owner: TComponent): Boolean;
-function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string): Boolean;
-function InstallFiles(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
 
 implementation
 
@@ -129,213 +125,12 @@ uses
   kmint,
   OnlineConstants,
   TempFileManager,
-  UfrmHTML,
-  //UfrmSelectLanguage,
   utildir,
   utilkmshell,
   utilsystem,
   utiluac,
-  UtilWaitForTSF,
   Xml.XmlDoc,
   Xml.XmlIntf;
-
-{procedure FixupShadowKeyboards;
-begin
-
-end;}
-
-procedure InstallKeyboardPackageLanguage(FPackage: IKeymanPackageInstalled; const BCP47: string);
-var
-  DefaultBCP47Language: string;
-  i: Integer;
-begin
-  if FPackage.Keyboards.Count > 1 then
-  begin
-    // We don't attempt to propagate the language association preference
-    // when there is more than one keyboard in the package. This means a
-    // little bit of nasty hoop jumping in order to get the default
-    // language code for each keyboard.
-    for i := 0 to FPackage.Keyboards.Count - 1 do
-    begin
-      DefaultBCP47Language := FPackage.Keyboards[i].DefaultBCP47Languages;
-      if DefaultBCP47Language.Contains(' ') then
-        DefaultBCP47Language := DefaultBCP47Language.Split([' '])[0];
-      (FPackage.Keyboards[i] as IKeymanKeyboardInstalled).Languages.Install(DefaultBCP47Language);
-    end;
-  end
-  else if FPackage.Keyboards.Count > 0 then
-    (FPackage.Keyboards[0] as IKeymanKeyboardInstalled).Languages.Install(BCP47);
-end;
-
-/// <summary>
-/// Takes a list of filename + bcp47 pairs (in filename=bcp47 format) and
-/// installs each package / keyboard with the associated bcp47 language. If a
-/// bcp47 value is not provided, then the default language for the package is
-/// installed. If a package contains multiple keyboards, then bcp47 should not
-/// be provided, and will be ignored if it is.
-/// This is the handler for the `-i` parameter, e.g.
-///   kmshell -i khmer_angkor.kmp c:\temp\sil_euro_latin.kmp=fr
-/// </summary>
-function InstallFiles(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
-var
-  i, j: Integer;
-  FPackage: IKeymanPackageInstalled;
-  FKeyboard: IKeymanKeyboardInstalled;
-  Filename: string;
-  FilenameBCP47: TArray<string>;
-  IsPackage: Boolean;
-begin
-  Result := False;
-  FPackage := nil;
-  FKeyboard := nil;
-
-  for i := 0 to FileNames.Count - 1 do
-  begin
-    try
-      kmcom.Keyboards.Refresh;
-
-      FilenameBCP47 := Filenames[i].Split(['=']);
-      Filename := FilenameBCP47[0];
-      IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
-
-      if (Length(FilenameBCP47) > 1) and (FilenameBCP47[1] <> '') then
-      begin
-        if IsPackage then
-        begin
-          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True, False);
-          InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[2]);
-        end
-        else
-        begin
-          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True, False);
-          FKeyboard.Languages.Install(FilenameBCP47[2]);
-        end;
-      end
-      else
-      begin
-        if AnsiSameText(ExtractFileExt(FileName), '.kmp')
-          then kmcom.Packages.Install(FileName, True)
-          else kmcom.Keyboards.Install(FileName, True);
-      end;
-      CheckForMitigationWarningFor_Win10_1803(ASilent, '');
-    except
-      on E:EOleException do
-      begin
-        if kmcom.Errors.Count = 0 then Raise;
-        if not ASilent then
-          for j := 0 to kmcom.Errors.Count - 1 do
-            ShowMessage(kmcom.Errors[j].Description);
-        Exit;
-      end;
-    end;
-
-    FPackage := nil;
-    FKeyboard := nil;
-  end;
-
-  kmcom.Keyboards.Refresh;
-  kmcom.Keyboards.Apply;
-  Result := True;
-end;
-
-procedure AddDefaultLanguageHotkey(Keyboard: IKeymanKeyboardInstalled);
-var
-  i: Integer;
-begin
-  if not Keyboard.DefaultHotkey.IsEmpty and (Keyboard.Languages.Count > 0) then
-  begin
-    for i := 0 to kmcom.Languages.Count - 1 do
-    begin
-      if kmcom.Languages[i].KeymanKeyboardLanguage = Keyboard.Languages[0] then
-      begin
-        kmcom.Languages[i].Hotkey.RawValue := Keyboard.DefaultHotkey.RawValue;
-        Break;
-      end;
-    end;
-  end;
-end;
-
-procedure AddDefaultLanguageHotkeys(InstalledKeyboards: array of IKeymanKeyboardInstalled);
-var
-  i: Integer;
-begin
-  for i := 0 to High(InstalledKeyboards) do
-    AddDefaultLanguageHotkey(InstalledKeyboards[i]);
-end;
-
-function InstallFile(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string): Boolean;
-var
-  n: Integer;
-  InstalledKeyboards: array of IKeymanKeyboardInstalled;
-  InstalledPackage: IKeymanPackageInstalled;
-  i: Integer;
-begin
-  with TfrmInstallKeyboard.Create(Owner) do
-  try
-    Silent := ASilent;
-    InstallFile := FileName;
-//TODO:    DefaultBCP47 := BCP47;
-    if ModalResult = mrCancel then
-      // failed to start install
-      Result := False
-    else
-    begin
-      if ASilent then
-      begin
-        InstallKeyboard(LogFile);
-        Result := True;
-      end
-      else
-        Result := ShowModal = mrOk;
-    end;
-  finally
-    Free;
-  end;
-
-  if not Result then
-    Exit;
-
-  kmcom.Keyboards.Refresh;
-  kmcom.Keyboards.Apply;
-  kmcom.Packages.Refresh;
-
-  InstalledPackage := nil;
-  SetLength(InstalledKeyboards, 0);
-  if LowerCase(ExtractFileExt(FileName)) = '.kmp' then
-  begin
-    n := kmcom.Packages.IndexOf(FileName);
-    if (n >= 0) then
-    begin
-      InstalledPackage := kmcom.Packages[n];
-      SetLength(InstalledKeyboards, InstalledPackage.Keyboards.Count);
-      for i := 0 to InstalledPackage.Keyboards.Count - 1 do
-        InstalledKeyboards[i] := InstalledPackage.Keyboards[i] as IKeymanKeyboardInstalled;
-    end;
-  end
-  else
-  begin
-    n := kmcom.Keyboards.IndexOf(FileName);
-    if n >= 0 then
-    begin
-      SetLength(InstalledKeyboards, 1);
-      InstalledKeyboards[0] := kmcom.Keyboards[n];
-    end;
-  end;
-
-  kmcom.Languages.Apply;
-  TWaitForTSF.WaitForLanguageProfilesToBeApplied(InstalledKeyboards);
-  AddDefaultLanguageHotkeys(InstalledKeyboards);
-
-  if InstalledPackage <> nil then
-  begin
-    //if not ASilent then SelectLanguage(False);
-    if not ASilent and not ANoWelcome then
-      DoShowPackageWelcome(InstalledPackage, False);
-  end;
-
-  {$MESSAGE HINT 'How do we correlate this with a Cancel in configuration? Do we change that to Close?' }
-  kmcom.Apply;
-end;
 
 { TfrmInstall }
 
@@ -503,6 +298,7 @@ end;
  - Control events                                                              -
  ------------------------------------------------------------------------------}
 
+// TODO: move this to TInstallFile
 procedure TfrmInstallKeyboard.InstallKeyboard(const ALogFile: string);
 var
   i: Integer;
@@ -624,24 +420,5 @@ begin
   ModalResult := mrOk;
 end;
 
-function InstallKeyboardFromFile(Owner: TComponent): Boolean;
-var
-  dlgOpen: TOpenDialog;
-begin
-  dlgOpen := TOpenDialog.Create(nil);
-  try
-    dlgOpen.Filter :=
-      'Keyman files (*.kmx, *.kxx, *.kmp)|*.kmx;*.kxx;*.kmp|Keyman keyboards (*.kmx,*.kxx)' +
-      '|*.kmx;*.kxx|Keyman packages (*.kmp)|*.kmp|All files (*.*)|*.*';
-    dlgOpen.Title := 'Install Keyman Keyboard';
-
-    if dlgOpen.Execute then
-      Result := InstallFile(Owner, dlgOpen.FileName, False, False, '', '')
-    else
-      Result := False;
-  finally
-    dlgOpen.Free;
-  end;
-end;
 
 end.

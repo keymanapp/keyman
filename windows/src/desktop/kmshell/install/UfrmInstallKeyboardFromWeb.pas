@@ -76,7 +76,7 @@ uses
 
   httpuploader,
   GlobalProxySettings,
-  UfrmInstallKeyboard,
+  Keyman.Configuration.UI.InstallFile,
   Upload_Settings,
   utilfiletypes,
   utildir,
@@ -156,7 +156,7 @@ begin
       frmDownloadProgress.Free;
     end;
 
-    if InstallFile(Self, FDownloadFilename, False, False, '', BCP47) then
+    if TInstallFile.Execute(Self, FDownloadFilename, False, False, '', BCP47) then
       ModalResult := mrOk;
 
   finally

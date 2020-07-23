@@ -183,12 +183,12 @@ uses
   ErrorControlledRegistry,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
+  Keyman.Configuration.UI.InstallFile,
   RegistryKeys,
   ShellApi,
   StrUtils,
   UfrmChangeHotkey,
   UfrmHTML,
-  UfrmInstallKeyboard,
   UfrmInstallKeyboardFromWeb,
   UfrmInstallKeyboardLanguage,
   UfrmKeyboardOptions,
@@ -496,7 +496,7 @@ procedure TfrmMain.Keyboard_Install;
 begin
   if MustReboot then Exit;  // I2789
 
-  if InstallKeyboardFromFile(Self) then
+  if TInstallFile.BrowseAndInstallKeyboardFromFile(Self) then
   begin
     RefreshKeymanConfiguration;
   end;

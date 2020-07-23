@@ -204,7 +204,7 @@ begin
   begin
     if msiLocation.LocationType = iilOnline then
     begin
-      if not TResourceDownloader.Execute(FInstallInfo, msiLocation) then
+      if not TResourceDownloader.Execute(FInstallInfo, msiLocation, FSilent) then
         Exit(False);
     end;
 
@@ -607,7 +607,7 @@ begin
         begin
           LogInfo('Downloading '+packLocation.Url);
           if packLocation.LocationType = iilOnline then
-            if not TResourceDownloader.Execute(FInstallInfo, packLocation) then
+            if not TResourceDownloader.Execute(FInstallInfo, packLocation, FSilent) then
             begin
               LogInfo('Failed to download '+packLocation.Url); // TODO: can we get more detail?
               Continue; //

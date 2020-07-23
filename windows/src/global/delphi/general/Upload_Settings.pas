@@ -94,8 +94,8 @@ const
   // Alpha versions will work against the staging server so that they
   // can access new APIs etc that will only be available there. The staging
   // servers have resource constraints but should be okay for limited use.
-  S_KeymanCom_Alpha = 'https://staging-keyman-com.azurewebsites.net';
-  S_APIServer_Alpha = 'staging-api-keyman-com.azurewebsites.net';
+  S_KeymanCom_Alpha = 'https://keyman-staging.com';
+  S_APIServer_Alpha = 'api.keyman-staging.com';
 
 const
   URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
