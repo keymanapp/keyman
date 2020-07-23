@@ -255,10 +255,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
+  // ---- CRITICAL SECTION FIELDS ----
+  // Any writes to these must be performed on `queueThread`.
+  // Async reads are permitted.
   private var queueRoot: DownloadQueueFrame
   private var queueStack: [DownloadQueueFrame]
+  // ------------- END ---------------
+
   private var queueThread: DispatchQueue
-  
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
 
