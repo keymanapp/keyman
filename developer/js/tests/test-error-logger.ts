@@ -28,5 +28,11 @@ describe('error logger', function () {
     assert.isTrue(this.logHoarder.hasSeenCode(
       KeymanCompilerError.CWARN_TooManyErrorsOrWarnings
     ));
+
+    // Log a DIFFERENT error -- it should not appear in the log
+    log(KeymanCompilerError.CWARN_MixedNormalizationForms, "fake error");
+    assert.isFalse(this.logHoarder.hasSeenCode(
+      KeymanCompilerError.CWARN_MixedNormalizationForms
+    ));
   })
 })
