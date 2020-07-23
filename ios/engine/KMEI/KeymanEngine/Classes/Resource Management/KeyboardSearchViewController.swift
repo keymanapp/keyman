@@ -143,55 +143,56 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
 
   // For unit testing.
   internal static func defaultKeyboardInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager,
+                                                          dispatchGroup: DispatchGroup? = nil,
                                                           installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
+    dispatchGroup?.enter() // register the closure for group synchronization.
+
+    // Used to finalize the results of the closure, allowing the callback to complete
+    // before signaling 'group completion' to the DispatchGroup synchronization object.
+    func finalize(as result: DefaultInstallationResult, noCallbackLog message: String? = nil) {
+      if let installCompletionBlock = installCompletionBlock {
+        installCompletionBlock(result)
+      } else if let message = message {
+        log.error(message)
+      }
+
+      dispatchGroup?.leave() // "fulfill" this closure's aspect of the group's synchronization scheme.
+    }
+
     return { packageKey, resourceKey in
       if let packageKey = packageKey {
         let url = downloadManager.defaultDownloadURL(forPackage: packageKey,
                                                                  andResource: resourceKey,
                                                                  asUpdate: false)
-
-        var kbdInstallClosure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage>
-
-        kbdInstallClosure = { package, error in
+        let downloadClosure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage> = { package, error in
           guard let package = package, error == nil else {
-            if let complete = installCompletionBlock {
-              complete(.error(error))
-            } else {
-              var message = "Could not download package \(packageKey): "
-              if let error = error {
-                message += " \(error)"
-              } else {
-                message += " <unknown error>"
-              }
-              log.error(message)
-            }
+            let errString = error != nil ? String(describing: error) : "<unknown error>"
+            let message = "Could not download package \(packageKey): \(errString)"
+
+            finalize(as: .error(error), noCallbackLog: message)
             return
           }
 
           do {
             if let resourceKey = resourceKey {
               try ResourceFileManager.shared.install(resourceWithID: resourceKey, from: package)
-              installCompletionBlock?(.success(resourceKey))
+              finalize(as: .success(resourceKey))
             } else {
               // TODO:  We don't know which resource the user actually wants.  Prompt them.
               // But for now, the old 'default' installation.
               try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
               // Yeah, it's ugly... but it's best to fix as part of resolution of the TODO above.
               // That's "the first language pairing of the first keyboard in the package."
-              installCompletionBlock?(.success(package.installables.first!.first!.fullID))
+              finalize(as: .success(package.installables.first!.first!.fullID))
             }
           } catch {
-            if let complete = installCompletionBlock {
-              complete(.error(error))
-            } else {
-              log.error("Could not install package \(packageKey): \(error)")
-            }
+            finalize(as: .error(error), noCallbackLog: "Could not install package \(packageKey): \(error)")
           }
         }
 
-        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: kbdInstallClosure)
+        downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: downloadClosure)
       } else {
-        installCompletionBlock?(.cancelled)
+        finalize(as: .cancelled)
       }
     }
   }
@@ -202,7 +203,22 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
 
   // For unit testing.
   internal static func defaultLexicalModelInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager,
+                                                              dispatchGroup: DispatchGroup? = nil,
                                                               installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullLexicalModelID> {
+    dispatchGroup?.enter() // register the closure for group synchronization.
+
+    // Used to finalize the results of the closure, allowing the callback to complete
+    // before signaling 'group completion' to the DispatchGroup synchronization object.
+    func finalize(as result: DefaultInstallationResult, noCallbackLog message: String? = nil) {
+      if let installCompletionBlock = installCompletionBlock {
+        installCompletionBlock(result)
+      } else if let message = message {
+        log.error(message)
+      }
+
+      dispatchGroup?.leave() // "fulfill" this closure's aspect of the group's synchronization scheme.
+    }
+
     return { packageKey, resourceKey in
       if let packageKey = packageKey, let resourceKey = resourceKey {
         // TODO:  Does not currently work properly for lexical models.
@@ -217,33 +233,22 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
             //  perform the actual installation
             do {
               try ResourceFileManager.shared.install(resourceWithID: resourceKey, from: package)
-              installCompletionBlock?(.success(resourceKey))
+              finalize(as: .success(resourceKey))
             } catch {
-              if let completion = installCompletionBlock {
-                completion(.error(error))
-              } else {
-                log.error("Could not install \(resourceKey) from package \(packageKey): \(error)")
-              }
+              finalize(as: .error(error), noCallbackLog: "Could not install \(resourceKey) from package \(packageKey): \(error)")
             }
           } else {
-            if let complete = installCompletionBlock {
-              complete(.error(error))
-            } else {
-              var message = "Could not download package \(packageKey): "
-              if let error = error {
-                message += " \(error)"
-              } else {
-                message += " <unknown error>"
-              }
-              log.error(message)
-            }
+            let errString = error != nil ? String(describing: error) : "<unknown error>"
+            let message = "Could not download package \(packageKey): \(errString)"
+
+            finalize(as: .error(error), noCallbackLog: message)
             return
           }
         }
 
         downloadManager.downloadPackage(withKey: packageKey, from: url, completionBlock: lmInstallClosure)
       } else {
-        installCompletionBlock?(.cancelled)
+        finalize(as: .cancelled)
       }
     }
   }
