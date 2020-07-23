@@ -1,4 +1,5 @@
 import { readFileSync } from "fs";
+import { log, KeymanCompilerError } from "../errors";
 
 // Supports LF or CRLF line terminators.
 const NEWLINE_SEPARATOR = /\u000d?\u000a/;
@@ -6,7 +7,7 @@ const NEWLINE_SEPARATOR = /\u000d?\u000a/;
 /**
  * A word list is (conceptually) an array of pairs: the concrete word form itself + a
  * non-negative count.
- * 
+ *
  * Since each word should only appear once within the list, we represent it with
  * an associative array pattern keyed by the wordform.
  */
@@ -86,7 +87,8 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
 function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
 
-  // @ts-ignore: unused
+  let wordsSeenInThisFile = new Set<string>();
+
   for (let [lineno, line] of source.lines()) {
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
@@ -101,8 +103,20 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     let [wordform, countText] = line.split(TAB);
 
     // Clean the word form.
-    // TODO: #2880 -- warn if we have multiple normalisation forms in the same file
-    wordform = wordform.normalize('NFC').trim();
+    let original = wordform;
+
+    wordform = wordform.normalize('NFC');
+    if (original !== wordform) {
+      // Mixed normalization forms are yucky! Warn about it.
+      log(
+        KeymanCompilerError.CWARN_MixedNormalizationForms,
+        `“${wordform}” is not in Unicode NFC. Automatically converting to NFC.`,
+        {filename: source.name, lineno}
+      )
+    }
+
+    wordform = wordform.trim()
+
     countText = (countText || '').trim();
     let count = parseInt(countText, 10);
 
@@ -113,6 +127,17 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
       count = 1;
     }
 
+    if (wordsSeenInThisFile.has(wordform)) {
+      // The same word seen across multiple files is fine,
+      // but a word seen multiple times in one file is a problem!
+      log(
+        KeymanCompilerError.CWARN_DuplicateWordInSameFile,
+        `duplicate word “${wordform}” found in same file; summing counts`,
+        {filename: source.name, lineno}
+      )
+    }
+    wordsSeenInThisFile.add(wordform);
+
     wordlist[wordform] = (wordlist[wordform] || 0) + count;
   }
 }
@@ -121,7 +146,7 @@ type LineNoAndText = [number, string];
 
 interface WordListSource {
   readonly name: string;
-  lines(): Iterator<LineNoAndText>;
+  lines(): Iterable<LineNoAndText>;
 }
 
 class WordListFromMemory implements WordListSource {
