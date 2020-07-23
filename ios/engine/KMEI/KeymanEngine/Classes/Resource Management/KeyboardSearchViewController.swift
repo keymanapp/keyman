@@ -128,27 +128,31 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
     var resourceKey: FullKeyboardID? = nil
 
     // If we have a language ID AND do not yet have a model for it.
-    if let lang_id = lang_id, Storage.active.userDefaults.preferredLexicalModelID(forLanguage: lang_id) == nil {
+    if let lang_id = lang_id {
       resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
 
-      Queries.LexicalModel.fetchModels(forLanguageCode: resourceKey!.languageID,
-                                       withSession: session) { results, error in
-        if let results = results {
-          if results.count == 0 {
-            self.lexicalModelSelectionClosure(nil, nil)
+      if Storage.active.userDefaults.userLexicalModels?.contains(where: { $0.languageID == lang_id }) == nil {
+        Queries.LexicalModel.fetchModels(forLanguageCode: resourceKey!.languageID,
+                                         withSession: session) { results, error in
+          if let results = results {
+            if results.count == 0 {
+              self.lexicalModelSelectionClosure(nil, nil)
+            } else {
+              let lexicalModel = results[0].0
+              self.lexicalModelSelectionClosure(lexicalModel.packageKey, lexicalModel.fullID)
+            }
           } else {
-            let lexicalModel = results[0].0
-            self.lexicalModelSelectionClosure(lexicalModel.packageKey, lexicalModel.fullID)
-          }
-        } else {
-          self.lexicalModelSelectionClosure(nil, nil)
+            self.lexicalModelSelectionClosure(nil, nil)
 
-          if let error = error {
-            log.error("Could not find a lexical model for language id \"\(lang_id)\" due to error: \(String(describing: error))")
+            if let error = error {
+              log.error("Could not find a lexical model for language id \"\(lang_id)\" due to error: \(String(describing: error))")
+            }
           }
         }
+      } else {
+        self.lexicalModelSelectionClosure(nil, nil)
       }
-    } else { // No language ID OR existing model for selected language?  No model download needed.
+    } else { // No language ID?  No model download possible.
       self.lexicalModelSelectionClosure(nil, nil)
     }
 

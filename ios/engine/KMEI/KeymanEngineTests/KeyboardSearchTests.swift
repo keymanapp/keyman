@@ -148,6 +148,50 @@ class KeyboardSearchTests: XCTestCase {
     wait(for: [kbdExpectation, lmExpectation, groupExpectation], timeout: 5)
   }
 
+  func testFinalizeWithLanguageModelPreinstalled() throws {
+    guard let mtntPackage = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) as? LexicalModelKeymanPackage else {
+      XCTFail()
+      return
+    }
+    try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.mtnt.fullID, from: mtntPackage)
+
+    let kbdExpectation = XCTestExpectation()
+    let lmExpectation = XCTestExpectation()
+    let groupExpectation = XCTestExpectation()
+
+    let dispatchGroup = DispatchGroup()
+
+    dispatchGroup.enter()
+    let noLangKbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { packageKey, resourceKey in
+      XCTAssertEqual(packageKey, TestUtils.Packages.Keys.sil_euro_latin)
+      XCTAssertEqual(resourceKey, TestUtils.Keyboards.sil_euro_latin.fullID)
+
+      kbdExpectation.fulfill()
+      dispatchGroup.leave()
+    }
+
+    dispatchGroup.enter()
+    let noLangLMBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { packageKey, resourceKey in
+      XCTAssertNil(packageKey)
+      XCTAssertNil(resourceKey)
+
+      lmExpectation.fulfill()
+      dispatchGroup.leave()
+    }
+
+    dispatchGroup.notify(queue: .main) {
+      groupExpectation.fulfill()
+    }
+
+    let searchNoLang = KeyboardSearchViewController(languageCode: nil,
+                                                    withSession: mockedURLSession!,
+                                                    keyboardSelectionBlock: noLangKbdBlock,
+                                                    lexicalModelSelectionBlock: noLangLMBlock)
+    searchNoLang.finalize(with: "sil_euro_latin", for: "en")
+
+    wait(for: [kbdExpectation, lmExpectation, groupExpectation], timeout: 5)
+  }
+
   func testDefaultKeyboardInstallationClosureTaggedSuccess() throws {
     // Step 1:  mocking.
     let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
