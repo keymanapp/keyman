@@ -126,7 +126,9 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   internal func finalize(with keyboard_id: String, for lang_id: String?) {
     let packageKey = KeymanPackage.Key(id: keyboard_id, type: .keyboard)
     var resourceKey: FullKeyboardID? = nil
-    if let lang_id = lang_id {
+
+    // If we have a language ID AND do not yet have a model for it.
+    if let lang_id = lang_id, Storage.active.userDefaults.preferredLexicalModelID(forLanguage: lang_id) == nil {
       resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
 
       Queries.LexicalModel.fetchModels(forLanguageCode: resourceKey!.languageID,
@@ -146,7 +148,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
       }
-    } else {
+    } else { // No language ID OR existing model for selected language?  No model download needed.
       self.lexicalModelSelectionClosure(nil, nil)
     }
 
