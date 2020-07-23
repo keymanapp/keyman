@@ -109,6 +109,7 @@ uses
   GetOsVersion,
   help,
   HTMLHelpViewer,
+  Keyman.Configuration.UI.InstallFile,
   KeymanPaths,
   KLog,
   kmint,
@@ -118,9 +119,7 @@ uses
   RegistryKeys,
   UfrmBaseKeyboard,
   UfrmKeymanBase,
-  UfrmInstallKeyboard,
   UfrmInstallKeyboardLanguage,
-  //UfrmSelectLanguage,
   UfrmSplash,
   UfrmHelp,
   UfrmHTML,
@@ -464,13 +463,7 @@ begin
         else ExitCode := 1;
 
     fmInstall:
-      if KeyboardFileNames.Count > 1 then
-      begin
-        if InstallFiles(nil, KeyboardFileNames, FSilent)
-          then ExitCode := 0
-          else ExitCode := 1;
-      end
-      else if InstallFile(nil, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
+      if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
         then ExitCode := 0
         else ExitCode := 1;
 

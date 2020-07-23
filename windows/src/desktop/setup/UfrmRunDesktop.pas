@@ -57,7 +57,6 @@ uses
   Vcl.ExtCtrls,
   Vcl.Forms,
   Vcl.Graphics,
-  Vcl.Imaging.jpeg,
   Vcl.Imaging.pngimage,
   Vcl.StdCtrls,
 
@@ -138,6 +137,7 @@ uses
   OnlineConstants,
   SFX,
   SetupStrings,
+  Keyman.System.MITLicense,
   Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
   RegistryHelpers,
@@ -644,9 +644,7 @@ procedure TfrmRunDesktop.lblLicenseClick(Sender: TObject);
 begin
   with TfrmHTML.Create(Self) do  // I2606
   try
-    Assert(FALSE, 'TODO: show linked in license content');
-    // TODO:
-//    ShowFile(FInstallInfo.LicenseFileName);  // I3476
+    ShowText(SKeymanMITLicense);
     ShowModal;
   finally
     Free;
@@ -977,6 +975,7 @@ begin
   end;
 
   lblStatus.Caption := Text;
+  lblStatus.Update;
   Update;
 end;
 

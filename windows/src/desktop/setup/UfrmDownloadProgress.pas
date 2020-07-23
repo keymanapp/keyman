@@ -26,7 +26,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls;
+  Dialogs, StdCtrls, Vcl.ComCtrls,
+
+  httpuploader;
 
 type
   TfrmDownloadProgress = class;
@@ -46,8 +48,8 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER;
   public
 
-    procedure HTTPCheckCancel(Sender: TObject; var Cancel: Boolean);
-    procedure HTTPStatus(Sender: TObject; const Message: string; Position, Total: Int64);  // I2855
+    procedure HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
+    procedure HTTPStatus(Sender: THTTPUploader; const Message: string; Position, Total: Int64);  // I2855
     property Callback: TDownloadProgressCallback read FCallback write FCallback;
     property Cancel: Boolean read FCancel;
   end;
@@ -73,12 +75,12 @@ begin
   PostMessage(Handle, WM_USER, 0, 0); // Starts process after form displays
 end;
 
-procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: TObject; var Cancel: Boolean);
+procedure TfrmDownloadProgress.HTTPCheckCancel(Sender: THTTPUploader; var Cancel: Boolean);
 begin
   Cancel := FCancel;
 end;
 
-procedure TfrmDownloadProgress.HTTPStatus(Sender: TObject;
+procedure TfrmDownloadProgress.HTTPStatus(Sender: THTTPUploader;
   const Message: string; Position, Total: Int64);  // I2855
 begin
   if Total = 0

@@ -15,27 +15,23 @@ type
     FDownloadURL: string;
     FDownloadFilename: string;
     FInstallInfo: TInstallInfo;
-    frmDownloadProgress: TfrmDownloadProgress;
-    function DownloadFile(const ADownloadURL,
-      ADownloadFilename: string): Boolean;
-    procedure DownloadFileCallback(AOwner: TfrmDownloadProgress;
-      var Result: Boolean);
-    constructor Create(AInstallInfo: TInstallInfo);
-    procedure HttpReceiveData(const Sender: TObject; AContentLength,
-      AReadCount: Int64; var Abort: Boolean);
+    FSilent: Boolean;
+    function DownloadFile(const ADownloadURL, ADownloadFilename: string): Boolean;
+    procedure DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
+    constructor Create(AInstallInfo: TInstallInfo; ASilent: Boolean);
   public
-    class function Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation): Boolean;
+    class function Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation; ASilent: Boolean): Boolean;
   end;
 
 implementation
 
 uses
   System.Classes,
-  System.Net.HttpClient,
   System.SysUtils,
   Vcl.Controls,
   Winapi.Windows,
 
+  httpuploader,
   SetupStrings,
   Upload_Settings;
 
@@ -46,11 +42,11 @@ uses
  * After installation, location will have its properties set to iilLocal;
  * the file is downloaded into TempPath, so will be removed post install.
  *}
-class function TResourceDownloader.Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation): Boolean;
+class function TResourceDownloader.Execute(AInstallInfo: TInstallInfo; ALocation: TInstallInfoFileLocation; ASilent: Boolean): Boolean;
 var
   rd: TResourceDownloader;
 begin
-  rd := TResourceDownloader.Create(AInstallInfo);
+  rd := TResourceDownloader.Create(AInstallInfo, ASilent);
   try
     Result := rd.DownloadFile(ALocation.Url, AInstallInfo.TempPath + ALocation.Path);
     if Result then
@@ -62,57 +58,66 @@ begin
   end;
 end;
 
-constructor TResourceDownloader.Create(AInstallInfo: TInstallInfo);
+constructor TResourceDownloader.Create(AInstallInfo: TInstallInfo; ASilent: Boolean);
 begin
   inherited Create;
   FInstallInfo := AInstallInfo;
+  FSilent := ASilent;
 end;
 
 function TResourceDownloader.DownloadFile(const ADownloadURL, ADownloadFilename: String): Boolean;
+var
+  frmDownloadProgress: TfrmDownloadProgress;
 begin
   FDownloadURL := ADownloadURL;
   FDownloadFilename := ADownloadFilename;
 
-  { Download the redistributable }
-  frmDownloadProgress := TfrmDownloadProgress.Create(nil);
-  try
-    frmDownloadProgress.Caption := FInstallInfo.Text(ssDownloadingTitle, [ExtractFileName(ADownloadFilename)]);
-    frmDownloadProgress.Callback := DownloadFileCallback;
-    Result := frmDownloadProgress.ShowModal = mrOk;
-  finally
-    frmDownloadProgress.Free;
+  if FSilent then
+    DownloadFileCallback(nil, Result)
+  else
+  begin
+    { Download the redistributable }
+    frmDownloadProgress := TfrmDownloadProgress.Create(nil);
+    try
+      frmDownloadProgress.Caption := FInstallInfo.Text(ssDownloadingTitle, [ExtractFileName(ADownloadFilename)]);
+      frmDownloadProgress.Callback := DownloadFileCallback;
+      Result := frmDownloadProgress.ShowModal = mrOk;
+    finally
+      frmDownloadProgress.Free;
+    end;
   end;
-end;
-
-procedure TResourceDownloader.HttpReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
-begin
-  // TODO: stop using this form and report back to main form instead
-  frmDownloadProgress.HTTPStatus(nil, FInstallInfo.Text(ssDownloadingText,[ExtractFileName(FDownloadFilename)]), AReadCount, AContentLength);
-  frmDownloadProgress.HTTPCheckCancel(nil, Abort);
 end;
 
 procedure TResourceDownloader.DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
 var
-  Client: THTTPClient;
+  http: THTTPUploader;
   Stream: TStream;
-  Response: IHTTPResponse;
   FTempFilename: string;
 begin
   Result := False;
   FTempFilename := FDownloadFilename + '.download';
-  Client := THTTPClient.Create;
+  http := THTTPUploader.Create(nil);
   try
-    Client.OnReceiveData := HttpReceiveData;
-
-    Stream := TFileStream.Create(FTempFilename, fmCreate);
-    try
-      Response := Client.Get(FDownloadURL, Stream);
-      Result := Response.StatusCode = 200;
-    finally
-      Stream.Free;
+    http.ShowUI := not FSilent;
+    if Assigned(AOwner) then
+    begin
+      http.OnStatus := AOwner.HTTPStatus;
+      http.OnCheckCancel := AOwner.HTTPCheckCancel;
+    end;
+    http.Request.SetURL(FDownloadURL);
+    http.Upload;
+    Result := http.Response.StatusCode = 200;
+    if Result then
+    begin
+      Stream := TFileStream.Create(FTempFilename, fmCreate);
+      try
+        Stream.Write(http.Response.PMessageBody^, http.Response.MessageBodyLength);
+      finally
+        Stream.Free;
+      end;
     end;
 
-    if FileExists(FTempFilename)  then
+    if FileExists(FTempFilename) then
     begin
       if Result then
       begin
@@ -124,7 +129,7 @@ begin
         System.SysUtils.DeleteFile(FTempFilename);
     end;
   finally
-    Client.Free;
+    http.Free;
   end;
 end;
 
