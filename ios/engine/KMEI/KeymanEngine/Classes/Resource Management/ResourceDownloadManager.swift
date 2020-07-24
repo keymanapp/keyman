@@ -41,55 +41,73 @@ public class ResourceDownloadManager {
   
   // MARK - Downloading resources
 
+  /**
+   * Generates a download link for the specified package.  The resulting link is planned to be evergreen, with redirects as
+   * necessary to support it long, long into the future.
+   */
+  public func defaultDownloadURL(forPackage packageKey: KeymanPackage.Key,
+                                 andResource resourceKey: AnyLanguageResourceFullID? = nil,
+                                 withVersion version: Version? = nil,
+                                 asUpdate: Bool? = nil) -> URL {
+    var baseURL = KeymanHosts.KEYMAN_COM
+    baseURL.appendPathComponent("go")
+    baseURL.appendPathComponent("package")
+    baseURL.appendPathComponent("download")
+    baseURL.appendPathComponent(packageKey.id)
+
+    var urlComponents = URLComponents(string: baseURL.absoluteString)!
+    var queryItems: [URLQueryItem] = [
+      URLQueryItem(name: "platform", value: "ios"),
+      URLQueryItem(name: "tier", value: (Version.currentTagged.tier ?? .stable).rawValue)
+    ]
+
+    if let version = version {
+      queryItems.append(URLQueryItem(name: "version", value: version.description))
+    }
+
+    if let resourceKey = resourceKey {
+      queryItems.append(URLQueryItem(name: "bcp47", value: resourceKey.languageID))
+    }
+
+    if let asUpdate = asUpdate {
+      queryItems.append(URLQueryItem(name: "update", value: asUpdate ? "1" : "0"))
+    }
+
+    urlComponents.queryItems = queryItems
+    return urlComponents.url!
+  }
+
   // Used to maintain legacy API:  downloadKeyboard and downloadLexicalModel (based on ID, language ID)
   private func downloadResource<FullID: LanguageResourceFullID>(withFullID fullID: FullID,
                                                                 sendNotifications: Bool,
+                                                                asUpdate: Bool? = nil,
                                                                 completionBlock: CompletionHandler<FullID.Resource.Package>?)
   where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
-    // Note:  in this case, someone knows the "full ID" of the resource already, but NOT its location.
-    //        We can use the package-version query to attempt a lookup for a .kmp location
-    //        for download.
     let packageKey = KeymanPackage.Key(id: fullID.id, type: fullID.type)
-    Queries.PackageVersion.fetch(for: [packageKey], withSession: session) { result, error in
-      guard let result = result, error == nil else {
-        log.info("Error occurred requesting location for \(fullID.description)")
-        self.resourceDownloadFailed(withKey: packageKey, with: error ?? .noData)
-        try? completionBlock?(nil, error ?? .noData)
-        return
-      }
+    let packageURL = defaultDownloadURL(forPackage: KeymanPackage.Key(id: fullID.id, type: fullID.type),
+                                        andResource: fullID,
+                                        asUpdate: asUpdate)
 
-      guard case let .success(data) = result.entryFor(packageKey) else {
-        if case let .failure(errorEntry) = result.entryFor(packageKey) {
-          if let errorEntry = errorEntry {
-            log.info("Query reported error: \(String(describing: errorEntry.error))")
-          }
-        }
-        self.resourceDownloadFailed(withKey: packageKey, with: Queries.ResultError.unqueried)
-        try? completionBlock?(nil, Queries.ResultError.unqueried)
-        return
-      }
-
-      // Perform common 'can download' check.  We need positive reachability and no prior download queue.
-      guard self.downloader.state == .clear else {
-        let err = self.downloader.state.error ??
-          NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
-        self.resourceDownloadFailed(withKey: packageKey, with: err)
-        try? completionBlock?(nil, err)
-        return
-      }
-
-      let completionClosure: CompletionHandler<FullID.Resource.Package> = completionBlock ?? { package, error in
-        // If the caller doesn't specify a completion block, this will carry out a default installation.
-        if let package = package {
-          try? ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
-        }
-      }
-
-      self.downloadPackage(withKey: packageKey,
-                           from: URL.init(string: data.packageURL)!,
-                           withNotifications: sendNotifications,
-                           completionBlock: completionClosure)
+    // Perform common 'can download' check.  We need positive reachability and no prior download queue.
+    guard self.downloader.state == .clear else {
+      let err = self.downloader.state.error ??
+        NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
+      self.resourceDownloadFailed(withKey: packageKey, with: err)
+      try? completionBlock?(nil, err)
+      return
     }
+
+    let completionClosure: CompletionHandler<FullID.Resource.Package> = completionBlock ?? { package, error in
+      // If the caller doesn't specify a completion block, this will carry out a default installation.
+      if let package = package {
+        try? ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
+      }
+    }
+
+    self.downloadPackage(withKey: packageKey,
+                         from: packageURL,
+                         withNotifications: sendNotifications,
+                         completionBlock: completionClosure)
   }
 
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
