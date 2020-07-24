@@ -13,16 +13,14 @@ private let toolbarButtonTag = 100
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
   private var settingsArray = [[String: String]]()
-  private var keyboardRepository: KeyboardRepository?
 
   private var doPredictionsSwitch: UISwitch?
   private var doCorrectionsSwitch: UISwitch?
   private var doCorrectionsLabel: UILabel?
   private var correctionsCell: UITableViewCell?
 
-  public init(_ keyboardRepository: KeyboardRepository?, _ inLanguage: Language) {
+  public init(_ inLanguage: Language) {
     language = inLanguage
-    self.keyboardRepository = keyboardRepository
     super.init(nibName: nil, bundle: nil)
   }
   

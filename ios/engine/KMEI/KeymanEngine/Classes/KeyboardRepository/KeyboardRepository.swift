@@ -8,6 +8,7 @@
 
 import Foundation
 
+@available(*, deprecated, message: "Use of this protocol is no longer recommended to facilitate keyboard installation.")
 public protocol KeyboardRepository: class {
   typealias CompletionHandler = (Error?) -> Void
 
@@ -19,6 +20,7 @@ public protocol KeyboardRepository: class {
   func fetch(completionHandler: CompletionHandler?)
 }
 
+@available(*, deprecated, message: "Use of this class is no longer recommended to facilitate keyboard installation.")
 public extension KeyboardRepository {
   func installableKeyboard(withID keyboardID: String, languageID: String) -> InstallableKeyboard? {
     guard let keyboard = keyboards?.first(where: { $0.key == keyboardID })?.value else {

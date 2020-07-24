@@ -108,19 +108,19 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = true
     }
-    
-    let kbState = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
-    cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
+
+    let state = ResourceFileManager.shared.installState(forPackage: KeymanPackage.Key(id: lexicalModel.id, type: .lexicalModel))
+    cell.setInstallState(state, selected: false, defaultAccessoryType: cell.accessoryType)
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
     let lexicalModelIndex = indexPath.section
     let lexicalModel = packages[lexicalModelIndex].0
-    
-    let state = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
+
+    let state = ResourceFileManager.shared.installState(forPackage: KeymanPackage.Key(id: lexicalModel.id, type: .lexicalModel))
     if state != .downloading {
-      if state == .needsDownload {
+      if state == .none {
         isUpdate = false
       } else {
         isUpdate = true
