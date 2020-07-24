@@ -9,6 +9,8 @@ if __tier__ == 'alpha':
     # servers have resource constraints but should be okay for limited use.
     KeymanComUrl = 'https://keyman-staging.com'
     KeymanApiUrl = 'https://api.keyman-staging.com'
+    KeymanDownloadsUrl = 'https://downloads.keyman-staging.com'
 else:
     KeymanComUrl = 'https://keyman.com'
     KeymanApiUrl = 'https://api.keyman.com'
+    KeymanDownloadsUrl = 'https://downloads.keyman.com'
