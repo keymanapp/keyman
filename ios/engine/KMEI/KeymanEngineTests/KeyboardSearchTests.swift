@@ -430,6 +430,55 @@ class KeyboardSearchTests: XCTestCase {
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
   }
 
+  func testDeferredLexicalModelSearch() {
+    // Step 1:  mocking.
+    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
+
+    let kbdExpectation = XCTestExpectation(description: "Keyboard package download & installation should complete")
+    let lmExpectation = XCTestExpectation(description: "Deferred lexical model search should be triggered")
+    let groupExpectation = XCTestExpectation(description: "DispatchGroup should notify")
+
+    // Step 2 - build closures & synchronization check
+    let dispatchGroup = DispatchGroup()
+
+    let kbdClosure = KeyboardSearchViewController.defaultKeyboardInstallationClosure(withDownloadManager: downloadManager, dispatchGroup: dispatchGroup) { result in
+      if case let .success(fullID) = result {
+        XCTAssertEqual(fullID as? FullKeyboardID, TestUtils.Keyboards.khmer_angkor.fullID)
+      } else {
+        XCTFail("keyboard installation did not succeed.")
+      }
+
+      kbdExpectation.fulfill()
+    }
+
+    // This whole shebang is to mock the "untagged" closure and ensure it is properly called
+    // when a language tag is discovered at/after package install, rather than at download time.
+    dispatchGroup.enter()
+    let lmCallClosure: KeyboardSearchViewController.DeferredLexicalModelSearch = { param in
+      switch param {
+        case .tag(let tag):
+          XCTAssertEqual(tag, "km")
+        default:
+          XCTFail()
+      }
+
+      lmExpectation.fulfill()
+      dispatchGroup.leave()
+    }
+
+    // As the closure has now been built (and thus, DispatchGroup.enter() called),
+    // notification only occurs the callback completes.
+    dispatchGroup.notify(queue: .main) {
+      groupExpectation.fulfill()
+    }
+
+    // Step 3 - run closure
+    kbdClosure(.untagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, lmCallClosure))
+
+    wait(for: [kbdExpectation, lmExpectation, groupExpectation], timeout: 5, enforceOrder: true)
+  }
+
   // Synchronization test:  using both closures TOGETHER.
   func testDefaultClosureSynchronization() {
     let kbdExpectation = XCTestExpectation()
