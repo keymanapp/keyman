@@ -2,3 +2,6 @@
 [*]
 indent_style = space
 indent_size = 4
+
+[*.sharedmimeinfo]
+indent_style = tab
