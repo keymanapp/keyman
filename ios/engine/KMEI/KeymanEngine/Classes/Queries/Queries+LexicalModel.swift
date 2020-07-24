@@ -65,5 +65,32 @@ extension Queries {
       let task = session.dataTask(with: urlComponents.url!, completionHandler: completionClosure)
       task.resume()
     }
+
+    /**
+     * Returns an array of package keys containing models that support the specified language.
+     */
+    public static func fetchModels(forLanguageCode bcp47: String,
+                                        fetchCompletion: @escaping ([(InstallableLexicalModel, URL)]?, Error?) -> Void) {
+      fetchModels(forLanguageCode: bcp47, withSession: URLSession.shared, fetchCompletion: fetchCompletion)
+    }
+
+    internal static func fetchModels(forLanguageCode bcp47: String,
+                                     withSession session: URLSession,
+                                     fetchCompletion: @escaping ([(InstallableLexicalModel, URL)]?, Error?) -> Void) {
+      Queries.LexicalModel.fetch(forLanguageCode: bcp47, withSession: session) { result, error in
+        if let error = error {
+          fetchCompletion(nil, error)
+          return
+        }
+
+        guard let result = result, result.count > 0 else {
+          fetchCompletion([], nil)
+          return
+        }
+
+        // There are valid packages for the language code - send off the report!
+        fetchCompletion(result.map { ($0.modelFor(languageID: bcp47)!, URL.init(string: $0.packageFilename)!) }, nil)
+      }
+    }
   }
 }

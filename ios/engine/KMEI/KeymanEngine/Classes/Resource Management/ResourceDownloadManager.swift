@@ -41,6 +41,7 @@ public class ResourceDownloadManager {
   
   // MARK - Downloading resources
 
+  // TODO:  Consider renaming this if the format will only ever be used for keyboard packages.
   /**
    * Generates a download link for the specified package.  The resulting link is planned to be evergreen, with redirects as
    * necessary to support it long, long into the future.
@@ -187,32 +188,41 @@ public class ResourceDownloadManager {
   ///   then it takes the first of the list and download the KMP package file and asks the app to open it (like adhoc download)
   /// - Parameters:
   ///   - languageID: the bcp47 string of the desired language
-  public func downloadLexicalModelsForLanguageIfExists(languageID: String) {
+  ///   - completionClosure: a optional callback that receives either an error or the default lexical model package for the specified language.. If no closure is specified, all contents of the lexical model package will be installed automatically.
+  public func downloadLexicalModelsForLanguageIfExists(languageID: String, completionClosure: CompletionHandler<LexicalModelKeymanPackage>? = nil) {
     // Note:  we aren't caching the result of this query in any way.
     // TODO:  There's no check to ensure we don't already have a model installed for the language.
     //        The original lacked this check, as well, and it's a bit of an edge case right now.
-    Queries.LexicalModel.fetch(forLanguageCode: languageID) { result, error in
+    Queries.LexicalModel.fetchModels(forLanguageCode: languageID, withSession: session) { results, error in
       if let error = error {
         // We never quite started downloading the lexical model, so there's no download to have failed.
         log.info("Failed to fetch lexical model list for "+languageID+". error: "+error.localizedDescription)
+        try? completionClosure?(nil, error)
         return
       }
 
-      guard let result = result else {
+      guard let results = results else {  // Should not be possible.
         //TODO: put up an alert instead
         log.info("No lexical models available for language \(languageID) (nil)")
+        try? completionClosure?(nil, nil)
         return
       }
 
-      if result.count == 0 {
+      if results.count == 0 {
         log.info("No lexical models available for language \(languageID) (empty)")
+        try? completionClosure?(nil, nil)
         // We automatically use the first model in the list.
-      } else if let lmFullID = result[0].modelFor(languageID: languageID)?.fullID {
+      } else {
+        let lexicalModel = results[0].0
+        let lmFullID = results[0].0.fullID
         log.info("Fetched lexical model list for "+languageID+".")
-        let completionClosure = self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
-        self.downloadPackage(withKey: KeymanPackage.Key(id: lmFullID.id, type: .lexicalModel),
-                             from: URL.init(string: result[0].packageFilename)!,
-                             completionBlock: completionClosure)
+
+        let closure = completionClosure ?? self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
+        // Its format is not yet supported for lexical models.
+//        let downloadURL = self.defaultDownloadURL(forPackage: lexicalModel.packageKey,
+//                                                  andResource: lexicalModel.fullID,
+//                                                  asUpdate: false)
+        self.downloadPackage(withKey: lexicalModel.packageKey, from: results[0].1, completionBlock: closure)
       }
     }
   }
