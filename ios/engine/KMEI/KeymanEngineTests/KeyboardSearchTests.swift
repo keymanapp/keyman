@@ -75,22 +75,29 @@ class KeyboardSearchTests: XCTestCase {
     let dispatchGroup = DispatchGroup()
 
     dispatchGroup.enter()
-    let noLangKbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { packageKey, url, resourceKey in
+    let noLangKbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { searchResult in
+      switch searchResult {
+        case .untagged(let packageKey, let url, let langTaggingClosure):
+          XCTAssertEqual(packageKey, TestUtils.Packages.Keys.khmer_angkor)
+          XCTAssertNotNil(url)
 
-      XCTAssertEqual(packageKey, TestUtils.Packages.Keys.khmer_angkor)
-      XCTAssertNotNil(url)
-      XCTAssertNil(resourceKey)
+          langTaggingClosure(.none)
+        default:
+          XCTFail()
+      }
 
       kbdExpectation.fulfill()
       dispatchGroup.leave()
     }
 
     dispatchGroup.enter()
-    let noLangLMBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { packageKey, url, resourceKey in
-
-      XCTAssertNil(packageKey)
-      XCTAssertNil(url)
-      XCTAssertNil(resourceKey)
+    let noLangLMBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { searchResult in
+      switch searchResult {
+        case .cancelled:
+          break
+        default:
+          XCTFail()
+      }
 
       lmExpectation.fulfill()
       dispatchGroup.leave()
@@ -120,20 +127,30 @@ class KeyboardSearchTests: XCTestCase {
     let dispatchGroup = DispatchGroup()
 
     dispatchGroup.enter()
-    let noLangKbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { packageKey, url, resourceKey in
-      XCTAssertEqual(packageKey, TestUtils.Packages.Keys.sil_euro_latin)
-      XCTAssertNotNil(url)
-      XCTAssertEqual(resourceKey, TestUtils.Keyboards.sil_euro_latin.fullID)
+    let kbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { searchResult in
+      switch searchResult {
+        case .tagged(let packageKey, let url, let resourceKey):
+          XCTAssertEqual(packageKey, TestUtils.Packages.Keys.sil_euro_latin)
+          XCTAssertNotNil(url)
+          XCTAssertEqual(resourceKey, TestUtils.Keyboards.sil_euro_latin.fullID)
+        default:
+          XCTFail()
+      }
 
       kbdExpectation.fulfill()
       dispatchGroup.leave()
     }
 
     dispatchGroup.enter()
-    let noLangLMBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { packageKey, url, resourceKey in
-      XCTAssertEqual(packageKey, TestUtils.Packages.Keys.nrc_en_mtnt)
-      XCTAssertNotNil(url)
-      XCTAssertEqual(resourceKey, TestUtils.LexicalModels.mtnt.fullID)
+    let lmBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { searchResult in
+      switch searchResult {
+        case .tagged(let packageKey, let url, let resourceKey):
+          XCTAssertEqual(packageKey, TestUtils.Packages.Keys.nrc_en_mtnt)
+          XCTAssertNotNil(url)
+          XCTAssertEqual(resourceKey, TestUtils.LexicalModels.mtnt.fullID)
+        default:
+          XCTFail()
+      }
 
       lmExpectation.fulfill()
       dispatchGroup.leave()
@@ -145,8 +162,8 @@ class KeyboardSearchTests: XCTestCase {
 
     let searchNoLang = KeyboardSearchViewController(languageCode: nil,
                                                     withSession: mockedURLSession!,
-                                                    keyboardSelectionBlock: noLangKbdBlock,
-                                                    lexicalModelSelectionBlock: noLangLMBlock)
+                                                    keyboardSelectionBlock: kbdBlock,
+                                                    lexicalModelSelectionBlock: lmBlock)
     searchNoLang.finalize(with: "sil_euro_latin", for: "en")
 
     wait(for: [kbdExpectation, lmExpectation, groupExpectation], timeout: 5)
@@ -166,20 +183,28 @@ class KeyboardSearchTests: XCTestCase {
     let dispatchGroup = DispatchGroup()
 
     dispatchGroup.enter()
-    let noLangKbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { packageKey, url, resourceKey in
-      XCTAssertEqual(packageKey, TestUtils.Packages.Keys.sil_euro_latin)
-      XCTAssertNotNil(url)
-      XCTAssertEqual(resourceKey, TestUtils.Keyboards.sil_euro_latin.fullID)
+    let kbdBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullKeyboardID> = { searchResult in
+      switch searchResult {
+        case .tagged(let packageKey, let url, let resourceKey):
+          XCTAssertEqual(packageKey, TestUtils.Packages.Keys.sil_euro_latin)
+          XCTAssertNotNil(url)
+          XCTAssertEqual(resourceKey, TestUtils.Keyboards.sil_euro_latin.fullID)
+        default:
+          XCTFail()
+      }
 
       kbdExpectation.fulfill()
       dispatchGroup.leave()
     }
 
     dispatchGroup.enter()
-    let noLangLMBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { packageKey, url, resourceKey in
-      XCTAssertNil(packageKey)
-      XCTAssertNil(url)
-      XCTAssertNil(resourceKey)
+    let lmBlock: KeyboardSearchViewController.SelectionCompletedHandler<FullLexicalModelID> = { searchResult in
+      switch searchResult {
+        case .cancelled:
+          break
+        default:
+          XCTFail()
+      }
 
       lmExpectation.fulfill()
       dispatchGroup.leave()
@@ -191,8 +216,8 @@ class KeyboardSearchTests: XCTestCase {
 
     let searchNoLang = KeyboardSearchViewController(languageCode: nil,
                                                     withSession: mockedURLSession!,
-                                                    keyboardSelectionBlock: noLangKbdBlock,
-                                                    lexicalModelSelectionBlock: noLangLMBlock)
+                                                    keyboardSelectionBlock: kbdBlock,
+                                                    lexicalModelSelectionBlock: lmBlock)
     searchNoLang.finalize(with: "sil_euro_latin", for: "en")
 
     wait(for: [kbdExpectation, lmExpectation, groupExpectation], timeout: 5)
@@ -226,7 +251,7 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    closure(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID)
+    closure(.tagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID))
 
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
 
@@ -263,7 +288,7 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    closure(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID)
+    closure(.tagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID))
 
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
 
@@ -297,7 +322,7 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    closure(nil, nil, nil)
+    closure(.cancelled)
 
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
   }
@@ -330,7 +355,7 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    closure(TestUtils.Packages.Keys.nrc_en_mtnt, TestUtils.LexicalModels.mtntKMP, TestUtils.LexicalModels.mtnt.fullID)
+    closure(.tagged(TestUtils.Packages.Keys.nrc_en_mtnt, TestUtils.LexicalModels.mtntKMP, TestUtils.LexicalModels.mtnt.fullID))
 
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
 
@@ -367,7 +392,7 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    closure(TestUtils.Packages.Keys.nrc_en_mtnt, TestUtils.LexicalModels.mtntKMP, TestUtils.LexicalModels.mtnt.fullID)
+    closure(.tagged(TestUtils.Packages.Keys.nrc_en_mtnt, TestUtils.LexicalModels.mtntKMP, TestUtils.LexicalModels.mtnt.fullID))
 
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
 
@@ -400,9 +425,58 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    closure(nil, nil, nil)
+    closure(.cancelled)
 
     wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
+  }
+
+  func testDeferredLexicalModelSearch() {
+    // Step 1:  mocking.
+    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
+
+    let kbdExpectation = XCTestExpectation(description: "Keyboard package download & installation should complete")
+    let lmExpectation = XCTestExpectation(description: "Deferred lexical model search should be triggered")
+    let groupExpectation = XCTestExpectation(description: "DispatchGroup should notify")
+
+    // Step 2 - build closures & synchronization check
+    let dispatchGroup = DispatchGroup()
+
+    let kbdClosure = KeyboardSearchViewController.defaultKeyboardInstallationClosure(withDownloadManager: downloadManager, dispatchGroup: dispatchGroup) { result in
+      if case let .success(fullID) = result {
+        XCTAssertEqual(fullID as? FullKeyboardID, TestUtils.Keyboards.khmer_angkor.fullID)
+      } else {
+        XCTFail("keyboard installation did not succeed.")
+      }
+
+      kbdExpectation.fulfill()
+    }
+
+    // This whole shebang is to mock the "untagged" closure and ensure it is properly called
+    // when a language tag is discovered at/after package install, rather than at download time.
+    dispatchGroup.enter()
+    let lmCallClosure: KeyboardSearchViewController.DeferredLexicalModelSearch = { param in
+      switch param {
+        case .tag(let tag):
+          XCTAssertEqual(tag, "km")
+        default:
+          XCTFail()
+      }
+
+      lmExpectation.fulfill()
+      dispatchGroup.leave()
+    }
+
+    // As the closure has now been built (and thus, DispatchGroup.enter() called),
+    // notification only occurs the callback completes.
+    dispatchGroup.notify(queue: .main) {
+      groupExpectation.fulfill()
+    }
+
+    // Step 3 - run closure
+    kbdClosure(.untagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, lmCallClosure))
+
+    wait(for: [kbdExpectation, lmExpectation, groupExpectation], timeout: 5, enforceOrder: true)
   }
 
   // Synchronization test:  using both closures TOGETHER.
@@ -423,8 +497,8 @@ class KeyboardSearchTests: XCTestCase {
     }
 
     // Step 3 - run closure
-    kbdClosure(nil, nil, nil)
-    lmClosure(nil, nil, nil)
+    kbdClosure(.cancelled)
+    lmClosure(.cancelled)
 
     // These calls will technically be synchronous, so we can rely on kbd and lm to be
     // in the correct order.  The key is that the groupExpectation is only fulfilled after

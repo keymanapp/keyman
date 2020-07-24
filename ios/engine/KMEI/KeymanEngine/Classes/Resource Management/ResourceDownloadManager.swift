@@ -509,17 +509,18 @@ public class ResourceDownloadManager {
   // Only for use with individual downloads.  Updates should have different completion handling.
   internal func resourceDownloadCompletionClosure<Package: KeymanPackage>(withKey packageKey: KeymanPackage.Key, handler: CompletionHandler<Package>?) -> CompletionHandler<Package> {
     return { package, error in
-      if let error = error {
-        self.resourceDownloadFailed(withKey: packageKey, with: error)
-      } else if let package = package {
-        // successful download
-        self.resourceDownloadCompleted(with: package)
+      guard let package = package, error == nil else {
+        self.resourceDownloadFailed(withKey: packageKey, with: error ?? NSError())
+        try? handler?(nil, error)
+        return
       }
 
       do {
         try handler?(package, error)
+        self.resourceDownloadCompleted(with: package)
       } catch {
         log.error("Unhandled error occurred after resource successfully downloaded: \(String(describing: error))")
+        self.resourceDownloadFailed(withKey: packageKey, with: error)
       }
 
       // After the custom handler operates, ensure that any changes it made are synchronized for use
