@@ -353,7 +353,13 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   
   private func keyboardDownloadFailed() {
     log.info("keyboardDownloadFailed: InstalledLanguagesViewController")
+
+    if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
+      toolbar.displayStatus("Download unsuccessful", withIndicator: false, duration: 3.0)
+    }
     restoreNavigation()
+
+    navigationController?.popToRootViewController(animated: true)
   }
   
   private func lexicalModelDownloadFailed() {
