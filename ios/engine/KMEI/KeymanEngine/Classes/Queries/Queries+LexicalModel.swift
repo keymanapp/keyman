@@ -9,8 +9,8 @@
 import Foundation
 
 extension Queries {
-  class LexicalModel {
-    struct Result: Decodable {
+  public class LexicalModel {
+    public struct Result: Decodable {
       let id: String
       let name: String
       let version: String

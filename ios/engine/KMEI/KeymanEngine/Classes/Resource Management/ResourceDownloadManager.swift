@@ -128,14 +128,6 @@ public class ResourceDownloadManager {
     downloadResource(withFullID: kbdFullID, sendNotifications: !isUpdate, completionBlock: completionBlock)
   }
 
-  private func keyboardFontURLs(forFont font: Font?, options: Options) -> [URL] {
-    guard let font = font else {
-      return []
-    }
-    return font.source.filter({ $0.hasFontExtension })
-      .map({ options.fontBaseURL.appendingPathComponent($0) })
-  }
-
   @available(*, deprecated) // Used to maintain deprecated methods stateForKeyboard, stateForLexicalModel.
   private func keyboardState(for key: KeymanPackage.Key) -> KeyboardState {
     switch(ResourceFileManager.shared.installState(forPackage: key)) {

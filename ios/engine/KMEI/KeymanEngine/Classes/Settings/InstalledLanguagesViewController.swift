@@ -22,8 +22,6 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   private var selectedSection = 0
   private var installedLanguages: [String: Language]
   private var languages: [Language] = []
-  private let keyboardRepository: KeyboardRepository?
-  private let lexicalModelRepository: LexicalModelRepository?
   
   private var isDidUpdateCheck = false
   
@@ -39,10 +37,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     } else {
       self.installedLanguages = givenLanguages!
     }
-    self.keyboardRepository = Manager.shared.apiKeyboardRepository
-    self.lexicalModelRepository = nil
     super.init(nibName: nil, bundle: nil)
-//    keyboardRepository.delegate = self
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -52,6 +47,12 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   override public func loadView() {
     super.loadView()
     languages = languageList(installedLanguages)
+  }
+
+  private func languageList(_ languageDict: [String: Language]) -> [Language] {
+    return languageDict.values.sorted { a, b -> Bool in
+      a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
+    }
   }
   
   override public func viewDidLoad() {
@@ -255,7 +256,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   }
   
   private func showLanguageSettingsView(title: String, languageIndex: Int) {
-    let langSettingsView = LanguageSettingsViewController(keyboardRepository, languages[languageIndex])
+    let langSettingsView = LanguageSettingsViewController(languages[languageIndex])
     langSettingsView.title = title
     navigationController?.pushViewController(langSettingsView, animated: true)
   }
@@ -461,31 +462,6 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
                                             handler: errorAcknowledgmentHandler))
     
     self.present(alertController, animated: true, completion: nil)
-  }
-}
-
-// MARK: - KeyboardRepositoryDelegate
-extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
-  public func keyboardRepositoryDidFetch(_ repository: KeyboardRepository) {
-    if let languageDict = repository.languages {
-      languages = languageList(languageDict)
-    }
-    self.dismissActivityView()
-    self.tableView.reloadData()
-    if self.numberOfSections(in: self.tableView) == 0 {
-      self.showConnectionErrorAlert()
-    }
-  }
-  
-  public func keyboardRepository(_ repository: KeyboardRepository, didFailFetch error: Error) {
-    dismissActivityView()
-    showConnectionErrorAlert()
-  }
-  
-  private func languageList(_ languageDict: [String: Language]) -> [Language] {
-    return languageDict.values.sorted { a, b -> Bool in
-      a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
-    }
   }
 }
 

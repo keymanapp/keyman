@@ -9,6 +9,7 @@
 import Foundation
 
 extension Queries {
+  // Kept internal; the query is 'publicly exposed' through KeymanPackage and ResourceFileManager.
   class PackageVersion {
     class ResultComponent {}
 

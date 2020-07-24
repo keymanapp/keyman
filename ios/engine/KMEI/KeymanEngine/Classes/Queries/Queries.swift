@@ -9,7 +9,7 @@
 import Foundation
 
 // The core `Queries` definition provides common utility methods, handlers, etc across our API queries.
-class Queries {
+public class Queries {
   public enum FetchError: LocalizedError {
     case networkError(Error)
     case noData
@@ -38,7 +38,7 @@ class Queries {
     }
   }
 
-  public struct IDCodingKey: CodingKey {
+  struct IDCodingKey: CodingKey {
     /* Required by CodingKey, though we don't particularly need these */
     public var intValue: Int?
 
@@ -55,7 +55,7 @@ class Queries {
     }
   }
 
-  typealias JSONQueryCompletionBlock<T: Decodable> = (_: T?, _: Queries.FetchError?) -> Void
+  public typealias JSONQueryCompletionBlock<T: Decodable> = (_: T?, _: Queries.FetchError?) -> Void
   typealias DataTaskCompletionBlock = (_: Data?, _: URLResponse?, _: Error?) -> Void
 
   /**
