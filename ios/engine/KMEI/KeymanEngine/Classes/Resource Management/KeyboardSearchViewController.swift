@@ -22,8 +22,8 @@ import WebKit
  * and return the specifications of such interceptions - the search results - to the instance's owner via a closure specified
  * during initialization.
  */
-class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
-  enum DefaultInstallationResult {
+public class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
+  public enum DefaultInstallationResult {
     case success(AnyLanguageResourceFullID)
     case cancelled
     case error(Error?)
@@ -38,7 +38,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
    * 2. The Keyman cloud URL from which that package may be downloaded.  Will be nil if and only if the first parameter is nil.
    * 3. The unique identifier for the resource WITHIN that package to install.  Useful when a package's resource(s) support multiple languages.
    */
-  typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (KeymanPackage.Key?, URL?, FullID?) -> Void
+  public typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (KeymanPackage.Key?, URL?, FullID?) -> Void
 
   private let keyboardSelectionClosure: SelectionCompletedHandler<FullKeyboardID>!
   private let lexicalModelSelectionClosure: SelectionCompletedHandler<FullLexicalModelID>!
@@ -73,7 +73,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  override func loadView() {
+  public override func loadView() {
     let webView = WKWebView()
     webView.navigationDelegate = self
     if let languageCode = languageCode {
@@ -88,7 +88,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   }
 
   // Used to intercept download links.
-  func webView(_ webView: WKWebView,
+  public func webView(_ webView: WKWebView,
                decidePolicyFor navigationAction: WKNavigationAction,
                decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     if navigationAction.navigationType == .linkActivated {
