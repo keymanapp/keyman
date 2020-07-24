@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 
-from keyman_config import KeymanComUrl
+from keyman_config import KeymanComUrl, __tier__
 from keyman_config.handle_install import download_and_install_package
 
 
@@ -77,7 +77,7 @@ class HandleInstallTests(unittest.TestCase):
 
         # Verify
         downloadKmpFileMethod.assert_called_with(
-            KeymanComUrl + '/go/package/download/sil_euro_latin?platform=linux&tier=alpha',
+            KeymanComUrl + '/go/package/download/sil_euro_latin?platform=linux&tier=' + __tier__,
             mockPackagePath)
         installPackageMethod.assert_called_with(mockPackagePath, '')
 
@@ -97,7 +97,7 @@ class HandleInstallTests(unittest.TestCase):
 
         # Verify
         downloadKmpFileMethod.assert_called_with(
-            KeymanComUrl + '/go/package/download/sil_euro_latin?platform=linux&tier=alpha',
+            KeymanComUrl + '/go/package/download/sil_euro_latin?platform=linux&tier=' + __tier__,
             mockPackagePath)
         installPackageMethod.assert_called_with(mockPackagePath, 'de')
 
