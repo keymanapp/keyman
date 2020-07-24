@@ -231,29 +231,38 @@ private class DownloadQueueFrame {
   }
 }
 
-// The other half of ResourceDownloadManager, this class is responsible for executing the downloads
-// and handling the results.
+/**
+ * The other half of ResourceDownloadManager, this class is responsible for executing the downloads
+ * and handling the results.  Internally manages its own single-threaded `DispatchQueue`, which
+ * handles all necessary synchronization.
+ *
+ * At present, submissions to this class will be evaluated sequentially by its `DispatchQueue`, though
+ * this may change at a later time.  (The 'sequential' aspect is due to legacy design decisions from
+ * before concurrency was a consideration.)
+ */
 class ResourceDownloadQueue: HTTPDownloadDelegate {
   enum QueueState: String {
     case clear
-    case busy
     case noConnection
 
     var error: Error? {
       switch(self) {
         case .clear:
           return nil
-        case .busy:
-          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
         case .noConnection:
-          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       }
     }
   }
 
+  // ---- CRITICAL SECTION FIELDS ----
+  // Any writes to these must be performed on `queueThread`.
+  // Async reads are permitted.
   private var queueRoot: DownloadQueueFrame
   private var queueStack: [DownloadQueueFrame]
-  
+  // ------------- END ---------------
+
+  private var queueThread: DispatchQueue
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
 
@@ -278,6 +287,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
+
+    // Creates a single-threaded DispatchQueue, facilitating concurrency at this class's
+    // critical sections.
+    queueThread = DispatchQueue(label: "com.keyman.ResourceDownloadQueue")
   }
   
   public func hasConnection() -> Bool {
@@ -287,11 +300,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   public var state: QueueState {
     guard hasConnection() else {
       return .noConnection
-    }
-    
-    // At this stage, we now have everything needed to generate download requests.
-    guard currentBatch == nil else { // Original behavior - only one download operation is permitted at a time.
-      return .busy
     }
     
     return .clear
@@ -315,6 +323,12 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
+  // ---------- CRITICAL SECTION:  START -----------
+  // IMPORTANT: These functions should only ever be referenced from `queueThread`.
+  //            as they maintain synchronization for the queue's critical
+  //            tracking fields.
+  //
+  // As a result, these functions are intentionally and explicitly `private`.
   private func finalizeCurrentBatch(withError error: Error? = nil) {
     let frame = queueStack[queueStack.count - 1]
     
@@ -333,7 +347,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       frame.index += 1
     }
   }
-  
+
   private func executeNext() {
     let frame = queueStack[queueStack.count - 1]
     
@@ -374,15 +388,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  internal func step() {
-    executeNext()
-  }
-
-  // Exposes useful information for runtime mocking.  Used by some automated tests.
-  internal func topLevelNodes() -> [DownloadNode] {
-    return queueRoot.nodes
-  }
-
   private func innerExecute(_ node: DownloadNode) {
     switch(node) {
       case .simpleBatch(let batch):
@@ -410,16 +415,36 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         innerExecute(batch.tasks[0])
     }
   }
-  
+
+  // ----------- CRITICAL SECTION:  END ------------
+
+  // The next two functions are used as queueThread's "API".
+  // Internally, they must perform `sync` / `async` operations when
+  // writing to the critical tracking fields.
   public func queue(_ node: DownloadNode) {
-    queueRoot.nodes.append(node)
-    
-    // If the queue was empty before this...
-    if queueRoot.nodes.count == 1 && autoExecute {
-      executeNext()
+    // `sync` is particularly important here for some automated testing checks
+    // when `autoExecute == `false`.
+    queueThread.sync {
+      self.queueRoot.nodes.append(node)
+    }
+
+    queueThread.async {
+      // If the queue was empty before this...
+      if self.queueRoot.nodes.count == 1 && self.autoExecute {
+        self.executeNext()
+      }
     }
   }
-  
+
+  internal func step() {
+    queueThread.async { self.executeNext() }
+  }
+
+  // Exposes useful information for runtime mocking.  Used by some automated tests.
+  internal func topLevelNodes() -> [DownloadNode] {
+    return queueRoot.nodes
+  }
+
   // MARK - helper methods for ResourceDownloadManager
   
   // TODO:  Eliminate this property coompletely.
@@ -445,17 +470,25 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
     let packagePath = batch.tasks[0].file
+    var err: Error? = nil
     do {
       try batch.completeWithPackage(fromKMP: packagePath)
-      // Completing the queue means having completed a batch.  We should only move forward in this class's
-      // queue at this time, once a batch's task queue is complete.
-      finalizeCurrentBatch()
     } catch {
-      finalizeCurrentBatch(withError: error)
+      err = error
     }
 
-    if autoExecute {
-      executeNext()
+    queueThread.async {
+      if let error = err {
+        self.finalizeCurrentBatch(withError: error)
+      } else {
+        // Completing the queue means having completed a batch.  We should only move forward in this class's
+        // queue at this time, once a batch's task queue is complete.
+        self.finalizeCurrentBatch()
+      }
+
+      if self.autoExecute {
+        self.executeNext()
+      }
     }
   }
   
@@ -463,12 +496,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     if case .simpleBatch(let batch) = self.currentBatch {
       try? batch.completeWithCancellation()
     }
-    
-    // In case we're part of a 'composite' operation, we should still keep the queue moving.
-    finalizeCurrentBatch()
 
-    if autoExecute {
-      executeNext()
+    queueThread.async {
+      // In case we're part of a 'composite' operation, we should still keep the queue moving.
+      self.finalizeCurrentBatch()
+
+      if self.autoExecute {
+        self.executeNext()
+      }
     }
   }
 

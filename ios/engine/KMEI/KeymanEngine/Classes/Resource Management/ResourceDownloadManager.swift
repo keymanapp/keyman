@@ -615,20 +615,26 @@ public class ResourceDownloadManager {
 
   // MARK - Notifications
   internal func resourceDownloadStarted(withKey packageKey: KeymanPackage.Key) {
-    NotificationCenter.default.post(name: Notifications.packageDownloadStarted,
-                                    object: self,
-                                    value: packageKey)
+    DispatchQueue.main.async {
+      NotificationCenter.default.post(name: Notifications.packageDownloadStarted,
+                                      object: self,
+                                      value: packageKey)
+    }
   }
 
   internal func resourceDownloadCompleted(with package: KeymanPackage) {
-    NotificationCenter.default.post(name: Notifications.packageDownloadCompleted,
-                                    object: self,
-                                    value: package)
+    DispatchQueue.main.async {
+      NotificationCenter.default.post(name: Notifications.packageDownloadCompleted,
+                                      object: self,
+                                      value: package)
+    }
   }
 
   internal func resourceDownloadFailed(withKey packageKey: KeymanPackage.Key, with error: Error) {
-    NotificationCenter.default.post(name: Notifications.packageDownloadFailed,
-                                    object: self,
-                                    value: PackageDownloadFailedNotification(packageKey: packageKey, error: error))
+    DispatchQueue.main.async {
+      NotificationCenter.default.post(name: Notifications.packageDownloadFailed,
+                                      object: self,
+                                      value: PackageDownloadFailedNotification(packageKey: packageKey, error: error))
+    }
   }
 }
