@@ -32,7 +32,13 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
   // Useful documentation regarding certain implementation details:
   // https://docs.google.com/document/d/1rhgMeJlCdXCi6ohPb_CuyZd0PZMoSzMqGpv1A8cMFHY/edit
 
-  typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (KeymanPackage.Key?, FullID?) -> Void
+  /**
+   * Parameters:
+   * 1. The unique package identifier for the selected package.  If nil, the user 'cancelled' and intends for nothing to be installed.
+   * 2. The Keyman cloud URL from which that package may be downloaded.  Will be nil if and only if the first parameter is nil.
+   * 3. The unique identifier for the resource WITHIN that package to install.  Useful when a package's resource(s) support multiple languages.
+   */
+  typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (KeymanPackage.Key?, URL?, FullID?) -> Void
 
   private let keyboardSelectionClosure: SelectionCompletedHandler<FullKeyboardID>!
   private let lexicalModelSelectionClosure: SelectionCompletedHandler<FullLexicalModelID>!
@@ -136,13 +142,13 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
                                          withSession: session) { results, error in
           if let results = results {
             if results.count == 0 {
-              self.lexicalModelSelectionClosure(nil, nil)
+              self.lexicalModelSelectionClosure(nil, nil, nil)
             } else {
               let lexicalModel = results[0].0
-              self.lexicalModelSelectionClosure(lexicalModel.packageKey, lexicalModel.fullID)
+              self.lexicalModelSelectionClosure(lexicalModel.packageKey, results[0].1, lexicalModel.fullID)
             }
           } else {
-            self.lexicalModelSelectionClosure(nil, nil)
+            self.lexicalModelSelectionClosure(nil, nil, nil)
 
             if let error = error {
               log.error("Could not find a lexical model for language id \"\(lang_id)\" due to error: \(String(describing: error))")
@@ -150,13 +156,14 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
       } else {
-        self.lexicalModelSelectionClosure(nil, nil)
+        self.lexicalModelSelectionClosure(nil, nil, nil)
       }
     } else { // No language ID?  No model download possible.
-      self.lexicalModelSelectionClosure(nil, nil)
+      self.lexicalModelSelectionClosure(nil, nil, nil)
     }
 
-    self.keyboardSelectionClosure(packageKey, resourceKey)
+    let kbdURL = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: packageKey, andResource: resourceKey, asUpdate: false)
+    self.keyboardSelectionClosure(packageKey, kbdURL, resourceKey)
   }
 
   public static func defaultKeyboardInstallationClosure(installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
@@ -182,11 +189,8 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
       dispatchGroup?.leave() // "fulfill" this closure's aspect of the group's synchronization scheme.
     }
 
-    return { packageKey, resourceKey in
-      if let packageKey = packageKey {
-        let url = downloadManager.defaultDownloadURL(forPackage: packageKey,
-                                                                 andResource: resourceKey,
-                                                                 asUpdate: false)
+    return { packageKey, packageURL, resourceKey in
+      if let packageKey = packageKey, let packageURL = packageURL {
         let downloadClosure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage> = { package, error in
           guard let package = package, error == nil else {
             let errString = error != nil ? String(describing: error) : "<unknown error>"
@@ -213,7 +217,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
 
-        downloadManager.downloadPackage(withKey: packageKey, from: url, withNotifications: true, completionBlock: downloadClosure)
+        downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: downloadClosure)
       } else {
         finalize(as: .cancelled)
       }
@@ -242,14 +246,8 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
       dispatchGroup?.leave() // "fulfill" this closure's aspect of the group's synchronization scheme.
     }
 
-    return { packageKey, resourceKey in
-      if let packageKey = packageKey, let resourceKey = resourceKey {
-        // TODO:  Does not currently work properly for lexical models.
-        //        That said, there are plans to remedy this.
-        let url = downloadManager.defaultDownloadURL(forPackage: packageKey,
-                                                                 andResource: resourceKey,
-                                                                 asUpdate: false)
-
+    return { packageKey, packageURL, resourceKey in
+      if let packageKey = packageKey, let packageURL = packageURL, let resourceKey = resourceKey {
         var lmInstallClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage>
         lmInstallClosure = { package, error in
           if let package = package, error == nil {
@@ -269,7 +267,7 @@ class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
           }
         }
 
-        downloadManager.downloadPackage(withKey: packageKey, from: url, withNotifications: true, completionBlock: lmInstallClosure)
+        downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: lmInstallClosure)
       } else {
         finalize(as: .cancelled)
       }
