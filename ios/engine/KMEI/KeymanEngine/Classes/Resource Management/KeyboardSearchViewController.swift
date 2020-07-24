@@ -69,6 +69,7 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
   public typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (SearchResult<FullID>) -> Void
   internal typealias DeferredLexicalModelSearch = (DelayedLanguageSelection) -> Void
 
+  private var hasFinalized = false
   private let keyboardSelectionClosure: SelectionCompletedHandler<FullKeyboardID>!
   private let lexicalModelSelectionClosure: SelectionCompletedHandler<FullLexicalModelID>!
   private let languageCode: String?
@@ -126,6 +127,7 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
         decisionHandler(.cancel)
 
         // Notify our caller of the search results.
+        self.hasFinalized = true  // Prevent popViewController from triggering cancellation events.
         self.navigationController?.popViewController(animated: true) // Rewind UI
         finalize(with: keyboard_id, for: lang_id)
         return
@@ -133,6 +135,14 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     }
 
     decisionHandler(.allow)
+  }
+
+  override public func viewWillDisappear(_ animated: Bool) {
+    // If the view is being dismissed but no matching link has been intercepted...
+    if self.isMovingFromParent, !hasFinalized {
+      self.keyboardSelectionClosure(.cancelled)
+      self.lexicalModelSelectionClosure(.cancelled)
+    }
   }
 
   internal static func tryParseLink(_ link: URL) -> (String, String?)? {
