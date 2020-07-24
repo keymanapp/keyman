@@ -486,13 +486,9 @@ extension InstalledLanguagesViewController: KeyboardRepositoryDelegate {
 extension InstalledLanguagesViewController {
   
   @objc func addClicked(_ sender: Any) {
-    showAddKeyboard()
-  }
-  
-  func showAddKeyboard() {
-    navigationController?.setToolbarHidden(true, animated: true)
-    let vc = LanguageViewController(Manager.shared.apiKeyboardRepository)
-    navigationController?.pushViewController(vc, animated: true)
+    let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure(),
+                                                        lexicalModelSelectionBlock: KeyboardSearchViewController.defaultLexicalModelInstallationClosure())
+    navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 }
 
