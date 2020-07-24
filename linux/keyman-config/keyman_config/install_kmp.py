@@ -246,7 +246,25 @@ def install_kmp_user(inputfile, online=False, language=None):
         raise InstallError(InstallStatus.Abort, message)
 
 
+def _normalize_language(supportedLanguages, language):
+    if len(supportedLanguages) <= 0:
+        return ''
+
+    if not language:
+        return language
+
+    for supportedLanguage in supportedLanguages:
+        id = supportedLanguage['id']
+        if id == language or id.startswith(language + '-'):
+            return id
+    return None
+
+
 def install_keyboards(keyboards, packageDir, language=None):
+    firstKeyboard = keyboards[0]
+    if firstKeyboard and 'languages' in firstKeyboard and len(firstKeyboard['languages']) > 0:
+        language = _normalize_language(firstKeyboard['languages'], language)
+
     if is_gnome_shell():
         install_keyboards_to_gnome(keyboards, packageDir, language)
     else:
