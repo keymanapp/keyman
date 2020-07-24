@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.116 alpha 2020-07-24
+
+* refactor(ios/engine): builds package download links (#3383)
+* refactor(ios/engine): chained lexical model install callback, fix (#3388)
+* feat(ios/engine): download queue concurrency (#3395)
+* feat(ios/engine): keyboard search core (#3384)
+* feat(ios/engine): support for deferred chaining of lexical model downloads (#3401)
+* docs(linux): Update readme (#3397)
+* feat(ios/engine): use of Keyman staging sites (#3405)
+* feat(linux): keyman:// protocol handler (#3398)
+* chore(ios/engine): dead code removal + deprecations (#3402)
+
 ## 14.0.115 alpha 2020-07-23
 
 * feat(windows): keyman: protocol handler (#3382)
