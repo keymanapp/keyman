@@ -17,6 +17,7 @@ typealias FetchKeyboardsBlock = ([String: Any]?) -> Void
 // MARK: - Constants
 
 // Possible states that a keyboard or lexical model can be in
+@available(*, deprecated, message: "Version checks against keyboards and models are now based on their package.  Use `KeymanPackage.InstallationState` and `KeymanPackage.VersionState` instead.")
 public enum KeyboardState {
   case needsDownload
   case needsUpdate
@@ -34,9 +35,6 @@ public enum VibrationSupport {
 
 // Strings
 private let keyboardChangeHelpText = "Tap here to change keyboard"
-
-// URLs - used for reachability test
-private let keymanHostName = "api.keyman.com"
 
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
@@ -86,9 +84,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The default value is false.
   public var canRemoveDefaultKeyboard = false
 
-  public let apiKeyboardRepository: APIKeyboardRepository
-    
-    
   // TODO: Change API to not disable removing as well
   /// Allow users to add new lexical models in the lexical model picker.
   ///  - Default value is true.
@@ -116,8 +111,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The last lexical model CAN be removed, as this is an optional feature
   /// The default value is true.
   public var canRemoveDefaultLexicalModel = true
-  
-  public let apiLexicalModelRepository: APILexicalModelRepository
 
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
@@ -173,8 +166,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   // MARK: - Object Admin
 
   private override init() {
-    apiKeyboardRepository = APIKeyboardRepository()
-    apiLexicalModelRepository = APILexicalModelRepository()
     super.init()
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
@@ -207,7 +198,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     updateUserKeyboards(with: Defaults.keyboard)
 
     do {
-      try reachability = Reachability(hostname: keymanHostName)
+      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }
@@ -858,11 +849,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                                                         completionBlock: completionBlock)
   }
 
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForKeyboard(withID: keyboardID)
   }
 
   // Technically new, but it does closely parallel an old API point.
+  @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForLexicalModel(withID modelID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
   }

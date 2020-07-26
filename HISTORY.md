@@ -1,5 +1,63 @@
 # Keyman Version History
 
+## 14.0.116 alpha 2020-07-24
+
+* refactor(ios/engine): builds package download links (#3383)
+* refactor(ios/engine): chained lexical model install callback, fix (#3388)
+* feat(ios/engine): download queue concurrency (#3395)
+* feat(ios/engine): keyboard search core (#3384)
+* feat(ios/engine): support for deferred chaining of lexical model downloads (#3401)
+* docs(linux): Update readme (#3397)
+* feat(ios/engine): use of Keyman staging sites (#3405)
+* feat(linux): keyman:// protocol handler (#3398)
+* chore(ios/engine): dead code removal + deprecations (#3402)
+
+## 14.0.115 alpha 2020-07-23
+
+* feat(windows): keyman: protocol handler (#3382)
+* feat(developer/compilers): logging errors and warnings in the lexical model compiler (#3385)
+
+## 14.0.114 alpha 2020-07-22
+
+* chore(deps): bump lodash from 4.17.15 to 4.17.19 in /web/testing/regression-tests (#3360)
+
+## 14.0.113 alpha 2020-07-21
+
+* refactor(ios/engine): update detection now based upon packages (#3362)
+* refactor(ios/engine): package download notifications (#3363)
+* refactor(ios/engine): package-based resource updates, cloud resource migration (#3372)
+* fix(ios/engine): engine tier enum, proper detection (#3373)
+* refactor(ios/engine): Centralized Keyman domain definitions (#3381)
+* fix(linux): Use language from search when installing keyboard (#3290)
+* refactor(linux): Small refactorings (#3376)
+* refactor(developer/compilers): reading from a wordlist (#3380)
+
+## 14.0.112 alpha 2020-07-20
+
+* refactor(ios/engine): package-version query caching + package state properties (#3335)
+* refactor(ios/engine): keyboard downloads now retrieve KMPs (#3341)
+* refactor(ios/engine):  download queue & download state detection cleanup (#3342)
+* chore(developer): cleanup test constants (#3350)
+* change(common/models/wordbreakers): update word boundary props to 13.0 (#3365)
+* feat(linux): Use staging URLs for alpha version (#3364)
+
+## 14.0.111 alpha 2020-07-16
+
+* fix(android/engine): Update deprecated call to switch system keyboard for Android P (#3353)
+
+## 14.0.110 alpha 2020-07-15
+
+* refactor(developer): hashmap-based wordlist compilation (#3340)
+* chore(linux): Add license details for kmpdetails.* (#3355)
+
+## 14.0.109 alpha 2020-07-14
+
+* refactor(ios/engine): lexical model query & download rework (#3327)
+* refactor(ios/engine): hashable package keys (#3333)
+* fix(ios/engine): version equality (#3334)
+* refactor(linux): make some methods protected (#3291)
+* feat(android/oem): Add nrc.str.sencoten model and update SystemKeyboard from KMAPro (#3332)
+
 ## 14.0.108 alpha 2020-07-09
 
 * chore: cleanup global ExtPath (#3315)

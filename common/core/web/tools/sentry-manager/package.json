@@ -1,6 +1,6 @@
 {
   "name": "@keymanapp/web-sentry-manager",
-  "version": "14.0.109",
+  "version": "14.0.117",
   "description": "Common setup for KeymanWeb's Sentry-based error reporting",
   "main": "dist/index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@keymanapp/web-environment": "^14.0.109",
+    "@keymanapp/web-environment": "^14.0.117",
     "@sentry/browser": "^5.15.5"
   }
 }

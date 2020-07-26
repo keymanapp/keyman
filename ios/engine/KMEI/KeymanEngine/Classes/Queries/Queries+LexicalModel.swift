@@ -9,8 +9,8 @@
 import Foundation
 
 extension Queries {
-  class LexicalModel {
-    struct Result: Decodable {
+  public class LexicalModel {
+    public struct Result: Decodable {
       let id: String
       let name: String
       let version: String
@@ -42,7 +42,7 @@ extension Queries {
       }
     }
 
-    private static let MODEL_ENDPOINT = URLComponents(string: "https://api.keyman.com/model")!
+    private static let MODEL_ENDPOINT = URLComponents(string: "\(KeymanHosts.API_KEYMAN_COM)/model")!
 
     public static func fetch(forLanguageCode bcp47: String,
                              fetchCompletion: @escaping JSONQueryCompletionBlock<[Result]>) {
@@ -64,6 +64,33 @@ extension Queries {
       // Step 3:  run the actual query, letting the prepared completion closure take care of the rest.
       let task = session.dataTask(with: urlComponents.url!, completionHandler: completionClosure)
       task.resume()
+    }
+
+    /**
+     * Returns an array of package keys containing models that support the specified language.
+     */
+    public static func fetchModels(forLanguageCode bcp47: String,
+                                        fetchCompletion: @escaping ([(InstallableLexicalModel, URL)]?, Error?) -> Void) {
+      fetchModels(forLanguageCode: bcp47, withSession: URLSession.shared, fetchCompletion: fetchCompletion)
+    }
+
+    internal static func fetchModels(forLanguageCode bcp47: String,
+                                     withSession session: URLSession,
+                                     fetchCompletion: @escaping ([(InstallableLexicalModel, URL)]?, Error?) -> Void) {
+      Queries.LexicalModel.fetch(forLanguageCode: bcp47, withSession: session) { result, error in
+        if let error = error {
+          fetchCompletion(nil, error)
+          return
+        }
+
+        guard let result = result, result.count > 0 else {
+          fetchCompletion([], nil)
+          return
+        }
+
+        // There are valid packages for the language code - send off the report!
+        fetchCompletion(result.map { ($0.modelFor(languageID: bcp47)!, URL.init(string: $0.packageFilename)!) }, nil)
+      }
     }
   }
 }

@@ -1,18 +1,18 @@
 (*
   Name:             Upload_Settings
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    15 Apr 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     14 Sep 2006 - mcdurdin - Add CRM callbacks
                     04 Dec 2006 - mcdurdin - Add Activate and ViewCustomer URLs
@@ -33,6 +33,7 @@ const
   // https://api.keyman.com/ - programmatic endpoints
   API_Path_UpdateCheck_Windows = '/windows/14.0/update'; // version will only update when the api changes
 
+  // TODO: use /windows/ instead of /desktop/
   API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';  // TODO: use updatecheck_windows
   API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
   API_Path_DownloadLocale = '/desktop/'+SKeymanVersion+'/locale';
@@ -40,17 +41,23 @@ const
   API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
 
   // https://www.keyman.com/ - web pages
-  URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
-  URLPath_CreateTranslation = '/go/desktop/'+SKeymanVersion+'/create-locale';
-  URLPath_KeepInTouch = '/go/desktop/'+SKeymanVersion+'/keep-in-touch';
-  URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
+  URLPath_CreateTranslation = '/go/windows/'+SKeymanVersion+'/create-locale'; //TODO: i18n
+  URLPath_KeepInTouch = '/go/windows/'+SKeymanVersion+'/keep-in-touch';
+  URLPath_KeymanHome = '/go/windows/'+SKeymanVersion+'/home';
+  URLPath_ArchivedDownloads = '/go/windows/'+SKeymanVersion+'/archived-downloads';
 
+  URLPath_KeymanLanguageLookup = '/go/developer/'+SKeymanVersion+'/language-lookup';
+  URLPath_KeymanDeveloperDocumentation = '/go/developer/'+SKeymanVersion+'/docs';
   URLPath_KeymanDeveloperHome = '/go/developer/'+SKeymanVersion+'/home';
-  URLPath_KeymanHome = '/go/desktop/'+SKeymanVersion+'/home';
-  URLPath_ArchivedDownloads = '/go/desktop/'+SKeymanVersion+'/archived-downloads';
+
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
+
+  // Keyboard download and installation
+  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://[^/]+/keyboards/install/([^?/]+)(?:\?(.+))?$';
+
+function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
 
 function API_Protocol: string; // = 'https';
 function API_Server: string; // = 'api.keyman.com';
@@ -68,7 +75,11 @@ function MakeKeymanURL(const path: string): string;
 implementation
 
 uses
-  DebugPaths, ErrorControlledRegistry, RegistryKeys, Windows,
+  System.SysUtils,
+  Winapi.Windows,
+  DebugPaths,
+  ErrorControlledRegistry,
+  RegistryKeys,
   VersionInfo;
 
 const
@@ -83,8 +94,11 @@ const
   // Alpha versions will work against the staging server so that they
   // can access new APIs etc that will only be available there. The staging
   // servers have resource constraints but should be okay for limited use.
-  S_KeymanCom_Alpha = 'https://staging-keyman-com.azurewebsites.net';
-  S_APIServer_Alpha = 'staging-api-keyman-com.azurewebsites.net';
+  S_KeymanCom_Alpha = 'https://keyman-staging.com';
+  S_APIServer_Alpha = 'api.keyman-staging.com';
+
+const
+  URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
 
 function API_UserAgent: string;
 begin
@@ -131,6 +145,15 @@ end;
 function MakeAPIURL(path: string): string;
 begin
   Result := API_Protocol + '://' + API_Server + path;
+end;
+
+function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
+var
+  IsUpdateInt: Integer;
+begin
+  if IsUpdate then IsUpdateInt := 1 else IsUpdateInt := 0;
+
+  Result := Format(URLPath_PackageDownload_Format, [PackageID, CKeymanVersionInfo.Tier, BCP47, IsUpdateInt]);
 end;
 
 end.

@@ -8,6 +8,8 @@ License: GPL-2+
 
 Files: src/keymanutil.c
        src/keymanutil.h
+       src/kmpdetails.c
+       src/kmpdetails.h
 Copyright: 2009-2020 SIL International
 License: GPL-2+ or MIT
 

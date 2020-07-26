@@ -13,12 +13,12 @@ enum DownloadNode {
   case simpleBatch(AnyDownloadBatch)
   case compositeBatch(CompositeBatch)
 
-  var resourceIDs: [AnyLanguageResourceFullID] {
+  var packageKeys: [KeymanPackage.Key] {
     switch(self) {
       case .simpleBatch(let batch):
-        return batch.resourceIDs
+        return batch.packageKeys
       case .compositeBatch(let node):
-        return node.resourceIDs
+        return node.packageKeys
     }
   }
 
@@ -28,16 +28,7 @@ enum DownloadNode {
         case .simpleBatch(let batch):
           return batch.errors
         case .compositeBatch(let node):
-          return node.errors
-      }
-    }
-
-    set(value) {
-      switch(self) {
-        case .simpleBatch(var batch):
-          batch.errors = value
-        case .compositeBatch(let node):
-          node.errors = value
+          return node.batchQueue.map{ $0.1 }
       }
     }
   }
@@ -49,8 +40,7 @@ protocol AnyDownloadTask {
   var downloadFinalizationBlock: ((Bool) throws -> Void)? { get }
 }
 
-class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
-  public final var resourceIDs: [FullID]?
+class DownloadTask: AnyDownloadTask {
   public final var request: HTTPDownloadRequest
   public var file: URL {
     if let file = finalFile {
@@ -62,21 +52,15 @@ class DownloadTask<FullID: LanguageResourceFullID>: AnyDownloadTask {
 
   public var finalFile: URL?
 
-  // TEMPORARY:  needed to support Cloud JS downloads.
-  public final var resources: [FullID.Resource]?
-
   public final var downloadFinalizationBlock: ((Bool) throws -> Void)? = nil
   
-  public init(do request: HTTPDownloadRequest, for resourceIDs: [FullID]?, resources: [FullID.Resource]? = nil) {
+  public init(do request: HTTPDownloadRequest, forPackage packageKey: KeymanPackage.Key?) {
     self.request = request
-    self.resourceIDs = resourceIDs
-    self.resources = resources
   }
 
-  public init(forPackageWithID fullID: FullID,
+  public init(forPackageWithKey packageKey: KeymanPackage.Key,
                from url: URL,
                as destURL: URL, tempURL: URL) {
-    resourceIDs = [fullID]
 
     let request = HTTPDownloadRequest(url: url, userInfo: [:])
     request.destinationFile = tempURL.path
@@ -114,46 +98,41 @@ enum DownloadActivityType {
 
 protocol AnyDownloadBatch {
   var tasks: [AnyDownloadTask] { get }
-  var resourceIDs: [AnyLanguageResourceFullID] { get }
+  var packageKey: KeymanPackage.Key { get }
+
+  // Needed for DownloadNode compliance.
+  var packageKeys: [KeymanPackage.Key] { get }
 
   var startBlock: (() -> Void)? { get }
   var errors: [Error?] { get set }
 
-  func completeWithCancellation() -> Void
-  func completeWithError(error: Error) -> Void
-  func completeWithPackage(fromKMP file: URL) -> Void
+  func completeWithCancellation() throws -> Void
+  func completeWithError(error: Error) throws -> Void
+  func completeWithPackage(fromKMP file: URL) throws -> Void
 }
 
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where FullID.Resource.Package: TypedKeymanPackage<FullID.Resource> {
+class DownloadBatch<Package: KeymanPackage>: AnyDownloadBatch {
   typealias CompletionHandler = ResourceDownloadManager.CompletionHandler
 
-  public final var downloadTasks: [DownloadTask<FullID>]
+  public final var downloadTasks: [DownloadTask]
+  public let packageKey: KeymanPackage.Key
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
   public final var startBlock: (() -> Void)? = nil
-  public final var completionBlock: CompletionHandler<FullID.Resource>? = nil
+  public final var completionBlock: CompletionHandler<Package>? = nil
   
-  public init?(do tasks: [DownloadTask<FullID>],
-               startBlock: (() -> Void)? = nil,
-               completionBlock: CompletionHandler<FullID.Resource>? = nil) {
-    self.downloadTasks = tasks
-
-    self.errors = Array(repeating: nil, count: tasks.count)
-    self.startBlock = startBlock
-    self.completionBlock = completionBlock
-  }
-
-  public init(forPackageWithID fullID: FullID,
+  public init(forPackageWithKey packageKey: KeymanPackage.Key,
               from url: URL,
               startBlock: (() -> Void)?,
-              completionBlock: CompletionHandler<FullID.Resource>?) {
+              completionBlock: CompletionHandler<Package>?) {
     // If we can't build a proper DownloadTask, we can't build the batch.
-    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forID: fullID)
-    let finalFile = ResourceFileManager.shared.cachedPackagePath(forID: fullID)
+    self.packageKey = packageKey
+    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forKey: packageKey)
+    let finalFile = ResourceFileManager.shared.cachedPackagePath(forKey: packageKey)
 
-    let task = DownloadTask(forPackageWithID: fullID, from: url, as: finalFile, tempURL: tempArtifact)
+    let task = DownloadTask(forPackageWithKey: packageKey, from: url, as: finalFile, tempURL: tempArtifact)
 
 
     self.downloadTasks = [task]
@@ -170,68 +149,59 @@ class DownloadBatch<FullID: LanguageResourceFullID>: AnyDownloadBatch where Full
     return downloadTasks
   }
   
-  public var resourceIDs: [AnyLanguageResourceFullID] {
+  public var packageKeys: [KeymanPackage.Key] {
     get {
-      var resArray: [AnyLanguageResourceFullID] = []
-      
-      downloadTasks.forEach{ task in
-        resArray.append(contentsOf: task.resourceIDs ?? [])
-      }
-      
-      return resArray
+      return [ packageKey ]
     }
   }
 
-  public func completeWithCancellation() {
+  public func completeWithCancellation() throws {
     let complete = completionBlock
     completionBlock = nil
-    complete?(nil, nil)
+    try complete?(nil, nil)
   }
 
-  public func completeWithError(error: Error) {
+  public func completeWithError(error: Error) throws {
     let complete = completionBlock
     completionBlock = nil
-    complete?(nil, error)
+    try complete?(nil, error)
   }
 
-  public func completeWithPackage(fromKMP file: URL) {
+  public func completeWithPackage(fromKMP file: URL) throws {
     let complete = completionBlock
     completionBlock = nil
 
     do {
-      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? FullID.Resource.Package {
-        complete?(package, nil)
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Package {
+        try complete?(package, nil)
       } else {
-        complete?(nil, KMPError.invalidPackage)
+        try complete?(nil, KMPError.invalidPackage)
       }
     } catch {
-      complete?(nil, error)
+      try complete?(nil, error)
     }
   }
 }
 
 class CompositeBatch {
-  public final var batches: [DownloadNode]
-  var errors: [Error?] // Only used by the ResourceDownloadQueue.
+  public final var batchQueue: [(DownloadNode, Error?)]
   public final var startBlock: (() -> Void)? = nil
   public final var completionBlock: ResourceDownloadManager.InternalBatchCompletionHandler? = nil
 
   public init(queue: [DownloadNode],
               startBlock: (() -> Void)? = nil,
               completionBlock: ResourceDownloadManager.InternalBatchCompletionHandler? = nil) {
-    self.batches = queue
-    self.errors = Array(repeating: nil, count: batches.count)
-
+    self.batchQueue = queue.map { ($0, nil) }
     self.startBlock = startBlock
     self.completionBlock = completionBlock
   }
 
   public var tasks: [DownloadNode] {
-    return batches
+    return batchQueue.map { $0.0 }
   }
 
-  public var resourceIDs: [AnyLanguageResourceFullID] {
-    return batches.flatMap { $0.resourceIDs }
+  public var packageKeys: [KeymanPackage.Key] {
+    return batchQueue.flatMap { $0.0.packageKeys }
   }
 }
 
@@ -261,32 +231,40 @@ private class DownloadQueueFrame {
   }
 }
 
-// The other half of ResourceDownloadManager, this class is responsible for executing the downloads
-// and handling the results.
+/**
+ * The other half of ResourceDownloadManager, this class is responsible for executing the downloads
+ * and handling the results.  Internally manages its own single-threaded `DispatchQueue`, which
+ * handles all necessary synchronization.
+ *
+ * At present, submissions to this class will be evaluated sequentially by its `DispatchQueue`, though
+ * this may change at a later time.  (The 'sequential' aspect is due to legacy design decisions from
+ * before concurrency was a consideration.)
+ */
 class ResourceDownloadQueue: HTTPDownloadDelegate {
   enum QueueState: String {
     case clear
-    case busy
     case noConnection
 
     var error: Error? {
       switch(self) {
         case .clear:
           return nil
-        case .busy:
-          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
         case .noConnection:
-          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
       }
     }
   }
 
+  // ---- CRITICAL SECTION FIELDS ----
+  // Any writes to these must be performed on `queueThread`.
+  // Async reads are permitted.
   private var queueRoot: DownloadQueueFrame
   private var queueStack: [DownloadQueueFrame]
-  
+  // ------------- END ---------------
+
+  private var queueThread: DispatchQueue
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
-  private let keymanHostName = "api.keyman.com"
 
   private let session: URLSession
 
@@ -299,7 +277,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
   internal init(session: URLSession, autoExecute: Bool) {
     do {
-      try reachability = Reachability(hostname: keymanHostName)
+      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }
@@ -309,6 +287,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
 
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
+
+    // Creates a single-threaded DispatchQueue, facilitating concurrency at this class's
+    // critical sections.
+    queueThread = DispatchQueue(label: "com.keyman.ResourceDownloadQueue")
   }
   
   public func hasConnection() -> Bool {
@@ -318,11 +300,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   public var state: QueueState {
     guard hasConnection() else {
       return .noConnection
-    }
-    
-    // At this stage, we now have everything needed to generate download requests.
-    guard currentBatch == nil else { // Original behavior - only one download operation is permitted at a time.
-      return .busy
     }
     
     return .clear
@@ -346,7 +323,13 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  private func finalizeCurrentBatch() {
+  // ---------- CRITICAL SECTION:  START -----------
+  // IMPORTANT: These functions should only ever be referenced from `queueThread`.
+  //            as they maintain synchronization for the queue's critical
+  //            tracking fields.
+  //
+  // As a result, these functions are intentionally and explicitly `private`.
+  private func finalizeCurrentBatch(withError error: Error? = nil) {
     let frame = queueStack[queueStack.count - 1]
     
     if queueStack.count == 1 {
@@ -357,11 +340,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       // when everything's done instead.  Might be worth a thought.
       frame.nodes.remove(at: 0)
     } else {
+      if case let .compositeBatch(batch) = frame.batch {
+        batch.batchQueue[frame.index].1 = error
+      }
       // Batches in subframes should be kept so that we can report progress; increment the index instead.
       frame.index += 1
     }
   }
-  
+
   private func executeNext() {
     let frame = queueStack[queueStack.count - 1]
     
@@ -378,14 +364,16 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       if frame.index == frame.nodes.count {
         // We've hit the end of this stack frame's commands; time to pop and continue from the previous frame's perspective.
         _ = queueStack.popLast()
-        
-        // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
-        finalizeCurrentBatch()
 
+        // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
         // if-check below:  "if the current stack-frame came from a composite batch, let node = that 'composite batch'"
         if case .compositeBatch(let node) = frame.batch {
           // The base handler requires access to the batch's tracked success/failure data.
+          let error = node.batchQueue.first(where: { $0.1 != nil })?.1
+          finalizeCurrentBatch(withError: error)
           node.completionBlock?(node)
+        } else {
+          fatalError("Unexpected download queue state; cannot recover")
         }
 
         if autoExecute {
@@ -398,10 +386,6 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         innerExecute(node)
       }
     }
-  }
-
-  internal func step() {
-    executeNext()
   }
 
   private func innerExecute(_ node: DownloadNode) {
@@ -431,16 +415,36 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         innerExecute(batch.tasks[0])
     }
   }
-  
+
+  // ----------- CRITICAL SECTION:  END ------------
+
+  // The next two functions are used as queueThread's "API".
+  // Internally, they must perform `sync` / `async` operations when
+  // writing to the critical tracking fields.
   public func queue(_ node: DownloadNode) {
-    queueRoot.nodes.append(node)
-    
-    // If the queue was empty before this...
-    if queueRoot.nodes.count == 1 && autoExecute {
-      executeNext()
+    // `sync` is particularly important here for some automated testing checks
+    // when `autoExecute == `false`.
+    queueThread.sync {
+      self.queueRoot.nodes.append(node)
+    }
+
+    queueThread.async {
+      // If the queue was empty before this...
+      if self.queueRoot.nodes.count == 1 && self.autoExecute {
+        self.executeNext()
+      }
     }
   }
-  
+
+  internal func step() {
+    queueThread.async { self.executeNext() }
+  }
+
+  // Exposes useful information for runtime mocking.  Used by some automated tests.
+  internal func topLevelNodes() -> [DownloadNode] {
+    return queueRoot.nodes
+  }
+
   // MARK - helper methods for ResourceDownloadManager
   
   // TODO:  Eliminate this property coompletely.
@@ -451,10 +455,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  func containsResourceInQueue(matchingID: AnyLanguageResourceFullID, requireLanguageMatch: Bool = true) -> Bool {
+  func containsPackageKeyInQueue(matchingKey: KeymanPackage.Key) -> Bool {
     return queueRoot.nodes.contains { node in
-      node.resourceIDs.contains { fullID in
-        return fullID.matches(matchingID, requireLanguageMatch: requireLanguageMatch)
+      node.packageKeys.contains { fullID in
+        return fullID == matchingKey
       }
     }
   }
@@ -465,58 +469,41 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // We can use the properties of the current "batch" to generate specialized notifications.
     let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-    if let batch = batch as? DownloadBatch<InstallableKeyboard.FullID> {
-      let packagePath = batch.downloadTasks[0].file
-
-      // Check - is it a cloud resource or a KMP?
-      let file = packagePath.lastPathComponent
-      if file.hasSuffix(".kmp") {
-        // It is a keyboard package!
-        batch.completeWithPackage(fromKMP: packagePath)
-      } else {
-        // batch.downloadTasks[0].request.destinationFile - currently, the downloaded keyboard .js.
-        // Once downlading KMPs, will be the downloaded .kmp.
-
-        // The request has succeeded.
-        if downloader!.requestsCount == 0 { // Download queue finished.
-          // TEMPORARY:  to get the full InstallableKeyboard as specified by the cloud.
-          let keyboards = batch.downloadTasks[0].resources!
-          log.info("Downloaded keyboard: \(keyboards[0].id).")
-          // TEMP:  wrap the newly-downloaded resources with a kmp.json.
-          //        Serves as a bridge until we're downloading actual .kmps for keyboards.
-          let _ = Migrations.migrateToKMPFormat(keyboards)
-
-          if let package: KeyboardKeymanPackage = ResourceFileManager.shared.getInstalledPackage(for: keyboards[0]) {
-            batch.completionBlock?(package, nil)
-          } else {
-            log.error("Could not load metadata for newly-installed keyboard")
-          }
-        }
-      }
-    } else if let batch = batch as? DownloadBatch<InstallableLexicalModel.FullID> {
-      let packagePath = batch.downloadTasks[0].file
-      batch.completeWithPackage(fromKMP: packagePath)
+    let packagePath = batch.tasks[0].file
+    var err: Error? = nil
+    do {
+      try batch.completeWithPackage(fromKMP: packagePath)
+    } catch {
+      err = error
     }
-    
-    // Completing the queue means having completed a batch.  We should only move forward in this class's
-    // queue at this time, once a batch's task queue is complete.
-    finalizeCurrentBatch()
 
-    if autoExecute {
-      executeNext()
+    queueThread.async {
+      if let error = err {
+        self.finalizeCurrentBatch(withError: error)
+      } else {
+        // Completing the queue means having completed a batch.  We should only move forward in this class's
+        // queue at this time, once a batch's task queue is complete.
+        self.finalizeCurrentBatch()
+      }
+
+      if self.autoExecute {
+        self.executeNext()
+      }
     }
   }
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
     if case .simpleBatch(let batch) = self.currentBatch {
-      batch.completeWithCancellation()
+      try? batch.completeWithCancellation()
     }
-    
-    // In case we're part of a 'composite' operation, we should still keep the queue moving.
-    finalizeCurrentBatch()
 
-    if autoExecute {
-      executeNext()
+    queueThread.async {
+      // In case we're part of a 'composite' operation, we should still keep the queue moving.
+      self.finalizeCurrentBatch()
+
+      if self.autoExecute {
+        self.executeNext()
+      }
     }
   }
 
@@ -535,7 +522,10 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: errorMessage])
-      currentFrame.batch?.errors[currentFrame.index] = error
+
+      if case var .simpleBatch(batch) = currentFrame.batch {
+        batch.errors[currentFrame.index] = error
+      }
       
       // Now that we've synthesized an appropriate error instance, use the same handler
       // as for HTTPDownloader's 'failed' condition.
@@ -553,9 +543,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
   }
 
   func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
-    currentFrame.batch?.errors[currentFrame.index] = error
     let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
-    let batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
+    var batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
+    batch.errors[currentFrame.index] = error
 
     var err: Error
     if let error = error {
@@ -566,7 +556,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
 
     try? task.downloadFinalizationBlock?(false)
-    batch.completeWithError(error: err)
+    try? batch.completeWithError(error: err)
     downloader!.cancelAllOperations()
   }
 }

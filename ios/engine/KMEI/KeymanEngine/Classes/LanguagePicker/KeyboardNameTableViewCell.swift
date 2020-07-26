@@ -22,9 +22,9 @@ class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
     fatalError("init(coder:) has not been implemented")
   }
 
-  func setKeyboardState(_ kbState: KeyboardState, selected isSelected: Bool,
+  func setInstallState(_ state: KeymanPackage.InstallationState, selected isSelected: Bool,
                         defaultAccessoryType accessoryType: UITableViewCell.AccessoryType) {
-    if kbState != .downloading {
+    if state != .downloading {
       accessoryView = nil
     }
     self.accessoryType = accessoryType

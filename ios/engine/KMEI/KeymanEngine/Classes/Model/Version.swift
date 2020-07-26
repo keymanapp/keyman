@@ -10,6 +10,12 @@ import Foundation
 
 /// Dotted-decimal version.
 public class Version: NSObject, Comparable {
+  public enum Tier: String {
+    case alpha
+    case beta
+    case stable
+  }
+
   public static let fallback = Version("1.0")!
   public static let latestFeature = packageBasedFileReorg
 
@@ -40,7 +46,7 @@ public class Version: NSObject, Comparable {
   private let components: [Int]
   public let plainString: String
   public let fullString: String
-  public let tier: String?
+  public let tier: Tier?
 
   public init?(_ string: String) {
     let tagComponents = string.components(separatedBy: "-")
@@ -59,11 +65,11 @@ public class Version: NSObject, Comparable {
     if tagComponents.count > 1 {
       switch tagComponents[1] {
         case "alpha":
-          fallthrough
+          tier = .alpha
         case "beta":
-          fallthrough
+          tier = .beta
         case "stable":
-          tier = tagComponents[1]
+          tier = .stable
         default:
           tier = nil
       }
@@ -75,7 +81,7 @@ public class Version: NSObject, Comparable {
     self.components = components
   }
 
-  public init?(_ components: [Int], tier: String? = nil) {
+  public init?(_ components: [Int], tier: Tier? = nil) {
     if components.count == 0 {
       return nil
     }

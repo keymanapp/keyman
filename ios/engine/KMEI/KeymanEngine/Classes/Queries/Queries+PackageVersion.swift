@@ -9,6 +9,7 @@
 import Foundation
 
 extension Queries {
+  // Kept internal; the query is 'publicly exposed' through KeymanPackage and ResourceFileManager.
   class PackageVersion {
     class ResultComponent {}
 
@@ -94,7 +95,7 @@ extension Queries {
       }
     }
 
-    private static let PACKAGE_VERSION_ENDPOINT = URLComponents(string: "https://api.keyman.com/package-version")!
+    private static let PACKAGE_VERSION_ENDPOINT = URLComponents(string: "\(KeymanHosts.API_KEYMAN_COM)/package-version")!
 
     public static func fetch(for packageKeys: [KeymanPackage.Key],
                              withSession session: URLSession = .shared,

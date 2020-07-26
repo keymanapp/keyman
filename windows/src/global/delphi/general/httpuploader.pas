@@ -349,7 +349,6 @@ var
   buffersIn: INTERNET_BUFFERS;
   FFlags: DWORD;
   dwError: Cardinal;
-  dwErrorCode: Cardinal;
   pvData: Pointer;
   RetryCount: Integer;
   dwLength: DWord;
@@ -375,13 +374,6 @@ begin
       FProxyOption[0].pszValue := PChar('http://' + FProxy.Server + ':' + IntToStr(FProxy.Port));
       FProxyOption[1].dwOption := INTERNET_PER_CONN_FLAGS;
       FProxyOption[1].dwValue := PROXY_TYPE_PROXY;
-      InternetSetOption(hInet, INTERNET_OPTION_PER_CONNECTION_OPTION, @FProxyOptions, SizeOf(FProxyOptions));
-    end
-    else
-    begin
-      FProxyOptions.dwOptionCount := 1;
-      FProxyOption[0].dwOption := INTERNET_PER_CONN_FLAGS;
-      FProxyOption[0].dwValue := PROXY_TYPE_DIRECT;
       InternetSetOption(hInet, INTERNET_OPTION_PER_CONNECTION_OPTION, @FProxyOptions, SizeOf(FProxyOptions));
     end;
     
@@ -430,8 +422,9 @@ begin
           dwLength := 4;
           dwReserved := 0;
           if HttpQueryInfo(hRequest, HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER, @dwStatusCode, dwLength, dwReserved) and
-            (dwStatusCode = 407) then
+            (dwStatusCode = HTTP_STATUS_PROXY_AUTH_REQ) then
           begin
+            // Proxy is present and requires authentication to continue
             if FProxy.Username <> '' then
             begin
               InternetSetOption(hRequest, INTERNET_OPTION_PROXY_USERNAME, PChar(FProxy.Username), Length(FProxy.Username)+1);
@@ -441,18 +434,21 @@ begin
             end
             else
             begin
-              if hRequest <> nil
-                then dwErrorCode := ERROR_SUCCESS
-                else dwErrorCode := GetLastError();
-
+              // We don't have configured proxy options, so we'll prompt the
+              // user
               if FShowUI then
               begin
-                dwError := InternetErrorDlg(GetActiveWindow, hRequest, dwErrorCode,
+                // Present the standard Windows proxy authentication dialog
+                dwError := InternetErrorDlg(GetDesktopWindow, hRequest, ERROR_INTERNET_INCORRECT_PASSWORD,
                                            FLAGS_ERROR_UI_FILTER_FOR_ERRORS or
                                            FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS or
                                            FLAGS_ERROR_UI_FLAGS_GENERATE_DATA,
                                            pvData);
-                if dwError = ERROR_INTERNET_FORCE_RETRY then Continue;
+                if dwError = ERROR_INTERNET_FORCE_RETRY then
+                  // This indicates that the user clicked OK in the dialog
+                  Continue
+                else
+                  raise EHTTPUploader.Create('Unable to authenticate with proxy', dwError);
               end
               else
                 raise EHTTPUploader.Create('Proxy login required but no UI specified', 0);
@@ -499,15 +495,11 @@ begin
                 end
                 else
                 begin
-                  if hRequest <> nil
-                    then dwErrorCode := ERROR_SUCCESS
-                    else dwErrorCode := GetLastError();
-
-                  dwError := InternetErrorDlg(GetActiveWindow, hRequest, dwErrorCode,
-                                             FLAGS_ERROR_UI_FILTER_FOR_ERRORS or
-                                             FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS or
-                                             FLAGS_ERROR_UI_FLAGS_GENERATE_DATA,
-                                             pvData);
+                  dwError := InternetErrorDlg(GetDesktopWindow, hRequest, ERROR_INTERNET_INCORRECT_PASSWORD,
+                                           FLAGS_ERROR_UI_FILTER_FOR_ERRORS or
+                                           FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS or
+                                           FLAGS_ERROR_UI_FLAGS_GENERATE_DATA,
+                                           pvData);
 
                   if dwError = ERROR_INTERNET_FORCE_RETRY then Continue;
                   //InternetErrorDlg(GetActiveWindow,  hRequest, dwError, dwFlags, ...);

@@ -1,0 +1,42 @@
+{
+    "keyboards": {
+        "sil_sahu": {
+            "version": "1.0",
+            "kmp": "https://downloads.keyman.com/keyboards/sil_sahu/1.0/sil_sahu.kmp"
+        },
+        "sil_euro_latin": {
+            "version": "1.9.1",
+            "kmp": "https://downloads.keyman.com/keyboards/sil_euro_latin/1.9.1/sil_euro_latin.kmp"
+        },
+        "balochi_latin": {
+            "version": "1.0",
+            "kmp": "https://downloads.keyman.com/keyboards/balochi_latin/1.0/balochi_latin.kmp"
+        },
+        "sil_cameroon_qwerty": {
+            "version": "6.0.4",
+            "kmp": "https://downloads.keyman.com/keyboards/sil_cameroon_qwerty/6.0.4/sil_cameroon_qwerty.kmp"
+        },
+        "fv_sencoten": {
+            "version": "9.1",
+            "kmp": "https://downloads.keyman.com/keyboards/fv_sencoten/9.1/fv_sencoten.kmp"
+        },
+        "indigenous_nt": {
+            "version": "3.4.1",
+            "kmp": "https://downloads.keyman.com/keyboards/indigenous_nt/3.4.1/indigenous_nt.kmp"
+        }
+    },
+    "models": {
+        "nrc.en.mtnt": {
+            "version": "0.1.4",
+            "kmp": "https://downloads.keyman.com/models/nrc.en.mtnt/0.1.4/nrc.en.mtnt.model.kmp"
+        },
+        "nrc.str.sencoten": {
+            "version": "1.0.5",
+            "kmp": "https://downloads.keyman.com/models/nrc.str.sencoten/1.0.5/nrc.str.sencoten.model.kmp"
+        },
+        "sil.bcc-latn.upp_ptwl1": {
+            "version": "1.2",
+            "kmp": "https://downloads.keyman.com/models/sil.bcc-latn.upp_ptwl1/1.2/sil.bcc-latn.upp_ptwl1.model.kmp"
+        }
+    }
+}

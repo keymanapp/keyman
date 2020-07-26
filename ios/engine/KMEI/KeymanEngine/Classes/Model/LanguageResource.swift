@@ -8,8 +8,9 @@
 
 import Foundation
 
-public enum LanguageResourceType {
-  case keyboard, lexicalModel
+public enum LanguageResourceType: String, Codable {
+  case keyboard
+  case lexicalModel
 }
 
 // Subclasses must implement Equatable; Swift doesn't like it directly on the root protocol.

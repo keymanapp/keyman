@@ -132,7 +132,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.canRemoveDefaultKeyboard = true
 
     // Pre-load for use in update checks.
-    Manager.shared.apiKeyboardRepository.fetch()
+    if !ResourceDownloadManager.shared.updateCacheIsCurrent {
+      // TODO:  Actually use the query's results once available.
+      //        That said, this is as far as older versions used the query here.
+      ResourceDownloadManager.shared.queryKeysForUpdatablePackages { _, _ in }
+    }
 
     // Implement a default color...
     var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)

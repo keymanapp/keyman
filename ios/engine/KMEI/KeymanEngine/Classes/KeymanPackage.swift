@@ -30,7 +30,7 @@ public class KeymanPackage {
    *
    * Provides a unique, hashable key for use with package-oriented operations.
    */
-  public struct Key: Hashable {
+  public struct Key: Hashable, Codable {
     var id: String
     var type: LanguageResourceType
 
@@ -51,6 +51,119 @@ public class KeymanPackage {
 
     public static func == (lhs: KeymanPackage.Key, rhs: KeymanPackage.Key) -> Bool {
       return lhs.id == rhs.id && lhs.type == rhs.type
+    }
+  }
+
+  /**
+   * Indicates the distribution level and state of the package.
+   */
+  public enum DistributionMethod: String, Codable {
+    /**
+     * Indicates that the distribution method for the package is currently unknown.  Generally occurs when a
+     * package is installed via file-sharing before KeymanEngine is able to perform a package-version check.
+     */
+    case unknown
+
+    /**
+     * Indicates that the package is publicly distributed via Keyman's cloud API is is no longer maintained.
+     * Other, better-maintained packages targetting the same language exist and are more favored.
+     */
+    case cloudDeprecated = "cloud-deprecated"
+
+    /**
+     * Indicates that this package is publicly distributed via Keyman's cloud API and is considered well-maintained.
+     */
+    case cloud
+
+    /**
+     * Indicates that this package is distributed outside the Keyman cloud API network.  As a result, KeymanEngine
+     * cannot automatically validate or update this resource.
+     */
+    case custom
+  }
+
+  public enum VersionState: String, Codable {
+    /**
+     * KeymanEngine can't track up-to-date versions for custom packages, and we simply don't know before the first update-check for
+     * any models installed from local files.
+     */
+    case unknown
+
+    /**
+     * The installed version of this package matches the latest distributed version.
+     */
+    case upToDate
+
+    /**
+     * There is a publicly-distributed version of the package that is newer than the one currently installed within KeymanEngine.
+     */
+    case needsUpdate
+  }
+
+  public enum InstallationState: String, Codable {
+    /**
+     * Indicates that the package is neither installed nor being downloaded.
+     *
+     * While a `KeymanPackage` instance will never return it, external functions such as
+     * `ResourceFileManager.installState(for:)` that merely perform key-based lookups may..
+     */
+     case none
+
+    /**
+     * Indicates that the package not yet installed or downloaded, but is currently _being_ downloaded via KeymanEngine.
+     *
+     * While a `KeymanPackage` instance will never return it, external functions such as
+     * `ResourceFileManager.installState(for:)` that merely perform key-based lookups may..
+     */
+     case downloading
+
+     /**
+      * Indicates that this `KeymanPackage` instance has been temporarily extracted for installation from a KMP file, regardless
+      * of whether or not its contents have already been installed within KeymanEngine.
+      */
+     case pending
+
+     /**
+      * Indicates that this `KeymanPackage` instance corresponds has been fully installed and was loaded from its installed files, rather
+      * than its source KMP.
+      */
+     case installed
+  }
+
+  /**
+   * Cloud/query related metadata not tracked (or even trackable) within kmp.json regarding the distribution state of a package.
+   */
+  public struct DistributionStateMetadata: Codable {
+    var latestVersion: String?
+    var downloadURL: URL?
+
+    var timestampForLastQuery: TimeInterval?
+
+    var distributionMethod: DistributionMethod
+
+    init(from queryResult: Queries.PackageVersion.ResultComponent) {
+      if let entry = queryResult as? Queries.PackageVersion.ResultEntry {
+        self.latestVersion = entry.version
+        self.distributionMethod = .cloud
+        self.downloadURL = URL.init(string: entry.packageURL)
+      } else /* if queryResult is Queries.PackageVersion.ResultError */ {
+        self.latestVersion = nil
+        // The package-version query knows nothing about it - must be custom.
+        self.distributionMethod = .custom
+        self.downloadURL = nil
+      }
+
+      self.timestampForLastQuery = NSDate().timeIntervalSince1970
+    }
+
+    init(downloadURL: URL?) {
+      latestVersion = nil
+      timestampForLastQuery = nil
+
+      // Assumption: we cannot install a cloud-deprecated resource from
+      // in-app cloud-backed searches.
+      distributionMethod = downloadURL != nil ? .cloud : .unknown
+      self.downloadURL = downloadURL
     }
   }
 
@@ -99,12 +212,59 @@ public class KeymanPackage {
     }
   }
 
+  internal static func baseFilename(for key: KeymanPackage.Key) -> String {
+    var ext: String
+
+    switch(key.type) {
+      case .keyboard:
+        ext = "kmp"
+      case .lexicalModel:
+        ext = "model.kmp"
+    }
+
+    return "\(key.id).\(ext)"
+  }
+
   public var key: Key {
     return Key(for: self)
   }
 
   public func isKeyboard() -> Bool {
     return metadata.packageType == .Keyboard
+  }
+
+  public var distributionMethod: DistributionMethod {
+    let cachedQueryResult = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)
+    return cachedQueryResult?.distributionMethod ?? .unknown
+  }
+
+  public var installState: InstallationState {
+    // Other possible states are invalid for instantiated packages.
+    return isTemp ? .pending : .installed
+  }
+
+  public var versionState: VersionState {
+    if distributionMethod == .unknown || distributionMethod == .custom {
+      return .unknown
+    } else {
+      let cachedVersion = Version(Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: self.key)!.latestVersion!)!
+
+      if cachedVersion > self.version {
+        return .needsUpdate
+      } else {
+        return .upToDate
+      }
+    }
+  }
+
+  internal var versionQueryCache: DistributionStateMetadata {
+    get {
+      return Storage.active.userDefaults.cachedPackageQueryMetadata[self.key] ?? DistributionStateMetadata(downloadURL: nil)
+    }
+
+    set(value) {
+      Storage.active.userDefaults.cachedPackageQueryMetadata[self.key] = value
+    }
   }
 
   /**
@@ -139,8 +299,12 @@ public class KeymanPackage {
     return defaultInfoHtml()
   }
 
-  public var version: String? {
-    return metadata.version
+  public var version: Version {
+    if let versionString = metadata.version, let version = Version(versionString) {
+      return version
+    } else {
+      return Version.packageBasedFileReorg
+    }
   }
 
   var resources: [AnyKMPResource] {
@@ -225,6 +389,70 @@ public class KeymanPackage {
       return nil
     }
   }
+
+  /**
+   * Runs the package-version query for the specified packages to determine their current support-state.
+   */
+  public static func queryDistributionStates(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : DistributionStateMetadata]?, Error?)-> Void)? = nil) {
+    Queries.PackageVersion.fetch(for: keys, withSession: session) { results, error in
+      guard error == nil, let results = results else {
+        completionBlock?(nil, error)
+        return
+      }
+
+      var keyboardStates: [Key : DistributionStateMetadata] = [:]
+      keyboardStates.reserveCapacity(results.keyboards?.count ?? 0)
+
+      // Sadly, Dictionaries do not support mapping to other dictionaries when considering the keys.
+      results.keyboards?.forEach { key, value in
+        keyboardStates[KeymanPackage.Key(id: key, type: .keyboard)] = KeymanPackage.DistributionStateMetadata(from: value)
+      }
+
+      var lexicalModelStates: [Key : DistributionStateMetadata] = [:]
+      lexicalModelStates.reserveCapacity(results.models?.count ?? 0)
+
+      results.models?.forEach { key, value in
+        lexicalModelStates[KeymanPackage.Key(id: key, type: .lexicalModel)] = KeymanPackage.DistributionStateMetadata(from: value)
+      }
+
+      keyboardStates.forEach { result in
+        Storage.active.userDefaults.cachedPackageQueryMetadata[result.key] = result.value
+      }
+
+      lexicalModelStates.forEach { result in
+        Storage.active.userDefaults.cachedPackageQueryMetadata[result.key] = result.value
+      }
+
+      // There will be no 'merge' conflicts, so we ignore them by simply selecting the original before
+      // passing them off to the completion block.
+      if let completionBlock = completionBlock {
+        let stateSet = keyboardStates.merging(lexicalModelStates, uniquingKeysWith: { lhs, _ in return lhs })
+        completionBlock(stateSet, nil)
+      }
+    }
+  }
+
+  /**
+   * Runs the package-version query for the specified packages to determine if any updates are available.
+   */
+  public static func queryCurrentVersions(for keys: [Key], withSession session: URLSession = URLSession.shared, completionBlock: (([Key : Version]?, Error?) -> Void)? = nil) {
+    queryDistributionStates(for: keys, withSession: session) { stateSet, error in
+      guard error == nil, let stateSet = stateSet else {
+        completionBlock?(nil, error)
+        return
+      }
+
+      let versionSet: [Key: Version] = stateSet.compactMapValues { value in
+        if let versionString = value.latestVersion, let version = Version(versionString) {
+          return version
+        } else {
+          return nil
+        }
+      }
+
+      completionBlock?(versionSet, nil)
+    }
+  }
 }
 
 /**
@@ -238,21 +466,6 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
     self.installables = kmpResources.map { resource in
       return resource.typedInstallableResources as! [TypedLanguageResource]
     } as [[TypedLanguageResource]]
-  }
-
-  internal static func baseFilename(for fullID: TypedLanguageResource.FullID) -> String {
-    var ext: String
-
-    switch(TypedLanguageResource.self) {
-      case is InstallableKeyboard.Type:
-        ext = "kmp"
-      case is InstallableLexicalModel.Type:
-        ext = "model.kmp"
-      default:
-        fatalError("Unsupported language resource type")
-    }
-
-    return "\(fullID.id).\(ext)"
   }
 
   // Cannot directly override base class's installableResourceSets with more specific type,

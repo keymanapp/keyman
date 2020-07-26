@@ -160,8 +160,6 @@ implementation
 {$R *.DFM}
 
 uses
-  axctrls,
-  ActiveX,
   BaseKeyboards,
   ComObj,
   GetOSVersion,
@@ -171,6 +169,7 @@ uses
   initprog,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
+  KeymanVersion,
   KeyNames,
   custinterfaces,
   KLog,
@@ -184,12 +183,12 @@ uses
   ErrorControlledRegistry,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
+  Keyman.Configuration.UI.InstallFile,
   RegistryKeys,
   ShellApi,
   StrUtils,
   UfrmChangeHotkey,
   UfrmHTML,
-  UfrmInstallKeyboard,
   UfrmInstallKeyboardFromWeb,
   UfrmInstallKeyboardLanguage,
   UfrmKeyboardOptions,
@@ -300,7 +299,7 @@ begin
     XMLEncode(sharedDataIntf.State),
     Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),
     XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
-  ]);
+  ]) + DefaultServersXMLTags + DefaultVersionXMLTags;
 
   sharedData.Init(
     FXMLRenderers.TempPath,
@@ -497,7 +496,7 @@ procedure TfrmMain.Keyboard_Install;
 begin
   if MustReboot then Exit;  // I2789
 
-  if InstallKeyboardFromFile(Self) then
+  if TInstallFile.BrowseAndInstallKeyboardFromFile(Self) then
   begin
     RefreshKeymanConfiguration;
   end;

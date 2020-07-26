@@ -1284,11 +1284,14 @@ public final class KMManager {
   }
 
   public static void advanceToNextInputMode() {
-    InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-    // TODO: this method is added in API level 16 and deprecated in API level 28
-    // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (IMService != null) {
+        IMService.switchToNextInputMethod(false);
+      }
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      // This method is added in API level 16 and deprecated in API level 28
+      // Reference: https://developer.android.com/reference/android/view/inputmethod/InputMethodManager.html#switchToNextInputMethod(android.os.IBinder,%20boolean)
+      InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
       imm.switchToNextInputMethod(getToken(), false);
     }
   }

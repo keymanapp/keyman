@@ -1,0 +1,36 @@
+[Package]
+Version=7.0
+ExecuteProgram=
+[StartMenu]
+Path=
+Create=0
+AddUninstallEntry=0
+[Info]
+Name="Khmer Angkor",""
+Copyright="© 2015-2019 SIL International",""
+Author="Makara Sok","mailto:makara@keyman.com"
+Version="1.0.6",""
+[Files]
+0="File khmer_angkor.js","khmer_angkor.js",0
+1="File khmer_angkor.kvk","khmer_angkor.kvk",0
+2="Keyboard Khmer Angkor","khmer_angkor.kmx",0
+3="File keyboard_layout.png","keyboard_layout.png",0
+4="File welcome.htm","welcome.htm",0
+5="File FONTLOG.txt","FONTLOG.txt",0
+6="Font Khmer Mondulkiri Bold","Mondulkiri-B.ttf",0
+7="Font Khmer Mondulkiri Bold Italic","Mondulkiri-BI.ttf",0
+8="Font Khmer Mondulkiri Italic","Mondulkiri-I.ttf",0
+9="Font Khmer Mondulkiri","Mondulkiri-R.ttf",0
+10="File OFL.txt","OFL.txt",0
+11="File OFL-FAQ.txt","OFL-FAQ.txt",0
+12="File KAK_Documentation_EN.pdf","KAK_Documentation_EN.pdf",0
+13="File KAK_Documentation_KH.pdf","KAK_Documentation_KH.pdf",0
+14="Package information","kmp.inf",0
+15="Package information (JSON)","kmp.json",0
+[Keyboard0]
+Name=Khmer Angkor
+ID=khmer_angkor
+Version=1.0.6
+OSKFont=Mondulkiri-R.ttf
+DisplayFont=Mondulkiri-R.ttf
+Language0=km,Central Khmer (Khmer, Cambodia)

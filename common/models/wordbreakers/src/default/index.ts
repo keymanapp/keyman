@@ -358,14 +358,18 @@ namespace wordBreakers {
 
     let midpoint = left + ~~((right - left) / 2);
     let candidate = WORD_BREAK_PROPERTY[midpoint];
+
+    let nextRange = WORD_BREAK_PROPERTY[midpoint + 1];
+    let startOfNextRange = nextRange ? nextRange[I.Start] : Infinity;
+
     if (codePoint < candidate[I.Start]) {
       return searchForProperty(codePoint, left, midpoint - 1);
-    } else if (codePoint > candidate[I.End]) {
+    } else if (codePoint >= startOfNextRange) {
       return searchForProperty(codePoint, midpoint + 1, right);
-    } else {
-      // We found it!
-      return candidate[I.Value];
     }
+
+    // We found it!
+    return candidate[I.Value];
   }
 }
 

@@ -9,6 +9,9 @@ import sys
 import webbrowser
 import tempfile
 import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('WebKit2', '4.0')
+
 from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
@@ -18,8 +21,6 @@ from keyman_config.welcome import WelcomeView
 from keyman_config.uninstall_kmp import uninstall_kmp
 from keyman_config.get_kmp import user_keyboard_dir
 from keyman_config.accelerators import bind_accelerator, init_accel
-gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
 
 
 def find_keyman_image(image_file):
@@ -37,12 +38,13 @@ def find_keyman_image(image_file):
 
 class InstallKmpWindow(Gtk.Dialog):
 
-    def __init__(self, kmpfile, online=False, viewkmp=None):
+    def __init__(self, kmpfile, online=False, viewkmp=None, language=None):
         logging.debug("InstallKmpWindow: kmpfile: %s", kmpfile)
         self.kmpfile = kmpfile
         self.online = online
         self.viewwindow = viewkmp
         self.accelerators = None
+        self.language = language
         keyboardid = os.path.basename(os.path.splitext(kmpfile)[0])
         installed_kmp_ver = get_kmp_version(keyboardid)
         if installed_kmp_ver:
@@ -284,7 +286,7 @@ class InstallKmpWindow(Gtk.Dialog):
     def on_install_clicked(self, button):
         logging.info("Installing keyboard")
         try:
-            install_kmp(self.kmpfile, self.online)
+            install_kmp(self.kmpfile, self.online, language=self.language)
             if self.viewwindow:
                 self.viewwindow.refresh_installed_kmp()
             keyboardid = os.path.basename(os.path.splitext(self.kmpfile)[0])

@@ -102,6 +102,8 @@ uses
 { TfrmInstallOptions }
 
 procedure TfrmInstallOptions.FormCreate(Sender: TObject);
+var
+  FAllowOptions: Boolean;
 begin
   Caption := FInstallInfo.Text(ssOptionsTitle);
   chkStartWithWindows.Caption := FInstallInfo.Text(ssOptionsStartWithWindows);
@@ -116,6 +118,12 @@ begin
   lblDefaultKeymanSettings.Caption := FInstallInfo.Text(ssOptionsTitleDefaultKeymanSettings);
   lblSelectModulesToInstall.Caption := FInstallInfo.Text(ssOptionsTitleSelectModulesToInstall);
   lblAssociatedKeyboardLanguage.Caption := FInstallInfo.Text(ssOptionsTitleAssociatedKeyboardLanguage);
+
+  FAllowOptions := not FInstallInfo.IsInstalled and FInstallInfo.IsNewerAvailable;
+  lblDefaultKeymanSettings.Visible := FAllowOptions;
+  chkAutomaticallyReportUsage.Visible := FAllowOptions;
+  chkCheckForUpdates.Visible := FAllowOptions;
+  chkStartWithWindows.Visible := FAllowOptions;
 
   SetupDynamicOptions;
 end;
@@ -241,8 +249,8 @@ begin
       end
     else
       case FInstallInfo.BestMsi.LocationType of
-        iilLocal:  Text := FInstallInfo.Text(ssOptionsInstallKeyman, [FInstallInfo.BestMsi.Version]);
-        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadInstallKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
+        iilLocal:  Text := FInstallInfo.Text(ssOptionsUpgradeKeyman, [FInstallInfo.BestMsi.Version]);
+        iilOnline: Text := FInstallInfo.Text(ssOptionsDownloadUpgradeKeyman, [FInstallInfo.BestMsi.Version, FormatFileSize(FInstallInfo.BestMsi.Size)]);
       end;
   end
   else if FInstallInfo.IsInstalled then
@@ -301,6 +309,17 @@ begin
       Inc(n);
     end;
   end;
+
+  // Special case: if there are no options to change, don't present them
+  if (FInstallInfo.Packages.Count = 0) and not chkInstallKeyman.Enabled then
+  begin
+    sbTargets.Visible := False;
+    lblSelectModulesToInstall.Visible := False;
+  end;
+
+  lblAssociatedKeyboardLanguage.Visible := FInstallInfo.Packages.Count > 0;
+
+
   EnableControls;
 end;
 

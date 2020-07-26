@@ -319,6 +319,8 @@
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.InstallKeyboard.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.ProxyConfiguration.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas"/>
+        <DCCReference Include="install\Keyman.Configuration.UI.InstallFile.pas"/>
+        <DCCReference Include="install\Keyman.Configuration.UI.KeymanProtocolHandler.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

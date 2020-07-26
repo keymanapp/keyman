@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+@available(*, deprecated, message: "APIKeyboardRepository use is no longer recommended; interactive user selection of keyboards is now facilitated by KeyboardSearchViewController.")
 public enum APIKeyboardFetchError: Error {
   case duplicateLanguageCodes
   case networkError(Error)
@@ -16,8 +17,13 @@ public enum APIKeyboardFetchError: Error {
   case parsingError(Error)
 }
 
+// The primary reason we aren't obsoleting this and its associated protocols & classes outright
+// is that there are no direct replacements for them within KeymanEngine at present.
+// Should we add a keyboard-search query like the one we have for lexical models,
+// we may then obsolete them.
+@available(*, deprecated, message: "APIKeyboardRepository use is no longer recommended; interactive user selection of keyboards is now facilitated by KeyboardSearchViewController.")
 public class APIKeyboardRepository: KeyboardRepository {
-  private let languagesAPIURL = URLComponents(string: "https://api.keyman.com/cloud/4.0/languages")!
+  private let languagesAPIURL = URLComponents(string: "\(KeymanHosts.API_KEYMAN_COM)/cloud/4.0/languages")!
 
   public weak var delegate: KeyboardRepositoryDelegate?
   public private(set) var languages: [String: Language]?

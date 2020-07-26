@@ -282,13 +282,13 @@
                                 <div class='qrcode-caption'>
                                   <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_QRCode']"/>
                                   <a>
-                                    <xsl:attribute name="href">keyman:link?url=https://keyman.com/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
+                                    <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
                                     <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_Link']"/>
                                   </a>
                                   <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_LinkSuffix']"/>
                                 </div>
                                 <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
-                                    text: 'https://keyman.com/go/keyboard/<xsl:value-of select="../../id"/>/share',
+                                    text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
                                     width: 256,
                                     height: 256
                                   });

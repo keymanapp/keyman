@@ -24,7 +24,7 @@ display_usage ( ) {
   echo "  -no-update              Don't copy or build the Keyman Engine library in (assumes already present)"
   echo "  -lib-build              Force rebuild of the Keyman Engine library"
   echo "  -no-lib-build           Only rebuild the Keyman Engine library if it doesn't exist in /android"
-  echo "  -download-keyboards     Download keyboards from downloads.keyman.com"
+  echo "  -download-resources     Download fv_all.kmp and nrc.str.sencoten.model.kmp from downloads.keyman.com"
   echo ""
   exit 1
 }
@@ -33,22 +33,26 @@ export TARGET=FirstVoices
 KEYBOARD_PACKAGE_ID="fv_all"
 KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
+MODEL_PACKAGE_ID="nrc.str.sencoten"
+MODELS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
 
 # This build script assumes that the https://github.com/keymanapp/keyboards repo is in
 # the same parent folder as this repo, with the default name 'keyboards'
 
-PARAM_DOWNLOAD_KEYBOARDS=
 PARAM_DEBUG=
 PARAM_NO_DAEMON=
 PARAM_NO_UPDATE=
 PARAM_LIB_BUILD=
 PARAM_NO_LIB_BUILD=
+DO_KEYBOARDS_DOWNLOAD=false
+DO_MODELS_DOWNLOAD=false
 
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    -download-keyboards)
-      PARAM_DOWNLOAD_KEYBOARDS=-download-keyboards
+    -download-resources)
+      DO_KEYBOARDS_DOWNLOAD=true
+      DO_MODELS_DOWNLOAD=true
       ;;
     -h|-?)
       display_usage
@@ -72,10 +76,15 @@ while [[ $# -gt 0 ]] ; do
   shift
 done
 
-# Verify default keyboard package exists
+# Verify default keyboard and dictionary packages exists
 if [[ ! -f "$KEYBOARDS_TARGET" || ! -f "$KEYBOARDS_CSV_TARGET" ]]; then
   echo "$KEYBOARDS_TARGET and $KEYBOARDS_CSV_TARGET required. Will download the latest version"
-  PARAM_DOWNLOAD_KEYBOARDS=-download-keyboards
+  DO_KEYBOARDS_DOWNLOAD=true
+fi
+
+if [[ ! -f "$MODELS_TARGET" ]]; then
+  echo "$MODELS_TARGET doesn't exist. Will download the latest version"
+  DO_MODELS_DOWNLOAD=true
 fi
 
 if [ ! -z "$PARAM_LIB_BUILD" ] && [ ! -z "$PARAM_NO_LIB_BUILD" ]; then
@@ -83,11 +92,16 @@ if [ ! -z "$PARAM_LIB_BUILD" ] && [ ! -z "$PARAM_NO_LIB_BUILD" ]; then
   exit 1
 fi
 
-if [ "$PARAM_DOWNLOAD_KEYBOARDS" == "-download-keyboards" ]; then
+# Download default keyboard and dictionary packages
+if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then
   echo "Copying keyboards.csv"
   cp "$KEYMAN_ROOT/oem/firstvoices/keyboards.csv" "$KEYBOARDS_CSV_TARGET"
 
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
+fi
+
+if [ "$DO_MODELS_DOWNLOAD" = true ]; then
+  downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
 fi
 
 # TODO: in the future build_common.sh should probably be shared with all oem products?

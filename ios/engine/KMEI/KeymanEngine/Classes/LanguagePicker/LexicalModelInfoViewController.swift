@@ -69,7 +69,7 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomLexicalModel {
       if indexPath.row == 1 {
-        let url = URL(string: "http://help.keyman.com/lexicalModel/\(lexicalModelID)/\(lexicalModelVersion)/")!
+        let url = URL(string: "\(KeymanHosts.HELP_KEYMAN_COM)/lexicalModel/\(lexicalModelID)/\(lexicalModelVersion)/")!
         if let openURL = Manager.shared.openURL {
           _ = openURL(url)
         } else {

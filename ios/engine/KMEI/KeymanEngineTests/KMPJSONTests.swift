@@ -238,7 +238,7 @@ class KMPJSONTests: XCTestCase {
     let coder = JSONEncoder()
     let codedJSON = try coder.encode(constructedMetadata_khmer_angkor)
 
-    let schemaURL = URL(string: "https://api.keyman.com/schemas/package.json")!
+    let schemaURL = URL(string: "\(KeymanHosts.API_KEYMAN_COM)/schemas/package.json")!
     let schemaData = try Data(contentsOf: schemaURL)
 
     // - arguments ready, time to build the POST-based request
