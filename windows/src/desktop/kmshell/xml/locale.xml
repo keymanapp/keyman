@@ -464,11 +464,7 @@ keyboard layout for your language.</String>
 
 <!-- General -->
 
-<String Group="Formatted Messages"
-        Type="FormatString"
-        Id="SKApplicationTitle"
-		Version="7.0.230.0"
-		Description="Product name used for the title of message boxes and message dialogs">&Name;</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKApplicationTitle" Version="7.0.230.0" Description="Product name used for the title of message boxes and message dialogs">&Name;</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKSplashVersion" Version="7.0.230.0" Parameters="%0:s = Version number string" Description="Version number">Version %0:s</String>
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonHelp"  Version="7.0.230.0" Description="Help button in message boxes">Help</String>
@@ -477,11 +473,7 @@ keyboard layout for your language.</String>
 
 <!-- Notices -->
 
-<String Group="Formatted Messages"
-        Type="FormatString"
-        Id="SKPackageAlreadyInstalled"
-		Version="7.0.230.0"
-        Parameters="%0:s = Package to be uninstalled"
+<String Group="Formatted Messages" Type="FormatString" Id="SKPackageAlreadyInstalled" Version="7.0.230.0" Parameters="%0:s = Package to be uninstalled"
 		Description="Notice during package installation that a package with the same name is already installed.">A package with the name %0:s is already installed.  Do you want to uninstall it and install the new one?</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKKeyboardAlreadyInstalled" Version="7.0.230.0" Parameters="%0:s = Keyboard name" Description="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">A keyboard with the name '%0:s' is already installed.  If you continue, it will be uninstalled before the new one is installed.  Continue?</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKKeyboardPartOfPackage" Version="7.0.230.0" Parameters="%0:s = Keyboard name, %1:s = Package name" Description="Notice of need to uninstall an entire package">The keyboard '%0:s' is part of package '%1:s'.  You must uninstall the entire package.  Continue?</String>
