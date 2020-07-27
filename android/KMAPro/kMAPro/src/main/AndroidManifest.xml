@@ -193,14 +193,15 @@
       </intent-filter>
 
       <intent-filter>
-        <!-- cloud keyboard package download links https://{HOST}/go/package/download/ -->
+        <!-- cloud keyboard package download links https://{HOST}/go/package/download/
+             Use {HOST} as defined in KMPLink.java -->
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
         <data
-          android:host="staging-keyman-com.azurewebsites.net"
+          android:host="keyman-staging.com"
           android:scheme="https"
           android:pathPrefix="/go/package/download" />
 

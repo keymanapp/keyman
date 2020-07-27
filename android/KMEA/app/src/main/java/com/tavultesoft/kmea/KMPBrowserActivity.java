@@ -80,10 +80,10 @@ public class KMPBrowserActivity extends AppCompatActivity {
         }
 
         if (KMPLink.isKeymanInstallLink(url)) {
-          String downloadURL = KMPLink.getKeyboardDownloadLink(url);
+          Uri downloadURI = KMPLink.getKeyboardDownloadLink(url);
 
           // Create intent with keyboard download link for KMAPro main activity to handle
-          Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(downloadURL));
+          Intent intent = new Intent(Intent.ACTION_VIEW, downloadURI);
           startActivityForResult(intent, 1);
 
           // Finish activity
@@ -113,8 +113,7 @@ public class KMPBrowserActivity extends AppCompatActivity {
     });
 
     // Tier determines the keyboard search host
-    String host = (KMManager.getTier(BuildConfig.VERSION_NAME) == Tier.STABLE) ?
-      KMP_PRODUCTION_HOST : KMP_STAGING_HOST;
+    String host = KMPLink.getHost();
     // If language ID is provided, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
     String languageStr = (languageID != null) ? String.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
