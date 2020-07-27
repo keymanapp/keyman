@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_0" orientation="portrait" appearance="dark"/>
+    <device id="retina4_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
@@ -8,7 +8,14 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PackageInstallViewController" customModule="KeymanEngine" customModuleProvider="target">
+            <connections>
+                <outlet property="lblAuthor" destination="33W-zU-8EX" id="WFI-4P-1iI"/>
+                <outlet property="lblVersion" destination="ZjR-uh-gz5" id="bNa-sy-VF9"/>
+                <outlet property="view" destination="iN0-l3-epB" id="NJC-ib-Wg0"/>
+                <outlet property="webViewContainer" destination="peW-vU-Eez" id="DCv-fv-s7t"/>
+            </connections>
+        </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
@@ -47,8 +54,7 @@
                     </variation>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="peW-vU-Eez" userLabel="WebView Container">
-                    <rect key="frame" x="0.0" y="160" width="320" height="378"/>
-                    <color key="backgroundColor" systemColor="systemTealColor" red="0.35294117650000001" green="0.7843137255" blue="0.98039215690000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <rect key="frame" x="0.0" y="160" width="320" height="384"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="128" id="hux-E5-Tbu"/>
                     </constraints>
@@ -64,10 +70,28 @@
                     </variation>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Vb-Wo-rx6" userLabel="Version View">
-                    <rect key="frame" x="0.0" y="538" width="320" height="30"/>
-                    <color key="backgroundColor" systemColor="systemPinkColor" red="1" green="0.1764705882" blue="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <rect key="frame" x="0.0" y="544" width="320" height="24"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version: 1.2.3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZjR-uh-gz5">
+                            <rect key="frame" x="8" y="3.5" width="86.5" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Author: anonymous" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="33W-zU-8EX">
+                            <rect key="frame" x="186" y="3.5" width="126" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="secondarySystemBackgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="30" id="BF9-JW-EvK"/>
+                        <constraint firstItem="ZjR-uh-gz5" firstAttribute="leading" secondItem="OZc-1J-VJs" secondAttribute="leading" constant="8" id="5jm-LI-VNb"/>
+                        <constraint firstItem="33W-zU-8EX" firstAttribute="centerY" secondItem="7Vb-Wo-rx6" secondAttribute="centerY" id="9Yb-zi-1dT"/>
+                        <constraint firstAttribute="height" constant="24" id="BF9-JW-EvK"/>
+                        <constraint firstAttribute="trailing" secondItem="33W-zU-8EX" secondAttribute="trailing" constant="8" id="pVa-ty-gdH"/>
+                        <constraint firstItem="ZjR-uh-gz5" firstAttribute="centerY" secondItem="7Vb-Wo-rx6" secondAttribute="centerY" id="x2G-gs-NBc"/>
                     </constraints>
                     <viewLayoutGuide key="safeArea" id="OZc-1J-VJs"/>
                     <variation key="heightClass=regular-widthClass=compact">
