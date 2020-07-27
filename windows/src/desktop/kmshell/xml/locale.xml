@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE Locale SYSTEM 'localedef.dtd'>
+<!DOCTYPE Locale [
+<!ENTITY Company "">
+<!ENTITY ProductName "Keyman">
+<!ENTITY Edition "">
+<!ENTITY Version "14.0">
+
+<!ENTITY EvaluationPeriod "30">
+
+
+<!ENTITY Name "&ProductName;">
+<!ENTITY Name_CNV "&Company;&#160;&ProductName;&#160;&Version;">
+<!ENTITY Name_CN "&Company;&#160;&ProductName;">
+<!ENTITY Name_NV "&ProductName;&#160;&Version;">
+]>
 
 <Locale>
 

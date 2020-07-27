@@ -10,7 +10,7 @@
 <head>
   <script src="/app/sentry.bundle.min.js"></script>
   <script src="/app/sentry.init.js"></script>
-  <title><xsl:value-of select="($locale/String[@Id='S_Splash_Title'])[1]" /></title>
+  <title><xsl:value-of select="($locale/String[@Id='S_Splash_Name'])[1]" />&#160;<xsl:value-of select="/Keyman/version-info/@versionRelease" /></title>
   <style> * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";} </style>
   <link rel="stylesheet" type="text/css" href="/app/menu.css" />
   <link rel="stylesheet" type="text/css" href="/app/splash.css" />

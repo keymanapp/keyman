@@ -99,7 +99,7 @@
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <BT_BuildType>Debug</BT_BuildType>
-        <Debugger_RunParams>-c</Debugger_RunParams>
+        <Debugger_RunParams>-splash</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -413,15 +413,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
