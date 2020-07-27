@@ -80,8 +80,6 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     return baseURL
   }
 
-  private static let REGEX_FOR_DOWNLOAD_INTERCEPT = try! NSRegularExpression(pattern: "^http(?:s)?:\\/\\/[^\\/]+\\/keyboards\\/install\\/([^?\\/]+)(?:\\?(.+))?$")
-
   public init(languageCode: String? = nil,
               withSession session: URLSession = URLSession.shared,
               keyboardSelectionBlock: @escaping SelectionCompletedHandler<FullKeyboardID>) {
@@ -115,13 +113,13 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
                decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
     if navigationAction.navigationType == .linkActivated {
       let link = navigationAction.request.url!
-      if let (keyboard_id, lang_id) = KeyboardSearchViewController.tryParseLink(link) {
+      if let parsedLink = UniversalLinks.tryParseKeyboardInstallLink(link) {
         decisionHandler(.cancel)
 
         // Notify our caller of the search results.
         self.hasFinalized = true  // Prevent popViewController from triggering cancellation events.
         self.navigationController?.popViewController(animated: true) // Rewind UI
-        finalize(with: keyboard_id, for: lang_id)
+        finalize(with: parsedLink)
         return
       }
     }
@@ -136,35 +134,12 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     }
   }
 
-  internal static func tryParseLink(_ link: URL) -> (String, String?)? {
-    let linkString = link.absoluteString
-
-    // If it matches the format for the Keyboard Universal Link URL Pattern...
-    // (see https://docs.google.com/document/d/1rhgMeJlCdXCi6ohPb_CuyZd0PZMoSzMqGpv1A8cMFHY/edit?ts=5f11cb13#heading=h.qw7pas2adckj)
-    if let match = REGEX_FOR_DOWNLOAD_INTERCEPT.firstMatch(in: linkString,
-                                                           options: [],
-                                                           range: NSRange(location: 0, length: linkString.utf16.count)) {
-      let keyboard_id_range = Range(match.range(at: 1), in: linkString)!
-      let keyboard_id = String(linkString[keyboard_id_range])
-
-      var lang_id: String? = nil
-      let urlComponents = URLComponents(string: linkString)!
-      if let lang_id_component = urlComponents.queryItems?.first(where: { $0.name == "bcp47" }) {
-        lang_id = lang_id_component.value
-      }
-
-      return (keyboard_id, lang_id)
-    } else {
-      return nil
-    }
-  }
-
-  internal func finalize(with keyboard_id: String, for lang_id: String?) {
-    let packageKey = KeymanPackage.Key(id: keyboard_id, type: .keyboard)
+  internal func finalize(with parsedLink: UniversalLinks.ParsedKeyboardInstallLink) {
+    let packageKey = KeymanPackage.Key(id: parsedLink.keyboard_id, type: .keyboard)
 
     // If we have a language ID AND do not yet have a model for it.
-    if let lang_id = lang_id {
-      let resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
+    if let lang_id = parsedLink.lang_id {
+      let resourceKey = FullKeyboardID(keyboardID: parsedLink.keyboard_id, languageID: lang_id)
       let kbdURL = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: packageKey, andResource: resourceKey, asUpdate: false)
       self.keyboardSelectionClosure(.tagged(packageKey, kbdURL, resourceKey))
     } else {

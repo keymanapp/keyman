@@ -210,6 +210,8 @@
 		CEA1486C2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA1486D2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA14870240780E100C6ECD2 /* ResourceInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEA14872240780E100C6ECD2 /* ResourceInfoView.xib */; };
+		CE9E95CD24CE786900F6DD78 /* UniversalLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */; };
+		CE9E95CF24CE7A2C00F6DD78 /* UniversalLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9E95CE24CE7A2C00F6DD78 /* UniversalLinkTests.swift */; };
 		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
 		CEA70CCF24CAC3AE001C12E6 /* Obsoletions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */; };
 		CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */; };
@@ -515,6 +517,8 @@
 		CEA14871240780E100C6ECD2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ResourceInfoView.xib; sourceTree = "<group>"; };
 		CEA14874240780EF00C6ECD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		CEA148772407869200C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinks.swift; sourceTree = "<group>"; };
+		CE9E95CE24CE7A2C00F6DD78 /* UniversalLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinkTests.swift; sourceTree = "<group>"; };
 		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Obsoletions.swift; sourceTree = "<group>"; };
 		CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUpdateTests.swift; sourceTree = "<group>"; };
@@ -778,6 +782,7 @@
 				CED8B63124A9C2400054E300 /* ResourceDownloadManagerTests.swift */,
 				CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */,
 				CE88143924A9B7F4002809C3 /* ResourceDownloadQueueTests.swift */,
+				CE9E95CE24CE7A2C00F6DD78 /* UniversalLinkTests.swift */,
 			);
 			path = KeymanEngineTests;
 			sourceTree = "<group>";
@@ -1096,6 +1101,7 @@
 				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
 				CE7ADD6523DE89FC00BC9A00 /* Alerts.swift */,
 				CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */,
+				CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1498,6 +1504,7 @@
 				CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */,
 				CED8B63224A9C2400054E300 /* ResourceDownloadManagerTests.swift in Sources */,
 				CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */,
+				CE9E95CF24CE7A2C00F6DD78 /* UniversalLinkTests.swift in Sources */,
 				CE973D812484A56500F66045 /* PackageJSON.swift in Sources */,
 				CE88143A24A9B7F4002809C3 /* ResourceDownloadQueueTests.swift in Sources */,
 				CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */,
@@ -1540,6 +1547,7 @@
 				C0B901AA1FA1AFC200764EB8 /* UserDefaults+Types.swift in Sources */,
 				CE1F67A32304EB3800FF6972 /* ResourceDownloadManager.swift in Sources */,
 				9A079E372238680700581263 /* KMPLexicalModel.swift in Sources */,
+				CE9E95CD24CE786900F6DD78 /* UniversalLinks.swift in Sources */,
 				CE89641F24A4686000D5EB8E /* Queries.swift in Sources */,
 				CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */,
 				9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
