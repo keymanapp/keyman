@@ -15,8 +15,12 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+LOCALE_DIR="$KEYMAN_ROOT/windows/src/desktop/locale/"
 XSLT="$KEYMAN_ROOT/windows/bin/buildtools/xslt.exe"
 [ -f "$XSLT" ] || die "ERROR: Unable to find xslt.exe; build Keyman buildtools first."
+
+SOURCE_LOCALE_XML="$KEYMAN_ROOT/windows/src/desktop/kmshell/xml/locale.xml"
+TARGET_STRINGS_XML="$LOCALE_DIR/strings.xml"
 
 display_usage() {
     echo <<-END
@@ -29,6 +33,24 @@ display_usage() {
       Android strings format for import into Crowdin
 END
   exit 1
+}
+
+##
+## Uploads kmshell/xml/locale.xml to Crowdin
+##
+do_upload() {
+  # Convert locale.xml to Android strings format
+  "$XSLT" "$SOURCE_LOCALE_XML" "$LOCALE_DIR/locale-to-android-strings.xsl" "$TARGET_STRINGS_XML"
+  crowdin.bat upload
+}
+
+##
+## Downloads latest strings.xml from Crowdin for each
+## target locale and converts them to locale.xml format
+##
+do_download() {
+  # crowdin.bat download
+  die "Not yet implemented"
 }
 
 # Parse args
@@ -49,32 +71,18 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       ;;
     *)
-      fail "Invalid parameters specified. $0 --help for help."
+      die "Invalid parameters specified. $0 --help for help."
       ;;
   esac
   shift # past argument
 done
 
-if [ ACTION = upload ]; then
+if [ -z $ACTION ]; then
+  die "No parameters specified. $0 --help for help.";
+fi
+
+if [ $ACTION = upload ]; then
   do_upload
 else
   do_download
 fi
-
-##
-## Uploads kmshell/xml/locale.xml to Crowdin
-##
-do_upload() {
-  # Convert locale.xml to Android strings format
-  "$XSLT" "$SOURCE_LOCALE_XML" "$(dirname "$THIS_SCRIPT")/locale-android-strings.xsl" "$(dirname "$THIS_SCRIPT")/strings.xml"
-  crowdin.bat upload
-}
-
-##
-## Downloads latest strings.xml from Crowdin for each
-## target locale and converts them to locale.xml format
-##
-do_download() {
-  # crowdin.bat download
-  fail "Not yet implemented"
-}
