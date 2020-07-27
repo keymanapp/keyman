@@ -229,6 +229,10 @@ public class KeymanPackage {
     return Key(for: self)
   }
 
+  public var name: String {
+    return self.metadata.info?.name?.description ?? id
+  }
+
   public func isKeyboard() -> Bool {
     return metadata.packageType == .Keyboard
   }
@@ -288,15 +292,23 @@ public class KeymanPackage {
   }
   
   public func infoHtml() -> String {
-    let welcomePath = self.sourceFolder.appendingPathComponent("welcome.htm")
-    
-    if FileManager.default.fileExists(atPath: welcomePath.path) {
-      if let html = try? String(contentsOfFile: welcomePath.path, encoding: String.Encoding.utf8) {
+    if let welcomeURL = self.welcomePageURL {
+      if let html = try? String(contentsOfFile: welcomeURL.path, encoding: String.Encoding.utf8) {
         return html
       }
     }
   
     return defaultInfoHtml()
+  }
+
+  public var welcomePageURL: URL? {
+    let welcomeURL = self.sourceFolder.appendingPathComponent("welcome.htm")
+
+    if FileManager.default.fileExists(atPath: welcomeURL.path) {
+      return welcomeURL
+    } else {
+      return nil
+    }
   }
 
   public var version: Version {

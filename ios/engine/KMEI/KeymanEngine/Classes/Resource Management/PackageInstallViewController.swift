@@ -47,10 +47,15 @@ public class PackageInstallViewController: UIViewController {
 
     navigationItem.leftBarButtonItem = cancelBtn
     navigationItem.rightBarButtonItem = installBtn
+    navigationItem.title = package.name
   }
 
   override public func viewWillAppear(_ animated: Bool) {
-    wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
+    if let welcomeURL = package.welcomePageURL {
+      wkWebView?.loadFileURL(welcomeURL, allowingReadAccessTo: package.sourceFolder)
+    } else {
+      wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
+    }
   }
 
   @objc func cancelBtnHandler() {
