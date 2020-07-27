@@ -209,8 +209,12 @@ public class ResourceFileManager {
 
       if let fullIDs = fullIDs {
         do {
-          //try ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom)
           try ResourceFileManager.shared.install(resourcesWithIDs: fullIDs, from: package)
+
+          if package is KeyboardKeymanPackage {
+            // TODO(?): We might should attempt an automatic download + install of lexical models
+            // for the specified language codes.
+          }
         } catch {
           if let kmpError = error as? KMPError {
             let alert = self.buildKMPError(kmpError)
