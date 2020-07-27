@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
 <Locale Version="7.1.261.0" OnlineProductID="1">
-  <String Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard">Fechar Teclado Virtual</String>
-  <String Type="Caption" Id="S_Menu_Exit">&amp;Sair</String>
-  <String Type="Caption" Id="S_OSKContext_FadeWhenInactive">Tornar &amp;Invisível Quando Inativo</String>
-  <String Type="Caption" Id="S_Menu_Help">&amp;Ajuda...</String>
+  <String Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard">Fechar Teclado Virtual</String>
+  <String Type="PlainText" Id="S_Menu_Exit">&amp;Sair</String>
+  <String Type="PlainText" Id="S_OSKContext_FadeWhenInactive">Tornar &amp;Invisível Quando Inativo</String>
+  <String Type="PlainText" Id="S_Menu_Help">&amp;Ajuda...</String>
   <String Type="Hint" Id="Hint_KH_CLOSEOSK">Você fechou o Teclado Virtual. Keyman Desktop ainda está rodando. Você pode abrir o Teclado Virtual em qualquer momento por clicar no ícone do Keyman Desktop e selecionar "Teclado Virtual"</String>
   <String Type="Hint" Id="Hint_KH_EXITPRODUCT">Você tem certeza que quer sair do Keyman Desktop? Se você deseja usar seu teclado padrão, não é necessário sair. Você pode usar o teclado padrão por selecionar "Desligar Keyman Desktop" no menu do ícone do Keyman Desktop.</String>
   
@@ -32,10 +32,10 @@
   <String Type="FormatString" Id="koTestKeymanFunctioning">Procurar conflitos de aplicativos ao iniciar o Keyman</String>
   <String Type="FormatString" Id="koTurnOnSurrogates">Ativar tela de caracteres suplementares Unicode (é necessário reiniciar)</String>
   <String Type="FormatString" Id="koUnknownLanguage">Ativar o idioma "Desconhecido"</String>
-  <String Type="Caption" Id="S_Menu_OnScreenKeyboard">Teclado &amp;Virtual</String>
-  <String Type="Caption" Id="S_Toolbar_OpenHelp">Abrir Ajuda</String>
-  <String Type="Caption" Id="S_Toolbar_OpenConfiguration">Abrir a Configuração do &Name;</String>
-  <String Type="Caption" Id="S_OSKContext_Print">Im&amp;primir</String>
+  <String Type="PlainText" Id="S_Menu_OnScreenKeyboard">Teclado &amp;Virtual</String>
+  <String Type="PlainText" Id="S_Toolbar_OpenHelp">Abrir Ajuda</String>
+  <String Type="PlainText" Id="S_Toolbar_OpenConfiguration">Abrir a Configuração do &Name;</String>
+  <String Type="PlainText" Id="S_OSKContext_Print">Im&amp;primir</String>
   
   
   
@@ -209,8 +209,8 @@
   
   
   <String Type="PlainText" Id="S_Yes">Sim</String>
-  <String Type="Caption" Id="S_OSKContext_SaveAsWebPage">&amp;Salvar como Página da Web</String>
-  <String Type="Caption" Id="S_OSKContext_ShowToolbar">Mostrar Barra de &amp;Ferramentas</String>
+  <String Type="PlainText" Id="S_OSKContext_SaveAsWebPage">&amp;Salvar como Página da Web</String>
+  <String Type="PlainText" Id="S_OSKContext_ShowToolbar">Mostrar Barra de &amp;Ferramentas</String>
   <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
   <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
@@ -298,11 +298,11 @@ AVISO DE PRIVACIDADE: Este arquivo vai gravar todos os caracteres que você digi
   <String Type="FormatString" Id="SKUpdate_UnableToContact">Não foi possível contatar o site da Tavultesoft - certifique-se de estar conectado à Internet e tente novamente.</String>
   <String Type="FormatString" Id="SKUpdate_UnableToContact_Error">Não foi possível contatar o site da Tavultesoft - certifique-se de estar conectado à Internet e tente novamente. O erro recebido foi: %0:s</String>
   
-  <String Type="Caption" Id="S_Menu_SwitchKeymanOff">Desativar &Name;</String>
-  <String Type="Caption" Id="S_Toolbar_ViewCharacterMap">Ver Mapeamento dos Caracteres</String>
-  <String Type="Caption" Id="S_Toolbar_ViewFontHelper">Ver o Assistente de Fonte</String>
-  <String Type="Caption" Id="S_Toolbar_ViewKeyboardUsage">Ver a Usagem de Teclados.</String>
-  <String Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard">Ver o Teclado Virtual</String>
+  <String Type="PlainText" Id="S_Menu_SwitchKeymanOff">Desativar &Name;</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewCharacterMap">Ver Mapeamento dos Caracteres</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewFontHelper">Ver o Assistente de Fonte</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewKeyboardUsage">Ver a Usagem de Teclados.</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewOnScreenKeyboard">Ver o Teclado Virtual</String>
   <Dialog Id="Activate" Width="309" Height="308"/>
   <Dialog Id="DownloadKeyboard" Width="740" Height="400">
     <footerheight>40</footerheight>

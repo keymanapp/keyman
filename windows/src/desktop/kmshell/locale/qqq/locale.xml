@@ -411,38 +411,38 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Prefix" Version="7.0.230.0" Description="Help - text preceding keyboard name">[!!Ħėŀƥ ōņ "!!]</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Suffix" Version="7.0.230.0" Description="Help - text following keyboard name">[!!" ƙęŷƃőáŕď!!]</String>
 
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - View OSK pop-up text">[!!Vīěŵ Őŋ Şčŗęȇņ Ƙȅƴƅŏȃřď!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewKeyboardUsage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">[!!Vįĕŵ Ƙȇɏƅơãŗď Ŭśȁĝě!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewFontHelper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">[!!Vĩėŵ Ƒōňţ Ħēĺƥěŗ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewCharacterMap" Version="7.0.230.0" Description="Toolbar help - View Character Map pop-up text">[!!Vīěŵ Ċħåřāčŧĕř Máƿ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">[!!Ŝŵĭŧčħ !!]&Name;[!! Ōƒƒ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_OpenConfiguration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">[!!Ơƥĕŉ !!]&Name;[!! Ċơƞƒĩġũřáţīőń!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_OpenHelp" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">[!!Ơƿĕň Ĥȅłƿ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">[!!Ćļŏŝȇ Ŏň Şĉŗȅēŉ Ķēƴƃōäŗď!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - View OSK pop-up text">[!!Vīěŵ Őŋ Şčŗęȇņ Ƙȅƴƅŏȃřď!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewKeyboardUsage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">[!!Vįĕŵ Ƙȇɏƅơãŗď Ŭśȁĝě!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewFontHelper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">[!!Vĩėŵ Ƒōňţ Ħēĺƥěŗ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewCharacterMap" Version="7.0.230.0" Description="Toolbar help - View Character Map pop-up text">[!!Vīěŵ Ċħåřāčŧĕř Máƿ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">[!!Ŝŵĭŧčħ !!]&Name;[!! Ōƒƒ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenConfiguration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">[!!Ơƥĕŉ !!]&Name;[!! Ċơƞƒĩġũřáţīőń!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenHelp" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">[!!Ơƿĕň Ĥȅłƿ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">[!!Ćļŏŝȇ Ŏň Şĉŗȅēŉ Ķēƴƃōäŗď!!]</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Menu Items                        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">[!!Şŵıţčħ !!]&Name;[!! &amp;Ōƒƒ!!]</String> 
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_OnScreenKeyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_KeyboardUsage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_FontHelper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_CharacterMap" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">[!!Ĉĥãřāĉťęř &amp;Mâƥ!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_TextEditor" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">[!!&amp;Ťēxť Ȇďĩťŏř...!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_Configuration" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">[!!&amp;Ċơņƒığūŕåťĭơŉ...!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">[!!Şŵıţčħ !!]&Name;[!! &amp;Ōƒƒ!!]</String> 
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_OnScreenKeyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_KeyboardUsage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_FontHelper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_CharacterMap" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">[!!Ĉĥãřāĉťęř &amp;Mâƥ!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_TextEditor" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">[!!&amp;Ťēxť Ȇďĩťŏř...!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Configuration" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">[!!&amp;Ċơņƒığūŕåťĭơŉ...!!]</String>
 
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_Help" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">[!!&amp;Ħęłƥ...!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">[!!Ĕ&amp;xĩŧ!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Help" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">[!!&amp;Ħęłƥ...!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">[!!Ĕ&amp;xĩŧ!!]</String>
 
 <String Group="System Tray Menu Items" Type="PlainText" Id="SKMenu_NoKeyboardsInstalled" Version="7.0.230.0" Description="Systray - notice of no keyboard layouts installed">[!!Ňơ ƙěƴɓőȃřď ŀāƴőůťš āŕĕ ıŋşţāłłěď.
 Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á 
 ķȅɏƂőäŗđ ļąɏōůţ ƒőř ɏŏūŕ ĺáňġųáĝę.!!]</String>
 
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_FadeWhenInactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_ShowToolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_SaveAsWebPage" Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">[!!Śǻvĕ äš ŴěƄ Ƥąģę...!!]</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_Print" Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">[!!Ƥŕıňŧ...!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_FadeWhenInactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_ShowToolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_SaveAsWebPage" Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">[!!Śǻvĕ äš ŴěƄ Ƥąģę...!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_Print" Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">[!!Ƥŕıňŧ...!!]</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Usage Page                        -->

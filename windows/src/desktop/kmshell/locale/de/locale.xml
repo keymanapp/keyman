@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
 <Locale Version="7.1.261.0" OnlineProductID="1">
-  <String Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard">Bildschirmtastatur schließen</String>
-  <String Type="Caption" Id="S_Menu_Exit">&amp;Verlassen</String>
-  <String Type="Caption" Id="S_OSKContext_FadeWhenInactive">Wenn inaktiv, ausblenden</String>
-  <String Type="Caption" Id="S_Menu_Help">&amp;Hilfe</String>
+  <String Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard">Bildschirmtastatur schließen</String>
+  <String Type="PlainText" Id="S_Menu_Exit">&amp;Verlassen</String>
+  <String Type="PlainText" Id="S_OSKContext_FadeWhenInactive">Wenn inaktiv, ausblenden</String>
+  <String Type="PlainText" Id="S_Menu_Help">&amp;Hilfe</String>
   <String Type="Hint" Id="Hint_KH_CLOSEOSK">Sie haben die Bildschirmtastatur geschlossen. Keyman Desktop läuft immer noch. Mit einem Klick auf „Bildschirmtastatur“ in dem Keyman Menü, darfen Sie die Bildschirmtastatur jederzeit wieder öffnen.</String>
   <String Type="Hint" Id="Hint_KH_EXITPRODUCT">Sind Sie sicher, daß Sie &Name; verlassen wollen? Wenn Sie Ihre Standard-Tastatur benutzen möchten, müssen Sie &Name; nicht verlassen. Mit einem Klick auf „&Name; ausschalten“ in dem Keyman Menü, können Sie Ihre Standard-Tastatur benutzen.</String>
   
@@ -32,10 +32,10 @@
   <String Type="FormatString" Id="koTestKeymanFunctioning">Als &Name; startet, wird Windows auf widersprüchliche Anwendungen geprüft</String>
   <String Type="FormatString" Id="koTurnOnSurrogates">Die Unicode ergänzender Zeichen-Display einschalten (Neustart erforderlich)</String>
   <String Type="FormatString" Id="koUnknownLanguage">In Windows "unbekannte Sprache" einschalten</String>
-  <String Type="Caption" Id="S_Menu_OnScreenKeyboard">&amp;Bildschirmtastatur</String>
-  <String Type="Caption" Id="S_Toolbar_OpenHelp">Hilfe öffnen</String>
-  <String Type="Caption" Id="S_Toolbar_OpenConfiguration">&Name; Konfiguration öffnen</String>
-  <String Type="Caption" Id="S_OSKContext_Print">Drucken...</String>
+  <String Type="PlainText" Id="S_Menu_OnScreenKeyboard">&amp;Bildschirmtastatur</String>
+  <String Type="PlainText" Id="S_Toolbar_OpenHelp">Hilfe öffnen</String>
+  <String Type="PlainText" Id="S_Toolbar_OpenConfiguration">&Name; Konfiguration öffnen</String>
+  <String Type="PlainText" Id="S_OSKContext_Print">Drucken...</String>
   
   
   
@@ -211,8 +211,8 @@
   
   
   <String Type="PlainText" Id="S_Yes">Ja</String>
-  <String Type="Caption" Id="S_OSKContext_SaveAsWebPage">Als Webseite speichern...</String>
-  <String Type="Caption" Id="S_OSKContext_ShowToolbar">Toolbar der Bildschirmtastatur anzeigen</String>
+  <String Type="PlainText" Id="S_OSKContext_SaveAsWebPage">Als Webseite speichern...</String>
+  <String Type="PlainText" Id="S_OSKContext_ShowToolbar">Toolbar der Bildschirmtastatur anzeigen</String>
   <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
   <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
@@ -296,11 +296,11 @@
   <String Type="FormatString" Id="SKUpdate_UnableToContact">Die Tavultesoft Webseite ist nicht erreichbar - bitte testen Sie Ihre Internet-Verbindung, und versuchen Sie es erneut.</String>
   <String Type="FormatString" Id="SKUpdate_UnableToContact_Error">Die Tavultesoft Webseite ist nicht erreichbar - bitte testen Sie Ihre Internet-Verbindung, und versuchen Sie es erneut. Der erhaltenen Fehler war: %0:s</String>
   
-  <String Type="Caption" Id="S_Menu_SwitchKeymanOff">&Name; ausschalten</String>
-  <String Type="Caption" Id="S_Toolbar_ViewCharacterMap">Zeichentabelle anzeigen</String>
-  <String Type="Caption" Id="S_Toolbar_ViewFontHelper">Schrift-Helfer anzeigen</String>
-  <String Type="Caption" Id="S_Toolbar_ViewKeyboardUsage">Tastaturbelegungshilfe anzeigen</String>
-  <String Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard">Bildschirmtastatur anzeigen</String>
+  <String Type="PlainText" Id="S_Menu_SwitchKeymanOff">&Name; ausschalten</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewCharacterMap">Zeichentabelle anzeigen</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewFontHelper">Schrift-Helfer anzeigen</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewKeyboardUsage">Tastaturbelegungshilfe anzeigen</String>
+  <String Type="PlainText" Id="S_Toolbar_ViewOnScreenKeyboard">Bildschirmtastatur anzeigen</String>
 <String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">Keyman</String>
 <String Group="General Strings" Type="PlainText" Id="S_Button_Apply" Version="8.0.314.0" Description="Apply button term">Apply</String>
 <String Group="General Strings" Type="PlainText" Id="S_Button_RemindLater" Version="8.0.314.0" Description="Remind me Later button term">Remind me Later</String>
