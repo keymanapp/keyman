@@ -472,6 +472,7 @@ public class KeymanPackage {
  */
 public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: KeymanPackage {
   public private(set) var installables: [[TypedLanguageResource]] = []
+  typealias Resource = TypedLanguageResource
 
   internal func setInstallableResourceSets<Resource: KMPResource>(for kmpResources: [Resource]) where
       TypedLanguageResource: KMPInitializableLanguageResource {

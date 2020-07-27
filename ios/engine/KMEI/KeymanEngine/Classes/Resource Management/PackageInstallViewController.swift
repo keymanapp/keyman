@@ -9,15 +9,15 @@
 import Foundation
 import WebKit
 
-public class PackageInstallViewController: UIViewController {
-  public typealias CompletionHandler = (Error?) -> Void
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController {
+  public typealias CompletionHandler = ([Resource.FullID]?) -> Void
 
-  let package: KeymanPackage
+  let package: Resource.Package
   var wkWebView: WKWebView?
   let completionHandler: CompletionHandler
   let isCustom: Bool
 
-  public init(for package: KeymanPackage, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
+  public init(for package: Resource.Package, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
     self.package = package
     self.completionHandler = completionHandler
     self.isCustom = isCustom
@@ -59,16 +59,20 @@ public class PackageInstallViewController: UIViewController {
   }
 
   @objc func cancelBtnHandler() {
-    dismiss(animated: true, completion: nil)
+    dismiss(animated: true, completion: {
+      self.completionHandler(nil)
+    })
   }
 
   @objc func installBtnHandler() {
     dismiss(animated: true, completion: {
-      do {
-        try ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom)
-        self.completionHandler(nil)
-      } catch {
-        self.completionHandler(error)
+      // A stop-gap pending further changes.
+      let defaultResource = self.package.installableResourceSets[0] as! [Resource]
+      switch self.package.resourceType() {
+        case .keyboard:
+          self.completionHandler([defaultResource[0].typedFullID])
+        case .lexicalModel:
+          self.completionHandler(defaultResource.map { $0.typedFullID })
       }
     })
   }

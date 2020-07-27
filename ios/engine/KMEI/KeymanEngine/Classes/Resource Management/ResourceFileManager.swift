@@ -199,26 +199,52 @@ public class ResourceFileManager {
     }
   }
 
-  public func promptPackageInstall(of package: KeymanPackage,
+  internal func typedPromptForPackageInstall<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+                                   of package: Package,
                                    in rootVC: UIViewController,
                                    isCustom: Bool,
-                                   successHandler: ((KeymanPackage) -> Void)? = nil) {
-    let vc = PackageInstallViewController(for: package, isCustom: isCustom, completionHandler: { error in
-      if let err = error {
-        if let kmpError = err as? KMPError {
-          let alert = self.buildKMPError(kmpError)
-          rootVC.present(alert, animated: true, completion: nil)
+                                   successHandler: ((Package) -> Void)? = nil) -> PackageInstallViewController<Resource>
+  where Package == Resource.Package {
+    return PackageInstallViewController(for: package, isCustom: isCustom, completionHandler: { fullIDs in
+
+      if let fullIDs = fullIDs {
+        do {
+          //try ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom)
+          try ResourceFileManager.shared.install(resourcesWithIDs: fullIDs, from: package)
+        } catch {
+          if let kmpError = error as? KMPError {
+            let alert = self.buildKMPError(kmpError)
+            rootVC.present(alert, animated: true, completion: nil)
+          }
         }
-      } else {
+
         let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.", completionHandler: {
             successHandler?(package)
           })
         rootVC.present(alert, animated: true, completion: nil)
       }
     })
+  }
 
-    let nvc = UINavigationController.init(rootViewController: vc)
-    rootVC.present(nvc, animated: true, completion: nil)
+  public func promptPackageInstall(of package: KeymanPackage,
+                                   in rootVC: UIViewController,
+                                   isCustom: Bool,
+                                   successHandler: ((KeymanPackage) -> Void)? = nil) {
+    var vc: UIViewController? = nil
+    if let kbdPackage = package as? KeyboardKeymanPackage {
+      vc = typedPromptForPackageInstall(of: kbdPackage, in: rootVC, isCustom: isCustom) { package in
+        successHandler?(package)
+      }
+    } else if let lmPackage = package as? LexicalModelKeymanPackage {
+      vc = typedPromptForPackageInstall(of: lmPackage, in: rootVC, isCustom: isCustom) { package in
+        successHandler?(package)
+      }
+    }
+
+    if let vc = vc {
+      let nvc = UINavigationController.init(rootViewController: vc)
+      rootVC.present(nvc, animated: true, completion: nil)
+    }
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
