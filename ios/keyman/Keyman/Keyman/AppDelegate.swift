@@ -88,6 +88,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
 
+  // Handles universal links.
+  func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
+      guard let incomingURL = userActivity.webpageURL else {
+        return false
+      }
+
+      if let parsedLink = UniversalLinks.tryParseKeyboardInstallLink(incomingURL) {
+        // Aha!  We know this link type!
+
+        // TODO:  Things.  Note - here, there are no pre-existing UI expectations, so while
+        //        what we need to do is _functionally_ similiar to what keyboard-search does
+        //        after clicking a link, the integration requirements are pretty distinct.
+
+        return true
+      }
+    }
+
+    return false
+  }
+
   func applicationDidEnterBackground(_ application: UIApplication) {
     _overlayWindow = nil
     FontManager.shared.unregisterCustomFonts()
