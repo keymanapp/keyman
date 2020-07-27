@@ -209,6 +209,7 @@
 		CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */; };
 		CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */; };
 		CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */; };
+		CE9E95D124CEB27200F6DD78 /* PackageInstallView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE9E95D024CEB27200F6DD78 /* PackageInstallView.xib */; };
 		CEA6BA9D249872E8002D44CE /* Simple 13.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */; };
 		CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */; };
 		CEA9670B24BEC8030035AACF /* EngineStateBundler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */; };
@@ -510,6 +511,7 @@
 		CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 12.0 Migration.bundle"; sourceTree = "<group>"; };
 		CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		CE9E95D024CEB27200F6DD78 /* PackageInstallView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PackageInstallView.xib; sourceTree = "<group>"; };
 		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUpdateTests.swift; sourceTree = "<group>"; };
 		CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineStateBundler.swift; sourceTree = "<group>"; };
@@ -910,6 +912,7 @@
 			children = (
 				CE1F67A22304EB3800FF6972 /* ResourceDownloadManager.swift */,
 				CE87751D24C68DA500B1475A /* KeyboardSearchViewController.swift */,
+				CE9E95D024CEB27200F6DD78 /* PackageInstallView.xib */,
 				CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */,
 				CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */,
 				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
@@ -1345,6 +1348,7 @@
 				CE754A0223D151B90030CB79 /* ResourceInfoView.xib in Resources */,
 				9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */,
 				CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */,
+				CE9E95D124CEB27200F6DD78 /* PackageInstallView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
