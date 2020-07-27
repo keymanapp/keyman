@@ -108,7 +108,7 @@ Create a user interface translation for Keyman for Windows at https://crowdin.co
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Button_InstallKeyboard" Version="7.0.230.0" Description="Keyboard Layouts - install keyboard button">Install keyboard...</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Button_DownloadKeyboard" Version="7.0.230.0" Description="Keyboard Layouts - download keyboard button">Download keyboard...</String>
 
-  <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_Options" Version="8.0.287.0" Description="KL option button submenu - keyboard options">Keyboard options</String>
+<String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_Options" Version="8.0.287.0" Description="KL option button submenu - keyboard options">Keyboard options</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_Uninstall" Version="7.0.230.0" Description="KL option button submenu - uninstall keyboard">Uninstall</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_UninstallPackage" Version="7.0.230.0" Description="KL option button submenu - uninstall package">Uninstall package</String>
 <String Group="Configuration Dialog - Keyboard Layouts tab" Type="PlainText" Id="S_Menu_ShowWelcome" Version="7.0.230.0" Description="KL option button submenu - show introductory help">Show introductory help</String>

@@ -411,38 +411,38 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Prefix" Version="7.0.230.0" Description="Help - text preceding keyboard name">Help on "</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Suffix" Version="7.0.230.0" Description="Help - text following keyboard name">" keyboard</String>
 
-<String Group="Toolbar Context Help" Type="Caption" Caption="View On Screen Keyboard" Version="7.0.230.0" Description="Toolbar help - View OSK pop-up text">View On Screen Keyboard</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="View Keyboard Usage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">View Keyboard Usage</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="View Font Helper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">View Font Helper</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - View OSK pop-up text">View On Screen Keyboard</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewKeyboardUsage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">View Keyboard Usage</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_ViewFontHelper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">View Font Helper</String>
 <String Group="Toolbar Context Help" Type="Caption" Caption="View Character Map" Version="7.0.230.0" Description="Toolbar help - View Character Map pop-up text">View Character Map</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Switch Keyman Desktop Off" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">Switch &Name; Off</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Open Keyman Desktop Configuration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">Open &Name; Configuration</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Open Help" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">Open Help</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Close On Screen Keyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">Close On Screen Keyboard</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">Switch &Name; Off</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_OpenConfiguration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">Open &Name; Configuration</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_OpenHelp" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">Open Help</String>
+<String Group="Toolbar Context Help" Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">Close On Screen Keyboard</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Menu Items                        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<String Group="System Tray Menu Items" Type="Caption" Caption="Switch Keyman Desktop Off" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">Switch &Name; &amp;Off</String> 
-<String Group="System Tray Menu Items" Type="Caption" Caption="On Screen Keyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">On Screen &amp;Keyboard</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Keyboard Usage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">Keyboard &amp;Usage</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Font Helper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">&amp;Font Helper</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Character Map" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">Character &amp;Map</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Text Editor..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">&amp;Text Editor...</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Configuration..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">&amp;Configuration...</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">Switch &Name; &amp;Off</String> 
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_OnScreenKeyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">On Screen &amp;Keyboard</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_KeyboardUsage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">Keyboard &amp;Usage</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_FontHelper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">&amp;Font Helper</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_CharacterMap" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">Character &amp;Map</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_TextEditor" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">&amp;Text Editor...</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_Configuration" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">&amp;Configuration...</String>
 
-<String Group="System Tray Menu Items" Type="Caption" Caption="Help..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">&amp;Help...</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">E&amp;xit</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_Help" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">&amp;Help...</String>
+<String Group="System Tray Menu Items" Type="Caption" Id="S_Menu_Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">E&amp;xit</String>
 
 <String Group="System Tray Menu Items" Type="PlainText" Id="SKMenu_NoKeyboardsInstalled" Version="7.0.230.0" Description="Systray - notice of no keyboard layouts installed">No keyboard layouts are installed.
 Choose "Configuration" to install a 
 keyboard layout for your language.</String>
 
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Fade When Inactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">Fade When Inactive</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Show Toolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">Show Toolbar</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Save as Web Page..." Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">Save as Web Page...</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Print..." Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">Print...</String>
+<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_FadeWhenInactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">Fade When Inactive</String>
+<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_ShowToolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">Show Toolbar</String>
+<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_SaveAsWebPage" Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">Save as Web Page...</String>
+<String Group="On Screen Keyboard Menu Items" Type="Caption" Id="S_OSKContext_Print" Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">Print...</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Usage Page                        -->

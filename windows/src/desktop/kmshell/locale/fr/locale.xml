@@ -564,19 +564,19 @@ CONFIDENTIALITÉ : Veuillez noter que le fichier journal de débogage enregistre
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <!--   Left click -->
-<String Type="PlainText" Caption="Switch Keyman Desktop Off">
+<String Type="PlainText" Id="S_Menu_SwitchKeymanOff">
 &amp;Désactiver &Name;</String>
 
 <!--   Right click -->
 <String Type="PlainText" Caption="Keyman Desktop Configuration...">
 &amp;Configuration de &Name;...</String> 
-<String Type="PlainText" Caption="On Screen Keyboard">
+<String Type="PlainText" Id="S_Menu_OnScreenKeyboard">
 Clavier &amp;visuel</String>
 <String Type="PlainText" Caption="Keyman Desktop Help...">
 &amp;Aide de &Name;...</String>
 <String Type="PlainText" Caption="Active Keyboard Help...">
 Aide du clavier acti&amp;f...</String>
-<String Type="PlainText" Caption="Exit">
+<String Type="PlainText" Id="S_Menu_Exit">
 &amp;Quitter</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
@@ -584,29 +584,29 @@ Aide du clavier acti&amp;f...</String>
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <!--  Toolbar buttons  -->
-<String Type="PlainText" Caption="View On Screen Keyboard">
+<String Type="PlainText" Id="S_Toolbar_ViewOnScreenKeyboard">
 Afficher le clavier visuel</String>
-<String Type="PlainText" Caption="View Character Map">
+<String Type="PlainText" Id="S_Toolbar_ViewCharacterMap">
 Afficher la table des caractères</String>
-<String Type="PlainText" Caption="Switch Keyman Desktop Off">
+<String Type="PlainText" Id="S_Menu_SwitchKeymanOff">
 Désactiver &Name;</String>
-<String Type="PlainText" Caption="Open Keyman Desktop Configuration">
+<String Type="PlainText" Id="S_Toolbar_OpenConfiguration">
 Ouvrir la configuration de &Name;</String>
-<String Type="PlainText" Caption="Open Help">
+<String Type="PlainText" Id="S_Toolbar_OpenHelp">
 Afficher l'aide</String>
 <String Type="PlainText" Caption="Open Active Keyboard Help">
 Afficher l'aide du clavier actif</String>
-<String Type="PlainText" Caption="Close On Screen Keyboard">
+<String Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard">
 Fermer le clavier visuel</String>
 
 <!--   Right click -->
-<String Type="PlainText" Caption="Fade When Inactive">
+<String Type="PlainText" Id="S_OSKContext_FadeWhenInactive">
 Rendre &amp;transparent quand inactif</String>
-<String Type="PlainText" Caption="Show Toolbar">
+<String Type="PlainText" Id="S_OSKContext_ShowToolbar">
 Afficher la  barre d'&amp;outils</String>
-<String Type="PlainText" Caption="Save as Web Page...">
+<String Type="PlainText" Id="S_OSKContext_SaveAsWebPage">
 &amp;Sauvegarder comme page web</String>
-<String Type="PlainText" Caption="Print...">
+<String Type="PlainText" Id="S_OSKContext_Print">
 &amp;Imprimer</String>
 
 <!--   Keys -->

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
 <Locale Version="9.0.465.0" OnlineProductID="1">
-  <String Type="Caption" Caption="Close On Screen Keyboard">Screenပေါ်သုံးကီးဘုတ်ကို ပိတ်</String>
-  <String Type="Caption" Caption="Exit">E&amp;xit</String>
-  <String Type="Caption" Caption="Fade When Inactive">မလုပ်ဆောင်နေသောအခါတွင် မှိန်ဖျော့ထားပါ</String>
-  <String Type="Caption" Caption="Help...">&amp;အကူအညီ..</String>
+  <String Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard">Screenပေါ်သုံးကီးဘုတ်ကို ပိတ်</String>
+  <String Type="Caption" Id="S_Menu_Exit">E&amp;xit</String>
+  <String Type="Caption" Id="S_OSKContext_FadeWhenInactive">မလုပ်ဆောင်နေသောအခါတွင် မှိန်ဖျော့ထားပါ</String>
+  <String Type="Caption" Id="S_Menu_Help">&amp;အကူအညီ..</String>
   <String Type="Hint" Id="Hint_KH_CLOSEOSK">Screenပေါ်ကီးဘုတ်ကို ပိတ်ထားပါပြီ။  &Name;က ဆက်လက်လည်ပတ်နေဆဲဖြစ်ပါသည်။ အချိန်မရွေး  &Name;Iconကိုနှိပ်ပြီး တော့ "မျက်နှာပြင်ပေါ်ရှိကီးဘုတ်ကို ရွေးပြီး" Screenမှာပေါ်တဲ့ကီးဘုတ်ကို ပြန်ဖွင့်နိုင်ပါတယ်</String>
   <String Type="Hint" Id="Hint_KH_EXITPRODUCT">&Name; ကနေထွက်ဖို့သေချာပါသလား။  သင့်ရဲ့ကီးမန်းကီးဘုတ်များက ဝင်းဒိုးဘာသာစကားများထဲမှာ ဆက်လက်ရှိနေပါလိမ့်မည်။ ဒါပေမယ့်&Name;ကိုပြန်မစမစချင်းတော့ အလုပ်လုပ်လိမ့်မည်မဟုတ်ပါ</String>
   
@@ -33,10 +33,10 @@
   <String Type="FormatString" Id="koTestKeymanFunctioning">&Name;စသည့်အချိန် တွင် အဆင်မပြေပဲညိနိုင်သော application များကို စစ်ဆေးခြင်း </String>
   <String Type="FormatString" Id="koTurnOnSurrogates">ယူနီကုဒ် အပို အက္ခရာ ဖော်ပြမှုကို ဖွင့်ပါ( Restart လုပ်ရန်လိုသည်)</String>
   <String Type="FormatString" Id="koUnknownLanguage">"အမည်မသိ"ဘာသာစကားကိုဖွင့်ပါ</String>
-  <String Type="Caption" Caption="On Screen Keyboard">&amp;Screen ပေါ်ကီးဘုတ်</String>
-  <String Type="Caption" Caption="Open Help">အကူအညီကိုဖွင့်ပါ</String>
-  <String Type="Caption" Caption="Open Keyman Desktop Configuration">&Name;ရဲ့စနစ်ပိုင်းဆိုင်ရာကို ဖွင့်ပါ</String>
-  <String Type="Caption" Caption="Print...">ပရင့်ထုတ်</String>
+  <String Type="Caption" Id="S_Menu_OnScreenKeyboard">&amp;Screen ပေါ်ကီးဘုတ်</String>
+  <String Type="Caption" Id="S_Toolbar_OpenHelp">အကူအညီကိုဖွင့်ပါ</String>
+  <String Type="Caption" Id="S_Toolbar_OpenConfiguration">&Name;ရဲ့စနစ်ပိုင်းဆိုင်ရာကို ဖွင့်ပါ</String>
+  <String Type="Caption" Id="S_OSKContext_Print">ပရင့်ထုတ်</String>
   
   
   
@@ -319,8 +319,8 @@
   
   
   <String Type="PlainText" Id="S_Yes">လုပ်မည်</String>
-  <String Type="Caption" Caption="Save as Web Page...">ဝက်ဘ်စာမျက်နှာအဖြစ်သိမ်းပါ</String>
-  <String Type="Caption" Caption="Show Toolbar">Toolbar ကိုပြပါ</String>
+  <String Type="Caption" Id="S_OSKContext_SaveAsWebPage">ဝက်ဘ်စာမျက်နှာအဖြစ်သိမ်းပါ</String>
+  <String Type="Caption" Id="S_OSKContext_ShowToolbar">Toolbar ကိုပြပါ</String>
   <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
   <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
@@ -418,11 +418,11 @@
   <String Type="FormatString" Id="SKUpdate_UnableToContact">Tavultesoft ဝက်ဘ်ဆိုဒ် ကိုဆက်သွယ်လို့မရပါ။- အင်တာနက်လိုင်းရမရ အရင်စစ်ဆေးပြီးနောက်တစ်ခေါက် ကြိုးစားပါ</String>
   <String Type="FormatString" Id="SKUpdate_UnableToContact_Error">Tavultesoft ဝက်ဘ်ဆိုဒ် ကိုဆက်သွယ်လို့မရပါ။- အင်တာနက်လိုင်းရမရ အရင်စစ်ဆေးပြီးနောက်တစ်ခေါက် ကြိုးစားပါ။ The error received was: %0:s</String>
   
-  <String Type="Caption" Caption="Switch Keyman Desktop Off">&Name; ကိုပိတ်</String>
-  <String Type="Caption" Caption="View Character Map">အက္ခရာမြေပုံကိုကြည့်ပါ</String>
-  <String Type="Caption" Caption="View Font Helper">ဖောင့်အကူအညီကိုကြည့်ပါ</String>
-  <String Type="Caption" Caption="View Keyboard Usage">ကီးဘုတ်အသုံးပြုမှုကိုကြည့်ပါ</String>
-  <String Type="Caption" Caption="View On Screen Keyboard">Screenပေါ်သုံးကီ:ဘုတ်ကိုကြည့်ပါ</String>
+  <String Type="Caption" Id="S_Menu_SwitchKeymanOff">&Name; ကိုပိတ်</String>
+  <String Type="Caption" Id="S_Toolbar_ViewCharacterMap">အက္ခရာမြေပုံကိုကြည့်ပါ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewFontHelper">ဖောင့်အကူအညီကိုကြည့်ပါ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewKeyboardUsage">ကီးဘုတ်အသုံးပြုမှုကိုကြည့်ပါ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard">Screenပေါ်သုံးကီ:ဘုတ်ကိုကြည့်ပါ</String>
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_KeepInTouch" Version="9.0.493.0" Description="Keep in touch tab name">Keep in Touch</String>
 <String Group="Configuration Dialog - Tab names" Type="PlainText" Id="S_KeepInTouch_AccessChar" Version="9.0.492.0" Description="Direct access to the Keep in Touch tab using alt+">T</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koDeadkeyConversion" Version="9.0.480.0" Description="Advanced options - Base keyboard deadkeys are treated as normal keys">Treat hardware deadkeys as plain keys</String>

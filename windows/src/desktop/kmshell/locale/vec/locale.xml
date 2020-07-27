@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
 <Locale Version="7.1.261.0" OnlineProductID="1">
-  <String Type="Caption" Caption="Close On Screen Keyboard">Sèra tastièra so schèrmo</String>
-  <String Type="Caption" Caption="Exit">Sòrti</String>
-  <String Type="Caption" Caption="Fade When Inactive">Scondi co inativa</String>
-  <String Type="Caption" Caption="Help...">Àida...</String>
+  <String Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard">Sèra tastièra so schèrmo</String>
+  <String Type="Caption" Id="S_Menu_Exit">Sòrti</String>
+  <String Type="Caption" Id="S_OSKContext_FadeWhenInactive">Scondi co inativa</String>
+  <String Type="Caption" Id="S_Menu_Help">Àida...</String>
   <String Type="Hint" Id="Hint_KH_CLOSEOSK">Te gà serà ƚa tastièra so schèrmo. Keyman Desktop el xé oncora drio andar. Te pol vèrxar ƚa tastièra so schèrmo co te vol, a clicando so ƚa icona Keyman Desktop e desernindo "Tastièra so Schèrmo"</String>
   <String Type="Hint" Id="Hint_KH_EXITPRODUCT">Vusto dabon nar fora da Keyman Desktop? Se te vol doparar ƚa to tastièra standard, nNo e gà da bexon de nar fora. Te pol doparar ƚa to tastièra standard a strucando "Destùa Keyman Desktop" so 'l menu de ƚa icona Keyman Desktop.</String>
   
@@ -32,10 +32,10 @@
   <String Type="FormatString" Id="koTestKeymanFunctioning">Verìfega se ghe xé confliti co' programi co se invìa &Name;</String>
   <String Type="FormatString" Id="koTurnOnSurrogates">Inpisa ƚa mostra de i caràteri suplementar Unicode (senghe vol de inviar da novo)</String>
   <String Type="FormatString" Id="koUnknownLanguage">Inpisa lengua 'desconosesta'</String>
-  <String Type="Caption" Caption="On Screen Keyboard">Tastièra so schèrmo</String>
-  <String Type="Caption" Caption="Open Help">Vèrxi àida</String>
-  <String Type="Caption" Caption="Open Keyman Desktop Configuration">Vèrxi confegurasion Keyman Desktop</String>
-  <String Type="Caption" Caption="Print...">Stanpa...</String>
+  <String Type="Caption" Id="S_Menu_OnScreenKeyboard">Tastièra so schèrmo</String>
+  <String Type="Caption" Id="S_Toolbar_OpenHelp">Vèrxi àida</String>
+  <String Type="Caption" Id="S_Toolbar_OpenConfiguration">Vèrxi confegurasion Keyman Desktop</String>
+  <String Type="Caption" Id="S_OSKContext_Print">Stanpa...</String>
   
   
   
@@ -207,8 +207,8 @@
   
   
   <String Type="PlainText" Id="S_Yes">Sì</String>
-  <String Type="Caption" Caption="Save as Web Page...">Salva fà pàxena web...</String>
-  <String Type="Caption" Caption="Show Toolbar">Mostra strica de ƚe inpreste</String>
+  <String Type="Caption" Id="S_OSKContext_SaveAsWebPage">Salva fà pàxena web...</String>
+  <String Type="Caption" Id="S_OSKContext_ShowToolbar">Mostra strica de ƚe inpreste</String>
   <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
   <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
@@ -292,11 +292,11 @@
   <String Type="FormatString" Id="SKUpdate_UnableToContact">No se rièse a contatar el sito Tavultesoft - varda ben de aver na conesion interent ativa e proa da novo.</String>
   <String Type="FormatString" Id="SKUpdate_UnableToContact_Error">No se rièse a contatar el sito Tavultesoft - varda ben de aver na conesion interent ativa e proa da novo. El eror risevesto el xé: %0:s</String>
   
-  <String Type="Caption" Caption="Switch Keyman Desktop Off">Destùa Keyman Desktop</String>
-  <String Type="Caption" Caption="View Character Map">Vedi mapa caràteri</String>
-  <String Type="Caption" Caption="View Font Helper">Vedi guida font</String>
-  <String Type="Caption" Caption="View Keyboard Usage">Vedi àida funsionamento tastièra</String>
-  <String Type="Caption" Caption="View On Screen Keyboard">Vedi àida tastièra so schèrmo</String>
+  <String Type="Caption" Id="S_Menu_SwitchKeymanOff">Destùa Keyman Desktop</String>
+  <String Type="Caption" Id="S_Toolbar_ViewCharacterMap">Vedi mapa caràteri</String>
+  <String Type="Caption" Id="S_Toolbar_ViewFontHelper">Vedi guida font</String>
+  <String Type="Caption" Id="S_Toolbar_ViewKeyboardUsage">Vedi àida funsionamento tastièra</String>
+  <String Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard">Vedi àida tastièra so schèrmo</String>
 <String Group="System" Type="PlainText" Id="S_LocaleAuthors" Version="7.1.266.0" Description="Name(s) of people who created this translation - i.e. your name">Keyman</String>
 <String Group="System" Type="PlainText" Id="S_BETA" Version="7.0.230.0" Description="Set this text to 'BETA' for beta versions of Keyman, and empty otherwise"></String>
 <String Group="General Strings" Type="PlainText" Id="S_Button_Apply" Version="8.0.314.0" Description="Apply button term">Apply</String>

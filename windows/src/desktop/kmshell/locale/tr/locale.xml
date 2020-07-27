@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Locale SYSTEM "..\..\xml\localedef.dtd">
 <Locale Version="9.0.525.0" OnlineProductID="1">
-  <String Type="Caption" Caption="Close On Screen Keyboard">Ekran Klavyesi Kapat</String>
-  <String Type="Caption" Caption="Exit">&amp;Çıkış</String>
-  <String Type="Caption" Caption="Fade When Inactive">Aktif Olmadığında Soluk Göster</String>
-  <String Type="Caption" Caption="Help...">Yar&amp;dım...</String>
+  <String Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard">Ekran Klavyesi Kapat</String>
+  <String Type="Caption" Id="S_Menu_Exit">&amp;Çıkış</String>
+  <String Type="Caption" Id="S_OSKContext_FadeWhenInactive">Aktif Olmadığında Soluk Göster</String>
+  <String Type="Caption" Id="S_Menu_Help">Yar&amp;dım...</String>
   <String Type="Hint" Id="Hint_KH_CLOSEOSK">Ekran Klavyesini kapattınız ama &Name; halen çalışıyor. Ekran Klavyesini istediğiniz zaman açabilirsiniz, sadece &Name; simgesine tıklayarak 'Ekran Klavyesi'ni seçmelisiniz.</String>
   <String Type="Hint" Id="Hint_KH_EXITPRODUCT">&Name;'tan çıkmak istediğinizden emin misiniz? Keyman klavye hala Windows dillerinde listelenecek, ancak yeniden başlamadan &Name; işlevsel olmayacaktır.</String>
   
@@ -34,10 +34,10 @@
   <String Type="FormatString" Id="koTestKeymanFunctioning">&Name; başladığında çakışan uygulamaları test et</String>
   <String Type="FormatString" Id="koTurnOnSurrogates">Unicode ek karakter ekranını açın (yeniden başlatmayı gerektirir)</String>
   <String Type="FormatString" Id="koUnknownLanguage">'Bilinmiyor' dili açın</String>
-  <String Type="Caption" Caption="On Screen Keyboard">&amp;Ekran Klavyesi</String>
-  <String Type="Caption" Caption="Open Help">Yardım Açın</String>
-  <String Type="Caption" Caption="Open Keyman Desktop Configuration">&Name; Yapılandırma Açın</String>
-  <String Type="Caption" Caption="Print...">Yazdır...</String>
+  <String Type="Caption" Id="S_Menu_OnScreenKeyboard">&amp;Ekran Klavyesi</String>
+  <String Type="Caption" Id="S_Toolbar_OpenHelp">Yardım Açın</String>
+  <String Type="Caption" Id="S_Toolbar_OpenConfiguration">&Name; Yapılandırma Açın</String>
+  <String Type="Caption" Id="S_OSKContext_Print">Yazdır...</String>
   
   
   
@@ -322,8 +322,8 @@
   
   
   <String Type="PlainText" Id="S_Yes">Evet</String>
-  <String Type="Caption" Caption="Save as Web Page...">Web sayfası olarak kaydet...</String>
-  <String Type="Caption" Caption="Show Toolbar">Araç Çubuğu Göster</String>
+  <String Type="Caption" Id="S_OSKContext_SaveAsWebPage">Web sayfası olarak kaydet...</String>
+  <String Type="Caption" Id="S_OSKContext_ShowToolbar">Araç Çubuğu Göster</String>
   <String Type="PlainText" Id="SK_UIFontName">Segoe UI</String>
   <String Type="PlainText" Id="SK_UIFontSize">9</String>
   
@@ -419,16 +419,16 @@
   <String Type="FormatString" Id="SKUpdate_UnableToContact">Tavultesoft web sitesine başvurulamadı - lütfen etkin bir İnternet bağlantınız olduğundan emin olun ve tekrar deneyin.</String>
   <String Type="FormatString" Id="SKUpdate_UnableToContact_Error">Tavultesoft web sitesi ile iletişim kurulamıyor, lütfen aktif bir İnternet bağlantınız olduğundan emin olun ve ve tekrar deneyin.  Alınan hata şuydu: %0:s</String>
   
-  <String Type="Caption" Caption="Switch Keyman Desktop Off">&Name;'u &amp;Kapat</String>
-  <String Type="Caption" Caption="View Character Map">Karakter Haritasını İncele</String>
-  <String Type="Caption" Caption="View Font Helper">Yazı Tipi Yardımcısını Görüntüle</String>
-  <String Type="Caption" Caption="View Keyboard Usage">Klavye Kullanımını Görüntüle</String>
-  <String Type="Caption" Caption="View On Screen Keyboard">Ekran Klavyesi Göster</String>
-  <String Type="Caption" Caption="Keyboard Usage">&amp;Klavye Kullanımı</String>
-  <String Type="Caption" Caption="Font Helper">&amp;Font Yardımcısı</String>
-  <String Type="Caption" Caption="Character Map">Karakter &amp;Haritası</String>
-  <String Type="Caption" Caption="Text Editor...">&amp;Metin Düzenleyici...</String>
-  <String Type="Caption" Caption="Configuration...">&amp;Yapılandırma...</String>  
+  <String Type="Caption" Id="S_Menu_SwitchKeymanOff">&Name;'u &amp;Kapat</String>
+  <String Type="Caption" Id="S_Toolbar_ViewCharacterMap">Karakter Haritasını İncele</String>
+  <String Type="Caption" Id="S_Toolbar_ViewFontHelper">Yazı Tipi Yardımcısını Görüntüle</String>
+  <String Type="Caption" Id="S_Toolbar_ViewKeyboardUsage">Klavye Kullanımını Görüntüle</String>
+  <String Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard">Ekran Klavyesi Göster</String>
+  <String Type="Caption" Id="S_Menu_KeyboardUsage">&amp;Klavye Kullanımı</String>
+  <String Type="Caption" Id="S_Menu_FontHelper">&amp;Font Yardımcısı</String>
+  <String Type="Caption" Id="S_Menu_CharacterMap">Karakter &amp;Haritası</String>
+  <String Type="Caption" Id="S_Menu_TextEditor">&amp;Metin Düzenleyici...</String>
+  <String Type="Caption" Id="S_Menu_Configuration">&amp;Yapılandırma...</String>  
 <String Group="System" Type="PlainText" Id="S_BETA" Version="7.0.230.0" Description="Set this text to 'BETA' for beta versions of Keyman, and empty otherwise"></String>
 <String Group="Hints" Type="PlainText" Id="S_HintDialog_DontShowHintAgain" Version="10.0.836.0" Description="Hint dialog - caption of checkbox at bottom of dialog">Don't show this hint again</String>
 <String Group="Text Editor" Type="FormatString" Version="10.0.836.0" Id="SKTextEditorCaption" Description="Caption of Text Editor">Text Editor - &Name;</String>

@@ -212,22 +212,22 @@
   <String Type="PlainText" Id="S_Help_Product">ಸಹಾಯ ಪರಿವಿಡಿ</String>
   <String Type="PlainText" Id="S_Help_Keyboard_Prefix">"</String>
   <String Type="PlainText" Id="S_Help_Keyboard_Suffix">" ಕೀಲಿಮಣೆಗೆ ಸಹಾಯ</String>
-  <String Type="Caption" Caption="View On Screen Keyboard">"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ತೆರೆ</String>
-  <String Type="Caption" Caption="View Keyboard Usage">ಕೀಲಿಮಣೆ ಬಳಕೆ ಫಲಕವನ್ನು ತೆರೆ</String>
-  <String Type="Caption" Caption="View Font Helper">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಫಲಕವನ್ನು ತೆರೆ</String>
-  <String Type="Caption" Caption="View Character Map">ಅಕ್ಷರ ನಕ್ಷೆ ಫಲಕವನ್ನು ತೆರೆ</String>
-  <String Type="Caption" Caption="Switch Keyman Desktop Off">&Name; ಬೆಳಕನ್ನು ಮುಚ್ಚಿ</String>
-  <String Type="Caption" Caption="Open Keyman Desktop Configuration">&Name; ಸಂರಚನೆ(ಕಾನ್ಫಿಗರೇಷನ್) ತೆರೆ</String>
-  <String Type="Caption" Caption="Open Help">ಸಹಾಯ ತೆರೆ</String>
-  <String Type="Caption" Caption="Close On Screen Keyboard">"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ಮುಚ್ಷು</String>
-  <String Type="Caption" Caption="On Screen Keyboard">&amp;ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ</String>
-  <String Type="Caption" Caption="Help...">&amp;ಸಹಾಯ...</String>
-  <String Type="Caption" Caption="Exit">&amp;ನಿರ್ಗಮನ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewOnScreenKeyboard">"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ತೆರೆ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewKeyboardUsage">ಕೀಲಿಮಣೆ ಬಳಕೆ ಫಲಕವನ್ನು ತೆರೆ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewFontHelper">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಫಲಕವನ್ನು ತೆರೆ</String>
+  <String Type="Caption" Id="S_Toolbar_ViewCharacterMap">ಅಕ್ಷರ ನಕ್ಷೆ ಫಲಕವನ್ನು ತೆರೆ</String>
+  <String Type="Caption" Id="S_Menu_SwitchKeymanOff">&Name; ಬೆಳಕನ್ನು ಮುಚ್ಚಿ</String>
+  <String Type="Caption" Id="S_Toolbar_OpenConfiguration">&Name; ಸಂರಚನೆ(ಕಾನ್ಫಿಗರೇಷನ್) ತೆರೆ</String>
+  <String Type="Caption" Id="S_Toolbar_OpenHelp">ಸಹಾಯ ತೆರೆ</String>
+  <String Type="Caption" Id="S_Toolbar_CloseOnScreenKeyboard">"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ಮುಚ್ಷು</String>
+  <String Type="Caption" Id="S_Menu_OnScreenKeyboard">&amp;ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ</String>
+  <String Type="Caption" Id="S_Menu_Help">&amp;ಸಹಾಯ...</String>
+  <String Type="Caption" Id="S_Menu_Exit">&amp;ನಿರ್ಗಮನ</String>
   <String Type="PlainText" Id="SKMenu_NoKeyboardsInstalled">ನೀವು ಯಾವುದೇ ಕೀಲಿಮಣೆಯನ್ನು ಅನುಸ್ಥಾಪಿಸಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಸ್ಥಾಪಿಸಲು "ಸಂರಚನೆ"(ಕಾನ್ಫಿಗರೇಷನ್)ನಲ್ಲಿ "ಡೌನ್ಲೋಡ್ ಕೀಲಿಮಣೆ" ಗುಂಡಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
-  <String Type="Caption" Caption="Fade When Inactive">ನಿಷ್ಕ್ರಿಯವಾಗಿದ್ದಾಗ ಫೇಡ್ ಮಾಡಿ</String>
-  <String Type="Caption" Caption="Show Toolbar">ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್) ತೋರಿಸು</String>
-  <String Type="Caption" Caption="Save as Web Page...">ವೆಬ್ ಪುಟದಂತೆ ಉಳಿಸು...</String>
-  <String Type="Caption" Caption="Print...">ಪ್ರಿಂಟ್...</String>
+  <String Type="Caption" Id="S_OSKContext_FadeWhenInactive">ನಿಷ್ಕ್ರಿಯವಾಗಿದ್ದಾಗ ಫೇಡ್ ಮಾಡಿ</String>
+  <String Type="Caption" Id="S_OSKContext_ShowToolbar">ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್) ತೋರಿಸು</String>
+  <String Type="Caption" Id="S_OSKContext_SaveAsWebPage">ವೆಬ್ ಪುಟದಂತೆ ಉಳಿಸು...</String>
+  <String Type="Caption" Id="S_OSKContext_Print">ಪ್ರಿಂಟ್...</String>
   <String Type="PlainText" Id="S_Usage_Welcome">ಕೀಲಿಮಣೆ ಸಹಾಯ</String>
   <String Type="PlainText" Id="S_Usage_OSK">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ</String>
   <String Type="PlainText" Id="S_Usage_Tutorial">ಪ್ರಾರಂಭಿಸು</String>
@@ -298,10 +298,10 @@
   <String Type="Plain Text" Id="S_OSK_Hint4b">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಉಪಕರಣ</String>
   <String Type="Plain Text" Id="S_OSK_Hint5a">ಕೀಲಿಮಣೆಯ ಇನ್ನಷ್ಟು ಸಹಾಯ ಪಡೆಯಲು, ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</String>
   <String Type="Plain Text" Id="S_OSK_Hint5b">ಕೀಲಿಮಣೆ ಬಳಕೆ ಗುಂಡಿ</String>
-  <String Type="Caption" Caption="Keyboard Usage">ಕೀಲಿ&amp;ಮಣೆ ಬಳಕೆ</String>
-  <String Type="Caption" Caption="Font Helper">ಅಕ್ಷ&amp;ರ ಶೈಲಿ (ಫಾಂಟ್) ಸಹಾಯಕ</String>
-  <String Type="Caption" Caption="Character Map">&amp;ಅಕ್ಷರ ನಕ್ಷೆ</String>
-  <String Type="Caption" Caption="Text Editor...">&amp;ಪಠ್ಯ ಸಂಪಾದಕ</String>
-  <String Type="Caption" Caption="Configuration...">ಸಂರಚನೆ (&amp;ಕಾನ್ಫಿಗರೇಷನ್)</String>
+  <String Type="Caption" Id="S_Menu_KeyboardUsage">ಕೀಲಿ&amp;ಮಣೆ ಬಳಕೆ</String>
+  <String Type="Caption" Id="S_Menu_FontHelper">ಅಕ್ಷ&amp;ರ ಶೈಲಿ (ಫಾಂಟ್) ಸಹಾಯಕ</String>
+  <String Type="Caption" Id="S_Menu_CharacterMap">&amp;ಅಕ್ಷರ ನಕ್ಷೆ</String>
+  <String Type="Caption" Id="S_Menu_TextEditor">&amp;ಪಠ್ಯ ಸಂಪಾದಕ</String>
+  <String Type="Caption" Id="S_Menu_Configuration">ಸಂರಚನೆ (&amp;ಕಾನ್ಫಿಗರೇಷನ್)</String>
   <String Type="FormatString" Id="SKTextEditorCaption">ಪಠ್ಯ ಸಂಪಾದಕ - &Name;</String>
 </Locale>
