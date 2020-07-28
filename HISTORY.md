@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.117 alpha 2020-07-28
+
+* feat(windows): i18n groundwork (#3411)
+* feat(windows): Removes unused strings from locale.xml (#3412)
+* refactor(ios/engine): package installer tweaks (#3410)
+* chore(ios/engine): more obsoletions (#3407)
+
 ## 14.0.116 alpha 2020-07-24
 
 * refactor(ios/engine): builds package download links (#3383)
