@@ -79,7 +79,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       textField.clearButtonMode = .whileEditing
       self.inputUrlField = textField
     })
-    alertController.addAction(UIAlertAction(title: "Cancel",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("menu-cancel", comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
 

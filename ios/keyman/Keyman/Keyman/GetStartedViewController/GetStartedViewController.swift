@@ -50,7 +50,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
     let labelFrame = CGRect(x: x, y: 0, width: width, height: height)
     let label = UILabel(frame: labelFrame)
 
-    label.text = "Don't show again"
+    label.text = NSLocalizedString("disable-get-started", comment: "")
     label.font = label.font.withSize(12.0)
     label.textAlignment = .center
     label.backgroundColor = UIColor.clear
@@ -105,7 +105,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
                  forRowAt indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
-      cell.textLabel?.text = "Add a keyboard for your language"
+      cell.textLabel?.text = NSLocalizedString("tutorial-add-keyboard", comment: "")
       cell.detailTextLabel?.text = ""
       if !didAddKeyboard() {
         cell.accessoryType = .none
@@ -113,11 +113,15 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
         cell.accessoryType = .checkmark
       }
     case 1:
-      cell.textLabel?.text = "Set up Keyman as system-wide keyboard"
+      cell.textLabel?.text = NSLocalizedString("tutorial-system-keyboard", comment: "")
       if #available(iOS 11.0, *) {
         // We can expedite this via near-direct settings link.
         // So, let's add the one extra needed detail to our detail text.
-        cell.detailTextLabel?.text = "Keyboards > Enable \"Keyman\""
+        let keyboardsMenuText = NSLocalizedString("ios-settings-keyboards", comment: "Name for the iOS system 'keyboards' menu.")
+        let enableText = String.init(format: NSLocalizedString("toggle-to-enable", comment: ""), "Keyman")
+        // Probably needs to be i18n-adjusted too.
+        let menuBreadcrumbing = NSLocalizedString("menu-breadcrumbing", comment: "Used to indicate a sequence of menu options that a user needs to copy.  Example:  Keyboards (1) > Enable Keyman (2)")
+        cell.detailTextLabel?.text = String.init(format: menuBreadcrumbing, keyboardsMenuText, enableText)
       } else {
         cell.detailTextLabel?.text = ""
       }
@@ -127,7 +131,7 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
         cell.accessoryType = .checkmark
       }
     case 2:
-      cell.textLabel?.text = "More info"
+      cell.textLabel?.text = NSLocalizedString("tutorial-show-help", comment: "")
       cell.detailTextLabel?.text = ""
       cell.accessoryType = .detailButton
     default:

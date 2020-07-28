@@ -31,7 +31,7 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
   }
   
   public override func defaultInfoHtml() -> String {
-    var str = "Found Keyboards in package:<br/>"
+    var str = NSLocalizedString("Found keyboards in package:", comment: "Default welcome text when installing new keyboards") + "<br/>"
     for keyboard in keyboards {
       str += keyboard.keyboardId + "<br/>"
     }
