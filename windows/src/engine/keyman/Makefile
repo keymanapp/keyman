@@ -39,7 +39,6 @@ debug-manifest:
 
 install:
     $(COPY) $(PROGRAM)\engine\keyman.exe "$(INSTALLPATH_KEYMANENGINE)"
-    $(COPY) keyman.rsm "$(INSTALLPATH_KEYMANENGINE)"
 
 test-uiaccess:
     grep -c "uiAccess=\"true\"" manifest.in

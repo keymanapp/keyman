@@ -5,4 +5,5 @@ EXPORTS
         DllCanUnloadNow                 PRIVATE
         DllRegisterServer               PRIVATE
         DllUnregisterServer             PRIVATE
-		RefreshPreservedKeys
+		    RefreshPreservedKeys
+        Keyman_Diagnostic

@@ -37,64 +37,30 @@ uses
   SysUtils,
   Classes,
   TypInfo,
-  CustomisationStorage,
-  StockFileNames,
-  StockMessages,
   msxml;
 
 type
-  TCustomisationMessage = class(TCollectionItem)
-  private
-    FValue: WideString;
-    FID: string;
-  public
-    function TranslatedValue(const localedoc, defaultlocaledoc: IXMLDOMDocument): WideString;
-  published
-    property ID: string read FID write FID;
-    property Value: WideString read FValue write FValue;
-  end;
-
-  TCustomisationMessages = class(TCollection)
-  private
-    function GetItem(Index: Integer): TCustomisationMessage;
-    procedure SetItem(Index: Integer; const Value: TCustomisationMessage);
-  public
-    constructor Create; reintroduce;
-    destructor Destroy; override;
-    function Add: TCustomisationMessage;
-    property Items[Index: Integer]: TCustomisationMessage read GetItem write SetItem; default;
-  end;
-
   TCustomisationMessageManager = class(TComponent)
   private
     FLanguageCode: string;
-    FCustStorage: TCustomisationStorage;
-    FCustFile: TCustFile;
-    FMessages: TCustomisationMessages;
     FLocaleDoc: IXMLDOMDocument;
     FDefaultLocaleDoc: IXMLDOMDocument;
     FLanguages: TStringList;
-    FSections: TStockMessageSections;  // I3217
-    procedure SetSections(const Value: TStockMessageSections);  // I3217
-    procedure SetMessages(const Value: TCustomisationMessages);
+    FCustStorageFilename: string;
     procedure SetLanguageCode(Value: string);
     function GetAvailableLanguages: string;
     procedure LoadLocale;
   public
-    constructor Create(ACustStorage: TCustomisationStorage; ALoadLocale: Boolean = True); reintroduce;
+    constructor Create(ACustStorageFilename: string; ALoadLocale: Boolean = True); reintroduce;
     destructor Destroy; override;
     procedure Load(ALoadLocale: Boolean = True);
-    procedure Save;
     function MessageFromID(ID: WideString): WideString; overload;
     function MessageFromID(ID, LanguageCode: WideString): WideString; overload;
-    function MessageObjectFromID(ID: string): TCustomisationMessage;
     function GetLocalePathForLocale(LocaleName: WideString): WideString;
     procedure GetDialogParameters(DialogName: WideString; var FWidth: Integer; var FHeight: Integer);
   published
     property AvailableLanguages: string read GetAvailableLanguages;
     property LanguageCode: string read FLanguageCode write SetLanguageCode;
-    property Messages: TCustomisationMessages read FMessages write SetMessages;
-    property Sections: TStockMessageSections read FSections write SetSections;  // I3217
   end;
 
 implementation
@@ -103,54 +69,21 @@ uses
   DebugPaths,
   MessageDefaults,
   KLog,
-  ErrorControlledRegistry, 
+  ErrorControlledRegistry,
   RegistryKeys;
-
-{ TCustomisationMessages }
-
-function TCustomisationMessages.Add: TCustomisationMessage;
-begin
-  Result := inherited Add as TCustomisationMessage;
-end;
-
-constructor TCustomisationMessages.Create;
-begin
-  inherited Create(TCustomisationMessage);
-end;
-
-destructor TCustomisationMessages.Destroy;
-begin
-  inherited Destroy;
-end;
-
-function TCustomisationMessages.GetItem(Index: Integer): TCustomisationMessage;
-begin
-  Result := inherited GetItem(Index) as TCustomisationMessage;
-end;
-
-procedure TCustomisationMessages.SetItem(Index: Integer; const Value: TCustomisationMessage);
-begin
-  inherited SetItem(Index, Value);
-end;
 
 { TCustomisationMessageManager }
 
-constructor TCustomisationMessageManager.Create(ACustStorage: TCustomisationStorage; ALoadLocale: Boolean = True);
+constructor TCustomisationMessageManager.Create(ACustStorageFilename: string; ALoadLocale: Boolean = True);
 begin
   inherited Create(nil);
   FLanguages := TStringList.Create;
-  FCustStorage := ACustStorage;
-  FMessages := TCustomisationMessages.Create;
-  FSections := TStockMessageSections.Create;  // I3217
-  //FDomain := WideChangeFileExt(WideExtractFileName(FCustStorage.FileName), '');
-  //DefaultInstance.bindtextdomain(FDomain, LocalePath); //ExtractFilePath(FCustStorage.FileName)+'locale\');
+  FCustStorageFilename := ACustStorageFilename;
   Load(ALoadLocale);
 end;
 
 destructor TCustomisationMessageManager.Destroy;
 begin
-  FreeAndNil(FSections);  // I3217
-  FreeAndNil(FMessages);
   FreeAndNil(FLanguages);
   inherited Destroy;
 end;
@@ -166,7 +99,7 @@ function TCustomisationMessageManager.GetAvailableLanguages: string;
       FLocaleDoc.preserveWhiteSpace := True;
       FLocaleDoc.async := False;
       FLocaleDoc.validateOnParse := False;
-      FLocaleDoc.load(path); //GetLocalePath + LanguageCode + '\locale.xml');
+      FLocaleDoc.load(path);
       if FLocaleDoc.documentElement <> nil
         then Result := (FLocaleDoc.documentElement.tagName = 'Locale')
         else Result := False;
@@ -235,7 +168,7 @@ var
   FLocalePath: WideString;
 begin
   Result := '';
-  FLocalePath := ExtractFilePath(FCustStorage.FileName)+'locale\';
+  FLocalePath := ExtractFilePath(FCustStorageFileName)+'locale\';
   FLanguages.Clear;
   if FindFirst(FLocalePath + '*', faDirectory, f) = 0 then
   begin
@@ -288,47 +221,13 @@ function TCustomisationMessageManager.GetLocalePathForLocale(
   LocaleName: WideString): WideString;
 begin
   if LocaleName = ''
-    then Result := ExtractFilePath(FCustStorage.FileName)+'locale\'
+    then Result := ExtractFilePath(FCustStorageFileName)+'locale\'
     else Result := FLanguages.Values[LocaleName];
 end;
 
 procedure TCustomisationMessageManager.Load(ALoadLocale: Boolean = True);
-var
-  n: Integer;
-  ms: TMemoryStream;
 begin
   GetAvailableLanguages;
-
-  n := FCustStorage.CustFiles.IndexOfFileName(StockFileName_Messages);
-  if n < 0 then
-  begin
-    with FCustStorage.CustFiles.AddCustFile do
-    begin
-      FileName := StockFileName_Messages;
-    end;
-    n := FCustStorage.CustFiles.IndexOfFileName(StockFileName_Messages);
-  end;
-  FCustFile := FCustStorage.CustFiles[n];
-
-  FCustFile.Stream.Position := 0;
-  if FCustFile.Stream.Size > 0 then
-  try
-    ms := TMemoryStream.Create;
-    try
-      ObjectTextToBinary(FCustFile.Stream, ms);
-      ms.Position := 0;
-      ms.ReadComponent(Self);
-    finally
-      ms.Free;
-    end;
-  except
-    on E:Exception do
-    begin
-      //ExceptionHook.LogException;
-      KL.LogError('Exception %s loading messages: %s', [E.ClassName, E.Message]);
-    end;
-  end;
-
   if ALoadLocale then
     LoadLocale;
 end;
@@ -341,114 +240,34 @@ begin
   FLocaleDoc.preserveWhiteSpace := True;
   FLocaleDoc.async := False;
   FLocaleDoc.validateOnParse := False;
-  if FileExists(GetLocalePathForLocale(LanguageCode)) then // + LanguageCode + '\locale.xml') then
-    FLocaleDoc.load(GetLocalePathForLocale(LanguageCode)); //GetLocalePath + LanguageCode + '\locale.xml');
+  if FileExists(GetLocalePathForLocale(LanguageCode)) then
+    FLocaleDoc.load(GetLocalePathForLocale(LanguageCode));
 
   FDefaultLocaleDoc := CoDomDocument.Create;
   FDefaultLocaleDoc.preserveWhiteSpace := True;
   FDefaultLocaleDoc.async := False;
   FDefaultLocaleDoc.validateOnParse := False;
 
-  FPath := GetDebugPath('xmltemplate '+ExtractFileName(FCustStorage.FileName), ExtractFilePath(FCustStorage.FileName));
+  FPath := GetDebugPath('xmltemplate '+ExtractFileName(FCustStorageFileName), ExtractFilePath(FCustStorageFileName));
   if FileExists(FPath + 'locale.xml') then
     FDefaultLocaleDoc.load(FPath + 'locale.xml')
-  else if FileExists(ExtractFilePath(FCustStorage.FileName) + 'xml\locale.xml') then
-    FDefaultLocaleDoc.load(ExtractFilePath(FCustStorage.FileName) + 'xml\locale.xml');
+  else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\locale.xml') then
+    FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\locale.xml');
 end;
 
 function TCustomisationMessageManager.MessageFromID(ID: WideString): WideString;
 var
-  FIdentifiers: TList;
-
-    function ExpandIdentifiers(Value: WideString): WideString; forward;
-
-    function ExpandIdentifier(sID: string): WideString;
-    var
-      node: IXMLDOMNode;
-      m: TCustomisationMessage;
-    begin
-      m := MessageObjectFromID(sID);
-      if Assigned(m) then
-      begin
-        if FIdentifiers.IndexOf(m) >= 0 { avoid recursion } then
-          Result := m.TranslatedValue(FLocaleDoc, FDefaultLocaleDoc)
-        else
-        begin
-          FIdentifiers.Add(m);
-          Result := ExpandIdentifiers(m.TranslatedValue(FLocaleDoc, FDefaultLocaleDoc));
-        end;
-      end
-      else
-      begin
-        node := FLocaleDoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
-        if Assigned(node) then Result := node.text
-        else
-        begin
-          node := FDefaultLocaleDoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
-          if Assigned(node)
-            then Result := node.text
-            else Result := MsgDefault(sID);
-        end;
-      end;
-    end;
-
-    function ExpandIdentifiers(Value: WideString): WideString;
-    var
-      i: Integer;
-      n: Integer;
-      s: string;
-      t: WideString;
-    begin
-      i := 1;
-      while i <= Length(Value) - 3 do
-      begin
-        if (Value[i] = '$') and (Value[i+1] = '(') then
-        begin
-          n := Pos(')', Copy(Value, i+2, Length(Value)));
-          if n > 0 then
-          begin
-            s := Copy(Value, i+2, n-1);
-            Delete(Value, i, n+2);
-            t := ExpandIdentifier(s);
-            Insert(t, Value, i);
-            Inc(i, Length(t));
-          end
-          else
-            Inc(i);
-        end
-        else
-          Inc(i);
-      end;
-      Result := Value;
-    end;
-
-    function LocaleString(ID: WideString): WideString;
-    var
-      node: IXMLDOMNode;
-    begin
-      // Reading only from locale.xml
-      Delete(ID, 1, 1);
-      node := FLocaleDoc.selectSingleNode('/Locale/'+ID);
-      if Assigned(node) then Result := node.text
-      else
-      begin
-        node := FDefaultLocaleDoc.selectSingleNode('/Locale/'+ID);
-        if Assigned(node)
-          then Result := node.text
-          else Result := '';
-      end;
-    end;
+  node: IXMLDOMNode;
 begin
-  if Copy(ID, 1, 1) = ':' then
-    Result := LocaleString(ID)
+  node := Flocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
+  if Assigned(node) then
+    Result := node.text
   else
   begin
-    FIdentifiers := TList.Create;
-    try
-      Result := ExpandIdentifier(ID);
-    finally
-      FIdentifiers.Free;
-    end;
+    node := Fdefaultlocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
+    if Assigned(node)
+      then Result := node.text
+      else Result := ID;
   end;
 end;
 
@@ -461,7 +280,7 @@ begin
     Result := MessageFromID(ID)
   else
   begin
-    mm := TCustomisationMessageManager.Create(FCustStorage, False);
+    mm := TCustomisationMessageManager.Create(FCustStorageFilename, False);
     try
       mm.LanguageCode := LanguageCode;
       Result := mm.MessageFromID(ID);
@@ -471,60 +290,10 @@ begin
   end;
 end;
 
-function TCustomisationMessageManager.MessageObjectFromID(ID: string): TCustomisationMessage;
-var
-  i: Integer;
-begin
-  for i := 0 to FMessages.Count - 1 do
-    if AnsiCompareText(FMessages[i].ID, ID) = 0 then
-    begin
-      Result := FMessages[i];
-      Exit;
-    end;
-  Result := nil;
-end;
-
-procedure TCustomisationMessageManager.Save;
-begin
-  FCustFile.Stream.Size := 0;
-  FCustFile.Stream.WriteComponent(Self);
-end;
-
 procedure TCustomisationMessageManager.SetLanguageCode(Value: string);
 begin
   FLanguageCode := Value;
   LoadLocale;
-end;
-
-procedure TCustomisationMessageManager.SetMessages(const Value: TCustomisationMessages);
-begin
-  FMessages.Assign(Value);
-end;
-
-procedure TCustomisationMessageManager.SetSections(
-  const Value: TStockMessageSections);  // I3217
-begin
-  FSections.Assign(Value);
-end;
-
-{ TCustomisationMessage }
-
-function TCustomisationMessage.TranslatedValue(const localedoc, defaultlocaledoc: IXMLDOMDocument): WideString;
-var
-  node: IXMLDOMNode;
-begin
-  node := localedoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
-  if Assigned(node) then
-    Result := node.text
-  else
-  begin
-    node := defaultlocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
-    if Assigned(node)
-      then Result := node.text
-      else Result := Value;
-  end;
-  //Result := dgettext(domain, ID);
-  //if Result = ID then Result := Value; { No default found, so use the value from the .pxx file }
 end;
 
 end.

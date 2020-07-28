@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -27,6 +28,7 @@ import io.sentry.core.Sentry;
 public class SystemKeyboard extends InputMethodService implements KeyboardEventHandler.OnKeyboardEventListener {
 
     private View inputView = null;
+    private static ExtractedText exText = null;
     private KMHardwareKeyboardInterpreter interpreter = null;
 
     private static final String TAG = "SystemKeyboard";
@@ -106,6 +108,23 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
         attribute.imeOptions |= EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN;
         super.onStartInput(attribute, restarting);
         KMManager.onStartInput(attribute, restarting);
+        KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+
+        // Select numeric layer if applicable
+        int inputType = attribute.inputType;
+        if (((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_NUMBER) ||
+                ((inputType & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_PHONE)) {
+            KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        }
+
+        // Temporarily disable predictions if entering a hidden password field
+        KMManager.setMayPredictOverride(inputType);
+        if (KMManager.getMayPredictOverride()) {
+            KMManager.setBannerOptions(false);
+        } else {
+            final boolean mayPredict = true;
+            KMManager.setBannerOptions(mayPredict);
+        }
 
         // User switched to a new input field so we should extract the text from input field
         // and pass it to Keyman Engine together with selection range
@@ -113,10 +132,13 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
         if (ic != null) {
             ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
             if (icText != null) {
-                KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
+                boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
                 int selStart = icText.startOffset + icText.selectionStart;
                 int selEnd = icText.startOffset + icText.selectionEnd;
-                KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM, selStart, selEnd);
+                boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM, selStart, selEnd);
+                if (!didUpdateText || !didUpdateSelection) {
+                    exText = icText;
+                }
             }
         }
 
@@ -157,8 +179,9 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
         if (inputView != null)
             inputViewHeight = inputView.getHeight();
 
+        int bannerHeight = KMManager.getBannerHeight(this);
         int kbHeight = KMManager.getKeyboardHeight(this);
-        outInsets.contentTopInsets = inputViewHeight - kbHeight;
+        outInsets.contentTopInsets = inputViewHeight - bannerHeight - kbHeight;
         outInsets.touchableInsets = Insets.TOUCHABLE_INSETS_REGION;
         outInsets.touchableRegion.set(0, outInsets.contentTopInsets, size.x, size.y);
     }
@@ -166,6 +189,8 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
     @Override
     public void onKeyboardLoaded(KeyboardType keyboardType) {
         // Handle Keyman keyboard loaded event here if needed
+        if (exText != null)
+            exText = null;
     }
 
     @Override
@@ -185,6 +210,18 @@ public class SystemKeyboard extends InputMethodService implements KeyboardEventH
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
+              case KeyEvent.KEYCODE_BACK:
+                // Dismiss the keyboard if currently shown
+                if (isInputViewShown()) {
+                  KMManager.hideSystemKeyboard();
+                  return true;
+                }
+                break;
+            }
+        }
+
         return interpreter.onKeyDown(keyCode, event);  // if false, will revert to default handling.
     }
 

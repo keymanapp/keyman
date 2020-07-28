@@ -11,6 +11,8 @@
 <html>
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+  <script src="/app/sentry.bundle.min.js"></script>
+  <script src="/app/sentry.init.js"></script>
 <title><xsl:value-of select="$locale/String[@Id='S_Update_Title']"/></title>
 <style type="text/css">
 
@@ -129,9 +131,7 @@ div {
 <body onload="javascript:enableControls()">
 <div id="border">
   <div id="header">
-    <img alt='Keyman'>
-      <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath' />keyman-desktop.png</xsl:attribute>
-    </img>
+    <img alt='Keyman' src="/app/keyman-desktop.png" />
   </div>
   <div id='content'>
     <div id="NewVersionAvailable"><xsl:copy-of select="($locale/String[@Id='S_Update_NewVersionAvailable'])[1]" /></div>
@@ -150,9 +150,7 @@ div {
   </div>
   <div id="footer">
     <button type="submit" id="submitButton" class='button shieldButton' onclick="javascript:location.href='keyman:installnow'">
-      <img alt="" style="vertical-align:middle; width: 16px; margin: 0 4px 0 2px;">
-        <xsl:attribute name="src"><xsl:value-of select='/Keyman/templatepath' />shield.png</xsl:attribute>
-      </img>
+      <img alt="" style="vertical-align:middle; width: 16px; margin: 0 4px 0 2px;" src="/app/shield.png" />
       <xsl:value-of select="$locale/String[@Id='S_Update_Button_InstallNow']"/>
     </button>
     &#160;

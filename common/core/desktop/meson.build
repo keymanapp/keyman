@@ -6,10 +6,7 @@
 #
 
 project('keyboardprocessor', 'cpp', 'c',
-        # Get version number from file (VERSION.md is in this directory for source package)
-        # Fallback to "more" for Windows compatbility
-        version: run_command(find_program('cat', 'more'),
-                 files('VERSION.md')).stdout().strip(),
+        version: run_command(find_program('getversion.bat', 'getversion.sh')).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14'])

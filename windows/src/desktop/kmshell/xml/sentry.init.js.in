@@ -1,0 +1,40 @@
+// init.js
+// Initializes Sentry with Keyman definitions
+// This file is dynamically built from init.js.in into init.js
+// which allows us to easily populate a release tag. This
+// transform is made in TIKE's makefile with mkver
+//
+// DO NOT MODIFY init.js; instead make changes in init.js.in.
+//
+
+Sentry.init({
+  dsn: 'https://92eb58e6005d47daa33c9c9e39458eb7@sentry.keyman.com/5',  // Keyman Desktop
+  environment: '$Environment',
+  release: 'release-$VersionWithTag'
+});
+
+function keymanEnableDiagnostics() {
+  var e = document.createElement('button');
+  e.style.zIndex = '1000';
+  e.style.position = 'fixed';
+  e.style.right = '10px';
+  e.style.top = '10px';
+  e.style.height = '24px';
+  e.innerText = 'Test Exception';
+  e.onclick = function() {
+    var boo = null.boo();
+  }
+  document.body.appendChild(e);
+
+  e = document.createElement('button');
+  e.style.zIndex = '1000';
+  e.style.position = 'fixed';
+  e.style.right = '10px';
+  e.style.top = '38px';
+  e.style.height = '24px';
+  e.innerText = 'Test Event';
+  e.onclick = function() {
+    Sentry.captureMessage('Test Event');
+  }
+  document.body.appendChild(e);
+}

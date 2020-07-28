@@ -19,17 +19,18 @@
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<style> *{font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
+        <style> *{font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
         <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
-        <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
-        <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>jquery.min.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>config.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>menu-frame.js</xsl:attribute><xsl:text> </xsl:text></script>
-        <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>qrcode.min.js</xsl:attribute><xsl:text> </xsl:text></script>
+        <link rel="stylesheet" type="text/css" href="/app/config.css" />
+        <link rel="stylesheet" type="text/css" href="/app/menu.css" />
+        <script type="text/javascript" src="/app/jquery.min.js"></script>
+        <script type="text/javascript" src="/app/config.js"></script>
+        <script type="text/javascript" src="/app/menu.js"></script>
+        <script type="text/javascript" src="/app/menu-frame.js"></script>
+        <script type="text/javascript" src="/app/qrcode.min.js"></script>
       </head>
 
       <body visited="white">
@@ -61,9 +62,7 @@
   <xsl:template name="header_helplinks">
     <div class="helplinks">
       <a href="keyman:help" onmouseover="this.style.cursor='hand';" >
-        <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;'>
-          <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath'/>help24.png</xsl:attribute>
-        </img>
+        <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;' src="/app/help24.png" />
         <xsl:value-of select="$locale/String[@Id='S_Caption_Help']" />
       </a>
 

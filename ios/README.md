@@ -7,7 +7,8 @@
 * Carthage (`brew install carthage`)
 * [Node.js](https://nodejs.org/) 8.9+ (for building KeymanWeb)
 * Coreutils (`brew install coreutils`)
-* sentry-cli (`brew install getsentry/tools/sentry-cli) to utilize Sentry-based error reporting
+* sentry-cli (`brew install getsentry/tools/sentry-cli`) to utilize Sentry-based error reporting
+* jq (`brew install jq`)
 
 ## Keyman App
 
@@ -61,7 +62,7 @@ To build in Xcode,
 The framework will be built to **engine/KMEI/build/(Debug|Release)-universal/KeymanEngine.framework**.
 
 If it doesn't build, and you have upgraded from Xcode 10.0 (or earlier) to 10.1 (or later), it may not
-build due to "Could not find any available simulators for iOS" error from Carthage, probably while 
+build due to "Could not find any available simulators for iOS" error from Carthage, probably while
 building DeviceKit. Xcode 10.1 changed the output format which confuses Carthage. Upgrade Carthage:
 ```
 brew upgrade carthage

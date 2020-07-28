@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  
+
   <xsl:template name="content_keyboards">
     <xsl:text disable-output-escaping="yes"><![CDATA[
       <script type="text/javascript">
@@ -13,7 +13,7 @@
   		<xsl:call-template name="header_helplinks" />
       <xsl:value-of select="$locale/String[@Id='S_Keyboards']"/>
     </div>
-    
+
     <div class="content" id="subcontent_keyboards">
       <div class="contentBox" id='keyboards-content-box'>
         <xsl:choose>
@@ -30,16 +30,14 @@
                   <xsl:otherwise><xsl:call-template name="keyboard" /></xsl:otherwise>
                 </xsl:choose>
               </xsl:for-each>
-              
+
               <xsl:for-each select="Keyman/KeymanPackageInstalled[count(./KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled)!=1]">
                 <xsl:sort select="name" />
-                
+
                   <div class="item">
                     <xsl:attribute name="id">package_<xsl:value-of select="id" /></xsl:attribute>
-                      
-                    <img class="list_icon">
-                      <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>package.gif</xsl:attribute>
-                    </img>
+
+                    <img class="list_icon" src="/app/package.gif" />
                     <div class="packagetitle">
                       <xsl:choose>
                         <xsl:when test="name"><xsl:value-of select="name"/></xsl:when>
@@ -58,11 +56,7 @@
           <xsl:otherwise>
             <div id="keyboards" class='info'>
               <div>
-                <img>
-                  <xsl:attribute name="src">
-                    <xsl:value-of select="/Keyman/templatepath"/>info.png
-                  </xsl:attribute>
-                </img>
+                <img src="/app/info.png" />
                 <xsl:value-of select="$locale/String[@Id='S_Keyboards_NoKeyboardsInstalled']"/>
               </div>
             </div>
@@ -95,7 +89,7 @@
       <xsl:attribute name="onfocus">return list_focus(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
 			<xsl:attribute name="onblur">return list_blur(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
 			<xsl:attribute name="oncontextmenu">event.cancelBubble=true;event.returnValue=false;</xsl:attribute>
-      
+
       <xsl:attribute name="style">left:0;top:0;width:99%</xsl:attribute>
       <div>
         <xsl:attribute name="onmousedown">return list_detail(event,'keyboard_<xsl:value-of select="$id"/>');</xsl:attribute>
@@ -113,17 +107,8 @@
           <div class="list_icon">
             <img style="width: 16px; height:16px;">
               <xsl:choose>
-                <xsl:when test="bitmap">          
-                  <xsl:attribute name="src">
-                    <xsl:value-of select="/Keyman/ImagePath"/>
-                    <xsl:value-of select="bitmap"/>
-                  </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:attribute name="src">
-                    <xsl:value-of select="/Keyman/templatepath"/>no_icon.gif
-                  </xsl:attribute>
-                </xsl:otherwise>
+                <xsl:when test="bitmap"><xsl:attribute name="src">/data/keyman/bitmap/<xsl:value-of select="bitmap"/>?tag=<xsl:value-of select="/Keyman/PageTag" /></xsl:attribute></xsl:when>
+                <xsl:otherwise><xsl:attribute name="src">/app/no_icon.gif</xsl:attribute></xsl:otherwise>
               </xsl:choose>
             </img>
           </div>
@@ -138,11 +123,11 @@
           </div>
         </div>
 
-       
+
         <div class="list_expand">
           <xsl:attribute name="id">list_expand_keyboard_<xsl:value-of select="id"/></xsl:attribute>
         </div>
-       
+
         <xsl:choose>
           <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
             <div class="list_close">
@@ -208,14 +193,14 @@
                           <td>
                             <span><xsl:value-of select="../../name"/></span>
                           </td>
-                        </tr>    
+                        </tr>
                       </xsl:if>
                       <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                         <tr><td class="table_header"><xsl:value-of select="$locale/String[@Id='S_Caption_Version']"/></td>
                           <td>
                             <span><xsl:value-of select="../../detail[@name='version']"/></span>
                           </td>
-                        </tr>    
+                        </tr>
                       </xsl:if>
                       <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]/../../Fonts"><!-- I2216 -->
                         <tr>
@@ -297,13 +282,13 @@
                                 <div class='qrcode-caption'>
                                   <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_QRCode']"/>
                                   <a>
-                                    <xsl:attribute name="href">keyman:link?url=https://keyman.com/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
+                                    <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
                                     <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_Link']"/>
                                   </a>
                                   <xsl:value-of select="$locale/String[@Id='S_Keyboard_Share_LinkSuffix']"/>
                                 </div>
                                 <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
-                                    text: 'https://keyman.com/go/keyboard/<xsl:value-of select="../../id"/>/share',
+                                    text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
                                     width: 256,
                                     height: 256
                                   });
@@ -311,7 +296,7 @@
                               </div>
                             </div>
                           </td>
-                        </tr>    
+                        </tr>
                       </xsl:if>
 
                     </table>
@@ -323,21 +308,20 @@
           </table>
         </div>
       </div>
-    
+
   </xsl:template>
 
   <xsl:template match="KeymanKeyboardLanguageInstalled">
     <div class='keyboard-language'>
       <a>
         <xsl:attribute name="href">keyman:keyboardlanguage_uninstall?id=<xsl:value-of select='../../id'/>&amp;index=<xsl:value-of select="position()-1"/></xsl:attribute>
-        <img>
+        <img src="/app/cross.png">
           <xsl:attribute name="title"><xsl:value-of select="$locale/String[@Id='S_Languages_Uninstall']"/></xsl:attribute>
-          <xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>cross.png</xsl:attribute>
         </img>
       </a>
       <span class="language-icon"><xsl:value-of select="substring(bcp47code, 1, 2)" /></span>
       <span><xsl:value-of select="langname" /></span>
     </div>
   </xsl:template>
-  
+
   </xsl:stylesheet>

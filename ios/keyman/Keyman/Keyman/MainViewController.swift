@@ -43,7 +43,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var profilesToInstall: [String] = []
   private var checkedProfiles: [String] = []
   private var profileName: String?
-  private var launchUrl: URL?
   private var keyboardToDownload: InstallableKeyboard?
   private var customKeyboardToDownload: URL?
   private var wasKeyboardVisible: Bool = false
@@ -54,7 +53,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var portRightMargin: CGFloat = 0.0
   private var lscpeLeftMargin: CGFloat = 0.0
   private var lscpeRightMargin: CGFloat = 0.0
-  private var didDownload = false
   private var didKeyboardLoad = false
 
   private var keyboardLoadedObserver: NotificationObserver?
@@ -62,9 +60,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var languagesDownloadFailedObserver: NotificationObserver?
   private var keyboardPickerDismissedObserver: NotificationObserver?
   private var keyboardChangedObserver: NotificationObserver?
-  private var keyboardDownloadStartedObserver: NotificationObserver?
-  private var keyboardDownloadCompletedObserver: NotificationObserver?
-  private var keyboardDownloadFailedObserver: NotificationObserver?
   private var keyboardRemovedObserver: NotificationObserver?
 
   var appDelegate: AppDelegate! {
@@ -105,18 +100,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardPickerDismissed,
       observer: self,
       function: MainViewController.keyboardPickerDismissed)
-    keyboardDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadStarted,
-      observer: self,
-      function: MainViewController.keyboardDownloadStarted)
-    keyboardDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadCompleted,
-      observer: self,
-      function: MainViewController.keyboardDownloadCompleted)
-    keyboardDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.keyboardDownloadFailed,
-      observer: self,
-      function: MainViewController.keyboardDownloadFailed)
     keyboardRemovedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.keyboardRemoved,
       observer: self,
@@ -149,8 +132,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.canRemoveDefaultKeyboard = true
 
     // Pre-load for use in update checks.
-    Manager.shared.apiKeyboardRepository.fetch()
-    Manager.shared.apiLexicalModelRepository.fetch()
+    if !ResourceDownloadManager.shared.updateCacheIsCurrent {
+      // TODO:  Actually use the query's results once available.
+      //        That said, this is as far as older versions used the query here.
+      ResourceDownloadManager.shared.queryKeysForUpdatablePackages { _, _ in }
+    }
 
     // Implement a default color...
     var bgColor = UIColor(red: 1.0, green: 1.0, blue: 207.0 / 255.0, alpha: 1.0)
@@ -427,62 +413,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     didKeyboardLoad = true
     dismissActivityIndicator()
     textView.becomeFirstResponder()
-    if let launchUrl = launchUrl {
-      performAction(from: launchUrl)
-    } else {
-      if shouldShowGetStarted {
-        perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
-      }
+    if shouldShowGetStarted {
+      perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)
     }
   }
 
   private func keyboardChanged(_ kb: InstallableKeyboard) {
-    var listCheck: Bool = true
-    if didDownload {
-      listCheck = false
-      didDownload = false
-    }
-
-    checkProfile(forFullID: kb.fullID, doListCheck: listCheck)
-  }
-
-  private func keyboardDownloadStarted() {
-    if launchUrl != nil {
-      showActivityIndicator()
-    }
-  }
-
-  private func keyboardDownloadCompleted(_ keyboards: [InstallableKeyboard]) {
-    didDownload = true
-    if launchUrl == nil {
-      return
-    }
-
-    let userData = AppDelegate.activeUserDefaults()
-    let userKeyboards = userData.userKeyboards
-    if userKeyboards == nil || userKeyboards!.isEmpty {
-      Manager.shared.addKeyboard(Defaults.keyboard)
-    }
-
-    perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-
-    for keyboard in keyboards {
-      Manager.shared.addKeyboard(keyboard)
-      _ = Manager.shared.setKeyboard(keyboard)
-    }
-
-    launchUrl = nil
-  }
-
-  private func keyboardDownloadFailed(_ notification: KeyboardDownloadFailedNotification) {
-    if launchUrl != nil {
-      perform(#selector(self.dismissActivityIndicator), with: nil, afterDelay: 1.0)
-      let error = notification.error
-      let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Keyboard Download Error",
-                                                              message: error.localizedDescription)
-      self.present(alert, animated: true, completion: nil)
-      launchUrl = nil
-    }
+    checkProfile(forFullID: kb.fullID, doListCheck: true)
   }
 
   private func keyboardPickerDismissed() {
@@ -826,58 +763,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     }
   }
 
-  private func performAction(from url: URL) {
-    guard let query = url.query else {
-      launchUrl = nil
-      return
-    }
-
-    if url.lastPathComponent != "open" {
-      return
-    }
-
-    let params = self.params(of: query)
-    if let urlString = params["url"] {
-      // Download and set custom keyboard
-      guard let url = URL(string: urlString) else {
-        let alert = ResourceFileManager.shared.buildSimpleAlert(title: "Custom Keyboard",
-                                    message: "The keyboard could not be installed: Invalid Url")
-        self.present(alert, animated: true, completion: nil)
-        launchUrl = nil
-        return
-      }
-
-      Manager.shared.dismissKeyboardPicker(self)
-      if !infoView.view.isHidden {
-        perform(#selector(self.infoButtonClick), with: nil)
-      }
-
-      customKeyboardToDownload = url
-      let title = "Custom Keyboard: \(url.lastPathComponent)"
-      confirmInstall(withTitle: title, message: "Would you like to install this keyboard?",
-                cancelButtonHandler: showGetStartedIfNeeded,
-                installButtonHandler: proceedWithCustomKeyboardDownload)
-    } else if let kbID = params["keyboard"], let langID = params["language"] {
-      // Query should include keyboard and language IDs to set the keyboard (first download if not available)
-      guard let keyboard = Manager.shared.apiKeyboardRepository.installableKeyboard(withID: kbID,
-                                                                                    languageID: langID) else {
-        return
-      }
-
-      if ResourceDownloadManager.shared.stateForKeyboard(withID: kbID) == .needsDownload {
-        keyboardToDownload = keyboard
-        confirmInstall(withTitle: "\(keyboard.languageName): \(keyboard.name)",
-          message: "Would you like to install this keyboard?",
-          installButtonHandler: proceedWithKeyboardDownload)
-      } else {
-        Manager.shared.addKeyboard(keyboard)
-        _ = Manager.shared.setKeyboard(keyboard)
-      }
-    } else {
-      launchUrl = nil
-    }
-  }
-
   private func profileName(withFullID fullID: FullKeyboardID) -> String? {
     guard let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID),
           let font = keyboard.font else {
@@ -948,14 +833,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     self.present(alertController, animated: true, completion: nil)
   }
 
-  private func proceedWithKeyboardDownload(withAction action: UIAlertAction) {
-    if let keyboard = keyboardToDownload {
-      ResourceDownloadManager.shared.downloadKeyboard(withID: keyboard.id,
-                                                      languageID: keyboard.languageID,
-                                                      isUpdate: false)
-    }
-  }
-
   private func handleUserDecisionAboutInstallingProfile(withAction action: UIAlertAction) {
     if let profileName = profileName {
       checkedProfiles.append(profileName)
@@ -968,13 +845,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       }
       self.profileName = nil
     }
-  }
-
-  private func proceedWithCustomKeyboardDownload(withAction action: UIAlertAction) {
-    if let url = customKeyboardToDownload {
-      ResourceDownloadManager.shared.downloadKeyboard(from: url)
-    }
-    showGetStartedIfNeeded(withAction: action)
   }
 
   private func showGetStartedIfNeeded(withAction action: UIAlertAction) {

@@ -3,17 +3,17 @@
 # Keyboard details window
 
 import json
-import logging
 import os.path
 import qrcode
 
 import gi
-gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from keyman_config.accelerators import bind_accelerator, init_accel
-from keyman_config.get_kmp import get_keyboard_data
+from keyman_config import KeymanComUrl
+from keyman_config.accelerators import init_accel
 from keyman_config.kmpmetadata import parsemetadata
+
+gi.require_version('Gtk', '3.0')
 
 # basics: keyboard name, package version, description
 # other things: filename (of kmx), ,
@@ -24,26 +24,27 @@ from keyman_config.kmpmetadata import parsemetadata
 # there is data in kmp.inf/kmp.json
 # there is possibly data in kbid.json (downloaded from api)
 
-class KeyboardDetailsView(Gtk.Window):
+
+class KeyboardDetailsView(Gtk.Dialog):
     # TODO Display all the information that is available
     #    especially what is displayed for Keyman on Windows
     # TODO clean up file once have what we want
-    def __init__(self, kmp):
-        #kmp has name, version, packageID, area
+    def __init__(self, parent, kmp):
+        # kmp has name, version, packageID, area
         if "keyboard" in kmp["name"].lower():
             wintitle = kmp["name"]
         else:
             wintitle = kmp["name"] + " keyboard"
-        Gtk.Window.__init__(self, title=wintitle)
+        Gtk.Dialog.__init__(self, wintitle, parent)
         init_accel(self)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.set_border_width(6)
 
         packageDir = os.path.join(kmp['areapath'], kmp['packageID'])
         kmp_json = os.path.join(packageDir, "kmp.json")
         info, system, options, keyboards, files = parsemetadata(kmp_json)
 
-        if (info == None):
+        if info is None:
             raise Exception("could not parse kmp.json", kmp['packageID'], packageDir, kmp_json)
 
         kbdata = None
@@ -53,12 +54,12 @@ class KeyboardDetailsView(Gtk.Window):
                 kbdata = json.load(read_file)
 
         box = Gtk.Box(spacing=10)
-        #self.add(box)
+        # self.add(box)
         grid = Gtk.Grid()
-        #grid.set_column_homogeneous(True)
+        # grid.set_column_homogeneous(True)
 
         box.add(grid)
-        #self.add(grid)
+        # self.add(grid)
 
         # kbdatapath = os.path.join("/usr/local/share/keyman", kmp["id"], kmp["id"] + ".json")
 
@@ -143,7 +144,6 @@ class KeyboardDetailsView(Gtk.Window):
 
         divider_pkg = Gtk.HSeparator()
         grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
-
 
         # Keyboard info for each keyboard
 
@@ -283,15 +283,12 @@ class KeyboardDetailsView(Gtk.Window):
                         # prevlabel = label9
                         # label = Gtk.Label()
                         # label.set_line_wrap(True)
-                        # label.set_text("This keyboard is distributed under the MIT license (MIT) as described somewhere")
+                        # label.set_text(
+                        #     "This keyboard is distributed under the MIT license (MIT) as described somewhere")
                         # #label.set_text(kmp["description"])
                         # label.set_halign(Gtk.Align.START)
                         # label.set_selectable(True)
                         # grid.attach_next_to(label, label9, Gtk.PositionType.RIGHT, 1, 1)
-        vbox.pack_start(box, True, True, 0)
-
-        hbox = Gtk.Box(spacing=6)
-        vbox.pack_start(hbox, False, False, 0)
 
         # Add an entire row of padding
         lbl_pad = Gtk.Label()
@@ -304,11 +301,11 @@ class KeyboardDetailsView(Gtk.Window):
         path_qr = packageDir + "/qrcode.png"
         if not os.path.isfile(path_qr):
             qr = qrcode.QRCode(
-                 version = 1,
-                 error_correction = qrcode.constants.ERROR_CORRECT_H,
-                 box_size = 4,
-                 border = 4)
-            url = "https://keyman.com/go/keyboard/" + kmp['packageID'] + "/share"
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_H,
+                box_size=4,
+                border=4)
+            url = KeymanComUrl + "/go/keyboard/" + kmp['packageID'] + "/share"
             qr.add_data(url)
             qr.make(fit=True)
 
@@ -328,16 +325,8 @@ class KeyboardDetailsView(Gtk.Window):
         grid.attach_next_to(lbl_share_kbd, image, Gtk.PositionType.BOTTOM, 2, 1)
         prevlabel = lbl_share_kbd
 
-        button = Gtk.Button.new_with_mnemonic("_Close")
-        button.set_tooltip_text("Close window")
-        button.connect("clicked", self.on_close_clicked)
+        self.add_button("_Close", Gtk.ResponseType.CLOSE)
 
-        hbox.pack_end(button, False, False, 0)
-        bind_accelerator(self.accelerators, button, '<Control>w')
-
-        self.add(vbox)
-        self.resize(635, 270)
-
-    def on_close_clicked(self, button):
-        logging.debug("Closing keyboard details window")
-        self.close()
+        self.get_content_area().pack_start(box, True, True, 12)
+        self.resize(800, 450)
+        self.show_all()

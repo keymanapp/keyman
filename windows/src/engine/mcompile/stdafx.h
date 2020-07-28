@@ -16,3 +16,4 @@
 #include "../../global/inc/compfile.h"
 #include "../../global/inc/comperr.h"
 #include "../../global/inc/xstring.h"
+#include "../../global/inc/keymansentry.h"

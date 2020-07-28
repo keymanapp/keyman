@@ -121,7 +121,7 @@ type
     GroupName: string;
   end;
 
-const KeymanOptionInfo: array[0..13] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
+const KeymanOptionInfo: array[0..15] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
   // Global options
 
   (opt: koKeyboardHotkeysAreToggle;          RegistryName: SRegValue_KeyboardHotkeysAreToggle;         OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
@@ -129,6 +129,9 @@ const KeymanOptionInfo: array[0..13] of TKeymanOptionInfo = (  // I3331   // I36
   (opt: koAltGrCtrlAlt;                      RegistryName: SRegValue_AltGrCtrlAlt;                     OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koShowHints;                         RegistryName: SRegValue_EnableHints;                      OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),
   (opt: koBaseLayout;                        RegistryName: SRegValue_UnderlyingLayout;                 OptionType: kotLong; IntValue: 0;      GroupName: 'kogGeneral'),
+
+  (opt: koAutomaticallyReportErrors;         RegistryName: SRegValue_AutomaticallyReportErrors;        OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),   // I4393
+  (opt: koAutomaticallyReportUsage;          RegistryName: SRegValue_AutomaticallyReportUsage;         OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),   // I4393
 
   // OSK options
 
@@ -147,7 +150,7 @@ const KeymanOptionInfo: array[0..13] of TKeymanOptionInfo = (  // I3331   // I36
 
   (opt: koDeadkeyConversion;                 RegistryName: SRegValue_DeadkeyConversionMode;            OptionType: kotBool; BoolValue: True;  GroupName: 'kogAdvanced'),   // I4552
   (opt: koDebugging;                         RegistryName: SRegValue_KeymanDebug;                      OptionType: kotBool; BoolValue: False; GroupName: 'kogAdvanced')   // I4393
-  );
+);
 
 implementation
 

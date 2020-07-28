@@ -7,7 +7,7 @@ uses
   IdCustomHTTPServer,
   IdHTTPServer,
 
-  Keyman.Developer.System.HttpServer.Base,
+  Keyman.System.HttpServer.Base,
 
   utilfiletypes;
 
@@ -315,7 +315,8 @@ begin
   // App requests are only accepted from local computer
   // So test that the request comes from localhost
   if (AContext.Binding.PeerIP <> '127.0.0.1') and
-    (AContext.Binding.PeerIP <> '0:0:0:0:0:0:0:1') then
+    (AContext.Binding.PeerIP <> '0:0:0:0:0:0:0:1') and
+    not doc.StartsWith('lib/sentry/') then  // We'll allow sentry for non-local requests
   begin
     AResponseInfo.ResponseNo := 403;
     AResponseInfo.ResponseText := 'Access denied';

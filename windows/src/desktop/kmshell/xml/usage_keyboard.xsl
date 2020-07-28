@@ -10,7 +10,8 @@
 
 		<html>
 			<head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
 				<title>
 					<xsl:value-of select="$locale/String[@Id='Usage_Title']" />
 				</title>

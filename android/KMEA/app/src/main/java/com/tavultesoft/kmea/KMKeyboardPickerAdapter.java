@@ -21,8 +21,11 @@ import android.widget.TextView;
 
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.adapters.AdapterFilter;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.MapCompat;
 
 final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyboards, Void> implements OnClickListener {
   private final static int KEYBOARD_LAYOUT_RESOURCE = R.layout.list_row_layout3;
@@ -41,17 +44,9 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     //        should instead refer to this adapter.)
     super(context, KEYBOARD_LAYOUT_RESOURCE, adapter, new AdapterFilter<Keyboard, Dataset.Keyboards, Void>() {
 
-      // Yeah, so this is a MASSIVE hack.  Right now, it's either this or refactor up to 60
-      // separate references to keyboardList within KeyboardPickerActivity.  Yikes.
       public List<Keyboard> selectFrom(Dataset.Keyboards adapter, Void dummy) {
-        List<HashMap<String, String>> kbdMapList = KeyboardPickerActivity.getKeyboardsList(context);
-        List<Keyboard> kbdList = new ArrayList<>(kbdMapList.size());
-
-        for(HashMap<String, String> kbdMap: kbdMapList) {
-          kbdList.add(new Keyboard(kbdMap));
-        }
-
-        return kbdList;
+        // Return the keyboards list
+        return adapter.asList();
       }
     }, null);
   }
@@ -74,7 +69,7 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
       holder = (ViewHolder) convertView.getTag();
     }
 
-    if(kbd.isNewKeyboard())
+    if(kbd.getNewKeyboard())
       holder.textLang.setText(String.format("[%s]", getContext().getText(R.string.keyboard_picker_new_keyboard_prefix))
         + " " + kbd.getLanguageName());
     else
@@ -102,33 +97,10 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
 
   @Override
   public void onClick(View v) {
-    @SuppressWarnings("unchecked")
-    Map<String, String> kbInfo = ((Keyboard) v.getTag()).map;
+    Keyboard kbInfo = (Keyboard) v.getTag();
     Intent i = new Intent(this.getContext(), KeyboardInfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-    String packageID = kbInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
-    if (packageID == null || packageID.isEmpty()) {
-      packageID = KMManager.KMDefault_UndefinedPackageID;
-    }
-    i.putExtra(KMManager.KMKey_PackageID, packageID);
-    i.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
-    i.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
-    i.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
-    String keyboardVersion = KMManager.getLatestKeyboardFileVersion(this.getContext(), packageID, keyboardID);
-    i.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
-    boolean isCustom = false;
-    if (kbInfo.get(KMManager.KMKey_CustomKeyboard) != null || kbInfo.containsKey(KMManager.KMKey_CustomKeyboard)) {
-      isCustom = kbInfo.get(KMManager.KMKey_CustomKeyboard).equals("Y") ? true : false;
-    }
-    i.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
-    String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
-    if (customHelpLink != null) {
-      i.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
-    } else {
-      i.putExtra(KMManager.KMKey_HelpLink,
-        String.format("https://help.keyman.com/keyboard/%s/%s/", keyboardID, keyboardVersion));
-    }
+    i.putExtra(KMManager.KMKey_Keyboard, kbInfo);
     KeyboardInfoActivity.titleFont = listFont;
     this.getContext().startActivity(i);
   }

@@ -2,41 +2,62 @@ package com.tavultesoft.kmea.cloud;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
+import android.os.Bundle;
 
 import com.tavultesoft.kmea.JSONParser;
 import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KeyboardPickerActivity;
 import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.MapCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class CloudDataJsonUtil {
 
   private static final String TAG = "CloudDataJsonUtil";
+
+  // Deprecated
+  public static final String JSON_Keyboards_Cache_Filename = "jsonKeyboardsCache.dat";
+
+  public static final String JSON_Lexical_Models_Cache_Filename = "jsonLexicalModelsCache.dat";
+  public static final String JSON_Resources_Cache_Filename = "jsonResourcesCache.json";
+
+  // keys for api.keyman.com/package-version
+  private static final String CDKey_Keyboards = "keyboards";
+  private static final String CDKey_Models = "models";
+  private static final String CDKey_KMP = "kmp";
+  private static final String CDKey_Version = "version";
+  private static final String CDKey_Error = "error";
+
   private CloudDataJsonUtil()
   {
     //no instances
   }
 
   public static HashMap<String,String> createKeyboardInfoMap(String aPackageId,String aLanguageId, String aLanguageName, String aKeyboardId,
-                                                   String aKeyboardName, String aKeyboardVersion, String anIsCustomKeyboard,
+                                                   String aKeyboardName, String aKeyboardVersion,
                                                    String aFont, String aOskFont, String aCustomHelpLink)
   {
     HashMap<String, String> keyboardInfo = new HashMap<String, String>();
@@ -46,7 +67,6 @@ public class CloudDataJsonUtil {
     keyboardInfo.put(KMManager.KMKey_KeyboardName, aKeyboardName);
     keyboardInfo.put(KMManager.KMKey_LanguageName, aLanguageName);
     keyboardInfo.put(KMManager.KMKey_KeyboardVersion, aKeyboardVersion);
-    keyboardInfo.put(KMManager.KMKey_CustomKeyboard, anIsCustomKeyboard);
     keyboardInfo.put(KMManager.KMKey_Font, aFont);
     if (aOskFont != null) {
       keyboardInfo.put(KMManager.KMKey_OskFont, aOskFont);
@@ -64,114 +84,152 @@ public class CloudDataJsonUtil {
       return keyboardsList;
     }
 
-    String isCustom = fromKMP ? "Y" : "N";
-
     try {
-      // Thank you, Cloud API format.
+      // Thank you, Cloud API format
       JSONArray languages = query.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).getJSONArray(KMKeyboardDownloaderActivity.KMKey_Languages);
       for (int i = 0; i < languages.length(); i++) {
-        JSONObject language = languages.getJSONObject(i);
+        JSONObject languageJSON = languages.getJSONObject(i);
+        JSONArray langKeyboards = languageJSON.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
 
-        String langID = language.getString(KMManager.KMKey_ID);
-        String langName = language.getString(KMManager.KMKey_Name);
-
-        JSONArray langKeyboards = language.getJSONArray(KMKeyboardDownloaderActivity.KMKey_LanguageKeyboards);
-
+        // Can't foreach a JSONArray
         int kbLength = langKeyboards.length();
         for (int j = 0; j < kbLength; j++) {
           JSONObject keyboardJSON = langKeyboards.getJSONObject(j);
-          String pkgID = keyboardJSON.optString(KMManager.KMKey_PackageID, KMManager.KMDefault_UndefinedPackageID);
-          String kbID = keyboardJSON.getString(KMManager.KMKey_ID);
-          String kbName = keyboardJSON.getString(KMManager.KMKey_Name);
-          String kbVersion = keyboardJSON.optString(KMManager.KMKey_KeyboardVersion, "1.0");
-          String kbFont = keyboardJSON.optString(KMManager.KMKey_Font, "");
-          String customHelpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink, null);
-
-          //String kbKey = String.format("%s_%s", langID, kbID);
-          HashMap<String, String> hashMap = createKeyboardInfoMap(pkgID,langID,langName,kbID,kbName,kbVersion,isCustom,kbFont,null, customHelpLink);
-
-
-//          if (keyboardModifiedDates.get(kbID) == null) {
-//            keyboardModifiedDates.put(kbID, keyboardJSON.getString(KMManager.KMKey_KeyboardModified));
-//          }
-
-          keyboardsList.add(new Keyboard(hashMap));
+          keyboardsList.add(new Keyboard(languageJSON, keyboardJSON));
         }
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(TAG, "JSONParse Error: " + e);
-      return new ArrayList<>();  // Is this ideal?
+      KMLog.LogException(TAG, "JSONParse Error: ", e);
+      return new ArrayList<Keyboard>();  // Is this ideal?
     }
 
     return keyboardsList;
   }
 
-  public static List<LexicalModel> processLexicalModelJSON(JSONArray models) {
+  /**
+   * Parse a JSONArray of models to create a list of LexicalModel
+   * @param models
+   * @param fromKMP - boolean. If true, only  the first language in an array is processed
+   * @return List of LexicalModel
+   */
+  public static List<LexicalModel> processLexicalModelJSON(JSONArray models, boolean fromKMP) {
     List<LexicalModel> modelList = new ArrayList<>(models.length());
 
     try {
       // Parse each model JSON Object.
       int modelsLength = models.length();
       for (int i = 0; i < modelsLength; i++) {
-        JSONObject model = models.getJSONObject(i);
-        String packageID = "", modelURL = "";
-        if (model.has(KMManager.KMKey_PackageID)) {
-          packageID = model.getString(KMManager.KMKey_PackageID);
-        } else {
-          // Determine package ID from packageFilename
-          modelURL = model.optString("packageFilename", "");
-          packageID = FileUtils.getFilename(modelURL);
-          packageID = packageID.replace(FileUtils.MODELPACKAGE, "");
-        }
-
-        // api.keyman.com query returns an array of language IDs Strings while
-        // kmp.json "languages" is an array of JSONObject
-        String languageID = "", langName = "";
-        Object obj = model.getJSONArray("languages");
-        if (((JSONArray) obj).get(0) instanceof String) {
-          // language name not provided, so re-use language ID
-          languageID = model.getJSONArray("languages").getString(0);
-          langName = languageID;
-        } else if (((JSONArray) obj).get(0) instanceof JSONObject) {
-          JSONObject languageObj = model.getJSONArray("languages").getJSONObject(0);
-          languageID = languageObj.getString("id");
-          langName = languageObj.getString("name");
-        }
-
-        String modelID = model.getString(KMManager.KMKey_ID);
-        String modelName = model.getString(KMManager.KMKey_Name);
-
-        // Cloud data may not contain lexical model version, so fallback to (package) version
-        String version = model.optString(KMManager.KMKey_Version, "1.0");
-        String modelVersion = model.optString(KMManager.KMKey_LexicalModelVersion, version);
-
-        String isCustom = model.optString(KMManager.KMKey_CustomModel, "N");
-        
-        String icon = "0";
-
-        HashMap<String, String> hashMap = new HashMap<String, String>();
-        hashMap.put(KMManager.KMKey_PackageID, packageID);
-        hashMap.put(KMManager.KMKey_LanguageID, languageID.toLowerCase());
-        hashMap.put(KMManager.KMKey_LexicalModelID, modelID);
-        hashMap.put(KMManager.KMKey_LexicalModelName, modelName);
-        hashMap.put(KMManager.KMKey_LanguageName, langName);
-        hashMap.put(KMManager.KMKey_LexicalModelVersion, modelVersion);
-        hashMap.put(KMManager.KMKey_CustomModel, isCustom);
-        hashMap.put(KMManager.KMKey_LexicalModelPackageFilename, modelURL);
-        hashMap.put("isEnabled", "true");
-        hashMap.put(KMManager.KMKey_Icon, String.valueOf(R.drawable.ic_arrow_forward));
-
-        modelList.add(new LexicalModel(hashMap));
+        JSONObject modelJSON = models.getJSONObject(i);
+        modelList.addAll(LexicalModel.LexicalModelList(modelJSON, fromKMP));
       }
     } catch (JSONException | NullPointerException e) {
-      Log.e(TAG, "JSONParse Error: " + e);
-      return new ArrayList<>();  // Is this ideal?
+      KMLog.LogException(TAG, "JSONParse Error: ", e);
+      return new ArrayList<LexicalModel>();  // Is this ideal?
     }
 
     return modelList;
   }
 
-   public static JSONArray getCachedJSONArray(File file) {
+  /**
+   * Process the "keyboards" JSON Object to determine keyboard updates
+   * @param aContext Context
+   * @param pkgData JSONObject from the package-version API
+   * @param updateBundles - List of keyboard bundle updates
+   */
+  public static void processKeyboardPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
+    boolean saveKeyboardList = false;
+    // Parse for the keyboard package updates
+    if (pkgData.has(CDKey_Keyboards)) {
+      try {
+        JSONObject cloudKeyboardPackages = pkgData.getJSONObject(CDKey_Keyboards);
+        Iterator<String> keyboardIDs = cloudKeyboardPackages.keys();
+        while (keyboardIDs.hasNext()) {
+          String keyboardID = keyboardIDs.next();
+          JSONObject cloudKeyboardObj = cloudKeyboardPackages.getJSONObject(keyboardID);
+          if (!cloudKeyboardObj.has(CDKey_Error)) {
+            String cloudVersion = cloudKeyboardObj.getString(CDKey_Version);
+            String cloudKMP = cloudKeyboardObj.getString(CDKey_KMP);
+            // Valid keyboard package exists. See if keyboard list needs to be updated
+            for (int i = 0; i < KeyboardController.getInstance().get().size(); i++) {
+              Keyboard kbd = KeyboardController.getInstance().getKeyboardInfo(i);
+              String version = kbd.getVersion();
+              if (keyboardID.equalsIgnoreCase(kbd.getKeyboardID()) &&
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
+                  (!kbd.getUpdateKMP().equalsIgnoreCase(cloudKMP))) {
+                // Update keyboard with the latest KMP link
+                kbd.setUpdateKMP(cloudKMP);
+                KeyboardController.getInstance().add(kbd);
+
+                // Update bundle list
+                Bundle bundle = new Bundle(kbd.buildDownloadBundle());
+                updateBundles.add(bundle);
+
+                saveKeyboardList = true;
+              }
+            }
+          }
+        }
+      } catch (JSONException | NullPointerException e) {
+        KMLog.LogException(TAG, "processPackageUpdateJSON Error process keyboards: ", e);
+      }
+    }
+
+    if (saveKeyboardList) {
+      KeyboardController.getInstance().save(aContext);
+    }
+  }
+
+  public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
+    boolean saveModelsList = false;
+    // Parse for lexical model package updates
+    if (pkgData.has(CDKey_Models)) {
+      try {
+        JSONObject cloudModelPackages = pkgData.getJSONObject(CDKey_Models);
+        Iterator<String> lexicalModelIDs = cloudModelPackages.keys();
+        while (lexicalModelIDs.hasNext()) {
+          String lexicalModelID = lexicalModelIDs.next();
+          JSONObject cloudModelObj = cloudModelPackages.getJSONObject(lexicalModelID);
+          if (!cloudModelObj.has(CDKey_Error)) {
+            String cloudVersion = cloudModelObj.getString(CDKey_Version);
+            String cloudKMP = cloudModelObj.getString(CDKey_KMP);
+            // Valid lexical model package exists. See if lexical model list needs to be updated
+            // Valid keyboard package exists. See if keyboard list needs to be updated
+            int index = KeyboardPickerActivity.getLexicalModelIndex(aContext, lexicalModelID);
+            if (index != -1) {
+              HashMap<String, String> lmInfo = KeyboardPickerActivity.getLexicalModelInfo(aContext, index);
+              String version = lmInfo.get(KMManager.KMKey_Version);
+              if (lexicalModelID.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LexicalModelID)) &&
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
+                  (!MapCompat.getOrDefault(lmInfo, KMManager.KMKey_KMPLink, "").equalsIgnoreCase(cloudKMP))) {
+                // Update keyboard with the latest KMP link
+                lmInfo.put(KMManager.KMKey_KMPLink, cloudKMP);
+                KeyboardPickerActivity.addLexicalModel(aContext, lmInfo);
+
+                // Update bundle list
+                LexicalModel lm = new LexicalModel(
+                  lmInfo.get(KMManager.KMKey_PackageID),
+                  lmInfo.get(KMManager.KMKey_LexicalModelID),
+                  lmInfo.get(KMManager.KMKey_LexicalModelName),
+                  lmInfo.get(KMManager.KMKey_LanguageID),
+                  lmInfo.get(KMManager.KMKey_LanguageName),
+                  lmInfo.get(KMManager.KMKey_Version),
+                  lmInfo.get(KMManager.KMKey_CustomHelpLink),
+                  lmInfo.get(KMManager.KMKey_KMPLink));
+                Bundle bundle = new Bundle(lm.buildDownloadBundle());
+                updateBundles.add(bundle);
+
+                saveModelsList = true;
+              }
+            }
+          }
+        }
+      } catch (JSONException | NullPointerException e) {
+        KMLog.LogException(TAG, "processPackageUpdateJSON Error processing models: ", e);
+      }
+    }
+  }
+
+  public static JSONArray getCachedJSONArray(File file) {
     JSONArray lmData = null;
     try {
       // Read from cache file
@@ -181,7 +239,7 @@ public class CloudDataJsonUtil {
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      KMLog.LogException(TAG, "getCachedJSONArray failed to read from cache file. Error: ", e);
       lmData = null;
     }
 
@@ -193,12 +251,17 @@ public class CloudDataJsonUtil {
     try {
       // Read from cache file
       if (file.exists()) {
-        ObjectInputStream objInput = new ObjectInputStream(new FileInputStream(file));
-        kbData = new JSONObject(objInput.readObject().toString());
+        StringBuilder sb = new StringBuilder(0);
+        String line;
+        BufferedReader objInput = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        while ((line = objInput.readLine()) != null) {
+          sb.append(line);
+        }
+        kbData = new JSONObject(sb.toString());
         objInput.close();
       }
     } catch (Exception e) {
-      Log.e(TAG, "Failed to read from cache file. Error: " + e);
+      KMLog.LogException(TAG, "getCachedJSONObject failed to read from cache file. Error: ", e);
       kbData = null;
     }
 
@@ -219,36 +282,24 @@ public class CloudDataJsonUtil {
       objOutput.writeObject(json.toString());
       objOutput.close();
     } catch (Exception e) {
-      Log.e(TAG, "Failed to save to cache file. Error: " + e);
+      KMLog.LogException(TAG, "Failed to save to cache file. Error: ", e);
     }
   }
 
-  /**
-   * Save the JSON catalog data that's available from the cloud.
-   * The catalog is saved to a unique file.  Separate files should
-   * be used for each API call, such as for keyboards vs lexical models.
-   * @param json - JSON object containing API return info
-   */
-  public static void saveJSONObjectToCache(File file, JSONObject json) {
-    ObjectOutput objOutput;
-    try {
-      // Save to cache file
-      objOutput = new ObjectOutputStream(new FileOutputStream(file));
-      objOutput.writeObject(json.toString());
-      objOutput.close();
-    } catch (Exception e) {
-      Log.e(TAG, "Failed to save to cache file. Error: " + e);
-    }
-  }
-
+  // Deprecated
   public static File getKeyboardCacheFile(Context context) {
-    final String jsonCacheFilename = "jsonKeyboardsCache.dat";
+    final String jsonCacheFilename = JSON_Keyboards_Cache_Filename;
     return new File(context.getCacheDir(), jsonCacheFilename);
   }
 
   public static File getLexicalModelCacheFile(Context context) {
-    final String jsonLexicalCacheFilename = "jsonLexicalModelsCache.dat";
+    final String jsonLexicalCacheFilename = JSON_Lexical_Models_Cache_Filename;
     return new File(context.getCacheDir(), jsonLexicalCacheFilename);
+  }
+
+  public static File getResourcesCacheFile(Context context) {
+    final String jsonCacheFilename = JSON_Resources_Cache_Filename;
+    return new File(context.getCacheDir(), jsonCacheFilename);
   }
 
   /**
@@ -271,7 +322,7 @@ public class CloudDataJsonUtil {
             dataObject = jsonParser.getJSONObjectFromFile(aDownload.getDestinationFile(),JSONObject.class);
           }
         } catch (Exception e) {
-          Log.d(TAG, e.getMessage(),e);
+          KMLog.LogException(TAG, "", e);
         } finally {
           aDownload.getDestinationFile().delete();
         }
@@ -319,7 +370,7 @@ public class CloudDataJsonUtil {
         }
       }
     } catch (JSONException e) {
-      Log.e(TAG, "findTTF exception" + e);
+      KMLog.LogException(TAG, "findTTF exception", e);
     }
   }
 
@@ -334,7 +385,7 @@ public class CloudDataJsonUtil {
       }
       return false;
     } catch (JSONException e) {
-      Log.e(TAG, "hasTTFFont exception" + e);
+      KMLog.LogException(TAG, "hasTTFFont exception", e);
       return false;
     }
   }
@@ -374,6 +425,7 @@ public class CloudDataJsonUtil {
             urls.add(baseUri + fontFilename);
           }
         } catch (JSONException e) {
+          KMLog.LogException(TAG, "", e);
           return null;
         }
       }
@@ -388,6 +440,7 @@ public class CloudDataJsonUtil {
           urls.add(baseUri + fontFilename);
         }
       } catch (JSONException e) {
+        KMLog.LogException(TAG, "", e);
         return null;
       }
     }

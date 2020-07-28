@@ -1,0 +1,8 @@
+{
+    "models": {
+        "nrc.en.mtnt": {
+            "version": "0.1.4",
+            "kmp": "https://downloads.keyman.com/models/nrc.en.mtnt/0.1.4/nrc.en.mtnt.model.kmp"
+        }
+    }
+}

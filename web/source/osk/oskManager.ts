@@ -1,8 +1,4 @@
 /// <reference path="../kmwexthtml.ts" />  // Includes KMW-added property declaration extensions for HTML elements.
-// Includes KMW string extension declarations.
-/// <reference path="../text/kmwstring.ts" /> 
-// Includes the default layout specification.
-/// <reference path="defaultLayouts.ts" /> 
 // Includes the touch-mode language picker UI.
 /// <reference path="languageMenu.ts" />
 // Includes the banner
@@ -146,7 +142,7 @@ namespace com.keyman.osk {
       let util = keymanweb.util;
       let device = util.device;
 
-      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
+      var activeKeyboard = keymanweb.core.activeKeyboard;
 
       // If _Load called before OSK is ready, must wait and call again
       if(this._Box == null) {
@@ -221,58 +217,20 @@ namespace com.keyman.osk {
         Ldiv.className='kmw-osk-none';
         this._Box.appendChild(Ldiv);
       } else {
-        var Lviskbd=null,layouts=null,layout=null,Lhelp='';
+        var Lhelp='';
         this._Box.className = "";
         if(activeKeyboard != null) {
-          Lviskbd=activeKeyboard['KV'];
-          Lhelp=activeKeyboard['KH'];
-
-          // Check if dynamic layout is defined within keyboard
-          layouts=activeKeyboard['KVKL'];
-
-          // If any keyboard layout file is provided, use that to override the generated layout
-          if(typeof layouts != 'undefined' && layouts != null) {
-            layout=layouts[device.formFactor];
-
-            // Use the layout for the device, if defined, otherwise use the desktop (default) layout
-            if(typeof layout == 'undefined' || layout == null) {
-              if(device.formFactor == 'phone') {
-                layout=layouts['tablet'];
-              } else if(device.formFactor == 'tablet') {
-                layout=layouts['phone'];
-              }
-
-              if(typeof layout == 'undefined' || layout == null) {
-                layout=layouts['desktop'];
-              }
-            }
-          }
-        }
-
-        // Test if Visual keyboard is simply a place holder, set to null if so
-        if(Lviskbd != null && Lviskbd['BK'] != null) {
-          var keyCaps=Lviskbd['BK'], noKeyCaps=true;
-          for(var i=0; i<keyCaps.length; i++) {
-            if(keyCaps[i].length > 0) {
-              noKeyCaps = false;
-              break;
-            }
-          }
-          if(noKeyCaps) {
-            Lviskbd=null;
-          }
+          // Note:  must exist in order for insertHelpHTML to be used!
+          Lhelp=activeKeyboard.helpText;
         }
 
         // Generate a visual keyboard from the layout (or layout default)
-        // TODO: this should probably be unconditional now
-        if(Lviskbd != null || Lhelp == '' || device.touchable) { // I3363 (Build 301)
-          // TODO: May want to define a default BK array here as well
-          if(Lviskbd == null) {
-            Lviskbd={'F':'Tahoma', 'BK': Layouts.dfltText}; //DDOSK
-          }
-
-          this._GenerateVisualKeyboard(Lviskbd, Lhelp, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask());
-        } else { //The following code applies only to preformatted 'help' such as European Latin
+        // Condition is false if no key definitions exist, formFactor == desktop, AND help text exists.  All three.
+        if(activeKeyboard && activeKeyboard.layout(device.formFactor as utils.FormFactor)) {
+          this._GenerateVisualKeyboard(activeKeyboard);
+        } else if(!activeKeyboard) {
+          this._GenerateVisualKeyboard(null);
+        } else { //The following code applies only to preformatted 'help' such as SIL EuroLatin
           //osk.ddOSK = false;
           Ldiv=util._CreateElement('div');
           Ldiv.className = "kmw-title-bar";
@@ -285,21 +243,21 @@ namespace com.keyman.osk {
           Ldiv.className='kmw-osk-static';
           Ldiv.innerHTML = Lhelp;
           this._Box.appendChild(Ldiv);
-          if(activeKeyboard['KHF']) {
-            activeKeyboard['KHF'](this._Box);
+          if(activeKeyboard.hasHelpHTML) {
+            activeKeyboard.insertHelpHTML(this._Box);
           }
         }
         if(keymanweb._TitleElement)
         {
           keymanweb._TitleElement.innerHTML = "<span style='font-weight:bold'>"
-            + activeKeyboard['KN'] + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
+            + activeKeyboard.name + '</span> - ' + keymanweb._TitleElement.innerHTML; // I1972  // I2186
           keymanweb._TitleElement.className=''; keymanweb._TitleElement.style.color='#fff';
         }
       }
 
       // Correct the classname for the (inner) OSK frame (Build 360)
       var innerFrame=<HTMLDivElement> this._Box.firstChild,
-        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard['KI'].replace('Keyboard_','') : '');
+        kbdClass = ' kmw-keyboard-' + (activeKeyboard ? activeKeyboard.id.replace('Keyboard_','') : '');
       if(innerFrame.id == 'keymanweb_title_bar') {
         // Desktop order is title_bar, banner_container, inner-frame
         innerFrame=<HTMLDivElement> innerFrame.nextSibling.nextSibling;
@@ -333,8 +291,8 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the visual keyboard element and attaches it to KMW
      */
-    private _GenerateVisualKeyboard(PVK, Lhelp, layout0, kbdBitmask) {
-      this.vkbd = new com.keyman.osk.VisualKeyboard(PVK, Lhelp, layout0, kbdBitmask);
+    private _GenerateVisualKeyboard(keyboard: keyboards.Keyboard) {
+      this.vkbd = new com.keyman.osk.VisualKeyboard(keyboard);
       let util = com.keyman.singleton.util;
 
       // Set box class - OS and keyboard added for Build 360
@@ -374,8 +332,8 @@ namespace com.keyman.osk {
       bar.className='kmw-title-bar';
       bar.onmousedown=this._VMoveMouseDown;
 
-      if(keymanweb.keyboardManager.activeKeyboard) {
-        title=keymanweb.keyboardManager.activeKeyboard['KN'];
+      if(keymanweb.core.activeKeyboard) {
+        title=keymanweb.core.activeKeyboard.name;
       }
       var Ltitle=util._CreateElement('span');
       Ltitle.className='kmw-title-bar-caption';
@@ -779,7 +737,7 @@ namespace com.keyman.osk {
       this._VMoveX = Lposx - this._Box.offsetLeft;
       this._VMoveY = Lposy - this._Box.offsetTop;
 
-      if(keymanweb.keyboardManager.isCJK()) {
+      if(keymanweb.isCJK()) {
         this.pinImg.style.left='15px';
       }
 
@@ -1269,7 +1227,7 @@ namespace com.keyman.osk {
       }
 
       // Never display the OSK for desktop browsers unless KMW element is focused, and a keyboard selected
-      if((!device.touchable) && (keymanweb.keyboardManager.activeKeyboard == null || !this._Enabled)) {
+      if((!device.touchable) && (keymanweb.core.activeKeyboard == null || !this._Enabled)) {
         return;
       }
 
@@ -1402,7 +1360,7 @@ namespace com.keyman.osk {
 
       if(hiddenByUser) {
         //osk.loadCookie(); // preserve current offset and userlocated state
-        this._Enabled = ((keymanweb.keyboardManager.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
+        this._Enabled = ((keymanweb.isCJK() || device.touchable)? true : false); // I3363 (Build 301)
         this.saveCookie();  // Save current OSK state, size and position (desktop only)
       } else if(device.formFactor == 'desktop') {
         //Allow desktop OSK to remain visible on blur if body class set

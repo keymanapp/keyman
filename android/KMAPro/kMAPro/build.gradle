@@ -12,6 +12,10 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
 
+    // Don't compress kmp files so they can be copied via AssetManager
+    aaptOptions {
+        noCompress "kmp"
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -19,28 +23,17 @@ android {
 
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 29
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
         //println "===END DUMP==="
 
-        String env_services_json_file = System.getenv('services_json_file')
-
-        if (env_services_json_file != null) {
-            env_services_json_file = String.valueOf(env_services_json_file)
-            println "Copying production google-services.json and using at kMAPro/"
-            copy {
-                from env_services_json_file
-                include '*.json'
-                into './'
-            }
-        }
-
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
+        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
     }
 
     String env_release_store_file = System.getenv("release_store_file")
@@ -152,5 +145,3 @@ dependencies {
     println it.properties.entrySet()*.toString()
             .sort().toString().replaceAll(", ","\n")
 }*/
-
-apply plugin: 'com.google.gms.google-services'

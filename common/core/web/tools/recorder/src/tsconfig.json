@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+	"allowJs": true,
+	"module": "none",
+	"outDir": "../dist/",
+	"inlineSources": true,
+  "inlineSourceMap": true,
+  "target": "es5",
+  "types": ["node"],
+  "lib": ["es6"],
+  "outFile": "../dist/index.js"
+  },
+  "files": [
+    "../node_modules/@keymanapp/models-types/index.d.ts",
+    "../node_modules/@keymanapp/web-environment/environment.inc.ts",
+    "../node_modules/@keymanapp/web-utils/src/index.ts",
+		"index.ts"
+  ]
+}

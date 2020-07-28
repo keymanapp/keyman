@@ -357,6 +357,8 @@ var
 
   wm_keyman_globalswitch, wm_keyman_globalswitch_process, wm_keyman_control, wm_keyman_control_internal, wm_test_keyman_functioning: Cardinal;
 
+  FEnableCrashTest: Boolean = False;
+
 const
   KMC_StartProduct = 0;
   KMC_StopProduct = 1;
@@ -396,6 +398,7 @@ uses
   UfrmOSKCharacterMap,
   utilstr,
   utilwow64,
+  Keyman.System.KeymanSentryClient,
   KeymanEngineControl,
   KeymanControlMessages,
   KeymanDesktopShell,
@@ -1543,6 +1546,10 @@ end;
 
 procedure TfrmKeyman7Main.MnuOpenProductHelp(Sender: TObject);
 begin
+  // Ctrl+Shift+Help command, with command line -sentry-client-test-exception
+  if FEnableCrashTest and (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0) then
+    TKeymanSentryClient.Validate(True);
+
   TKeymanDesktopShell.OpenHelpJump('context_traymenu', Self.ActiveKeyboard);
 end;
 

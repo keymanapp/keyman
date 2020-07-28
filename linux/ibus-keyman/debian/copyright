@@ -1,23 +1,25 @@
 Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?view=markup&pathrev=174
 Upstream-Name: ibus-keyman
-Upstream-Contact: Daniel Glassey <wdg@debian.org>
+Upstream-Contact: Keyman team <support@keyman.com>
 
 Files: *
-Copyright: 2004-2018 SIL International
+Copyright: 2004-2020 SIL International
 License: GPL-2+
 
 Files: src/keymanutil.c
        src/keymanutil.h
-Copyright: 2009-2018 SIL International
+       src/kmpdetails.c
+       src/kmpdetails.h
+Copyright: 2009-2020 SIL International
 License: GPL-2+ or MIT
 
 Files: src/keyman-service.c
        src/keyman-service.h
-Copyright: 2018 SIL International
+Copyright: 2018-2020 SIL International
 License: GPL-3+
 
 Files: debian/*
-Copyright: 2004-2018 SIL International
+Copyright: 2004-2020 SIL International
 License: GPL-2+
 
 License: GPL-2+

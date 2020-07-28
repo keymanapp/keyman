@@ -1,6 +1,4 @@
 // Since 'web' compilation is the path recognized by VSCode, we need to make references here to prevent TS errors.
-// Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
 // References the base Keyman object (and consequently, the rest of the core objects).
 /// <reference path="kmwbase.ts" />
 
@@ -14,29 +12,6 @@
 /*****************************************/
 
 namespace com.keyman.osk {
-  // Send the subkey array to iOS, with centre,top of base key position
-  /**
-   * Create a popup key array natively 
-   * 
-   * @param {Object}  key   base key element
-   */            
-  VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
-    let util = com.keyman.singleton.util;
-    if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
-      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
-      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv)*/ /*+ bannerHeight*/;
-      
-      if(util.device.formFactor == 'phone') {
-        this.prependBaseKey(key);
-      }
-
-      this.popupBaseKey = key;
-      this.popupPending=true;
-      window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
-    }
-  };
-
   VisualKeyboard.prototype.optionKey = function(this: VisualKeyboard, e: KeyElement, keyName: string, keyDown: boolean) {
     let keyman = com.keyman.singleton;
 
@@ -65,50 +40,96 @@ namespace com.keyman.osk {
     }
   };
 
-  // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
-  VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
-    let util = com.keyman.singleton.util;
-    var tip = this.keytip,
-        showPreview = window['oskCreateKeyPreview'],
-        clearPreview = window['oskClearKeyPreview'];
+  // iOS now relies upon native-mode popup key management, so we only implement these hybrid-targetted
+  // methods when embedding in Android.
+  let device = com.keyman.singleton.util.device;
 
-    if(tip == null || (key == tip.key && on == tip.state)) {
-      return;
-    }
+  if(device.OS == 'Android') { // assumption - if this file is being loaded, keyman.isEmbedded == true.
+    // Send the subkey array to iOS, with centre,top of base key position
+    /**
+     * Create a popup key array natively 
+     * 
+     * @param {Object}  key   base key element
+     */            
+    VisualKeyboard.prototype.touchHold = function(this: VisualKeyboard, key: KeyElement) {
+      let util = com.keyman.singleton.util;
+      if(key['subKeys'] && (typeof(window['oskCreatePopup']) == 'function')) {
+        var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+            yBase = dom.Utils.getAbsoluteY(key);
+        
+        if(util.device.formFactor == 'phone') {
+          this.prependBaseKey(key);
+        }
 
-    if(on && (typeof showPreview == 'function')) {
-      let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
-      var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
-          yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
-          kc;
+        this.popupBaseKey = key;
+        this.popupPending=true;
+        window['oskCreatePopup'](key['subKeys'], xBase, yBase, key.offsetWidth, key.offsetHeight);
+      }
+    };
 
-      // Find key text element
-      for(var i=0; i<key.childNodes.length; i++) {
-        kc = key.childNodes[i];
-        if(util.hasClass(kc,'kmw-key-text')) {
-          break;
+    // Send the key details to KMEI or KMEA for showing or hiding the native-code keytip
+    VisualKeyboard.prototype.showKeyTip = function(this: VisualKeyboard, key: KeyElement, on: boolean) {
+      let util = com.keyman.singleton.util;
+      var tip = this.keytip,
+          showPreview = window['oskCreateKeyPreview'],
+          clearPreview = window['oskClearKeyPreview'];
+
+      if(tip == null || (key == tip.key && on == tip.state)) {
+        return;
+      }
+
+      if(on && (typeof showPreview == 'function')) {
+        let bannerHeight : number = com.keyman.singleton.osk.getBannerHeight();
+        var xBase = dom.Utils.getAbsoluteX(key) - dom.Utils.getAbsoluteX(this.kbdDiv) + key.offsetWidth/2,
+            yBase = dom.Utils.getAbsoluteY(key) /*- dom.Utils.getAbsoluteY(this.kbdDiv) + bannerHeight*/,
+            kc;
+
+        // Find key text element
+        for(var i=0; i<key.childNodes.length; i++) {
+          kc = key.childNodes[i];
+          if(util.hasClass(kc,'kmw-key-text')) {
+            break;
+          }
+        }
+          
+        if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
+          showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
+        }
+      } else if(!on && (typeof clearPreview == 'function')) {
+        if(this.touchCount == 0 || key == null) {
+          clearPreview();
         }
       }
-        
-      if(key.className.indexOf('kmw-key-default') >= 0 && key.id.indexOf('K_SPACE') < 0) {
-        showPreview(xBase, yBase, key.offsetWidth, key.offsetHeight, kc.innerHTML);
+
+      tip.key = key;
+      tip.state = on;
+    };
+
+    // Create a keytip (dummy call - actual keytip handled by native code)
+    VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
+      if(com.keyman.singleton.util.device.formFactor == 'phone') {
+        this.keytip = {key:null, state:false};
       }
-    } else if(!on && (typeof clearPreview == 'function')) {
-      if(this.touchCount == 0 || key == null) {
-        clearPreview();
-      }
+    };
+
+    VisualKeyboard.prototype.highlightSubKeys = function(this: VisualKeyboard, k, x, y) {
+      // a dummy function; it's only really used for 'native' KMW.
     }
 
-    tip.key = key;
-    tip.state = on;
-  };
-
-  // Create a keytip (dummy call - actual keytip handled by native code)
-  VisualKeyboard.prototype.createKeyTip = function(this: VisualKeyboard) {
-    if(com.keyman.singleton.util.device.formFactor == 'phone') {
-      this.keytip = {key:null, state:false};
+    VisualKeyboard.prototype.drawPreview = function(this: VisualKeyboard, w, h, edge) {
+      // a dummy function; it's only really used for 'native' KMW.
     }
-  };
+
+    VisualKeyboard.prototype.addCallout = function(this: VisualKeyboard, key) {
+      // a dummy function; it's only really used for 'native' KMW.
+      return null;
+    }
+
+    VisualKeyboard.prototype.waitForFonts = function(this: VisualKeyboard, kfd, ofd) {
+      // a dummy function; it's only really used for 'native' KMW.
+      return true;
+    }
+  }
 
   SuggestionManager.prototype.platformHold = function(this: SuggestionManager, suggestionObj: BannerSuggestion, isCustom: boolean) {
     // Parallels VisualKeyboard.prototype.touchHold, but for predictive suggestions instead of keystrokes.
@@ -124,29 +145,16 @@ namespace com.keyman.osk {
 }
 
 namespace com.keyman.text {
-  let nativeDefaultKeyOutput = Processor.prototype.defaultKeyOutput;
+  let nativeForBaseKeys = DefaultOutput.forBaseKeys;
 
   // Overrides the 'native'-mode implementation with in-app friendly defaults prioritized over 'native' defaults.
-  Processor.prototype.defaultKeyOutput = function(this: Processor, Lkc: KeyEvent, keyShiftState: number, usingOSK: boolean, disableDOM: boolean): string {
-    let keyman = com.keyman.singleton;
-
-    // Note:  this assumes Lelem is properly attached and has an element interface.
-    // Currently true in the Android and iOS apps.
+  DefaultOutput.forBaseKeys = function(Lkc: KeyEvent): string {
     let Codes = com.keyman.text.Codes;
     let code = Lkc.Lcode;
 
     // Intentionally not assigning K_TAB or K_ENTER so KMW will pass them back
     // to the mobile apps to handle (insert characters or navigate forms).
-    if (code == Codes.keyCodes.K_SPACE) {
-      return ' ';
-    } else if (code == Codes.keyCodes.K_BKSP) {
-      if(!disableDOM) {
-        keyman['interface'].defaultBackspace();
-        return '';
-      } else {
-        return '\b';
-      }
-    } else if (code == Codes.keyCodes.K_oE2) {
+    if (code == Codes.keyCodes.K_oE2) {
       // Using defaults of English US layout for the 102nd key
       if (Lkc.Lmodifiers == Codes.modifierCodes['SHIFT']) {
         return '|';
@@ -156,7 +164,7 @@ namespace com.keyman.text {
     }
 
     // Use 'native'-mode defaults, determining the character from the OSK
-    return nativeDefaultKeyOutput.call(this, Lkc, keyShiftState, usingOSK);
+    return nativeForBaseKeys(Lkc);
   }
 }
 
@@ -164,8 +172,6 @@ namespace com.keyman.text {
   // Declare KeymanWeb and related objects
   var keymanweb=window['keyman'], osk: com.keyman.osk.OSKManager = keymanweb['osk'],util=keymanweb['util'],device=util.device;
   var dom = com.keyman.dom;
-  var Layouts = com.keyman.osk.Layouts;
-  var kbdInterface=keymanweb['interface'];
 
   // Allow definition of application name
   keymanweb.options['app']='';
@@ -369,10 +375,10 @@ namespace com.keyman.text {
    *  @param  {string}  keyName   key identifier
    **/            
   keymanweb['executePopupKey'] = function(keyName: string) {
-      let processor = (<KeymanBase> keymanweb).textProcessor;
+      let core = (<KeymanBase> keymanweb).core;
 
       var origArg = keyName;
-      if(!keymanweb.keyboardManager.activeKeyboard || !osk.vkbd) {
+      if(!keymanweb.core.activeKeyboard || !osk.vkbd) {
         return false;
       }
 
@@ -382,14 +388,15 @@ namespace com.keyman.text {
       // Changes for Build 353 to resolve KMEI popup key issues      
       keyName=keyName.replace('popup-',''); //remove popup prefix if present (unlikely)      
       
-      var t=keyName.split('-'),layer=(t.length>1?t[0]:osk.vkbd.layerId);
+      var t=keyName.split('-'),layer=(t.length>1?t[0]:core.keyboardProcessor.layerId);
       keyName=t[t.length-1];
-      if(layer == 'undefined') layer=osk.vkbd.layerId;
-      
+      if(layer == 'undefined') {
+        layer=core.keyboardProcessor.layerId;
+      }
       
       // Note:  this assumes Lelem is properly attached and has an element interface.
       // Currently true in the Android and iOS apps.
-      var Lelem=keymanweb.domManager.getLastActiveElement(),Lkc,keyShiftState=processor.getModifierState(layer);
+      var Lelem=keymanweb.domManager.getLastActiveElement(),keyShiftState=com.keyman.text.KeyboardProcessor.getModifierState(layer);
       
       keymanweb.domManager.initActiveElement(Lelem);
 
@@ -423,35 +430,38 @@ namespace com.keyman.text {
       } else {
         console.warn("No base key exists for the subkey being executed: '" + origArg + "'");
       }
-      
-      // Process modifier key action
-      if(processor.selectLayer(keyName)) {
-        return true;      
-      }
 
       let Codes = com.keyman.text.Codes;
       
       // Check the virtual key 
-      Lkc = {
-        Ltarg: Lelem,
+      let Lkc: com.keyman.text.KeyEvent = {
+        Ltarg: com.keyman.dom.Utils.getOutputTarget(Lelem),
         Lmodifiers: keyShiftState,
         Lstates: 0,
         Lcode: Codes.keyCodes[keyName],
         LisVirtualKey: true,
         kName: keyName,
-        kNextLayer: nextLayer
+        kNextLayer: nextLayer,
+        vkCode: null, // was originally undefined
+        isSynthetic: true,
+        device: keymanweb.util.device.coreSpec
       };
+
+      // Process modifier key action
+      if(core.keyboardProcessor.selectLayer(Lkc, true)) { // ignores key's 'nextLayer' property for this check
+        return true;      
+      }
 
       // While we can't source the base KeyEvent properties for embedded subkeys the same way as native,
       // we can handle many other pre-processing steps the same way with this common method.
-      processor.commonClickEventPreprocessing(Lkc);
+      core.keyboardProcessor.setSyntheticEventDefaults(Lkc);
 
       //if(!Lkc.Lcode) return false;  // Value is now zero if not known (Build 347)
       //Build 353: revert to prior test to try to fix lack of KMEI output, May 1, 2014      
       if(isNaN(Lkc.Lcode) || !Lkc.Lcode) { 
         // Addresses modifier SHIFT keys.
         if(nextLayer) {
-          processor.selectLayer(keyName, nextLayer);
+          core.keyboardProcessor.selectLayer(Lkc);
         }
         return false;
       }
@@ -460,7 +470,15 @@ namespace com.keyman.text {
 
       // Now that we have a valid key event, hand it off to the Processor for execution.
       // This allows the Processor to also handle any predictive-text tasks necessary.
-      return processor.processKeyEvent(Lkc, true);
+      let retVal = com.keyman.osk.PreProcessor.handleClick(Lkc, null);
+
+      // Special case for embedded to pass K_TAB back to device to process
+      if(Lkc.Lcode == Codes.keyCodes["K_TAB"] || Lkc.Lcode == Codes.keyCodes["K_TABBACK"] 
+          || Lkc.Lcode == Codes.keyCodes["K_TABFWD"]) {
+        return false;
+      }
+
+      return retVal;
   };
 
   /**
@@ -473,7 +491,7 @@ namespace com.keyman.text {
    **/            
   keymanweb['executeHardwareKeystroke'] = function(code, shift, lstates = 0) {
     let keyman = com.keyman.singleton;
-    if(!keyman.keyboardManager.activeKeyboard || code == 0) {
+    if(!keyman.core.activeKeyboard || code == 0) {
       return false;
     }
 
@@ -488,19 +506,21 @@ namespace com.keyman.text {
 
     // Check the virtual key 
     var Lkc: com.keyman.text.KeyEvent = {
-      Ltarg: com.keyman.text.Processor.getOutputTarget(keyman.domManager.getActiveElement()),
+      Ltarg: com.keyman.dom.Utils.getOutputTarget(keyman.domManager.getActiveElement()),
       Lmodifiers: shift,
       vkCode: code,
       Lcode: code,
       Lstates: lstates,
       LisVirtualKey: true,
-      kName: ''
+      kName: '',
+      device: keyman.util.physicalDevice.coreSpec, // As we're executing a hardware keystroke.
+      isSynthetic: false
     }; 
 
     try {
       // Now that we've manually constructed a proper keystroke-sourced KeyEvent, pass control
       // off to the processor for its actual execution.
-      return keyman.textProcessor.processKeyEvent(Lkc); // Lack of second argument -> `usingOSK == false`
+      return keyman.core.processKeyEvent(Lkc) != null;
     } catch (err) {
       console.error(err.message, err);
       return false;

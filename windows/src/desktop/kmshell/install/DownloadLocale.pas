@@ -44,11 +44,11 @@ uses
   custinterfaces,
   Dialogs,
   httpuploader,
+  Keyman.Configuration.UI.InstallFile,
   kmint,
   Upload_Settings,
   GlobalProxySettings,
   VersionInfo,
-  UfrmInstallKeyboard,
   UfrmWebContainer, // for FOnDownloadLocale
   utildir,
   RegistryKeys,
@@ -128,7 +128,7 @@ var
               end;
             end;
 
-            if InstallFile(AOwner, FTempFileName, False, True, '') then Result := True;   // I4989
+            if TInstallFile.Execute(AOwner, FTempFileName, False, True, '', '') then Result := True;   // I4989
           finally
             if FileExists(FTempFileName) then
               DeleteFile(FTempFileName);

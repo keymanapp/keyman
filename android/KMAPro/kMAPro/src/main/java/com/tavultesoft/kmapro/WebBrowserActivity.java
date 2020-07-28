@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.util.FileUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,10 +18,12 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.View;
@@ -40,8 +43,10 @@ import android.webkit.WebViewClient;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class WebBrowserActivity extends AppCompatActivity {
+import com.tavultesoft.kmea.util.KMLog;
 
+public class WebBrowserActivity extends AppCompatActivity {
+  private static final String TAG = "WebBrowserActivity";
   private WebView webView;
   private EditText addressField;
   private ImageButton clearButton;
@@ -256,10 +261,27 @@ public class WebBrowserActivity extends AppCompatActivity {
 
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        if (!url.toLowerCase().equals("about:blank"))
-          view.loadUrl(url);
+        String lowerURL = url.toLowerCase();
+        if (lowerURL.equals("about:blank")) {
+          return true; // never load a blank page, e.g. when the component initializes
+        }
+        if (FileUtils.isKeymanLink(lowerURL)) {
+          // KMAPro main activity will handle this intent
+          // Pass original url because path and query are case-sensitive
+          Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+          startActivityForResult(intent, 1);
 
-        return true;
+          // Finish activity
+          finish();
+        }
+        if (lowerURL.startsWith("keyman:")) {
+          // Warn for unsupported keyman schemes
+          Log.d(TAG, "Scheme for " + url + " not handled");
+          return true;
+        }
+
+        // Display URL
+        return false;
       }
 
       @Override
@@ -301,6 +323,8 @@ public class WebBrowserActivity extends AppCompatActivity {
           try {
             new URL(urlStr);
           } catch (MalformedURLException e) {
+            KMLog.LogException(TAG, "", e);
+
             if (Patterns.WEB_URL.matcher(String.format("%s%s", "http://", urlStr)).matches()) {
               urlStr = String.format("%s%s", "http://", urlStr);
             } else {

@@ -23,7 +23,7 @@
                     06 Oct 2006 - mcdurdin - Add download keyboard
                     04 Dec 2006 - mcdurdin - Use T-frmWebContainer;
                     04 Dec 2006 - mcdurdin - Add keyboard_download, package_welcome, footer_buy, select_uilanguage
-                    05 Dec 2006 - mcdurdin - Refactor using XMLRenderer
+                    05 Dec 2006 - mcdurdin - Refactor using XML-Renderer
                     05 Dec 2006 - mcdurdin - Localize additional messages
                     12 Dec 2006 - mcdurdin - Capitalize form name; start on Keyboards page, not options
                     04 Jan 2007 - mcdurdin - Proxy support
@@ -74,9 +74,11 @@ uses
   System.Contnrs,
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Types, Graphics, Controls, Forms, Dialogs,
-  keymanapi_TLB, UfrmKeymanBase,
-  UfrmWebContainer,
-  XMLRenderer;
+  keymanapi_TLB,
+  XMLRenderer,
+  KeyboardListXMLRenderer,
+  UfrmKeymanBase,
+  UfrmWebContainer;
 
 type
   TfrmMain = class(TfrmWebContainer)
@@ -86,14 +88,16 @@ type
     procedure TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
 
   private
+    FPageTag: Integer;
     FClosing: Boolean;
+
+    FKeyboardXMLRenderer: TKeyboardListXMLRenderer;
+    FXMLRenderers: TXMLRenderers;
 
     DebuggingChecked: Boolean;   // I3630
 
     dlgOpenAddin: TOpenDialog;
     dlgOpenVisualKeyboard: TOpenDialog;
-
-    FState: string;
 
     procedure dlgOpenVisualKeyboardCanClose(Sender: TObject; var CanClose: Boolean);
 
@@ -134,7 +138,6 @@ type
     procedure Support_ContactSupport(params: TStringList);   // I4390
     procedure OpenSite(params: TStringList);
     procedure RefreshKeymanConfiguration;
-    procedure SaveState;
     procedure Keyboard_Download;
     function GetHotkeyLanguageFromParams(params: TStringList; out lang: IKeymanLanguage): Boolean;
     function MustReboot: Boolean;
@@ -157,20 +160,17 @@ implementation
 {$R *.DFM}
 
 uses
-  axctrls,
-  ActiveX,
   BaseKeyboards,
   ComObj,
   GetOSVersion,
   Hints,
   HotkeyUtils,
-  HotkeysXMLRenderer,
-  KeyboardListXMLRenderer,
   Imm,
   initprog,
+  Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
+  KeymanVersion,
   KeyNames,
-  LanguagesXMLRenderer,
   custinterfaces,
   KLog,
   kmint,
@@ -178,17 +178,17 @@ uses
   MessageIdentifiers,
   onlineconstants,
   OnlineUpdateCheck,
-  OptionsXMLRenderer,
   //GlobalProxySettings,
   //Registration,
   ErrorControlledRegistry,
+  Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.Configuration.System.HttpServer.App.ConfigMain,
+  Keyman.Configuration.UI.InstallFile,
   RegistryKeys,
   ShellApi,
   StrUtils,
-  SupportXMLRenderer,
   UfrmChangeHotkey,
   UfrmHTML,
-  UfrmInstallKeyboard,
   UfrmInstallKeyboardFromWeb,
   UfrmInstallKeyboardLanguage,
   UfrmKeyboardOptions,
@@ -203,6 +203,10 @@ uses
   utilhttp,
   utiluac,
   utilxml,
+  HotkeysXMLRenderer,
+  OptionsXMLRenderer,
+  LanguagesXMLRenderer,
+  SupportXMLRenderer,
   Variants;
 
 type
@@ -221,29 +225,23 @@ begin
 
   kmcom.AutoApply := False;
 
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) and ValueExists(SRegValue_ConfigurationState)
-      then FState := ReadString(SRegValue_ConfigurationState)
-      else FState := '0';
-  finally
-    Free;
-  end;
-
   InitNonVisualComponents;
-
-  XMLRenderers.RenderTemplate := 'Keyman.xsl';
-  XMLRenderers.Add(TKeyboardListXMLRenderer.Create);
-  XMLRenderers.Add(THotkeysXMLRenderer.Create);
-  XMLRenderers.Add(TOptionsXMLRenderer.Create(Self));
-  XMLRenderers.Add(TLanguagesXMLRenderer.Create);
-  XMLRenderers.Add(TSupportXMLRenderer.Create);
 
   Icon.ReleaseHandle;
   Icon.Handle := DuplicateIcon(hInstance, Application.Icon.Handle);
 
   Keyboards_Init;
   Options_Init;
+
+  FRenderPage := 'keyman'; // TODO: rename to 'configmain'
+  FXMLRenderers := TXMLRenderers.Create;
+  FXMLRenderers.RenderTemplate := 'Keyman.xsl';
+  FKeyboardXMLRenderer := TKeyboardListXMLRenderer.Create(FXMLRenderers);
+  FXMLRenderers.Add(FKeyboardXMLRenderer);
+  FXMLRenderers.Add(THotkeysXMLRenderer.Create(FXMLRenderers));
+  FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
+  FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
+  FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
 
   Do_Content_Render(False);
 end;
@@ -263,16 +261,10 @@ end;
 
 procedure TfrmMain.TntFormDestroy(Sender: TObject);
 begin
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
-      WriteString(SRegValue_ConfigurationState, FState);
-  finally
-    Free;
-  end;
-
   Application.OnActivate := nil;
-  //xmlstylesheet := nil;
+  FreeAndNil(FXMLRenderers);
+  if FPageTag > 0 then
+    modWebHttpServer.SharedData.Remove(FPageTag);
   inherited;
 end;
 
@@ -282,16 +274,40 @@ end;
 
 procedure TfrmMain.Do_Content_Render(FRefreshKeyman: Boolean);
 var
+  sharedDataIntf: IConfigMainSharedData;
+  sharedData: TConfigMainSharedData;
   s: string;
 begin
-  SaveState;
+  if FPageTag > 0 then
+  begin
+    modWebHttpServer.SharedData.Remove(FPageTag);
+    FPageTag := 0;
+  end;
 
-  s := '<state>'+XMLEncode(FState)+'</state>';
-  s := s + '<basekeyboard id="'+IntToHex(Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),8)+'">'+
-    XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))+
-    '</basekeyboard>';   // I4169
+  // TODO: Unlike other forms, we currently render the XML here in the window in
+  // order to avoid loading the Keyman Configuration data for every page view. A
+  // better approach would be shared data but the threading concerns for keyman
+  // API mean that this is a bigger job
 
-  Content_Render(FRefreshKeyman, s);
+  sharedData := TConfigMainSharedData.Create;
+  sharedDataIntf := sharedData;
+
+  FPageTag := modWebHttpServer.SharedData.Add(sharedDataIntf);
+
+  s := Format('<PageTag>%d</PageTag><state>%s</state><basekeyboard id="%08.8x">%s</basekeyboard>', [
+    FPageTag, // This is used in the XSL transform
+    XMLEncode(sharedDataIntf.State),
+    Cardinal(kmcom.Options[KeymanOptionName(koBaseLayout)].Value),
+    XMLEncode(TBaseKeyboards.GetName(kmcom.Options[KeymanOptionName(koBaseLayout)].Value))
+  ]) + DefaultServersXMLTags + DefaultVersionXMLTags;
+
+  sharedData.Init(
+    FXMLRenderers.TempPath,
+    FXMLRenderers.RenderToString(False, s),
+    FKeyboardXMLRenderer.FileReferences.ToStringArray
+  );
+
+  Content_Render(FRefreshKeyman, 'tag='+IntToStr(FPageTag));
 end;
 
 procedure TfrmMain.FireCommand(const command: WideString; params: TStringList);
@@ -480,7 +496,7 @@ procedure TfrmMain.Keyboard_Install;
 begin
   if MustReboot then Exit;  // I2789
 
-  if InstallKeyboardFromFile(Self) then
+  if TInstallFile.BrowseAndInstallKeyboardFromFile(Self) then
   begin
     RefreshKeymanConfiguration;
   end;
@@ -805,7 +821,10 @@ end;
 
 procedure TfrmMain.Support_Diagnostics;
 begin
-  kmcom.Control.OpenDiagnostics;
+  // Show the internal debug diagnostic tests form if Ctrl+Shift is down
+  if(GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0)
+    then TfrmDiagnosticTests.Run
+    else kmcom.Control.OpenDiagnostics;
 end;
 
 procedure TfrmMain.Support_Online;
@@ -852,7 +871,6 @@ end;
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   inherited;
-  SaveState;
   CanClose := True;
 end;
 
@@ -864,22 +882,6 @@ end;
 procedure TfrmMain.RefreshKeymanConfiguration;
 begin
   Do_Content_Render(True);
-end;
-
-procedure TfrmMain.SaveState;
-begin
-{$MESSAGE HINT 'TODO: Save state support'}
-  {try  TODO: save state
-    if Assigned(web.Document) then
-    begin
-      elem:= (web.Document as IHTMLDocument3).getElementById('state');
-      if elem <> nil then
-        FState := elem.innerText;
-      elem := nil;
-    end;
-  except
-    FState := '';
-  end;}
 end;
 
 class function TfrmMain.ShouldRegisterWindow: Boolean; // I2720

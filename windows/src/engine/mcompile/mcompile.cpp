@@ -40,10 +40,18 @@ BOOL DoConvert(LPKEYBOARD kbd, PWSTR kbid, BOOL bDeadkeyConversion);
 BOOL SaveKeyboard(LPKEYBOARD kbd, PWSTR filename);
 bool ImportRules(WCHAR *kbid, LPKEYBOARD kp, std::vector<DeadkeyMapping> *FDeadkeys, BOOL bDeadkeyConversion);   // I4353   // I4327
 BOOL ConvertKeyboardToUnicode(LPKEYBOARD kbd);   // I4273
+int run(int argc, wchar_t * argv[]);
 
 std::vector<DeadkeyMapping> FDeadkeys;   // I4353
 
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_MCOMPILE KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".mcompile"
+
 int wmain(int argc, wchar_t * argv[])
+{
+  return keyman_sentry_wmain(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_MCOMPILE, argc, argv, run);
+}
+
+int run(int argc, wchar_t * argv[])
 {
   if(argc < 3 || (argc < 5 && wcscmp(argv[1], L"-u") != 0)) {   // I4273
     printf(

@@ -1,5 +1,4 @@
-/// <reference path="activeLayout.ts" />
-/// <reference path="../utils/version.ts" />
+/// <reference path="preProcessor.ts" />
 
 namespace com.keyman.osk {
   let Codes = com.keyman.text.Codes;
@@ -45,10 +44,10 @@ namespace com.keyman.osk {
   //#endregion
 
   //#region OSK key objects and construction
-  export class OSKKeySpec implements LayoutKey {
+  export class OSKKeySpec implements keyboards.LayoutKey {
     id: string;
     text?: string;
-    sp?: number | ButtonClass;
+    sp?: number | keyboards.ButtonClass;
     width: string;
     layer?: string; // The key will derive its base modifiers from this property - may not equal the layer on which it is displayed.
     nextlayer?: string;
@@ -57,7 +56,7 @@ namespace com.keyman.osk {
     padpc?: number; // Added during OSK construction.
     sk?: OSKKeySpec[];
 
-    constructor(id: string, text?: string, width?: string, sp?: number | ButtonClass, nextlayer?: string, pad?: string) {
+    constructor(id: string, text?: string, width?: string, sp?: number | keyboards.ButtonClass, nextlayer?: string, pad?: string) {
       this.id = id;
       this.text = text;
       this.width = width ? width : "50";
@@ -210,7 +209,7 @@ namespace com.keyman.osk {
         ts.fontSize=spec['fontsize'];
       }
 
-      let keyboardManager = (<KeymanBase>window['keyman']).keyboardManager;
+      let activeKeyboard = com.keyman.singleton.core.activeKeyboard;
 
       // For some reason, fonts will sometimes 'bug out' for the embedded iOS page if we
       // instead assign fontFamily to the existing style 'ts'.  (Occurs in iOS 12.)
@@ -228,7 +227,7 @@ namespace com.keyman.osk {
         // Add the Unicode 'empty circle' as a base support for needy diacritics.
         keyText = '\u25cc' + keyText;
 
-        if(keyboardManager.isRTL()) {
+        if(activeKeyboard && activeKeyboard.isRTL) {
           // Add the RTL marker to ensure it displays properly.
           keyText = '\u200f' + keyText;
         }
@@ -328,7 +327,7 @@ namespace com.keyman.osk {
       btn.appendChild(skIcon);
     }
 
-    construct(osk: VisualKeyboard, layout: LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
+    construct(osk: VisualKeyboard, layout: keyboards.LayoutFormFactor, rowStyle: CSSStyleDeclaration, totalPercent: number): {element: HTMLDivElement, percent: number} {
       let util = com.keyman.singleton.util;
       let spec = this.spec;
       let isDesktop = this.formFactor == "desktop"
@@ -426,12 +425,13 @@ namespace com.keyman.osk {
 
     getId(osk: VisualKeyboard): string {
       let spec = this.spec;
+      let core = com.keyman.singleton.core;
       // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
       if(typeof(this.layer) == 'string' && this.layer != '') {
         return 'popup-'+this.layer+'-'+spec['id'];
       } else {
         // We only create subkeys when they're needed - the currently-active layer should be fine.
-        return 'popup-' + osk.layerId + '-'+spec['id'];
+        return 'popup-' + core.keyboardProcessor.layerId + '-'+spec['id'];
       }
     }
 
@@ -525,9 +525,9 @@ namespace com.keyman.osk {
      * so that its geometry may be updated on rotations and keyboard resize events, as
      * said geometry needs to be accurate for fat-finger probability calculations.
      */
-    layout: ActiveLayout;
-    layers: LayoutLayer[];
-    layerId: string = "default";
+    layout: keyboards.ActiveLayout;
+    layers: keyboards.LayoutLayer[];
+    private layerId: string = "default";
     layerIndex: number;
 
     device: Device;
@@ -573,16 +573,6 @@ namespace com.keyman.osk {
     keytip: {key: KeyElement, state: boolean, element?: HTMLDivElement};
     popupCallout: HTMLDivElement;
 
-    // Function fields (fleshed out by kmwnative.ts and/or kmwembedded.ts)
-    touchHold: (key: KeyElement) => void;
-    optionKey: (e: KeyElement, keyName: string, keyDown: boolean) => void;
-    highlightSubKeys: (key: KeyElement, x: number, y: number) => void;
-    showKeyTip: (key: KeyElement, on: boolean) => void;
-    drawPreview: (canvas: HTMLCanvasElement, w: number, h: number, edge: number) => void;
-    createKeyTip: () => void;
-    addCallout: (key: KeyElement) => HTMLDivElement;
-    waitForFonts: (kfd,ofd) => boolean;
-
     //#region OSK constructor and helpers
 
     /**
@@ -592,16 +582,10 @@ namespace com.keyman.osk {
      * @param       {Number}      kbdBitmask  Keyboard modifier bitmask
      * Description  Generates the base visual keyboard element, prepping for attachment to KMW
      */
-    constructor(PVK, Lhelp, layout0: LayoutFormFactor, kbdBitmask: number, device?: Device, isStatic?: boolean) {
-      // Add handler stubs if not otherwise defined.  (We can no longer in-line default-define with the declaration.)
-      this.highlightSubKeys = this.highlightSubKeys || function(k,x,y) {};
-      this.drawPreview = this.drawPreview || function(c,w,h,e) {};
-      this.addCallout = this.addCallout || function(key) {return null};
-      this.waitForFonts = this.waitForFonts || function(kfd,ofd){return true;}; // Default is used by embedded.
-      
-      // Do normal constructor stuff.
-
+    constructor(keyboard: keyboards.Keyboard, device?: Device, isStatic?: boolean) {
       let keyman = com.keyman.singleton;
+      // Ensure the OSK's current layer is kept up to date.
+      keyman.core.keyboardProcessor.layerStore.handler = this.layerChangeHandler;
 
       let util = keyman.util;
       this.device = device = device || util.device;
@@ -609,27 +593,20 @@ namespace com.keyman.osk {
         this.isStatic = isStatic;
       }
 
-      let layout=layout0;
-      var Lkbd=util._CreateElement('div'), oskWidth;//s=Lkbd.style,
-      var activeKeyboard = keyman.keyboardManager.activeKeyboard;
-
-      // Build a layout using the default for the device
-      if(typeof layout != 'object' || layout == null) {
-        var kbdDevVersion: utils.Version;
-
-        // This CAN be called with no backing keyboard; KMW will try to force-show
-        // the OSK even without a backing keyboard on mobile, using the default
-        // layout as the OSK's base.
-        if(activeKeyboard) {
-          kbdDevVersion = new utils.Version(activeKeyboard['KVER']);
-        } else {
-          kbdDevVersion = new utils.Version(keyman['version']);
-        }
-        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, kbdBitmask, device.formFactor);
-      }
-
       // Create the collection of HTML elements from the device-dependent layout object
-      this.layout = ActiveLayout.polyfill(layout, device.formFactor);
+      var Lkbd=util._CreateElement('div');
+      let layout: keyboards.ActiveLayout;
+      if(keyboard) {
+        layout = this.layout = keyboard.layout(device.formFactor as utils.FormFactor);
+      } else {
+        // This COULD be called with no backing keyboard; KMW will try to force-show the OSK even without 
+        // a backing keyboard on mobile, using the most generic default layout as the OSK's base.
+        //
+        // In KMW's current state, it'd take a major break, though - Processor always has an activeKeyboard,
+        // even if it's "hollow".
+        let rawLayout = keyboards.Layouts.buildDefaultLayout(null, null, device.formFactor);
+        layout = this.layout = keyboards.ActiveLayout.polyfill(rawLayout, null, device.formFactor as utils.FormFactor);
+      }
       this.layers=layout['layer'];
 
       // Override font if specified by keyboard
@@ -640,13 +617,9 @@ namespace com.keyman.osk {
       }
 
       // Set flag to add default (US English) key label if specified by keyboard
-      if(typeof layout['displayUnderlying'] != 'undefined') {
-        layout.keyLabels = layout['displayUnderlying'] == true; // force bool
-      } else {
-        layout.keyLabels = activeKeyboard && ((typeof(activeKeyboard['KDU']) != 'undefined') && activeKeyboard['KDU']);
-      }
+      layout.keyLabels = keyboard && keyboard.displaysUnderlyingKeys;
 
-      let divLayerContainer = this.deviceDependentLayout(layout, device.formFactor);
+      let divLayerContainer = this.deviceDependentLayout(keyboard, device.formFactor as utils.FormFactor);
 
       this.ddOSK = true;
 
@@ -672,7 +645,8 @@ namespace com.keyman.osk {
      * @return    {Object}    An object that contains default key properties
      */
     getDefaultKeyObject(): OSKKeySpec {
-      return new OSKKeySpec(undefined, '', ActiveKey.DEFAULT_KEY.width, ActiveKey.DEFAULT_KEY.sp as ButtonClass, null, ActiveKey.DEFAULT_KEY.pad);
+      return new OSKKeySpec(undefined, '', keyboards.ActiveKey.DEFAULT_KEY.width, keyboards.ActiveKey.DEFAULT_KEY.sp as keyboards.ButtonClass,
+          null, keyboards.ActiveKey.DEFAULT_KEY.pad);
     };
 
     /**
@@ -682,7 +656,13 @@ namespace com.keyman.osk {
      * @param       {string}              formFactor  layout form factor
      * @return      {Object}                          fully formatted OSK object
      */
-    deviceDependentLayout(layout: LayoutFormFactor, formFactor: string): HTMLDivElement {
+    deviceDependentLayout(keyboard: keyboards.Keyboard, formFactor: utils.FormFactor): HTMLDivElement {
+      if(!keyboard) {
+        // May occasionally be null in embedded contexts; have seen this when iOS engine sets
+        // keyboard height during change of keyboards.
+        keyboard = new keyboards.Keyboard(null);
+      }
+      let layout = keyboard.layout(formFactor);
       let util = com.keyman.singleton.util;
       let oskManager = com.keyman.singleton.osk;
       let rowsPercent = 100;
@@ -719,9 +699,9 @@ namespace com.keyman.osk {
 
       // Create a separate OSK div for each OSK layer, only one of which will ever be visible
       var n: number, i: number, j: number;
-      var layers: LayoutLayer[], gDiv: HTMLDivElement;
+      var layers: keyboards.LayoutLayer[], gDiv: HTMLDivElement;
       var rowHeight: number, rDiv: HTMLDivElement;
-      var keys: LayoutKey[], key: LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
+      var keys: keyboards.LayoutKey[], key: keyboards.LayoutKey, rs: CSSStyleDeclaration, gs: CSSStyleDeclaration;
 
       layers=layout['layer'];
 
@@ -775,8 +755,10 @@ namespace com.keyman.osk {
         //lDiv.addEventListener('touchcancel', osk.cancel,false); //event never generated by iOS
       }
 
+      let precalibrated = (keyboard.getLayoutState(formFactor) == keyboards.LayoutState.CALIBRATED);
+
       for(n=0; n<layers.length; n++) {
-        let layer=layers[n] as ActiveLayer;
+        let layer=layers[n] as keyboards.ActiveLayer;
         gDiv=util._CreateElement('div'), gs=gDiv.style;
         gDiv.className='kmw-key-layer';
 
@@ -812,49 +794,51 @@ namespace com.keyman.osk {
           // Apply defaults, setting the width and other undefined properties for each key
           keys=row['key'];
 
-          // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
-          // adjusting the width of the last key to make the total exactly 100%.
-          // Overwrite the previously-computed percent.
-          // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
-          // All key widths and paddings are rounded for uniformity
-          var keyPercent: number, padPercent: number, totalPercent=0;
-          for(j=0; j<keys.length-1; j++) {
-            keyPercent = keys[j]['widthpc'] * objectWidth;
-            keys[j]['widthpc']=keyPercent;
-            padPercent = keys[j]['padpc'] * objectWidth;
-            keys[j]['padpc']=padPercent;
+          if(!precalibrated) {
+            // Calculate actual key widths by multiplying by the OSK's width and rounding appropriately,
+            // adjusting the width of the last key to make the total exactly 100%.
+            // Overwrite the previously-computed percent.
+            // NB: the 'percent' suffix is historical, units are percent on desktop devices, but pixels on touch devices
+            // All key widths and paddings are rounded for uniformity
+            var keyPercent: number, padPercent: number, totalPercent=0;
+            for(j=0; j<keys.length-1; j++) {
+              keyPercent = keys[j]['widthpc'] * objectWidth;
+              keys[j]['widthpc']=keyPercent;
+              padPercent = keys[j]['padpc'] * objectWidth;
+              keys[j]['padpc']=padPercent;
 
-            // Recompute center's x-coord with exact, in-browser values.
-            (<ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
-            (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+              // Recompute center's x-coord with exact, in-browser values.
+              (<keyboards.ActiveKey> keys[j]).proportionalX = (totalPercent + padPercent + (keyPercent/2))/objectWidth;
+              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
 
-            totalPercent += padPercent+keyPercent;
-          }
+              totalPercent += padPercent+keyPercent;
+            }
 
-          // Allow for right OSK margin (15 layout units)
-          let rightMargin = ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
-          totalPercent += rightMargin;
+            // Allow for right OSK margin (15 layout units)
+            let rightMargin = keyboards.ActiveKey.DEFAULT_RIGHT_MARGIN*objectWidth/layer.totalWidth;
+            totalPercent += rightMargin;
 
-          // If a single key, and padding is negative, add padding to right align the key
-          if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
-            keyPercent = keys[0]['widthpc'] * objectWidth;
-            keys[0]['widthpc']=keyPercent;
-            totalPercent += keyPercent;
-            keys[0]['padpc']=(objectWidth-totalPercent);
+            // If a single key, and padding is negative, add padding to right align the key
+            if(keys.length == 1 && parseInt(keys[0]['pad'],10) < 0) {
+              keyPercent = keys[0]['widthpc'] * objectWidth;
+              keys[0]['widthpc']=keyPercent;
+              totalPercent += keyPercent;
+              keys[0]['padpc']=(objectWidth-totalPercent);
 
-            // Recompute center's x-coord with exact, in-browser values.
-            (<ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
-            (<ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
-          } else if(keys.length > 0) {
-            j=keys.length-1;
-            padPercent = keys[j]['padpc'] * objectWidth;
-            keys[j]['padpc']=padPercent;
-            totalPercent += padPercent;
-            keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
+              // Recompute center's x-coord with exact, in-browser values.
+              (<keyboards.ActiveKey> keys[0]).proportionalX = (totalPercent - rightMargin - keyPercent/2)/objectWidth;
+              (<keyboards.ActiveKey> keys[0]).proportionalWidth = keyPercent / objectWidth;
+            } else if(keys.length > 0) {
+              j=keys.length-1;
+              padPercent = keys[j]['padpc'] * objectWidth;
+              keys[j]['padpc']=padPercent;
+              totalPercent += padPercent;
+              keys[j]['widthpc']= keyPercent = (objectWidth-totalPercent);
 
-            // Recompute center's x-coord with exact, in-browser values.
-            (<ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
-            (<ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+              // Recompute center's x-coord with exact, in-browser values.
+              (<keyboards.ActiveKey> keys[j]).proportionalX = (objectWidth - rightMargin - keyPercent/2)/objectWidth;
+              (<keyboards.ActiveKey> keys[j]).proportionalWidth = keyPercent / objectWidth;
+            }
           }
 
           //Create the key square (an outer DIV) for each key element with padding, and an inner DIV for the button (btn)
@@ -874,9 +858,22 @@ namespace com.keyman.osk {
         // Add layer to group
         lDiv.appendChild(gDiv);
       }
+
+      // Now that we've properly processed the keyboard's layout, mark it as calib
+      keyboard.markLayoutCalibrated(formFactor);
       return lDiv;
     }
     //#endregion
+
+    layerChangeHandler: text.SystemStoreMutationHandler = function(this: VisualKeyboard,
+                                                                   source: text.MutableSystemStore,
+                                                                   newValue: string) {
+      if(source.value != newValue) {
+        this.layerId = newValue;
+        let keyman = com.keyman.singleton;
+        keyman.osk._Show();
+      }
+    }.bind(this);
 
     //#region OSK touch handlers
     getTouchCoordinatesOnKeyboard(touch: Touch) {
@@ -895,13 +892,13 @@ namespace com.keyman.osk {
 
     getTouchProbabilities(touch: Touch): text.KeyDistribution {
       let keyman = com.keyman.singleton;
-      if(!keyman.modelManager.mayCorrect) {
+      if(!keyman.core.languageProcessor.mayCorrect) {
         return null;
       }
 
       let touchKbdPos = this.getTouchCoordinatesOnKeyboard(touch);
       let layerGroup = this.kbdDiv.firstChild as HTMLDivElement;  // Always has proper dimensions, unlike kbdDiv itself.
-      return this.layout.layer[this.layerIndex].getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
+      return this.layout.getLayer(this.layerId).getTouchProbabilities(touchKbdPos, layerGroup.offsetWidth / layerGroup.offsetHeight);
     }
 
     /**
@@ -911,7 +908,6 @@ namespace com.keyman.osk {
      *
      */
     touch: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      let Processor = com.keyman.singleton.textProcessor;
       // Identify the key touched
       var t = <HTMLElement> e.changedTouches[0].target, key = this.keyTarget(t);
 
@@ -952,7 +948,7 @@ namespace com.keyman.osk {
       // Special function keys need immediate action
       if(keyName == 'K_LOPT' || keyName == 'K_ROPT')      {
         window.setTimeout(function(this: VisualKeyboard){
-          Processor.clickKey(key);
+          PreProcessor.clickKey(key);
         }.bind(this),0);
         this.keyPending = null;
         this.touchPending = null;
@@ -962,7 +958,7 @@ namespace com.keyman.osk {
         let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
         // While we could inline the execution of the delete key here, we lose the ability to
         // record the backspace key if we do so.
-        Processor.clickKey(key, e.changedTouches[0], this.layerId, touchProbabilities);
+        PreProcessor.clickKey(key, e.changedTouches[0], this.layerId, touchProbabilities);
         this.deleteKey = key;
         this.deleting = window.setTimeout(this.repeatDelete,500);
         this.keyPending = null;
@@ -971,7 +967,7 @@ namespace com.keyman.osk {
         if(this.keyPending) {
           this.highlightKey(this.keyPending, false);
           let touchProbabilities = this.getTouchProbabilities(this.touchPending);
-          Processor.clickKey(this.keyPending, this.touchPending, this.layerId, touchProbabilities);
+          PreProcessor.clickKey(this.keyPending, this.touchPending, this.layerId, touchProbabilities);
           this.clearPopup();
           // Decrement the number of unreleased touch points to prevent
           // sending the keystroke again when the key is actually released
@@ -992,15 +988,13 @@ namespace com.keyman.osk {
      *
      **/
     release: (e: TouchEvent) => void = function(this: VisualKeyboard, e: TouchEvent) {
-      let Processor = com.keyman.singleton.textProcessor;
-
       // Prevent incorrect multi-touch behaviour if native or device popup visible
       var sk = document.getElementById('kmw-popup-keys'), t = this.currentTarget;
 
       // Clear repeated backspace if active, preventing 'sticky' behavior.
       this.cancelDelete();
 
-      if((sk && sk.style.visibility == 'visible') || this.popupVisible) {
+      if((sk && sk.style.visibility == 'visible')) {
         // Ignore release if a multiple touch
         if(e.touches.length > 0) {
           return;
@@ -1013,6 +1007,15 @@ namespace com.keyman.osk {
           this.keyPending = null;
           this.touchPending = null;
         }
+      }
+
+      // Only set when embedded in our Android/iOS app.  Signals that the device is handling 
+      // subkeys, so we shouldn't allow output for the base key.
+      //
+      // Note that on iOS (at least), this.release() will trigger before kmwembedded.ts's
+      // executePopupKey() function.
+      if(this.popupVisible) {
+        return;
       }
 
       // Handle menu key release event
@@ -1038,7 +1041,7 @@ namespace com.keyman.osk {
         // Output character unless moved off key
         if(this.keyPending.className.indexOf('hidden') < 0 && tc > 0 && !beyondEdge) {
           let touchProbabilities = this.getTouchProbabilities(e.changedTouches[0]);
-          Processor.clickKey(this.keyPending, e.changedTouches[0], this.layerId, touchProbabilities);
+          PreProcessor.clickKey(this.keyPending, e.changedTouches[0], this.layerId, touchProbabilities);
         }
         this.clearPopup();
         this.keyPending = null;
@@ -1312,10 +1315,8 @@ namespace com.keyman.osk {
      *  Repeat backspace as long as the backspace key is held down
      **/
     repeatDelete: () => void = function(this: VisualKeyboard) {
-      let Processor = com.keyman.singleton.textProcessor;
-
       if(this.deleting) {
-        Processor.clickKey(this.deleteKey);
+        PreProcessor.clickKey(this.deleteKey);
         this.deleting = window.setTimeout(this.repeatDelete,100);
       }
     }.bind(this);
@@ -1376,7 +1377,7 @@ namespace com.keyman.osk {
      */
     _UpdateVKShiftStyle(layerId?: string) {
       var i, n, layer=null, layerElement=null;
-      let Processor = com.keyman.singleton.textProcessor;
+      let core = com.keyman.singleton.core;
 
       if(layerId) {
         for(n=0; n<this.layers.length; n++) {
@@ -1403,7 +1404,7 @@ namespace com.keyman.osk {
           continue;
         }
 
-        keys[i]['sp'] = Processor.stateKeys[states[i]] ? Layouts.buttonClasses['SHIFT-ON'] : Layouts.buttonClasses['SHIFT'];
+        keys[i]['sp'] = core.keyboardProcessor.stateKeys[states[i]] ? keyboards.Layouts.buttonClasses['SHIFT-ON'] : keyboards.Layouts.buttonClasses['SHIFT'];
         let keyId = layerId+'-'+states[i]
         var btn = document.getElementById(keyId);
 
@@ -1565,11 +1566,25 @@ namespace com.keyman.osk {
       }
       ss.left=x+'px';
 
-      // Add the callout
-      this.popupCallout = this.addCallout(e);
-
       // Make the popup keys visible
       ss.visibility='visible';
+
+      // For now, should only be true (in production) when keyman.isEmbedded == true.
+      let constrainPopup = keyman.isEmbedded;
+
+      let cs = getComputedStyle(subKeys);
+      let oskHeight = keyman.osk.getHeight();
+      let bottomY = parseInt(cs.bottom, 10);
+      let popupHeight = parseInt(cs.height, 10);
+
+      let delta = 0;
+      if(popupHeight + bottomY > oskHeight && constrainPopup) {
+        delta = popupHeight + bottomY - oskHeight;
+        ss.bottom = (bottomY - delta) + 'px';
+      }
+
+      // Add the callout
+      this.popupCallout = this.addCallout(e, delta);
 
       // And add a filter to fade main keyboard
       subKeys.shim = document.createElement('DIV');
@@ -1754,7 +1769,7 @@ namespace com.keyman.osk {
       // Process as click if mouse button released anywhere over key
       if(util.eventType(e) == 'mouseup') {
         if(key.id == this.currentKey) {
-          keyman.textProcessor.clickKey(key);
+          PreProcessor.clickKey(key);
         }
         this.currentKey='';
       }
@@ -1860,35 +1875,6 @@ namespace com.keyman.osk {
 
       // Define for both desktop and touchable OSK
       this.spaceBar=this.getSpecialKey(nLayer,'K_SPACE'); //TODO: should be saved with layer
-    }
-
-    /**
-     * Function     showLayer
-     * Scope        Private
-     * @param       {string}      id      ID of the layer to show
-     * @return      {boolean}             true if the layer is shown, or false if it cannot be found
-     * Description  Shows the layer identified by 'id' in the on screen keyboard
-     */
-    showLayer(id: string): boolean {
-      let keyman = com.keyman.singleton;
-
-      // Do not change layer unless needed (27/08/2015)
-      if(id == this.layerId && this.device.formFactor != 'desktop') {
-        // The layer's already shown, so report success.
-        return true;
-      }
-
-      if(keyman.keyboardManager.activeKeyboard) {
-        for(var i=0; i<this.layers.length; i++) {
-          if(this.layers[i].id == id) {
-            this.layerId=id;
-            keyman.osk._Show();
-            return true;
-          }
-        }
-      }
-
-      return false;
     }
 
     /**
@@ -2067,8 +2053,8 @@ namespace com.keyman.osk {
       let keymanweb = com.keyman.singleton;
       let util = keymanweb.util;
 
-      var activeKeyboard = keymanweb.keyboardManager.activeKeyboard;
-      var activeStub: com.keyman.KeyboardStub = keymanweb.keyboardManager.activeStub;
+      var activeKeyboard = keymanweb.core.activeKeyboard;
+      var activeStub: com.keyman.keyboards.KeyboardStub = keymanweb.keyboardManager.activeStub;
 
       // Do not do anything if a null stub
       if(activeStub == null) {
@@ -2094,8 +2080,8 @@ namespace com.keyman.osk {
       //       so must apply style before testing for font availability
       // Extended to allow keyboard-specific custom styles for Build 360
       var customStyle=this.addFontStyle(kfd,ofd);
-      if( activeKeyboard != null && typeof(activeKeyboard['KCSS']) == 'string')  // KMEW-129
-        customStyle=customStyle+activeKeyboard['KCSS'];
+      if( activeKeyboard != null && typeof(activeKeyboard.oskStyling) == 'string')  // KMEW-129
+        customStyle=customStyle+activeKeyboard.oskStyling;
 
       this.styleSheet = util.addStyleSheet(customStyle); //Build 360
 
@@ -2171,7 +2157,7 @@ namespace com.keyman.osk {
      */
     static buildDocumentationKeyboard(PInternalName,Pstatic,argFormFactor,argLayerId): HTMLElement { // I777
       let keymanweb = com.keyman.singleton;
-      var PKbd=keymanweb.keyboardManager.activeKeyboard,Ln,
+      var PKbd=keymanweb.core.activeKeyboard,Ln,
           formFactor=(typeof(argFormFactor) == 'undefined' ? 'desktop' : argFormFactor),
           layerId=(typeof(argLayerId) == 'undefined' ? 'default' : argLayerId),
           device = new Device();
@@ -2198,37 +2184,9 @@ namespace com.keyman.osk {
         return null;
       }
 
-      var layouts=PKbd['KVKL'], layout=null, PVK=PKbd['KV'];
+      let layout = PKbd.layout(formFactor);
 
-      // Get the layout defined in the keyboard, or its nearest equivalent
-      if(typeof layouts == 'object') {
-        if(typeof(layouts[formFactor]) == 'object' && layouts[formFactor] != null) {
-          layout=layouts[formFactor];
-        } else if(formFactor == 'phone' && typeof(layouts['tablet']) == 'object' && layouts['tablet'] != null) {
-          layout=layouts['tablet'];
-        } else if(formFactor == 'tablet' && typeof(layouts['phone']) == 'object' && layouts['phone'] != null) {
-          layout=layouts['phone'];
-        } else if(typeof(layouts['desktop']) == 'object' && layouts['desktop'] != null) {
-          layout=layouts['desktop'];
-        }
-      }
-
-      // Else get a default layout for the device for this keyboard
-      if(layout == null && PVK != null) {
-        let kbdDevVersion = new utils.Version(PKbd['KVER']);
-        layout=Layouts.buildDefaultLayout(PVK, kbdDevVersion, keymanweb.keyboardManager.getKeyboardModifierBitmask(PKbd),formFactor);
-      }
-
-      // Cannot create an OSK if no layout defined, just return empty DIV
-      if(layout != null) {
-        if(typeof layout['displayUnderlying'] != 'undefined') {
-          layout.keyLabels = layout['displayUnderlying'] == true; // force bool
-        } else {
-          layout.keyLabels = typeof(PKbd['KDU']) != 'undefined' && PKbd['KDU'];
-        }        
-      }
-
-      let kbdObj = new VisualKeyboard(PVK, null, layout, keymanweb.keyboardManager.getKeyboardModifierBitmask(), device, true);
+      let kbdObj = new VisualKeyboard(PKbd, device, true);
       let kbd = kbdObj.kbdDiv.childNodes[0] as HTMLDivElement; // Gets the layer group.
 
       // Select the layer to display, and adjust sizes
@@ -2239,7 +2197,7 @@ namespace com.keyman.osk {
         // Relocates the font size definition from the main VisualKeyboard wrapper, since we don't return the whole thing.
         kbd.style.fontSize = kbdObj.kbdDiv.style.fontSize;
       } else {
-        kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd['KN']+".</p>";
+        kbd.innerHTML="<p style='color:#c40; font-size:0.5em;margin:10px;'>No "+formFactor+" layout is defined for "+PKbd.name+".</p>";
       }
       // Add a faint border
       kbd.style.border='1px solid #ccc';
@@ -2252,5 +2210,399 @@ namespace com.keyman.osk {
         this.highlightKey(this.hkKey,false);
       }
     }
+
+    /**
+   * Touch hold key display management
+   * 
+   * @param   {Object}  key   base key object
+   */
+  touchHold(key: KeyElement) {
+    // Clear and restart the popup timer
+    if(this.subkeyDelayTimer) {
+      window.clearTimeout(this.subkeyDelayTimer);
+      this.subkeyDelayTimer = null;
+    }
+
+    if(typeof key['subKeys'] != 'undefined' && key['subKeys'] != null) {
+      this.subkeyDelayTimer = window.setTimeout(
+        function(this: VisualKeyboard) {
+          this.clearPopup();
+          this.showSubKeys(key);
+        }.bind(this), this.popupDelay);
+    }
+  };
+
+  optionKey(e: KeyElement, keyName: string, keyDown: boolean) {
+    let keyman = com.keyman.singleton;
+    let oskManager = keyman.osk;
+    if(keyDown) {
+      if(keyName.indexOf('K_LOPT') >= 0) {
+        oskManager.showLanguageMenu();
+      } else if(keyName.indexOf('K_ROPT') >= 0) {
+        keyman.uiManager.setActivatingUI(false);
+        oskManager._Hide(true); 
+        let active = keyman.domManager.getActiveElement();
+        if(dom.Utils.instanceof(active, "TouchAliasElement")) {
+          (active as dom.TouchAliasElement).hideCaret();
+        }
+        keyman.domManager.clearLastActiveElement();
+      }
+    }
+  };
+
+  // Manage popup key highlighting
+  highlightSubKeys(k: KeyElement, x: number, y: number) {
+    let util = com.keyman.singleton.util;
+
+    // Test for subkey array, return if none
+    // (JH 2/4/19) So, if a subkey is passed in, we return immediately?
+    if(k == null || k['subKeys'] == null) {
+      return;
+    }
+
+    // Highlight key at touch position (and clear other highlighting)
+    var i,sk,x0,y0,x1,y1,onKey,skBox=document.getElementById('kmw-popup-keys');
+
+    //#region This section fills a different role than the method name would suggest.
+    // Might correspond better to a 'checkInstantSubkeys' or something.
+
+    // Show popup keys immediately if touch moved up towards key array (KMEW-100, Build 353)
+    if((this.touchY-y > 5) && skBox == null) {
+      if(this.subkeyDelayTimer) {
+        window.clearTimeout(this.subkeyDelayTimer);
+      }
+      this.showSubKeys(k);
+      skBox=document.getElementById('kmw-popup-keys');
+    } 
+    //#endregion
+    
+    /* (JH 2/4/19) Because of that earlier note, in KMW 12 alpha (and probably 11),
+     * the following code is effectively impotent and could be deleted with no effect.
+     * Note that this probably results from VisualKeyboard.keyTarget finding the 
+     * subkey first... which is necessary anyway to support subkey output.
+     */
+    for(i=0; i < k['subKeys'].length; i++) {
+      try {
+        sk=<HTMLElement> skBox.childNodes[i].firstChild;
+        x0=dom.Utils.getAbsoluteX(sk); y0=dom.Utils.getAbsoluteY(sk);//-document.body.scrollTop;
+        x1=x0+sk.offsetWidth; y1=y0+sk.offsetHeight;
+        onKey=(x > x0 && x < x1 && y > y0 && y < y1);
+        this.highlightKey(sk, onKey);
+        if(onKey) {
+          this.highlightKey(k, false);
+        }
+      } catch(ex){}           
+    }    
+  };
+
+  /**
+   * Add (or remove) the keytip preview (if KeymanWeb on a phone device)
+   * 
+   * @param   {Object}  key   HTML key element
+   * @param   {boolean} on    show or hide
+   */              
+  showKeyTip(key: KeyElement, on: boolean) {
+    let keyman = com.keyman.singleton;
+    let util = keyman.util;
+    let oskManager = keyman.osk;
+
+    var tip=this.keytip;
+
+    // Do not change the key preview unless key or state has changed
+    if(tip == null || (key == tip.key && on == tip.state)) {
+      return;
+    }
+
+    var sk=document.getElementById('kmw-popup-keys'),
+        popup = (sk && sk.style.visibility == 'visible')
+
+    // Create and display the preview
+    if(on && !popup) {                                                       
+      var y0 = dom.Utils.getAbsoluteY(oskManager._Box),
+          h0 = oskManager._Box.offsetHeight,  
+          xLeft = dom.Utils.getAbsoluteX(key),
+          xTop = dom.Utils.getAbsoluteY(key),
+          xWidth = key.offsetWidth,
+          xHeight = key.offsetHeight,
+          kc = <HTMLElement> key.firstChild,
+          kcs = kc.style, 
+          kts = tip.element.style, 
+          ktLabel = <HTMLElement> tip.element.childNodes[1],
+          ktls = ktLabel.style,
+          edge = 0,
+          canvas = <HTMLCanvasElement> tip.element.firstChild, 
+          previewFontScale = 1.8;
+          
+      // Find key text element
+      for(var i=0; i<key.childNodes.length; i++) {
+        kc = <HTMLElement> key.childNodes[i];
+        if(util.hasClass(kc,'kmw-key-text')) {
+          break;
+        }
+      }
+      
+      // Canvas dimensions must be set explicitly to prevent clipping
+      canvas.width = 1.6 * xWidth;
+      canvas.height = 2.3 * xHeight;
+
+      kts.top = 'auto';
+      kts.bottom = (y0 + h0 - xTop - xHeight)+'px';
+      kts.textAlign = 'center';   kts.overflow = 'visible';
+      kts.fontFamily = util.getStyleValue(kc,'font-family');
+      kts.width = canvas.width+'px';
+      kts.height = canvas.height+'px';
+
+      var px=util.getStyleInt(kc, 'font-size');
+      if(px != 0) {
+        let popupFS = previewFontScale * px;
+        kts.fontSize = popupFS + 'px';
+
+        let textWidth = com.keyman.osk.OSKKey.getTextWidth(this, ktLabel.textContent, kts);
+        // We use a factor of 0.9 to serve as a buffer in case of mild measurement error.
+        let proportion = canvas.width * 0.9 / (textWidth);
+
+        // Prevent the preview from overrunning its display area.
+        if(proportion < 1) {
+          kts.fontSize = (popupFS * proportion) + 'px';
+        }
+      }
+      
+      ktLabel.textContent = kc.textContent;
+      ktls.display = 'block';
+      ktls.position = 'absolute';
+      ktls.textAlign = 'center';
+      ktls.width='100%';
+      ktls.top = '2%';
+      ktls.bottom = 'auto';
+      
+      // Adjust canvas shape if at edges
+      var xOverflow = (canvas.width - xWidth) / 2;
+      if(xLeft < xOverflow) {
+        edge = -1;
+        xLeft += xOverflow;
+      } else if(xLeft > window.innerWidth - xWidth - xOverflow) {
+        edge = 1;
+        xLeft -= xOverflow;
+      }
+
+      // For now, should only be true (in production) when keyman.isEmbedded == true.
+      let constrainPopup = keyman.isEmbedded;
+
+      let cs = getComputedStyle(tip.element);
+      let oskHeight = keyman.osk.getHeight();
+      let bottomY = parseInt(cs.bottom, 10);
+      let tipHeight = parseInt(cs.height, 10);
+
+      let delta = 0;
+      if(tipHeight + bottomY > oskHeight && constrainPopup) {
+        delta = tipHeight + bottomY - oskHeight;
+        canvas.height = canvas.height - delta;
+        kts.height = canvas.height + 'px';
+      }
+
+      this.drawPreview(canvas, xWidth, xHeight, edge, delta);
+                
+      kts.left=(xLeft - xOverflow) + 'px';
+      kts.display = 'block';
+    } else { // Hide the key preview
+      tip.element.style.display = 'none';
+    }
+    
+    // Save the key preview state
+    tip.key = key;
+    tip.state = on;
+  };
+
+  /**
+   * Draw key preview in element using CANVAS
+   *  @param  {Object}  canvas CANVAS element 
+   *  @param  {number}  w width of touched key, px
+   *  @param  {number}  h height of touched key, px      
+   *  @param  {number}  edge  -1 left edge, 1 right edge, else 0     
+   */
+  drawPreview(canvas: HTMLCanvasElement, w: number, h: number, edge: number, delta?: number) {
+    let util = com.keyman.singleton.util;
+    let device = util.device;
+
+    delta = delta || 0;
+
+    var ctx = canvas.getContext('2d'), dx = (canvas.width - w)/2, hMax = canvas.height + delta,
+        w0 = 0, w1 = dx, w2 = w + dx, w3 = w + 2 * dx, 
+        h1 = 0.5 * hMax, h2 = 0.6 * hMax, h3 = hMax, r = 8; 
+
+    let hBoundedMax = canvas.height;
+
+    h2 = h2 > hBoundedMax ? hBoundedMax : h2;
+    h3 = hMax > hBoundedMax ? hBoundedMax : h3;
+    
+    if(device.OS == 'Android') {
+      r = 3;
+    }
+    
+    // Adjust the preview shape at the edge of the keyboard
+    switch(edge) {
+      case -1:
+        w1 -= dx;
+        w2 -= dx;
+        break;
+      case 1:
+        w1 += dx;
+        w2 += dx;
+        break;
+    }
+    
+    // Clear the canvas
+    ctx.clearRect(0,0,canvas.width,canvas.height);     
+
+    // Define appearance of preview (cannot be done directly in CSS)
+    if(device.OS == 'Android') {
+      var wx=(w1+w2)/2; 
+      w1 = w2 = wx;
+    }
+    ctx.fillStyle = device.styles.popupCanvasBackgroundColor;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#cccccc';
+
+    // Draw outline
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(w0+r,0);
+    ctx.arcTo(w3,0,w3,r,r);
+    if(device.OS == 'Android') {    
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w1,h2,r);
+    } else {
+      let lowerR = 0;
+      if(h3 > h2) {
+        lowerR = h3-h2 > r ? r : h3-h2;
+      }
+      ctx.arcTo(w3,h1,w2,h2,r);
+      ctx.arcTo(w2,h2,w2-lowerR,h3,lowerR);
+      ctx.arcTo(w2,h3,w1,h3,lowerR);
+      ctx.arcTo(w1,h3,w1,h2-lowerR,lowerR);
+    }
+    ctx.arcTo(w1,h2,w0,h1-r,r);
+    ctx.arcTo(w0,h1,w0,r,r);
+    ctx.arcTo(w0,0,w0+r,0,r);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();  
+  };
+
+    /** 
+     *  Create a key preview element for phone devices
+     */    
+    createKeyTip() {
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      if(keyman.util.device.formFactor == 'phone') {
+        if(this.keytip == null) {
+          this.keytip = {
+            key: null,
+            state: false
+          }
+          let tipElement = this.keytip.element=util._CreateElement('div');
+          tipElement.className='kmw-keytip';
+          tipElement.id = 'kmw-keytip';
+          
+          // The following style is critical, so do not rely on external CSS
+          tipElement.style.pointerEvents='none';
+          
+          // Add CANVAS element for outline and SPAN for key label
+          tipElement.appendChild(util._CreateElement('canvas'));
+          tipElement.appendChild(util._CreateElement('span')); 
+        }
+        
+        // Always append to _Box (since cleared during OSK Load) 
+        keyman.osk._Box.appendChild(this.keytip.element);
+      }
+    };
+
+    /**
+     * Add a callout for popup keys (if KeymanWeb on a phone device)
+     * 
+     * @param   {Object}  key   HTML key element
+     * @return  {Object}        callout object   
+     */              
+    addCallout(key: KeyElement, delta?: number): HTMLDivElement {   
+      let keyman = com.keyman.singleton;
+      let util = keyman.util;
+
+      if(util.device.formFactor != 'phone' || util.device.OS != 'iOS') {
+        return null;
+      }
+
+      delta = delta || 0;
+
+      let calloutHeight = key.offsetHeight - delta;
+
+      if(calloutHeight > 0) {  
+        var cc = util._CreateElement('div'), ccs = cc.style;
+        cc.id = 'kmw-popup-callout';
+        keyman.osk._Box.appendChild(cc);
+        
+        // Create the callout
+        var xLeft = key.offsetLeft,
+            xTop = key.offsetTop + delta,
+            xWidth = key.offsetWidth,
+            xHeight = calloutHeight;
+
+        // Set position and style 
+        ccs.top = (xTop-6)+'px'; ccs.left = xLeft+'px'; 
+        ccs.width = xWidth+'px'; ccs.height = (xHeight+6)+'px';
+        
+        // Return callout element, to allow removal later
+        return cc;
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Wait until font is loaded before applying stylesheet - test each 100 ms
+     * @param   {Object}  kfd   main font descriptor
+     * @param   {Object}  ofd   secondary font descriptor (OSK only)
+     * @return  {boolean}
+     */       
+    waitForFonts(kfd, ofd) {
+      let keymanweb = com.keyman.singleton;
+      let util = keymanweb.util;
+
+      if(typeof(kfd) == 'undefined' && typeof(ofd) == 'undefined') {
+        return true;
+      }
+      
+      if(typeof(kfd['files']) == 'undefined' && typeof(ofd['files']) == 'undefined') {
+        return true;
+      }
+
+      var kReady=util.checkFontDescriptor(kfd), oReady=util.checkFontDescriptor(ofd); 
+      if(kReady && oReady) {
+        return true;
+      }
+
+      keymanweb.fontCheckTimer=window.setInterval(function() {        
+        if(util.checkFontDescriptor(kfd) && util.checkFontDescriptor(ofd)) {
+          window.clearInterval(keymanweb.fontCheckTimer);
+          keymanweb.fontCheckTimer=null;
+          keymanweb.alignInputs();    
+        }    
+      }, 100);
+      
+      // Align anyway as best as can if font appears to remain uninstalled after 5 seconds   
+      window.setTimeout(function() {
+        if(keymanweb.fontCheckTimer)
+        {
+          window.clearInterval(keymanweb.fontCheckTimer);
+          keymanweb.fontCheckTimer=null;
+          keymanweb.alignInputs();
+          // Don't notify - this is a management issue, not anything the user needs to deal with
+          // TODO: Consider having an icon in the OSK with a bubble that indicates missing font
+          //util.alert('Unable to download the font normally used with '+ks['KN']+'.');
+        }
+      }, 5000);
+      return false;
+    };
   }
 }

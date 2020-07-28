@@ -22,6 +22,7 @@
                     25 Oct 2016 - mcdurdin - I5136 - Remove additional product references from Keyman Engine
 */
 #include "keymanx64.h"   // I5136
+#include "keymansentry.h"
 
 // Forward declarations of functions included in this code module
 ATOM             MyRegisterClass(HINSTANCE hInstance);
@@ -84,6 +85,8 @@ const PWSTR
 
 //const char *szGPA_ChangeWindowMessageFilter = "ChangeWindowMessageFilter"; // Do not localize
 
+#define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64 KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ".keymanx64"
+
 //
 //   FUNCTION: _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int
 //
@@ -99,18 +102,35 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
+
+  keyman_sentry_init(false, KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+  keyman_sentry_setexceptionfilter();
+
+  keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_INFO, "Started " KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANX64);
+
+  if (!wcscmp(lpCmdLine, L"-sentry-client-test-exception")) {
+    keyman_sentry_test_crash();
+  }
 
 	MSG msg;
 
-  if(!UniqueInstance())
-    return Fail(0, szError_CannotRunMultipleInstances);
+  if (!UniqueInstance()) {
+    Fail(0, szError_CannotRunMultipleInstances);
+    keyman_sentry_shutdown();
+    return 1;
+  }
 
-	if(!MyRegisterClass(hInstance))
-    return Fail(0, szError_FailedToRegister);
+  if (!MyRegisterClass(hInstance)) {
+    Fail(0, szError_FailedToRegister);
+    keyman_sentry_shutdown();
+    return 1;
+  }
 
-	if (!InitInstance (hInstance, nCmdShow))
-		return Fail(0, szError_FailedToInitInstance);
+  if (!InitInstance(hInstance, nCmdShow)) {
+    Fail(0, szError_FailedToInitInstance);
+    keyman_sentry_shutdown();
+    return 1;
+  }
 
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -118,6 +138,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
+  keyman_sentry_shutdown();
 
 	return (int) msg.wParam;
 }
@@ -189,6 +211,19 @@ BOOL Fail(HWND hwnd, PWSTR msg)
   }
   else
     wsprintfW(outbuf, szFail_ErrorFormat_OtherUnknown, msg);
+
+  size_t sz = WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, NULL, 0, NULL, NULL);
+  if (sz == 0) return FALSE;
+
+  char *buffer = (char *) calloc(sz, sizeof(char));
+  if (buffer == NULL) return FALSE;
+
+  if (WideCharToMultiByte(CP_UTF8, 0, outbuf, -1, buffer, (int) sz, NULL, NULL) != 0) {
+    buffer[sz - 1] = 0;
+    keyman_sentry_report_message(KEYMAN_SENTRY_LEVEL_ERROR, buffer, true);
+  }
+
+  free(buffer);
 
   MessageBox(hwnd, outbuf, szTitle, MB_OK | MB_ICONERROR);
 

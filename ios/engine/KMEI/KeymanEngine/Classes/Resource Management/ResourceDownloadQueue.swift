@@ -9,87 +9,199 @@
 import Foundation
 import Reachability
 
-protocol DownloadNode {
-  var resources: [LanguageResource]? { get }
+enum DownloadNode {
+  case simpleBatch(AnyDownloadBatch)
+  case compositeBatch(CompositeBatch)
+
+  var packageKeys: [KeymanPackage.Key] {
+    switch(self) {
+      case .simpleBatch(let batch):
+        return batch.packageKeys
+      case .compositeBatch(let node):
+        return node.packageKeys
+    }
+  }
+
+  var errors: [Error?] {
+    get {
+      switch(self) {
+        case .simpleBatch(let batch):
+          return batch.errors
+        case .compositeBatch(let node):
+          return node.batchQueue.map{ $0.1 }
+      }
+    }
+  }
 }
 
-class DownloadTask: DownloadNode {
-  public enum Resource {
-    case keyboard, lexicalModel, other
-  }
-  
-  public final var type: Resource
-  public final var resources: [LanguageResource]?
+protocol AnyDownloadTask {
+  var request: HTTPDownloadRequest { get }
+  var file: URL { get }
+  var downloadFinalizationBlock: ((Bool) throws -> Void)? { get }
+}
+
+class DownloadTask: AnyDownloadTask {
   public final var request: HTTPDownloadRequest
-  
-  public init(do request: HTTPDownloadRequest, for resources: [LanguageResource]?, type: DownloadTask.Resource) {
-    self.request = request
-    self.type = type
-    self.resources = resources
+  public var file: URL {
+    if let file = finalFile {
+      return file
+    } else {
+      return URL(fileURLWithPath: request.destinationFile!)
+    }
   }
+
+  public var finalFile: URL?
+
+  public final var downloadFinalizationBlock: ((Bool) throws -> Void)? = nil
+  
+  public init(do request: HTTPDownloadRequest, forPackage packageKey: KeymanPackage.Key?) {
+    self.request = request
+  }
+
+  public init(forPackageWithKey packageKey: KeymanPackage.Key,
+               from url: URL,
+               as destURL: URL, tempURL: URL) {
+
+    let request = HTTPDownloadRequest(url: url, userInfo: [:])
+    request.destinationFile = tempURL.path
+    request.tag = 0
+
+    self.finalFile = destURL
+    self.request = request
+
+    self.downloadFinalizationBlock = DownloadTask.resourceDownloadFinalizationClosure(tempURL: tempURL, finalURL: destURL)
+  }
+
+
+  /**
+   * Supports downloading to a 'temp' file that is renamed once the download completes.
+   */
+  internal static func resourceDownloadFinalizationClosure(tempURL: URL,
+                                                       finalURL: URL) -> ((Bool) throws -> Void) {
+    return { success in
+      // How to check for download failure
+      if !success {
+        if FileManager.default.fileExists(atPath: tempURL.path) {
+          try? FileManager.default.removeItem(at: tempURL)
+        }
+      } else {
+        try ResourceFileManager.shared.copyWithOverwrite(from: tempURL, to: finalURL)
+        try? FileManager.default.removeItem(at: tempURL)
+      }
+    }
+  }
+}
+
+enum DownloadActivityType {
+  case download, update
+}
+
+protocol AnyDownloadBatch {
+  var tasks: [AnyDownloadTask] { get }
+  var packageKey: KeymanPackage.Key { get }
+
+  // Needed for DownloadNode compliance.
+  var packageKeys: [KeymanPackage.Key] { get }
+
+  var startBlock: (() -> Void)? { get }
+  var errors: [Error?] { get set }
+
+  func completeWithCancellation() throws -> Void
+  func completeWithError(error: Error) throws -> Void
+  func completeWithPackage(fromKMP file: URL) throws -> Void
 }
 
 /**
  * Represents one overall resource-related command for requests against the Keyman Cloud API.
  */
-class DownloadBatch: DownloadNode {
-  public enum Activity {
-    case download, update, composite
-  }
-  
-  /*
-   * Three main cases so far:
-   * - [.download,  .keyboard]:      download new Keyboard (possibly with an associated lexical model)
-   * - [.download,  .lexicalModel]:  download new LexicalModel.
-   * - [.composite, .other]:   batch update of all resources, containing the following within its compositeQueue
-   *   - [.update, .keyboard]:      updates one Keyboard
-   *   - [.update, .lexicalModel]:  updates one LexicalModel
-   *   - Depending on needs, this may be extended to allow 'nested' .composite instances.
-   */
-  public final var activity: Activity
-  public final var type: DownloadTask.Resource
-  
-  public final var tasks: [DownloadNode]
+class DownloadBatch<Package: KeymanPackage>: AnyDownloadBatch {
+  typealias CompletionHandler = ResourceDownloadManager.CompletionHandler
+
+  public final var downloadTasks: [DownloadTask]
+  public let packageKey: KeymanPackage.Key
   var errors: [Error?] // Only used by the ResourceDownloadQueue.
-  //public final var promise: Int
+  public final var startBlock: (() -> Void)? = nil
+  public final var completionBlock: CompletionHandler<Package>? = nil
   
-  public init?(do tasks: [DownloadTask], as activity: Activity, ofType type: DownloadTask.Resource) {
-    self.activity = activity
-    self.type = type
-    self.tasks = tasks
+  public init(forPackageWithKey packageKey: KeymanPackage.Key,
+              from url: URL,
+              startBlock: (() -> Void)?,
+              completionBlock: CompletionHandler<Package>?) {
+    // If we can't build a proper DownloadTask, we can't build the batch.
+    self.packageKey = packageKey
+    let tempArtifact = ResourceFileManager.shared.packageDownloadTempPath(forKey: packageKey)
+    let finalFile = ResourceFileManager.shared.cachedPackagePath(forKey: packageKey)
 
-    self.errors = Array(repeating: nil, count: tasks.count)
-    
-    // Indicates 'composite' mode, which should use the other initializer.
-    if activity == .composite {
-      return nil
-    }
+    let task = DownloadTask(forPackageWithKey: packageKey, from: url, as: finalFile, tempURL: tempArtifact)
 
-    // A batch containing tasks should always be targeting a 'primary' language resource.
-    // .other exists to handle fonts packaged with keyboards, not our primary resources.
-    if type == .other {
-      return nil
-    }
+
+    self.downloadTasks = [task]
+    self.errors = Array(repeating: nil, count: 1) // We only build the one task.
+
+    self.startBlock = startBlock
+    self.completionBlock = completionBlock
+
+    task.request.userInfo[Key.downloadTask] = task
+    task.request.userInfo[Key.downloadBatch] = self
+  }
+
+  public var tasks: [AnyDownloadTask] {
+    return downloadTasks
   }
   
-  public init(queue: [DownloadBatch]) {
-    self.activity = .composite
-    self.type = .other
-    self.tasks = queue
-    
-    self.errors = Array(repeating: nil, count: tasks.count)
-  }
-  
-  public var resources: [LanguageResource]? {
+  public var packageKeys: [KeymanPackage.Key] {
     get {
-      var resArray: [LanguageResource] = []
-      
-      tasks.forEach{ task in
-        resArray.append(contentsOf: task.resources ?? [])
-      }
-      
-      return resArray
+      return [ packageKey ]
     }
+  }
+
+  public func completeWithCancellation() throws {
+    let complete = completionBlock
+    completionBlock = nil
+    try complete?(nil, nil)
+  }
+
+  public func completeWithError(error: Error) throws {
+    let complete = completionBlock
+    completionBlock = nil
+    try complete?(nil, error)
+  }
+
+  public func completeWithPackage(fromKMP file: URL) throws {
+    let complete = completionBlock
+    completionBlock = nil
+
+    do {
+      if let package = try ResourceFileManager.shared.prepareKMPInstall(from: file) as? Package {
+        try complete?(package, nil)
+      } else {
+        try complete?(nil, KMPError.invalidPackage)
+      }
+    } catch {
+      try complete?(nil, error)
+    }
+  }
+}
+
+class CompositeBatch {
+  public final var batchQueue: [(DownloadNode, Error?)]
+  public final var startBlock: (() -> Void)? = nil
+  public final var completionBlock: ResourceDownloadManager.InternalBatchCompletionHandler? = nil
+
+  public init(queue: [DownloadNode],
+              startBlock: (() -> Void)? = nil,
+              completionBlock: ResourceDownloadManager.InternalBatchCompletionHandler? = nil) {
+    self.batchQueue = queue.map { ($0, nil) }
+    self.startBlock = startBlock
+    self.completionBlock = completionBlock
+  }
+
+  public var tasks: [DownloadNode] {
+    return batchQueue.map { $0.0 }
+  }
+
+  public var packageKeys: [KeymanPackage.Key] {
+    return batchQueue.flatMap { $0.0.packageKeys }
   }
 }
 
@@ -99,77 +211,108 @@ class DownloadBatch: DownloadNode {
 private class DownloadQueueFrame {
   public var nodes: [DownloadNode] = []
   public var index: Int = 0
-  public final var batch: DownloadBatch?
-  private(set) var isComposite = false
+  public final var batch: DownloadNode?
   
   public init() {
     batch = nil
   }
   
-  public init? (from batch: DownloadBatch) {
-    if batch.activity != .composite {
-      return nil
-    }
-    
-    self.isComposite = true
-    self.batch = batch
+  public init? (from batch: CompositeBatch) {
+    self.batch = .compositeBatch(batch)
     nodes.append(contentsOf: batch.tasks)
+  }
+
+  public var isComposite: Bool {
+    if case .compositeBatch(_) = batch {
+      return true
+    } else {
+      return false
+    }
   }
 }
 
-// The other half of ResourceDownloadManager, this class is responsible for executing the downloads
-// and handling the results.
+/**
+ * The other half of ResourceDownloadManager, this class is responsible for executing the downloads
+ * and handling the results.  Internally manages its own single-threaded `DispatchQueue`, which
+ * handles all necessary synchronization.
+ *
+ * At present, submissions to this class will be evaluated sequentially by its `DispatchQueue`, though
+ * this may change at a later time.  (The 'sequential' aspect is due to legacy design decisions from
+ * before concurrency was a consideration.)
+ */
 class ResourceDownloadQueue: HTTPDownloadDelegate {
+  enum QueueState: String {
+    case clear
+    case noConnection
+
+    var error: Error? {
+      switch(self) {
+        case .clear:
+          return nil
+        case .noConnection:
+          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+      }
+    }
+  }
+
+  // ---- CRITICAL SECTION FIELDS ----
+  // Any writes to these must be performed on `queueThread`.
+  // Async reads are permitted.
   private var queueRoot: DownloadQueueFrame
   private var queueStack: [DownloadQueueFrame]
-  
+  // ------------- END ---------------
+
+  private var queueThread: DispatchQueue
   private var downloader: HTTPDownloader?
   private var reachability: Reachability?
-  private let keymanHostName = "api.keyman.com"
+
+  private let session: URLSession
+
+  // Designed for use with testing.
+  internal var autoExecute: Bool = true
   
-  public init() {
+  public convenience init() {
+    self.init(session: URLSession.shared, autoExecute: true)
+  }
+
+  internal init(session: URLSession, autoExecute: Bool) {
     do {
-      try reachability = Reachability(hostname: keymanHostName)
+      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
       log.error("Could not start Reachability object: \(error)")
     }
-    
+
+    self.session = session
+    self.autoExecute = autoExecute
+
     queueRoot = DownloadQueueFrame()
     queueStack = [queueRoot] // queueRoot will always be the bottom frame of the stack.
+
+    // Creates a single-threaded DispatchQueue, facilitating concurrency at this class's
+    // critical sections.
+    queueThread = DispatchQueue(label: "com.keyman.ResourceDownloadQueue")
   }
   
   public func hasConnection() -> Bool {
     return reachability?.connection != Reachability.Connection.unavailable
   }
-  
-  // Might should add a "withNotification: Bool" option for clarity.
-  public func canExecute(_ batch: DownloadBatch) -> Bool {
+
+  public var state: QueueState {
     guard hasConnection() else {
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
-      downloadFailed(forBatch: batch, error: error)
-      return false
+      return .noConnection
     }
     
-    // At this stage, we now have everything needed to generate download requests.
-    guard currentBatch == nil else { // Original behavior - only one download operation is permitted at a time.
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Download queue is busy"])
-      downloadFailed(forBatch: batch, error: error)
-      return false
-    }
-    
-    return true
+    return .clear
   }
   
-  public var currentBatch: DownloadBatch? {
+  public var currentBatch: DownloadNode? {
     get {
       let frame = currentFrame
       
       if(frame.nodes.count == 0) {
         return nil // Nothing's downloading.
       } else {
-        return (frame.nodes[frame.index] as! DownloadBatch) // Return the currently processing DownloadBatch.
+        return (frame.nodes[frame.index]) // Return the currently processing DownloadNode.
       }
     }
   }
@@ -180,7 +323,13 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  private func finalizeCurrentBatch() {
+  // ---------- CRITICAL SECTION:  START -----------
+  // IMPORTANT: These functions should only ever be referenced from `queueThread`.
+  //            as they maintain synchronization for the queue's critical
+  //            tracking fields.
+  //
+  // As a result, these functions are intentionally and explicitly `private`.
+  private func finalizeCurrentBatch(withError error: Error? = nil) {
     let frame = queueStack[queueStack.count - 1]
     
     if queueStack.count == 1 {
@@ -191,11 +340,14 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       // when everything's done instead.  Might be worth a thought.
       frame.nodes.remove(at: 0)
     } else {
+      if case let .compositeBatch(batch) = frame.batch {
+        batch.batchQueue[frame.index].1 = error
+      }
       // Batches in subframes should be kept so that we can report progress; increment the index instead.
       frame.index += 1
     }
   }
-  
+
   private func executeNext() {
     let frame = queueStack[queueStack.count - 1]
     
@@ -206,69 +358,93 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         return
       } // else
       
-      let batch = frame.nodes[0] as! DownloadBatch
-      innerExecute(batch)
+      let node = frame.nodes[0]
+      innerExecute(node)
     } else { // We're in a queue stack frame; check our state!
       if frame.index == frame.nodes.count {
         // We've hit the end of this stack frame's commands; time to pop and continue from the previous frame's perspective.
         _ = queueStack.popLast()
-        
-        // In the current state of the app, this is only the case for batch updates.
-        if frame.isComposite {
-          let parentFrame = queueStack[queueStack.count - 1]
-          updateBatchFinished(parentFrame.nodes[parentFrame.index] as! DownloadBatch)
-        }
-        
+
         // Of course, this means we've "finished" a batch download.  We can use the same handlers as before.
-        finalizeCurrentBatch()
-        executeNext()
+        // if-check below:  "if the current stack-frame came from a composite batch, let node = that 'composite batch'"
+        if case .compositeBatch(let node) = frame.batch {
+          // The base handler requires access to the batch's tracked success/failure data.
+          let error = node.batchQueue.first(where: { $0.1 != nil })?.1
+          finalizeCurrentBatch(withError: error)
+          node.completionBlock?(node)
+        } else {
+          fatalError("Unexpected download queue state; cannot recover")
+        }
+
+        if autoExecute {
+          executeNext()
+        }
         return
       } else {
         // We've got more batches left within this stack frame.  Continue.
-        let batch = frame.nodes[frame.index] as! DownloadBatch
-        innerExecute(batch)
+        let node = frame.nodes[frame.index]
+        innerExecute(node)
       }
     }
   }
 
-  private func innerExecute(_ batch: DownloadBatch) {
-    if batch.activity == .composite {
-      if batch.type == .other {
+  private func innerExecute(_ node: DownloadNode) {
+    switch(node) {
+      case .simpleBatch(let batch):
+        // Make a separate one for each batch; this simplifies event handling when multiple batches are in queue,
+        // as the old downloader will have a final event left to trigger at this point.  (downloadQueueFinished)
+        downloader = HTTPDownloader(self, session: self.session)
+        let tasks = batch.tasks
+
+        downloader!.userInfo = [Key.downloadBatch: batch]
+
+        tasks.forEach { task in
+          downloader!.addRequest(task.request)
+        }
+
+        // Signal that we've started processing this batch.
+        batch.startBlock?()
+        downloader!.run()
+      case .compositeBatch(let batch):
         // It's the top level of an update operation.  Time to make a correpsonding notification.
-        updateBatchStarted(batch)
-      }
-      // We're a batch composed of multiple sub-batches.  Time to set that up on the queue!
-      let frame = DownloadQueueFrame(from: batch)!
-      queueStack.append(frame)
-      // TODO:  Notify about the new batch being started!
-      
-      innerExecute(batch.tasks[0] as! DownloadBatch)
-      return
-    } else {
-      // Make a separate one for each batch; this simplifies event handling when multiple batches are in queue,
-      // as the old downloader will have a final event left to trigger at this point.  (downloadQueueFinished)
-      downloader = HTTPDownloader(self)
-      let tasks = batch.tasks as! [DownloadTask]
-      downloader!.userInfo = [Key.downloadBatch: batch]
-      
-      tasks.forEach { task in
-        downloader!.addRequest(task.request)
-      }
-      
-      downloader!.run()
-      // TODO:  Notify about the new batch being started!
+        batch.startBlock?()
+        // We're a batch composed of multiple sub-batches.  Time to set that up on the queue!
+        let frame = DownloadQueueFrame(from: batch)!
+        queueStack.append(frame)
+
+        innerExecute(batch.tasks[0])
     }
   }
-  
-  public func queue(_ batch: DownloadBatch) {
-    queueRoot.nodes.append(batch)
-    
-    // If the queue was empty before this...
-    if queueRoot.nodes.count == 1 {
-      executeNext()
+
+  // ----------- CRITICAL SECTION:  END ------------
+
+  // The next two functions are used as queueThread's "API".
+  // Internally, they must perform `sync` / `async` operations when
+  // writing to the critical tracking fields.
+  public func queue(_ node: DownloadNode) {
+    // `sync` is particularly important here for some automated testing checks
+    // when `autoExecute == `false`.
+    queueThread.sync {
+      self.queueRoot.nodes.append(node)
+    }
+
+    queueThread.async {
+      // If the queue was empty before this...
+      if self.queueRoot.nodes.count == 1 && self.autoExecute {
+        self.executeNext()
+      }
     }
   }
-  
+
+  internal func step() {
+    queueThread.async { self.executeNext() }
+  }
+
+  // Exposes useful information for runtime mocking.  Used by some automated tests.
+  internal func topLevelNodes() -> [DownloadNode] {
+    return queueRoot.nodes
+  }
+
   // MARK - helper methods for ResourceDownloadManager
   
   // TODO:  Eliminate this property coompletely.
@@ -279,212 +455,66 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     }
   }
 
-  // TODO: Needs validation.
-  func keyboardIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasJavaScriptExtension {
-        return String(tmpStr.dropLast(3))
-      }
-    } else {
-      // TODO:  search the queue instead.
-//      let kbInfo = downloader!.userInfo[Key.keyboardInfo]
-//      if let keyboards = kbInfo as? [InstallableKeyboard], let keyboard = keyboards.first {
-//        return keyboard.id
-//      }
-    }
-    return nil
-  }
-  
-  func lexicalModelIdForCurrentRequest() -> String? {
-    if let currentRequest = currentRequest {
-      let tmpStr = currentRequest.url.lastPathComponent
-      if tmpStr.hasJavaScriptExtension {
-        return String(tmpStr.dropLast(3))
-      }
-    } else {
-      // TODO: search the queue instead.
-//      let kbInfo = downloader!.userInfo[Key.lexicalModelInfo]
-//      if let lexicalModels = kbInfo as? [InstallableLexicalModel], let lexicalModel = lexicalModels.first {
-//        return lexicalModel.id
-//      }
-    }
-    return nil
-  }
-
-  // MARK - notification methods
-  
-  private func downloadFailed(forBatch batch: DownloadBatch, error: Error) {
-    let tasks = batch.tasks as! [DownloadTask]
-    if batch.activity == .composite {
-      // It's an update operation.
-      // Not yet called in this case.
-    } else if batch.type == .keyboard {
-      let keyboards = tasks.compactMap { task in
-        return task.resources as? [InstallableKeyboard]
-      }.flatMap {$0}
-      downloadFailed(forKeyboards: keyboards, error: error)
-    } else if batch.type == .lexicalModel {
-      let lexModels = tasks.compactMap { task in
-        return task.resources as? [InstallableLexicalModel]
-      }.flatMap {$0}
-      downloadFailed(forLanguageID: lexModels[0].languageID, error: error)
-    }
-  }
-  
-  public func downloadFailed(forKeyboards keyboards: [InstallableKeyboard], error: Error) {
-    let notification = KeyboardDownloadFailedNotification(keyboards: keyboards, error: error)
-    NotificationCenter.default.post(name: Notifications.keyboardDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadFailed(forLanguageID languageID: String, error: Error) {
-    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: languageID, error: error)
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadFailed(forLexicalModelPackage packageURL: String, error: Error) {
-    let notification = LexicalModelDownloadFailedNotification(lmOrLanguageID: packageURL, error: error)
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadFailed,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadSucceeded(forKeyboards keyboards: [InstallableKeyboard]) {
-    let notification = KeyboardDownloadCompletedNotification(keyboards)
-    NotificationCenter.default.post(name: Notifications.keyboardDownloadCompleted,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func downloadSucceeded(forLexicalModel lm: InstallableLexicalModel) {
-    let notification = LexicalModelDownloadCompletedNotification([lm])
-    NotificationCenter.default.post(name: Notifications.lexicalModelDownloadCompleted,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  
-  public func updateBatchStarted(_ batch: DownloadBatch) {
-    let notification = BatchUpdateStartedNotification(batch.resources!)
-    NotificationCenter.default.post(name: Notifications.batchUpdateStarted,
-                                    object: self,
-                                    value: notification)
-  }
-  
-  public func updateBatchFinished(_ batch: DownloadBatch) {
-    var successes: [[LanguageResource]] = []
-    var failures: [[LanguageResource]] = []
-    var errors: [Error] = []
-    
-    // Remember, since this is for .composite batches, batch.tasks is of type [DownloadBatch].
-    for (index, res) in batch.tasks.enumerated() {
-      if batch.errors[index] == nil {
-        successes.append(res.resources!)
-      } else {
-        failures.append(res.resources!)
-        errors.append(batch.errors[index]!)
+  func containsPackageKeyInQueue(matchingKey: KeymanPackage.Key) -> Bool {
+    return queueRoot.nodes.contains { node in
+      node.packageKeys.contains { fullID in
+        return fullID == matchingKey
       }
     }
-    
-    let notification = BatchUpdateCompletedNotification(successes: successes, failures: failures, errors: errors)
-    NotificationCenter.default.post(name: Notifications.batchUpdateCompleted,
-                                    object: self,
-                                    value: notification)
   }
 
   //MARK: - HTTPDownloadDelegate methods
   
   func downloadQueueFinished(_ queue: HTTPDownloader) {
     // We can use the properties of the current "batch" to generate specialized notifications.
-    let batch = queue.userInfo[Key.downloadBatch] as! DownloadBatch
-    
-    // Due to how the queue operates, batch.activity != .composite.  That case is handled elsewhere.
-    if(batch.activity == .composite) {
-      // Composite indicates that a batch is made of multiple sub-batches, not individual
-      // DownloadTasks that the HTTPDownloader can handle, which are 1-to-1 with its requests.
-      fatalError("HTTPDownloader should never be assigned a .composite-type DownloadBatch.")
-    } else {
-      let isUpdate = batch.activity == .update
-    
-      if batch.type == .keyboard {
-        // The request has succeeded.
-        if downloader!.requestsCount == 0 { // Download queue finished.
-          let keyboards = batch.resources as! [InstallableKeyboard]
+    let batch = queue.userInfo[Key.downloadBatch] as! AnyDownloadBatch
 
-          FontManager.shared.registerCustomFonts()
-          log.info("Downloaded keyboard: \(keyboards[0].id).")
+    let packagePath = batch.tasks[0].file
+    var err: Error? = nil
+    do {
+      try batch.completeWithPackage(fromKMP: packagePath)
+    } catch {
+      err = error
+    }
 
-          if(!isUpdate) {
-            downloadSucceeded(forKeyboards: keyboards)
-          } else {
-            // Since we don't generate the notification as above, we need to manually update
-            // the keyboards' metadata.
-            keyboards.forEach { keyboard in
-              Manager.shared.addKeyboard(keyboard)
-            }
-          }
+    queueThread.async {
+      if let error = err {
+        self.finalizeCurrentBatch(withError: error)
+      } else {
+        // Completing the queue means having completed a batch.  We should only move forward in this class's
+        // queue at this time, once a batch's task queue is complete.
+        self.finalizeCurrentBatch()
+      }
 
-          let userDefaults = Storage.active.userDefaults
-          userDefaults.set([Date()], forKey: Key.synchronizeSWKeyboard)
-          userDefaults.synchronize()
-        }
-      } else if batch.type == .lexicalModel {
-        let task = batch.tasks[0] as! DownloadTask // It's always at this index.
-        if let lm = installLexicalModelPackage(downloadedPackageFile: URL(fileURLWithPath: task.request.destinationFile!)) {
-          if !isUpdate {
-            downloadSucceeded(forLexicalModel: lm)
-          } else {
-            // Since we don't generate the notification as above, we need to manually update
-            // the lexical model's metadata.
-            Manager.shared.updateUserLexicalModels(with: lm)
-          }
-        } else if !isUpdate {
-          let installError = NSError(domain: "Keyman", code: 0,
-                                     userInfo: [NSLocalizedDescriptionKey: "installError"])
-          downloadFailed(forLexicalModelPackage: "\(task.request.url)", error: installError)
-          currentFrame.batch?.errors[currentFrame.index] = installError
-        }
+      if self.autoExecute {
+        self.executeNext()
       }
     }
-    
-    // Completing the queue means having completed a batch.  We should only move forward in this class's
-    // queue at this time, once a batch's task queue is complete.
-    finalizeCurrentBatch()
-    executeNext()
   }
   
   func downloadQueueCancelled(_ queue: HTTPDownloader) {
-    //
-    
-    // In case we're part of a 'composite' operation, we should still keep the queue moving.
-    finalizeCurrentBatch()
-    executeNext()
+    if case .simpleBatch(let batch) = self.currentBatch {
+      try? batch.completeWithCancellation()
+    }
+
+    queueThread.async {
+      // In case we're part of a 'composite' operation, we should still keep the queue moving.
+      self.finalizeCurrentBatch()
+
+      if self.autoExecute {
+        self.executeNext()
+      }
+    }
   }
 
   func downloadRequestStarted(_ request: HTTPDownloadRequest) {
-    // If we're downloading a new keyboard.
-    // The extra check is there to filter out other potential request types in the future.
-    let batch = request.userInfo[Key.downloadBatch] as! DownloadBatch
-
-    if request.tag == 0 && batch.activity != .update {
-      let task = request.userInfo[Key.downloadTask] as! DownloadTask
-      if task.type == .keyboard {
-        NotificationCenter.default.post(name: Notifications.keyboardDownloadStarted,
-                                        object: self,
-                                        value: task.resources as! [InstallableKeyboard])
-      } else if task.type == .lexicalModel {
-        NotificationCenter.default.post(name: Notifications.lexicalModelDownloadStarted,
-                                        object: self,
-                                        value: task.resources as! [InstallableLexicalModel])
-      }
+    if let batch = request.userInfo[Key.downloadBatch] as? AnyDownloadBatch {
+      batch.startBlock?()
     }
   }
 
   func downloadRequestFinished(_ request: HTTPDownloadRequest) {
+    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
     // Did we finish, but with an request error code?
     if request.responseStatusCode != 200 {
       // Possible request error (400 Bad Request, 404 Not Found, etc.)
@@ -492,81 +522,41 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
       let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
       let error = NSError(domain: "Keyman", code: 0,
                           userInfo: [NSLocalizedDescriptionKey: errorMessage])
-      currentFrame.batch?.errors[currentFrame.index] = error
+
+      if case var .simpleBatch(batch) = currentFrame.batch {
+        batch.errors[currentFrame.index] = error
+      }
       
       // Now that we've synthesized an appropriate error instance, use the same handler
       // as for HTTPDownloader's 'failed' condition.
       downloadRequestFailed(request, with: error)
-    } // else - handled once the entire queue is completed without errors.
-      //        This particularly matters for keyboards.
-  }
-  
-  func downloadRequestFailed(_ request: HTTPDownloadRequest) {
-    // We should never be in a state to return 'Unknown error", but better safe than sorry.
-    downloadRequestFailed(request, with: request.error ?? NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"]))
-  }
 
-  func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error) {
-    currentFrame.batch?.errors[currentFrame.index] = error
-
-    let task = request.userInfo[Key.downloadTask] as! DownloadTask
-    let batch = request.userInfo[Key.downloadBatch] as! DownloadBatch
-    let isUpdate = batch.activity == .update
-    
-    if task.type == .keyboard {
-      log.error("Keyboard download failed: \(error).")
-      let keyboards = task.resources as? [InstallableKeyboard]
-
-      if !isUpdate {
-        // Clean up keyboard file if anything fails
-        // TODO: Also clean up remaining fonts
-        try? FileManager.default.removeItem(at: Storage.active.keyboardURL(for: keyboards![0]))
-        downloadFailed(forKeyboards: keyboards ?? [], error: error as NSError)
-      }
-    } else if task.type == .lexicalModel {
-      log.error("Lexical model download failed: \(error).")
-      let lexicalModels = task.resources as? [InstallableLexicalModel]
-      
-      if !isUpdate {
-        // Clean up model file if anything fails
-        try? FileManager.default.removeItem(at: Storage.active.lexicalModelURL(for: lexicalModels![0]))
-        downloadFailed(forLanguageID: lexicalModels?[0].languageID ?? "", error: error as NSError)
+      // If we used a temp filename during download, resolve it.
+      try? task.downloadFinalizationBlock?(false)
+    } else {
+      do {
+        try task.downloadFinalizationBlock?(true)
+      } catch {
+        downloadRequestFailed(request, with: error)
       }
     }
-    
-    downloader!.cancelAllOperations()
   }
-  
-  // MARK - Language resource installation methods
-  
-  // Processes fetched lexical models.
-  // return a lexical model so caller can use it in a downloadSucceeded call
-  // is called by other class funcs
-  public func installLexicalModelPackage(downloadedPackageFile: URL) -> InstallableLexicalModel? {
-    var installedLexicalModel: InstallableLexicalModel? = nil
 
-    ResourceFileManager.shared.prepareKMPInstall(from: downloadedPackageFile, completionHandler: { kmp, error in
-      if let kmp = kmp as! LexicalModelKeymanPackage? {
-        do {
-          ResourceFileManager.shared.finalizePackageInstall(kmp, isCustom: false, completionHandler: { error in
-              if error != nil {
-                log.error("Error installing the lexical model: \(String(describing: error))")
-              } else {
-                log.info("successfully parsed the lexical model in: \(kmp.sourceFolder)")
-                installedLexicalModel = kmp.models[0].installableLexicalModels[0]
-              }
-            })
+  func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
+    let task = request.userInfo[Key.downloadTask] as! AnyDownloadTask
+    var batch = request.userInfo[Key.downloadBatch] as! AnyDownloadBatch
+    batch.errors[currentFrame.index] = error
 
-          //this can fail gracefully and not show errors to users
-          try FileManager.default.removeItem(at: downloadedPackageFile)
-        } catch {
-          log.error("Error installing the lexical model: \(error)")
-        }
-      } else {
-        log.error("Error extracting the lexical model from the package: \(String(describing: error))")
-      }
-    })
-    return installedLexicalModel
+    var err: Error
+    if let error = error {
+      err = error
+    } else {
+      err = NSError(domain: "Keyman", code: 0,
+                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
+    }
+
+    try? task.downloadFinalizationBlock?(false)
+    try? batch.completeWithError(error: err)
+    downloader!.cancelAllOperations()
   }
 }

@@ -167,7 +167,6 @@ uses
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   TextFileTemplates in 'main\TextFileTemplates.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UfrmFontHelper in 'dialogs\UfrmFontHelper.pas' {Form1},
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   usp10 in '..\..\global\delphi\general\usp10.pas',
@@ -255,7 +254,7 @@ uses
   Keyman.System.CEFManager in '..\..\global\delphi\chromium\Keyman.System.CEFManager.pas',
   Keyman.Developer.System.HttpServer.Debugger in 'http\Keyman.Developer.System.HttpServer.Debugger.pas',
   Keyman.Developer.System.HttpServer.App in 'http\Keyman.Developer.System.HttpServer.App.pas',
-  Keyman.Developer.System.HttpServer.Base in 'http\Keyman.Developer.System.HttpServer.Base.pas',
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
   Keyman.UI.FontUtils in '..\..\global\delphi\general\Keyman.UI.FontUtils.pas',
   Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
@@ -305,8 +304,10 @@ uses
 // If you don't add this flag the rederer process will crash when you try to load large images.
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
+const
+  LOGGER_DEVELOPER_IDE_TIKE = TKeymanSentryClient.LOGGER_DEVELOPER_IDE + '.tike';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
 
@@ -324,8 +325,8 @@ begin
         if TikeActive then Exit;
         InitClasses;
         Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-        Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-        Application.Run;
+  Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
+  Application.Run;
       end;
     finally
       FInitializeCEF.Free;

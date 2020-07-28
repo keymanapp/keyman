@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,8 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.util.MapCompat;
+import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.util.HashMap;
 
@@ -90,7 +90,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       }
 
       // If the active keyboard is for this language, immediately enact the new pref setting.
-      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).get(KMManager.KMKey_LanguageID);
+      String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
       if (kbdLgCode.equals(lgCode)) {
         // Not only registers the model but also applies our modeling preferences.
         KMManager.registerAssociatedLexicalModel(lgCode);
@@ -118,7 +118,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     Bundle bundle = getIntent().getExtras();
     if (bundle == null) {
       // Should never actually happen.
-      Log.e(TAG, "Language data not specified for LanguageSettingsActivity!");
+      KMLog.LogError(TAG, "Language data not specified for LanguageSettingsActivity!");
       finish();
 
       if(KMManager.isDebugMode()) {
@@ -130,7 +130,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     lgCode = bundle.getString(KMManager.KMKey_LanguageID);
     lgName = bundle.getString(KMManager.KMKey_LanguageName);
-    customHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
+    customHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink, "");
 
     // Necessary to properly insert a language name into the title.  (Has a %s slot for it.)
     String title = String.format(getString(R.string.title_language_settings), lgName);
@@ -206,31 +206,12 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         listView.setItemChecked(position, true);
         listView.setSelection(position);
-        Keyboard kbd = ((FilteredKeyboardsAdapter) listView.getAdapter()).getItem(position);
-        HashMap<String, String> kbInfo = new HashMap<>(kbd.map);
-        String packageID = kbInfo.get(KMManager.KMKey_PackageID);
-        String keyboardID = kbInfo.get(KMManager.KMKey_KeyboardID);
-        if (packageID == null || packageID.isEmpty()) {
-          packageID = KMManager.KMDefault_UndefinedPackageID;
-        }
+        Keyboard kbdInfo = ((FilteredKeyboardsAdapter) listView.getAdapter()).getItem(position);
         Intent intent = new Intent(context, KeyboardSettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.putExtra(KMManager.KMKey_PackageID, packageID);
-        intent.putExtra(KMManager.KMKey_KeyboardID, keyboardID);
-        intent.putExtra(KMManager.KMKey_LanguageID, kbInfo.get(KMManager.KMKey_LanguageID));
-        intent.putExtra(KMManager.KMKey_LanguageName, kbInfo.get(KMManager.KMKey_LanguageName));
-        intent.putExtra(KMManager.KMKey_KeyboardName, kbInfo.get(KMManager.KMKey_KeyboardName));
-        String keyboardVersion = KMManager.getLatestKeyboardFileVersion(context, packageID, keyboardID);
-        intent.putExtra(KMManager.KMKey_KeyboardVersion, keyboardVersion);
-        boolean isCustom = MapCompat.getOrDefault(kbInfo, KMManager.KMKey_CustomKeyboard, "N").equals("Y") ? true : false;
-        intent.putExtra(KMManager.KMKey_CustomKeyboard, isCustom);
-        String customHelpLink = kbInfo.get(KMManager.KMKey_CustomHelpLink);
-        if (customHelpLink != null) {
-          intent.putExtra(KMManager.KMKey_CustomHelpLink, customHelpLink);
-        } else {
-          intent.putExtra(KMManager.KMKey_HelpLink,
-            String.format("https://help.keyman.com/keyboard/%s/%s/", keyboardID, keyboardVersion));
-        }
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(KMManager.KMKey_Keyboard, kbdInfo);
+        intent.putExtras(bundle);
         startActivity(intent);
       }
     });
@@ -238,18 +219,21 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        // Check that available keyboard information can be obtained via:
-        // 1. connection to cloud catalog
-        // 2. cached file
-        // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || CloudRepository.shared.hasCache(context) ||
-          KeyboardPickerActivity.hasKeyboardFromPackage()){
-          // Rework to use languuage-specific (KeyboardList) picker!
-          Intent i = new Intent(context, KeyboardListActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        // Check scenarios to add available keyboards:
+        if (KMManager.hasConnection(context)){
+          // Scenario 1: Connection to keyman.com catalog
+          // Pass the BCP47 language code to the KMPBrowserActivity
+          Intent i = new Intent(context, KMPBrowserActivity.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           i.putExtra("languageCode", lgCode);
           i.putExtra("languageName", lgName);
           context.startActivity(i);
+        /*
+        } else if (KeyboardPickerActivity.hasKeyboardFromPackage()) {
+          // Scenario 2: Local kmp.json files in packages/
+          // TODO: Cleanly re-implement this based on the languages available in each package
+        */
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
@@ -352,7 +336,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-      com.tavultesoft.kmea.data.Keyboard kbd = this.getItem(position);
+      Keyboard kbd = this.getItem(position);
       ViewHolder holder;
 
       // If we're being told to reuse an existing view, do that.  It's automatic optimization.
@@ -366,7 +350,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         holder = (ViewHolder) convertView.getTag();
       }
 
-      holder.text.setText(kbd.map.get(KMManager.KMKey_KeyboardName));
+      holder.text.setText(kbd.getResourceName());
       holder.img.setImageResource(R.drawable.ic_arrow_forward);
 
       return convertView;

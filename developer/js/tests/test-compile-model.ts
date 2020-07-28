@@ -10,6 +10,8 @@ describe('compileModel', function () {
     'example.qaa.sencoten',
     'example.qaa.trivial',
     'example.qaa.utf16le',
+    'example.qaa.wordbreaker',
+    'example.qaa.joinwordbreaker'
   ];
 
   for (let modelID of MODELS) {
@@ -17,14 +19,14 @@ describe('compileModel', function () {
 
     it(`should compile ${modelID}`, function () {
       let code = compileModel(modelPath);
-      let r;
+      let r: unknown;
       assert.doesNotThrow(() => {
         r = compileModelSourceCode(code);
       });
       let compilation = r as CompilationResult;
 
-      assert.isFalse(compilation.hasSyntaxError);
-      assert.isNull(compilation.error);
+      assert.isFalse(compilation.hasSyntaxError, 'model code had syntax error');
+      assert.isNull(compilation.error, `compilation error: ${compilation.error}`);
       assert.equal(compilation.modelConstructorName, 'TrieModel');
     });
   }

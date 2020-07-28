@@ -17,15 +17,19 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   private var userLexicalModels: [String: InstallableLexicalModel] = [:]
   private var isUpdate = false // unused currently, may be used when we switch to HTTPDownloader
   private let language: Language
-  public var lexicalModels: [LexicalModel]? = nil
+  public var packages: [(InstallableLexicalModel, URL)]
   
   private var lexicalModelDownloadStartedObserver: NotificationObserver?
   //NOTE: there is no need for a CompletedObserver, as our parent LexicalModelPickerViewController
   //  is registered for that and deals with it by popping us out to root.
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
+
+  private var onSuccessClosure: ((InstallableLexicalModel) -> Void)?
   
-  init(language: Language) {
+  init(language: Language, packages: [(InstallableLexicalModel, URL)], onSuccess: ((InstallableLexicalModel) -> Void)?) {
     self.language = language
+    self.packages = packages
+    self.onSuccessClosure = onSuccess
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -42,11 +46,11 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   override func viewDidLoad() {
     super.viewDidLoad()
     lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadStarted,
+      forName: Notifications.packageDownloadStarted,
       observer: self,
       function: LanguageLMDetailViewController.lexicalModelDownloadStarted)
     lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadFailed,
+      forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LanguageLMDetailViewController.lexicalModelDownloadFailed)
     log.info("viewDidLoad: LanguageLMDetailViewController (registered for lexicalModelDownloadStarted)")
@@ -68,7 +72,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   // MARK: - Table view data source UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return lexicalModels!.count
+    return packages.count
   }
   
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -89,7 +93,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    let lexicalModel = lexicalModels![indexPath.section]
+    let lexicalModel = packages[indexPath.section].0
     let cell = cell as! KeyboardNameTableViewCell
     cell.indexPath = indexPath
     cell.textLabel?.text = lexicalModel.name
@@ -104,19 +108,19 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = true
     }
-    
-    let kbState = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
-    cell.setKeyboardState(kbState, selected: false, defaultAccessoryType: cell.accessoryType)
+
+    let state = ResourceFileManager.shared.installState(forPackage: KeymanPackage.Key(id: lexicalModel.id, type: .lexicalModel))
+    cell.setInstallState(state, selected: false, defaultAccessoryType: cell.accessoryType)
   }
   
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
     let lexicalModelIndex = indexPath.section
-    let lexicalModel = lexicalModels![lexicalModelIndex]
-    
-    let state = ResourceDownloadManager.shared.stateForLexicalModel(withID: lexicalModel.id)
+    let lexicalModel = packages[lexicalModelIndex].0
+
+    let state = ResourceFileManager.shared.installState(forPackage: KeymanPackage.Key(id: lexicalModel.id, type: .lexicalModel))
     if state != .downloading {
-      if state == .needsDownload {
+      if state == .none {
         isUpdate = false
       } else {
         isUpdate = true
@@ -137,8 +141,17 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   }
   
   func downloadHandler(_ lexicalModelIndex: Int) {
-    let lexicalModel = lexicalModels![lexicalModelIndex]
-    ResourceDownloadManager.shared.downloadLexicalModel(withID: lexicalModel.id, languageID: language.id, isUpdate: false)
+    let package = packages[lexicalModelIndex]
+    let lmFullID = package.0.fullID
+    let completionClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage> = { package, error in
+      try? ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)(package, error)
+
+      if let lm = package?.findResource(withID: lmFullID) {
+        self.onSuccessClosure?(lm)
+      }
+    }
+
+    ResourceDownloadManager.shared.downloadPackage(withKey: package.0.packageKey, from: package.1, withNotifications: true, completionBlock: completionClosure)
   }
   
   private func lexicalModelDownloadStarted() {

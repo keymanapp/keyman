@@ -32,6 +32,7 @@ desktop: prereq
     $(MAKE) -fdownload.mak candle
     $(WIXLIGHT) -dWixUILicenseRtf=License.rtf -out keymandesktop.msi -ext WixUIExtension $(DESKTOP_FILES)
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.msi
+    # TODO: replace buildpkg with kmcomp and remove buildpkg from repository
     $(ROOT)\bin\buildtools\buildpkg -m keymandesktop.msi -s $(ROOT)\bin\desktop -l license.html
     $(SIGNCODE) /d "Keyman Desktop" keymandesktop.exe
     $(MAKE) -fdownload.mak copyredist-desktop

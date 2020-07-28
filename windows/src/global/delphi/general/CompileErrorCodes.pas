@@ -19,6 +19,7 @@
                     04 May 2015 - mcdurdin - I4688 - V9.0 - Add build path to project settings
                     24 Aug 2015 - mcdurdin - I4872 - OSK font and Touch Layout font should be the same in Developer
                     28 Feb 2018 - jahorton - Imported the "SomewhereIGotItWrong" error code for use in KMW compilation
+                    22 Jul 2020 - eddieantonio - Add lexical model range https://github.com/keymanapp/keyman/pull/3385
 *)
 unit CompileErrorCodes;
 
@@ -29,6 +30,9 @@ const
   CWARN_FLAG = $2000;
   CERR_FLAG = $4000;
   CFATAL_FLAG = $8000;
+
+  CERR_LEXICAL_MODEL_MIN = $0800;
+  CERR_LEXICAL_MODEL_MAX = $08FF;
 
   CERR_NotSupportedInKeymanWebContext =               $4054;
   CERR_NotSupportedInKeymanWebOutput =                $4055;

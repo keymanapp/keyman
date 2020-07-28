@@ -36,6 +36,21 @@ public extension UserDefaults {
     }
   }
 
+  internal func cachedPackageQueryMetadata(forKey key: String) -> [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata]? {
+    guard let data = self.data(forKey: key) else {
+      log.error("Error decoding cached package query results")
+      return nil
+    }
+
+    // Since we're dealing with dictionaries & Codable, it's probably better to use JSON here.
+    let decoder = JSONDecoder()
+    if let dict = try? decoder.decode([KeymanPackage.Key: KeymanPackage.DistributionStateMetadata].self, from: data) {
+      return dict
+    } else {
+      return nil
+    }
+  }
+
   func set(_ keyboards: [InstallableKeyboard]?, forKey key: String) {
     guard let keyboards = keyboards else {
       removeObject(forKey: key)
@@ -134,12 +149,35 @@ public extension UserDefaults {
     }
   }
 
-  var userResources: [LanguageResource]? {
+  internal var cachedPackageQueryMetadata: [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata] {
+    get {
+      return cachedPackageQueryMetadata(forKey: Key.userPackageQueryCacheDict) ?? [:]
+    }
+
+    set(metadata) {
+      let encoder = JSONEncoder()
+      if let data = try? encoder.encode(metadata) {
+        set(data, forKey: Key.userPackageQueryCacheDict)
+      }
+    }
+  }
+
+  func userResources<Resource: LanguageResource>(ofType: Resource.Type) -> [Resource]? {
+    if ofType == InstallableKeyboard.self {
+      return (userKeyboards as? [Resource])
+    } else if ofType == InstallableLexicalModel.self {
+      return (userLexicalModels as? [Resource])
+    } else {
+      return nil
+    }
+  }
+
+  var userResources: [AnyLanguageResource]? {
     get {
       let keyboards = userKeyboards ?? []
       let lexicalModels = userLexicalModels ?? []
       
-      let resources: [LanguageResource] = keyboards + lexicalModels
+      let resources: [AnyLanguageResource] = keyboards + lexicalModels
       if resources.count == 0 {
         return nil
       } else {
@@ -210,6 +248,10 @@ public extension UserDefaults {
     return userLexicalModels?.filter({
       $0.languageID == languageID
     }) ?? []
+  }
+
+  internal func cachedPackageQueryResult(forPackageKey packageKey: KeymanPackage.Key) -> KeymanPackage.DistributionStateMetadata? {
+    return cachedPackageQueryMetadata[packageKey]
   }
 
   var migrationLevel: Int {

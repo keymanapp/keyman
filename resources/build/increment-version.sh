@@ -19,9 +19,9 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.config"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.sh"
-. "$(dirname "$THIS_SCRIPT")/sentry-control.sh"
+. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/sentry-control.inc.sh"
 
 gitbranch=`git branch --show-current`
 
@@ -100,6 +100,20 @@ if [ "$action" == "commit" ]; then
   git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
+
+  # Also updates package versions, committing those changes
+  # Uses the 'version' run script defined in the base package.json.
+  npm install
+
+  npm run version -- "$NEWVERSION"
+
+  # Version info will be updated in lerna.json and all the lerna-managed package.json files.
+  git add lerna.json
+  # Iterates through all lerna-managed packages in serial mode (--concurrency 1),
+  # git-adding only the updated package.json and package-lock.json files.
+  npm run lerna -- exec --concurrency 1 -- git add package.json package-lock.json
+
+  # Now that all version-related changes are ready and git-added, it's time to commit.
   git commit -m "$message"
   git push --tags origin "$branch"
   hub pull-request -f --no-edit -b $base -l auto

@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.tavultesoft.kmea.KMManager;
+import com.tavultesoft.kmea.KMPBrowserActivity;
+import com.tavultesoft.kmea.data.Keyboard;
 
 import android.os.Bundle;
 import android.provider.Settings;
@@ -69,6 +71,7 @@ public class GetStartedActivity extends AppCompatActivity {
     });
 
     final TextView getStartedText = findViewById(R.id.getStartedText);
+    getStartedText.setText(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
     getStartedText.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -111,7 +114,11 @@ public class GetStartedActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == 0) {
-          KMManager.showLanguageList(context);
+          if (KMManager.hasConnection(context)) {
+            // Keyman Settings install activity
+            Intent i = new Intent(context, KeymanSettingsInstallActivity.class);
+            context.startActivity(i);
+          }
         } else if (position == 1) {
           startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
         } else if (position == 2) {
@@ -148,7 +155,7 @@ public class GetStartedActivity extends AppCompatActivity {
       String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
       String info = String.valueOf(R.drawable.ic_info_outline);
 
-      ArrayList<HashMap<String, String>> kbList = KMManager.getKeyboardsList(this);
+      List<Keyboard> kbList = KMManager.getKeyboardsList(this);
       if (kbList != null && kbList.size() > 1) {
         list.get(0).put(iconKey, checkbox_on);
       } else {

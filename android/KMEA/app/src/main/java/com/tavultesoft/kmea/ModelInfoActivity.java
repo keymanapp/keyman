@@ -61,26 +61,12 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     final ListView listView = findViewById(R.id.listView);
 
-    final String packageID = getIntent().getStringExtra(KMManager.KMKey_PackageID);
-    final String languageID = getIntent().getStringExtra(KMManager.KMKey_LanguageID);
-    final String modelID = getIntent().getStringExtra(KMManager.KMKey_LexicalModelID);
-    final String modelName = getIntent().getStringExtra(KMManager.KMKey_LexicalModelName);
-    final String modelVersion = getIntent().getStringExtra(KMManager.KMKey_LexicalModelVersion);
-    String latestModelCloudVersion = modelVersion;
-
-    // Determine if model update is available from the cloud
-    Dataset dataset = CloudRepository.shared.fetchDataset(this);
-    HashMap<String, String> modelInfo = new HashMap<>();
-    modelInfo.put(KMManager.KMKey_PackageID, packageID);
-    modelInfo.put(KMManager.KMKey_LanguageID, languageID);
-    modelInfo.put(KMManager.KMKey_LexicalModelID, modelID);
-    modelInfo.put(KMManager.KMKey_LexicalModelName, modelName);
-
-    LexicalModel modelQuery = new LexicalModel(modelInfo);
-    final LexicalModel latestModel = dataset.lexicalModels.findMatch(modelQuery);
-    if (latestModel != null) {
-      latestModelCloudVersion = latestModel.getVersion();
-    }
+    final LexicalModel lm = (LexicalModel)getIntent().getSerializableExtra(KMManager.KMKey_LexicalModel);
+    final String packageID = lm.getPackageID();
+    final String languageID = lm.getLanguageID();
+    final String modelID = lm.getLexicalModelID();
+    final String modelName = lm.getLexicalModelName();
+    final String modelVersion = lm.getVersion();
 
     final TextView textView = findViewById(R.id.bar_title);
     textView.setText(String.format(getString(R.string.model_info_header), modelName));
@@ -92,8 +78,8 @@ public final class ModelInfoActivity extends AppCompatActivity {
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.model_version));
     hashMap.put(subtitleKey, modelVersion);
-    // Display notification to download update if latestModelCloudVersion > modelVersion (installed)
-    if (FileUtils.compareVersions(latestModelCloudVersion, modelVersion) == FileUtils.VERSION_GREATER) {
+    // Display notification to download update if available
+    if (lm.hasUpdateAvailable()) {
       hashMap.put(subtitleKey, context.getString(R.string.update_available, modelVersion));
       icon = String.valueOf(R.drawable.ic_cloud_download);
     }
@@ -102,7 +88,7 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
     // Display model help link
     hashMap = new HashMap<>();
-    final String customHelpLink = getIntent().getStringExtra(KMManager.KMKey_CustomHelpLink);
+    final String customHelpLink = lm.getHelpLink();
     // Check if app declared FileProvider
     // Currently, model help only available if custom link exists
     icon = String.valueOf(R.drawable.ic_arrow_forward);
@@ -154,10 +140,11 @@ public final class ModelInfoActivity extends AppCompatActivity {
 
         // "Version" link clicked to download latest model version from cloud
         if (itemTitle.equals(getString(R.string.model_version))) {
-          Bundle args = latestModel.buildDownloadBundle();
+          Bundle args = lm.buildDownloadBundle();
           Intent i = new Intent(getApplicationContext(), KMKeyboardDownloaderActivity.class);
           i.putExtras(args);
           startActivity(i);
+          finish();
 
         // "Help" link clicked
         } else if (itemTitle.equals(getString(R.string.help_link))) {

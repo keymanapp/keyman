@@ -1,6 +1,7 @@
 program tsysinfo;
 
 uses
+  Winapi.Windows,
   Forms,
   winver in 'winver.pas',
   fileversioninfo in 'fileversioninfo.pas',
@@ -26,7 +27,6 @@ uses
   DebugPaths in '..\..\global\delphi\general\DebugPaths.pas',
   GetOsVersion in '..\..\global\delphi\general\GetOsVersion.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   klog in '..\..\global\delphi\general\klog.pas',
   utildir in '..\..\global\delphi\general\utildir.pas',
   utilsystem in '..\..\global\delphi\general\utilsystem.pas',
@@ -65,9 +65,19 @@ uses
 {$R manifest.res}
 {$R version.res}
 
+// CEF3 needs to set the LARGEADDRESSAWARE flag which allows 32-bit processes to use up to 3GB of RAM.
+// If you don't add this flag the rederer process will crash when you try to load large images.
+{$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
+
+const
+  LOGGER_DESKTOP_ENGINE_TSYSINFO = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.tsysinfo';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, [kscfCaptureExceptions]); // no ui for exceptions, no termination
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_TSYSINFO,
+    [kscfCaptureExceptions]); // no ui for exceptions, no termination
   try
+    if RunCrashReportHandler then
+      Exit;
+
     FInitializeCEF := TCEFManager.Create;
     try
       try

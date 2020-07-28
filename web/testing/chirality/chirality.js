@@ -28,6 +28,7 @@ function Keyboard_chirality() {
   };
   this.KH = '';
   this.KM = 0;
+  this.KBVER = "1.0";
 
   this.dfltCodes = ["K_BKQUOTE","K_1","K_2","K_3","K_4","K_5","K_6","K_7","K_8","K_9","K_0",
       "K_HYPHEN","K_EQUAL","K_*","K_*","K_*","K_Q","K_W","K_E","K_R","K_T",
@@ -42,7 +43,7 @@ function Keyboard_chirality() {
   };
   this.g0 = function (t, e) {
     var k = KeymanWeb, r = 0, m = 0;
-    var Processor = keyman.textProcessor;
+    var core = keyman.core;
     var Constants = com.keyman.text.Codes;
     
     // Handwritten time!
@@ -54,7 +55,7 @@ function Keyboard_chirality() {
     for(var i = 0; i < layers.length; i++) {
       // Obtain the modifier code to match for the selected layer.
       // The following uses a non-public property potentially subject to change in the future.
-      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | Processor.getModifierState(layers[i]);
+      var modCode = Constants.modifierCodes['VIRTUAL_KEY'] | com.keyman.text.KeyboardProcessor.getModifierState(layers[i]);
       var layer = layers[i];
       
       for(var key=0; key < kls[layer].length; key++) {

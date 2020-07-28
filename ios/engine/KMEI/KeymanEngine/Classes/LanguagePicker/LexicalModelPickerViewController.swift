@@ -44,15 +44,15 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
     
     lexicalModelDownloadStartedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadStarted,
+      forName: Notifications.packageDownloadStarted,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadStarted)
     lexicalModelDownloadCompletedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadCompleted,
+      forName: Notifications.packageDownloadCompleted,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadCompleted)
     lexicalModelDownloadFailedObserver = NotificationCenter.default.addObserver(
-      forName: Notifications.lexicalModelDownloadFailed,
+      forName: Notifications.packageDownloadFailed,
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadFailed)
     
@@ -177,13 +177,13 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     return globalIndex
   }
   
-  private func lexicalModelDownloadStarted(_ lexicalModels: [InstallableLexicalModel]) {
+  private func lexicalModelDownloadStarted() {
     view.isUserInteractionEnabled = false
     navigationItem.leftBarButtonItem?.isEnabled = false
     navigationItem.rightBarButtonItem?.isEnabled = false
   }
   
-  private func lexicalModelDownloadCompleted(_ lexicalModels: [InstallableLexicalModel]) {
+  private func lexicalModelDownloadCompleted() {
     log.info("lexicalModelDownloadCompleted LexicalModelPicker")
     
     // Actually used now.
@@ -193,18 +193,10 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       navigationItem.rightBarButtonItem?.isEnabled = true
     }
     
-    // Add lexicalModel.
-    for lexicalModel in lexicalModels {
-      if lexicalModel.languageID == language?.id {
-        Manager.addLexicalModel(lexicalModel)
-        switchLexicalModel(lexicalModel)
-      }
-    }
-    
     navigationController?.popToRootViewController(animated: true)
   }
   
-  private func lexicalModelDownloadFailed(_ notification: LexicalModelDownloadFailedNotification) {
+  private func lexicalModelDownloadFailed(_ notification: PackageDownloadFailedNotification) {
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
     if let item = navigationItem.rightBarButtonItem {
@@ -300,30 +292,36 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   func showAddLexicalModel() {
     //get list of lexical models for this languageID and show it
-    func listCompletionHandler(lexicalModels: [LexicalModel]?, error: Error?) -> Void {
+    Queries.LexicalModel.fetch(forLanguageCode: language.id) { result, error in
       if let error = error {
-        log.info("Failed to fetch lexical model list for "+language.id+". error: "+(error.localizedDescription))
+        log.info("Failed to fetch lexical model list for "+self.language.id+". error: "+error.localizedDescription)
         DispatchQueue.main.async {
-          self.lexicalModelDownloadFailed(LexicalModelDownloadFailedNotification(lmOrLanguageID: self.language.id, error: error))
+          self.lexicalModelDownloadFailed(PackageDownloadFailedNotification(packageKey: nil, error: error))
         }
-      } else if nil == lexicalModels {
-        noModelsAvailable(cause: "nil")
-      } else if 0 == lexicalModels?.count {
-        noModelsAvailable(cause: "empty")
+        return
+      }
+
+      guard let result = result else {
+        self.noModelsAvailable(cause: "nil")
+        return
+      }
+
+      if result.count == 0 {
+        self.noModelsAvailable(cause: "empty")
       } else {
-        log.info("Fetched lexical model list for "+language.id+".")
+        log.info("Fetched lexical model list for "+self.language.id+".")
+        let packages: [(InstallableLexicalModel, URL)] = result.map { ($0.modelFor(languageID: self.language.id)!, URL.init(string: $0.packageFilename)!) }
         // show the list of lexical models (on the main thread)
         DispatchQueue.main.async {
           let button: UIButton? = (self.navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
           button?.isEnabled = false
-          let vc = LanguageLMDetailViewController(language: self.language)
-          vc.lexicalModels = lexicalModels!
+          let vc = LanguageLMDetailViewController(language: self.language, packages: packages, onSuccess: { lm in
+            self.switchLexicalModel(lm)
+          })
           self.navigationController?.pushViewController(vc, animated: true)
         }
       }
     }
-    
-    Manager.shared.apiLexicalModelRepository.fetchList(languageID: language.id, completionHandler: listCompletionHandler)
   }
 
   func noModelsAvailable(cause: String = "nil") {

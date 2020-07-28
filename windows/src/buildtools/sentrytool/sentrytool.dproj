@@ -79,8 +79,8 @@
         <DCC_DebugInfoInTds>true</DCC_DebugInfoInTds>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>(None)</Manifest_File>
-        <Debugger_CWD>C:\Projects\keyman\app\windows\src\desktop\kmshell</Debugger_CWD>
-        <Debugger_RunParams>delphiprep kmshell.exe -dpr kmshell.dpr -o kmshell-out.exe</Debugger_RunParams>
+        <Debugger_CWD>C:\Projects\keyman\app\windows\src\engine\tsysinfox64</Debugger_CWD>
+        <Debugger_RunParams>-v delphiprep win64\release\tsysinfox64.exe -dpr tsysinfox64.dpr -o tsysinfox64-out.exe</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>

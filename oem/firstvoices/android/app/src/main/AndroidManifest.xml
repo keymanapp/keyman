@@ -13,13 +13,16 @@
 
         <!--    see the events from this app in sentry.keyman.com  dashboard -->
         <meta-data
-            android:name="io.sentry.dsn" android:value="https://a00ed3e10a2045acb3d93416be90d89a@sentry.keyman.com/7"/>
+            android:name="io.sentry.dsn" android:value="https://8236f0bffdce42a69b81821a5ba41117@sentry.keyman.com/21"/>
         <!--    how to enable Sentry's debug mode -->
         <meta-data
             android:name="io.sentry.debug" android:value="true" />
         <!-- Disable monitoring "Application Not Responding" (ANR).  Too many reports at the default 4000 ms -->
         <meta-data
             android:name="io.sentry.anr.enable" android:value="false" />
+        <!-- Have application handle initializing Sentry -->
+        <meta-data
+          android:name="io.sentry.auto-init" android:value="false" />
 
         <service
             android:name="com.firstvoices.keyboards.SystemKeyboard"

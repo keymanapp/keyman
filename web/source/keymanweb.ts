@@ -1,7 +1,5 @@
 // Includes KMW-added property declaration extensions for HTML elements.
 /// <reference path="kmwexthtml.ts" />
-// Includes KMW string extension declarations.
-/// <reference path="text/kmwstring.ts" />
 // Includes type definitions for basic KMW types.
 /// <reference path="kmwtypedefs.ts" />
 
@@ -20,8 +18,7 @@ if(!window['keyman']['initialized']) {
   {
 
     // Declare KeymanWeb, OnScreen Keyboard and Util object variables
-    var keymanweb=window['keyman'],osk=keymanweb['osk'],util=keymanweb['util'], device=util.device;
-    var kbdInterface=keymanweb['interface'];
+    var keymanweb=window['keyman'],util=keymanweb['util'];
 
     /**
      * Function     debug
@@ -108,15 +105,6 @@ if(!window['keyman']['initialized']) {
         
     keymanweb.delayedInit();
 
-    // I732 START - Support for European underlying keyboards #1
-    if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') 
-      com.keyman.osk.Layouts._BaseLayout = window['KeymanWeb_BaseLayout'];
-    else
-      com.keyman.osk.Layouts._BaseLayout = 'us';    
-    
-    
-    keymanweb._BrowserIsSafari = (navigator.userAgent.indexOf('AppleWebKit') >= 0);  // I732 END - Support for European underlying keyboards #1      
-
   //TODO: find all references to next three routines and disambiguate!!
     
     // Complete page initialization only after the page is fully loaded, including any embedded fonts
@@ -127,10 +115,20 @@ if(!window['keyman']['initialized']) {
     
     // *** I3319 Supplementary Plane modifications - end new code
 
-    util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);  
+    util.attachDOMEvent(document, 'keyup', keymanweb.hotkeyManager._Process, false);
+
+    /**
+     * Reset OSK shift states when entering or exiting the active element
+     **/    
+    function resetVKShift() {
+      let keyman = com.keyman.singleton;
+      if(!keyman.uiManager.isActivating && keyman.osk.vkbd) {
+        keyman.core.keyboardProcessor._UpdateVKShift(null, 15, 0);  //this should be enabled !!!!! TODO
+      }
+    }
 
     // We need to track this handler, as it causes... interesting... interactions during testing in certain browsers.
-    keymanweb['pageFocusHandler'] = keymanweb.interface.resetVKShift.bind(keymanweb.interface);
+    keymanweb['pageFocusHandler'] = resetVKShift;
     util.attachDOMEvent(window, 'focus', keymanweb['pageFocusHandler'], false);  // I775
     util.attachDOMEvent(window, 'blur', keymanweb['pageFocusHandler'], false);   // I775
     

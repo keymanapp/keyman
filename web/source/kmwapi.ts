@@ -1,6 +1,5 @@
 /// <reference path="kmwbase.ts" />
 /// <reference path="kmwutils.ts" />
-/// <reference path="text/kbdInterface.ts" />
 
 /**
  * This file generates aliases linking renamed functions to some of our published developer API for KMW.
@@ -23,36 +22,9 @@
   publishAPI("toNzString", "nzString");
 }());
 
-// Keyboard callbacks
 (function() {
-  let prototype = com.keyman.text.KeyboardInterface.prototype;
-
-  var exportKBCallback = function(miniName: string, longName: string) {
-    prototype[miniName] = prototype[longName];
-  }
-
-  exportKBCallback('KSF', 'saveFocus');
-  exportKBCallback('KBR', 'beepReset');
-  exportKBCallback('KT', 'insertText');
-  exportKBCallback('KR', 'registerKeyboard');
-  exportKBCallback('KRS', 'registerStub');
-  exportKBCallback('KC', 'context');
-  exportKBCallback('KN', 'nul');
-  exportKBCallback('KCM', 'contextMatch');
-  exportKBCallback('KFCM', 'fullContextMatch');
-  exportKBCallback('KIK', 'isKeypress');
-  exportKBCallback('KKM', 'keyMatch');
-  exportKBCallback('KSM', 'stateMatch');
-  exportKBCallback('KKI', 'keyInformation');
-  exportKBCallback('KDM', 'deadkeyMatch');
-  exportKBCallback('KB', 'beep');
-  exportKBCallback('KA', 'any');
-  exportKBCallback('KDC', 'deleteContext');
-  exportKBCallback('KO', 'output');
-  exportKBCallback('KDO', 'deadkeyOutput');
-  exportKBCallback('KIO', 'indexOutput');
-  exportKBCallback('KIFS', 'ifStore');
-  exportKBCallback('KSETS', 'setStore');
-  exportKBCallback('KLOAD', 'loadStore');
-  exportKBCallback('KSAVE', 'saveStore');
+  // DOM-aware KeymanWeb overwrites some of the API functions, so we
+  // re-publish the API so that the overwritten functions are accessible
+  // via their short-form equivalents found in actual keyboard code.
+  com.keyman.text.KeyboardInterface.__publishShorthandAPI();
 }());

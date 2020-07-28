@@ -12,9 +12,7 @@
       <item quantity="one">Keyboard</item>
       <item quantity="other">Keyboards</item>
     </plurals>
-    <string name="title_add_language">Add New Language</string>
     <string name="title_add_keyboard">Add New Keyboard</string>
-    <string name="title_add_keyboard_from_device">Add Keyboard from Device</string>
     <string name="title_languages_settings">Installed Languages</string>
     <string name="title_language_settings" comment="Language Settings">%1$s Settings</string>
 

@@ -8,7 +8,7 @@ uses
 type
   TSentryClientConsole = class(TSentryClient)
   public
-    constructor Create(AOptions: TSentryClientOptions; ACaptureExceptions: Boolean = True); override;
+    constructor Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags); override;
     destructor Destroy; override;
   end;
 
@@ -17,7 +17,7 @@ implementation
 { TSentryClientConsole }
 
 constructor TSentryClientConsole.Create(AOptions: TSentryClientOptions;
-  ACaptureExceptions: Boolean);
+  const ALogger: string; AFlags: TSentryClientFlags);
 begin
   inherited;
 

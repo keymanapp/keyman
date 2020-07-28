@@ -24,7 +24,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
   private var infoArray = [[String: String]]()
 
-  let resource: LanguageResource
+  let resource: AnyLanguageResource
 
   @IBOutlet weak var scrollView: UIScrollView!
   @IBOutlet weak var contentView: UIView!
@@ -35,7 +35,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
   @IBOutlet weak var labelHeightConstraint: NSLayoutConstraint!
 
-  init(for resource: LanguageResource) {
+  init(for resource: AnyLanguageResource) {
     self.resource = resource
 
     super.init(nibName: "ResourceInfoView", bundle: Bundle.init(for: ResourceInfoViewController.self))
@@ -131,7 +131,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if !isCustomKeyboard {
       if indexPath.row == 1 {
-        let url = URL(string: "http://help.keyman.com/keyboard/\(resource.id)/\(resource.version)/")!
+        let url = URL(string: "\(KeymanHosts.HELP_KEYMAN_COM)/keyboard/\(resource.id)/\(resource.version)/")!
         if let openURL = Manager.shared.openURL {
           _ = openURL(url)
         } else {

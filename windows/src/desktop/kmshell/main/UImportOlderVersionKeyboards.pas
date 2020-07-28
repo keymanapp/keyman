@@ -69,9 +69,9 @@ implementation
 uses
   Winapi.Messages,
 
-  ErrLogPath,
   GetOsVersion,
   IniFiles,
+  KeymanPaths,
   kmpinffile,
   Keyman.System.UpgradeRegistryKeys,
   KPInstallFontKMShell,
@@ -384,7 +384,7 @@ begin
   FAdmin := AAdmin;  // I2361
   for i := 0 to 5 do
   try
-    FLogFile := TFileStream.Create(GetErrLogFileName('keymanimport'), fmCreate);  // I2792
+    FLogFile := TFileStream.Create(TKeymanPaths.ErrorLogPath('keymanimport'), fmCreate);  // I2792
     Break;
   except
     on E:EFCreateError do

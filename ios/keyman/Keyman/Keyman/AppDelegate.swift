@@ -32,13 +32,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     if let vc = window?.rootViewController {
-      rfm.prepareKMPInstall(from: destinationUrl,
-                            alertHost: vc,
-                            completionHandler: { package in
-                              // We choose to prompt the user for comfirmation, rather
-                              // than automatically installing the package.
-                              rfm.promptPackageInstall(of: package, in: vc, isCustom: true)
-                            })
+      if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
+        // We choose to prompt the user for comfirmation, rather
+        // than automatically installing the package.
+        rfm.promptPackageInstall(of: package, in: vc, isCustom: true)
+      }
     } else {
       log.error("Cannot find app's root UIViewController")
     }

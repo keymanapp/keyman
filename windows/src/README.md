@@ -158,3 +158,13 @@ The `KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of t
 repo on your local machine.
 
 Keyman Desktop does not currently depend on this component.
+
+### Crash Reporting
+
+Crash report dialogs as shown by tsysinfo have a few special secret hotkeys
+useful for development purposes:
+
+1. Ctrl+C - copy details to clipboard
+2. Ctrl+Shift+C - copy more details to clipboard
+3. Alt+DblClk on icon - open sentry site to event
+4. Ctrl+DblClk on icon - show more details in message box

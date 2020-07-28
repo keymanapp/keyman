@@ -6,6 +6,10 @@ apply from: "$rootPath/version.gradle"
 android {
     compileSdkVersion 29
 
+    // Don't compress kmp files so they can be copied via AssetManager
+    aaptOptions {
+        noCompress "kmp"
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -13,12 +17,13 @@ android {
 
     defaultConfig {
         applicationId "com.keyman.kmsample1"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 29
 
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
+        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
     }
     buildTypes {
         release {
@@ -38,8 +43,8 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.2.0-alpha02'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0-alpha03'
+    implementation 'com.google.android.material:material:1.1.0'
     api(name: 'keyman-engine', ext: 'aar')
     implementation 'io.sentry:sentry-android:2.0.1'
 }

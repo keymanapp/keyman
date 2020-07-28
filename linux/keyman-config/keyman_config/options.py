@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 
-import ast
 import gi
 import logging
 import webbrowser
 import urllib.parse
-gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, WebKit2
 from urllib.parse import parse_qsl, urlencode
-from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.accelerators import init_accel
 from keyman_config.dconf_util import get_option, set_option
+
+gi.require_version('Gtk', '3.0')
+gi.require_version('WebKit2', '4.0')
 
 
 class OptionsView(Gtk.Window):
@@ -73,7 +73,7 @@ class OptionsView(Gtk.Window):
                 self.close()
                 return True
 
-            if not "options.htm" in uri:
+            if "options.htm" not in uri:
                 logging.debug("opening uri %s in webbrowser")
                 webbrowser.open(uri)
                 decision.ignore()
@@ -82,5 +82,5 @@ class OptionsView(Gtk.Window):
 
     def process_option(self):
         # Write the Keyman options to DConf
-        info = { "packageID": self.packageID, "keyboardID": self.keyboardID}
+        info = {"packageID": self.packageID, "keyboardID": self.keyboardID}
         set_option(info, self.options)

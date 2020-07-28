@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B1774149-3D2F-45DA-A888-2DD359CC31F3}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="TIKE\Tike.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="setup\setup.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmconvert\kmconvert.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="kmcomp\kmcomp.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Tike">
+        <MSBuild Projects="TIKE\Tike.dproj"/>
+    </Target>
+    <Target Name="Tike:Clean">
+        <MSBuild Projects="TIKE\Tike.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Tike:Make">
+        <MSBuild Projects="TIKE\Tike.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="setup">
+        <MSBuild Projects="setup\setup.dproj"/>
+    </Target>
+    <Target Name="setup:Clean">
+        <MSBuild Projects="setup\setup.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="setup:Make">
+        <MSBuild Projects="setup\setup.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="kmconvert">
+        <MSBuild Projects="kmconvert\kmconvert.dproj"/>
+    </Target>
+    <Target Name="kmconvert:Clean">
+        <MSBuild Projects="kmconvert\kmconvert.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmconvert:Make">
+        <MSBuild Projects="kmconvert\kmconvert.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="kmcomp">
+        <MSBuild Projects="kmcomp\kmcomp.dproj"/>
+    </Target>
+    <Target Name="kmcomp:Clean">
+        <MSBuild Projects="kmcomp\kmcomp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="kmcomp:Make">
+        <MSBuild Projects="kmcomp\kmcomp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Tike;setup;kmconvert;kmcomp"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Tike:Clean;setup:Clean;kmconvert:Clean;kmcomp:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Tike:Make;setup:Make;kmconvert:Make;kmcomp:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

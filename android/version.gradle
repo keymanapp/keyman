@@ -19,21 +19,34 @@ def getVersionCode = { ->
 }
 
 def getVersionName = { ->
-    String env_version = System.getenv("VERSION")
-    String env_tier = System.getenv("TIER")
-    if (env_version != null && env_tier != null) {
-        // If building from script, we have build number in VERSION and tier in TIER
-        return "$env_version-$env_tier"
+    String env_version = System.getenv("VERSION_WITH_TAG")
+    if (env_version != null) {
+        // If building from script, we have build number in VERSION_WITH_TAG
+        return "$env_version"
     } else {
         // Building probably from IDE, so let's use VERSION.md and TIER.md directly
+        // This is a close match with VERSION_WITH_TAG, except that 'stable' tier
+        // is not normally included with VERSION_WITH_TAG
         String version_md = file("$rootPath/../VERSION.md").text.trim()
         String tier_md = file("$rootPath/../TIER.md").text.trim()
-        println "Using build $version_md-$tier_md from project VERSION.md"
-        return "$version_md-$tier_md"
+        println "Using build $version_md-$tier_md-local from project VERSION.md/TIER.md"
+        return "$version_md-$tier_md-local"
+    }
+}
+
+def getVersionEnvironment = { ->
+    String env_environment = System.getenv("VERSION_ENVIRONMENT")
+    if (env_environment != null) {
+        // If building from script, we have build number in VERSION_ENVIRONMENT
+        return "$env_environment"
+    } else {
+        // Building probably from IDE, so use "local"
+        return "local"
     }
 }
 
 ext {
     VERSION_CODE=getVersionCode()
     VERSION_NAME=getVersionName()
+    VERSION_ENVIRONMENT=getVersionEnvironment()
 }

@@ -9,15 +9,15 @@
 import Foundation
 import WebKit
 
-public class PackageInstallViewController: UIViewController {
-  public typealias CompletionHandler = (Error?) -> Void
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController {
+  public typealias CompletionHandler = ([Resource.FullID]?) -> Void
 
-  let package: KeymanPackage
+  let package: Resource.Package
   var wkWebView: WKWebView?
   let completionHandler: CompletionHandler
   let isCustom: Bool
 
-  public init(for package: KeymanPackage, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
+  public init(for package: Resource.Package, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
     self.package = package
     self.completionHandler = completionHandler
     self.isCustom = isCustom
@@ -47,19 +47,33 @@ public class PackageInstallViewController: UIViewController {
 
     navigationItem.leftBarButtonItem = cancelBtn
     navigationItem.rightBarButtonItem = installBtn
+    navigationItem.title = package.name
   }
 
   override public func viewWillAppear(_ animated: Bool) {
-    wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
+    if let welcomeURL = package.welcomePageURL {
+      wkWebView?.loadFileURL(welcomeURL, allowingReadAccessTo: package.sourceFolder)
+    } else {
+      wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
+    }
   }
 
   @objc func cancelBtnHandler() {
-    dismiss(animated: true, completion: nil)
+    dismiss(animated: true, completion: {
+      self.completionHandler(nil)
+    })
   }
 
   @objc func installBtnHandler() {
     dismiss(animated: true, completion: {
-      ResourceFileManager.shared.finalizePackageInstall(self.package, isCustom: self.isCustom, completionHandler: self.completionHandler)
+      // A stop-gap pending further changes.
+      let defaultResource = self.package.installableResourceSets[0] as! [Resource]
+      switch self.package.resourceType() {
+        case .keyboard:
+          self.completionHandler([defaultResource[0].typedFullID])
+        case .lexicalModel:
+          self.completionHandler(defaultResource.map { $0.typedFullID })
+      }
     })
   }
 }

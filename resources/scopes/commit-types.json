@@ -1,0 +1,13 @@
+{
+  "commitTypes": [
+    "fix",
+    "feat",
+    "chore",
+    "change",
+    "docs",
+    "style",
+    "refactor",
+    "test",
+    "auto"
+  ]
+}

@@ -28,28 +28,24 @@ WORKER_OUTPUT=build/intermediate
 INCLUDES_OUTPUT=build/includes
 NAKED_WORKER=$WORKER_OUTPUT/index.js
 EMBEDDED_WORKER=$WORKER_OUTPUT/embedded_worker.js
-LEXICAL_MODELS_TYPES=../lexical-model-types
 
+# Builds the top-level JavaScript file for use in browsers (the second stage of compilation)
+build-browser () {
+  npm run tsc -- -p ./browser.tsconfig.json || fail "Could not build top-level browser-targeted JavaScript file."
+  cp ./index.d.ts $INCLUDES_OUTPUT/LMLayer.d.ts
+  cp ./message.d.ts $INCLUDES_OUTPUT/message.d.ts
+}
 
+# Builds the top-level JavaScript file for use on Node (the second stage of compilation)
+build-headless () {
+  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level node-targeted JavaScript file."
+}
 
-# Build the worker and the main script.
-build ( ) {
-  # Ensure that the build-product destination for any generated include .d.ts files exists.
-  if ! [ -d $INCLUDES_OUTPUT ]; then
-    mkdir -p "$INCLUDES_OUTPUT"
-  fi
-
+build-wrapped-worker () {
   # Build worker first; the main file depends on it.
   # Then wrap the worker; Then build the main file.
 
-  build-worker && wrap-worker && build-main
-}
-
-# Builds the top-level JavaScript file (the second stage of compilation)
-build-main () {
-  npm run tsc -- -p ./tsconfig.json || fail "Could not build top-level JavaScript file."
-  cp ./index.d.ts $INCLUDES_OUTPUT/LMLayer.d.ts
-  cp ./message.d.ts $INCLUDES_OUTPUT/message.d.ts
+  build-worker && wrap-worker || fail "Could not build inner-level JavaScript file for use in the Worker."
 }
 
 # Builds the inner JavaScript worker (the first stage of compilation).
@@ -88,13 +84,14 @@ clean ( ) {
 }
 
 display_usage ( ) {
-  echo "Usage: $0 [-clean] [-test | -tdd]"
+  echo "Usage: $0 [-clean] [-skip-package-install | -S] [-test | -tdd]"
   echo "       $0 -help"
   echo
-  echo "  -clean              to erase pre-existing build products before a re-build"
-  echo "  -help               displays this screen and exits"
-  echo "  -tdd                skips dependency updates, builds, then runs unit tests only"
-  echo "  -test               runs unit and integration tests after building"
+  echo "  -clean                 to erase pre-existing build products before a re-build"
+  echo "  -help                  displays this screen and exits"
+  echo "  -skip-package-install  (or -S) skips dependency updates"
+  echo "  -tdd                   skips dependency updates, builds, then runs unit tests only"
+  echo "  -test                  runs unit and integration tests after building"
 }
 
 # Creates embedded_worker.js. Must be run after the worker is built for the
@@ -138,7 +135,7 @@ wrap-worker-code ( ) {
 ################################ Main script ################################
 
 run_tests=0
-fetch_deps=1
+fetch_deps=true
 unit_tests_only=0
 
 # Process command-line arguments
@@ -152,12 +149,15 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit
       ;;
+    -skip-package-install|-S)
+      fetch_deps=false
+      ;;
     -test)
       run_tests=1
       ;;
     -tdd)
       run_tests=1
-      fetch_deps=0
+      fetch_deps=false
       unit_tests_only=1
       ;;
     *)
@@ -169,18 +169,16 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Check if Node.JS/npm is installed.
-type npm >/dev/null ||\
-    fail "Build environment setup error detected!  Please ensure Node.js is installed!"
+verify_npm_setup $fetch_deps
 
-if (( fetch_deps )); then
-  # Before installing, ensure that the local npm package we need can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
-
-  echo "Dependencies check"
-  npm install --no-optional
+# Ensure that the build-product destination for any generated include .d.ts files exists.
+if ! [ -d $INCLUDES_OUTPUT ]; then
+  mkdir -p "$INCLUDES_OUTPUT"
 fi
 
-build || fail "Compilation failed."
+build-wrapped-worker || fail "LMLayer worker compilation failed."
+build-browser || fail "Browser-oriented compilation failed."
+build-headless || fail "Headless compilation failed."
 echo "Typescript compilation successful."
 
 if (( run_tests )); then

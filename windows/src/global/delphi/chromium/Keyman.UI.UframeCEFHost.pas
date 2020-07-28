@@ -397,9 +397,15 @@ begin
   end;
 end;
 
-function IsLocalURL(URL: WideString): Boolean;
+function IsLocalURL(URL: string): Boolean;
 begin
-  Result := (Copy(URL, 1, 5) = 'file:') or (Copy(URL, 1, 1) = '/');
+  Result :=
+    URL.StartsWith('file:') or
+    URL.StartsWith('/') or
+    URL.StartsWith('http://localhost:') or
+    URL.StartsWith('http://localhost/') or
+    URL.StartsWith('http://127.0.0.1:') or
+    URL.StartsWith('http://127.0.0.1/');
 end;
 
 procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);

@@ -13,10 +13,14 @@ struct InstallableConstants {
 }
 
 /// Mainly differs from the API `LexicalModel` by having an associated language.
-public struct InstallableLexicalModel: Codable, LanguageResource {
+public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource {
+  typealias Metadata = KMPLexicalModel
+  public typealias Package = LexicalModelKeymanPackage
+
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
+    case packageID
     case name
     case lgCode = "languageID"  // Redirects the old plain-property to something we can wrap with accessors.
     case version
@@ -24,6 +28,7 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
   }
 
   public private(set) var id: String
+  public internal(set) var packageID: String? = nil
   public var name: String
   private var lgCode: String
   public var version: String
@@ -39,9 +44,14 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
       return nil
     }
   }
-  
-  public var fullID: FullLexicalModelID {
+
+  // Weird scheme due to https://stackoverflow.com/a/58774558
+  public var typedFullID: FullLexicalModelID {
     return FullLexicalModelID(lexicalModelID: id, languageID: languageID)
+  }
+
+  public var fullID: FullLexicalModelID {
+    return typedFullID
   }
   
   public init(id: String,
@@ -62,6 +72,24 @@ public struct InstallableLexicalModel: Codable, LanguageResource {
     self.lgCode = languageID
     self.version = lexicalModel.version ?? InstallableConstants.defaultVersion
     self.isCustom = isCustom
+  }
+
+  internal init?(from metadata: KMPLexicalModel, packageID: String, lgCode: String) {
+    self.id = metadata.id
+    self.name = metadata.name
+    self.lgCode = lgCode
+    self.version = metadata.version!
+    self.isCustom = false
+    self.packageID = packageID
+  }
+
+  // Lexical models don't bundle fonts.  At least, not yet?
+  public var fonts: [Font] {
+    return []
+  }
+
+  public var sourceFilename: String {
+    return "\(id).model.js"
   }
 }
 

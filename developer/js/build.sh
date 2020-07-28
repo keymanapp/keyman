@@ -6,12 +6,16 @@
 # Exit on command failure and when using unset variables:
 set -eu
 
-# Include some helper functions from resources
-. ../../resources/shellHelperFunctions.sh
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 EX_USAGE=64
 
 # Where to find lexical model types.
-LEXICAL_MODELS_TYPES=../../common/lexical-model-types
+LEXICAL_MODELS_TYPES=../../common/models/types
 
 
 # Build the main script.
@@ -51,9 +55,11 @@ while [[ $# -gt 0 ]] ; do
         display_usage
         exit
         ;;
+      -skip-package-install|-S)
+        install_dependencies=0
+        ;;
       -test)
         run_tests=1
-        install_dependencies=1
         ;;
       -tdd)
         run_tests=1
@@ -130,10 +136,7 @@ type npm >/dev/null ||\
     fail "Build environment setup error detected!  Please ensure Node.js is installed!"
 
 if (( install_dependencies )) ; then
-  # Ensure that the local npm package can be require()'d.
-  (cd $LEXICAL_MODELS_TYPES && npm link .) || fail "Could not link lexical-model-types"
-
-  npm install || fail "Could not download dependencies."
+  verify_npm_setup
 fi
 
 if [ -n "$publish_version" ]; then

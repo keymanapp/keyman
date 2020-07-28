@@ -10,8 +10,14 @@ import Foundation
 
 /// Dotted-decimal version.
 public class Version: NSObject, Comparable {
+  public enum Tier: String {
+    case alpha
+    case beta
+    case stable
+  }
+
   public static let fallback = Version("1.0")!
-  public static let latestFeature = Version("13.0.65")!
+  public static let latestFeature = packageBasedFileReorg
 
   public static var current: Version {
     let engineInfo = Bundle(for: Manager.self).infoDictionary
@@ -33,10 +39,14 @@ public class Version: NSObject, Comparable {
   public static let fileBrowserImplemented = Version("13.0")!
   public static let defaultsNeedBackup = Version("13.0.65")!
 
+  // A major shift in where resources are installed occurred during
+  // the 14.0 alpha.
+  public static let packageBasedFileReorg = Version("14.0")!
+
   private let components: [Int]
   public let plainString: String
   public let fullString: String
-  public let tier: String?
+  public let tier: Tier?
 
   public init?(_ string: String) {
     let tagComponents = string.components(separatedBy: "-")
@@ -55,11 +65,11 @@ public class Version: NSObject, Comparable {
     if tagComponents.count > 1 {
       switch tagComponents[1] {
         case "alpha":
-          fallthrough
+          tier = .alpha
         case "beta":
-          fallthrough
+          tier = .beta
         case "stable":
-          tier = tagComponents[1]
+          tier = .stable
         default:
           tier = nil
       }
@@ -71,7 +81,7 @@ public class Version: NSObject, Comparable {
     self.components = components
   }
 
-  public init?(_ components: [Int], tier: String? = nil) {
+  public init?(_ components: [Int], tier: Tier? = nil) {
     if components.count == 0 {
       return nil
     }
@@ -120,7 +130,25 @@ public class Version: NSObject, Comparable {
    * (For example, 12.3.45 beta is considered equal to 12.3.45 stable.)
    */
   public static func ==(lhs: Version, rhs: Version) -> Bool {
-    return lhs.components == rhs.components
+    var left = lhs.components
+    while(left.last == 0 && left.count > 0) {
+      left.removeLast()
+    }
+
+    var right = rhs.components
+    while(right.last == 0 && right.count > 0) {
+      right.removeLast()
+    }
+
+    return left.elementsEqual(right)
+  }
+
+  public override func isEqual(_ object: Any?) -> Bool {
+    if let object = object as? Version {
+      return self == object
+    } else {
+      return false
+    }
   }
 
   // For nice logging output & debugger visibility.

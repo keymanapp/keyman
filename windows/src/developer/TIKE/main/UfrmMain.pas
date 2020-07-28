@@ -267,21 +267,21 @@ type
     ReloadasANSI1: TMenuItem;
     ReloadasUTF81: TMenuItem;
     ReloadasUTF161: TMenuItem;
-    DebugTests1: TMenuItem;
-    CrashTest1: TMenuItem;
+    mnuToolsDebugTests: TMenuItem;
+    mnuToolsDebugTestsExceptionTest: TMenuItem;
     CloseProject1: TMenuItem;
     mnuModel: TMenuItem;
     CompileModel1: TMenuItem;
     N2: TMenuItem;
     estLexicalModel1: TMenuItem;
+    mnuToolsDebugTestsCompilerExceptionTest: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure mnuFileClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure mnuProjectClick(Sender: TObject);
-    procedure crash1Click(Sender: TObject);
-    procedure cmdCrashTestClick(Sender: TObject);
+    procedure mnuToolsDebugTestsExceptionTestClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure cbTextFileFormatItemClick(Sender: TObject);
     procedure cbDebugSystemKeyboard_DropDown(Sender: TObject);
@@ -293,6 +293,7 @@ type
     procedure pagesChange(Sender: TObject);
     procedure pagesCloseTab(Sender: TObject; Index: Integer);
     procedure ools1Click(Sender: TObject);
+    procedure mnuToolsDebugTestsCompilerExceptionTestClick(Sender: TObject);
 
   private
     AppStorage: TJvAppRegistryStorage;
@@ -425,11 +426,13 @@ uses
   Keyman.System.CEFManager,
 
   CharMapDropTool,
+  compile,
   HTMLHelpViewer,
   KLog,
   keymanapi_TLB,
   KeymanVersion,
   OnlineConstants,
+  Keyman.System.KeymanSentryClient,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
   GlobalProxySettings,
   Keyman.Developer.System.Project.ProjectFile,
@@ -444,6 +447,7 @@ uses
   RedistFiles,
   ErrorControlledRegistry,
   RegistryKeys,
+  Sentry.Client,
   TikeUnicodeData,
   UfrmCharacterMapDock,
   UfrmMessages,
@@ -1030,16 +1034,6 @@ begin
   //modActionsKeyboardEditor.SetupDebugSystemKeyboard(cbDebugSystemKeyboard.Strings);
 end;
 
-procedure TfrmKeymanDeveloper.cmdCrashTestClick(Sender: TObject);
-var
-  p: PChar;
-  c: Char;
-begin
-  p := nil;
-  c := p^;
-  if c <> #0 then ShowMessage('Why didn''t it crash?');
-end;
-
 {-------------------------------------------------------------------------------
  - Utility functions                                                           -
  -------------------------------------------------------------------------------}
@@ -1374,8 +1368,7 @@ end;
 
 procedure TfrmKeymanDeveloper.ools1Click(Sender: TObject);
 begin
-  inherited;
-  DebugTests1.Visible := GetKeyState(VK_SHIFT) < 0;
+  mnuToolsDebugTests.Visible := (GetKeyState(VK_CONTROL) < 0) and (GetKeyState(VK_SHIFT) < 0);
 end;
 
 procedure TfrmKeymanDeveloper.mnuProjectClick(Sender: TObject);
@@ -1412,12 +1405,15 @@ begin
   modActionsMain.actToolsFileFormat.Execute;
 end;
 
-procedure TfrmKeymanDeveloper.crash1Click(Sender: TObject);
-var
-  p: PChar;
+procedure TfrmKeymanDeveloper.mnuToolsDebugTestsCompilerExceptionTestClick(
+  Sender: TObject);
 begin
-  p := nil;
-  p^ := #0;
+  Compiler_Diagnostic(0);
+end;
+
+procedure TfrmKeymanDeveloper.mnuToolsDebugTestsExceptionTestClick(Sender: TObject);
+begin
+  TKeymanSentryClient.Validate(True);
 end;
 
 procedure TfrmKeymanDeveloper.SetActiveChild(const Value: TfrmTikeChild);

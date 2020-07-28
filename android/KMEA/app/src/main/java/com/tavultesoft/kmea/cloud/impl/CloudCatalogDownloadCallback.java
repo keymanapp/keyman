@@ -13,6 +13,7 @@ import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.data.LanguageResource;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -101,11 +102,11 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   void saveDataToCache(CloudCatalogDownloadReturns jsonTuple)
   {
     // First things first - we've successfully downloaded from the Cloud.  Cache that stuff!
-    if (jsonTuple.keyboardJSON != null) {
-      CloudDataJsonUtil.saveJSONObjectToCache(CloudDataJsonUtil.getKeyboardCacheFile(context), jsonTuple.keyboardJSON);
-    }
     if (jsonTuple.lexicalModelJSON != null) {
       CloudDataJsonUtil.saveJSONArrayToCache(CloudDataJsonUtil.getLexicalModelCacheFile(context), jsonTuple.lexicalModelJSON);
+    }
+    if (jsonTuple.packagesJSON != null) {
+      FileUtils.saveList(CloudDataJsonUtil.getResourcesCacheFile(context), jsonTuple.packagesJSON);
     }
   }
 
@@ -134,6 +135,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
   {
     jsonTuple.keyboardJSON = ensureInit(aContext,aDataSet,jsonTuple.keyboardJSON);
     jsonTuple.lexicalModelJSON = ensureInit(aContext,aDataSet, jsonTuple.lexicalModelJSON);
+    jsonTuple.packagesJSON = ensureInit(aContext, aDataSet, jsonTuple.packagesJSON);
   }
 
   public void processCloudReturns(Dataset aDataSet, CloudCatalogDownloadReturns jsonTuple, boolean executeCallbacks) {
@@ -144,8 +146,8 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
       return;
     }
 
-    List<Keyboard> keyboardsArrayList = CloudDataJsonUtil.processKeyboardJSON(jsonTuple.keyboardJSON, false);
-    List<LexicalModel> lexicalModelsArrayList = CloudDataJsonUtil.processLexicalModelJSON(jsonTuple.lexicalModelJSON);
+    final boolean fromKMP = false;
+    List<LexicalModel> lexicalModelsArrayList = CloudDataJsonUtil.processLexicalModelJSON(jsonTuple.lexicalModelJSON, fromKMP);
 
     Dataset installedData = KeyboardPickerActivity.getInstalledDataset(context);
     final List<Bundle> updateBundles = new ArrayList<>();
@@ -153,75 +155,37 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
     // We're about to do a big batch of edits.
     aDataSet.setNotifyOnChange(false);
 
-    // Filter out any duplicates from KMP keyboards, properly merging the lists.
-    for (int i = 0; i < keyboardsArrayList.size(); i++) {
-      Keyboard keyboard = keyboardsArrayList.get(i);
+    // The actual update check
+    CloudDataJsonUtil.processKeyboardPackageUpdateJSON(context, jsonTuple.packagesJSON, updateBundles);
 
-      // Check for duplicates / possible updates.
-      Keyboard match = aDataSet.keyboards.findMatch(keyboard);
+    // Only add installed kmp keyboards
+    aDataSet.keyboards.clear();
+    aDataSet.keyboards.addAll(KeyboardController.getInstance().get());
 
+    // Keep already-installed models and remove duplicate entries in cloud catalog.
+    // Then properly merge the lists. This way, we display installed model info.
+    // Doing reverse order to remove items in lexicalModelsArrayList
+    for (int i = lexicalModelsArrayList.size()-1; i>=0; i--) {
+      LexicalModel model = lexicalModelsArrayList.get(i); // cloud catalog
+      LexicalModel match = aDataSet.lexicalModels.findMatch(model); // installed model
+
+      // Check for model update information before removing duplicate
       if (match != null) {
-        if (compareVersions(keyboard, match) == FileUtils.VERSION_GREATER) {
-          aDataSet.keyboards.remove(match);
-        } else {
-          keyboardsArrayList.remove(keyboard);
-          i--; // Decrement our index to reflect the removal.
-        }
-      } // else no match == no special handling.
-    }
-
-    // Add cloud-returned keyboard info to the CloudRepository's KeyboardsAdapter.
-    aDataSet.keyboards.addAll(keyboardsArrayList);
-
-    // The actual update check.
-    for (int i = 0; i < installedData.keyboards.getCount(); i++) {
-      Keyboard keyboard = installedData.keyboards.getItem(i);
-
-      // Check for duplicates / possible updates.
-      Keyboard match = aDataSet.keyboards.findMatch(keyboard);
-
-      if (match != null) {
-        Bundle bundle = updateCheck(match, keyboard);
+        Bundle bundle = updateCheck(model, match);
         if (bundle != null) {
+          String kmp = model.getUpdateKMP();
+          if (kmp != null && !kmp.isEmpty()) {
+            match.setUpdateKMP(kmp);
+          }
           updateBundles.add(bundle);
         }
-      } // else no match == no special handling.
-    }
 
-    // Filter out any duplicates from already-installed models, properly merging the lists.
-    for (int i = 0; i < lexicalModelsArrayList.size(); i++) {
-      LexicalModel model = lexicalModelsArrayList.get(i);
-
-      // Check for duplicates / possible updates.
-      LexicalModel match = aDataSet.lexicalModels.findMatch(model);
-
-      if (match != null) {
-        if (compareVersions(model, match) == FileUtils.VERSION_GREATER) {
-          aDataSet.lexicalModels.remove(match);
-        } else {
-          lexicalModelsArrayList.remove(model);
-          i--; // Decrement our index to reflect the removal.
-        }
+        lexicalModelsArrayList.remove(model);
       } // else no match == no special handling.
     }
 
     // Add the cloud-returned lexical model info to the CloudRepository's lexical models adapter.
     aDataSet.lexicalModels.addAll(lexicalModelsArrayList);
-
-    // Do the actual update checks.
-    for (int i = 0; i < installedData.lexicalModels.getCount(); i++) {
-      LexicalModel model = installedData.lexicalModels.getItem(i);
-
-      // Check for duplicates / possible updates.
-      LexicalModel match = aDataSet.lexicalModels.findMatch(model);
-
-      if (match != null) {
-        Bundle bundle = updateCheck(match, model);
-        if (bundle != null) {
-          updateBundles.add(bundle);
-        }
-      } // else no match == no special handling.
-    }
 
     if (updateBundles.size() > 0 && !(DEBUG_SIMULATE_UPDATES && !executeCallbacks)) {
       // Time for updates!

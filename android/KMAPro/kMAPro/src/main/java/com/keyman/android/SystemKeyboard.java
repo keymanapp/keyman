@@ -11,6 +11,7 @@ import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
 import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
 import com.tavultesoft.kmea.LanguageSettingsActivity;
 import com.tavultesoft.kmea.R;
+import com.tavultesoft.kmea.data.Keyboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -27,8 +28,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
-
-import java.util.HashMap;
 
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.core.Sentry;
@@ -51,7 +50,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     if (!Sentry.isEnabled()) {
       Log.d(TAG, "Initializing Sentry");
-      SentryAndroid.init(getApplicationContext());
+      SentryAndroid.init(getApplicationContext(), options -> {
+        options.setRelease("release-"+com.tavultesoft.kmapro.BuildConfig.VERSION_NAME);
+        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
+      });
     }
     if (BuildConfig.DEBUG) {
       KMManager.setDebugMode(true);
@@ -136,9 +138,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     } else {
       // Check if predictions needs to be re-enabled per Settings preference
       Context appContext = getApplicationContext();
-      HashMap<String, String> kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
+      Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
       if (kbInfo != null) {
-        String langId = kbInfo.get(KMManager.KMKey_LanguageID);
+        String langId = kbInfo.getLanguageID();
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         boolean mayPredict = prefs.getBoolean(LanguageSettingsActivity.getLanguagePredictionPreferenceKey(langId), true);
         KMManager.setBannerOptions(mayPredict);
@@ -220,6 +222,18 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+      switch (keyCode) {
+        case KeyEvent.KEYCODE_BACK:
+          // Dismiss the keyboard if currently shown
+          if (isInputViewShown()) {
+            KMManager.hideSystemKeyboard();
+            return true;
+          }
+          break;
+      }
+    }
+
     return interpreter.onKeyDown(keyCode, event);  // if false, will revert to default handling.
   }
 

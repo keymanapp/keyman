@@ -1,27 +1,29 @@
 {
-  "name": "keyman-lmlayer-prototype",
-  "version": "0.0.0",
+  "name": "@keymanapp/lexical-model-layer",
+  "version": "14.0.117",
   "description": "Keyman/Predictive Text integration layer",
   "main": "build/index.js",
   "scripts": {
     "karma": "karma",
+    "lerna": "cd ../.. && npm run lerna --",
     "mocha": "mocha",
-    "test": "bash ./unit_tests/test.sh",
-    "tsc": "tsc",
-    "install": "npm link @keymanapp/lexical-model-types"
+    "test": "gosh ./unit_tests/test.sh",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eddieantonio/keyman-lmlayer-prototype.git"
+    "url": "git+https://github.com/keymanapp/keyman.git"
   },
-  "author": "Eddie Antonio Santos <easantos@ualberta.ca> (http://eddieantonio.ca/)",
+  "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eddieantonio/keyman-lmlayer-prototype/issues"
+    "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "homepage": "https://github.com/eddieantonio/keyman-lmlayer-prototype#readme",
+  "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@types/node": "^10.12.11",
+    "@keymanapp/models-types": "^14.0.117",
+    "@keymanapp/resources-gosh": "^14.0.117",
+    "@types/node": "^10.17.21",
     "chai": "^4.2.0",
     "karma": "^4.2.0",
     "karma-browserstack-launcher": "^1.5.1",
@@ -41,9 +43,13 @@
     "mocha-teamcity-reporter": "^2.5.1",
     "sinon": "^7.1.1",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.1"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
+    "@keymanapp/models-templates": "^14.0.117",
+    "@keymanapp/models-wordbreakers": "^14.0.117",
+    "@keymanapp/web-environment": "^14.0.117",
+    "@keymanapp/web-utils": "^14.0.117",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",
     "string.prototype.startswith": "^0.2.0"

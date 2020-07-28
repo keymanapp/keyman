@@ -68,7 +68,7 @@ namespace com.keyman.renderer {
 
         eleDescription.appendChild(document.createTextNode('Name: ' + kbd['Name']));
         eleDescription.appendChild(document.createElement('br'));
-        eleDescription.appendChild(document.createTextNode('Font:  ' + window['keyman'].keyboardManager.activeKeyboard.KV.F));
+        eleDescription.appendChild(document.createTextNode('Font:  ' + window['keyman'].core.activeKeyboard._legacyLayoutSpec.F));
 
       } else {
         eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
@@ -110,7 +110,7 @@ namespace com.keyman.renderer {
         } else {
           // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
           // We instead rely upon the KLS definition to ensure we keep the renders sparse.
-          layers = keyman.keyboardManager.activeKeyboard.KV.KLS;
+          layers = keyman.core.activeKeyboard._legacyLayoutSpec.KLS;
         }
 
         let renderLayer = function(i: number) {
@@ -118,9 +118,9 @@ namespace com.keyman.renderer {
             // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
             if(keyman.osk.vkbd) {
               if(isMobile) {
-                keyman.osk.vkbd.layerId = layers[i].id;
+                keyman.core.keyboardProcessor.layerId = layers[i].id;
               } else {
-                keyman.osk.vkbd.layerId = Object.keys(layers)[i];
+                keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
               }
             } else {
               console.error("Error - keyman.osk.vkbd is undefined!");
@@ -187,7 +187,7 @@ namespace com.keyman.renderer {
     }
 
     setActiveDummy() {
-      com.keyman['DOMEventHandlers'].states.activeElement = BatchRenderer.dummy;
+      com.keyman['dom']['DOMEventHandlers'].states.activeElement = BatchRenderer.dummy;
     }
 
     run() {

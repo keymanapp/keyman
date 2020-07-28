@@ -25,12 +25,14 @@ type
     const S_FallbackKeyboardPath = 'Keyboards\';
     const S__Package = '_Package\';
     const S_MCompileExe = 'mcompile.exe';
+    class function ErrorLogPath(const app: string = ''): string; static;
     class function KeymanDesktopInstallPath(const filename: string = ''): string; static;
     class function KeymanEngineInstallPath(const filename: string = ''): string; static;
     class function KeymanDesktopInstallDir: string; static;
     class function KeymanEngineInstallDir: string; static;
     class function KeyboardsInstallPath(const filename: string = ''): string; static;
     class function KeyboardsInstallDir: string; static;
+    class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
     class function CEFSubprocessPath: string; static;
@@ -56,20 +58,13 @@ function GetFolderPath(csidl: Integer): string;
 var
   buf: array[0..260] of Char;
   idl: PItemIDList;
-  mm: IMalloc;
 begin
   Result := '';
-  if SHGetMalloc(mm) = NOERROR then
+  if SUCCEEDED(SHGetFolderLocation(0, csidl, 0, 0, idl)) then
   begin
-    if SHGetSpecialFolderLocation(0, csidl, idl) = NOERROR then
-    begin
-      if SHGetPathFromIDList(idl, buf) then
-      begin
-        Result := Buf;
-      end;
-      mm.Free(idl);
-    end;
-    mm._Release;
+    if SHGetPathFromIDList(idl, buf) then
+    Result := buf;
+    ILFree(idl);
   end;
 
   if (Result = '') and (csidl = CSIDL_PROGRAM_FILES) then
@@ -288,6 +283,40 @@ begin
     raise EKeymanPath.Create('Unable to find the Keyboards directory.  You should reinstall the product.');
 
   Result := Result + Filename;
+end;
+
+class function TKeymanPaths.ErrorLogPath(const app: string): string;
+begin
+  Result := GetFolderPath(CSIDL_LOCAL_APPDATA) + SFolderKeymanEngineDiag + '\';
+  ForceDirectories(Result);  // I2768
+  if app <> '' then
+    Result := Result + app + '-' + IntToStr(GetCurrentProcessId) + '.log';
+end;
+
+class function TKeymanPaths.KeymanConfigStaticHttpFilesPath(const filename: string): string;
+var
+  keyman_root: string;
+begin
+  // Look up KEYMAN_ROOT development variable -- if found and executable
+  // within that path then use that as source path
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
+  begin
+    Exit(IncludeTrailingPathDelimiter(keyman_root) + 'windows\src\desktop\kmshell\xml\' + filename);
+  end;
+
+  Result := GetDebugPath('KeymanConfigStaticHttpFilesPath', '');
+  if Result = '' then
+  begin
+    Result := ExtractFilePath(ParamStr(0));
+
+    // The xml files may be in the same folder as the executable
+    // for some 3rd party distributions of Keyman Desktop files.
+    if FileExists(Result + 'xml\locale.xml') then
+      Result := Result + 'xml\';
+  end;
+
+  Result := Result + filename;
 end;
 
 end.

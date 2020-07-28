@@ -1,0 +1,28 @@
+{
+  "name": "@keymanapp/web-utils",
+  "version": "14.0.117",
+  "description": "Common utility functions used throughout other Keyman packages",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "gosh ./build.sh",
+    "prepare": "npm run build -- -skip-package-install",
+    "tsc": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "author": "SIL International",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "devDependencies": {
+    "@keymanapp/resources-gosh": "^14.0.117",
+    "@keymanapp/web-environment": "^14.0.117",
+    "@types/node": "^14.0.5",
+    "typescript": "^3.8.3"
+  }
+}

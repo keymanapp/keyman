@@ -1,0 +1,79 @@
+{
+  "specVersion": "14.0",
+  "keyboard": {
+    "id": "options_with_save",
+    "name": "Variable-store test kbd: options_with_save",
+    "filename": "resources/keyboards/options_with_save.js",
+    "languages": [
+      {
+        "id": "en",
+        "name": "English",
+        "region": "World"
+      }
+    ]
+  },
+  "inputTestSets": [
+    {
+      "constraint": {
+        "target": "hardware",
+        "validOSList": null,
+        "validBrowsers": null
+      },
+      "testSet": [
+        {
+          "inputs": [
+            {
+              "type": "key",
+              "keyCode": 65,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "a",
+                "code": "KeyA",
+                "keyCode": 65,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 48,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "0",
+                "code": "Digit0",
+                "keyCode": 48,
+                "location": 0,
+                "modifierSet": 0
+              }
+            },
+            {
+              "type": "key",
+              "keyCode": 50,
+              "states": 10752,
+              "modifiers": 0,
+              "modifierChanged": false,
+              "isVirtualKey": true,
+              "eventSpec": {
+                "type": "key",
+                "key": "2",
+                "code": "Digit2",
+                "keyCode": 50,
+                "location": 0,
+                "modifierSet": 0
+              }
+            }
+          ],
+          "output": "foo."
+        }
+      ]
+    }
+  ]
+}

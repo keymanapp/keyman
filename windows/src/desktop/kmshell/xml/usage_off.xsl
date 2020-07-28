@@ -11,18 +11,18 @@
 		<html>
 			<head>
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
-
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
 				<title>
 					<xsl:value-of select="$locale/String[@Id='SK_Usage_Title']" />
 				</title>
 				<style type="text/css">
 					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
-					body { padding: 6px; margin: 0px; 
+					body { padding: 6px; margin: 0px;
 					background: #A0C1DC; border: none; }
 					html { padding: 0px; margin: 0px;  }
-					
+
 					#toolbar {
 						border-left: solid 1px black;
 						border-right: solid 1px black;
@@ -42,14 +42,14 @@
 					#buttons input {
 					x-margin: 4px 4px; font-size: 12px
 					}
-					
+
 					#outer { position: relative; }
 					#middle { position: absolute; top: 50%; }
 					#inner { position: relative; top: -30%; width: 100%; font-size: 13.3px; text-align: center; }
-					
+
 					#nokeyboards { width: 84%; padding: 8px 3%; margin-left: 5%; background: #F5F6BE; border: solid 1px gray; text-align: left }
 					#nokeyboards img { float: left; padding: 0 16px 0 0 }
-					
+
 				</style>
 			</head>
 
@@ -72,9 +72,7 @@
 								</xsl:when>
 								<xsl:otherwise>
 									<div id="nokeyboards">
-										<img>
-											<xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>info.png</xsl:attribute>
-										</img>
+										<img src="/app/info.png" />
                     <xsl:copy-of select="($locale/String[@Id='S_Usage_NoKeyboardsInstalled'])[1]" />
 									</div>
 									<p></p>

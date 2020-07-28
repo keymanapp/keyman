@@ -81,7 +81,7 @@ uses
   Accctrl,
   AclApi,
   ErrorControlledRegistry,
-  ErrLogPath,
+  KeymanPaths,
   RegistryKeys,
   Unicode;
 
@@ -237,7 +237,7 @@ const
 
 function TDebugLogManager.DebugLogFileName(n: Integer): string;
 begin
-  Result := GetErrLogPath + 'system' + IntToStr(n) + '.etl';
+  Result := TKeymanPaths.ErrorLogPath + 'system' + IntToStr(n) + '.etl';
 end;
 
 procedure TDebugLogManager.FindFirstLogFileName;

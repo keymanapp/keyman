@@ -17,6 +17,7 @@
                     25 May 2010 - mcdurdin - I1632 - Keyboard Options
                     21 Feb 2014 - mcdurdin - I4061 - V9.0 - KeymanWeb compiler needs defined codes for some errors
                     06 Mar 2014 - mcdurdin - I4118 - V9.0 - KMW compiler should warn when extended shift flags are used
+                    22 Jul 2020 - eddieantonio - Add lexical model range https://github.com/keymanapp/keyman/pull/3385
 */
    // I4061
 #ifndef _COMPERR_H
@@ -26,6 +27,10 @@
 #define CERR_ERROR						0x00004000
 #define CERR_WARNING					0x00002000
 #define CERR_MEMORY						0x00001000
+
+// Any messages from the lexical model compiler occupy this range:
+#define CERR_LEXICAL_MODEL_MIN			0x00000800
+#define CERR_LEXICAL_MODEL_MAX			0x000008FF
 
 #define CERR_None						0x00000000
 #define CERR_EndOfFile					0x00000001

@@ -64,6 +64,9 @@ var
 
 procedure Run;
 
+var
+  ExtPath: string = '';
+
 implementation
 
 uses
@@ -84,6 +87,8 @@ const
 
 var
   TempPath: string = '';
+
+procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string); forward;
 
 procedure CreateTempDir;
 var
@@ -192,25 +197,14 @@ BEGIN
 
         if FExtractOnly then
         begin
-          ExtPath := FExtractOnly_Path;  // I3310
-          if ExtPath = '' then
-            ExtPath := '.';
+          DoExtractOnly(FSilent, FExtractOnly_Path);
+          Exit;
         end;
 
-        if not ProcessArchive then
+        if not ProcessArchive(ExtPath) then
         begin
-          if FExtractOnly then
-          begin
-            LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
-            Exit;
-          end;
           { The files must be in the current directory.  Use them instead }
           ExtPath := ExtractFilePath(ParamStr(0));  // I3310
-        end
-        else if FExtractOnly then
-        begin
-          LogError('All files extracted from the archive to '+ExtPath+'\.');  // I3310
-          Exit;
         end;
 
         ExtPath := IncludeTrailingPathDelimiter(ExtPath);  // I3310
@@ -330,10 +324,37 @@ begin
   Result := WideFormat(Text(Name), Args);
 end;
 
+procedure DoExtractOnly(FSilent: Boolean; const FExtractOnly_Path: string);
+var
+  path: string;
+begin
+  path := FExtractOnly_Path;  // I3476
 
-{
-////ExecuteApp insertion
-}
+  if path = '' then
+    path := '.';
+
+  if (path <> '.') and (path <> '.\') and not DirectoryExists(path) then  // I3081  // I3476
+  begin
+    if not CreateDir(path) then  // I3476
+    begin
+      LogError('Setup could not create the target folder '+path);  // I3476
+      ExitCode := Integer(GetLastError);
+      Exit;
+    end;
+  end;
+
+  if not ProcessArchive(path) then
+  begin
+    LogError('This file was not a valid self-extracting archive.  The files should already be in the same folder as the archive.');
+    ExitCode := ERROR_BAD_FORMAT;
+    Exit;
+  end;
+
+  if not FSilent then
+    LogError('All files extracted from the archive to '+path+'\.');  // I3476
+
+  ExitCode := ERROR_SUCCESS;
+end;
 
 
 end.

@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 
 public class KeymanSettingsActivity extends AppCompatActivity {
   protected static final String installedLanguagesKey = "InstalledLanguages";
+  protected static final String installKeyboardOrDictionaryKey = "InstallKeyboardOrDictionary";
   protected static final String showBannerKey = "ShowBanner";
 
   protected KeymanSettingsFragment innerFragment;

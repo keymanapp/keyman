@@ -7,13 +7,16 @@ import sys
 
 from keyman_config import __version__
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally print the details of the kvk file.')
+    parser = argparse.ArgumentParser(
+        description='Convert a Keyman kvk on-screen keyboard file to an LDML file. Optionally ' +
+        'print the details of the kvk file.')
     parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
     parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
     parser.add_argument('-o', '--output', metavar='LDMLFILE', help='output LDML file location')
-    parser.add_argument('--version', action='version', version='%(prog)s version '+__version__)
+    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
     parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
 
@@ -53,6 +56,7 @@ def main():
     with open(outputfile, 'wb') as ldmlfile:
         ldml = convert_ldml(kvkData)
         output_ldml(ldmlfile, ldml)
+
 
 if __name__ == "__main__":
     main()

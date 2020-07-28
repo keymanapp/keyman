@@ -26,6 +26,7 @@ function run_test() {
     -sdk iphonesimulator \
     -destination "platform=iOS Simulator,name=$DEVICE" \
     -only-testing KeymanEngineTests \
+    SKIP_UNSTABLE_TESTS=true \
     test
 }
 

@@ -39,7 +39,7 @@
 
       kmw.addEventListener('keyboardloaded', setIsChiral);
       kmw.addEventListener('keyboardchange', setIsChiral);
-      kmw.addEventListener('mm.modelchange', onModelChange);
+      kmw.core.languageProcessor.on('statechange', onStateChange);
 
       notifyHost('pageLoaded');
     }
@@ -95,8 +95,8 @@
       window.jsInterface.beepKeyboard();
     }
 
-    function onModelChange(change) {
-      //window.console.log('onModelChange change: ' + change);
+    function onStateChange(change) {
+      //window.console.log('onStateChange change: ' + change);
 
       // Refresh KMW OSK
       var kmw=window['keyman'];
@@ -118,7 +118,7 @@
 
     function setKeymanLanguage(keyboardName, internalName, languageName, langId, kbdFile, font, oskFont, package) {
       var kmw=window['keyman'];
-      var kbdInterface=kmw['interface'];
+      var kbdInterface=window.KeymanWeb;
 
       // Defaults for missing arguments
       switch (arguments.length) {
@@ -309,7 +309,7 @@
       var kmw=window['keyman'];
       //window.console.log('executeHardwareKeystroke:('+code+', ' + shift + ', ' + lstates + ');');
       try {
-        if (!kmw['executeHardwareKeystroke'](code, shift, lstates)) {
+        if (kmw['executeHardwareKeystroke'](code, shift, lstates)) { // false if matched, true if not
           // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
           window.jsInterface.dispatchKey(code, eventModifiers);
         }

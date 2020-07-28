@@ -28,6 +28,7 @@ import com.tavultesoft.kmea.KeyboardEventHandler;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONObject;
 
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PackageActivity extends AppCompatActivity {
-
+  private final static String TAG = "PackageActivity";
   private Toolbar toolbar;
   private WebView webView;
   private AlertDialog alertDialog;
@@ -53,12 +54,14 @@ public class PackageActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_package_installer);
     boolean silentInstall = false;
+    String languageID = null;
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
     if (bundle != null) {
       kmpFile = new File(bundle.getString("kmpFile"));
       silentInstall = bundle.getBoolean("silentInstall", false);
+      languageID = bundle.getString("language", null);
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -76,6 +79,7 @@ public class PackageActivity extends AppCompatActivity {
       tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
 
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       showErrorToast(context, getString(R.string.failed_to_extract));
       return;
     }
@@ -88,7 +92,7 @@ public class PackageActivity extends AppCompatActivity {
 
     // Silent installation (skip displaying welcome.htm and user confirmation)
     if (silentInstall) {
-      installPackage(context, pkgTarget, pkgId,true);
+      installPackage(context, pkgTarget, pkgId, languageID, true);
       return;
     }
 
@@ -166,7 +170,7 @@ public class PackageActivity extends AppCompatActivity {
     if (files.length > 0 && files[0].exists() && files[0].length() > 0) {
       webView.loadUrl("file:///" + files[0].getAbsolutePath());
     } else {
-      // No welcome.htm so display minimal package information
+      // No readme.htm so display minimal package information
       String targetString = "";
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         targetString = pkgName != null && pkgName.toLowerCase().endsWith("keyboard")
@@ -181,16 +185,17 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
-    initializeButtons(context, pkgId, pkgTarget);
+    initializeButtons(context, pkgId, languageID, pkgTarget);
   }
 
   /**
    * Initialize buttons of package installer.
    * @param context the context
    * @param pkgId the keyman package id
+   * @param languageID the optional language id
    * @param pkgTarget  String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    */
-  private void initializeButtons(final Context context, final String pkgId, final String pkgTarget) {
+  private void initializeButtons(final Context context, final String pkgId, final String languageID, final String pkgTarget) {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
     final Button finishButton = (Button) findViewById(R.id.finishButton);
@@ -198,7 +203,9 @@ public class PackageActivity extends AppCompatActivity {
     installButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        installPackage(context, pkgTarget, pkgId,false);
+
+
+        installPackage(context, pkgTarget, pkgId, languageID, false);
       }
     });
 
@@ -231,7 +238,7 @@ public class PackageActivity extends AppCompatActivity {
         FileUtils.deleteDirectory(tempPackagePath);
       }
     } catch (Exception e) {
-      Log.e("PackageActivity", "cleanup() failed with error " + e);
+      KMLog.LogException(TAG, "cleanup() failed with error ", e);
     } finally {
       finish();
     }
@@ -310,13 +317,19 @@ public class PackageActivity extends AppCompatActivity {
    * @param context Context   The activity context
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param pkgId String      The Keyman package ID
+   * @param languageID String The optional language ID
+   * @param anSilentInstall boolean If true, don't display readme.htm/welcome.htm content during installation
    */
-  private void installPackage(Context context, String pkgTarget, String pkgId, boolean anSilentInstall) {
+  private void installPackage(Context context, String pkgTarget, String pkgId, String languageID, boolean anSilentInstall) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
+
+        //Dataset kmpDataset = new Dataset(context);
+        //kmpDataset.keyboards.addAll(kbdsList);
+
         List<Map<String, String>> installedPackageKeyboards =
-          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, languageID);
         // Do the notifications!
         boolean success = installedPackageKeyboards.size() != 0;
         boolean _cleanup = true;
@@ -356,7 +369,7 @@ public class PackageActivity extends AppCompatActivity {
         }
       }
     } catch (Exception e) {
-      Log.e("PackageActivity", "Error " + e);
+      KMLog.LogException(TAG, "", e);
       showErrorDialog(context, pkgId, getString(R.string.no_targets_to_install));
     }
   }

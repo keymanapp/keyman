@@ -179,6 +179,18 @@
       </Component>
 
       <Component>
+        <File Name="sentry.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="sentry.x64.dll" KeyPath="yes" />
+      </Component>
+
+      <Component>
+        <File Name="crashpad_handler.exe" KeyPath="yes" />
+      </Component>
+
+      <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
       </Component>
 

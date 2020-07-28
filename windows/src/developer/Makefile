@@ -35,7 +35,7 @@ kmconvert:
     cd $(ROOT)\src\developer\kmconvert
     $(MAKE) $(TARGET)
 
-tike: kmcmpdll
+tike: kmcmpdll redist
     cd $(ROOT)\src\developer\tike
     $(MAKE) $(TARGET)
 
@@ -47,7 +47,16 @@ setup:
     cd $(ROOT)\src\developer\setup
     $(MAKE) $(TARGET)
 
-inst:
+# ----------------------------------------------------------------------
+
+redist:
+    copy $(ROOT)\src\ext\sentry\sentry.dll $(ROOT)\bin\developer
+    copy $(ROOT)\src\ext\sentry\sentry.x64.dll $(ROOT)\bin\developer
+    copy $(ROOT)\src\ext\sentry\crashpad_handler.exe $(ROOT)\bin\developer
+
+# ----------------------------------------------------------------------
+
+inst: redist
     cd $(ROOT)\src\developer\inst
     $(MAKE) $(TARGET)
 

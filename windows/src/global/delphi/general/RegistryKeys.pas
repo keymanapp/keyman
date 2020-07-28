@@ -183,6 +183,11 @@ const
   SRegValue_AvailableLanguages = 'available languages'; //CU
   SRegValue_CurrentLanguage    = 'current language';    //CU
 
+  { Privacy }
+
+  SRegValue_AutomaticallyReportErrors = 'automatically report errors';              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
+  SRegValue_AutomaticallyReportUsage  = 'automatically report usage';               // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
+
   { ActiveKeyboards }
 
   SRegKey_ActiveKeyboards_CU = SRegKey_KeymanEngine_CU + '\Active Keyboards';                   // CU

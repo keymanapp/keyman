@@ -1,7 +1,13 @@
 #!/bin/sh
 
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
 # Include our resource functions; they're pretty useful!
-. ../../../resources/shellHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" == *"darwin" ]]; then
@@ -40,7 +46,7 @@ verify_KMEI ( ) {
     [ -d "$KEYMAN_ENGINE_FRAMEWORK_SRC" ] || KMEI_BUILD_EXISTS=false
 }
 
-KMEI_BUILD_DIR="../../../ios/"
+KMEI_BUILD_DIR="$KEYMAN_ROOT/ios/"
 
 BUILD_FOLDER=build
 
@@ -103,7 +109,16 @@ done
 # Build Keyman Engine
 #
 
-KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-iphoneos/KeymanEngine.framework"
+if [ $CONFIG = "Debug" ]; then
+    # When doing a debug run, we'd like to be able to run the result in the Simulator.
+    # 'universal' can be run both on real devices and in the simulator.
+    PLATFORM_TARGET="universal"
+else
+    # Actual release builds can't have Simulator-targeted content; Apple will block the submission.
+    PLATFORM_TARGET="iphoneos"
+fi
+
+KEYMAN_ENGINE_FRAMEWORK_SRC="$KMEI_BUILD_DIR/build/Build/Products/$CONFIG-$PLATFORM_TARGET/KeymanEngine.framework"
 KEYMAN_ENGINE_FRAMEWORK_DST=./
 
 if [ $DO_UPDATE = true ]; then
@@ -159,29 +174,26 @@ if [ $CODE_SIGN = true ]; then
     # Time to prepare the deployment archive data.
     echo ""
     echo "Preparing .ipa file for deployment."
-    xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates
+    xcodebuild $XCODEFLAGS_EXT -scheme $TARGET -archivePath $ARCHIVE_PATH archive -allowProvisioningUpdates \
+               VERSION=$VERSION \
+               VERSION_WITH_TAG=$VERSION_WITH_TAG
 
     assertDirExists "$ARCHIVE_PATH"
 
-    # Pass the build number information along to the Plist file of the app.
-    if [ $VERSION ]; then
-      echo "Setting version numbers to $VERSION."
-      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleVersion $VERSION" "$ARCHIVE_PATH/Info.plist"
-      /usr/libexec/Plistbuddy -c "Set ApplicationProperties:CFBundleShortVersionString $VERSION" "$ARCHIVE_PATH/Info.plist"
-
-      ARCHIVE_APP="$ARCHIVE_PATH/Products/Applications/$TARGET.app"
-      ARCHIVE_KBD="$ARCHIVE_APP/Plugins/SWKeyboard.appex"
-
-      set_version "$ARCHIVE_APP" "$TARGET"
-      set_version "$ARCHIVE_KBD"
-    fi
-
-    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates
+    xcodebuild $XCODEFLAGS -exportArchive -archivePath $ARCHIVE_PATH -exportOptionsPlist exportAppStore.plist \
+               -exportPath $BUILD_PATH/${CONFIG}-iphoneos -allowProvisioningUpdates \
+               VERSION=$VERSION \
+               VERSION_WITH_TAG=$VERSION_WITH_TAG
   else
-    xcodebuild $XCODEFLAGS -scheme "$TARGET"
+    xcodebuild $XCODEFLAGS -scheme "$TARGET" \
+               VERSION=$VERSION \
+               VERSION_WITH_TAG=$VERSION_WITH_TAG    
   fi
 else
-  xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO $XCODEFLAGS -scheme "$TARGET"
+  xcodebuild CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED="NO" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+             $XCODEFLAGS -scheme "$TARGET" \
+             VERSION=$VERSION \
+             VERSION_WITH_TAG=$VERSION_WITH_TAG
 fi
 
 if [ $? = 0 ]; then

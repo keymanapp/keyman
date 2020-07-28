@@ -37,7 +37,7 @@ uses
   keymanerrorcodes, keymankeyboardinstalled, keymankeyboard, internalinterfaces;
 
 type
-  TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled, IIntKeymanKeyboardsInstalled)   // I4376
+  TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled, IKeymanKeyboardsInstalled2, IIntKeymanKeyboardsInstalled)   // I4376
   private
     FKeyboards: TKeyboardList;
   protected
@@ -53,6 +53,7 @@ type
       safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     procedure Apply; safecall;
+    function Install2(const Filename: WideString; Force, InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
 
     { IIntKeymanKeyboardsInstalled }
     procedure StartKeyboards;   // I4381
@@ -101,6 +102,23 @@ begin
   finally
     Free;
   end;
+end;
+
+function TKeymanKeyboardsInstalled.Install2(const Filename: WideString; Force,
+  InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled;
+begin
+  with TKPInstallKeyboard.Create(Context) do
+  try
+    if InstallDefaultLanguage then
+      Execute(FileName, '', [ikInstallDefaultLanguage], nil, Force)
+    else
+      Execute(FileName, '', [], nil, Force);
+  finally
+    Free;
+  end;
+
+  DoRefresh;
+  Result := Get_Items(FileName);
 end;
 
 procedure TKeymanKeyboardsInstalled.StartKeyboards;   // I4381

@@ -8,8 +8,8 @@
 
 		<html>
 			<head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-
+        <script src="/app/sentry.bundle.min.js"></script>
+        <script src="/app/sentry.init.js"></script>
 				<title>fonts</title>
 				<style type="text/css">
 					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
@@ -64,11 +64,7 @@
 				<div style="margin-top: 24px">
           <xsl:copy-of select="$locale/String[@Id='S_FontHelper_Hint1']"/>
           <xsl:text xml:space="preserve"> </xsl:text>
-          <img style="vertical-align: middle; margin: 0 2px 0 0">
-					  <xsl:attribute name="src">
-						  <xsl:value-of select="/Keyman/templatepath"/>fonthinticon.gif
-					  </xsl:attribute>
-				  </img>
+          <img style="vertical-align: middle; margin: 0 2px 0 0" src="/app/fonthinticon.gif" />
           <xsl:text xml:space="preserve"> </xsl:text>
           <xsl:copy-of select="$locale/String[@Id='S_FontHelper_Hint2']"/>
         </div>

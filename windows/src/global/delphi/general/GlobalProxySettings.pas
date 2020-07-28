@@ -41,14 +41,18 @@ type
 
 function GetProxySettings: TProxySettings;
 
+const
+  ProxySettingsStandinPassword = '##PASSWORD##';
+
 implementation
 
 uses
+  System.SysUtils,
+
   DCPcrypt2,
   DCPrc4,
-  ErrorControlledRegistry, 
-  RegistryKeys,
-  SysUtils;
+  ErrorControlledRegistry,
+  RegistryKeys;
 
 var
   FProxySettings: TProxySettings = nil;

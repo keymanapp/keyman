@@ -12,16 +12,16 @@
       <xsl:copy-of select="$altlocale" />
   </xsl:variable>
   <xsl:variable name="locale" select="msxsl:node-set($comlocale)" />
-    
+
   <!--
   -
   - Generic list implementation: supports entry plus expanding details
   -
   -->
 
-  
-  
-  <!-- 
+
+
+  <!--
   -
   - Checkbox implementation
   -
@@ -35,7 +35,7 @@
     <xsl:param name="title" />
     <xsl:param name="disabled" />
     <xsl:param name="tabid" />
-   
+
     <input type="checkbox">
       <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
       <xsl:attribute name="id"><xsl:value-of select="$id"/></xsl:attribute>
@@ -47,12 +47,12 @@
     </input>
   </xsl:template>
 
-  <!-- 
+  <!--
   -
   - Button implementation
   -
   -->
-  
+
   <xsl:template name="button">
     <xsl:param name="caption" />
     <xsl:param name="command" />
@@ -78,16 +78,14 @@
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
             font-size: 12px;
-            height: 25px; 
+            height: 25px;
             display: inline-block;
             text-align: center;
             width: <xsl:value-of select="$width"/>;
             margin-right: 8px;
             vertical-align: top;
           </xsl:attribute>
-          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;">
-            <xsl:attribute name="src"><xsl:value-of select='/Keyman/templatepath' />shield.png</xsl:attribute>
-          </img> 
+          <img alt="" style="vertical-align: middle; width: 16px; padding: 0; margin: 2px 4px 5px 0px; display: inline; height: 18px;" src="/app/shield.png" />
           <xsl:value-of select="$caption" />
         </button>
       </xsl:when>
@@ -115,7 +113,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- 
+  <!--
   -
   - Popup menu implementation
   -
@@ -138,7 +136,7 @@
       <xsl:copy-of select="$caption"/>
     </span>
   </xsl:template>
-  
+
   <xsl:template name="menubutton">
     <xsl:param name="caption" />
     <xsl:param name="menutemplate" />
@@ -147,7 +145,7 @@
     <xsl:param name="width" />
     <xsl:param name="className" />
     <xsl:param name="tabid" />
-    
+
     <xsl:call-template name="button">
       <xsl:with-param name="caption"><xsl:value-of select="$caption" /></xsl:with-param>
       <xsl:with-param name="onclick">ShowMenu('<xsl:value-of select="$id"/>','<xsl:value-of select="$align" />',0,0); return false;</xsl:with-param>
@@ -157,11 +155,11 @@
       <xsl:with-param name="width"><xsl:value-of select="$width"/></xsl:with-param>
       <xsl:with-param name="tabid"><xsl:value-of select="$tabid"/></xsl:with-param>
     </xsl:call-template>
-    
+
   </xsl:template>
 
   <!-- Replaces a string, e.g. ' with \' https://stackoverflow.com/a/7712434/1836776 -->
-  
+
   <xsl:template name="replace-string">
     <xsl:param name="text"/>
     <xsl:param name="replace"/>
@@ -182,5 +180,5 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>

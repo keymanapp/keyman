@@ -4,7 +4,6 @@ package com.tavultesoft.kmea;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import com.tavultesoft.kmea.data.CloudRepository;
 import com.tavultesoft.kmea.data.Dataset;
 import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.data.adapters.NestedAdapter;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.MapCompat;
 
 import java.io.File;
@@ -64,7 +64,7 @@ public final class ModelPickerActivity extends AppCompatActivity {
 
     Bundle bundle = getIntent().getExtras();
     String newLanguageID = bundle.getString(KMManager.KMKey_LanguageID);
-    String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink);
+    String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink, "");
 
     // Sometimes we need to re-initialize the list of models that are displayed in the ListView
     languageID = newLanguageID;
@@ -84,57 +84,49 @@ public final class ModelPickerActivity extends AppCompatActivity {
       didExecuteParser = true;
       repo = CloudRepository.shared.fetchDataset(context);
 
-      // Initialize the dataset of installed lexical models
-      listView.setAdapter(new FilteredLexicalModelAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), languageID));
+      // Initialize the dataset of available lexical models (installed and from the cloud catalog)
+      listView.setAdapter(new FilteredLexicalModelAdapter(context, repo, languageID));
       listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
           int selectedIndex = position;
           LexicalModel model = ((FilteredLexicalModelAdapter) listView.getAdapter()).getItem(position);
-          Map<String, String> modelInfo = model.map;
-          String packageID = modelInfo.get(KMManager.KMKey_PackageID);
-          String languageID = modelInfo.get(KMManager.KMKey_LanguageID);
-          String modelID = modelInfo.get(KMManager.KMKey_LexicalModelID);
-          String modelName = modelInfo.get(KMManager.KMKey_LexicalModelName);
-          String langName = modelInfo.get(KMManager.KMKey_LanguageName);
+          String packageID = model.getPackageID();
+          String languageID = model.getLanguageID();
+          String modelID = model.getLexicalModelID();
+          String modelName = model.getLexicalModelName();
+          String langName = model.getLanguageName();
+          String version = model.getVersion();
 
-          // File check to see if lexical model already exists locally
-          File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
-
-          String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
-          boolean modelInstalled = KeyboardPickerActivity.containsLexicalModel(context, modelKey);
           boolean immediateRegister = false;
-          Map<String, String> preInstalledModelMap = KMManager.getAssociatedLexicalModel(languageID);
 
+          // File check to see if lexical model file already exists locally (may not be currently installed)
+          File modelCheck = new File(KMManager.getLexicalModelsDir() + packageID + File.separator + modelID + ".model.js");
+          String modelKey = model.getKey();
+          boolean modelInstalled = KeyboardPickerActivity.containsLexicalModel(context, modelKey);
           if (modelInstalled) {
             // Show Model Info
             listView.setItemChecked(position, true);
             listView.setSelection(position);
 
             // Start intent for selected Predictive Text Model screen
-            if (!languageID.equalsIgnoreCase(modelInfo.get(KMManager.KMKey_LanguageID))) {
-              Log.d(TAG, "Language ID " + languageID + " doesn't match model language ID: " +
-                  modelInfo.get(KMManager.KMKey_LanguageID));
-            }
-            Bundle bundle = new Bundle();
-            // Note: package ID of a model is different from package ID for a keyboard.
-            // Language ID can be re-used
-            bundle.putString(KMManager.KMKey_PackageID, packageID);
-            bundle.putString(KMManager.KMKey_LanguageID, languageID);
-            bundle.putString(KMManager.KMKey_LexicalModelID, modelID);
-            bundle.putString(KMManager.KMKey_LexicalModelName, modelName);
-            bundle.putString(KMManager.KMKey_LexicalModelVersion,
-                modelInfo.get(KMManager.KMKey_LexicalModelVersion));
-            bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
             Intent i = new Intent(context, ModelInfoActivity.class);
-            i.putExtras(bundle);
+            i.putExtra(KMManager.KMKey_LexicalModel, model);
             startActivityForResult(i, 1);
           } else if (modelCheck.exists()) {
             // Handle scenario where previously installed kmp already exists so
             // we only need to add the model to the list of installed models
+            HashMap<String, String> modelInfo = new HashMap<String, String>();
+            modelInfo.put(KMManager.KMKey_PackageID, packageID);
+            modelInfo.put(KMManager.KMKey_LexicalModelID, modelID);
+            modelInfo.put(KMManager.KMKey_LanguageID, languageID);
+            modelInfo.put(KMManager.KMKey_LexicalModelName, modelName);
+            modelInfo.put(KMManager.KMKey_LanguageName, langName);
+            modelInfo.put(KMManager.KMKey_LexicalModelVersion, version);
             // Add help link
             modelInfo.put(KMManager.KMKey_CustomHelpLink, "");
+
             boolean result = KMManager.addLexicalModel(context, new HashMap<>(modelInfo));
             if (result) {
               Toast.makeText(context, getString(R.string.model_install_toast), Toast.LENGTH_SHORT).show();
@@ -154,10 +146,19 @@ public final class ModelPickerActivity extends AppCompatActivity {
           if(!modelInstalled) {
             // While awkward, we must obtain the preInstalledModelMap before any installations occur.
             // We don't want to remove the model we just installed, after all!
+            HashMap<String, String> preInstalledModelMap = KMManager.getAssociatedLexicalModel(languageID);
             if(preInstalledModelMap != null) {
-              LexicalModel preInstalled = new LexicalModel(preInstalledModelMap);
-              String itemKey = String.format("%s_%s_%s",
-                  preInstalled.map.get(KMManager.KMKey_PackageID), preInstalled.getLanguageCode(), preInstalled.getResourceId());
+              // This might be unncessary
+              LexicalModel preInstalled = new LexicalModel(
+                preInstalledModelMap.get(KMManager.KMKey_PackageID),
+                preInstalledModelMap.get(KMManager.KMKey_LexicalModelID),
+                preInstalledModelMap.get(KMManager.KMKey_LexicalModelName),
+                preInstalledModelMap.get(KMManager.KMKey_LanguageID),
+                preInstalledModelMap.get(KMManager.KMKey_LanguageName),
+                preInstalledModelMap.get(KMManager.KMKey_LexicalModelVersion),
+                preInstalledModelMap.get(KMManager.KMKey_HelpLink),
+                MapCompat.getOrDefault(preInstalledModelMap, KMManager.KMKey_KMPLink, ""));
+              String itemKey = preInstalled.getKey();
               int modelIndex = KeyboardPickerActivity.getLexicalModelIndex(context, itemKey);
               KeyboardPickerActivity.deleteLexicalModel(context, modelIndex, true);
             }
@@ -166,8 +167,8 @@ public final class ModelPickerActivity extends AppCompatActivity {
           if(immediateRegister) {
             // Register associated lexical model if it matches the active keyboard's language code;
             // it's safe since we're on the same thread.  Needs to be called AFTER deinstalling the old one.
-            String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).get(KMManager.KMKey_LanguageID);
-            if(kbdLgCode.equals(languageID)) {
+            String kbdLgCode = KMManager.getCurrentKeyboardInfo(context).getLanguageID();
+            if(BCP47.languageEquals(kbdLgCode, languageID)) {
               KMManager.registerAssociatedLexicalModel(languageID);
             }
           }
@@ -241,24 +242,20 @@ public final class ModelPickerActivity extends AppCompatActivity {
       }
 
       // Needed for the check below.
-      String packageID = model.map.get(KMManager.KMKey_PackageID);
-      String languageID = model.map.get(KMManager.KMKey_LanguageID);
-      String modelID = model.map.get(KMManager.KMKey_LexicalModelID);
-      String modelKey = String.format("%s_%s_%s", packageID, languageID, modelID);
+      String modelKey = model.getKey();
 
       // TODO:  Refactor this check - we should instead test against the installed models listing
       //        once it has its own backing Dataset instance.
       // Is this an installed model or not?
 
+      holder.imgDetails.setImageResource(R.drawable.ic_arrow_forward);
       if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
         holder.imgInstalled.setImageResource(R.drawable.ic_check);
-        holder.imgDetails.setImageResource(R.drawable.ic_arrow_forward);
       } else {
         holder.imgInstalled.setImageResource(0);
-        holder.imgDetails.setImageResource(0);
       }
 
-      holder.text.setText(model.map.get(KMManager.KMKey_LexicalModelName));
+      holder.text.setText(model.getLexicalModelName());
 
       return convertView;
     }

@@ -133,9 +133,8 @@ public class PackageProcessorTest {
     Assert.assertNotNull(json);
     String pkgVersion = PP.getPackageVersion(json);
 
-    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion);
-    // Only the first language is installed with the keyboard
-    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
+    String languageID = null;
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
     amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
@@ -144,10 +143,34 @@ public class PackageProcessorTest {
     amharic.put(KMManager.KMKey_LanguageID, "am");
     amharic.put(KMManager.KMKey_LanguageName, "Amharic");
     amharic.put(KMManager.KMKey_KeyboardVersion, "1.4");
-    amharic.put(KMManager.KMKey_CustomKeyboard, "Y");
     amharic.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
 
+    // If languageID doesn't match, verify only the first language is installed with the keyboard
     Assert.assertEquals(amharic, keyboards[0]);
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
+
+    languageID = "am";
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+
+    // Verify "am" matched
+    Assert.assertEquals(amharic, keyboards[0]);
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
+
+    languageID = "GEZ";
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+
+    HashMap<String, String> geez = new HashMap<String, String>();
+    geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
+    geez.put(KMManager.KMKey_KeyboardName, "Amharic");
+    geez.put(KMManager.KMKey_KeyboardID, "gff_amh_7");
+    geez.put(KMManager.KMKey_LanguageID, "gez");
+    geez.put(KMManager.KMKey_LanguageName, "Ge'ez");
+    geez.put(KMManager.KMKey_KeyboardVersion, "1.4");
+    geez.put(KMManager.KMKey_CustomHelpLink, TEST_GFF_KMP_TARGET + File.separator + "welcome.htm");
+
+    // Verify "gez" matched
+    Assert.assertEquals(geez, keyboards[0]);
+    Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
   }
 
   @Test

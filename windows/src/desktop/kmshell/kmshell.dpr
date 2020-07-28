@@ -1,6 +1,7 @@
 program kmshell;
 
 uses
+  Winapi.Windows,
   comobj,
   Forms,
   SysUtils,
@@ -70,7 +71,6 @@ uses
   utilcheckfonts in '..\..\global\delphi\general\utilcheckfonts.pas',
   wininet5 in '..\..\global\delphi\general\wininet5.pas',
   GlobalProxySettings in '..\..\global\delphi\general\GlobalProxySettings.pas',
-  ErrLogPath in '..\..\global\delphi\general\ErrLogPath.pas',
   UFixupMissingFile in '..\..\global\delphi\ui\UFixupMissingFile.pas',
   UImportOlderVersionKeyboards in 'main\UImportOlderVersionKeyboards.pas',
   UImportOlderKeyboardUtils in 'main\UImportOlderKeyboardUtils.pas',
@@ -158,13 +158,31 @@ uses
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Vcl in '..\..\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
-  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas';
+  Keyman.System.KeymanSentryClient in '..\..\global\delphi\general\Keyman.System.KeymanSentryClient.pas',
+  Keyman.Configuration.UI.UfrmDiagnosticTests in 'util\Keyman.Configuration.UI.UfrmDiagnosticTests.pas' {frmDiagnosticTests},
+  Keyman.Configuration.System.UmodWebHttpServer in 'web\Keyman.Configuration.System.UmodWebHttpServer.pas' {modWebHttpServer: TDataModule},
+  Keyman.Configuration.System.HttpServer.App in 'web\Keyman.Configuration.System.HttpServer.App.pas',
+  Keyman.System.HttpServer.Base in '..\..\global\delphi\web\Keyman.System.HttpServer.Base.pas',
+  Keyman.Configuration.System.HttpServer.SharedData in 'web\Keyman.Configuration.System.HttpServer.SharedData.pas',
+  Keyman.Configuration.System.HttpServer.App.OnlineUpdate in 'web\Keyman.Configuration.System.HttpServer.App.OnlineUpdate.pas',
+  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas',
+  Keyman.Configuration.System.HttpServer.App.InstallKeyboard in 'web\Keyman.Configuration.System.HttpServer.App.InstallKeyboard.pas',
+  Keyman.Configuration.System.HttpServer.App.ProxyConfiguration in 'web\Keyman.Configuration.System.HttpServer.App.ProxyConfiguration.pas',
+  Keyman.Configuration.System.HttpServer.App.ConfigMain in 'web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas',
+  Keyman.Configuration.UI.InstallFile in 'install\Keyman.Configuration.UI.InstallFile.pas',
+  Keyman.Configuration.UI.KeymanProtocolHandler in 'install\Keyman.Configuration.UI.KeymanProtocolHandler.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
 
+// CEF3 needs to set the LARGEADDRESSAWARE flag which allows 32-bit processes to use up to 3GB of RAM.
+// If you don't add this flag the rederer process will crash when you try to load large images.
+{$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
+
+const
+  LOGGER_DESKTOP_KMSHELL = TKeymanSentryClient.LOGGER_DESKTOP + '.kmshell';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
     FInitializeCEF := TCEFManager.Create;
@@ -172,7 +190,13 @@ begin
       if FInitializeCEF.Start then
       try
         Application.Initialize;
-        Run;
+        Application.Title := 'Keyman Configuration';
+        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
+  try
+          Run;
+        finally
+          FreeAndNil(modWebHttpServer);
+        end;
       except
         on E:Exception do
           SentryHandleException(E);

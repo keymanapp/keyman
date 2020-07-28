@@ -37,9 +37,8 @@ uses
   keymanpackagecontentfiles, StdVcl, kmpinffile, KeymanContext, Graphics, Classes, internalinterfaces;
 
 type
-  TKeymanPackageFile = class(TKeymanAutoObject, IKeymanPackage, IKeymanPackageFile)
+  TKeymanPackageFile = class(TKeymanAutoObject, IKeymanPackage, IKeymanPackageFile, IKeymanPackageFile2)
   private
-
     FSourcePath: string;
     FSubFiles: IKeymanPackageContentFiles;
     FKeyboards: IKeymanPackageContentKeyboards;
@@ -74,6 +73,7 @@ type
 
     { IKeymanPackageFile }
     procedure Install(Force: WordBool); safecall;
+    function Install2(Force, InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
   public
     constructor Create(AContext: TKeymanContext; const Filename: Widestring);
     destructor Destroy; override;
@@ -170,10 +170,26 @@ procedure TKeymanPackageFile.Install(Force: WordBool);
 begin
   with TKPInstallPackage.Create(Context) do
   try
-    Execute(FFileName, Force);
+    Execute(FFileName, Force, True);
   finally
     Free;
   end;
+end;
+
+function TKeymanPackageFile.Install2(Force, InstallDefaultLanguage: WordBool): IKeymanPackageInstalled;
+var
+  kpi: IKeymanPackagesInstalled;
+begin
+  with TKPInstallPackage.Create(Context) do
+  try
+    Execute(FFileName, Force, InstallDefaultLanguage);
+  finally
+    Free;
+  end;
+
+  kpi := Context.Packages as IKeymanPackagesInstalled;
+  kpi.Refresh;
+  Result := kpi.Items[FFileName];
 end;
 
 procedure TKeymanPackageFile.LoadPackage;

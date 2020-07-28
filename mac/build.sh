@@ -390,7 +390,11 @@ if $PREPRELEASE || $NOTARIZE; then
 
     echo_heading "Uploading Keyman.zip to Apple for notarization"
 
-    xcrun altool --notarize-app --primary-bundle-id "com.Keyman.im.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || fail "altool failed"
+    xcrun altool --notarize-app --primary-bundle-id "com.Keyman.im.zip" --asc-provider "$APPSTORECONNECT_PROVIDER" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --file "$TARGET_ZIP_PATH" --output-format xml > $ALTOOL_LOG_PATH || (
+      ALTOOL_CODE=$?
+      cat "$ALTOOL_LOG_PATH"
+      fail "altool failed with code $ALTOOL_CODE"
+    )
     cat "$ALTOOL_LOG_PATH"
 
     ALTOOL_UUID=$(/usr/libexec/PlistBuddy -c "Print notarization-upload:RequestUUID" "$ALTOOL_LOG_PATH")
@@ -401,7 +405,11 @@ if $PREPRELEASE || $NOTARIZE; then
       # We'll sleep 30 seconds before checking status, to give the altool server time to process the archive
       echo "Waiting 30 seconds for status"
       sleep 30
-      xcrun altool --notarization-info "$ALTOOL_UUID" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --output-format xml > "$ALTOOL_LOG_PATH" || fail "altool failed"
+      xcrun altool --notarization-info "$ALTOOL_UUID" --username "$APPSTORECONNECT_USERNAME" --password @env:APPSTORECONNECT_PASSWORD --output-format xml > "$ALTOOL_LOG_PATH" || (
+        ALTOOL_CODE=$?
+        cat "$ALTOOL_LOG_PATH"
+        fail "altool failed with code $ALTOOL_CODE"
+      )
       ALTOOL_STATUS=$(/usr/libexec/PlistBuddy -c "Print notarization-info:Status" "$ALTOOL_LOG_PATH")
       if [ "$ALTOOL_STATUS" == "success" ]; then
         ALTOOL_FINISHED=1

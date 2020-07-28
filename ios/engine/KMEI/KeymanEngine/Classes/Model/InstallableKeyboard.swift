@@ -9,10 +9,15 @@
 import Foundation
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
-public struct InstallableKeyboard: Codable, LanguageResource {
+public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
+  public typealias FullID = FullKeyboardID
+  internal typealias Metadata = KMPKeyboard
+  public typealias Package = KeyboardKeymanPackage
+  
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
+    case packageID
     case name
     case lgCode = "languageID" // The original name of the property, which we maintain for serialization.
     case languageName
@@ -24,6 +29,7 @@ public struct InstallableKeyboard: Codable, LanguageResource {
   }
 
   public private(set) var id: String
+  public private(set) var packageID: String? = nil
   public var name: String
   public private(set) var lgCode: String
   public var languageName: String
@@ -33,7 +39,7 @@ public struct InstallableKeyboard: Codable, LanguageResource {
   public var oskFont: Font?
   public var isCustom: Bool
 
-  public static let sharingLink = "https://keyman.com/go/keyboard/%@/share"
+  public static let sharingLink = "\(KeymanHosts.KEYMAN_COM)/go/keyboard/%@/share"
 
   public var sharableURL: String? {
     get {
@@ -51,8 +57,13 @@ public struct InstallableKeyboard: Codable, LanguageResource {
     return lgCode.lowercased()
   }
 
-  public var fullID: FullKeyboardID {
+  // Weird scheme due to https://stackoverflow.com/a/58774558.
+  public var typedFullID: FullKeyboardID {
     return FullKeyboardID(keyboardID: id, languageID: languageID)
+  }
+
+  public var fullID: FullKeyboardID {
+    return typedFullID
   }
 
   public init(id: String,
@@ -85,5 +96,42 @@ public struct InstallableKeyboard: Codable, LanguageResource {
     self.font = keyboard.font
     self.oskFont = keyboard.oskFont
     self.isCustom = isCustom
+  }
+
+  internal init?(from metadata: KMPKeyboard, packageID: String, lgCode: String) {
+    self.id = metadata.id
+    self.name = metadata.name
+    self.lgCode = lgCode
+
+    let languageMatches = metadata.languages.compactMap { return $0.languageId == lgCode ? $0.name : nil }
+    guard languageMatches.count == 1 else {
+      return nil
+    }
+
+    self.languageName = languageMatches[0]
+    self.version = metadata.version
+    self.isRTL = metadata.isRTL
+    self.font = metadata.displayFont
+    self.oskFont = metadata.oskFont
+    self.packageID = packageID
+    self.isCustom = false
+  }
+
+  public var fonts: [Font] {
+    var fonts: [Font] = []
+
+    if let displayFont = self.font {
+      fonts.append(displayFont)
+    }
+
+    if let oskFont = self.oskFont {
+      fonts.append(oskFont)
+    }
+
+    return fonts
+  }
+
+  public var sourceFilename: String {
+    return "\(id).js"
   }
 }

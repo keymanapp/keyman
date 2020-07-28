@@ -13,16 +13,14 @@ private let toolbarButtonTag = 100
 class LanguageSettingsViewController: UITableViewController {
   let language: Language
   private var settingsArray = [[String: String]]()
-  private var keyboardRepository: KeyboardRepository?
 
   private var doPredictionsSwitch: UISwitch?
   private var doCorrectionsSwitch: UISwitch?
   private var doCorrectionsLabel: UILabel?
   private var correctionsCell: UITableViewCell?
 
-  public init(_ keyboardRepository: KeyboardRepository?, _ inLanguage: Language) {
+  public init(_ inLanguage: Language) {
     language = inLanguage
-    self.keyboardRepository = keyboardRepository
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -308,16 +306,12 @@ class LanguageSettingsViewController: UITableViewController {
   }
   
   @objc func addClicked(_ sender: Any) {
-    showAddLanguageKeyboard()
+    let keyboardSearchVC = KeyboardSearchViewController(languageCode: self.language.id,
+                                                        keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure(),
+                                                        lexicalModelSelectionBlock: KeyboardSearchViewController.defaultLexicalModelInstallationClosure())
+    navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
-  
-  func showAddLanguageKeyboard() {
-    let button: UIButton? = (navigationController?.toolbar?.viewWithTag(toolbarButtonTag) as? UIButton)
-    button?.isEnabled = false
-    let vc = LanguageDetailViewController(keyboardRepository, language: language)
-    vc.title = "Add new \(language.name) keyboard"
-    navigationController?.pushViewController(vc, animated: true)
-  }
+
   
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {

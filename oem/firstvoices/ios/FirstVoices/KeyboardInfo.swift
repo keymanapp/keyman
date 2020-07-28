@@ -27,7 +27,40 @@ struct KeyboardInfo: Decodable {
   let id: String
   let version: String
   let name: String
-  let languages: [String:KeyboardInfoLanguage]
+  let languages: [String:KeyboardInfoLanguage?]
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case version
+    case name
+    case languages
+  }
+
+  init(from decoder: Decoder) throws {
+    let values = try decoder.container(keyedBy: CodingKeys.self)
+
+    id = try values.decode(String.self, forKey: .id)
+    version = try values.decode(String.self, forKey: .version)
+    name = try values.decode(String.self, forKey: .name)
+
+    do {
+      // Ideal case - the metadata exists, giving us a dictionary of KeyboardInfoLanguage entries.
+      languages = try values.decode([String:KeyboardInfoLanguage].self, forKey: .languages)
+    } catch {
+      // Sometimes the metadata fails to build properly, giving us only an array of language IDs.
+      // If this backup fails, we deserve to crash.
+      let langIdArray = try values.decode([String].self, forKey: .languages)
+
+      var dict: [String:KeyboardInfoLanguage?] = [:]
+      langIdArray.forEach({ id in
+        // Fortunately, the app doesn't actually need to know the metadata; it'll function
+        // fine with a nil entry.
+        // If this changes, we'll just need to be sure to perform guard checks on the optional value.
+        dict.updateValue(nil, forKey: id)
+      })
+      languages = dict
+    }
+  }
 }
 
 class KeyboardInfoParser {

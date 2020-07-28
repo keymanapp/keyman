@@ -109,16 +109,18 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     addButton = (ImageButton) findViewById(R.id.add_button);
     addButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        // Check that available keyboard information can be obtained via:
-        // 1. connection to cloud catalog
-        // 2. cached file
-        // 3. local kmp.json files in packages/
-        if (KMManager.hasConnection(context) || CloudDataJsonUtil.getKeyboardCacheFile(context).exists() ||
-          KeyboardPickerActivity.hasKeyboardFromPackage()){
-          dismissOnSelect = false;
-          Intent i = new Intent(context, LanguageListActivity.class);
-          i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        // Check scenarios to add available keyboards:
+        if (KMManager.hasConnection(context)) {
+          // Scenario 1: Connection to keyman.com catalog
+          Intent i = new Intent(context, KMPBrowserActivity.class);
+          i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           context.startActivity(i);
+        /*
+        } else if (KeyboardPickerActivity.hasKeyboardFromPackage()) {
+          // Scenario 2: Local kmp.json files in packages/
+          // TODO: Cleanly re-implement this based on the languages available in each package
+        */
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));

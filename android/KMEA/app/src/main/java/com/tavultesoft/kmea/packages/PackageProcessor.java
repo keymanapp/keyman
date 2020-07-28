@@ -1,11 +1,13 @@
 package com.tavultesoft.kmea.packages;
 
 import androidx.annotation.NonNull;
-import android.util.Log;
 
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.JSONParser;
+import com.tavultesoft.kmea.data.Keyboard;
+import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 import com.tavultesoft.kmea.util.ZipUtils;
 
 import java.io.File;
@@ -128,7 +130,7 @@ public class PackageProcessor {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
-      Log.e(TAG, "kmp.json does not exist");
+      KMLog.LogError(TAG, "kmp.json does not exist");
       return null;
     }
   }
@@ -141,23 +143,31 @@ public class PackageProcessor {
    * @param jsonEntry  One entry of the master JSONArray of the top-level "keyboards" property.
    * @param packageId  Package ID
    * @param packageVersion Package version (used for lexical model version)
+   * @param languageID Preferred language ID to associate with the entry. If not found,
+   *                   the first language in kmp.json is used.
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray("languages");
 
     String keyboardId = jsonEntry.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
-      // Only use the first language
       HashMap<String, String>[] keyboards = new HashMap[1];
       int i=0;
       keyboards[i] = new HashMap<>();
       keyboards[i].put(KMManager.KMKey_PackageID, packageId);
       keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
       keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
-      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(i).getString("id").toLowerCase());
-      keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(i).getString("name"));
+
+      int languageIndex = JSONUtils.findID(languages, languageID);
+      if (languageIndex == -1) {
+        // languageID not found so use first language
+        languageIndex = 0;
+      }
+      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(languageIndex).getString("id").toLowerCase());
+      keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(languageIndex).getString("name"));
+
       keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
       if (jsonEntry.has("displayFont")) {
         keyboards[i].put(KMManager.KMKey_Font, jsonEntry.getString("displayFont"));
@@ -166,8 +176,6 @@ public class PackageProcessor {
         keyboards[i].put(KMManager.KMKey_OskFont, jsonEntry.getString("oskFont"));
       }
 
-      // For now, all KMP distributed keyboards are custom
-      keyboards[i].put(KMManager.KMKey_CustomKeyboard, "Y");
       if (welcomeExists(packageId)) {
         File kmpFile = new File(packageId + ".kmp");
         File packageDir = constructPath(kmpFile, false);
@@ -205,6 +213,7 @@ public class PackageProcessor {
     try {
       return json.getJSONObject("info").getJSONObject("name").getString("description");
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return "";
     }
   }
@@ -219,6 +228,7 @@ public class PackageProcessor {
     try {
       return json.getJSONObject("info").getJSONObject("version").getString("description");
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return PP_DEFAULT_VERSION;
     }
   }
@@ -239,6 +249,7 @@ public class PackageProcessor {
         return PP_TARGET_INVALID;
       }
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return PP_TARGET_INVALID;
     }
   }
@@ -256,6 +267,7 @@ public class PackageProcessor {
       FileUtils.deleteDirectory(tempPath);
       return target;
     } catch (Exception e) {
+      KMLog.LogException(TAG, "", e);
       return PP_TARGET_INVALID;
     }
   }
@@ -399,11 +411,128 @@ public class PackageProcessor {
   }
 
   /**
+   * Generates a list of Keyboards from the keyboard JSONObject. baseKeyboard contains
+   * keyboard information that's already installed.
+   * @param keyboardJSON JSONObject - Keyboard JSONObject from kmp.json (entry for keyboardID)
+   * @param baseKeyboard Keyboard - information of the keyboard that's already installed
+   * @param excludeInstalledLanguages - boolean whether to exclude languages that are already installed
+   * @return List<Keyboard>
+   */
+  private List<Keyboard> getKeyboards(JSONObject keyboardJSON, Keyboard baseKeyboard,
+      boolean excludeInstalledLanguages ) {
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    String packageID = baseKeyboard.getPackageID();
+    String keyboardID = baseKeyboard.getKeyboardID();
+    try {
+      JSONArray languages = keyboardJSON.getJSONArray("languages");
+      for (int j = 0; j < languages.length(); j++) {
+        JSONObject language = languages.getJSONObject(j);
+        String languageID = language.getString("id");
+        String languageName = language.getString("name");
+        if (!excludeInstalledLanguages ||
+          !(KeyboardController.getInstance().keyboardExists(packageID, keyboardID, languageID))) {
+          // Copy keyboard info and update language
+          Keyboard newKeyboard = new Keyboard(baseKeyboard);
+          newKeyboard.setLanguage(languageID, languageName);
+          list.add(newKeyboard);
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getKeyboards() ", e);
+    }
+    return list;
+  }
+
+  /**
+   * Get a list of available keyboard and language pairings that are available to add
+   * (parses the kmp.json for the language list)
+   * @param packageID - String of the package ID
+   * @param keyboardID - String of the keyboard ID
+   * @param excludeInstalledLanguages - Boolean whether to exclude
+   *        installed languages from the returned list.
+   * @return List of <Keyboard> based on kmp.json. If excludeInstalledLanguages is true, this list
+   *         excludes languages already installed
+   */
+  public List<Keyboard> getKeyboardList(String packageID, String keyboardID, boolean excludeInstalledLanguages) {
+    File packagePath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID);
+    List<Keyboard> list = new ArrayList<Keyboard>();
+    JSONObject infoJSON = loadPackageInfo(packagePath);
+    try {
+      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+
+      for (int i = 0; i < keyboards.length(); i++) {
+        JSONObject keyboard = keyboards.getJSONObject(i);
+        if (keyboardID.equals(keyboard.getString("id"))) {
+          // Find the keyboard already installed. We'll use it as the base
+          // for creating new keyboards
+          int baseKeyboardIndex =  KeyboardController.getInstance().getKeyboardIndex(packageID, keyboardID, "");
+          if (baseKeyboardIndex == KeyboardController.INDEX_NOT_FOUND) {
+            continue;
+          }
+          Keyboard baseKeyboard = KeyboardController.getInstance().getKeyboardInfo(baseKeyboardIndex);
+          return getKeyboards(keyboard, baseKeyboard, excludeInstalledLanguages);
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getKeyboardList() ", e);
+    }
+    return list;
+  }
+
+  /**
+   * Parses kmp.json to get a specified keyboard with an associated language. If languageID not
+   * provided, return the keyboard with the first associated language.
+   * This differs from getKeyboardList because this method doesn't search through
+   * KeyboardController (installed keyboards)
+   * @param packageID String of the package ID
+   * @param keyboardID String of the keyboard ID
+   * @param languageID String of the language ID
+   * @return <Keyboard> object
+   */
+  public Keyboard getKeyboard(String packageID, String keyboardID, String languageID) {
+    File packagePath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID);
+    Keyboard kbd = null;
+    JSONObject infoJSON = loadPackageInfo(packagePath);
+    String packageVersion = getPackageVersion(infoJSON);
+
+    try {
+      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+
+      for (int i=0; i < keyboards.length(); i++) {
+        JSONObject keyboard = keyboards.getJSONObject(i);
+        if (keyboardID.equals(keyboard.getString("id"))) {
+          Map<String, String>[] maps = processEntry(keyboard, packageID, packageVersion, languageID);
+          if (maps != null) {
+            // Only returning first keyboard map
+            kbd = new Keyboard(
+              maps[0].get(KMManager.KMKey_PackageID),
+              maps[0].get(KMManager.KMKey_KeyboardID),
+              maps[0].get(KMManager.KMKey_KeyboardName),
+              maps[0].get(KMManager.KMKey_LanguageID),
+              maps[0].get(KMManager.KMKey_LanguageName),
+              maps[0].get(KMManager.KMKey_KeyboardVersion),
+              maps[0].get(KMManager.KMKey_CustomHelpLink), // can be null
+              "",
+              false,
+              maps[0].get(KMManager.KMKey_Font),
+              maps[0].get(KMManager.KMKey_OskFont));
+          }
+        }
+      }
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "getKeyboard() ", e);
+    }
+    return kbd;
+  }
+
+  /**
    * The master KMP processing method; use after a .kmp download to fully install within the filesystem.
    * This will overwrite an existing package.
    * @param path Filepath of a newly downloaded .kmp file.
    * @param tempPath Filepath of temporarily extracted .kmp file
    * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
+   * @param languageID String of the preferred language ID to associate with the entry. If languageID is null or
+   *                   not found in kmp.json, then the first entry will be added.
    * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
@@ -412,7 +541,7 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key, String languageID) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
     ArrayList<Map<String, String>> specs = new ArrayList<>();
@@ -446,14 +575,18 @@ public class PackageProcessor {
       JSONArray entries = newInfoJSON.getJSONArray(key);
 
       for (int i = 0; i < entries.length(); i++) {
-        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion);
+        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion, languageID);
         if (maps != null) {
           specs.addAll(Arrays.asList(maps));
         }
       }
     }  else {
-      Log.e(TAG, path.getName() + " must contain \"" + key + "\"");
+      KMLog.LogError(TAG, path.getName() + " must contain \"" + key + "\"");
     }
     return specs;
+  }
+
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
+    return processKMP(path, tempPath, key, null);
   }
 }

@@ -4,14 +4,14 @@ inherited frmMain: TfrmMain
   HelpContext = 1050
   BorderIcons = [biSystemMenu, biMinimize, biMaximize, biHelp]
   ClientHeight = 494
-  ClientWidth = 617
+  ClientWidth = 846
   Constraints.MinHeight = 530
   Constraints.MinWidth = 600
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = TntFormClose
   OnCloseQuery = TntFormCloseQuery
-  ExplicitWidth = 633
+  ExplicitWidth = 862
   ExplicitHeight = 533
   PixelsPerInch = 96
   TextHeight = 13

@@ -13,6 +13,7 @@ android {
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
+        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
     }
     buildTypes {
         release {

@@ -1,10 +1,12 @@
 #! /bin/bash
 
 # We should work within the script's directory, not the one we were called in.
-cd $(dirname "$BASH_SOURCE")
+THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
+. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include useful testing resource functions
-. ../../../resources/shellHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+SCRIPT_ROOT="$(dirname "$THIS_SCRIPT")"
 
 # A simple utility script to facilitate unit-testing for the LM Layer.
 # It's rigged to be callable by NPM to facilitate testing during development when in other folders.
@@ -21,7 +23,7 @@ display_usage ( ) {
 
 init_dependencies ( ) {
   # Ensure all testing dependencies are in place.
-  npm install
+  verify_npm_setup
 }
 
 test-headless ( ) {
@@ -39,7 +41,7 @@ test-browsers ( ) {
     _FLAGS="$_FLAGS -CI -reporter teamcity"
   fi
 
-  in_browser/browser-test.sh $os_id $_FLAGS
+  $SCRIPT_ROOT/in_browser/browser-test.sh $os_id $_FLAGS
 }
 
 # Defaults

@@ -10,6 +10,7 @@ import com.tavultesoft.kmea.R;
 import com.tavultesoft.kmea.cloud.CloudApiTypes;
 import com.tavultesoft.kmea.cloud.ICloudDownloadCallback;
 import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,9 +84,8 @@ public class CloudKeyboardDataDownloadCallback implements ICloudDownloadCallback
             FileUtils.copy(_d.getDestinationFile(), _data_file);
 
         }
-        catch (IOException _e)
-        {
-          Log.e(TAG,_e.getLocalizedMessage(),_e);
+        catch (IOException e) {
+          KMLog.LogException(TAG, "", e);
         }
       }
       else

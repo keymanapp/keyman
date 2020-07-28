@@ -18,6 +18,7 @@ build: version.res manifest.res kbd_noicon.res dirs
     if exist $(WIN64_TARGET_PATH)\kmcomapi.x64.dll del $(WIN64_TARGET_PATH)\kmcomapi.x64.dll
     # Delphi does not allow us to build to a different target filename so we rename after build
     ren $(WIN64_TARGET_PATH)\kmcomapi.dll kmcomapi.x64.dll
+    # Not yet supported: $(SENTRYTOOL_DELPHIPREP) $(WIN64_TARGET_PATH)\kmcomapi.x64.dll -dpr kmcomapi.dpr
     $(COPY) $(WIN64_TARGET_PATH)\kmcomapi.x64.dll $(PROGRAM)\engine\kmcomapi.x64.dll
     if exist $(WIN64_TARGET_PATH)\kmcomapi.dbg $(COPY) $(WIN64_TARGET_PATH)\kmcomapi.dbg $(DEBUGPATH)\engine\kmcomapi.x64.dbg
 

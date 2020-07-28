@@ -11,6 +11,9 @@
 #   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
 #   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
+#   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
+#   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
+#                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
 #
 # On macOS, this script requires coreutils (`brew install coreutils`)
 #
@@ -37,7 +40,6 @@ function findRepositoryRoot() {
     # See https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
     # None of the answers are 100% correct for cross-platform
     # On macOS, requires coreutils (`brew install coreutils`)
-
     local SCRIPT=$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")
     KEYMAN_ROOT=$(dirname $(dirname $(dirname "$SCRIPT")))
     readonly KEYMAN_ROOT
@@ -74,9 +76,11 @@ function findVersion() {
     if [ -z "${TEAMCITY_VERSION-}" ]; then
         # Local dev machine, not TeamCity
         VERSION_TAG="$VERSION_TAG-local"
+        VERSION_ENVIRONMENT=local
     else
         # On TeamCity; are we running a pull request build or a master/beta/stable build?
         if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
+            VERSION_ENVIRONMENT=test
             # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
             # This indicates we are running a Test build.
             if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
@@ -84,6 +88,8 @@ function findVersion() {
             else
                 VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
             fi
+        else
+            VERSION_ENVIRONMENT="$TIER"
         fi
     fi
 
@@ -97,6 +103,7 @@ function findVersion() {
     readonly VERSION_WIN
     readonly VERSION_TAG
     readonly VERSION_WITH_TAG
+    readonly VERSION_ENVIRONMENT
 }
 
 function findTier() {
@@ -135,11 +142,27 @@ function printVersionUtilsDebug() {
     echo "VERSION_WITH_TAG: $VERSION_WITH_TAG"
 }
 
+function findShouldSentryRelease() {
+    # Default, for 'test' or 'local' environment, or in case $VERSION_ENVIRONMENT is improperly specified.
+    # (May be overridden by -upload-sentry in supporting build scripts.)
+    UPLOAD_SENTRY=false
+
+    # Default: override to `true` for release builds.
+    case $VERSION_ENVIRONMENT in
+    # Actual release tiers
+    alpha | beta | stable)
+        UPLOAD_SENTRY=true
+        ;;
+    esac
+}
+
 findRepositoryRoot
 findTier
 findVersion
 # printVersionUtilsDebug
 printBuildNumberForTeamCity
+
+findShouldSentryRelease
 
 # Intended for use with macOS-based builds, as Xcode build phase "run script"s do not have access to important
 # environment variables.  Doesn't hurt to run it at other times as well.  The output file is .gitignore'd.

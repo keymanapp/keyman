@@ -36,19 +36,33 @@
   <string name="enable_system_keyboard">Enable Keyman as system-wide keyboard</string>
   <string name="set_keyman_as_default">Set Keyman as default keyboard</string>
   <string name="more_info" comment="Open the help page">More info</string>
-  <string name="show_get_started">Show this menu on startup</string>
+  <string name="show_get_started">Show \"%1$s\" on startup</string>
 
 
   <!-- Keyman Settings menu strings -->
-  <string name="keyman_settings"  comment="Settings menu title">Settings</string>
+  <string name="keyman_settings" comment="Settings menu title">Settings</string>
   <plurals name="installed_languages">
     <item quantity="zero">Installed languages</item>
     <item quantity="other">Installed languages (%1$d)</item>
   </plurals>
+  <string name="install_keyboard_or_dictionary">Install Keyboard or Dictionary</string>
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
   <string name="show_banner_on" comment="Description when toggle is on">To be implemented</string>
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
   <!-- reuse show_get_started -->
+
+  <!-- Keyman Settings Install Keyboard or Dictionary menu strings -->
+  <string name="install_from_keyman_dot_com">Install from keyman.com</string>
+  <string name="install_from_local_file">Install from local file</string>
+  <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
+  <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
+  <string name="add_language_subtext">(from keyboard package)</string>
+
+  <!-- Select Package and Select Language menu strings -->
+  <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
+  <string name="title_select_language_for_package">Select language for %1$s</string>
+  <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
+  <string name="all_languages_installed">All languages already installed</string>
 
   <!-- Web Browser strings -->
   <string name="hint_text">Search or type URL</string>

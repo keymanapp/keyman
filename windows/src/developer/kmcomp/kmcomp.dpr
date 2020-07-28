@@ -124,10 +124,22 @@ uses
 {$R version.res}
 {$R manifest.res}
 
+const
+{$IFDEF WIN64}
+  LOGGER_DEVELOPER_TOOLS_KMCOMP = TKeymanSentryClient.LOGGER_DEVELOPER_TOOLS + '.kmcomp.x64';
+{$ELSE}
+  LOGGER_DEVELOPER_TOOLS_KMCOMP = TKeymanSentryClient.LOGGER_DEVELOPER_TOOLS + '.kmcomp';
+{$ENDIF}
 begin
-  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper);
+  TKeymanSentryClient.Start(TSentryClientConsole, kscpDeveloper, LOGGER_DEVELOPER_TOOLS_KMCOMP);
   try
     try
+      if (ParamStr(1) = '-sentry-client-test-exception') and (ParamStr(2) = 'dll') then
+      begin
+        compile.Compiler_Diagnostic_Console(0);
+        Exit;
+      end;
+      TKeymanSentryClient.Validate;
       Run;
     except
       on E: Exception do

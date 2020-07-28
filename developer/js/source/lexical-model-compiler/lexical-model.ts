@@ -2,12 +2,33 @@
  * Interfaces and constants used by the lexical model compiler. These target
  * the LMLayer's internal worker code, so we provide those definitions too.
  */
-/// <reference path="../../node_modules/@keymanapp/lexical-model-types/index.d.ts" />
 
 interface LexicalModelDeclaration {
   readonly format: 'trie-1.0'|'fst-foma-1.0'|'custom-1.0',
   //... metadata ...
 }
+
+/**
+ * Keyman 14.0+ word breaker specification:
+ *
+ * Can support all old word breaking specification,
+ * but can also be extended with options.
+ */
+interface WordBreakerSpec {
+  readonly use: SimpleWordBreakerSpec;
+  /**
+   * If present, joins words that were split by the word breaker
+   * together at the given strings. e.g.,
+   *
+   *    joinWordsAt: ['-'] // to keep hyphenated items together
+   */
+  readonly joinWordsAt?: string[];
+}
+
+/**
+ * Keyman 11.0+ word breaker specification:
+ */
+type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 
 interface LexicalModelSource extends LexicalModelDeclaration {
   readonly sources: Array<string>;
@@ -25,7 +46,7 @@ interface LexicalModelSource extends LexicalModelDeclaration {
    *  - word breaking function -- provide your own function that breaks words.
    *  - class-based word-breaker - may be supported in the future.
    */
-  readonly wordBreaker?: 'default' | 'ascii' | WordBreakingFunction;
+  readonly wordBreaker?: WordBreakerSpec | SimpleWordBreakerSpec;
 
   /**
    * How to simplify words, to convert them into simplifired search keys

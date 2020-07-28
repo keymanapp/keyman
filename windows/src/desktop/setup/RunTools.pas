@@ -48,30 +48,23 @@ unit RunTools;  // I3306
 interface
 
 uses
-  Windows,
-  Messages,
-  Classes,
-  SysUtils,
-  Controls,
+  System.Classes,
+  System.SysUtils,
+  Vcl.Controls,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  Keyman.Setup.System.InstallInfo,
   UfrmDownloadProgress;
 
 type
-  TMSIInfo = record
-    Version, ProductCode: WideString;
-    InstallURL, Filename: WideString;
-    InstallSize: Integer;  // I1917
-  end;
-
   TStatusEvent = procedure(const Status: WideString) of object;
 
   TRunTools = class
   private
     FSilent: Boolean;
     FPromptForReboot: Boolean;  // I3355   // I3500
-    FDownloadURL: WideString;
-    FDownloadFilename: WideString;
     FErrorLog: TFileStream;
-    FNewVersion, FInstalledVersion, FInstallerVersion: TMSIInfo;
     StatusMax: Integer;
     FOnStatus: TStatusEvent;
     FOnline: Boolean;
@@ -81,17 +74,15 @@ type
     FRunUpgrade9: Boolean;
     FRunUpgrade10: Boolean;
     constructor Create;
-    procedure DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
-    function InstallNewVersion(var HasAcceptedUpdate: Boolean): Boolean;
     function IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
-    procedure CheckNewVersion;
     procedure Status(Text: WideString);
-    function CacheMSIFile(const SrcMSIFileName: WideString): WideString;
-    procedure FinishCacheMSIFile(const SrcMSIFileName: WideString;
+    function CacheMSIFile(msiLocation: TInstallInfoFileLocation): WideString;
+    procedure FinishCacheMSIFile(msiLocation: TInstallInfoFileLocation;
       InstallSuccess: Boolean);
-    procedure CheckInstalledVersion;
-    function InstallMSI: Boolean;
-    procedure InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration: Boolean);
+    function InstallMSI(msiLocation: TInstallInfoFileLocation): Boolean;
+    procedure InstallPackages(StartKeyman,StartWithWindows,
+      CheckForUpdates,StartDisabled,StartWithConfiguration,
+      AutomaticallyReportUsage: Boolean);
     procedure PrepareForReboot(res: Cardinal);
     function RestartWindows: Boolean;
     procedure RunVersion6Upgrade(const kmshellpath: WideString);
@@ -102,12 +93,18 @@ type
     procedure CloseKeymanApplications;  // I2740
     procedure DeleteBackupPath; // I2747
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
+    procedure WriteToLog(const msg: string);
   public
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
-    function DownloadFile(ADownloadURL, ADownloadFilename: WideString): Boolean;
-    function DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled, StartWithConfiguration: Boolean): Boolean;
+    function DoInstall(Handle: THandle;
+      StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
+      StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
+    procedure LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
+
+    class procedure CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
+
     property Silent: Boolean read FSilent write FSilent;
     property PromptForReboot: Boolean read FPromptForReboot write FPromptForReboot;  // I3355   // I3500
     property Online: Boolean read FOnline;
@@ -120,7 +117,7 @@ type
   end;
 
 function GetRunTools: TRunTools;
-procedure CheckMSIResult(res: UINT);
+procedure CheckMSIResult(msiLocation: TInstallInfoFileLocation; res: UINT);
 
 implementation
 
@@ -136,12 +133,11 @@ uses
   jwawintype,
 
   bootstrapmain,
-  errlogpath,
   GetOsVersion,
-  HTTPUploader,
+  Keyman.Setup.System.ResourceDownloader,
   Keyman.System.UpgradeRegistryKeys,
-  Keyman.System.UpdateCheckResponse,
   KeymanPaths,
+  KeymanVersion,
   OnlineConstants,
   RegistryHelpers,
   RegistryKeys,
@@ -150,7 +146,6 @@ uses
   TntDialogHelp,
   ErrorControlledRegistry,
   UCreateProcessAsShellUser,
-  Upload_Settings,
   utilsystem,
   utilexecute,
   VersionInfo;
@@ -158,6 +153,13 @@ uses
 var
   FRunTools: TRunTools = nil;
 
+const
+ UpgradeCode_Keyman11Plus =   '{c70af17c-8b9e-47a1-a099-b65aee3dc8b4}'; // Keyman 11+
+ ProductCode_Keyman7_1Light = '{35E06B45-17C0-406C-B94F-70EFF1EC9278}'; // Keyman 7.1 Light
+ ProductCode_Keyman7_1Pro =   '{04C8710E-3D29-4A25-80A2-A56853A4267D}'; // Keyman 7.1 Pro
+ ProductCode_Keyman8 =        '{18E9B728-8E4E-48DF-9E9F-6F3086A1FE04}'; // Keyman 8.0
+ ProductCode_Keyman9 =        '{E6806190-7B09-4A8C-8C95-25982589D919}'; // Keyman 9.0
+ ProductCode_Keyman10 =       '{A20AFB02-7581-4019-9229-5312308FBA1E}'; // Keyman 10.0
 
 function GetRunTools: TRunTools;
 begin
@@ -166,10 +168,13 @@ begin
   Result := FRunTools;
 end;
 
-procedure CheckMSIResult(res: UINT);
+procedure CheckMSIResult(msiLocation: TInstallInfoFileLocation; res: UINT);
 begin
   if res <> ERROR_SUCCESS then
-    raise Exception.Create('Failed to install '+FInstallInfo.MSIFileName+': ['+IntToStr(res)+'] '+SysErrorMessage(res));
+    if Assigned(msiLocation) then
+      raise Exception.Create('Failed to install '+msiLocation.Path+': ['+IntToStr(res)+'] '+SysErrorMessage(res))
+    else
+      raise Exception.Create('Failed to install msi: ['+IntToStr(res)+'] '+SysErrorMessage(res));
 end;
 
 { TRunTools }
@@ -184,113 +189,57 @@ begin
   inherited;
 end;
 
-function TRunTools.DoInstall(Handle: THandle; PackagesOnly, CheckForUpdatesInstall, StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled, StartWithConfiguration: Boolean): Boolean;
+function TRunTools.DoInstall(Handle: THandle;
+  StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
+  StartWithConfiguration, AutomaticallyReportUsage: Boolean): Boolean;
+var
+  msiLocation: TInstallInfoFileLocation;
 begin
-  Result := False;
+  if FInstallInfo.ShouldInstallKeyman
+    then StatusMax := 6 + FInstallInfo.Packages.Count
+    else StatusMax := FInstallInfo.Packages.Count;
 
-  if PackagesOnly
-    then StatusMax := FInstallInfo.Packages.Count
-    else StatusMax := 6 + FInstallInfo.Packages.Count;
-
-  if not PackagesOnly then
+  msiLocation := FInstallInfo.BestMsi;
+  if Assigned(msiLocation) and FInstallInfo.ShouldInstallKeyman then
   begin
-    CheckInstalledVersion;
-
-    if CheckForUpdatesInstall then
+    if msiLocation.LocationType = iilOnline then
     begin
-      Status(FInstallInfo.Text(ssStatusCheckingForUpdates));
-      try
-        CheckNewVersion;
-      except
-        on E:Exception do // I1440 - avoid update check failure stopping install
-          LogError('Error checking for updates: '+E.Message);
-      end;
+      if not TResourceDownloader.Execute(FInstallInfo, msiLocation, FSilent) then
+        Exit(False);
     end;
+
     Status(FInstallInfo.Text(ssStatusInstalling));
 
     CloseKeymanApplications;  // I2740
 
-    if InstallMSI then
-    begin
-      InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration);
-      Result := True;
-    end
-  end
-  else
-  begin
-    CheckInstalledVersion;
-    InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration);
-    Result := True;
+    if not InstallMSI(msiLocation) then
+      Exit(False);
   end;
-end;
 
-function TRunTools.DownloadFile(ADownloadURL, ADownloadFilename: WideString): Boolean;
-begin
-  FDownloadURL := ADownloadURL;
-  FDownloadFilename := ADownloadFilename;
+  InstallPackages(StartAfterInstall,StartWithWindows,CheckForUpdates,
+    StartDisabled,StartWithConfiguration,AutomaticallyReportUsage);
 
-  { Download the redistributable }
-  with TfrmDownloadProgress.Create(nil) do
-  try
-    Callback := DownloadFileCallback;
-    Result := ShowModal = mrOk;
-  finally
-    Free;
-  end;
-end;
-
-procedure TRunTools.DownloadFileCallback(AOwner: TfrmDownloadProgress; var Result: Boolean);
-begin
-  Result := False;
-  try
-    with THTTPUploader.Create(AOwner) do
-    try
-      OnCheckCancel := AOwner.HTTPCheckCancel;
-      OnStatus := AOwner.HTTPStatus;
-      Request.Agent := API_UserAgent;
-      //Request.Protocol := Upload_Protocol;
-      //Request.HostName := Upload_Server;
-      Request.SetURL(FDownloadURL);// UrlPath := URL;
-      Upload;
-      if Response.StatusCode = 200 then
-      begin
-        with TFileStream.Create(ExtPath + FDownloadFilename, fmCreate) do  // I3476
-        try
-          Write(Response.PMessageBody^, Response.MessageBodyLength);
-        finally
-          Free;
-        end;
-        Result := True;
-      end
-      else
-        LogError(FInstallInfo.Text(ssErrorDownloadingUpdate, [Response.StatusCode]));
-    finally
-      Free;
-    end;
-  except
-    on E:EHTTPUploader do
-    begin
-      if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
-        then LogError(FInstallInfo.Text(ssErrorUnableToContactServer))
-        else LogError(FInstallInfo.Text(ssErrorUnableToContactServerDetailed, [E.Message]));
-      Result := False;
-    end;
-  end;
+  Result := True;
 end;
 
 procedure TRunTools.LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
+begin
+  WriteToLog('ERROR: '+msg);
+  if not FSilent and ShowDialogIfNotSilent then
+    ShowMessageW(msg);
+end;
+
+procedure TRunTools.WriteToLog(const msg: string);
 const
   nl: WideString = #13#10;
 var
   path: WideString;
 begin
-  if not FSilent and ShowDialogIfNotSilent then
-    ShowMessageW(msg);
   if not Assigned(FErrorLog) then
   begin
-    path := GetErrLogPath + 'setup.log'; // I2314
+    path := TKeymanPaths.ErrorLogPath + 'setup.log'; // I2314
 
-    if SysUtils.FileExists(path) then
+    if System.SysUtils.FileExists(path) then
     begin
       FErrorLog := TFileStream.Create(path, fmOpenReadWrite);
       FErrorLog.Seek(0, soFromEnd);
@@ -302,63 +251,17 @@ begin
   FErrorLog.Write(PWideChar(msg+nl)^, Length(msg+nl)*2);
 end;
 
+procedure TRunTools.LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
+begin
+  WriteToLog('INFO: '+msg);
+  if not FSilent and ShowDialogIfNotSilent then
+    ShowMessageW(msg);
+end;
+
 function TRunTools.IsNewerVersionInstalled(const NewVersion: WideString): Boolean;
 begin
-  Result := (FInstalledVersion.Version <> '') and
-    (CompareVersions(FInstalledVersion.Version, NewVersion) <= 0);
-end;
-
-function TRunTools.InstallNewVersion(var HasAcceptedUpdate: Boolean): Boolean;
-begin
-  Result := True;
-  HasAcceptedUpdate := False;
-
-  if GetRunTools.Silent then
-    Exit;
-
-  case MessageDlgW(FInstallInfo.Text(ssQueryUpdateVersion, [FNewVersion.InstallSize div 1024, FNewVersion.Version]),  // I1917
-      mtConfirmation, mbYesNoCancel, 0) of
-    mrYes:    HasAcceptedUpdate := GetRunTools.DownloadFile(FNewVersion.InstallURL, FNewVersion.Filename);
-    mrNo:     ;
-    mrCancel: Result := False;
-  end;
-end;
-
-procedure TRunTools.CheckNewVersion;
-var
-  ucr: TUpdateCheckResponse;
-begin
-  with THTTPUploader.Create(nil) do
-  try
-    if FInstalledVersion.Version = ''
-      then Fields.Add('Version', ansistring(FInstallInfo.Version))
-      else Fields.Add('Version', ansistring(FInstalledVersion.Version));
-
-    Request.HostName := API_Server;
-    Request.Protocol := API_Protocol;
-    Request.UrlPath := API_Path_UpdateCheck_Desktop;
-
-    Upload;
-    if Response.StatusCode = 200 then
-    begin
-      if ucr.Parse(Response.MessageBodyAsString, 'windows', FInstallInfo.Version) then
-      begin
-        if ucr.Status = ucrsUpdateReady then
-        begin
-          FNewVersion.Version := ucr.NewVersion;
-          FNewVersion.InstallURL := ucr.InstallURL;
-          FNewVersion.InstallSize := ucr.InstallSize;
-          FNewVersion.Filename := ExtractFileName(StringReplace(FNewVersion.InstallURL, '/', '\', [rfReplaceAll]));  // I1917
-        end;
-      end
-      else
-        raise Exception.Create(ucr.ErrorMessage);
-    end
-    else
-      raise Exception.Create('Error '+IntToStr(Response.StatusCode));
-  finally
-    Free;
-  end;
+  Result := (FInstallInfo.InstalledVersion.Version <> '') and
+    (CompareVersions(FInstallInfo.InstalledVersion.Version, NewVersion) <= 0);
 end;
 
 function CloseThreadWindowProc(hwnd: THandle; lParam: LPARAM): BOOL; stdcall;  // I2740
@@ -474,16 +377,16 @@ begin
   end;
 end;
 
-function TRunTools.CacheMSIFile(const SrcMSIFileName: WideString): WideString;
+function TRunTools.CacheMSIFile(msiLocation: TInstallInfoFileLocation): WideString;
 var
   path: WideString;
 begin
-  path := GetFolderPath(CSIDL_PROGRAM_FILES_COMMON) + SFolder_CachedInstallerFiles+'\'+FInstallerVersion.ProductCode;  // I2561
+  path := GetFolderPath(CSIDL_PROGRAM_FILES_COMMON) + SFolder_CachedInstallerFiles+'\'+msiLocation.ProductCode;  // I2561
 
-  if not SysUtils.ForceDirectories(path) then
+  if not System.SysUtils.ForceDirectories(path) then
     raise Exception.Create('Failed to cache installer MSI file (code 1,'+IntToStr(GetLastError)+'): '+SysErrorMessage(GetLastError));
 
-  Result := path+'\'+ExtractFileName(SrcMSIFileName);
+  Result := path+'\'+ExtractFileName(msiLocation.Path);
 
   if FileExists(PWideChar(Result)) then
   begin
@@ -491,30 +394,30 @@ begin
     RenameFile(Result, Result + '.1');
   end;
 
-  if not CopyFile(PWideChar(SrcMSIFileName), PWideChar(Result), False) then
+  if not CopyFile(PWideChar(msiLocation.Path), PWideChar(Result), False) then
     raise Exception.Create('Failed to cache installer MSI file (code 2,'+IntToStr(GetLastError)+'): '+SysErrorMessage(GetLastError));
 end;
 
-procedure TRunTools.FinishCacheMSIFile(const SrcMSIFileName: WideString; InstallSuccess: Boolean);
+procedure TRunTools.FinishCacheMSIFile(msiLocation: TInstallInfoFileLocation; InstallSuccess: Boolean);
 var
   newmsi, path: WideString;
 begin
-  path := GetFolderPath(CSIDL_PROGRAM_FILES_COMMON) + SFolder_CachedInstallerFiles+'\'+FInstallerVersion.ProductCode;  // I2561
-  newmsi := path+'\'+ExtractFileName(SrcMSIFileName);
+  path := GetFolderPath(CSIDL_PROGRAM_FILES_COMMON) + SFolder_CachedInstallerFiles+'\'+msiLocation.ProductCode;  // I2561
+  newmsi := path+'\'+ExtractFileName(msiLocation.Path);
 
-  if SysUtils.FileExists(newmsi+'.1') then
+  if System.SysUtils.FileExists(newmsi+'.1') then
   begin
     if InstallSuccess then
-      DeleteFile(newmsi+'.1')
+      System.SysUtils.DeleteFile(newmsi+'.1')
     else
     begin
-      DeleteFile(newmsi);
+      System.SysUtils.DeleteFile(newmsi);
       RenameFile(newmsi+'.1', newmsi);
     end;
   end
   else if not InstallSuccess then
   begin
-    DeleteFile(newmsi);
+    System.SysUtils.DeleteFile(newmsi);
     RemoveDir(path);
     RemoveDir(ExtractFileDir(path)); // may fail if other products cached there, we don't care
     RemoveDir(ExtractFileDir(ExtractFileDir(path))); // may fail if other products installed there, we don't care
@@ -548,70 +451,60 @@ begin
 end;
 {$WARNINGS ON}
 
-procedure TRunTools.CheckInstalledVersion;
+// TODO: move to another unit so we can mock?
+class procedure TRunTools.CheckInstalledVersion(msiLocation: TInstallInfoFileLocation);
 var
   hProduct: MSIHANDLE;
   buf: array[0..64] of WideChar;
   sz: DWord;
   UpgradeCode: WideString;
   i: DWord;
+  ver: TMSIInfo;
 begin
-  FInstalledVersion.Version := '';
-  CheckMSIResult(MsiOpenPackageExW(PWideChar(ExtPath + FInstallInfo.MSIFileName), MSIOPENPACKAGEFLAGS_IGNOREMACHINESTATE, hProduct));  // I3476
-  try
-    sz := 64;
-    CheckMSIResult(MsiGetProductPropertyW(hProduct, 'UpgradeCode', buf, @sz));
-    UpgradeCode := buf;
-    sz := 64;
-    CheckMSIResult(MsiGetProductPropertyW(hProduct, 'ProductCode', buf, @sz));
-    FInstallerVersion.ProductCode := buf;
-  finally
-    MsiCloseHandle(hProduct);
+  if not Assigned(msiLocation) or (msiLocation.LocationType = iilOnline) then
+  begin
+    UpgradeCode := UpgradeCode_Keyman11Plus
+  end
+  else
+  begin
+    CheckMSIResult(msiLocation, MsiOpenPackageExW(PWideChar(msiLocation.Path), MSIOPENPACKAGEFLAGS_IGNOREMACHINESTATE, hProduct));  // I3476
+    try
+      sz := 64;
+      CheckMSIResult(msiLocation, MsiGetProductPropertyW(hProduct, 'UpgradeCode', buf, @sz));
+      UpgradeCode := buf;
+      sz := 64;
+      CheckMSIResult(msiLocation, MsiGetProductPropertyW(hProduct, 'ProductCode', buf, @sz));
+      msiLocation.ProductCode := buf;
+    finally
+      MsiCloseHandle(hProduct);
+    end;
   end;
 
   i := 0;
   if MsiEnumRelatedProducts(PWideChar(UpgradeCode), 0, i, buf) = ERROR_SUCCESS then
   begin
+    ver.ProductCode := buf;
     sz := 64;
-    FInstalledVersion.ProductCode := buf;
-    CheckMSIResult(MsiGetProductInfoW(PWideChar(FInstalledVersion.ProductCode), INSTALLPROPERTY_VERSIONSTRING, buf, @sz));
-    FInstalledVersion.Version := buf;
+    CheckMSIResult(msiLocation, MsiGetProductInfoW(PWideChar(ver.ProductCode), INSTALLPROPERTY_VERSIONSTRING, buf, @sz));
+    ver.Version := buf;
+    FInstallInfo.InstalledVersion := ver;
   end;
 end;
 
-function TRunTools.InstallMSI: Boolean;
+function TRunTools.InstallMSI(msiLocation: TInstallInfoFileLocation): Boolean;
 var
   pcode: array[0..39] of Char;
   res: Cardinal;
   ReinstallMode: WideString;
   FCacheFileName: WideString;
   FLogFileName: WideString;
-  FHasAcceptedUpdate: Boolean;
 begin
   Result := True;
 
-  { We need to check if the included installer or the installer available is a newer version than the currently installed version }
-  if FNewVersion.Version <> '' then
-  begin
-    if IsNewerVersionInstalled(FNewVersion.Version) then
-      { The downloadable installer is older than the installed version }
-      Exit;
-
-    if not InstallNewVersion(FHasAcceptedUpdate) then
-      Exit(False);
-
-    if not FHasAcceptedUpdate then
-    begin
-      { We need to check if the included installer is a newer version than the currently installed version }
-      FNewVersion.Filename := '';
-      FNewVersion.Version := '';
-    end;
-  end;
-
-  if not IsNewerVersionInstalled(FInstallInfo.Version) then // I2560
+  if not IsNewerVersionInstalled(msiLocation.Version) then // I2560
   begin
     ReinstallMode := 'REBOOTPROMPT=S REBOOT=ReallySuppress'; // I2754 - Auto update is too silent
-    if (FInstalledVersion.Version <> '') and (FInstalledVersion.ProductCode = FInstallerVersion.ProductCode) then
+    if (FInstallInfo.InstalledVersion.Version <> '') and (FInstallInfo.InstalledVersion.ProductCode = msiLocation.ProductCode) then
     begin
       ReinstallMode := ReinstallMode + ' REINSTALLMODE=vomus REINSTALL=ALL';
     end
@@ -622,11 +515,11 @@ begin
       // because we've backed up the relevant keys for reapplication post-install
       // Version 11 and later do not need this treatment as they are upgraded in-place
       // with the file and registry locations remaining static
-      if (MsiGetProductCode('{35E06B45-17C0-406C-B94F-70EFF1EC9278}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
-         (MsiGetProductCode('{04C8710E-3D29-4A25-80A2-A56853A4267D}', pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
-         (MsiGetProductCode('{18E9B728-8E4E-48DF-9E9F-6F3086A1FE04}', pcode) = ERROR_SUCCESS) or // Keyman 8.0
-         (MsiGetProductCode('{E6806190-7B09-4A8C-8C95-25982589D919}', pcode) = ERROR_SUCCESS) or // Keyman 9.0
-         (MsiGetProductCode('{A20AFB02-7581-4019-9229-5312308FBA1E}', pcode) = ERROR_SUCCESS) then // Keyman 10.0
+      if (MsiGetProductCode(ProductCode_Keyman7_1Light, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Light
+         (MsiGetProductCode(ProductCode_Keyman7_1Pro, pcode) = ERROR_SUCCESS) or // Keyman 7.1 Pro
+         (MsiGetProductCode(ProductCode_Keyman8, pcode) = ERROR_SUCCESS) or // Keyman 8.0
+         (MsiGetProductCode(ProductCode_Keyman9, pcode) = ERROR_SUCCESS) or // Keyman 9.0
+         (MsiGetProductCode(ProductCode_Keyman10, pcode) = ERROR_SUCCESS) then // Keyman 10.0
       begin
         MsiConfigureProduct(pcode, INSTALLLEVEL_DEFAULT, INSTALLSTATE_ABSENT);
         // We'll ignore errors ...
@@ -636,18 +529,18 @@ begin
 
     { Log the install to the diag folder }
 
-    FLogFileName := GetErrLogFileName(ChangeFileExt(ExtractFileName(FInstallInfo.MSIFileName), ''));  // I1610 // I2755 // I2792
+    FLogFileName := TKeymanPaths.ErrorLogPath(ChangeFileExt(ExtractFileName(msiLocation.Path), ''));  // I1610 // I2755 // I2792
     //ForceDirectories(GetErrLogPath);  // I2768
 
     MsiEnableLogW(INSTALLLOGMODE_VERBOSE, PWideChar(FLogFileName), 0);
 
     { Cache the msi file to avoid source dependencies for repair, patch, uninstall, bleagh }
 
-    FCacheFileName := CacheMSIFile(ExtPath + FInstallInfo.MSIFileName);  // I3476
+    FCacheFileName := CacheMSIFile(msiLocation);  // I3476
 
     res := MsiInstallProductW(PWideChar(FCacheFileName), PWideChar(ReinstallMode));
 
-    FinishCacheMSIFile(ExtPath + FInstallInfo.MSIFileName,  // I3476
+    FinishCacheMSIFile(msiLocation,  // I3476
       (res = ERROR_SUCCESS_REBOOT_REQUIRED) or (res = ERROR_SUCCESS_REBOOT_INITIATED) or (res = ERROR_SUCCESS));
 
     case res of
@@ -660,21 +553,12 @@ begin
         end;
       ERROR_INSTALL_USEREXIT: begin Result := False; Exit; end;
     else
-      CheckMSIResult(res);
+      CheckMSIResult(msiLocation, res);
     end;
   end;
 
   if not FSilent then
     MsiSetInternalUI(INSTALLUILEVEL_FULL, nil);
-
-  if FNewVersion.Filename <> '' then
-  begin
-    //Run the setup app silently
-    TUtilExecute.WaitForProcess('"'+ExtPath + FNewVersion.FileName+'" -s -o', ExtPath, SW_SHOW, WaitFor);  // I3349  // I3476
-    //if not FSilent then
-    //  MsiSetInternalUI(INSTALLUILEVEL_BASIC, nil);
-    //CheckMSIResult(MsiApplyPatchW(PWideChar(ExtPath + FNewVersion.Filename), nil, INSTALLTYPE_DEFAULT, ''));
-  end;
 end;
 
 procedure TRunTools.WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
@@ -687,17 +571,22 @@ begin
   end;
 end;
 
-procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,StartDisabled,StartWithConfiguration: Boolean);
+procedure TRunTools.InstallPackages(StartKeyman,StartWithWindows,CheckForUpdates,
+  StartDisabled,StartWithConfiguration,AutomaticallyReportUsage: Boolean);
 var
   i: Integer;
   s: WideString;
+  pack: TInstallInfoPackage;
+  packLocation: TInstallInfoPackageFileLocation;
   FKMShellPath: WideString;
   FExitCode: Cardinal;
+  msiLocation: TInstallInfoFileLocation;
+  FKMShellVersion: string;
 begin
   //if FInstallInfo.Packages.Count = 0 then Exit;  I879
 
   FKMShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
-  if SysUtils.FileExists(FKMShellPath) then
+  if System.SysUtils.FileExists(FKMShellPath) then
   begin
     RunVersion6Upgrade(FKMShellPath);
     RunVersion7Upgrade(FKMShellPath);  // I2548
@@ -705,10 +594,35 @@ begin
     RunVersion9Upgrade(FKMShellPath);
     RunVersion10Upgrade(FKMShellPath);
 
+    FKMShellVersion := GetFileVersionString(FKMShellPath);
+
     { Install packages for all users }
-    s := '-nowelcome -s -i '; //"'+ExtPath+'" ';
-    for i := 0 to FInstallInfo.Packages.Count - 1 do
-      s := s + '"'+ExtPath+FInstallInfo.Packages.Names[i]+'" ';  // I3476
+    s := '-nowelcome -s -i ';
+    for pack in FInstallInfo.Packages do
+    begin
+      if pack.ShouldInstall then
+      begin
+        packLocation := pack.GetBestLocation;
+        if Assigned(packLocation) then
+        begin
+          LogInfo('Downloading '+packLocation.Url);
+          if packLocation.LocationType = iilOnline then
+            if not TResourceDownloader.Execute(FInstallInfo, packLocation, FSilent) then
+            begin
+              LogInfo('Failed to download '+packLocation.Url); // TODO: can we get more detail?
+              Continue; //
+            end;
+
+          // Need to check kmshell version >= 14.0 for support for non-default
+          // language installation; if installing into an older version, then
+          // the default language for the keyboard will be installed and the
+          // user's language selection will be ignored (sadface).
+          if CompareVersions(SKeymanVersion_Min_SpecifyLanguage, FKMShellVersion) >= 0
+            then s := s + '"'+packLocation.Path+'='+pack.BCP47+'" '
+            else s := s + '"'+packLocation.Path+'" ';  // I3476
+        end;
+      end;
+    end;
     TUtilExecute.WaitForProcess('"'+FKMShellPath+'" '+s, ExtractFilePath(FKMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
 
     { Configure Keyman Desktop for initial install, both local-machine, and current-user }
@@ -716,8 +630,13 @@ begin
 
     if StartWithWindows then s := s + 'StartWithWindows,';
     if CheckForUpdates then s := s + 'CheckForUpdates,';
+    if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
-    if (FInstalledVersion.Version = '') or (FInstalledVersion.ProductCode <> FInstallerVersion.ProductCode) then s := s + 'InstallDefaults,';  // I2651
+
+    msiLocation := FInstallInfo.BestMsi;
+    if Assigned(msiLocation) and (
+        (FInstallInfo.InstalledVersion.Version = '') or (FInstallInfo.InstalledVersion.ProductCode <> msiLocation.ProductCode)
+      ) then s := s + 'InstallDefaults,';  // I2651
 
     if StartDisabled then
     begin
@@ -725,7 +644,7 @@ begin
       for i := 0 to FInstallInfo.Packages.Count - 1 do
       begin
         if i > 0 then s := s + ',';
-        s := s + '"'+ExtractFileName(ChangeFileExt(FInstallInfo.Packages.Names[i], ''))+'"';
+        s := s + '"'+FInstallInfo.Packages[i].ID+'"';
       end;
     end;
 
@@ -744,7 +663,7 @@ begin
 
   if StartKeyman then  // I2738
   begin
-    if SysUtils.FileExists(FKMShellPath) then
+    if System.SysUtils.FileExists(FKMShellPath) then
     begin
       s := '"'+FKMShellPath+'"';
       if StartWithConfiguration then

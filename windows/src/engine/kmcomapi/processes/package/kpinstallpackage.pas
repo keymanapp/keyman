@@ -50,7 +50,7 @@ type
   private
     procedure UpdateLocaleDoctype(const path: WideString);
   public
-    procedure Execute(const FileName: string; Force: Boolean);
+    procedure Execute(const FileName: string; Force, InstallDefaultLanguage: Boolean);
   end;
 
 implementation
@@ -86,7 +86,7 @@ uses
 { TKPInstallPackage }
 
 
-procedure TKPInstallPackage.Execute(const FileName: string; Force: Boolean);
+procedure TKPInstallPackage.Execute(const FileName: string; Force, InstallDefaultLanguage: Boolean);
       function GetHHIcon: string;
       var
         buf: array[0..260] of char;
@@ -115,9 +115,14 @@ var
 
   procedure InstallKeyboard(FileName: string);
   var
+    FOptions: TKPInstallKeyboardOptions;
     kbd: TPackageKeyboard;
     FLanguages: TPackageKeyboardLanguageList;
   begin
+    FOptions := [ikPartOfPackage];
+    if InstallDefaultLanguage then
+      Include(FOptions, ikInstallDefaultLanguage);
+
     kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
     if Assigned(kbd) and (kbd.Languages.Count > 0) then
     begin
@@ -128,7 +133,7 @@ var
 
     with TKPInstallKeyboard.Create(Context) do
     try
-      Execute(FileName, PackageName, [ikPartOfPackage], FLanguages, Force);
+      Execute(FileName, PackageName, FOptions, FLanguages, Force);
     finally
       Free;
     end;
@@ -262,7 +267,7 @@ begin
             ftPackageFile:
               with TKPInstallPackage.Create(Context) do
               try
-                Execute(dest + inf.Files[i].FileName, Force);
+                Execute(dest + inf.Files[i].FileName, Force, InstallDefaultLanguage);
               finally
                 Free;
               end;
@@ -388,3 +393,4 @@ begin
 end;
 
 end.
+

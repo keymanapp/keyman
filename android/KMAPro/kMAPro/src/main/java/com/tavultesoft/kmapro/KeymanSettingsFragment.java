@@ -2,7 +2,6 @@ package com.tavultesoft.kmapro;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.inputmethod.InputMethodManager;
@@ -20,7 +19,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static final String TAG = "SettingsFragment";
   private static Context context;
 
-  private Preference languagesPreference, addKeyboardFromDevice;
+  private Preference languagesPreference, installKeyboardOrDictionary;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
 
@@ -41,23 +40,12 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     languagesIntent.putExtra(KMManager.KMKey_DisplayKeyboardSwitcher, false);
     languagesPreference.setIntent(languagesIntent);
 
-    // Launch System file browser for user to navigate to local .kmp files
-    // Using generic "Add keyboard" title even though this can also install lexical model .kmp's.
-    addKeyboardFromDevice = new Preference(context);
-    addKeyboardFromDevice.setTitle(getString(R.string.title_add_keyboard_from_device));
-    addKeyboardFromDevice.setWidgetLayoutResource(R.layout.preference_file_browser_layout);
-    addKeyboardFromDevice.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.putExtra("android.content.extra.SHOW_ADVANCED", false);
-        // Unfortunately, we can't filter for a "kmp" mime type
-        intent.setType("*/*");
-        startActivityForResult(intent, MainActivity.READ_REQUEST_CODE);
-        return false;
-      }
-    });
+    installKeyboardOrDictionary = new Preference(context);
+    installKeyboardOrDictionary.setKey(KeymanSettingsActivity.installKeyboardOrDictionaryKey);
+    installKeyboardOrDictionary.setTitle(getString(R.string.install_keyboard_or_dictionary));
+    installKeyboardOrDictionary.setWidgetLayoutResource(R.layout.preference_add_icon_layout);
+    Intent installIntent = new Intent(context, KeymanSettingsInstallActivity.class);
+    installKeyboardOrDictionary.setIntent(installIntent);
 
     /*
       Automatically does the following:
@@ -73,7 +61,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
-    getStartedPreference.setTitle(getString(R.string.show_get_started));
+    getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
+
     getStartedPreference.setDefaultValue(true);
 
     // Blocks the default checkmark interaction; we want to control the checkmark's state separately
@@ -111,7 +100,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     setDefaultKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
 
     screen.addPreference(languagesPreference);
-    screen.addPreference(addKeyboardFromDevice);
+    screen.addPreference(installKeyboardOrDictionary);
 
     screen.addPreference(setSystemKeyboardPreference);
     screen.addPreference(setDefaultKeyboardPreference);
@@ -146,16 +135,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     //
     // As a result, we rely on KeymanSettingsActivity.onWindowFocusChanged to call
     // .update() on our behalf.
-  }
-
-
-  public void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
-    // Handle kmp file selected from file browser
-    if ((requestCode == MainActivity.READ_REQUEST_CODE) && (returnIntent != null)) {
-      String kmpFilename = returnIntent.getDataString();
-      Uri data = Uri.parse(kmpFilename);
-      MainActivity.useLocalKMP(this.getContext(), data);
-    }
   }
 
   public void update() {
