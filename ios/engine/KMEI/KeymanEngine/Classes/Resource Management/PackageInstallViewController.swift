@@ -15,7 +15,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   // Needed to support iOS 9 + 10.
   @IBOutlet weak var webViewContainer: UIView!
   @IBOutlet weak var lblVersion: UILabel!
-  @IBOutlet weak var lblAuthor: UILabel!
+  @IBOutlet weak var lblCopyright: UILabel!
 
   let package: Resource.Package
   var wkWebView: WKWebView?
@@ -64,10 +64,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     navigationItem.title = package.name
 
     lblVersion.text = "Version: \(package.version)"
-    if let author = package.metadata.info?.author?.description {
-      lblAuthor.text = "Author: \(author)"
+    if let copyright = package.metadata.info?.copyright?.description {
+      lblCopyright.text = copyright
     } else {
-      lblAuthor.isHidden = true
+      lblCopyright.isHidden = true
     }
   }
 
