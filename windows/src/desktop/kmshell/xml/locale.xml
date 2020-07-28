@@ -392,8 +392,9 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="Formatted Messages" Type="FormatString" Id="SKOSNotSupported" Version="7.0.230.0" Description="Notice of unsupported operating system">This operating system is not supported.</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKOnlineHelpFile" Version="7.0.230.0" Description="File name of the help file - must be .chm format.  The locale folder will be checked first for the file">KeymanDesktop.chm</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKCouldNotFindHelp" Version="7.0.230.0" Description="Notice of help file not found">The help file could not be found.</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKANSIEncoding" Version="7.0.230.0" Description="Keyboard with an ANSI or Codepage encoding">Codepage</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKUnicodeEncoding" Version="7.0.230.0" Description="Keyboard with a Unicode encoding">Unicode</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKDownloadProgress_Title" Version="7.0.230.0" Description="Notice of file downloading">Downloading File</String>
-
 
 <!-- Confirmation Requests -->
 
@@ -428,25 +429,11 @@ PRIVACY WARNING: Please note that the debug logfile records all keystrokes that 
 
 <!-- OSK Font Helper -->
 
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PleaseWait1" Description="OSK Font helper loading message part 1">Please wait while &Name; finds the fonts that will work with</String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PleaseWait2" Description="OSK Font helper loading message part 2">keyboard.</String>
+<String Group="OSK Font Helper" Type="FormatString" Version="8.0.294.0" Id="S_OSK_FontHelper_PleaseWait" Description="OSK Font helper message">Please wait while searching for releted fonts for keyboard %0:s</String>
+<String Group="OSK Font Helper" Type="FormatString" Version="8.0.294.0" Id="S_OSK_FontHelper_NonUnicode" Description="OSK Font helper non-Unicode keyboard">Keyboard %0:s is not a Unicode keyboard. Fonts cannot be automatically located.  Please check the keyboard documentation for font information.</String>
 
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NonUnicode1" Description="OSK Font helper non-Unicode part 1"></String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NonUnicode2" Description="OSK Font helper non-Unicode part 2">is not a Unicode keyboard.  Fonts cannot be automatically located.  Please check the keyboard documentation for font information.</String>
-
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_MatchedFonts1" Description="OSK Font helper matched fonts part 1">The following fonts work with</String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_MatchedFonts2" Description="OSK Font helper matched fonts part 2">keyboard:</String>
-
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PossibleFonts" Description="OSK Font helper additional possible fonts">The following fonts may also work:</String>
-
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PossibleFontsOnly1" Description="OSK Font helper possible fonts part 1">The following fonts may work with</String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_PossibleFontsOnly2" Description="OSK Font helper possible fonts part 2">keyboard:</String>
-
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1a" Description="OSK Font helper no fonts part 1">No fonts were found on your system that work with </String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoFonts1b" Description="OSK Font helper no fonts part 2">.  Please <a href="keyman:welcome">check the documentation</a> to find fonts for this keyboard.</String>
-
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_NoKeyboards" Description="OSK Font helper no keyboards">No keyboard layouts are currently installed or loaded.  Use &Name; Configuration to install a keyboard layout.</String>
-<String Group="OSK Font Helper" Type="HTML" Version="8.0.294.0" Id="S_OSK_FontHelper_ChooseKeyboard" Description="OSK Font helper choose keyboard">Please choose a &Name; keyboard to find the fonts that will work with it.</String>
+<String Group="OSK Font Helper" Type="FormatString" Version="8.0.294.0" Id="S_OSK_FontHelper_NoKeyboards" Description="OSK Font helper no keyboards">No keyboard layouts are currently installed or loaded.</String>
+<String Group="OSK Font Helper" Type="FormatString" Version="8.0.294.0" Id="S_OSK_FontHelper_ChooseKeyboard" Description="OSK Font helper choose keyboard">Please select a &Name; keyboard to find related fonts.</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Text Editor                       -->
