@@ -291,6 +291,22 @@ public final class KMManager {
   }
 
   /**
+   * Extract KMEA major version #.# from VERSION_NAME
+   * @return String
+   */
+  public static String getMajorVersion() {
+    // Regex needs to match the entire string
+    String appVersion = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
+    Pattern pattern = Pattern.compile("^(\\d+\\.\\d+)\\.\\d+.*");
+    Matcher matcher = pattern.matcher(appVersion);
+    if (matcher.matches() && matcher.groupCount() >= 1) {
+      appVersion = matcher.group(1);
+    }
+
+    return appVersion;
+  }
+
+  /**
    * Extract KMEA version #.#.# from VERSION_NAME
    * @return String
    */

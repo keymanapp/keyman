@@ -1,9 +1,9 @@
+/**
+ * Copyright (C) 2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.util;
 
 import android.content.Context;
-import android.os.Build;
-
-import com.tavultesoft.kmea.KMManager;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -18,8 +18,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
   * Limitations:
@@ -263,38 +261,6 @@ public final class FileUtils {
         filename = urlStr.substring(urlStr.lastIndexOf('/') + 1);
     }
     return filename;
-  }
-
-  /**
-   * Utility to parse a URL and determine if it's a valid keyman:<method>
-   * Currently, only "keyman" scheme with "download" path and query is supported.
-   * Legacy keyman:// protocol is deprecated and not supported.
-   * @param u String of the URL
-   * @return boolean true if URL is a supported Keyman link
-   */
-  public static boolean isKeymanLink(String u) {
-    boolean ret = false;
-    if (u == null) {
-      return ret;
-    }
-    String lowerU = u.toLowerCase();
-    Pattern pattern = Pattern.compile("^keyman:(\\w+)\\?(.+)");
-    Matcher matcher = pattern.matcher(lowerU);
-    // Check URL starts with "keyman"
-    if (matcher.matches() && (matcher.group(1) != null)) {
-      // For now, only handle "download"
-      switch (matcher.group(1).toLowerCase()) {
-        case "download":
-          if (matcher.group(2) != null) {
-            // Contains query
-            ret = true;
-          }
-          break;
-        default:
-          ret = false;
-      }
-    }
-    return ret;
   }
 
   /**
