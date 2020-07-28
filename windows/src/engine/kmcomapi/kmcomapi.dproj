@@ -240,7 +240,6 @@
         <DCCReference Include="..\..\global\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
         <DCCReference Include="..\..\global\delphi\productactivation\OnlineConstants.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\MessageDefaults.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\MessageIdentifierConsts.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanEngineControl.pas"/>
         <DCCReference Include="..\..\global\delphi\vcl\ErrorControlledRegistry.pas"/>
@@ -262,7 +261,6 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockMessages.pas"/>
         <DCCReference Include="processes\keyboard\kpinstallkeyboardlanguageprofiles.pas"/>
         <DCCReference Include="processes\keyboard\kpuninstallkeyboardlanguageprofiles.pas"/>
         <DCCReference Include="processes\keyboard\kprecompilemnemonickeyboard.pas"/>
