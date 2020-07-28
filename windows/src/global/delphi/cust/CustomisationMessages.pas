@@ -67,7 +67,6 @@ implementation
 
 uses
   DebugPaths,
-  MessageDefaults,
   KLog,
   ErrorControlledRegistry,
   RegistryKeys;

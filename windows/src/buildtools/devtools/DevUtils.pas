@@ -41,6 +41,7 @@ uses
   DevInstallPackages,
   DevIncludePaths,
   DevReleaseBuildCheck,
+  Keyman.System.DevTools.BuildMessageConstants,
   RegistryKeys;
 
 procedure DevLog(const s: string; nl: Boolean);
@@ -65,7 +66,7 @@ begin
 
     if ParamCount < 1 then
     begin
-      writeln('Usage: devutils -ip <package>|-rp|-ai <path>|-ri|-dcc[q] *|-dccx *');    // I3339  // I3378
+      writeln('Usage: devutils <command>');    // I3339  // I3378
       writeln('  -ip package.bpl      : install package');
       writeln('  -rp                  : reset packages');
       writeln('  -ai path[;path...]   : add include path(s)');
@@ -76,6 +77,7 @@ begin
       writeln('  -dccq ...            : wrap a call to DCC32, ignoring hints and warnings');    // I3339  // I3378
       writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
+      writeln('  -buildmessageconstants <locale.xml> <messageidentifierconsts.pas>: build MessageIdentifierConsts.pas from current locale.xml');
       ExitCode := 1;
       Exit;
     end;
@@ -102,6 +104,8 @@ begin
       Success := TReleaseBuildCheck.Run
     else if (ParamStr(1) = '-git') then   // I3726   // I5087
       Success := TCheckGitStatus.Run
+    else if (ParamStr(1) = '-buildmessageconstants') and (ParamCount = 3) then
+      Success := TBuildMessageConstants.Run(ParamStr(2), ParamStr(3))
     else
     begin
       writeln('Invalid parameters');

@@ -23,6 +23,7 @@ engine/keyman64/Keyman64.res
 engine/keymanx64/keymanx64.res
 engine/mcompile/Release/
 tds_file.txt
+global/delphi/cust/MessageIdentifierConsts.pas
 
 # These are built from corresponding manifest.in and version.in
 **/manifest.xml
