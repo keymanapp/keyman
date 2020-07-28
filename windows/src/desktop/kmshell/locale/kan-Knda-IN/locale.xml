@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale Version="10.0.1100.0" OnlineProductID="30">
   <String Type="PlainText" Id="S_LocaleAuthors">www.ಸಿರಿಗನ್ನಡ.com (www.sirigannada.com)</String>
   <String Type="PlainText" Id="SK_UIFontName">Noto Sans Kannada</String>
   <String Type="PlainText" Id="SK_UIFontSize">10</String>
-  <String Type="PlainText" Id="S_ShortProductName">&Name_CNV;</String>
+  <String Type="PlainText" Id="S_ShortProductName">&Name;</String>
   <String Type="PlainText" Id="S_Yes">ಹೌದು</String>
   <String Type="PlainText" Id="S_No">ಇಲ್ಲ</String>
   <String Type="FormatString" Id="SKButtonYes">&amp;ಹೌದು</String>
@@ -153,7 +155,7 @@
   <String Type="FormatString" Id="SKSelectKeyboardsTitle">ಅನುಸ್ಥಾಪಿಸಲು ಕೀಲಿಮಣೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ</String>
   <String Type="FormatString" Id="SKSelectKeyboardsBlurb">ಈ ಪ್ಯಾಕೇಜ್‌ನಲ್ಲಿ ಎಲ್ಲಾ ಕೀಲಿಮಣೆಗಳನ್ನು ಸ್ಥಾಪಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ಗರಿಷ್ಟ %0:d ಹೆಚ್ಚುವರಿ ಕೀಲಿಮಣೆಗಳನ್ನು ಸ್ಥಾಪಿಸಬಹುದು. ದಯವಿಟ್ಟು ನೀವು ಈ ಪ್ಯಾಕೇಜ್‌ನಿಂದ ಸ್ಥಾಪಿಸಲು ಬಯಸುವ ಕೀಲಿಮಣೆಯನ್ನು ಮಾತ್ರ ಆಯ್ಕೆ ಮಾಡಿ.</String>
   <String Type="PlainText" Id="S_Update_Title">ನವೀಕರಿಸಲಾದ &Name; ಘಟಕಗಳು ಲಭ್ಯವಿದೆ</String>
-  <String Type="PlainText" Id="S_Update_NewVersionAvailable">&Name_CN; ಇದಕ್ಕಾಗಿ ಅಪ್‌ಡೇಟ್‌ಗಳು ಲಭ್ಯವಿದೆ</String>
+  <String Type="PlainText" Id="S_Update_NewVersionAvailable">&Name; ಇದಕ್ಕಾಗಿ ಅಪ್‌ಡೇಟ್‌ಗಳು ಲಭ್ಯವಿದೆ</String>
   <String Type="PlainText" Id="S_Update_NewVersionPrompt">ದಯವಿಟ್ಟು ನೀವು ಸ್ಥಾಪಿಸಲು ಬಯಸುವ ನವೀಕರಣಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:</String>
   <String Type="PlainText" Id="S_Update_InstallQuery">ಈ ಪ್ಯಾಚ್ ಅನ್ನು ಇದೀಗ ನೀವು ಡೌನ್ಲೋಡ್ ಮಾಡಲು ಮತ್ತು ಸ್ಥಾಪಿಸಲು ಬಯಸುವಿರಾ?</String>
   <String Type="PlainText" Id="S_Update_DownloadFrom">ನೀವು ಈ ಹೊಸ ಆವೃತ್ತಿಯನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಬಹುದು:</String>
@@ -171,9 +173,8 @@
   <String Type="FormatString" Id="SKUpdate_IconText">ನವೀಕರಣಗಳನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಲು ಮತ್ತು ಅನುಸ್ಥಾಪಿಸಲು ಈ ಐಕಾನ್ ಕ್ಲಿಕ್ ಮಾಡಿ</String>
   <String Type="FormatString" Id="SKUpdate_IconMenuText">ವೀಕ್ಷಿಸಿ ಮತ್ತು ಅನುಸ್ಥಾಪನೆ &Name; ನವೀಕರಣಗಳು</String>
   <String Type="FormatString" Id="SKUpdate_IconMenuExit">ಆನ್‌ಲೈನ್ ಅಪ್‌ಡೇಟ್ ಪರಿಶೀಲನೆಗೆ ನಿರ್ಗಮನ</String>
-  <String Type="PlainText" Id="S_Splash_Title">&Name_CNV;</String>
+  <String Type="PlainText" Id="S_Splash_Title">&Name;</String>
   <String Type="PlainText" Id="S_Splash_Name">&Name;</String>
-  <String Type="PlainText" Id="S_Splash_Version">&Version;</String>
   <String Type="PlainText" Id="S_Splash_Start">ಪ್ರಾರಂಭಿಸು</String>
   <String Type="PlainText" Id="S_Splash_Exit">ನಿರ್ಗಮಿಸು</String>
   <String Type="PlainText" Id="S_Splash_OtherTasks">ಇತರೆ ಕಾರ್ಯಗಳು</String>
@@ -237,7 +238,7 @@
   <String Type="HTML" Id="S_Usage_KeyboardDocumentation">ಹೆಚ್ಚುವರಿ ದಸ್ತಾವೇಜನ್ನು ಮತ್ತು/ಅಥವಾ "ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ" ವೀಕ್ಷಿಸಲು ಕೆಳಗಿನ ಗುಂಡಿಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
   <String Type="HTML" Id="S_Usage_KeymanOff">ಪ್ರಸ್ತುತ &Name; ರಲ್ಲಿ ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಮೇಲಿನ ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್)ನಲ್ಲಿನ ಯಾವುದೇ ಕೀಲಿಮಣೆ ಚಿತ್ರ(ಐಕಾನ್)ಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</String>
   <String Type="HTML" Id="S_Usage_NoKeyboardsInstalled">ಯಾವುದೇ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸಗಳನ್ನು ಪ್ರಸ್ತುತ ಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು &Name; ಸಂರಚನೆಯನ್ನು(ಕಾನ್ಫಿಗರೇಷನ್) ಬಳಸಿ.</String>
-  <String Type="FormatString" Id="SKApplicationTitle">&Name_CN;</String>
+  <String Type="FormatString" Id="SKApplicationTitle">&Name;</String>
   <String Type="FormatString" Id="SKSplashVersion">ಆವೃತ್ತಿ %0:s</String>
   <String Type="FormatString" Id="SKButtonHelp">ಸಹಾಯ</String>
   <String Type="FormatString" Id="SKButtonPrint">&amp;ಮುದ್ರಿಸು....</String>
