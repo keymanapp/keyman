@@ -35,19 +35,11 @@ public final class KMPLink {
     KMP_STAGING_HOST);
   private static final Pattern downloadPattern = Pattern.compile(downloadPatternFormatStr);
 
-  // Keyman 13.0 keyboard download links from Keyman server
-  // TODO: Remove this in 14.0 Beta  when keyboard search updated on live site
-  private static final String KMP_DOWNLOAD_KEYBOARDS_13_PATTERN_FORMATSTR = "^https://(%s)(/keyboard/download\\?id=)(\\w+)(&platform=android&mode=standalone)(.+)?";
-  private static final String download13PatternFromatStr = String.format(KMP_DOWNLOAD_KEYBOARDS_13_PATTERN_FORMATSTR,
-    KMP_PRODUCTION_HOST);
-  private static final Pattern download13Pattern = Pattern.compile(download13PatternFromatStr);
-
   // Keyman 14.0+ generated URL for keyboard download links
   private static final String KMP_DOWNLOAD_KEYBOARDS_FORMATSTR = "https://%s/go/package/download/%s";
 
   /**
-   * Check if a URL is a valid Keyman keyboard download link with a packageID
-   *
+   * Check if a URL is a valid Keyman keyboard install link with a packageID
    * @param url String of the URL to parse
    * @return boolean
    */
@@ -64,14 +56,18 @@ public final class KMPLink {
     return status;
   }
 
+  /**
+   * Check if a URL is a valid Keyman keyboard download KMP link
+   * @param url String of the URL to parse
+   * @return boolean
+   */
   public static boolean isKeymanDownloadLink(String url) {
     boolean status = false;
     if (url == null || url.isEmpty()) {
       return status;
     }
     Matcher matcher = downloadPattern.matcher(url);
-    Matcher matcher13 = download13Pattern.matcher(url);
-    if (matcher.matches() || matcher13.matches()) {
+    if (matcher.matches()) {
       status = true;
     }
 
