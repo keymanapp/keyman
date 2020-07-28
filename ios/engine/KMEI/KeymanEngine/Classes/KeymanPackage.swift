@@ -323,6 +323,10 @@ public class KeymanPackage {
     fatalError("abstract base method went uninplemented by derived class")
   }
 
+  var languages: [Language] {
+    fatalError("abstract base method went unimplemented by derived class")
+  }
+
   /**
    * Returns an array of arrays corresponding to the available permutations of resource + language for each resource
    * specified by the package.
@@ -521,5 +525,22 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
       // For some reason, Swift just won't recognize that it's the same type in the line below.
       kbdMetadata.hasMatchingMetadata(for: resource as! Metadata.LanguageResourceType, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
     })
+  }
+
+  public override var languages: [Language] {
+    let unfilteredLanguageList = self.resources.flatMap { $0.languages }
+
+    var languages: [Language] = []
+    var langCodeSet: Set<String> = Set<String>()
+
+    unfilteredLanguageList.forEach { entry in
+      if !langCodeSet.contains(entry.languageId) {
+        langCodeSet.insert(entry.languageId)
+        languages.append(Language(from: entry))
+      }
+    }
+
+    languages.sort { $0.name < $1.name }
+    return languages
   }
 }

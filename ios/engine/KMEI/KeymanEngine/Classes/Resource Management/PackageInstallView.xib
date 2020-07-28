@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina4_0" orientation="portrait" appearance="light"/>
+    <device id="retina4_0" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
@@ -10,6 +10,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PackageInstallViewController" customModule="KeymanEngine" customModuleProvider="target">
             <connections>
+                <outlet property="languageTable" destination="g0u-la-8U2" id="szy-2k-o1j"/>
                 <outlet property="lblCopyright" destination="33W-zU-8EX" id="BY9-fn-qHT"/>
                 <outlet property="lblVersion" destination="ZjR-uh-gz5" id="bNa-sy-VF9"/>
                 <outlet property="view" destination="iN0-l3-epB" id="NJC-ib-Wg0"/>
@@ -21,8 +22,8 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="peW-vU-Eez" userLabel="WebView Container">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="384"/>
+                <view contentMode="scaleToFill" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="peW-vU-Eez" userLabel="WebView Container">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="356.5"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="128" id="hux-E5-Tbu"/>
                     </constraints>
@@ -37,10 +38,42 @@
                         </mask>
                     </variation>
                 </view>
+                <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="13C-Qj-3hM" userLabel="Tagging View">
+                    <rect key="frame" x="0.0" y="356.5" width="320" height="187.5"/>
+                    <subviews>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="800" verticalHuggingPriority="800" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="36" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="g0u-la-8U2" userLabel="languageTable">
+                            <rect key="frame" x="0.0" y="8" width="320" height="179.5"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        </tableView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="secondarySystemBackgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="trailing" secondItem="JpI-h2-DXO" secondAttribute="trailing" id="0Vo-QN-H7t"/>
+                        <constraint firstAttribute="width" constant="180" id="2Pu-qT-ca0"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="bottom" secondItem="JpI-h2-DXO" secondAttribute="bottom" id="4rc-HM-gX8"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="top" secondItem="JpI-h2-DXO" secondAttribute="top" constant="8" id="Aq6-w0-byQ"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="leading" secondItem="JpI-h2-DXO" secondAttribute="leading" id="dUW-4h-qvC"/>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="800" constant="100" id="hV9-Wg-NIL">
+                            <variation key="heightClass=compact-widthClass=compact" constant="100"/>
+                        </constraint>
+                    </constraints>
+                    <viewLayoutGuide key="safeArea" id="JpI-h2-DXO"/>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="2Pu-qT-ca0"/>
+                            <exclude reference="hV9-Wg-NIL"/>
+                        </mask>
+                    </variation>
+                    <variation key="heightClass=compact-widthClass=compact">
+                        <mask key="constraints">
+                            <include reference="hV9-Wg-NIL"/>
+                        </mask>
+                    </variation>
+                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Vb-Wo-rx6" userLabel="Version View">
                     <rect key="frame" x="0.0" y="544" width="320" height="24"/>
                     <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version: 1.2.3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZjR-uh-gz5">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="700" verticalCompressionResistancePriority="700" text="Version: 1.2.3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZjR-uh-gz5">
                             <rect key="frame" x="8" y="3.5" width="86.5" height="17"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <nil key="textColor"/>
@@ -58,6 +91,7 @@
                         <constraint firstItem="ZjR-uh-gz5" firstAttribute="leading" secondItem="OZc-1J-VJs" secondAttribute="leading" constant="8" id="5jm-LI-VNb"/>
                         <constraint firstItem="33W-zU-8EX" firstAttribute="centerY" secondItem="7Vb-Wo-rx6" secondAttribute="centerY" id="9Yb-zi-1dT"/>
                         <constraint firstAttribute="height" constant="24" id="BF9-JW-EvK"/>
+                        <constraint firstItem="33W-zU-8EX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ZjR-uh-gz5" secondAttribute="trailing" constant="8" id="ZZz-O3-Ezm"/>
                         <constraint firstAttribute="trailing" secondItem="33W-zU-8EX" secondAttribute="trailing" constant="8" id="pVa-ty-gdH"/>
                         <constraint firstItem="ZjR-uh-gz5" firstAttribute="centerY" secondItem="7Vb-Wo-rx6" secondAttribute="centerY" id="x2G-gs-NBc"/>
                     </constraints>
@@ -65,38 +99,6 @@
                     <variation key="heightClass=regular-widthClass=compact">
                         <mask key="constraints">
                             <include reference="BF9-JW-EvK"/>
-                        </mask>
-                    </variation>
-                </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="13C-Qj-3hM" userLabel="Tagging View">
-                    <rect key="frame" x="0.0" y="384" width="320" height="160"/>
-                    <color key="backgroundColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="180" id="2Pu-qT-ca0"/>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="6a8-ni-wrx"/>
-                        <constraint firstAttribute="height" priority="999" constant="160" id="NiG-Sz-tp8"/>
-                        <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="800" constant="100" id="hV9-Wg-NIL">
-                            <variation key="heightClass=compact-widthClass=compact" constant="100"/>
-                        </constraint>
-                    </constraints>
-                    <viewLayoutGuide key="safeArea" id="JpI-h2-DXO"/>
-                    <variation key="default">
-                        <mask key="constraints">
-                            <exclude reference="2Pu-qT-ca0"/>
-                            <exclude reference="6a8-ni-wrx"/>
-                            <exclude reference="NiG-Sz-tp8"/>
-                            <exclude reference="hV9-Wg-NIL"/>
-                        </mask>
-                    </variation>
-                    <variation key="heightClass=compact-widthClass=compact">
-                        <mask key="constraints">
-                            <include reference="6a8-ni-wrx"/>
-                            <include reference="hV9-Wg-NIL"/>
-                        </mask>
-                    </variation>
-                    <variation key="heightClass=regular-widthClass=compact">
-                        <mask key="constraints">
-                            <include reference="NiG-Sz-tp8"/>
                         </mask>
                     </variation>
                 </view>
@@ -112,6 +114,7 @@
                 </constraint>
                 <constraint firstItem="peW-vU-Eez" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="4KI-e4-tLS"/>
                 <constraint firstItem="7Vb-Wo-rx6" firstAttribute="trailing" secondItem="13C-Qj-3hM" secondAttribute="trailing" id="5de-Rk-g1o"/>
+                <constraint firstItem="13C-Qj-3hM" firstAttribute="height" secondItem="vUN-kp-3ea" secondAttribute="height" multiplier="0.33" priority="750" id="6p8-lD-wII"/>
                 <constraint firstItem="peW-vU-Eez" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="8K0-lF-1Wb"/>
                 <constraint firstItem="13C-Qj-3hM" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="8mB-Vp-Zyh"/>
                 <constraint firstItem="peW-vU-Eez" firstAttribute="leading" secondItem="7Vb-Wo-rx6" secondAttribute="trailing" id="9Yt-wB-B29"/>
@@ -198,6 +201,7 @@
                     <exclude reference="nbL-6v-COM"/>
                     <exclude reference="ule-XW-hOz"/>
                     <exclude reference="0hJ-bR-l67"/>
+                    <exclude reference="6p8-lD-wII"/>
                     <exclude reference="8mB-Vp-Zyh"/>
                     <exclude reference="I1l-nB-H86"/>
                     <exclude reference="Im3-nd-LOk"/>
@@ -268,6 +272,7 @@
                     <include reference="4KI-e4-tLS"/>
                     <include reference="LCM-wA-C1A"/>
                     <include reference="Shx-qx-QGy"/>
+                    <include reference="6p8-lD-wII"/>
                     <include reference="8mB-Vp-Zyh"/>
                     <include reference="Tvb-LM-Ayn"/>
                     <include reference="awR-i3-KQd"/>
