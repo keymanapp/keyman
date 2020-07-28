@@ -8,9 +8,7 @@ uses
 
 type
   Tmd = class(TForm)
-    cmdMessages: TButton;
     Button1: TButton;
-    procedure cmdMessagesClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
@@ -23,19 +21,9 @@ var
 
 implementation
 
-uses StockMessageEditor, COMMessageEditor;
+uses COMMessageEditor;
 
 {$R *.DFM}
-
-procedure Tmd.cmdMessagesClick(Sender: TObject);
-begin
-  with TfrmStockMessageEditor.Create(Self) do
-  try
-    ShowModal;
-  finally
-    Free;
-  end;
-end;
 
 procedure Tmd.Button1Click(Sender: TObject);
 begin

@@ -13,22 +13,13 @@ object md: Tmd
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object cmdMessages: TButton
-    Left = 40
-    Top = 28
-    Width = 75
-    Height = 25
-    Caption = '&Messages...'
-    TabOrder = 0
-    OnClick = cmdMessagesClick
-  end
   object Button1: TButton
-    Left = 44
-    Top = 76
-    Width = 75
+    Left = 8
+    Top = 8
+    Width = 97
     Height = 25
     Caption = 'COM Messages'
-    TabOrder = 1
+    TabOrder = 0
     OnClick = Button1Click
   end
 end

@@ -83,8 +83,6 @@ procedure AddKeyboardItems(FKeyman: IKeyman; mnu: TPopupMenu; MenuClick: TNotify
   cmi: IKeymanCustomisationMenuItem);   // I3933   // I4390
 
   function CreateLanguageMenuItem(Language: TLangSwitchLanguage): TKeymanMenuItem;   // I3933
-  var
-    s: WideString;
   begin
     Result := TKeymanMenuItem.Create(mnu);
 
@@ -92,11 +90,7 @@ procedure AddKeyboardItems(FKeyman: IKeyman; mnu: TPopupMenu; MenuClick: TNotify
     if Result.FontName = '' then Result.FontName := 'Tahoma';
 
     Result.FontSize := StrToIntDef(MsgFromId(SK_UIFontSize), 8);
-
-    s := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(Language.Caption))+''']');
-    if s = ''
-      then Result.WideCaption := StringReplace(Language.Caption, '&', '&&', [rfReplaceAll])
-      else Result.WideCaption := s;
+    Result.WideCaption := StringReplace(Language.Caption, '&', '&&', [rfReplaceAll]);
 
     Result.OnClick := MenuClick;
     if Assigned(cmi)
@@ -161,10 +155,7 @@ procedure AddKeyboardItems(FKeyman: IKeyman; mnu: TPopupMenu; MenuClick: TNotify
       Result.ItemType := kmitKeyboard;
     end;
 
-    Result.WideCaption := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(FCaption))+''']');
-    if Result.WideCaption = '' then
-      Result.WideCaption := StringReplace(FCaption, '&', '&&', [rfReplaceAll]);
-
+    Result.WideCaption := StringReplace(FCaption, '&', '&&', [rfReplaceAll]);
     Result.OnClick := MenuClick;
     if Assigned(FTargetLanguage) then
       Result.ShortCut := HotkeyToShortcut(FTargetLanguage.Hotkey);   // I4398
@@ -230,7 +221,7 @@ begin
   case cmi.ItemType of
     mitText:
       begin
-        s := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(cmi.Caption))+''']');
+        s := MsgFromStr(xmlencode(StripHotkey(cmi.Caption)));
         if s = ''
           then Result.WideCaption := cmi.Caption
           else Result.WideCaption := s;
@@ -462,7 +453,7 @@ procedure AddKeyboardToolbarItems(FKeyman: IKeyman; toolbar: TToolBar; imglist: 
       FCaption := Language.Caption + ' - ' + Keyboard.Caption;
 
       btn.ShowHint := True;
-      btn.Hint := MsgFromStr(':String[@Caption='''+xmlencode(StripHotkey(FCaption))+''']');
+      btn.Hint := MsgFromStr(xmlencode(StripHotkey(FCaption)));
       if btn.Hint = '' then
         btn.Hint := StringReplace(FCaption, '&', '&&', [rfReplaceAll]);
 

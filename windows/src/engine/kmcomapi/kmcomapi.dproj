@@ -3,7 +3,7 @@
         <ProjectGuid>{A20773C5-2124-434E-9F3C-27DC9EBC85EE}</ProjectGuid>
         <MainSource>kmcomapi.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Library</AppType>
         <FrameworkType>VCL</FrameworkType>

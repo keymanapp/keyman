@@ -101,7 +101,7 @@ begin
   nm := LowerCase(ExtractFileName(ffilename));
   if nm = StockFileName_TrayIcon then Result := ftTrayIcon
   else if nm = StockFileName_Menu then Result := ftKeymanMenu
-  else if nm = StockFileName_Messages then Result := ftMessages
+//  else if nm = StockFileName_Messages then Result := ftMessages
   else if nm = StockFileName_AppIcon then Result := ftAppIcon
   else if nm = StockFileName_ConfigIcon then Result := ftCfgIcon
   else Result := ftOther;

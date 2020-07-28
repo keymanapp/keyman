@@ -1,6 +1,6 @@
 # Localization Maintenance
 Localization for Keyman is maintained at https://crowdin.com/project/keyman
-The Crowdin CLI (v3) tool is used to automate downloading and updating files 
+The Crowdin CLI (v3) tool is used to automate downloading and updating files
 between Keyman and Crowdin. The configuration file for each platform is a YAML file named `crowdin.yml`.
 
 On Windows, use `crowdin.bat` instead of `crowdin` for all the syntax below.
@@ -15,23 +15,23 @@ For example, `android/KMEA/strings.xml` string uses
 ```
 
 ## Setup
-Install the [Crowdin CLI (v3)](https://support.crowdin.com/cli-tool-v3/) for your OS. 
+Install the [Crowdin CLI (v3)](https://support.crowdin.com/cli-tool-v3/) for your OS.
 Note, it has a prerequisite on Java 8.
 
 ### Environment Variables
-In Crowdin, create a [personal access token](https://crowdin.com/settings#api-key) 
+In Crowdin, create a [personal access token](https://crowdin.com/settings#api-key)
 and set it as an environment variable `CROWDIN_PERSONAL_TOKEN`.
 
-Also copy the [project id](https://crowdin.com/project/keyman/settings#api) 
+Also copy the [project id](https://crowdin.com/project/keyman/settings#api)
 from API v2 and set it as an environment variable `CROWDIN_PROJECT_ID`.
 
-### Testing Crowdin CLI is Set Up Correctly 
-To check your CLI setup, 
+### Testing Crowdin CLI is Set Up Correctly
+To check your CLI setup,
 ```
 crowdin list project
 ```
 
-You should see the CLI fetching project info and generating a list of files associated with the project. 
+You should see the CLI fetching project info and generating a list of files associated with the project.
 
 ## Downloading from Crowdin
 

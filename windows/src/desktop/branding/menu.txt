@@ -16,7 +16,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = 'Switch Keyman Desktop &Off'
+      Caption = 'S_Menu_SwitchKeymanOff'
       Icon.Data = {
         07544269746D617036030000424D360300000000000036000000280000001000
         000010000000010018000000000000030000130B0000130B0000000000000000
@@ -69,7 +69,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = 'On Screen &Keyboard'
+      Caption = 'S_Menu_OnScreenKeyboard'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -261,7 +261,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = 'Keyboard &Usage'
+      Caption = 'S_Menu_KeyboardUsage'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -313,7 +313,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = '&Font Helper'
+      Caption = 'S_Menu_FontHelper'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -365,7 +365,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = 'Character &Map'
+      Caption = 'S_Menu_CharacterMap'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -429,7 +429,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = '&Text Editor...'
+      Caption = 'S_Menu_TextEditor'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -481,7 +481,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = '&Configuration...'
+      Caption = 'S_Menu_Configuration'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -709,7 +709,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = '&Help...'
+      Caption = 'S_Menu_Help'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -881,7 +881,7 @@ object TCustomisationMenu
       MouseButton = 2
       Location = 2
       ItemType = 1
-      Caption = 'E&xit'
+      Caption = 'S_Menu_Exit'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1037,7 +1037,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = 'Switch Keyman Desktop &Off'
+      Caption = 'S_Menu_SwitchKeymanOff'
       Icon.Data = {
         07544269746D617036030000424D360300000000000036000000280000001000
         000010000000010018000000000000030000130B0000130B0000000000000000
@@ -1078,7 +1078,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'View On Screen Keyboard'
+      Caption = 'S_Toolbar_ViewOnScreenKeyboard'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1130,7 +1130,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'View Keyboard Usage'
+      Caption = 'S_Toolbar_ViewKeyboardUsage'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1182,7 +1182,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'View Font Helper'
+      Caption = 'S_Toolbar_ViewFontHelper'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1234,7 +1234,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'View Character Map'
+      Caption = 'S_Toolbar_ViewCharacterMap'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1322,7 +1322,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'Open Keyman Desktop Configuration'
+      Caption = 'S_Toolbar_OpenConfiguration'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1374,7 +1374,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'Open Help'
+      Caption = 'S_Toolbar_OpenHelp'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1438,7 +1438,7 @@ object TCustomisationMenu
       MouseButton = 3
       Location = 3
       ItemType = 1
-      Caption = 'Close On Screen Keyboard'
+      Caption = 'S_Toolbar_CloseOnScreenKeyboard'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1490,7 +1490,7 @@ object TCustomisationMenu
       MouseButton = 4
       Location = 4
       ItemType = 1
-      Caption = '&Fade When Inactive'
+      Caption = 'S_OSKContext_FadeWhenInactive'
       Action = 9
       HotKey = 0
       Font.Charset = DEFAULT_CHARSET
@@ -1503,7 +1503,7 @@ object TCustomisationMenu
       MouseButton = 4
       Location = 4
       ItemType = 1
-      Caption = 'Show &Toolbar'
+      Caption = 'S_OSKContext_ShowToolbar'
       Action = 10
       HotKey = 0
       Font.Charset = DEFAULT_CHARSET
@@ -1528,7 +1528,7 @@ object TCustomisationMenu
       MouseButton = 4
       Location = 4
       ItemType = 1
-      Caption = '&Save as Web Page...'
+      Caption = 'S_OSKContext_SaveAsWebPage'
       Action = 11
       HotKey = 0
       Font.Charset = DEFAULT_CHARSET
@@ -1541,7 +1541,7 @@ object TCustomisationMenu
       MouseButton = 4
       Location = 4
       ItemType = 1
-      Caption = '&Print...'
+      Caption = 'S_OSKContext_Print'
       Action = 12
       HotKey = 0
       Font.Charset = DEFAULT_CHARSET
@@ -1562,7 +1562,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = 'On Screen &Keyboard'
+      Caption = 'S_Menu_OnScreenKeyboard'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1612,7 +1612,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = 'Keyboard &Usage'
+      Caption = 'S_Menu_KeyboardUsage'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1662,7 +1662,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = '&Font Helper'
+      Caption = 'S_Menu_FontHelper'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1712,7 +1712,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = 'Character &Map'
+      Caption = 'S_Menu_CharacterMap'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1772,7 +1772,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = '&Text Editor...'
+      Caption = 'S_Menu_TextEditor'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1822,7 +1822,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = '&Configuration...'
+      Caption = 'S_Menu_Configuration'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1872,7 +1872,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = '&Help...'
+      Caption = 'S_Menu_Help'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000
@@ -1922,7 +1922,7 @@ object TCustomisationMenu
     end
     item
       ItemType = 1
-      Caption = 'E&xit'
+      Caption = 'S_Menu_Exit'
       Icon.Data = {
         07544269746D6170AA040000424DAA0400000000000036000000280000001300
         000013000000010018000000000074040000C21E0000C21E0000000000000000

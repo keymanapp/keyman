@@ -25,44 +25,50 @@ unit main;
 interface
 
 uses
-  classes, xmlintf, xmldoc, activex;
+  System.Classes,
+  Xml.xmlintf,
+  Xml.xmldoc,
+  Winapi.activex;
 
 procedure Run;
 
 implementation
 
 uses
-  SysUtils, Unicode;
+  Xml.Win.msxmldom,
+  System.SysUtils,
+
+  Unicode;
 
 procedure Parse;
 var
   doc, xsl: IXMLDocument;
   xml: WideString;
 begin
-    doc := TXMLDocument.Create(nil);
-    doc.ParseOptions := [poResolveExternals];  // I902 - resolve externals when loading XML files
-    doc.LoadFromFile(ParamStr(1));
+  doc := TXMLDocument.Create(nil);
+  doc.ParseOptions := [poResolveExternals, poPreserveWhiteSpace];  // I902 - resolve externals when loading XML files
+  doc.LoadFromFile(ParamStr(1));
 
-    xsl := TXMLDocument.Create(nil);
-    xsl.ParseOptions := [poResolveExternals];  // I902 - resolve externals when loading XML files
-    xsl.LoadFromFile(ParamStr(2));
+  xsl := TXMLDocument.Create(nil);
+  xsl.ParseOptions := [poResolveExternals];  // I902 - resolve externals when loading XML files
+  xsl.LoadFromFile(ParamStr(2));
 
-    doc.Node.TransformNode(xsl.Node, xml);
-    xsl := nil;
-    doc := nil;
-    xml := FormatXMLData(xml);
-    if ParamCount < 3 then
-    begin
-      writeln(UTF8Encode(xml));   // I3337  // Yes.  We want to write it to the console as UTF-8
-    end
-    else
-      with TStringList.Create do  // I3306
-      try
-        Text := xml;
-        SaveToFile(ParamStr(3), TEncoding.UTF8);    // I3337 // Yes, we are using UTF-8 // I3306
-      finally
-        Free;
-      end;
+  doc.Node.TransformNode(xsl.Node, xml);
+  xsl := nil;
+  doc := nil;
+  xml := FormatXMLData(xml);
+  if ParamCount < 3 then
+  begin
+    writeln(UTF8Encode(xml));   // I3337  // Yes.  We want to write it to the console as UTF-8
+  end
+  else
+    with TStringList.Create do  // I3306
+    try
+      Text := xml;
+      SaveToFile(ParamStr(3), TEncoding.UTF8);    // I3337 // Yes, we are using UTF-8 // I3306
+    finally
+      Free;
+    end;
 end;
 
 procedure Run;
@@ -72,16 +78,20 @@ begin
     writeln('xslt doc.xml stylesheet.xsl [output.xml]');
     writeln('Outputs the document transformed by stylesheet.xsl in UTF-8');
     writeln('If output.xml is not specified, then writes to stdout');
+    ExitCode := 3;
     Exit;
   end;
 
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   try
+    Xml.Win.msxmldom.MSXMLDOMDocumentFactory.AddDOMProperty('ProhibitDTD', False);
     Parse;
+    ExitCode := 0;
   except
     on E:Exception do
     begin
       writeln(E.ClassName+': '+E.Message);
+      ExitCode := 1;
     end;
   end;
 
