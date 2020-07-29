@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Tastatur</item>
+    </plurals>
+    <string name="title_add_keyboard">Neue Tastatur hinzufügen</string>
+    <string name="title_languages_settings">Installierte Sprachen</string>
+    <string name="title_language_settings" comment="Language Settings">%1$s Einstellungen</string>
+    <!-- Button labels -->
+    <string name="label_add">Neu</string>
+    <string name="label_cancel">Abbrechen</string>
+    <string name="label_close" comment="Close a dialog">Schließen</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Keyman schließen</string>
+    <string name="label_download">Download</string>
+    <string name="label_install">Installieren</string>
+    <string name="label_later" comment="Do an action at a later time">Später</string>
+    <string name="label_ok">Ok</string>
+    <string name="label_update">Aktualisieren</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Keine Verbindung zum Keyman-Server!</string>
+    <string name="confirm_delete_keyboard">Möchten Sie diese Tastatur löschen?</string>
+    <string name="confirm_download_keyboard">Möchten Sie die neueste Version dieser Tastatur herunterladen?</string>
+    <string name="confirm_update">Möchten Sie Tastaturen und Wörterbücher jetzt aktualisieren?</string>
+    <string name="custom_keyboard">Benutzerdefinierte Tastatur</string>
+    <string name="font_failed_to_download">Warnung: Schriftart konnte nicht heruntergeladen werden</string>
+    <string name="keyboard_failed_to_download">Fehler: Tastatur konnte nicht heruntergeladen werden</string>
+    <string name="keyboard_updates_channel">Ressourcen Aktualisierungen</string>
+    <string name="keyboard_updates_available">Ressourcen Updates verfügbar</string>
+    <string name="update_available">%1$s (Update verfügbar)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Updates für Tastatur %1$sverfügbar: %2$s </string>
+    <string name="dictionary_update_message">Aktualisierungen für das Wörterbuch %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Tastaturversion</string>
+    <string name="help_link">Hilfe-Link</string>
+    <string name="uninstall_keyboard">Tastatur deinstallieren</string>
+    <string name="keyboard_picker_new_keyboard_prefix">neu</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Scanne diesen Code, um diese\nTastatur auf einem anderen Gerät zu laden</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Möchten Sie die neueste Version dieses Wörterbuchs herunterladen?</string>
+    <string name="catalog_unavailable">Der Ressourcenkatalog ist nicht verfügbar</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Katalogaktualisierung im Hintergrund gestartet</string>
+    <string name="catalog_download_is_running_in_background">      Der Katalog wird noch heruntergeladen. Bitte versuchen Sie es gleich nochmal!</string>
+    <string name="progress_message_catalog_download_is_running">Der Katalog wird noch heruntergeladen!</string>
+    <string name="keyboard_download_start_in_background">Das Herunterladen der Tastatur wurde im Hintergrund gestartet</string>
+    <string name="keyboard_download_is_running_in_background">Die ausgewählte Tastatur wird bereits heruntergeladen. Bitte versuchen Sie es gleich nochmal!</string>
+    <string name="keyboard_download_finished">Download der Tastatur ist abgeschlossen!</string>
+    <string name="dictionary_download_start_in_background">Lade Wörterbuch im Hintergrund herunter</string>
+    <string name="dictionary_download_is_running_in_background">Das ausgewählte Wörterbuch wird bereits heruntergeladen. Bitte versuchen Sie es gleich nochmal!</string>
+    <string name="dictionary_download_finished">Download des Wörterbuchs ist beendet.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Serverzugriff fehlgeschlagen!</string>
+    <string name="update_check_current">"Alle Ressourcen sind auf dem neuesten Stand!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Wörterbuchversion</string>
+    <string name="uninstall_model">Wörterbuch deinstallieren</string>
+    <string name="confirm_delete_model">Möchten Sie dieses Wörterbuch löschen?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Korrekturen aktivieren</string>
+    <string name="enable_predictions">Vorhersagen aktivieren</string>
+    <string name="model">Wörterbuch</string>
+    <string name="model_info_header" comment="Dictionary name">Wörterbuch: %1$s</string>
+    <string name="model_picker_header">%1$s Wörterbücher</string>
+    <string name="manage_dictionary">Wörterbuch verwalten</string>
+    <string name="model_install_toast">Wörterbuch installiert</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d Tastatur)</item>
+        <item quantity="other">(%1$d Tastaturen)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Löschen</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Hier tippen, um Tastatur zu ändern</string>
+</resources>
