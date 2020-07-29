@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="action_share" comment="Send text content to another app">分享</string>
+  <string name="action_web" comment="Open Keyman browser">Web Browser</string>
+  <string name="action_text_size" comment="Adjust text size">Text Size</string>
+  <string name="action_overflow" comment="Additional menu items">More</string>
+  <string name="action_clear_text" comment="Erase text">Clear Text</string>
+  <string name="action_info" comment="Display Keyman help page">Info</string>
+  <string name="action_settings" comment="Open Settings menu">Settings</string>
+  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Install Updates</string>
+  <string name="title_version">版本</string>
+  <!-- &#8230; is the ellipsis character "..." -->
+  <string name="textview_hint">Start typing here&#8230;</string>
+  <!-- Splash screen (version/copyright info currently disabled -->
+  <!-- Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">文本大小已升高</string>
+  <string name="ic_text_size_down" comment="Make text smaller">文本大小下移</string>
+  <!-- Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">所有文本将被清除</string>
+  <!-- Info screen reuses title_version -->
+  <!-- Get Started menu strings -->
+  <string name="get_started">开始</string>
+  <string name="add_a_keyboard">为您的语言添加键盘</string>
+  <string name="enable_system_keyboard">启用Keyman作为全系统键盘</string>
+  <string name="set_keyman_as_default">设置键盘为默认键盘</string>
+  <string name="more_info" comment="Open the help page">更多信息</string>
+  <string name="show_get_started">Show \"%1$s\" on startup</string>
+  <!-- Keyman Settings menu strings -->
+  <string name="keyman_settings" comment="Settings menu title">Settings</string>
+  <plurals name="installed_languages">
+    <item quantity="other">已安装的语言 (%1$d)</item>
+  </plurals>
+  <string name="install_keyboard_or_dictionary">Install Keyboard or Dictionary</string>
+  <string name="show_banner" comment="text suggestions banner">总是显示素材</string>
+  <string name="show_banner_on" comment="Description when toggle is on">待执行</string>
+  <string name="show_banner_off" comment="Description when toggle is off">关闭时，仅在启用预测文本时显示</string>
+  <!-- reuse show_get_started -->
+  <!-- Keyman Settings Install Keyboard or Dictionary menu strings -->
+  <string name="install_from_keyman_dot_com">Install from keyman.com</string>
+  <string name="install_from_local_file">Install from local file</string>
+  <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
+  <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
+  <string name="add_language_subtext">(from keyboard package)</string>
+  <!-- Select Package and Select Language menu strings -->
+  <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
+  <string name="title_select_language_for_package">Select language for %1$s</string>
+  <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
+  <string name="all_languages_installed">All languages already installed</string>
+  <!-- Web Browser strings -->
+  <string name="hint_text">搜索或输入 URL</string>
+  <string name="title_bookmarks">Bookmarks</string>
+  <string name="no_bookmarks">没有书签</string>
+  <string name="add_bookmark">添加书签</string>
+  <string name="hint_title">标题</string>
+  <string name="hint_url">网址</string>
+  <!-- KMP Package strings -->
+  <string name="title_package">包</string>
+  <string name="title_failed_to_install">安装失败</string>
+  <string name="downloading_keyboard_package">正在下载键盘包</string>
+  <string name="failed_to_extract" comment="Keyboard package failed to unzip">提取失败</string>
+  <string name="install_keyboard_package">安装键盘包</string>
+  <string name="install_predictive_text_package">安装预测文本包</string>
+  <string name="no_new_touch_keyboards_to_install">没有新的触摸式优化键盘安装</string>
+  <string name="no_new_predictive_text_to_install">没有新的预测文本可以安装</string>
+  <string name="no_valid_touch_keyboards_to_install">没有有效的触摸优化键盘安装</string>
+  <string name="no_targets_to_install">没有需要安装的键盘或预测文本</string>
+  <string name="missing_metadata" comment="kmp.json file is missing from the keyboard package">kmp.json 不存在</string>
+  <string name="invalid_metadata">软件包中的元数据无效</string>
+</resources>
