@@ -248,22 +248,22 @@ begin
   FDefaultLocaleDoc.validateOnParse := False;
 
   FPath := GetDebugPath('xmltemplate '+ExtractFileName(FCustStorageFileName), ExtractFilePath(FCustStorageFileName));
-  if FileExists(FPath + 'locale.xml') then
-    FDefaultLocaleDoc.load(FPath + 'locale.xml')
-  else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\locale.xml') then
-    FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\locale.xml');
+  if FileExists(FPath + 'strings.xml') then
+    FDefaultLocaleDoc.load(FPath + 'strings.xml')
+  else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml') then
+    FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml');
 end;
 
 function TCustomisationMessageManager.MessageFromID(ID: WideString): WideString;
 var
   node: IXMLDOMNode;
 begin
-  node := Flocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
+  node := Flocaledoc.selectSingleNode('/resources/string[@name="'+ID+'"]');
   if Assigned(node) then
     Result := node.text
   else
   begin
-    node := Fdefaultlocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
+    node := Fdefaultlocaledoc.selectSingleNode('/resources/string[@name="'+ID+'"]');
     if Assigned(node)
       then Result := node.text
       else Result := ID;
