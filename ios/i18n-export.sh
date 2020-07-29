@@ -6,8 +6,6 @@ THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BA
 . "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
-
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
@@ -19,60 +17,40 @@ verify_on_mac
 
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-BASE_EXPORT_FOLDER="build/localizations"
+
+#xcodebuild -exportLocalizations -project "engine/KMEI/KeymanEngine.xcodeproj"
+#xcodebuild -exportLocalizations -project "keyman/Keyman/Keyman.xcodeproj" 
+
+BASE_EXPORT_FOLDER="build/crowdin"
 START_DIRECTORY=`pwd`
-ARCHIVE_NAME="iOS_localization.zip"
 
 readonly BASE_EXPORT_FOLDER
 readonly START_DIRECTORY
 readonly ARCHIVE_NAME
 
-function exportFile() {
-  BASE_EXPORT_FOLDER="build/localizations"
+function exportFiles() {
+  PROJECT_PATH=$1
+  PROJECT=$2
 
   if ! [ -d "$BASE_EXPORT_FOLDER" ]; then
       mkdir -p "$BASE_EXPORT_FOLDER"
   fi
 
-  LPROJ_SITE=$0
-  LPROJ_BASE=`dirname $0`
-  EXPORT_NAME="en.lproj"
-  EXPORT_SITE="$BASE_EXPORT_FOLDER/$LPROJ_BASE"
-
-  echo "Exporting $LPROJ_SITE"
-
-  rm -rf "$EXPORT_SITE" > /dev/null 2> /dev/null
-  mkdir -p "$EXPORT_SITE"
-  cp -r "$LPROJ_SITE" "$EXPORT_SITE"
+  xcodebuild -exportLocalizations -project "$PROJECT_PATH" -localizationPath "$BASE_EXPORT_FOLDER/$PROJECT"
 }
 
 # Makes this function accessible to commands
-export -f exportFile
+export -f exportFiles
 export BASE_EXPORT_FOLDER
 
 rm -r $BASE_EXPORT_FOLDER > /dev/null 2> /dev/null
 
-echo "" 
-find . -type d -name \en.lproj ! -path "./build/*" -exec bash -c 'exportFile "$0"' {} \;
-
-# Now to construct a clean .zip for upload to CrowdIn
-
-cd $BASE_EXPORT_FOLDER
-
-rm $ARCHIVE_NAME > /dev/null 2> /dev/null
-zip -q -r $ARCHIVE_NAME . -x "**/.*" -x "__MACOSX"
-
-mv "$ARCHIVE_NAME" "../$ARCHIVE_NAME"
-
-cd ..
-
-ARCHIVE_DIRECTORY=`pwd`
+exportFiles "engine/KMEI/KeymanEngine.xcodeproj" "engine"
+exportFiles "keyman/Keyman/Keyman.xcodeproj"     "keyman"
 
 echo ""
 echo "---------------------------------------------"
-echo "iOS Localization .zip is now ready for upload"
-echo "See ${SUCCESS_GREEN}$ARCHIVE_DIRECTORY/$ARCHIVE_NAME${NORMAL}"
+echo "iOS base i18n files have been exported."
+echo "See ${SUCCESS_GREEN}$KEYMAN_ROOT/ios/$BASE_EXPORT_FOLDER${NORMAL}"
 echo "---------------------------------------------"
-
-cd $START_DIRECTORY
 
