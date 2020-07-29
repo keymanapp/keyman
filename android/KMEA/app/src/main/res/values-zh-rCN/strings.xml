@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="other">键盘</item>
+    </plurals>
+    <string name="title_add_keyboard">添加新键盘</string>
+    <string name="title_languages_settings">已安装的语言</string>
+    <string name="title_language_settings" comment="Language Settings">%1$s 设置</string>
+    <!-- Button labels -->
+    <string name="label_add">添加</string>
+    <string name="label_cancel">取消</string>
+    <string name="label_close" comment="Close a dialog">关闭</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">关闭 Keyman</string>
+    <string name="label_download">下载</string>
+    <string name="label_install">安装</string>
+    <string name="label_later" comment="Do an action at a later time">稍后再说</string>
+    <string name="label_ok">确定</string>
+    <string name="label_update">更新</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">无法连接到 Keyman 服务器！</string>
+    <string name="confirm_delete_keyboard">您想要删除此键盘吗？</string>
+    <string name="confirm_download_keyboard">您想要下载此键盘的最新版本吗？</string>
+    <string name="confirm_update">您想现在更新键盘和字典吗？</string>
+    <string name="custom_keyboard">自定义键盘</string>
+    <string name="font_failed_to_download">警告：字体下载失败</string>
+    <string name="keyboard_failed_to_download">错误：键盘下载失败</string>
+    <string name="keyboard_updates_channel">资源更新</string>
+    <string name="keyboard_updates_available">可用的资源更新</string>
+    <string name="update_available">%1$s (更新可用)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      键盘可用更新 %1$s: %2$s </string>
+    <string name="dictionary_update_message">字典 %1$s可用更新: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">键盘版本</string>
+    <string name="help_link">帮助链接</string>
+    <string name="uninstall_keyboard">卸载键盘</string>
+    <string name="keyboard_picker_new_keyboard_prefix">新的</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      扫描此代码以在另一台设备上加载此\n键盘</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">您想要下载这个字典的最新版本吗？</string>
+    <string name="catalog_unavailable">资源目录不可用</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">目录更新在后台开始</string>
+    <string name="catalog_download_is_running_in_background">      编目仍在下载，请稍后再试！</string>
+    <string name="progress_message_catalog_download_is_running">目录仍在下载！</string>
+    <string name="keyboard_download_start_in_background">正在下载键盘开始于背景</string>
+    <string name="keyboard_download_is_running_in_background">选中的键盘已经在下载，请稍后再试！</string>
+    <string name="keyboard_download_finished">键盘下载已完成！</string>
+    <string name="dictionary_download_start_in_background">正在下载字典开始于背景</string>
+    <string name="dictionary_download_is_running_in_background">选中的字典已在下载，请稍后再试！</string>
+    <string name="dictionary_download_finished">字典下载已完成。</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">访问服务器失败！</string>
+    <string name="update_check_current">"所有资源都是最新的！"</string>
+    <!-- Model Info -->
+    <string name="model_version">词典版本</string>
+    <string name="uninstall_model">卸载词典</string>
+    <string name="confirm_delete_model">您想要删除这个字典吗？</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">启用校正</string>
+    <string name="enable_predictions">启用预测</string>
+    <string name="model">词典</string>
+    <string name="model_info_header" comment="Dictionary name">词典： %1$s</string>
+    <string name="model_picker_header">%1$s 词典</string>
+    <string name="manage_dictionary">管理词典</string>
+    <string name="model_install_toast">字典已安装</string>
+    <plurals name="keyboard_count">
+        <item quantity="other">(%1$d 键盘)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">删除</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">点击此处更改键盘</string>
+</resources>
