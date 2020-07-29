@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="few">Клавіатури</item>
+        <item quantity="many">Клавіатури</item>
+        <item quantity="other">Клавіатури</item>
+    </plurals>
+    <string name="title_add_keyboard">Додати нову клавіатуру</string>
+    <string name="title_languages_settings">Встановлені мови</string>
+    <string name="title_language_settings" comment="Language Settings">%1$s Налаштування</string>
+    <!-- Button labels -->
+    <string name="label_add">Додати</string>
+    <string name="label_cancel">Скасувати</string>
+    <string name="label_close" comment="Close a dialog">Закрити</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Закрити Keyman</string>
+    <string name="label_download">Звантажити</string>
+    <string name="label_install">Інсталювати</string>
+    <string name="label_later" comment="Do an action at a later time">Пізніше</string>
+    <string name="label_ok">Гаразд</string>
+    <string name="label_update">Оновити</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Не вдається підключитися до сервера Keyman!</string>
+    <string name="confirm_delete_keyboard">Ви хотіли б видалити цю клавіатуру?</string>
+    <string name="confirm_download_keyboard">Завантажити останню версію цієї клавіатури?</string>
+    <string name="confirm_update">Оновити клавіатури та словники?</string>
+    <string name="custom_keyboard">Користувацька клавіатура</string>
+    <string name="font_failed_to_download">Попередження: Не вдалося завантажити шрифт</string>
+    <string name="keyboard_failed_to_download">Помилка: Не вдалося завантажити клавіатуру</string>
+    <string name="keyboard_updates_channel">Оновлення ресурсів</string>
+    <string name="keyboard_updates_available">Доступні оновлення для ресурсів</string>
+    <string name="update_available">%1$s (Оновити доступне)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Доступні оновлення для клавіатури %1$s: %2$s </string>
+    <string name="dictionary_update_message">Доступні оновлення для словника %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Версія клавіатури</string>
+    <string name="help_link">Посилання допомоги</string>
+    <string name="uninstall_keyboard">Видалити клавіатуру</string>
+    <string name="keyboard_picker_new_keyboard_prefix">новий</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Відскануйте цей код, щоб завантажити цю\nклавіатуру на іншому пристрої</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Бажаєте завантажити останню версію цього словника?</string>
+    <string name="catalog_unavailable">Каталог ресурсів недоступний</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Оновлення каталогу розпочате у фоновому режимі</string>
+    <string name="catalog_download_is_running_in_background">      Каталог ще завантажується; будь ласка, спробуйте ще раз!</string>
+    <string name="progress_message_catalog_download_is_running">Каталог все ще завантажується!</string>
+    <string name="keyboard_download_start_in_background">Завантаження клавіатури почнеться у фоновому режимі</string>
+    <string name="keyboard_download_is_running_in_background">Обрана клавіатура вже завантажується; будь ласка, спробуйте ще раз за хвилину!</string>
+    <string name="keyboard_download_finished">Завантаження клавіатури завершено!</string>
+    <string name="dictionary_download_start_in_background">Завантаження словника розпочато в фоновому режимі</string>
+    <string name="dictionary_download_is_running_in_background">Обраний словник вже завантажується; будь ласка, спробуйте ще раз!</string>
+    <string name="dictionary_download_finished">Словник завантаження завершено.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Не вдалося отримати доступ до сервера!</string>
+    <string name="update_check_current">"Усі ресурси найновіші!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Версія словника</string>
+    <string name="uninstall_model">Видалити словник</string>
+    <string name="confirm_delete_model">Видалити цей словник?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Увімкнути виправлення</string>
+    <string name="enable_predictions">Увімкнути передбачення</string>
+    <string name="model">Словник</string>
+    <string name="model_info_header" comment="Dictionary name">Словник: %1$s</string>
+    <string name="model_picker_header">%1$s словників</string>
+    <string name="manage_dictionary">Керувати словником</string>
+    <string name="model_install_toast">Словник встановлено</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d клавіатура)</item>
+        <item quantity="few">(%1$d клавіатури)</item>
+        <item quantity="many">(%1$d клавіатури)</item>
+        <item quantity="other">(%1$d клавіатури)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Видалити</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Натисніть тут для зміни клавіатури</string>
+</resources>
