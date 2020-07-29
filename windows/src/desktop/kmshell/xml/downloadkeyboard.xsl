@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_downloadkeyboard" select="$locale/Dialog[@Id='DownloadKeyboard'][1]" />
+  <xsl:variable name="dialoginfo_downloadkeyboard" select="$dialoginfo/Dialog[@Id='DownloadKeyboard'][1]" />
 
   <xsl:template match="/">
     <html xmlns="http://www.w3.org/1999/xhtml">
@@ -19,15 +19,15 @@
 
             body {
               padding: 0px; margin: 0px; overflow: hidden;
-              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px;
-              height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
+              width: <xsl:value-of select="$dialoginfo_downloadkeyboard/@Width" />px;
+              height: <xsl:value-of select="$dialoginfo_downloadkeyboard/@Height" />px;
             }
             html { width: 100%; padding: 0px; margin: 0px; overflow: hidden }
 
             #size {
               position: absolute;
-              width: <xsl:value-of select="$locale_downloadkeyboard/@Width" />px;
-              height: <xsl:value-of select="$locale_downloadkeyboard/@Height" />px;
+              width: <xsl:value-of select="$dialoginfo_downloadkeyboard/@Width" />px;
+              height: <xsl:value-of select="$dialoginfo_downloadkeyboard/@Height" />px;
             }
 
             #contentframe {
@@ -35,15 +35,15 @@
               left: 0;
               top: 0;
               width: 100%;
-              height: <xsl:value-of select="$locale_downloadkeyboard/@Height - $locale_downloadkeyboard/footerheight" />px;
+              height: <xsl:value-of select="$dialoginfo_downloadkeyboard/@Height - $dialoginfo_downloadkeyboard/footerheight" />px;
               border-bottom: 2px solid #888888;
               overflow: scroll;
               }
             #footerframe {
               position: absolute;
               left: 0px;
-              top: <xsl:value-of select="$locale_downloadkeyboard/@Height - $locale_downloadkeyboard/footerheight" />px;
-              height: <xsl:value-of select="$locale_downloadkeyboard/footerheight" />px;
+              top: <xsl:value-of select="$dialoginfo_downloadkeyboard/@Height - $dialoginfo_downloadkeyboard/footerheight" />px;
+              height: <xsl:value-of select="$dialoginfo_downloadkeyboard/footerheight" />px;
               width: 100%;
               overflow: hidden;
               background: #dcdcdc;

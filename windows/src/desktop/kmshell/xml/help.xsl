@@ -4,7 +4,7 @@
 
 	<xsl:include href="elements.xsl"/>
 
-	<xsl:variable name="locale_help" select="$locale/Dialog[@Id='Help'][1]" />
+	<xsl:variable name="dialoginfo_help" select="$dialoginfo/Dialog[@Id='Help'][1]" />
 
 	<xsl:template match="/">
 
@@ -19,8 +19,8 @@
 					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; font-size: 13.3px; }
 
 					body { padding: 0px; margin: 0px; overflow: hidden;
-					width: <xsl:value-of select="$locale_help/@Width" />px;
-					height: <xsl:value-of select="$locale_help/@Height" />px;
+					width: <xsl:value-of select="$dialoginfo_help/@Width" />px;
+					height: <xsl:value-of select="$dialoginfo_help/@Height" />px;
 					background: white; border: none; }
 					html { padding: 0px; margin: 0px; overflow: hidden; }
 
@@ -30,8 +30,8 @@
 					}
 
 					#size { position: absolute; left: 0; top: 0;
-						width: <xsl:value-of select="$locale_help/@Width" />px;
-						height: <xsl:value-of select="$locale_help/@Height" />px;
+						width: <xsl:value-of select="$dialoginfo_help/@Width" />px;
+						height: <xsl:value-of select="$dialoginfo_help/@Height" />px;
           }
 
           #captionBox {

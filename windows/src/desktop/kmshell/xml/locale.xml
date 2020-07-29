@@ -38,13 +38,6 @@ Create a user interface translation for Keyman for Windows at https://crowdin.co
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <String Group="Configuration Dialog" Type="PlainText" Id="S_ConfigurationTitle" Version="7.0.230.0" Description="Configuration dialog title, which includes the product name">&Name; Configuration</String>
-
-<Dialog Id="Keyman" Version="7.0.230.0" Width="740" Height="476">
-  <footerheight>40</footerheight>
-  <menuwidth>118</menuwidth>
-  <headerheight>40</headerheight>
-</Dialog>
-
 <String Group="Configuration Dialog" Type="PlainText" Id="S_Caption_Help" Version="7.0.239.0" Description="Configuration dialog link to Help">Help</String>
 
 <!-- Tab names and shortcut keys -->
@@ -180,10 +173,6 @@ Create a user interface translation for Keyman for Windows at https://crowdin.co
 <!-- Download Keyboard Layout Dialog   -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="DownloadKeyboard" Width="740" Height="400">
-  <footerheight>40</footerheight>
-</Dialog>
-
 <String Group="Download Keyboard Dialog" Type="PlainText" Id="S_DownloadKeyboard_Title" Version="7.0.230.0" Description="Download keyboard layout from keyman.com dialog title">Download Keyboard From keyman.com</String>
 <String Group="Download Keyboard Dialog" Type="PlainText" Id="S_DownloadKeyboard_DownloadOnlyCheckbox" Version="7.0.230.0" Description="Download only option checkbox">Don't install, just download</String>
 
@@ -192,8 +181,6 @@ Create a user interface translation for Keyman for Windows at https://crowdin.co
 <!-- - - - - - - - - - - - - - - - - - -->
 
 <!-- Note: this dialog uses captions from the Configuration dialog as well -->
-
-<Dialog Id="InstallKeyboard" Width="600" Height="300" />
 
 <String Group="Install Keyboard Dialog" Type="PlainText" Id="S_InstallKeyboard_Title" Version="7.0.230.0" Description="Install keyboard/package dialog title">Install Keyboard/Package</String>
 
@@ -206,8 +193,6 @@ Create a user interface translation for Keyman for Windows at https://crowdin.co
 <!-- Proxy Configuration Dialog        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="ProxyConfiguration" Width="240" Height="176" />
-
 <String Group="Proxy Configuration Dialog" Type="PlainText" Id="S_ProxyConfiguration_Title" Version="7.0.230.0" Description="Proxy configuration dialog title">Proxy Server Configuration</String>
 
 <String Group="Proxy Configuration Dialog" Type="PlainText" Id="S_ProxyConfiguration_Server" Version="7.0.230.0" Description="Proxy dialog - fillable-field server">Server: </String>
@@ -218,8 +203,6 @@ Create a user interface translation for Keyman for Windows at https://crowdin.co
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Base Keyboard Dialog        -->
 <!-- - - - - - - - - - - - - - - - - - -->
-
-<Dialog Id="BaseKeyboard" Width="512" Height="160" />
 
 <String Group="Base Keyboard Dialog" Type="PlainText" Id="S_BaseKeyboard_Title" Version="9.0.445.0" Description="Base keyboard dialog title">Set Base Keyboard</String>
 <String Group="Base Keyboard Dialog" Type="PlainText" Id="S_BaseKeyboard_Text" Version="9.0.445.0" Description="Base keyboard dialog description">Select the base Latin script
@@ -241,8 +224,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Online Update Dialog              -->
 <!-- - - - - - - - - - - - - - - - - - -->
-
-<Dialog Id="OnlineUpdate" Width="470" Height="260" />
 
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Title" Version="7.0.230.0" Description="Update dialog title, where &Name; = product name">Updated &Name; Components Available</String>
 
@@ -273,8 +254,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <!-- Splash Dialog                     -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="Splash" Width="630" Height="450" />
-
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman button">Start &Name;</String>
@@ -301,11 +280,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <!-- Hints                             -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="Hint" Width="450" Height="300">
-	<footerheight>40</footerheight>
-	<headerheight>40</headerheight>
-</Dialog>
-
 <String Group="Hints" Type="PlainText" Id="S_Button_ResetHints" Version="7.0.244.0" Description="Hint - options tab button to reset hints">Reset Hints</String>
 <String Group="Hints" Type="PlainText" Id="SKHintsReset" Version="7.0.244.0" Description="Hint - options tab dialog confirming reset of hints">All hint messages have been reset and will be displayed again.</String>
 
@@ -322,7 +296,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <!-- Help                              -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<Dialog Id="Help" Width="450" Height="300"></Dialog>
 <String Group="Help Dialog" Type="PlainText" Id="S_HelpTitle" Version="7.0.230.0" Description="Help - product name help">&Name; Help</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Product" Version="7.0.230.0" Description="Help - help contents link title">Help Contents</String>
 

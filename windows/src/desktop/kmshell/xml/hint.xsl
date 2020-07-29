@@ -4,7 +4,7 @@
 
 	<xsl:include href="elements.xsl"/>
 
-	<xsl:variable name="locale_hint" select="$locale/Dialog[@Id='Hint'][1]" />
+	<xsl:variable name="dialoginfo_hint" select="$dialoginfo/Dialog[@Id='Hint'][1]" />
 	<xsl:variable name="HintTitle">HintTitle_<xsl:value-of select="/Keyman/Hint/@ID" /></xsl:variable>
 	<xsl:variable name="Hint">Hint_<xsl:value-of select="/Keyman/Hint/@ID" /></xsl:variable>
 
@@ -23,8 +23,8 @@
             font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
           }
 					#container {
-  					width: <xsl:value-of select="$locale_hint/@Width" />px;
-	  				height: <xsl:value-of select="$locale_hint/@Height" />px;
+  					width: <xsl:value-of select="$dialoginfo_hint/@Width" />px;
+	  				height: <xsl:value-of select="$dialoginfo_hint/@Height" />px;
           }
 
         </style>

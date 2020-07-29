@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_onlineupdate" select="$locale/Dialog[@Id='OnlineUpdate'][1]" />
+  <xsl:variable name="dialoginfo_onlineupdate" select="$dialoginfo/Dialog[@Id='OnlineUpdate'][1]" />
 
   <xsl:template match="/">
 
@@ -46,8 +46,8 @@ div {
 
 #border {
   border: none;
-  width: <xsl:value-of select="$locale_onlineupdate/@Width - 2" />px;
-  height: <xsl:value-of select="$locale_onlineupdate/@Height - 2" />px;
+  width: <xsl:value-of select="$dialoginfo_onlineupdate/@Width - 2" />px;
+  height: <xsl:value-of select="$dialoginfo_onlineupdate/@Height - 2" />px;
   }
 
 #header { background: white;  }

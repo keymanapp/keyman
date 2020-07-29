@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_basekeyboard" select="$locale/Dialog[@Id='BaseKeyboard'][1]" />
+  <xsl:variable name="dialoginfo_basekeyboard" select="$dialoginfo/Dialog[@Id='BaseKeyboard'][1]" />
 
   <xsl:template match="/">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -22,8 +22,8 @@ html {
  text-align:	justify;
  margin: 	 0px;
  padding: 0;
- width:    <xsl:value-of select="$locale_basekeyboard/@Width" />px;
- height:   <xsl:value-of select="$locale_basekeyboard/@Height" />px;
+ width:    <xsl:value-of select="$dialoginfo_basekeyboard/@Width" />px;
+ height:   <xsl:value-of select="$dialoginfo_basekeyboard/@Height" />px;
  overflow: hidden;
 }
 
@@ -32,8 +32,8 @@ body {
  text-align:	justify;
  padding: 0;
  margin:	 0px;
- width:    <xsl:value-of select="$locale_basekeyboard/@Width" />px;
- height:   <xsl:value-of select="$locale_basekeyboard/@Height" />px;
+ width:    <xsl:value-of select="$dialoginfo_basekeyboard/@Width" />px;
+ height:   <xsl:value-of select="$dialoginfo_basekeyboard/@Height" />px;
  overflow: hidden;
 }
 
@@ -55,8 +55,8 @@ div {
   position: absolute;
   left: 0;
   top: 0;
-  width: <xsl:value-of select="$locale_basekeyboard/@Width - 2" />px;
-  height: <xsl:value-of select="$locale_basekeyboard/@Height - 2" />px;
+  width: <xsl:value-of select="$dialoginfo_basekeyboard/@Width - 2" />px;
+  height: <xsl:value-of select="$dialoginfo_basekeyboard/@Height - 2" />px;
   }
 
 #content {
@@ -66,7 +66,7 @@ div {
 
 #footer {
   position: absolute;
-  top: expression(<xsl:value-of select="$locale_basekeyboard/@Height" /> - 36);
+  top: expression(<xsl:value-of select="$dialoginfo_basekeyboard/@Height" /> - 36);
   height: 36px;
   text-align: center;
   width: 100%;

@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_proxyconfiguration" select="$locale/Dialog[@Id='ProxyConfiguration'][1]" />
+  <xsl:variable name="dialoginfo_proxyconfiguration" select="$dialoginfo/Dialog[@Id='ProxyConfiguration'][1]" />
 
   <xsl:template match="/">
 
@@ -20,8 +20,8 @@ html {
  font-size:		 13px;
  text-align:	justify;
  margin: 	 0px;
- width:    <xsl:value-of select="$locale_proxyconfiguration/@Width" />px;
- height:   <xsl:value-of select="$locale_proxyconfiguration/@Height" />px;
+ width:    <xsl:value-of select="$dialoginfo_proxyconfiguration/@Width" />px;
+ height:   <xsl:value-of select="$dialoginfo_proxyconfiguration/@Height" />px;
  overflow: hidden;
 }
 
@@ -29,8 +29,8 @@ body {
  font-size:	 	 13px;
  text-align:	justify;
  margin:	 0px;
- width:    <xsl:value-of select="$locale_proxyconfiguration/@Width" />px;
- height:   <xsl:value-of select="$locale_proxyconfiguration/@Height" />px;
+ width:    <xsl:value-of select="$dialoginfo_proxyconfiguration/@Width" />px;
+ height:   <xsl:value-of select="$dialoginfo_proxyconfiguration/@Height" />px;
  overflow: hidden;
 }
 
@@ -45,8 +45,8 @@ div {
 
 #border {
   border: 1px solid #AD4A29;
-  width: <xsl:value-of select="$locale_proxyconfiguration/@Width - 2" />px;
-  height: <xsl:value-of select="$locale_proxyconfiguration/@Height - 2" />px;
+  width: <xsl:value-of select="$dialoginfo_proxyconfiguration/@Width - 2" />px;
+  height: <xsl:value-of select="$dialoginfo_proxyconfiguration/@Height - 2" />px;
   }
 #content {
  padding: 10px;
