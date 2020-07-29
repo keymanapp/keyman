@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="other">Keyboards</item>
+    </plurals>
+    <string name="title_add_keyboard">Add New Keyboard</string>
+    <string name="title_languages_settings">Installed Languages</string>
+    <string name="title_language_settings" comment="Language Settings">%1$s Settings</string>
+    <!-- Button labels -->
+    <string name="label_add">Tambah</string>
+    <string name="label_cancel">Batal</string>
+    <string name="label_close" comment="Close a dialog">Tutup</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
+    <string name="label_download">Download</string>
+    <string name="label_install">Install</string>
+    <string name="label_later" comment="Do an action at a later time">Later</string>
+    <string name="label_ok">OK</string>
+    <string name="label_update">Kemaskini</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Cannot connect to Keyman server!</string>
+    <string name="confirm_delete_keyboard">Would you like to delete this keyboard?</string>
+    <string name="confirm_download_keyboard">Would you like to download the latest version of this keyboard?</string>
+    <string name="confirm_update">Would you like to update keyboards and dictionaries now?</string>
+    <string name="custom_keyboard">Custom Keyboard</string>
+    <string name="font_failed_to_download">Warning: Font failed to download</string>
+    <string name="keyboard_failed_to_download">Error: Keyboard failed to download</string>
+    <string name="keyboard_updates_channel">Resource Updates</string>
+    <string name="keyboard_updates_available">Resource Updates Available</string>
+    <string name="update_available">%1$s (Update Available)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Updates available for keyboard %1$s: %2$s </string>
+    <string name="dictionary_update_message">Updates available for dictionary %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Keyboard version</string>
+    <string name="help_link">Help link</string>
+    <string name="uninstall_keyboard">Uninstall keyboard</string>
+    <string name="keyboard_picker_new_keyboard_prefix">new</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Scan this code to load this\nkeyboard on another device</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Would you like to download the latest version of this dictionary?</string>
+    <string name="catalog_unavailable">The resource catalog is unavailable</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Catalog update started in background</string>
+    <string name="catalog_download_is_running_in_background">      The catalog is still downloading; please try again in a moment!</string>
+    <string name="progress_message_catalog_download_is_running">The catalog is still downloading!</string>
+    <string name="keyboard_download_start_in_background">Downloading keyboard started in Background</string>
+    <string name="keyboard_download_is_running_in_background">The selected keyboard is already downloading; please try again in a moment!</string>
+    <string name="keyboard_download_finished">Keyboard download is finished!</string>
+    <string name="dictionary_download_start_in_background">Downloading dictionary started in Background</string>
+    <string name="dictionary_download_is_running_in_background">The selected dictionary is already downloading; please try again in a moment!</string>
+    <string name="dictionary_download_finished">Dictionary download is finished.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Failed to access server!</string>
+    <string name="update_check_current">"All resources are up to date!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Dictionary version</string>
+    <string name="uninstall_model">Uninstall dictionary</string>
+    <string name="confirm_delete_model">Would you like to delete this dictionary?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Enable corrections</string>
+    <string name="enable_predictions">Enable predictions</string>
+    <string name="model">Dictionary</string>
+    <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>
+    <string name="model_picker_header">%1$s dictionaries</string>
+    <string name="manage_dictionary">Manage dictionary</string>
+    <string name="model_install_toast">Dictionary installed</string>
+    <plurals name="keyboard_count">
+        <item quantity="other">(%1$d keyboards)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Delete</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Tap here to change keyboard</string>
+</resources>
