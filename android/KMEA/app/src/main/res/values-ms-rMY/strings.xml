@@ -10,15 +10,15 @@
     <string name="title_languages_settings">Installed Languages</string>
     <string name="title_language_settings" comment="Language Settings">%1$s Settings</string>
     <!-- Button labels -->
-    <string name="label_add">Tambah</string>
-    <string name="label_cancel">Batal</string>
-    <string name="label_close" comment="Close a dialog">Tutup</string>
+    <string name="label_add">Add</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_close" comment="Close a dialog">Close</string>
     <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
     <string name="label_download">Download</string>
     <string name="label_install">Install</string>
     <string name="label_later" comment="Do an action at a later time">Later</string>
     <string name="label_ok">OK</string>
-    <string name="label_update">Kemaskini</string>
+    <string name="label_update">Update</string>
     <!-- Keyboard Updates -->
     <string name="cannot_connect">Cannot connect to Keyman server!</string>
     <string name="confirm_delete_keyboard">Would you like to delete this keyboard?</string>
