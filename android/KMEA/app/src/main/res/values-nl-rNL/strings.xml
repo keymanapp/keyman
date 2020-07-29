@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Toetsenborden</item>
+    </plurals>
+    <string name="title_add_keyboard">Toetsenbord toevoegen</string>
+    <string name="title_languages_settings">Geïnstalleerde talen</string>
+    <string name="title_language_settings" comment="Language Settings">%1$s Instellingen</string>
+    <!-- Button labels -->
+    <string name="label_add">Toevoegen</string>
+    <string name="label_cancel">annuleren</string>
+    <string name="label_close" comment="Close a dialog">Afsluiten</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Sluit Keyman</string>
+    <string name="label_download">downloaden</string>
+    <string name="label_install">Installeren</string>
+    <string name="label_later" comment="Do an action at a later time">Later</string>
+    <string name="label_ok">Ok</string>
+    <string name="label_update">Vernieuwen</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Kan geen verbinding maken met Keyman server!</string>
+    <string name="confirm_delete_keyboard">Wilt u dit toetsenbord verwijderen?</string>
+    <string name="confirm_download_keyboard">Wil je de laatste versie van dit toetsenbord downloaden?</string>
+    <string name="confirm_update">Wil je de toetsenborden en woordenboeken nu bijwerken?</string>
+    <string name="custom_keyboard">Aangepast toetsenbord</string>
+    <string name="font_failed_to_download">Waarschuwing: Lettertype kon niet worden gedownload</string>
+    <string name="keyboard_failed_to_download">Fout: Toetsenbord downloaden mislukt</string>
+    <string name="keyboard_updates_channel">Bron updates</string>
+    <string name="keyboard_updates_available">Updates beschikbaar</string>
+    <string name="update_available">%1$s (Update beschikbaar)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Updates beschikbaar voor toetsenbord %1$s: %2$s </string>
+    <string name="dictionary_update_message">Er zijn updates beschikbaar voor woordenboek %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Toetsenbord versie</string>
+    <string name="help_link">Koppeling naar hulp</string>
+    <string name="uninstall_keyboard">Toetsenbord verwijderen</string>
+    <string name="keyboard_picker_new_keyboard_prefix">Nieuw</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Scan deze code om dit\ntoetsenbord op een ander apparaat te laden</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Wil je de laatste versie van dit woordenboek downloaden?</string>
+    <string name="catalog_unavailable">De documentcatalogus is niet beschikbaar</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Catalogusupdate gestart op de achtergrond</string>
+    <string name="catalog_download_is_running_in_background">      De catalogus is nog steeds aan het downloaden, probeer het over een moment opnieuw!</string>
+    <string name="progress_message_catalog_download_is_running">De catalogus is nog steeds aan het downloaden!</string>
+    <string name="keyboard_download_start_in_background">Downloaden van toetsenbord gestart in achtergrond</string>
+    <string name="keyboard_download_is_running_in_background">Het geselecteerde toetsenbord is al aan het downloaden, probeer het over een moment opnieuw!</string>
+    <string name="keyboard_download_finished">Download van het toetsenbord is voltooid!</string>
+    <string name="dictionary_download_start_in_background">Downloaden woordenboek gestart op de achtergrond</string>
+    <string name="dictionary_download_is_running_in_background">Het geselecteerde woordenboek wordt al gedownload; probeer het later opnieuw!</string>
+    <string name="dictionary_download_finished">Download van het woordenboek is voltooid.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Toegang tot server mislukt!</string>
+    <string name="update_check_current">"Alle bronnen zijn up-to-date!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Woordenboek versie</string>
+    <string name="uninstall_model">Woordenboek verwijderen</string>
+    <string name="confirm_delete_model">Wil je dit woordenboek verwijderen?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">correcties inschakelen</string>
+    <string name="enable_predictions">Schakel voorspellingen in</string>
+    <string name="model">Woordenboek</string>
+    <string name="model_info_header" comment="Dictionary name">Woordenboek: %1$s</string>
+    <string name="model_picker_header">%1$s woordenboeken</string>
+    <string name="manage_dictionary">Woordenboek beheren</string>
+    <string name="model_install_toast">Woordenboek geïnstalleerd</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d toetsenbord)</item>
+        <item quantity="other">(%1$d toetsenborden)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Verwijderen</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Tik hier om het toetsenbord te wijzigen</string>
+</resources>
