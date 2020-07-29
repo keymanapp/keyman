@@ -83,7 +83,6 @@ uses
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
   UImportOlderVersionKeyboards10 in 'main\UImportOlderVersionKeyboards10.pas',
-  FixupLocaleDoctype in '..\..\global\delphi\general\FixupLocaleDoctype.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   UfrmPrintOSK in 'util\UfrmPrintOSK.pas' {frmPrintOSK},

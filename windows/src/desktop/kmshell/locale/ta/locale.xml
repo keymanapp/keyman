@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale>
 	<!--
 
@@ -439,7 +441,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconMenuText" Version="8.0.288.0" Description="Update icon - install menu item">View and &amp;install &Name; updates</String>
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconMenuExit" Version="8.0.288.0" Description="Update icon - exit menu item">E&amp;xit online update check</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version">&Version;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">Start Keyman</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">Exit</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_OtherTasks" Version="8.0.294.0" Description="Other tasks heading">Other tasks</String>
