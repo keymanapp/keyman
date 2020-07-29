@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="action_share" comment="Send text content to another app">Share</string>
+  <string name="action_web" comment="Open Keyman browser">Web Browser</string>
+  <string name="action_text_size" comment="Adjust text size">Text Size</string>
+  <string name="action_overflow" comment="Additional menu items">More</string>
+  <string name="action_clear_text" comment="Erase text">Clear Text</string>
+  <string name="action_info" comment="Display Keyman help page">Info</string>
+  <string name="action_settings" comment="Open Settings menu">Settings</string>
+  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Install Updates</string>
+  <string name="title_version">Versie</string>
+  <!-- &#8230; is the ellipsis character "..." -->
+  <string name="textview_hint">Start typing here&#8230;</string>
+  <!-- Splash screen (version/copyright info currently disabled -->
+  <!-- Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">Tekstgrootte omhoog</string>
+  <string name="ic_text_size_down" comment="Make text smaller">Tekstgrootte omlaag</string>
+  <!-- Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">Alle tekst zal worden gewist</string>
+  <!-- Info screen reuses title_version -->
+  <!-- Get Started menu strings -->
+  <string name="get_started">Nu inschrijven</string>
+  <string name="add_a_keyboard">Voeg een toetsenbord toe voor uw taal</string>
+  <string name="enable_system_keyboard">Keyman inschakelen als systeemwijd toetsenbord</string>
+  <string name="set_keyman_as_default">Sleutelman als standaard toetsenbord instellen</string>
+  <string name="more_info" comment="Open the help page">Meer informatie</string>
+  <string name="show_get_started">Show \"%1$s\" on startup</string>
+  <!-- Keyman Settings menu strings -->
+  <string name="keyman_settings" comment="Settings menu title">Settings</string>
+  <plurals name="installed_languages">
+    <item quantity="one">Geïnstalleerde talen (%1$d)</item>
+    <item quantity="other">Geïnstalleerde talen (%1$d)</item>
+  </plurals>
+  <string name="install_keyboard_or_dictionary">Install Keyboard or Dictionary</string>
+  <string name="show_banner" comment="text suggestions banner">Altijd banner weergeven</string>
+  <string name="show_banner_on" comment="Description when toggle is on">Te implementeren</string>
+  <string name="show_banner_off" comment="Description when toggle is off">Als uit, alleen getoond wanneer voorspelbare tekst is ingeschakeld</string>
+  <!-- reuse show_get_started -->
+  <!-- Keyman Settings Install Keyboard or Dictionary menu strings -->
+  <string name="install_from_keyman_dot_com">Install from keyman.com</string>
+  <string name="install_from_local_file">Install from local file</string>
+  <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
+  <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
+  <string name="add_language_subtext">(from keyboard package)</string>
+  <!-- Select Package and Select Language menu strings -->
+  <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
+  <string name="title_select_language_for_package">Select language for %1$s</string>
+  <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
+  <string name="all_languages_installed">All languages already installed</string>
+  <!-- Web Browser strings -->
+  <string name="hint_text">Zoek of typ URL</string>
+  <string name="title_bookmarks">Bookmarks</string>
+  <string name="no_bookmarks">Geen bladwijzers</string>
+  <string name="add_bookmark">Bladwijzer toevoegen</string>
+  <string name="hint_title">Aanspreektitel</string>
+  <string name="hint_url">URL</string>
+  <!-- KMP Package strings -->
+  <string name="title_package">Pakket</string>
+  <string name="title_failed_to_install">Installatie mislukt</string>
+  <string name="downloading_keyboard_package">Toetsenbordpakket downloaden</string>
+  <string name="failed_to_extract" comment="Keyboard package failed to unzip">Uitpakken mislukt</string>
+  <string name="install_keyboard_package">Installeer toetsenbordpakket</string>
+  <string name="install_predictive_text_package">Predictive tekstpakket installeren</string>
+  <string name="no_new_touch_keyboards_to_install">Geen nieuwe aanraakgeoptimaliseerde toetsenborden om te installeren</string>
+  <string name="no_new_predictive_text_to_install">Geen nieuwe voorspelbare tekst om te installeren</string>
+  <string name="no_valid_touch_keyboards_to_install">Geen geldige aanraakgeoptimaliseerde toetsenborden om te installeren</string>
+  <string name="no_targets_to_install">Geen toetsenborden of voorspelbare tekst om te installeren</string>
+  <string name="missing_metadata" comment="kmp.json file is missing from the keyboard package">kmp.json bestaat niet</string>
+  <string name="invalid_metadata">Ongeldige metagegevens in pakket</string>
+</resources>
