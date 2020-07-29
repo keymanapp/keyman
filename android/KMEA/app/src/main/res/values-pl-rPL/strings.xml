@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="few">Do napięć przekraczających 1000 V</item>
+        <item quantity="many">Do napięć przekraczających 1000 V</item>
+        <item quantity="other">Do napięć przekraczających 1000 V</item>
+    </plurals>
+    <string name="title_add_keyboard">Dodaj nową klawiaturę</string>
+    <string name="title_languages_settings">Zainstalowane języki</string>
+    <string name="title_language_settings" comment="Language Settings">Ustawienia %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">Dodaj</string>
+    <string name="label_cancel">Anuluj</string>
+    <string name="label_close" comment="Close a dialog">Zamknij</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Zamknij Keyman</string>
+    <string name="label_download">Pobierz</string>
+    <string name="label_install">Zainstaluj</string>
+    <string name="label_later" comment="Do an action at a later time">Później</string>
+    <string name="label_ok">OK</string>
+    <string name="label_update">Aktualizuj</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Nie można połączyć się z serwerem Keyman!</string>
+    <string name="confirm_delete_keyboard">Czy chcesz usunąć tę klawiaturę?</string>
+    <string name="confirm_download_keyboard">Czy chcesz pobrać najnowszą wersję tej klawiatury?</string>
+    <string name="confirm_update">Czy chcesz teraz zaktualizować klawiatury i słowniki?</string>
+    <string name="custom_keyboard">Klawiatura niestandardowa</string>
+    <string name="font_failed_to_download">Ostrzeżenie: Pobieranie czcionki nie powiodło się</string>
+    <string name="keyboard_failed_to_download">Błąd: Nie udało się pobrać klawiatury</string>
+    <string name="keyboard_updates_channel">Aktualizacje zasobów</string>
+    <string name="keyboard_updates_available">Dostępne aktualizacje zasobów</string>
+    <string name="update_available">%1$s (Dostępne)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Aktualizacje dostępne dla klawiatury %1$s: %2$s </string>
+    <string name="dictionary_update_message">Aktualizacje dostępne dla słownika %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Wersja klawiatury</string>
+    <string name="help_link">Link pomocy</string>
+    <string name="uninstall_keyboard">Odinstaluj klawiaturę</string>
+    <string name="keyboard_picker_new_keyboard_prefix">nowy</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Zeskanuj ten kod, aby załadować tę klawiaturę\nna innym urządzeniu</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Czy chcesz pobrać najnowszą wersję tego słownika?</string>
+    <string name="catalog_unavailable">Katalog zasobów jest niedostępny</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Aktualizacja katalogu rozpoczęta w tle</string>
+    <string name="catalog_download_is_running_in_background">      Katalog jest nadal pobierany. Spróbuj ponownie za chwilę!</string>
+    <string name="progress_message_catalog_download_is_running">Katalog jest nadal pobierany!</string>
+    <string name="keyboard_download_start_in_background">Pobieranie klawiatury rozpoczęte w tle</string>
+    <string name="keyboard_download_is_running_in_background">Wybrana klawiatura jest już pobierana. Spróbuj ponownie za chwilę!</string>
+    <string name="keyboard_download_finished">Pobieranie klawiatury zostało zakończone!</string>
+    <string name="dictionary_download_start_in_background">Pobieranie słownika rozpoczęte w tle</string>
+    <string name="dictionary_download_is_running_in_background">Wybrany słownik jest już pobierany. Spróbuj ponownie za chwilę!</string>
+    <string name="dictionary_download_finished">Pobieranie słownika zostało zakończone.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Nie udało się uzyskać dostępu do serwera!</string>
+    <string name="update_check_current">"Wszystkie zasoby są aktualne!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Wersja słownika</string>
+    <string name="uninstall_model">Odinstaluj słownik</string>
+    <string name="confirm_delete_model">Czy chcesz usunąć ten słownik?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Włącz korekty</string>
+    <string name="enable_predictions">Włącz przewidywania</string>
+    <string name="model">Słownik</string>
+    <string name="model_info_header" comment="Dictionary name">Słownik: %1$s</string>
+    <string name="model_picker_header">%1$s słowników</string>
+    <string name="manage_dictionary">Zarządzaj słownikiem</string>
+    <string name="model_install_toast">Słownik zainstalowany</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d klawiatura)</item>
+        <item quantity="few">(%1$d klawiatur)</item>
+        <item quantity="many">(%1$d klawiatur)</item>
+        <item quantity="other">(%1$d klawiatur)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Usuń</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Dotknij tutaj, aby zmienić klawiaturę</string>
+</resources>
