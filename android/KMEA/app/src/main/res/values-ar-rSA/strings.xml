@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="zero">لوحات مفاتيح</item>
+        <item quantity="one">لوحة المفاتيح</item>
+        <item quantity="two">لوحتي مفاتيح</item>
+        <item quantity="few">لوحات مفاتيح</item>
+        <item quantity="many">لوحات مفاتيح</item>
+        <item quantity="other">لوحات مفاتيح</item>
+    </plurals>
+    <string name="title_add_keyboard">إضافة لوحة مفاتيح جديدة</string>
+    <string name="title_languages_settings">اللغات المثبتة</string>
+    <string name="title_language_settings" comment="Language Settings">إعدادات %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">إضافة</string>
+    <string name="label_cancel">إلغاء</string>
+    <string name="label_close" comment="Close a dialog">أغلق</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">أغلق المفتاح</string>
+    <string name="label_download">تنزيل</string>
+    <string name="label_install">تثبيت</string>
+    <string name="label_later" comment="Do an action at a later time">لاحقاً</string>
+    <string name="label_ok">حسناً</string>
+    <string name="label_update">تحديث</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">لا يمكن الاتصال بخادم Keyman!</string>
+    <string name="confirm_delete_keyboard">هل ترغب في حذف لوحة المفاتيح هذه؟</string>
+    <string name="confirm_download_keyboard">هل ترغب في تحميل أحدث إصدار من لوحة المفاتيح هذه؟</string>
+    <string name="confirm_update">هل ترغب في تحديث لوحة المفاتيح والقواميس الآن؟</string>
+    <string name="custom_keyboard">لوحة المفاتيح المخصصة</string>
+    <string name="font_failed_to_download">تحذير: فشل تحميل الخط</string>
+    <string name="keyboard_failed_to_download">خطأ: فشل تنزيل لوحة المفاتيح</string>
+    <string name="keyboard_updates_channel">تحديثات الموارد</string>
+    <string name="keyboard_updates_available">تحديثات الموارد المتاحة</string>
+    <string name="update_available">%1$s (التحديث متوفر)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      التحديثات المتاحة للوحة المفاتيح %1$s: %2$s </string>
+    <string name="dictionary_update_message">التحديثات المتاحة للقاموس %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">إصدار لوحة المفاتيح</string>
+    <string name="help_link">رابط المساعدة</string>
+    <string name="uninstall_keyboard">إلغاء تثبيت لوحة المفاتيح</string>
+    <string name="keyboard_picker_new_keyboard_prefix">جديد</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Scan this code to load this\nkeyboard on another device</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">هل ترغب في تحميل أحدث إصدار من هذا القاموس؟</string>
+    <string name="catalog_unavailable">The resource catalog is unavailable</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Catalog update started in background</string>
+    <string name="catalog_download_is_running_in_background">      The catalog is still downloading; please try again in a moment!</string>
+    <string name="progress_message_catalog_download_is_running">The catalog is still downloading!</string>
+    <string name="keyboard_download_start_in_background">بدأ تنزيل لوحة المفاتيح في الخلفية</string>
+    <string name="keyboard_download_is_running_in_background">لوحة المفاتيح المحددة قيد التنزيل؛ الرجاء المحاولة مرة أخرى في لحظة!</string>
+    <string name="keyboard_download_finished">تم الانتهاء من تحميل لوحة المفاتيح!</string>
+    <string name="dictionary_download_start_in_background">بدأ تنزيل القاموس في الخلفية</string>
+    <string name="dictionary_download_is_running_in_background">القاموس المحدد قيد التحميل بالفعل؛ الرجاء المحاولة مرة أخرى في لحظة!</string>
+    <string name="dictionary_download_finished">انتهى تنزيل القاموس.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Failed to access server!</string>
+    <string name="update_check_current">"All resources are up to date!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Dictionary version</string>
+    <string name="uninstall_model">Uninstall dictionary</string>
+    <string name="confirm_delete_model">Would you like to delete this dictionary?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Enable corrections</string>
+    <string name="enable_predictions">Enable predictions</string>
+    <string name="model">القاموس</string>
+    <string name="model_info_header" comment="Dictionary name">القاموس: %1$s</string>
+    <string name="model_picker_header">%1$s قواميس</string>
+    <string name="manage_dictionary">إدارة القاموس</string>
+    <string name="model_install_toast">Dictionary installed</string>
+    <plurals name="keyboard_count">
+        <item quantity="zero">(%1$d لوحات مفاتيح)</item>
+        <item quantity="one">(%1$d لوحة مفاتيح)</item>
+        <item quantity="two">(%1$d لوحتي مفاتيح)</item>
+        <item quantity="few">(%1$d لوحات مفاتيح)</item>
+        <item quantity="many">(%1$d لوحات مفاتيح)</item>
+        <item quantity="other">(%1$d لوحات مفاتيح)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Delete</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Tap here to change keyboard</string>
+</resources>
