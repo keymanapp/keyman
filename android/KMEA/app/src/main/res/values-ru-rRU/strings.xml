@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="few">Клавиатуры</item>
+        <item quantity="many">Клавиатуры</item>
+        <item quantity="other">Клавиатуры</item>
+    </plurals>
+    <string name="title_add_keyboard">Добавить новую клавиатуру</string>
+    <string name="title_languages_settings">Установленные языки</string>
+    <string name="title_language_settings" comment="Language Settings">Настройки %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">Добавить</string>
+    <string name="label_cancel">Отменить</string>
+    <string name="label_close" comment="Close a dialog">Закрыть</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Закрыть Клавиатуру</string>
+    <string name="label_download">Скачать</string>
+    <string name="label_install">Установить</string>
+    <string name="label_later" comment="Do an action at a later time">Позже</string>
+    <string name="label_ok">ОК</string>
+    <string name="label_update">Обновить</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Не удается подключиться к серверу Keyman!</string>
+    <string name="confirm_delete_keyboard">Вы хотите удалить эту клавиатуру?</string>
+    <string name="confirm_download_keyboard">Хотите загрузить последнюю версию этой клавиатуры?</string>
+    <string name="confirm_update">Вы хотите обновить клавиатуры и словари сейчас?</string>
+    <string name="custom_keyboard">Пользовательская клавиатура</string>
+    <string name="font_failed_to_download">Предупреждение: Не удалось загрузить шрифт</string>
+    <string name="keyboard_failed_to_download">Ошибка: Не удалось загрузить клавиатуру</string>
+    <string name="keyboard_updates_channel">Обновления ресурсов</string>
+    <string name="keyboard_updates_available">Доступно обновление ресурсов</string>
+    <string name="update_available">%1$s (Доступно обновление)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Доступны обновления для клавиатуры %1$s: %2$s </string>
+    <string name="dictionary_update_message">Доступные обновления для словаря %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Версия клавиатуры</string>
+    <string name="help_link">Справка</string>
+    <string name="uninstall_keyboard">Удалить клавиатуру</string>
+    <string name="keyboard_picker_new_keyboard_prefix">новый</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Отсканируйте этот код, чтобы загрузить эту клавиатуру\nна другом устройстве</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Загрузить последнюю версию этого словаря?</string>
+    <string name="catalog_unavailable">Каталог ресурсов недоступен</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Обновление каталога запущено в фоновом режиме</string>
+    <string name="catalog_download_is_running_in_background">      Каталог все еще загружается; Пожалуйста, повторите попытку через некоторое время!</string>
+    <string name="progress_message_catalog_download_is_running">Каталог все еще загружается!</string>
+    <string name="keyboard_download_start_in_background">Загрузка клавиатуры началась в фоновом режиме</string>
+    <string name="keyboard_download_is_running_in_background">Выбранная клавиатура уже загружается; Пожалуйста, попробуйте еще раз через некоторое время!</string>
+    <string name="keyboard_download_finished">Загрузка клавиатуры завершена!</string>
+    <string name="dictionary_download_start_in_background">Загрузка словаря началась в фоновом режиме</string>
+    <string name="dictionary_download_is_running_in_background">Выбранный словарь уже загружается; Пожалуйста, попробуйте еще раз через некоторое время!</string>
+    <string name="dictionary_download_finished">Загрузка словаря завершена.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Не удалось получить доступ к серверу!</string>
+    <string name="update_check_current">"Все ресурсы актуальны!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Версия словаря</string>
+    <string name="uninstall_model">Удалить словарь</string>
+    <string name="confirm_delete_model">Вы хотите удалить этот словарь?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Включить исправления</string>
+    <string name="enable_predictions">Включить прогнозы</string>
+    <string name="model">Словарь</string>
+    <string name="model_info_header" comment="Dictionary name">Словарь: %1$s</string>
+    <string name="model_picker_header">словари %1$s</string>
+    <string name="manage_dictionary">Управление словарем</string>
+    <string name="model_install_toast">Словарь установлен</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d клавиатура)</item>
+        <item quantity="few">(%1$d клавиатура)</item>
+        <item quantity="many">(%1$d клавиатура)</item>
+        <item quantity="other">(%1$d клавиатура)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Удалить</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Нажмите здесь, чтобы изменить клавиатуру</string>
+</resources>
