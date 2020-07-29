@@ -450,19 +450,6 @@ keyboard layout for your language.</String>
 <String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_ShowToolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">Show Toolbar</String>
 <String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_SaveAsWebPage" Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">Save as Web Page...</String>
 <String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_Print" Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">Print...</String>
-
-<!-- - - - - - - - - - - - - - - - - - -->
-<!-- Usage Page                        -->
-<!-- - - - - - - - - - - - - - - - - - -->
-
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_Welcome" Version="7.0.244.0" Description="Usage page - keyboard help button">Keyboard Help</String>
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_OSK" Version="7.0.244.0" Description="Usage page - On Screen Keyboard button">On Screen Keyboard</String>
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_Help" Version="7.0.244.0" Description="Usage page - Product Help button">&Name; Help</String>
-<String Group="Usage Page" Type="PlainText" Id="S_Usage_Config" Version="7.0.244.0" Description="Usage page - Product Configuration button">&Name; Configuration</String>
-<String Group="Usage Page" Type="HTML" Id="S_Usage_KeyboardNoDocumentation" Version="7.1.261.0" Description="Usage page - Text shown when keyboard has no documentation">This keyboard layout has no Getting Started or Usage documentation. Please check the Start Menu or contact the keyboard developer for more information on how to use this keyboard layout.</String>
-<String Group="Usage Page" Type="HTML" Id="S_Usage_KeyboardDocumentation" Version="7.1.261.0" Description="Usage page - Text shown when keyboard has documentation">Click the buttons below to view additional documentation and/or On Screen Keyboard.</String>
-<String Group="Usage Page" Type="HTML" Id="S_Usage_KeymanOff" Version="7.1.261.0" Description="Usage page - Text shown when no Keyman keyboard is active">No keyboard layout is currently selected in &Name;.  Click on any of the keyboard icons in the toolbar above to choose a keyboard layout.</String>
-<String Group="Usage Page" Type="HTML" Id="S_Usage_NoKeyboardsInstalled" Version="7.1.261.0" Description="Usage page - Text shown when no Keyman keyboards are installed">No keyboard layouts are currently installed or loaded.  Use &Name; Configuration to install a keyboard layout.</String>
   
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!-- Formatted messages, assorted                                              -->
