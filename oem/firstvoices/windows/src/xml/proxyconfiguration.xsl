@@ -4,22 +4,22 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_proxyconfiguration" select="$locale/Dialog[@Id='ProxyConfiguration'][1]" />
+  <xsl:variable name="dialoginfo_proxyconfiguration" select="$dialoginfo/Dialog[@Id='ProxyConfiguration'][1]" />
   
   <xsl:template match="/">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Title']"/></title>
+<title><xsl:value-of select="$locale/string[@name='S_ProxyConfiguration_Title']"/></title>
 <style type="text/css">
-  * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; }
+  * { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />; }
 
 html {
  font-size:		 11px;
  text-align:	justify;
  margin: 	 0px;
- width:    <xsl:value-of select="$locale_proxyconfiguration/@Width" />px;
- height:   <xsl:value-of select="$locale_proxyconfiguration/@Height" />px;
+ width:    <xsl:value-of select="$dialoginfo_proxyconfiguration/@Width" />px;
+ height:   <xsl:value-of select="$dialoginfo_proxyconfiguration/@Height" />px;
  overflow: hidden;
 }
 
@@ -27,8 +27,8 @@ body {
  font-size:	 	 11px;
  text-align:	justify;
  margin:	 0px;
- width:    <xsl:value-of select="$locale_proxyconfiguration/@Width" />px;
- height:   <xsl:value-of select="$locale_proxyconfiguration/@Height" />px;
+ width:    <xsl:value-of select="$dialoginfo_proxyconfiguration/@Width" />px;
+ height:   <xsl:value-of select="$dialoginfo_proxyconfiguration/@Height" />px;
  overflow: hidden;
 }
 
@@ -43,8 +43,8 @@ div {
 
 #border { 
   border: 1px solid #AD4A29; 
-  width: <xsl:value-of select="$locale_proxyconfiguration/@Width - 2" />px; 
-  height: <xsl:value-of select="$locale_proxyconfiguration/@Height - 2" />px;
+  width: <xsl:value-of select="$dialoginfo_proxyconfiguration/@Width - 2" />px; 
+  height: <xsl:value-of select="$dialoginfo_proxyconfiguration/@Height - 2" />px;
   }
   
 #content {
@@ -100,28 +100,28 @@ div {
 <body>
 <div id="border">
   <div id='content'>
-    <div class='form' id="ProxyServerLabel"><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Server']" /></div>
+    <div class='form' id="ProxyServerLabel"><xsl:value-of select="$locale/string[@name='S_ProxyConfiguration_Server']" /></div>
     <div class='form' id="ProxyServer">
       <input type="text" id="Form_ProxyServer">
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Server"/></xsl:attribute>
       </input>
     </div>
     
-    <div class='form' id="ProxyPortLabel"><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Port']" /></div>
+    <div class='form' id="ProxyPortLabel"><xsl:value-of select="$locale/string[@name='S_ProxyConfiguration_Port']" /></div>
     <div class='form' id="ProxyPort">
       <input type="text" id="Form_ProxyPort">
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Port"/></xsl:attribute>
       </input>
     </div>
 
-    <div class='form' id="ProxyUsernameLabel"><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Username']" /></div>
+    <div class='form' id="ProxyUsernameLabel"><xsl:value-of select="$locale/string[@name='S_ProxyConfiguration_Username']" /></div>
     <div class='form' id="ProxyUsername">
       <input type="text" id="Form_ProxyUsername">
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Username"/></xsl:attribute>
       </input>
     </div>
 
-    <div class='form' id="ProxyPasswordLabel"><xsl:value-of select="$locale/String[@Id='S_ProxyConfiguration_Password']" /></div>
+    <div class='form' id="ProxyPasswordLabel"><xsl:value-of select="$locale/string[@name='S_ProxyConfiguration_Password']" /></div>
     <div class='form' id="ProxyPassword">
       <input type="password" id="Form_ProxyPassword">
         <xsl:attribute name="value"><xsl:value-of select="/Keyman/Proxy/Password"/></xsl:attribute>
@@ -130,10 +130,10 @@ div {
   </div>    
   <div id="footer">
     <input type="submit" class='button' onclick="javascript:ok()">
-      <xsl:attribute name="value"><xsl:value-of select="$locale/String[@Id='S_Button_OK']"/></xsl:attribute>
+      <xsl:attribute name="value"><xsl:value-of select="$locale/string[@name='S_Button_OK']"/></xsl:attribute>
     </input>
     <input type="button" class='button' onclick="javascript:location.href='keyman:footer_cancel'">
-      <xsl:attribute name="value"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:attribute>
+      <xsl:attribute name="value"><xsl:value-of select="$locale/string[@name='S_Button_Cancel']"/></xsl:attribute>
     </input>
   </div>
 </div>

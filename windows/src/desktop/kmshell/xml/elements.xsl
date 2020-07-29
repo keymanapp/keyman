@@ -6,7 +6,7 @@
 
   <!-- I978 - locale was not reliably selected due to undefined order of document() loading and | processing -->
   <xsl:variable name="prilocale" select="document(/Keyman/localepath)/Locale" />
-  <xsl:variable name="altlocale" select="document('locale.xml')/Locale/*[not(@Id = $prilocale//@Id)]" />
+  <xsl:variable name="altlocale" select="document('strings.xml')/resources/*[not(@name = $prilocale//@name)]" />
   <xsl:variable name="comlocale">
       <xsl:copy-of select="$prilocale/*" />
       <xsl:copy-of select="$altlocale" />

@@ -1,18 +1,18 @@
 (*
   Name:             CustomisationMessages
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     06 Oct 2006 - mcdurdin - Allow embedding of messages within messages
                     04 Dec 2006 - mcdurdin - Add localization
@@ -174,8 +174,8 @@ begin
     repeat
       if ((f.Attr and faDirectory) = faDirectory) and (f.Name <> '.') and (f.Name <> '..') then
       begin
-        if IsValidLocaleFile(FLocalePath+f.Name+'\locale.xml') then  // I3192
-          FLanguages.Add(f.Name+'='+FLocalePath+f.Name+'\locale.xml');
+        if IsValidLocaleFile(FLocalePath+f.Name+'\strings.xml') then  // I3192
+          FLanguages.Add(f.Name+'='+FLocalePath+f.Name+'\strings.xml');
         if Result <> '' then Result := Result + #13#10;
         Result := Result + f.Name;
       end;

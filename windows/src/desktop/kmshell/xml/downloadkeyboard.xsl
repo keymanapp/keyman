@@ -12,10 +12,10 @@
         <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
         <script src="/app/sentry.bundle.min.js"></script>
         <script src="/app/sentry.init.js"></script>
-        <title><xsl:value-of select="$locale/String[@Id='S_DownloadKeyboard_Title']"/></title>
+        <title><xsl:value-of select="$locale/string[@name='S_DownloadKeyboard_Title']"/></title>
         <link rel="stylesheet" type="text/css" href="/app/config.css" />
         <style type="text/css">
-            * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; }
+            * { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI"; }
 
             body {
               padding: 0px; margin: 0px; overflow: hidden;
@@ -67,11 +67,11 @@
         </iframe>
         <div id="footerframe">
           <!--<div style="float:left; font-size: 13.3px;">
-            <input type="checkbox" id="chkDownloadOnly" /> <label for="chkDownloadOnly"><xsl:value-of select="$locale/String[@Id='S_DownloadKeyboard_DownloadOnlyCheckbox']"/></label>
+            <input type="checkbox" id="chkDownloadOnly" /> <label for="chkDownloadOnly"><xsl:value-of select="$locale/string[@name='S_DownloadKeyboard_DownloadOnlyCheckbox']"/></label>
           </div>-->
           <div style="float:right; padding-right: 8px">
             <xsl:call-template name="button">
-              <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
+              <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Cancel']"/></xsl:with-param>
               <xsl:with-param name="command">keyman:footer_cancel</xsl:with-param>
               <xsl:with-param name="width">70px</xsl:with-param>
             </xsl:call-template>
