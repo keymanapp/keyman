@@ -236,6 +236,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 <String Group="Hotkey Dialog" Type="FormatString" Id="SKUnsafeHotkey" Version="7.0.230.0" Parameters="%0:s = Hotkey" Description="Hotkey dialog - warning of hotkey conflict with standard keyboard use">The hotkey %0:s will conflict with normal keyboard use.  You should use at least Ctrl or Alt.  Do you want to change this now?</String>
 <String Group="Hotkey Dialog" Type="FormatString" Id="SKHotkeyConflicts_Keyboard" Version="7.0.230.0" Parameters="%0:s = Hotkey, %1:s = Conflicting keyboard" Description="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">The hotkey %0:s conflicts with the hotkey selected for keyboard %1:s.  If you continue, the hotkey for keyboard %1:s will be cleared.  Continue?</String>
+<String Group="Hotkey Dialog" Type="FormatString" Id="SKHotkeyConflicts_Interface" Version="14.0.117" Parameters="%0:s = Hotkey" Description="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">The hotkey %0:s conflicts with another hotkey.  If you continue, the other hotkey will be cleared.  Continue?</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Online Update Dialog              -->

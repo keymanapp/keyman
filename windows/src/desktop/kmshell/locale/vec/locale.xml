@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale Version="7.1.261.0" OnlineProductID="1">
   <String Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard">Sèra tastièra so schèrmo</String>
   <String Type="PlainText" Id="S_Menu_Exit">Sòrti</String>
@@ -161,13 +163,13 @@
   <String Type="PlainText" Id="S_ProxyConfiguration_Server">Server:</String>
   <String Type="PlainText" Id="S_ProxyConfiguration_Title">Confegurasion server proxy</String>
   <String Type="PlainText" Id="S_ProxyConfiguration_Username">Nòme utente:</String>
-  <String Type="PlainText" Id="S_ShortProductName">&Name_CNV;</String>
+  <String Type="PlainText" Id="S_ShortProductName">&Name;</String>
   
   
   
   
   
-  <String Type="" Id="S_Splash_Title">&Name_CNV;</String>
+  <String Type="" Id="S_Splash_Title">&Name;</String>
   <String Type="PlainText" Id="S_Support">Supòrto</String>
   <String Type="PlainText" Id="S_Support_AccessChar">S</String>
   
@@ -186,7 +188,7 @@
   <String Type="PlainText" Id="S_Update_DownloadFrom">Te pol descargar ƚa version niova da:</String>
   <String Type="PlainText" Id="S_Update_DownloadQuery">Vusto vixitar el sito web dèso?</String>
   <String Type="PlainText" Id="S_Update_InstallQuery">Vusto descargar e istaƚar sta patch dèso?</String>
-  <String Type="PlainText" Id="S_Update_NewVersionAvailable">Ghe xé axornamenti par  &Name_CN; disponìbiƚi</String>
+  <String Type="PlainText" Id="S_Update_NewVersionAvailable">Ghe xé axornamenti par  &Name; disponìbiƚi</String>
   <String Type="PlainText" Id="S_Update_NewVersionPrompt">Desernisi i axornamenti che te vol istaƚar:</String>
   <String Type="PlainText" Id="S_Update_OldVersionHead">Version vècia</String>
   <String Type="PlainText" Id="S_Update_SizeHead">Dimension</String>
@@ -219,7 +221,7 @@
   
   <String Type="" Id="SKAllLanguageSettingsTestedOK">Microsoft Windows el rexulta confegurà poƚito par ƚa/e to lengua/e.</String>
   <String Type="FormatString" Id="SKANSIEncoding">Codepage</String>
-  <String Type="FormatString" Id="SKApplicationTitle">&Name_CN;</String>
+  <String Type="FormatString" Id="SKApplicationTitle">&Name;</String>
   <String Type="FormatString" Id="SKButtonCancel">Anuƚa</String>
   <String Type="FormatString" Id="SKButtonClearHotkey">&amp;Boton de funsion Clear</String>
   <String Type="FormatString" Id="SKButtonDownload">&amp;Descarga...</String>
@@ -338,7 +340,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconMenuText" Version="8.0.288.0" Description="Update icon - install menu item">View and &amp;install &Name; updates</String>
 <String Group="Online Update Dialog" Type="FormatString" Id="SKUpdate_IconMenuExit" Version="8.0.288.0" Description="Update icon - exit menu item">E&amp;xit online update check</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version">&Version;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">Start Keyman</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">Exit</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_OtherTasks" Version="8.0.294.0" Description="Other tasks heading">Other tasks</String>
