@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl" />
 
-  <xsl:variable name="locale_installkeyboard" select="$locale/Dialog[@Id='InstallKeyboard'][1]" />
+  <xsl:variable name="dialoginfo_installkeyboard" select="$dialoginfo/Dialog[@Id='InstallKeyboard'][1]" />
 
   <xsl:template match="/">
     <html>
@@ -21,20 +21,20 @@
           }
 
           #background {
-            width: <xsl:value-of select="$locale_installkeyboard/@Width" />px;
-            height: <xsl:value-of select="$locale_installkeyboard/@Height" />px;
+            width: <xsl:value-of select="$dialoginfo_installkeyboard/@Width" />px;
+            height: <xsl:value-of select="$dialoginfo_installkeyboard/@Height" />px;
           }
           #foreground {
-            width: <xsl:value-of select="$locale_installkeyboard/@Width" />px;
-            height: <xsl:value-of select="$locale_installkeyboard/@Height" />px;
+            width: <xsl:value-of select="$dialoginfo_installkeyboard/@Width" />px;
+            height: <xsl:value-of select="$dialoginfo_installkeyboard/@Height" />px;
           }
 
           #frame {
-            width: <xsl:value-of select="$locale_installkeyboard/@Width - 20" />px;
+            width: <xsl:value-of select="$dialoginfo_installkeyboard/@Width - 20" />px;
           }
 
           #footer {
-            width: <xsl:value-of select="$locale_installkeyboard/@Width - 16" />px;
+            width: <xsl:value-of select="$dialoginfo_installkeyboard/@Width - 16" />px;
           }
         </style>
         <script src="/app/installkeyboard.js"></script>

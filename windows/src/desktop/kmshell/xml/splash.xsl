@@ -3,7 +3,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:include href="elements.xsl"/>
-  <xsl:variable name="locale_splash" select="$locale/Dialog[@Id='Splash'][1]" />
+  <xsl:variable name="locale_splash" select="$dialoginfo/Dialog[@Id='Splash'][1]" />
   <xsl:template match="/">
 
 <html>
