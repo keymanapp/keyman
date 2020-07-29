@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Teclados</item>
+    </plurals>
+    <string name="title_add_keyboard">Adicionar novo teclado</string>
+    <string name="title_languages_settings">Idiomas instalados</string>
+    <string name="title_language_settings" comment="Language Settings">Configurações de %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">Adicionar</string>
+    <string name="label_cancel">Cancelar</string>
+    <string name="label_close" comment="Close a dialog">Fechar</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Fechar keyman</string>
+    <string name="label_download">BAIXAR</string>
+    <string name="label_install">Instale</string>
+    <string name="label_later" comment="Do an action at a later time">Mais tarde</string>
+    <string name="label_ok">OK</string>
+    <string name="label_update">Atualizar</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Não foi possível conectar ao servidor Keyman!</string>
+    <string name="confirm_delete_keyboard">Gostaria de excluir este teclado?</string>
+    <string name="confirm_download_keyboard">Gostaria de baixar a versão mais recente deste teclado?</string>
+    <string name="confirm_update">Gostaria de atualizar teclados e dicionários agora?</string>
+    <string name="custom_keyboard">Teclado personalizado</string>
+    <string name="font_failed_to_download">Aviso: A fonte falhou ao baixar</string>
+    <string name="keyboard_failed_to_download">Erro: Falha no download do teclado</string>
+    <string name="keyboard_updates_channel">Atualizações de Recursos</string>
+    <string name="keyboard_updates_available">Atualizações de Recursos Disponíveis</string>
+    <string name="update_available">%1$s (Atualização Disponível)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Atualizações disponíveis para o teclado %1$s: %2$s </string>
+    <string name="dictionary_update_message">Atualizações disponíveis para o dicionário %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Versão do teclado</string>
+    <string name="help_link">Link de ajuda</string>
+    <string name="uninstall_keyboard">Desinstalar teclado</string>
+    <string name="keyboard_picker_new_keyboard_prefix">Novo</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Escaneie este código para carregar este teclado\nem outro dispositivo</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Gostaria de baixar a versão mais recente deste dicionário?</string>
+    <string name="catalog_unavailable">O catálogo de recursos está indisponível</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Atualização de catálogo iniciada em segundo plano</string>
+    <string name="catalog_download_is_running_in_background">      O catálogo ainda está baixando; por favor, tente novamente em alguns instantes!</string>
+    <string name="progress_message_catalog_download_is_running">O catálogo ainda está sendo baixado!</string>
+    <string name="keyboard_download_start_in_background">Download do teclado iniciado em segundo plano</string>
+    <string name="keyboard_download_is_running_in_background">O teclado selecionado já está baixando; por favor, tente novamente daqui a pouco!</string>
+    <string name="keyboard_download_finished">O download do teclado terminou!</string>
+    <string name="dictionary_download_start_in_background">Download do dicionário iniciado em segundo plano</string>
+    <string name="dictionary_download_is_running_in_background">O dicionário selecionado já está baixando; por favor, tente novamente mais tarde!</string>
+    <string name="dictionary_download_finished">O download do dicionário terminou.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Falha ao acessar o servidor!</string>
+    <string name="update_check_current">"Todos os recursos estão atualizados!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Versão do dicionário</string>
+    <string name="uninstall_model">Desinstalar dicionário</string>
+    <string name="confirm_delete_model">Você gostaria de excluir este dicionário?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Habilitar correções</string>
+    <string name="enable_predictions">Habilitar previsões</string>
+    <string name="model">Dicionário</string>
+    <string name="model_info_header" comment="Dictionary name">Dicionário: %1$s</string>
+    <string name="model_picker_header">%1$s dicionários</string>
+    <string name="manage_dictionary">Gerenciar dicionário</string>
+    <string name="model_install_toast">Dicionário instalado</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d teclado)</item>
+        <item quantity="other">(%1$d teclados)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">excluir</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Toque aqui para alterar o teclado</string>
+</resources>
