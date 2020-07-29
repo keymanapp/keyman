@@ -235,7 +235,7 @@ build-tools: global-versions
     $(PROGRAM)\buildtools\devtools -ti
 
 message-constants: build-tools
-    $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\locale.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
+    $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
 
 #
 # Remove all files from output folders to ensure no legacy files left in a release
