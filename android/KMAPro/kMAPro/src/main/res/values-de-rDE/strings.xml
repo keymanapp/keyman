@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="action_share" comment="Send text content to another app">Teilen</string>
+  <string name="action_web" comment="Open Keyman browser">Web-Browser</string>
+  <string name="action_text_size" comment="Adjust text size">Schriftgröße</string>
+  <string name="action_overflow" comment="Additional menu items">Mehr</string>
+  <string name="action_clear_text" comment="Erase text">Text löschen</string>
+  <string name="action_info" comment="Display Keyman help page">Info</string>
+  <string name="action_settings" comment="Open Settings menu">Einstellungen</string>
+  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Updates installieren</string>
+  <string name="title_version">Version</string>
+  <!-- &#8230; is the ellipsis character "..." -->
+  <string name="textview_hint">Tippen Sie hier&#8230;</string>
+  <!-- Splash screen (version/copyright info currently disabled -->
+  <!-- Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">Textgröße hoch</string>
+  <string name="ic_text_size_down" comment="Make text smaller">Textgröße unten</string>
+  <!-- Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">Der gesamte Text wird gelöscht</string>
+  <!-- Info screen reuses title_version -->
+  <!-- Get Started menu strings -->
+  <string name="get_started">Los geht\'s</string>
+  <string name="add_a_keyboard">Tastatur für Ihre Sprache hinzufügen</string>
+  <string name="enable_system_keyboard">Keyman als systemweite Tastatur aktivieren</string>
+  <string name="set_keyman_as_default">Keyman als Standard-Tastatur festlegen</string>
+  <string name="more_info" comment="Open the help page">Mehr Info</string>
+  <string name="show_get_started">Show \"%1$s\" on startup</string>
+  <!-- Keyman Settings menu strings -->
+  <string name="keyman_settings" comment="Settings menu title">Einstellungen</string>
+  <plurals name="installed_languages">
+    <item quantity="one">Installierte Sprachen (%1$d)</item>
+    <item quantity="other">Installierte Sprachen (%1$d)</item>
+  </plurals>
+  <string name="install_keyboard_or_dictionary">Install Keyboard or Dictionary</string>
+  <string name="show_banner" comment="text suggestions banner">Banner immer anzeigen</string>
+  <string name="show_banner_on" comment="Description when toggle is on">Zu implementieren</string>
+  <string name="show_banner_off" comment="Description when toggle is off">Wenn ausgeschaltet, wird das Banner nur angezeigt, wenn vorhersagender Text aktiviert ist</string>
+  <!-- reuse show_get_started -->
+  <!-- Keyman Settings Install Keyboard or Dictionary menu strings -->
+  <string name="install_from_keyman_dot_com">Install from keyman.com</string>
+  <string name="install_from_local_file">Install from local file</string>
+  <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
+  <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
+  <string name="add_language_subtext">(from keyboard package)</string>
+  <!-- Select Package and Select Language menu strings -->
+  <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
+  <string name="title_select_language_for_package">Select language for %1$s</string>
+  <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
+  <string name="all_languages_installed">All languages already installed</string>
+  <!-- Web Browser strings -->
+  <string name="hint_text">URL suchen oder eingeben</string>
+  <string name="title_bookmarks">Lesezeichen</string>
+  <string name="no_bookmarks">Keine Lesezeichen</string>
+  <string name="add_bookmark">Lesezeichen hinzufügen</string>
+  <string name="hint_title">Titel</string>
+  <string name="hint_url">Url</string>
+  <!-- KMP Package strings -->
+  <string name="title_package">Paket</string>
+  <string name="title_failed_to_install">konnte nicht installiert werden</string>
+  <string name="downloading_keyboard_package">Tastaturpaket herunterladen</string>
+  <string name="failed_to_extract" comment="Keyboard package failed to unzip">Entpacken fehlgeschlagen</string>
+  <string name="install_keyboard_package">Tastaturpaket installieren</string>
+  <string name="install_predictive_text_package">Predictive Text Paket installieren</string>
+  <string name="no_new_touch_keyboards_to_install">Keine neuen Touch-Tastaturen zu installieren</string>
+  <string name="no_new_predictive_text_to_install">Kein neuer vorhersagender Text zu installieren</string>
+  <string name="no_valid_touch_keyboards_to_install">Keine gültigen Touch-Tastaturen zu installieren</string>
+  <string name="no_targets_to_install">Keine Tastaturen oder vorausschauenden Text zu installieren</string>
+  <string name="missing_metadata" comment="kmp.json file is missing from the keyboard package">kmp.json existiert nicht</string>
+  <string name="invalid_metadata">Ungültige Metadaten im Paket</string>
+</resources>
