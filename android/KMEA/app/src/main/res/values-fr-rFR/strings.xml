@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Clavier</item>
+        <item quantity="other">Claviers</item>
+    </plurals>
+    <string name="title_add_keyboard">Ajouter un nouveau clavier</string>
+    <string name="title_languages_settings">Langues installées</string>
+    <string name="title_language_settings" comment="Language Settings">Paramètres de %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">Ajouter</string>
+    <string name="label_cancel">Annuler</string>
+    <string name="label_close" comment="Close a dialog">Fermer</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Fermer le Keyman</string>
+    <string name="label_download">Télécharger</string>
+    <string name="label_install">Installer</string>
+    <string name="label_later" comment="Do an action at a later time">Plus tard</string>
+    <string name="label_ok">OK</string>
+    <string name="label_update">Mise à jour</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Impossible de se connecter au serveur Keyman !</string>
+    <string name="confirm_delete_keyboard">Voulez-vous supprimer ce clavier?</string>
+    <string name="confirm_download_keyboard">Voulez-vous télécharger la dernière version de ce clavier?</string>
+    <string name="confirm_update">Voulez-vous mettre à jour les claviers et les dictionnaires maintenant ?</string>
+    <string name="custom_keyboard">Clavier personnalisé</string>
+    <string name="font_failed_to_download">Attention : la police n\'a pas pu être téléchargée</string>
+    <string name="keyboard_failed_to_download">Erreur: Le téléchargement du clavier a échoué</string>
+    <string name="keyboard_updates_channel">Mises à jour des ressources</string>
+    <string name="keyboard_updates_available">Mises à jour de ressources disponibles</string>
+    <string name="update_available">%1$s (Mise à jour disponible)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Mises à jour disponibles pour le clavier %1$s: %2$s </string>
+    <string name="dictionary_update_message">Mises à jour disponibles pour le dictionnaire %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Version du clavier</string>
+    <string name="help_link">Lien d\'aide</string>
+    <string name="uninstall_keyboard">Désinstaller le clavier</string>
+    <string name="keyboard_picker_new_keyboard_prefix">Nouveau</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Scannez ce code pour charger ce clavier\nsur un autre appareil</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Voulez-vous télécharger la dernière version de ce dictionnaire ?</string>
+    <string name="catalog_unavailable">Le catalogue de ressources est indisponible</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">La mise à jour du catalogue a commencé en arrière-plan</string>
+    <string name="catalog_download_is_running_in_background">      Le catalogue est toujours en cours de téléchargement; veuillez réessayer dans un instant!</string>
+    <string name="progress_message_catalog_download_is_running">Le catalogue est toujours en cours de téléchargement!</string>
+    <string name="keyboard_download_start_in_background">Le téléchargement du clavier a commencé en arrière-plan</string>
+    <string name="keyboard_download_is_running_in_background">Le clavier sélectionné est déjà en cours de téléchargement; veuillez réessayer dans un instant!</string>
+    <string name="keyboard_download_finished">Le téléchargement du clavier est terminé !</string>
+    <string name="dictionary_download_start_in_background">Le téléchargement du dictionnaire a commencé en arrière-plan</string>
+    <string name="dictionary_download_is_running_in_background">Le dictionnaire sélectionné est déjà en cours de téléchargement; veuillez réessayer dans un instant!</string>
+    <string name="dictionary_download_finished">Téléchargement du dictionnaire terminé.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Impossible d\'accéder au serveur!</string>
+    <string name="update_check_current">"Toutes les ressources sont à jour !"</string>
+    <!-- Model Info -->
+    <string name="model_version">Version du dictionnaire</string>
+    <string name="uninstall_model">Désinstaller le dictionnaire</string>
+    <string name="confirm_delete_model">Voulez-vous supprimer ce dictionnaire ?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Activer les corrections</string>
+    <string name="enable_predictions">Activer les prédictions</string>
+    <string name="model">Dictionnaire</string>
+    <string name="model_info_header" comment="Dictionary name">Dictionnaire : %1$s</string>
+    <string name="model_picker_header">%1$s dictionnaires</string>
+    <string name="manage_dictionary">Gérer le dictionnaire</string>
+    <string name="model_install_toast">Dictionnaire installé</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(clavier%1$d)</item>
+        <item quantity="other">(%1$d claviers)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Supprimez</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Appuyez ici pour changer de clavier</string>
+</resources>
