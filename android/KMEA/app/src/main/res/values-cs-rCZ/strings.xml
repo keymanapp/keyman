@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="few">Klávesnice</item>
+        <item quantity="many">Klávesnice</item>
+        <item quantity="other">Klávesnice</item>
+    </plurals>
+    <string name="title_add_keyboard">Přidat novou klávesnici</string>
+    <string name="title_languages_settings">Nainstalované jazyky</string>
+    <string name="title_language_settings" comment="Language Settings">Nastavení %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">Přidat</string>
+    <string name="label_cancel">Zrušit</string>
+    <string name="label_close" comment="Close a dialog">Zavřít</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Zavřít klíč</string>
+    <string name="label_download">Stáhnout</string>
+    <string name="label_install">Instalovat</string>
+    <string name="label_later" comment="Do an action at a later time">Později</string>
+    <string name="label_ok">OK</string>
+    <string name="label_update">Aktualizovat</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Nelze se připojit k Keyman serveru!</string>
+    <string name="confirm_delete_keyboard">Chcete odstranit tuto klávesnici?</string>
+    <string name="confirm_download_keyboard">Chcete stáhnout nejnovější verzi této klávesnice?</string>
+    <string name="confirm_update">Chcete nyní aktualizovat klávesnice a slovníky?</string>
+    <string name="custom_keyboard">Vlastní klávesnice</string>
+    <string name="font_failed_to_download">Varování: Písmo se nepodařilo stáhnout</string>
+    <string name="keyboard_failed_to_download">Chyba: Klávesnice se nepodařilo stáhnout</string>
+    <string name="keyboard_updates_channel">Aktualizace zdrojů</string>
+    <string name="keyboard_updates_available">Dostupné aktualizace zdrojů</string>
+    <string name="update_available">%1$s (Aktualizace k dispozici)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Dostupné aktualizace pro klávesnici %1$s: %2$s </string>
+    <string name="dictionary_update_message">Dostupné aktualizace pro slovník %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Verze klávesnice</string>
+    <string name="help_link">Odkaz na pomoc</string>
+    <string name="uninstall_keyboard">Odinstalovat klávesnici</string>
+    <string name="keyboard_picker_new_keyboard_prefix">nový</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Naskenujte tento kód pro načtení této\nklávesnice na jiném zařízení</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Chcete stáhnout nejnovější verzi tohoto slovníku?</string>
+    <string name="catalog_unavailable">Katalog zdrojů není k dispozici</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Aktualizace katalogu byla spuštěna na pozadí</string>
+    <string name="catalog_download_is_running_in_background">      Katalog se stále stahuje; zkuste to prosím za chvíli znovu!</string>
+    <string name="progress_message_catalog_download_is_running">Katalog se stále stahuje!</string>
+    <string name="keyboard_download_start_in_background">Stahování klávesnice spuštěno na pozadí</string>
+    <string name="keyboard_download_is_running_in_background">Vybraná klávesnice se již stahuje; zkuste to prosím za chvíli znovu!</string>
+    <string name="keyboard_download_finished">Stahování klávesnice je dokončeno!</string>
+    <string name="dictionary_download_start_in_background">Stahování slovníku začalo na pozadí</string>
+    <string name="dictionary_download_is_running_in_background">Vybraný slovník se již stahuje; zkuste to prosím za chvíli znovu!</string>
+    <string name="dictionary_download_finished">Stahování slovníku je dokončeno.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Přístup k serveru se nezdařil!</string>
+    <string name="update_check_current">"Všechny zdroje jsou aktuální!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Verze slovníku</string>
+    <string name="uninstall_model">Odinstalovat slovník</string>
+    <string name="confirm_delete_model">Chcete odstranit tento slovník?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Povolit opravy</string>
+    <string name="enable_predictions">Povolit predikce</string>
+    <string name="model">Slovník</string>
+    <string name="model_info_header" comment="Dictionary name">Slovník: %1$s</string>
+    <string name="model_picker_header">%1$s slovníků</string>
+    <string name="manage_dictionary">Správa slovníku</string>
+    <string name="model_install_toast">Slovník nainstalován</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d klávesnice)</item>
+        <item quantity="few">(%1$d klávesnice)</item>
+        <item quantity="many">(%1$d klávesnice)</item>
+        <item quantity="other">(%1$d klávesnice)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Vymazat</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Klepnutím sem změníte klávesnici</string>
+</resources>
