@@ -252,7 +252,7 @@ public class ResourceFileManager {
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
-    return buildSimpleAlert(title: "Error", message: error.rawValue)
+    return buildSimpleAlert(title: "Error", message: error.localizedDescription)
   }
 
   public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {
