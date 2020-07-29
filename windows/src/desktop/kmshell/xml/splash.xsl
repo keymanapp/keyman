@@ -48,9 +48,7 @@
     <xsl:if test="count(//KeymanKeyboardInstalled[loaded]) = 0">No keyboards loaded - <a href="keyman:config">Open Configuration</a></xsl:if>
   </div>
 
-  <div id="version"><xsl:value-of select="/Keyman/Version"/>
-    <span id="beta"><xsl:value-of select="$locale/string[@name='S_BETA']"/></span>
-  </div>
+  <div id="version"><xsl:value-of select="/Keyman/Version"/></div>
 </div>
 </body>
 </html>

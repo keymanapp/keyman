@@ -23,20 +23,37 @@ prepareredist:
 clean:
   rem clean
 
-candle: candle-desktop candle-cef
+candle: candle-desktop candle-cef candle-locale
+
+#
+# Keyman for Windows and resources
+#
 
 candle-desktop:
   $(WIXHEAT) dir ..\kmshell\xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=..\kmshell\xml keymandesktop.wxs desktopui.wxs
 
+#
+# Chromium Embedded Framework
+#
+
 heat-cef:
-    # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
-    mkdir $(KEYMAN_WIX_TEMP_CEF)
-    xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
-    $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
-    # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
-    -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+  # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+  -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
+  mkdir $(KEYMAN_WIX_TEMP_CEF)
+  xcopy $(KEYMAN_CEF4DELPHI_ROOT)\* $(KEYMAN_WIX_TEMP_CEF)\ /s
+  $(WIXHEAT) dir $(KEYMAN_WIX_TEMP_CEF) -o cef.wxs -ag -cg CEF -dr INSTALLDIR -var var.CefSourceDir -wx -nologo
+  # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
+  -rmdir /s/q $(KEYMAN_WIX_TEMP_CEF)
 
 candle-cef: heat-cef
   $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dCefSourceDir=$(KEYMAN_CEF4DELPHI_ROOT) cef.wxs
+
+#
+# Locale files
+#
+
+candle-locale:
+  # locale files are in desktop/locale/*
+  $(WIXHEAT) dir ..\kmshell\locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
+  $(WIXCANDLE) -dVERSION=$VERSION -dRELEASE=$RELEASE -dPRODUCTID=$GUID1 -dLOCALESOURCE=..\kmshell\locale locale.wxs
