@@ -1,4 +1,8 @@
 #
+# Shared Crowdin control for all Keyman platforms
+#
+
+#
 # Your Crowdin credentials
 #
 project_id_env: "CROWDIN_PROJECT_ID"
@@ -20,18 +24,52 @@ files:
   # dest: crowdin path in https://crowdin.com/project/keyman
   # translation: local path where downloaded translations from crowdin go
 
+
+  # Android files
+
+  - source: /android/KMEA/app/src/main/res/values/strings.xml
+    dest: /android/KMEA/strings.xml
+    translation: /android/KMEA/app/src/main/res/values-%android_code%/strings.xml
+    languages_mapping:
+      # Prevent invalid region pap-rPAP
+      android_code:
+        pap: pap
+
+  - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
+    dest: /android/KMAPro/strings.xml
+    translation: /android/KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml
+    languages_mapping:
+      # Prevent invalid region pap-rPAP
+      android_code:
+        pap: pap
+
+  # Windows files
+
+  - source: /windows/src/desktop/locale/strings.xml
+    dest: /windows/strings.xml
+    translation: /windows/src/desktop/locale/%locale%/strings.xml
+    type: android
+    #languages_mapping:
+      # Prevent invalid region pap-rPAP
+      #code:
+        #pap: pap
+
   # iOS files
-  - source: /engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings
+
+  - source: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings
     dest: /ios/KMEI/LanguagePicker/ResourceInfoView.strings
-    translation: /engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
+    translation: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
 
-  - source: /engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
+  - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
     dest: /ios/KMEI/Localizable.strings
-    translation: /engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
+    translation: /ios/engine/KMEI/KeymanEngine/%osx_code%/%original_file_name%
 
-  - source: /keyman/Keyman/Keyman/en.lproj/Localizable.strings
+  - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
     dest: /ios/keyman/Localizable.strings
-    translation: /keyman/Keyman/Keyman/%osx_code%/%original_file_name%
+    translation: /ios/keyman/Keyman/Keyman/%osx_code%/%original_file_name%
+
+
+
 
   # crowdin parameters descriptions:
 
@@ -39,7 +77,7 @@ files:
   # Source files filter
   # e.g. "/resources/en/*.json"
   #
- 
+
   #
   # Where translations will be placed
   # e.g. "/resources/%two_letters_code%/%original_file_name%"
