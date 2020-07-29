@@ -57,8 +57,8 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   
   override public func viewDidLoad() {
     super.viewDidLoad()
-    
-    title = "Installed Languages"
+
+    title = NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: "")
     selectedSection = NSNotFound
     packageDownloadStartedObserver = NotificationCenter.default.addObserver(
       forName: Notifications.packageDownloadStarted,
@@ -119,13 +119,13 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     
     // We do have updates - prepare the UI!
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-      toolbar.displayButton("Update available", with: self, callback: #selector(self.updateClicked))
+      toolbar.displayButton(NSLocalizedString("notification-update-available", bundle: engineBundle, comment: ""), with: self, callback: #selector(self.updateClicked))
     }
   }
   
   @objc func updateClicked(_ sender: Any) {
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
-      toolbar.displayStatus("Updating\u{2026}", withIndicator: true)
+      toolbar.displayStatus(NSLocalizedString("notification-update-processing", bundle: engineBundle, comment: ""), withIndicator: true)
     }
     
     // Do the actual updates!
@@ -209,7 +209,11 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       cell.selectedBackgroundView = selectionColor
       cell.accessoryType = .disclosureIndicator
     }
-    cell.detailTextLabel?.text = keyboards.count < 2 ? (keyboards.first?.name ?? "") : "\(keyboards.count) installed"
+
+    let formatString = NSLocalizedString("settings-keyboards-installed-count", bundle: engineBundle, comment: "")
+    cell.detailTextLabel?.text = keyboards.count < 2 ?
+      (keyboards.first?.name ?? "") :
+      String.localizedStringWithFormat(formatString, keyboards.count)
     return cell
   }
   

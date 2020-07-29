@@ -38,10 +38,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     // Ensure the web view fills its available space.
     wkWebView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
-    let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
+    let cancelBtn = UIBarButtonItem(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""), style: .plain,
                                     target: self,
                                     action: #selector(cancelBtnHandler))
-    let installBtn = UIBarButtonItem(title: "Install", style: .plain,
+    let installBtn = UIBarButtonItem(title: NSLocalizedString("command-install", bundle: engineBundle, comment: ""), style: .plain,
                                      target: self,
                                      action: #selector(installBtnHandler))
 

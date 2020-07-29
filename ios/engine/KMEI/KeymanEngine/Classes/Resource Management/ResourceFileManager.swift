@@ -222,9 +222,9 @@ public class ResourceFileManager {
           }
         }
 
-        let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.", completionHandler: {
-            successHandler?(package)
-          })
+        let alert = self.buildSimpleAlert(title: NSLocalizedString("success-title", bundle: engineBundle, comment: ""),
+                                          message: NSLocalizedString("success-install", bundle: engineBundle, comment: ""),
+                                          completionHandler: { successHandler?(package) })
         rootVC.present(alert, animated: true, completion: nil)
       }
     })
