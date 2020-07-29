@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Tangentbord</item>
+    </plurals>
+    <string name="title_add_keyboard">Lägg till nytt tangentbord</string>
+    <string name="title_languages_settings">Installerade språk</string>
+    <string name="title_language_settings" comment="Language Settings">%1$s Inställningar</string>
+    <!-- Button labels -->
+    <string name="label_add">Lägg till</string>
+    <string name="label_cancel">Avbryt</string>
+    <string name="label_close" comment="Close a dialog">Stäng</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Stäng Keyman</string>
+    <string name="label_download">Hämta</string>
+    <string name="label_install">Installera</string>
+    <string name="label_later" comment="Do an action at a later time">Senare</string>
+    <string name="label_ok">Ok</string>
+    <string name="label_update">Uppdatera</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Kan inte ansluta till Keyman-servern!</string>
+    <string name="confirm_delete_keyboard">Vill du ta bort det här tangentbordet?</string>
+    <string name="confirm_download_keyboard">Vill du ladda ner den senaste versionen av detta tangentbord?</string>
+    <string name="confirm_update">Vill du uppdatera tangentbord och ordböcker nu?</string>
+    <string name="custom_keyboard">Anpassat tangentbord</string>
+    <string name="font_failed_to_download">Varning: Teckensnitt kunde inte hämtas</string>
+    <string name="keyboard_failed_to_download">Fel: Tangentbord kunde inte hämta</string>
+    <string name="keyboard_updates_channel">Uppdateringar av resurs</string>
+    <string name="keyboard_updates_available">Uppdateringar av resurs tillgängliga</string>
+    <string name="update_available">%1$s (Uppdatering tillgänglig)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Uppdateringar tillgängliga för tangentbord %1$s: %2$s </string>
+    <string name="dictionary_update_message">Uppdateringar tillgängliga för ordbok %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Tangentbord version</string>
+    <string name="help_link">Hjälp länk</string>
+    <string name="uninstall_keyboard">Avinstallera tangentbordet</string>
+    <string name="keyboard_picker_new_keyboard_prefix">ny</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Skanna koden för att ladda detta\ntangentbord på en annan enhet</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Vill du ladda ner den senaste versionen av denna ordbok?</string>
+    <string name="catalog_unavailable">Resurskatalogen är inte tillgänglig</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Kataloguppdatering startad i bakgrunden</string>
+    <string name="catalog_download_is_running_in_background">      Katalogen laddas fortfarande ner; försök igen om ett ögonblick!</string>
+    <string name="progress_message_catalog_download_is_running">Katalogen laddas fortfarande ner!</string>
+    <string name="keyboard_download_start_in_background">Nedladdning av tangentbord startat i bakgrunden</string>
+    <string name="keyboard_download_is_running_in_background">Det valda tangentbordet laddas redan ner; försök igen om ett ögonblick!</string>
+    <string name="keyboard_download_finished">Tangentbords nedladdning är klar!</string>
+    <string name="dictionary_download_start_in_background">Nedladdning av ordbok startad i bakgrunden</string>
+    <string name="dictionary_download_is_running_in_background">Den valda ordboken laddas redan ner; försök igen om en stund!</string>
+    <string name="dictionary_download_finished">Nedladdning av ordbok är klar.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Det gick inte att komma åt servern!</string>
+    <string name="update_check_current">"Alla resurser är uppdaterade!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Ordbok version</string>
+    <string name="uninstall_model">Avinstallera ordbok</string>
+    <string name="confirm_delete_model">Vill du ta bort denna ordbok?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Aktivera korrigeringar</string>
+    <string name="enable_predictions">Aktivera förutsägelser</string>
+    <string name="model">Ordbok</string>
+    <string name="model_info_header" comment="Dictionary name">Ordbok: %1$s</string>
+    <string name="model_picker_header">%1$s ordböcker</string>
+    <string name="manage_dictionary">Hantera ordlista</string>
+    <string name="model_install_toast">Ordbok installerad</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d tangentbord)</item>
+        <item quantity="other">(%1$d tangentbord)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Radera</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Tryck här för att ändra tangentbordet</string>
+</resources>
