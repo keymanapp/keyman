@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Title for lists-->
+    <plurals name="title_keyboards">
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Tastiere</item>
+    </plurals>
+    <string name="title_add_keyboard">Aggiungi nuova tastiera</string>
+    <string name="title_languages_settings">Lingue installate</string>
+    <string name="title_language_settings" comment="Language Settings">Impostazioni di %1$s</string>
+    <!-- Button labels -->
+    <string name="label_add">Aggiungi</string>
+    <string name="label_cancel">annulla</string>
+    <string name="label_close" comment="Close a dialog">Chiudi</string>
+    <string name="label_close_keyman" comment="Close the Keyman application">Chiudi Keyman</string>
+    <string name="label_download">Scaricare</string>
+    <string name="label_install">Installazione</string>
+    <string name="label_later" comment="Do an action at a later time">Più tardi</string>
+    <string name="label_ok">ok</string>
+    <string name="label_update">Aggiornamento</string>
+    <!-- Keyboard Updates -->
+    <string name="cannot_connect">Impossibile connettersi al server Keyman!</string>
+    <string name="confirm_delete_keyboard">Vuoi eliminare questa tastiera?</string>
+    <string name="confirm_download_keyboard">Vuoi scaricare l\'ultima versione di questa tastiera?</string>
+    <string name="confirm_update">Vuoi aggiornare le tastiere e i dizionari ora?</string>
+    <string name="custom_keyboard">Tastiera personalizzata</string>
+    <string name="font_failed_to_download">Attenzione: Impossibile scaricare il font</string>
+    <string name="keyboard_failed_to_download">Errore: Impossibile scaricare la tastiera</string>
+    <string name="keyboard_updates_channel">Aggiornamenti Risorsa</string>
+    <string name="keyboard_updates_available">Aggiornamenti Risorse Disponibili</string>
+    <string name="update_available">%1$s (Aggiornamento disponibile)</string>
+    <string name="keyboard_update_message" comment="language name: keyboard name">      Aggiornamenti disponibili per la tastiera %1$s: %2$s </string>
+    <string name="dictionary_update_message">Aggiornamenti disponibili per il dizionario %1$s: %2$s </string>
+    <!-- Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version">Versione tastiera</string>
+    <string name="help_link">Link della guida</string>
+    <string name="uninstall_keyboard">Disinstalla tastiera</string>
+    <string name="keyboard_picker_new_keyboard_prefix">Novità</string>
+    <string name="keyboard_qr_code" comment="QR Code description">      Scansiona questo codice per caricare questa tastiera\nsu un altro dispositivo</string>
+    <!-- Model Updates -->
+    <string name="confirm_download_model">Vuoi scaricare l\'ultima versione di questo dizionario?</string>
+    <string name="catalog_unavailable">Il catalogo di risorse non è disponibile</string>
+    <!-- Background download messages-->
+    <string name="catalog_download_start_in_background">Aggiornamento del catalogo iniziato in background</string>
+    <string name="catalog_download_is_running_in_background">      Il catalogo è ancora in download; si prega di riprovare tra un momento!</string>
+    <string name="progress_message_catalog_download_is_running">Il catalogo sta ancora scaricando!</string>
+    <string name="keyboard_download_start_in_background">Download della tastiera avviato in background</string>
+    <string name="keyboard_download_is_running_in_background">La tastiera selezionata è già in download; riprova tra un attimo!</string>
+    <string name="keyboard_download_finished">Il download della tastiera è terminato!</string>
+    <string name="dictionary_download_start_in_background">Download del dizionario avviato in background</string>
+    <string name="dictionary_download_is_running_in_background">Il dizionario selezionato è già in download; riprova tra un attimo!</string>
+    <string name="dictionary_download_finished">Download dizionario completato.</string>
+    <!-- General Updates -->
+    <string name="update_check_unavailable">Impossibile accedere al server!</string>
+    <string name="update_check_current">"Tutte le risorse sono aggiornate!"</string>
+    <!-- Model Info -->
+    <string name="model_version">Versione del dizionario</string>
+    <string name="uninstall_model">Disinstalla il dizionario</string>
+    <string name="confirm_delete_model">Vuoi eliminare questo dizionario?</string>
+    <!-- Language Settings menu strings -->
+    <string name="enable_corrections">Abilita correzioni</string>
+    <string name="enable_predictions">Abilita previsioni</string>
+    <string name="model">Dizionario</string>
+    <string name="model_info_header" comment="Dictionary name">Dizionario: %1$s</string>
+    <string name="model_picker_header">%1$s dizionari</string>
+    <string name="manage_dictionary">Gestisci dizionario</string>
+    <string name="model_install_toast">Dizionario installato</string>
+    <plurals name="keyboard_count">
+        <item quantity="one">( Tastiera%1$d)</item>
+        <item quantity="other">(%1$d tastiere)</item>
+    </plurals>
+    <!-- Content descriptions -->
+    <!-- Popup menu labels -->
+    <string name="label_delete">Cancellare</string>
+    <!-- Shared preferences name -->
+    <!-- Other strings -->
+    <string name="help_bubble_text">Tocca qui per cambiare tastiera</string>
+</resources>
