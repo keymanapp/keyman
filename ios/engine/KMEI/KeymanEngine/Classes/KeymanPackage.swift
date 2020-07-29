@@ -22,7 +22,7 @@ public enum KMPError : String, Error {
   case resourceNotInPackage = "kmp-error-missing-resource"
 
   var localizedDescription: String {
-    return String.init(NSLocalizedString(self.rawValue, comment: ""))
+    return engineBundle.localizedString(forKey: self.rawValue, value: nil, table: nil)
   }
 }
 

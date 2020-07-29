@@ -36,6 +36,11 @@ public enum VibrationSupport {
 // Strings
 private let keyboardChangeHelpText = "Tap here to change keyboard"
 
+/**
+ * Obtains the bundle for KeymanEngine.framework.
+ */
+internal let engineBundle: Bundle = Bundle(for: Manager.self)
+
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?

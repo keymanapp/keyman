@@ -152,7 +152,7 @@
 		CE4459F523FBBB8F003151FD /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1687ACCC1FD8DE5300926D69 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE4459F623FBBB8F003151FD /* Zip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; };
 		CE4459F723FBBB8F003151FD /* Zip.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 165C8B8B1FD8220600D4A78D /* Zip.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CE46D65D247B93C9005FD506 /* ResourceInfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE754A0123D151B90030CB79 /* ResourceInfoView.xib */; };
+		CE46D65D247B93C9005FD506 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
 		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
@@ -187,6 +187,7 @@
 		CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */; };
 		CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* FileManagementTests.swift */; };
 		CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */; };
+		CE96E42B24D1229A005B8E5A /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */; };
 		CE973D812484A56500F66045 /* PackageJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE973D802484A56500F66045 /* PackageJSON.swift */; };
 		CE973D832484A5DC00F66045 /* PackageJSON.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE973D822484A5DB00F66045 /* PackageJSON.bundle */; };
 		CE973D852484A71700F66045 /* KMPJSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE973D842484A71700F66045 /* KMPJSONTests.swift */; };
@@ -487,6 +488,7 @@
 		CE8B0BBE248764ED0045EB2E /* KMPResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPResource.swift; sourceTree = "<group>"; };
 		CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "13.0 Cloud to Package Migration.bundle"; sourceTree = "<group>"; };
 		CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionTests.swift; sourceTree = "<group>"; };
+		CE96E42C24D1229A005B8E5A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CE973D802484A56500F66045 /* PackageJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageJSON.swift; sourceTree = "<group>"; };
 		CE973D822484A5DB00F66045 /* PackageJSON.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PackageJSON.bundle; sourceTree = "<group>"; };
 		CE973D842484A71700F66045 /* KMPJSONTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPJSONTests.swift; sourceTree = "<group>"; };
@@ -832,6 +834,7 @@
 			isa = PBXGroup;
 			children = (
 				CEA1486F2407808F00C6ECD2 /* Localizable.strings */,
+				CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */,
 				CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */,
 				C06D372D1F81F4E100F61AE0 /* KeymanEngine.h */,
 				C06D372E1F81F4E100F61AE0 /* Info.plist */,
@@ -1303,7 +1306,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE46D65D247B93C9005FD506 /* ResourceInfoView.xib in Resources */,
+				CE46D65D247B93C9005FD506 /* (null) in Resources */,
 				9AD4F53F22A8A286007992D3 /* LanguageSettingsViewController.xib in Resources */,
 				CE37C38B23FCC9EE007031C6 /* Keyboards.bundle in Resources */,
 				CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */,
@@ -1331,6 +1334,7 @@
 				CEA14870240780E100C6ECD2 /* ResourceInfoView.xib in Resources */,
 				9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */,
 				CE7A26D123CEE5790005955C /* Keyboard Colors.xcassets in Resources */,
+				CE96E42B24D1229A005B8E5A /* Localizable.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1646,6 +1650,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE96E42C24D1229A005B8E5A /* en */,
+			);
+			name = Localizable.stringsdict;
+			sourceTree = "<group>";
+		};
 		CEA1486F2407808F00C6ECD2 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
