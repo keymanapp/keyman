@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE Locale SYSTEM "localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale>
   
 <!--
@@ -19,7 +21,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <!-- Product Name -->
 
-<String Group="Product" Type="PlainText" Id="S_ShortProductName" Version="7.0.230.0" Description="Company, product and version name">&Name_CNV;</String>
+<String Group="Product" Type="PlainText" Id="S_ShortProductName" Version="7.0.230.0" Description="Company, product and version name">&Name;</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- General Strings                   -->
@@ -293,7 +295,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Title" Version="7.0.230.0" Description="Update dialog title, where &Name; = product name">[!!Ŭƥđăţĕď !!]&Name;[!! Ċơmƥơƞȅƞŧś Ãváīŀâɓļĕ!!]</String>
 
-<String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionAvailable" Version="7.0.230.0" Description="Update dialog - updates available text">[!!Ůƥđäţęş ƒōŕ !!]&Name_CN;[!! àŕė ŋơŵ ävàıłàƄľē!!]</String>
+<String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionAvailable" Version="7.0.230.0" Description="Update dialog - updates available text">[!!Ůƥđäţęş ƒōŕ !!]&Name;[!! àŕė ŋơŵ ävàıłàƄľē!!]</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionPrompt" Version="7.1.255.0" Description="Update dialog - prompt to select updates">[!!Ƥłęāşȅ šĕĺěčţ ŧħę űƥđáŧěš ȳőŭ ŵīŝħ ŧō ĭńšťąľŀ:!!]</String>
   
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_InstallQuery" Version="7.0.230.0" Description="Update dialog - install query">[!!Đō ȳőů ŵãŉŧ ťŏ ďơŵńĺơăď ăńď ĭŋśţȁŀļ ťħīš ƿăŧċħ ƞōŵ?!!]</String>
@@ -324,9 +326,8 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <Dialog Id="Splash" Width="630" Height="450"/>
 
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Title" Version="7.0.230.0" Description="Splash dialog title, with company, product and version name">&Name_CNV;</String>
+<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Title" Version="7.0.230.0" Description="Splash dialog title, with company, product and version name">&Name;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version">&Version;</String>
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">[!!Ŝŧăŕŧ Ƙęƴmâņ!!]</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">[!!Ĕxīţ!!]</String>
@@ -466,7 +467,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <!-- General -->
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKApplicationTitle" Version="7.0.230.0" Description="Company and product name used for the title of message boxes and message dialogs">&Name_CN;</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKApplicationTitle" Version="7.0.230.0" Description="Company and product name used for the title of message boxes and message dialogs">&Name;</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKSplashVersion" Version="7.0.230.0" Parameters="%0:s = Version number string" Description="Version number">[!!Vĕŕŝĩŏņ %0:s!!]</String>
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonHelp" Version="7.0.230.0" Description="Help button in message boxes">[!!Ĥėļƥ!!]</String>

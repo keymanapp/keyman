@@ -16,7 +16,6 @@ type
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
   public
     const S_KMShell = 'kmshell.exe';
-    const S_Xml_LocaleDef = 'xml\localedef.dtd';
     const S_TSysInfoExe = 'tsysinfo.exe';
     const S_KeymanExe = 'keyman.exe';
     const S_CfgIcon = 'cfgicon.ico';

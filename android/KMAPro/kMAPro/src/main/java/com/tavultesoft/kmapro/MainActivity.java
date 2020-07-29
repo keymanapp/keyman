@@ -32,6 +32,7 @@ import com.tavultesoft.kmea.data.LexicalModel;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.util.DownloadIntentService;
 import com.tavultesoft.kmea.util.KMLog;
+import com.tavultesoft.kmea.util.KMPLink;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -361,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           break;
         case "keyman" :
           // Only accept download links from Keyman browser activities
-          if (FileUtils.isKeymanLink(data.toString()) && caller != null &&
+          if (KMPLink.isKeymanDownloadLink(data.toString()) && caller != null &&
             (caller.equalsIgnoreCase("com.tavultesoft.kmea.KMPBrowserActivity") ||
              caller.equalsIgnoreCase("com.tavultesoft.kmapro.WebBrowserActivity"))) {
 
@@ -605,59 +606,59 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       return;
     }
     try {
+      // Initial try with Keyman 13.0 download link
       String url = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url == null) {
         url = data.toString();
       }
       if (url != null) {
-        String filename = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_Filename);
+        // Create filename by extracting packageID from query or urlNoQuery
+        String filename = data.getQueryParameter("id");
         if (filename == null) {
-          FileUtils.getFilename(url);
+          String urlNoQuery = data.getPath();
+          filename = FileUtils.getFilename(urlNoQuery);
+        }
+        if (!filename.endsWith(FileUtils.KEYMANPACKAGE)) {
+          filename += FileUtils.KEYMANPACKAGE;
         }
 
-        // Parse data for the BCP 47 language ID
+        // Parse query for the BCP 47 language ID
         String languageID = data.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
         // TODO: Using "tag" for now, but production will be KMKeyboardDownloaderActivity.KMKey_BCP47
         if (languageID == null) {
           languageID = data.getQueryParameter("tag");
         }
 
-        // Keyboard download endpoint:
-        // download.php?id=<keyboard_id>&platform=[&mode=<bundle|standalone>][&cid=xxxx]
         url = url.toLowerCase();
+        try {
+          // Download the KMP to app cache
+          Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
+          downloadIntent.putExtra("url", url);
+          downloadIntent.putExtra("filename", filename);
+          downloadIntent.putExtra("language", languageID);
+          downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
+          downloadIntent.putExtra("receiver", resultReceiver);
 
-        // Only handle ad-hoc kmp packages or from keyman.com
-        if (FileUtils.hasKeymanPackageExtension(url) || scheme.equals("keyman")) {
-          try {
-            // Download the KMP to app cache
-            Intent downloadIntent = new Intent(MainActivity.this, DownloadIntentService.class);
-            downloadIntent.putExtra("url", url);
-            downloadIntent.putExtra("filename", filename);
-            downloadIntent.putExtra("language", languageID);
-            downloadIntent.putExtra("destination", MainActivity.this.getCacheDir().toString());
-            downloadIntent.putExtra("receiver", resultReceiver);
+          progressDialog = new ProgressDialog(MainActivity.this);
+          String ellipsisStr = "\u2026";
+          progressDialog.setMessage(String.format("%s\n%s%s",
+            getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
+          progressDialog.setCancelable(false);
+          progressDialog.show();
 
-            progressDialog = new ProgressDialog(MainActivity.this);
-            String ellipsisStr = "\u2026";
-            progressDialog.setMessage(String.format("%s\n%s%s",
-              getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-
-            startService(downloadIntent);
-          } catch (Exception e) {
-            KMLog.LogException(TAG, "", e);
-            if (progressDialog != null && progressDialog.isShowing()) {
-              progressDialog.dismiss();
-            }
-            progressDialog = null;
-            return;//break;
+          startService(downloadIntent);
+        } catch (Exception e) {
+          KMLog.LogException(TAG, "", e);
+          if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
           }
-        } else {
-          String message = "Download failed. Not a .kmp keyboard package.";
-          Toast.makeText(getApplicationContext(), message,
-            Toast.LENGTH_SHORT).show();
+          progressDialog = null;
+          return;//break;
         }
+      } else {
+        String message = "Download failed. Not a .kmp keyboard package.";
+        Toast.makeText(getApplicationContext(), message,
+          Toast.LENGTH_SHORT).show();
       }
     } catch (UnsupportedOperationException e) {
       String message = "Download failed. Invalid URL.";

@@ -44,14 +44,16 @@ public class KMKeyboardDownloaderActivity extends AppCompatActivity {
   private static final String TAG = "KMKbdDownloaderActivity"; // TAG needs to be less than 28 chars
 
   // Keyman public keys
-  public static final String KMKey_URL = "url";
+  public static final String KMKey_BCP47 = "bcp47";
+  public static final String KMKey_Filename = "filename";
   public static final String KMKey_Keyboard = "keyboard";
   public static final String KMKey_LanguageKeyboards = "keyboards";
-  public static final String KMKey_BCP47 = "bcp47";
-  public static final String KMKey_Options = "options";
   public static final String KMKey_Language = "language";
   public static final String KMKey_Languages = "languages";
-  public static final String KMKey_Filename = "filename";
+  public static final String KMKey_Options = "options";
+  public static final String KMKey_Platform = "platform";
+  public static final String KMKey_Tier = "tier";
+  public static final String KMKey_URL = "url";
 
   // Keyman internal keys
   public static final String KMKey_KeyboardBaseURI = "keyboardBaseUri";

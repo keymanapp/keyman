@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Locale SYSTEM "..\..\xml\localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale Version="9.0.525.0" OnlineProductID="1">
   <String Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard">Ekran Klavyesi Kapat</String>
   <String Type="PlainText" Id="S_Menu_Exit">&amp;Çıkış</String>
@@ -253,7 +255,7 @@
   <String Type="PlainText" Id="S_ProxyConfiguration_Server">Sunucu:</String>
   <String Type="PlainText" Id="S_ProxyConfiguration_Title">Proxy Sunucu Yapılandırması</String>
   <String Type="PlainText" Id="S_ProxyConfiguration_Username">Kullanıcı adı:</String>
-  <String Type="PlainText" Id="S_ShortProductName">&Name_CNV;</String>
+  <String Type="PlainText" Id="S_ShortProductName">&Name;</String>
   
   
   
@@ -273,7 +275,7 @@
   <String Type="PlainText" Id="S_Splash_ShowAtStartup">Bu ekranı başlangıçta göster</String>
   
   <String Type="PlainText" Id="S_Splash_Start">Keyman Başlat</String>
-  <String Type="" Id="S_Splash_Title">&Name_CNV;</String>
+  <String Type="" Id="S_Splash_Title">&Name;</String>
   
   <String Type="PlainText" Id="S_Splash_Version">&amp;Sürüm;</String>
   <String Type="PlainText" Id="S_Support">Destek</String>
@@ -301,7 +303,7 @@
   <String Type="PlainText" Id="S_Update_DownloadFrom">Yeni sürümü şu adresten indirebilirsiniz:</String>
   <String Type="PlainText" Id="S_Update_DownloadQuery">Şimdi web sitesini ziyaret etmek istiyor musunuz?</String>
   <String Type="PlainText" Id="S_Update_InstallQuery">Bu düzeltme ekini şimdi indirip yüklemek istiyor musunuz?</String>
-  <String Type="PlainText" Id="S_Update_NewVersionAvailable">&Name_CN; güncelleştirmeleri şimdi mevcut</String>
+  <String Type="PlainText" Id="S_Update_NewVersionAvailable">&Name; güncelleştirmeleri şimdi mevcut</String>
   <String Type="PlainText" Id="S_Update_NewVersionPrompt">Lütfen yüklemek istediğiniz güncellemeleri seçin:</String>
   <String Type="PlainText" Id="S_Update_OldVersionHead">Eski Versiyon</String>
   <String Type="PlainText" Id="S_Update_SizeHead">Boyut</String>

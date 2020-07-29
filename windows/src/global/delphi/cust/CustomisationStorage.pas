@@ -33,7 +33,6 @@ type
 
   TCustFileType =
     (ftOther,
-    ftMessages,         // Messages for display within Keyman Configuration
     ftKeymanMenu,       // data file describing menu entries and actions for the Keyman menu
     ftTrayIcon,         // Icon to go in task tray
     ftAppIcon,          // Main program icon
@@ -41,7 +40,7 @@ type
 
 const
   CustFileTypeName: array[TCustFileType] of string =
-    ('Other', 'Messages', 'Keyman Menu', 'Keyman Tray Icon', 'Application Icon', 'Configuration Icon');
+    ('Other', 'Keyman Menu', 'Keyman Tray Icon', 'Application Icon', 'Configuration Icon');
 
 type
   TCustFile = class
@@ -101,7 +100,6 @@ begin
   nm := LowerCase(ExtractFileName(ffilename));
   if nm = StockFileName_TrayIcon then Result := ftTrayIcon
   else if nm = StockFileName_Menu then Result := ftKeymanMenu
-//  else if nm = StockFileName_Messages then Result := ftMessages
   else if nm = StockFileName_AppIcon then Result := ftAppIcon
   else if nm = StockFileName_ConfigIcon then Result := ftCfgIcon
   else Result := ftOther;
