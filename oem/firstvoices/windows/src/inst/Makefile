@@ -27,7 +27,6 @@ prereq:
 
     cd $(FVROOT)\src\inst
     $(MKVER_U) download.in download.mak
-    $(MKVER_U) ..\localedef.dtd.in ..\xml\localedef.dtd
 
     #
     # Build FirstVoices keyboards fv_all.kmp

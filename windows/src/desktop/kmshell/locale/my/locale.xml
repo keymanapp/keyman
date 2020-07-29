@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Locale SYSTEM "../../xml/localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale Version="9.0.465.0" OnlineProductID="1">
   <String Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard">Screenပေါ်သုံးကီးဘုတ်ကို ပိတ်</String>
   <String Type="PlainText" Id="S_Menu_Exit">E&amp;xit</String>
@@ -250,7 +252,7 @@
   <String Type="PlainText" Id="S_ProxyConfiguration_Server">Server:</String>
   <String Type="PlainText" Id="S_ProxyConfiguration_Title">Proxy Server Configuration</String>
   <String Type="PlainText" Id="S_ProxyConfiguration_Username">Username:</String>
-  <String Type="PlainText" Id="S_ShortProductName">&Name_CNV;</String>
+  <String Type="PlainText" Id="S_ShortProductName">&Name;</String>
   
   
   
@@ -270,9 +272,8 @@
   <String Type="PlainText" Id="S_Splash_ShowAtStartup">စစခြင်းမှာ ဒီScreenကိုပြပါ</String>
   
   <String Type="PlainText" Id="S_Splash_Start">Start Keyman</String>
-  <String Type="" Id="S_Splash_Title">&Name_CNV;</String>
+  <String Type="" Id="S_Splash_Title">&Name;</String>
   
-  <String Type="PlainText" Id="S_Splash_Version">&Version;</String>
   <String Type="PlainText" Id="S_Support">အကူအညီ</String>
   <String Type="PlainText" Id="S_Support_AccessChar">S</String>
   
@@ -298,7 +299,7 @@
   <String Type="PlainText" Id="S_Update_DownloadFrom">ဗားရှင်းအသစ်ကိုဒေါင်းလုဒ်ဆွဲနိုင်ပါသည် ..မှ..</String>
   <String Type="PlainText" Id="S_Update_DownloadQuery">ဝက်ဘ်ဆိုဒ်ကို ဃခုသွားရောက်လည်ပတ်ချင်ပါသလား</String>
   <String Type="PlainText" Id="S_Update_InstallQuery">ဒီpatch  ကို ယခု ဒေါင်းလုဒ်ဆွဲပြီး တပ်ဆင်ချင်ပါသလား</String>
-  <String Type="PlainText" Id="S_Update_NewVersionAvailable">&Name_CN;အတွက် မွမ်းမံမှုများကို ရရှိနိုင်ပါပြီ</String>
+  <String Type="PlainText" Id="S_Update_NewVersionAvailable">&Name;အတွက် မွမ်းမံမှုများကို ရရှိနိုင်ပါပြီ</String>
   <String Type="PlainText" Id="S_Update_NewVersionPrompt">သင်တပ်ဆင်ချင်တဲ့မွမ်းမံမှုများကို ရွေးချယ်ပါ</String>
   <String Type="PlainText" Id="S_Update_OldVersionHead">ဗားရှင်းအဟောင်း</String>
   <String Type="PlainText" Id="S_Update_SizeHead">အရွယ်</String>
@@ -332,7 +333,7 @@
   
   <String Type="" Id="SKAllLanguageSettingsTestedOK">မိုက်ခရိုဆော့ဖ် ဝင်းဒိုးက သင့်ဘာသာစကားအတွက် မှန်ကန်စွာအစီအစဉ်ချထားပုံရသည်။</String>
   <String Type="FormatString" Id="SKANSIEncoding">ကုဒ်စာမျက်နှာ</String>
-  <String Type="FormatString" Id="SKApplicationTitle">&Name_CN;</String>
+  <String Type="FormatString" Id="SKApplicationTitle">&Name;</String>
   <String Type="FormatString" Id="SKBalloonClickToSelectKeyboard">ကီးဘုတ်ကိုရွေးရန်ဒီပုံကိုနှိပ်ပါ</String>
   <String Type="FormatString" Id="SKBalloonOSKClosed">&Name;က လည်ပတ်နေဆဲပါ။ ပုံကိုနှိပ်ပြီး သင့်ရဲ့ဘာသာစကားကီးဘုတ်ကို ဘယ်အချိန်ဖြစ်ဖြစ်ရွေးနိုင်ပါသည်။</String>
   <String Type="FormatString" Id="SKButtonCancel">ပယ်ဖျက်</String>

@@ -47,8 +47,6 @@ uses kpbase, keymanapi_TLB;
 
 type
   TKPInstallPackage = class(TKPBase)
-  private
-    procedure UpdateLocaleDoctype(const path: WideString);
   public
     procedure Execute(const FileName: string; Force, InstallDefaultLanguage: Boolean);
   end;
@@ -253,14 +251,6 @@ begin
         for i := 0 to inf.Files.Count - 1 do
         begin
           case inf.Files[i].FileType of
-            ftOther, ftXMLFile:
-              begin
-                if Copy(inf.Files[i].FileName, 1, 7) = 'locale-' then
-                begin
-                  // Update the locale file's
-                  UpdateLocaleDoctype(dest + inf.Files[i].FileName);
-                end;
-              end;
             ftKeymanFile:
               InstallKeyboard(dest + inf.Files[i].FileName);
 
@@ -348,47 +338,6 @@ begin
     end;
   finally
     KL.MethodExit(Self, 'Execute');
-  end;
-end;
-
-procedure TKPInstallPackage.UpdateLocaleDoctype(const path: WideString);
-var
-  I: Integer;
-  localedefpath: WideString;
-  ss: Widestring;
-  n1: Integer;
-  n2: Integer;
-  l: Integer;
-begin
-  localedefpath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_Xml_LocaleDef);
-
-  with TStringList.Create do
-  try
-    LoadFromFile(path);  // Rely on preamble for encoding
-    ss := Text;   // I1320 - fix locale.xml doctype parsing and replacement
-
-    n1 := Pos('<!DOCTYPE', string(ss));
-    if n1 > 0 then
-    begin
-      i := 1; n2 := n1 + 8; l := Length(ss);
-      while (i > 0) and (n2 <= l) do
-      begin
-        case ss[n2] of
-          '<': Inc(i);
-          '>': Dec(i);
-        end;
-        Inc(n2);
-      end;
-
-      if n2 <= l then
-      begin
-        Text := Copy(ss, 1, n1-1) + '<!DOCTYPE Locale SYSTEM '''+localedefpath+'''>' + Copy(ss, n2+1, l);
-
-        SaveToFile(path);  // Stay with previous encoding
-      end;
-    end;
-  finally
-    Free;
   end;
 end;
 

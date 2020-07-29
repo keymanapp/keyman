@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE Locale SYSTEM 'localedef.dtd'>
+<!DOCTYPE Locale [
+
+<!ENTITY ProductName "FirstVoices Keyboards">
+<!ENTITY Name "&ProductName;">
+<!ENTITY Name_CNV "&ProductName;">
+<!ENTITY Name_CN "&ProductName;">
+
+]>
 
 <Locale>
   
@@ -327,7 +334,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Title" Version="7.0.230.0" Description="Splash dialog title, with company, product and version name">&Name_CNV;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version">&Version;</String>
+<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version"></String>
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">Start Keyman</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">Exit</String>
