@@ -12,10 +12,10 @@
     <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
     <script src="/app/sentry.bundle.min.js"></script>
     <script src="/app/sentry.init.js"></script>
-    <title><xsl:value-of select="$locale/String[@Id='S_BaseKeyboard_Title']"/></title>
+    <title><xsl:value-of select="$locale/string[@name='S_BaseKeyboard_Title']"/></title>
     <link rel="stylesheet" type="text/css" href="/app/config.css" />
 <style type="text/css">
-  * { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}
+  * { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";}
 
 html {
  font-size:		 11px;
@@ -108,7 +108,7 @@ div {
 <div id="border">
   <div id='content'>
 
-    <p><xsl:value-of select="$locale/String[@Id='S_BaseKeyboard_Text']"/></p>
+    <p><xsl:value-of select="$locale/string[@name='S_BaseKeyboard_Text']"/></p>
 
     <div id="options_base_keyboard">
       <select id='options_base_keyboard_select'>
@@ -125,13 +125,13 @@ div {
   <div id="footer">
     <xsl:call-template name="button">
       <xsl:with-param name="default">1</xsl:with-param>
-      <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_OK']"/></xsl:with-param>
+      <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_OK']"/></xsl:with-param>
       <xsl:with-param name="command">javascript:ok()</xsl:with-param>
       <xsl:with-param name="width">100px</xsl:with-param>
     </xsl:call-template>
 
     <xsl:call-template name="button">
-      <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_Cancel']"/></xsl:with-param>
+      <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Cancel']"/></xsl:with-param>
       <xsl:with-param name="command">keyman:footer_cancel</xsl:with-param>
       <xsl:with-param name="width">100px</xsl:with-param>
     </xsl:call-template>

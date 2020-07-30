@@ -5,7 +5,9 @@
 	<xsl:template match="String">
     <string>
       <xsl:attribute name="name"><xsl:value-of select="@Id" /></xsl:attribute>
-      <xsl:attribute name="comment"><xsl:value-of select="@Group" />/<xsl:value-of select="@Type" />: <xsl:value-of select="@Description" /></xsl:attribute>
+      <xsl:attribute name="comment"><xsl:value-of select="@Group" />/<xsl:value-of select="@Type" />: <xsl:value-of select="@Description" 
+        /><xsl:if test="@Parameters"> [<xsl:value-of select="@Parameters" />]</xsl:if
+        ><xsl:if test="@Version"> (introduced <xsl:value-of select="@Version" />)</xsl:if></xsl:attribute>
       <xsl:value-of select="." />
     </string>
   </xsl:template>

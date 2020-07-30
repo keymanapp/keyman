@@ -32,17 +32,17 @@
   <xsl:template name="content_hotkeys">
     <div class="header">
   		<xsl:call-template name="header_helplinks" />
-      <xsl:value-of select="$locale/String[@Id='S_Hotkeys']"/>
+      <xsl:value-of select="$locale/string[@name='S_Hotkeys']"/>
     </div>
     
     <div class="content" id="subcontent_hotkeys">
-        <div class="hotkey_title"><xsl:value-of select="$locale/String[@Id='S_Hotkey_Control_Title']"/></div>
+        <div class="hotkey_title"><xsl:value-of select="$locale/string[@name='S_Hotkey_Control_Title']"/></div>
         <xsl:for-each select="/Keyman/Hotkeys/Hotkey">
           <xsl:sort select="translate(Target,'012345678','013845672')"/><!--I2302-->
           <xsl:call-template name="hotkey_control" />
         </xsl:for-each>
         
-        <div class="hotkey_title"><xsl:value-of select="$locale/String[@Id='S_Hotkey_Keyboard_Title']"/></div>
+        <div class="hotkey_title"><xsl:value-of select="$locale/string[@name='S_Hotkey_Keyboard_Title']"/></div>
         <xsl:for-each select="//KeymanLanguage">
 					<xsl:call-template name="hotkey_language" />
 				</xsl:for-each>
@@ -81,8 +81,8 @@
         </img>
       </div>
       
-		  <xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Prefix']"/> <xsl:value-of select="localename"/> &#x2014; <xsl:value-of select="layoutname"/>
-      <xsl:value-of select="$locale/String[@Id='S_Hotkey_Language_Suffix']"/>
+		  <xsl:value-of select="$locale/string[@name='S_Hotkey_Language_Prefix']"/> <xsl:value-of select="localename"/> &#x2014; <xsl:value-of select="layoutname"/>
+      <xsl:value-of select="$locale/string[@name='S_Hotkey_Language_Suffix']"/>
       </div>
       <div style="float:right">
         <div style="float: left; padding: 1px 3px 1px 0px;">
@@ -91,7 +91,7 @@
             <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
             <xsl:choose>
               <xsl:when test="hotkey"><xsl:value-of select="hotkey"/></xsl:when>
-              <xsl:otherwise><xsl:value-of select="$locale/String[@Id='S_Hotkey_None']"/></xsl:otherwise>
+              <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
             </xsl:choose>
           </a> 
         </div>
@@ -108,15 +108,15 @@
 
       <div style="float:left; padding: 1px 0px 1px 3px;">
         <xsl:choose>
-          <xsl:when test="Target='0'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_TurnKeymanOff']"/></xsl:when>
-          <xsl:when test="Target='1'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_OpenKeyboardMenu']"/></xsl:when>
-          <xsl:when test="Target='2'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_ShowOnScreenKeyboard']"/></xsl:when>
-          <xsl:when test="Target='3'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_OpenConfiguration']"/></xsl:when>
-          <xsl:when test="Target='4'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_ShowKeyboardUsage']"/></xsl:when>
-          <xsl:when test="Target='5'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_ShowFontHelper']"/></xsl:when>
-          <xsl:when test="Target='6'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_ShowCharacterMap']"/></xsl:when>
-          <xsl:when test="Target='7'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_OpenTextEditor']"/></xsl:when>
-          <xsl:when test="Target='8'"><xsl:value-of select="$locale/String[@Id='S_Hotkey_SwitchLanguage']"/></xsl:when>
+          <xsl:when test="Target='0'"><xsl:value-of select="$locale/string[@name='S_Hotkey_TurnKeymanOff']"/></xsl:when>
+          <xsl:when test="Target='1'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenKeyboardMenu']"/></xsl:when>
+          <xsl:when test="Target='2'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowOnScreenKeyboard']"/></xsl:when>
+          <xsl:when test="Target='3'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenConfiguration']"/></xsl:when>
+          <xsl:when test="Target='4'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowKeyboardUsage']"/></xsl:when>
+          <xsl:when test="Target='5'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowFontHelper']"/></xsl:when>
+          <xsl:when test="Target='6'"><xsl:value-of select="$locale/string[@name='S_Hotkey_ShowCharacterMap']"/></xsl:when>
+          <xsl:when test="Target='7'"><xsl:value-of select="$locale/string[@name='S_Hotkey_OpenTextEditor']"/></xsl:when>
+          <xsl:when test="Target='8'"><xsl:value-of select="$locale/string[@name='S_Hotkey_SwitchLanguage']"/></xsl:when>
         </xsl:choose>
       </div>
       <div style="float:right">
@@ -126,7 +126,7 @@
             <xsl:attribute name="onmouseover">this.style.cursor='hand';</xsl:attribute>
             <xsl:choose>
               <xsl:when test="string-length(Value) > 0"><xsl:value-of select="Value"/></xsl:when>
-              <xsl:otherwise><xsl:value-of select="$locale/String[@Id='S_Hotkey_None']"/></xsl:otherwise>
+              <xsl:otherwise><xsl:value-of select="$locale/string[@name='S_Hotkey_None']"/></xsl:otherwise>
             </xsl:choose>
           </a> 
         </div>

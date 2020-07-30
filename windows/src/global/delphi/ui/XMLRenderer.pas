@@ -1,18 +1,18 @@
 (*
   Name:             XMLRenderer
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      6 Oct 2006
 
   Modified Date:    1 May 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     06 Oct 2006 - mcdurdin - Move TemplatePath into separate function
                     04 Dec 2006 - mcdurdin - Read xml from locale folder
@@ -199,9 +199,9 @@ begin
   try
     with (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages do
     begin
-      s := GetLocalePathForLocale(LanguageCode); // + '/locale.xml';
+      s := GetLocalePathForLocale(LanguageCode);
       if not FileExists(s) then
-        s := FTemplatePath + 'locale.xml';
+        s := FTemplatePath + 'strings.xml';
     end;
 
     FOutput.Add(
@@ -215,7 +215,6 @@ begin
         IfThen(CanElevate, '<canelevate />')+
         IfThen(Assigned(kmcom) and kmcom.SystemInfo.IsAdministrator, '<isadmin />')+   // I3612   // I3626
         '<uilanguages>'+GetUILanguages+'</uilanguages>'+
-        '<defaultlocalepath>'+XMLEncode(FTemplatePath)+'locale.xml</defaultlocalepath>'+
         '<localepath>'+XMLEncode(s)+'</localepath>');
 
     for i := 0 to Count - 1 do

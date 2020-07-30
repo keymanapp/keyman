@@ -15,13 +15,13 @@
 
 				<title>fonts</title>
 				<style type="text/css">
-					* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; font-size: 12px; }
+					* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />; font-size: 12px; }
 
 					body { padding: 0px 0px; margin: 0px; width: 100%; height: 100%; background: #A0C1DC; border: none;}
 					html { padding: 0px; margin: 0px; overflow: auto; }
 					table { margin: 12px 0; border-collapse: collapse; width: <xsl:value-of select="count(/Keyman/Chars/Ch) * 15 + 250" />px; }
-					table tr td.font { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; white-space: nowrap; font-size: 11px; font-weight: bold; margin: 0px; padding: 0px; border-left: none; border-right: none; }
-					table tr td.coverage { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />; white-space: nowrap; font-size: 11px; margin: 0px; padding-left: 6px; border-left: none; }
+					table tr td.font { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />; white-space: nowrap; font-size: 11px; font-weight: bold; margin: 0px; padding: 0px; border-left: none; border-right: none; }
+					table tr td.coverage { text-align: left; vertical-align: middle; font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />; white-space: nowrap; font-size: 11px; margin: 0px; padding-left: 6px; border-left: none; }
           
           td.char { text-align: center; vertical-align: middle; border: solid 1px #80A1BC; font-size: 13.3px; background: white; }
           td.excluded { background: #FFcfc0; }
@@ -73,11 +73,11 @@
 												<xsl:value-of select="/Keyman/templatepath"/>search.gif
 											</xsl:attribute>
 										</img>
-                    <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_PleaseWait1']"/>
+                    <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_PleaseWait1']"/>
                     <xsl:text xml:space="preserve"> </xsl:text>
 										<b><xsl:value-of select="/Keyman/Keyboard/@Name" /></b>
                     <xsl:text xml:space="preserve"> </xsl:text>
-                    <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_PleaseWait2']"/>
+                    <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_PleaseWait2']"/>
 									</div>
  								</div>
 							</div>
@@ -87,21 +87,21 @@
 							<xsl:choose>
 							  <xsl:when test="not(/Keyman/Fonts)">
 							    <div id="fonts">
-                  <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_NonUnicode1']"/>
+                  <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_NonUnicode1']"/>
                   <xsl:text xml:space="preserve"> </xsl:text>
 							    <b><xsl:value-of select="/Keyman/Keyboard/@Name" /></b> 
                   <xsl:text xml:space="preserve"> </xsl:text>
-                  <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_NonUnicode2']"/>
+                  <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_NonUnicode2']"/>
 							    </div>
 							  </xsl:when>
 								<xsl:when test="count(/Keyman/Fonts/Font[@Coverage &gt; 90]) > 0">
 									<div id="fonts">
 										<div>
-                      <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_MatchedFonts1']"/>
+                      <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_MatchedFonts1']"/>
                       <xsl:text xml:space="preserve"> </xsl:text>
 											<b><xsl:value-of select="/Keyman/Keyboard/@Name" /></b>
                       <xsl:text xml:space="preserve"> </xsl:text>
-                      <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_MatchedFonts2']"/>
+                      <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_MatchedFonts2']"/>
 										</div>
 										<div>
 											<table id="tableHighCover">
@@ -111,7 +111,7 @@
 										</div>
 										<xsl:if test="count(/Keyman/Fonts/Font[@Coverage &lt;= 90 and @Coverage &gt;= 50]) > 0">
 											<div>
-                        <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_PossibleFonts']"/>
+                        <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_PossibleFonts']"/>
 											</div>
 											<div>
 												<table id="tableLowCover">
@@ -126,11 +126,11 @@
 									<div id="fonts">
 										<div>
                       <!--<input type="button" onclick="keyman:openinbrowser" value="View this list in your browser" />-->
-                      <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_PossibleFontsOnly1']"/>
+                      <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_PossibleFontsOnly1']"/>
 											<xsl:text xml:space="preserve"> </xsl:text>
                       <b><xsl:value-of select="/Keyman/Keyboard/@Name" /></b>
                       <xsl:text xml:space="preserve"> </xsl:text>
-                      <xsl:value-of select="$locale/String[@Id='S_OSK_FontHelper_PossibleFontsOnly2']"/>
+                      <xsl:value-of select="$locale/string[@name='S_OSK_FontHelper_PossibleFontsOnly2']"/>
 										</div>
 										<div>
 											<table id="tableLowCover">
@@ -145,10 +145,10 @@
 										<div id="middle">
 											<div id="inner">
 												<div id="no">
-                          <xsl:copy-of select="$locale/String[@Id='S_OSK_FontHelper_NoFonts1a'][1]" />
+                          <xsl:copy-of select="$locale/string[@name='S_OSK_FontHelper_NoFonts1a'][1]" />
                           <xsl:text xml:space="preserve"> </xsl:text>
 													<b><xsl:value-of select="/Keyman/Keyboard/@Name" /></b>
-                          <xsl:copy-of select="$locale/String[@Id='S_OSK_FontHelper_NoFonts1b'][1]" />
+                          <xsl:copy-of select="$locale/string[@name='S_OSK_FontHelper_NoFonts1b'][1]" />
 												</div>
 											</div>
 										</div>
@@ -165,7 +165,7 @@
 											<xsl:value-of select="/Keyman/templatepath"/>info.png
 										</xsl:attribute>
 									</img>
-                  <xsl:copy-of select="$locale/String[@Id='S_OSK_FontHelper_NoKeyboards'][1]" />
+                  <xsl:copy-of select="$locale/string[@name='S_OSK_FontHelper_NoKeyboards'][1]" />
 									
 								</div>
 							</div>
@@ -175,7 +175,7 @@
 						<div id="outer">
 							<div id="middle">
 								<div id="inner">
-									<div id="no"><xsl:copy-of select="$locale/String[@Id='S_OSK_FontHelper_ChooseKeyboard'][1]" /></div>
+									<div id="no"><xsl:copy-of select="$locale/string[@name='S_OSK_FontHelper_ChooseKeyboard'][1]" /></div>
 								</div>
 							</div>
 						</div>

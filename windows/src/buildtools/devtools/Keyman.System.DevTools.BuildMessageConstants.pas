@@ -68,6 +68,7 @@ begin
   begin
     if node.NodeName = 'String' then
     begin
+      // Legacy locale.xml format (deprecated, will be removed later)
       if HasPreviousNode then
       begin
         stype := stype + ','#13#10;
@@ -76,6 +77,19 @@ begin
 
       stype := stype + '  '+node.Attributes['Id'];
       sconst := sconst + '  '''+node.Attributes['Id']+'''';
+      HasPreviousNode := True;
+    end
+    else if node.NodeName = 'string' then
+    begin
+      // Android strings.xml format
+      if HasPreviousNode then
+      begin
+        stype := stype + ','#13#10;
+        sconst := sconst + ','#13#10;
+      end;
+
+      stype := stype + '  '+node.Attributes['name'];
+      sconst := sconst + '  '''+node.Attributes['name']+'''';
       HasPreviousNode := True;
     end;
     node := node.NextSibling;

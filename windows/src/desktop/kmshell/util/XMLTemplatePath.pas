@@ -1,18 +1,18 @@
 (*
   Name:             XMLTemplatePath
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    27 Mar 2008
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - Initial version
 *)
 unit XMLTemplatePath;
@@ -31,14 +31,14 @@ begin
   Result := WideExtractFilePath(ParamStr(0));// + 'xml\';
   if WideDirectoryExists(Result + 'xml') then Result := Result + 'xml\';
 end;
-  
+
 function GetXMLTemplatePath(const FileName: WideString): WideString;
 begin
   with ((FActiveProduct as IKeymanCustomisation).CustMessages as IKeymanCustomisationMessages2) do
   begin
     Result := GetLocalePathForLocale(LanguageCode);
 
-    if (WideExtractFileName(Result) = 'locale.xml') and WideFileExists(WideExtractFilePath(Result) + '\'+FileName)
+    if (WideExtractFileName(Result) = 'strings.xml') and WideFileExists(WideExtractFilePath(Result) + '\'+FileName)
       then Result := WideExtractFilePath(Result) + '\'
       else Result := OldXMLTemplatePath;
   end;
