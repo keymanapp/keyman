@@ -79,12 +79,15 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     languageTable.dataSource = self
 
     let defaultRow = languages.firstIndex(where: { $0.id == package.installableResourceSets[0][0].languageID })!
-    languageTable.selectRow(at: IndexPath(row: defaultRow, section: 0), animated: false, scrollPosition: .top)
+    let defaultIndexPath = IndexPath(row: defaultRow, section: 0)
+    languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
+    languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
+    //
   }
 
   override public func viewWillAppear(_ animated: Bool) {
-    if let welcomeURL = package.welcomePageURL {
-      wkWebView?.loadFileURL(welcomeURL, allowingReadAccessTo: package.sourceFolder)
+    if let readmeURL = package.readmePageURL {
+      wkWebView?.loadFileURL(readmeURL, allowingReadAccessTo: package.sourceFolder)
     } else {
       wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
     }
@@ -126,6 +129,11 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
     if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
       cell = reusedCell
+
+      // The checkmark is not properly managed by default.
+      let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
+      // Note for later:  also ensure that it wasn't already installed.  (exception to rule above)
+      cell.accessoryType = shouldCheck ? .checkmark : .none
     } else {
       let selectionColor = UIView()
 
@@ -151,11 +159,13 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     navigationItem.rightBarButtonItem?.isEnabled = true
+    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
   }
 
   public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
     if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
       navigationItem.rightBarButtonItem?.isEnabled = false
     }
+    tableView.cellForRow(at: indexPath)?.accessoryType = .none
   }
 }

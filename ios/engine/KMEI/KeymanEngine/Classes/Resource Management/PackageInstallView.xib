@@ -41,8 +41,8 @@
                 <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="13C-Qj-3hM" userLabel="Tagging View">
                     <rect key="frame" x="0.0" y="356.5" width="320" height="187.5"/>
                     <subviews>
-                        <tableView clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="800" verticalHuggingPriority="800" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="36" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="g0u-la-8U2" userLabel="languageTable">
-                            <rect key="frame" x="0.0" y="8" width="320" height="179.5"/>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="800" verticalHuggingPriority="800" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="36" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="g0u-la-8U2" userLabel="languageTable">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="187.5"/>
                             <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         </tableView>
                     </subviews>
@@ -51,7 +51,7 @@
                         <constraint firstItem="g0u-la-8U2" firstAttribute="trailing" secondItem="JpI-h2-DXO" secondAttribute="trailing" id="0Vo-QN-H7t"/>
                         <constraint firstAttribute="width" constant="180" id="2Pu-qT-ca0"/>
                         <constraint firstItem="g0u-la-8U2" firstAttribute="bottom" secondItem="JpI-h2-DXO" secondAttribute="bottom" id="4rc-HM-gX8"/>
-                        <constraint firstItem="g0u-la-8U2" firstAttribute="top" secondItem="JpI-h2-DXO" secondAttribute="top" constant="8" id="Aq6-w0-byQ"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="top" secondItem="JpI-h2-DXO" secondAttribute="top" id="Aq6-w0-byQ"/>
                         <constraint firstItem="g0u-la-8U2" firstAttribute="leading" secondItem="JpI-h2-DXO" secondAttribute="leading" id="dUW-4h-qvC"/>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="800" constant="100" id="hV9-Wg-NIL">
                             <variation key="heightClass=compact-widthClass=compact" constant="100"/>
