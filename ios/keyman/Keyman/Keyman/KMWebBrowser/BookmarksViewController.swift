@@ -19,6 +19,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   @IBOutlet var tableView: UITableView!
   @IBOutlet var doneButton: UIBarButtonItem!
   @IBOutlet var navBarTopConstraint: NSLayoutConstraint!
+  @IBOutlet weak var navBar: UINavigationBar!
   // TODO: Create struct for bookmarks
   private var bookmarks = [[String: String]]()
 
@@ -34,6 +35,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     super.viewDidLoad()
     loadBookmarks()
     tableView.tableFooterView = UIView(frame: CGRect.zero)
+    navBar.topItem?.title = NSLocalizedString("browser-bookmarks-title", comment: "")
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -51,7 +53,8 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
   }
 
   @IBAction func addBookmark(_ sender: Any) {
-    let alertController = UIAlertController(title: "Add Bookmark", message: "",
+    let alertController = UIAlertController(title: NSLocalizedString("browser-bookmarks-add-title", comment: ""),
+                                            message: "",
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addTextField(configurationHandler: { (textField) in
       //listen for changes
@@ -83,7 +86,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
 
-    let addAlertAction = UIAlertAction(title: "Add",
+    let addAlertAction = UIAlertAction(title: NSLocalizedString("menu-add", comment: ""),
                                   style: UIAlertAction.Style.default,
                                   handler: {_ in self.addBookmarkHandler()
     })
@@ -101,7 +104,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       label.textAlignment = .center
       label.textColor = UIColor.lightGray
       label.font = UIFont.systemFont(ofSize: 14.0)
-      label.text = "No bookmarks"
+      label.text = NSLocalizedString("browser-bookmarks-none", comment: "")
       tableView.backgroundView = label
     }
   }
