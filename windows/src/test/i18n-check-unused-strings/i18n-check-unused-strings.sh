@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #
-# This script finds all references to strings in locale.xml in order to make sure that old
+# This script finds all references to strings in strings.xml in order to make sure that old
 # strings do not proliferate over time. The script generates the following files:
 #
-# * strings.txt: A plain-text list of all string identifiers found in locale.xml.
+# * strings.txt: A plain-text list of all string identifiers found in strings.xml.
 # * summary.md: A summary of number of matches for each string found.
 # * details.md: List of every reference to each string found
 #
@@ -36,11 +36,11 @@ echo | tee -a summary.md
 echo " Count | String | Flag" | tee -a summary.md
 echo "-------|--------|------" | tee -a summary.md
 
-# Lazy extract all identifiers from locale.xml into local strings.txt
+# Lazy extract all identifiers from strings.xml into local strings.txt
 # Note that this relies on the XML following a single line per string pattern
-# (up to the Id component, anyway) but this is good enough for now.
+# (up to the name attribute, anyway) but this is good enough for now.
 
-grep -oP '<String.+Id="(.+?)"' "$KEYMAN_ROOT/windows/src/desktop/kmshell/xml/locale.xml" | grep -oP 'Id="(.+?)"' | awk -F[\"] '{print $2}' > strings.txt
+grep -oP '<string.+name="(.+?)"' "$KEYMAN_ROOT/windows/src/desktop/kmshell/xml/strings.xml" | grep -oP 'Id="(.+?)"' | awk -F[\"] '{print $2}' > strings.txt
 
 while IFS= read -r string; do
   echo "## $string" >> detail.md

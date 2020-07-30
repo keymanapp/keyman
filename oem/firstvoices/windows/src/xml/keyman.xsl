@@ -4,7 +4,7 @@
   
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_keyman" select="$locale/Dialog[@Id='Keyman']" />
+  <xsl:variable name="dialoginfo_keyman" select="$dialoginfo/Dialog[@Id='Keyman']" />
   
   <xsl:include href="keyman_menu.xsl"/>
 
@@ -20,7 +20,7 @@
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
+        <title><xsl:value-of select="$locale/string[@name='S_ConfigurationTitle']"/></title>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>config.css</xsl:attribute></link>
         <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="/Keyman/templatepath"/>menu.css</xsl:attribute></link>
         <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="/Keyman/templatepath"/>jquery.min.js</xsl:attribute><xsl:text> </xsl:text></script>
@@ -61,15 +61,15 @@
         <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: 0 4px 0 4px;'>
           <xsl:attribute name='src'><xsl:value-of select='/Keyman/templatepath'/>help24.png</xsl:attribute>
         </img>
-        <xsl:value-of select="$locale/String[@Id='S_Caption_Help']" />
+        <xsl:value-of select="$locale/string[@name='S_Caption_Help']" />
       </a>
 
             &#160; 
-      <xsl:value-of select="$locale/String[@Id='S_DisplayIn']" />:
+      <xsl:value-of select="$locale/string[@name='S_DisplayIn']" />:
         <a id="button_uilanguage" href="#" 
            onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;" 
            onkeydown="if(event.keyCode == 32) ShowMenu('uilanguage','right'); else return true; return false;"
-        ><xsl:value-of select="$locale/String[@Id='SKUILanguageNameWithEnglish']"/></a>
+        ><xsl:value-of select="$locale/string[@name='SKUILanguageNameWithEnglish']"/></a>
       
     </div>
   </xsl:template>
@@ -86,12 +86,12 @@
       <div class="menubreak" ></div>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="id">menu_uilanguage_more</xsl:with-param>
-        <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_MoreUILanguagesMenu']"/></xsl:with-param>
+        <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_MoreUILanguagesMenu']"/></xsl:with-param>
         <xsl:with-param name="command">keyman:downloaduilanguages</xsl:with-param>
       </xsl:call-template>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="id">menu_uilanguage_contribute</xsl:with-param>
-        <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_ContributeUILanguagesMenu']"/></xsl:with-param>
+        <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_ContributeUILanguagesMenu']"/></xsl:with-param>
         <xsl:with-param name="command">keyman:contributeuilanguages</xsl:with-param>
       </xsl:call-template>
     </div>

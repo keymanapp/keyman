@@ -1,18 +1,18 @@
 (*
   Name:             CustomisationMessages
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     06 Oct 2006 - mcdurdin - Allow embedding of messages within messages
                     04 Dec 2006 - mcdurdin - Add localization
@@ -174,8 +174,8 @@ begin
     repeat
       if ((f.Attr and faDirectory) = faDirectory) and (f.Name <> '.') and (f.Name <> '..') then
       begin
-        if IsValidLocaleFile(FLocalePath+f.Name+'\locale.xml') then  // I3192
-          FLanguages.Add(f.Name+'='+FLocalePath+f.Name+'\locale.xml');
+        if IsValidLocaleFile(FLocalePath+f.Name+'\strings.xml') then  // I3192
+          FLanguages.Add(f.Name+'='+FLocalePath+f.Name+'\strings.xml');
         if Result <> '' then Result := Result + #13#10;
         Result := Result + f.Name;
       end;
@@ -248,22 +248,22 @@ begin
   FDefaultLocaleDoc.validateOnParse := False;
 
   FPath := GetDebugPath('xmltemplate '+ExtractFileName(FCustStorageFileName), ExtractFilePath(FCustStorageFileName));
-  if FileExists(FPath + 'locale.xml') then
-    FDefaultLocaleDoc.load(FPath + 'locale.xml')
-  else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\locale.xml') then
-    FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\locale.xml');
+  if FileExists(FPath + 'strings.xml') then
+    FDefaultLocaleDoc.load(FPath + 'strings.xml')
+  else if FileExists(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml') then
+    FDefaultLocaleDoc.load(ExtractFilePath(FCustStorageFileName) + 'xml\strings.xml');
 end;
 
 function TCustomisationMessageManager.MessageFromID(ID: WideString): WideString;
 var
   node: IXMLDOMNode;
 begin
-  node := Flocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
+  node := Flocaledoc.selectSingleNode('/resources/string[@name="'+ID+'"]');
   if Assigned(node) then
     Result := node.text
   else
   begin
-    node := Fdefaultlocaledoc.selectSingleNode('/Locale/String[@Id="'+ID+'"]');
+    node := Fdefaultlocaledoc.selectSingleNode('/resources/string[@name="'+ID+'"]');
     if Assigned(node)
       then Result := node.text
       else Result := ID;

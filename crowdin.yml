@@ -45,14 +45,11 @@ files:
 
   # Windows files
 
-  - source: /windows/src/desktop/locale/strings.xml
+  - source: /windows/src/desktop/kmshell/xml/strings.xml
     dest: /windows/strings.xml
-    translation: /windows/src/desktop/locale/%locale%/strings.xml
+    translation: /windows/src/desktop/kmshell/locale/%locale%/strings.xml
     type: android
-    #languages_mapping:
-      # Prevent invalid region pap-rPAP
-      #code:
-        #pap: pap
+    # yes, we use type: android for the Windows project
 
   # iOS files
 
