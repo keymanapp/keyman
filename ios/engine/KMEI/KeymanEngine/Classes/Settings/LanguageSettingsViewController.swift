@@ -362,10 +362,8 @@ class LanguageSettingsViewController: UITableViewController {
       }
       let kbIndex:Int = index
       let thisKb = globalUserKeyboards[kbIndex]
-      let infoView = ResourceInfoViewController(for: thisKb)
-      infoView.title = thisKb.name
-      infoView.keyboardCount = globalUserKeyboards.count
-      infoView.keyboardIndex = index
+      let mayDelete = mayDeleteKeyboard(keyboardIndex: index, keyboardCount: globalUserKeyboards.count)
+      let infoView = ResourceInfoViewController(for: thisKb, mayDelete: mayDelete)
       infoView.isCustomKeyboard = thisKb.isCustom
       navigationController?.pushViewController(infoView, animated: true)
     } else {
@@ -373,44 +371,27 @@ class LanguageSettingsViewController: UITableViewController {
       return
     }
   }
-  
+
+  private func mayDeleteKeyboard(keyboardIndex: Int, keyboardCount: Int) -> Bool {
+    if !Manager.shared.canRemoveKeyboards {
+      return false
+    }
+
+    if !Manager.shared.canRemoveDefaultKeyboard {
+      return keyboardIndex != 0
+    }
+
+    if keyboardIndex > 0 {
+      return true
+    }
+    return keyboardCount > 1
+  }
+
   func showLexicalModelsView() {
     //LanguageLexicalModelPickerViewController? (should show just the models for this language)
     let lmListView = LexicalModelPickerViewController(self.language)
     lmListView.language = self.language
     navigationController?.pushViewController(lmListView, animated: true)
- }
-  
-  func showLexicalModelInfoView() {
-    if let lm = language.lexicalModels?[safe: 0] {
-      let version = lm.version
-      let matchingFullID = FullLexicalModelID(lexicalModelID: lm.id, languageID: language.id)
-      
-      let userData = Storage.active.userDefaults
-      
-      if let globalUserLexicalModels = userData.userLexicalModels {
-        if let index = globalUserLexicalModels.firstIndex(where: { $0.fullID == matchingFullID }) {
-          guard index < globalUserLexicalModels.count else {
-            return
-          }
-          let lmIndex:Int = index
-          let thisLm = globalUserLexicalModels[lmIndex]
-          let infoView = LexicalModelInfoViewController()
-          infoView.title = thisLm.name
-          infoView.lexicalModelCount = globalUserLexicalModels.count
-          infoView.lexicalModelIndex = index
-          infoView.lexicalModelID = thisLm.id
-          infoView.languageID = language.id
-          infoView.lexicalModelVersion = version ?? InstallableConstants.defaultVersion
-          infoView.isCustomLexicalModel = thisLm.isCustom
-          navigationController?.pushViewController(infoView, animated: true)
-        } else {
-          log.error("this lexical model \(matchingFullID) not found among language's installed lexical model!")
-        }
-      } else {
-        log.error("no lexical models in the global models list!")
-      }
-    }
   }
   
     /*

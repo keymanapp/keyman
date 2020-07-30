@@ -56,6 +56,7 @@ public protocol LanguageResourceFullID: AnyLanguageResourceFullID {
 // specific LanguageResources use.
 public protocol AnyLanguageResource {
   var id: String { get }
+  var name: String { get }
   var languageID: String { get }
   // Was not always tracked within KeymanEngine - is optional for legacy reasons.
   var packageID: String? { get }

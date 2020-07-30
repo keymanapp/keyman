@@ -96,8 +96,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     cell.selectedBackgroundView = selectionColor
     return cell
   }
-  
-  // TODO: Refactor. Duplicated in LexicalModelInfoViewController
+
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
     if !Manager.shared.canRemoveLexicalModels {
       return false
@@ -125,16 +124,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   func showLexicalModelInfoView(with index: Int) {
     let lm = userLexicalModels[index]
-    let version = lm.version
-    
-    let infoView = LexicalModelInfoViewController()
-    infoView.title = lm.name
-    infoView.lexicalModelCount = userLexicalModels.count
-    infoView.lexicalModelIndex = local2globalIndex(index)
-    infoView.lexicalModelID = lm.id
-    infoView.languageID = lm.languageID
-    infoView.lexicalModelVersion = version
-    infoView.isCustomLexicalModel = lm.isCustom
+
+    let infoView = ResourceInfoViewController(for: lm, mayDelete: Manager.shared.canRemoveLexicalModels)
     navigationController?.pushViewController(infoView, animated: true)
   }
   
