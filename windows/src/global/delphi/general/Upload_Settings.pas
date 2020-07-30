@@ -36,12 +36,11 @@ const
   // TODO: use /windows/ instead of /desktop/
   API_Path_UpdateCheck_Desktop = '/desktop/'+SKeymanVersion+'/update';  // TODO: use updatecheck_windows
   API_Path_UpdateCheck_Developer = '/developer/'+SKeymanVersion+'/update';
-  API_Path_DownloadLocale = '/desktop/'+SKeymanVersion+'/locale';
   API_Path_SubmitDiag = '/desktop/'+SKeymanVersion+'/submitdiag';
   API_Path_IsOnline = '/desktop/'+SKeymanVersion+'/isonline';
 
   // https://www.keyman.com/ - web pages
-  URLPath_CreateTranslation = '/go/windows/'+SKeymanVersion+'/create-locale'; //TODO: i18n
+  URLPath_CreateTranslation = '/go/windows/'+SKeymanVersion+'/create-locale';
   URLPath_KeepInTouch = '/go/windows/'+SKeymanVersion+'/keep-in-touch';
   URLPath_KeymanHome = '/go/windows/'+SKeymanVersion+'/home';
   URLPath_ArchivedDownloads = '/go/windows/'+SKeymanVersion+'/archived-downloads';

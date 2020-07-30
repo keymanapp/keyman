@@ -28,7 +28,7 @@ files:
   # Android files
 
   - source: /android/KMEA/app/src/main/res/values/strings.xml
-    dest: /android/KMEA/strings.xml
+    dest: /android/engine/strings.xml
     translation: /android/KMEA/app/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
       # Prevent invalid region pap-rPAP
@@ -36,7 +36,7 @@ files:
         pap: pap
 
   - source: /android/KMAPro/kMAPro/src/main/res/values/strings.xml
-    dest: /android/KMAPro/strings.xml
+    dest: /android/app/strings.xml
     translation: /android/KMAPro/kMAPro/src/main/res/values-%android_code%/strings.xml
     languages_mapping:
       # Prevent invalid region pap-rPAP

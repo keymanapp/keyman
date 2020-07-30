@@ -58,7 +58,6 @@ type
     FDialogName: WideString;
     procedure WMUser_FormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUser_ContentRender(var Message: TMessage); message WM_USER_ContentRender;
-    procedure DownloadUILanguages;
     procedure ContributeUILanguages;
   protected
     cef: TframeCEFHost;
@@ -93,12 +92,6 @@ type
   end;
 
 procedure CreateForm(InstanceClass: TComponentClass; var Reference);
-
-type
-  TOnDownloadLocale = function(Owner: TForm): Boolean;
-
-var
-  FOnDownloadLocale: TOnDownloadLocale = nil;
 
 implementation
 
@@ -165,7 +158,6 @@ procedure TfrmWebContainer.FireCommand(const command: WideString; params: TStrin
 begin
   if command = 'link' then OpenLink(params)
   else if command = 'uilanguage' then UILanguage(params)
-  else if command = 'downloaduilanguages' then DownloadUILanguages
   else if command = 'contributeuilanguages' then ContributeUILanguages   // I4989
   else if command = 'resize' then cef.DoResizeByContent
   else ShowMessage(command + '?' + params.Text);
@@ -229,13 +221,6 @@ begin
     else if e.event.windows_key_code = VK_F1 then
       Application.HelpJump('context_'+lowercase(FDialogName));
   end;
-end;
-
-procedure TfrmWebContainer.DownloadUILanguages;
-begin
-  if Assigned(FOnDownloadLocale) then
-    if FOnDownloadLocale(Self) then
-      Do_Content_Render(True);
 end;
 
 procedure TfrmWebContainer.ContributeUILanguages;   // I4989

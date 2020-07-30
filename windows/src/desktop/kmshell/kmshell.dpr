@@ -75,7 +75,6 @@ uses
   UImportOlderVersionKeyboards in 'main\UImportOlderVersionKeyboards.pas',
   UImportOlderKeyboardUtils in 'main\UImportOlderKeyboardUtils.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
-  DownloadLocale in 'install\DownloadLocale.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UILanguages in 'util\UILanguages.pas',
   utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',

@@ -201,7 +201,6 @@
         <DCCReference Include="main\UImportOlderVersionKeyboards.pas"/>
         <DCCReference Include="main\UImportOlderKeyboardUtils.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiluac.pas"/>
-        <DCCReference Include="install\DownloadLocale.pas"/>
         <DCCReference Include="..\..\global\delphi\general\UserMessages.pas"/>
         <DCCReference Include="util\UILanguages.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilmsxml.pas"/>
@@ -213,7 +212,6 @@
         </DCCReference>
         <DCCReference Include="..\..\engine\keyman\KeymanTrayIcon.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards10.pas"/>
-        <DCCReference Include="..\..\global\delphi\general\FixupLocaleDoctype.pas"/>
         <DCCReference Include="..\..\global\delphi\visualkeyboard\VisualKeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\VKeyChars.pas"/>
         <DCCReference Include="util\UfrmPrintOSK.pas">
@@ -413,15 +411,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
