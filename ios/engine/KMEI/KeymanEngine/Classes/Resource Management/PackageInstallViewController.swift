@@ -82,7 +82,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     let defaultIndexPath = IndexPath(row: defaultRow, section: 0)
     languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
     languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
-    //
   }
 
   override public func viewWillAppear(_ animated: Bool) {
