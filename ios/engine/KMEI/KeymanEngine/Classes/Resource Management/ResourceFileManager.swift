@@ -222,9 +222,9 @@ public class ResourceFileManager {
           }
         }
 
-        let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.", completionHandler: {
-            successHandler?(package)
-          })
+        let alert = self.buildSimpleAlert(title: NSLocalizedString("success-title", bundle: engineBundle, comment: ""),
+                                          message: NSLocalizedString("success-install", bundle: engineBundle, comment: ""),
+                                          completionHandler: { successHandler?(package) })
         rootVC.present(alert, animated: true, completion: nil)
       }
     })
@@ -252,7 +252,7 @@ public class ResourceFileManager {
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
-    return buildSimpleAlert(title: "Error", message: error.rawValue)
+    return buildSimpleAlert(title: "Error", message: error.localizedDescription)
   }
 
   public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {

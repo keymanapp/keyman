@@ -35,7 +35,8 @@ class LanguageSettingsViewController: UITableViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    title = "\(language.name) Settings"
+    let titleFormat = NSLocalizedString("menu-langsettings-title", bundle: engineBundle, comment: "")
+    title = String.localizedStringWithFormat(titleFormat, language.name)
     log.info("viewDidLoad: LanguageSettingsViewController title: \(title ?? "<empty>")")
 
     if Manager.shared.canAddNewKeyboards {
@@ -191,9 +192,11 @@ class LanguageSettingsViewController: UITableViewController {
     var title: String
     switch (section) {
     case 0:
-      title = "Keyboards"
+      // We do NOT use a general-use "keyboards" entry because different languages have different
+      // pluralization rules, and it's a major assumption to assume which is preferred for general use.
+      title = NSLocalizedString("menu-langsettings-section-keyboards", bundle: engineBundle, comment: "")
     case 1:
-      title = "Language settings"
+      title = NSLocalizedString("menu-langsettings-section-settings", bundle: engineBundle, comment: "")
     default:
       title = "unknown header"
     }
@@ -233,30 +236,21 @@ class LanguageSettingsViewController: UITableViewController {
       cell.accessoryType = .none
       switch indexPath.row {
         case 0:
-          cell.textLabel?.text = "Enable predictions"
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-toggle-predict", bundle: engineBundle, comment: "")
         case 1:
           doCorrectionsLabel = cell.textLabel
-          cell.textLabel?.text = "Enable corrections"
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-toggle-correct", bundle: engineBundle, comment: "")
           cell.textLabel?.isEnabled = !(doCorrectionsSwitch?.isHidden ?? false)
         case 2:
-          cell.textLabel?.text = "Dictionaries"
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-label-lexical-models", bundle: engineBundle, comment: "")
           cell.accessoryType = .disclosureIndicator
-          if let modelCt = language.lexicalModels?.count {
-            switch modelCt {
-            case 0:
-              cell.detailTextLabel?.text = "no dictionaries installed"
-            case 1:
-              cell.detailTextLabel?.text = "\(language.lexicalModels![0].name)"
-            default:
-              cell.detailTextLabel?.text = "\(modelCt) dictionaries installed"
-            }
+          let modelCt = language.lexicalModels?.count ?? 0
+          if modelCt != 1 {
+            let formatString = NSLocalizedString("menu-langsettings-lexical-model-count", bundle: engineBundle, comment: "")
+            cell.detailTextLabel?.text = String.localizedStringWithFormat(formatString, modelCt)
           } else {
-            cell.detailTextLabel?.text = "no dictionaries installed"
+            cell.detailTextLabel?.text = "\(language.lexicalModels![0].name)"
           }
-        case 3: // future
-          cell.textLabel?.text = "Manage dictionary"
-          cell.accessoryType = .disclosureIndicator
-          cell.isUserInteractionEnabled = false
 
         default:
           cell.textLabel?.text = "error"

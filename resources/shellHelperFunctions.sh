@@ -80,11 +80,13 @@ get_platform_folder() {
 # terminal attached, so not on the build machine.
 if [[ -n "$TERM" ]] && [[ "$TERM" != "dumb" ]]; then
     ERROR_RED=$(tput setaf 1)
+    SUCCESS_GREEN=$(tput setaf 2)
     WARNING_YELLOW=$(tput setaf 3)
     NORMAL=$(tput sgr0)
     TERM_HEADING=$(tput setaf 4)
 else
     ERROR_RED=
+    SUCCESS_GREEN=
     WARNING_YELLOW=
     NORMAL=
     TERM_HEADING=

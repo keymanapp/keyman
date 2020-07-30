@@ -19,7 +19,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = "Keyboards"
+    title = NSLocalizedString("menu-picker-title", bundle: engineBundle, comment: "")
     
     self.accessoryType = .none
     

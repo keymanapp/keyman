@@ -24,18 +24,18 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   
     infoArray = [[String: String]]()
     infoArray.append([
-        "title": "Dictionary version",
+        "title": NSLocalizedString("info-label-version-lexical-model", bundle: engineBundle, comment: ""),
         "subtitle": lexicalModelVersion
         ])
   
     if !isCustomLexicalModel {
       infoArray.append([
-          "title": "Help link",
+          "title": NSLocalizedString("info-command-help", bundle: engineBundle, comment: ""),
           "subtitle": ""
           ])
     }
     infoArray.append([
-        "title": "Uninstall dictionary",
+        "title": NSLocalizedString("command-uninstall-lexical-model", bundle: engineBundle, comment: ""),
         "subtitle": ""
         ])
   }
@@ -112,12 +112,13 @@ class LexicalModelInfoViewController: UITableViewController, UIAlertViewDelegate
   }
   
   private func showDeleteLexicalModel() {
-    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this dictionary?",
+    let helpText = NSLocalizedString("command-uninstall-lexical-model-confirm", bundle: engineBundle, comment: "")
+    let alertController = UIAlertController(title: title ?? "", message: helpText,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "Cancel",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
-    alertController.addAction(UIAlertAction(title: "Delete",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-uninstall", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: deleteHandler))
   

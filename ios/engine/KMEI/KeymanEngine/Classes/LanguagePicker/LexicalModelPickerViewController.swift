@@ -33,8 +33,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    title = "\(language.name) Dictionaries"
+
+    let format = NSLocalizedString("menu-lexical-model-title", bundle: engineBundle, comment: "")
+    title = String.localizedStringWithFormat(format, language.name)
     if Manager.shared.canAddNewLexicalModels {
       let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self,
                                       action: #selector(self.addClicked))
@@ -203,12 +204,12 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       item.isEnabled = true
     }
     
-    let title: String = "Dictionary Download Error"
+    let title: String = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
     navigationController?.setToolbarHidden(true, animated: true)
     
     let alertController = UIAlertController(title: title, message: notification.error.localizedDescription,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: { _ in
                                               self.navigationController?.popToRootViewController(animated: true)
@@ -276,7 +277,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   private func setIsDoneButtonEnabled(_ value: Bool) {
     _isDoneButtonEnabled = value
     if _isDoneButtonEnabled {
-      let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+      let doneButton = UIBarButtonItem(title: NSLocalizedString("command-done", bundle: engineBundle, comment: ""), style: .plain, target: self,
                                        action: #selector(self.doneClicked))
       navigationItem.leftBarButtonItem = doneButton
     } else {
@@ -325,13 +326,13 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
 
   func noModelsAvailable(cause: String = "nil") {
-    let msg = "No dictionaries available"
-    let logMsg = "No lexical models available for language \(language.id) (\(cause))"
+    let msg = NSLocalizedString("menu-lexical-model-none-message", bundle: engineBundle, comment: "")
+    let logMsg = "No lexical models available for language \(language.id): (\(cause))"
     log.info(logMsg)
 
     let alertController = UIAlertController(title: title, message: msg,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: { _ in
                                               self.navigationController?.popViewController(animated: true)

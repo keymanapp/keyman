@@ -9,13 +9,21 @@
 import Foundation
 import Zip
 
+// KMPErrors may be passed to UIAlertControllers, so they need localization.
 public enum KMPError : String, Error {
-  case noMetadata = "Could not find kmp.json for package."
-  case invalidPackage = "Invalid Keyman Package."
-  case fileSystem = "Unable to create directory structure in file system."
-  case copyFiles = "Unable to copy keyboard files to file system."
-  case wrongPackageType = "Package provided does not match the type expected by this method"
-  case resourceNotInPackage = "Resource cannot be found in specified package"
+  // The value:  the translation-lookup key.
+  case noMetadata = "kmp-error-no-metadata"
+  case invalidPackage = "kmp-error-invalid"
+  case fileSystem = "kmp-error-file-system"
+  case copyFiles = "kmp-error-file-copying"
+  // TODO:  Consider changing the parent type so that these may take arguments that may be used
+  //        to provide better clarity.
+  case wrongPackageType = "kmp-error-wrong-type"
+  case resourceNotInPackage = "kmp-error-missing-resource"
+
+  var localizedDescription: String {
+    return engineBundle.localizedString(forKey: self.rawValue, value: nil, table: nil)
+  }
 }
 
 /**

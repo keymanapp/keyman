@@ -45,7 +45,8 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       titleCloseButton = closeButtonTitle
     } else {
       let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Keyman"
-      titleCloseButton = "Close \(appName)"
+      let format = NSLocalizedString("keyboard-menu-exit", bundle: engineBundle, comment: "")
+      titleCloseButton = String.localizedStringWithFormat(format, appName)
     }
 
     if let keyboardList = keyboardList {
