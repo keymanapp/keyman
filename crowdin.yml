@@ -54,7 +54,7 @@ files:
   # iOS files
 
   - source: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/en.lproj/ResourceInfoView.strings
-    dest: /ios/KMEI/ResourceInfoView.strings
+    dest: /ios/engine/ResourceInfoView.strings
     translation: /ios/engine/KMEI/KeymanEngine/Classes/LanguagePicker/%osx_code%/%original_file_name%
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
