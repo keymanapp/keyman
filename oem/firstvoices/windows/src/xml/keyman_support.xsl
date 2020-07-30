@@ -21,7 +21,7 @@
         </div>
         
         <div class="support_edition">
-          <xsl:value-of select="$locale/string[@name='S_Support_Version']"/>&#160;<xsl:value-of select="/Keyman/support/version" /><xsl:value-of select="$locale/string[@name='S_BETA']"/><br />
+          <xsl:value-of select="$locale/string[@name='S_Support_Version']"/>&#160;<xsl:value-of select="/Keyman/support/version" /><br />
         </div>
         
         <div class="support_contact">

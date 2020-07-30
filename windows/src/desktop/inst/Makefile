@@ -6,7 +6,7 @@
 
 # ----------------------------------------------------------------------
 
-DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj cef.wixobj
+DESKTOP_FILES=keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
 manual-setup: check setup
 
@@ -51,6 +51,7 @@ clean:
     -del /Q desktop_resources.res
     -del /Q desktopui.wxs
     -del /Q cef.wxs
+    -del /Q locale.wxs
 
 check:
     if not exist $(ROOT)\src\engine\inst\keymanengine.msm $(MAKE) check-engine

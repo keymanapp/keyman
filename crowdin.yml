@@ -49,10 +49,7 @@ files:
     dest: /windows/strings.xml
     translation: /windows/src/desktop/kmshell/locale/%locale%/strings.xml
     type: android
-    #languages_mapping:
-      # Prevent invalid region pap-rPAP
-      #code:
-        #pap: pap
+    # yes, we use type: android for the Windows project
 
   # iOS files
 
