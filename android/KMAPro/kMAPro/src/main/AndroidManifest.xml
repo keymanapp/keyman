@@ -192,7 +192,7 @@
 
       </intent-filter>
 
-      <intent-filter>
+      <intent-filter android:autoVerify="true">
         <!-- cloud keyboard package download links https://{HOST}/go/package/download/
              Use {HOST} as defined in KMPLink.java -->
         <action android:name="android.intent.action.VIEW" />
