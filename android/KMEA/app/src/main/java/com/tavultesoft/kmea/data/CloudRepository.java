@@ -37,6 +37,13 @@ public class CloudRepository {
 
   public static final String DOWNLOAD_IDENTIFIER_CATALOGUE = "catalogue";
 
+  public static final String API_PRODUCTION_HOST = "api.keyman.com";
+  public static final String API_STAGING_HOST = "api.keyman-staging.com";
+
+  public static final String API_MODEL_QUERY = "?q";
+  public static final String API_MODEL_FORMATSTR = "https://%s/model%s";
+  public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
+
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
   private boolean invalidateLexicalCache = false;
@@ -56,6 +63,20 @@ public class CloudRepository {
 
   public interface UpdateHandler {
     void onUpdateDetection(List<Bundle> updateBundles);
+  }
+
+  /**
+   * Get the api.keyman.com host (production vs staging) based on the tier
+   * @return String of api.keyman.com host
+   */
+  public static String getHost() {
+    switch (KMManager.getTier(BuildConfig.VERSION_NAME)) {
+      case ALPHA:
+      case BETA:
+        return API_STAGING_HOST;
+      default:
+        return API_PRODUCTION_HOST;
+    }
   }
 
   /**
@@ -176,8 +197,7 @@ public class CloudRepository {
       }
     }
 
-    String queryURL = String.format("%s%s%s",
-      KMKeyboardDownloaderActivity.kKeymanApiPackageVersionURL, keyboardQuery, lexicalModelQuery);
+    String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), keyboardQuery, lexicalModelQuery);
     return new CloudApiTypes.CloudApiParam(
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }
@@ -187,13 +207,14 @@ public class CloudRepository {
     // This allows us to directly get the full lexical model catalog.
     // TODO:  Remove and replace with commented-out code below once the proper multi-language
     //        query is ready!
-    String lexicalURL = String.format("%s?q", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
+    String lexicalURL = String.format(API_MODEL_FORMATSTR, getHost(), API_MODEL_QUERY);
 
     return new CloudApiTypes.CloudApiParam(CloudApiTypes.ApiTarget.LexicalModels, lexicalURL)
       .setType(CloudApiTypes.JSONType.Array);
 
     // TODO: We want a list of lexical models for every language with an installed resource (kbd, lex model)
-//      String lexicalURL = String.format("%s?q=bcp47:", KMKeyboardDownloaderActivity.kKeymanApiModelURL);
+
+//      String lexicalURL = String.format(API_MODEL_FORMATSTR, getHost(), "?q=bcp47:");
 //
 //      for(String lgCode: languageCodes) {
 //        lexicalURL = String.format("%s%s,", lexicalURL, lgCode);
