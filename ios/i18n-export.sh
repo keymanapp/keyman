@@ -46,7 +46,7 @@ export BASE_EXPORT_FOLDER
 rm -r $BASE_EXPORT_FOLDER > /dev/null 2> /dev/null
 
 exportFiles "engine/KMEI/KeymanEngine.xcodeproj" "engine"
-exportFiles "keyman/Keyman/Keyman.xcodeproj"     "keyman"
+exportFiles "keyman/Keyman/Keyman.xcodeproj"     "app"
 
 echo ""
 echo "---------------------------------------------"
