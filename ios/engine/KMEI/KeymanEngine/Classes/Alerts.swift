@@ -17,7 +17,7 @@ open class Alerts {
     let alertController = UIAlertController(title: title,
                                             message: msg,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: handler))
 
@@ -25,7 +25,10 @@ open class Alerts {
   }
 
   public static func showConnectionErrorAlert(in vc: UIViewController, handler: @escaping AcceptanceHandler) {
-    showErrorAlert(in: vc, title: "Connection Error", msg: "Could not reach Keyman server.  Please try again later.", handler: handler)
+    showErrorAlert(in: vc,
+                   title: NSLocalizedString("alert-no-connection-title", bundle: engineBundle, comment: ""),
+                   msg: NSLocalizedString("alert-no-connection-detail", bundle: engineBundle, comment: ""),
+                   handler: handler)
   }
 
   public static func showDownloadErrorAlert(in vc: UIViewController, handler: @escaping AcceptanceHandler) {
@@ -40,7 +43,10 @@ open class Alerts {
       showConnectionErrorAlert(in: vc, handler: handler)
     } else {
       // Show a different alert!
-      showErrorAlert(in: vc, title: "Download error", msg: "Error occurred during download or installation.", handler: handler)
+      showErrorAlert(in: vc,
+                     title: NSLocalizedString("alert-download-error-title", bundle: engineBundle, comment: ""),
+                     msg: NSLocalizedString("alert-download-error-detail", bundle: engineBundle, comment: ""),
+                     handler: handler)
     }
   }
 

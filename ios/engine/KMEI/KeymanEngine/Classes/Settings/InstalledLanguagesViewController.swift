@@ -424,14 +424,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   
   private func showConnectionErrorAlert() {
     dismissActivityView()
-    let alertController = UIAlertController(title: NSLocalizedString("no-connection-title", bundle: engineBundle, comment: ""),
-                                            message: NSLocalizedString("no-connection-detail", bundle: engineBundle, comment: ""),
-                                            preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "OK",
-                                            style: UIAlertAction.Style.default,
-                                            handler: errorAcknowledgmentHandler))
-    
-    self.present(alertController, animated: true, completion: nil)
+    Alerts.showDownloadErrorAlert(in: self, handler: errorAcknowledgmentHandler)
   }
 }
 
