@@ -48,22 +48,20 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let bundle = Bundle(for: Manager.self)
-
     infoArray = [[String: String]]()
     infoArray.append([
-      "title": NSLocalizedString("Keyboard version", bundle: bundle, comment: "As seen on the keyboard's information page"),
+      "title": NSLocalizedString("info-label-version-keyboard", bundle: engineBundle, comment: ""),
       "subtitle": resource.version
       ])
 
     if !isCustomKeyboard {
       infoArray.append([
-        "title": NSLocalizedString("Help link", bundle: bundle, comment: "Links to the help page of the keyboard"),
+        "title": NSLocalizedString("info-command-help", bundle: engineBundle, comment: ""),
         "subtitle": ""
         ])
     }
     infoArray.append([
-      "title": NSLocalizedString("Uninstall keyboard", bundle: bundle, comment: "Removes the keyboard from the application"),
+      "title": NSLocalizedString("command-uninstall-keyboard", bundle: engineBundle, comment: ""),
       "subtitle": ""
       ])
 
@@ -197,12 +195,13 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   }
 
   private func showDeleteKeyboard() {
-    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this keyboard?",
+    let uninstallHelp = NSLocalizedString("command-uninstall-keyboard-confirm", bundle: engineBundle, comment: "")
+    let alertController = UIAlertController(title: title ?? "", message: uninstallHelp,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "Cancel",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
-    alertController.addAction(UIAlertAction(title: "Delete",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-uninstall", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: deleteHandler))
 

@@ -360,9 +360,13 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
     if let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar {
       if results.failures.count == 0 {
-        toolbar.displayStatus("\(results.successes.count) update(s) successfully downloaded!", withIndicator: false, duration: 3.0)
+        let formatString = NSLocalizedString("notification-update-success", bundle: engineBundle, comment: "")
+        toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.successes.count), withIndicator: false, duration: 3.0)
       } else {
-        toolbar.displayStatus("Updates complete: \(results.successes.count) successful, \(results.failures.count) failed", withIndicator: false, duration: 3.0)
+        // Needs to be a short string on iPhones.
+        // Possible TODO:  condition on "is an iPad", provide more info on iPads?
+        let formatString = NSLocalizedString("notification-update-failed", bundle: engineBundle, comment: "")
+        toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.failures.count), withIndicator: false, duration: 3.0)
       }
     }
     

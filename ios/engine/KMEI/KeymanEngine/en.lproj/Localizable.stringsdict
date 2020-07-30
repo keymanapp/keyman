@@ -2,6 +2,56 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>menu-langsettings-lexical-model-count</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>u</string>
+			<key>zero</key>
+			<string>No dictionaries installed</string>
+			<key>one</key>
+			<string>%u dictionary installed</string>
+			<key>other</key>
+			<string>%u dictionaries installed</string>
+		</dict>
+	</dict>
+	<key>notification-update-failed</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>u</string>
+			<key>one</key>
+			<string>%u update failed</string>
+			<key>other</key>
+			<string>%u updates failed</string>
+		</dict>
+	</dict>
+	<key>notification-update-success</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>u</string>
+			<key>one</key>
+			<string>%u update successful</string>
+			<key>other</key>
+			<string>%u updates successful</string>
+		</dict>
+	</dict>
 	<key>settings-keyboards-installed-count</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
