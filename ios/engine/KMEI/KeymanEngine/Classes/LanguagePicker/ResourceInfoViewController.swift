@@ -14,7 +14,7 @@ import UIKit
  * eventually support lexical model resources as well, but additional work is needed before this class
  * will be ready... possibly as a common base class. 
  */
-class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
+class ResourceInfoViewController<Resource: LanguageResource>: UIViewController, UIAlertViewDelegate, UITableViewDelegate, UITableViewDataSource {
   // Collectively used to determine if a keyboard may be deleted.
   var keyboardCount: Int = 0
   var keyboardIndex: Int = 0
@@ -24,7 +24,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
   private var infoArray = [[String: String]]()
 
-  let resource: AnyLanguageResource
+  let resource: Resource
 
   @IBOutlet weak var scrollView: UIScrollView!
   @IBOutlet weak var contentView: UIView!
@@ -35,7 +35,7 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   @IBOutlet weak var tableHeightConstraint: NSLayoutConstraint!
   @IBOutlet weak var labelHeightConstraint: NSLayoutConstraint!
 
-  init(for resource: AnyLanguageResource) {
+  init(for resource: Resource) {
     self.resource = resource
 
     super.init(nibName: "ResourceInfoView", bundle: Bundle.init(for: ResourceInfoViewController.self))
@@ -71,14 +71,19 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
     tableView.reloadData()
     
     // Generate & display the QR code!
-    if let resourceURL = resource.sharableURL {
-      if let qrImg = generateQRCode(from: resourceURL) {
-        qrImageView.image = qrImg
+    let package = ResourceFileManager.shared.getInstalledPackage(for: resource)!
+    if package.distributionMethod == .cloud {
+      if let resourceURL = resource.sharableURL {
+        if let qrImg = generateQRCode(from: resourceURL) {
+          qrImageView.image = qrImg
+        } else {
+          log.info("Unable to generate QR code for URL: \(resourceURL)")
+        }
       } else {
-        log.info("Unable to generate QR code for URL: \(resourceURL)")
+        // No resource-sharing link available.  Hide the text label!
+        shareLabel.isHidden = true
       }
     } else {
-      // No resource-sharing link available.  Hide the text label!
       shareLabel.isHidden = true
     }
   }
