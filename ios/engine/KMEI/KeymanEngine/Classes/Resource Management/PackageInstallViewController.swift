@@ -67,7 +67,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     navigationItem.rightBarButtonItem = installBtn
     navigationItem.title = package.name
 
-    lblVersion.text = "Version: \(package.version)"
+    let versionFormat = NSLocalizedString("installer-label-version", bundle: engineBundle, comment: "")
+    lblVersion.text = String.localizedStringWithFormat(versionFormat, package.version.description)
     if let copyright = package.metadata.info?.copyright?.description {
       lblCopyright.text = copyright
     } else {
@@ -107,7 +108,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
-    return "Available languages"
+    return NSLocalizedString("installer-section-available-languages", bundle: engineBundle, comment: "")
   }
 
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
