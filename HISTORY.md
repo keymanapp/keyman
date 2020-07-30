@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.119 alpha 2020-07-30
+
+* feat(windows): convert locale.xml to strings.xml format (#3424)
+* refactor(windows): add translations to windows install (#3428)
+* refactor(windows): remove old locale links (#3429)
+* chore(windows): remove old locale tools (#3430)
+* feat(ios): Start of engine and app internationalization (#2745)
+
 ## 14.0.118 alpha 2020-07-29
 
 * fix(android/app): Use go/android/ links to download cloud keyboards (#3343)
