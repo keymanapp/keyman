@@ -66,12 +66,12 @@ developer: global
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
-engine: global
+engine: global message-constants
     cd $(ROOT)\src\engine
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
 
-desktop: global
+desktop: global message-constants
     cd $(ROOT)\src\desktop
     $(MAKE) $(TARGET)
     cd $(ROOT)\src
@@ -233,6 +233,9 @@ build-tools: global-versions
     # We'll build a default PathDefines.mak if it is missing here so we can
     # go on and do the rest of the build
     $(PROGRAM)\buildtools\devtools -ti
+
+message-constants: build-tools
+    $(PROGRAM)\buildtools\devtools -buildmessageconstants $(ROOT)\src\desktop\kmshell\xml\strings.xml $(ROOT)\src\global\delphi\cust\MessageIdentifierConsts.pas
 
 #
 # Remove all files from output folders to ensure no legacy files left in a release

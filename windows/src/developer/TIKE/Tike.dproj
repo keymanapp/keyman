@@ -226,12 +226,10 @@
             <Form>frameCEFHost</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\UnitDrawArrow.pas"/>
-        <DCCReference Include="kct\StockObjects.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationStorage.pas"/>
         <DCCReference Include="..\..\global\delphi\general\klog.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\custinterfaces.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\CustomisationMessages.pas"/>
-        <DCCReference Include="..\..\global\delphi\cust\StockMessages.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\HeadingCheckListBox.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\BitmapEditor.pas"/>
         <DCCReference Include="..\..\global\delphi\comp\StringGridEditControlled.pas"/>
@@ -310,7 +308,6 @@
             <Form>frmTikeOnlineUpdateNewVersion</Form>
         </DCCReference>
         <DCCReference Include="..\..\global\delphi\general\DebugPaths.pas"/>
-        <DCCReference Include="kct\MessageDefaults.pas"/>
         <DCCReference Include="main\UfrmDownloadProgress.pas">
             <Form>frmDownloadProgress</Form>
         </DCCReference>

@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_onlineupdate" select="$locale/Dialog[@Id='OnlineUpdate'][1]" />
+  <xsl:variable name="dialoginfo_onlineupdate" select="$dialoginfo/Dialog[@Id='OnlineUpdate'][1]" />
 
   <xsl:template match="/">
 
@@ -13,10 +13,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
   <script src="/app/sentry.bundle.min.js"></script>
   <script src="/app/sentry.init.js"></script>
-<title><xsl:value-of select="$locale/String[@Id='S_Update_Title']"/></title>
+<title><xsl:value-of select="$locale/string[@name='S_Update_Title']"/></title>
 <style type="text/css">
 
-* { font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI"; }
+* { font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI"; }
 
 html { overflow: hidden }
 
@@ -29,7 +29,7 @@ body {
 }
 
 .button {
- font: 11px <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
+ font: 11px <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";
  height: 23px; width: 128px;
 }
 
@@ -41,13 +41,13 @@ body {
 </xsl:if>
 
 div {
-  font: 13.3px <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";
+  font: 13.3px <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";
 }
 
 #border {
   border: none;
-  width: <xsl:value-of select="$locale_onlineupdate/@Width - 2" />px;
-  height: <xsl:value-of select="$locale_onlineupdate/@Height - 2" />px;
+  width: <xsl:value-of select="$dialoginfo_onlineupdate/@Width - 2" />px;
+  height: <xsl:value-of select="$dialoginfo_onlineupdate/@Height - 2" />px;
   }
 
 #header { background: white;  }
@@ -134,15 +134,15 @@ div {
     <img alt='Keyman' src="/app/keyman-desktop.png" />
   </div>
   <div id='content'>
-    <div id="NewVersionAvailable"><xsl:copy-of select="($locale/String[@Id='S_Update_NewVersionAvailable'])[1]" /></div>
-    <div id="NewVersionText"><xsl:copy-of select="($locale/String[@Id='S_Update_NewVersionPrompt'])[1]"/></div>
+    <div id="NewVersionAvailable"><xsl:copy-of select="($locale/string[@name='S_Update_NewVersionAvailable'])[1]" /></div>
+    <div id="NewVersionText"><xsl:copy-of select="($locale/string[@name='S_Update_NewVersionPrompt'])[1]"/></div>
     <div id="UpdateContainer">
 			<table cellspacing="0" cellpadding="0" id="Updates">
         <tr>
           <th></th>
-          <th><xsl:value-of select="$locale/String[@Id='S_Update_ComponentHead']"/></th>
-          <th><xsl:value-of select="$locale/String[@Id='S_Update_OldVersionHead']"/></th>
-          <th><xsl:value-of select="$locale/String[@Id='S_Update_SizeHead']"/></th>
+          <th><xsl:value-of select="$locale/string[@name='S_Update_ComponentHead']"/></th>
+          <th><xsl:value-of select="$locale/string[@name='S_Update_OldVersionHead']"/></th>
+          <th><xsl:value-of select="$locale/string[@name='S_Update_SizeHead']"/></th>
         </tr>
 				<xsl:apply-templates select="//Update" />
 			</table>
@@ -151,11 +151,11 @@ div {
   <div id="footer">
     <button type="submit" id="submitButton" class='button shieldButton' onclick="javascript:location.href='keyman:installnow'">
       <img alt="" style="vertical-align:middle; width: 16px; margin: 0 4px 0 2px;" src="/app/shield.png" />
-      <xsl:value-of select="$locale/String[@Id='S_Update_Button_InstallNow']"/>
+      <xsl:value-of select="$locale/string[@name='S_Update_Button_InstallNow']"/>
     </button>
     &#160;
     <input type="button" class='button' onclick="javascript:location.href='keyman:installlater'">
-      <xsl:attribute name="value"><xsl:value-of select="$locale/String[@Id='S_Update_Button_InstallLater']"/></xsl:attribute>
+      <xsl:attribute name="value"><xsl:value-of select="$locale/string[@name='S_Update_Button_InstallLater']"/></xsl:attribute>
     </input>
   </div>
 </div>
@@ -208,7 +208,7 @@ div {
       <xsl:otherwise>
         <td>
           <div id="DownloadFrom">
-            <xsl:value-of select="$locale/String[@Id='S_Update_DownloadFrom']"/>
+            <xsl:value-of select="$locale/string[@name='S_Update_DownloadFrom']"/>
           </div>
           <div id="URL">
             <a href="keyman:openwebsite">

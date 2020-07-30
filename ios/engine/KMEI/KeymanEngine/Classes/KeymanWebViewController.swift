@@ -10,7 +10,7 @@ import UIKit
 import WebKit
 import AudioToolbox
 
-private let keyboardChangeHelpText = "Tap here to change keyboard"
+private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", bundle: engineBundle, comment: "")
 
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted

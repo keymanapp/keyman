@@ -33,8 +33,8 @@ public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalMo
   }
 
   public override func defaultInfoHtml() -> String {
-    let count = models.count
-    var str = "Found "+(count > 1 ? "\(count) dictionaries" : "dictionary")+" in package:<br/>"
+    let formatString = NSLocalizedString("package-default-found-lexical-models", bundle: engineBundle, comment: "See Localized.stringsdict")
+    var str = String.localizedStringWithFormat(formatString, models.count) + "<br/>"
     for model in models {
       str += model.lexicalModelId + "<br/>"
     }

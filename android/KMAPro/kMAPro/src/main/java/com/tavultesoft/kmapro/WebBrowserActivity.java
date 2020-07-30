@@ -8,7 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.FileUtils;
+import com.tavultesoft.kmea.util.KMPLink;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -265,7 +265,7 @@ public class WebBrowserActivity extends AppCompatActivity {
         if (lowerURL.equals("about:blank")) {
           return true; // never load a blank page, e.g. when the component initializes
         }
-        if (FileUtils.isKeymanLink(lowerURL)) {
+        if (KMPLink.isKeymanDownloadLink(lowerURL)) {
           // KMAPro main activity will handle this intent
           // Pass original url because path and query are case-sensitive
           Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

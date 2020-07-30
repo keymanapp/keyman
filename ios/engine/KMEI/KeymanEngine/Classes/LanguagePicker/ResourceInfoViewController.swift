@@ -50,18 +50,18 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
 
     infoArray = [[String: String]]()
     infoArray.append([
-      "title": "Keyboard version",
+      "title": NSLocalizedString("info-label-version-keyboard", bundle: engineBundle, comment: ""),
       "subtitle": resource.version
       ])
 
     if !isCustomKeyboard {
       infoArray.append([
-        "title": "Help link",
+        "title": NSLocalizedString("info-command-help", bundle: engineBundle, comment: ""),
         "subtitle": ""
         ])
     }
     infoArray.append([
-      "title": "Uninstall keyboard",
+      "title": NSLocalizedString("command-uninstall-keyboard", bundle: engineBundle, comment: ""),
       "subtitle": ""
       ])
 
@@ -195,12 +195,13 @@ class ResourceInfoViewController: UIViewController, UIAlertViewDelegate, UITable
   }
 
   private func showDeleteKeyboard() {
-    let alertController = UIAlertController(title: title ?? "", message: "Would you like to delete this keyboard?",
+    let uninstallHelp = NSLocalizedString("command-uninstall-keyboard-confirm", bundle: engineBundle, comment: "")
+    let alertController = UIAlertController(title: title ?? "", message: uninstallHelp,
                                             preferredStyle: UIAlertController.Style.alert)
-    alertController.addAction(UIAlertAction(title: "Cancel",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
-    alertController.addAction(UIAlertAction(title: "Delete",
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("command-uninstall", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: deleteHandler))
 

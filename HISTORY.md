@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 14.0.118 alpha 2020-07-29
+
+* fix(android/app): Use go/android/ links to download cloud keyboards (#3343)
+* fix(windows): i18n of strings in Font Helper (#3414)
+* refactor(windows): refactor Dialog elements (#3421)
+* chore(windows): Remove usage page resources (#3422)
+
+## 14.0.117 alpha 2020-07-28
+
+* feat(windows): i18n groundwork (#3411)
+* feat(windows): Removes unused strings from locale.xml (#3412)
+* refactor(ios/engine): package installer tweaks (#3410)
+* chore(ios/engine): more obsoletions (#3407)
+
 ## 14.0.116 alpha 2020-07-24
 
 * refactor(ios/engine): builds package download links (#3383)

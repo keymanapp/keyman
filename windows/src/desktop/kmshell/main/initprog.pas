@@ -105,7 +105,6 @@ uses
   custinterfaces,
   DebugPaths,
   Dialogs,
-  FixupLocaleDoctype,
   GetOsVersion,
   help,
   HTMLHelpViewer,
@@ -542,8 +541,6 @@ begin
       FDisablePackages,
       Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753
   end;
-
-  UpdateAllLocaleDoctypes; // I2605
 end;
 
 procedure ShowKeyboardWelcome(PackageName: WideString);  // I2569

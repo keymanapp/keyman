@@ -33,8 +33,10 @@ public enum VibrationSupport {
   case taptic // Has the Taptic engine, allowing use of UIImpactFeedbackGenerator for customizable vibrations
 }
 
-// Strings
-private let keyboardChangeHelpText = "Tap here to change keyboard"
+/**
+ * Obtains the bundle for KeymanEngine.framework.
+ */
+internal let engineBundle: Bundle = Bundle(for: Manager.self)
 
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.

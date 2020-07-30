@@ -22,8 +22,8 @@ open class SettingsViewController: UITableViewController {
   override open func viewDidLoad() {
     super.viewDidLoad()
     
-    title = "Keyman Settings"
-    let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+    title = NSLocalizedString("menu-settings-title", bundle: engineBundle, comment: "")
+    let doneButton = UIBarButtonItem(title: NSLocalizedString("Done", bundle: engineBundle, comment: ""), style: .plain, target: self,
                                      action: #selector(self.doneClicked))
     navigationItem.leftBarButtonItem = doneButton
 
@@ -55,19 +55,19 @@ open class SettingsViewController: UITableViewController {
     
     itemsArray = [[String: String]]()
     itemsArray.append([
-      "title": "Installed Languages",
+      "title": NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: ""),
       "subtitle": "0", //count of installed languages as string
       "reuseid" : "languages"
       ])
     
     itemsArray.append([
-      "title": "Show Banner",
+      "title": NSLocalizedString("menu-settings-show-banner", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid" : "showbanner"
       ])
     
     itemsArray.append([
-      "title": "Show 'Get Started' at startup",
+      "title": NSLocalizedString("menu-settings-startup-get-started", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid" : "showgetstarted"
       ])
@@ -75,8 +75,8 @@ open class SettingsViewController: UITableViewController {
     // The iOS Files app is only available with 11.0+.
     if #available(iOS 11.0, *) {
       itemsArray.append([
-        "title": "Install From File",
-        "subtitle": "Browse for .kmp files",
+        "title": NSLocalizedString("menu-settings-install-from-file", bundle: engineBundle, comment: ""),
+        "subtitle": NSLocalizedString("menu-settings-install-from-file-description", bundle: engineBundle, comment: ""),
         "reuseid" : "installfile"
         ])
     }
@@ -342,18 +342,15 @@ open class SettingsViewController: UITableViewController {
     }
 
     userLanguages = keyboardLanguages
-    if 1 == userLanguages.count {
-      itemsArray[0]["subtitle"] = "one language installed"
-    } else {
-      itemsArray[0]["subtitle"] = "\(userLanguages.count) languages installed"
-    }
+    let formatString = NSLocalizedString("settings-languages-installed-count", bundle: engineBundle, comment: "")
+    itemsArray[0]["subtitle"] = String.localizedStringWithFormat(formatString, userLanguages.count)
     tableView.reloadData()
   }
   
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {
     let doneOrCancel = value
     if doneOrCancel {
-      let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self,
+      let doneButton = UIBarButtonItem(title: NSLocalizedString("command-done", bundle: engineBundle, comment: ""), style: .plain, target: self,
                                        action: nil /* #selector(self.doneClicked) */ )
       nc.navigationItem.leftBarButtonItem = doneButton
     } else {

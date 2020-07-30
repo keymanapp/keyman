@@ -199,7 +199,7 @@ begin
   // I5122
 
   FStorage := TCustomisationStorage.Create(FFileName, nil, True);
-  FMessages := TCustomisationMessageManager.Create(FStorage);
+  FMessages := TCustomisationMessageManager.Create(FStorage.FileName);
   FMenu := TCustomisationMenu.Create(FStorage);
 end;
 

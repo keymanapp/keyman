@@ -125,14 +125,15 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       } else {
         isUpdate = true
       }
-      
-      let alertController = UIAlertController(title: "\(language.name): \(lexicalModel.name)",
-        message: "Would you like to download this dictionary?",
+
+      let format = NSLocalizedString("menu-lexical-model-install-title", bundle: engineBundle, comment: "")
+      let alertController = UIAlertController(title: String.localizedStringWithFormat(format, language.name, lexicalModel.name),
+        message: NSLocalizedString("menu-lexical-model-install-message", bundle: engineBundle, comment: ""),
         preferredStyle: UIAlertController.Style.alert)
-      alertController.addAction(UIAlertAction(title: "Cancel",
+      alertController.addAction(UIAlertAction(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""),
                                               style: UIAlertAction.Style.cancel,
                                               handler: nil))
-      alertController.addAction(UIAlertAction(title: "Download",
+      alertController.addAction(UIAlertAction(title: NSLocalizedString("command-install", bundle: engineBundle, comment: ""),
                                               style: UIAlertAction.Style.default,
                                               handler: {_ in self.downloadHandler(lexicalModelIndex)} ))
       

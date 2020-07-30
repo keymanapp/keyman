@@ -118,6 +118,8 @@ uses
 
   findfonts,
   kmint,
+  MessageIdentifiers,
+  MessageIdentifierConsts,
   UfrmKeyman7Main,
   UfrmVisualKeyboard,
   Unicode,
@@ -388,11 +390,11 @@ begin
 
   if Keyboard.Encodings = keANSI then
   begin
-    SetDisplay('The selected keyboard is not a Unicode keyboard');
+    SetDisplay(MsgFromIdFormat(S_OSK_FontHelper_NonUnicode, [Keyboard.Name]));
   end
   else
   begin
-    SetDisplay('Please wait while searching for related fonts for keyboard '+Keyboard.Name);
+    SetDisplay(MsgFromIdFormat(S_OSK_FontHelper_PleaseWait, [Keyboard.Name]));
 
     FCheckFontsThread := TCheckFontsThread.Create;
     FCheckFontsThread.FreeOnTerminate := True;
@@ -483,9 +485,9 @@ begin
   else
   begin
     if kmcom.Keyboards.Count = 0 then
-      SetDisplay('No keyboards are installed')
+      SetDisplay(MsgFromId(S_OSK_FontHelper_NoKeyboards))
     else
-      SetDisplay('Please select a Keyman keyboard to find related fonts');
+      SetDisplay(MsgFromId(S_OSK_FontHelper_ChooseKeyboard))
   end;
 end;
 

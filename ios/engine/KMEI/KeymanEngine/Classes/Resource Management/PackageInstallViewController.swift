@@ -56,10 +56,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     wkWebView!.bottomAnchor.constraint(equalTo: webViewContainer.bottomAnchor).isActive = true
     wkWebView!.trailingAnchor.constraint(equalTo: webViewContainer.trailingAnchor).isActive = true
 
-    let cancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
+    let cancelBtn = UIBarButtonItem(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""), style: .plain,
                                     target: self,
                                     action: #selector(cancelBtnHandler))
-    let installBtn = UIBarButtonItem(title: "Install", style: .plain,
+    let installBtn = UIBarButtonItem(title: NSLocalizedString("command-install", bundle: engineBundle, comment: ""), style: .plain,
                                      target: self,
                                      action: #selector(installBtnHandler))
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE Locale SYSTEM "localedef.dtd">
+<!DOCTYPE Locale [
+<!ENTITY Name "Keyman">
+]>
 <Locale>
   
 <!--
@@ -19,7 +21,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <!-- Product Name -->
 
-<String Group="Product" Type="PlainText" Id="S_ShortProductName" Version="7.0.230.0" Description="Company, product and version name">&Name_CNV;</String>
+<String Group="Product" Type="PlainText" Id="S_ShortProductName" Version="7.0.230.0" Description="Company, product and version name">&Name;</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- General Strings                   -->
@@ -293,7 +295,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_Title" Version="7.0.230.0" Description="Update dialog title, where &Name; = product name">[!!Ŭƥđăţĕď !!]&Name;[!! Ċơmƥơƞȅƞŧś Ãváīŀâɓļĕ!!]</String>
 
-<String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionAvailable" Version="7.0.230.0" Description="Update dialog - updates available text">[!!Ůƥđäţęş ƒōŕ !!]&Name_CN;[!! àŕė ŋơŵ ävàıłàƄľē!!]</String>
+<String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionAvailable" Version="7.0.230.0" Description="Update dialog - updates available text">[!!Ůƥđäţęş ƒōŕ !!]&Name;[!! àŕė ŋơŵ ävàıłàƄľē!!]</String>
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_NewVersionPrompt" Version="7.1.255.0" Description="Update dialog - prompt to select updates">[!!Ƥłęāşȅ šĕĺěčţ ŧħę űƥđáŧěš ȳőŭ ŵīŝħ ŧō ĭńšťąľŀ:!!]</String>
   
 <String Group="Online Update Dialog" Type="PlainText" Id="S_Update_InstallQuery" Version="7.0.230.0" Description="Update dialog - install query">[!!Đō ȳőů ŵãŉŧ ťŏ ďơŵńĺơăď ăńď ĭŋśţȁŀļ ťħīš ƿăŧċħ ƞōŵ?!!]</String>
@@ -324,9 +326,8 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <Dialog Id="Splash" Width="630" Height="450"/>
 
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Title" Version="7.0.230.0" Description="Splash dialog title, with company, product and version name">&Name_CNV;</String>
+<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Title" Version="7.0.230.0" Description="Splash dialog title, with company, product and version name">&Name;</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Name" Version="8.0.288.0" Description="Splash major title">&Name;</String>
-<String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Version" Version="8.0.288.0" Description="Splash major version">&Version;</String>
 
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Start" Version="8.0.294.0" Description="Start Keyman Desktop button">[!!Ŝŧăŕŧ Ƙęƴmâņ!!]</String>
 <String Group="Splash Dialog" Type="PlainText" Id="S_Splash_Exit" Version="8.0.294.0" Description="Exit button">[!!Ĕxīţ!!]</String>
@@ -411,38 +412,38 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Prefix" Version="7.0.230.0" Description="Help - text preceding keyboard name">[!!Ħėŀƥ ōņ "!!]</String>
 <String Group="Help Dialog" Type="PlainText" Id="S_Help_Keyboard_Suffix" Version="7.0.230.0" Description="Help - text following keyboard name">[!!" ƙęŷƃőáŕď!!]</String>
 
-<String Group="Toolbar Context Help" Type="Caption" Caption="View On Screen Keyboard" Version="7.0.230.0" Description="Toolbar help - View OSK pop-up text">[!!Vīěŵ Őŋ Şčŗęȇņ Ƙȅƴƅŏȃřď!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="View Keyboard Usage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">[!!Vįĕŵ Ƙȇɏƅơãŗď Ŭśȁĝě!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="View Font Helper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">[!!Vĩėŵ Ƒōňţ Ħēĺƥěŗ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="View Character Map" Version="7.0.230.0" Description="Toolbar help - View Character Map pop-up text">[!!Vīěŵ Ċħåřāčŧĕř Máƿ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Switch Keyman Desktop Off" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">[!!Ŝŵĭŧčħ !!]&Name;[!! Ōƒƒ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Open Keyman Desktop Configuration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">[!!Ơƥĕŉ !!]&Name;[!! Ċơƞƒĩġũřáţīőń!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Open Help" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">[!!Ơƿĕň Ĥȅłƿ!!]</String>
-<String Group="Toolbar Context Help" Type="Caption" Caption="Close On Screen Keyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">[!!Ćļŏŝȇ Ŏň Şĉŗȅēŉ Ķēƴƃōäŗď!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - View OSK pop-up text">[!!Vīěŵ Őŋ Şčŗęȇņ Ƙȅƴƅŏȃřď!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewKeyboardUsage" Version="7.0.230.0" Description="Toolbar help - View Keyboard Usage pop-up text">[!!Vįĕŵ Ƙȇɏƅơãŗď Ŭśȁĝě!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewFontHelper" Version="7.0.230.0" Description="Toolbar help - View Font Helper pop-up text">[!!Vĩėŵ Ƒōňţ Ħēĺƥěŗ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_ViewCharacterMap" Version="7.0.230.0" Description="Toolbar help - View Character Map pop-up text">[!!Vīěŵ Ċħåřāčŧĕř Máƿ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Description="Toolbar help - Switch Keyman Desktop Off pop-up text">[!!Ŝŵĭŧčħ !!]&Name;[!! Ōƒƒ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenConfiguration" Version="7.0.230.0" Description="Toolbar help - Open Keyman Desktop Configuration pop-up text">[!!Ơƥĕŉ !!]&Name;[!! Ċơƞƒĩġũřáţīőń!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_OpenHelp" Version="7.0.230.0" Description="Toolbar help - Open help pop-up text">[!!Ơƿĕň Ĥȅłƿ!!]</String>
+<String Group="Toolbar Context Help" Type="PlainText" Id="S_Toolbar_CloseOnScreenKeyboard" Version="7.0.230.0" Description="Toolbar help - Close OSK pop-up text">[!!Ćļŏŝȇ Ŏň Şĉŗȅēŉ Ķēƴƃōäŗď!!]</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Menu Items                        -->
 <!-- - - - - - - - - - - - - - - - - - -->
 
-<String Group="System Tray Menu Items" Type="Caption" Caption="Switch Keyman Desktop Off" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">[!!Şŵıţčħ !!]&Name;[!! &amp;Ōƒƒ!!]</String> 
-<String Group="System Tray Menu Items" Type="Caption" Caption="On Screen Keyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Keyboard Usage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Font Helper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Character Map" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">[!!Ĉĥãřāĉťęř &amp;Mâƥ!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Text Editor..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">[!!&amp;Ťēxť Ȇďĩťŏř...!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Configuration..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">[!!&amp;Ċơņƒığūŕåťĭơŉ...!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_SwitchKeymanOff" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Switch Keyman Desktop Off">[!!Şŵıţčħ !!]&Name;[!! &amp;Ōƒƒ!!]</String> 
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_OnScreenKeyboard" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - OSK">[!!Ōń Ŝćŗĕėň &amp;ĶȇȳƂőářď!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_KeyboardUsage" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Keyboard Usage">[!!Ķȇƴƃơăřď &amp;Ůšăĝė!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_FontHelper" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Font Helper">[!!&amp;Ƒōńť Ħȇŀƥěŕ!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_CharacterMap" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Character Map">[!!Ĉĥãřāĉťęř &amp;Mâƥ!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_TextEditor" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Text Editor">[!!&amp;Ťēxť Ȇďĩťŏř...!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Configuration" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Configuration">[!!&amp;Ċơņƒığūŕåťĭơŉ...!!]</String>
 
-<String Group="System Tray Menu Items" Type="Caption" Caption="Help..." Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">[!!&amp;Ħęłƥ...!!]</String>
-<String Group="System Tray Menu Items" Type="Caption" Caption="Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">[!!Ĕ&amp;xĩŧ!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Help" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Help">[!!&amp;Ħęłƥ...!!]</String>
+<String Group="System Tray Menu Items" Type="PlainText" Id="S_Menu_Exit" Version="7.0.230.0" Parameters="&amp; precedes alt + access-character" Description="Systray item - Exit">[!!Ĕ&amp;xĩŧ!!]</String>
 
 <String Group="System Tray Menu Items" Type="PlainText" Id="SKMenu_NoKeyboardsInstalled" Version="7.0.230.0" Description="Systray - notice of no keyboard layouts installed">[!!Ňơ ƙěƴɓőȃřď ŀāƴőůťš āŕĕ ıŋşţāłłěď.
 Ĉĥơơšȇ "Čőŉƒįğűŗäťīŏƞ" ŧơ īňŝŧǻłľ á 
 ķȅɏƂőäŗđ ļąɏōůţ ƒőř ɏŏūŕ ĺáňġųáĝę.!!]</String>
 
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Fade When Inactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Show Toolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Save as Web Page..." Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">[!!Śǻvĕ äš ŴěƄ Ƥąģę...!!]</String>
-<String Group="On Screen Keyboard Menu Items" Type="Caption" Caption="Print..." Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">[!!Ƥŕıňŧ...!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_FadeWhenInactive" Version="7.0.230.0" Description="OSK right-click menu - fade OSK when mouse is elsewhere">[!!Ƒȁďȅ Ŵĥęń Ĭŉàčţĭvē!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_ShowToolbar" Version="7.0.230.0" Description="OSK right-click menu - show/hide OSK toolbar">[!!Ŝĥŏŵ Ťōōĺƀåř!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_SaveAsWebPage" Version="7.0.230.0" Description="OSK right-click menu - save diagram of active keyboard layout as a web page">[!!Śǻvĕ äš ŴěƄ Ƥąģę...!!]</String>
+<String Group="On Screen Keyboard Menu Items" Type="PlainText" Id="S_OSKContext_Print" Version="7.0.230.0" Description="OSK right-click menu - print diagram of active keyboard layout">[!!Ƥŕıňŧ...!!]</String>
 
 <!-- - - - - - - - - - - - - - - - - - -->
 <!-- Usage Page                        -->
@@ -466,7 +467,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 
 <!-- General -->
 
-<String Group="Formatted Messages" Type="FormatString" Id="SKApplicationTitle" Version="7.0.230.0" Description="Company and product name used for the title of message boxes and message dialogs">&Name_CN;</String>
+<String Group="Formatted Messages" Type="FormatString" Id="SKApplicationTitle" Version="7.0.230.0" Description="Company and product name used for the title of message boxes and message dialogs">&Name;</String>
 <String Group="Formatted Messages" Type="FormatString" Id="SKSplashVersion" Version="7.0.230.0" Parameters="%0:s = Version number string" Description="Version number">[!!Vĕŕŝĩŏņ %0:s!!]</String>
 
 <String Group="Formatted Messages" Type="FormatString" Id="SKButtonHelp" Version="7.0.230.0" Description="Help button in message boxes">[!!Ĥėļƥ!!]</String>

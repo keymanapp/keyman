@@ -1,18 +1,18 @@
 (*
   Name:             DevUtils
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 May 2012
 
   Modified Date:    13 Sep 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 May 2012 - mcdurdin - I3307 - V9.0 - Delphi XE2 path and package manager
                     25 May 2012 - mcdurdin - I3339 - V9.0 - Add GUI compiler wrapper for quicker review of hints and warnings
                     26 Jun 2012 - mcdurdin - I3378 - KM9 - Delphi compiler wrapper needs quiet mode
@@ -41,6 +41,7 @@ uses
   DevInstallPackages,
   DevIncludePaths,
   DevReleaseBuildCheck,
+  Keyman.System.DevTools.BuildMessageConstants,
   RegistryKeys;
 
 procedure DevLog(const s: string; nl: Boolean);
@@ -65,7 +66,7 @@ begin
 
     if ParamCount < 1 then
     begin
-      writeln('Usage: devutils -ip <package>|-rp|-ai <path>|-ri|-dcc[q] *|-dccx *');    // I3339  // I3378
+      writeln('Usage: devutils <command>');    // I3339  // I3378
       writeln('  -ip package.bpl      : install package');
       writeln('  -rp                  : reset packages');
       writeln('  -ai path[;path...]   : add include path(s)');
@@ -76,6 +77,7 @@ begin
       writeln('  -dccq ...            : wrap a call to DCC32, ignoring hints and warnings');    // I3339  // I3378
       writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
+      writeln('  -buildmessageconstants <strings.xml> <messageidentifierconsts.pas>: build MessageIdentifierConsts.pas from current strings.xml');
       ExitCode := 1;
       Exit;
     end;
@@ -102,6 +104,8 @@ begin
       Success := TReleaseBuildCheck.Run
     else if (ParamStr(1) = '-git') then   // I3726   // I5087
       Success := TCheckGitStatus.Run
+    else if (ParamStr(1) = '-buildmessageconstants') and (ParamCount = 3) then
+      Success := TBuildMessageConstants.Run(ParamStr(2), ParamStr(3))
     else
     begin
       writeln('Invalid parameters');
