@@ -236,56 +236,56 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                         imageScale: imageScaleF,
                                         action: #selector(self.showDropDownMenu),
                                         orientation: orientation)
-    moreButton.title = NSLocalizedString("menu-more", comment: "Menu option that displays the main screen's drop-down menu")
+    moreButton.title = NSLocalizedString("menu-more", comment: "")
 
     let infoButton = createNavBarButton(with: UIImage(named: "IconInfo")!,
                                         highlightedImage: UIImage(named: "IconInfoSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.infoButtonClick),
                                         orientation: orientation)
-    infoButton.title = NSLocalizedString("menu-help", comment: "Menu option that displays help for the app")
+    infoButton.title = NSLocalizedString("menu-help", comment: "")
 
     let getStartedButton = createNavBarButton(with: UIImage(named: "IconNotepad")!,
                                               highlightedImage: UIImage(named: "IconNotepadSelected")!,
                                               imageScale: imageScaleF,
                                               action: #selector(self.showGetStartedView),
                                               orientation: orientation)
-    getStartedButton.title = NSLocalizedString("menu-get-started", comment: "Menu option that displays a list designed to help users start using the app")
+    getStartedButton.title = NSLocalizedString("menu-get-started", comment: "")
 
     let trashButton = createNavBarButton(with: UIImage(named: "IconTrash")!,
                                          highlightedImage: UIImage(named: "IconTrashSelected")!,
                                          imageScale: imageScaleF,
                                          action: #selector(self.trashButtonClick),
                                          orientation: orientation)
-    trashButton.title = NSLocalizedString("menu-clear-text", comment: "Menu option that erases all previously-typed text.")
+    trashButton.title = NSLocalizedString("menu-clear-text", comment: "")
 
     let textSizeButton = createNavBarButton(with: UIImage(named: "IconTextSize")!,
                                             highlightedImage: UIImage(named: "IconTextSizeSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.textSizeButtonClick),
                                             orientation: orientation)
-    textSizeButton.title = NSLocalizedString("menu-text-size", comment: "Menu option used to control in-app font size.")
+    textSizeButton.title = NSLocalizedString("menu-text-size", comment: "")
 
     let browserButton = createNavBarButton(with: UIImage(named: "IconBrowser")!,
                                            highlightedImage: UIImage(named: "IconBrowserSelected")!,
                                            imageScale: 1.0,
                                            action: #selector(self.showKMWebBrowserView),
                                            orientation: orientation)
-    browserButton.title = NSLocalizedString("menu-show-browser", comment: "Menu option that displays an embedded web browser.")
+    browserButton.title = NSLocalizedString("menu-show-browser", comment: "")
 
     let actionButton = createNavBarButton(with: UIImage(named: "IconShare")!,
                                           highlightedImage: UIImage(named: "IconShareSelected")!,
                                           imageScale: imageScaleF,
                                           action: #selector(self.actionButtonClick),
                                           orientation: orientation)
-    actionButton.title = NSLocalizedString("menu-share", comment: "Menu option that displays the iOS Share menu")
+    actionButton.title = NSLocalizedString("menu-share", comment: "")
 
     let settingsButton = createNavBarButton(with: UIImage(named: "IconMore")!,
                                             highlightedImage: UIImage(named: "IconMoreSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.settingsButtonClick),
                                             orientation: orientation)
-    settingsButton.title = NSLocalizedString("menu-settings", comment: "Menu option used to edit keyboard and dictionary settings")
+    settingsButton.title = NSLocalizedString("menu-settings", comment: "")
 
     dropdownItems = [textSizeButton, trashButton, infoButton, getStartedButton, settingsButton]
 
@@ -492,7 +492,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       let versionLabel = UILabel()
       let infoDict = Bundle.main.infoDictionary
       let version = infoDict?["KeymanVersionWithTag"] as? String ?? ""
-      versionLabel.text = String.init(format: NSLocalizedString("version-label", comment: "(as in \"Version: 1.0.2\""), version)
+      versionLabel.text = String.init(format: NSLocalizedString("version-label", comment: ""), version)
       versionLabel.font = UIFont.systemFont(ofSize: 9.0)
       versionLabel.textAlignment = .right
       versionLabel.sizeToFit()
@@ -677,10 +677,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   @objc func trashButtonClick(_ sender: Any) {
     _ = dismissDropDownMenu()
     let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-    let clear = UIAlertAction(title: NSLocalizedString("Clear Text", comment: "Menu option that erases all previously-typed text."), style: .destructive, handler: {(_ action: UIAlertAction) -> Void in
+    let clear = UIAlertAction(title: NSLocalizedString("menu-clear-text", comment: ""),
+                              style: .destructive,
+                              handler: {(_ action: UIAlertAction) -> Void in
       self.textView.text = ""
     })
-    let cancel = UIAlertAction(title: NSLocalizedString("menu-cancel", comment: "Used to exit a menu without choosing an option"), style: .default, handler: nil)
+    let cancel = UIAlertAction(title: NSLocalizedString("menu-cancel", comment: ""),
+                               style: .default, handler: nil)
     alert.addAction(clear)
     alert.addAction(cancel)
     alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
@@ -717,7 +720,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textSize = CGFloat(sender.value + Float(minTextSize)).rounded()
     textView.font = textView.font?.withSize(textSize)
     let textSizeTitle = presentedViewController?.view.viewWithTag(2) as? UILabel
-    textSizeTitle?.text = String.init(format: NSLocalizedString("text-size-label", comment: "Used to describe the current font size"), Int(textSize))
+    textSizeTitle?.text = String.init(format: NSLocalizedString("text-size-label", comment: ""), Int(textSize))
   }
   private func rectForBarButtonItem(_ barButtonItem: UIBarButtonItem) -> CGRect {
     let view =  barButtonItem.value(forKey: "view") as? UIView
@@ -801,7 +804,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       profileName = profile
       let keyboard = AppDelegate.activeUserDefaults().userKeyboard(withFullID: fullID)!
       let languageName = keyboard.languageName
-      let title = String.init(format: NSLocalizedString("language-for-font", comment: "Short-form used when installing a font in order to display a language properly."), languageName)
+      let title = String.init(format: NSLocalizedString("language-for-font", comment: ""), languageName)
       let msg = String.init(
         format: NSLocalizedString(
           "font-install-description",
@@ -829,7 +832,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     alertController.addAction(UIAlertAction(title: NSLocalizedString("menu-cancel", comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: cbHandler))
-    alertController.addAction(UIAlertAction(title: NSLocalizedString("confirm-install", comment: "Used to confirm a user's desire to install a package"),
+    alertController.addAction(UIAlertAction(title: NSLocalizedString("confirm-install", comment: ""),
                                               style: UIAlertAction.Style.default,
                                               handler: installHandler))
 

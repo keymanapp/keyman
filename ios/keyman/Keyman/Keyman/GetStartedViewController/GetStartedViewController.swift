@@ -117,10 +117,10 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
       if #available(iOS 11.0, *) {
         // We can expedite this via near-direct settings link.
         // So, let's add the one extra needed detail to our detail text.
-        let keyboardsMenuText = NSLocalizedString("ios-settings-keyboards", comment: "Name for the iOS system 'keyboards' menu.")
+        let keyboardsMenuText = NSLocalizedString("ios-settings-keyboards", comment: "")
         let enableText = String.init(format: NSLocalizedString("toggle-to-enable", comment: ""), "Keyman")
         // Probably needs to be i18n-adjusted too.
-        let menuBreadcrumbing = NSLocalizedString("menu-breadcrumbing", comment: "Used to indicate a sequence of menu options that a user needs to copy.  Example:  Keyboards (1) > Enable Keyman (2)")
+        let menuBreadcrumbing = NSLocalizedString("menu-breadcrumbing", comment: "")
         cell.detailTextLabel?.text = String.init(format: menuBreadcrumbing, keyboardsMenuText, enableText)
       } else {
         cell.detailTextLabel?.text = ""
