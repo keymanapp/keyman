@@ -87,11 +87,6 @@
       </xsl:for-each>
       <div class="menubreak" ></div>
       <xsl:call-template name="menuitem">
-        <xsl:with-param name="id">menu_uilanguage_more</xsl:with-param>
-        <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_MoreUILanguagesMenu']"/></xsl:with-param>
-        <xsl:with-param name="command">keyman:downloaduilanguages</xsl:with-param>
-      </xsl:call-template>
-      <xsl:call-template name="menuitem">
         <xsl:with-param name="id">menu_uilanguage_contribute</xsl:with-param>
         <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_ContributeUILanguagesMenu']"/></xsl:with-param>
         <xsl:with-param name="command">keyman:contributeuilanguages</xsl:with-param>
