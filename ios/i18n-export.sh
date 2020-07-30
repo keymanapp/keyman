@@ -54,6 +54,6 @@ echo "iOS base i18n files have been exported."
 echo "Examine the contents of the folder at"
 echo "${SUCCESS_GREEN}$KEYMAN_ROOT/ios/$BASE_EXPORT_FOLDER${NORMAL}"
 echo "and compare against the iOS entries within"
-echo "${SUCCESS_GREEN}$KEYMAN_ROOT/crowdin.yaml${NORMAL}"
+echo "${SUCCESS_GREEN}$KEYMAN_ROOT/crowdin.yml${NORMAL}"
 echo "---------------------------------------------"
 

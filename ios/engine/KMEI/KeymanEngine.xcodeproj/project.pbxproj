@@ -506,7 +506,6 @@
 		CEA14871240780E100C6ECD2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ResourceInfoView.xib; sourceTree = "<group>"; };
 		CEA14874240780EF00C6ECD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		CEA148772407869200C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
-		CEA148782407869B00C6ECD2 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEA6BA9C249872E7002D44CE /* Simple 13.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 13.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Obsoletions.swift; sourceTree = "<group>"; };
 		CEA9670824BEC4030035AACF /* ResourceUpdateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceUpdateTests.swift; sourceTree = "<group>"; };
@@ -1662,7 +1661,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				CEA1486E2407808F00C6ECD2 /* en */,
-				CEA148782407869B00C6ECD2 /* km */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
