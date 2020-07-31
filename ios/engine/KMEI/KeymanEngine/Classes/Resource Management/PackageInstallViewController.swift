@@ -9,19 +9,29 @@
 import Foundation
 import WebKit
 
-public class PackageInstallViewController<Resource: LanguageResource>: UIViewController {
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
   public typealias CompletionHandler = ([Resource.FullID]?) -> Void
+
+  // Needed to support iOS 9 + 10.
+  @IBOutlet weak var webViewContainer: UIView!
+  @IBOutlet weak var lblVersion: UILabel!
+  @IBOutlet weak var lblCopyright: UILabel!
+  @IBOutlet weak var languageTable: UITableView!
 
   let package: Resource.Package
   var wkWebView: WKWebView?
   let completionHandler: CompletionHandler
   let isCustom: Bool
+  let languages: [Language]
 
   public init(for package: Resource.Package, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
     self.package = package
     self.completionHandler = completionHandler
     self.isCustom = isCustom
-    super.init(nibName: nil, bundle: nil)
+    self.languages = package.languages
+
+    super.init(nibName: "PackageInstallView", bundle: Bundle.init(for: PackageInstallViewController.self))
 
     _ = view
   }
@@ -31,12 +41,20 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   override public func loadView() {
-    wkWebView = WKWebView.init(frame: .zero)
-    wkWebView!.backgroundColor = .white
-    view = wkWebView!
+    super.loadView()
 
-    // Ensure the web view fills its available space.
-    wkWebView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    wkWebView = WKWebView.init(frame: webViewContainer.frame)
+    wkWebView!.backgroundColor = .white
+    wkWebView!.translatesAutoresizingMaskIntoConstraints = false
+    webViewContainer.addSubview(wkWebView!)
+
+//    // Ensure the web view fills its available space.
+//    wkWebView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    wkWebView!.topAnchor.constraint(equalTo: webViewContainer.topAnchor).isActive = true
+    wkWebView!.leadingAnchor.constraint(equalTo: webViewContainer.leadingAnchor).isActive = true
+
+    wkWebView!.bottomAnchor.constraint(equalTo: webViewContainer.bottomAnchor).isActive = true
+    wkWebView!.trailingAnchor.constraint(equalTo: webViewContainer.trailingAnchor).isActive = true
 
     let cancelBtn = UIBarButtonItem(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""), style: .plain,
                                     target: self,
@@ -48,11 +66,27 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     navigationItem.leftBarButtonItem = cancelBtn
     navigationItem.rightBarButtonItem = installBtn
     navigationItem.title = package.name
+
+    let versionFormat = NSLocalizedString("installer-label-version", bundle: engineBundle, comment: "")
+    lblVersion.text = String.localizedStringWithFormat(versionFormat, package.version.description)
+    if let copyright = package.metadata.info?.copyright?.description {
+      lblCopyright.text = copyright
+    } else {
+      lblCopyright.isHidden = true
+    }
+
+    languageTable.delegate = self
+    languageTable.dataSource = self
+
+    let defaultRow = languages.firstIndex(where: { $0.id == package.installableResourceSets[0][0].languageID })!
+    let defaultIndexPath = IndexPath(row: defaultRow, section: 0)
+    languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
+    languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
   }
 
   override public func viewWillAppear(_ animated: Bool) {
-    if let welcomeURL = package.welcomePageURL {
-      wkWebView?.loadFileURL(welcomeURL, allowingReadAccessTo: package.sourceFolder)
+    if let readmeURL = package.readmePageURL {
+      wkWebView?.loadFileURL(readmeURL, allowingReadAccessTo: package.sourceFolder)
     } else {
       wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
     }
@@ -66,14 +100,71 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   @objc func installBtnHandler() {
     dismiss(animated: true, completion: {
-      // A stop-gap pending further changes.
-      let defaultResource = self.package.installableResourceSets[0] as! [Resource]
-      switch self.package.resourceType() {
-        case .keyboard:
-          self.completionHandler([defaultResource[0].typedFullID])
-        case .lexicalModel:
-          self.completionHandler(defaultResource.map { $0.typedFullID })
-      }
+      let selectedItems = self.languageTable.indexPathsForSelectedRows ?? []
+      let selectedLanguageCodes = selectedItems.map { self.languages[$0.row].id }
+
+      let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
+
+      self.completionHandler(selectedResources.map { $0.typedFullID })
     })
+  }
+
+  public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {
+    return NSLocalizedString("installer-section-available-languages", bundle: engineBundle, comment: "")
+  }
+
+  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    switch section {
+      case 0:
+        return languages.count
+      default:
+        return 0
+    }
+  }
+
+  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cellIdentifier = "any"
+    var cell: UITableViewCell
+
+    if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+      cell = reusedCell
+
+      // The checkmark is not properly managed by default.
+      let shouldCheck = languageTable.indexPathsForSelectedRows?.contains(indexPath) ?? false
+      // Note for later:  also ensure that it wasn't already installed.  (exception to rule above)
+      cell.accessoryType = shouldCheck ? .checkmark : .none
+    } else {
+      let selectionColor = UIView()
+
+      if #available(iOSApplicationExtension 11.0, *) {
+        selectionColor.backgroundColor = UIColor(named: "SelectionPrimary")
+      } else {
+        selectionColor.backgroundColor = Colors.selectionPrimary
+      }
+
+      cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+      cell.selectedBackgroundView = selectionColor
+    }
+
+    switch indexPath.section {
+      case 0:
+        let index = indexPath.row
+        cell.detailTextLabel?.text = languages[index].name
+        return cell
+      default:
+        return cell
+    }
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    navigationItem.rightBarButtonItem?.isEnabled = true
+    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+  }
+
+  public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+    if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
+      navigationItem.rightBarButtonItem?.isEnabled = false
+    }
+    tableView.cellForRow(at: indexPath)?.accessoryType = .none
   }
 }

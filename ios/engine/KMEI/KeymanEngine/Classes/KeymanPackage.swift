@@ -300,13 +300,23 @@ public class KeymanPackage {
   }
   
   public func infoHtml() -> String {
-    if let welcomeURL = self.welcomePageURL {
-      if let html = try? String(contentsOfFile: welcomeURL.path, encoding: String.Encoding.utf8) {
+    if let readmeURL = self.readmePageURL {
+      if let html = try? String(contentsOfFile: readmeURL.path, encoding: String.Encoding.utf8) {
         return html
       }
     }
   
     return defaultInfoHtml()
+  }
+
+  public var readmePageURL: URL? {
+    let readmeURL = self.sourceFolder.appendingPathComponent("readme.htm")
+
+    if FileManager.default.fileExists(atPath: readmeURL.path) {
+      return readmeURL
+    } else {
+      return nil
+    }
   }
 
   public var welcomePageURL: URL? {
@@ -329,6 +339,10 @@ public class KeymanPackage {
 
   var resources: [AnyKMPResource] {
     fatalError("abstract base method went uninplemented by derived class")
+  }
+
+  var languages: [Language] {
+    fatalError("abstract base method went unimplemented by derived class")
   }
 
   /**
@@ -529,5 +543,22 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
       // For some reason, Swift just won't recognize that it's the same type in the line below.
       kbdMetadata.hasMatchingMetadata(for: resource as! Metadata.LanguageResourceType, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
     })
+  }
+
+  public override var languages: [Language] {
+    let unfilteredLanguageList = self.resources.flatMap { $0.languages }
+
+    var languages: [Language] = []
+    var langCodeSet: Set<String> = Set<String>()
+
+    unfilteredLanguageList.forEach { entry in
+      if !langCodeSet.contains(entry.languageId) {
+        langCodeSet.insert(entry.languageId)
+        languages.append(Language(from: entry))
+      }
+    }
+
+    languages.sort { $0.name < $1.name }
+    return languages
   }
 }
