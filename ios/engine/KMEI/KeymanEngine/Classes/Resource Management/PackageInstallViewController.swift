@@ -11,6 +11,16 @@ import WebKit
 import DeviceKit
 
 public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate {
+  private enum NavigationMode: Int {  // b/c hashable
+    // left nav
+    case cancel
+    case back
+
+    // right nav
+    case none
+    case next
+    case install
+  }
 
   public typealias CompletionHandler = ([Resource.FullID]?) -> Void
 
@@ -33,6 +43,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   let completionHandler: CompletionHandler
   let isCustom: Bool
   let languages: [Language]
+
+  private var leftNavMode: NavigationMode = .cancel
+  private var rightNavMode: NavigationMode = .none
+  private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
 
   public init(for package: Resource.Package, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
     self.package = package
@@ -70,15 +84,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     wkWebView!.bottomAnchor.constraint(equalTo: webViewContainer.bottomAnchor).isActive = true
     wkWebView!.trailingAnchor.constraint(equalTo: webViewContainer.trailingAnchor).isActive = true
 
-    let cancelBtn = UIBarButtonItem(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""), style: .plain,
-                                    target: self,
-                                    action: #selector(cancelBtnHandler))
-    let installBtn = UIBarButtonItem(title: NSLocalizedString("command-install", bundle: engineBundle, comment: ""), style: .plain,
-                                     target: self,
-                                     action: #selector(installBtnHandler))
-
-    navigationItem.leftBarButtonItem = cancelBtn
-    navigationItem.rightBarButtonItem = installBtn
+    loadNavigationItems()
+    leftNavigationMode = .cancel
+    rightNavigationMode = .install
     navigationItem.title = package.name
 
     let versionFormat = NSLocalizedString("installer-label-version", bundle: engineBundle, comment: "")
@@ -112,8 +120,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       // It's weird, yeah.
       edgesForExtendedLayout = []
 
-      // Do not allow installation until the user has viewed the language list.
-      navigationItem.rightBarButtonItem?.isEnabled = false
+      rightNavigationMode = .next
     }
 
     // If we're using the iPad layout and there's only one language in the package,
@@ -136,7 +143,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
         tabVC.tabBar.isHidden = true
 
         // Since we won't be showing the user a language list, allow them to install from the info view.
-        navigationItem.rightBarButtonItem?.isEnabled = true
+        rightNavigationMode = .install
       }
     }
   }
@@ -149,6 +156,53 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     }
   }
 
+  private func loadNavigationItems() {
+    navMapping[.cancel] = UIBarButtonItem(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""), style: .plain,
+                                    target: self,
+                                    action: #selector(cancelBtnHandler))
+
+    navMapping[.back] = UIBarButtonItem(title: NSLocalizedString("command-back", bundle: engineBundle, comment: ""), style: .plain,
+                                    target: self,
+                                    action: #selector(backBtnHandler))
+
+    navMapping[.none] = UIBarButtonItem(title: NSLocalizedString("command-install", bundle: engineBundle, comment: ""), style: .plain,
+                                     target: self,
+                                     action: nil)
+    navMapping[.none]!.isEnabled = false
+
+    navMapping[.next] = UIBarButtonItem(title: NSLocalizedString("command-next", bundle: engineBundle, comment: ""), style: .plain,
+                                    target: self,
+                                    action: #selector(nextBtnHandler))
+
+    navMapping[.install] = UIBarButtonItem(title: NSLocalizedString("command-install", bundle: engineBundle, comment: ""), style: .plain,
+                                     target: self,
+                                     action: #selector(installBtnHandler))
+  }
+
+  private var leftNavigationMode: NavigationMode {
+    get {
+      return leftNavMode
+    }
+
+    set(mode) {
+      leftNavMode = mode
+
+      navigationItem.leftBarButtonItem = navMapping[mode]
+    }
+  }
+
+  private var rightNavigationMode: NavigationMode {
+    get {
+      return rightNavMode
+    }
+
+    set(mode) {
+      rightNavMode = mode
+
+      navigationItem.rightBarButtonItem = navMapping[mode]
+    }
+  }
+
   public func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
     if viewController.view.tag == 1, languages.count <= 1 {
       return false
@@ -158,8 +212,17 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   public func tabBarController(_ tabBarController: UITabBarController, didSelect item: UIViewController) {
-    if item.view.tag == 1 {
-      navigationItem.rightBarButtonItem?.isEnabled = true
+    if item.view.tag == 0 {
+      leftNavigationMode = .cancel
+      rightNavigationMode = .next
+    } else if item.view.tag == 1 {
+      leftNavigationMode = .back
+
+      if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
+        rightNavigationMode = .none
+      } else {
+        rightNavigationMode = .install
+      }
     }
   }
 
@@ -167,6 +230,26 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     dismiss(animated: true, completion: {
       self.completionHandler(nil)
     })
+  }
+
+  @objc func backBtnHandler() {
+    guard let tabVC = iphoneTabViewController else {
+      return
+    }
+    // Should only occur for iPhone layouts
+    tabVC.selectedIndex -= 1
+    // Is not automatically called!
+    tabBarController(tabVC, didSelect: tabVC.viewControllers![tabVC.selectedIndex])
+  }
+
+  @objc func nextBtnHandler() {
+    guard let tabVC = iphoneTabViewController else {
+      return
+    }
+    // Should only occur for iPhone layouts
+    tabVC.selectedIndex += 1
+    // Is not automatically called!
+    tabBarController(tabVC, didSelect: tabVC.viewControllers![tabVC.selectedIndex])
   }
 
   @objc func installBtnHandler() {
@@ -234,7 +317,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
     if languageTable.indexPathsForSelectedRows?.count ?? 0 == 0 {
-      navigationItem.rightBarButtonItem?.isEnabled = false
+      rightNavigationMode = .none
+    } else {
+      rightNavigationMode = .install
     }
     tableView.cellForRow(at: indexPath)?.accessoryType = .none
   }
