@@ -41,17 +41,15 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   let package: Resource.Package
   var wkWebView: WKWebView?
   let completionHandler: CompletionHandler
-  let isCustom: Bool
   let languages: [Language]
 
   private var leftNavMode: NavigationMode = .cancel
   private var rightNavMode: NavigationMode = .none
   private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
 
-  public init(for package: Resource.Package, isCustom: Bool, completionHandler: @escaping CompletionHandler) {
+  public init(for package: Resource.Package, completionHandler: @escaping CompletionHandler) {
     self.package = package
     self.completionHandler = completionHandler
-    self.isCustom = isCustom
     self.languages = package.languages
 
     var xib: String
@@ -76,11 +74,10 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     wkWebView!.translatesAutoresizingMaskIntoConstraints = false
     webViewContainer.addSubview(wkWebView!)
 
-//    // Ensure the web view fills its available space.
-//    wkWebView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    // Ensure the web view fills its available space.  Required b/c iOS 9 & 10 cannot load
+    // these correctly from XIBs.
     wkWebView!.topAnchor.constraint(equalTo: webViewContainer.topAnchor).isActive = true
     wkWebView!.leadingAnchor.constraint(equalTo: webViewContainer.leadingAnchor).isActive = true
-
     wkWebView!.bottomAnchor.constraint(equalTo: webViewContainer.bottomAnchor).isActive = true
     wkWebView!.trailingAnchor.constraint(equalTo: webViewContainer.trailingAnchor).isActive = true
 
@@ -89,6 +86,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     rightNavigationMode = .install
     navigationItem.title = package.name
 
+    // Initialize the package info labels and the language-picker table.
     let versionFormat = NSLocalizedString("installer-label-version", bundle: engineBundle, comment: "")
     lblVersion.text = String.localizedStringWithFormat(versionFormat, package.version.description)
     if let copyright = package.metadata.info?.copyright?.description {
@@ -100,11 +98,13 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     languageTable.delegate = self
     languageTable.dataSource = self
 
+    // Set the default selection.
     let defaultRow = languages.firstIndex(where: { $0.id == package.installableResourceSets[0][0].languageID })!
     let defaultIndexPath = IndexPath(row: defaultRow, section: 0)
     languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
     languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
 
+    // iPhone-only layout setup
     if let tabVC = iphoneTabViewController {
       tabVC.delegate = self
 
@@ -126,8 +126,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       rightNavigationMode = .next
     }
 
-    // If we're using the iPad layout and there's only one language in the package,
-    // hide the language picker.
+    // If there's only one language in the package, hide the language picker.
     if languages.count <= 1 {
       if let sourceTagConstraint = ipadTagWidthConstraint {
         // Rebuild the width constraint, setting it to zero width.
