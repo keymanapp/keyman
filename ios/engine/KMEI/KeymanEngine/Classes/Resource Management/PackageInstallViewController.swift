@@ -10,18 +10,23 @@ import Foundation
 import WebKit
 import DeviceKit
 
-public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource {
+public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate {
 
   public typealias CompletionHandler = ([Resource.FullID]?) -> Void
 
   // Needed to support iOS 9 + 10.
   @IBOutlet weak var webViewContainer: UIView!
+
+  // Common fields between both layout formats.
   @IBOutlet weak var lblVersion: UILabel!
   @IBOutlet weak var lblCopyright: UILabel!
   @IBOutlet weak var languageTable: UITableView!
 
-  // May be altered programatically.
+  // iPad layout only - May be altered programatically.
   @IBOutlet weak var ipadTagWidthConstraint: NSLayoutConstraint?
+
+  // iPhone layout only
+  @IBOutlet var iphoneTabViewController: UITabBarController!
 
   let package: Resource.Package
   var wkWebView: WKWebView?
@@ -39,7 +44,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     if Device.current.isPad {
       xib = "PackageInstallView_iPad"
     } else {
-      xib = "PackageInstallView_base"
+      xib = "PackageInstallView_iPhone"
     }
 
     super.init(nibName: xib, bundle: Bundle.init(for: PackageInstallViewController.self))
@@ -51,9 +56,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     fatalError("init(coder:) has not been implemented")
   }
 
-  override public func loadView() {
-    super.loadView()
-
+  override public func viewDidLoad() {
     wkWebView = WKWebView.init(frame: webViewContainer.frame)
     wkWebView!.backgroundColor = .white
     wkWebView!.translatesAutoresizingMaskIntoConstraints = false
@@ -94,9 +97,28 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
     languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
 
+    if let tabVC = iphoneTabViewController {
+      tabVC.delegate = self
+
+      let tabView = tabVC.view!
+      self.view.addSubview(tabVC.view)
+
+      tabView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+      tabView.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+      tabView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+      tabView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+
+      // Prevents the tab view from being obscured by the navigation bar.
+      // It's weird, yeah.
+      edgesForExtendedLayout = []
+
+      // Do not allow installation until the user has viewed the language list.
+      navigationItem.rightBarButtonItem?.isEnabled = false
+    }
+
     // If we're using the iPad layout and there's only one language in the package,
     // hide the language picker.
-    if languages.count == 1 {
+    if languages.count <= 1 {
       if let sourceTagConstraint = ipadTagWidthConstraint {
         // Rebuild the width constraint, setting it to zero width.
         // The 'proper' iOS approach is to disable the old one and replace it with a new one.
@@ -109,8 +131,12 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
                                                    multiplier: 0,
                                                    constant: 0)
         hideTagConstraint.isActive = true
-      } else {
-        // Do iPhone layout single-lang-tag things.
+      } else if let tabVC = iphoneTabViewController {
+        // Hide the tab bar, making it appear as if only the "info view" portion exists.
+        tabVC.tabBar.isHidden = true
+
+        // Since we won't be showing the user a language list, allow them to install from the info view.
+        navigationItem.rightBarButtonItem?.isEnabled = true
       }
     }
   }
@@ -120,6 +146,20 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       wkWebView?.loadFileURL(readmeURL, allowingReadAccessTo: package.sourceFolder)
     } else {
       wkWebView?.loadHTMLString(package.infoHtml(), baseURL: nil)
+    }
+  }
+
+  public func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+    if viewController.view.tag == 1, languages.count <= 1 {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  public func tabBarController(_ tabBarController: UITabBarController, didSelect item: UIViewController) {
+    if item.view.tag == 1 {
+      navigationItem.rightBarButtonItem?.isEnabled = true
     }
   }
 
