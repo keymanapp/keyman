@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>menu-langsettings-lexical-model-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>%u dictionaries installed</string>
+        <key>one</key>
+        <string>%u dictionary installed</string>
+        <key>two</key>
+        <string>%u dictionaries installed</string>
+        <key>few</key>
+        <string>%u dictionaries installed</string>
+        <key>many</key>
+        <string>%u dictionaries installed</string>
+        <key>other</key>
+        <string>%u dictionaries installed</string>
+      </dict>
+    </dict>
+    <key>notification-update-failed</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>zero</key>
+        <string>%u updates failed</string>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u update failed</string>
+        <key>two</key>
+        <string>%u updates failed</string>
+        <key>few</key>
+        <string>%u updates failed</string>
+        <key>many</key>
+        <string>%u updates failed</string>
+        <key>other</key>
+        <string>%u updates failed</string>
+      </dict>
+    </dict>
+    <key>notification-update-success</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>zero</key>
+        <string>%u updates successful</string>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>one</key>
+        <string>%u update successful</string>
+        <key>two</key>
+        <string>%u updates successful</string>
+        <key>few</key>
+        <string>%u updates successful</string>
+        <key>many</key>
+        <string>%u updates successful</string>
+        <key>other</key>
+        <string>%u updates successful</string>
+      </dict>
+    </dict>
+    <key>settings-keyboards-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>%u keyboards installed</string>
+        <key>one</key>
+        <string>%u keyboard installed</string>
+        <key>two</key>
+        <string>%u keyboards installed</string>
+        <key>few</key>
+        <string>%u keyboards installed</string>
+        <key>many</key>
+        <string>%u keyboards installed</string>
+        <key>other</key>
+        <string>%u keyboards installed</string>
+      </dict>
+    </dict>
+    <key>settings-languages-installed-count</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>%u languages installed</string>
+        <key>one</key>
+        <string>%u language installed</string>
+        <key>two</key>
+        <string>%u languages installed</string>
+        <key>few</key>
+        <string>%u languages installed</string>
+        <key>many</key>
+        <string>%u languages installed</string>
+        <key>other</key>
+        <string>%u languages installed</string>
+      </dict>
+    </dict>
+    <key>package-default-found-keyboards</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>Found %u keyboards in package:</string>
+        <key>one</key>
+        <string>Found %u keyboard in package:</string>
+        <key>two</key>
+        <string>Found %u keyboards in package:</string>
+        <key>few</key>
+        <string>Found %u keyboards in package:</string>
+        <key>many</key>
+        <string>Found %u keyboards in package:</string>
+        <key>other</key>
+        <string>Found %u keyboards in package:</string>
+      </dict>
+    </dict>
+    <key>package-default-found-lexical-models</key>
+    <dict>
+      <key>NSStringLocalizedFormatKey</key>
+      <string>%#@count@</string>
+      <key>count</key>
+      <dict>
+        <key>NSStringFormatSpecTypeKey</key>
+        <string>NSStringPluralRuleType</string>
+        <key>NSStringFormatValueTypeKey</key>
+        <string>u</string>
+        <key>zero</key>
+        <string>Found %u dictionaries in package:</string>
+        <key>one</key>
+        <string>Found %u dictionary in package:</string>
+        <key>two</key>
+        <string>Found %u dictionaries in package:</string>
+        <key>few</key>
+        <string>Found %u dictionaries in package:</string>
+        <key>many</key>
+        <string>Found %u dictionaries in package:</string>
+        <key>other</key>
+        <string>Found %u dictionaries in package:</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>
