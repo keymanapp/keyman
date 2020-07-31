@@ -34,6 +34,7 @@ uses
 
   Hints,
   InterfaceHotkeys,
+  Keyman.Configuration.System.InstallDefaultUILanguage,
   Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
   kmint,
@@ -52,6 +53,8 @@ begin
 
   if DoDefaults then  // I2753
   begin
+    TInstallDefaultUILanguage.Execute;
+
     { General }
     kmcom.Options['koKeyboardHotkeysAreToggle'].Value := True;
     kmcom.Options['koAltGrCtrlAlt'].Value := False;
