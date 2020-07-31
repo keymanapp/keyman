@@ -44,7 +44,7 @@ public class KMPBrowserActivity extends AppCompatActivity {
   // Patterns for determining if a link should be opened in external browser
   // 1. Host isn't keyman.com (production/staging)
   // 2. Host is keyman.com but not /keyboards/
-  private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/keyboards(\\/)?(.+)?$";
+  private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/keyboards(/)?(.+)?$";
   private static final String keyboardPatternFormatStr = String.format(INTERNAL_KEYBOARDS_LINK_FORMATSTR,
     KMPLink.KMP_PRODUCTION_HOST,
     KMPLink.KMP_STAGING_HOST);
