@@ -124,6 +124,13 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       edgesForExtendedLayout = []
 
       rightNavigationMode = .next
+
+      if #available(*, iOS 13.4) {
+        // No icon issues here.
+      } else {
+        tabVC.tabBar.items![0].titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -16)
+        tabVC.tabBar.items![1].titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -16)
+      }
     }
 
     // If there's only one language in the package, hide the language picker.
