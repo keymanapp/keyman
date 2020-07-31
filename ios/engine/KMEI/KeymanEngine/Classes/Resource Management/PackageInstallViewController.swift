@@ -8,6 +8,7 @@
 
 import Foundation
 import WebKit
+import DeviceKit
 
 public class PackageInstallViewController<Resource: LanguageResource>: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -18,6 +19,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @IBOutlet weak var lblVersion: UILabel!
   @IBOutlet weak var lblCopyright: UILabel!
   @IBOutlet weak var languageTable: UITableView!
+
+  // May be altered programatically.
+  @IBOutlet weak var ipadTagWidthConstraint: NSLayoutConstraint?
 
   let package: Resource.Package
   var wkWebView: WKWebView?
@@ -31,7 +35,14 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.isCustom = isCustom
     self.languages = package.languages
 
-    super.init(nibName: "PackageInstallView", bundle: Bundle.init(for: PackageInstallViewController.self))
+    var xib: String
+    if Device.current.isPad {
+      xib = "PackageInstallView_iPad"
+    } else {
+      xib = "PackageInstallView_base"
+    }
+
+    super.init(nibName: xib, bundle: Bundle.init(for: PackageInstallViewController.self))
 
     _ = view
   }
@@ -82,6 +93,26 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     let defaultIndexPath = IndexPath(row: defaultRow, section: 0)
     languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
     languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
+
+    // If we're using the iPad layout and there's only one language in the package,
+    // hide the language picker.
+    if languages.count == 1 {
+      if let sourceTagConstraint = ipadTagWidthConstraint {
+        // Rebuild the width constraint, setting it to zero width.
+        // The 'proper' iOS approach is to disable the old one and replace it with a new one.
+        sourceTagConstraint.isActive = false
+        let hideTagConstraint = NSLayoutConstraint(item: sourceTagConstraint.firstItem as Any,
+                                                   attribute: sourceTagConstraint.firstAttribute,
+                                                   relatedBy: sourceTagConstraint.relation,
+                                                   toItem: sourceTagConstraint.secondItem,
+                                                   attribute: sourceTagConstraint.secondAttribute,
+                                                   multiplier: 0,
+                                                   constant: 0)
+        hideTagConstraint.isActive = true
+      } else {
+        // Do iPhone layout single-lang-tag things.
+      }
+    }
   }
 
   override public func viewWillAppear(_ animated: Bool) {
