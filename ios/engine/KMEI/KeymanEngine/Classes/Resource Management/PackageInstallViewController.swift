@@ -116,6 +116,9 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       tabView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
       tabView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
 
+      tabVC.tabBar.items![0].title = NSLocalizedString("installer-label-package-info", bundle: engineBundle, comment: "")
+      tabVC.tabBar.items![1].title = NSLocalizedString("installer-label-select-languages", bundle: engineBundle, comment: "")
+
       // Prevents the tab view from being obscured by the navigation bar.
       // It's weird, yeah.
       edgesForExtendedLayout = []
