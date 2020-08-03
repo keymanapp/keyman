@@ -44,12 +44,17 @@ files:
         pap: pap
 
   # Windows files
+  # Note: we use type: android for the Windows project files
 
   - source: /windows/src/desktop/kmshell/xml/strings.xml
     dest: /windows/strings.xml
-    translation: /windows/src/desktop/kmshell/locale/%locale%/strings.xml
+    translation: /windows/src/desktop/kmshell/locale/%locale%/%original_file_name%
     type: android
-    # yes, we use type: android for the Windows project
+
+  - source: /window/src/desktop/setup/locale/en/strings.xml
+    dest: /windows/setup/strings.xml
+    translation: /windows/src/desktop/setup/locale/%locale%/%original_file_name%
+    type: android
 
   # iOS files
 

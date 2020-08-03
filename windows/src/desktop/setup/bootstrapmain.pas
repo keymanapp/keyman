@@ -126,7 +126,7 @@ BEGIN
       Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
       InitCommonControl(ICC_PROGRESS_CLASS);
 
-      TSetupUILanguageManager.Execute;
+      TSetupUILanguageManager.SetDefault;
 
       FTempPath := CreateTempDir;
       try

@@ -143,6 +143,7 @@ uses
   OnlineConstants,
   SFX,
   SetupStrings,
+  Keyman.Setup.System.SetupUILanguageManager,
   Keyman.System.MITLicense,
   Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
@@ -577,10 +578,10 @@ var
   item: TPair<string,string>;
   n: Integer;
 begin
-  for item in TLocaleManager.Locales do
+  for item in TSetupUILanguageManager.Locales do
   begin
     n := cbLanguage.Items.Add(item.Value);
-    if TLocaleManager.ActiveLocale = item.Key then
+    if TSetupUILanguageManager.ActiveLocale = item.Key then
       cbLanguage.ItemIndex := n;
   end;
   cbLanguage.Visible := cbLanguage.Items.Count > 1;
@@ -945,7 +946,7 @@ end;
 
 procedure TfrmRunDesktop.cbLanguageClick(Sender: TObject);
 begin
-  TLocaleManager.ActiveLocale := TLocaleManager.Locales.Keys.ToArray[cbLanguage.ItemIndex];
+  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[cbLanguage.ItemIndex];
   FillStrings;
 end;
 
