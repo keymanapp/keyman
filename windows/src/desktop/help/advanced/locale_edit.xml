@@ -1,43 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <section id="advanced_locale_edit">
-  <title>The Locale Editor - Translating the Keyman Desktop User Interface</title>
-  <para>Localization of the user interface is possible via editing a single XML file called <filename>locale.xml</filename>.  The default <filename>locale.xml</filename> file is in the folder <filename class="directory">[Program Files]\Keyman\Keyman Desktop 10.0\xml\</filename>.</para>
+  <title>Translating the Keyman Desktop User Interface</title>
 
-  <bridgehead>Online Locale Editor</bridgehead>
-  <para>The recommended method for editing a locale file is to use the Online Editor, available on the
-<!--do we have such a link?-->  <ulink url="http://www.keyman.com/keyman/support/locale/">Keyman Website</ulink>.</para>
+  <bridgehead>Online User Interface Translation Editor</bridgehead>
+  <para>Localization of the user interface is possible by using the online interface at <ulink url="https://translate.keyman.com/">translate.keyman.com</ulink>.</para>
   
-  <bridgehead>First steps to creating a translation</bridgehead>
-  <orderedlist>
-    <listitem>
-      <para>Find the language code for your translation</para>
-      <para>Use the <ulink url="http://www.loc.gov/standards/iso639-2/">ISO 639-2</ulink> or <ulink url="http://www.sil.org/iso639-3/">ISO 639-3</ulink> language code (we recommend using the            ISO 639-3 codes as many Keyman keyboard layouts support languages not included in ISO 639-2!).</para>
-    </listitem>
-    <listitem>
-      <para>Create a folder for the translated locale.xml file and copy the default locale.xml into it</para>
-	  <!--we do not seem to have 'langcode' folder in v10.0-->
-      <para>The folder should be called: <filename>[Program Files]\Keyman\Keyman Desktop 10.0\locale\<userinput>langcode</userinput></filename></para>
-    </listitem>
-  </orderedlist>
-  <bridgehead>File Format</bridgehead>
-  <para>The file is an XML file, with a few different elements:</para>
-  <para>
-    <itemizedlist>
-      <listitem>
-        <para>Entity declarations: these are at the start of the file and define commonly repeated           strings within the locale.xml file itself, for example, the name of the product.</para>
-      </listitem>
-      <listitem>
-        <para>Dialog elements: these define the size of a dialog box and, for some dialogs, the elements within the dialog.</para>
-      </listitem>
-      <listitem>
-        <para>String elements: every translatable string in the file.</para>
-      </listitem>
-    </itemizedlist>
-  </para>
-  <para>Nearly all strings have identifiers (e.g. SKButtonOK for        the <guibutton>OK</guibutton> button).  We have three different types of strings in the file - plain, HTML and format strings:</para>
+  <bridgehead>Notes on editing translations</bridgehead>
+  <para>Nearly all strings have identifiers (e.g. SKButtonOK for the <guibutton>OK</guibutton> button).  We have three different types of strings in the file - plain, HTML and format strings:</para>
   <itemizedlist>
     <listitem>
-      <para>Format strings often include %#:s or %#:d markers that are placeholders for parameters, and should be            included in a translated string.  The order of the markers in the translated string is not important.</para>
+      <para>Format strings often include %#:s or %#:d markers that are placeholders for parameters, and should be included in a translated string.  The order of the markers in the translated string is not important.</para>
       <para>Example: <code>&lt;String Type="FormatString" Id="SKPackageAlreadyInstalled"&gt;A package with the name %0:s is already installed.  Do you want to uninstall it and install the new one?&lt;/String&gt;</code></para>
     </listitem>
     <listitem>
@@ -45,26 +17,21 @@
       <para>Example: <code>&lt;String Type="PlainText" Id="S_ShortProductName"&gt;Keyman Desktop&lt;/String&lt;</code></para>
     </listitem>
     <listitem>
-      <para>HTML strings can include tags - there are only a few of these, and they are flagged in the <filename>locale.xml</filename> file.  The most obvious of these is in the Welcome screen text.</para>
-      <para>Example: <code>&lt;String Type="HTML" Id="S_Splash_Button_Buy" AccessKey="B"&gt;&lt;u&gt;B&lt;/u&gt;uy&lt;/String&gt;</code></para>
+      <para>HTML strings can include tags - there are only a few of these.  The most obvious of these is in the Welcome screen text.</para>
+      <para>Example: <code>&lt;String Type="HTML" Id="S_Splash_Button_Start" AccessKey="S"&gt;&lt;u&gt;S&lt;/u&gt;tart&lt;/String&gt;</code></para>
     </listitem>
   </itemizedlist>
-  <para>There is one exception to these formats - the strings on the tray menu do not have identifiers, but        instead use the following format (note that the Caption attribute should not include the &amp;amp; entity).            You can even use these strings to translate the name of keyboard layouts in the tray menu!</para>
-  <para>Example:</para>
-  <para>
-    <code>&lt;String Type="PlainText" Caption="Keyman Configuration..."&gt;localized &amp;amp;text...&lt;/String&gt;</code>
-  </para>
-  <para>The &amp;amp; entity is used to mark hotkeys in menu items, labels and buttons.  It can be used only       with strings identified as formatted messages (these mostly start with SK) and with the Menu strings.</para>
-  <bridgehead>Hints on editing the file</bridgehead>
-  <para>First, edit the file's language information - SKUILanguageName, SKUILanguageNameWithEnglish, and SKLanguageCode.        The SKLanguageCode should be the same as the language code you chose earlier.  You will also see a String with       id SKDefaultLanguageCode.  For Keyman Desktop, this should remain "en" for all translations.  When developing a        custom product using the Keyman Developer Branding Kit, you may change your product's default language, and this       would then entail changing SKDefaultLanguageCode.</para>
+  <para>The &amp;amp; entity is used to mark hotkeys in menu items, labels and buttons.  It can be used only 
+        with strings identified as formatted messages (these mostly start with SK) and with the Menu strings.</para>
+  <bridgehead>Hints on editing a translation</bridgehead>
+  <para>First, edit the translations's language information - SKUILanguageName, SKUILanguageNameWithEnglish, and SKLanguageCode. 
+        The SKLanguageCode should be the same as the language code you chose earlier.  You will also see a String with 
+        id SKDefaultLanguageCode.  For Keyman Desktop, this should remain "en" for all translations.  When developing a 
+        custom product using the Keyman Engine, you may change your product's default language, and this
+        would then entail changing SKDefaultLanguageCode.</para>
   <note>
-    <para>Any entries missing from the translated locale.xml will be retrieved from the default file.</para>
+    <para>Any entries missing from the translation will be retrieved from the default file.</para>
   </note>
-  <bridgehead>Editing other files in the XML folder</bridgehead>
-  <para>If you find that you need to do more work on the user interface, you can always copy the other files        from the default xml folder into your locale folder, and edit them directly.  Note        that the XSL file for each dialog (e.g. activate.xsl, or keyman.xsl) references other files - these        other files must also be copied to the locale folder: 	  <!--we do not seem to have 'langcode' folder in v10.0--><filename>[Program Files]\Keyman\Keyman Desktop 10.0\locale\<userinput>langcode</userinput></filename></para>
-  <tip>
-    <para>The format and organisation of these files is complex.  More details are available in the Keyman Developer help files.</para>
-  </tip>
   
   <bridgehead>Related Topics</bridgehead>
   <itemizedlist>
