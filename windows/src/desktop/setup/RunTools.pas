@@ -135,6 +135,7 @@ uses
   bootstrapmain,
   GetOsVersion,
   Keyman.Setup.System.ResourceDownloader,
+  Keyman.Setup.System.SetupUILanguageManager,
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
@@ -632,11 +633,14 @@ begin
     if CheckForUpdates then s := s + 'CheckForUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
-
     msiLocation := FInstallInfo.BestMsi;
     if Assigned(msiLocation) and (
         (FInstallInfo.InstalledVersion.Version = '') or (FInstallInfo.InstalledVersion.ProductCode <> msiLocation.ProductCode)
-      ) then s := s + 'InstallDefaults,';  // I2651
+      ) then
+    begin
+      s := s + 'InstallDefaults,';  // I2651
+      s := s + ' -defaultuilanguage='+TSetupUILanguageManager.ActiveLocale;
+    end;
 
     if StartDisabled then
     begin

@@ -147,7 +147,7 @@ uses
 
   extctrls, stdctrls, comctrls;
 
-function FirstRun(FQuery, FDisablePackages: string): Boolean; forward;  // I2562
+function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 
@@ -190,7 +190,7 @@ begin
 end;
 
 function Init(var FMode: TKMShellMode; KeyboardFileNames: TStrings; var FSilent, FForce, FNoWelcome: Boolean;
-  var FLogFile, FQuery: string; var FDisablePackages: string; var FStartWithConfiguration: Boolean; var FParentWindow: THandle): Boolean;
+  var FLogFile, FQuery: string; var FDisablePackages, FDefaultUILanguage: string; var FStartWithConfiguration: Boolean; var FParentWindow: THandle): Boolean;
 var
   s: string;
   i: Integer;
@@ -201,6 +201,7 @@ begin
   FNoWelcome := False;
   FStartWithConfiguration := False;
   FDisablePackages := '';
+  FDefaultUILanguage := '';
   FQuery := '';
   FMode := fmStart;
   KeyboardFileNames.Clear;
@@ -249,6 +250,8 @@ begin
       else if s = '-repair' then FMode := fmRepair   // I4773
       else if s = '-keepintouch' then FMode := fmKeepInTouch
       else if Copy(s,1,Length('-disablepackages')) = '-disablepackages' then begin FDisablePackages := Copy(s, Length('-disablepackages')+2, MaxInt); end // Used with -firstrun
+      else if Copy(s,1,Length('-defaultuilanguage')) = '-defaultuilanguage' then begin FDefaultUILanguage := Copy(s, Length('-defaultuilanguage')+2, MaxInt); end // Used with -firstrun
+
       else if s = '-startwithconfiguration' then FStartWithConfiguration := True
       else if s = '-q'   then
       begin
@@ -288,7 +291,7 @@ begin
 end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
-  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean; FParentWindow: THandle); forward;
+  FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle); forward;
 
 procedure Run;
 var
@@ -299,7 +302,7 @@ var
   FForce: Boolean;
   FParentWindow: THandle;
   FLogFile: string;
-  FDisablePackages: string;
+  FDisablePackages, FDefaultUILanguage: string;
   FStartWithConfiguration: Boolean;
 begin
   RegisterControlClasses;
@@ -307,7 +310,7 @@ begin
   KeyboardFileNames := TStringList.Create;
   try
     FParentWindow := 0;
-    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration, FParentWindow) then
+    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow) then
     begin
   //TODO:   TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
       Exit;
@@ -315,7 +318,7 @@ begin
 
     if not LoadKMCOM then Exit;
     try
-      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FStartWithConfiguration, FParentWindow);
+      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow);
     finally
       kmcom := nil;
     end;
@@ -325,7 +328,7 @@ begin
 end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
-  FLogFile, FQuery: string; FDisablePackages: string; FStartWithConfiguration: Boolean; FParentWindow: THandle);
+  FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle);
 var
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
@@ -395,7 +398,7 @@ begin
       PrintKeyboard(FirstKeyboardFileName);
 
     fmFirstRun:  // I2562
-      if FirstRun(FQuery, FDisablePackages)
+      if FirstRun(FQuery, FDisablePackages, FDefaultUILanguage)
         then ExitCode := 0
         else ExitCode := 2;
 
@@ -513,7 +516,7 @@ begin
   FreeAndNil(FMutex);  // I2720
 end;
 
-function FirstRun(FQuery, FDisablePackages: string): Boolean; // I2562
+function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; // I2562
 var
   DoAdmin: Boolean;
 begin
@@ -528,6 +531,7 @@ begin
       Pos('startwithwindows', FQuery) > 0,
       Pos('checkforupdates', FQuery) > 0,
       FDisablePackages,
+      FDefaultUILanguage,
       Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753
   end;
 end;
