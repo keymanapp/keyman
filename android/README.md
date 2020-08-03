@@ -14,7 +14,7 @@ https://github.com/ojdkbuild/ojdkbuild
 2. On on windows: use the default java path C:\Program Files\Java to avoid error message "Error 0x80010135 Path Too Long".
 3. Aso set an environment variable for JAVA_HOME e.g C:\Program Files\Java\openjdk-1.8.0.232-1
 
-## Minimum Android Requirements
+## Keyman Minimum Android Requirements
 Keyman for Android has a minSdkVersion of 21 for [Android 5.0 Lollipop](https://developer.android.com/about/versions/lollipop)
 
 ## Setup Android Studio
@@ -47,6 +47,12 @@ yes | ./sdkmanager --licenses
 Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
 Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
+
+### Install JQ
+jq 1.6+ is used during the build process to determine the latest versions of the default keyboard (sil_euro_latin.kmp) and lexical-model (en.nrc.mtnt.model.kmp) packages to download. For builds on Windows, jq is already included in `/resources/build/`
+
+On Linux
+sudo apt install jq
 
 ### Crash Reporting
 Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
