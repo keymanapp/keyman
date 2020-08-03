@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.121 alpha 2020-08-03
+
+* fix(android): Fix KMTextView to compile on Linux (#3442)
+
 ## 14.0.120 alpha 2020-07-31
 
 * feat(android): Use api.keyman-staging.com for pre-release builds (#3423)
