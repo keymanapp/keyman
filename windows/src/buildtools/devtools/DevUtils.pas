@@ -42,6 +42,7 @@ uses
   DevIncludePaths,
   DevReleaseBuildCheck,
   Keyman.System.DevTools.BuildMessageConstants,
+  Keyman.System.DevTools.BuildSetupStringTranslations,
   RegistryKeys;
 
 procedure DevLog(const s: string; nl: Boolean);
@@ -78,6 +79,7 @@ begin
       writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
       writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
       writeln('  -buildmessageconstants <strings.xml> <messageidentifierconsts.pas>: build MessageIdentifierConsts.pas from current strings.xml');
+      writeln('  -buildsetupstrings <sourcepath> <destinationpath>: build Keyman.Setup.System.Locale.*.pas from strings.xml found in sourcepath');
       ExitCode := 1;
       Exit;
     end;
@@ -106,6 +108,8 @@ begin
       Success := TCheckGitStatus.Run
     else if (ParamStr(1) = '-buildmessageconstants') and (ParamCount = 3) then
       Success := TBuildMessageConstants.Run(ParamStr(2), ParamStr(3))
+    else if (ParamStr(1) = '-buildsetupstrings') and (ParamCount = 3) then
+      Success := TBuildSetupStringTranslations.Run(ParamStr(2), ParamStr(3))
     else
     begin
       writeln('Invalid parameters');

@@ -535,6 +535,9 @@ object frmRunDesktop: TfrmRunDesktop
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 1
+    DesignSize = (
+      699
+      60)
     object lblOptions: TLabel
       Left = 20
       Top = 24
@@ -561,6 +564,20 @@ object frmRunDesktop: TfrmRunDesktop
       Width = 3
       Height = 13
     end
+    object lblGlobe: TLabel
+      Left = 433
+      Top = 17
+      Width = 25
+      Height = 27
+      Anchors = [akTop, akRight]
+      Caption = #55356#57104
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -22
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
     object progress: TProgressBar
       Left = 247
       Top = 28
@@ -574,9 +591,28 @@ object frmRunDesktop: TfrmRunDesktop
       Top = 19
       Width = 69
       Height = 25
+      Anchors = [akTop, akRight]
       Caption = 'ssExitButton'
       TabOrder = 1
       OnClick = cmdExitClick
+    end
+    object cbLanguage: TComboBox
+      Left = 464
+      Top = 19
+      Width = 152
+      Height = 24
+      BevelInner = bvNone
+      BevelOuter = bvNone
+      Style = csDropDownList
+      Anchors = [akTop, akRight]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      OnClick = cbLanguageClick
     end
   end
 end

@@ -34,7 +34,7 @@ uses
 
   Hints,
   InterfaceHotkeys,
-  Keyman.Configuration.System.InstallDefaultUILanguage,
+  Keyman.Configuration.System.KeymanUILanguageManager,
   Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
   kmint,
@@ -53,7 +53,7 @@ begin
 
   if DoDefaults then  // I2753
   begin
-    TInstallDefaultUILanguage.Execute;
+    TKeymanUILanguageManager.Execute;
 
     { General }
     kmcom.Options['koKeyboardHotkeysAreToggle'].Value := True;

@@ -304,17 +304,6 @@ var
 begin
   RegisterControlClasses;
 
-  with TRegistryErrorControlled.Create do   // I4400
-  try
-    if OpenKey(SRegKey_InternetExplorerFeatureBrowserEmulation_CU, True) then   // I4436
-    begin
-      WriteInteger(TKeymanPaths.S_KMShell, 9000);
-      WriteInteger(TKeymanPaths.S_KeymanExe, 9000);
-    end;
-  finally
-    Free;
-  end;
-
   KeyboardFileNames := TStringList.Create;
   try
     FParentWindow := 0;

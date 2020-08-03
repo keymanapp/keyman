@@ -1,18 +1,18 @@
 (*
   Name:             SetupStrings
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jun 2007
 
   Modified Date:    23 Oct 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jun 2007 - mcdurdin - I817 - Translate to Unicode
                     14 Sep 2007 - mcdurdin - I1066 - -s option does not do a fully silent install in setup.exe (strings for logging)
                     28 Aug 2008 - mcdurdin - I1616 - Upgrade keyboards from 6.x
@@ -23,8 +23,12 @@ unit SetupStrings;
 
 interface
 
+uses
+  System.Generics.Collections;
+
 type
   TInstallInfoText = (
+    ssLanguageName,
     ssApplicationTitle,
     ssTitle,
     ssInstallSuccess,
@@ -92,8 +96,9 @@ type
     ssOffline
   );
 
+  (*
 const
-  FDefaultStrings: array[TInstallInfoText] of WideString = (
+  FDefaultStrings: array[TInstallInfoText] of string = (
   {ssApplicationTitle}                        '$APPNAME $VERSION Setup',
   {ssTitle}                                   'Install $APPNAME $VERSION',
   {ssInstallSuccess}                          '$APPNAME $VERSION has been installed successfully.',
@@ -166,7 +171,59 @@ const
                                               'Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.'
 
 );
+*)
+
+type
+  TLocaleArray = array[TInstallInfoText] of string;
+
+  TSetupLocales = TDictionary<string,string>;
+
+  TLocaleManager = class
+  private
+    class var
+    FStrings: TDictionary<string, TLocaleArray>;
+    FActiveLocale: string;
+    FLocales: TSetupLocales;
+    class procedure CreateStatic;
+  public
+    class procedure RegisterSetupStrings(const tag: string; const locale: TLocaleArray);
+    class function Get(id: TInstallInfoText): string;
+    class function Locales: TSetupLocales; static;
+    class property ActiveLocale: string read FActiveLocale write FActiveLocale;
+  end;
 
 implementation
+
+{ TLocaleManager }
+
+class procedure TLocaleManager.CreateStatic;
+begin
+  if not Assigned(FStrings) then
+  begin
+    FStrings := TDictionary<string,TLocaleArray>.Create;
+    FLocales := TSetupLocales.Create;
+  end;
+end;
+
+class function TLocaleManager.Locales: TSetupLocales;
+begin
+  Result := FLocales;
+end;
+
+class function TLocaleManager.Get(id: TInstallInfoText): string;
+begin
+  CreateStatic;
+  Result := FStrings[FActiveLocale][id];
+end;
+
+class procedure TLocaleManager.RegisterSetupStrings(const tag: string;
+  const locale: TLocaleArray);
+begin
+  CreateStatic;
+  if FActiveLocale = '' then
+    FActiveLocale := tag;
+  FStrings.Add(tag, locale);
+  FLocales.Add(tag, locale[ssLanguageName]);
+end;
 
 end.

@@ -73,6 +73,7 @@ uses
   ErrorControlledRegistry,
   GetOsVersion,
   Keyman.Setup.System.OnlineResourceCheck,
+  Keyman.Setup.System.SetupUILanguageManager,
   Keyman.System.UpgradeRegistryKeys,
   KeymanPaths,
   KeymanVersion,
@@ -124,6 +125,8 @@ BEGIN
     try
       Vcl.Forms.Application.Icon.LoadFromResourceID(hInstance, 1);  // I2611
       InitCommonControl(ICC_PROGRESS_CLASS);
+
+      TSetupUILanguageManager.Execute;
 
       FTempPath := CreateTempDir;
       try
