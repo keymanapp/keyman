@@ -55,7 +55,7 @@ public class InfoActivity extends AppCompatActivity {
     version.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     version.setGravity(Gravity.CENTER);
 
-    // Parse to create a version title
+    // Parse app version string to create a version title (Not using KMManager.getVersion() because that's for KMEA)
     String versionStr = "";
     PackageInfo pInfo;
     try {
@@ -68,7 +68,7 @@ public class InfoActivity extends AppCompatActivity {
       versionStr = "12.0.0.0";
     }
 
-    String versionTitle = String.format("%s: %s", getString(R.string.title_version), versionStr);
+    String versionTitle = String.format(getString(R.string.title_version), versionStr);
     version.setText(versionTitle);
     getSupportActionBar().setCustomView(version);
 

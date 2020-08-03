@@ -645,9 +645,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           downloadIntent.putExtra("receiver", resultReceiver);
 
           progressDialog = new ProgressDialog(MainActivity.this);
-          String ellipsisStr = "\u2026";
-          progressDialog.setMessage(String.format("%s\n%s%s",
-            getString(R.string.downloading_keyboard_package), filename, ellipsisStr));
+          progressDialog.setMessage(String.format(getString(R.string.downloading_keyboard_package), filename));
           progressDialog.setCancelable(false);
           progressDialog.show();
 
@@ -767,7 +765,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
-    dialogBuilder.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
+    dialogBuilder.setTitle(String.format(getString(R.string.text_size), textSize));
     dialogBuilder.setView(textSizeController);
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
@@ -798,7 +796,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         textSize = progress + minTextSize;
         textView.setTextSize((float) textSize);
-        dialog.setTitle(String.format("%s: %d", getString(R.string.action_text_size), textSize));
+        dialog.setTitle(String.format(getString(R.string.text_size), textSize));
       }
     });
 
@@ -827,7 +825,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_trash);
     dialogBuilder.setTitle(getString(R.string.action_clear_text));
-    dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.all_text_will_be_cleared)));
+    dialogBuilder.setMessage(getString(R.string.all_text_will_be_cleared));
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
