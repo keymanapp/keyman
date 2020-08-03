@@ -194,7 +194,6 @@
 
       <intent-filter android:autoVerify="true">
         <!-- KMPBrowserActivity converts cloud keyboard package links from http(s)://{HOST}/keyboards/install into /go/package/download
-             KMAPro should be able to handle both links.
              Use {HOST} as defined in KMPLink.java
              Also note, Manifest will OR all the scheme/host/pathPrefix combinations -->
         <action android:name="android.intent.action.VIEW" />
@@ -211,6 +210,15 @@
           android:host="keyman.com"
           android:scheme="https"
           android:pathPrefix="/go/package/download" />
+
+      </intent-filter>
+
+      <intent-filter>
+        <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
         <data
           android:host="keyman-staging.com"
