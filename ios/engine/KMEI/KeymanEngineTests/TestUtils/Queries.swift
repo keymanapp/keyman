@@ -23,5 +23,7 @@ extension TestUtils {
 
     static let model_case_en = query_bundle.url(forResource: "model-case-en", withExtension: "json")!
     static let model_case_km = query_bundle.url(forResource: "model-case-km", withExtension: "json")!
+    static let model_case_str = query_bundle.url(forResource: "model-case-str", withExtension: "json")!
+    static let model_case_none = query_bundle.url(forResource: "model-case-none", withExtension: "json")!
   }
 }
