@@ -9,13 +9,48 @@
 import Foundation
 
 // Important note:  be sure to always call pickerDismissed or pickerFinalized when using this class.
-public class LanguagePickAssociator<Resource: LanguageResource> {
+public class LanguagePickAssociator {
   public typealias AssociationSearcher = (Set<String>, @escaping ([String: (KeymanPackage.Key, URL)?]) -> Void) -> Void
   public typealias AssociationReceiver = ([KeymanPackage.Key: Association]) -> Void
 
   public struct Association {
     public let url: URL
     public let languageCodes: Set<String>
+  }
+
+  /**
+   * The default AssociationSearcher for lexical model lookups.
+   */
+  public static let lexicalModelSearcher: AssociationSearcher = constructLexicalModelSearcher(session: URLSession.shared)
+
+  internal static func constructLexicalModelSearcher(session: URLSession) -> AssociationSearcher {
+    return { lgCodes, completion in
+      // Sadly, we don't yet have an actual multi-language-code server-side model query yet.
+      // So, we have to sync up the results of this query first.
+      //
+      // Should we implement such a server-side query, this becomes markedly simpler.
+      let queueDispatch = DispatchGroup()
+      var modelMap: [String: (KeymanPackage.Key, URL)?] = [:]
+
+      lgCodes.forEach { lgCode in
+        queueDispatch.enter()
+        Queries.LexicalModel.fetchModels(forLanguageCode: lgCode,
+                                         withSession: session) { models, error in
+          guard error == nil, let models = models, models.count > 0 else {
+            modelMap[lgCode] = nil
+            queueDispatch.leave()
+            return
+          }
+
+          modelMap[lgCode] = (models[0].0.packageKey, models[0].1)
+          queueDispatch.leave()
+        }
+      }
+
+      queueDispatch.notify(queue: DispatchQueue.global()) {
+        completion(modelMap)
+      }
+    }
   }
 
   /**
@@ -103,10 +138,14 @@ public class LanguagePickAssociator<Resource: LanguageResource> {
    */
   private var pickerActive: Bool = false
 
+  private static var queueToken: Int = 0
+
   public init(searchWith searcher: @escaping AssociationSearcher, completion: @escaping AssociationReceiver) {
     closureShared = ClosureSharedSpace(searcher: searcher, closure: completion)
 
-    associationQueue = DispatchQueue(label: "com.keyman.associationQueue.\(String(describing: Resource.self))",
+    let queueID = LanguagePickAssociator.queueToken
+    LanguagePickAssociator.queueToken += 1
+    associationQueue = DispatchQueue(label: "com.keyman.associationQueue.\(queueID)",
                                      qos: .default,
                                      attributes: .concurrent,
                                      autoreleaseFrequency: .inherit,
@@ -188,18 +227,25 @@ public class LanguagePickAssociator<Resource: LanguageResource> {
 
       // Use the closure provided at initialization to search for associated resource packages.
       closureShared.searcher(languages) { map in
-        map.forEach { (lgCode, tuple) in
-          guard let (packageKey, url) = tuple else {
-            return
-          }
-
+        // We allow the searcher to return 'sparse' maps.  If no association is detected,
+        // we don't require an entry in the returned map.
+        //
+        // This allows us to save on context switching with the following if-check.
+        // We only need to synchronize when there's something actually worth writing.
+        if map.count > 0 {
           // The only non-parallel part - writing to the result cache.
           // We synchronize by evaluating all writes on our single-threaded DispatchQueue.
           closureShared.querySyncQueue.async {
-            var languageSet = (closureShared.packageMap[packageKey]?.languageCodes ?? Set())
-            languageSet.insert(lgCode)
+            map.forEach { (lgCode, tuple) in
+              guard let (packageKey, url) = tuple else {
+                return
+              }
 
-            closureShared.packageMap[packageKey] = Association(url: url, languageCodes: languageSet)
+              var languageSet = (closureShared.packageMap[packageKey]?.languageCodes ?? Set())
+              languageSet.insert(lgCode)
+
+              closureShared.packageMap[packageKey] = Association(url: url, languageCodes: languageSet)
+            }
           }
         }
 

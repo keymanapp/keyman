@@ -10,6 +10,8 @@ import XCTest
 @testable import KeymanEngine
 
 class LanguagePickAssociatorTests: XCTestCase {
+  var mockedURLSession: TestUtils.Downloading.URLSessionMock!
+
   let mockedSearchCallback: LanguagePickAssociator.AssociationSearcher = { lgCodes, callback in
     var searchResult: [String: (KeymanPackage.Key, URL)?] = [:]
 
@@ -31,17 +33,26 @@ class LanguagePickAssociatorTests: XCTestCase {
   }
 
   override func setUp() {
+    mockedURLSession = TestUtils.Downloading.URLSessionMock()
   }
 
   override func tearDownWithError() throws {
-    // Resets resource directories for a clean slate.
     TestUtils.standardTearDown()
+
+    let queueWasCleared = mockedURLSession!.queueIsEmpty
+    mockedURLSession = nil
+
+    if !queueWasCleared {
+      throw NSError(domain: "Keyman",
+                    code: 4,
+                    userInfo: [NSLocalizedDescriptionKey: "A test did not fully utilize its queued mock results!"])
+    }
   }
 
   func testSequentialQuadPick() throws {
     let expectation = XCTestExpectation()
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: mockedSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
       if results.count == 2 {
         XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -64,7 +75,7 @@ class LanguagePickAssociatorTests: XCTestCase {
   func testSimultaneousQuadPick() throws {
     let expectation = XCTestExpectation()
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: mockedSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
       if results.count == 2 {
         XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -84,7 +95,7 @@ class LanguagePickAssociatorTests: XCTestCase {
   func testDeselect() throws {
     let expectation = XCTestExpectation()
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: mockedSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
       if results.count == 1 {
         XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -123,7 +134,7 @@ class LanguagePickAssociatorTests: XCTestCase {
 
     let expectation = XCTestExpectation()
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: singleSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: singleSearchCallback) { results in
       if results.count == 1 {
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -150,7 +161,7 @@ class LanguagePickAssociatorTests: XCTestCase {
   func testNoSelect() throws {
     let expectation = XCTestExpectation()
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: mockedSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
       if results.count == 0 {
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -172,7 +183,7 @@ class LanguagePickAssociatorTests: XCTestCase {
   func testSelectionsDismissed() throws {
     let expectation = XCTestExpectation()
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: mockedSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
       if results.count == 0 {
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -194,7 +205,7 @@ class LanguagePickAssociatorTests: XCTestCase {
 
     // Uses scoping to test variable de-init behavior.
     do {
-      var associator: LanguagePickAssociator<InstallableLexicalModel>? = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
+      var associator: LanguagePickAssociator? = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
         if results.count == 0 {
           XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
           XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -228,7 +239,7 @@ class LanguagePickAssociatorTests: XCTestCase {
       }
     }
 
-    let associator = LanguagePickAssociator<InstallableLexicalModel>(searchWith: delayedSearchCallback) { results in
+    let associator = LanguagePickAssociator(searchWith: delayedSearchCallback) { results in
       if results.count == 0 {
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
         XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
@@ -248,5 +259,99 @@ class LanguagePickAssociatorTests: XCTestCase {
     delaySync.leave()
 
     wait(for: [delayedExpectation], timeout: 1)
+  }
+
+  func testLexicalModelSearcher() throws {
+    let mocked_en_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_en, error: nil)
+    let mocked_km_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_km, error: nil)
+    let mocked_str_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_str, error: nil)
+    let mocked_none_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_none, error: nil)
+
+    // Ensure the mocking order matches the set's iteration order.
+    // The calls will be synchronous; it's the callback that isn't.
+    let languageSet = Set(["en", "km", "str", "foobar"])
+    languageSet.forEach { lgCode in
+      switch lgCode {
+        case "en":
+          mockedURLSession.queueMockResult(.data(mocked_en_query))
+        case "km":
+          mockedURLSession.queueMockResult(.data(mocked_km_query))
+        case "str":
+          mockedURLSession.queueMockResult(.data(mocked_str_query))
+        default:
+          mockedURLSession.queueMockResult(.data(mocked_none_query))
+      }
+    }
+
+    let expectation = XCTestExpectation()
+
+    let searchCallback = LanguagePickAssociator.constructLexicalModelSearcher(session: mockedURLSession)
+
+    searchCallback(languageSet) { results in
+      if results.count == 2 {
+        XCTAssertTrue(results.keys.contains("en"))
+        XCTAssertTrue(results.keys.contains("str"))
+      } else {
+        XCTFail()
+      }
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
+  }
+
+  // A modded version of `testSequentialQuadPick`.
+  func testWithQueryIntegration() throws {
+    let mocked_en_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_en, error: nil)
+    let mocked_km_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_km, error: nil)
+    let mocked_str_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_str, error: nil)
+    let mocked_none_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_none, error: nil)
+
+    // Here, we control the order in which the queries arise.
+    mockedURLSession.queueMockResult(.data(mocked_en_query))
+    mockedURLSession.queueMockResult(.data(mocked_km_query))
+    mockedURLSession.queueMockResult(.data(mocked_str_query))
+    mockedURLSession.queueMockResult(.data(mocked_none_query))
+
+    let expectation = XCTestExpectation()
+    let queryExpectations: [String: XCTestExpectation] = [
+      "en": XCTestExpectation(),
+      "km": XCTestExpectation(),
+      "str": XCTestExpectation(),
+      "foobar": XCTestExpectation()
+    ]
+
+    let baseSearchCallback = LanguagePickAssociator.constructLexicalModelSearcher(session: mockedURLSession)
+    let searchCallback: LanguagePickAssociator.AssociationSearcher = { lgCodes, completion in
+      baseSearchCallback(lgCodes) { results in
+        completion(results)
+
+        // Allows us to enforce query ordering.
+        queryExpectations[lgCodes.first!]!.fulfill()
+      }
+    }
+
+    let associator = LanguagePickAssociator(searchWith: searchCallback) { results in
+      if results.count == 2 {
+        XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
+        XCTAssertTrue(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
+      } else {
+        XCTFail()
+      }
+      expectation.fulfill()
+    }
+
+    associator.pickerInitialized()
+    associator.selectLanguages(Set(["en"]))
+    wait(for: [queryExpectations["en"]!], timeout: 1)
+    associator.selectLanguages(Set(["km"]))
+    wait(for: [queryExpectations["km"]!], timeout: 1)
+    associator.selectLanguages(Set(["str"]))
+    wait(for: [queryExpectations["str"]!], timeout: 1)
+    associator.selectLanguages(Set(["foobar"]))
+    wait(for: [queryExpectations["foobar"]!], timeout: 1)
+    associator.pickerFinalized()
+
+    wait(for: [expectation], timeout: 5)
   }
 }
