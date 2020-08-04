@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.122 alpha 2020-08-04
+
+* feat(android/app): Associate app with /keyboards/install links (#3449)
+* fix(android): Update KMPBrowser to pass external links to user browser (#3439)
+* feat(ios/engine): Language-pick associator (#3451)
+
 ## 14.0.121 alpha 2020-08-03
 
 * fix(android): Fix KMTextView to compile on Linux (#3442)
