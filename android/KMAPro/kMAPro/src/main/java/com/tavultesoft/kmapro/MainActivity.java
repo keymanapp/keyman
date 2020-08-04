@@ -358,6 +358,11 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
           break;
         case "http" :
         case "https" :
+          // Might need to modify link like KMPBrowserActivity
+          String link = data.toString();
+          if (KMPLink.isKeymanInstallLink(link)) {
+            data = KMPLink.getKeyboardDownloadLink(link);
+          }
           downloadKMP(scheme);
           break;
         case "keyman" :
