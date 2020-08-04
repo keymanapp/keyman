@@ -23,7 +23,19 @@ import Foundation
  * `static let lexicalModelSearcher`.
  */
 public class LanguagePickAssociator {
+  /**
+   * A callback that returns available packages corresponding to provided language codes.
+   *
+   * This callback may preemptively filter out unwanted associations if desired.  One good example:
+   * not searching for associated resources when one of the appropriate type is already installed
+   * for the specified language code.
+   */
   public typealias AssociationSearcher = (Set<String>, @escaping ([String: (KeymanPackage.Key, URL)?]) -> Void) -> Void
+
+  /**
+   * Returns a set of package keys and source URLs found by the provided search closure associated with
+   * the selected languages.
+   */
   public typealias AssociationReceiver = ([KeymanPackage.Key: Association]) -> Void
 
   public struct Association {
@@ -46,17 +58,22 @@ public class LanguagePickAssociator {
       var modelMap: [String: (KeymanPackage.Key, URL)?] = [:]
 
       lgCodes.forEach { lgCode in
-        queueDispatch.enter()
-        Queries.LexicalModel.fetchModels(forLanguageCode: lgCode,
-                                         withSession: session) { models, error in
-          guard error == nil, let models = models, models.count > 0 else {
-            modelMap[lgCode] = nil
-            queueDispatch.leave()
-            return
-          }
+        // First, filter out any language codes that already have an installed lexical model.
+        let alreadyInstalled = Storage.active.userDefaults.userLexicalModels?.contains(where: { $0.languageID == lgCode}) ?? false
 
-          modelMap[lgCode] = (models[0].0.packageKey, models[0].1)
-          queueDispatch.leave()
+        if(!alreadyInstalled) {
+          queueDispatch.enter()
+          Queries.LexicalModel.fetchModels(forLanguageCode: lgCode,
+                                           withSession: session) { models, error in
+            guard error == nil, let models = models, models.count > 0 else {
+              modelMap[lgCode] = nil
+              queueDispatch.leave()
+              return
+            }
+
+            modelMap[lgCode] = (models[0].0.packageKey, models[0].1)
+            queueDispatch.leave()
+          }
         }
       }
 

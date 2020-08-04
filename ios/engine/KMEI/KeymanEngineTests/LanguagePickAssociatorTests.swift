@@ -300,6 +300,51 @@ class LanguagePickAssociatorTests: XCTestCase {
     wait(for: [expectation], timeout: 5)
   }
 
+  func testLexicalModelSearcherWithFiltering() throws {
+    // For this test, we want a pre-installed lexical model for the "en" language code.
+    guard let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.LexicalModels.mtntKMP) as? LexicalModelKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    try ResourceFileManager.shared.install(resourceWithID: TestUtils.LexicalModels.mtnt.fullID, from: package)
+
+    let mocked_km_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_km, error: nil)
+    let mocked_str_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_str, error: nil)
+    let mocked_none_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_none, error: nil)
+
+    // Ensure the mocking order matches the set's iteration order.
+    // The calls will be synchronous; it's the callback that isn't.
+    let languageSet = Set(["en", "km", "str", "foobar"])
+    languageSet.forEach { lgCode in
+      switch lgCode {
+        case "en":
+          return // Do not queue - the query should never occur!
+        case "km":
+          mockedURLSession.queueMockResult(.data(mocked_km_query))
+        case "str":
+          mockedURLSession.queueMockResult(.data(mocked_str_query))
+        default:
+          mockedURLSession.queueMockResult(.data(mocked_none_query))
+      }
+    }
+
+    let expectation = XCTestExpectation()
+
+    let searchCallback = LanguagePickAssociator.constructLexicalModelSearcher(session: mockedURLSession)
+
+    searchCallback(languageSet) { results in
+      if results.count == 1 {
+        XCTAssertTrue(results.keys.contains("str"))
+      } else {
+        XCTFail()
+      }
+      expectation.fulfill()
+    }
+
+    wait(for: [expectation], timeout: 5)
+  }
+
   // A modded version of `testSequentialQuadPick`.
   func testWithQueryIntegration() throws {
     let mocked_en_query = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_en, error: nil)
