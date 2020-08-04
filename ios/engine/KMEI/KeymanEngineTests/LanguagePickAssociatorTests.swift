@@ -189,28 +189,28 @@ class LanguagePickAssociatorTests: XCTestCase {
     wait(for: [expectation], timeout: 5)
   }
 
-//  func testSelectionsDeinit() throws {
-//    let expectation = XCTestExpectation()
-//
-//    // Uses scoping to test variable de-init behavior.
-//    autoreleasepool {
-//      var associator: LanguagePickAssociator<InstallableLexicalModel>? = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
-//        if results.count == 0 {
-//          XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
-//          XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
-//        } else {
-//          XCTFail()
-//        }
-//        expectation.fulfill()
-//      }
-//
-//      associator!.pickerInitialized()
-//      associator!.selectLanguages(Set(["en", "km", "str", "foobar"]))
-//      associator = nil
-//    }
-//
-//    wait(for: [expectation], timeout: 5)
-//  }
+  func testSelectionsDeinit() throws {
+    let expectation = XCTestExpectation()
+
+    // Uses scoping to test variable de-init behavior.
+    do {
+      var associator: LanguagePickAssociator<InstallableLexicalModel>? = LanguagePickAssociator(searchWith: mockedSearchCallback) { results in
+        if results.count == 0 {
+          XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_en_mtnt))
+          XCTAssertFalse(results.keys.contains(TestUtils.Packages.Keys.nrc_str_sencoten))
+        } else {
+          XCTFail()
+        }
+        expectation.fulfill()
+      }
+
+      associator!.pickerInitialized()
+      associator!.selectLanguages(Set(["en", "km", "str", "foobar"]))
+      associator = nil
+    }
+
+    wait(for: [expectation], timeout: 5)
+  }
 
   func testQueryCompletionDelay() throws {
     let expectation = XCTestExpectation()
