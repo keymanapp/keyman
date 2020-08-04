@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 14.0.121 alpha 2020-08-03
+
+* fix(android): Fix KMTextView to compile on Linux (#3442)
+
+## 14.0.120 alpha 2020-07-31
+
+* feat(android): Use api.keyman-staging.com for pre-release builds (#3423)
+* refactor(ios/engine): merges keyboard & lexical model info views, fixes QR code logic (#3432)
+* feat(android): Add app association to keyman.com (#3431)
+* chore(windows): cleanup comments in strings.xml (#3434)
+* feat(ios/engine): language selection during (file-based) package installation (#3416)
+* feat(ios/engine) Package-installer layout optimizations (#3437)
+
 ## 14.0.119 alpha 2020-07-30
 
 * feat(windows): convert locale.xml to strings.xml format (#3424)

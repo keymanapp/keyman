@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="ipad12_9rounded" orientation="portrait" layout="fullscreen" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PackageInstallViewController" customModule="KeymanEngine" customModuleProvider="target">
+            <connections>
+                <outlet property="ipadTagWidthConstraint" destination="SaO-5L-WuS" id="w7Z-2z-Sop"/>
+                <outlet property="languageTable" destination="g0u-la-8U2" id="szy-2k-o1j"/>
+                <outlet property="lblCopyright" destination="33W-zU-8EX" id="BY9-fn-qHT"/>
+                <outlet property="lblVersion" destination="ZjR-uh-gz5" id="bNa-sy-VF9"/>
+                <outlet property="view" destination="iN0-l3-epB" id="NJC-ib-Wg0"/>
+                <outlet property="webViewContainer" destination="peW-vU-Eez" id="DCv-fv-s7t"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="peW-vU-Eez" userLabel="WebView Container">
+                    <rect key="frame" x="307" y="24" width="717" height="1342"/>
+                    <constraints>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="128" id="hux-E5-Tbu"/>
+                    </constraints>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="hux-E5-Tbu"/>
+                        </mask>
+                    </variation>
+                    <variation key="heightClass=regular-widthClass=compact">
+                        <mask key="constraints">
+                            <include reference="hux-E5-Tbu"/>
+                        </mask>
+                    </variation>
+                </view>
+                <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="13C-Qj-3hM" userLabel="Tagging View">
+                    <rect key="frame" x="0.0" y="24" width="307" height="1322"/>
+                    <subviews>
+                        <tableView clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="800" verticalHuggingPriority="800" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="36" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="g0u-la-8U2" userLabel="languageTable">
+                            <rect key="frame" x="0.0" y="0.0" width="307" height="1322"/>
+                        </tableView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="secondarySystemBackgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="trailing" secondItem="JpI-h2-DXO" secondAttribute="trailing" id="0Vo-QN-H7t"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="bottom" secondItem="JpI-h2-DXO" secondAttribute="bottom" id="4rc-HM-gX8"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="top" secondItem="JpI-h2-DXO" secondAttribute="top" id="Aq6-w0-byQ"/>
+                        <constraint firstItem="g0u-la-8U2" firstAttribute="leading" secondItem="JpI-h2-DXO" secondAttribute="leading" id="dUW-4h-qvC"/>
+                    </constraints>
+                    <viewLayoutGuide key="safeArea" id="JpI-h2-DXO"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Vb-Wo-rx6" userLabel="Version View">
+                    <rect key="frame" x="0.0" y="0.0" width="1024" height="24"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="700" verticalCompressionResistancePriority="700" text="Version: 1.2.3" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZjR-uh-gz5">
+                            <rect key="frame" x="8" y="3.5" width="86.5" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Copyright" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="33W-zU-8EX">
+                            <rect key="frame" x="952" y="3.5" width="64" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="secondarySystemBackgroundColor" red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="ZjR-uh-gz5" firstAttribute="leading" secondItem="OZc-1J-VJs" secondAttribute="leading" constant="8" id="5jm-LI-VNb"/>
+                        <constraint firstItem="33W-zU-8EX" firstAttribute="centerY" secondItem="7Vb-Wo-rx6" secondAttribute="centerY" id="9Yb-zi-1dT"/>
+                        <constraint firstAttribute="height" constant="24" id="BF9-JW-EvK"/>
+                        <constraint firstItem="33W-zU-8EX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ZjR-uh-gz5" secondAttribute="trailing" constant="8" id="ZZz-O3-Ezm"/>
+                        <constraint firstAttribute="trailing" secondItem="33W-zU-8EX" secondAttribute="trailing" constant="8" id="pVa-ty-gdH"/>
+                        <constraint firstItem="ZjR-uh-gz5" firstAttribute="centerY" secondItem="7Vb-Wo-rx6" secondAttribute="centerY" id="x2G-gs-NBc"/>
+                    </constraints>
+                    <viewLayoutGuide key="safeArea" id="OZc-1J-VJs"/>
+                    <variation key="heightClass=regular-widthClass=compact">
+                        <mask key="constraints">
+                            <include reference="BF9-JW-EvK"/>
+                        </mask>
+                    </variation>
+                </view>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstItem="13C-Qj-3hM" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="0hJ-bR-l67"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="7Vb-Wo-rx6" secondAttribute="trailing" id="9Yt-wB-B29"/>
+                <constraint firstItem="7Vb-Wo-rx6" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="GFV-Na-BP9"/>
+                <constraint firstItem="13C-Qj-3hM" firstAttribute="top" secondItem="7Vb-Wo-rx6" secondAttribute="bottom" id="I1l-nB-H86"/>
+                <constraint firstItem="13C-Qj-3hM" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Im3-nd-LOk"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="13C-Qj-3hM" secondAttribute="bottom" id="Q6N-RQ-XHI"/>
+                <constraint firstItem="peW-vU-Eez" firstAttribute="top" secondItem="7Vb-Wo-rx6" secondAttribute="bottom" id="R5C-vw-hVT">
+                    <variation key="heightClass=regular-widthClass=regular" constant="0.0"/>
+                </constraint>
+                <constraint firstItem="13C-Qj-3hM" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.3" id="SaO-5L-WuS"/>
+                <constraint firstItem="7Vb-Wo-rx6" firstAttribute="leading" secondItem="13C-Qj-3hM" secondAttribute="leading" id="i69-qh-L8a"/>
+                <constraint firstItem="7Vb-Wo-rx6" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="kcA-N2-SK1"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="peW-vU-Eez" secondAttribute="trailing" id="nbL-6v-COM"/>
+                <constraint firstItem="peW-vU-Eez" firstAttribute="leading" secondItem="13C-Qj-3hM" secondAttribute="trailing" id="ub0-ZL-NhK"/>
+                <constraint firstAttribute="bottom" secondItem="peW-vU-Eez" secondAttribute="bottom" id="xCT-WJ-yt3">
+                    <variation key="heightClass=regular-widthClass=regular" constant="0.0"/>
+                </constraint>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <point key="canvasLocation" x="146.25" y="106.69014084507042"/>
+        </view>
+    </objects>
+</document>

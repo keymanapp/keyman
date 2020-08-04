@@ -205,7 +205,7 @@ public class ResourceFileManager {
                                    isCustom: Bool,
                                    successHandler: ((Package) -> Void)? = nil) -> PackageInstallViewController<Resource>
   where Package == Resource.Package {
-    return PackageInstallViewController(for: package, isCustom: isCustom, completionHandler: { fullIDs in
+    return PackageInstallViewController(for: package, completionHandler: { fullIDs in
 
       if let fullIDs = fullIDs {
         do {
