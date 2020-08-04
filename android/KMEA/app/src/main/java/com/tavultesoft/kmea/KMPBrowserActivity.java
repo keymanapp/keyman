@@ -40,6 +40,16 @@ public class KMPBrowserActivity extends AppCompatActivity {
   // URL for keyboard search web page presented to user when they add a keyboard in the app.
   private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s";
   private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
+
+  // Patterns for determining if a link should be opened in external browser
+  // 1. Host isn't keyman.com (production/staging)
+  // 2. Host is keyman.com but not /keyboards/
+  private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/keyboards([/?].*)?$";
+  private static final String keyboardPatternFormatStr = String.format(INTERNAL_KEYBOARDS_LINK_FORMATSTR,
+    KMPLink.KMP_PRODUCTION_HOST,
+    KMPLink.KMP_STAGING_HOST);
+  private static final Pattern keyboardPattern = Pattern.compile(keyboardPatternFormatStr);
+
   private WebView webView;
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
@@ -88,6 +98,13 @@ public class KMPBrowserActivity extends AppCompatActivity {
 
           // Finish activity
           finish();
+        } else if (!isKeymanKeyboardsLink(url)) {
+          Uri uri = Uri.parse(url);
+
+          // All links that aren't internal Keyman keyboard links open in user's browser
+          Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+          startActivity(intent);
+          return true;
         }
         if (lowerURL.startsWith("keyman:")) {
           // Warn for unsupported keyman schemes
@@ -168,4 +185,21 @@ public class KMPBrowserActivity extends AppCompatActivity {
     }
   }
 
+  /**
+   * Check if a URL is a valid internal Keyman keyboard link
+   * @param url String of the URL to parse
+   * @return boolean
+   */
+  public boolean isKeymanKeyboardsLink(String url) {
+    boolean status = false;
+    if (url == null || url.isEmpty()) {
+      return status;
+    }
+    Matcher matcher = keyboardPattern.matcher(url);
+    if (matcher.matches()) {
+      status = true;
+    }
+
+    return status;
+  }
 }
