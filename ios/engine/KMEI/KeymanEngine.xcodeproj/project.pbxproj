@@ -197,11 +197,15 @@
 		CE976D4F23FA380700FFDF3A /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; };
 		CE976D5023FA380700FFDF3A /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9A0FC9FC22D66D9E00D33F86 /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE97866224C7DD1A00C5DCBC /* KeyboardSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */; };
+		CE99350E24D7CCFC00202DA3 /* LanguagePickAssociator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */; };
+		CE99351024D8018B00202DA3 /* LanguagePickAssociatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE99350F24D8018B00202DA3 /* LanguagePickAssociatorTests.swift */; };
 		CE9B440C23FE49F000499CAB /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B440B23FE49F000499CAB /* Migrations.swift */; };
 		CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440D23FE4E7400499CAB /* 12.0 Ad-hoc Migration.bundle */; };
 		CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */; };
 		CE9CD88023FCC1CA002BF2F8 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */; };
 		CE9CD88323FCC4E3002BF2F8 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */; };
+		CE9E95CD24CE786900F6DD78 /* UniversalLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */; };
+		CE9E95CF24CE7A2C00F6DD78 /* UniversalLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9E95CE24CE7A2C00F6DD78 /* UniversalLinkTests.swift */; };
 		CE9E95D124CEB27200F6DD78 /* PackageInstallView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE9E95D024CEB27200F6DD78 /* PackageInstallView.xib */; };
 		CEA1486C2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		CEA1486D2407808F00C6ECD2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
@@ -496,11 +500,15 @@
 		CE973D8A2484DCA300F66045 /* KMPOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPOptions.swift; sourceTree = "<group>"; };
 		CE973D8C2484DD1900F66045 /* KMPFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPFile.swift; sourceTree = "<group>"; };
 		CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSearchTests.swift; sourceTree = "<group>"; };
+		CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickAssociator.swift; sourceTree = "<group>"; };
+		CE99350F24D8018B00202DA3 /* LanguagePickAssociatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickAssociatorTests.swift; sourceTree = "<group>"; };
 		CE9B440B23FE49F000499CAB /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		CE9B440D23FE4E7400499CAB /* 12.0 Ad-hoc Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "12.0 Ad-hoc Migration.bundle"; sourceTree = "<group>"; };
 		CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 12.0 Migration.bundle"; sourceTree = "<group>"; };
 		CE9CD87F23FCC1CA002BF2F8 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		CE9CD88223FCC4E3002BF2F8 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinks.swift; sourceTree = "<group>"; };
+		CE9E95CE24CE7A2C00F6DD78 /* UniversalLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinkTests.swift; sourceTree = "<group>"; };
 		CE9E95D024CEB27200F6DD78 /* PackageInstallView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PackageInstallView.xib; sourceTree = "<group>"; };
 		CEA1486E2407808F00C6ECD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEA14871240780E100C6ECD2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ResourceInfoView.xib; sourceTree = "<group>"; };
@@ -759,6 +767,7 @@
 				CE4459CD23FBBA8D003151FD /* AppDelegate.swift */,
 				CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */,
 				CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */,
+				CE99350F24D8018B00202DA3 /* LanguagePickAssociatorTests.swift */,
 				CEDFEF8E23FE43B700BECF39 /* MigrationTests.swift */,
 				CE973D842484A71700F66045 /* KMPJSONTests.swift */,
 				CE89642424A46D0000D5EB8E /* QueryPackageVersionTests.swift */,
@@ -900,6 +909,7 @@
 				CE22DFB9230B94DB00A4551C /* ResourceDownloadQueue.swift */,
 				CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */,
 				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
+				CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */,
 				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
 			);
 			path = "Resource Management";
@@ -1475,6 +1485,7 @@
 				CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */,
 				CEA9670924BEC4030035AACF /* ResourceUpdateTests.swift in Sources */,
 				CE07E3D6247E41DB00DFA9D2 /* URLSessionMock.swift in Sources */,
+				CE99351024D8018B00202DA3 /* LanguagePickAssociatorTests.swift in Sources */,
 				CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */,
 				CEB8276724C6811800F3D39C /* KeymanHostTests.swift in Sources */,
 				CEDFEF8F23FE43B700BECF39 /* MigrationTests.swift in Sources */,
@@ -1516,6 +1527,7 @@
 				9A079E3D223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */,
 				C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */,
 				C0A93A541F8B21240079948B /* Manager.swift in Sources */,
+				CE99350E24D7CCFC00202DA3 /* LanguagePickAssociator.swift in Sources */,
 				C024C9981FA6F2340060583B /* NotificationObserver.swift in Sources */,
 				9ADC459D22E1895D004C78C6 /* LanguageLMDetailViewController.swift in Sources */,
 				C0B901AA1FA1AFC200764EB8 /* UserDefaults+Types.swift in Sources */,
