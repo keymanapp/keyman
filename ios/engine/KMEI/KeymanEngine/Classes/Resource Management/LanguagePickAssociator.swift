@@ -8,7 +8,20 @@
 
 import Foundation
 
-// Important note:  be sure to always call pickerDismissed or pickerFinalized when using this class.
+/**
+ * This class is designed for use with the `PackageInstallViewController` or
+ * other language-picking UI classes.  As languages are selected in a picker, instances of
+ * this class will use the provided `AssociationSearcher` to look up associated
+ * resources that are compatible.  These searches will be run concurrently in order to
+ * reduce waiting time for end users.
+ *
+ * When the picker signals that language selection is complete, any detected associations
+ * will be returned through the instance's provided `AssociationReceiver`.
+ * It is then up to the `AssociationReceiver` to download and install these associations.
+ *
+ * A default `AssociationSearcher` for lexical model lookups is provided as
+ * `static let lexicalModelSearcher`.
+ */
 public class LanguagePickAssociator {
   public typealias AssociationSearcher = (Set<String>, @escaping ([String: (KeymanPackage.Key, URL)?]) -> Void) -> Void
   public typealias AssociationReceiver = ([KeymanPackage.Key: Association]) -> Void
