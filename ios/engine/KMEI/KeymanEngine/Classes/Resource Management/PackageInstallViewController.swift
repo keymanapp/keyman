@@ -36,7 +36,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @IBOutlet weak var ipadTagWidthConstraint: NSLayoutConstraint?
 
   // iPhone layout only
-  @IBOutlet weak var iphoneTabViewController: UITabBarController!
+  // Do _NOT_ use `weak` here - things break otherwise.
+  @IBOutlet var iphoneTabViewController: UITabBarController!
 
   let package: Resource.Package
   var wkWebView: WKWebView?
