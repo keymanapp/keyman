@@ -251,10 +251,14 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   @objc func cancelBtnHandler() {
-    dismiss(animated: true, completion: {
-      self.completionHandler(nil)
-      self.associators.forEach { $0.pickerDismissed() }
-    })
+    // If it is not the root view of a navigationController, just pop it off the stack.
+    if let navVC = self.navigationController, navVC.viewControllers[0] != self {
+      navVC.popViewController(animated: true)
+    } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
+      dismiss(animated: true)
+    }
+    self.completionHandler(nil)
+    self.associators.forEach { $0.pickerDismissed() }
   }
 
   @objc func backBtnHandler() {
