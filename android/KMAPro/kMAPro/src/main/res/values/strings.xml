@@ -3,16 +3,17 @@
 
   <string name="app_name" translatable="false">Keyman</string>
 
-  <string name="action_share" comment="Send text content to another app">Share</string>
-  <string name="action_web" comment="Open Keyman browser">Web Browser</string>
-  <string name="action_text_size" comment="Adjust text size">Text Size</string>
-  <string name="action_overflow" comment="Additional menu items">More</string>
-  <string name="action_clear_text" comment="Erase text">Clear Text</string>
-  <string name="action_info" comment="Display Keyman help page">Info</string>
-  <string name="action_settings" comment="Open Settings menu">Settings</string>
-  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Install Updates</string>
+  <!-- Menu Actions -->
+  <string name="action_share" comment="Menu action to send text content to another app">Share</string>
+  <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
+  <string name="action_text_size" comment="Menu action to adjust text size">Text Size</string>
+  <string name="action_overflow" comment="Show additional menu items">More</string>
+  <string name="action_clear_text" comment="Menu action to erase text">Clear Text</string>
+  <string name="action_info" comment="Menu action to display Keyman help page">Info</string>
+  <string name="action_settings" comment="Menu action to open Settings menu">Settings</string>
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Install Updates</string>
 
-  <string name="title_version">Version</string>
+  <string name="title_version">Version: %1$s</string>
 
   <!-- &#8230; is the ellipsis character "..." -->
   <string name="textview_hint">Start typing here&#8230;</string>
@@ -22,11 +23,12 @@
   <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
 
   <!-- Text Size dialog -->
+  <string name="text_size" comment="Current text size (number)">Text Size: %1$d</string>
   <string name="ic_text_size_up" comment="Make text bigger">Text size up</string>
   <string name="ic_text_size_down" comment="Make text smaller">Text size down</string>
 
   <!-- Clear Text dialog -->
-  <string name="all_text_will_be_cleared" comment="Erase all the text">All text will be cleared</string>
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nAll text will be cleared\n</string>
 
   <!-- Info screen reuses title_version -->
 
@@ -73,12 +75,11 @@
   <string name="hint_url">Url</string>
 
   <!-- KMP Package strings -->
-  <string name="title_package">Package</string>
-  <string name="title_failed_to_install">failed to install</string>
-  <string name="downloading_keyboard_package">Downloading keyboard package</string>
+  <string name="title_package_failed_to_install">Package %1$s failed to install</string>
+  <string name="downloading_keyboard_package" comment="Confirmation of keyboard package filename to download">Downloading keyboard package\n%1$s&#8230;</string>
   <string name="failed_to_extract" comment="Keyboard package failed to unzip">Failed to extract</string>
-  <string name="install_keyboard_package">Install Keyboard Package</string>
-  <string name="install_predictive_text_package">Install Predictive Text Package</string>
+  <string name="install_keyboard_package">Install Keyboard Package %1$s</string>
+  <string name="install_predictive_text_package">Install Predictive Text Package %1$s</string>
   <string name="no_new_touch_keyboards_to_install">No new touch-optimized keyboards to install</string>
   <string name="no_new_predictive_text_to_install">No new predictive text to install</string>
   <string name="no_valid_touch_keyboards_to_install">No valid touch-optimized keyboards to install</string>

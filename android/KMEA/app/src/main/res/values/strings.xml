@@ -29,7 +29,7 @@
     <string name="label_update">Update</string>
 
     <!-- Keyboard Updates -->
-    <string name="cannot_connect">Cannot connect to Keyman server!</string>
+    <string name="cannot_connect">\nCannot connect to Keyman server!\n</string>
     <string name="confirm_delete_keyboard">Would you like to delete this keyboard?</string>
     <string name="confirm_download_keyboard">Would you like to download the latest version of this keyboard?</string>
     <string name="confirm_update">Would you like to update keyboards and dictionaries now?</string>
@@ -47,7 +47,7 @@
     <string name="keyboard_version">Keyboard version</string>
     <string name="help_link">Help link</string>
     <string name="uninstall_keyboard">Uninstall keyboard</string>
-    <string name="keyboard_picker_new_keyboard_prefix">new</string>
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
     <string name="keyboard_qr_code" comment="QR Code description">
       Scan this code to load this\nkeyboard on another device</string>
 
