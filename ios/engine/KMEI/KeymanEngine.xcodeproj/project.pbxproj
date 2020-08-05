@@ -199,6 +199,7 @@
 		CE97866224C7DD1A00C5DCBC /* KeyboardSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */; };
 		CE99350E24D7CCFC00202DA3 /* LanguagePickAssociator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */; };
 		CE99351024D8018B00202DA3 /* LanguagePickAssociatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE99350F24D8018B00202DA3 /* LanguagePickAssociatorTests.swift */; };
+		CE9A7A7924DA55D5007CCB5F /* AssociatingPackageInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9A7A7824DA55D5007CCB5F /* AssociatingPackageInstaller.swift */; };
 		CE9B440C23FE49F000499CAB /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE9B440B23FE49F000499CAB /* Migrations.swift */; };
 		CE9B440F23FE4E7500499CAB /* 12.0 Ad-hoc Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440D23FE4E7400499CAB /* 12.0 Ad-hoc Migration.bundle */; };
 		CE9B441023FE4E7500499CAB /* Simple 12.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */; };
@@ -501,6 +502,7 @@
 		CE97866124C7DD1A00C5DCBC /* KeyboardSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardSearchTests.swift; sourceTree = "<group>"; };
 		CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickAssociator.swift; sourceTree = "<group>"; };
 		CE99350F24D8018B00202DA3 /* LanguagePickAssociatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickAssociatorTests.swift; sourceTree = "<group>"; };
+		CE9A7A7824DA55D5007CCB5F /* AssociatingPackageInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssociatingPackageInstaller.swift; sourceTree = "<group>"; };
 		CE9B440B23FE49F000499CAB /* Migrations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
 		CE9B440D23FE4E7400499CAB /* 12.0 Ad-hoc Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "12.0 Ad-hoc Migration.bundle"; sourceTree = "<group>"; };
 		CE9B440E23FE4E7500499CAB /* Simple 12.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 12.0 Migration.bundle"; sourceTree = "<group>"; };
@@ -910,6 +912,7 @@
 				CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */,
 				CE99350D24D7CCFC00202DA3 /* LanguagePickAssociator.swift */,
 				C0E30C8B1FC40D0400C80416 /* Storage.swift */,
+				CE9A7A7824DA55D5007CCB5F /* AssociatingPackageInstaller.swift */,
 			);
 			path = "Resource Management";
 			sourceTree = "<group>";
@@ -1572,6 +1575,7 @@
 				C075EB061F8EFF870041F4BD /* String+Helpers.swift in Sources */,
 				1645D5952036C6FF0076C51B /* KeymanPackage.swift in Sources */,
 				9A079E40223B602B00581263 /* LexicalModel.swift in Sources */,
+				CE9A7A7924DA55D5007CCB5F /* AssociatingPackageInstaller.swift in Sources */,
 				C0E30C8C1FC40D0400C80416 /* Storage.swift in Sources */,
 				C045148A1F85DF9100D88416 /* InputViewController.swift in Sources */,
 				CE22DFBA230B94DB00A4551C /* ResourceDownloadQueue.swift in Sources */,
