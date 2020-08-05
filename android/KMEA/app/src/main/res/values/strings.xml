@@ -33,9 +33,6 @@
     <string name="confirm_delete_keyboard">Would you like to delete this keyboard?</string>
     <string name="confirm_download_keyboard">Would you like to download the latest version of this keyboard?</string>
     <string name="confirm_update">Would you like to update keyboards and dictionaries now?</string>
-    <string name="custom_keyboard">Custom Keyboard</string>
-    <string name="font_failed_to_download">Warning: Font failed to download</string>
-    <string name="keyboard_failed_to_download">Error: Keyboard failed to download</string>
     <string name="keyboard_updates_channel">Resource Updates</string>
     <string name="keyboard_updates_available">Resource Updates Available</string>
     <string name="update_available">%1$s (Update Available)</string>
@@ -79,7 +76,7 @@
     <!-- Language Settings menu strings -->
     <string name="enable_corrections">Enable corrections</string>
     <string name="enable_predictions">Enable predictions</string>
-    <string name="model">Dictionary</string>
+    <string name="model_label">Dictionary</string>
     <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>
     <string name="model_picker_header">%1$s dictionaries</string>
     <string name="manage_dictionary">Manage dictionary</string>
