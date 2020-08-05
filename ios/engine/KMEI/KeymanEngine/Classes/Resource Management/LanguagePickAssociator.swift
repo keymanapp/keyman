@@ -24,10 +24,24 @@ import Foundation
  */
 public class LanguagePickAssociator {
   public enum Progress {
+    /**
+     * Indicates that the language-picking process was aborted.  No further calls to the receiving AssociationReceiver will occur.
+     */
     case cancelled
-    // (queriesComplete, associations found)
+
+    /**
+     * Indicates that a set of association queries has returned.   Reports the number of completed queries followed by
+     * the number of detected associated packages found.
+     *
+     * For calculating a progress percent, note that the total number of queries
+     * may be found at `LanguagePickAssociator.languagesQueried`.
+     */
     case inProgress(Int, Int)
-    // (queriesComplete, package map for associations)
+
+    /**
+     * Indicates that all generated association queries have returned.  Reports the total number of queries that occurred,
+     * followed by a map of package keys to the corresponding URL and language codes to install from the package.
+     */
     case complete(Int, [KeymanPackage.Key: Association])
   }
   /**
@@ -40,8 +54,11 @@ public class LanguagePickAssociator {
   public typealias AssociationSearcher = (Set<String>, @escaping ([String: (KeymanPackage.Key, URL)?]) -> Void) -> Void
 
   /**
-   * Returns a set of package keys and source URLs found by the provided search closure associated with
-   * the selected languages.
+   * Tracks the progress of the association process.  See `LanguagePickAssociator.Progress` for more information.
+   *
+   * May be called multiple times, though a few guarantees exist:
+   * * Either `.cancelled` or `.complete` will be called exactly once, with the other never occurring, so long as `pickerInitialized` has been called.
+   * * When either occurs, it will be the final call to the `AssociationReceiver`.
    */
   public typealias AssociationReceiver = (Progress) -> Void
 
@@ -285,7 +302,7 @@ public class LanguagePickAssociator {
           if closureShared.isCancelled {
             return
           }
-          
+
           // Since the results may be sparse, we rely on the original parameter's count.
           closureShared.queriesComplete += languages.count
 
