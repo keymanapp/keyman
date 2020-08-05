@@ -10,7 +10,6 @@ import XCTest
 @testable import KeymanEngine
 
 class KeyboardSearchTests: XCTestCase {
-
   var mockedURLSession: TestUtils.Downloading.URLSessionMock?
   var downloadManager: ResourceDownloadManager!
 
