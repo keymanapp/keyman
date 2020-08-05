@@ -327,8 +327,12 @@ public class LanguagePickAssociator {
           let finishedCodeSet = Set(finishedCodeList)
           let selectedSet = finishedCodeSet.intersection(closureShared.languageSet)
 
+          let packagesToInstall = closureShared.packageMap.filter { (key, value) in
+            return selectedSet.intersection(value.languageCodes).count > 0
+          }
+
           // Report progress.
-          closureShared.progressClosure(.inProgress(closureShared.queriesComplete, selectedSet.count))
+          closureShared.progressClosure(.inProgress(closureShared.queriesComplete, packagesToInstall.count))
         }
 
         // We leave this dispatch group AFTER collating all relevant install requests.

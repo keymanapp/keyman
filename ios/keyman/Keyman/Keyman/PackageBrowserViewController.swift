@@ -68,14 +68,9 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
           let packageInstaller = AssociatingPackageInstaller(for: kbdPackage,
                                                              withAssociators: [.lexicalModels])
           packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
-        } else {
-          // We choose to prompt the user for comfirmation, rather
-          // than automatically installing the package.
-          rfm.promptPackageInstall(of: package, in: self, isCustom: true, successHandler: { _ in
-            // Auto-dismiss the document browser upon successful KMP install.
-            // It's likely quite rare that someone would want to install 2+ at once.
-            self.navigationController?.popViewController(animated: true)
-          })
+        } else if let lmPackage = package as? LexicalModelKeymanPackage {
+          let packageInstaller = AssociatingPackageInstaller(for: lmPackage)
+          packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
         }
       }
     }
