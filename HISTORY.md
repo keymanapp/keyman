@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.123 alpha 2020-08-05
+
+* feat(android): Use staging help site for pre-release builds (#3453)
+* fix(android): Cleanup string formatting with strings.xml (#3452)
+* chore(android): Add script to find unused strings. Manually remove them (#3456)
+* feat(ios/engine): LanguagePickAssociator progress tracking, base integration with package lang picker (#3455)
+
 ## 14.0.122 alpha 2020-08-04
 
 * feat(android/app): Associate app with /keyboards/install links (#3449)
