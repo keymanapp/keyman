@@ -166,7 +166,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.model));
+    textView.setText(getString(R.string.model_label));
 
     lexicalModelTextView = layout.findViewById(R.id.text2);
 

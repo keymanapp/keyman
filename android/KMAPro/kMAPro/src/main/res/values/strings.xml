@@ -82,9 +82,7 @@
   <string name="install_predictive_text_package">Install Predictive Text Package %1$s</string>
   <string name="no_new_touch_keyboards_to_install">No new touch-optimized keyboards to install</string>
   <string name="no_new_predictive_text_to_install">No new predictive text to install</string>
-  <string name="no_valid_touch_keyboards_to_install">No valid touch-optimized keyboards to install</string>
   <string name="no_targets_to_install">No keyboards or predictive text to install</string>
-  <string name="missing_metadata" comment="kmp.json file is missing from the keyboard package">kmp.json does not exist</string>
-  <string name="invalid_metadata">Invalid metadata in package</string>
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Invalid/Missing metadata in package</string>
 
 </resources>
