@@ -124,7 +124,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
-          dialogBuilder.setMessage(String.format(getString(R.string.cannot_connect)));
+          dialogBuilder.setMessage(getString(R.string.cannot_connect));
           dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
           dialog.show();
