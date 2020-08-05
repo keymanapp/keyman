@@ -357,6 +357,10 @@ public class KeymanPackage {
     fatalError("abstract base method went unimplemented by derived class")
   }
 
+  public func installableResources(forLanguage lgCode: String) -> [AnyLanguageResource] {
+    return installableResourceSets.flatMap { $0.filter { $0.languageID == lgCode }}
+  }
+
   /**
    * Parses a decompressed KMP's metadata file, producing the typed KeymanPackage instance corresponding to it.
    *
@@ -508,6 +512,10 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
   // See https://forums.swift.org/t/confusing-limitations-on-covariant-overriding/16252
   public override var installableResourceSets: [[AnyLanguageResource]] {
     return installables
+  }
+
+  public func installables(forLanguage lgCode: String) -> [TypedLanguageResource] {
+    return super.installableResources(forLanguage: lgCode) as! [TypedLanguageResource]
   }
 
   public func findResource(withID fullID: TypedLanguageResource.FullID) -> TypedLanguageResource? {

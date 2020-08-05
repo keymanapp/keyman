@@ -23,6 +23,13 @@ import Foundation
  * `static let lexicalModelSearcher`.
  */
 public class LanguagePickAssociator {
+  public enum Progress {
+    case cancelled
+    // (queriesComplete, associations found)
+    case inProgress(Int, Int)
+    // (queriesComplete, package map for associations)
+    case complete(Int, [KeymanPackage.Key: Association])
+  }
   /**
    * A callback that returns available packages corresponding to provided language codes.
    *
@@ -36,7 +43,7 @@ public class LanguagePickAssociator {
    * Returns a set of package keys and source URLs found by the provided search closure associated with
    * the selected languages.
    */
-  public typealias AssociationReceiver = ([KeymanPackage.Key: Association]) -> Void
+  public typealias AssociationReceiver = (Progress) -> Void
 
   public struct Association {
     public let url: URL
@@ -140,11 +147,22 @@ public class LanguagePickAssociator {
      * The closure provided to the `LanguagePickAssociator` containing this class
      * for processing any detected language associations.
      */
-    let completionClosure: AssociationReceiver
+    let progressClosure: AssociationReceiver
+
+    /**
+     * Tracks how many languages have been successfully queried, regardless of whether
+     * or not they reported that associated resources were available.
+     */
+    var queriesComplete: Int = 0
+
+    /**
+     * Notifies the worker threads of query cancellation.
+     */
+    var isCancelled: Bool = false
 
     public init(searcher: @escaping AssociationSearcher, closure: @escaping AssociationReceiver) {
       self.searcher = searcher
-      self.completionClosure = closure
+      self.progressClosure = closure
     }
   }
 
@@ -170,8 +188,8 @@ public class LanguagePickAssociator {
 
   private static var queueToken: Int = 0
 
-  public init(searchWith searcher: @escaping AssociationSearcher, completion: @escaping AssociationReceiver) {
-    closureShared = ClosureSharedSpace(searcher: searcher, closure: completion)
+  public init(searchWith searcher: @escaping AssociationSearcher, progressClosure: @escaping AssociationReceiver) {
+    closureShared = ClosureSharedSpace(searcher: searcher, closure: progressClosure)
 
     let queueID = LanguagePickAssociator.queueToken
     LanguagePickAssociator.queueToken += 1
@@ -207,6 +225,10 @@ public class LanguagePickAssociator {
     // We `notify` on the single-threaded queue to ensure all writes (performed
     // exclusively on the same queue) have already completed.
     closureShared.queryDispatch.notify(queue: closureShared.querySyncQueue) {
+      if closureShared.isCancelled {
+        return
+      }
+
       // With all association info collated, it's time to prepare the actual 'return' values,
       // filtered to only give data regarding the picked languages.
       var associationMap: [KeymanPackage.Key: Association] = [:]
@@ -222,7 +244,7 @@ public class LanguagePickAssociator {
       // Now that all association stuff is computed, use the finalization callback
       // Use the 'main' (UI) thread to prevent unexpected UI issues.
       DispatchQueue.main.async {
-        closureShared.completionClosure(associationMap)
+        closureShared.progressClosure(.complete(closureShared.queriesComplete, associationMap))
       }
     }
   }
@@ -257,26 +279,37 @@ public class LanguagePickAssociator {
 
       // Use the closure provided at initialization to search for associated resource packages.
       closureShared.searcher(languages) { map in
-        // We allow the searcher to return 'sparse' maps.  If no association is detected,
-        // we don't require an entry in the returned map.
-        //
-        // This allows us to save on context switching with the following if-check.
-        // We only need to synchronize when there's something actually worth writing.
-        if map.count > 0 {
-          // The only non-parallel part - writing to the result cache.
-          // We synchronize by evaluating all writes on our single-threaded DispatchQueue.
-          closureShared.querySyncQueue.async {
-            map.forEach { (lgCode, tuple) in
-              guard let (packageKey, url) = tuple else {
-                return
-              }
-
-              var languageSet = (closureShared.packageMap[packageKey]?.languageCodes ?? Set())
-              languageSet.insert(lgCode)
-
-              closureShared.packageMap[packageKey] = Association(url: url, languageCodes: languageSet)
-            }
+        // The only non-parallel parts - writing to the result cache and reporting progress.
+        // We synchronize by evaluating all writes on our single-threaded DispatchQueue.
+        closureShared.querySyncQueue.async {
+          if closureShared.isCancelled {
+            return
           }
+          
+          // Since the results may be sparse, we rely on the original parameter's count.
+          closureShared.queriesComplete += languages.count
+
+          map.forEach { (lgCode, tuple) in
+            guard let (packageKey, url) = tuple else {
+              return
+            }
+
+            var languageSet = (closureShared.packageMap[packageKey]?.languageCodes ?? Set())
+            languageSet.insert(lgCode)
+
+            closureShared.packageMap[packageKey] = Association(url: url, languageCodes: languageSet)
+          }
+
+          // How many picked languages have matching dictionaries?
+          let finishedCodeList: [String] = closureShared.packageMap.flatMap { (key, association) in
+            association.languageCodes
+          }
+
+          let finishedCodeSet = Set(finishedCodeList)
+          let selectedSet = finishedCodeSet.intersection(closureShared.languageSet)
+
+          // Report progress.
+          closureShared.progressClosure(.inProgress(closureShared.queriesComplete, selectedSet.count))
         }
 
         // We leave this dispatch group AFTER collating all relevant install requests.
@@ -290,7 +323,13 @@ public class LanguagePickAssociator {
   }
 
   public func pickerDismissed() {
-    closureShared.languageSet = Set()
+    closureShared.querySyncQueue.sync {
+      closureShared.languageSet = Set()
+      closureShared.isCancelled = true
+
+      closureShared.progressClosure(.cancelled)
+    }
+
     pickerActive = false
 
     // Signals that no further queries will start.
@@ -304,5 +343,13 @@ public class LanguagePickAssociator {
     // Signals that no further queries will start.
     // Once all current queries complete, completionClosure will be called.
     closureShared.pickerDispatch.leave()
+  }
+
+  public var languagesPicked: Int {
+    return closureShared.languageSet.count
+  }
+
+  public var languagesQueried: Int {
+    return languageSetSearched.count
   }
 }

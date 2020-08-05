@@ -219,6 +219,7 @@ public class ResourceFileManager {
           if let kmpError = error as? KMPError {
             let alert = self.buildKMPError(kmpError)
             rootVC.present(alert, animated: true, completion: nil)
+            return
           }
         }
 

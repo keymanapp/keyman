@@ -36,21 +36,30 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @IBOutlet weak var ipadTagWidthConstraint: NSLayoutConstraint?
 
   // iPhone layout only
-  @IBOutlet var iphoneTabViewController: UITabBarController!
+  @IBOutlet weak var iphoneTabViewController: UITabBarController!
 
   let package: Resource.Package
   var wkWebView: WKWebView?
   let completionHandler: CompletionHandler
+  let defaultLanguageCode: String
+  let associators: [LanguagePickAssociator]
   let languages: [Language]
 
   private var leftNavMode: NavigationMode = .cancel
   private var rightNavMode: NavigationMode = .none
   private var navMapping: [NavigationMode : UIBarButtonItem] = [:]
 
-  public init(for package: Resource.Package, completionHandler: @escaping CompletionHandler) {
+  public init(for package: Resource.Package,
+              defaultLanguageCode: String? = nil,
+              languageAssociators: [LanguagePickAssociator] = [],
+              completionHandler: @escaping CompletionHandler) {
     self.package = package
     self.completionHandler = completionHandler
     self.languages = package.languages
+
+    let packageFirstLangCode = package.installableResourceSets[0][0].languageID
+    self.defaultLanguageCode = package.languages.contains(where: { $0.id == defaultLanguageCode }) ? defaultLanguageCode! : packageFirstLangCode
+    self.associators = languageAssociators
 
     var xib: String
     if Device.current.isPad {
@@ -99,10 +108,15 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     languageTable.dataSource = self
 
     // Set the default selection.
-    let defaultRow = languages.firstIndex(where: { $0.id == package.installableResourceSets[0][0].languageID })!
+    let defaultRow = languages.firstIndex(where: { $0.id == self.defaultLanguageCode })!
     let defaultIndexPath = IndexPath(row: defaultRow, section: 0)
     languageTable.selectRow(at: defaultIndexPath, animated: false, scrollPosition: .top)
     languageTable.cellForRow(at: defaultIndexPath)?.accessoryType = .checkmark
+
+    associators.forEach {
+      $0.pickerInitialized()
+      $0.selectLanguages(Set([self.defaultLanguageCode]))
+    }
 
     // iPhone-only layout setup
     if let tabVC = iphoneTabViewController {
@@ -238,6 +252,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   @objc func cancelBtnHandler() {
     dismiss(animated: true, completion: {
       self.completionHandler(nil)
+      self.associators.forEach { $0.pickerDismissed() }
     })
   }
 
@@ -269,6 +284,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
 
       self.completionHandler(selectedResources.map { $0.typedFullID })
+      self.associators.forEach { $0.pickerFinalized() }
     })
   }
 
@@ -322,6 +338,8 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     navigationItem.rightBarButtonItem?.isEnabled = true
     tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+
+    associators.forEach { $0.selectLanguages( Set([languages[indexPath.row].id]) ) }
   }
 
   public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
@@ -331,5 +349,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       rightNavigationMode = .install
     }
     tableView.cellForRow(at: indexPath)?.accessoryType = .none
+
+    associators.forEach { $0.deselectLanguages( Set([languages[indexPath.row].id]) ) }
   }
 }
