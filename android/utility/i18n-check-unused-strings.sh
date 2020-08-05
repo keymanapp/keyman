@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Based on /windows/src/test/i18n-check-unused-strings
 #
 # This script finds all references to strings in strings.xml in order to make sure that old
 # strings do not proliferate over time. The script generates the following files:
@@ -51,7 +52,6 @@ while IFS= read -r string; do
   count=$(grep -Inr \
     --exclude=strings.xml \
     --exclude-dir=utility \
-    --exclude-dir=__history \
     "$string" \
     "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/res/layout" "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/res/menu" "$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/java" \
     "$KEYMAN_ROOT/android/KMEA/app/src/main/res/layout" "$KEYMAN_ROOT/android/KMEA/app/src/main/java" | tee -a detail.md | wc -l)
