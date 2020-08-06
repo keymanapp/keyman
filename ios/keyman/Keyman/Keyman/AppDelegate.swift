@@ -124,7 +124,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             // We choose to prompt the user for comfirmation, rather
             // than automatically installing the package.
-            ResourceFileManager.shared.promptPackageInstall(of: package, in: vc, isCustom: true)
+            let nvc = UINavigationController.init()
+            ResourceFileManager.shared.promptPackageInstall(of: package, in: nvc, isCustom: true)
+            vc.present(nvc, animated: true, completion: nil)
           } else {
             log.error("Cannot find app's root UIViewController")
           }
