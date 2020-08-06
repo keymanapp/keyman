@@ -97,11 +97,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
       if let parsedLink = UniversalLinks.tryParseKeyboardInstallLink(incomingURL) {
         // Aha!  We know this link type!
+        let packageKey = parsedLink.packageKey
 
-        // TODO:  Things.  Note - here, there are no pre-existing UI expectations, so while
-        //        what we need to do is _functionally_ similiar to what keyboard-search does
-        //        after clicking a link, the integration requirements are pretty distinct.
+        let downloadLink: URL
+        if let langID = parsedLink.lang_id {
+          let fullID = FullKeyboardID(keyboardID: parsedLink.keyboard_id, languageID: langID)
+          downloadLink = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: parsedLink.packageKey,
+                                                                           andResource: fullID,
+                                                                           asUpdate: false)
+        } else {
+          downloadLink = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: parsedLink.packageKey,
+                                                                           asUpdate: false)
+        }
+        ResourceDownloadManager.shared.downloadPackage(withKey: parsedLink.packageKey, from: downloadLink) { (package: KeyboardKeymanPackage?, error: Error?) in
+          guard error == nil, let package = package else {
+            // Maybe add an alert about the package error?
+            return
+          }
+          if let vc = self.window?.rootViewController {
+            // Force the app to the top-level view.  (Prompts won't display if we're in a submenu!)
+            vc.dismiss(animated: true, completion: nil)
 
+            // We choose to prompt the user for comfirmation, rather
+            // than automatically installing the package.
+            ResourceFileManager.shared.promptPackageInstall(of: package, in: vc, isCustom: true)
+          } else {
+            log.error("Cannot find app's root UIViewController")
+          }
+        }
         return true
       }
     }

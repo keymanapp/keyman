@@ -22,6 +22,11 @@ public struct FullKeyboardID: Codable, LanguageResourceFullID, Equatable {
   public var type: LanguageResourceType {
     return .keyboard
   }
+
+  public init(keyboardID: String, languageID: String) {
+    self.keyboardID = keyboardID
+    self.languageID = languageID
+  }
 }
 
 // MARK: - CustomStringConvertible

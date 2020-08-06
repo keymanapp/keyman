@@ -10,8 +10,12 @@ import Foundation
 
 public class UniversalLinks {
   public struct ParsedKeyboardInstallLink {
-    let keyboard_id: String
-    let lang_id: String?
+    public let keyboard_id: String
+    public let lang_id: String?
+
+    public var packageKey: KeymanPackage.Key {
+      return KeymanPackage.Key(id: keyboard_id, type: .keyboard)
+    }
   }
 
   private static let KEYBOARD_INSTALL_LINK_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?:\\/\\/[^\\/]+\\/keyboards\\/install\\/([^?\\/]+)(?:\\?(.+))?$")
