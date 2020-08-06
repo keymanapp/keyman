@@ -59,17 +59,7 @@ public class InfoActivity extends AppCompatActivity {
     version.setGravity(Gravity.CENTER);
 
     // Parse app version string to create a version title (Not using KMManager.getVersion() because that's for KMEA)
-    String versionStr = "";
-    PackageInfo pInfo;
-    try {
-      pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-      versionStr = pInfo.versionName;
-    } catch (NameNotFoundException e) {
-      KMLog.LogException(TAG, "", e);
-
-      // Fallback to a "current" version. This does not need to be maintained
-      versionStr = "12.0.0.0";
-    }
+    String versionStr = BuildConfig.VERSION_NAME;
 
     String versionTitle = String.format(getString(R.string.title_version), versionStr);
     version.setText(versionTitle);

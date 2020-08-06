@@ -22,6 +22,7 @@ def getVersionName = { ->
     String env_version = System.getenv("VERSION_WITH_TAG")
     if (env_version != null) {
         // If building from script, we have build number in VERSION_WITH_TAG
+        println "Using build $env_version from VERSION_WITH_TAG"
         return "$env_version"
     } else {
         // Building probably from IDE, so let's use VERSION.md and TIER.md directly
@@ -38,9 +39,11 @@ def getVersionEnvironment = { ->
     String env_environment = System.getenv("VERSION_ENVIRONMENT")
     if (env_environment != null) {
         // If building from script, we have build number in VERSION_ENVIRONMENT
+        println "Using $env_environment from VERSION_ENVIRONMENT"
         return "$env_environment"
     } else {
         // Building probably from IDE, so use "local"
+        println "Using local environment"
         return "local"
     }
 }

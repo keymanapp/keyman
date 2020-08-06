@@ -93,7 +93,9 @@ function findVersion() {
         fi
     fi
 
-    VERSION_WITH_TAG="$VERSION$VERSION_TAG"
+    # export these two so version.gradle can access them
+    export VERSION_ENVIRONMENT
+    export VERSION_WITH_TAG="$VERSION$VERSION_TAG"
 
     readonly VERSION
     readonly VERSION_MAJOR
