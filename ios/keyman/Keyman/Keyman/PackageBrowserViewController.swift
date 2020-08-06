@@ -77,15 +77,8 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
         for package: Package,
         withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [])
     where Resource.Package == Package {
-      let activitySpinner: UIActivityIndicatorView
-      activitySpinner = UIActivityIndicatorView(style: .whiteLarge)
-      activitySpinner.hidesWhenStopped = true
-      activitySpinner.translatesAutoresizingMaskIntoConstraints = false
-      activitySpinner.backgroundColor = Colors.spinnerBackground
-      activitySpinner.layer.cornerRadius = 6.0
+      let activitySpinner = Alerts.constructActivitySpinner()
       activitySpinner.center = view.center
-      activitySpinner.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
-                                       .flexibleBottomMargin]
 
       let packageInstaller = AssociatingPackageInstaller(for: package,
                                                          withAssociators: associators) { status in

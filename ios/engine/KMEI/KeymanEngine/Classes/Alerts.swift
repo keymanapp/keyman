@@ -13,6 +13,18 @@ import Reachability
 open class Alerts {
   public typealias AcceptanceHandler = ((UIAlertAction)) -> Void
 
+  public static func constructActivitySpinner() -> UIActivityIndicatorView {
+    let activitySpinner: UIActivityIndicatorView
+    activitySpinner = UIActivityIndicatorView(style: .whiteLarge)
+    activitySpinner.hidesWhenStopped = true
+    activitySpinner.translatesAutoresizingMaskIntoConstraints = false
+    activitySpinner.backgroundColor = Colors.spinnerBackground
+    activitySpinner.layer.cornerRadius = 6.0
+    activitySpinner.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
+                                     .flexibleBottomMargin]
+    return activitySpinner
+  }
+
   public static func showErrorAlert(in vc: UIViewController, title: String, msg: String, handler: @escaping AcceptanceHandler) {
     let alertController = UIAlertController(title: title,
                                             message: msg,

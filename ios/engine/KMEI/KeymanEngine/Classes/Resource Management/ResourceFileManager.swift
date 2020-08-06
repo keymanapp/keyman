@@ -199,56 +199,48 @@ public class ResourceFileManager {
     }
   }
 
-  internal func typedPromptForPackageInstall<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
-                                   of package: Package,
-                                   in rootVC: UIViewController,
-                                   isCustom: Bool,
-                                   successHandler: ((Package) -> Void)? = nil) -> PackageInstallViewController<Resource>
-  where Package == Resource.Package {
-    return PackageInstallViewController(for: package, completionHandler: { fullIDs in
+  private func doInstallPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+        for package: Package,
+        in rootVC: UIViewController,
+        withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [],
+        successHandler: ((KeymanPackage) -> Void)? = nil)
+    where Resource.Package == Package {
+      let activitySpinner = Alerts.constructActivitySpinner()
+      activitySpinner.center = rootVC.view.center
 
-      if let fullIDs = fullIDs {
-        do {
-          try ResourceFileManager.shared.install(resourcesWithIDs: fullIDs, from: package)
+      let packageInstaller = AssociatingPackageInstaller(for: package,
+                                                         withAssociators: associators) { status in
+        if status == .starting {
+          // Start a spinner!
+          activitySpinner.startAnimating()
+          rootVC.view.addSubview(activitySpinner)
 
-          if package is KeyboardKeymanPackage {
-            // TODO(?): We might should attempt an automatic download + install of lexical models
-            // for the specified language codes.
-          }
-        } catch {
-          if let kmpError = error as? KMPError {
-            let alert = self.buildKMPError(kmpError)
-            rootVC.present(alert, animated: true, completion: nil)
-            return
-          }
+          activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
+          activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
+          rootVC.view.isUserInteractionEnabled = false
+        } else if status == .complete {
+          // Report completion!
+          activitySpinner.stopAnimating()
+          activitySpinner.removeFromSuperview()
+          rootVC.view.isUserInteractionEnabled = true
+          rootVC.dismiss(animated: true, completion: nil)
+          successHandler?(package)
         }
-
-        let alert = self.buildSimpleAlert(title: NSLocalizedString("success-title", bundle: engineBundle, comment: ""),
-                                          message: NSLocalizedString("success-install", bundle: engineBundle, comment: ""),
-                                          completionHandler: { successHandler?(package) })
-        rootVC.present(alert, animated: true, completion: nil)
       }
-    })
-  }
+
+      let nvc = UINavigationController.init()
+      packageInstaller.promptForLanguages(inNavigationVC: nvc)
+      rootVC.present(nvc, animated: true, completion: nil)
+    }
 
   public func promptPackageInstall(of package: KeymanPackage,
                                    in rootVC: UIViewController,
                                    isCustom: Bool,
                                    successHandler: ((KeymanPackage) -> Void)? = nil) {
-    var vc: UIViewController? = nil
     if let kbdPackage = package as? KeyboardKeymanPackage {
-      vc = typedPromptForPackageInstall(of: kbdPackage, in: rootVC, isCustom: isCustom) { package in
-        successHandler?(package)
-      }
+      doInstallPrompt(for: kbdPackage, in: rootVC, withAssociators: [.lexicalModels], successHandler: successHandler)
     } else if let lmPackage = package as? LexicalModelKeymanPackage {
-      vc = typedPromptForPackageInstall(of: lmPackage, in: rootVC, isCustom: isCustom) { package in
-        successHandler?(package)
-      }
-    }
-
-    if let vc = vc {
-      let nvc = UINavigationController.init(rootViewController: vc)
-      rootVC.present(nvc, animated: true, completion: nil)
+     doInstallPrompt(for: lmPackage, in: rootVC, withAssociators: [], successHandler: successHandler)
     }
   }
 

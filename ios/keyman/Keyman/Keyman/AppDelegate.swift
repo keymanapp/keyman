@@ -32,6 +32,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     if let vc = window?.rootViewController {
+      // Force the app to the top-level view.  (Prompts won't display if we're in a submenu!)
+      vc.dismiss(animated: true, completion: nil)
+
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
         // We choose to prompt the user for comfirmation, rather
         // than automatically installing the package.
