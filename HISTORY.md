@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 14.0.124 alpha 2020-08-06
+
+* feat(windows): set default UI language at install (#3438)
+* feat(windows): i18n for Setup (#3444)
+* feat(windows): add globe icon to Configuration UI (#3446)
+* feat(windows): set UI language from Setup preference on first install (#3447)
+* feat(windows): docs on editing translations (#3448)
+* Modify/android/improve string context (#3457)
+* fix(android/app): Fix environment portion of app version string (#3462)
+
 ## 14.0.123 alpha 2020-08-05
 
 * feat(android): Use staging help site for pre-release builds (#3453)
