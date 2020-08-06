@@ -318,7 +318,12 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     }
 
     restoreNavigation()
-    navigationController?.popToRootViewController(animated: true)
+
+    // Do NOT do this for keyboards; they're not yet installed and have a managed installer
+    // yet to operate.
+    if package.resourceType() == .lexicalModel {
+      navigationController?.popToRootViewController(animated: true)
+    }
   }
 
   private func packageDownloadFailed(notification: PackageDownloadFailedNotification) {
@@ -431,7 +436,22 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 extension InstalledLanguagesViewController {
   
   @objc func addClicked(_ sender: Any) {
-    let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure())
+    let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultDownloadClosure() { result in
+      switch result {
+        case .cancelled:
+          break
+        case .error(let error):
+          if let error = error {
+            log.error(String(describing: error))
+          }
+        case .success(let package, let fullID):
+          ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
+                                                     defaultLanguageCode: fullID.languageID,
+                                                     in: self.navigationController!,
+                                                     withAssociators: [.lexicalModels])
+      }
+    })
+
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 }

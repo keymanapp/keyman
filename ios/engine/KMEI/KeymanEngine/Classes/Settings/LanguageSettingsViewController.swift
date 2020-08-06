@@ -301,7 +301,22 @@ class LanguageSettingsViewController: UITableViewController {
   
   @objc func addClicked(_ sender: Any) {
     let keyboardSearchVC = KeyboardSearchViewController(languageCode: self.language.id,
-                                                        keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure())
+                                                        keyboardSelectionBlock: KeyboardSearchViewController.defaultDownloadClosure() { result in
+      switch result {
+        case .cancelled:
+          break
+        case .error(let error):
+          if let error = error {
+            log.error(String(describing: error))
+          }
+        case .success(let package, let fullID):
+          ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
+                                                     defaultLanguageCode: fullID.languageID,
+                                                     in: self.navigationController!,
+                                                     withAssociators: [.lexicalModels])
+      }
+    })
+
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 

@@ -199,8 +199,9 @@ public class ResourceFileManager {
     }
   }
 
-  private func doInstallPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+  internal func doInstallPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
         for package: Package,
+        defaultLanguageCode: String? = nil,
         in rootVC: UIViewController,
         withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [],
         successHandler: ((KeymanPackage) -> Void)? = nil)
@@ -228,9 +229,14 @@ public class ResourceFileManager {
         }
       }
 
-      let nvc = UINavigationController.init()
-      packageInstaller.promptForLanguages(inNavigationVC: nvc)
-      rootVC.present(nvc, animated: true, completion: nil)
+
+      if let navVC = rootVC as? UINavigationController {
+        packageInstaller.promptForLanguages(inNavigationVC: navVC)
+      } else {
+        let nvc = UINavigationController.init()
+        packageInstaller.promptForLanguages(inNavigationVC: nvc)
+        rootVC.present(nvc, animated: true, completion: nil)
+      }
     }
 
   public func promptPackageInstall(of package: KeymanPackage,
