@@ -8,6 +8,17 @@
 
 import Foundation
 
+/**
+ * Given a `KeymanPackage` that KeymanEngine knows how to install, this class facilitates language selection as part of the
+ * package installation process.
+ *
+ * "Associations" may also be specified to look up 'associated' resources for the selected language codes and have them install alongside
+ * the base package.  For example, installing the `sil_euro_latin` keyboard for `en` (English) with the `.lexicalModels` association
+ * will query for `en` models and install them as well as the `sil_euro_latin` package.
+ *
+ * At the time of writing, this will return the `nrc.en.mtnt` model and will install it for use with `en`
+ * before indicating that overall package installation is complete.
+ */
 public class AssociatingPackageInstaller<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>> where Resource.Package == Package {
 
   // The second parameter should be used to report on installation success on a per-package basis.
@@ -23,7 +34,14 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
    * Defines behaviors for finding and installing resources associated with the set of languages selected for installation.
    */
   public enum Associator {
+    /**
+     * Facilitates installing lexical models for the languages being installed.
+     */
     case lexicalModels
+
+    /**
+     * Designed to allow framework users to specify their own associations if desired.
+     */
     case custom(AssociatorBuilder, AssociationInstaller)
 
     internal func instance(for installer: AssociatingPackageInstaller,
