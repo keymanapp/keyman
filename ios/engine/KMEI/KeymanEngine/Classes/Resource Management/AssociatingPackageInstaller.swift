@@ -27,18 +27,19 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     case custom(AssociatorBuilder, AssociationInstaller)
 
     internal func instance(for installer: AssociatingPackageInstaller,
+                           withSession session: URLSession,
                            withReceiver receiver: @escaping LanguagePickAssociator.AssociationReceiver)
                            -> LanguagePickAssociator {
       switch self {
         case .lexicalModels:
-          return LanguagePickAssociator(searchWith: LanguagePickAssociator.lexicalModelSearcher,
+          return LanguagePickAssociator(searchWith: LanguagePickAssociator.constructLexicalModelSearcher(session: session),
                                         progressClosure: receiver)
         case .custom(let constructor, _):
           return constructor(installer, receiver)
       }
     }
 
-    internal func installer() -> AssociationInstaller {
+    internal func installer(downloadManager: ResourceDownloadManager) -> AssociationInstaller {
       switch self {
         case .lexicalModels:
           return { associatedLexicalModelMap, completionClosure in
@@ -47,7 +48,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
               let url = association.url
               let lgCodes = association.languageCodes
 
-              ResourceDownloadManager.shared.downloadPackage(withKey: packageKey, from: url) {
+              downloadManager.downloadPackage(withKey: packageKey, from: url) {
                 (package: LexicalModelKeymanPackage?, error: Error?) in
                 guard error == nil, let package = package else {
                   completionClosure(packageKey, .error(error ?? NSError()))
@@ -105,11 +106,13 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     var installProgressMap: [KeymanPackage.Key: PackageInstallResult?] = [:]
 
     let progressCallback: ProgressReceiver
+    let downloadManager: ResourceDownloadManager
 
     var isCancelled = false
 
-    init(with associationSpecs: [Associator], receiver: @escaping ProgressReceiver) {
+    init(with associationSpecs: [Associator], downloadManager: ResourceDownloadManager, receiver: @escaping ProgressReceiver) {
       self.associationSpecs = associationSpecs
+      self.downloadManager = downloadManager
       self.progressCallback = receiver
     }
 
@@ -152,14 +155,26 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
   let defaultLgCode: String?
   var associationQueriers: [LanguagePickAssociator]?
 
-  public init(for package: Package,
-              defaultLanguageCode: String? = nil,
-              withAssociators associators: [Associator] = [],
-              progressReceiver: @escaping ProgressReceiver) {
+  public convenience init(for package: Package,
+                          defaultLanguageCode: String? = nil,
+                          withAssociators associators: [Associator] = [],
+                          progressReceiver: @escaping ProgressReceiver) {
+    self.init(for: package,
+              defaultLanguageCode: defaultLanguageCode,
+              downloadManager: ResourceDownloadManager.shared,
+              withAssociators: associators,
+              progressReceiver: progressReceiver)
+  }
+
+  internal init(for package: Package,
+                defaultLanguageCode: String? = nil,
+                downloadManager: ResourceDownloadManager = ResourceDownloadManager.shared,
+                withAssociators associators: [Associator] = [],
+                progressReceiver: @escaping ProgressReceiver) {
     self.package = package
     self.defaultLgCode = defaultLanguageCode
 
-    self.closureShared = ClosureShared(with: associators, receiver: progressReceiver)
+    self.closureShared = ClosureShared(with: associators, downloadManager: downloadManager, receiver: progressReceiver)
   }
 
   // TODO:  deinit handling in case everything gets cancelled.
@@ -169,6 +184,11 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     // We instantiate this now, indicating that language selection has begun.
     associationQueriers = []
 
+    // So, the for-loop below throws an error for this case.  Yay, Swift weirdnesses.
+    if closureShared.associationSpecs.count == 0 {
+      return
+    }
+
     // Using a classical for-loop allows us to 'map' receivers (within their closures) to their associators.
     for i in 0 ... closureShared.associationSpecs.count-1 {
       let associationSpec = closureShared.associationSpecs[i]
@@ -176,7 +196,9 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       closureShared.queryGroup.enter()
       let receiver: LanguagePickAssociator.AssociationReceiver = constructAssociationReceiver(specIndex: i)
 
-      associationQueriers!.append(associationSpec.instance(for: self, withReceiver: receiver))
+      associationQueriers!.append(associationSpec.instance(for: self,
+                                                           withSession: closureShared.downloadManager.session,
+                                                           withReceiver: receiver))
     }
   }
 
@@ -191,7 +213,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
         // case .inProgress(let queryCount, let associationsFound):
         //   break
         case .complete(_, let associationMap):
-          let installer = closureShared.associationSpecs[specIndex].installer()
+          let installer = closureShared.associationSpecs[specIndex].installer(downloadManager: closureShared.downloadManager)
           closureShared.associationInstallers[specIndex] = installer
 
           // Since completions will be signaled once per package,
@@ -327,7 +349,10 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     let baseResources: [Resource] = languageIDs.flatMap { package.installables(forLanguage: $0) }
     let baseFullIDs: [Resource.FullID] = baseResources.map { $0.typedFullID }
 
-    self.associationQueriers?.forEach { $0.selectLanguages(languageIDs) }
+    self.associationQueriers?.forEach { associator in
+      associator.pickerInitialized()
+      associator.selectLanguages(languageIDs)
+    }
 
     let installClosure = coreInstallationClosure()
     installClosure(baseFullIDs)
