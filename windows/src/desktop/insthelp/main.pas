@@ -84,13 +84,6 @@ begin
       end;
       RegCloseKey(hkey);
     end;
-
-    if RegOpenKeyEx(HKEY_CURRENT_USER, SRegKey_InternetExplorerFeatureBrowserEmulation_CU, 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then   // I4436
-    begin
-      RegDeleteValue(hk, Pchar(TKeymanPaths.S_KMShell));
-      RegDeleteValue(hk, Pchar(TKeymanPaths.S_KeymanExe));
-      RegCloseKey(hk);
-    end;
   finally
     KL.MethodExit(nil, 'Uninstall');
   end;

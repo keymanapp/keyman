@@ -167,6 +167,7 @@ uses
   System.Zip,
   Winapi.Windows,
 
+  Keyman.Setup.System.SetupUILanguageManager,
   KeymanVersion,
   kmpinffile,
   utilfiletypes,
@@ -223,7 +224,7 @@ begin
   s := GetEnumName(TypeInfo(TInstallInfoText), Ord(Name));
   Result := FStrings.Values[s];
   if Result = '' then
-    Result := FDefaultStrings[Name];
+    Result := TSetupUILanguageManager.Get(Name);
 
   Result := ReplaceText(Result, '$VERSION', SKeymanVersion);
   Result := ReplaceText(Result, '$APPNAME', FAppName);

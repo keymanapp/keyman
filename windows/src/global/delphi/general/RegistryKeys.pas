@@ -241,10 +241,6 @@ const
 
   SRegKey_LatinKeyboardCache_LM = SRegKey_KeymanEngine_LM + '\Latin Keyboard Cache';      // LM   // I4169
 
-  { Internet Explorer feature control }
-
-  SRegKey_InternetExplorerFeatureBrowserEmulation_CU = 'Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION';   // I4436
-
   { System KeyboardLayouts }
 
   SRegKey_KeyboardLayouts_LM = 'System\CurrentControlSet\Control\keyboard layouts';    // LM

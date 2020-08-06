@@ -1,4 +1,4 @@
-program InstallDefaultUILanguage;
+program UILanguageManagerTest;
 
 {$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
@@ -11,11 +11,8 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
-  Keyman.System.Test.InstallDefaultUILanguageTest in 'Keyman.System.Test.InstallDefaultUILanguageTest.pas',
-  kmint in '..\..\test\manual-tests\default-ui-language\kmint.pas',
-  custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
-  keymanapi_TLB in '..\..\engine\kmcomapi\keymanapi_TLB.pas',
-  Keyman.Configuration.System.InstallDefaultUILanguage in '..\..\desktop\kmshell\main\Keyman.Configuration.System.InstallDefaultUILanguage.pas';
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
+  Keyman.System.Test.UILanguageManagerTest in 'Keyman.System.Test.UILanguageManagerTest.pas';
 
 {$R *.res}
 

@@ -1,4 +1,4 @@
-unit Keyman.Configuration.System.InstallDefaultUILanguage;
+unit Keyman.System.UILanguageManager;
 
 interface
 
@@ -6,55 +6,22 @@ uses
   System.Classes;
 
 type
-  TInstallDefaultUILanguage = class sealed
-  private
+  TUILanguageManager = class
   public
-    class function GetKeymanUILanguages: TStrings; static;
     class function GetUserUILanguages: TStrings; static;
     class function Find(KeymanLanguages, UserLanguages: TStrings): string; static;
-    class function Execute: Boolean; static;
   end;
 
 implementation
 
 uses
   System.SysUtils,
-  Winapi.Windows,
+  Winapi.Windows;
 
-  kmint;
-
-{ TInstallDefaultUILanguage }
-
-/// Sets the Keyman UI language to the first matching user preferred UI language, if any found.
-class function TInstallDefaultUILanguage.Execute: Boolean;
-var
-  tag: string;
-  ktags, utags: TStrings;
-begin
-  ktags := GetKeymanUILanguages;
-  utags := GetUserUILanguages;
-  try
-    tag := Find(ktags, utags);
-  finally
-    ktags.Free;
-    utags.Free;
-  end;
-
-  Result := tag <> '';
-  if Result then
-    kmint.KeymanCustomisation.CustMessages.LanguageCode := tag;
-end;
-
-/// Returns list of BCP 47 tags (lower cased) of Keyman's available UI languages
-class function TInstallDefaultUILanguage.GetKeymanUILanguages: TStrings;
-begin
-  Result := TStringList.Create;
-  Result.Text := LowerCase(KeymanCustomisation.CustMessages.GetAvailableLanguages);
-  Result.Insert(0, LowerCase(KeymanCustomisation.CustMessages.MessageFromID('SKDefaultLanguageCode')));
-end;
+{ TUILanguageManager }
 
 /// Returns list of BCP 47 tags (lower cased) of user's preferred UI languages
-class function TInstallDefaultUILanguage.GetUserUILanguages: TStrings;
+class function TUILanguageManager.GetUserUILanguages: TStrings;
 var
   ulNumLanguages, cchLanguagesBuffer: ULONG;
   p, pwszLanguagesBuffer: PChar;
@@ -88,7 +55,7 @@ end;
 /// Look at the Windows UI language list and see if we have anything similar
 /// in our list of available UI languages, and if so, returns it. Returns empty
 /// string if nothing found.
-class function TInstallDefaultUILanguage.Find(KeymanLanguages, UserLanguages: TStrings): string;
+class function TUILanguageManager.Find(KeymanLanguages, UserLanguages: TStrings): string;
 var
   ktag, ktag2, utag, utag2: string;
 begin

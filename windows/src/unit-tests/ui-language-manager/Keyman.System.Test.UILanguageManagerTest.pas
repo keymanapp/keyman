@@ -1,4 +1,4 @@
-unit Keyman.System.Test.InstallDefaultUILanguageTest;
+unit Keyman.System.Test.UILanguageManagerTest;
 
 interface
 
@@ -9,7 +9,7 @@ uses
 
 type
   [TestFixture]
-  TInstallDefaultUILanguageTest = class(TObject)
+  TUILanguageManagerTest = class(TObject)
   public
     [Test]
     procedure TestFind;
@@ -18,11 +18,11 @@ type
 implementation
 
 uses
-  Keyman.Configuration.System.InstallDefaultUILanguage;
+  Keyman.System.UILanguageManager;
 
-{ TInstallDefaultUILanguageTest }
+{ TUILanguageManagerTest }
 
-procedure TInstallDefaultUILanguageTest.TestFind;
+procedure TUILanguageManagerTest.TestFind;
 var
   ktags, utags: TStringList;
 begin
@@ -31,20 +31,20 @@ begin
 
   ktags.CommaText := 'en,de,fr,kan-knda-in,my,pt-br,qqq,ta,tr,vec';
   utags.CommaText := 'en-US';
-  Assert.AreEqual('en', TInstallDefaultUILanguage.Find(ktags, utags));
+  Assert.AreEqual('en', TUILanguageManager.Find(ktags, utags));
 
   ktags.CommaText := 'en,en-au,de,fr,kan-knda-in,my,pt-br,qqq,ta,tr,vec';
-  Assert.AreEqual('en', TInstallDefaultUILanguage.Find(ktags, utags));
+  Assert.AreEqual('en', TUILanguageManager.Find(ktags, utags));
 
   utags.CommaText := 'en-AU';
-  Assert.AreEqual('en-au', TInstallDefaultUILanguage.Find(ktags, utags));
+  Assert.AreEqual('en-au', TUILanguageManager.Find(ktags, utags));
 
   utags.CommaText := 'kan';
-  Assert.AreEqual('kan-knda-in', TInstallDefaultUILanguage.Find(ktags, utags));
+  Assert.AreEqual('kan-knda-in', TUILanguageManager.Find(ktags, utags));
 
   ktags.CommaText := 'en,en-au,de,fr,km,kan-knda-in,my,pt-br,qqq,ta,tr,vec';
   utags.CommaText := 'jar,km-KH';
-  Assert.AreEqual('km', TInstallDefaultUILanguage.Find(ktags, utags));
+  Assert.AreEqual('km', TUILanguageManager.Find(ktags, utags));
 
   ktags.Free;
   utags.Free;

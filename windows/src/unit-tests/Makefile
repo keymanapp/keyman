@@ -6,7 +6,7 @@
 
 TARGETS=keyboard-info keyboard-js-info keyboard-package-versions \
         kmx-file-languages package-info new-tests jsonutil windows-setup \
-        install-default-ui-language
+        ui-language-manager
 
 test:
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -43,8 +43,8 @@ windows-setup:
     cd $(ROOT)\src\unit-tests\windows-setup
     $(MAKE) $(TARGET)
 
-install-default-ui-language:
-    cd $(ROOT)\src\unit-tests\install-default-ui-language
+ui-language-manager:
+    cd $(ROOT)\src\unit-tests\ui-language-manager
     $(MAKE) $(TARGET)
 
 new-tests:

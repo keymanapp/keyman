@@ -72,7 +72,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <Debugger_CWD>C:\Projects\keyman\apps\windows\src\ext\dcpcrypt</Debugger_CWD>
         <DCC_ExeOutput>.\</DCC_ExeOutput>
-        <Debugger_RunParams>-dccx DCPDelphi2009.dpk</Debugger_RunParams>
+        <Debugger_RunParams>-buildsetupstrings ..\..\desktop\setup\locale ..\..\desktop\setup</Debugger_RunParams>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
@@ -106,6 +106,8 @@
         <DCCReference Include="DevDelphiStarterCompileWrapper.pas"/>
         <DCCReference Include="SourceRootPath.pas"/>
         <DCCReference Include="Keyman.System.DevTools.BuildMessageConstants.pas"/>
+        <DCCReference Include="Keyman.System.DevTools.BuildSetupStringTranslations.pas"/>
+        <DCCReference Include="..\..\desktop\setup\SetupStrings.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
