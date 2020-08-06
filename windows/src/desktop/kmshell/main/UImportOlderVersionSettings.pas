@@ -24,7 +24,7 @@ unit UImportOlderVersionSettings;
 
 interface
 
-function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
 
 implementation
 
@@ -43,7 +43,7 @@ uses
   RegistryKeys,
   UImportOlderKeyboardUtils;
 
-function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
 var
   n, I: Integer;
   v: Integer;
@@ -54,6 +54,10 @@ begin
   if DoDefaults then  // I2753
   begin
     TKeymanUILanguageManager.Execute;
+    if FDefaultUILanguage <> '' then
+    begin
+       kmint.KeymanCustomisation.CustMessages.LanguageCode := FDefaultUILanguage;
+    end;
 
     { General }
     kmcom.Options['koKeyboardHotkeysAreToggle'].Value := True;
