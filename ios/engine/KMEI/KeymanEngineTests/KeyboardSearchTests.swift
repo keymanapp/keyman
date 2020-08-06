@@ -112,108 +112,99 @@ class KeyboardSearchTests: XCTestCase {
     wait(for: [kbdExpectation], timeout: 5)
   }
 
-//
-//  func testDefaultKeyboardInstallationClosureTaggedSuccess() throws {
-//    // Step 1:  mocking.
-//    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
-//    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
-//
-//    let installExpectation = XCTestExpectation(description: "Keyboard package download & installation should complete")
-//    let groupExpectation = XCTestExpectation(description: "DispatchGroup should notify")
-//
-//    // Step 2 - build closure & synchronization check
-//    let dispatchGroup = DispatchGroup()
-//
-//    let closure = KeyboardSearchViewController.defaultKeyboardInstallationClosure(withDownloadManager: downloadManager, dispatchGroup: dispatchGroup) { result in
-//      if case let .success(fullID) = result {
-//        XCTAssertEqual(fullID as? FullKeyboardID, TestUtils.Keyboards.khmer_angkor.fullID)
-//      } else {
-//        XCTFail("keyboard installation did not succeed.")
-//      }
-//
-//      installExpectation.fulfill()
-//    }
-//
-//    // As the closure has now been built (and thus, DispatchGroup.enter() called),
-//    // notification only occurs the callback completes.
-//    dispatchGroup.notify(queue: .main) {
-//      groupExpectation.fulfill()
-//    }
-//
-//    // Step 3 - run closure
-//    closure(.tagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID))
-//
-//    wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
-//
-//    // Step 4 - verify installation
-//    XCTAssertTrue(Storage.active.userDefaults.userKeyboards!.contains { $0.fullID == TestUtils.Keyboards.khmer_angkor.fullID })
-//    XCTAssertNotNil(ResourceFileManager.shared.getInstalledPackage(withKey: TestUtils.Packages.Keys.khmer_angkor))
-//  }
-//
-//  func testDefaultKeyboardInstallationClosureTaggedError() throws {
-//    // Step 1:  mocking.
-//    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: TestUtils.mockedError)
-//    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
-//
-//    let installExpectation = XCTestExpectation(description: "Keyboard package download & installation should complete")
-//    let groupExpectation = XCTestExpectation(description: "DispatchGroup should notify")
-//
-//    // Step 2 - build closure & synchronization check
-//    let dispatchGroup = DispatchGroup()
-//
-//    let closure = KeyboardSearchViewController.defaultKeyboardInstallationClosure(withDownloadManager: downloadManager, dispatchGroup: dispatchGroup) { result in
-//      if case .error(_) = result {
-//        // Success!
-//      } else {
-//        XCTFail("keyboard installation did not result in mocked error.")
-//      }
-//
-//      installExpectation.fulfill()
-//    }
-//
-//    // As the closure has now been built (and thus, DispatchGroup.enter() called),
-//    // notification only occurs the callback completes.
-//    dispatchGroup.notify(queue: .main) {
-//      groupExpectation.fulfill()
-//    }
-//
-//    // Step 3 - run closure
-//    closure(.tagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID))
-//
-//    wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
-//
-//    // Step 4 - verify lack of installation
-//    XCTAssertFalse(Storage.active.userDefaults.userKeyboards?.contains { $0.fullID == TestUtils.Keyboards.khmer_angkor.fullID } ?? false)
-//    XCTAssertNil(ResourceFileManager.shared.getInstalledPackage(withKey: TestUtils.Packages.Keys.khmer_angkor))
-//  }
-//
-// func testDefaultKeyboardInstallationClosureTaggedCancel() throws {
-//    // Step 1:  mocking.
-//    let installExpectation = XCTestExpectation(description: "Keyboard package download & installation should complete")
-//    let groupExpectation = XCTestExpectation(description: "DispatchGroup should notify")
-//
-//    // Step 2 - build closure & synchronization check
-//    let dispatchGroup = DispatchGroup()
-//
-//    let closure = KeyboardSearchViewController.defaultKeyboardInstallationClosure(withDownloadManager: downloadManager, dispatchGroup: dispatchGroup) { result in
-//      if case .cancelled = result {
-//        // Success!
-//      } else {
-//        XCTFail("keyboard-search cancellation handled improperly.")
-//      }
-//
-//      installExpectation.fulfill()
-//    }
-//
-//    // As the closure has now been built (and thus, DispatchGroup.enter() called),
-//    // notification only occurs the callback completes.
-//    dispatchGroup.notify(queue: .main) {
-//      groupExpectation.fulfill()
-//    }
-//
-//    // Step 3 - run closure
-//    closure(.cancelled)
-//
-//    wait(for: [installExpectation, groupExpectation], timeout: 5, enforceOrder: true)
-//  }
+
+  func testDefaultDownloadClosureTaggedSuccess() throws {
+    // Step 1:  mocking.
+    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
+
+    let downloadExpectation = XCTestExpectation(description: "Keyboard package download should complete")
+
+    // Step 2 - build closure
+    let closure = KeyboardSearchViewController.defaultDownloadClosure(withDownloadManager: downloadManager) { result in
+      if case let .success(package, fullID) = result {
+        XCTAssertEqual(package.key, TestUtils.Packages.Keys.khmer_angkor)
+        XCTAssertEqual(fullID as? FullKeyboardID, TestUtils.Keyboards.khmer_angkor.fullID)
+      } else {
+        XCTFail("keyboard installation did not succeed.")
+      }
+
+      downloadExpectation.fulfill()
+    }
+
+    // Step 3 - run closure
+    closure(.tagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID))
+
+    wait(for: [downloadExpectation], timeout: 5, enforceOrder: true)
+  }
+
+  func testDefaultDownloadClosureUntaggedSuccess() throws {
+    // Step 1:  mocking.
+    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: nil)
+    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
+
+    let downloadExpectation = XCTestExpectation(description: "Keyboard package download should complete")
+
+    // Step 2 - build closure
+    let closure = KeyboardSearchViewController.defaultDownloadClosure(withDownloadManager: downloadManager) { result in
+      if case let .success(package, fullID) = result {
+        XCTAssertEqual(package.key, TestUtils.Packages.Keys.khmer_angkor)
+        XCTAssertEqual(fullID as? FullKeyboardID, TestUtils.Keyboards.khmer_angkor.fullID)
+      } else {
+        XCTFail("keyboard installation did not succeed.")
+      }
+
+      downloadExpectation.fulfill()
+    }
+
+    // Step 3 - run closure
+    closure(.untagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP))
+
+    wait(for: [downloadExpectation], timeout: 5, enforceOrder: true)
+  }
+
+  func testDefaultDownloadClosureTaggedError() throws {
+    // Step 1:  mocking.
+    let packageDownloadTask = TestUtils.Downloading.MockResult(location: TestUtils.Keyboards.khmerAngkorKMP, error: TestUtils.mockedError)
+    mockedURLSession!.queueMockResult(.download(packageDownloadTask))
+
+    let downloadExpectation = XCTestExpectation(description: "Keyboard package download should complete")
+
+    // Step 2 - build closure
+    let closure = KeyboardSearchViewController.defaultDownloadClosure(withDownloadManager: downloadManager) { result in
+      if case .error(_) = result {
+        // Success!
+      } else {
+        XCTFail("keyboard installation did not result in mocked error.")
+      }
+
+      downloadExpectation.fulfill()
+    }
+
+    // Step 3 - run closure
+    closure(.tagged(TestUtils.Packages.Keys.khmer_angkor, TestUtils.Keyboards.khmerAngkorKMP, TestUtils.Keyboards.khmer_angkor.fullID))
+
+    wait(for: [downloadExpectation], timeout: 5, enforceOrder: true)
+  }
+
+ func testDefaultDownloadClosureCancelled() throws {
+    // Step 1:  mocking.
+    let downloadExpectation = XCTestExpectation(description: "Keyboard package download should complete")
+
+    // Step 2 - build closure
+    let closure = KeyboardSearchViewController.defaultDownloadClosure(withDownloadManager: downloadManager) { result in
+      if case .cancelled = result {
+        // Success!
+      } else {
+        XCTFail("keyboard-search cancellation handled improperly.")
+      }
+
+      downloadExpectation.fulfill()
+    }
+
+    // Step 3 - run closure
+    closure(.cancelled)
+
+    wait(for: [downloadExpectation], timeout: 5, enforceOrder: true)
+  }
 }
