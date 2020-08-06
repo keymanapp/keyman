@@ -61,7 +61,6 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       switch self {
         case .lexicalModels:
           return { associatedLexicalModelMap, completionClosure in
-            // TODO:  Stuff!
             associatedLexicalModelMap.forEach { packageKey, association in
               let url = association.url
               let lgCodes = association.languageCodes
