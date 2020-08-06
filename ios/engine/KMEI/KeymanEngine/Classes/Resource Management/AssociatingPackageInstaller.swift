@@ -18,6 +18,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
   public typealias AssociatorBuilder = (AssociatingPackageInstaller,
                                         LanguagePickAssociator.AssociationReceiver)
                                         -> LanguagePickAssociator
+
   /**
    * Defines behaviors for finding and installing resources associated with the set of languages selected for installation.
    */
@@ -49,7 +50,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
               ResourceDownloadManager.shared.downloadPackage(withKey: packageKey, from: url) {
                 (package: LexicalModelKeymanPackage?, error: Error?) in
                 guard error == nil, let package = package else {
-                  // TODO:  Error handling, progress tracking
+                  completionClosure(packageKey, .error(error ?? NSError()))
                   return
                 }
 
@@ -76,6 +77,14 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     case complete
   }
 
+  public enum Progress {
+    case cancelled
+    case inProgress
+    case complete
+  }
+
+  public typealias ProgressReceiver = (Progress) -> Void
+
   typealias AssociationInstallMap = [KeymanPackage.Key: PackageInstallResult]
 
   // TODO:  Move more relevant class properties into the inner class below.
@@ -94,10 +103,13 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     var associationQueryProgress: [Int: LanguagePickAssociator.Progress] = [:]
     var installProgressMap: [KeymanPackage.Key: PackageInstallResult?] = [:]
 
+    let progressCallback: ProgressReceiver
+
     var isCancelled = false
 
-    init(with associationSpecs: [Associator]) {
+    init(with associationSpecs: [Associator], receiver: @escaping ProgressReceiver) {
       self.associationSpecs = associationSpecs
+      self.progressCallback = receiver
     }
   }
 
@@ -107,71 +119,77 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
   let defaultLgCode: String?
   var associationQueriers: [LanguagePickAssociator]?
 
-  // TODO:  Add progress-report callback closure parameter.
   public init(for package: Package,
               defaultLanguageCode: String? = nil,
-              withAssociators associators: [Associator] = []) {
+              withAssociators associators: [Associator] = [],
+              progressReceiver: @escaping ProgressReceiver) {
     self.package = package
     self.defaultLgCode = defaultLanguageCode
 
-    self.closureShared = ClosureShared(with: associators)
+    self.closureShared = ClosureShared(with: associators, receiver: progressReceiver)
   }
 
   private func constructAssociationPickers() {
     // We instantiate this now, indicating that language selection has begun.
-    self.associationQueriers = []
+    associationQueriers = []
 
-    let closureShared = self.closureShared
     // Using a classical for-loop allows us to 'map' receivers (within their closures) to their associators.
     for i in 0 ... closureShared.associationSpecs.count-1 {
       let associationSpec = closureShared.associationSpecs[i]
 
       closureShared.queryGroup.enter()
-      // TODO:  Define in separate method.
-      let receiver: LanguagePickAssociator.AssociationReceiver = { status in
-        switch status {
-          case .cancelled:
-            // TODO:  anything else to do if cancelled?
-            closureShared.queryGroup.leave()
-            // TODO:
-          //case .inProgress(let queryCount, let associationsFound):
-          case .complete(_, let associationMap):
-            let installer = closureShared.associationSpecs[i].installer()
-            closureShared.associationInstallers[i] = installer
+      let receiver: LanguagePickAssociator.AssociationReceiver = constructAssociationReceiver(specIndex: i)
 
-            // Since completions will be signaled once per package,
-            // we enter the install group once per package.
-            associationMap.forEach { _, _ in closureShared.installGroup.enter() }
-            closureShared.queryGroup.leave()
+      associationQueriers!.append(associationSpec.instance(for: self, withReceiver: receiver))
+    }
+  }
 
-            installer(associationMap) { packageKey, result in
-              closureShared.progressQueue.async {
-                closureShared.installProgressMap[packageKey] = result
+  private func constructAssociationReceiver(specIndex: Int) -> LanguagePickAssociator.AssociationReceiver {
+    let closureShared = self.closureShared
 
-                // TODO:  compute & report progress.
+    return { status in
+      switch status {
+        case .cancelled:
+          // TODO:  anything else to do if cancelled?
+          closureShared.queryGroup.leave()
+          // TODO:
+        //case .inProgress(let queryCount, let associationsFound):
+        //  break
+        case .complete(_, let associationMap):
+          let installer = closureShared.associationSpecs[specIndex].installer()
+          closureShared.associationInstallers[specIndex] = installer
 
-                // Last thing in this closure.
-                closureShared.installGroup.leave()
-              }
-            }
-          default:
-            break
-        }
+          // Since completions will be signaled once per package,
+          // we enter the install group once per package.
+          associationMap.forEach { _, _ in closureShared.installGroup.enter() }
+          closureShared.queryGroup.leave()
 
-        closureShared.progressQueue.async {
-          closureShared.associationQueryProgress[i] = status
+          installer(associationMap) { packageKey, result in
+            closureShared.progressQueue.async {
+              closureShared.installProgressMap[packageKey] = result
 
-          if case let .complete(_, associationMap) = status {
-            associationMap.forEach { (key, _) in
-              // Allows tracking install-completion progress.
-              closureShared.installProgressMap[key] = nil  // indicates 'downloading'.
+              // TODO:  compute & report progress.
+
+              // Last thing in this closure.
+              closureShared.installGroup.leave()
             }
           }
-
-          // TODO:  trigger a 'progress report' if in the right state. (isCancelled == false is part of that.)
-        }
+        default:
+          break
       }
-      self.associationQueriers!.append(associationSpec.instance(for: self, withReceiver: receiver))
+
+      closureShared.progressQueue.async {
+        closureShared.associationQueryProgress[specIndex] = status
+
+        if case let .complete(_, associationMap) = status {
+          associationMap.forEach { (key, _) in
+            // Allows tracking install-completion progress.
+            closureShared.installProgressMap[key] = nil  // indicates 'downloading'.
+          }
+        }
+
+        // TODO:  trigger a 'progress report' if in the right state. (isCancelled == false is part of that.)
+      }
     }
   }
 
@@ -191,23 +209,13 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     }
   }
 
-  public func promptForLanguages(inNavigationVC navVC: UINavigationController) {
-    guard self.associationQueriers == nil, !closureShared.pickingCompleted else {
-      fatalError("Invalid state - language picking has already been triggered.")
-    }
-
-    initializeSynchronizationGroups()
-    constructAssociationPickers()
-
-    let closureShared = self.closureShared
+  private func coreInstallationClosure() -> ([Resource.FullID]?) -> Void {
     // For use in closures called by other DispatchGroups.
     let packageKey = self.package.key
+    let closureShared = self.closureShared
 
-    // TODO:  Move contents to their own method so that this may be shared with a future
-    //        programmatic installation method.
-    //
-    // Is triggered from UI, so is in the standard, main UI thread / DispatchGroup.
-    let baseResourceReceiver: PackageInstallViewController<Resource>.CompletionHandler = { fullIDs in
+    // This closure should be triggered from UI, thus from the standard, main UI thread / DispatchGroup.
+    return { fullIDs in
       guard let fullIDs = fullIDs else {
         closureShared.isCancelled = true
         closureShared.queryGroup.leave()
@@ -239,11 +247,20 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
 
       closureShared.installGroup.leave()
     }
+  }
+
+  public func promptForLanguages(inNavigationVC navVC: UINavigationController) {
+    guard self.associationQueriers == nil, !closureShared.pickingCompleted else {
+      fatalError("Invalid state - language picking has already been triggered.")
+    }
+
+    initializeSynchronizationGroups()
+    constructAssociationPickers()
 
     let pickerPrompt = PackageInstallViewController<Resource>(for: self.package,
                                                               defaultLanguageCode: defaultLgCode,
                                                               languageAssociators: associationQueriers!,
-                                                              completionHandler: baseResourceReceiver)
+                                                              completionHandler: coreInstallationClosure())
 
     navVC.pushViewController(pickerPrompt, animated: true)
   }
