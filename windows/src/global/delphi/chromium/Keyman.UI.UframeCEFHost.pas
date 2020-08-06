@@ -40,6 +40,12 @@ const
   CEF_COMMAND = WM_USER + 310;
   CEF_RESIZEFROMDOCUMENT = WM_USER + 311;
   CEF_SETFOCUS = WM_USER + 312;
+  CEF_LOADINGSTATECHANGE = WM_USER + 313;
+
+
+  CEF_LOADINGSTATECHANGE_ISLOADING = $0001;
+  CEF_LOADINGSTATECHANGE_CANGOBACK = $0002;
+  CEF_LOADINGSTATECHANGE_CANGOFORWARD = $0004;
 
 type
   TCEFHostKeyEventData = record
@@ -74,6 +80,7 @@ type
   TCEFHostKeyEvent = procedure(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean) of object;
   TCEFHostTitleChangeEvent = procedure(Sender: TObject; const title: string) of object;
   TCEFHostResizeFromDocumentEvent = procedure(Sender: TObject; width, height: Integer) of object;
+  TCEFHostLoadingStateChangeEvent = procedure(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean) of object;
 
   TframeCEFHost = class(TForm, IKeymanCEFHost)
     tmrRefresh: TTimer;
@@ -122,6 +129,8 @@ type
       const browser: ICefBrowser; sourceProcess: TCefProcessId;
       const message: ICefProcessMessage; out Result: Boolean);
     procedure cefWidgetCompMsg(var aMessage: TMessage; var aHandled: Boolean);
+    procedure cefLoadingStateChange(Sender: TObject; const browser: ICefBrowser;
+      isLoading, canGoBack, canGoForward: Boolean);
   private
     FApplicationHandle: THandle;
     FNextURL: string;
@@ -141,6 +150,8 @@ type
     FOnCommand: TCEFCommandEvent;
     FOnResizeFromDocument: TCEFHostResizeFromDocumentEvent;
     FOnHelpTopic: TNotifyEvent;
+    FIsCreated: Boolean;
+    FOnLoadingStateChange: TCEFHostLoadingStateChangeEvent;
 
     procedure CallbackWndProc(var Message: TMessage);
 
@@ -158,6 +169,7 @@ type
     procedure Handle_CEF_COMMAND(var message: TMessage);
     procedure Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);
     procedure Handle_CEF_SETFOCUS(var message: TMessage);
+    procedure Handle_CEF_LOADINGSTATECHANGE(var message: TMessage);
 
     // CEF: You have to handle this two messages to call NotifyMoveOrResizeStarted or some page elements will be misaligned.
     procedure WMMove(var aMessage : TWMMove); message WM_MOVE;
@@ -187,6 +199,7 @@ type
     property OnPreKeySyncEvent: TCEFHostPreKeySyncEvent read FOnPreKeySyncEvent write FOnPreKeySyncEvent;
     property OnKeyEvent: TCEFHostKeyEvent read FOnKeyEvent write FOnKeyEvent;
     property OnResizeFromDocument: TCEFHostResizeFromDocumentEvent read FOnResizeFromDocument write FOnResizeFromDocument;
+    property OnLoadingStateChange: TCEFHostLoadingStateChangeEvent read FOnLoadingStateChange write FOnLoadingStateChange;
   end;
 
 // Helpers to make sure we don't accidentally code
@@ -315,6 +328,7 @@ end;
 procedure TframeCEFHost.CreateBrowser;
 begin
   AssertVclThread;
+  FIsCreated := True;
   tmrCreateBrowser.Enabled := not cef.CreateBrowser(cefwp);
 end;
 
@@ -330,6 +344,13 @@ begin
   AssertVclThread;
   if FNextURL = '' then
     Exit;
+
+  if not FIsCreated then
+  begin
+    cef.DefaultUrl := FNextURL;
+    FNextURL := '';
+    Exit;
+  end;
 
   if not cef.Initialized then
   begin
@@ -366,6 +387,7 @@ begin
     CEF_COMMAND: Handle_CEF_COMMAND(Message);
     CEF_RESIZEFROMDOCUMENT: Handle_CEF_RESIZEFROMDOCUMENT(Message);
     CEF_SETFOCUS: Handle_CEF_SETFOCUS(Message);
+    CEF_LOADINGSTATECHANGE: Handle_CEF_LOADINGSTATECHANGE(Message);
   end;
 
   if Self <> nil then
@@ -552,6 +574,19 @@ begin
   PostMessage(FCallbackWnd, CEF_LOADEND, httpStatusCode, 0);
 end;
 
+procedure TframeCEFHost.cefLoadingStateChange(Sender: TObject;
+  const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
+var
+  v: Integer;
+begin
+  AssertCefThread;
+  v := 0;
+  if isLoading then v := v or CEF_LOADINGSTATECHANGE_ISLOADING;
+  if canGoBack then v := v or CEF_LOADINGSTATECHANGE_CANGOBACK;
+  if canGoForward then v := v or CEF_LOADINGSTATECHANGE_CANGOFORWARD;
+  PostMessage(FCallbackWnd, CEF_LOADINGSTATECHANGE, v, 0);
+end;
+
 procedure TframeCEFHost.Handle_CEF_KEYEVENT(var message: TMessage);
 var
   p: PCEFHostKeyEventData;
@@ -590,6 +625,19 @@ begin
 
   if Assigned(FOnLoadEnd) then
     FOnLoadEnd(Self);
+end;
+
+procedure TframeCEFHost.Handle_CEF_LOADINGSTATECHANGE(var message: TMessage);
+begin
+  if csDestroying in ComponentState then
+    Exit;
+  AssertVclThread;
+
+  if Assigned(FOnLoadingStateChange) then
+    FOnLoadingStateChange(Self,
+      (message.WParam and CEF_LOADINGSTATECHANGE_ISLOADING) <> 0,
+      (message.WParam and CEF_LOADINGSTATECHANGE_CANGOBACK) <> 0,
+      (message.WParam and CEF_LOADINGSTATECHANGE_CANGOFORWARD) <> 0);
 end;
 
 procedure TframeCEFHost.Handle_CEF_RESIZEFROMDOCUMENT(var message: TMessage);

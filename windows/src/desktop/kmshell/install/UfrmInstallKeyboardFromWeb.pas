@@ -49,16 +49,19 @@ uses
 type
   TfrmInstallKeyboardFromWeb = class(TfrmWebContainer)
     dlgSaveFile: TSaveDialog;
-    procedure TntFormShow(Sender: TObject);
+    procedure TntFormCreate(Sender: TObject);
   private
     FDownloadFilename: string;
     FDownloadURL: string;
     frmDownloadProgress: TfrmDownloadProgress;
+    FDownloadStatusText: string;
+    FDownloadStatusCode: Integer;
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
     procedure cefBeforeBrowse(Sender: TObject; const Url: string;
       wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string;
       out Handled: Boolean);
+    procedure cefLoadingStateChange(Sender: TObject; isLoading, canGoBack, canGoForward: Boolean);
     procedure DownloadAndInstallPackage(const PackageID, BCP47: string);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
       AReadCount: Int64; var Abort: Boolean);
@@ -77,6 +80,9 @@ uses
   httpuploader,
   GlobalProxySettings,
   Keyman.Configuration.UI.InstallFile,
+  Keyman.System.LocaleStrings,
+  kmint,
+  MessageIdentifierConsts,
   Upload_Settings,
   utilfiletypes,
   utildir,
@@ -95,22 +101,34 @@ begin
     inherited;
 end;
 
-procedure TfrmInstallKeyboardFromWeb.TntFormShow(Sender: TObject);
+procedure TfrmInstallKeyboardFromWeb.TntFormCreate(Sender: TObject);
 begin
+  inherited;
   // Ensures keyman.com hosted site opens locally
   cef.ShouldOpenRemoteUrlsInBrowser := False;
   cef.OnBeforeBrowse := cefBeforeBrowse;
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnLoadingStateChange := cefLoadingStateChange;
 
   FRenderPage := 'downloadkeyboard';
 
   Content_Render;
-  inherited;
 end;
 
 procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowseSync(Sender: TObject; const Url: string; out Handled: Boolean);
 begin
   Handled := TRegEx.IsMatch(Url, UrlPath_RegEx_MatchKeyboardsInstall);
+end;
+
+procedure TfrmInstallKeyboardFromWeb.cefLoadingStateChange(Sender: TObject;
+  isLoading, canGoBack, canGoForward: Boolean);
+begin
+  if not isLoading then
+  begin
+    if canGoBack
+      then cef.cef.ExecuteJavaScript('updateBackButtonState(true)', cef.cef.Browser.MainFrame.Url)
+      else cef.cef.ExecuteJavaScript('updateBackButtonState(false)', cef.cef.Browser.MainFrame.Url);
+  end;
 end;
 
 procedure TfrmInstallKeyboardFromWeb.cefBeforeBrowse(Sender: TObject; const Url: string; wasHandled: Boolean);
@@ -120,6 +138,7 @@ var
   BCP47: string;
   PackageID: string;
 begin
+
   m := TRegEx.Match(Url, UrlPath_RegEx_MatchKeyboardsInstall);
   if m.Success then
   begin
@@ -151,7 +170,10 @@ begin
     try
       frmDownloadProgress.Callback := DoDownload;
       if frmDownloadProgress.ShowModal <> mrOk then
+      begin
+        ShowMessage(TLocaleStrings.MsgFromIdFormat(kmcom, S_DownloadKeyboard_DownloadError, [FDownloadStatusText, FDownloadStatusCode]));
         Exit;
+      end;
     finally
       frmDownloadProgress.Free;
     end;
@@ -181,33 +203,35 @@ var
   FTempFilename: string;
 begin
   Result := False;
-    FTempFilename := FDownloadFilename + '.download';
-    Client := THTTPClient.Create;
+  FTempFilename := FDownloadFilename + '.download';
+  Client := THTTPClient.Create;
+  try
+    Client.OnReceiveData := HttpReceiveData;
+
+    Stream := TFileStream.Create(FTempFilename, fmCreate);
     try
-      Client.OnReceiveData := HttpReceiveData;
-
-      Stream := TFileStream.Create(FTempFilename, fmCreate);
-      try
-        Response := Client.Get(FDownloadURL, Stream);
-        Result := Response.StatusCode = 200;
-      finally
-        Stream.Free;
-      end;
-
-      if FileExists(FTempFilename)  then
-      begin
-        if Result then
-        begin
-          if FileExists(FDownloadFilename) then
-            System.SysUtils.DeleteFile(FDownloadFilename);
-          RenameFile(FTempFilename, FDownloadFilename);
-        end
-        else
-          System.SysUtils.DeleteFile(FTempFilename);
-      end;
+      Response := Client.Get(FDownloadURL, Stream);
+      Result := Response.StatusCode = 200;
+      FDownloadStatusText := Response.StatusText;
+      FDownloadStatusCode := Response.StatusCode;
     finally
-      Client.Free;
+      Stream.Free;
     end;
+
+    if FileExists(FTempFilename) then
+    begin
+      if Result then
+      begin
+        if FileExists(FDownloadFilename) then
+          System.SysUtils.DeleteFile(FDownloadFilename);
+        RenameFile(FTempFilename, FDownloadFilename);
+      end
+      else
+        System.SysUtils.DeleteFile(FTempFilename);
+    end;
+  finally
+    Client.Free;
+  end;
 end;
 
 

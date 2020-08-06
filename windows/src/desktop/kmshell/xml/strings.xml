@@ -570,6 +570,16 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">Don't install, just download</string>
 
+  <!-- Parameters: %0:s = Error Message, %1:d Error Code -->
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">Unable to download keyboard, error %1:d: %0:s</string>
+
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Button_Back" comment="Back button">&lt; Back</string>
   
   
 

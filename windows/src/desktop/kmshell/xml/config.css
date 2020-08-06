@@ -136,6 +136,12 @@ input[type='submit'], input[type='button'], button
   border: none;
 }
 
+input[type='submit']:disabled, input[type='button']:disabled, button:disabled
+{
+  color: #c0c0cf;
+  background: #80808f;
+}
+
 a.hotkey:link, a.hotkey:visited
 {
   color: blue;
