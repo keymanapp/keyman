@@ -50,7 +50,7 @@ class KeyboardSearchTests: XCTestCase {
     let searchNoLang = KeyboardSearchViewController(languageCode: nil,
                                                     withSession: mockedURLSession!,
                                                     keyboardSelectionBlock: kbdBlock)
-    searchNoLang.finalize(with: UniversalLinks.ParsedKeyboardInstallLink(keyboard_id: "khmer_angkor", lang_id: nil), for: nil)
+    searchNoLang.finalize(with: UniversalLinks.ParsedKeyboardInstallLink(keyboard_id: "khmer_angkor", lang_id: nil))
 
     wait(for: [kbdExpectation], timeout: 5)
   }
@@ -73,7 +73,7 @@ class KeyboardSearchTests: XCTestCase {
     let search = KeyboardSearchViewController(languageCode: nil,
                                                     withSession: mockedURLSession!,
                                                     keyboardSelectionBlock: kbdBlock)
-    search.finalize(with: UniversalLinks.ParsedKeyboardInstallLink(keyboard_id: "sil_euro_latin", for: "en")
+    search.finalize(with: UniversalLinks.ParsedKeyboardInstallLink(keyboard_id: "sil_euro_latin", lang_id: "en"))
 
     wait(for: [kbdExpectation], timeout: 5)
   }
