@@ -64,15 +64,13 @@
       <a href="keyman:help" onmouseover="this.style.cursor='hand';" >
         <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;' src="/app/help24.png" />
         <xsl:value-of select="$locale/string[@name='S_Caption_Help']" />
-      </a>
-
-            &#160;
+      </a>&#160;
+      <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;' src="/app/globe.png" />
       <xsl:value-of select="$locale/string[@name='S_DisplayIn']" />:
-        <a id="button_uilanguage" href="#"
-           onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;"
-           onkeydown="if(event.keyCode == 32) ShowMenu('uilanguage','right'); else return true; return false;"
-        ><xsl:value-of select="$locale/string[@name='SKUILanguageNameWithEnglish']"/></a>
-
+      <a id="button_uilanguage" href="#"
+          onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;"
+          onkeydown="if(event.keyCode == 32) ShowMenu('uilanguage','right'); else return true; return false;"
+      ><xsl:value-of select="$locale/string[@name='SKUILanguageNameWithEnglish']"/></a>
     </div>
   </xsl:template>
 
