@@ -301,8 +301,7 @@ class LanguageSettingsViewController: UITableViewController {
   
   @objc func addClicked(_ sender: Any) {
     let keyboardSearchVC = KeyboardSearchViewController(languageCode: self.language.id,
-                                                        keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure(),
-                                                        lexicalModelSelectionBlock: KeyboardSearchViewController.defaultLexicalModelInstallationClosure())
+                                                        keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure())
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 

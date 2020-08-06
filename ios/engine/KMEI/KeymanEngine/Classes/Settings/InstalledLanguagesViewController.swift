@@ -431,8 +431,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 extension InstalledLanguagesViewController {
   
   @objc func addClicked(_ sender: Any) {
-    let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure(),
-                                                        lexicalModelSelectionBlock: KeyboardSearchViewController.defaultLexicalModelInstallationClosure())
+    let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultKeyboardInstallationClosure())
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
 }
