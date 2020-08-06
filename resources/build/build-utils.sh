@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This script sets build environment variables:
+# This script sets build environment variables. VERSION vars are also exported:
 #   VERSION:          Full current build version, e.g. "14.0.1"
 #   VERSION_WIN:      Full current build version for Windows, e.g. "14.0.1.0"
 #   VERSION_RELEASE:  Current release version, e.g. "14.0"
@@ -93,9 +93,7 @@ function findVersion() {
         fi
     fi
 
-    # export these two so version.gradle can access them
-    export VERSION_ENVIRONMENT
-    export VERSION_WITH_TAG="$VERSION$VERSION_TAG"
+    VERSION_WITH_TAG="$VERSION$VERSION_TAG"
 
     readonly VERSION
     readonly VERSION_MAJOR
@@ -106,6 +104,17 @@ function findVersion() {
     readonly VERSION_TAG
     readonly VERSION_WITH_TAG
     readonly VERSION_ENVIRONMENT
+
+    # Export version strings so places like version.gradle can access them
+    export VERSION
+    export VERSION_MAJOR
+    export VERSION_MINOR
+    export VERSION_PATCH
+    export VERSION_RELEASE
+    export VERSION_WIN
+    export VERSION_TAG
+    export VERSION_WITH_TAG
+    export VERSION_ENVIRONMENT
 }
 
 function findTier() {
