@@ -79,6 +79,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
 
   public enum Progress {
     case cancelled
+    case starting // signals that language picks are finalized, so progress reports will now begin.
     case inProgress
     case complete
   }
@@ -111,6 +112,38 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       self.associationSpecs = associationSpecs
       self.progressCallback = receiver
     }
+
+    // Since progress info is stored here, it makes the most sense to track progress-related
+    // methods here too.
+
+    internal var reportsProgress: Bool {
+      return !isCancelled && pickingCompleted
+    }
+
+    /**
+     * Computes the initial level of progress made toward the overall installation at the time that language selections were
+     * finalized.
+     */
+    internal func initializeProgress() {
+      self.progressCallback(.starting)
+    }
+
+    /**
+     * Generates data useful for reporting about the installation's overall progress.
+     */
+    internal func reportProgress(complete: Bool = false) {
+      if reportsProgress {
+        if complete {
+          progressCallback(.complete)
+        } else {
+          progressCallback(.inProgress)
+        }
+      }
+    }
+
+    internal func reportCancelled() {
+      progressCallback(.cancelled)
+    }
   }
 
   private let closureShared: ClosureShared
@@ -128,6 +161,9 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
 
     self.closureShared = ClosureShared(with: associators, receiver: progressReceiver)
   }
+
+  // TODO:  deinit handling in case everything gets cancelled.
+  // deinit { }
 
   private func constructAssociationPickers() {
     // We instantiate this now, indicating that language selection has begun.
@@ -150,11 +186,10 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     return { status in
       switch status {
         case .cancelled:
-          // TODO:  anything else to do if cancelled?
           closureShared.queryGroup.leave()
-          // TODO:
-        //case .inProgress(let queryCount, let associationsFound):
-        //  break
+        // TODO:
+        // case .inProgress(let queryCount, let associationsFound):
+        //   break
         case .complete(_, let associationMap):
           let installer = closureShared.associationSpecs[specIndex].installer()
           closureShared.associationInstallers[specIndex] = installer
@@ -167,13 +202,13 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
           installer(associationMap) { packageKey, result in
             closureShared.progressQueue.async {
               closureShared.installProgressMap[packageKey] = result
-
-              // TODO:  compute & report progress.
+              closureShared.reportProgress()
 
               // Last thing in this closure.
               closureShared.installGroup.leave()
             }
           }
+        // Since we aren't yet directly handling case .inProgress.
         default:
           break
       }
@@ -188,7 +223,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
           }
         }
 
-        // TODO:  trigger a 'progress report' if in the right state. (isCancelled == false is part of that.)
+        closureShared.reportProgress()
       }
     }
   }
@@ -205,7 +240,8 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     }
 
     closureShared.installGroup.notify(queue: DispatchQueue.main) {
-      // TODO:  The final 'progress report' / completion signaller.
+      // The final 'progress report' / completion signaller.
+      closureShared.reportProgress(complete: true)
     }
   }
 
@@ -219,6 +255,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
       guard let fullIDs = fullIDs else {
         closureShared.isCancelled = true
         closureShared.queryGroup.leave()
+        closureShared.reportCancelled()
 
         return
       }
@@ -227,6 +264,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
         // Indicates a transition to 'installing' state.
         closureShared.pickingCompleted = true
         closureShared.installProgressMap[packageKey] = nil
+        closureShared.initializeProgress()
       }
       closureShared.installGroup.enter()  // Enter the 'install' group before exiting the 'query' group, to be safe.
       closureShared.queryGroup.leave()
@@ -241,14 +279,20 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
 
       closureShared.progressQueue.async {
         closureShared.installProgressMap[packageKey] = result
-
-        // TODO:  report on installation progress?
+        closureShared.reportProgress()
       }
 
       closureShared.installGroup.leave()
     }
   }
 
+  /**
+   * Summons UI that allows the user to interactively select which languages are installed for this package,
+   * searching for specified associations in the background and adding them to the installation set.
+   *
+   * May only be called once during the lifetime of its instance and is mutually exclusive with `pickLanguages`,
+   * the programmatic alternative.
+   */
   public func promptForLanguages(inNavigationVC navVC: UINavigationController) {
     guard self.associationQueriers == nil, !closureShared.pickingCompleted else {
       fatalError("Invalid state - language picking has already been triggered.")
@@ -265,6 +309,29 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     navVC.pushViewController(pickerPrompt, animated: true)
   }
 
-  // TODO: a programmatic version with the approximate signature seen below.
-  // public func selectLanguages(withCodes languageIDs: Set<String>)
+  /**
+   * Allows programmatically selecting which languages are installed for this package.
+   * The specified associations will be used to find related packages and add them to the installation set.
+   *
+   * May only be called once during the lifetime of its instance and is mutually exclusive with `promptForLanguages`,
+   * the user-interactive alternative.
+   */
+  public func pickLanguages(withCodes languageIDs: Set<String>) {
+    guard self.associationQueriers == nil, !closureShared.pickingCompleted else {
+      fatalError("Invalid state - language picking has already been triggered.")
+    }
+
+    initializeSynchronizationGroups()
+    constructAssociationPickers()
+
+    let baseResources: [Resource] = languageIDs.flatMap { package.installables(forLanguage: $0) }
+    let baseFullIDs: [Resource.FullID] = baseResources.map { $0.typedFullID }
+
+    self.associationQueriers?.forEach { $0.selectLanguages(languageIDs) }
+
+    let installClosure = coreInstallationClosure()
+    installClosure(baseFullIDs)
+
+    self.associationQueriers?.forEach { $0.pickerFinalized() }
+  }
 }

@@ -282,15 +282,20 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
   }
 
   @objc func installBtnHandler() {
-    dismiss(animated: true, completion: {
-      let selectedItems = self.languageTable.indexPathsForSelectedRows ?? []
-      let selectedLanguageCodes = selectedItems.map { self.languages[$0.row].id }
+    // If it is not the root view of a navigationController, just pop it off the stack.
+    if let navVC = self.navigationController, navVC.viewControllers[0] != self {
+      navVC.popViewController(animated: true)
+    } else { // Otherwise, if the root view of a navigation controller, dismiss it outright.  (pop not available)
+      dismiss(animated: true)
+    }
 
-      let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
+    let selectedItems = self.languageTable.indexPathsForSelectedRows ?? []
+    let selectedLanguageCodes = selectedItems.map { self.languages[$0.row].id }
 
-      self.completionHandler(selectedResources.map { $0.typedFullID })
-      self.associators.forEach { $0.pickerFinalized() }
-    })
+    let selectedResources = self.package.installableResourceSets.flatMap { $0.filter { selectedLanguageCodes.contains($0.languageID) }} as! [Resource]
+
+    self.completionHandler(selectedResources.map { $0.typedFullID })
+    self.associators.forEach { $0.pickerFinalized() }
   }
 
   public func tableView(_ tableView: UITableView, titleForHeaderInSection: Int) -> String? {

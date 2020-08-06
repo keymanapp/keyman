@@ -64,14 +64,47 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
       }
 
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: self) {
+        // These type checks are necessary due to generic constraints.
         if let kbdPackage = package as? KeyboardKeymanPackage {
-          let packageInstaller = AssociatingPackageInstaller(for: kbdPackage,
-                                                             withAssociators: [.lexicalModels])
-          packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
+          doPrompt(for: kbdPackage, withAssociators: [.lexicalModels])
         } else if let lmPackage = package as? LexicalModelKeymanPackage {
-          let packageInstaller = AssociatingPackageInstaller(for: lmPackage)
-          packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
+          doPrompt(for: lmPackage)
         }
       }
+    }
+
+    private func doPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+        for package: Package,
+        withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [])
+    where Resource.Package == Package {
+      let activitySpinner: UIActivityIndicatorView
+      activitySpinner = UIActivityIndicatorView(style: .whiteLarge)
+      activitySpinner.hidesWhenStopped = true
+      activitySpinner.translatesAutoresizingMaskIntoConstraints = false
+      activitySpinner.backgroundColor = Colors.spinnerBackground
+      activitySpinner.layer.cornerRadius = 6.0
+      activitySpinner.center = view.center
+      activitySpinner.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
+                                       .flexibleBottomMargin]
+
+      let packageInstaller = AssociatingPackageInstaller(for: package,
+                                                         withAssociators: associators) { status in
+        if status == .starting {
+          // Start a spinner!
+          activitySpinner.startAnimating()
+          self.view.addSubview(activitySpinner)
+
+          activitySpinner.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+          activitySpinner.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+          self.view.isUserInteractionEnabled = false
+        } else if status == .complete {
+          // Report completion!
+          activitySpinner.stopAnimating()
+          activitySpinner.removeFromSuperview()
+          self.view.isUserInteractionEnabled = true
+          self.dismiss(animated: true, completion: nil)
+        }
+      }
+      packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
     }
 }
