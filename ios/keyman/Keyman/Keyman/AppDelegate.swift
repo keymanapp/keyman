@@ -38,7 +38,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
         // We choose to prompt the user for comfirmation, rather
         // than automatically installing the package.
-        rfm.promptPackageInstall(of: package, in: vc, isCustom: true)
+        //
+        // Since we're operating at the root, we want to present in a separate UINavigationController.
+        let nvc = UINavigationController.init()
+        rfm.promptPackageInstall(of: package, in: nvc, isCustom: true)
+        vc.present(nvc, animated: true, completion: nil)
       }
     } else {
       log.error("Cannot find app's root UIViewController")

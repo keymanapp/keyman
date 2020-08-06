@@ -229,7 +229,6 @@ public class ResourceFileManager {
         }
       }
 
-
       if let navVC = rootVC as? UINavigationController {
         packageInstaller.promptForLanguages(inNavigationVC: navVC)
       } else {
