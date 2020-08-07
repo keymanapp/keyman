@@ -68,7 +68,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
               downloadManager.downloadPackage(withKey: packageKey, from: url) {
                 (package: LexicalModelKeymanPackage?, error: Error?) in
                 guard error == nil, let package = package else {
-                  completionClosure(packageKey, .error(error ?? NSError()))
+                  completionClosure(packageKey, .error(error ?? KeymanError.unknown))
                   return
                 }
 

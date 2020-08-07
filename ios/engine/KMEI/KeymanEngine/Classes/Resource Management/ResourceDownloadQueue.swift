@@ -250,7 +250,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
         case .clear:
           return nil
         case .noConnection:
-          return NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "No internet connection"])
+          return DownloadError.noInternet
       }
     }
   }
@@ -518,10 +518,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     // Did we finish, but with an request error code?
     if request.responseStatusCode != 200 {
       // Possible request error (400 Bad Request, 404 Not Found, etc.)
-
-      let errorMessage = "\(request.responseStatusMessage ?? ""): \(request.url)"
-      let error = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: errorMessage])
+      let error = DownloadError.failed(.responseCode(request.responseStatusCode ?? 400,
+                                                     request.responseStatusMessage ?? "",
+                                                     request.url))
 
       if case var .simpleBatch(batch) = currentFrame.batch {
         batch.errors[currentFrame.index] = error
@@ -551,8 +550,7 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     if let error = error {
       err = error
     } else {
-      err = NSError(domain: "Keyman", code: 0,
-                          userInfo: [NSLocalizedDescriptionKey: "Unknown error"])
+      err = KeymanError.unknown
     }
 
     try? task.downloadFinalizationBlock?(false)
