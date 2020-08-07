@@ -8,6 +8,7 @@
 
 import Foundation
 import XCGLogger
+import XCTest
 
 extension TestUtils.Downloading {
   class MockResult {
@@ -38,14 +39,14 @@ extension TestUtils.Downloading {
       case mockQueueEmpty
     }
 
-    private var mockedResultQueue: [Task]
+    private var mockedResultQueue: [(Task, XCTestExpectation?)]
 
     override init() {
       mockedResultQueue = []
     }
 
-    func queueMockResult(_ result: Task) {
-      mockedResultQueue.append(result)
+    func queueMockResult(_ result: Task, expectation: XCTestExpectation? = nil) {
+      mockedResultQueue.append((result, expectation))
     }
 
     var queueIsEmpty: Bool {
@@ -61,10 +62,11 @@ extension TestUtils.Downloading {
           completionHandler(nil, nil, URLSessionMockError.mockQueueEmpty)
         }
       } else {
-        if case .download(let response) = self.mockedResultQueue.removeFirst() {
+        if case (.download(let response), let expectation) = self.mockedResultQueue.removeFirst() {
           let mockedURLResponse = HTTPURLResponse(url: response.location!, statusCode: 200, httpVersion: nil, headerFields: nil)
           return URLSessionDownloadTaskMock(response: mockedURLResponse) {
             completionHandler(response.location, mockedURLResponse, response.error)
+            expectation?.fulfill()
           }
         } else {
           return URLSessionDownloadTaskMock {
@@ -81,10 +83,12 @@ extension TestUtils.Downloading {
         }
       } else {
         return URLSessionDataTaskMock {
-          if case .data(let response) = self.mockedResultQueue.removeFirst() {
+          if case (.data(let response), let expectation) = self.mockedResultQueue.removeFirst() {
             if !FileManager.default.fileExists(atPath: response.location!.path) {
               // TODO:  Properly mock HTTPURLSession for 404 errors?
               completionHandler(nil, nil, URLSessionMockError.mockedFileNotFound)
+              expectation?.fulfill()
+              return
             }
 
             do {
@@ -99,6 +103,7 @@ extension TestUtils.Downloading {
             } catch {
               completionHandler(nil, nil, URLSessionMockError.dataInitializationError)
             }
+            expectation?.fulfill()
           } else {
             completionHandler(nil, nil, URLSessionMockError.unexpectedTaskType)
           }
