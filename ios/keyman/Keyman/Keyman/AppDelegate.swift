@@ -93,27 +93,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   // Handles universal links.
-  func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+  func application(_ application: UIApplication,
+                   continue userActivity: NSUserActivity,
+                   restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
     if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
       guard let incomingURL = userActivity.webpageURL else {
         return false
       }
 
       if let parsedLink = UniversalLinks.tryParseKeyboardInstallLink(incomingURL) {
-        // Aha!  We know this link type!
-        let packageKey = parsedLink.packageKey
+        // We use this mostly to shorten line lengths, b/c lint warnings.
+        let downloadManager = ResourceDownloadManager.shared
 
+        // Aha!  We know this link type!
         let downloadLink: URL
         if let langID = parsedLink.lang_id {
           let fullID = FullKeyboardID(keyboardID: parsedLink.keyboard_id, languageID: langID)
-          downloadLink = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: parsedLink.packageKey,
-                                                                           andResource: fullID,
-                                                                           asUpdate: false)
+          downloadLink = downloadManager.defaultDownloadURL(forPackage: parsedLink.packageKey,
+                                                            andResource: fullID,
+                                                            asUpdate: false)
         } else {
-          downloadLink = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: parsedLink.packageKey,
-                                                                           asUpdate: false)
+          downloadLink = downloadManager.defaultDownloadURL(forPackage: parsedLink.packageKey, asUpdate: false)
         }
-        ResourceDownloadManager.shared.downloadPackage(withKey: parsedLink.packageKey, from: downloadLink) { (package: KeyboardKeymanPackage?, error: Error?) in
+        downloadManager.downloadPackage(withKey: parsedLink.packageKey,
+                                        from: downloadLink) { (package: KeyboardKeymanPackage?, error: Error?) in
           guard error == nil, let package = package else {
             // Maybe add an alert about the package error?
             return
