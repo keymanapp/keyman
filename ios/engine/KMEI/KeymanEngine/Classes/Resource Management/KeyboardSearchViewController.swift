@@ -23,15 +23,10 @@ import WebKit
  * during initialization.
  */
 public class KeyboardSearchViewController: UIViewController, WKNavigationDelegate {
-  public enum DefaultInstallationResult {
-    case success(AnyLanguageResourceFullID)
+  public enum SearchDownloadResult {
+    case success(KeymanPackage, AnyLanguageResourceFullID)
     case cancelled
     case error(Error?)
-  }
-
-  public enum DelayedLanguageSelection {
-    case none
-    case tag(String)
   }
 
   public enum SearchResult<FullID: LanguageResourceFullID> {
@@ -48,7 +43,7 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
      * for associated lexical models (or to indicate that none should occur).  Otherwise, the lexical model
      * search closure provided to the keyboard search will never evaluate.
      */
-    case untagged(KeymanPackage.Key, URL, (DelayedLanguageSelection) -> Void)
+    case untagged(KeymanPackage.Key, URL)
 
     /**
      * Indicates that a package has been selected for download and is already associated with a
@@ -67,11 +62,10 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
    * 3. The unique identifier for the resource WITHIN that package to install.  Useful when a package's resource(s) support multiple languages.
    */
   public typealias SelectionCompletedHandler<FullID: LanguageResourceFullID> = (SearchResult<FullID>) -> Void
-  internal typealias DeferredLexicalModelSearch = (DelayedLanguageSelection) -> Void
+  public typealias SearchDownloadHandler<FullID: LanguageResourceFullID> = (SearchDownloadResult) -> Void
 
   private var hasFinalized = false
   private let keyboardSelectionClosure: SelectionCompletedHandler<FullKeyboardID>!
-  private let lexicalModelSelectionClosure: SelectionCompletedHandler<FullLexicalModelID>!
   private let languageCode: String?
   private let session: URLSession
 
@@ -90,12 +84,10 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
 
   public init(languageCode: String? = nil,
               withSession session: URLSession = URLSession.shared,
-              keyboardSelectionBlock: @escaping SelectionCompletedHandler<FullKeyboardID>,
-              lexicalModelSelectionBlock: @escaping SelectionCompletedHandler<FullLexicalModelID>) {
+              keyboardSelectionBlock: @escaping SelectionCompletedHandler<FullKeyboardID>) {
     self.languageCode = languageCode
     self.session = session
     self.keyboardSelectionClosure = keyboardSelectionBlock
-    self.lexicalModelSelectionClosure = lexicalModelSelectionBlock
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -141,7 +133,6 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     // If the view is being dismissed but no matching link has been intercepted...
     if self.isMovingFromParent, !hasFinalized {
       self.keyboardSelectionClosure(.cancelled)
-      self.lexicalModelSelectionClosure(.cancelled)
     }
   }
 
@@ -175,82 +166,30 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     if let lang_id = lang_id {
       let resourceKey = FullKeyboardID(keyboardID: keyboard_id, languageID: lang_id)
       let kbdURL = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: packageKey, andResource: resourceKey, asUpdate: false)
-      performLanguageSearch(languageID: lang_id)
       self.keyboardSelectionClosure(.tagged(packageKey, kbdURL, resourceKey))
     } else {
-      // No language ID?  Defer the language search!
-      let deferredModelClosure: DeferredLexicalModelSearch = { arg in
-        if case let .tag(lgCode) = arg {
-          self.performLanguageSearch(languageID: lgCode)
-        } else {
-          self.lexicalModelSelectionClosure(.cancelled)
-        }
-      }
       let kbdURL = ResourceDownloadManager.shared.defaultDownloadURL(forPackage: packageKey, asUpdate: false)
-      self.keyboardSelectionClosure(.untagged(packageKey, kbdURL, deferredModelClosure))
+      self.keyboardSelectionClosure(.untagged(packageKey, kbdURL))
     }
   }
 
-  internal func performLanguageSearch(languageID: String) {
-    if Storage.active.userDefaults.userLexicalModels?.contains(where: { $0.languageID == languageID }) == nil {
-      Queries.LexicalModel.fetchModels(forLanguageCode: languageID,
-                                       withSession: session) { results, error in
-        if let results = results {
-          if results.count == 0 {
-            self.lexicalModelSelectionClosure(.cancelled)
-          } else {
-            let lexicalModel = results[0].0
-            self.lexicalModelSelectionClosure(.tagged(lexicalModel.packageKey, results[0].1, lexicalModel.fullID))
-          }
-        } else {
-          // .cancelled because if we already errored once, a redo of the query is likely
-          // to raise an error again.  We -could- defer as if there were no language tag, though.
-          self.lexicalModelSelectionClosure(.cancelled)
-
-          if let error = error {
-            log.error("Could not find a lexical model for language id \"\(languageID)\" due to error: \(String(describing: error))")
-          }
-        }
-      }
-    } else {
-      // We already have a lexical model for the language.  No need to download a new one.
-      self.lexicalModelSelectionClosure(.cancelled)
-    }
-  }
-
-
-  public static func defaultKeyboardInstallationClosure(installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
-    return defaultKeyboardInstallationClosure(withDownloadManager: ResourceDownloadManager.shared,
-                                              installCompletionBlock: installCompletionBlock)
+  public static func defaultDownloadClosure(downloadCompletionBlock: @escaping SearchDownloadHandler<FullKeyboardID>) -> SelectionCompletedHandler<FullKeyboardID> {
+    return defaultDownloadClosure(withDownloadManager: ResourceDownloadManager.shared,
+                                              downloadCompletionBlock: downloadCompletionBlock)
   }
 
   // For unit testing.
-  internal static func defaultKeyboardInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager,
-                                                          dispatchGroup: DispatchGroup? = nil,
-                                                          installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullKeyboardID> {
-    dispatchGroup?.enter() // register the closure for group synchronization.
-
-    // Used to finalize the results of the closure, allowing the callback to complete
-    // before signaling 'group completion' to the DispatchGroup synchronization object.
-    func finalize(as result: DefaultInstallationResult, noCallbackLog message: String? = nil) {
-      if let installCompletionBlock = installCompletionBlock {
-        installCompletionBlock(result)
-      } else if let message = message {
-        log.error(message)
-      }
-
-      dispatchGroup?.leave() // "fulfill" this closure's aspect of the group's synchronization scheme.
-    }
-
+  internal static func defaultDownloadClosure(withDownloadManager downloadManager: ResourceDownloadManager,
+                                              downloadCompletionBlock: @escaping SearchDownloadHandler<FullKeyboardID>) -> SelectionCompletedHandler<FullKeyboardID> {
     return { searchResult in
       var packageKey: KeymanPackage.Key
       var packageURL: URL
 
       switch searchResult {
         case .cancelled:
-          finalize(as: .cancelled)
+          downloadCompletionBlock(.cancelled)
           return
-        case .untagged(let key, let url, _):
+        case .untagged(let key, let url):
           packageKey = key
           packageURL = url
         case .tagged(let key, let url, _):
@@ -260,42 +199,16 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
 
       let downloadClosure: ResourceDownloadManager.CompletionHandler<KeyboardKeymanPackage> = { package, error in
         guard let package = package, error == nil else {
-          let errString = error != nil ? String(describing: error) : "<unknown error>"
-          let message = "Could not download package \(packageKey): \(errString)"
-
-          finalize(as: .error(error), noCallbackLog: message)
-          if case let .untagged(_, _, deferredLexicalModelSearch) = searchResult {
-            deferredLexicalModelSearch(.none)
-          }
+          downloadCompletionBlock(.error(error))
           return
         }
 
         switch searchResult {
-          case .untagged(_, _, let deferredLexicalModelSearch):
-            do {
-              // TODO:  We don't know which resource the user actually wants.  Prompt them.
-              // But for now, the old 'default' installation.
-              try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
-              // Whatever solution we put in place should return (at least) one of these:
-              let resourceKey = package.installables.first!.first!.fullID
-
-              // Yeah, it's ugly... but it's best to fix as part of resolution of the TODO above.
-              // That's "the first language pairing of the first keyboard in the package."
-              finalize(as: .success(resourceKey))
-              deferredLexicalModelSearch(.tag(resourceKey.languageID))
-            } catch {
-              finalize(as: .error(error), noCallbackLog: "Could not install package \(packageKey): \(error)")
-              deferredLexicalModelSearch(.none)
-              throw error // For more accurate notifications
-            }
+          case .untagged(_, _):
+            let resourceKey = package.installables.first!.first!.fullID
+            downloadCompletionBlock(.success(package, resourceKey))
           case .tagged(_, _, let resourceKey):
-            do {
-              try ResourceFileManager.shared.install(resourceWithID: resourceKey, from: package)
-              finalize(as: .success(resourceKey))
-            } catch {
-              finalize(as: .error(error), noCallbackLog: "Could not install package \(packageKey): \(error)")
-              throw error // For more accurate notifications
-            }
+            downloadCompletionBlock(.success(package, resourceKey))
           default:
             // Illegal state - we already checked this.
             fatalError()
@@ -303,61 +216,6 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
       }
 
       downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: downloadClosure)
-    }
-  }
-
-  public static func defaultLexicalModelInstallationClosure(installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullLexicalModelID> {
-    return defaultLexicalModelInstallationClosure(withDownloadManager: ResourceDownloadManager.shared)
-  }
-
-  // For unit testing.
-  internal static func defaultLexicalModelInstallationClosure(withDownloadManager downloadManager: ResourceDownloadManager,
-                                                              dispatchGroup: DispatchGroup? = nil,
-                                                              installCompletionBlock: ((DefaultInstallationResult) -> Void)? = nil) -> SelectionCompletedHandler<FullLexicalModelID> {
-    dispatchGroup?.enter() // register the closure for group synchronization.
-
-    // Used to finalize the results of the closure, allowing the callback to complete
-    // before signaling 'group completion' to the DispatchGroup synchronization object.
-    func finalize(as result: DefaultInstallationResult, noCallbackLog message: String? = nil) {
-      if let installCompletionBlock = installCompletionBlock {
-        installCompletionBlock(result)
-      } else if let message = message {
-        log.error(message)
-      }
-
-      dispatchGroup?.leave() // "fulfill" this closure's aspect of the group's synchronization scheme.
-    }
-
-    return { searchResult in
-      switch searchResult {
-        case .cancelled:
-          finalize(as: .cancelled)
-          return
-        case .tagged(let packageKey, let packageURL, let resourceKey):
-          var lmInstallClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage>
-          lmInstallClosure = { package, error in
-            if let package = package, error == nil {
-              //  perform the actual installation
-              do {
-                try ResourceFileManager.shared.install(resourceWithID: resourceKey, from: package)
-                finalize(as: .success(resourceKey))
-              } catch {
-                finalize(as: .error(error), noCallbackLog: "Could not install \(resourceKey) from package \(packageKey): \(error)")
-                throw error
-              }
-            } else {
-              let errString = error != nil ? String(describing: error) : "<unknown error>"
-              let message = "Could not download package \(packageKey): \(errString)"
-
-              finalize(as: .error(error), noCallbackLog: message)
-              throw error ?? NSError()
-            }
-          }
-
-          downloadManager.downloadPackage(withKey: packageKey, from: packageURL, withNotifications: true, completionBlock: lmInstallClosure)
-        case .untagged(_, _, _):
-          fatalError() // Explicitly illegal state, as documented in the enum's definition.
-      }
     }
   }
 }
