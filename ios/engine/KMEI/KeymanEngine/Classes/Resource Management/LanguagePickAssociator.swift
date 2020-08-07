@@ -42,7 +42,7 @@ public class LanguagePickAssociator {
      * Indicates that all generated association queries have returned.  Reports the total number of queries that occurred,
      * followed by a map of package keys to the corresponding URL and language codes to install from the package.
      */
-    case complete(Int, [KeymanPackage.Key: Association])
+    case complete(Int, AssociationMap)
   }
   /**
    * A callback that returns available packages corresponding to provided language codes.
@@ -61,6 +61,8 @@ public class LanguagePickAssociator {
    * * When either occurs, it will be the final call to the `AssociationReceiver`.
    */
   public typealias AssociationReceiver = (Progress) -> Void
+
+  public typealias AssociationMap = [KeymanPackage.Key: Association]
 
   public struct Association {
     public let url: URL
@@ -325,8 +327,12 @@ public class LanguagePickAssociator {
           let finishedCodeSet = Set(finishedCodeList)
           let selectedSet = finishedCodeSet.intersection(closureShared.languageSet)
 
+          let packagesToInstall = closureShared.packageMap.filter { (key, value) in
+            return selectedSet.intersection(value.languageCodes).count > 0
+          }
+
           // Report progress.
-          closureShared.progressClosure(.inProgress(closureShared.queriesComplete, selectedSet.count))
+          closureShared.progressClosure(.inProgress(closureShared.queriesComplete, packagesToInstall.count))
         }
 
         // We leave this dispatch group AFTER collating all relevant install requests.
