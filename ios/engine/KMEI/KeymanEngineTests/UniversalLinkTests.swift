@@ -20,6 +20,8 @@ class UniversalLinkTests: XCTestCase {
     if let parsedLink = parsedLink {
       XCTAssertEqual(parsedLink.keyboard_id, "khmer_angkor")
       XCTAssertNil(parsedLink.lang_id)
+    } else {
+      XCTFail()
     }
 
     parsedLink = UniversalLinks.tryParseKeyboardInstallLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/khmer_angkor?bcp47=km")!)
@@ -27,6 +29,8 @@ class UniversalLinkTests: XCTestCase {
     if let parsedLink = parsedLink {
       XCTAssertEqual(parsedLink.keyboard_id, "khmer_angkor")
       XCTAssertEqual(parsedLink.lang_id, "km")
+    } else {
+      XCTFail()
     }
 
     parsedLink = UniversalLinks.tryParseKeyboardInstallLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/sil_euro_latin")!)
@@ -34,6 +38,8 @@ class UniversalLinkTests: XCTestCase {
     if let parsedLink = parsedLink {
       XCTAssertEqual(parsedLink.keyboard_id, "sil_euro_latin")
       XCTAssertNil(parsedLink.lang_id)
+    } else {
+      XCTFail()
     }
 
     parsedLink = UniversalLinks.tryParseKeyboardInstallLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/foo?bcp47=bar")!)
@@ -41,6 +47,28 @@ class UniversalLinkTests: XCTestCase {
     if let parsedLink = parsedLink {
       XCTAssertEqual(parsedLink.keyboard_id, "foo")
       XCTAssertEqual(parsedLink.lang_id, "bar")
+    } else {
+      XCTFail()
+    }
+  }
+
+  func testTryLinkParseWithExtraneousComponents() {
+    var parsedLink = UniversalLinks.tryParseKeyboardInstallLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/foo?bcp47=bar&baz=nope")!)
+
+    if let parsedLink = parsedLink {
+      XCTAssertEqual(parsedLink.keyboard_id, "foo")
+      XCTAssertEqual(parsedLink.lang_id, "bar")
+    } else {
+      XCTFail()
+    }
+
+    parsedLink = UniversalLinks.tryParseKeyboardInstallLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/foo?_t=123&bcp47=bar")!)
+
+    if let parsedLink = parsedLink {
+      XCTAssertEqual(parsedLink.keyboard_id, "foo")
+      XCTAssertEqual(parsedLink.lang_id, "bar")
+    } else {
+      XCTFail()
     }
   }
 }
