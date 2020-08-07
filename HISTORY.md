@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.125 alpha 2020-08-07
+
+* fix(android): Update Gradle wrapper to 5.6.4 (#3467)
+* feat(ios/engine): Associating package installer (#3458)
+* feat(ios/app):  Associating package installer use within existing install paths (#3465)
+
 ## 14.0.124 alpha 2020-08-06
 
 * feat(windows): set default UI language at install (#3438)
