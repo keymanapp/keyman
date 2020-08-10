@@ -8,6 +8,51 @@
 
 import Foundation
 
+public enum DownloadError : Error {
+  public enum Cause: Error {
+    case error(Error)
+    // code, message, triggering link
+    case responseCode(Int, String, URL)
+  }
+
+  // The value:  the translation-lookup key.
+  case failed(Cause)
+  case busy
+  case noInternet
+
+  var localizedDescription: String {
+    switch self {
+      case .failed(_):
+        return engineBundle.localizedString(forKey: "alert-download-error-detail", value: nil, table: nil)
+      case .busy:
+        return engineBundle.localizedString(forKey: "alert-download-error-busy", value: nil, table: nil)
+      case .noInternet:
+        return engineBundle.localizedString(forKey: "alert-no-connection-detail", value: nil, table: nil)
+    }
+  }
+}
+
+public enum UpdateError : Error {
+  public enum Cause: Error {
+    case error(Error)
+    // code, message, triggering link
+    case responseCode(Int, String, URL)
+  }
+
+  // The value:  the translation-lookup key.
+  case unmanaged
+  case sourceUnavailable
+
+  var localizedDescription: String {
+    switch self {
+      case .unmanaged:
+        return engineBundle.localizedString(forKey: "error-update-not-managed", value: nil, table: nil)
+      case .sourceUnavailable:
+        return engineBundle.localizedString(forKey: "error-update-no-link", value: nil, table: nil)
+    }
+  }
+}
+
 // One half of the resource management puzzle - this part generates download and update requests at the demand
 // of app UI and submits them to the actual 'download manager', the ResourceDownloadQueue.
 //
@@ -94,8 +139,7 @@ public class ResourceDownloadManager {
 
     // Perform common 'can download' check.  We need positive reachability and no prior download queue.
     guard self.downloader.state == .clear else {
-      let err = self.downloader.state.error ??
-        NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Already busy downloading something"])
+      let err = self.downloader.state.error ?? DownloadError.busy
       self.resourceDownloadFailed(withKey: packageKey, with: err)
       try? completionBlock?(nil, err)
       return
@@ -424,8 +468,7 @@ public class ResourceDownloadManager {
       // Generate errors for any entries that KeymanEngine cannot update.
       keysToUpdate!.forEach { key in
         if !updatables.contains(key) {
-          // TODO:  Better error definition
-          invalids.append( (key, NSError()) )
+          invalids.append( (key, UpdateError.unmanaged) )
         }
       }
     }
@@ -439,8 +482,7 @@ public class ResourceDownloadManager {
     updatables.forEach { key in
       guard let downloadURL = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: key)!.downloadURL else {
         // Note error - download URL missing.  Shouldn't be possible, but still.
-        // TODO:  Better error definition
-        invalids.append( (key, NSError()) )
+        invalids.append( (key, UpdateError.sourceUnavailable) )
         return
       }
 
@@ -502,7 +544,8 @@ public class ResourceDownloadManager {
   internal func resourceDownloadCompletionClosure<Package: KeymanPackage>(withKey packageKey: KeymanPackage.Key, handler: CompletionHandler<Package>?) -> CompletionHandler<Package> {
     return { package, error in
       guard let package = package, error == nil else {
-        self.resourceDownloadFailed(withKey: packageKey, with: error ?? NSError())
+        self.resourceDownloadFailed(withKey: packageKey,
+                                    with: DownloadError.failed(.error( error ?? KeymanError.unknown )))
         try? handler?(nil, error)
         return
       }

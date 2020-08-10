@@ -308,8 +308,7 @@ extension Storage {
 
   private static func copy(from bundle: Bundle, resourceName: String, dstDir: URL, excludeFromBackup: Bool = false) throws {
     guard let srcURL = bundle.url(forResource: resourceName, withExtension: nil) else {
-      let message = "Could not locate \(resourceName) in the Keyman bundle"
-      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+      throw KeymanError.missingFile(resourceName, true)
     }
     let dstURL = dstDir.appendingPathComponent(srcURL.lastPathComponent)
 
@@ -346,8 +345,7 @@ extension Storage {
     }
 
     if !fileExists {
-      let message = "Nothing to copy at \(src)"
-      throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+      throw KeymanError.missingFile(src.path, false)
     }
 
     if !fm.fileExists(atPath: dst.path) {
