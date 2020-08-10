@@ -106,7 +106,6 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
 
   typealias AssociationInstallMap = [KeymanPackage.Key: PackageInstallResult]
 
-  // TODO:  Move more relevant class properties into the inner class below.
   private class ClosureShared {
     // Synchronization
     let queryGroup = DispatchGroup()
@@ -156,7 +155,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
         if complete {
           progressCallback(.complete)
         } else {
-          progressCallback(.inProgress)
+          //progressCallback(.inProgress)
         }
       }
     }
@@ -172,6 +171,26 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
   let defaultLgCode: String?
   var associationQueriers: [LanguagePickAssociator]?
 
+  /**
+   * Constructs an instance for installing the specified package alongside any detected packages containing specified types
+   * of associated resources for the languages that are selected for installation.
+   *
+   * - parameters:
+   *     - package: An already-download package to install.  Any language selection must choose languages supported by this package.
+   *     - defaultLanguageCode: The BCP-47 code for the default language to select when prompting the user for languages.
+   *     - withAssociators: A set of desired "language associations" to install alongside the package if they exist.
+   *       Currently supports the following options:
+   *       - `.lexicalModels`:  intended for use with keyboard packages.  Will query for and install lexical models for any
+   *       picked languages as part of the installation process.
+   *       - `.custom`:  allows specifying custom language associations.
+   *     - progressReceiver:  This will _always_ be called, even should picking never start before the class is deinitialized.
+   *       It will either receive `.cancelled` (exactly once) or a sequence like the following:
+   *       - `.starting` (exactly once)
+   *       - `.complete` (exactly once)
+   *
+   * In the future, `.inProgress` may be implemented; at that time, it will provide data for reporting installation progress and
+   * may be called multiple times between `.starting` and `.complete`.
+   */
   public convenience init(for package: Package,
                           defaultLanguageCode: String? = nil,
                           withAssociators associators: [Associator] = [],
@@ -194,10 +213,25 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     self.closureShared = ClosureShared(with: associators, downloadManager: downloadManager, receiver: progressReceiver)
   }
 
-  // TODO:  deinit handling in case everything gets cancelled.
-  // deinit { }
+  deinit {
+    // Ensure we send a 'cancel' signal IF this is a 'constructive cancellation'.
+    // That is, if no installs were triggered... even if picking never even started.
+    if !closureShared.pickingCompleted, self.associationQueriers != nil, !closureShared.isCancelled {
+       // Auto-dismiss any association queriers that might still be executing.
+       // Necessary for their closures to exit their DispatchGroups cleanly.
+      self.associationQueriers = nil
 
-  private func constructAssociationPickers() {
+      // Now we may safely send an artificial 'cancel'.
+      let installClosure = coreInstallationClosure()
+      installClosure(nil)
+    } else if self.associationQueriers == nil {
+      // We never started the associators or a picker, so bypass all of that and directly
+      // report cancellation.
+      closureShared.reportCancelled()
+    }
+  }
+
+  internal func constructAssociationPickers() {
     // We instantiate this now, indicating that language selection has begun.
     associationQueriers = []
 
@@ -225,11 +259,15 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     return { status in
       switch status {
         case .cancelled:
+          // Do not trigger installation or even _start_ attempting installation.
+          // Do a simple, graceful exit.
           closureShared.queryGroup.leave()
         // TODO:
         // case .inProgress(let queryCount, let associationsFound):
         //   break
         case .complete(_, let associationMap):
+          // Assumption:  .complete will only occur if 'picking' was not cancelled.
+          //              We know this holds true for the current LanguagePickAssociation implementation.
           let installer = closureShared.associationSpecs[specIndex].installer(downloadManager: closureShared.downloadManager)
           closureShared.associationInstallers[specIndex] = installer
 
@@ -267,7 +305,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     }
   }
 
-  private func initializeSynchronizationGroups() {
+  internal func initializeSynchronizationGroups() {
     let closureShared = self.closureShared
     closureShared.queryGroup.enter()
     closureShared.installGroup.enter()
@@ -284,7 +322,7 @@ public class AssociatingPackageInstaller<Resource: LanguageResource, Package: Ty
     }
   }
 
-  private func coreInstallationClosure() -> ([Resource.FullID]?) -> Void {
+  internal func coreInstallationClosure() -> ([Resource.FullID]?) -> Void {
     // For use in closures called by other DispatchGroups.
     let packageKey = self.package.key
     let closureShared = self.closureShared

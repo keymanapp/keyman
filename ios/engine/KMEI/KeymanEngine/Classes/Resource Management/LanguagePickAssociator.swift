@@ -271,9 +271,11 @@ public class LanguagePickAssociator {
   public func selectLanguages(_ languages: Set<String>) {
     let unsearched = languages.filter { !languageSetSearched.contains($0) }
 
-    languages.forEach {
-      closureShared.languageSet.insert($0)
-      languageSetSearched.insert($0)
+    languages.forEach { lgCode in
+      closureShared.querySyncQueue.sync {
+        _ = closureShared.languageSet.insert(lgCode)
+      }
+      languageSetSearched.insert(lgCode)
     }
 
     // Start fetch queries for any previously-unsearched language codes!
@@ -342,7 +344,9 @@ public class LanguagePickAssociator {
   }
 
   public func deselectLanguages(_ languages: Set<String>) {
-    languages.forEach { closureShared.languageSet.remove($0) }
+    closureShared.querySyncQueue.sync {
+      languages.forEach { closureShared.languageSet.remove($0) }
+    }
   }
 
   public func pickerDismissed() {
@@ -369,7 +373,7 @@ public class LanguagePickAssociator {
   }
 
   public var languagesPicked: Int {
-    return closureShared.languageSet.count
+    return closureShared.querySyncQueue.sync { closureShared.languageSet.count }
   }
 
   public var languagesQueried: Int {

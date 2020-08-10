@@ -71,6 +71,8 @@ class AssociatingPackageInstallerTests: XCTestCase {
         startExpectation.fulfill()
       } else if status == .complete {
         completeExpectation.fulfill()
+      } else if status == .cancelled {
+        XCTFail()
       }
     }
 
@@ -105,6 +107,8 @@ class AssociatingPackageInstallerTests: XCTestCase {
         startExpectation.fulfill()
       } else if status == .complete {
         completeExpectation.fulfill()
+      } else if status == .cancelled {
+        XCTFail()
       }
     }
 
@@ -146,6 +150,8 @@ class AssociatingPackageInstallerTests: XCTestCase {
         startExpectation.fulfill()
       } else if status == .complete {
         completeExpectation.fulfill()
+      } else if status == .cancelled {
+        XCTFail()
       }
     }
 
@@ -164,5 +170,159 @@ class AssociatingPackageInstallerTests: XCTestCase {
 
     XCTAssertEqual(ResourceFileManager.shared.installState(forPackage: TestUtils.Packages.Keys.sil_euro_latin), .installed)
     XCTAssertEqual(ResourceFileManager.shared.installState(forPackage: TestUtils.Packages.Keys.nrc_en_mtnt), .installed)
+  }
+
+
+  func testCancellationNoAssociations() throws {
+    guard let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    let cancelExpectation = XCTestExpectation()
+
+    let installer = AssociatingPackageInstaller(for: package,
+                                                defaultLanguageCode: "en",
+                                                downloadManager: downloadManager) { status in
+      if status == .cancelled {
+        // When the user 'cancels' language selection, this installer should also
+        // signal cancellation.
+        cancelExpectation.fulfill()
+      } else {
+        XCTFail()
+      }
+    }
+
+    // A bit of white-box testing - sets up the closure framework
+    installer.initializeSynchronizationGroups()
+    // And the install closure, which we'll send a 'cancel' signal to.
+    let installClosure = installer.coreInstallationClosure()
+    installClosure(nil)
+
+    wait(for: [cancelExpectation], timeout: 5)
+
+    XCTAssertNil(Storage.active.userDefaults.userKeyboards)
+    XCTAssertNil(Storage.active.userDefaults.userLexicalModels)
+  }
+
+  func testCancellationWithAssociations() throws {
+    guard let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    // While the query should occur, the installation phase should never be reached.
+    // So, we don't mock the download.
+    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_en, error: nil)
+    mockedURLSession.queueMockResult(.data(mockedQuery))
+
+    let cancelExpectation = XCTestExpectation()
+
+    let installer = AssociatingPackageInstaller(for: package,
+                                                defaultLanguageCode: "en",
+                                                downloadManager: downloadManager,
+                                                withAssociators: [.lexicalModels]) { status in
+      if status == .cancelled {
+        // When the user 'cancels' language selection, this installer should also
+        // signal cancellation.
+        cancelExpectation.fulfill()
+      } else {
+        XCTFail()
+      }
+    }
+
+    // Heavier white-box testing this time.
+    installer.initializeSynchronizationGroups()
+    installer.constructAssociationPickers()
+    installer.associationQueriers?.forEach {
+      $0.pickerInitialized()
+      $0.selectLanguages(Set(["en"])) // calls the expected query
+      // And, since we're modeling cancellation...
+      $0.pickerDismissed()
+    }
+
+    // Finally, the install closure, which we'll send a 'cancel' signal to.
+    let installClosure = installer.coreInstallationClosure()
+    installClosure(nil)
+
+    wait(for: [cancelExpectation], timeout: 5)
+
+    XCTAssertNil(Storage.active.userDefaults.userKeyboards)
+    XCTAssertNil(Storage.active.userDefaults.userLexicalModels)
+  }
+
+  func testDeinitConstructiveCancellation() throws {
+    guard let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    // While the query should occur, the installation phase should never be reached.
+    // So, we don't mock the download.
+    let mockedQuery = TestUtils.Downloading.MockResult(location: TestUtils.Queries.model_case_en, error: nil)
+    let queryExpectation = XCTestExpectation()
+    mockedURLSession.queueMockResult(.data(mockedQuery), expectation: queryExpectation)
+
+    let cancelExpectation = XCTestExpectation()
+
+    do {
+      let installer = AssociatingPackageInstaller(for: package,
+                                                  defaultLanguageCode: "en",
+                                                  downloadManager: downloadManager,
+                                                  withAssociators: [.lexicalModels]) { status in
+        // When the user 'cancels' language selection, this installer should also
+        // signal cancellation.
+        if status == .cancelled {
+          // First, wait to ensure that the standard query did launch.
+          // Otherwise, we might accidentally skip the mocked query!
+          self.wait(for: [queryExpectation], timeout: 4)
+          cancelExpectation.fulfill()
+        } else {
+          XCTFail()
+        }
+      }
+
+      // Heavier white-box testing this time.
+      installer.initializeSynchronizationGroups()
+      installer.constructAssociationPickers()
+      installer.associationQueriers?.forEach {
+        $0.pickerInitialized()
+        $0.selectLanguages(Set(["en"])) // calls the expected query
+        // De-init will trigger the 'dismiss' signal.
+      }
+    }
+
+    wait(for: [cancelExpectation], timeout: 5)
+
+    XCTAssertNil(Storage.active.userDefaults.userKeyboards)
+    XCTAssertNil(Storage.active.userDefaults.userLexicalModels)
+  }
+
+  func testDeinitUnstarted() throws {
+    guard let package = try ResourceFileManager.shared.prepareKMPInstall(from: TestUtils.Keyboards.silEuroLatinKMP) as? KeyboardKeymanPackage else {
+      XCTFail()
+      return
+    }
+
+    let cancelExpectation = XCTestExpectation()
+
+    do {
+      let _ = AssociatingPackageInstaller(for: package,
+                                                  defaultLanguageCode: "en",
+                                                  downloadManager: downloadManager,
+                                                  withAssociators: [.lexicalModels]) { status in
+        // Since language-picking never began, no "cancelled" signal should occur.
+        if status == .cancelled {
+          cancelExpectation.fulfill()
+        } else {
+          XCTFail()
+        }
+      }
+    }
+
+    wait(for: [cancelExpectation], timeout: 1)
+
+    XCTAssertNil(Storage.active.userDefaults.userKeyboards)
+    XCTAssertNil(Storage.active.userDefaults.userLexicalModels)
   }
 }
