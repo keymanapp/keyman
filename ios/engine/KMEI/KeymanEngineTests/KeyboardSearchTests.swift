@@ -32,40 +32,6 @@ class KeyboardSearchTests: XCTestCase {
     }
   }
 
-  func testTryLinkParse() {
-    var tuple = KeyboardSearchViewController.tryParseLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/randomURL")!)
-
-    XCTAssertNil(tuple)
-
-    tuple = KeyboardSearchViewController.tryParseLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/khmer_angkor")!)
-
-    if let tuple = tuple {
-      XCTAssertEqual(tuple.0, "khmer_angkor")
-      XCTAssertNil(tuple.1)
-    }
-
-    tuple = KeyboardSearchViewController.tryParseLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/khmer_angkor?bcp47=km")!)
-
-    if let tuple = tuple {
-      XCTAssertEqual(tuple.0, "khmer_angkor")
-      XCTAssertEqual(tuple.1, "km")
-    }
-
-    tuple = KeyboardSearchViewController.tryParseLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/sil_euro_latin")!)
-
-    if let tuple = tuple {
-      XCTAssertEqual(tuple.0, "sil_euro_latin")
-      XCTAssertNil(tuple.1)
-    }
-
-    tuple = KeyboardSearchViewController.tryParseLink(URL.init(string: "\(KeymanHosts.KEYMAN_COM)/keyboards/install/foo?bcp47=bar")!)
-
-    if let tuple = tuple {
-      XCTAssertEqual(tuple.0, "foo")
-      XCTAssertEqual(tuple.1, "bar")
-    }
-  }
-
   func testFinalizeNoLanguage() {
     let kbdExpectation = XCTestExpectation()
 
@@ -84,7 +50,7 @@ class KeyboardSearchTests: XCTestCase {
     let searchNoLang = KeyboardSearchViewController(languageCode: nil,
                                                     withSession: mockedURLSession!,
                                                     keyboardSelectionBlock: kbdBlock)
-    searchNoLang.finalize(with: "khmer_angkor", for: nil)
+    searchNoLang.finalize(with: UniversalLinks.ParsedKeyboardInstallLink(keyboard_id: "khmer_angkor", lang_id: nil))
 
     wait(for: [kbdExpectation], timeout: 5)
   }
@@ -107,7 +73,7 @@ class KeyboardSearchTests: XCTestCase {
     let search = KeyboardSearchViewController(languageCode: nil,
                                                     withSession: mockedURLSession!,
                                                     keyboardSelectionBlock: kbdBlock)
-    search.finalize(with: "sil_euro_latin", for: "en")
+    search.finalize(with: UniversalLinks.ParsedKeyboardInstallLink(keyboard_id: "sil_euro_latin", lang_id: "en"))
 
     wait(for: [kbdExpectation], timeout: 5)
   }
