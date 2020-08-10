@@ -16,7 +16,7 @@ if hotdoc.found()
                  output: 'hotdoc.json',
                  configuration: cfg)
   deps = files(
-    '../include/doc/keyboardprocessor.h.in',
+    '../include/keyman/keyboardprocessor.h.in',
     '../src/json.hpp',
     '../src/utfcodec.hpp'
   )
