@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 14.0.126 alpha 2020-08-10
+
+* fix(android): Add CI script to publish to Play Store (#3469)
+* fix(android): Update sentry plugin to remove obsolete API  use (#3471)
+* feat(ios/app): universal links for keyboard installation (#3466)
+* fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
+* refactor(ios): error definitions, i18n (#3470)
+* chore: cleanup keyboardprocessor.h.in (#3473)
+
 ## 14.0.125 alpha 2020-08-07
 
 * fix(android): Update Gradle wrapper to 5.6.4 (#3467)
