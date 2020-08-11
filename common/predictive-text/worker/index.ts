@@ -304,7 +304,7 @@ class LMLayerWorker {
         }
       },
       compositor: compositor
-    } as LMLayerWorkerReadyState;
+    };
   }
 
   /**

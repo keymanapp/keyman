@@ -118,29 +118,42 @@ interface WordbreakMessage {
   context: Context;
 }
 
+type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModellessState | LMLayerWorkerReadyState;
 
 /**
- * Represents a state in the LMLayer.
+ * Represents the unconfigured state of the LMLayer.
  */
-interface LMLayerWorkerState {
+interface LMLayerWorkerUnconfiguredState {
   /**
    * Informative property. Name of the state. Currently, the LMLayerWorker can only
    * be the following states:
    */
-  name: 'unconfigured' | 'modelless' | 'ready';
+  name: 'unconfigured';
   handleMessage(payload: IncomingMessage): void;
 }
 
 /**
- * Represents a state in the LMLayer.
+ * Represents the pre-model-load state of the LMLayer.
  */
-interface LMLayerWorkerReadyState extends LMLayerWorkerState {
+interface LMLayerWorkerModellessState {
+  /**
+   * Informative property. Name of the state. Currently, the LMLayerWorker can only
+   * be the following states:
+   */
+  name: 'modelless';
+  handleMessage(payload: IncomingMessage): void;
+}
+
+/**
+ * Represents the 'ready' state of the LMLayer.
+ */
+interface LMLayerWorkerReadyState {
   /**
    * Informative property. Name of the state. Currently, the LMLayerWorker can only
    * be the following states:
    */
   name: 'ready';
-
+  handleMessage(payload: IncomingMessage): void;
   compositor: ModelCompositor;
 }
 
