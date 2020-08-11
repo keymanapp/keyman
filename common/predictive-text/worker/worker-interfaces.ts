@@ -131,6 +131,18 @@ interface LMLayerWorkerState {
   handleMessage(payload: IncomingMessage): void;
 }
 
+/**
+ * Represents a state in the LMLayer.
+ */
+interface LMLayerWorkerReadyState extends LMLayerWorkerState {
+  /**
+   * Informative property. Name of the state. Currently, the LMLayerWorker can only
+   * be the following states:
+   */
+  name: 'ready';
+
+  compositor: ModelCompositor;
+}
 
 /**
  * Constructors that return worker internal models.

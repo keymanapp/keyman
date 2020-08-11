@@ -273,14 +273,13 @@ class LMLayerWorker {
    * @param model The loaded language model.
    */
   private transitionToReadyState(model: LexicalModel) {
+    let compositor = new ModelCompositor(model);
     this.state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {
           case 'predict':
             let {transform, context} = payload;
-            let compositor = new ModelCompositor(model); // Yeah, should probably use a persistent one eventually.
-
             let suggestions = compositor.predict(transform, context);
 
             // Now that the suggestions are ready, send them out!
@@ -303,8 +302,9 @@ class LMLayerWorker {
           default:
           throw new Error(`invalid message; expected one of {'predict', 'unload'} but got ${payload.message}`);
         }
-      }
-    };
+      },
+      compositor: compositor
+    } as LMLayerWorkerReadyState;
   }
 
   /**
