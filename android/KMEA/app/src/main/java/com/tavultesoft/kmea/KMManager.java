@@ -1417,22 +1417,17 @@ public final class KMManager {
     } else {
       path = getPackagesDir() + packageID + File.separator + PackageProcessor.PP_DEFAULT_METADATA;
 
-      try {
-        File kmpJSONFile = new File(path);
-        if (!kmpJSONFile.exists()) {
-          if (!KMManager.isTestMode()) {
-            KMLog.LogError(TAG, path + " not found. Returning version 1.0");
-          }
-          return "1.0";
+      File kmpJSONFile = new File(path);
+      if (!kmpJSONFile.exists()) {
+        if (!KMManager.isTestMode()) {
+          KMLog.LogError(TAG, path + " not found. Returning version 1.0");
         }
-        JSONParser jsonParser = new JSONParser();
-        JSONObject kmpObject = jsonParser.getJSONObjectFromFile(kmpJSONFile);
-
-        return PackageProcessor.getKeyboardVersion(kmpObject, keyboardID);
-      } catch (Exception e) {
-        KMLog.LogException(TAG, "", e);
-        return null;
+        return "1.0";
       }
+      JSONParser jsonParser = new JSONParser();
+      JSONObject kmpObject = jsonParser.getJSONObjectFromFile(kmpJSONFile);
+
+      return PackageProcessor.getKeyboardVersion(kmpObject, keyboardID);
     }
 
     return kbFileVersion;

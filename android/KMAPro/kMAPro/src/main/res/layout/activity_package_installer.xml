@@ -29,17 +29,17 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-      <Button
-        android:id="@+id/finishButton"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="15dp"
-        android:text="@string/label_ok"
-        android:textColor="@color/keyman_blue"
-        android:elevation="1dp"
-        android:singleLine="true"/>
+        <Button
+            android:id="@+id/finishButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="15dp"
+            android:text="@string/label_ok"
+            android:textColor="@color/keyman_blue"
+            android:elevation="1dp"
+            android:singleLine="true"/>
 
         <Button
             android:id="@+id/cancelButton"
@@ -53,6 +53,7 @@
             android:elevation="1dp"
             android:singleLine="true"/>
 
+        <!-- PackageActivity will manager installButton/nextButton so only one is displayed -->
         <Button
             android:id="@+id/installButton"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
@@ -65,6 +66,17 @@
             <requestFocus/>
         </Button>
 
+        <Button
+            android:id="@+id/nextButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="15dp"
+            android:text="@string/label_next"
+            android:textColor="@color/keyman_blue">
+            <requestFocus/>
+        </Button>
 
 
     </LinearLayout>

@@ -40,6 +40,7 @@ public class PackageProcessorTest {
   private static final int TEST_GFF_KBD_COUNT = 1;
   private static final String TEST_GFF_PACKAGE_NAME = "GFF Amharic Keyboard";
   private static final String TEST_GFF_KBD_ID = "gff_amh_7";
+  private static final String TEST_GFF_KBD_NAME = "Amharic";
 
   private static final String TEST_EN_CUSTOM_MODEL_NAME = "example.en.custom";
   private static final File TEST_EN_CUSTOM_MODEL_KMP_FILE = new File(TEST_RESOURCE_ROOT, "packages" +
@@ -227,7 +228,21 @@ public class PackageProcessorTest {
   }
 
   @Test
-  public void test_keyboardVersion() throws Exception {
+  public void test_getFirstKeyboardID() {
+    JSONObject json = PP.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals(TEST_GFF_KBD_ID, PackageProcessor.getFirstKeyboardID(json));
+  }
+
+  @Test
+  public void test_getFirstKeyboardName() {
+    JSONObject json = PP.loadPackageInfo(tempPkg);
+
+    Assert.assertEquals(TEST_GFF_KBD_NAME, PackageProcessor.getFirstKeyboardName(json));
+  }
+
+  @Test
+  public void test_keyboardVersion() {
     JSONObject json = PP.loadPackageInfo(tempPkg);
 
     Assert.assertEquals("1.4", PackageProcessor.getKeyboardVersion(json, TEST_GFF_KBD_ID));

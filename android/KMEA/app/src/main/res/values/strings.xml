@@ -45,6 +45,9 @@
     <string name="label_later" comment="Do an action at a later time">Later</string>
 
     <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">Next</string>
+
+    <!-- Context: Button label -->
     <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
 
     <!-- Context: Button label -->

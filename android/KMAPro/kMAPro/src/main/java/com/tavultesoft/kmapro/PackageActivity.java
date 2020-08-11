@@ -98,6 +98,7 @@ public class PackageActivity extends AppCompatActivity {
 
     String pkgVersion = kmpProcessor.getPackageVersion(pkgInfo);
     String pkgName = kmpProcessor.getPackageName(pkgInfo);
+    final int languageCount = kmpProcessor.getKeyboardLanguageCount(pkgInfo);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -185,19 +186,23 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
-    initializeButtons(context, pkgId, languageID, pkgTarget);
+    initializeButtons(context, pkgId, languageID, pkgTarget, languageCount);
   }
 
   /**
    * Initialize buttons of package installer.
+   * If keyboard package languageCount > 1, use nextButton instead of installButton
    * @param context the context
    * @param pkgId the keyman package id
    * @param languageID the optional language id
    * @param pkgTarget  String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
+   * @param languageCount int number of languages for the first keyboard in a keyboard package
    */
-  private void initializeButtons(final Context context, final String pkgId, final String languageID, final String pkgTarget) {
+  private void initializeButtons(final Context context, final String pkgId, final String languageID,
+                                 final String pkgTarget, final int languageCount) {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
+    final Button nextButton = (Button) findViewById(R.id.nextButton);
     final Button finishButton = (Button) findViewById(R.id.finishButton);
 
     installButton.setOnClickListener(new OnClickListener() {
@@ -206,6 +211,19 @@ public class PackageActivity extends AppCompatActivity {
 
 
         installPackage(context, pkgTarget, pkgId, languageID, false);
+      }
+    });
+
+    nextButton.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("packagePath", tempPackagePath);
+        bundle.putBoolean("tempPath", true);
+        bundle.putString("packageID", pkgId);
+        Intent intent = new Intent(context, SelectLanguageActivity.class);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, 2);
       }
     });
 
@@ -218,7 +236,19 @@ public class PackageActivity extends AppCompatActivity {
     cancelButton.setOnClickListener(_cleanup_action);
     finishButton.setOnClickListener(_cleanup_action);
 
-    updateButtonState(true);
+    updateButtonState(true, pkgTarget, languageCount);
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    // Use the result of SelectLanguageActivity and install the package
+    if (requestCode == 2) {
+      String pkgTarget = data.getStringExtra("pkgTarget");
+      String pkgId = data.getStringExtra("packageID");
+      String languageID = data.getStringExtra("languageID");
+      installPackage(this, pkgTarget, pkgId, languageID, false);
+    }
   }
 
   @Override
@@ -264,36 +294,54 @@ public class PackageActivity extends AppCompatActivity {
 
   /**
    * switch button visibility for package installer.
-   * before installation show Install and Cancel
+   * before installation show Install/Next and Cancel
    * after installation show OK button
+   * If keyboard package languageCount > 1, use nextButton instead of installButton
    * @param anIsStartInstaller if true - before installation, false - after installation
+   * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
+   * @param languageCount int number of languages for a keyboard
    */
-  private void updateButtonState(boolean anIsStartInstaller)
+  private void updateButtonState(boolean anIsStartInstaller, String pkgTarget, int languageCount)
   {
     final Button installButton = (Button) findViewById(R.id.installButton);
+    final Button nextButton = (Button) findViewById(R.id.nextButton);
     final Button cancelButton = (Button) findViewById(R.id.cancelButton);
     final Button closeButton = (Button) findViewById(R.id.finishButton);
     if(anIsStartInstaller)
     {
-      installButton.setVisibility(View.VISIBLE);
+      if (pkgTarget.equalsIgnoreCase(PackageProcessor.PP_TARGET_KEYBOARDS) && languageCount > 1) {
+        installButton.setVisibility(View.GONE);
+        nextButton.setVisibility(View.VISIBLE);
+      } else {
+        installButton.setVisibility(View.VISIBLE);
+        nextButton.setVisibility(View.GONE);
+      }
       cancelButton.setVisibility(View.VISIBLE);
       closeButton.setVisibility(View.GONE);
     }
     else
     {
       installButton.setVisibility(View.GONE);
+      nextButton.setVisibility(View.GONE);
       cancelButton.setVisibility(View.GONE);
       closeButton.setVisibility(View.VISIBLE);
     }
     findViewById(R.id.buttonBar).requestLayout();
   }
 
+  // Wrapper where languageCount doesn't matter
+  private void updateButtonState(boolean anIsStartInstaller, String pkgTarget)
+  {
+    updateButtonState(anIsStartInstaller, pkgTarget, 0);
+  }
+
   /**
    * show welcome page from installed keyboard.
    * @param theInstalledPackages the installed keyboards or lexical models
+   * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @return true if a welcomepage is available
    */
-  private boolean loadWelcomePage(List<Map<String, String>> theInstalledPackages)
+  private boolean loadWelcomePage(List<Map<String, String>> theInstalledPackages, String pkgTarget)
   {
     boolean _found=false;
      for(Map<String,String> _keyboard:theInstalledPackages) {
@@ -307,7 +355,7 @@ public class PackageActivity extends AppCompatActivity {
      if(!_found)
        return false;
 
-     updateButtonState(false);
+     updateButtonState(false, pkgTarget);
 
       return true;
 
@@ -335,7 +383,7 @@ public class PackageActivity extends AppCompatActivity {
         boolean _cleanup = true;
         if (success) {
           if(!anSilentInstall)
-            _cleanup = !loadWelcomePage(installedPackageKeyboards);
+            _cleanup = !loadWelcomePage(installedPackageKeyboards, pkgTarget);
           notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
             installedPackageKeyboards, 1);
           if (installedPackageKeyboards != null) {
@@ -355,7 +403,7 @@ public class PackageActivity extends AppCompatActivity {
         boolean _cleanup = true;
         if (success) {
           if(!anSilentInstall)
-            _cleanup = !loadWelcomePage(installedLexicalModels);
+            _cleanup = !loadWelcomePage(installedLexicalModels, pkgTarget);
           notifyLexicalModelInstallListeners(KeyboardEventHandler.EventType.LEXICAL_MODEL_INSTALLED,
             installedLexicalModels, 1);
           if (installedLexicalModels != null) {

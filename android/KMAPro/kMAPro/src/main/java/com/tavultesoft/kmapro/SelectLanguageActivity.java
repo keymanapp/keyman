@@ -5,6 +5,7 @@
 package com.tavultesoft.kmapro;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,9 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.KMLog;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,8 +63,21 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     final ListView listView = findViewById(R.id.listView);
     listView.setFastScrollEnabled(true);
 
-    final Keyboard keyboard = (Keyboard)getIntent().getSerializableExtra("keyboard");
-    final String packageID = keyboard.getPackageID();
+    Bundle bundle = getIntent().getExtras();
+    if (bundle == null) {
+      KMLog.LogError(TAG, "No bundle parameters");
+      return;
+    }
+
+    Boolean tempPath = bundle.getBoolean("tempPath");
+    File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+    PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
+    // Get the list of available Keyboards from the keyboard package kmp.json (could be temp path or installed path)
+    File packagePath = (File)getIntent().getSerializableExtra("packagePath");
+    final String packageID = bundle.getString("packageID");
+    JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
+    Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
+      kmpProcessor.getFirstKeyboard(pkgInfo, packageID);
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
     String title_install = String.format(getString(R.string.title_select_language_for_package), keyboardName);
@@ -71,11 +88,8 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       textView.setTypeface(titleFont, Typeface.BOLD);
     }
 
-    // Get the list of available Keyboards from kmp.json
-    File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
-    PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
     List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
-      packageID, keyboardID, excludeInstalledLanguages);
+      pkgInfo, packageID, keyboardID, tempPath, excludeInstalledLanguages);
 
     final String noIcon = "0";
     list = new ArrayList<HashMap<String, String>>();
@@ -83,10 +97,12 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, k.getLanguageName());
       hashMap.put(subtitleKey, k.getLanguageID());
+      hashMap.put("packageID", packageID);
       String enable = "true";
       String icon = String.valueOf(R.drawable.ic_arrow_forward);
-      if (!excludeInstalledLanguages && KeyboardController.getInstance().keyboardExists(
+      if (!excludeInstalledLanguages && !tempPath && KeyboardController.getInstance().keyboardExists(
           k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
+        // If Activity is listing an installed keyboard package, mark installed keyboards with a check
         icon = String.valueOf(R.drawable.ic_check);
         enable = "false";
       } else {
@@ -109,11 +125,23 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         Keyboard k = availableKeyboardsList.get(position);
-        KMManager.addKeyboard(context, k);
-        String confirmation = String.format(getString(R.string.added_language_to_keyboard),
-          k.getLanguageName(), k.getKeyboardName());
-        Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
-        finish();
+        String pkgId = hashMap.get("packageID");
+        if (tempPath) {
+          // Temporary path for kmp.json means return languageID back to PackageActivity to install the keyboard package
+          Intent intent = new Intent();
+          intent.putExtra("pkgTarget", PackageProcessor.PP_TARGET_KEYBOARDS);
+          intent.putExtra("packageID", pkgId);
+          intent.putExtra("languageID", k.getLanguageID());
+          setResult(2, intent);
+          finish();
+        } else {
+          // Otherwise, add the language association
+          KMManager.addKeyboard(context, k);
+          String confirmation = String.format(getString(R.string.added_language_to_keyboard),
+            k.getLanguageName(), k.getKeyboardName());
+          Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
+          finish();
+        }
       }
     });
   }

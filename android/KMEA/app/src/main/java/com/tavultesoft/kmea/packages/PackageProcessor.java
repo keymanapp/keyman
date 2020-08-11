@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2017-2020 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmea.packages;
 
 import androidx.annotation.NonNull;
@@ -24,12 +27,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by joshua on 12/7/2017.
- */
-
-/**
  * A class for use in handling Keyman's .kmp package file format, as it relates to the
  * KMEA engine.  This is primarily for installing keyboard packages.
+ * Some utility methods are available for parsing the kmp.json before the .kmp file has been extracted.
+ * Other utilities assume the package file has already been extracted to the file system.
  */
 public class PackageProcessor {
   protected File resourceRoot = null;
@@ -37,6 +38,7 @@ public class PackageProcessor {
   public static final String PP_DEFAULT_VERSION = "1.0";
   public static final String PP_DEFAULT_METADATA = "kmp.json";
 
+  // Package target types
   public static final String PP_TARGET_INVALID = "invalid";
   public static final String PP_TARGET_KEYBOARDS = "keyboards";
   public static final String PP_TARGET_LEXICAL_MODELS = "lexicalModels";
@@ -44,6 +46,7 @@ public class PackageProcessor {
   // keys in kmp.json
   public static final String PP_KEYBOARDS_KEY = "keyboards";
   public static final String PP_LEXICAL_MODELS_KEY = "lexicalModels";
+  public static final String PP_LANGUAGES_KEY = "languages";
 
   private static final String TAG = "PackageProcessor";
 
@@ -149,7 +152,7 @@ public class PackageProcessor {
    * @throws JSONException
    */
   public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
-    JSONArray languages = jsonEntry.getJSONArray("languages");
+    JSONArray languages = jsonEntry.getJSONArray(PP_LANGUAGES_KEY);
 
     String keyboardId = jsonEntry.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
@@ -179,7 +182,7 @@ public class PackageProcessor {
       if (welcomeExists(packageId)) {
         File kmpFile = new File(packageId + ".kmp");
         File packageDir = constructPath(kmpFile, false);
-        File welcomeFile = new File(packageDir, "welcome.htm");
+        File welcomeFile = new File(packageDir, FileUtils.WELCOME_HTM);
         // Only storing relative instead of absolute paths as a convenience for unit tests.
         keyboards[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
       }
@@ -190,24 +193,124 @@ public class PackageProcessor {
     }
   }
 
-  public static String getKeyboardVersion(JSONObject json, String kbdId) throws JSONException {
-    JSONArray keyboards = json.getJSONArray("keyboards");
-
-    for(int i=0; i < keyboards.length(); i++) {
-      JSONObject keyboard = keyboards.getJSONObject(i);
-
-      if(keyboard.getString("id").equals(kbdId)) {
-        return keyboard.getString("version");
+  /**
+   * Get the language and keyboard information for the first keyboard in a keyboard package.
+   * Use placeholders for other fields like help links, and font info.
+   * @param json kmp.json as a JSON object
+   * @param packageID String of the keyboard package ID
+   * @return Keyboard info. Null if no keyboard found
+   */
+  public static Keyboard getFirstKeyboard(JSONObject json, String packageID) {
+    try {
+      if (!json.has(PP_KEYBOARDS_KEY)) {
+        return null;
       }
+      JSONObject keyboardObj = json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(0);
+      JSONArray languages = keyboardObj.getJSONArray(PP_LANGUAGES_KEY);
+      JSONObject languageObj = languages.getJSONObject(0);
+      return new Keyboard(
+        packageID,
+        keyboardObj.getString("id"),
+        keyboardObj.getString("name"),
+        languageObj.getString("id"),
+        languageObj.getString("name"),
+        keyboardObj.getString("version"),
+        null,
+        null,
+        true,
+        null,
+        null
+      );
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return null;
     }
-
-    return null;
   }
 
   /**
-   * Simply extracts the package's name.
-   * @param json The metadata JSONObject for the package.
-   * @return The package name (via String)
+   * Parse a kmp.json JSON object and return the first keyboard ID. If no keyboard found, returns empty string
+   * @param json kmp.json as a JSON object
+   * @return String of the first keyboard ID
+   */
+  public static String getFirstKeyboardID(JSONObject json) {
+    try {
+      if (!json.has(PP_KEYBOARDS_KEY)) {
+        return "";
+      }
+      return json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(0).getString("id");
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return "";
+    }
+  }
+
+  /**
+   * Pase a kmp.json JSON object and return the first keyboard name. If no keyboard found, returns empty string
+   * @param json kmp.json as a JSON object
+   * @return String of the first keyboard name
+   */
+  public static String getFirstKeyboardName(JSONObject json) {
+    try {
+      if (!json.has(PP_KEYBOARDS_KEY)) {
+        return "";
+      }
+      return json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(0).getString("name");
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return "";
+    }
+  }
+
+  /**
+   * Parse a kmp.json JSON object and return the language count for the first keyboard
+   * @param json kmp.json as a JSON object
+   * @return int of number of languages. 0 if not found
+   */
+  public static int getKeyboardLanguageCount(JSONObject json) {
+    int count = 0;
+    try {
+      if (!json.has(PP_KEYBOARDS_KEY)) {
+        return count;
+      }
+      JSONArray keyboards = json.getJSONArray(PP_KEYBOARDS_KEY);
+      JSONArray languages = keyboards.getJSONObject(0).getJSONArray(PP_LANGUAGES_KEY);
+      count = languages.length();
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+    }
+
+    return count;
+  }
+
+  /**
+   * Parse a kmp.json JSON object for a given keyboard ID and return the keyboard version
+   * @param json kmp.json as a JSON object
+   * @param kbdId String of the keyboard ID
+   * @return String of the keyboard version
+   */
+  public static String getKeyboardVersion(JSONObject json, String kbdId) {
+    try {
+      JSONArray keyboards = json.getJSONArray(PP_KEYBOARDS_KEY);
+
+      for (int i = 0; i < keyboards.length(); i++) {
+        JSONObject keyboard = keyboards.getJSONObject(i);
+
+        if (keyboard.getString("id").equals(kbdId)) {
+          return keyboard.getString("version");
+        }
+      }
+
+      return null;
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return null;
+    }
+  }
+
+  /**
+   * Parse a kmp.json JSON object and return the package's name.
+   * @param json kmp.json as a JSON object
+   * @return String of the package name
    */
   public String getPackageName(JSONObject json) {
     try {
@@ -219,10 +322,10 @@ public class PackageProcessor {
   }
 
   /**
-   * Simply extracts the package's version number.
+   * Parse a kmp.json JSON object and return the package's version number.
    * If undefined, return default version "1.0"
-   * @param json The metadata JSONObject for the package.
-   * @return The version number (via String)
+   * @param json kmp.json as a JSON object.
+   * @return String of the package version number
    */
   public static String getPackageVersion(JSONObject json) {
     try {
@@ -234,10 +337,10 @@ public class PackageProcessor {
   }
 
   /**
-   * Simply extracts the package's target (keyboards vs lexical models).
+   * Parse a kmp.json JSON object and return the package's target (keyboards vs lexical models).
    * Only one can be valid. Otherwise, return "invalid"
-   * @param json The metadata JSONObject for the package.
-   * @return String The target ("keyboards", "lexicalModels", or "invalid")
+   * @param json kmp.json as a JSON object.
+   * @return String of the package target ("keyboards", "lexicalModels", or "invalid")
    */
   public String getPackageTarget(JSONObject json) {
     try {
@@ -424,7 +527,7 @@ public class PackageProcessor {
     String packageID = baseKeyboard.getPackageID();
     String keyboardID = baseKeyboard.getKeyboardID();
     try {
-      JSONArray languages = keyboardJSON.getJSONArray("languages");
+      JSONArray languages = keyboardJSON.getJSONArray(PP_LANGUAGES_KEY);
       for (int j = 0; j < languages.length(); j++) {
         JSONObject language = languages.getJSONObject(j);
         String languageID = language.getString("id");
@@ -446,23 +549,33 @@ public class PackageProcessor {
   /**
    * Get a list of available keyboard and language pairings that are available to add
    * (parses the kmp.json for the language list)
+   * @param infoJSON - kmp.json as a JSON object
    * @param packageID - String of the package ID
    * @param keyboardID - String of the keyboard ID
+   * @param tempPath - Boolean whether the kmp.json file is in a temporary location. If true,
+   *                   don't use KeyboardController to determine a base keyboard.
    * @param excludeInstalledLanguages - Boolean whether to exclude
    *        installed languages from the returned list.
    * @return List of <Keyboard> based on kmp.json. If excludeInstalledLanguages is true, this list
    *         excludes languages already installed
    */
-  public List<Keyboard> getKeyboardList(String packageID, String keyboardID, boolean excludeInstalledLanguages) {
-    File packagePath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID);
+  public List<Keyboard> getKeyboardList(JSONObject infoJSON, String packageID, String keyboardID,
+                                        boolean tempPath, boolean excludeInstalledLanguages) {
     List<Keyboard> list = new ArrayList<Keyboard>();
-    JSONObject infoJSON = loadPackageInfo(packagePath);
     try {
-      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+      JSONArray keyboards = infoJSON.getJSONArray(PP_KEYBOARDS_KEY);
 
       for (int i = 0; i < keyboards.length(); i++) {
         JSONObject keyboard = keyboards.getJSONObject(i);
-        if (keyboardID.equals(keyboard.getString("id"))) {
+        if (tempPath) {
+          // temporary path for kmp.json so don't use KeyboardController to get the base keyboard.
+          if (i==0) {
+            // Create a "baseKeyboard" for the language picker menu. Don't need full keyboard info...
+            Keyboard baseKeyboard = getFirstKeyboard(infoJSON, packageID);
+            return getKeyboards(keyboard, baseKeyboard, excludeInstalledLanguages);
+          }
+        }
+        else if (keyboardID != null && keyboardID.equals(keyboard.getString("id"))) {
           // Find the keyboard already installed. We'll use it as the base
           // for creating new keyboards
           int baseKeyboardIndex =  KeyboardController.getInstance().getKeyboardIndex(packageID, keyboardID, "");
@@ -480,7 +593,7 @@ public class PackageProcessor {
   }
 
   /**
-   * Parses kmp.json to get a specified keyboard with an associated language. If languageID not
+   * Parses installed kmp.json to get a specified keyboard with an associated language. If languageID not
    * provided, return the keyboard with the first associated language.
    * This differs from getKeyboardList because this method doesn't search through
    * KeyboardController (installed keyboards)
@@ -496,7 +609,7 @@ public class PackageProcessor {
     String packageVersion = getPackageVersion(infoJSON);
 
     try {
-      JSONArray keyboards = infoJSON.getJSONArray("keyboards");
+      JSONArray keyboards = infoJSON.getJSONArray(PP_KEYBOARDS_KEY);
 
       for (int i=0; i < keyboards.length(); i++) {
         JSONObject keyboard = keyboards.getJSONObject(i);
