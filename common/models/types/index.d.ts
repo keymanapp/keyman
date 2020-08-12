@@ -17,6 +17,11 @@
  */	
 declare type USVString = string;
 
+declare interface LexiconTraversal {
+  children(): Generator<{key: USVString, traversal: () => LexiconTraversal}>;
+  entries: USVString[];
+}
+
 /**
  * The model implementation, within the Worker.
  */
@@ -78,6 +83,13 @@ declare interface LexicalModel {
    * @see LexicalModelPunctuation
    */
   readonly punctuation?: LexicalModelPunctuation;
+
+  /**
+   * Lexical models _may_ provide a LexiconTraversal object usable to enhance 
+   * prediction and correction results.  The returned object represents the
+   * unfiltered lexicon (with an empty prefix).
+   */
+  getRootTraversal?(): LexiconTraversal;
 }
 
 /**

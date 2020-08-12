@@ -161,6 +161,95 @@
     public wordbreak(context: Context): USVString {
       return this.getLastWord(context.left);
     }
+
+    public getRootTraversal(): LexiconTraversal {
+      return new TrieModel.Traversal(this._trie['root'], '');
+    }
+
+    private static Traversal = class implements LexiconTraversal {
+      prefix: String;
+      root: Node;
+
+      constructor(root: Node, prefix: string) {
+        this.root = root;
+        this.prefix = prefix;
+      }
+
+      *children(): Generator<{key: string, traversal: () => LexiconTraversal}> {
+        let root = this.root;
+
+        if(root.type == 'internal') {
+          for(let i = 0; i < root.values.length; i++) {
+            let entry = root.values[i];
+            let entryNode = root.children[entry];
+
+            // SMP check
+            let charCode = entry.charCodeAt(0);
+            if(charCode >= 0xD800 && charCode <= 0xDBFF) {
+              // First part of a SMP char.
+              // For now, we'll just assume the second completes such a char.
+              if(entryNode.type == 'internal') {
+                let internalNode = entryNode;
+                for(let j = 0; j < entryNode.values.length; j++) {
+                  let prefix = this.prefix + entry + internalNode.values[j];
+                  yield {
+                    key: entryNode.values[j],
+                    traversal: function() { return new TrieModel.Traversal(internalNode.children[internalNode.values[j]], prefix) }
+                  }
+                }
+              } else {
+                // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
+                let fullText = entryNode.entries[0].key;
+                entry = entry + fullText[this.prefix.length + 1]; // The other half of the SMP.
+                let prefix = this.prefix + entry;
+
+                yield {
+                  key: entry,
+                  traversal: function () {return new TrieModel.Traversal(entryNode, prefix)}
+                }
+              }
+            } else if(charCode == 0xFDD0) {
+              continue;
+            } else {
+              let prefix = this.prefix + entry;
+              yield {
+                key: entry,
+                traversal: function() { return new TrieModel.Traversal(entryNode, prefix)}
+              }
+            }
+          }
+
+          return;
+        } else {
+          let fullText = root.entries[0].key;
+          let prefix = this.prefix;
+          if(prefix.length < fullText.length) {
+            yield {
+              key: fullText[prefix.length],
+              traversal: function() { return new TrieModel.Traversal(root, prefix + fullText[prefix.length])}
+            }
+          }
+          return;
+        }
+      }
+
+      get entries(): string[] {
+        if(this.root.type == 'leaf') {
+          console.log("leaf, prefix " + this.prefix);
+          return this.root.entries.map(function(value) { return value.content });
+        } else {
+          console.log("not leaf, prefix " + this.prefix);
+          let matchingLeaf = this.root.children['\uFDD0'];
+          if(matchingLeaf && matchingLeaf.type == 'leaf') {
+            console.log("matched leaf");
+            return matchingLeaf.entries.map(function(value) { return value.content });
+          } else {
+            console.log("big meanie");
+            return undefined;
+          }
+        }
+      }
+    }
   };
 
   /////////////////////////////////////////////////////////////////////////////////
