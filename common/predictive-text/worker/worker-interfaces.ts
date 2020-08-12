@@ -118,6 +118,9 @@ interface WordbreakMessage {
   context: Context;
 }
 
+/**
+ * The LMLayer can be in one of the following states. The LMLayer can only produce predictions in the 'ready' state.
+ */
 type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModellessState | LMLayerWorkerReadyState;
 
 /**
@@ -125,8 +128,6 @@ type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModelles
  */
 interface LMLayerWorkerUnconfiguredState {
   /**
-   * Informative property. Name of the state. Currently, the LMLayerWorker can only
-   * be the following states:
    */
   name: 'unconfigured';
   handleMessage(payload: IncomingMessage): void;
@@ -137,8 +138,6 @@ interface LMLayerWorkerUnconfiguredState {
  */
 interface LMLayerWorkerModellessState {
   /**
-   * Informative property. Name of the state. Currently, the LMLayerWorker can only
-   * be the following states:
    */
   name: 'modelless';
   handleMessage(payload: IncomingMessage): void;
@@ -149,8 +148,6 @@ interface LMLayerWorkerModellessState {
  */
 interface LMLayerWorkerReadyState {
   /**
-   * Informative property. Name of the state. Currently, the LMLayerWorker can only
-   * be the following states:
    */
   name: 'ready';
   handleMessage(payload: IncomingMessage): void;
