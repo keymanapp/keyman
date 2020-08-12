@@ -127,8 +127,6 @@ type LMLayerWorkerState = LMLayerWorkerUnconfiguredState | LMLayerWorkerModelles
  * Represents the unconfigured state of the LMLayer.
  */
 interface LMLayerWorkerUnconfiguredState {
-  /**
-   */
   name: 'unconfigured';
   handleMessage(payload: IncomingMessage): void;
 }
@@ -137,8 +135,6 @@ interface LMLayerWorkerUnconfiguredState {
  * Represents the pre-model-load state of the LMLayer.
  */
 interface LMLayerWorkerModellessState {
-  /**
-   */
   name: 'modelless';
   handleMessage(payload: IncomingMessage): void;
 }
@@ -147,8 +143,6 @@ interface LMLayerWorkerModellessState {
  * Represents the 'ready' state of the LMLayer.
  */
 interface LMLayerWorkerReadyState {
-  /**
-   */
   name: 'ready';
   handleMessage(payload: IncomingMessage): void;
   compositor: ModelCompositor;
