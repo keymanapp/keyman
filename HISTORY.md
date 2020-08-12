@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.127 alpha 2020-08-12
+
+* refactor(common/models): LMLayer state management tweak, persistent ModelCompositor (#3477)
+
 ## 14.0.126 alpha 2020-08-10
 
 * fix(android): Add CI script to publish to Play Store (#3469)
