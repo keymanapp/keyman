@@ -85,7 +85,8 @@ namespace models {
      * @param elements 
      */
     enqueueAll(elements: Type[]) {
-      for(let element of elements) {this.enqueue(element);
+      for(let element of elements) {
+        this.enqueue(element);
       }
     }
 
