@@ -235,16 +235,16 @@
 
       get entries(): string[] {
         if(this.root.type == 'leaf') {
-          console.log("leaf, prefix " + this.prefix);
-          return this.root.entries.map(function(value) { return value.content });
+          if(this.root.entries[0].key == this.prefix) {
+            return this.root.entries.map(function(value) { return value.content });
+          } else {
+            return undefined;
+          }
         } else {
-          console.log("not leaf, prefix " + this.prefix);
           let matchingLeaf = this.root.children['\uFDD0'];
           if(matchingLeaf && matchingLeaf.type == 'leaf') {
-            console.log("matched leaf");
             return matchingLeaf.entries.map(function(value) { return value.content });
           } else {
-            console.log("big meanie");
             return undefined;
           }
         }
