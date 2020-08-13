@@ -23,6 +23,7 @@
  */
 
 /// <reference path="common.ts" />
+/// <reference path="priority-queue.ts" />
 
 /**
  * @file trie-model.ts
@@ -425,7 +426,10 @@
    * @param queue
    */
   function getSortedResults(node: Node, prefix: SearchKey, N: number, limit = MAX_SUGGESTIONS): TextWithProbability[] {
-    let queue = new PriorityQueue();
+    let queue = new PriorityQueue(function(a: Weighted, b: Weighted) {
+      // In case of Trie compilation issues that emit `null` or `undefined`
+      return (b ? b.weight : 0) - (a ? a.weight : 0);
+    });
     let results: TextWithProbability[] = [];
 
     if (node.type === 'leaf') {
@@ -448,7 +452,7 @@
       queue.enqueue(node);
       let next: Weighted;
 
-      while (next = queue.pop()) {
+      while (next = queue.dequeue()) {
         if (isNode(next)) {
           // When a node is next up in the queue, that means that next least
           // likely suggestion is among its decsendants.
@@ -485,41 +489,6 @@
   /** TypeScript type guard that returns whether the thing is a Node. */
   function isNode(x: Entry | Node): x is Node {
     return 'type' in x;
-  }
-
-  /**
-   * A priority queue that always pops the highest weighted item.
-   */
-  class PriorityQueue {
-    // TODO: This probable should use a max-heap implementation, but I'm just doing
-    // a O(n log n) sort of the array when an item is popped.
-    private _storage: Weighted[] = [];
-    // TODO: this should have a limit, and ensure small values are not added.
-
-    /**
-     * Enqueues a single element to the priority queue.
-     */
-    enqueue(element: Weighted) {
-      this._storage.push(element);
-    }
-
-    /**
-     * Adds an array of weighted elements to the priority queue.
-     */
-    enqueueAll(elements: Weighted[]) {
-      this._storage = this._storage.concat(elements);
-    }
-
-    /**
-     * Pops the highest weighted item in the queue.
-     */
-    pop(): Weighted {
-      // Lazily sort only when NEEDED.
-      // Sort in descending order of weight, so heaviest weight will be popped
-      // first.
-      this._storage.sort((a, b) => b.weight - a.weight);
-      return this._storage.shift();
-    }
   }
 
   /**
