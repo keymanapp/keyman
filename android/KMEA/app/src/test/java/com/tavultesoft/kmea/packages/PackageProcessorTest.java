@@ -228,20 +228,6 @@ public class PackageProcessorTest {
   }
 
   @Test
-  public void test_getFirstKeyboardID() {
-    JSONObject json = PP.loadPackageInfo(tempPkg);
-
-    Assert.assertEquals(TEST_GFF_KBD_ID, PackageProcessor.getFirstKeyboardID(json));
-  }
-
-  @Test
-  public void test_getFirstKeyboardName() {
-    JSONObject json = PP.loadPackageInfo(tempPkg);
-
-    Assert.assertEquals(TEST_GFF_KBD_NAME, PackageProcessor.getFirstKeyboardName(json));
-  }
-
-  @Test
   public void test_keyboardVersion() {
     JSONObject json = PP.loadPackageInfo(tempPkg);
 

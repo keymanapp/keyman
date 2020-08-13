@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -20,7 +19,6 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 
-import android.util.Log;
 import android.widget.Toast;
 
 import com.tavultesoft.kmea.KMManager;
@@ -47,6 +45,9 @@ public class PackageActivity extends AppCompatActivity {
   private File tempPackagePath;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private PackageProcessor kmpProcessor;
+  private TextView packageActivityTitle;
+  private String pkgName;
+  private String pkgVersion;
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -90,32 +91,33 @@ public class PackageActivity extends AppCompatActivity {
       return;
     }
 
+    pkgName = kmpProcessor.getPackageName(pkgInfo);
+    pkgVersion = kmpProcessor.getPackageVersion(pkgInfo);
+    final int languageCount = kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0);
+
     // Silent installation (skip displaying welcome.htm and user confirmation)
     if (silentInstall) {
       installPackage(context, pkgTarget, pkgId, languageID, true);
       return;
     }
 
-    String pkgVersion = kmpProcessor.getPackageVersion(pkgInfo);
-    String pkgName = kmpProcessor.getPackageName(pkgInfo);
-    final int languageCount = kmpProcessor.getKeyboardLanguageCount(pkgInfo);
-
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
     getSupportActionBar().setDisplayUseLogoEnabled(false);
-    getSupportActionBar().setDisplayShowHomeEnabled(false);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
 
-    TextView packageActivityTitle = new TextView(this);
+    packageActivityTitle = new TextView(this);
     packageActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
     String titleStr = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ?
-      String.format(getString(R.string.install_keyboard_package), pkgVersion) :
+      String.format(getString(R.string.install_keyboard_package), pkgName, pkgVersion) :
       String.format(getString(R.string.install_predictive_text_package), pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
@@ -190,7 +192,7 @@ public class PackageActivity extends AppCompatActivity {
   }
 
   /**
-   * Initialize buttons of package installer.
+   * Initialize button of package installer.
    * If keyboard package languageCount > 1, use nextButton instead of installButton
    * @param context the context
    * @param pkgId the keyman package id
@@ -198,10 +200,9 @@ public class PackageActivity extends AppCompatActivity {
    * @param pkgTarget  String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param languageCount int number of languages for the first keyboard in a keyboard package
    */
-  private void initializeButtons(final Context context, final String pkgId, final String languageID,
-                                 final String pkgTarget, final int languageCount) {
+  private void initializeButtons(final Context context, final String pkgId,
+                                 final String languageID, final String pkgTarget, final int languageCount) {
     final Button installButton = (Button) findViewById(R.id.installButton);
-    final Button cancelButton = (Button) findViewById(R.id.cancelButton);
     final Button nextButton = (Button) findViewById(R.id.nextButton);
     final Button finishButton = (Button) findViewById(R.id.finishButton);
 
@@ -233,7 +234,6 @@ public class PackageActivity extends AppCompatActivity {
         cleanup();
       }
     };
-    cancelButton.setOnClickListener(_cleanup_action);
     finishButton.setOnClickListener(_cleanup_action);
 
     updateButtonState(true, pkgTarget, languageCount);
@@ -243,7 +243,7 @@ public class PackageActivity extends AppCompatActivity {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     // Use the result of SelectLanguageActivity and install the package
-    if (requestCode == 2) {
+    if (resultCode == 2 && data != null) {
       String pkgTarget = data.getStringExtra("pkgTarget");
       String pkgId = data.getStringExtra("packageID");
       String languageID = data.getStringExtra("languageID");
@@ -257,6 +257,12 @@ public class PackageActivity extends AppCompatActivity {
     if ( alertDialog !=null && alertDialog.isShowing() ){
       alertDialog.dismiss();
     }
+  }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    super.onBackPressed();
+    return true;
   }
 
   private void cleanup() {
@@ -293,10 +299,10 @@ public class PackageActivity extends AppCompatActivity {
   }
 
   /**
-   * switch button visibility for package installer.
-   * before installation show Install/Next and Cancel
-   * after installation show OK button
+   * Switch button visibility for package installer so only one button is visible.
+   * Before installation: show Install or Next
    * If keyboard package languageCount > 1, use nextButton instead of installButton
+   * AFter installation: show OK button
    * @param anIsStartInstaller if true - before installation, false - after installation
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param languageCount int number of languages for a keyboard
@@ -305,7 +311,6 @@ public class PackageActivity extends AppCompatActivity {
   {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button nextButton = (Button) findViewById(R.id.nextButton);
-    final Button cancelButton = (Button) findViewById(R.id.cancelButton);
     final Button closeButton = (Button) findViewById(R.id.finishButton);
     if(anIsStartInstaller)
     {
@@ -316,14 +321,12 @@ public class PackageActivity extends AppCompatActivity {
         installButton.setVisibility(View.VISIBLE);
         nextButton.setVisibility(View.GONE);
       }
-      cancelButton.setVisibility(View.VISIBLE);
       closeButton.setVisibility(View.GONE);
     }
     else
     {
       installButton.setVisibility(View.GONE);
       nextButton.setVisibility(View.GONE);
-      cancelButton.setVisibility(View.GONE);
       closeButton.setVisibility(View.VISIBLE);
     }
     findViewById(R.id.buttonBar).requestLayout();
@@ -336,30 +339,39 @@ public class PackageActivity extends AppCompatActivity {
   }
 
   /**
-   * show welcome page from installed keyboard.
+   * Show welcome page from installed keyboard.
    * @param theInstalledPackages the installed keyboards or lexical models
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
-   * @return true if a welcomepage is available
+   * @return true if a welcome page is available
    */
   private boolean loadWelcomePage(List<Map<String, String>> theInstalledPackages, String pkgTarget)
   {
     boolean _found=false;
-     for(Map<String,String> _keyboard:theInstalledPackages) {
-       String _customlink = _keyboard.get(KMManager.KMKey_CustomHelpLink);
-       if (_customlink != null) {
-         webView.loadUrl("file:///" + _customlink);
-         _found=true;
-         break;
-       }
-     }
-     if(!_found)
-       return false;
 
-     updateButtonState(false, pkgTarget);
+    // Update titlebar: Don't display back button and update text
+    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(false);
+    String titleStr =
+      String.format(getString(R.string.welcome_package), pkgName, pkgVersion);
+    packageActivityTitle.setText(titleStr);
 
-      return true;
+    for(Map<String,String> _keyboard:theInstalledPackages) {
+      String _customlink = _keyboard.get(KMManager.KMKey_CustomHelpLink);
+      if (_customlink != null) {
+        webView.loadUrl("file:///" + _customlink);
+        _found=true;
+        break;
+      }
+    }
+    if(!_found) {
+      return false;
+    }
+    updateButtonState(false, pkgTarget);
+
+    return true;
 
   }
+
   /**
    * Installs the keyboard or lexical model package, and then notifies the corresponding listeners
    * @param context Context   The activity context
@@ -368,7 +380,8 @@ public class PackageActivity extends AppCompatActivity {
    * @param languageID String The optional language ID
    * @param anSilentInstall boolean If true, don't display readme.htm/welcome.htm content during installation
    */
-  private void installPackage(Context context, String pkgTarget, String pkgId, String languageID, boolean anSilentInstall) {
+  private void installPackage(Context context, String pkgTarget, String pkgId,
+                              String languageID, boolean anSilentInstall) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install

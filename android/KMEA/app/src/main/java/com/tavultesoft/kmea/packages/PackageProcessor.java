@@ -194,19 +194,21 @@ public class PackageProcessor {
   }
 
   /**
-   * Get the language and keyboard information for the first keyboard in a keyboard package.
+   * Get the language and keyboard information for the keyboard in a keyboard package at a specified index.
    * Use placeholders for other fields like help links, and font info.
    * @param json kmp.json as a JSON object
    * @param packageID String of the keyboard package ID
+   * @param index int of the keyboard entry
    * @return Keyboard info. Null if no keyboard found
    */
-  public static Keyboard getFirstKeyboard(JSONObject json, String packageID) {
+  public static Keyboard getKeyboard(JSONObject json, String packageID, int index) {
     try {
       if (!json.has(PP_KEYBOARDS_KEY)) {
         return null;
       }
-      JSONObject keyboardObj = json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(0);
+      JSONObject keyboardObj = json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(index);
       JSONArray languages = keyboardObj.getJSONArray(PP_LANGUAGES_KEY);
+      // Just get first language
       JSONObject languageObj = languages.getJSONObject(0);
       return new Keyboard(
         packageID,
@@ -228,53 +230,25 @@ public class PackageProcessor {
   }
 
   /**
-   * Parse a kmp.json JSON object and return the first keyboard ID. If no keyboard found, returns empty string
+   * Parse a kmp.json JSON object and return the language count for the specified resource and index
    * @param json kmp.json as a JSON object
-   * @return String of the first keyboard ID
-   */
-  public static String getFirstKeyboardID(JSONObject json) {
-    try {
-      if (!json.has(PP_KEYBOARDS_KEY)) {
-        return "";
-      }
-      return json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(0).getString("id");
-    } catch (JSONException e) {
-      KMLog.LogException(TAG, "", e);
-      return "";
-    }
-  }
-
-  /**
-   * Pase a kmp.json JSON object and return the first keyboard name. If no keyboard found, returns empty string
-   * @param json kmp.json as a JSON object
-   * @return String of the first keyboard name
-   */
-  public static String getFirstKeyboardName(JSONObject json) {
-    try {
-      if (!json.has(PP_KEYBOARDS_KEY)) {
-        return "";
-      }
-      return json.getJSONArray(PP_KEYBOARDS_KEY).getJSONObject(0).getString("name");
-    } catch (JSONException e) {
-      KMLog.LogException(TAG, "", e);
-      return "";
-    }
-  }
-
-  /**
-   * Parse a kmp.json JSON object and return the language count for the first keyboard
-   * @param json kmp.json as a JSON object
+   * @param key PP_KEYBOARDS_KEY or PP_LEXICAL_MODELS_KEY
+   * @param index int Item number the resource array
    * @return int of number of languages. 0 if not found
    */
-  public static int getKeyboardLanguageCount(JSONObject json) {
+  public static int getLanguageCount(JSONObject json, String key, int index) {
     int count = 0;
     try {
-      if (!json.has(PP_KEYBOARDS_KEY)) {
+      if ( (key.equals(PP_KEYBOARDS_KEY) && !json.has(PP_KEYBOARDS_KEY)) ||
+           (key.equals(PP_LEXICAL_MODELS_KEY) && !json.has(PP_LEXICAL_MODELS_KEY)) ){
+        KMLog.LogError(TAG, "kmp.json doesn't contain " + key);
         return count;
       }
-      JSONArray keyboards = json.getJSONArray(PP_KEYBOARDS_KEY);
-      JSONArray languages = keyboards.getJSONObject(0).getJSONArray(PP_LANGUAGES_KEY);
+      JSONArray resources = json.getJSONArray(key);
+      JSONArray languages = resources.getJSONObject(index).getJSONArray(PP_LANGUAGES_KEY);
       count = languages.length();
+    } catch (NullPointerException e) {
+      KMLog.LogException(TAG, "getLanguageCount with null JSONObject", e);
     } catch (JSONException e) {
       KMLog.LogException(TAG, "", e);
     }
@@ -571,7 +545,7 @@ public class PackageProcessor {
           // temporary path for kmp.json so don't use KeyboardController to get the base keyboard.
           if (i==0) {
             // Create a "baseKeyboard" for the language picker menu. Don't need full keyboard info...
-            Keyboard baseKeyboard = getFirstKeyboard(infoJSON, packageID);
+            Keyboard baseKeyboard = getKeyboard(infoJSON, packageID, 0);
             return getKeyboards(keyboard, baseKeyboard, excludeInstalledLanguages);
           }
         }

@@ -4,6 +4,7 @@
 
 package com.tavultesoft.kmapro;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -77,7 +78,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     final String packageID = bundle.getString("packageID");
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
     Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
-      kmpProcessor.getFirstKeyboard(pkgInfo, packageID);
+      kmpProcessor.getKeyboard(pkgInfo, packageID, 0);
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
     String title_install = String.format(getString(R.string.title_select_language_for_package), keyboardName);
@@ -149,6 +150,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
   @Override
   public boolean onSupportNavigateUp() {
     super.onBackPressed();
+    setResult(Activity.RESULT_CANCELED);
     return true;
   }
 }

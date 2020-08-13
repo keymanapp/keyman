@@ -8,26 +8,23 @@
     tools:context=".PackageActivity" >
 
     <include layout="@layout/titlebar" />
-    <WebView
-        android:id="@+id/packageWebView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/titlebar"
-        android:layout_above="@+id/buttonBar"/>
 
     <LinearLayout
         android:id="@+id/buttonBar"
         style="?android:attr/buttonBarStyle"
-        android:layout_alignParentBottom="true"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/titlebar"
         android:orientation="horizontal">
 
-        <!-- Spacer to pad buttons to the right -->
+        <!-- Spacer to pad button to the right -->
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
+
+        <!-- PackageActivity will manage so only one of these button is displayed -->
 
         <Button
             android:id="@+id/finishButton"
@@ -41,19 +38,6 @@
             android:elevation="1dp"
             android:singleLine="true"/>
 
-        <Button
-            android:id="@+id/cancelButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:text="@string/label_cancel"
-            android:textColor="@color/keyman_blue"
-            android:elevation="1dp"
-            android:singleLine="true"/>
-
-        <!-- PackageActivity will manager installButton/nextButton so only one is displayed -->
         <Button
             android:id="@+id/installButton"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
@@ -80,5 +64,12 @@
 
 
     </LinearLayout>
+
+  <WebView
+    android:id="@+id/packageWebView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/buttonBar"
+    />
 
 </RelativeLayout>
