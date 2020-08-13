@@ -17,8 +17,33 @@
  */	
 declare type USVString = string;
 
+/**
+ * Used to facilitate edit-distance calculations by allowing the LMLayer to
+ * efficiently search the model's lexicon in a Trie-like manner.
+ */
 declare interface LexiconTraversal {
+  /**
+   * Provides an iterable pattern used to search for words with a prefix matching
+   * the current traversal state's prefix when a new character is appended.
+   * 
+   * For example, if the current traversal state corresponds to 'th', children() may return
+   * an iterator with states corresponding 'e' (for 'the', 'then', 'there'),
+   * 'a' (for 'than', 'that'), etc.
+   * 
+   * @param key       The character suffixed to the existing lookup-prefix's string
+   * @param traversal A closure providing an iterable over the possible child states
+   * of the resulting state.
+   */
   children(): Generator<{key: USVString, traversal: () => LexiconTraversal}>;
+
+  /**
+   * Any entries directly keyed by the currently-represented lookup prefix.  Entries and
+   * children may exist simultaneously, but `entries` must always exist when no children are
+   * available in the returned `children()` iterable.
+   * 
+   * For example, with a search prefix of 'the', entries should return ['the'] even if 'then'
+   * and 'there' also exist within the lexicon.
+   */
   entries: USVString[];
 }
 
