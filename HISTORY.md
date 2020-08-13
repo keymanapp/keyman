@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 14.0.128 alpha 2020-08-13
+
+* feat(linux): Hook up Sentry for km-config (#3378)
+* chore(linux): Use new staging site names and use variable for downloads.keyman.com (#3406)
+
 ## 14.0.127 alpha 2020-08-12
 
 * refactor(common/models): LMLayer state management tweak, persistent ModelCompositor (#3477)
