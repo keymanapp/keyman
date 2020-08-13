@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<DialogInfo>
+  <Dialog Id="Keyman" Version="7.0.230.0" Width="740" Height="476">
+    <footerheight>40</footerheight>
+    <menuwidth>118</menuwidth>
+    <headerheight>40</headerheight>
+  </Dialog>
+
+  <Dialog Id="DownloadKeyboard" Width="740" Height="400">
+    <footerheight>40</footerheight>
+  </Dialog>
+
+  <Dialog Id="InstallKeyboard" Width="600" Height="300" />
+
+  <Dialog Id="ProxyConfiguration" Width="240" Height="176" />
+
+  <Dialog Id="BaseKeyboard" Width="512" Height="160" />
+
+  <Dialog Id="OnlineUpdate" Width="470" Height="260" />
+
+  <Dialog Id="Splash" Width="630" Height="450" />
+
+  <Dialog Id="Hint" Width="450" Height="300">
+    <footerheight>40</footerheight>
+    <headerheight>40</headerheight>
+  </Dialog>
+
+  <Dialog Id="Help" Width="450" Height="300"></Dialog>
+</DialogInfo>

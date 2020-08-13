@@ -28,7 +28,9 @@ uses
   VersionInfo in '..\..\global\delphi\general\VersionInfo.pas',
   SetupStrings in '..\..\desktop\setup\SetupStrings.pas',
   kmpinffile in '..\..\global\delphi\general\kmpinffile.pas',
-  PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas';
+  PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
+  Keyman.Setup.System.SetupUILanguageManager in '..\..\desktop\setup\Keyman.Setup.System.SetupUILanguageManager.pas',
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas';
 
 var
   runner : ITestRunner;

@@ -75,7 +75,6 @@ uses
   UImportOlderVersionKeyboards in 'main\UImportOlderVersionKeyboards.pas',
   UImportOlderKeyboardUtils in 'main\UImportOlderKeyboardUtils.pas',
   utiluac in '..\..\global\delphi\general\utiluac.pas',
-  DownloadLocale in 'install\DownloadLocale.pas',
   UserMessages in '..\..\global\delphi\general\UserMessages.pas',
   UILanguages in 'util\UILanguages.pas',
   utilmsxml in '..\..\global\delphi\general\utilmsxml.pas',
@@ -83,7 +82,6 @@ uses
   UfrmOnlineUpdateIcon in 'main\UfrmOnlineUpdateIcon.pas' {frmOnlineUpdateIcon},
   KeymanTrayIcon in '..\..\engine\keyman\KeymanTrayIcon.pas',
   UImportOlderVersionKeyboards10 in 'main\UImportOlderVersionKeyboards10.pas',
-  FixupLocaleDoctype in '..\..\global\delphi\general\FixupLocaleDoctype.pas',
   VisualKeyboard in '..\..\global\delphi\visualkeyboard\VisualKeyboard.pas',
   VKeyChars in '..\..\global\delphi\general\VKeyChars.pas',
   UfrmPrintOSK in 'util\UfrmPrintOSK.pas' {frmPrintOSK},
@@ -170,7 +168,9 @@ uses
   Keyman.Configuration.System.HttpServer.App.ProxyConfiguration in 'web\Keyman.Configuration.System.HttpServer.App.ProxyConfiguration.pas',
   Keyman.Configuration.System.HttpServer.App.ConfigMain in 'web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas',
   Keyman.Configuration.UI.InstallFile in 'install\Keyman.Configuration.UI.InstallFile.pas',
-  Keyman.Configuration.UI.KeymanProtocolHandler in 'install\Keyman.Configuration.UI.KeymanProtocolHandler.pas';
+  Keyman.Configuration.UI.KeymanProtocolHandler in 'install\Keyman.Configuration.UI.KeymanProtocolHandler.pas',
+  Keyman.Configuration.System.KeymanUILanguageManager in '..\kmshell\main\Keyman.Configuration.System.KeymanUILanguageManager.pas',
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

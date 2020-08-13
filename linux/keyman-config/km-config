@@ -2,9 +2,9 @@
 
 import argparse
 import logging
-import os
 
 from keyman_config import __version__
+from keyman_config.handle_install import download_and_install_package
 
 
 if __name__ == '__main__':
@@ -23,13 +23,7 @@ if __name__ == '__main__':
         logging.basicConfig(format='%(levelname)s:%(message)s')
 
     if args.install:
-        if os.path.isfile(args.install):
-            from keyman_config.install_window import InstallKmpWindow
-            w = InstallKmpWindow(args.install)
-            w.run()
-            w.destroy()
-        else:
-            logging.error("Can't find file " + args.install)
+        download_and_install_package(args.install)
     else:
         from keyman_config.view_installed import ViewInstalledWindow
         w = ViewInstalledWindow()

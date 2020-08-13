@@ -3,87 +3,172 @@
 
   <string name="app_name" translatable="false">Keyman</string>
 
-  <string name="action_share" comment="Send text content to another app">Share</string>
-  <string name="action_web" comment="Open Keyman browser">Web Browser</string>
-  <string name="action_text_size" comment="Adjust text size">Text Size</string>
-  <string name="action_overflow" comment="Additional menu items">More</string>
-  <string name="action_clear_text" comment="Erase text">Clear Text</string>
-  <string name="action_info" comment="Display Keyman help page">Info</string>
-  <string name="action_settings" comment="Open Settings menu">Settings</string>
-  <string name="action_install_updates" comment="Keyboard or dictionary updates available">Install Updates</string>
+  <!-- Context: Menu Action -->
+  <string name="action_share" comment="Menu action to send text content to another app">Share</string>
 
-  <string name="title_version">Version</string>
+  <!-- Context: Menu Action -->
+  <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
 
-  <!-- &#8230; is the ellipsis character "..." -->
-  <string name="textview_hint">Start typing here&#8230;</string>
+  <!-- Context: Menu Action -->
+  <string name="action_text_size" comment="Menu action to adjust text size">Text Size</string>
 
-  <!-- Splash screen (version/copyright info currently disabled -->
-  <string name="splash_blank" translatable="false"></string>
-  <string name="splash_copyright" translatable="false">Copyright &#169; 1992-</string>
+  <!-- Context: Menu Action -->
+  <string name="action_overflow" comment="Show additional menu items">More</string>
 
-  <!-- Text Size dialog -->
+  <!-- Context: Menu Action -->
+  <string name="action_clear_text" comment="Menu action to erase text">Clear Text</string>
+
+  <!-- Context: Menu Action -->
+  <string name="action_info" comment="Menu action to display Keyman help page">Info</string>
+
+  <!-- Context: Menu Action -->
+  <string name="action_settings" comment="Menu action to open Settings menu">Settings</string>
+
+  <!-- Context: Menu Action -->
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Install Updates</string>
+
+
+  <!-- Context: Title -->
+  <string name="title_version" comment="Title of Keyman for Android version">Version: %1$s</string>
+
+
+  <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
+  <string name="textview_hint" comment="Prompt to start typing">Start typing here&#8230;</string>
+
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
+
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <string name="splash_copyright" translatable="false" comment="Placeholder for copyright text while version info on splash page is disabled">Copyright &#169; 1992-</string>
+
+
+  <!-- Context: Text Size dialog -->
+  <string name="text_size" comment="Current text size (number)">Text Size: %1$d</string>
+
+  <!-- Context: Text Size dialog -->
   <string name="ic_text_size_up" comment="Make text bigger">Text size up</string>
+
+  <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Text size down</string>
 
-  <!-- Clear Text dialog -->
-  <string name="all_text_will_be_cleared" comment="Erase all the text">All text will be cleared</string>
 
-  <!-- Info screen reuses title_version -->
-
-  <!-- Get Started menu strings -->
-  <string name="get_started">Get Started</string>
-  <string name="add_a_keyboard">Add a keyboard for your language</string>
-  <string name="enable_system_keyboard">Enable Keyman as system-wide keyboard</string>
-  <string name="set_keyman_as_default">Set Keyman as default keyboard</string>
-  <string name="more_info" comment="Open the help page">More info</string>
-  <string name="show_get_started">Show \"%1$s\" on startup</string>
+  <!-- Context: Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nAll text will be cleared\n</string>
 
 
-  <!-- Keyman Settings menu strings -->
+  <!-- Context: Get Started menu -->
+  <string name="get_started" comment="Menu for getting started">Get Started</string>
+
+  <!-- Context: Get Started menu -->
+  <string name="add_a_keyboard" comment="Menu item to add a keyboard">Add a keyboard for your language</string>
+
+  <!-- Context: Get Started menu -->
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Enable Keyman as system-wide keyboard</string>
+
+  <!-- Context: Get Started menu -->
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Set Keyman as default keyboard</string>
+
+  <!-- Context: Get Started menu -->
+  <string name="more_info" comment="Open the Keyman for Android help page">More info</string>
+
+  <!-- Context: Get Started menu -->
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Show \"%1$s\" on startup</string>
+
+
+  <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Settings</string>
+
+  <!-- Context: Keyman Settings menu -->
   <plurals name="installed_languages">
     <item quantity="zero">Installed languages</item>
     <item quantity="other">Installed languages (%1$d)</item>
   </plurals>
-  <string name="install_keyboard_or_dictionary">Install Keyboard or Dictionary</string>
+
+  <!-- Context: Keyman Settings menu -->
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Install Keyboard or Dictionary</string>
+
+  <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
+
+  <!-- Context: Keyman Settings menu -->
   <string name="show_banner_on" comment="Description when toggle is on">To be implemented</string>
+
+  <!-- Context: Keyman Settings menu -->
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
-  <!-- reuse show_get_started -->
 
-  <!-- Keyman Settings Install Keyboard or Dictionary menu strings -->
-  <string name="install_from_keyman_dot_com">Install from keyman.com</string>
-  <string name="install_from_local_file">Install from local file</string>
+
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Install from keyman.com</string>
+
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_local_file" comment="Install package file from local device">Install from local file</string>
+
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="install_from_other_device" comment="Scan QR Code">Install from other device</string>
-  <string name="add_language_to_installed_keyboard">Add language to installed keyboard</string>
-  <string name="add_language_subtext">(from keyboard package)</string>
 
-  <!-- Select Package and Select Language menu strings -->
-  <string name="title_select_keyboard_package_list">Select Keyboard Package</string>
-  <string name="title_select_language_for_package">Select language for %1$s</string>
-  <string name="added_language_to_keyboard">Added language %1$s to %2$s</string>
-  <string name="all_languages_installed">All languages already installed</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_language_to_installed_keyboard" comment="Install another language from a keyboard package">Add language to installed keyboard</string>
 
-  <!-- Web Browser strings -->
-  <string name="hint_text">Search or type URL</string>
-  <string name="title_bookmarks">Bookmarks</string>
-  <string name="no_bookmarks">No Bookmarks</string>
-  <string name="add_bookmark">Add Bookmark</string>
-  <string name="hint_title">Title</string>
-  <string name="hint_url">Url</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_language_subtext" comment="Additional information for adding another language">(from keyboard package)</string>
 
-  <!-- KMP Package strings -->
-  <string name="title_package">Package</string>
-  <string name="title_failed_to_install">failed to install</string>
-  <string name="downloading_keyboard_package">Downloading keyboard package</string>
-  <string name="failed_to_extract" comment="Keyboard package failed to unzip">Failed to extract</string>
-  <string name="install_keyboard_package">Install Keyboard Package</string>
-  <string name="install_predictive_text_package">Install Predictive Text Package</string>
-  <string name="no_new_touch_keyboards_to_install">No new touch-optimized keyboards to install</string>
-  <string name="no_new_predictive_text_to_install">No new predictive text to install</string>
-  <string name="no_valid_touch_keyboards_to_install">No valid touch-optimized keyboards to install</string>
-  <string name="no_targets_to_install">No keyboards or predictive text to install</string>
-  <string name="missing_metadata" comment="kmp.json file is missing from the keyboard package">kmp.json does not exist</string>
-  <string name="invalid_metadata">Invalid metadata in package</string>
+
+  <!-- Context: Select Package and Select Language menu -->
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add a language">Select Keyboard Package</string>
+
+  <!-- Context: Select Package and Select Language menu -->
+  <string name="title_select_language_for_package" comment="Select a language name from the keyboard package">Select language for %1$s</string>
+
+  <!-- Context: Select Package and Select Language menu -->
+  <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">Added language %1$s to %2$s</string>
+
+  <!-- Context: Select Package and Select Language menu -->
+  <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">All languages already installed</string>
+
+
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_text" comment="Prompt to type in the browser search bar">Search or type URL</string>
+
+  <!-- Context: Keyman Web Browser -->
+  <string name="title_bookmarks" comment="Title for bookmarks">Bookmarks</string>
+
+  <!-- Context: Keyman Web Browser -->
+  <string name="no_bookmarks" comment="Text when bookmark list is empty">No Bookmarks</string>
+
+  <!-- Context: Keyman Web Browser -->
+  <string name="add_bookmark" comment="Confirmation to add bookmark">Add Bookmark</string>
+
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_title" comment="Page title for saved bookmark">Title</string>
+
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_url" comment="Page URL for saved bookmark">Url</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">Package %1$s failed to install</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">Downloading keyboard package\n%1$s&#8230;</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Failed to extract</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="install_keyboard_package" comment="Title to install keyboard package">Install Keyboard Package %1$s</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Predictive Text Package %1$s</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">No new touch-optimized keyboards to install</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">No new predictive text to install</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">No keyboards or predictive text to install</string>
+
+  <!-- Context: KMP Package strings -->
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Invalid/Missing metadata in package</string>
 
 </resources>

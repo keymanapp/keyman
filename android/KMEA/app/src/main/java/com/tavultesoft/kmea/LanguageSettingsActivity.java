@@ -166,7 +166,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.model));
+    textView.setText(getString(R.string.model_label));
 
     lexicalModelTextView = layout.findViewById(R.id.text2);
 
@@ -237,7 +237,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         } else {
           AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
           dialogBuilder.setTitle(getString(R.string.title_add_keyboard));
-          dialogBuilder.setMessage(String.format("\n%s\n", getString(R.string.cannot_connect)));
+          dialogBuilder.setMessage(getString(R.string.cannot_connect));
           dialogBuilder.setPositiveButton(getString(R.string.label_ok), null);
           AlertDialog dialog = dialogBuilder.create();
           dialog.show();

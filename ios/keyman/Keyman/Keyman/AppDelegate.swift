@@ -32,10 +32,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     if let vc = window?.rootViewController {
+      // Force the app to the top-level view.  (Prompts won't display if we're in a submenu!)
+      vc.dismiss(animated: true, completion: nil)
+
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: vc) {
         // We choose to prompt the user for comfirmation, rather
         // than automatically installing the package.
-        rfm.promptPackageInstall(of: package, in: vc, isCustom: true)
+        //
+        // Since we're operating at the root, we want to present in a separate UINavigationController.
+        let nvc = UINavigationController.init()
+        rfm.promptPackageInstall(of: package, in: nvc, isCustom: true)
+        vc.present(nvc, animated: true, completion: nil)
       }
     } else {
       log.error("Cannot find app's root UIViewController")
@@ -83,6 +90,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //self.installAdhocKeyboard(filePath: "")
 
     return true
+  }
+
+  // Handles universal links.
+  func application(_ application: UIApplication,
+                   continue userActivity: NSUserActivity,
+                   restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    if userActivity.activityType == NSUserActivityTypeBrowsingWeb {
+      guard let incomingURL = userActivity.webpageURL else {
+        return false
+      }
+
+      if let parsedLink = UniversalLinks.tryParseKeyboardInstallLink(incomingURL) {
+        // We use this mostly to shorten line lengths, b/c lint warnings.
+        let downloadManager = ResourceDownloadManager.shared
+
+        // Aha!  We know this link type!
+        let downloadLink: URL
+        if let langID = parsedLink.lang_id {
+          let fullID = FullKeyboardID(keyboardID: parsedLink.keyboard_id, languageID: langID)
+          downloadLink = downloadManager.defaultDownloadURL(forPackage: parsedLink.packageKey,
+                                                            andResource: fullID,
+                                                            asUpdate: false)
+        } else {
+          downloadLink = downloadManager.defaultDownloadURL(forPackage: parsedLink.packageKey, asUpdate: false)
+        }
+        downloadManager.downloadPackage(withKey: parsedLink.packageKey,
+                                        from: downloadLink) { (package: KeyboardKeymanPackage?, error: Error?) in
+          guard error == nil, let package = package else {
+            // Maybe add an alert about the package error?
+            return
+          }
+          if let vc = self.window?.rootViewController {
+            // Force the app to the top-level view.  (Prompts won't display if we're in a submenu!)
+            vc.dismiss(animated: true, completion: nil)
+
+            // We choose to prompt the user for comfirmation, rather
+            // than automatically installing the package.
+            let nvc = UINavigationController.init()
+            ResourceFileManager.shared.promptPackageInstall(of: package, in: nvc, isCustom: true)
+            vc.present(nvc, animated: true, completion: nil)
+          } else {
+            log.error("Cannot find app's root UIViewController")
+          }
+        }
+        return true
+      }
+    }
+
+    return false
   }
 
   func applicationDidEnterBackground(_ application: UIApplication) {

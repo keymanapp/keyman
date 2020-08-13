@@ -16,7 +16,6 @@ type
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
   public
     const S_KMShell = 'kmshell.exe';
-    const S_Xml_LocaleDef = 'xml\localedef.dtd';
     const S_TSysInfoExe = 'tsysinfo.exe';
     const S_KeymanExe = 'keyman.exe';
     const S_CfgIcon = 'cfgicon.ico';
@@ -312,7 +311,7 @@ begin
 
     // The xml files may be in the same folder as the executable
     // for some 3rd party distributions of Keyman Desktop files.
-    if FileExists(Result + 'xml\locale.xml') then
+    if FileExists(Result + 'xml\strings.xml') then
       Result := Result + 'xml\';
   end;
 

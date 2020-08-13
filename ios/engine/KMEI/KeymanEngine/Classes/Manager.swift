@@ -33,8 +33,10 @@ public enum VibrationSupport {
   case taptic // Has the Taptic engine, allowing use of UIImpactFeedbackGenerator for customizable vibrations
 }
 
-// Strings
-private let keyboardChangeHelpText = "Tap here to change keyboard"
+/**
+ * Obtains the bundle for KeymanEngine.framework.
+ */
+internal let engineBundle: Bundle = Bundle(for: Manager.self)
 
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
@@ -84,9 +86,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The default value is false.
   public var canRemoveDefaultKeyboard = false
 
-  public let apiKeyboardRepository: APIKeyboardRepository
-    
-    
   // TODO: Change API to not disable removing as well
   /// Allow users to add new lexical models in the lexical model picker.
   ///  - Default value is true.
@@ -114,8 +113,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The last lexical model CAN be removed, as this is an optional feature
   /// The default value is true.
   public var canRemoveDefaultLexicalModel = true
-  
-  public let apiLexicalModelRepository: APILexicalModelRepository
 
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
@@ -171,8 +168,6 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   // MARK: - Object Admin
 
   private override init() {
-    apiKeyboardRepository = APIKeyboardRepository()
-    apiLexicalModelRepository = APILexicalModelRepository()
     super.init()
 
     URLProtocol.registerClass(KeymanURLProtocol.self)

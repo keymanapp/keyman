@@ -3,11 +3,9 @@ program StockEditor;
 uses
   Forms,
   UfrmMain in 'UfrmMain.pas' {md},
-  StockMessages in '..\..\global\delphi\cust\StockMessages.pas',
   COMMessageEditor in 'COMMessageEditor.pas' {frmCOMMessages},
   StringGridEditControlled in '..\..\global\delphi\comp\StringGridEditControlled.pas',
   Unicode in '..\..\global\delphi\general\Unicode.pas',
-  UfrmStockMessageEditorMoveToGroup in 'UfrmStockMessageEditorMoveToGroup.pas' {frmStockMessageEditorMoveToGroup},
   ErrorControlledRegistry in '..\..\global\delphi\vcl\ErrorControlledRegistry.pas',
   SourceRootPath in '..\devtools\SourceRootPath.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',

@@ -1,5 +1,94 @@
 # Keyman Version History
 
+## 14.0.127 alpha 2020-08-12
+
+* refactor(common/models): LMLayer state management tweak, persistent ModelCompositor (#3477)
+
+## 14.0.126 alpha 2020-08-10
+
+* fix(android): Add CI script to publish to Play Store (#3469)
+* fix(android): Update sentry plugin to remove obsolete API  use (#3471)
+* feat(ios/app): universal links for keyboard installation (#3466)
+* fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
+* refactor(ios): error definitions, i18n (#3470)
+* chore: cleanup keyboardprocessor.h.in (#3473)
+
+## 14.0.125 alpha 2020-08-07
+
+* fix(android): Update Gradle wrapper to 5.6.4 (#3467)
+* feat(ios/engine): Associating package installer (#3458)
+* feat(ios/app):  Associating package installer use within existing install paths (#3465)
+
+## 14.0.124 alpha 2020-08-06
+
+* feat(windows): set default UI language at install (#3438)
+* feat(windows): i18n for Setup (#3444)
+* feat(windows): add globe icon to Configuration UI (#3446)
+* feat(windows): set UI language from Setup preference on first install (#3447)
+* feat(windows): docs on editing translations (#3448)
+* Modify/android/improve string context (#3457)
+* fix(android/app): Fix environment portion of app version string (#3462)
+
+## 14.0.123 alpha 2020-08-05
+
+* feat(android): Use staging help site for pre-release builds (#3453)
+* fix(android): Cleanup string formatting with strings.xml (#3452)
+* chore(android): Add script to find unused strings. Manually remove them (#3456)
+* feat(ios/engine): LanguagePickAssociator progress tracking, base integration with package lang picker (#3455)
+
+## 14.0.122 alpha 2020-08-04
+
+* feat(android/app): Associate app with /keyboards/install links (#3449)
+* fix(android): Update KMPBrowser to pass external links to user browser (#3439)
+* feat(ios/engine): Language-pick associator (#3451)
+
+## 14.0.121 alpha 2020-08-03
+
+* fix(android): Fix KMTextView to compile on Linux (#3442)
+
+## 14.0.120 alpha 2020-07-31
+
+* feat(android): Use api.keyman-staging.com for pre-release builds (#3423)
+* refactor(ios/engine): merges keyboard & lexical model info views, fixes QR code logic (#3432)
+* feat(android): Add app association to keyman.com (#3431)
+* chore(windows): cleanup comments in strings.xml (#3434)
+* feat(ios/engine): language selection during (file-based) package installation (#3416)
+* feat(ios/engine) Package-installer layout optimizations (#3437)
+
+## 14.0.119 alpha 2020-07-30
+
+* feat(windows): convert locale.xml to strings.xml format (#3424)
+* refactor(windows): add translations to windows install (#3428)
+* refactor(windows): remove old locale links (#3429)
+* chore(windows): remove old locale tools (#3430)
+* feat(ios): Start of engine and app internationalization (#2745)
+
+## 14.0.118 alpha 2020-07-29
+
+* fix(android/app): Use go/android/ links to download cloud keyboards (#3343)
+* fix(windows): i18n of strings in Font Helper (#3414)
+* refactor(windows): refactor Dialog elements (#3421)
+* chore(windows): Remove usage page resources (#3422)
+
+## 14.0.117 alpha 2020-07-28
+
+* feat(windows): i18n groundwork (#3411)
+* feat(windows): Removes unused strings from locale.xml (#3412)
+* refactor(ios/engine): package installer tweaks (#3410)
+* chore(ios/engine): more obsoletions (#3407)
+
+## 14.0.116 alpha 2020-07-24
+
+* refactor(ios/engine): builds package download links (#3383)
+* refactor(ios/engine): chained lexical model install callback, fix (#3388)
+* feat(ios/engine): download queue concurrency (#3395)
+* feat(ios/engine): keyboard search core (#3384)
+* feat(ios/engine): support for deferred chaining of lexical model downloads (#3401)
+* docs(linux): Update readme (#3397)
+* feat(ios/engine): use of Keyman staging sites (#3405)
+* feat(linux): keyman:// protocol handler (#3398)
+* chore(ios/engine): dead code removal + deprecations (#3402)
+
 ## 14.0.115 alpha 2020-07-23
 
 * feat(windows): keyman: protocol handler (#3382)

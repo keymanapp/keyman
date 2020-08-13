@@ -39,7 +39,6 @@ inherited frmOSKFontHelper: TfrmOSKFontHelper
       OnKeyDown = gridKeyDown
       OnMouseWheelDown = gridMouseWheelDown
       OnMouseWheelUp = gridMouseWheelUp
-      ExplicitTop = -3
     end
     object panControls: TPanel
       Left = 0

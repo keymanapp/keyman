@@ -1,0 +1,314 @@
+﻿<?xml version="1.0"?>
+<resources>
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Kapat</string>
+  <string name="S_Menu_Exit" comment="/PlainText: ">&amp;Çıkış</string>
+  <string name="S_OSKContext_FadeWhenInactive" comment="/PlainText: ">Aktif Olmadığında Soluk Göster</string>
+  <string name="S_Menu_Help" comment="/PlainText: ">Yar&amp;dım...</string>
+  <string name="Hint_KH_CLOSEOSK" comment="/Hint: ">Ekran Klavyesini kapattınız ama Keyman halen çalışıyor. Ekran Klavyesini istediğiniz zaman açabilirsiniz, sadece Keyman simgesine tıklayarak 'Ekran Klavyesi'ni seçmelisiniz.</string>
+  <string name="Hint_KH_EXITPRODUCT" comment="/Hint: ">Keyman'tan çıkmak istediğinizden emin misiniz? Keyman klavye hala Windows dillerinde listelenecek, ancak yeniden başlamadan Keyman işlevsel olmayacaktır.</string>
+  <string name="HintTitle_KH_CLOSEOSK" comment="/HintTitle: ">Ekran Klavyesi Kapatıldı</string>
+  <string name="HintTitle_KH_EXITPRODUCT" comment="/HintTitle: ">Keyman'tan Çıkış?</string>
+  <string name="koAltGrCtrlAlt" comment="/FormatString: ">AltGr'yi Ctrl+Alt ile simüle edin</string>
+  <string name="koAutoOpenOSK" comment="/FormatString: ">Keyman klavye seçildiğinde daima Ekran Klavyesi Penceresini gösterin</string>
+  <string name="koAutoSwitchOSKPages" comment="/FormatString: ">Bir klavye seçildiğinde uygun Ekran Klavyesi/ Yardım'a otomatik olarak geçin</string>
+  <string name="koCheckForUpdates" comment="/FormatString: ">Güncellemeler için www.tavultesoft.com adresini haftalık olarak otomatik olarak kontrol edin.</string>
+  <string name="koDeadkeyConversion" comment="/FormatString: ">Harf imleme tuşlarına düz tuşlar gibi davran</string>
+  <string name="koDebugging" comment="/FormatString: ">Hata Ayıklama</string>
+  <string name="kogAdvanced" comment="/FormatString: ">Gelişmiş</string>
+  <string name="kogGeneral" comment="/FormatString: ">Genel</string>
+  <string name="kogOSK" comment="/FormatString: ">Ekran Klavyesi</string>
+  <string name="kogStartup" comment="/FormatString: ">Açılış</string>
+  <string name="koKeyboardHotkeysAreToggle" comment="/FormatString: ">Klavye kısayol tuşları, etkin klavyeyi değiştirir</string>
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="/FormatString: ">Bir tuşa tıkladıktan sonra Ekran Klavyesinde Shift/Ctrl/Alt tuşlarını bırakın</string>
+  <string name="koRunElevatedInVista" comment="/FormatString: ">Windows Vista'da çalışırken daima kullanıcı izinlerini yükseltin</string>
+  <string name="koShowHints" comment="/FormatString: ">İpucu iletileri göster</string>
+  <string name="koShowStartup" comment="/FormatString: ">Karşılama ekranı göster</string>
+  <string name="koShowWelcome" comment="/FormatString: ">Hoş Geldiniz ekranı</string>
+  <string name="koStartWithWindows" comment="/FormatString: ">Windows başladığında başla</string>
+  <string name="koSwitchLanguageForAllApplications" comment="/FormatString: ">Tüm uygulamalar için klavye düzenini seçin</string>
+  <string name="koSwitchLanguageWithKeyboard" comment="/FormatString: ">Bir Keyman klavye seçildiğinde Windows dilini değiştir</string>
+  <string name="koTestKeymanFunctioning" comment="/FormatString: ">Keyman başladığında çakışan uygulamaları test et</string>
+  <string name="koTurnOnSurrogates" comment="/FormatString: ">Unicode ek karakter ekranını açın (yeniden başlatmayı gerektirir)</string>
+  <string name="koUnknownLanguage" comment="/FormatString: ">'Bilinmiyor' dili açın</string>
+  <string name="S_Menu_OnScreenKeyboard" comment="/PlainText: ">&amp;Ekran Klavyesi</string>
+  <string name="S_Toolbar_OpenHelp" comment="/PlainText: ">Yardım Açın</string>
+  <string name="S_Toolbar_OpenConfiguration" comment="/PlainText: ">Keyman Yapılandırma Açın</string>
+  <string name="S_OSKContext_Print" comment="/PlainText: ">Yazdır...</string>
+  <string name="S_BaseKeyboard_Text" comment="/PlainText: ">Windows'da kullandığınız Temel Latince klavyeyi seçin. Keyman klavyeleri otomatik olarak tercih ettiğiniz düzene uyarlanır.</string>
+  <string name="S_BaseKeyboard_Title" comment="/PlainText: ">Temel Klavyeyi Ayarla</string>
+  <string name="S_Button_Apply" comment="/PlainText: ">Uygula</string>
+  <string name="S_Button_BaseKeyboard" comment="/PlainText: ">Temel Klavye...</string>
+  <string name="S_Button_Cancel" comment="/PlainText: ">İptal</string>
+  <string name="S_Button_CheckForUpdates" comment="/PlainText: ">Güncelleştirmeleri Denetle</string>
+  <string name="S_Button_Close" comment="/PlainText: ">Kapat</string>
+  <string name="S_Button_CommunitySupport" comment="/PlainText: ">Keyman Topluluk Forumu'nu Açın</string>
+  <string name="S_Button_Diagnostics" comment="/PlainText: ">Tanılama</string>
+  <string name="S_Button_DownloadKeyboard" comment="/PlainText: ">Klavye indir...</string>
+  <string name="S_Button_InstallKeyboard" comment="/PlainText: ">Klavye yükle...</string>
+  <string name="S_Button_KeyboardOptions" comment="/PlainText: ">Seçenekler</string>
+  <string name="S_Button_OK" comment="/PlainText: ">Tamam</string>
+  <string name="S_Button_OnlineSupport" comment="/PlainText: ">Çevrimiçi Yardım</string>
+  <string name="S_Button_PackageOptions" comment="/PlainText: ">Paket seçenekler</string>
+  <string name="S_Button_ProxyConfig" comment="/PlainText: ">Proxy Ayarları...</string>
+  <string name="S_Button_RemindLater" comment="/PlainText: ">Daha Sonra Anımsat</string>
+  <string name="S_Button_ResetHints" comment="/PlainText: ">İpucular Sıfırla</string>
+  <string name="S_Button_SendSupportRequest" comment="/PlainText: ">Destek İsteği Gönder</string>
+  <string name="S_Button_UILanguage" comment="/PlainText: ">Kullanıcı arayüz dili...</string>
+  <string name="S_Button_UpgradeNow" comment="/PlainText: ">Şimdi yükselt!</string>
+  <string name="S_Caption_Author" comment="/PlainText: ">Yazar:</string>
+  <string name="S_Caption_Copyright" comment="/PlainText: ">Telif hakkı:</string>
+  <string name="S_Caption_Description" comment="/PlainText: ">Açıklama:</string>
+  <string name="S_Caption_Documentation" comment="/PlainText: ">Belgeler:</string>
+  <string name="S_Caption_Encodings" comment="/PlainText: ">Kodlama:</string>
+  <string name="S_Caption_Filename" comment="/PlainText: ">Dosya adı:</string>
+  <string name="S_Caption_Fonts" comment="/PlainText: ">Yazı Tipi:</string>
+  <string name="S_Caption_GettingStarted" comment="/PlainText: ">Hemen Başlayın</string>
+  <string name="S_Caption_Help" comment="/PlainText: ">Yardım</string>
+  <string name="S_Caption_InstalledFor" comment="/PlainText: ">İçin Yüklü:</string>
+  <string name="S_Caption_Keyboards" comment="/PlainText: ">Klavye Düzenleri:</string>
+  <string name="S_Caption_KeyboardVersion" comment="/PlainText: ">Klavye versiyonu:</string>
+  <string name="S_Caption_Languages" comment="/PlainText: ">Diller:</string>
+  <string name="S_Caption_LayoutType" comment="/PlainText: ">Düzen Türü:</string>
+  <string name="S_Caption_Message" comment="/PlainText: ">İleti:</string>
+  <string name="S_Caption_OnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi:</string>
+  <string name="S_Caption_Package" comment="/PlainText: ">Paket:</string>
+  <string name="S_Caption_Version" comment="/PlainText: ">Paket versionu:</string>
+  <string name="S_Caption_Website" comment="/PlainText: ">Website:</string>
+  <string name="S_ConfigurationTitle" comment="/PlainText: ">Keyman Yapılandırma</string>
+  <string name="S_ContributeUILanguagesMenu" comment="/PlainText: ">Kullanıcı arayüzünü çevirmeye yardımcı ol...</string>
+  <string name="S_DisplayIn" comment="/PlainText: ">Dilinde Göster</string>
+  <string name="S_Documentation_Installed" comment="/PlainText: ">Yüklü</string>
+  <string name="S_Documentation_NotInstalled" comment="/PlainText: ">Yüklü değil</string>
+  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="/PlainText: ">Yükleme, sadece indir</string>
+  <string name="S_DownloadKeyboard_Title" comment="/PlainText: ">Tavultesoft'tan Klavye İndir</string>
+  <string name="S_Help_Keyboard_Prefix" comment="/PlainText: ">"</string>
+  <string name="S_Help_Keyboard_Suffix" comment="/PlainText: ">" klavyesi yardımı</string>
+  <string name="S_Help_Product" comment="/PlainText: ">Yardım İçeriği</string>
+  <string name="S_Help_Tutorial" comment="/PlainText: ">Hemen Başlayın</string>
+  <string name="S_HelpTitle" comment="/PlainText: ">Keyman Yardım</string>
+  <string name="S_Hotkey_Control_Title" comment="/PlainText: ">Genel Kısayol</string>
+  <string name="S_Hotkey_Keyboard_Prefix" comment="/PlainText: "/>
+  <string name="S_Hotkey_Keyboard_Suffix" comment="/PlainText: "/>
+  <string name="S_Hotkey_Keyboard_Title" comment="/PlainText: ">Klavyeler</string>
+  <string name="S_Hotkey_Language_Prefix" comment="/PlainText: "/>
+  <string name="S_Hotkey_Language_Suffix" comment="/PlainText: "/>
+  <string name="S_Hotkey_None" comment="/PlainText: ">(hiçbiri)</string>
+  <string name="S_Hotkey_OpenConfiguration" comment="/PlainText: ">Yapılandırma Açın</string>
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="/PlainText: ">Klavye Menüsü Aç</string>
+  <string name="S_Hotkey_OpenTextEditor" comment="/PlainText: ">Metin Düzenleyici Aç</string>
+  <string name="S_Hotkey_ShowCharacterMap" comment="/PlainText: ">Karakter Haritası Bölmesini Göster</string>
+  <string name="S_Hotkey_ShowFontHelper" comment="/PlainText: ">Yazı Tipi Yardımcısı Bölmesini Göster</string>
+  <string name="S_Hotkey_ShowKeyboardUsage" comment="/PlainText: ">Klavye Kullanım Bölmesini Göster</string>
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="/PlainText: ">Ekran Klavye Bölmesi Göster</string>
+  <string name="S_Hotkey_SwitchLanguage" comment="/PlainText: ">Dil Değiştiricisini Açın</string>
+  <string name="S_Hotkey_TurnKeymanOff" comment="/PlainText: ">Keyman'u Kapat</string>
+  <string name="S_Hotkeys" comment="/PlainText: ">Kısayollar</string>
+  <string name="S_Hotkeys_AccessChar" comment="/PlainText: ">K</string>
+  <string name="S_InstalledFor_AllUsers" comment="/PlainText: ">Tüm kullanıcılar</string>
+  <string name="S_InstalledFor_CurrentUser" comment="/PlainText: ">Mevcut kullanıcı</string>
+  <string name="S_InstallKeyboard_Button_Install" comment="/PlainText: ">Yükle</string>
+  <string name="S_InstallKeyboard_Button_InstallAllUsers" comment="/PlainText: ">Tüm kullanıcılar için yükle</string>
+  <string name="S_InstallKeyboard_Tab_Details" comment="/PlainText: ">Ayrıntılar</string>
+  <string name="S_InstallKeyboard_Tab_Readme" comment="/PlainText: ">Benioku</string>
+  <string name="S_InstallKeyboard_Title" comment="/PlainText: ">Klavye/Paket Yükle</string>
+  <string name="S_KeepInTouch" comment="/PlainText: ">İletişimi sürdürün</string>
+  <string name="S_KeepInTouch_AccessChar" comment="/PlainText: ">İ</string>
+  <string name="S_Keyboards" comment="/PlainText: ">Klavye Düzenleri</string>
+  <string name="S_Keyboards_AccessChar" comment="/PlainText: ">K</string>
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="/: ">Yüklü herhangi bir klavyeniz yok.  Tavultesoft web sitesinden bir klavye düzeni yüklemek için Klavye Yükle düğmesine tıklayın.</string>
+  <string name="S_LangSetup_Ask" comment="/: ">Keyman bu işlemleri şimdi tamamlamasını istiyor musunuz?</string>
+  <string name="S_LangSetup_BlurbPrefix" comment="/: ">Yazı(ları) bilgisayarınızda doğru çalışmak için</string>
+  <string name="S_LangSetup_BlurbSuffix" comment="/: ">Keyman aşağıdaki yapılandırma görevlerinin sırayla tamamlanması gerekmektedir:</string>
+  <string name="S_LangSetup_MoreInfo" comment="/: ">Daha Fazla Bilgi...</string>
+  <string name="S_LangSetup_Note" comment="/: "/>
+  <string name="S_LangSetup_psrtMSOfficeLanguage" comment="/: ">Microsoft Office Dil Desteği</string>
+  <string name="S_LangSetup_SaveDisabledItems" comment="/: ">Bana bir daha sorma</string>
+  <string name="S_LangSetup_Title" comment="/: ">Dil Yapılandırma Görevleri</string>
+  <string name="S_LangSetup_TitleInnerPrefix" comment="/: ">Bilgisayarınızı bu dil(ler)le çalışacak şekilde yapılandırın:</string>
+  <string name="S_LangSetup_TitleInnerSuffix" comment="/: "/>
+  <string name="S_Languages_Install" comment="/PlainText: ">Dil ekle</string>
+  <string name="S_Languages_InstalledLanguage" comment="/PlainText: ">Yüklü Dil</string>
+  <string name="S_Languages_KeymanKeyboard" comment="/PlainText: ">Keyman Klavye</string>
+  <string name="S_Languages_Uninstall" comment="/PlainText: ">x</string>
+  <string name="S_Languages_UseWindowsLayout" comment="/PlainText: ">(Windows düzeni kullan)</string>
+  <string name="S_Languages_WindowsLayout" comment="/PlainText: ">Windows Düzeni</string>
+  <string name="S_LayoutType_Mnemonic" comment="/PlainText: ">Windows düzenine (Anımsatıcı) eşleştirildi</string>
+  <string name="S_LayoutType_Positional" comment="/PlainText: ">Sabit (Konumsal)</string>
+  <string name="S_LocaleAuthors" comment="/PlainText: ">Stevan Vanderwerf</string>
+  <string name="S_Menu_ChangeHotkey" comment="/PlainText: ">Kısayol değiştir</string>
+  <string name="S_Menu_Diagnostics_CheckLanguages" comment="/PlainText: ">Dil Ayarları Denetle</string>
+  <string name="S_Menu_Diagnostics_Diagnostics" comment="/PlainText: ">Tanılama</string>
+  <string name="S_Menu_InstallOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Yükle...</string>
+  <string name="S_Menu_Options" comment="/PlainText: ">Klavye seçenekler</string>
+  <string name="S_Menu_SetHotkey" comment="/PlainText: ">Kısayol ayarla</string>
+  <string name="S_Menu_ShowWelcome" comment="/PlainText: ">Yardım metnini göster</string>
+  <string name="S_Menu_Uninstall" comment="/PlainText: ">Kaldır</string>
+  <string name="S_Menu_UninstallOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Kaldır</string>
+  <string name="S_Menu_UninstallPackage" comment="/PlainText: ">Paketi kaldır</string>
+  <string name="S_MoreUILanguagesMenu" comment="/PlainText: ">Çevrimiçi diğer görüntüleme dillerini bulun...</string>
+  <string name="S_No" comment="/PlainText: ">Hayır</string>
+  <string name="S_OnScreenKeyboard_Custom" comment="/PlainText: ">Özel</string>
+  <string name="S_OnScreenKeyboard_Installed" comment="/PlainText: ">Yüklü</string>
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="/PlainText: ">Yüklü değil</string>
+  <string name="S_Options" comment="/PlainText: ">Seçenekler</string>
+  <string name="S_Options_AccessChar" comment="/PlainText: ">S</string>
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="/HTML: ">Lütfen onunla çalışacak yazı tiplerini bulmak için bir Keyman klavyesi seçin.</string>
+  <string name="S_OSK_FontHelper_MatchedFonts1" comment="/HTML: ">Aşağıdaki yazı tipleri</string>
+  <string name="S_OSK_FontHelper_MatchedFonts2" comment="/HTML: ">klavye ile çalışır:</string>
+  <string name="S_OSK_FontHelper_NoFonts1a" comment="/HTML: ">Bunun ile çalışan hiçbir yazı tipi bulunamadı</string>
+  <string name="S_OSK_FontHelper_NoFonts1b" comment="/HTML: ">. Bu klavye yazı tiplerini bulmak için Lütfen dokümantasyonu kontrol edin veya Tavultesoft Destek ile iletişim kurunuz.</string>
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="/HTML: ">Herhangi bir klavye düzeni kurulu veya yüklü değildir.  Bir klavye düzeni yüklemek için Keyman Konfigürasyon kısmına tıklayın.</string>
+  <string name="S_OSK_FontHelper_NonUnicode1" comment="/HTML: "/>
+  <string name="S_OSK_FontHelper_NonUnicode2" comment="/HTML: ">bir Unicode klavye değil. Yazı tipleri otomatik olarak konumlandırılamıyor. Lütfen Yazı tipi bilgileri için klavye belgelerine bakın.</string>
+  <string name="S_OSK_FontHelper_PleaseWait1" comment="/HTML: ">Klavye ile Keyman çalışacak yazı tiplerini bulurken lütfen </string>
+  <string name="S_OSK_FontHelper_PleaseWait2" comment="/HTML: ">bekleyin.</string>
+  <string name="S_OSK_FontHelper_PossibleFonts" comment="/HTML: ">Aşağıdaki yazı tipleri de kullanılabilir:</string>
+  <string name="S_OSK_FontHelper_PossibleFontsOnly1" comment="/HTML: ">Aşağıdaki yazı tipleri</string>
+  <string name="S_OSK_FontHelper_PossibleFontsOnly2" comment="/HTML: ">klavye ile çalışabilir:</string>
+  <string name="S_OSK_Hint_Title" comment="/Plain Text: ">İpucu:</string>
+  <string name="S_OSK_Hint1" comment="/Plain Text: ">Pencere kenarlığına tıklayıp sürükleyerek Ekran Klavyesini yeniden boyutlandırın</string>
+  <string name="S_OSK_Hint2" comment="/Plain Text: ">Ekran Klavyesini "Keyman" başlık kısmına tıklayıp sürükleyerek taşıyın</string>
+  <string name="S_OSK_Hint3a" comment="/Plain Text: ">Karakter Haritası Aracı ile</string>
+  <string name="S_OSK_Hint3b" comment="/Plain Text: ">belgenize herhangi bir Unicode karakteri ekleyin</string>
+  <string name="S_OSK_Hint4a" comment="/Plain Text: ">Yazı Tipi Yardımcı Aracı ile</string>
+  <string name="S_OSK_Hint4b" comment="/Plain Text: ">hangi yazı tiplerinin dilinizle çalışacağını öğrenin</string>
+  <string name="S_OSK_Hint5a" comment="/Plain Text: ">Klavye Kullanımı düğmesi ile</string>
+  <string name="S_OSK_Hint5b" comment="/Plain Text: ">klavye hakkında daha fazla yardım alın</string>
+  <string name="S_ProxyConfiguration_Password" comment="/PlainText: ">Şifre:</string>
+  <string name="S_ProxyConfiguration_Port" comment="/PlainText: ">Bağlantı Noktası:</string>
+  <string name="S_ProxyConfiguration_Server" comment="/PlainText: ">Sunucu:</string>
+  <string name="S_ProxyConfiguration_Title" comment="/PlainText: ">Proxy Sunucu Yapılandırması</string>
+  <string name="S_ProxyConfiguration_Username" comment="/PlainText: ">Kullanıcı adı:</string>
+  <string name="S_ShortProductName" comment="/PlainText: ">Keyman</string>
+  <string name="S_Splash_Configuration" comment="/PlainText: ">Yapılandırma</string>
+  <string name="S_Splash_Exit" comment="/PlainText: ">Çıkış</string>
+  <string name="S_Splash_HideAtStartup" comment="/PlainText: ">Bu ekranı başlangıçta gizle</string>
+  <string name="S_Splash_Name" comment="/PlainText: ">Keyman</string>
+  <string name="S_Splash_OtherTasks" comment="/PlainText: ">Diğer görevler</string>
+  <string name="S_Splash_ShowAtStartup" comment="/PlainText: ">Bu ekranı başlangıçta göster</string>
+  <string name="S_Splash_Start" comment="/PlainText: ">Keyman Başlat</string>
+  <string name="S_Splash_Title" comment="/: ">Keyman</string>
+  <string name="S_Splash_Version" comment="/PlainText: ">&amp;Sürüm;</string>
+  <string name="S_Support" comment="/PlainText: ">Destek</string>
+  <string name="S_Support_AccessChar" comment="/PlainText: ">E</string>
+  <string name="S_Support_ContactHeading" comment="/PlainText: ">Keyman Desteğe başvurun</string>
+  <string name="S_Support_ContactInstructions_Free" comment="/PlainText: ">Keyman'ı kullanırken herhangi bir sorununuz varsa, Keyman Topluluk Forumu üzerinde bir soru sorun.</string>
+  <string name="S_Support_Copyright" comment="/PlainText: ">Copyright © Tavultesoft Pty Ltd. Tüm Hakları Saklıdır.</string>
+  <string name="S_Support_EngineVersion" comment="/PlainText: ">Altyapı Sürümü</string>
+  <string name="S_Support_UsefulLinks" comment="/PlainText: ">Faydalı Linkler</string>
+  <string name="S_Support_Version" comment="/PlainText: ">Sürüm</string>
+  <string name="S_Update_Button_InstallLater" comment="/PlainText: ">İptal</string>
+  <string name="S_Update_Button_InstallNow" comment="/PlainText: ">Şimdi Yükle</string>
+  <string name="S_Update_ComponentHead" comment="/PlainText: ">Güncellenmiş Bileşen</string>
+  <string name="S_Update_DownloadFrom" comment="/PlainText: ">Yeni sürümü şu adresten indirebilirsiniz:</string>
+  <string name="S_Update_DownloadQuery" comment="/PlainText: ">Şimdi web sitesini ziyaret etmek istiyor musunuz?</string>
+  <string name="S_Update_InstallQuery" comment="/PlainText: ">Bu düzeltme ekini şimdi indirip yüklemek istiyor musunuz?</string>
+  <string name="S_Update_NewVersionAvailable" comment="/PlainText: ">Keyman güncelleştirmeleri şimdi mevcut</string>
+  <string name="S_Update_NewVersionPrompt" comment="/PlainText: ">Lütfen yüklemek istediğiniz güncellemeleri seçin:</string>
+  <string name="S_Update_OldVersionHead" comment="/PlainText: ">Eski Versiyon</string>
+  <string name="S_Update_SizeHead" comment="/PlainText: ">Boyut</string>
+  <string name="S_Update_Title" comment="/PlainText: ">Güncellenmiş Keyman Bileşenler Mevcut</string>
+  <string name="S_Usage_Config" comment="/PlainText: ">Keyman Yapılandırma</string>
+  <string name="S_Usage_Help" comment="/PlainText: ">Keyman Yardım</string>
+  <string name="S_Usage_KeyboardDocumentation" comment="/HTML: ">Ek belgeleri ve/veya Ekran Klavyesini görüntülemek için aşağıdaki düğmeleri tıklayın.</string>
+  <string name="S_Usage_KeyboardNoDocumentation" comment="/HTML: ">Bu klavye düzeni bir Hemen Başlayın veya Kullanım kılavuzu içermez. Lütfen bu klavye düzenini kullanma hakkında daha fazla bilgi için Başlat Menüsünü kontrol edin veya klavye geliştiricisine başvurun.</string>
+  <string name="S_Usage_KeymanOff" comment="/HTML: ">Keyman içinde herhangi bir klavye düzeni seçili değil.  Klavye düzenini seçmek için yukarıdaki araç çubuğundaki klavye simgelerinden herhangi birine tıklayın.</string>
+  <string name="S_Usage_NoKeyboardsInstalled" comment="/HTML: ">Herhangi bir klavye düzeni kurulu veya yüklü değildir.  Bir klavye düzeni kopyası yüklemek için Keyman Konfigürasyon kısmına tıklayın.</string>
+  <string name="S_Usage_OSK" comment="/PlainText: ">Ekran Klavyesi</string>
+  <string name="S_Usage_Tutorial" comment="/PlainText: ">Hemen Başlayın</string>
+  <string name="S_Usage_Welcome" comment="/PlainText: ">Klavye Yardımı</string>
+  <string name="S_Yes" comment="/PlainText: ">Evet</string>
+  <string name="S_OSKContext_SaveAsWebPage" comment="/PlainText: ">Web sayfası olarak kaydet...</string>
+  <string name="S_OSKContext_ShowToolbar" comment="/PlainText: ">Araç Çubuğu Göster</string>
+  <string name="SK_UIFontName" comment="/PlainText: ">Segoe UI</string>
+  <string name="SK_UIFontSize" comment="/PlainText: ">9</string>
+  <string name="SKActivation_OnlineNow" comment="/FormatString: ">$(SKShortApplicationTitle) uygulamasını %0:s numarası ile çevrimiçi olarak etkinleştirmek ister misiniz?  Hayır'ı tıklarsanız, alternatif etkinleştirme yöntemleri arasında seçimyapabilirsiniz.</string>
+  <string name="SKActivation_Success" comment="/FormatString: ">Lisansınız başarıyla etkinleştirildi.</string>
+  <string name="SKAllLanguageSettingsTestedOK" comment="/: ">Microsoft Windows, dilleriniz için doğru şekilde yapılandırılmış gibi görünüyor.</string>
+  <string name="SKANSIEncoding" comment="/FormatString: ">Kod sayfası</string>
+  <string name="SKApplicationTitle" comment="/FormatString: ">Keyman_CN;</string>
+  <string name="SKBalloonClickToSelectKeyboard" comment="/FormatString: ">Bir klavye seçmek için bu simgeyi tıklayın</string>
+  <string name="SKBalloonOSKClosed" comment="/FormatString: ">Keyman halen çalışıyor.  Dil klavyenizi istediğiniz zaman kullanmak için bu simgeyi tıklayın</string>
+  <string name="SKButtonCancel" comment="/FormatString: ">İptal</string>
+  <string name="SKButtonClearHotkey" comment="/FormatString: ">&amp;Kısayol Kaldır</string>
+  <string name="SKButtonDownload" comment="/FormatString: ">&amp;İndir...</string>
+  <string name="SKButtonHelp" comment="/FormatString: ">Yardım</string>
+  <string name="SKButtonNo" comment="/FormatString: ">&amp;Hayır</string>
+  <string name="SKButtonOK" comment="/FormatString: ">Tamam</string>
+  <string name="SKButtonPrint" comment="/FormatString: ">&amp;Yazdır...</string>
+  <string name="SKButtonUILanguageDownload" comment="/Format String: ">&amp;Daha fazla dil çevrim içi...</string>
+  <string name="SKButtonYes" comment="/FormatString: ">&amp;Evet</string>
+  <string name="SKCannotStartProduct" comment="/FormatString: ">Keyman başlatılamıyor. Lütfen keyman.exe programının devam etmeden önce başlatılmasına izin verildiğinden emin olunuz.  Döndürülen hata şöyleydi: "%0:s" Denemek ve Keyman öğesini şimdi yeniden başlatmak ister misiniz?</string>
+  <string name="SKChangeHotkeyTitle" comment="/FormatString: ">Kısayol Değiştir</string>
+  <string name="SKCouldNotFindHelp" comment="/FormatString: ">Yardım dosyası $(SKOnlineHelpFile) bulunamıyor</string>
+  <string name="SKCouldNotPrintKeyboard" comment="/FormatString: ">Klavye başarıyla yazdırılamadı. Lütfen bir web sayfasına kaydedin ve manuel olarak yazdırın.</string>
+  <string name="SKDamagedKeyboard" comment="/FormatString: ">&lt;Klavye zarar görmüş&gt;</string>
+  <string name="SKDebuggingWarning" comment="/FormatString: ">Keyman hata ayıklama bilgileri masaüstünüzde keymanlog\system.log adlı metin dosyasında saklanır.  Bu dosyayı okumadan ve silmeden önce Keyman çıkış yapmalısınız. UYARI: Bu dosya çok hızlı büyür.  Hata ayıklamayı etkinleştirmek sisteminizi yavaşlatır ve yalnızca Tavultesoft destek birimi tarafından tavsiye edilirse yapılmalıdır. GİZLİLİK UYARISI: Hata ayıklama günlük dosyası yazdığınız tuş vuruşlarının tamamını kaydeder.  Hata ayıklama günlüğünü sadece hata ayıklama veya tanılama oturumunun süresi için açmalısınız ve [masaüstü]\keymanlog\system.log dosyanızı en kısa sürede silmeniz gerekir.</string>
+  <string name="SKDefaultLanguageCode" comment="/FormatString: ">en</string>
+  <string name="SKDialogSelectLanguage" comment="/FormatString: ">Kullanıcı Arabirimi Dili Seçin</string>
+  <string name="SKDialogUILanguageCreateTranslation" comment="/FormatString: ">Çevrimiçi olarak yeni bir çeviri hazırla</string>
+  <string name="SKDownloadProgress_Title" comment="/FormatString: ">Dosya İndiriyor</string>
+  <string name="SKErrorActivatingBrowser" comment="/FormatString: ">Bu URL için tarayıcıyı veya e-posta programını etkinleştiremiyor.</string>
+  <string name="SKHintsReset" comment="/PlainText: ">Tüm ipucu mesajları sıfırlandı ve tekrar görüntülenecek.</string>
+  <string name="SKHotkeyConflicts_Keyboard" comment="/FormatString: ">%0:s kısayol tuşu %1:s klavyesi için seçilen bir kısayol tuşu ile çakışıyor.  Devam ederseniz, %1:s klavyesi için kısayol tuşu silinecek.  Devam edilsin mi?</string>
+  <string name="SKInstallOnlyAsAdmin" comment="/FormatString: ">Klavyeleri yalnızca Yönetici olarak yükleyebilir veya kaldırabilirsiniz.  Normal kullanıcı olarak kullanılacak dilleri seçmek için Denetim Masası'nı kullanın.</string>
+  <string name="SKKeyboardAlreadyInstalled" comment="/FormatString: ">'%0:s’ adlı klavye zaten yüklü.  Devam ederseniz, yenisi yüklenmeden önce kaldırılacaktır.  Devam edilsin mi?</string>
+  <string name="SKKeyboardPartOfPackage" comment="/FormatString: ">'%0:s’ klavyesi '%1:s’ paketinin bir parçasıdır.  Tüm paketi kaldırmanız gerekir.  Devam edilsin mi?</string>
+  <string name="SKLangCheck_Office" comment="/FormatString: ">%1:s için %0:s destek ekle</string>
+  <string name="SKLangCheck_Office_Office2000" comment="/FormatString: ">Microsoft Office 2000</string>
+  <string name="SKLangCheck_Office_Office2003" comment="/FormatString: ">Microsoft Office 2003</string>
+  <string name="SKLangCheck_Office_Office2007" comment="/FormatString: ">Microsoft Office 2007</string>
+  <string name="SKLangCheck_Office_Office2010" comment="/FormatString: ">Microsoft Office 2010</string>
+  <string name="SKLangCheck_Office_OfficeXP" comment="/FormatString: ">Microsoft Office XP</string>
+  <string name="SKLangCheck_WindowsLanguage_Install" comment="/FormatString: ">%0:s dilini yükleyin ve %1:s Keyman klavyesine bağlantılandırın</string>
+  <string name="SKLangCheck_WindowsLanguage_Link" comment="/FormatString: ">%0:s dilini %1:s Keyman klavyesine bağlayın</string>
+  <string name="SKLanguageCode" comment="/FormatString: ">tr</string>
+  <string name="SKMenu_NoKeyboardsInstalled" comment="/: ">Hiçbir klavye düzeni kurulu değil. Diliniz için bir klavye düzeni yüklemek için 'Yapılandırma'yı seçin.</string>
+  <string name="SKOnlineHelpFile" comment="/FormatString: ">KeymanDesktop.chm</string>
+  <string name="SKOSNotSupported" comment="/FormatString: ">Bu işletim sistemi desteklenmiyor.  Daha fazla bilgi için lütfen Tavultesoft ile iletişime geçin.</string>
+  <string name="SKPackageAlreadyInstalled" comment="/FormatString: ">%0:s adlı paket zaten yüklü.  Onu kaldırıp yenisini yüklemek ister misiniz?</string>
+  <string name="SKPackageDoesNotIncludeWelcome" comment="/FormatString: ">Paket veya '%0:s’ klavyesi, giriş yardımı içermiyor.</string>
+  <string name="SKSelectKeyboardsBlurb" comment="/FormatString: ">Bu paketteki tüm klavyeleri yükleyemezsiniz. Maksimum %0:d ek klavye kurabilirsiniz.  Lütfen bu paketten yüklemek istediğiniz klavyeleri seçin.</string>
+  <string name="SKSelectKeyboardsTitle" comment="/FormatString: ">Yüklenecek Klavyeleri Seçin</string>
+  <string name="SKSetHotkey_Interface" comment="/FormatString: ">Standart bir kısayol tuşu seçin veya 'Özel'i seçin ve Ctrl, Shift ve/veya Alt tuşlarını basılı tutun ve istediğiniz kısayol tuşunu yazın:</string>
+  <string name="SKSetHotkey_Keyboard" comment="/FormatString: ">Standart bir kısayol tuşu seçin veya 'Özel'i seçin ve Ctrl, Shift ve/veya Alt tuşlarını basılı tutun ve %0:s klavyesi için istediğiniz kısayol tuşunu yazın:</string>
+  <string name="SKSetHotkey_Language" comment="/FormatString: ">Standart bir kısayol tuşu seçin veya 'Özel'i seçin ve Ctrl, Shift ve/veya Alt tuşlarını basılı tutun ve %0:s dili için istediğiniz kısayol tuşunu yazın:</string>
+  <string name="SKShortApplicationTitle" comment="/FormatString: ">Keyman</string>
+  <string name="SKSplashVersion" comment="/FormatString: ">Versiyon %0:s</string>
+  <string name="SKSurrogatesRequiresRestart" comment="/FormatString: ">Vekillerin ayarını değiştirmek, Windows'un yeniden başlatılmasını gerektirir.  Windows'u şimdi yeniden başlatmak istiyor musunuz?</string>
+  <string name="SKUILanguageHelp" comment="/Format String: ">Keyman arabiriminde görüntülenmesini istediğiniz dili seçin.</string>
+  <string name="SKUILanguageName" comment="/FormatString: ">Türkçe</string>
+  <string name="SKUILanguageNameWithEnglish" comment="/FormatString: ">Türkçe (Turkish)</string>
+  <string name="SKUnicodeData_Build" comment="/FormatString: ">Karakter Haritası, önceden oluşturulması gereken bir karakter veritabanına sahiptir.  Şimdi oluşturulsun mu?</string>
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="/FormatString: ">Unicode karakter veritabanı oluşturulamadı ve devre dışı bırakıldı. Hata ayrıntıları: %0:s</string>
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="/FormatString: ">Yeniden oluşturma için Unicode Karakter veritabanı silinemedi. Hata ayrıntıları: %0:s</string>
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="/FormatString: ">Unicode karakter veritabanı başarıyla yüklenmedi (%0:s).  Yeniden oluştur?</string>
+  <string name="SKUnicodeEncoding" comment="/FormatString: ">Unicode</string>
+  <string name="SKUninstallKeyboard" comment="/FormatString: ">%0:s klavyesini kaldırmak istediğinizden emin misiniz?</string>
+  <string name="SKUninstallOnScreenKeyboard" comment="/FormatString: ">%0:s için yüklenmiş ekran klavyesini kaldırmak istediğinizden emin misiniz?</string>
+  <string name="SKUninstallPackage" comment="/FormatString: ">%0:s paketini kaldırmak istediğinizden emin misiniz? %1:s</string>
+  <string name="SKUninstallPackageFonts" comment="/FormatString: ">Aşağıdaki yazı tipleri de kaldırılacak: %0:s.</string>
+  <string name="SKUninstallRequireAdmin" comment="/PlainText: ">Yalnızca yöneticiyseniz '% 0: s' klavyesini kaldırabilirsiniz.</string>
+  <string name="SKUnsafeHotkey" comment="/FormatString: ">%0:s kısayol tuşu, normal klavye kullanımı ile çakışıyor.  Ctrl veya Alt'ı kullanmalısınız.  Bunu şimdi değiştirmek ister misiniz?</string>
+  <string name="SKUpdate_IconMenuExit" comment="/FormatString: ">Çevrimiçi güncelleme denetiminden ç&amp;ık </string>
+  <string name="SKUpdate_IconMenuText" comment="/FormatString: ">Keyman güncelleştirmelerini görüntüleyin ve &amp;Yükleyin</string>
+  <string name="SKUpdate_IconText" comment="/FormatString: ">Güncellemeleri indirmek ve yüklemek için bu simgeye tıklayın</string>
+  <string name="SKUpdate_IconTitle" comment="/FormatString: ">Keyman güncelleştirmeler var.</string>
+  <string name="SKUpdate_KeymanText" comment="/FormatString: ">Keyman %0:s</string>
+  <string name="SKUpdate_PackageText" comment="/FormatString: ">Klavye %0:s %1:s</string>
+  <string name="SKUpdate_UnableToContact" comment="/FormatString: ">Tavultesoft web sitesine başvurulamadı - lütfen etkin bir İnternet bağlantınız olduğundan emin olun ve tekrar deneyin.</string>
+  <string name="SKUpdate_UnableToContact_Error" comment="/FormatString: ">Tavultesoft web sitesi ile iletişim kurulamıyor, lütfen aktif bir İnternet bağlantınız olduğundan emin olun ve ve tekrar deneyin.  Alınan hata şuydu: %0:s</string>
+  <string name="S_Menu_SwitchKeymanOff" comment="/PlainText: ">Keyman'u &amp;Kapat</string>
+  <string name="S_Toolbar_ViewCharacterMap" comment="/PlainText: ">Karakter Haritasını İncele</string>
+  <string name="S_Toolbar_ViewFontHelper" comment="/PlainText: ">Yazı Tipi Yardımcısını Görüntüle</string>
+  <string name="S_Toolbar_ViewKeyboardUsage" comment="/PlainText: ">Klavye Kullanımını Görüntüle</string>
+  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Göster</string>
+  <string name="S_Menu_KeyboardUsage" comment="/PlainText: ">&amp;Klavye Kullanımı</string>
+  <string name="S_Menu_FontHelper" comment="/PlainText: ">&amp;Font Yardımcısı</string>
+  <string name="S_Menu_CharacterMap" comment="/PlainText: ">Karakter &amp;Haritası</string>
+  <string name="S_Menu_TextEditor" comment="/PlainText: ">&amp;Metin Düzenleyici...</string>
+  <string name="S_Menu_Configuration" comment="/PlainText: ">&amp;Yapılandırma...</string>
+  <string name="S_BETA" comment="System/PlainText: Set this text to 'BETA' for beta versions of Keyman, and empty otherwise (introduced 7.0.230.0)"/>
+  <string name="S_HintDialog_DontShowHintAgain" comment="Hints/PlainText: Hint dialog - caption of checkbox at bottom of dialog (introduced 10.0.836.0)">Don't show this hint again</string>
+  <string name="SKTextEditorCaption" comment="Text Editor/FormatString: Caption of Text Editor (introduced 10.0.836.0)">Text Editor - Keyman</string>
+</resources>

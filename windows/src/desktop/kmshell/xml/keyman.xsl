@@ -4,7 +4,7 @@
 
   <xsl:include href="elements.xsl"/>
 
-  <xsl:variable name="locale_keyman" select="$locale/Dialog[@Id='Keyman']" />
+  <xsl:variable name="dialoginfo_keyman" select="$dialoginfo/Dialog[@Id='Keyman']" />
 
   <xsl:include href="keyman_menu.xsl"/>
 
@@ -22,8 +22,8 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <script src="/app/sentry.bundle.min.js"></script>
         <script src="/app/sentry.init.js"></script>
-        <style> *{font-family: <xsl:value-of select="($locale/String[@Id='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
-        <title><xsl:value-of select="$locale/String[@Id='S_ConfigurationTitle']"/></title>
+        <style> *{font-family: <xsl:value-of select="($locale/string[@name='SK_UIFontName'])[1]" />, "Segoe UI";}</style>
+        <title><xsl:value-of select="$locale/string[@name='S_ConfigurationTitle']"/></title>
         <link rel="stylesheet" type="text/css" href="/app/config.css" />
         <link rel="stylesheet" type="text/css" href="/app/menu.css" />
         <script type="text/javascript" src="/app/jquery.min.js"></script>
@@ -63,16 +63,14 @@
     <div class="helplinks">
       <a href="keyman:help" onmouseover="this.style.cursor='hand';" >
         <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;' src="/app/help24.png" />
-        <xsl:value-of select="$locale/String[@Id='S_Caption_Help']" />
-      </a>
-
-            &#160;
-      <xsl:value-of select="$locale/String[@Id='S_DisplayIn']" />:
-        <a id="button_uilanguage" href="#"
-           onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;"
-           onkeydown="if(event.keyCode == 32) ShowMenu('uilanguage','right'); else return true; return false;"
-        ><xsl:value-of select="$locale/String[@Id='SKUILanguageNameWithEnglish']"/></a>
-
+        <xsl:value-of select="$locale/string[@name='S_Caption_Help']" />
+      </a>&#160;
+      <img onmouseover="this.style.cursor='hand';" style='width: 24px; height: 24px; border: none; vertical-align: middle; margin: -2px 4px 2px 4px;' src="/app/globe.png" />
+      <xsl:value-of select="$locale/string[@name='S_DisplayIn']" />:
+      <a id="button_uilanguage" href="#"
+          onmousedown="ShowMenu('uilanguage','right', document.body.offsetWidth, 38); return false;"
+          onkeydown="if(event.keyCode == 32) ShowMenu('uilanguage','right'); else return true; return false;"
+      ><xsl:value-of select="$locale/string[@name='SKUILanguageNameWithEnglish']"/></a>
     </div>
   </xsl:template>
 
@@ -87,13 +85,8 @@
       </xsl:for-each>
       <div class="menubreak" ></div>
       <xsl:call-template name="menuitem">
-        <xsl:with-param name="id">menu_uilanguage_more</xsl:with-param>
-        <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_MoreUILanguagesMenu']"/></xsl:with-param>
-        <xsl:with-param name="command">keyman:downloaduilanguages</xsl:with-param>
-      </xsl:call-template>
-      <xsl:call-template name="menuitem">
         <xsl:with-param name="id">menu_uilanguage_contribute</xsl:with-param>
-        <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_ContributeUILanguagesMenu']"/></xsl:with-param>
+        <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_ContributeUILanguagesMenu']"/></xsl:with-param>
         <xsl:with-param name="command">keyman:contributeuilanguages</xsl:with-param>
       </xsl:call-template>
     </div>

@@ -124,3 +124,22 @@ public enum FileExtensions {
   public static let openTypeFont = "otf"
   public static let configurationProfile = "mobileconfig"
 }
+
+public enum KeymanError: Error, LocalizedError {
+  case unknown
+  // file that is missing, is the file critical?
+  case missingFile(String, Bool)
+
+  var localizedDescription: String {
+    switch self {
+      case .unknown:
+        return engineBundle.localizedString(forKey: "error-unknown", value: nil, table: nil)
+      case .missingFile(_, let isCritical):
+        if isCritical {
+          return engineBundle.localizedString(forKey: "error-missing-file-critical", value: nil, table: nil)
+        } else {
+          return engineBundle.localizedString(forKey: "error-missing-file", value: nil, table: nil)
+        }
+    }
+  }
+}

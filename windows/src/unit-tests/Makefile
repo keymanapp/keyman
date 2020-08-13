@@ -5,7 +5,8 @@
 # ----------------------------------------------------------------------
 
 TARGETS=keyboard-info keyboard-js-info keyboard-package-versions \
-        kmx-file-languages package-info new-tests jsonutil windows-setup
+        kmx-file-languages package-info new-tests jsonutil windows-setup \
+        ui-language-manager
 
 test:
     $(MAKE) -DTARGET=test $(TARGETS)
@@ -40,6 +41,10 @@ jsonutil:
 
 windows-setup:
     cd $(ROOT)\src\unit-tests\windows-setup
+    $(MAKE) $(TARGET)
+
+ui-language-manager:
+    cd $(ROOT)\src\unit-tests\ui-language-manager
     $(MAKE) $(TARGET)
 
 new-tests:

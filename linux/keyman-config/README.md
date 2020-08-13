@@ -7,8 +7,22 @@ then you will need to:
 
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil python3-requests \
-    python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli python3-setuptools
+    python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli python3-setuptools python3-pip
 ```
+
+Either `python3-raven` or `python3-sentry-sdk` is required as well. To install it on Ubuntu 18.04 and earlier run:
+
+```bash
+sudo apt install python3-raven
+```
+
+On Ubuntu 20.04 and later:
+
+```bash
+sudo apt install python3-sentry-sdk
+```
+
+(It's also possible to install it with pip: `pip3 install sentry-sdk`)
 
 You will also need `kmflcomp` either from a package or built and installed locally.
 

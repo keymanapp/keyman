@@ -1,4 +1,4 @@
-(*
+﻿(*
   Name:             UfrmRunDesktop
   Copyright:        Copyright (C) 2003-2017 SIL International.
   Documentation:    
@@ -79,6 +79,8 @@ type
     cmdExit: TButton;
     panText: TPanel;
     lblActions: TLabel;
+    cbLanguage: TComboBox;
+    lblGlobe: TLabel;
     procedure URLLabelMouseEnter(Sender: TObject);
     procedure URLLabelMouseLeave(Sender: TObject);
     procedure lblOptionsClick(Sender: TObject);
@@ -88,6 +90,7 @@ type
     procedure cmdInstallClick(Sender: TObject);
     procedure lblLicenseClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure cbLanguageClick(Sender: TObject);
   private
     g_iCurPos, g_iProgress, g_iProgressTotal: Integer;
     g_bCancelInstall, g_bScriptInProgress, g_bForwardProgress, g_bFirstTime, g_bEnableActionData: Boolean;
@@ -119,6 +122,8 @@ type
     procedure BackupKey(Root: HKEY; Path: WideString);  // I2642
     procedure GetDefaultSettings;
     procedure FillActionText;
+    procedure FillLanguageList;
+    procedure FillStrings;
     { Private declarations }
   public
     procedure DoInstall(Silent, PromptForReboot: Boolean);  // I3355   // I3500
@@ -130,6 +135,7 @@ type
 implementation
 
 uses
+  System.Generics.Collections,
   System.Win.Registry,
   jwamsi,
 
@@ -137,6 +143,7 @@ uses
   OnlineConstants,
   SFX,
   SetupStrings,
+  Keyman.Setup.System.SetupUILanguageManager,
   Keyman.System.MITLicense,
   Keyman.System.UpgradeRegistryKeys,
   KeymanVersion,
@@ -533,13 +540,7 @@ var
 begin
   FAutomaticallyReportUsage := True;
 
-  Application.Title := FInstallInfo.Text(ssApplicationTitle);
-  Caption := FInstallInfo.Text(ssTitle);
-  cmdInstall.Caption := FInstallInfo.Text(ssInstallButton);
-  cmdExit.Caption := FInstallInfo.Text(ssExitButton);
-  lblLicense.Caption := FInstallInfo.Text(ssLicenseLink);
-  lblOptions.Caption := FInstallInfo.Text(ssInstallOptionsLink);
-  lblFree.Caption := FInstallInfo.Text(ssFreeCaption);
+  FillStrings;
 
   if FInstallInfo.TitleImageFilename <> '' then
   begin
@@ -556,7 +557,35 @@ begin
 
   GetDefaultSettings;  // I2651
 
+  FillLanguageList;
+  FillStrings;
+end;
+
+procedure TfrmRunDesktop.FillStrings;
+begin
+  Application.Title := FInstallInfo.Text(ssApplicationTitle);
+  Caption := FInstallInfo.Text(ssTitle);
+  cmdInstall.Caption := FInstallInfo.Text(ssInstallButton);
+  cmdExit.Caption := FInstallInfo.Text(ssExitButton);
+  lblLicense.Caption := FInstallInfo.Text(ssLicenseLink);
+  lblOptions.Caption := FInstallInfo.Text(ssInstallOptionsLink);
+  lblFree.Caption := FInstallInfo.Text(ssFreeCaption);
   FillActionText;
+end;
+
+procedure TfrmRunDesktop.FillLanguageList;
+var
+  item: TPair<string,string>;
+  n: Integer;
+begin
+  for item in TSetupUILanguageManager.Locales do
+  begin
+    n := cbLanguage.Items.Add(item.Value);
+    if TSetupUILanguageManager.ActiveLocale = item.Key then
+      cbLanguage.ItemIndex := n;
+  end;
+  cbLanguage.Visible := cbLanguage.Items.Count > 1;
+  lblGlobe.Visible := cbLanguage.Visible;
 end;
 
 procedure TfrmRunDesktop.FillActionText;
@@ -915,6 +944,12 @@ begin
   end;
 end;
 
+procedure TfrmRunDesktop.cbLanguageClick(Sender: TObject);
+begin
+  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[cbLanguage.ItemIndex];
+  FillStrings;
+end;
+
 procedure TfrmRunDesktop.CheckVersion10Upgrade;   // I4293
 var
   str: TStringList;
@@ -960,9 +995,11 @@ begin
   if Text = '' then
   begin
     progress.Visible := False;
+    cbLanguage.Visible := cbLanguage.Items.Count > 1;
   end
   else
   begin
+    cbLanguage.Visible := False;
     progress.Visible := True;
     if progress.Max <> StatusMax then
     begin
@@ -973,6 +1010,7 @@ begin
     else
       progress.StepIt;
   end;
+  lblGlobe.Visible := cbLanguage.Visible;
 
   lblStatus.Caption := Text;
   lblStatus.Update;

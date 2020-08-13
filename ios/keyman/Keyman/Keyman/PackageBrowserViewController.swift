@@ -64,13 +64,40 @@ class PackageBrowserViewController: UIDocumentBrowserViewController, UIDocumentB
       }
 
       if let package = rfm.prepareKMPInstall(from: destinationUrl, alertHost: self) {
-        // We choose to prompt the user for comfirmation, rather
-        // than automatically installing the package.
-        rfm.promptPackageInstall(of: package, in: self, isCustom: true, successHandler: { _ in
-          // Auto-dismiss the document browser upon successful KMP install.
-          // It's likely quite rare that someone would want to install 2+ at once.
-          self.navigationController?.popViewController(animated: true)
-        })
+        // These type checks are necessary due to generic constraints.
+        if let kbdPackage = package as? KeyboardKeymanPackage {
+          doPrompt(for: kbdPackage, withAssociators: [.lexicalModels])
+        } else if let lmPackage = package as? LexicalModelKeymanPackage {
+          doPrompt(for: lmPackage)
+        }
       }
+    }
+
+    private func doPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+        for package: Package,
+        withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [])
+    where Resource.Package == Package {
+      let activitySpinner = Alerts.constructActivitySpinner()
+      activitySpinner.center = view.center
+
+      let packageInstaller = AssociatingPackageInstaller(for: package,
+                                                         withAssociators: associators) { status in
+        if status == .starting {
+          // Start a spinner!
+          activitySpinner.startAnimating()
+          self.view.addSubview(activitySpinner)
+
+          activitySpinner.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+          activitySpinner.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+          self.view.isUserInteractionEnabled = false
+        } else if status == .complete {
+          // Report completion!
+          activitySpinner.stopAnimating()
+          activitySpinner.removeFromSuperview()
+          self.view.isUserInteractionEnabled = true
+          self.dismiss(animated: true, completion: nil)
+        }
+      }
+      packageInstaller.promptForLanguages(inNavigationVC: self.navigationController!)
     }
 }

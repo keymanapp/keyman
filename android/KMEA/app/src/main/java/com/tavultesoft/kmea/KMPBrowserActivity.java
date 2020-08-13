@@ -26,14 +26,31 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.tavultesoft.kmea.util.FileUtils;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KMManager.Tier;
+import com.tavultesoft.kmea.util.KMPLink;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.tavultesoft.kmea.util.KMPLink.KMP_PRODUCTION_HOST;
+import static com.tavultesoft.kmea.util.KMPLink.KMP_STAGING_HOST;
 
 public class KMPBrowserActivity extends AppCompatActivity {
   private static final String TAG = "KMPBrowserActivity";
+
+  // URL for keyboard search web page presented to user when they add a keyboard in the app.
+  private static final String KMP_SEARCH_KEYBOARDS_FORMATSTR = "https://%s/go/android/%s/download-keyboards%s";
+  private static final String KMP_SEARCH_KEYBOARDS_LANGUAGES = "/languages/%s";
+
+  // Patterns for determining if a link should be opened in external browser
+  // 1. Host isn't keyman.com (production/staging)
+  // 2. Host is keyman.com but not /keyboards/
+  private static final String INTERNAL_KEYBOARDS_LINK_FORMATSTR = "^http(s)?://(%s|%s)/keyboards([/?].*)?$";
+  private static final String keyboardPatternFormatStr = String.format(INTERNAL_KEYBOARDS_LINK_FORMATSTR,
+    KMPLink.KMP_PRODUCTION_HOST,
+    KMPLink.KMP_STAGING_HOST);
+  private static final Pattern keyboardPattern = Pattern.compile(keyboardPatternFormatStr);
+
   private WebView webView;
-  private static final String KMP_PRODUCTION_HOST = "https://keyman.com";
-  private static final String KMP_STAGING_HOST = "https://staging-keyman-com.azurewebsites.net";
-  private static final String KMP_SEARCH_URL_FORMATSTR = "%s/keyboards%s?embed=android&version=%s";
-  private static final String KMP_LANGUAGE_FORMATSTR = "/languages/%s";
   private boolean isLoading = false;
   private boolean didFinishLoading = false;
 
@@ -71,14 +88,23 @@ public class KMPBrowserActivity extends AppCompatActivity {
         if (lowerURL.equals("about:blank")) {
           return true; // never load a blank page, e.g. when the component initializes
         }
-        if (FileUtils.isKeymanLink(lowerURL)) {
-          // KMAPro main activity will handle this intent
-          // Pass original url because path and query are case-sensitive
-          Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+        if (KMPLink.isKeymanInstallLink(url)) {
+          Uri downloadURI = KMPLink.getKeyboardDownloadLink(url);
+
+          // Create intent with keyboard download link for KMAPro main activity to handle
+          Intent intent = new Intent(Intent.ACTION_VIEW, downloadURI);
           startActivityForResult(intent, 1);
 
           // Finish activity
           finish();
+        } else if (!isKeymanKeyboardsLink(url)) {
+          Uri uri = Uri.parse(url);
+
+          // All links that aren't internal Keyman keyboard links open in user's browser
+          Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+          startActivity(intent);
+          return true;
         }
         if (lowerURL.startsWith("keyman:")) {
           // Warn for unsupported keyman schemes
@@ -104,13 +130,12 @@ public class KMPBrowserActivity extends AppCompatActivity {
     });
 
     // Tier determines the keyboard search host
-    String host = (KMManager.getTier(BuildConfig.VERSION_NAME) == Tier.STABLE) ?
-      KMP_PRODUCTION_HOST : KMP_STAGING_HOST;
+    String host = KMPLink.getHost();
     // If language ID is provided, include it in the keyboard search
     String languageID = getIntent().getStringExtra("languageCode");
-    String languageStr = (languageID != null) ? String.format(KMP_LANGUAGE_FORMATSTR, languageID) : "";
-    String appVersion = KMManager.getVersion();
-    String kmpSearchUrl = String.format(KMP_SEARCH_URL_FORMATSTR, host, languageStr, appVersion);
+    String languageStr = (languageID != null) ? String.format(KMP_SEARCH_KEYBOARDS_LANGUAGES, languageID) : "";
+    String appMajorVersion = KMManager.getMajorVersion();
+    String kmpSearchUrl = String.format(KMP_SEARCH_KEYBOARDS_FORMATSTR, host, appMajorVersion, languageStr);
     webView.loadUrl(kmpSearchUrl);
   }
 
@@ -160,4 +185,21 @@ public class KMPBrowserActivity extends AppCompatActivity {
     }
   }
 
+  /**
+   * Check if a URL is a valid internal Keyman keyboard link
+   * @param url String of the URL to parse
+   * @return boolean
+   */
+  public boolean isKeymanKeyboardsLink(String url) {
+    boolean status = false;
+    if (url == null || url.isEmpty()) {
+      return status;
+    }
+    Matcher matcher = keyboardPattern.matcher(url);
+    if (matcher.matches()) {
+      status = true;
+    }
+
+    return status;
+  }
 }

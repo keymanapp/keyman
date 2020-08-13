@@ -9,6 +9,7 @@
 import Foundation
 
 extension Queries {
+  // Kept internal; the query is 'publicly exposed' through KeymanPackage and ResourceFileManager.
   class PackageVersion {
     class ResultComponent {}
 
@@ -55,7 +56,7 @@ extension Queries {
             } else if let error = try? container.decode(ResultError.self, forKey: id) {
               dict[id.stringValue] = error
             } else {
-              throw NSError(domain: "Keyman", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unexpected value contained during \(category) decoding, id \(id.stringValue)"])
+              throw FetchError.decodingError(category, id.stringValue)
             }
             return dict
           }

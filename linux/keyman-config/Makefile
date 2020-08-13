@@ -4,7 +4,7 @@ default: clean version man
 	python3 setup.py build
 
 install: # run as sudo
-	pip3 install qrcode
+	pip3 install qrcode sentry-sdk
 	python3 setup.py install
 	# install icons
 	mkdir -p /usr/local/share/keyman/icons

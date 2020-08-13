@@ -199,30 +199,58 @@ public class ResourceFileManager {
     }
   }
 
+  internal func doInstallPrompt<Resource: LanguageResource, Package: TypedKeymanPackage<Resource>>(
+        for package: Package,
+        defaultLanguageCode: String? = nil,
+        in rootVC: UIViewController,
+        withAssociators associators: [AssociatingPackageInstaller<Resource, Package>.Associator] = [],
+        successHandler: ((KeymanPackage) -> Void)? = nil)
+    where Resource.Package == Package {
+      let activitySpinner = Alerts.constructActivitySpinner()
+      activitySpinner.center = rootVC.view.center
+
+      let packageInstaller = AssociatingPackageInstaller(for: package,
+                                                         withAssociators: associators) { status in
+        if status == .starting {
+          // Start a spinner!
+          activitySpinner.startAnimating()
+          rootVC.view.addSubview(activitySpinner)
+
+          activitySpinner.centerXAnchor.constraint(equalTo: rootVC.view.centerXAnchor).isActive = true
+          activitySpinner.centerYAnchor.constraint(equalTo: rootVC.view.centerYAnchor).isActive = true
+          rootVC.view.isUserInteractionEnabled = false
+        } else if status == .complete {
+          // Report completion!
+          activitySpinner.stopAnimating()
+          activitySpinner.removeFromSuperview()
+          rootVC.view.isUserInteractionEnabled = true
+          rootVC.dismiss(animated: true, completion: nil)
+          successHandler?(package)
+        }
+      }
+
+      if let navVC = rootVC as? UINavigationController {
+        packageInstaller.promptForLanguages(inNavigationVC: navVC)
+      } else {
+        let nvc = UINavigationController.init()
+        packageInstaller.promptForLanguages(inNavigationVC: nvc)
+        rootVC.present(nvc, animated: true, completion: nil)
+      }
+    }
+
   public func promptPackageInstall(of package: KeymanPackage,
                                    in rootVC: UIViewController,
                                    isCustom: Bool,
                                    successHandler: ((KeymanPackage) -> Void)? = nil) {
-    let vc = PackageInstallViewController(for: package, isCustom: isCustom, completionHandler: { error in
-      if let err = error {
-        if let kmpError = err as? KMPError {
-          let alert = self.buildKMPError(kmpError)
-          rootVC.present(alert, animated: true, completion: nil)
-        }
-      } else {
-        let alert = self.buildSimpleAlert(title: "Success", message: "Installed successfully.", completionHandler: {
-            successHandler?(package)
-          })
-        rootVC.present(alert, animated: true, completion: nil)
-      }
-    })
-
-    let nvc = UINavigationController.init(rootViewController: vc)
-    rootVC.present(nvc, animated: true, completion: nil)
+    if let kbdPackage = package as? KeyboardKeymanPackage {
+      doInstallPrompt(for: kbdPackage, in: rootVC, withAssociators: [.lexicalModels], successHandler: successHandler)
+    } else if let lmPackage = package as? LexicalModelKeymanPackage {
+     doInstallPrompt(for: lmPackage, in: rootVC, withAssociators: [], successHandler: successHandler)
+    }
   }
 
   public func buildKMPError(_ error: KMPError) -> UIAlertController {
-    return buildSimpleAlert(title: "Error", message: error.rawValue)
+    return buildSimpleAlert(title: "Error", message: error.localizedDescription)
   }
 
   public func buildSimpleAlert(title: String, message: String, completionHandler: (() -> Void)? = nil ) -> UIAlertController {

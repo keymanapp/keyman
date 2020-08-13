@@ -5,14 +5,14 @@
 
 		<div class="header">
   		<xsl:call-template name="header_helplinks" />
-			<xsl:value-of select="$locale/String[@Id='S_Options']"/>
+			<xsl:value-of select="$locale/string[@name='S_Options']"/>
 		</div>
 
 		<div class="content" id="subcontent_options">
       <div id="options" class="options_list">
         <xsl:for-each select="//OptionGroups/OptionGroup">
 					<xsl:sort select="sort" />
-          <div class="options_list_header"><xsl:value-of select="$locale/String[@Id=current()/name]"/></div>
+          <div class="options_list_header"><xsl:value-of select="$locale/string[@name=current()/name]"/></div>
           <xsl:for-each select="//KeymanOption[group=current()/name]">
             <xsl:if test="optiontype = 1">
               <xsl:call-template name="option" />
@@ -26,13 +26,13 @@
 
         <div id='options_control'>
           <xsl:call-template name="button">
-            <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_ProxyConfig']"/></xsl:with-param>
+            <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_ProxyConfig']"/></xsl:with-param>
             <xsl:with-param name="command">keyman:support_proxyconfig</xsl:with-param>
           </xsl:call-template>
       
           <xsl:call-template name="button">
             <xsl:with-param name="shield">1</xsl:with-param>
-            <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_BaseKeyboard']"/></xsl:with-param>
+            <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_BaseKeyboard']"/></xsl:with-param>
             <xsl:with-param name="command">keyman:options_basekeyboard</xsl:with-param>
           </xsl:call-template>
           <span id='options_base_keyboard_current'>(<xsl:value-of select= "//basekeyboard" />)</span>
@@ -46,7 +46,7 @@
 			<div style="float:right; margin-top:-3px">
 				<xsl:call-template name="button">
 					<xsl:with-param name="caption">
-						<xsl:value-of select="$locale/String[@Id='S_Button_ResetHints']"/>
+						<xsl:value-of select="$locale/string[@name='S_Button_ResetHints']"/>
 					</xsl:with-param>
 					<xsl:with-param name="command">keyman:options_resethints</xsl:with-param>
 				</xsl:call-template>
@@ -79,7 +79,7 @@
               <xsl:attribute name="style">display: inline; margin-left: 3px; </xsl:attribute>
             </xsl:otherwise>
           </xsl:choose>
-			  <xsl:value-of select="$locale/String[@Id=current()/id]"/>
+			  <xsl:value-of select="$locale/string[@name=current()/id]"/>
         </div>
       </div>
 

@@ -113,9 +113,9 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
     packageActivityTitle.setGravity(Gravity.CENTER);
 
-    String pkgTargetTitle = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ? 
-      getString(R.string.install_keyboard_package) : getString(R.string.install_predictive_text_package);
-    String titleStr = String.format("%s %s", pkgTargetTitle, pkgVersion);
+    String titleStr = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ?
+      String.format(getString(R.string.install_keyboard_package), pkgVersion) :
+      String.format(getString(R.string.install_predictive_text_package), pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
@@ -377,8 +377,7 @@ public class PackageActivity extends AppCompatActivity {
   private void showErrorDialog(Context context, String pkgId, String message) {
     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
-    alertDialogBuilder.setTitle(String.format("%s %s %s",
-      getString(R.string.title_package), pkgId, getString(R.string.title_failed_to_install)));
+    alertDialogBuilder.setTitle(String.format(getString(R.string.title_package_failed_to_install), pkgId));
     alertDialogBuilder
       .setMessage(message)
       .setCancelable(false)

@@ -7,7 +7,7 @@
   <xsl:template name="content_support">
     <div class="header">
       <xsl:call-template name="header_helplinks" />
-      <xsl:value-of select="$locale/String[@Id='S_Support']"/>
+      <xsl:value-of select="$locale/string[@name='S_Support']"/>
     </div>
         
     <div id="subcontent_support" class="content">
@@ -21,13 +21,13 @@
         </div>
         
         <div class="support_edition">
-          <xsl:value-of select="$locale/String[@Id='S_Support_Version']"/>&#160;<xsl:value-of select="/Keyman/support/version" /><xsl:value-of select="$locale/String[@Id='S_BETA']"/><br />
+          <xsl:value-of select="$locale/string[@name='S_Support_Version']"/>&#160;<xsl:value-of select="/Keyman/support/version" /><br />
         </div>
         
         <div class="support_contact">
-          <p><xsl:value-of select="$locale/String[@Id='S_Support_ContactInstructions_Free']"/></p>
+          <p><xsl:value-of select="$locale/string[@name='S_Support_ContactInstructions_Free']"/></p>
           <xsl:call-template name="button">
-            <xsl:with-param name="caption"><xsl:value-of select="$locale/String[@Id='S_Button_CommunitySupport']"/></xsl:with-param>
+            <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_CommunitySupport']"/></xsl:with-param>
             <xsl:with-param name="command">keyman:link?url=https://firstvoices.atlassian.net/servicedesk/customer/portals</xsl:with-param>
             <xsl:with-param name="width">220px</xsl:with-param>
           </xsl:call-template>
@@ -37,21 +37,21 @@
         </div>
 
         <div class="support_sil">
-          <xsl:value-of select="$locale/String[@Id='S_Support_CreatedBySIL']"/>
+          <xsl:value-of select="$locale/string[@name='S_Support_CreatedBySIL']"/>
         </div>
         
         <div class="support_copyright">
-          <xsl:value-of select="$locale/String[@Id='S_Support_Copyright']"/>
+          <xsl:value-of select="$locale/string[@name='S_Support_Copyright']"/>
         </div>
 
         <div class="support_links">
-          <h2><xsl:value-of select="$locale/String[@Id='S_Support_UsefulLinks']"/></h2>
+          <h2><xsl:value-of select="$locale/string[@name='S_Support_UsefulLinks']"/></h2>
           <ul>
             <li><a href="https://www.firstvoices.com/">www.firstvoices.com</a></li>
             <li><a href="https://www.keyman.com/">www.keyman.com</a></li>
-            <li><a href="keyman:support_diagnostics"><xsl:value-of select="$locale/String[@Id='S_Menu_Diagnostics_Diagnostics']"/></a></li>
-            <li><a href="keyman:support_updatecheck"><xsl:value-of select="$locale/String[@Id='S_Button_CheckForUpdates']"/></a></li>
-            <li><a href="keyman:link?url=https://keyman.com/go/desktop/10.0/support"><xsl:value-of select="$locale/String[@Id='S_Button_OnlineSupport']"/></a></li>
+            <li><a href="keyman:support_diagnostics"><xsl:value-of select="$locale/string[@name='S_Menu_Diagnostics_Diagnostics']"/></a></li>
+            <li><a href="keyman:support_updatecheck"><xsl:value-of select="$locale/string[@name='S_Button_CheckForUpdates']"/></a></li>
+            <li><a href="keyman:link?url=https://keyman.com/go/desktop/10.0/support"><xsl:value-of select="$locale/string[@name='S_Button_OnlineSupport']"/></a></li>
           </ul>
         </div>
       </div>

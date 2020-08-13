@@ -44,7 +44,10 @@ uses
   PackageFileFormats in '..\..\global\delphi\general\PackageFileFormats.pas',
   Keyman.Setup.System.ResourceDownloader in 'Keyman.Setup.System.ResourceDownloader.pas',
   httpuploader in '..\..\global\delphi\general\httpuploader.pas',
-  Keyman.System.MITLicense in '..\..\global\delphi\general\Keyman.System.MITLicense.pas';
+  Keyman.System.MITLicense in '..\..\global\delphi\general\Keyman.System.MITLicense.pas',
+  Keyman.Setup.System.Locales in 'Keyman.Setup.System.Locales.pas',
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
+  Keyman.Setup.System.SetupUILanguageManager in 'Keyman.Setup.System.SetupUILanguageManager.pas';
 
 {$R icons.res}
 {$R version.res}

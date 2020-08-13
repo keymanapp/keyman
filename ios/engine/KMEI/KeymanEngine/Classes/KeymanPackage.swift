@@ -9,13 +9,21 @@
 import Foundation
 import Zip
 
+// KMPErrors may be passed to UIAlertControllers, so they need localization.
 public enum KMPError : String, Error {
-  case noMetadata = "Could not find kmp.json for package."
-  case invalidPackage = "Invalid Keyman Package."
-  case fileSystem = "Unable to create directory structure in file system."
-  case copyFiles = "Unable to copy keyboard files to file system."
-  case wrongPackageType = "Package provided does not match the type expected by this method"
-  case resourceNotInPackage = "Resource cannot be found in specified package"
+  // The value:  the translation-lookup key.
+  case noMetadata = "kmp-error-no-metadata"
+  case invalidPackage = "kmp-error-invalid"
+  case fileSystem = "kmp-error-file-system"
+  case copyFiles = "kmp-error-file-copying"
+  // TODO:  Consider changing the parent type so that these may take arguments that may be used
+  //        to provide better clarity.
+  case wrongPackageType = "kmp-error-wrong-type"
+  case resourceNotInPackage = "kmp-error-missing-resource"
+
+  var localizedDescription: String {
+    return engineBundle.localizedString(forKey: self.rawValue, value: nil, table: nil)
+  }
 }
 
 /**
@@ -229,6 +237,10 @@ public class KeymanPackage {
     return Key(for: self)
   }
 
+  public var name: String {
+    return self.metadata.info?.name?.description ?? id
+  }
+
   public func isKeyboard() -> Bool {
     return metadata.packageType == .Keyboard
   }
@@ -288,15 +300,33 @@ public class KeymanPackage {
   }
   
   public func infoHtml() -> String {
-    let welcomePath = self.sourceFolder.appendingPathComponent("welcome.htm")
-    
-    if FileManager.default.fileExists(atPath: welcomePath.path) {
-      if let html = try? String(contentsOfFile: welcomePath.path, encoding: String.Encoding.utf8) {
+    if let readmeURL = self.readmePageURL {
+      if let html = try? String(contentsOfFile: readmeURL.path, encoding: String.Encoding.utf8) {
         return html
       }
     }
   
     return defaultInfoHtml()
+  }
+
+  public var readmePageURL: URL? {
+    let readmeURL = self.sourceFolder.appendingPathComponent("readme.htm")
+
+    if FileManager.default.fileExists(atPath: readmeURL.path) {
+      return readmeURL
+    } else {
+      return nil
+    }
+  }
+
+  public var welcomePageURL: URL? {
+    let welcomeURL = self.sourceFolder.appendingPathComponent("welcome.htm")
+
+    if FileManager.default.fileExists(atPath: welcomeURL.path) {
+      return welcomeURL
+    } else {
+      return nil
+    }
   }
 
   public var version: Version {
@@ -311,6 +341,10 @@ public class KeymanPackage {
     fatalError("abstract base method went uninplemented by derived class")
   }
 
+  var languages: [Language] {
+    fatalError("abstract base method went unimplemented by derived class")
+  }
+
   /**
    * Returns an array of arrays corresponding to the available permutations of resource + language for each resource
    * specified by the package.
@@ -321,6 +355,10 @@ public class KeymanPackage {
    */
   public var installableResourceSets: [[AnyLanguageResource]] {
     fatalError("abstract base method went unimplemented by derived class")
+  }
+
+  public func installableResources(forLanguage lgCode: String) -> [AnyLanguageResource] {
+    return installableResourceSets.flatMap { $0.filter { $0.languageID == lgCode }}
   }
 
   /**
@@ -460,6 +498,7 @@ public class KeymanPackage {
  */
 public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: KeymanPackage {
   public private(set) var installables: [[TypedLanguageResource]] = []
+  typealias Resource = TypedLanguageResource
 
   internal func setInstallableResourceSets<Resource: KMPResource>(for kmpResources: [Resource]) where
       TypedLanguageResource: KMPInitializableLanguageResource {
@@ -473,6 +512,10 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
   // See https://forums.swift.org/t/confusing-limitations-on-covariant-overriding/16252
   public override var installableResourceSets: [[AnyLanguageResource]] {
     return installables
+  }
+
+  public func installables(forLanguage lgCode: String) -> [TypedLanguageResource] {
+    return super.installableResources(forLanguage: lgCode) as! [TypedLanguageResource]
   }
 
   public func findResource(withID fullID: TypedLanguageResource.FullID) -> TypedLanguageResource? {
@@ -508,5 +551,22 @@ public class TypedKeymanPackage<TypedLanguageResource: LanguageResource>: Keyman
       // For some reason, Swift just won't recognize that it's the same type in the line below.
       kbdMetadata.hasMatchingMetadata(for: resource as! Metadata.LanguageResourceType, ignoreLanguage: ignoreLanguage, ignoreVersion: ignoreVersion)
     })
+  }
+
+  public override var languages: [Language] {
+    let unfilteredLanguageList = self.resources.flatMap { $0.languages }
+
+    var languages: [Language] = []
+    var langCodeSet: Set<String> = Set<String>()
+
+    unfilteredLanguageList.forEach { entry in
+      if !langCodeSet.contains(entry.languageId) {
+        langCodeSet.insert(entry.languageId)
+        languages.append(Language(from: entry))
+      }
+    }
+
+    languages.sort { $0.name < $1.name }
+    return languages
   }
 }

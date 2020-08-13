@@ -144,6 +144,13 @@
         <DCCReference Include="Keyman.Setup.System.ResourceDownloader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\httpuploader.pas"/>
         <DCCReference Include="..\..\global\delphi\general\Keyman.System.MITLicense.pas"/>
+        <DCCReference Include="Keyman.Setup.System.Locales.pas">
+            <Form>$R icons.res</Form>
+        </DCCReference>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.UILanguageManager.pas">
+            <Form>$R icons.res</Form>
+        </DCCReference>
+        <DCCReference Include="Keyman.Setup.System.SetupUILanguageManager.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

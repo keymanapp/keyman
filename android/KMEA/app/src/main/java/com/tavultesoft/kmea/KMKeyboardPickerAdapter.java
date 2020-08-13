@@ -70,8 +70,8 @@ final class KMKeyboardPickerAdapter extends NestedAdapter<Keyboard, Dataset.Keyb
     }
 
     if(kbd.getNewKeyboard())
-      holder.textLang.setText(String.format("[%s]", getContext().getText(R.string.keyboard_picker_new_keyboard_prefix))
-        + " " + kbd.getLanguageName());
+      holder.textLang.setText(String.format(getContext().getString(R.string.keyboard_picker_new_keyboard),
+        kbd.getLanguageName()));
     else
       holder.textLang.setText(kbd.getLanguageName());
     holder.textKbd.setText(kbd.getResourceName());

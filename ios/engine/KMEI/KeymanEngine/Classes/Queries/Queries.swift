@@ -9,20 +9,23 @@
 import Foundation
 
 // The core `Queries` definition provides common utility methods, handlers, etc across our API queries.
-class Queries {
+public class Queries {
   public enum FetchError: LocalizedError {
     case networkError(Error)
     case noData
     case parsingError(Error)
+    case decodingError(String, String)
 
     var localizedDescription: String {
       switch self {
         case .noData:
-          return "no data returned"
-        case .networkError(let baseError):
-          return "network error occurred - \(String(describing: baseError))"
-        case .parsingError(let baseError):
-          return "failure occurred when parsing results - \(String(describing: baseError))"
+          return engineBundle.localizedString(forKey: "error-query-no-data", value: nil, table: nil)
+        case .networkError(_):
+          return engineBundle.localizedString(forKey: "error-query-general", value: nil, table: nil)
+        case .parsingError(_):
+          return engineBundle.localizedString(forKey: "error-query-decoding", value: nil, table: nil)
+        case .decodingError(_, _):
+          return engineBundle.localizedString(forKey: "error-query-decoding", value: nil, table: nil)
       }
     }
   }
@@ -38,7 +41,7 @@ class Queries {
     }
   }
 
-  public struct IDCodingKey: CodingKey {
+  struct IDCodingKey: CodingKey {
     /* Required by CodingKey, though we don't particularly need these */
     public var intValue: Int?
 
@@ -55,7 +58,7 @@ class Queries {
     }
   }
 
-  typealias JSONQueryCompletionBlock<T: Decodable> = (_: T?, _: Queries.FetchError?) -> Void
+  public typealias JSONQueryCompletionBlock<T: Decodable> = (_: T?, _: Queries.FetchError?) -> Void
   typealias DataTaskCompletionBlock = (_: Data?, _: URLResponse?, _: Error?) -> Void
 
   /**
@@ -85,7 +88,13 @@ class Queries {
         let result = try decoder.decode(resultType, from: data)
         DispatchQueue.main.async { completionBlock(result, nil) }
       } catch {
-        DispatchQueue.main.async { completionBlock(nil, .parsingError(error)) }
+        DispatchQueue.main.async {
+          if let error = error as? FetchError {
+            completionBlock(nil, error)
+          } else {
+            completionBlock(nil, .parsingError(error))
+          }
+        }
       }
     }
   }
