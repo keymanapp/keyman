@@ -187,13 +187,16 @@
             let charCode = entry.charCodeAt(0);
             if(charCode >= 0xD800 && charCode <= 0xDBFF) {
               // First part of a SMP char.
-              // For now, we'll just assume the second completes such a char.
+              // For now, we'll just assume the second always completes such a char.
+              //
+              // Note:  Things get nasty here if this is only sometimes true; in the future,
+              // we should compile-time enforce that this assumption is always true if possible.
               if(entryNode.type == 'internal') {
                 let internalNode = entryNode;
                 for(let j = 0; j < entryNode.values.length; j++) {
                   let prefix = this.prefix + entry + internalNode.values[j];
                   yield {
-                    key: entryNode.values[j],
+                    key: entry + entryNode.values[j],
                     traversal: function() { return new TrieModel.Traversal(internalNode.children[internalNode.values[j]], prefix) }
                   }
                 }
@@ -224,9 +227,15 @@
           let fullText = root.entries[0].key;
           let prefix = this.prefix;
           if(prefix.length < fullText.length) {
+            let key = fullText[prefix.length];
+            let charCode = fullText.charCodeAt(prefix.length);
+            if(charCode >= 0xD800 && charCode <= 0xDBFF) {
+              // Merge the other half of an SMP char in!
+              key = key + fullText[prefix.length+1];
+            }
             yield {
-              key: fullText[prefix.length],
-              traversal: function() { return new TrieModel.Traversal(root, prefix + fullText[prefix.length])}
+              key: key,
+              traversal: function() { return new TrieModel.Traversal(root, prefix + key)}
             }
           }
           return;

@@ -5,6 +5,14 @@
 var assert = require('chai').assert;
 var TrieModel = require('../').models.TrieModel;
 
+// Useful for tests related to strings with supplementary pairs.
+var smpForUnicode = function(code){
+  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+  var L = (code - 0x10000) % 0x400 + 0xDC00;
+
+  return String.fromCharCode(H, L);
+}
+
 describe('Trie traversal abstractions', function() {
   it('root-level iteration over child nodes', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
@@ -24,7 +32,7 @@ describe('Trie traversal abstractions', function() {
     assert.isEmpty(rootKeys);
   });
 
-  it('iteration over simple internal node', function() {
+  it('traversal with simple internal nodes', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
 
     let rootTraversal = model.getRootTraversal();
@@ -77,7 +85,7 @@ describe('Trie traversal abstractions', function() {
     assert.isEmpty(eKeys);
   });
 
-  it('iteration over compact leaf node', function() {
+  it('traversal over compact leaf node', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
 
     let rootTraversal = model.getRootTraversal();
@@ -108,14 +116,14 @@ describe('Trie traversal abstractions', function() {
                 do {
                   assert.isNotEmpty(leafChildSequence);
 
-                  let oIter = curChild.traversal().children();
-                  let curr = oIter.next();
+                  let iter = curChild.traversal().children();
+                  let curr = iter.next();
                   curChild = curr.value;
 
                   // Test generator behavior - there should be one child, then the 'done' state.
                   assert.isDefined(curChild);
                   assert.equal(curChild.key, leafChildSequence[0]);
-                  curr = oIter.next();
+                  curr = iter.next();
                   assert.isTrue(curr.done);
 
                   // Prepare for iteration.
@@ -139,5 +147,97 @@ describe('Trie traversal abstractions', function() {
     }
 
     assert.isTrue(eSuccess);
+  });
+
+
+  it('traversal with SMP entries', function() {
+    // Two entries, both of which read "apple" to native English speakers.
+    // One solely uses SMP characters, the other of which uses a mix of SMP and standard.
+    var model = new TrieModel(jsonFixture('tries/smp-apple'));
+
+    let rootTraversal = model.getRootTraversal();
+    assert.isDefined(rootTraversal);
+
+    let smpA = smpForUnicode(0x1d5ba);
+    let smpP = smpForUnicode(0x1d5c9);
+    let smpE = smpForUnicode(0x1d5be);
+
+    // Just to be sure our utility function is working right.
+    assert.equal(smpA + smpP + 'pl' + smpE, "𝖺𝗉pl𝖾");
+
+    let pKeys = ['p', smpP];
+    let leafChildSequence = ['l', smpE];
+
+    let aSuccess = false;
+    let pSuccess = false;
+    let eSuccess = false;
+    for(child of rootTraversal.children()) {
+      if(child.key == smpA) {
+        aSuccess = true;
+        let traversalInner1 = child.traversal();
+        assert.isDefined(traversalInner1);
+        assert.isUndefined(child.entries);
+
+        for(aChild of traversalInner1.children()) {
+          if(aChild.key == smpP) { 
+            pSuccess = true;
+            let traversalInner2 = aChild.traversal();
+            assert.isDefined(traversalInner2);
+            assert.isUndefined(aChild.entries);
+
+            for(pChild of traversalInner2.children()) {
+              let keyIndex = pKeys.indexOf(pChild.key);
+              assert.notEqual(keyIndex, -1, "Did not find char '" + pChild.key + "' in array!");
+              pKeys.splice(keyIndex, 1);
+
+              if(pChild.key == 'p') { // We'll test traversal with the 'mixed' entry from here.
+                let traversalInner3 = pChild.traversal();
+                assert.isDefined(traversalInner3);
+                assert.isUndefined(pChild.entries);
+
+                // Now to handle the rest, knowing it's backed by a leaf node.
+                let curChild = pChild;
+
+                // At this point, we're already at the trie's actual leaf node for "trouble".
+                // But for edit-distance trie traversal, we want to decompress this and model
+                // an uncompacted Trie.
+                do {
+                  assert.isNotEmpty(leafChildSequence);
+
+                  let iter = curChild.traversal().children();
+                  let curr = iter.next();
+                  curChild = curr.value;
+
+                  // Test generator behavior - there should be one child, then the 'done' state.
+                  assert.isDefined(curChild);
+                  assert.equal(curChild.key, leafChildSequence[0]);
+                  curr = iter.next();
+                  assert.isTrue(curr.done);
+
+                  // Prepare for iteration.
+                  leafChildSequence.shift();
+
+                  // Conditional test - if that was not the final character, entries should be undefined.
+                  if(leafChildSequence.length > 0) {
+                    assert.isUndefined(curChild.traversal().entries);
+                  } else {
+                    let finalTraversal = curChild.traversal();
+                    assert.isDefined(finalTraversal.entries);
+                    assert.equal(finalTraversal.entries[0], smpA + smpP + 'pl' + smpE);
+                    eSuccess = true;
+                  }
+                } while (leafChildSequence.length > 0);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    assert.isTrue(aSuccess);
+    assert.isTrue(pSuccess);
+    assert.isTrue(eSuccess);
+
+    assert.isEmpty(pKeys);
   });
 });
