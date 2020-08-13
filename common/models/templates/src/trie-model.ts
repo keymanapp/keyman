@@ -223,29 +223,41 @@
           }
 
           return;
-        } else {
-          let fullText = root.entries[0].key;
+        } else { // type == 'leaf'
           let prefix = this.prefix;
-          if(prefix.length < fullText.length) {
-            let key = fullText[prefix.length];
-            let charCode = fullText.charCodeAt(prefix.length);
+
+          let children = root.entries.filter(function(entry) {
+            return entry.key != prefix && prefix.length < entry.key.length;
+          })
+
+          for(let i = 0; i < children.length; i++) {
+            let entry = children[i];
+            let key = entry.key;
+            let nodeKey = entry.key[prefix.length]
+            let charCode = nodeKey.charCodeAt(0);
+
             if(charCode >= 0xD800 && charCode <= 0xDBFF) {
               // Merge the other half of an SMP char in!
-              key = key + fullText[prefix.length+1];
+              nodeKey = nodeKey + key[prefix.length+1];
             }
             yield {
-              key: key,
-              traversal: function() { return new TrieModel.Traversal(root, prefix + key)}
+              key: nodeKey,
+              traversal: function() { return new TrieModel.Traversal(root, prefix + nodeKey)}
             }
-          }
+          };
           return;
         }
       }
 
       get entries(): string[] {
         if(this.root.type == 'leaf') {
-          if(this.root.entries[0].key == this.prefix) {
-            return this.root.entries.map(function(value) { return value.content });
+          let prefix = this.prefix;
+
+          let matches = this.root.entries.filter(function(entry) {
+            return entry.key == prefix;
+          })
+          if(matches.length > 0) {
+            return matches.map(function(value) { return value.content });
           } else {
             return undefined;
           }
