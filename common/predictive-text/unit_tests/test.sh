@@ -32,7 +32,7 @@ test-headless ( ) {
     _FLAGS="$_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $_FLAGS ./unit_tests/headless/*.js
+  npm run mocha -- --recursive $_FLAGS ./unit_tests/headless/*.js ./unit_tests/headless/**/*.js
 }
 
 test-browsers ( ) {
