@@ -50,10 +50,18 @@ type
     procedure Install; safecall;
     procedure Uninstall; safecall;
 
+    function FindInstallationLangID(out LangID: Integer;
+      out TemporaryKeyboardID: WideString; out RegistrationRequired: WordBool;
+      Flags: Integer): WordBool; safecall;
+    procedure InstallTip(LangID: Integer;
+      const TemporaryKeyboardToRemove: WideString); safecall;
+    procedure RegisterTip(LangID: Integer); safecall;
+
+
     { IIntKeymanKeyboardLanguageInstalled }
     procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
   public
-    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
+    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
       ALangID: Integer; AProfileGUID: TGUID; const AName: string);
   end;
 
@@ -66,6 +74,7 @@ uses
 
   glossary,
   keymanerrorcodes,
+  Keyman.System.Process.KPInstallKeyboardLanguage,
   kpinstallkeyboardlanguageprofiles,
   kpuninstallkeyboardlanguageprofiles,
   utiltsf,
@@ -102,12 +111,63 @@ begin
 end;
 
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
-  AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string; ALangID: Integer;
-  AProfileGUID: TGUID; const AName: string);
+  AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
+  ALangID: Integer; AProfileGUID: TGUID; const AName: string);
 begin
   FOwner := AOwner;
   FProfileGUID := AProfileGUID;
-  inherited Create(AContext, AOwner, ABCP47Code, ALangID, AName);
+  inherited Create(AContext, AOwner, AOriginalBCP47Code, ABCP47Code, ALangID, AName);
+end;
+
+function TKeymanKeyboardLanguageInstalled.FindInstallationLangID(
+  out LangID: Integer; out TemporaryKeyboardID: WideString;
+  out RegistrationRequired: WordBool; Flags: Integer): WordBool;
+var
+  kp: TKPInstallKeyboardLanguage;
+  s: string;
+begin
+  LangID := Self.Get_LangID;
+  TemporaryKeyboardID := '';
+  RegistrationRequired := False;
+
+  if LangID <> 0 then
+    Exit(True);
+
+  RegistrationRequired := True;
+  kp := TKPInstallKeyboardLanguage.Create(Context);
+  try
+    Result := kp.FindInstallationLangID(Self.Get_BCP47Code, LangID, s, Flags);
+    TemporaryKeyboardID := s;
+  finally
+    kp.Free;
+  end;
+end;
+
+procedure TKeymanKeyboardLanguageInstalled.RegisterTip(LangID: Integer);
+var
+  kp: TKPInstallKeyboardLanguage;
+begin
+  kp := TKPInstallKeyboardLanguage.Create(Context);
+  try
+    kp.RegisterTip(FOwner.ID, Get_BCP47Code, FOwner.Name, LangID, FOwner.IconFilename, GetLangName);
+  finally
+    kp.Free;
+  end;
+end;
+
+procedure TKeymanKeyboardLanguageInstalled.InstallTip(LangID: Integer;
+  const TemporaryKeyboardToRemove: WideString);
+var
+  kp: TKPInstallKeyboardLanguage;
+begin
+  kp := TKPInstallKeyboardLanguage.Create(Context);
+  try
+    kp.InstallTip(FOwner.ID, Get_BCP47Code, LangID);
+    if TemporaryKeyboardToRemove <> '' then
+      kp.UninstallTemporaryLayout(TemporaryKeyboardToRemove);
+  finally
+    kp.Free;
+  end;
 end;
 
 function TKeymanKeyboardLanguageInstalled.Get_IsInstalled: WordBool;

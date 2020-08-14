@@ -51,7 +51,7 @@ type
 
     { IKeymanKeyboardFile }
     procedure Install(Force: WordBool); safecall;
-    function Install2(Force, InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
+    function Install2(Force: WordBool): IKeymanKeyboardInstalled; safecall;
 
     { IKeymanKeyboard }
     function Get_Copyright: WideString; override; safecall;
@@ -239,17 +239,13 @@ begin
   end;
 end;
 
-function TKeymanKeyboardFile.Install2(Force, InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled;
+function TKeymanKeyboardFile.Install2(Force: WordBool): IKeymanKeyboardInstalled;
 var
   kki: IKeymanKeyboardsInstalled;
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    if InstallDefaultLanguage then
-      Execute(FFileName, '', [ikInstallDefaultLanguage], nil, Force)
-    else
-      Execute(FFileName, '', [], nil, Force);
-
+    Execute(FFileName, '', [ikDontInstallLanguages], nil, Force);
   finally
     Free;
   end;

@@ -295,6 +295,7 @@
         <DCCReference Include="processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas">
             <Form>$R *.TLB</Form>
         </DCCReference>
+        <DCCReference Include="processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas"/>
         <RidlCompile Include="kmcomapi.ridl"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

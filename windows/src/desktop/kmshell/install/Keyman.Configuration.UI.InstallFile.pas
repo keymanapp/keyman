@@ -31,6 +31,7 @@ uses
   Vcl.Controls,
   Vcl.Dialogs,
 
+  Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.UI.KeymanProtocolHandler,
   Keyman.Configuration.UI.MitigationForWin10_1803,
   kmint,
@@ -163,24 +164,20 @@ begin
       Filename := FilenameBCP47[0];
       IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
 
-      if (Length(FilenameBCP47) > 1) and (FilenameBCP47[1] <> '') then
+      if IsPackage then
       begin
-        if IsPackage then
-        begin
-          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True, False);
-          InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[2]);
-        end
-        else
-        begin
-          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True, False);
-          FKeyboard.Languages.Install(FilenameBCP47[2]);
-        end;
+        FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True);
+        if Length(FilenameBCP47) > 1
+          then InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[1])
+          else InstallKeyboardPackageLanguage(FPackage, '');
       end
       else
       begin
-        if AnsiSameText(ExtractFileExt(FileName), '.kmp')
-          then kmcom.Packages.Install(FileName, True)
-          else kmcom.Keyboards.Install(FileName, True);
+        FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True);
+        // TODO: the split between user and lm here is a real pain; we need to handle this cleanly
+        if Length(FilenameBCP47) > 1
+          then TTIPMaintenance.DoInstall(FKeyboard.ID, FilenameBCP47[1])
+          else TTIPMaintenance.DoInstall(FKeyboard.ID, TTIPMaintenance.GetFirstLanguage(FKeyboard))
       end;
       CheckForMitigationWarningFor_Win10_1803(ASilent, '');
     except
@@ -228,7 +225,7 @@ var
   DefaultBCP47Language: string;
   i: Integer;
 begin
-  if FPackage.Keyboards.Count > 1 then
+  if (FPackage.Keyboards.Count > 1) or (BCP47 = '') then
   begin
     // We don't attempt to propagate the language association preference
     // when there is more than one keyboard in the package. This means a
@@ -239,11 +236,11 @@ begin
       DefaultBCP47Language := FPackage.Keyboards[i].DefaultBCP47Languages;
       if DefaultBCP47Language.Contains(' ') then
         DefaultBCP47Language := DefaultBCP47Language.Split([' '])[0];
-      (FPackage.Keyboards[i] as IKeymanKeyboardInstalled).Languages.Install(DefaultBCP47Language);
+      TTIPMaintenance.DoInstall(FPackage.Keyboards[i].ID, DefaultBCP47Language);
     end;
   end
   else if FPackage.Keyboards.Count > 0 then
-    (FPackage.Keyboards[0] as IKeymanKeyboardInstalled).Languages.Install(BCP47);
+    TTIPMaintenance.DoInstall(FPackage.Keyboards[0].ID, BCP47);
 end;
 
 class procedure TInstallFile.AddDefaultLanguageHotkey(Keyboard: IKeymanKeyboardInstalled);

@@ -52,7 +52,16 @@ uses
   kpbase;
 
 type
-  TKPInstallKeyboardOptions = set of (ikPartOfPackage, ikInstallDefaultLanguage);
+  TKPInstallKeyboardOptions = set of (
+    // Set if the keyboard is part of a package being installed
+    ikPartOfPackage,
+
+    // Prior to 14.0, the install would install the default language for the keyboard
+    // at the same time as installing the keyboard. For 14.0, the recommended approach
+    // is to iterate through the keyboards in the package post-install and add a
+    // language, first to register it LM, then to install it CU. So this flag is
+    // used by the Install2 methods introduced in 14.0 to avoid the legacy behaviour.
+    ikDontInstallLanguages);
 
   TKPInstallKeyboard = class(TKPBase)
     procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
@@ -239,7 +248,7 @@ begin
         //
         if Assigned(Languages) and (Languages.Count > 0) then
         begin
-          if ikInstallDefaultLanguage in FInstallOptions then
+          if not (ikDontInstallLanguages in FInstallOptions) then
           begin
             // Use language data from package to install; we only install
             // the first language now and add the rest to the registry for
@@ -306,7 +315,7 @@ begin
           if Length(FLanguages) = 0 then
             AddLanguage(HKLToLanguageID(FDefaultHKL));
 
-          if ikInstallDefaultLanguage in FInstallOptions then
+          if not (ikDontInstallLanguages in FInstallOptions) then
           begin
             // Registers only the first language
             RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707

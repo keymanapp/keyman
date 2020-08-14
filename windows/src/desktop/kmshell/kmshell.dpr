@@ -169,8 +169,9 @@ uses
   Keyman.Configuration.System.HttpServer.App.ConfigMain in 'web\Keyman.Configuration.System.HttpServer.App.ConfigMain.pas',
   Keyman.Configuration.UI.InstallFile in 'install\Keyman.Configuration.UI.InstallFile.pas',
   Keyman.Configuration.UI.KeymanProtocolHandler in 'install\Keyman.Configuration.UI.KeymanProtocolHandler.pas',
-  Keyman.Configuration.System.KeymanUILanguageManager in '..\kmshell\main\Keyman.Configuration.System.KeymanUILanguageManager.pas',
-  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas';
+  Keyman.Configuration.System.KeymanUILanguageManager in 'main\Keyman.Configuration.System.KeymanUILanguageManager.pas',
+  Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
+  Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

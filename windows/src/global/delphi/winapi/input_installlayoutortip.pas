@@ -9,6 +9,7 @@ const
   ILOT_UNINSTALL = 1;
 
 function InstallLayoutOrTip(FLayoutInstallString: PChar; Flags: DWord): Boolean;
+function InstallLayoutOrTipUserReg(pszUserReg, pszSystemReg, pszSoftwareReg, FLayoutInstallString: PChar; dwFlags: DWord): Boolean;
 procedure UnregisterTIPAndItsProfiles(AClsid: TGUID);
 
 implementation
@@ -40,7 +41,7 @@ begin
       Exit(False);
     end;
 
-    if not PInstallLayoutOrTip(FLayoutInstallString, 0) then
+    if not PInstallLayoutOrTip(FLayoutInstallString, Flags) then
     begin
       Exit(False);
     end;
@@ -51,6 +52,31 @@ begin
   Result := True;
 end;
 
+function InstallLayoutOrTipUserReg(pszUserReg, pszSystemReg, pszSoftwareReg, FLayoutInstallString: PChar; dwFlags: DWord): Boolean;
+type
+  TInstallLayoutOrTipUserRegFunc = function(pszUserReg, pszSystemReg, pszSoftwareReg, psz: PWideChar; dwFlags: DWord): BOOL; stdcall;   // I4244
+var
+  hInputDll: THandle;
+  PInstallLayoutOrTipUserReg: TInstallLayoutOrTipUserRegFunc;
+begin
+  hInputDll := LoadLibrary('input.dll');
+  if hInputDll = 0 then
+  begin
+    Exit(False);
+  end;
+
+  try
+    PInstallLayoutOrTipUserReg := TInstallLayoutOrTipUserRegFunc(GetProcAddress(hInputDll, 'InstallLayoutOrTipUserReg'));
+    if not Assigned(PInstallLayoutOrTipUserReg) then
+    begin
+      Exit(False);
+    end;
+
+    Result := PInstallLayoutOrTipUserReg(pszUserReg, pszSystemReg, pszSoftwareReg, FLayoutInstallString, dwFlags);
+  finally
+    FreeLibrary(hInputDll);
+  end;
+end;
 procedure UnregisterTIPAndItsProfiles(AClsid: TGUID);
 var
   pInputProcessorProfiles: ITfInputProcessorProfiles;

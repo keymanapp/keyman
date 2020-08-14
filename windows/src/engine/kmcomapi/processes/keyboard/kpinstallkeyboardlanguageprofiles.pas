@@ -48,19 +48,19 @@ type
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
   private
-    pInputProcessorProfiles: ITfInputProcessorProfiles;
-    pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;   // I3743
     reg: TRegistry;
     RootPath: string;
-    PIconFileName: PWideChar;
     FWin8Languages: TWindows8LanguageList;
     function RegisterLocale(KeyboardName, BCP47Tag: string; LangID: Integer; IconFileName, LanguageName: string): Boolean;   // I3768
     function ConvertLangIDToBCP47Tag(LangID: Integer; var Locale: string): Boolean;
     function ConvertBCP47TagToLangID(Locale: string; var LangID: Integer): Boolean;
     function InstallBCP47Language(const FLocaleName: string): Boolean;
-    function RemoveDefaultKeyboardForLanguage(FLocaleName: string): Boolean;
+    function RemoveDefaultKeyboardForLanguage(const uninstall_keyboard: string): Boolean;
     function ExtractBaseBCP47Tag(BCP47Tag: string): string;
-  end;
+    function GetInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+    function WaitForKeyboardToBeAvailable(LangID: Integer; var UninstallKeyboard: string): Boolean;
+  end
+  deprecated 'Use TKPInstallKeyboardLanguage';
 
 implementation
 
@@ -78,6 +78,7 @@ uses
   KeymanPaths,
   RegistryKeys,
   BCP47Tag,
+  glossary,
   TempFileManager,
   utilexecute,
   utilfiletypes,
@@ -106,24 +107,28 @@ begin
     else Locale := '';
 end;
 
-constructor TKPInstallKeyboardLanguageProfiles.Create(AContext: TKeymanContext);
+function TKPInstallKeyboardLanguageProfiles.GetInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+var
+  pInputProcessorProfiles: ITfInputProcessorProfiles;
 begin
-  FWin8Languages := TWindows8LanguageList.Create;
+  pInputProcessorProfiles := nil;
 
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
                           IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
 
-  if not Supports(pInputProcessorProfiles, IID_ITfInputProcessorProfileMgr, pInputProcessorProfileMgr) then   // I3743
+  if not Supports(pInputProcessorProfiles, IID_ITfInputProcessorProfileMgr, Result) then   // I3743
     raise Exception.Create('Missing interface IID_ITfInputProcessorProfileMgr');
+end;
 
+constructor TKPInstallKeyboardLanguageProfiles.Create(AContext: TKeymanContext);
+begin
+  FWin8Languages := TWindows8LanguageList.Create;
   inherited Create(AContext);
 end;
 
 destructor TKPInstallKeyboardLanguageProfiles.Destroy;
 begin
   FreeAndNil(FWin8Languages);
-  pInputProcessorProfiles := nil;
-  pInputProcessorProfileMgr := nil;
   inherited Destroy;
 end;
 
@@ -250,14 +255,15 @@ var
   guid: TGUID;
   FLayoutInstallString: string;
   IconIndex: Integer;
-  UserLanguageInstalled: Boolean;
   Win8Lang: TWindows8Language;
   ml: TMitigateWin10_1803.TMitigatedLanguage;
   FMitigationApplied: Boolean;
   TempLangID: Integer;
+  AEnabledInt: Integer;
+  pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+  uninstall_keyboard: string;   // I3743
 begin
   Result := False;
-  UserLanguageInstalled := False;
 
   //
   // Begin #1285 mitigation
@@ -301,7 +307,6 @@ begin
     // Install user language with Powershell if it isn't present
     //
 
-    UserLanguageInstalled := True;
     LangID := 0;
 
     BCP47Tag := ExtractBaseBCP47Tag(BCP47Tag);
@@ -327,6 +332,10 @@ begin
     // BCP47Tag will now be reduced to the installed tag, which may mean script and region have been stripped
 
     LangID := Win8Lang.LangID;
+
+    // We'll wait for the keyboard to made available so we can remove it again...
+    if not WaitForKeyboardToBeAvailable(LangID, uninstall_keyboard) then
+      uninstall_keyboard := '';
   end;
 
   reg.OpenKey('\' + RootPath + '\' + BCP47Tag, True);
@@ -338,6 +347,10 @@ begin
   begin
     CreateGuid(&guid);
     reg.WriteString(SRegValue_KeymanProfileGUID, GuidToString(guid));
+  end
+  else
+  begin
+    //TODO: fix this
   end;
 
   if IconFileName = '' then   // I4555
@@ -348,10 +361,29 @@ begin
   else
     IconIndex := 0;
 
-  PIconFileName := PWideChar(IconFileName);
-
   FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
     GuidToString(guid)]);
+
+  { Register the keyboard profile }
+
+  if Context.Control.IsKeymanRunning
+    then AEnabledInt := 1
+    else AEnabledInt := 0;
+
+  pInputProcessorProfileMgr := GetInputProcessorProfileMgr;
+  OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
+    c_clsidKMTipTextService,
+    LangID,
+    guid,
+    PWideChar(KeyboardName),
+    Length(KeyboardName),
+    PWideChar(IconFileName),
+    Length(IconFileName),
+    IconIndex,
+    0,
+    0,
+    AEnabledInt,
+    0));
 
   { Save TIP to registry }   // I4244
 
@@ -373,30 +405,16 @@ begin
     end;
   end;
 
-  { Register the keyboard profile }
-
-  OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
-    c_clsidKMTipTextService,
-    LangID,
-    guid,
-    PWideChar(KeyboardName),
-    Length(KeyboardName),
-    PWideChar(IconFileName),
-    Length(IconFileName),
-    IconIndex,
-    0,
-    0,
-    1,
-    0));
-
-  if UserLanguageInstalled then
+  if uninstall_keyboard <> '' then
   begin
-    RemoveDefaultKeyboardForLanguage(BCP47Tag);
+    // TODO: this is going to mess things up because of cached data.
+    RemoveDefaultKeyboardForLanguage(uninstall_keyboard);
   end;
 
   Result := True;
 end;
 
+// TODO Replace with TBCP47Tag.GetCanonicalTag
 function TKPInstallKeyboardLanguageProfiles.ExtractBaseBCP47Tag(BCP47Tag: string): string;
 var
   FTag: TBCP47Tag;
@@ -412,12 +430,13 @@ begin
   end;
 end;
 
+//procedure TKPIntsallKeyboardLanguageProfiles.InstallKeymanKeyboardW
+
 function TKPInstallKeyboardLanguageProfiles.InstallBCP47Language(const FLocaleName: string): Boolean;
 var
   ScriptFile: TTempFile;
   FLogText: string;
 begin
-
   // Use PowerShell
   ScriptFile := TTempFileManager.Get('.ps1');
 
@@ -436,27 +455,75 @@ begin
   Result := True;
 end;
 
-function TKPInstallKeyboardLanguageProfiles.RemoveDefaultKeyboardForLanguage(FLocaleName: string): Boolean;
-var
-  ScriptFile: TTempFile;
-  FLogText: string;
-begin
-  ScriptFile := TTempFileManager.Get('.ps1');
+{
+  Profile list updates can be asynchronous. This can happen when the profile was
+  installed by a separate process. We need to wait at this point before the
+  initial installation of the base keyboard is visible in the list of
+  profiles.
 
-  with TStringList.Create do
-  try
-    Add('$list = Get-WinUserLanguageList');
-    Add('$item = $list | Where-Object {$_.LanguageTag -like "'+FLocaleName+'"}');
-    Add('$result = $item.InputMethodTips.RemoveAll({ param($m) $m -match "[0-9a-z]{4}:[0-9a-z]{8}" })');
-    Add('Set-WinUserLanguageList $list -force');
-    SaveToFile(ScriptFile.name);
-    TUtilExecute.Console('powershell.exe -ExecutionPolicy Unrestricted "& ""'+ScriptFile.name+'"""', ExtractFilePath(ScriptFile.name), FLogText);
-  finally
-    Free;
-    ScriptFile.Free;
-  end;
-  Result := True;
+  Warning: this function can be re-entrant due to a message loop. This
+  appears to be unavoidable.
+}
+function TKPInstallKeyboardLanguageProfiles.WaitForKeyboardToBeAvailable(LangID: Integer; var UninstallKeyboard: string): Boolean;
+var
+  ppEnum: IEnumTfInputProcessorProfiles;
+  profile: TF_INPUTPROCESSORPROFILE;
+  pcFetch: LongWord;
+  pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;   // I3743
+  msg: TMSG;
+  Tries: Integer;
+  t: Cardinal;
+begin
+  Tries := 0;
+  repeat
+    pInputProcessorProfileMgr := GetInputProcessorProfileMgr;   // I3743
+
+    pInputProcessorProfileMgr.EnumProfiles(LangID, ppEnum);
+    while ppEnum.Next(1, profile, pcFetch) = S_OK do
+    begin
+      if profile.dwProfileType = TF_PROFILETYPE_KEYBOARDLAYOUT then
+      begin
+        UninstallKeyboard := Format('%04.4x:%08.8x', [LangID, HKLToKeyboardID(profile.HKL)]);
+        Exit(True);
+      end
+      else if (profile.dwProfileType = TF_PROFILETYPE_INPUTPROCESSOR) and (profile.catid = GUID_TFCAT_TIP_KEYBOARD) then
+      begin
+        UninstallKeyboard := Format('%04.4x:%s%s', [LangID, GUIDToString(profile.clsid), GUIDToString(profile.guidProfile)]);
+        Exit(True);
+      end;
+    end;
+
+    pInputProcessorProfileMgr := nil;
+    ppEnum := nil;
+
+    t := GetTickCount;
+
+    // Sleep 1 second and retry
+    while (GetTickCount - t < 1000) do
+    begin
+      Sleep(10);
+      while PeekMessage(msg, 0, 0, 0, PM_REMOVE) do
+        DispatchMessage(msg);
+    end;
+
+    Inc(Tries);
+  until Tries >= 10;
+
+  // We won't fail the keyboard install, but we'll be leaving a spurious keyboard
+  // in the system.
+  WarnFmt(KMN_W_UninstallFileInUse, VarArrayOf(['keyboard not found']));
+  Result := False;
 end;
 
+
+function TKPInstallKeyboardLanguageProfiles.RemoveDefaultKeyboardForLanguage(const uninstall_keyboard: string): Boolean; //; FLocaleName: string; FInstalledGUID: TGUID): Boolean;
+begin
+  Result := InstallLayoutOrTip(PChar(uninstall_keyboard), ILOT_UNINSTALL);
+  if not Result then
+  begin
+    WarnFmt(KMN_W_UninstallFileInUse, VarArrayOf([uninstall_keyboard]));
+    Result := False;
+  end;
+end;
 
 end.

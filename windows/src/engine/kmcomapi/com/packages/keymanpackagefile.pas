@@ -73,7 +73,7 @@ type
 
     { IKeymanPackageFile }
     procedure Install(Force: WordBool); safecall;
-    function Install2(Force, InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
+    function Install2(Force: WordBool): IKeymanPackageInstalled; safecall;
   public
     constructor Create(AContext: TKeymanContext; const Filename: Widestring);
     destructor Destroy; override;
@@ -167,22 +167,31 @@ begin
 end;
 
 procedure TKeymanPackageFile.Install(Force: WordBool);
+var
+  o: TKPInstallPackageOptions;
 begin
   with TKPInstallPackage.Create(Context) do
   try
-    Execute(FFileName, Force, True);
+    o := [];
+    if Force then
+      Include(o, ipForce);
+    Execute(FFileName, o);
   finally
     Free;
   end;
 end;
 
-function TKeymanPackageFile.Install2(Force, InstallDefaultLanguage: WordBool): IKeymanPackageInstalled;
+function TKeymanPackageFile.Install2(Force: WordBool): IKeymanPackageInstalled;
 var
+  o: TKPInstallPackageOptions;
   kpi: IKeymanPackagesInstalled;
 begin
   with TKPInstallPackage.Create(Context) do
   try
-    Execute(FFileName, Force, InstallDefaultLanguage);
+    o := [ipDontInstallLanguages];
+    if Force then
+      Include(o, ipForce);
+    Execute(FFileName, o);
   finally
     Free;
   end;

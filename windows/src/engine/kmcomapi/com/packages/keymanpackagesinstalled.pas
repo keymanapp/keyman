@@ -50,7 +50,7 @@ type
     function GetPackageFromFile(const Filename: WideString): IKeymanPackageFile; safecall;
     function IndexOf(const ID: WideString): Integer; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
-    function Install2(const Filename: WideString; Force, InstallDefaultLanguage: WordBool): IKeymanPackageInstalled; safecall;
+    function Install2(const Filename: WideString; Force: WordBool): IKeymanPackageInstalled; safecall;
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
@@ -109,24 +109,34 @@ begin
 end;
 
 procedure TKeymanPackagesInstalled.Install(const Filename: WideString; Force: WordBool);
+var
+  o: TKPInstallPackageOptions;
 begin
   KL.MethodEnter(Self, 'Install', [Filename, Force]);
   with TKPInstallPackage.Create(Context) do
   try
-    Execute(Filename, Force, True);
+    o := [];
+    if Force then
+      Include(o, ipForce);
+    Execute(Filename, o);
   finally
     Free;
   end;
   KL.MethodExit(Self, 'Install');
 end;
 
-function TKeymanPackagesInstalled.Install2(const Filename: WideString; Force,
-  InstallDefaultLanguage: WordBool): IKeymanPackageInstalled;
+function TKeymanPackagesInstalled.Install2(const Filename: WideString;
+  Force: WordBool): IKeymanPackageInstalled;
+var
+  o: TKPInstallPackageOptions;
 begin
-  KL.MethodEnter(Self, 'Install2', [Filename, Force, InstallDefaultLanguage]);
+  KL.MethodEnter(Self, 'Install2', [Filename, Force]);
   with TKPInstallPackage.Create(Context) do
   try
-    Execute(Filename, Force, InstallDefaultLanguage);
+    o := [ipDontInstallLanguages];
+    if Force then
+      Include(o, ipForce);
+    Execute(Filename, o);
   finally
     Free;
   end;

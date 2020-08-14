@@ -123,18 +123,12 @@ begin
   nLocale := reg.ReadInteger(SRegValue_LanguageProfileLangID);
   guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
 
-  if pInputProcessorProfileMgr.UnregisterProfile(c_clsidKMTipTextService, nLocale, guid, 0) <> S_OK then   // I3743
-  //if pInputProcessorProfiles.RemoveLanguageProfile(c_clsidKMTipTextService, nLocale, guid) = E_FAIL then   // I3721
-    WarnFmt(KMN_W_KeyboardUninstall_ProfileNotFound, VarArrayOf([Locale, KeyboardName]));
-
-  { Remove TIP from registry }   // I4244
-
   FLayoutInstallString := Format('%04.4x:%s%s', [nLocale, GuidToString(c_clsidKMTipTextService),
     GuidToString(guid)]);
 
   try   // I4494
     if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf(['bogus2'])); //TODO FIX CODE
+      WarnFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([FLayoutInstallString]));
   except
     on E:EOleException do
     begin
@@ -149,6 +143,12 @@ begin
       WarnFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]));
     end;
   end;
+
+  if pInputProcessorProfileMgr.UnregisterProfile(c_clsidKMTipTextService, nLocale, guid, 0) <> S_OK then   // I3743
+  //if pInputProcessorProfiles.RemoveLanguageProfile(c_clsidKMTipTextService, nLocale, guid) = E_FAIL then   // I3721
+    WarnFmt(KMN_W_KeyboardUninstall_ProfileNotFound, VarArrayOf([Locale, KeyboardName]));
+
+  { Remove TIP from registry }   // I4244
 
   reg.CloseKey;   // I3722
   reg.DeleteKey('\'+RootPath+'\'+Locale);   // I3722

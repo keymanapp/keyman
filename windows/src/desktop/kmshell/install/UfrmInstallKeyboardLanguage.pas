@@ -130,6 +130,7 @@ uses
   Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
+  Keyman.Configuration.System.TIPMaintenance,
 
   BCP47Tag,
   GetOSVersion,
@@ -142,17 +143,18 @@ uses
 { TfrmInstallKeyboardLanguage }
 
 function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string; Silent: Boolean): Boolean;
-var
-  n: Integer;
+//var
+//  n: Integer;
 begin
-  n := kmcom.Keyboards.IndexOf(KeyboardID);
+  Result := TTIPMaintenance.DoInstall(KeyboardID, ISOCode);
+{  n := kmcom.Keyboards.IndexOf(KeyboardID);
   if n < 0 then
     Exit(False);
 
   kmcom.Keyboards[n].Languages.Install(ISOCode);
   CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
-  Result := True;
+  Result := True;}
 end;
 
 
@@ -262,14 +264,15 @@ begin
     then FCode := FCustomLanguage.Tag // Using a custom code
     else FCode := FLanguageVariant.Code;
 
-  if not kmcom.SystemInfo.IsAdministrator then
-  begin
-    WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
-  end
-  else
-  begin
-    InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
-  end;
+  TTIPMaintenance.DoInstall(FKeyboard.ID, FCode);
+//  if not kmcom.SystemInfo.IsAdministrator then
+//  begin
+//    WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
+//  end
+//  else
+//  begin
+//    InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
+//  end;
 
   FKeyboardID := FKeyboard.ID;
   FKeyboard := nil;

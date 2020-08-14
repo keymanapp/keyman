@@ -121,6 +121,7 @@ uses
   Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.Configuration.System.HttpServer.App.InstallKeyboard,
   Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.Configuration.System.TIPMaintenance,
   kmcomapi_errors,
   kmint,
   OnlineConstants,
@@ -306,6 +307,8 @@ var
   pkg: IKeymanPackageInstalled;
   //FKeyboardsList: WideString;
   j: Integer;
+  FInstalledPackage: IKeymanPackageInstalled;
+  FInstalledKeyboard: IKeymanKeyboardInstalled;
 begin
   kmcom.Errors.Clear;
   try
@@ -339,7 +342,10 @@ begin
         kbd := nil;
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;
-        FKeyboard.Install(True);
+        FInstalledKeyboard := (FKeyboard as IKeymanKeyboardFile2).Install2(True);
+        // TODO: let user choose language
+        // GetFirstLanguage is a temporary function until we implement TODO above
+        TTIPMaintenance.DoInstall(FKeyboard.ID, TTIPMaintenance.GetFirstLanguage(FInstalledKeyboard));
         CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end
       else
@@ -395,7 +401,11 @@ begin
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;  // I2169
 
-        FPackage.Install(True);
+        FInstalledPackage := (FPackage as IKeymanPackageFile2).Install2(True);
+        // TODO: allow user to select language
+        for i := 0 to FInstalledPackage.Keyboards.Count - 1 do
+          TTIPMaintenance.DoInstall(FInstalledPackage.Keyboards[i].ID, TTIPMaintenance.GetFirstLanguage(FInstalledPackage.Keyboards[i] as IKeymanKeyboardInstalled));
+
         CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end;
     except
