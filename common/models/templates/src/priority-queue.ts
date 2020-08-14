@@ -86,11 +86,6 @@ namespace models {
           }
         }
       } else {
-        // Quick safety-check.
-        if(this.count == 0) {
-          return;
-        }
-
         this.heapify(0, this.count - 1);
       }
     }
@@ -142,11 +137,12 @@ namespace models {
      * @param elements A group of elements to enqueue simultaneously.
      */
     enqueueAll(elements: Type[]) {
-      let firstIndex = this.count > 0 ? this.count : 1; // parent of 0 is -1, which is illegal.
+      let firstIndex = this.count 
       this.heap = this.heap.concat(elements);
-      let lastIndex = this.count - 1;
+      let firstParent = PriorityQueue.parentIndex(firstIndex);
 
-      this.heapify(PriorityQueue.parentIndex(firstIndex), PriorityQueue.parentIndex(lastIndex));
+      // The 'parent' of index 0 will return -1, which is illegal.
+      this.heapify(firstParent >= 0 ? firstParent : 0, PriorityQueue.parentIndex(this.count-1));
     }
 
     /**
