@@ -176,7 +176,7 @@
         this.prefix = prefix;
       }
 
-      *children(): Generator<{key: string, traversal: () => LexiconTraversal}> {
+      *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
         let root = this.root;
 
         if(root.type == 'internal') {
@@ -197,7 +197,7 @@
                 for(let j = 0; j < entryNode.values.length; j++) {
                   let prefix = this.prefix + entry + internalNode.values[j];
                   yield {
-                    key: entry + entryNode.values[j],
+                    char: entry + entryNode.values[j],
                     traversal: function() { return new TrieModel.Traversal(internalNode.children[internalNode.values[j]], prefix) }
                   }
                 }
@@ -208,7 +208,7 @@
                 let prefix = this.prefix + entry;
 
                 yield {
-                  key: entry,
+                  char: entry,
                   traversal: function () {return new TrieModel.Traversal(entryNode, prefix)}
                 }
               }
@@ -217,7 +217,7 @@
             } else {
               let prefix = this.prefix + entry;
               yield {
-                key: entry,
+                char: entry,
                 traversal: function() { return new TrieModel.Traversal(entryNode, prefix)}
               }
             }
@@ -242,7 +242,7 @@
               nodeKey = nodeKey + key[prefix.length+1];
             }
             yield {
-              key: nodeKey,
+              char: nodeKey,
               traversal: function() { return new TrieModel.Traversal(root, prefix + nodeKey)}
             }
           };

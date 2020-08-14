@@ -24,7 +24,7 @@ describe('Trie traversal abstractions', function() {
                     'u', 'c', 'd', 'l', 'e', 'j', 'p', 'g', 'v', 'k', 'r', 'q']
 
     for(child of rootTraversal.children()) {
-      let keyIndex = rootKeys.indexOf(child.key);
+      let keyIndex = rootKeys.indexOf(child.char);
       assert.notEqual(keyIndex, -1);
       rootKeys.splice(keyIndex, 1);
     }
@@ -44,21 +44,21 @@ describe('Trie traversal abstractions', function() {
     let hSuccess = false;
     let eSuccess = false;
     for(child of rootTraversal.children()) {
-      if(child.key == 't') {
+      if(child.char == 't') {
         tSuccess = true;
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
         assert.isUndefined(child.entries);
 
         for(tChild of traversalInner1.children()) {
-          if(tChild.key == 'h') { 
+          if(tChild.char == 'h') { 
             hSuccess = true;
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
             assert.isUndefined(tChild.entries);
 
             for(hChild of traversalInner2.children()) {
-              if(hChild.key == 'e') {
+              if(hChild.char == 'e') {
                 eSuccess = true;
                 let traversalInner3 = hChild.traversal();
                 assert.isDefined(traversalInner3);
@@ -67,8 +67,8 @@ describe('Trie traversal abstractions', function() {
                 assert.equal(traversalInner3.entries[0], "the");
 
                 for(eChild of traversalInner3.children()) {
-                  let keyIndex = eKeys.indexOf(eChild.key);
-                  assert.notEqual(keyIndex, -1, "Did not find char '" + eChild.key + "' in array!");
+                  let keyIndex = eKeys.indexOf(eChild.char);
+                  assert.notEqual(keyIndex, -1, "Did not find char '" + eChild.char + "' in array!");
                   eKeys.splice(keyIndex, 1);
                 }
               }
@@ -95,19 +95,19 @@ describe('Trie traversal abstractions', function() {
     let leafChildSequence = ['u', 'b', 'l', 'e'];
     let eSuccess = false;
     for(child of rootTraversal.children()) {
-      if(child.key == 't') {
+      if(child.char == 't') {
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
         assert.isUndefined(child.entries);
 
         for(tChild of traversalInner1.children()) {
-          if(tChild.key == 'r') { 
+          if(tChild.char == 'r') { 
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
             assert.isUndefined(tChild.entries);
 
             for(rChild of traversalInner2.children()) {
-              if(rChild.key == 'o') {
+              if(rChild.char == 'o') {
                 let curChild = rChild;
 
                 // At this point, we're already at the trie's actual leaf node for "trouble".
@@ -122,7 +122,7 @@ describe('Trie traversal abstractions', function() {
 
                   // Test generator behavior - there should be one child, then the 'done' state.
                   assert.isDefined(curChild);
-                  assert.equal(curChild.key, leafChildSequence[0]);
+                  assert.equal(curChild.char, leafChildSequence[0]);
                   curr = iter.next();
                   assert.isTrue(curr.done);
 
@@ -172,25 +172,25 @@ describe('Trie traversal abstractions', function() {
     let pSuccess = false;
     let eSuccess = false;
     for(child of rootTraversal.children()) {
-      if(child.key == smpA) {
+      if(child.char == smpA) {
         aSuccess = true;
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
         assert.isUndefined(child.entries);
 
         for(aChild of traversalInner1.children()) {
-          if(aChild.key == smpP) { 
+          if(aChild.char == smpP) { 
             pSuccess = true;
             let traversalInner2 = aChild.traversal();
             assert.isDefined(traversalInner2);
             assert.isUndefined(aChild.entries);
 
             for(pChild of traversalInner2.children()) {
-              let keyIndex = pKeys.indexOf(pChild.key);
-              assert.notEqual(keyIndex, -1, "Did not find char '" + pChild.key + "' in array!");
+              let keyIndex = pKeys.indexOf(pChild.char);
+              assert.notEqual(keyIndex, -1, "Did not find char '" + pChild.char + "' in array!");
               pKeys.splice(keyIndex, 1);
 
-              if(pChild.key == 'p') { // We'll test traversal with the 'mixed' entry from here.
+              if(pChild.char == 'p') { // We'll test traversal with the 'mixed' entry from here.
                 let traversalInner3 = pChild.traversal();
                 assert.isDefined(traversalInner3);
                 assert.isUndefined(pChild.entries);
@@ -210,7 +210,7 @@ describe('Trie traversal abstractions', function() {
 
                   // Test generator behavior - there should be one child, then the 'done' state.
                   assert.isDefined(curChild);
-                  assert.equal(curChild.key, leafChildSequence[0]);
+                  assert.equal(curChild.char, leafChildSequence[0]);
                   curr = iter.next();
                   assert.isTrue(curr.done);
 
