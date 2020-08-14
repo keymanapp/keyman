@@ -59,3 +59,27 @@ man:
 
 version:
 	cd .. && ./scripts/reconf.sh keyman-config
+
+# i18n
+
+VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)")
+POFILES := $(shell find locale -name \*.po)
+MOFILES := $(POFILES:.po=/LC_MESSAGES/keyman-config.mo)
+
+update-template: version
+	xgettext --package-name "keyman" --package-version "$(VERSION)" \
+		--msgid-bugs-address "<support@keyman.com>" --copyright-holder "SIL International" \
+		--language=Python --directory=. --output-dir=locale --output=keyman-config.pot \
+		--add-comments=i18n: --sort-by-file --width=98 \
+		keyman_config/*.py km-*
+
+update-po: $(POFILES)
+
+locale/%.po: locale/keyman-config.pot
+	msgmerge --update --width=98 $@ $^
+
+$(MOFILES): %/LC_MESSAGES/keyman-config.mo: %.po
+	mkdir -p $(dir $@)
+	msgfmt -v --check --output-file=$@ $^
+
+compile-po: $(MOFILES)

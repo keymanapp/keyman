@@ -14,6 +14,7 @@ gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, WebKit2
 from distutils.version import StrictVersion
+from keyman_config import _
 from keyman_config.install_kmp import install_kmp, extract_kmp, get_metadata, InstallError, InstallStatus
 from keyman_config.list_installed_kmp import get_kmp_version
 from keyman_config.kmpmetadata import get_fonts
@@ -50,7 +51,7 @@ class InstallKmpWindow(Gtk.Dialog):
         if installed_kmp_ver:
             logging.info("installed kmp version %s", installed_kmp_ver)
 
-        windowtitle = "Installing keyboard/package " + keyboardid
+        windowtitle = _("Installing keyboard/package {keyboardid}").format(keyboardid=keyboardid)
         Gtk.Dialog.__init__(self, windowtitle, viewkmp)
         init_accel(self)
 
@@ -68,10 +69,11 @@ class InstallKmpWindow(Gtk.Dialog):
                 if info['version']['description'] == installed_kmp_ver:
                     dialog = Gtk.MessageDialog(
                         viewkmp, 0, Gtk.MessageType.QUESTION,
-                        Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
+                        Gtk.ButtonsType.YES_NO, _("Keyboard is installed already"))
                     dialog.format_secondary_text(
-                        "The " + self.kbname + " keyboard is already installed at version " + installed_kmp_ver +
-                        ". Do you want to uninstall then reinstall it?")
+                        _("The {name} keyboard is already installed at version {version}. "
+                          "Do you want to uninstall then reinstall it?")
+                        .format(name=self.kbname, version=installed_kmp_ver))
                     response = dialog.run()
                     dialog.destroy()
                     if response == Gtk.ResponseType.YES:
@@ -88,12 +90,12 @@ class InstallKmpWindow(Gtk.Dialog):
                         if StrictVersion(info['version']['description']) <= StrictVersion(installed_kmp_ver):
                             dialog = Gtk.MessageDialog(
                                 viewkmp, 0, Gtk.MessageType.QUESTION,
-                                Gtk.ButtonsType.YES_NO, "Keyboard is installed already")
+                                Gtk.ButtonsType.YES_NO, _("Keyboard is installed already"))
                             dialog.format_secondary_text(
-                                "The " + self.kbname + " keyboard is already installed with a newer version " +
-                                installed_kmp_ver +
-                                ". Do you want to uninstall it and install the older version" +
-                                info['version']['description'] + "?")
+                                _("The {name} keyboard is already installed with a newer version {installedversion}. "
+                                  "Do you want to uninstall it and install the older version {version}?")
+                                .format(name=self.kbname, installedversion=installed_kmp_ver,
+                                        version=info['version']['description']))
                             response = dialog.run()
                             dialog.destroy()
                             if response == Gtk.ResponseType.YES:
@@ -123,7 +125,7 @@ class InstallKmpWindow(Gtk.Dialog):
             self.page1.add(grid)
 
             label1 = Gtk.Label()
-            label1.set_text("Keyboard layouts:   ")
+            label1.set_text(_("Keyboard layouts:   "))
             label1.set_halign(Gtk.Align.END)
             grid.add(label1)
             prevlabel = label1
@@ -142,7 +144,7 @@ class InstallKmpWindow(Gtk.Dialog):
             if fonts:
                 label2 = Gtk.Label()
                 # Fonts are optional
-                label2.set_text("Fonts:   ")
+                label2.set_text(_("Fonts:   "))
                 label2.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label2, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label2
@@ -162,7 +164,7 @@ class InstallKmpWindow(Gtk.Dialog):
                 grid.attach_next_to(label, label2, Gtk.PositionType.RIGHT, 1, 1)
 
             label3 = Gtk.Label()
-            label3.set_text("Package version:   ")
+            label3.set_text(_("Package version:   "))
             label3.set_halign(Gtk.Align.END)
             grid.attach_next_to(label3, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = label3
@@ -174,7 +176,7 @@ class InstallKmpWindow(Gtk.Dialog):
 
             if info and 'author' in info:
                 label4 = Gtk.Label()
-                label4.set_text("Author:   ")
+                label4.set_text(_("Author:   "))
                 label4.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label4, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label4
@@ -192,7 +194,7 @@ class InstallKmpWindow(Gtk.Dialog):
             if info and 'website' in info:
                 label5 = Gtk.Label()
                 # Website is optional and may be a mailto for the author
-                label5.set_text("Website:   ")
+                label5.set_text(_("Website:   "))
                 label5.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label5, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = label5
@@ -206,7 +208,7 @@ class InstallKmpWindow(Gtk.Dialog):
 
             if info and 'copyright' in info:
                 label6 = Gtk.Label()
-                label6.set_text("Copyright:   ")
+                label6.set_text(_("Copyright:   "))
                 label6.set_halign(Gtk.Align.END)
                 grid.attach_next_to(label6, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 label = Gtk.Label()
@@ -240,10 +242,10 @@ class InstallKmpWindow(Gtk.Dialog):
                 mainhbox.pack_start(self.notebook, True, True, 0)
                 self.notebook.append_page(
                     self.page1,
-                    Gtk.Label('Details'))
+                    Gtk.Label(_('Details')))
                 self.notebook.append_page(
                     self.page2,
-                    Gtk.Label('README'))
+                    Gtk.Label(_('README')))
             else:
                 mainhbox.pack_start(self.page1, True, True, 0)
         self.get_content_area().pack_start(mainhbox, True, True, 0)
@@ -251,11 +253,11 @@ class InstallKmpWindow(Gtk.Dialog):
         hbox = Gtk.Box(spacing=6)
         self.get_content_area().pack_start(hbox, False, False, 0)
 
-        button = Gtk.Button.new_with_mnemonic("_Install")
+        button = Gtk.Button.new_with_mnemonic(_("_Install"))
         button.connect("clicked", self.on_install_clicked)
         hbox.pack_start(button, False, False, 0)
 
-        button = Gtk.Button.new_with_mnemonic("_Cancel")
+        button = Gtk.Button.new_with_mnemonic(_("_Cancel"))
         button.connect("clicked", self.on_cancel_clicked)
         hbox.pack_end(button, False, False, 0)
         bind_accelerator(self.accelerators, button, '<Control>w')
@@ -300,17 +302,18 @@ class InstallKmpWindow(Gtk.Dialog):
             else:
                 dialog = Gtk.MessageDialog(
                     self, 0, Gtk.MessageType.INFO,
-                    Gtk.ButtonsType.OK, "Keyboard " + self.kbname + " installed")
+                    Gtk.ButtonsType.OK, _("Keyboard {name} installed").format(name=self.kbname))
                 dialog.run()
                 dialog.destroy()
         except InstallError as e:
             if e.status == InstallStatus.Abort:
-                message = "Keyboard " + self.kbname + " could not be installed.\n\nError Message:\n%s" % (e.message)
+                message = _("Keyboard {name} could not be installed.").format(name=self.kbname) \
+                    + "\n\n" + _("Error Message:") + "\n %s" % (e.message)
                 logging.error(message)
                 message_type = Gtk.MessageType.ERROR
             else:
-                message = "Keyboard " + self.kbname + " could not be installed fully.\n\nWarning Message:\n%s" % (
-                    e.message)
+                message = _("Keyboard {name} could not be installed.").format(name=self.kbname) \
+                    + "\n\n" + _("Warning Message:") + "\n %s" % (e.message)
                 logging.warning(message)
                 message_type = Gtk.MessageType.WARNING
             dialog = Gtk.MessageDialog(

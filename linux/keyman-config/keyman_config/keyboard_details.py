@@ -9,7 +9,7 @@ import qrcode
 import gi
 from gi.repository import Gtk
 
-from keyman_config import KeymanComUrl
+from keyman_config import KeymanComUrl, _
 from keyman_config.accelerators import init_accel
 from keyman_config.kmpmetadata import parsemetadata
 
@@ -34,7 +34,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         if "keyboard" in kmp["name"].lower():
             wintitle = kmp["name"]
         else:
-            wintitle = kmp["name"] + " keyboard"
+            wintitle = _("{name} keyboard").format(name=kmp["name"])
         Gtk.Dialog.__init__(self, wintitle, parent)
         init_accel(self)
 
@@ -45,7 +45,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         info, system, options, keyboards, files = parsemetadata(kmp_json)
 
         if info is None:
-            raise Exception("could not parse kmp.json", kmp['packageID'], packageDir, kmp_json)
+            raise Exception(_("could not parse kmp.json"), kmp['packageID'], packageDir, kmp_json)
 
         kbdata = None
         jsonfile = os.path.join(packageDir, kmp['packageID'] + ".json")
@@ -66,7 +66,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         # Package info
 
         lbl_pkg_name = Gtk.Label()
-        lbl_pkg_name.set_text("Package name:   ")
+        lbl_pkg_name.set_text(_("Package name:   "))
         lbl_pkg_name.set_halign(Gtk.Align.END)
         grid.add(lbl_pkg_name)
         prevlabel = lbl_pkg_name
@@ -77,7 +77,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(label, lbl_pkg_name, Gtk.PositionType.RIGHT, 1, 1)
 
         lbl_pkg_id = Gtk.Label()
-        lbl_pkg_id.set_text("Package id:   ")
+        lbl_pkg_id.set_text(_("Package id:   "))
         lbl_pkg_id.set_halign(Gtk.Align.END)
         grid.attach_next_to(lbl_pkg_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = lbl_pkg_id
@@ -88,7 +88,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(label, lbl_pkg_id, Gtk.PositionType.RIGHT, 1, 1)
 
         lbl_pkg_vrs = Gtk.Label()
-        lbl_pkg_vrs.set_text("Package version:   ")
+        lbl_pkg_vrs.set_text(_("Package version:   "))
         lbl_pkg_vrs.set_halign(Gtk.Align.END)
         grid.attach_next_to(lbl_pkg_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
         prevlabel = lbl_pkg_vrs
@@ -100,7 +100,7 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         if kbdata:
             lbl_pkg_desc = Gtk.Label()
-            lbl_pkg_desc.set_text("Package description:   ")
+            lbl_pkg_desc.set_text(_("Package description:   "))
             lbl_pkg_desc.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_desc
@@ -113,7 +113,7 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         if "author" in info:
             lbl_pkg_auth = Gtk.Label()
-            lbl_pkg_auth.set_text("Package author:   ")
+            lbl_pkg_auth.set_text(_("Package author:   "))
             lbl_pkg_auth.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_auth
@@ -125,7 +125,7 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         if "copyright" in info:
             lbl_pkg_cpy = Gtk.Label()
-            lbl_pkg_cpy.set_text("Package copyright:   ")
+            lbl_pkg_cpy.set_text(_("Package copyright:   "))
             lbl_pkg_cpy.set_halign(Gtk.Align.END)
             grid.attach_next_to(lbl_pkg_cpy, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
             prevlabel = lbl_pkg_cpy
@@ -158,7 +158,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                 # show the icon somewhere
 
                 lbl_kbd_file = Gtk.Label()
-                lbl_kbd_file.set_text("Keyboard filename:   ")
+                lbl_kbd_file.set_text(_("Keyboard filename:   "))
                 lbl_kbd_file.set_halign(Gtk.Align.END)
                 grid.attach_next_to(lbl_kbd_file, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                 prevlabel = lbl_kbd_file
@@ -171,7 +171,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                 if kbdata:
                     if kbdata['id'] != kmp['packageID']:
                         lbl_kbd_name = Gtk.Label()
-                        lbl_kbd_name.set_text("Keyboard name:   ")
+                        lbl_kbd_name.set_text(_("Keyboard name:   "))
                         lbl_kbd_name.set_halign(Gtk.Align.END)
                         grid.attach_next_to(lbl_kbd_name, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_name
@@ -182,7 +182,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(label, lbl_kbd_name, Gtk.PositionType.RIGHT, 1, 1)
 
                         lbl_kbd_id = Gtk.Label()
-                        lbl_kbd_id.set_text("Keyboard id:   ")
+                        lbl_kbd_id.set_text(_("Keyboard id:   "))
                         lbl_kbd_id.set_halign(Gtk.Align.END)
                         grid.attach_next_to(lbl_kbd_id, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_id
@@ -193,7 +193,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(label, lbl_kbd_id, Gtk.PositionType.RIGHT, 1, 1)
 
                         lbl_kbd_vrs = Gtk.Label()
-                        lbl_kbd_vrs.set_text("Keyboard version:   ")
+                        lbl_kbd_vrs.set_text(_("Keyboard version:   "))
                         lbl_kbd_vrs.set_halign(Gtk.Align.END)
                         grid.attach_next_to(lbl_kbd_vrs, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_vrs
@@ -205,7 +205,7 @@ class KeyboardDetailsView(Gtk.Dialog):
 
                         if "author" in info:
                             lbl_kbd_auth = Gtk.Label()
-                            lbl_kbd_auth.set_text("Keyboard author:   ")
+                            lbl_kbd_auth.set_text(_("Keyboard author:   "))
                             lbl_kbd_auth.set_halign(Gtk.Align.END)
                             grid.attach_next_to(lbl_kbd_auth, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                             prevlabel = lbl_kbd_auth
@@ -216,7 +216,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                             grid.attach_next_to(label, lbl_kbd_auth, Gtk.PositionType.RIGHT, 1, 1)
 
                         lbl_kbd_lic = Gtk.Label()
-                        lbl_kbd_lic.set_text("Keyboard license:   ")
+                        lbl_kbd_lic.set_text(_("Keyboard license:   "))
                         lbl_kbd_lic.set_halign(Gtk.Align.END)
                         grid.attach_next_to(lbl_kbd_lic, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_lic
@@ -227,7 +227,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(label, lbl_kbd_lic, Gtk.PositionType.RIGHT, 1, 1)
 
                         lbl_kbd_desc = Gtk.Label()
-                        lbl_kbd_desc.set_text("Keyboard description:   ")
+                        lbl_kbd_desc.set_text(_("Keyboard description:   "))
                         lbl_kbd_desc.set_halign(Gtk.Align.END)
                         grid.attach_next_to(lbl_kbd_desc, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         prevlabel = lbl_kbd_desc
@@ -249,7 +249,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                         grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
 
                         # label7 = Gtk.Label()
-                        # label7.set_text("On Screen Keyboard:   ")
+                        # label7.set_text(_("On Screen Keyboard:   "))
                         # label7.set_halign(Gtk.Align.END)
                         # grid.attach_next_to(label7, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         # prevlabel = label7
@@ -260,7 +260,7 @@ class KeyboardDetailsView(Gtk.Dialog):
                         # # grid.attach_next_to(label, label7, Gtk.PositionType.RIGHT, 1, 1)
 
                         # label8 = Gtk.Label()
-                        # label8.set_text("Documentation:   ")
+                        # label8.set_text(_("Documentation:   "))
                         # label8.set_halign(Gtk.Align.END)
                         # grid.attach_next_to(label8, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         # prevlabel = label8
@@ -268,16 +268,16 @@ class KeyboardDetailsView(Gtk.Dialog):
                         # # label = Gtk.Label()
                         # # welcome_file = os.path.join("/usr/local/share/doc/keyman", kmp["id"], "welcome.htm")
                         # # if os.path.isfile(welcome_file):
-                        # #     label.set_text("Installed")
+                        # #     label.set_text(_("Installed"))
                         # # else:
-                        # #     label.set_text("Not installed")
+                        # #     label.set_text(_("Not installed"))
                         # # label.set_halign(Gtk.Align.START)
                         # # label.set_selectable(True)
                         # # grid.attach_next_to(label, label8, Gtk.PositionType.RIGHT, 1, 1)
 
                         # label9 = Gtk.Label()
                         # # stored in kmx
-                        # label9.set_text("Message:   ")
+                        # label9.set_text(_("Message:   "))
                         # label9.set_halign(Gtk.Align.END)
                         # grid.attach_next_to(label9, prevlabel, Gtk.PositionType.BOTTOM, 1, 1)
                         # prevlabel = label9
@@ -318,14 +318,13 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(image, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
 
         lbl_share_kbd = Gtk.Label()
-        lbl_share_kbd.set_text("Scan this code to load this keyboard\n"
-                               "on another device or share online")
+        lbl_share_kbd.set_text(_("Scan this code to load this keyboard\non another device or share online"))
         lbl_share_kbd.set_halign(Gtk.Align.CENTER)
         lbl_share_kbd.set_line_wrap(True)
         grid.attach_next_to(lbl_share_kbd, image, Gtk.PositionType.BOTTOM, 2, 1)
         prevlabel = lbl_share_kbd
 
-        self.add_button("_Close", Gtk.ResponseType.CLOSE)
+        self.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
 
         self.get_content_area().pack_start(box, True, True, 12)
         self.resize(800, 450)
