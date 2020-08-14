@@ -30,11 +30,12 @@ declare interface LexiconTraversal {
    * an iterator with states corresponding 'e' (for 'the', 'then', 'there'),
    * 'a' (for 'than', 'that'), etc.
    * 
-   * @param key       The character suffixed to the existing lookup-prefix's string
+   * @param char      The character suffixed to the existing lookup-prefix's string after
+   *                  any 'keying' transformations are applied.
    * @param traversal A closure providing an iterable over the possible child states
    * of the resulting state.
    */
-  children(): Generator<{key: USVString, traversal: () => LexiconTraversal}>;
+  children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
 
   /**
    * Any entries directly keyed by the currently-represented lookup prefix.  Entries and
