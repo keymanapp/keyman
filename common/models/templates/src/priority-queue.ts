@@ -17,17 +17,23 @@ namespace models {
   export class PriorityQueue<Type> {
 
     private comparator: Comparator<Type>;
-    private heap: Type[] = [];
+    private heap: Type[];
 
     /**
      * Constructs an empty priority queue.
      * @param comparator A `Comparator` returning negative values when and only when
      * the first parameter should precede the second parameter.
      */
-    constructor(comparator: Comparator<Type>) {
+    constructor(comparator: Comparator<Type>, initialEntries: Type[] = []) {
       // TODO: We may wish to allow options specifying a limit or threshold for adding
       // items to the priority queue.  Possibly both.
+      //
+      // When that time comes, consider a min-max heap.
+      // https://en.wikipedia.org/wiki/Min-max_heap
       this.comparator = comparator;
+
+      this.heap = Array.from(initialEntries);
+      this.heapify();
     }
 
     private static leftChildIndex(index: number): number {
@@ -40,6 +46,53 @@ namespace models {
 
     private static parentIndex(index: number): number {
       return Math.floor((index-1)/2);
+    }
+
+    /**
+     * Maintains internal state, rearranging the internal state until all heap constraints
+     * are properly satisfied.
+     * - O(N) when 'heapifying' the whole heap
+     * - O(N) worst-case for partial heap operations (as part of an enqueueAll)
+     * <p>
+     */
+    private heapify(): void;
+    private heapify(start: number, end: number): void;
+    private heapify(start?: number, end?: number): void {
+      if(typeof start == 'number' && typeof end == 'number') {
+        // Use of 'indices' here is a bit of a customization.
+        // At the cost of (temporary) extra storage space, we can more efficiently enqueue
+        // multiple elements simultaneously.
+        let queuedIndices: number[] = [];
+        let lastParent = -1;
+
+        for(let i = end; i >= start; i--) {
+          let parent = PriorityQueue.parentIndex(i);
+          if(this.siftDown(i) && parent < start && lastParent != parent) {
+            // We only need to queue examination for a heap node if its children have changed
+            // and it isn't already being examined.
+            queuedIndices.push(parent);
+            lastParent = parent;
+          }
+        }
+
+        lastParent = -1;
+        while(queuedIndices.length > 0) {
+          let index = queuedIndices.shift();
+          let parent = PriorityQueue.parentIndex(index);
+          if(this.siftDown(index) && parent >= 0 && lastParent != parent) {
+              // We only need to queue examination for a heap node if its children have changed.
+            queuedIndices.push(parent);
+            lastParent = parent;
+          }
+        }
+      } else {
+        // Quick safety-check.
+        if(this.count == 0) {
+          return;
+        }
+
+        this.heapify(0, this.count - 1);
+      }
     }
 
     /**
@@ -81,13 +134,19 @@ namespace models {
     }
 
     /**
-     * Convenience function:  lazily calls enqueue for each element of the specified array.
-     * @param elements 
+     * Efficiently batch-enqueues multiple elements.
+     * Worst-case is the _better_ of the following:
+     * - O(`elements.count` + `heap.count`) - large element counts will trigger in-place
+     * heap reconstruction.
+     * - O(`elements.count` * log(`heap.count`)) - logarithmic when elements.count << heap.count
+     * @param elements A group of elements to enqueue simultaneously.
      */
     enqueueAll(elements: Type[]) {
-      for(let element of elements) {
-        this.enqueue(element);
-      }
+      let firstIndex = this.count > 0 ? this.count : 1; // parent of 0 is -1, which is illegal.
+      this.heap = this.heap.concat(elements);
+      let lastIndex = this.count - 1;
+
+      this.heapify(PriorityQueue.parentIndex(firstIndex), PriorityQueue.parentIndex(lastIndex));
     }
 
     /**
@@ -104,7 +163,7 @@ namespace models {
       let tail = this.heap.pop();
       if(this.heap.length > 0) {
         this.heap[0] = tail;
-        this.heapify(0);
+        this.siftDown(0);
       }
 
       return root;
@@ -118,8 +177,9 @@ namespace models {
      * 
      * @param index The index of the top-most node that must be examined
      * for repositioning.
+     * @returns `true` if a swap occurred, `false` otherwise.
      */
-    private heapify(index: number) {
+    private siftDown(index: number): boolean {
       let leftIndex = PriorityQueue.leftChildIndex(index);
       let rightIndex = PriorityQueue.rightChildIndex(index);
       let topMostIndex = index;
@@ -137,7 +197,10 @@ namespace models {
         this.heap[index] = this.heap[topMostIndex];
         this.heap[topMostIndex] = a;
 
-        this.heapify(topMostIndex);
+        this.siftDown(topMostIndex);
+        return true;
+      } else {
+        return false;
       }
     }
   }

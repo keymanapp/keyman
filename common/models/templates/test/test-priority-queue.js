@@ -22,6 +22,23 @@ describe('Priority queue', function() {
     assert.equal(queue.count, 0);
   });
 
+  it('initializes well from pre-existing values', function() {
+    let input = [1, 10, 2, 9, 3, 8, 4, 7, 5, 6];
+    let originalInput = Array.from(input);
+    let queue = new PriorityQueue((a, b) => a - b, input);
+
+    assert.deepEqual(input, originalInput);
+
+    assert.equal(queue.peek(), 1);
+    assert.equal(queue.count, 10);
+
+    for(let i = 1; i <= 10; i++) {
+      assert.equal(queue.dequeue(), i);
+    }
+
+    assert.equal(queue.count, 0);
+  });
+
   it('can act as a max-heap', function () {
     let input = [1, 10, 2, 9, 3, 8, 4, 7, 5, 6];
     
@@ -77,5 +94,23 @@ describe('Priority queue', function() {
 
     assert.equal(queue.dequeue(), 1);
     assert.equal(queue.count, 6);
-  })
+  });
+
+  it('properly batch-enqueues', function() {
+    let queue = new PriorityQueue((a, b) => a - b);
+
+    queue.enqueueAll([1, 10, 3, 8, 5]);
+    assert.equal(queue.count, 5);
+
+    assert.equal(queue.dequeue(), 1);
+    assert.equal(queue.count, 4);
+
+    let batch2 = [2, 7, 6, 13, 0, 1, 1];
+    queue.enqueueAll(batch2);
+
+    let correctOrder = [0, 1, 1, 2, 3, 5, 6, 7, 8, 10, 13];
+    while(correctOrder.length > 0) {
+      assert.equal(queue.dequeue(), correctOrder.shift());
+    }
+  });
 });
