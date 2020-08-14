@@ -13,6 +13,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -134,8 +135,8 @@ public class PackageProcessorTest {
     Assert.assertNotNull(json);
     String pkgVersion = PP.getPackageVersion(json);
 
-    String languageID = null;
-    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+    ArrayList<String> languageList = new ArrayList<String>();
+    Map<String, String>[] keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageList);
 
     HashMap<String, String> amharic = new HashMap<String, String>();
     amharic.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");
@@ -150,15 +151,18 @@ public class PackageProcessorTest {
     Assert.assertEquals(amharic, keyboards[0]);
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
-    languageID = "am";
-    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+    String languageID = "am";
+    languageList.add(languageID);
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageList);
 
     // Verify "am" matched
     Assert.assertEquals(amharic, keyboards[0]);
     Assert.assertEquals(TEST_GFF_KBD_COUNT, keyboards.length);
 
+    languageList.remove(0);
     languageID = "GEZ";
-    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageID);
+    languageList.add(languageID);
+    keyboards = PP.processEntry(json.getJSONArray("keyboards").getJSONObject(0), "gff_amh_7_test_json", pkgVersion, languageList);
 
     HashMap<String, String> geez = new HashMap<String, String>();
     geez.put(KMManager.KMKey_PackageID, "gff_amh_7_test_json");

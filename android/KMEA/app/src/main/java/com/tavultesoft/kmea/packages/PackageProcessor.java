@@ -148,45 +148,61 @@ public class PackageProcessor {
    * @param jsonEntry  One entry of the master JSONArray of the top-level "keyboards" property.
    * @param packageId  Package ID
    * @param packageVersion Package version (used for lexical model version)
-   * @param languageID Preferred language ID to associate with the entry. If not found,
+   * @param languageList List of preferred language IDs to associate with the entry. If null,
    *                   the first language in kmp.json is used.
    * @return A list of maps defining one keyboard-language pairing each.
    * @throws JSONException
    */
-  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, String languageID) throws JSONException {
+  public Map<String, String>[] processEntry(JSONObject jsonEntry, String packageId, String packageVersion, ArrayList<String> languageList) throws JSONException {
     JSONArray languages = jsonEntry.getJSONArray(PP_LANGUAGES_KEY);
+    int preferredLanguageCount = (languageList != null & !languageList.isEmpty()) ? languageList.size() : 1;
+    String defaultLanguageID = languages.getJSONObject(0).getString("id");
+    if (languageList == null || languageList.isEmpty()) {
+      languageList = new ArrayList<String>();
+      languageList.add(defaultLanguageID);
+    }
+
 
     String keyboardId = jsonEntry.getString("id");
     if (touchKeyboardExists(packageId, keyboardId)) {
-      HashMap<String, String>[] keyboards = new HashMap[1];
+      HashMap<String, String>[] keyboards = new HashMap[preferredLanguageCount];
+      boolean firstLanguageAdded = false;
       int i=0;
-      keyboards[i] = new HashMap<>();
-      keyboards[i].put(KMManager.KMKey_PackageID, packageId);
-      keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
-      keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
+      for (String languageID : languageList) {
+        keyboards[i] = new HashMap<>();
+        keyboards[i].put(KMManager.KMKey_PackageID, packageId);
+        keyboards[i].put(KMManager.KMKey_KeyboardName, jsonEntry.getString("name"));
+        keyboards[i].put(KMManager.KMKey_KeyboardID, jsonEntry.getString("id"));
 
-      int languageIndex = JSONUtils.findID(languages, languageID);
-      if (languageIndex == -1) {
-        // languageID not found so use first language
-        languageIndex = 0;
-      }
-      keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(languageIndex).getString("id").toLowerCase());
-      keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(languageIndex).getString("name"));
+        int languageIndex = JSONUtils.findID(languages, languageID);
+        if (languageIndex == -1) {
+          // languageID not found so use first language
+          if (!firstLanguageAdded) {
+            languageIndex = 0;
+          } else {
+            continue;
+          }
+        }
+        keyboards[i].put(KMManager.KMKey_LanguageID, languages.getJSONObject(languageIndex).getString("id").toLowerCase());
+        keyboards[i].put(KMManager.KMKey_LanguageName, languages.getJSONObject(languageIndex).getString("name"));
 
-      keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
-      if (jsonEntry.has("displayFont")) {
-        keyboards[i].put(KMManager.KMKey_Font, jsonEntry.getString("displayFont"));
-      }
-      if (jsonEntry.has("oskFont")) {
-        keyboards[i].put(KMManager.KMKey_OskFont, jsonEntry.getString("oskFont"));
-      }
+        keyboards[i].put(KMManager.KMKey_KeyboardVersion, jsonEntry.getString("version"));
+        if (jsonEntry.has("displayFont")) {
+          keyboards[i].put(KMManager.KMKey_Font, jsonEntry.getString("displayFont"));
+        }
+        if (jsonEntry.has("oskFont")) {
+          keyboards[i].put(KMManager.KMKey_OskFont, jsonEntry.getString("oskFont"));
+        }
 
-      if (welcomeExists(packageId)) {
-        File kmpFile = new File(packageId + ".kmp");
-        File packageDir = constructPath(kmpFile, false);
-        File welcomeFile = new File(packageDir, FileUtils.WELCOME_HTM);
-        // Only storing relative instead of absolute paths as a convenience for unit tests.
-        keyboards[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+        if (welcomeExists(packageId)) {
+          File kmpFile = new File(packageId + ".kmp");
+          File packageDir = constructPath(kmpFile, false);
+          File welcomeFile = new File(packageDir, FileUtils.WELCOME_HTM);
+          // Only storing relative instead of absolute paths as a convenience for unit tests.
+          keyboards[i].put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
+        }
+
+        i++;
       }
 
       return keyboards;
@@ -606,13 +622,17 @@ public class PackageProcessor {
     JSONObject infoJSON = loadPackageInfo(packagePath);
     String packageVersion = getPackageVersion(infoJSON);
 
+    ArrayList<String> languageList = new ArrayList<String>();
+    if (languageID != null && !languageID.isEmpty()) {
+      languageList.add(languageID);
+    }
     try {
       JSONArray keyboards = infoJSON.getJSONArray(PP_KEYBOARDS_KEY);
 
       for (int i=0; i < keyboards.length(); i++) {
         JSONObject keyboard = keyboards.getJSONObject(i);
         if (keyboardID.equals(keyboard.getString("id"))) {
-          Map<String, String>[] maps = processEntry(keyboard, packageID, packageVersion, languageID);
+          Map<String, String>[] maps = processEntry(keyboard, packageID, packageVersion, languageList);
           if (maps != null) {
             // Only returning first keyboard map
             kbd = new Keyboard(
@@ -642,8 +662,9 @@ public class PackageProcessor {
    * @param path Filepath of a newly downloaded .kmp file.
    * @param tempPath Filepath of temporarily extracted .kmp file
    * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
-   * @param languageID String of the preferred language ID to associate with the entry. If languageID is null or
-   *                   not found in kmp.json, then the first entry will be added.
+   * @param languageList List<String> of the preferred language ID to associate with the entry. If languageList is null or empty or
+   *                   not found in kmp.json, then the first entry will be added. The languageList is
+   *                   only used for the first keyboard in a package.
    * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.
    * <br/><br/>
@@ -652,7 +673,7 @@ public class PackageProcessor {
    * @throws IOException
    * @throws JSONException
    */
-  public List<Map<String, String>> processKMP(File path, File tempPath, String key, String languageID) throws IOException, JSONException {
+  public List<Map<String, String>> processKMP(File path, File tempPath, String key, ArrayList<String> languageList) throws IOException, JSONException {
     // Block reserved namespaces, like /cloud/.
     // TODO:  Consider throwing an exception instead?
     ArrayList<Map<String, String>> specs = new ArrayList<>();
@@ -686,7 +707,26 @@ public class PackageProcessor {
       JSONArray entries = newInfoJSON.getJSONArray(key);
 
       for (int i = 0; i < entries.length(); i++) {
-        Map<String, String>[] maps = processEntry(entries.getJSONObject(i), packageId, packageVersion, languageID);
+        Map<String, String>[] maps;
+        ArrayList<String> preferredLanguageList;
+        JSONArray languages = entries.getJSONObject(i).getJSONArray(PP_LANGUAGES_KEY);
+        if (i == 0 && key.equalsIgnoreCase(PP_KEYBOARDS_KEY) && languageList != null && !languageList.isEmpty()) {
+          preferredLanguageList = languageList;
+        } else {
+          preferredLanguageList = new ArrayList<String>();
+
+          if (key.equalsIgnoreCase(PP_LEXICAL_MODELS_KEY)) {
+            // Use the entire language list for lexical model packages
+            for (int j = 0; j < languages.length(); j++) {
+              preferredLanguageList.add(languages.getJSONObject(j).getString("id"));
+            }
+          } else {
+            // Just add the first language
+            preferredLanguageList.add(languages.getJSONObject(0).getString("id"));
+          }
+        }
+
+        maps = processEntry(entries.getJSONObject(i), packageId, packageVersion, preferredLanguageList);
         if (maps != null) {
           specs.addAll(Arrays.asList(maps));
         }

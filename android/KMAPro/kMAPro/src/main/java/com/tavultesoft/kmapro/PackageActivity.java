@@ -384,12 +384,16 @@ public class PackageActivity extends AppCompatActivity {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
+        ArrayList<String> languageList = new ArrayList<String>();
+        if (languageID != null && !languageID.isEmpty()) {
+          languageList.add(languageID);
+        }
 
         //Dataset kmpDataset = new Dataset(context);
         //kmpDataset.keyboards.addAll(kbdsList);
 
         List<Map<String, String>> installedPackageKeyboards =
-          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, languageID);
+          kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY, languageList);
         // Do the notifications!
         boolean success = installedPackageKeyboards.size() != 0;
         boolean _cleanup = true;
