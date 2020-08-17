@@ -18,6 +18,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,6 +229,26 @@ public class PackageProcessor {
       KMLog.LogException(TAG, "", e);
       return null;
     }
+  }
+
+  /**
+   * Parse a kmp.json JSON object and return the keyboard count. Lexical model packages return 0
+   * @param json kmp.json as a JSON object
+   * @return int of number of keyboards. 0 if not found
+   */
+  public static int getKeyboardCount(JSONObject json) {
+    int count = 0;
+    try {
+      if (!json.has(PP_KEYBOARDS_KEY)) {
+        return count;
+      }
+      JSONArray keyboards = json.getJSONArray(PP_KEYBOARDS_KEY);
+      count = keyboards.length();
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+    }
+
+    return count;
   }
 
   /**
@@ -489,7 +511,7 @@ public class PackageProcessor {
 
   /**
    * Generates a list of Keyboards from the keyboard JSONObject. baseKeyboard contains
-   * keyboard information that's already installed.
+   * keyboard information that's already installed. list is sorted by language name
    * @param keyboardJSON JSONObject - Keyboard JSONObject from kmp.json (entry for keyboardID)
    * @param baseKeyboard Keyboard - information of the keyboard that's already installed
    * @param excludeInstalledLanguages - boolean whether to exclude languages that are already installed
@@ -517,11 +539,13 @@ public class PackageProcessor {
     } catch (Exception e) {
       KMLog.LogException(TAG, "getKeyboards() ", e);
     }
+    Collections.sort(list, new LanguageNameSorter());
     return list;
   }
 
   /**
-   * Get a list of available keyboard and language pairings that are available to add
+   * Get a list of available keyboard and language pairings that are available to add.
+   * Keyboard list sorted by language name
    * (parses the kmp.json for the language list)
    * @param infoJSON - kmp.json as a JSON object
    * @param packageID - String of the package ID
@@ -676,4 +700,15 @@ public class PackageProcessor {
   public List<Map<String, String>> processKMP(File path, File tempPath, String key) throws IOException, JSONException {
     return processKMP(path, tempPath, key, null);
   }
+
+  /**
+   * Comparator to sort Keyboard list by language name
+   */
+  private class LanguageNameSorter implements Comparator<Keyboard> {
+    @Override
+    public int compare(Keyboard k1, Keyboard k2) {
+      return k1.getLanguageName().compareTo(k2.getLanguageName());
+    }
+  }
+
 }

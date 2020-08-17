@@ -93,6 +93,7 @@ public class PackageActivity extends AppCompatActivity {
 
     pkgName = kmpProcessor.getPackageName(pkgInfo);
     pkgVersion = kmpProcessor.getPackageVersion(pkgInfo);
+    final int keyboardCount = kmpProcessor.getKeyboardCount(pkgInfo);
     final int languageCount = kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0);
 
     // Silent installation (skip displaying welcome.htm and user confirmation)
@@ -188,7 +189,7 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
-    initializeButtons(context, pkgId, languageID, pkgTarget, languageCount);
+    initializeButtons(context, pkgId, languageID, pkgTarget, keyboardCount, languageCount);
   }
 
   /**
@@ -198,10 +199,12 @@ public class PackageActivity extends AppCompatActivity {
    * @param pkgId the keyman package id
    * @param languageID the optional language id
    * @param pkgTarget  String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
+   * @param keyboardCount int number of keyboards for the keyboard package
    * @param languageCount int number of languages for the first keyboard in a keyboard package
    */
   private void initializeButtons(final Context context, final String pkgId,
-                                 final String languageID, final String pkgTarget, final int languageCount) {
+                                 final String languageID, final String pkgTarget,
+                                 final int keyboardCount, final int languageCount) {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button nextButton = (Button) findViewById(R.id.nextButton);
     final Button finishButton = (Button) findViewById(R.id.finishButton);
@@ -236,7 +239,7 @@ public class PackageActivity extends AppCompatActivity {
     };
     finishButton.setOnClickListener(_cleanup_action);
 
-    updateButtonState(true, pkgTarget, languageCount);
+    updateButtonState(true, keyboardCount, languageCount);
   }
 
   @Override
@@ -300,21 +303,21 @@ public class PackageActivity extends AppCompatActivity {
 
   /**
    * Switch button visibility for package installer so only one button is visible.
-   * Before installation: show Install or Next
-   * If keyboard package languageCount > 1, use nextButton instead of installButton
-   * AFter installation: show OK button
+   * Before installation: show installButton or nextButton
+   * keyboardCount == 1 and languageCount > 1, use nextButton. Otherwise use installButton
+   * After installation: show closeButton
    * @param anIsStartInstaller if true - before installation, false - after installation
-   * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
+   * @param keyboardCount int number of keyboards in the package
    * @param languageCount int number of languages for a keyboard
    */
-  private void updateButtonState(boolean anIsStartInstaller, String pkgTarget, int languageCount)
+  private void updateButtonState(boolean anIsStartInstaller, int keyboardCount, int languageCount)
   {
     final Button installButton = (Button) findViewById(R.id.installButton);
     final Button nextButton = (Button) findViewById(R.id.nextButton);
     final Button closeButton = (Button) findViewById(R.id.finishButton);
     if(anIsStartInstaller)
     {
-      if (pkgTarget.equalsIgnoreCase(PackageProcessor.PP_TARGET_KEYBOARDS) && languageCount > 1) {
+      if (keyboardCount == 1 && languageCount > 1) {
         installButton.setVisibility(View.GONE);
         nextButton.setVisibility(View.VISIBLE);
       } else {
@@ -330,12 +333,6 @@ public class PackageActivity extends AppCompatActivity {
       closeButton.setVisibility(View.VISIBLE);
     }
     findViewById(R.id.buttonBar).requestLayout();
-  }
-
-  // Wrapper where languageCount doesn't matter
-  private void updateButtonState(boolean anIsStartInstaller, String pkgTarget)
-  {
-    updateButtonState(anIsStartInstaller, pkgTarget, 0);
   }
 
   /**
@@ -366,7 +363,9 @@ public class PackageActivity extends AppCompatActivity {
     if(!_found) {
       return false;
     }
-    updateButtonState(false, pkgTarget);
+
+    // keyboardCount and languageCount don't matter
+    updateButtonState(false, 0, 0);
 
     return true;
 

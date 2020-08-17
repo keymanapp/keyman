@@ -34,7 +34,8 @@ import java.util.List;
 
 /**
  * Keyman Settings --> KeymanInstallActivity --> SelectPackageActivity --> SelectLanguageActivity
- * Displays a list of available languages for the user to add for a given installed packageID/keyboardID.
+ * Also available during keyboard package installation that involves a language choice.
+ * Displays a list of available language namess for the user to add for a given installed packageID/keyboardID.
  */
 public final class SelectLanguageActivity extends AppCompatActivity {
   private static final String TAG = "SelectLanguageActivity";
@@ -97,10 +98,10 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     for (Keyboard k : availableKeyboardsList) {
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, k.getLanguageName());
-      hashMap.put(subtitleKey, k.getLanguageID());
+      // No need to display subtitleKey - k.getLanguageID()
       hashMap.put("packageID", packageID);
       String enable = "true";
-      String icon = String.valueOf(R.drawable.ic_arrow_forward);
+      String icon = noIcon;
       if (!excludeInstalledLanguages && !tempPath && KeyboardController.getInstance().keyboardExists(
           k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
         // If Activity is listing an installed keyboard package, mark installed keyboards with a check
