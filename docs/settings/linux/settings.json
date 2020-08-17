@@ -1,0 +1,17 @@
+{
+  // Settings for keyman-config unit tests. You'll have to change these if you want
+  // to run other tests.
+  "python.envFile": "${workspaceFolder}/linux/keyman-config/tests/python.env",
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s", "linux/keyman-config/tests",
+    "-p", "test_*.py"
+  ],
+  "python.testing.unittestEnabled": true,
+  "python.testing.pytestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.linting.enabled": true,
+  // We use flake8 for Python linting - install with `pip3 install flake8`
+  "python.linting.flake8Enabled": true,
+  "python.pythonPath": "/usr/bin/python3"
+}
