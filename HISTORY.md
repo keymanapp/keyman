@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.129 alpha 2020-08-17
+
+* feat(windows): rework download keyboard dialog style (#3463)
+* chore: Add sample vscode settings files (#3249)
+* fix(linux): Lookup language tag from keyboard (#3408)
+
 ## 14.0.128 alpha 2020-08-13
 
 * feat(linux): Hook up Sentry for km-config (#3378)
