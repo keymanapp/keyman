@@ -48,6 +48,15 @@ public class PackageActivity extends AppCompatActivity {
   private TextView packageActivityTitle;
   private String pkgName;
   private String pkgVersion;
+  private ButtonState titleButtonState = ButtonState.BUTTON_STATE_BLANK;
+
+  // Titlebar button states
+  public enum ButtonState {
+    BUTTON_STATE_BLANK,
+    BUTTON_STATE_INSTALL,
+    BUTTON_STATE_NEXT,
+    BUTTON_STATE_OK;
+  }
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -118,8 +127,8 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setGravity(Gravity.CENTER);
 
     String titleStr = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ?
-      String.format(getString(R.string.install_keyboard_package), pkgVersion) :
-      String.format(getString(R.string.install_predictive_text_package), pkgVersion);
+      getString(R.string.install_keyboard_package) :
+      getString(R.string.install_predictive_text_package);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);
 
@@ -189,12 +198,12 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
-    initializeButtons(context, pkgId, languageID, pkgTarget, keyboardCount, languageCount);
+    initializeButton(context, pkgId, languageID, pkgTarget, keyboardCount, languageCount);
   }
 
   /**
    * Initialize button of package installer.
-   * If keyboard package languageCount > 1, use nextButton instead of installButton
+   * If keyboard package languageCount > 1, use NEXT instead of INSTALL
    * @param context the context
    * @param pkgId the keyman package id
    * @param languageID the optional language id
@@ -202,42 +211,37 @@ public class PackageActivity extends AppCompatActivity {
    * @param keyboardCount int number of keyboards for the keyboard package
    * @param languageCount int number of languages for the first keyboard in a keyboard package
    */
-  private void initializeButtons(final Context context, final String pkgId,
+  private void initializeButton(final Context context, final String pkgId,
                                  final String languageID, final String pkgTarget,
                                  final int keyboardCount, final int languageCount) {
-    final Button installButton = (Button) findViewById(R.id.installButton);
-    final Button nextButton = (Button) findViewById(R.id.nextButton);
-    final Button finishButton = (Button) findViewById(R.id.finishButton);
+    final Button titleButton = (Button) findViewById(R.id.titleButton);
+    titleButton.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
 
-    installButton.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-
-
-        installPackage(context, pkgTarget, pkgId, languageID, false);
-      }
-    });
-
-    nextButton.setOnClickListener(new OnClickListener() {
+    titleButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("packagePath", tempPackagePath);
-        bundle.putBoolean("tempPath", true);
-        bundle.putString("packageID", pkgId);
-        Intent intent = new Intent(context, SelectLanguageActivity.class);
-        intent.putExtras(bundle);
-        startActivityForResult(intent, 2);
+        switch(titleButtonState) {
+          case BUTTON_STATE_INSTALL:
+            installPackage(context, pkgTarget, pkgId, languageID, false);
+            break;
+          case BUTTON_STATE_NEXT:
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("packagePath", tempPackagePath);
+            bundle.putBoolean("tempPath", true);
+            bundle.putString("packageID", pkgId);
+            Intent intent = new Intent(context, SelectLanguageActivity.class);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 2);
+            break;
+          case BUTTON_STATE_OK:
+            cleanup();
+            break;
+          default:
+            cleanup();
+            break;
+        }
       }
     });
-
-    OnClickListener _cleanup_action = new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        cleanup();
-      }
-    };
-    finishButton.setOnClickListener(_cleanup_action);
 
     updateButtonState(true, keyboardCount, languageCount);
   }
@@ -312,27 +316,39 @@ public class PackageActivity extends AppCompatActivity {
    */
   private void updateButtonState(boolean anIsStartInstaller, int keyboardCount, int languageCount)
   {
-    final Button installButton = (Button) findViewById(R.id.installButton);
-    final Button nextButton = (Button) findViewById(R.id.nextButton);
-    final Button closeButton = (Button) findViewById(R.id.finishButton);
-    if(anIsStartInstaller)
-    {
+    final Button titleButton = (Button) findViewById(R.id.titleButton);
+
+    if(anIsStartInstaller) {
       if (keyboardCount == 1 && languageCount > 1) {
-        installButton.setVisibility(View.GONE);
-        nextButton.setVisibility(View.VISIBLE);
+        titleButtonState = ButtonState.BUTTON_STATE_NEXT;
       } else {
-        installButton.setVisibility(View.VISIBLE);
-        nextButton.setVisibility(View.GONE);
+        titleButtonState = ButtonState.BUTTON_STATE_INSTALL;
       }
-      closeButton.setVisibility(View.GONE);
+    } else {
+      titleButtonState = ButtonState.BUTTON_STATE_OK;
     }
-    else
-    {
-      installButton.setVisibility(View.GONE);
-      nextButton.setVisibility(View.GONE);
-      closeButton.setVisibility(View.VISIBLE);
+
+    switch(titleButtonState) {
+      case BUTTON_STATE_NEXT:
+        titleButton.setCompoundDrawablesWithIntrinsicBounds (null, null, getDrawable(R.drawable.ic_arrow_forward),  null);
+        titleButton.setText(getString(R.string.label_next));
+        titleButton.setVisibility(View.VISIBLE);
+        break;
+      case BUTTON_STATE_INSTALL:
+        titleButton.setCompoundDrawablesWithIntrinsicBounds (null, null, getDrawable(R.drawable.ic_arrow_forward), null);
+        titleButton.setText(getString(R.string.label_install));
+        titleButton.setVisibility(View.VISIBLE);
+        break;
+      case BUTTON_STATE_OK:
+        // Clear the icon
+        titleButton.setCompoundDrawablesWithIntrinsicBounds (null, null, null, null);
+        titleButton.setText(getString(R.string.label_ok));
+        titleButton.setVisibility(View.VISIBLE);
+        break;
+      default:
+        titleButton.setVisibility(View.GONE);
     }
-    findViewById(R.id.buttonBar).requestLayout();
+
   }
 
   /**

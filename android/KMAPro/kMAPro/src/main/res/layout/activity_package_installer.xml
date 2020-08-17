@@ -9,67 +9,11 @@
 
     <include layout="@layout/titlebar" />
 
-    <LinearLayout
-        android:id="@+id/buttonBar"
-        style="?android:attr/buttonBarStyle"
-
+    <WebView
+        android:id="@+id/packageWebView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/titlebar"
-        android:orientation="horizontal">
-
-        <!-- Spacer to pad button to the right -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- PackageActivity will manage so only one of these button is displayed -->
-
-        <Button
-            android:id="@+id/finishButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:text="@string/label_ok"
-            android:textColor="@color/keyman_blue"
-            android:elevation="1dp"
-            android:singleLine="true"/>
-
-        <Button
-            android:id="@+id/installButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:text="@string/label_install"
-            android:textColor="@color/keyman_blue">
-            <requestFocus/>
-        </Button>
-
-        <Button
-            android:id="@+id/nextButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="15dp"
-            android:text="@string/label_next"
-            android:textColor="@color/keyman_blue">
-            <requestFocus/>
-        </Button>
-
-
-    </LinearLayout>
-
-  <WebView
-    android:id="@+id/packageWebView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@id/buttonBar"
+        android:layout_below="@id/titlebar"
     />
 
 </RelativeLayout>
