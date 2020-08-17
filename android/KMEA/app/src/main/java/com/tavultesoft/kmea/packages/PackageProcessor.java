@@ -663,7 +663,7 @@ public class PackageProcessor {
    * @param tempPath Filepath of temporarily extracted .kmp file
    * @param key String of jsonArray to iterate through ("keyboards" or "lexicalModels")
    * @param languageList List<String> of the preferred language ID to associate with the entry. If languageList is null or empty or
-   *                   not found in kmp.json, then the first entry will be added. The languageList is
+   *                   not found in kmp.json, then the first language will be added. The languageList is
    *                   only used for the first keyboard in a package.
    * @return A list of data maps of the newly installed and/or newly upgraded entries found in the package.
    * May be empty if the package file is actually an old version.

@@ -118,7 +118,7 @@ public class PackageActivity extends AppCompatActivity {
     packageActivityTitle.setGravity(Gravity.CENTER);
 
     String titleStr = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ?
-      String.format(getString(R.string.install_keyboard_package), pkgName, pkgVersion) :
+      String.format(getString(R.string.install_keyboard_package), pkgVersion) :
       String.format(getString(R.string.install_predictive_text_package), pkgVersion);
     packageActivityTitle.setText(titleStr);
     getSupportActionBar().setCustomView(packageActivityTitle);

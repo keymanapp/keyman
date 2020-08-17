@@ -154,13 +154,13 @@
   <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Failed to extract</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="install_keyboard_package" comment="Title to install keyboard package (name and version)">Install %1$s %2$s</string>
+  <string name="install_keyboard_package" comment="Title to install keyboard package">Install Keyboard (version %1$s)</string>
 
   <!-- Context: KMP Package welcome.htm title -->
   <string name="welcome_package" comment="Title to welcome.htm page (name and version)">Welcome to %1$s %2$s</string>
 
   <!-- Context: KMP Package strings -->
-  <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Predictive Text Package %1$s</string>
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">Install Predictive Text (version %1$s)</string>
 
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">No new touch-optimized keyboards to install</string>
