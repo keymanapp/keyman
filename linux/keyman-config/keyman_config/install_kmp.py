@@ -246,6 +246,9 @@ def install_kmp_user(inputfile, online=False, language=None):
         raise InstallError(InstallStatus.Abort, message)
 
 
+# The implementation of this method is a hack.
+# TODO: reimplement normalization according to langtags.json. See implementation for Windows once
+# that is in place.
 def _normalize_language(supportedLanguages, language):
     if len(supportedLanguages) <= 0:
         return ''
