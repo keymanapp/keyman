@@ -65,6 +65,7 @@ public class PackageActivity extends AppCompatActivity {
     setContentView(R.layout.activity_package_installer);
     boolean silentInstall = false;
     String languageID = null;
+    ArrayList<String> languageList = new ArrayList<String>();
 
     final Context context = this;
     Bundle bundle = getIntent().getExtras();
@@ -72,6 +73,9 @@ public class PackageActivity extends AppCompatActivity {
       kmpFile = new File(bundle.getString("kmpFile"));
       silentInstall = bundle.getBoolean("silentInstall", false);
       languageID = bundle.getString("language", null);
+      if (languageID != null && !languageID.isEmpty()) {
+        languageList.add(languageID);
+      }
     }
 
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
@@ -107,7 +111,7 @@ public class PackageActivity extends AppCompatActivity {
 
     // Silent installation (skip displaying welcome.htm and user confirmation)
     if (silentInstall) {
-      installPackage(context, pkgTarget, pkgId, languageID, true);
+      installPackage(context, pkgTarget, pkgId, languageList, true);
       return;
     }
 
@@ -215,6 +219,10 @@ public class PackageActivity extends AppCompatActivity {
                                  final int keyboardCount, final int languageCount) {
     final Button backButton = (Button) findViewById(R.id.backButton);
     final Button forwardButton = (Button) findViewById(R.id.forwardButton);
+    ArrayList languageList = new ArrayList<String>();
+    if (languageID != null && !languageID.isEmpty()) {
+      languageList.add(languageID);
+    }
 
     backButton.setOnClickListener(new OnClickListener() {
       @Override
@@ -228,7 +236,7 @@ public class PackageActivity extends AppCompatActivity {
       public void onClick(View view) {
         switch(forwardButtonState) {
           case BUTTON_STATE_INSTALL:
-            installPackage(context, pkgTarget, pkgId, languageID, false);
+            installPackage(context, pkgTarget, pkgId, languageList, false);
             break;
           case BUTTON_STATE_NEXT:
             Bundle bundle = new Bundle();
@@ -260,7 +268,8 @@ public class PackageActivity extends AppCompatActivity {
       String pkgTarget = data.getStringExtra("pkgTarget");
       String pkgId = data.getStringExtra("packageID");
       String languageID = data.getStringExtra("languageID");
-      installPackage(this, pkgTarget, pkgId, languageID, false);
+      ArrayList<String> languageList = (ArrayList)data.getSerializableExtra("languageList");
+      installPackage(this, pkgTarget, pkgId, languageList, false);
     }
   }
 
@@ -397,17 +406,19 @@ public class PackageActivity extends AppCompatActivity {
    * @param context Context   The activity context
    * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
    * @param pkgId String      The Keyman package ID
-   * @param languageID String The optional language ID
+   * @param preferredLanguages ArrayList<String>  The optional array of language ID's to use
    * @param anSilentInstall boolean If true, don't display readme.htm/welcome.htm content during installation
    */
   private void installPackage(Context context, String pkgTarget, String pkgId,
-                              String languageID, boolean anSilentInstall) {
+                              ArrayList<String> preferredLanguages, boolean anSilentInstall) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
         // processKMP will remove currently installed package and install
-        ArrayList<String> languageList = new ArrayList<String>();
-        if (languageID != null && !languageID.isEmpty()) {
-          languageList.add(languageID);
+        ArrayList<String> languageList;
+        if (preferredLanguages != null && !preferredLanguages.isEmpty()) {
+          languageList = preferredLanguages;
+        } else {
+          languageList = new ArrayList<String>();
         }
 
         //Dataset kmpDataset = new Dataset(context);

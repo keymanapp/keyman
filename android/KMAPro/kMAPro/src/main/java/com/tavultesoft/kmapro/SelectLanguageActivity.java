@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +49,8 @@ public final class SelectLanguageActivity extends AppCompatActivity {
   private static final String isEnabledKey = "isEnabled";
   private static Context context;
   private static final boolean excludeInstalledLanguages = false;
+  private static String packageID = null;
+  private ArrayList<String> languageList = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -55,14 +58,17 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
 
-    setContentView(R.layout.activity_list_layout);
+    setContentView(R.layout.activity_select_language);
     final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+    languageList = new ArrayList<>();
 
     final ListView listView = findViewById(R.id.listView);
+    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+    listView.setItemsCanFocus(false);
     listView.setFastScrollEnabled(true);
 
     Bundle bundle = getIntent().getExtras();
@@ -76,7 +82,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
     // Get the list of available Keyboards from the keyboard package kmp.json (could be temp path or installed path)
     File packagePath = (File)getIntent().getSerializableExtra("packagePath");
-    final String packageID = bundle.getString("packageID");
+    packageID = bundle.getString("packageID");
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
     Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
       kmpProcessor.getKeyboard(pkgInfo, packageID, 0);
@@ -125,17 +131,18 @@ public final class SelectLanguageActivity extends AppCompatActivity {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         Keyboard k = availableKeyboardsList.get(position);
-        String pkgId = hashMap.get("packageID");
         if (tempPath) {
-          // Temporary path for kmp.json means return languageID back to PackageActivity to install the keyboard package
-          Intent intent = new Intent();
-          intent.putExtra("pkgTarget", PackageProcessor.PP_TARGET_KEYBOARDS);
-          intent.putExtra("packageID", pkgId);
-          intent.putExtra("languageID", k.getLanguageID());
-          setResult(2, intent);
-          finish();
+          // Add/Remove the selected language from languageList
+          if (languageList == null) {
+            languageList = new ArrayList<String>();
+          }
+          String languageID = k.getLanguageID();
+          if (languageList.contains(languageID)) {
+            languageList.remove(languageID);
+          } else {
+            languageList.add(languageID);
+          }
         } else {
           // Otherwise, add the language association
           KMManager.addKeyboard(context, k);
@@ -144,6 +151,38 @@ public final class SelectLanguageActivity extends AppCompatActivity {
           Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
           finish();
         }
+      }
+    });
+
+    // Initialize buttons
+    final Button backButton = (Button) findViewById(R.id.backButton);
+    final Button forwardButton = (Button) findViewById(R.id.forwardButton);
+    if (!tempPath) {
+      // When adding a language from the Settings menu, we don't need the bottom nav bar
+      backButton.setVisibility(View.GONE);
+      forwardButton.setVisibility(View.GONE);
+    }
+
+    backButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        finish();
+      }
+    });
+
+    forwardButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        // Temporary path for kmp.json means return the selected languageList back to PackageActivity to install the keyboard package
+        Intent intent = new Intent();
+        intent.putExtra("pkgTarget", PackageProcessor.PP_TARGET_KEYBOARDS);
+        intent.putExtra("packageID", packageID);
+        //intent.putExtra("languageID", k.getLanguageID());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("languageList", languageList);
+        intent.putExtras(bundle);
+        setResult(2, intent);
+       finish();
       }
     });
   }
