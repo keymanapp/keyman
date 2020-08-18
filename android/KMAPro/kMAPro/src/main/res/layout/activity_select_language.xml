@@ -7,7 +7,10 @@
   android:orientation="vertical"
   tools:context=".SelectLanguageActivity" >
 
-  <include layout="@layout/activity_list_layout" />
+  <include layout="@layout/activity_list_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/buttonBar"/>
 
   <include
     layout="@layout/bottom_navigation_layout"
