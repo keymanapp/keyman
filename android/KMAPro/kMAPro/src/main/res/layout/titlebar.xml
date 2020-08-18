@@ -5,6 +5,4 @@
     android:id="@+id/titlebar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:layout_alignParentTop="true" >
-
-</androidx.appcompat.widget.Toolbar>
+    android:layout_alignParentTop="true" />

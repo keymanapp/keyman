@@ -50,7 +50,7 @@ public class PackageActivity extends AppCompatActivity {
   private String pkgVersion;
   private ButtonState forwardButtonState = ButtonState.BUTTON_STATE_BLANK;
 
-  // Titlebar button states
+  // Forward button states
   public enum ButtonState {
     BUTTON_STATE_BLANK,
     BUTTON_STATE_INSTALL,
@@ -116,7 +116,6 @@ public class PackageActivity extends AppCompatActivity {
     getSupportActionBar().setTitle(null);
     getSupportActionBar().setDisplayUseLogoEnabled(false);
     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-    getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
@@ -198,7 +197,7 @@ public class PackageActivity extends AppCompatActivity {
       webView.loadData(htmlString, "text/html; charset=utf-8", "UTF-8");
     }
 
-    initializeButton(context, pkgId, languageID, pkgTarget, keyboardCount, languageCount);
+    initializeButtons(context, pkgId, languageID, pkgTarget, keyboardCount, languageCount);
   }
 
   /**
@@ -211,7 +210,7 @@ public class PackageActivity extends AppCompatActivity {
    * @param keyboardCount int number of keyboards for the keyboard package
    * @param languageCount int number of languages for the first keyboard in a keyboard package
    */
-  private void initializeButton(final Context context, final String pkgId,
+  private void initializeButtons(final Context context, final String pkgId,
                                  final String languageID, final String pkgTarget,
                                  final int keyboardCount, final int languageCount) {
     final Button backButton = (Button) findViewById(R.id.backButton);
@@ -271,12 +270,6 @@ public class PackageActivity extends AppCompatActivity {
     if ( alertDialog !=null && alertDialog.isShowing() ){
       alertDialog.dismiss();
     }
-  }
-
-  @Override
-  public boolean onSupportNavigateUp() {
-    super.onBackPressed();
-    return true;
   }
 
   private void cleanup() {
