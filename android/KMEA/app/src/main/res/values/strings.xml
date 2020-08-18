@@ -27,6 +27,9 @@
     <string name="label_add" comment="Button to add an item">Add</string>
 
     <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">Back</string>
+
+    <!-- Context: Button label -->
     <string name="label_cancel" comment="Button to cancel an action">Cancel</string>
 
     <!-- Context: Button label -->

@@ -48,7 +48,7 @@ public class PackageActivity extends AppCompatActivity {
   private TextView packageActivityTitle;
   private String pkgName;
   private String pkgVersion;
-  private ButtonState titleButtonState = ButtonState.BUTTON_STATE_BLANK;
+  private ButtonState forwardButtonState = ButtonState.BUTTON_STATE_BLANK;
 
   // Titlebar button states
   public enum ButtonState {
@@ -115,7 +115,7 @@ public class PackageActivity extends AppCompatActivity {
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
     getSupportActionBar().setDisplayUseLogoEnabled(false);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -202,7 +202,7 @@ public class PackageActivity extends AppCompatActivity {
   }
 
   /**
-   * Initialize button of package installer.
+   * Initialize backButton and forwardButton and update the forwardButtonState
    * If keyboard package languageCount > 1, use NEXT instead of INSTALL
    * @param context the context
    * @param pkgId the keyman package id
@@ -214,13 +214,20 @@ public class PackageActivity extends AppCompatActivity {
   private void initializeButton(final Context context, final String pkgId,
                                  final String languageID, final String pkgTarget,
                                  final int keyboardCount, final int languageCount) {
-    final Button titleButton = (Button) findViewById(R.id.titleButton);
-    titleButton.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
+    final Button backButton = (Button) findViewById(R.id.backButton);
+    final Button forwardButton = (Button) findViewById(R.id.forwardButton);
 
-    titleButton.setOnClickListener(new OnClickListener() {
+    backButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
-        switch(titleButtonState) {
+        finish();
+      }
+    });
+
+    forwardButton.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        switch(forwardButtonState) {
           case BUTTON_STATE_INSTALL:
             installPackage(context, pkgTarget, pkgId, languageID, false);
             break;
@@ -316,37 +323,44 @@ public class PackageActivity extends AppCompatActivity {
    */
   private void updateButtonState(boolean anIsStartInstaller, int keyboardCount, int languageCount)
   {
-    final Button titleButton = (Button) findViewById(R.id.titleButton);
+    final Button backButton = (Button) findViewById(R.id.backButton);
+    final Button forwardButton = (Button) findViewById(R.id.forwardButton);
 
     if(anIsStartInstaller) {
       if (keyboardCount == 1 && languageCount > 1) {
-        titleButtonState = ButtonState.BUTTON_STATE_NEXT;
+        forwardButtonState = ButtonState.BUTTON_STATE_NEXT;
       } else {
-        titleButtonState = ButtonState.BUTTON_STATE_INSTALL;
+        forwardButtonState = ButtonState.BUTTON_STATE_INSTALL;
       }
     } else {
-      titleButtonState = ButtonState.BUTTON_STATE_OK;
+      forwardButtonState = ButtonState.BUTTON_STATE_OK;
     }
 
-    switch(titleButtonState) {
+    switch(forwardButtonState) {
       case BUTTON_STATE_NEXT:
-        titleButton.setCompoundDrawablesWithIntrinsicBounds (null, null, getDrawable(R.drawable.ic_arrow_forward),  null);
-        titleButton.setText(getString(R.string.label_next));
-        titleButton.setVisibility(View.VISIBLE);
+        backButton.setVisibility(View.VISIBLE);
+
+        forwardButton.setCompoundDrawablesWithIntrinsicBounds (null, null, getDrawable(R.drawable.ic_action_forward),  null);
+        forwardButton.setText(getString(R.string.label_next));
+        forwardButton.setVisibility(View.VISIBLE);
         break;
       case BUTTON_STATE_INSTALL:
-        titleButton.setCompoundDrawablesWithIntrinsicBounds (null, null, getDrawable(R.drawable.ic_arrow_forward), null);
-        titleButton.setText(getString(R.string.label_install));
-        titleButton.setVisibility(View.VISIBLE);
+        backButton.setVisibility(View.VISIBLE);
+
+        forwardButton.setCompoundDrawablesWithIntrinsicBounds (null, null, getDrawable(R.drawable.ic_action_forward), null);
+        forwardButton.setText(getString(R.string.label_install));
+        forwardButton.setVisibility(View.VISIBLE);
         break;
       case BUTTON_STATE_OK:
+        backButton.setVisibility(View.GONE);
+
         // Clear the icon
-        titleButton.setCompoundDrawablesWithIntrinsicBounds (null, null, null, null);
-        titleButton.setText(getString(R.string.label_ok));
-        titleButton.setVisibility(View.VISIBLE);
+        forwardButton.setCompoundDrawablesWithIntrinsicBounds (null, null, null, null);
+        forwardButton.setText(getString(R.string.label_ok));
+        forwardButton.setVisibility(View.VISIBLE);
         break;
       default:
-        titleButton.setVisibility(View.GONE);
+        forwardButton.setVisibility(View.GONE);
     }
 
   }
@@ -365,7 +379,7 @@ public class PackageActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     getSupportActionBar().setDisplayShowHomeEnabled(false);
     String titleStr =
-      String.format(getString(R.string.welcome_package), pkgName, pkgVersion);
+      String.format(getString(R.string.welcome_package), pkgName);
     packageActivityTitle.setText(titleStr);
 
     for(Map<String,String> _keyboard:theInstalledPackages) {
