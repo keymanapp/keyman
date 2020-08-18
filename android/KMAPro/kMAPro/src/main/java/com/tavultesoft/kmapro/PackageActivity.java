@@ -115,7 +115,7 @@ public class PackageActivity extends AppCompatActivity {
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
     getSupportActionBar().setDisplayUseLogoEnabled(false);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(false);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
@@ -306,10 +306,10 @@ public class PackageActivity extends AppCompatActivity {
   }
 
   /**
-   * Switch button visibility for package installer so only one button is visible.
-   * Before installation: show installButton or nextButton
-   * keyboardCount == 1 and languageCount > 1, use nextButton. Otherwise use installButton
-   * After installation: show closeButton
+   * Update back button visibility and forward button state
+   * Before installation: forward button is INSTALL or NEXT
+   * keyboardCount == 1 and languageCount > 1, use NEXT. Otherwise use INSTALL
+   * After installation: show OK
    * @param anIsStartInstaller if true - before installation, false - after installation
    * @param keyboardCount int number of keyboards in the package
    * @param languageCount int number of languages for a keyboard
@@ -368,9 +368,7 @@ public class PackageActivity extends AppCompatActivity {
   {
     boolean _found=false;
 
-    // Update titlebar: Don't display back button and update text
-    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-    getSupportActionBar().setDisplayShowHomeEnabled(false);
+    // Update titlebar:
     String titleStr =
       String.format(getString(R.string.welcome_package), pkgName);
     packageActivityTitle.setText(titleStr);
