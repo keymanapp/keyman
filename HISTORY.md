@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.130 alpha 2020-08-19
+
+* fix(android): Fix util to getting the tier on CI builds (#3491)
+
 ## 14.0.129 alpha 2020-08-17
 
 * feat(windows): rework download keyboard dialog style (#3463)
