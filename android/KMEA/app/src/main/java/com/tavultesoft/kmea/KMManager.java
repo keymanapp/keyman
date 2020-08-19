@@ -277,7 +277,7 @@ public final class KMManager {
     if (versionName == null || versionName.isEmpty()) {
       versionName = com.tavultesoft.kmea.BuildConfig.VERSION_NAME;
     }
-    Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+)-(alpha|beta|stable)-.*");
+    Pattern pattern = Pattern.compile("^(\\d+\\.\\d+\\.\\d+)-(alpha|beta|stable).*");
     Matcher matcher = pattern.matcher(versionName);
     if (matcher.matches() && matcher.groupCount() >= 2) {
       switch (matcher.group(2)) {
