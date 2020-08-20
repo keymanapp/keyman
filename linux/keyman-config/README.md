@@ -142,7 +142,7 @@ This will create the file `locale/de.po`.
 **NOTE:** Specifying _UTF-8_ is important if any non-ASCII characters will be used in the
 translation, i.e. always.
 
-**NOTE:** This is not necessary when using Crowding for translation
+**NOTE:** This step is not necessary when using Crowdin
 
 ### Update translations
 
@@ -158,6 +158,8 @@ Alternatively you can also update all po files at once:
 ```bash
 make update-po
 ```
+
+**NOTE:** This step is not necessary when using Crowdin
 
 ### Compile translations
 
