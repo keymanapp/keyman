@@ -53,13 +53,8 @@ class KeyboardDetailsView(Gtk.Dialog):
             with open(jsonfile, "r") as read_file:
                 kbdata = json.load(read_file)
 
-        box = Gtk.Box(spacing=10)
-        # self.add(box)
         grid = Gtk.Grid()
         # grid.set_column_homogeneous(True)
-
-        box.add(grid)
-        # self.add(grid)
 
         # kbdatapath = os.path.join("/usr/local/share/keyman", kmp["id"], kmp["id"] + ".json")
 
@@ -144,6 +139,7 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         divider_pkg = Gtk.HSeparator()
         grid.attach_next_to(divider_pkg, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+        prevlabel = divider_pkg
 
         # Keyboard info for each keyboard
 
@@ -154,6 +150,13 @@ class KeyboardDetailsView(Gtk.Dialog):
                 if os.path.isfile(jsonfile):
                     with open(jsonfile, "r") as read_file:
                         kbdata = json.load(read_file)
+
+                # start with padding
+                lbl_pad = Gtk.Label()
+                lbl_pad.set_text("")
+                lbl_pad.set_halign(Gtk.Align.END)
+                grid.attach_next_to(lbl_pad, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
+                prevlabel = lbl_pad
 
                 # show the icon somewhere
 
@@ -326,6 +329,6 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         self.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
 
-        self.get_content_area().pack_start(box, True, True, 12)
+        self.get_content_area().pack_start(grid, True, True, 12)
         self.resize(800, 450)
         self.show_all()
