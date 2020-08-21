@@ -3,8 +3,9 @@ Maintainer: Keyman team <support@keyman.com>
 Section: python
 Priority: optional
 Build-Depends: dh-python, debhelper (>= 9), bash-completion,
- python3-all (>= 3.5), python3-setuptools, python3-pip,
- python3-magic, python3-qrcode <!pkg.keyman-config.xenial>,
+ help2man, python3-all (>= 3.5), python3-setuptools,
+ python3-pip, python3-magic,
+ python3-qrcode <!pkg.keyman-config.xenial>,
  python-qrcode <pkg.keyman-config.xenial>,
  python3-sentry-sdk <pkg.keyman-config.focal>,
  python3-raven <pkg.keyman-config.bionic>,
