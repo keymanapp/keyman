@@ -299,13 +299,13 @@ class KeyboardDetailsView(Gtk.Dialog):
 
         # If it doesn't exist, generate QR code to share keyboard package
         path_qr = packageDir + "/qrcode.png"
+        url = KeymanComUrl + "/go/keyboard/" + kmp['packageID'] + "/share"
         if not os.path.isfile(path_qr):
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
                 box_size=4,
                 border=4)
-            url = KeymanComUrl + "/go/keyboard/" + kmp['packageID'] + "/share"
             qr.add_data(url)
             qr.make(fit=True)
 
@@ -318,7 +318,7 @@ class KeyboardDetailsView(Gtk.Dialog):
         grid.attach_next_to(image, prevlabel, Gtk.PositionType.BOTTOM, 2, 1)
 
         lbl_share_kbd = Gtk.Label()
-        lbl_share_kbd.set_text(_("Scan this code to load this keyboard\non another device or share online"))
+        lbl_share_kbd.set_markup(_("Scan this code to load this keyboard\non another device or <a href='{uri}'>share online</a>").format(uri=url))
         lbl_share_kbd.set_halign(Gtk.Align.CENTER)
         lbl_share_kbd.set_line_wrap(True)
         grid.attach_next_to(lbl_share_kbd, image, Gtk.PositionType.BOTTOM, 2, 1)
