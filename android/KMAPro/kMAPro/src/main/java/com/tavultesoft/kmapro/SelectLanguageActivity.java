@@ -77,7 +77,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       return;
     }
 
-    Boolean tempPath = bundle.getBoolean("tempPath");
+    Boolean isInstallingPackage = bundle.getBoolean("tempPath");
     File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
     // Get the list of available Keyboards from the keyboard package kmp.json (could be temp path or installed path)
@@ -97,7 +97,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     }
 
     List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
-      pkgInfo, packageID, keyboardID, tempPath, excludeInstalledLanguages);
+      pkgInfo, packageID, keyboardID, isInstallingPackage, excludeInstalledLanguages);
 
     final String noIcon = "0";
     list = new ArrayList<HashMap<String, String>>();
@@ -108,7 +108,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       hashMap.put("packageID", packageID);
       String enable = "true";
       String icon = noIcon;
-      if (!excludeInstalledLanguages && !tempPath && KeyboardController.getInstance().keyboardExists(
+      if (!excludeInstalledLanguages && !isInstallingPackage && KeyboardController.getInstance().keyboardExists(
           k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
         // If Activity is listing an installed keyboard package, mark installed keyboards with a check
         icon = String.valueOf(R.drawable.ic_check);
@@ -132,7 +132,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Keyboard k = availableKeyboardsList.get(position);
-        if (tempPath) {
+        if (isInstallingPackage) {
           // Add/Remove the selected language from languageList
           if (languageList == null) {
             languageList = new ArrayList<String>();
@@ -157,7 +157,8 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     // Initialize buttons
     final Button backButton = (Button) findViewById(R.id.backButton);
     final Button forwardButton = (Button) findViewById(R.id.forwardButton);
-    if (!tempPath) {
+    forwardButton.setText(R.string.label_install);
+    if (!isInstallingPackage) {
       // When adding a language from the Settings menu, we don't need the bottom nav bar
       backButton.setVisibility(View.GONE);
       forwardButton.setVisibility(View.GONE);
