@@ -1,28 +1,21 @@
 /**
  * Copyright (C) 2020 SIL International. All rights reserved.
  */
-
 package com.tavultesoft.kmapro;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
@@ -48,7 +41,7 @@ import java.util.List;
  * Displays a list of available language names for the user to add for a given installed packageID/keyboardID.
  */
 public final class SelectLanguageFragment extends Fragment implements BlockingStep {
-  private static final String TAG = "SelectLanguageActivity";
+  private static final String TAG = "SelectLanguageFragment";
   private static ArrayList<HashMap<String, String>> list = null;
   private static KMListAdapter adapter = null;
   private static Typeface titleFont = null;
@@ -76,18 +69,12 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
 
-    View v = inflater.inflate(R.layout.activity_select_language, container, false);
+    View v = inflater.inflate(R.layout.fragment_select_language, container, false);
 
     super.onCreate(savedInstanceState);
-    //supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = getActivity();
 
-    //setContentView(R.layout.activity_select_language);
     final Toolbar toolbar = v.findViewById(R.id.list_toolbar);
-    //setSupportActionBar(toolbar);
-    //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    //getSupportActionBar().setDisplayShowHomeEnabled(true);
-    //getSupportActionBar().setDisplayShowTitleEnabled(false);
     languageList = new ArrayList<>();
 
     final ListView listView = v.findViewById(R.id.listView);
@@ -110,6 +97,10 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
     Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
       kmpProcessor.getKeyboard(pkgInfo, packageID, 0);
+    if (keyboard == null) {
+      KMLog.LogError(TAG, "Package " + packageID + " has 0 keyboards");
+      return v;
+    }
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
     String title_install = String.format(getString(R.string.title_select_language_for_package), keyboardName);

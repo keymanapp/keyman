@@ -410,6 +410,27 @@ public class PackageProcessor {
   }
 
   /**
+   * Parse a kmp.json JSON object and return boolean if the package contains welcome.htm
+   * @param json kmp.json as a JSON object
+   * @return boolean
+   */
+  public boolean hasWelcome(JSONObject json) {
+    try {
+      JSONArray files = json.getJSONArray("files");
+      for (int i=0; i<files.length(); i++) {
+        JSONObject fileInfo = files.getJSONObject(i);
+        if (FileUtils.isWelcomeFile(fileInfo.getString("name"))) {
+          return true;
+        }
+      }
+    } catch (JSONException e) {
+      KMLog.LogException(TAG, "", e);
+      return false;
+    }
+    return false;
+  }
+
+  /**
    * Compares version information, ideally between the temporary extraction path of a package and its
    * desired installation path, to ensure that no accidental downgrade or side-grade overwrite occurs.
    * @param newPath The path for the (temporarily) extracted, newly downloaded version of the package.

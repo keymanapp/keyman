@@ -33,12 +33,25 @@ import java.io.FileFilter;
 
 /**
  * Fragment to display either readme.htm or welcome.htm in a WebView
+ * If button is "INSTALL", callback to PackageActivity will install the package
  */
 public class WebViewFragment extends Fragment implements BlockingStep {
   private File tempPackagePath;
+  private String packageID;
   private String pkgTarget;
   private String pkgName;
   private String fileName;
+  private boolean isInstallButton = false;
+  private OnInstallClickedListener callback;
+
+  public void setOnInstallClickedListener(OnInstallClickedListener callback) {
+    this.callback = callback;
+  }
+
+  // This interface to be implemented by calling Activity
+  public interface OnInstallClickedListener {
+    public void onInstallClicked(String pkgTarget, String packageID);
+  }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +63,9 @@ public class WebViewFragment extends Fragment implements BlockingStep {
       if (bundle.containsKey("tempPackagePath")) {
         tempPackagePath = (File)bundle.getSerializable("tempPackagePath");
       }
+      if (bundle.containsKey("packageID")) {
+        packageID = bundle.getString("packageID");
+      }
       if (bundle.containsKey("pkgTarget")) {
         pkgTarget = bundle.getString("pkgTarget");
       }
@@ -58,6 +74,9 @@ public class WebViewFragment extends Fragment implements BlockingStep {
       }
       if (bundle.containsKey("fileName")) {
         fileName = bundle.getString("fileName");
+      }
+      if (bundle.containsKey("isInstallButton")) {
+        isInstallButton = bundle.getBoolean("isInstallButton");
       }
     }
 
@@ -169,6 +188,11 @@ public class WebViewFragment extends Fragment implements BlockingStep {
   }
   @Override
   public void onNextClicked(final StepperLayout.OnNextClickedCallback callback) {
+    // Send data to calling Activity
+    if (isInstallButton) {
+      this.callback.onInstallClicked(pkgTarget, packageID);
+    }
+
     new Handler().postDelayed(new Runnable() {
       @Override
       public void run() {

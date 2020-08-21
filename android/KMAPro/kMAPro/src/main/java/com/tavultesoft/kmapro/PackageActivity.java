@@ -41,26 +41,18 @@ import java.util.List;
 import java.util.Map;
 
 public class PackageActivity extends AppCompatActivity implements
-  StepperLayout.StepperListener, SelectLanguageFragment.OnLanguagesSelectedListener {
+    StepperLayout.StepperListener, WebViewFragment.OnInstallClickedListener,
+    SelectLanguageFragment.OnLanguagesSelectedListener {
   private final static String TAG = "PackageActivity";
-  private Toolbar toolbar;
   private AlertDialog alertDialog;
   private File kmpFile;
   private File tempPackagePath;
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
   private PackageProcessor kmpProcessor;
-  private TextView packageActivityTitle;
   private String pkgName;
+  private boolean hasWelcome;
   private StepperLayout mStepperLayout;
   private StepperAdapter mStepperAdapter;
-
-  // Forward button states
-  public enum ButtonState {
-    BUTTON_STATE_BLANK,
-    BUTTON_STATE_INSTALL,
-    BUTTON_STATE_NEXT,
-    BUTTON_STATE_OK;
-  }
 
   @SuppressLint({"SetJavaScriptEnabled", "InflateParams"})
   @Override
@@ -110,7 +102,11 @@ public class PackageActivity extends AppCompatActivity implements
     }
 
     pkgName = kmpProcessor.getPackageName(pkgInfo);
+    hasWelcome = kmpProcessor.hasWelcome(pkgInfo);
     final int keyboardCount = kmpProcessor.getKeyboardCount(pkgInfo);
+
+    // Number of languages associated with the first keyboard in a keyboard package.
+    // lexical-model packages will be 0
     final int languageCount = kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0);
 
     // Silent installation (skip displaying welcome.htm and user confirmation)
@@ -119,30 +115,9 @@ public class PackageActivity extends AppCompatActivity implements
       return;
     }
 
-    /*
-    toolbar = (Toolbar) findViewById(R.id.titlebar);
-    setSupportActionBar(toolbar);
-    getSupportActionBar().setTitle(null);
-    getSupportActionBar().setDisplayUseLogoEnabled(false);
-    getSupportActionBar().setDisplayShowHomeEnabled(false);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
-    getSupportActionBar().setDisplayShowCustomEnabled(true);
-    getSupportActionBar().setBackgroundDrawable(MainActivity.getActionBarDrawable(this));
-
-    packageActivityTitle = new TextView(this);
-    packageActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
-    packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
-    packageActivityTitle.setGravity(Gravity.CENTER);
-
-    String titleStr = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ?
-      getString(R.string.install_keyboard_package) :
-      getString(R.string.install_predictive_text_package);
-    packageActivityTitle.setText(titleStr);
-    getSupportActionBar().setCustomView(packageActivityTitle);
-*/
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      tempPackagePath, pkgTarget, pkgId, pkgName);
+      tempPackagePath, pkgTarget, pkgId, pkgName, hasWelcome, languageCount);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
   }
@@ -216,10 +191,19 @@ public class PackageActivity extends AppCompatActivity implements
 
   @Override
   public void onAttachFragment(Fragment fragment) {
-    if (fragment instanceof SelectLanguageFragment) {
+    if (fragment instanceof WebViewFragment) {
+      WebViewFragment webViewFragment = (WebViewFragment) fragment;
+      webViewFragment.setOnInstallClickedListener(this);
+    } else if (fragment instanceof SelectLanguageFragment) {
       SelectLanguageFragment selectLanguageFragment = (SelectLanguageFragment) fragment;
       selectLanguageFragment.setOnLanguagesSelectedListener(this);
     }
+  }
+
+  @Override
+  public void onInstallClicked(String pkgTarget, String packageID) {
+    // Ignore language list and install the package
+    installPackage(this, pkgTarget, packageID, null, false);
   }
 
   @Override
@@ -234,42 +218,6 @@ public class PackageActivity extends AppCompatActivity implements
     setResult(1);
     cleanup();
   }
-
-  /**
-   * Show welcome page from installed keyboard.
-   * @param theInstalledPackages the installed keyboards or lexical models
-   * @param pkgTarget String: PackageProcessor.PP_TARGET_KEYBOARDS or PP_TARGET_LEXICAL_MODELS
-   * @return true if a welcome page is available
-   */
-  /*
-  private boolean loadWelcomePage(List<Map<String, String>> theInstalledPackages, String pkgTarget)
-  {
-    boolean _found=false;
-
-    // Update titlebar:
-    String titleStr =
-      String.format(getString(R.string.welcome_package), pkgName);
-    packageActivityTitle.setText(titleStr);
-
-    for(Map<String,String> _keyboard:theInstalledPackages) {
-      String _customlink = _keyboard.get(KMManager.KMKey_CustomHelpLink);
-      if (_customlink != null) {
-        webView.loadUrl("file:///" + _customlink);
-        _found=true;
-        break;
-      }
-    }
-    if(!_found) {
-      return false;
-    }
-
-    // keyboardCount and languageCount don't matter
-    updateButtonState(false, 0, 0);
-
-    return true;
-
-  }
-  */
 
   /**
    * Installs the keyboard or lexical model package, and then notifies the corresponding listeners
