@@ -4,12 +4,15 @@
 
 package com.tavultesoft.kmapro;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +24,9 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.KMLog;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +35,8 @@ import java.util.List;
 
 /**
  * Keyman Settings --> KeymanInstallActivity --> SelectPackageActivity --> SelectLanguageActivity
- * Displays a list of available languages for the user to add for a given installed packageID/keyboardID.
+ * Also available during keyboard package installation that involves a language choice.
+ * Displays a list of available language names for the user to add for a given installed packageID/keyboardID.
  */
 public final class SelectLanguageActivity extends AppCompatActivity {
   private static final String TAG = "SelectLanguageActivity";
@@ -42,6 +49,8 @@ public final class SelectLanguageActivity extends AppCompatActivity {
   private static final String isEnabledKey = "isEnabled";
   private static Context context;
   private static final boolean excludeInstalledLanguages = false;
+  private static String packageID = null;
+  private ArrayList<String> languageList = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -49,18 +58,34 @@ public final class SelectLanguageActivity extends AppCompatActivity {
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
 
-    setContentView(R.layout.activity_list_layout);
+    setContentView(R.layout.activity_select_language);
     final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+    languageList = new ArrayList<>();
 
     final ListView listView = findViewById(R.id.listView);
+    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+    listView.setItemsCanFocus(false);
     listView.setFastScrollEnabled(true);
 
-    final Keyboard keyboard = (Keyboard)getIntent().getSerializableExtra("keyboard");
-    final String packageID = keyboard.getPackageID();
+    Bundle bundle = getIntent().getExtras();
+    if (bundle == null) {
+      KMLog.LogError(TAG, "No bundle parameters");
+      return;
+    }
+
+    Boolean isInstallingPackage = bundle.getBoolean("tempPath");
+    File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+    PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
+    // Get the list of available Keyboards from the keyboard package kmp.json (could be temp path or installed path)
+    File packagePath = (File)getIntent().getSerializableExtra("packagePath");
+    packageID = bundle.getString("packageID");
+    JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
+    Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
+      kmpProcessor.getKeyboard(pkgInfo, packageID, 0);
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
     String title_install = String.format(getString(R.string.title_select_language_for_package), keyboardName);
@@ -71,22 +96,21 @@ public final class SelectLanguageActivity extends AppCompatActivity {
       textView.setTypeface(titleFont, Typeface.BOLD);
     }
 
-    // Get the list of available Keyboards from kmp.json
-    File resourceRoot =  new File(context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
-    PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
     List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
-      packageID, keyboardID, excludeInstalledLanguages);
+      pkgInfo, packageID, keyboardID, isInstallingPackage, excludeInstalledLanguages);
 
     final String noIcon = "0";
     list = new ArrayList<HashMap<String, String>>();
     for (Keyboard k : availableKeyboardsList) {
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, k.getLanguageName());
-      hashMap.put(subtitleKey, k.getLanguageID());
+      // No need to display subtitleKey - k.getLanguageID()
+      hashMap.put("packageID", packageID);
       String enable = "true";
-      String icon = String.valueOf(R.drawable.ic_arrow_forward);
-      if (!excludeInstalledLanguages && KeyboardController.getInstance().keyboardExists(
+      String icon = noIcon;
+      if (!excludeInstalledLanguages && !isInstallingPackage && KeyboardController.getInstance().keyboardExists(
           k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
+        // If Activity is listing an installed keyboard package, mark installed keyboards with a check
         icon = String.valueOf(R.drawable.ic_check);
         enable = "false";
       } else {
@@ -107,13 +131,59 @@ public final class SelectLanguageActivity extends AppCompatActivity {
 
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         Keyboard k = availableKeyboardsList.get(position);
-        KMManager.addKeyboard(context, k);
-        String confirmation = String.format(getString(R.string.added_language_to_keyboard),
-          k.getLanguageName(), k.getKeyboardName());
-        Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
+        if (isInstallingPackage) {
+          // Add/Remove the selected language from languageList
+          if (languageList == null) {
+            languageList = new ArrayList<String>();
+          }
+          String languageID = k.getLanguageID();
+          if (languageList.contains(languageID)) {
+            languageList.remove(languageID);
+          } else {
+            languageList.add(languageID);
+          }
+        } else {
+          // Otherwise, add the language association
+          KMManager.addKeyboard(context, k);
+          String confirmation = String.format(getString(R.string.added_language_to_keyboard),
+            k.getLanguageName(), k.getKeyboardName());
+          Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
+          finish();
+        }
+      }
+    });
+
+    // Initialize buttons
+    final Button backButton = (Button) findViewById(R.id.backButton);
+    final Button forwardButton = (Button) findViewById(R.id.forwardButton);
+    forwardButton.setText(R.string.label_install);
+    if (!isInstallingPackage) {
+      // When adding a language from the Settings menu, we don't need the bottom nav bar
+      backButton.setVisibility(View.GONE);
+      forwardButton.setVisibility(View.GONE);
+    }
+
+    backButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
         finish();
+      }
+    });
+
+    forwardButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        // Temporary path for kmp.json means return the selected languageList back to PackageActivity to install the keyboard package
+        Intent intent = new Intent();
+        intent.putExtra("pkgTarget", PackageProcessor.PP_TARGET_KEYBOARDS);
+        intent.putExtra("packageID", packageID);
+        //intent.putExtra("languageID", k.getLanguageID());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("languageList", languageList);
+        intent.putExtras(bundle);
+        setResult(2, intent);
+       finish();
       }
     });
   }
@@ -121,6 +191,7 @@ public final class SelectLanguageActivity extends AppCompatActivity {
   @Override
   public boolean onSupportNavigateUp() {
     super.onBackPressed();
+    setResult(Activity.RESULT_CANCELED);
     return true;
   }
 }

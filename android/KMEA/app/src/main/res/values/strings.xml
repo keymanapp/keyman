@@ -27,6 +27,9 @@
     <string name="label_add" comment="Button to add an item">Add</string>
 
     <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">Back</string>
+
+    <!-- Context: Button label -->
     <string name="label_cancel" comment="Button to cancel an action">Cancel</string>
 
     <!-- Context: Button label -->
@@ -43,6 +46,9 @@
 
     <!-- Context: Button label -->
     <string name="label_later" comment="Do an action at a later time">Later</string>
+
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">Next</string>
 
     <!-- Context: Button label -->
     <string name="label_ok" comment="Button to acknowledge a dialog">OK</string>
