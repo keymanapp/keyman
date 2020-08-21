@@ -123,6 +123,28 @@ public class PackageProcessor {
   }
 
   /**
+   * Given temp path of extracted keyboard package kmp file and package ID,
+   * move the tempPath to the permanent packages/ folder
+   * @param tempPath Filepath of temporarily extracted .kmp file
+   * @param packageID String of the package ID
+   */
+  public void moveTempToPackages(File tempPath, String packageID) {
+    File permPath = new File(resourceRoot, KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+    try {
+      if (permPath.exists()) {
+        // Out with the old.  "In with the new" is identical to a new package installation.
+        FileUtils.deleteDirectory(permPath);
+      }
+    } catch (IOException e) {
+
+    }
+    // No version conflict!  Proceed with the install!
+    // Unfortunately, the nice recursive method provided by Apache Commons-IO's FileUtils class
+    // isn't available at Android runtime.
+    tempPath.renameTo(permPath);
+  }
+
+  /**
    * Given a directory location for an extracted KMP file, extracts its kmp.json information
    * into a JSON object.  Works on temporary directories and the installed package directory.
    * @param packagePath The extracted location information to retrieve information for.

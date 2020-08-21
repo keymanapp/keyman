@@ -104,7 +104,7 @@ public final class SelectPackageActivity extends AppCompatActivity {
         bundle.putSerializable("packagePath", packagePath);
         bundle.putString("packageID", pkgID);
         bundle.putBoolean("tempPath", false);
-        Intent intent = new Intent(context, SelectLanguageActivity.class);
+        Intent intent = new Intent(context, SelectLanguageFragment.class);
         intent.putExtras(bundle);
         context.startActivity(intent);
       }

@@ -39,6 +39,9 @@
     <string name="label_close_keyman" comment="Close the Keyman application">Close Keyman</string>
 
     <!-- Context: Button label -->
+    <string name="label_complete" comment="Button when task is complete">Complete</string>
+
+    <!-- Context: Button label -->
     <string name="label_download" comment="Button to confirm downloading an item">Download</string>
 
     <!-- Context: Button label -->
@@ -155,6 +158,9 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Would you like to delete this dictionary?</string>
 
+
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Keyboard installed</string>
 
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Enable corrections</string>

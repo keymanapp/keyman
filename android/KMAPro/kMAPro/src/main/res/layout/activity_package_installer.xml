@@ -9,17 +9,20 @@
 
     <include layout="@layout/titlebar" />
 
-    <WebView
-        android:id="@+id/packageWebView"
+    <!-- Stepper Layout for navigating through package install.
+      Button text set here so we can localize -->
+    <com.stepstone.stepper.StepperLayout
+        android:id="@+id/stepperLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/titlebar"
-        android:layout_above="@+id/buttonBar" />
-
-    <include
-        layout="@layout/bottom_navigation_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        app:ms_showBackButtonOnFirstStep="true"
+        app:ms_backButtonColor="@color/keyman_blue"
+        app:ms_backButtonText="@string/label_back"
+        app:ms_nextButtonColor="@color/keyman_blue"
+        app:ms_nextButtonText="@string/label_next"
+        app:ms_completeButtonColor="@color/keyman_blue"
+        app:ms_completeButtonText="@string/label_complete"
+        app:ms_stepperType="dots" />
 
 </RelativeLayout>
