@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.131 alpha 2020-08-21
+
+* feat(android/app): Add language picker for keyboard package installation (#3481)
+
 ## 14.0.130 alpha 2020-08-19
 
 * fix(android): Fix util to getting the tier on CI builds (#3491)
