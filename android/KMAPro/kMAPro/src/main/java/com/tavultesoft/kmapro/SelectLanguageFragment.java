@@ -50,9 +50,11 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   private static final String iconKey = "icon";
   private static final String isEnabledKey = "isEnabled";
   private static Context context;
+  private Boolean isInstallingPackage = true;
   private static final boolean excludeInstalledLanguages = false;
   private static String packageID = null;
   private ArrayList<String> languageList = null;
+  private ArrayList<Keyboard> addKeyboardsList = null;
   private File packagePath;
   private OnLanguagesSelectedListener callback;
 
@@ -63,6 +65,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   // This interface to be implemented by calling Activity
   public interface OnLanguagesSelectedListener  {
     public void onLanguagesSelected(String pkgTarget, String packageID, ArrayList<String> languageList);
+    public void onLanguagesSelected(ArrayList<Keyboard> addKeyboardsList);
   }
 
   @Override
@@ -75,7 +78,8 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     context = getActivity();
 
     final Toolbar toolbar = v.findViewById(R.id.list_toolbar);
-    languageList = new ArrayList<>();
+    languageList = new ArrayList<String>();
+    addKeyboardsList = new ArrayList<Keyboard>();
 
     final ListView listView = v.findViewById(R.id.listView);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -88,7 +92,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
       return v;
     }
 
-    Boolean isInstallingPackage = bundle.getBoolean("tempPath");
+    isInstallingPackage = bundle.getBoolean("tempPath");
     File resourceRoot =  new File(getActivity().getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
     // Get the list of available Keyboards from the keyboard package kmp.json (could be temp path or installed path)
@@ -160,11 +164,14 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
           }
         } else {
           // Otherwise, add the language association
-          KMManager.addKeyboard(context, k);
-          String confirmation = String.format(getString(R.string.added_language_to_keyboard),
-            k.getLanguageName(), k.getKeyboardName());
-          Toast.makeText(context, confirmation, Toast.LENGTH_LONG).show();
-          //finish();
+          if (addKeyboardsList == null) {
+            addKeyboardsList = new ArrayList<Keyboard>();
+          }
+          if (addKeyboardsList.contains(k)) {
+            addKeyboardsList.remove(k);
+          } else {
+            addKeyboardsList.add(k);
+          }
         }
       }
     });
@@ -175,7 +182,11 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   @Override
   public void onNextClicked(final StepperLayout.OnNextClickedCallback callback) {
     // Send data to calling Activity
-    this.callback.onLanguagesSelected(PackageProcessor.PP_TARGET_KEYBOARDS, packageID, languageList);
+    if (!isInstallingPackage) {
+      this.callback.onLanguagesSelected(addKeyboardsList);
+    } else {
+      this.callback.onLanguagesSelected(PackageProcessor.PP_TARGET_KEYBOARDS, packageID, languageList);
+    }
 
     new Handler().postDelayed(new Runnable() {
       @Override
@@ -187,6 +198,10 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   }
   @Override
   public void onCompleteClicked(StepperLayout.OnCompleteClickedCallback callback) {
+    if (!isInstallingPackage) {
+      this.callback.onLanguagesSelected(addKeyboardsList);
+    }
+    getActivity().finish();
   }
   @Override
   public void onBackClicked(StepperLayout.OnBackClickedCallback callback) {

@@ -27,6 +27,7 @@ import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
 import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.KeyboardEventHandler;
+import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.packages.PackageProcessor;
 import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
 import com.tavultesoft.kmea.util.FileUtils;
@@ -115,9 +116,10 @@ public class PackageActivity extends AppCompatActivity implements
       return;
     }
 
+    boolean isInstallingPackage = true;
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      tempPackagePath, pkgTarget, pkgId, pkgName, hasWelcome, languageCount);
+      isInstallingPackage, tempPackagePath, pkgTarget, pkgId, pkgName, hasWelcome, languageCount);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
   }
@@ -210,6 +212,10 @@ public class PackageActivity extends AppCompatActivity implements
   public void onLanguagesSelected(String pkgTarget, String packageID, ArrayList<String>  languageList) {
     // Use the result of SelectLanguageActivity and install the package
     installPackage(this, pkgTarget, packageID, languageList, false);
+  }
+
+  @Override
+  public void onLanguagesSelected(ArrayList<Keyboard> addKeyboardsList) {
   }
 
   private void showErrorToast(Context context, String message) {

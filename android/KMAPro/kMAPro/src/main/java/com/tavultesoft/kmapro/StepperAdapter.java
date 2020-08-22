@@ -25,6 +25,7 @@ import java.io.File;
  */
 public class StepperAdapter extends AbstractFragmentStepAdapter {
   private static final String CURRENT_STEP_POSITION_KEY = "messageResourceId";
+  private boolean isInstallingPackage;
   private File tempPackagePath;
   private String pkgTarget;
   private String pkgName;
@@ -35,10 +36,12 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
   private int languageCount;
   private boolean hasWelcome;
 
-  public StepperAdapter(FragmentManager fm, Context context, File tempPackagePath,
+  public StepperAdapter(FragmentManager fm, Context context,
+                        boolean isInstallingPackage, File tempPackagePath,
                         String pkgTarget, String packageID, String pkgName,
                         boolean hasWelcome, int languageCount) {
     super(fm, context);
+    this.isInstallingPackage = isInstallingPackage;
     this.tempPackagePath = tempPackagePath;
     this.pkgTarget = pkgTarget;
     this.packageID = packageID;
@@ -51,8 +54,19 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
   public Step createStep(int position) {
     switch (position){
       case 0:
-        final WebViewFragment step1 = CreateWebView(position, FileUtils.README_HTM);
-        return step1;
+        if (isInstallingPackage) {
+          final WebViewFragment step1 = CreateWebView(position, FileUtils.README_HTM);
+          return step1;
+        } else {
+          final SelectLanguageFragment step1 = new SelectLanguageFragment();
+          Bundle b1 = new Bundle();
+          b1.putInt(CURRENT_STEP_POSITION_KEY, position);
+          b1.putBoolean("tempPath", isInstallingPackage);
+          b1.putSerializable("packagePath", tempPackagePath);
+          b1.putString("packageID", packageID);
+          step1.setArguments(b1);
+          return step1;
+        }
       case 1:
         if (getCount() > 2) {
           final SelectLanguageFragment step2 = new SelectLanguageFragment();
@@ -75,12 +89,16 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
   }
 
   /**
-   * Determine the number of states
+   * Determine the number of states for the StepperAdapter
+   * !isInstallingPackage:
+   * 1 dot: keyboard package already installed, so just use SelectLanguageFragment
+   *
    * Keyboard package:
    * 1 dot: package has one language, no welcome.htm.
    * 2 dots: package has one language, has welcome.htm.
    * 2 dots: package has multiple languages but no welcome.htm.
    * 3 dots: package has multiple languages and welcome.htm.
+   *
    * Lexical Model package:
    * 2 dots
    * @return int
@@ -92,7 +110,10 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
       if (pkgTarget.equals(PackageProcessor.PP_LEXICAL_MODELS_KEY)) {
         count = 2;
       } else if (pkgTarget.equals(PackageProcessor.PP_KEYBOARDS_KEY)) {
-        if (languageCount <= 1) {
+        if (!isInstallingPackage) {
+          count = 1;
+        }
+        else if (languageCount <= 1) {
           // One or less language
           count = (!hasWelcome) ? 1 : 2;
         } else {
@@ -110,7 +131,7 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
     //Override this method to customize the steps
     switch (position){
       case 0:
-        // readme.htm default to "NEXT" button
+        // readme.htm EndButton uses "NEXT" button
         String buttonLabel = context.getString(R.string.label_next);
         if (getCount() <= 2) {
           // If only 1-2 steps, use "INSTALL"
@@ -120,12 +141,12 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
           .setEndButtonLabel(buttonLabel)
           .create();
       case 1:
-        // Language picker uses "INSTALL" button
+        // Language picker EndButton uses "INSTALL" button
         buttonLabel = context.getString(R.string.label_install);
         boolean backButtonVisible = true;
         if (getCount() == 2) {
-          // If only two steps, use "COMPLETE" and hide back button
-          buttonLabel = context.getString(R.string.label_complete);
+          // If only two steps, use "OK" and hide back button
+          buttonLabel = context.getString(R.string.label_ok);
           backButtonVisible = false;
         }
         return new StepViewModel.Builder(context)
@@ -133,7 +154,7 @@ public class StepperAdapter extends AbstractFragmentStepAdapter {
           .setBackButtonVisible(backButtonVisible)
           .create();
       case 2:
-        // Adapter defaults last step to "COMPLETE" button. Hide back button
+        // Adapter style defaults last step EndButton to "OK". Hide back button
         return new StepViewModel.Builder(context)
           .setBackButtonVisible(false)
           .create();
