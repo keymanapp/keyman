@@ -187,8 +187,7 @@
         let root = this.root;
 
         if(root.type == 'internal') {
-          for(let i = 0; i < root.values.length; i++) {
-            let entry = root.values[i];
+          for(let entry of root.values) {
             let entryNode = root.children[entry];
 
             // UTF-16 astral plane check.
@@ -200,17 +199,17 @@
               // we should compile-time enforce that this assumption is always true if possible.
               if(entryNode.type == 'internal') {
                 let internalNode = entryNode;
-                for(let j = 0; j < entryNode.values.length; j++) {
-                  let prefix = this.prefix + entry + internalNode.values[j];
+                for(let lowSurrogate of internalNode.values) {
+                  let prefix = this.prefix + entry + lowSurrogate;
                   yield {
-                    char: entry + entryNode.values[j],
-                    traversal: function() { return new TrieModel.Traversal(internalNode.children[internalNode.values[j]], prefix) }
+                    char: entry + lowSurrogate,
+                    traversal: function() { return new TrieModel.Traversal(internalNode.children[lowSurrogate], prefix) }
                   }
                 }
               } else {
                 // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
                 let fullText = entryNode.entries[0].key;
-                entry = entry + fullText[this.prefix.length + 1]; // The other half of the SMP.
+                entry = entry + fullText[this.prefix.length + 1]; // The other half of the non-BMP char.
                 let prefix = this.prefix + entry;
 
                 yield {
@@ -237,10 +236,8 @@
             return entry.key != prefix && prefix.length < entry.key.length;
           })
 
-          for(let i = 0; i < children.length; i++) {
-            let entry = children[i];
-            let key = entry.key;
-            let nodeKey = entry.key[prefix.length];
+          for(let {key} of children) {
+            let nodeKey = key[prefix.length];
 
             if(models.isHighSurrogate(nodeKey)) {
               // Merge the other half of an SMP char in!
