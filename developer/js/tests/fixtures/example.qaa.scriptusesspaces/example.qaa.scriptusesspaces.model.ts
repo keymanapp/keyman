@@ -4,7 +4,7 @@ const source: LexicalModelSource = {
   /* Keyman 14.0+ word breaker specification: */
   wordBreaker: {
     use: 'default',
-    overrideScriptDefaults: 'spaces-break-words',
+    overrideScriptDefaults: 'break-words-at-spaces',
   }
 };
 export default source;
