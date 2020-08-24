@@ -107,7 +107,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     }
     final String keyboardID = keyboard.getKeyboardID();
     final String keyboardName = keyboard.getKeyboardName();
-    String title_install = String.format(getString(R.string.title_select_language_for_package), keyboardName);
+    String title_install = String.format(getString(R.string.title_select_languages_for_package), keyboardName);
     String title_no_install = getString(R.string.all_languages_installed);
     final TextView textView = v.findViewById(R.id.bar_title);
     textView.setText(title_no_install);
