@@ -42,8 +42,6 @@ public final class SelectPackageActivity extends AppCompatActivity {
   private static final String iconKey = "icon";
   private static Context context;
 
-  protected SelectLanguageFragment selectLanguageFragment;
-
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -87,9 +85,6 @@ public final class SelectPackageActivity extends AppCompatActivity {
       hashMap.put(iconKey, icon);
       list.add(hashMap);
     }
-
-    // TODO: Fix the ID
-    selectLanguageFragment = (SelectLanguageFragment) getSupportFragmentManager().findFragmentById(R.id.keyman_settings_fragment);
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
     int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.text2, com.tavultesoft.kmea.R.id.image1};
