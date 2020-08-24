@@ -7,6 +7,7 @@ import webbrowser
 gi.require_version('Gtk', '3.0')
 gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, WebKit2
+from keyman_config import _
 from keyman_config.accelerators import bind_accelerator, init_accel
 
 # NOTE: WebKit2 is not able to load XHTML files nor files with an encoding other
@@ -15,9 +16,12 @@ from keyman_config.accelerators import bind_accelerator, init_accel
 
 class WelcomeView(Gtk.Dialog):
 
-    def __init__(self, parent, welcomeurl, keyboardname):
+    def __init__(self, parent, welcomeurl, keyboardname, newlyInstalled=False):
         self.accelerators = None
-        kbtitle = keyboardname + " installed"
+        if newlyInstalled:
+            kbtitle = _("{name} installed").format(name=keyboardname)
+        else:
+            kbtitle = keyboardname
         self.welcomeurl = welcomeurl
         Gtk.Dialog.__init__(self, kbtitle, parent)
         init_accel(self)
@@ -33,12 +37,12 @@ class WelcomeView(Gtk.Dialog):
         hbox = Gtk.Box(spacing=12)
         self.get_content_area().pack_start(hbox, False, False, 6)
 
-        button = Gtk.Button.new_with_mnemonic("Open in _Web browser")
+        button = Gtk.Button.new_with_mnemonic(_("Open in _Web browser"))
         button.connect("clicked", self.on_openweb_clicked)
-        button.set_tooltip_text("Open in the default web browser to do things like printing")
+        button.set_tooltip_text(_("Open in the default web browser to do things like printing"))
         hbox.pack_start(button, False, False, 12)
 
-        button = Gtk.Button.new_with_mnemonic("_OK")
+        button = Gtk.Button.new_with_mnemonic(_("_OK"))
         button.connect("clicked", self.on_ok_clicked)
         hbox.pack_end(button, False, False, 12)
         bind_accelerator(self.accelerators, button, '<Control>w')

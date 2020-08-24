@@ -6,6 +6,7 @@ import webbrowser
 import urllib.parse
 from gi.repository import Gtk, WebKit2
 from urllib.parse import parse_qsl, urlencode
+from keyman_config import _
 from keyman_config.accelerators import init_accel
 from keyman_config.dconf_util import get_option, set_option
 
@@ -20,7 +21,7 @@ class OptionsView(Gtk.Window):
         self.optionurl = info["optionurl"]
         self.packageID = info["packageID"]
         self.keyboardID = info["keyboardID"]
-        kbtitle = self.packageID + " Settings"
+        kbtitle = _("{packageId} Settings").format(packageId=self.packageID)
         Gtk.Window.__init__(self, title=kbtitle)
         init_accel(self)
 

@@ -74,7 +74,13 @@ files:
     dest: /ios/app/Localizable.strings
     translation: /ios/keyman/Keyman/Keyman/%osx_code%/%original_file_name%
 
+  # Linux files
 
+  - source: /linux/keyman-config/locale/keyman-config.pot
+    dest: /linux/keyman-config.pot
+    translation: /linux/keyman-config/locale/%locale_with_underscore%.po
+    type: gettext
+    update_option: update_as_unapproved
 
 
   # crowdin parameters descriptions:
