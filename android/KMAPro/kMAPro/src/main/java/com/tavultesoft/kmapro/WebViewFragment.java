@@ -18,7 +18,6 @@ import com.tavultesoft.kmea.util.FileUtils;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,17 +82,17 @@ public class WebViewFragment extends Fragment implements BlockingStep {
     Toolbar toolbar = (Toolbar) v.findViewById(R.id.titlebar);
     ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
     ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-    actionBar.setTitle(null);
-    actionBar.setDisplayUseLogoEnabled(false);
-    actionBar.setDisplayShowHomeEnabled(false);
-    actionBar.setDisplayShowTitleEnabled(false);
-    actionBar.setDisplayShowCustomEnabled(true);
-    actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(getContext()));
+    if (actionBar != null) {
+      actionBar.setTitle(null);
+      actionBar.setDisplayUseLogoEnabled(false);
+      actionBar.setDisplayShowHomeEnabled(false);
+      actionBar.setDisplayShowTitleEnabled(false);
+      actionBar.setDisplayShowCustomEnabled(true);
+      actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(getContext()));
+    }
 
-    TextView packageActivityTitle = new TextView(getContext());
+    TextView packageActivityTitle = (TextView) v.findViewById(R.id.bar_title);
     packageActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
-    packageActivityTitle.setTextSize(getResources().getDimension(R.dimen.titlebar_label_textsize));
-    packageActivityTitle.setGravity(Gravity.CENTER);
 
     String titleStr = pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS) ?
       getString(R.string.install_keyboard_package) :
@@ -102,7 +101,6 @@ public class WebViewFragment extends Fragment implements BlockingStep {
       titleStr = String.format(getString(R.string.welcome_package), pkgName);
     }
     packageActivityTitle.setText(titleStr);
-    actionBar.setCustomView(packageActivityTitle);
 
     WebView webView = (WebView) v.findViewById(R.id.packageWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
