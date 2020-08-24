@@ -41,13 +41,14 @@ namespace correction {
       minimumPredictions: 3
     }
 
-    // Keep as a 'rotating cache'?
+    // Keep as a 'rotating cache'.  Includes search spaces corresponding to 'revert' commands.
+    private cachedSpaces: {[id: string]: SearchSpace} = {};
+    private cachedIDs: string[];
+
     private searchSpaces: SearchSpace[] = [];
     static readonly QUEUE_COMPARATOR: models.Comparator<SearchNode> = function(arg1, arg2) {
       return arg1.currentCost - arg2.currentCost;
     }
-
-    private operations: SearchOperation[] = [];
 
     private inputs: InputToken[] = [];
     private lexiconRoot: LexiconTraversal;
@@ -59,7 +60,15 @@ namespace correction {
 
     // TODO:  Define the type more properly.
     addInput(input: {char: string}) {
+      // TODO:  add 'addInput' operation
+      //        do search space things
+    }
 
+    // Current best guesstimate of how compositor will retrieve ideal corrections.
+    getBestMatches(): Generator<[string, number][]> {
+      // Duplicates underlying Priority Queue, iterates progressively through sets of evenly-costed
+      // corrections until satisfied.
+      return null;
     }
   }
 }
