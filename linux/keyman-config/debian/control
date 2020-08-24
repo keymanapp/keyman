@@ -4,7 +4,8 @@ Section: python
 Priority: optional
 Build-Depends: dh-python, debhelper (>= 9), bash-completion,
  help2man, python3-all (>= 3.5), python3-setuptools,
- python3-pip, python3-magic,
+ python3-pip, python3-magic, python3-lxml, python3-numpy,
+ python3-pil, python3-requests, python3-requests-cache,
  python3-qrcode <!pkg.keyman-config.xenial>,
  python-qrcode <pkg.keyman-config.xenial>,
  python3-sentry-sdk <pkg.keyman-config.focal>,
