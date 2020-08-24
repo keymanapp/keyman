@@ -101,13 +101,17 @@ function compileWordBreaker(spec: WordBreakerSpec): string {
     return baseWordBreakerCode;
   }
 
+  return compilerJoinDecorator(spec, baseWordBreakerCode);
+}
+
+function compilerJoinDecorator(spec: WordBreakerSpec, existingWordBreakerCode: string) {
   // Bundle the source of the join decorator, as an IIFE,
-  // like this: (function join(breaker, joiners) {/*...*/}(breaker, joiners)) 
+  // like this: (function join(breaker, joiners) {/*...*/}(breaker, joiners))
   // The decorator will run IMMEDIATELY when the model is loaded,
   // by the LMLayer returning the decorated word breaker to the
   // LMLayer model.
   let joinerExpr: string = JSON.stringify(spec.joinWordsAt)
-  return `(${decorateWithJoin.toString()}(${baseWordBreakerCode}, ${joinerExpr}))`;
+  return `(${decorateWithJoin.toString()}(${existingWordBreakerCode}, ${joinerExpr}))`;
 }
 
 /**
