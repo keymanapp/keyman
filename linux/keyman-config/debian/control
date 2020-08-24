@@ -17,7 +17,9 @@ Homepage: https://keyman.com/
 Package: python3-keyman-config
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, python3-gi, gir1.2-webkit2-4.0,
- kmflcomp (>=10.99.1), dconf-cli, ibus-keyman
+ kmflcomp (>=10.99.1), dconf-cli, ibus-keyman,
+ python3-sentry-sdk <pkg.keyman-config.focal>,
+ python3-raven <pkg.keyman-config.bionic>,
 Description: Keyman for Linux configuration
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
  open source keyboarding platform which allows anyone to write a keyboard layout
