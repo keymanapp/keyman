@@ -29,8 +29,8 @@ export function decorateWithScriptOverrides(breaker: WordBreakingFunction, optio
           spanContainsOnlyLetters(previousSpan) &&
           spanContainsOnlyLetters(currentSpan)
       ) {
-        outputSpans.pop();
-        outputSpans.push(concatenateSpans(previousSpan, currentSpan));
+        // previous span SHOULD be joined with current!
+        outputSpans[outputSpans.length - 1] = concatenateSpans(previousSpan, currentSpan);
       } else {
         outputSpans.push(currentSpan);
       }
