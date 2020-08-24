@@ -163,11 +163,42 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
     end;
   end;
 
-  procedure RefreshTransientProfiles;
+  procedure RefreshTransientProfile(LangID: Word);
+  var
+    i: Integer;
+    FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
+    BCP47Tag, RootPath: string;
+    FGUID: TGUID;
+    regLM: TRegistryErrorControlled;
   begin
-    // TODO!!
     // For each of the 4 transient profiles that are registered for the keyboard,
     // check to see if they are installed, and if so, add them.
+    regLM := TRegistryErrorControlled.Create(KEY_READ);
+    try
+      regLM.RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + SRegSubKey_TransientLanguageProfiles + '\' + IntToHex(LangID, 4);
+      if regLM.OpenKeyReadOnly(RootPath) and
+        regLM.ValueExists(SRegValue_KeymanProfileGUID) then
+      begin
+        FGUID := StringToGUID(regLM.ReadString(SRegValue_KeymanProfileGUID));
+        BCP47Tag := GetBCP47ForTransientTIP(LangID, FGUID);
+        if (BCP47Tag <> '') and (IndexOfBCP47Code(BCP47Tag) < 0) then
+        begin
+          FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, BCP47Tag, BCP47Tag, LangID, FGUID, BCP47Tag); // TODO: get language name
+          FLanguages.Add(FKeyboardLanguage);
+        end;
+      end;
+    finally
+      regLM.Free;
+    end;
+  end;
+
+  procedure RefreshTransientProfiles;
+  begin
+    RefreshTransientProfile($2000);
+    RefreshTransientProfile($2400);
+    RefreshTransientProfile($2800);
+    RefreshTransientProfile($2C00);
   end;
 
   function HasLanguage(BCP47: string): Boolean;
@@ -214,7 +245,7 @@ begin
   KL.MethodEnter(Self, 'DoRefresh', []);
   try
     RefreshProfiles;
-    // TODO: RefreshTransientProfiles;
+    RefreshTransientProfiles;
     RefreshSuggestedLanguages;
   finally
     KL.MethodExit(Self, 'DoRefresh');

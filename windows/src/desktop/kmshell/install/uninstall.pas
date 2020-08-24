@@ -45,6 +45,23 @@ uses
 
 { I1201, I1169, I1167, I1163, I1150, I1135 - Fix crash uninstalling admin-installed keyboards and packages }
 
+procedure UninstallKeyboardTips(Keyboard: IKeymanKeyboardInstalled);
+var
+  i: Integer;
+begin
+  for i := 0 to Keyboard.Languages.Count - 1 do
+    if Keyboard.Languages[i].IsInstalled then
+      Keyboard.Languages[i].Uninstall;
+end;
+
+procedure UninstallPackageTips(Package: IKeymanPackageInstalled);
+var
+  i: Integer;
+begin
+  for i := 0 to Package.Keyboards.Count - 1 do
+    UninstallKeyboardTips(Package.Keyboards[i] as IKeymanKeyboardInstalled);
+end;
+
 function UninstallPackage(Owner: TWinControl; const PackageName: WideString; Silent: Boolean): Boolean;
 var
   i, n: Integer;
@@ -77,6 +94,7 @@ begin
 
   if CanElevate then
   begin
+    UninstallPackageTips(pkg);
     pkgID := pkg.ID;
     pkg := nil;
     if WaitForElevatedConfiguration(Handle, '-up "'+pkgID+'" -s') = 0 then
@@ -97,6 +115,8 @@ begin
   end;
 
   kmcom.Keyboards.Apply;
+
+  UninstallPackageTips(pkg);
   pkg.Uninstall(True);
   pkg := nil;
   kmcom.Keyboards.Refresh;
@@ -124,6 +144,9 @@ begin
 
   if not Silent and (MessageDlg(MsgFromIdFormat(SKUninstallKeyboard, [kbd.Name]), mtConfirmation, mbOkCancel, 0) = mrCancel) then
     Exit;
+
+  // First, uninstall TIPs in user context
+  UninstallKeyboardTips(kbd);
 
   if CanElevate then
   begin

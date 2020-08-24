@@ -277,8 +277,10 @@ begin
   //
   // We need to check if the TIP is installed before attempting to remove it,
   // because otherwise Windows will attempt to 'tidy up' and may leave a stray
-  // keyboard layout installed (the user could have removed the TIP through
-  // Windows UI/APIs after we install it).
+  // keyboard layout installed.
+  //
+  // This scenario can arise if the user has removed the TIP through Windows
+  // UI/APIs after we install it.
   //
   if not IsTipInstalledForCurrentUser('', langid, guid) then
     Exit;
@@ -286,11 +288,7 @@ begin
   //
   // Uninstall the TIP from Windows current user
   //
-
-  // TODO: this probably needs to be a powershell script for full removal?
-
   FLayoutInstallString := GetLayoutInstallString(LangID, guid);
-
   if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 end;

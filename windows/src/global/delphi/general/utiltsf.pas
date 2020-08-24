@@ -24,6 +24,7 @@ interface
 
 function TSFInstalled: Boolean;
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
 function IsTransientLanguageID(LangID: Integer): Boolean;
 function GetLayoutInstallString(LangID: Integer; guidProfile: TGUID): string;
 
@@ -67,35 +68,52 @@ var
   reg: TRegistryErrorControlled;
   tags: TStringList;
 begin
+  if BCP47Tag <> '' then
+  begin
+    reg := TRegistryErrorControlled.Create(KEY_READ);
+    try
+      FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
+      Result :=
+        reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
+        reg.ValueExists(FLayoutInstallString);
+    finally
+      reg.Free;
+    end;
+  end
+  else
+  begin
+    Result := GetBCP47ForTransientTIP(LangID, guidProfile) <> '';
+  end;
+end;
+
+function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
+var
+  tag, FLayoutInstallString: string;
+  reg: TRegistryErrorControlled;
+  tags: TStringList;
+begin
+  Result := '';
+
   reg := TRegistryErrorControlled.Create(KEY_READ);
   try
     FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
 
-    if BCP47Tag <> '' then
+    // We'll search all the installed tags because it's probably a transient
+    // language for which we rely on the Windows language association because
+    // it can change on us
+    if reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
     begin
-      Result := reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
-        reg.ValueExists(FLayoutInstallString);
-    end
-    else
-    begin
-      // We'll search all the installed tags because it's probably a transient
-      // language for which we rely on the Windows language association because
-      // it can change on us
-      Result := False;
-      if reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
-      begin
-        tags := TStringList.Create;
-        try
-          reg.GetKeyNames(tags);
-          for tag in tags do
-          begin
-            if reg.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + tag) and
-                reg.ValueExists(FLayoutInstallString) then
-              Exit(True);
-          end;
-        finally
-          tags.Free;
+      tags := TStringList.Create;
+      try
+        reg.GetKeyNames(tags);
+        for tag in tags do
+        begin
+          if reg.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + tag) and
+              reg.ValueExists(FLayoutInstallString) then
+            Exit(tag);
         end;
+      finally
+        tags.Free;
       end;
     end;
   finally
