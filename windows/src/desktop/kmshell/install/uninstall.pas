@@ -177,7 +177,7 @@ begin
 
   if not Assigned(kbdlang) then Exit;
 
-  if not kmcom.SystemInfo.IsAdministrator then
+  {if not kmcom.SystemInfo.IsAdministrator then
   begin
     if not CanElevate then
     begin
@@ -191,7 +191,7 @@ begin
       Result := True;
     end;
     Exit;
-  end;
+  end;}
 
   kbdlang.Uninstall;
   kbdlang := nil;

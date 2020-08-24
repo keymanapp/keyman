@@ -60,7 +60,7 @@ begin
       GuidToString(guidProfile)]);
 
     Result := reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
-      reg.ValueExists(FLayoutInstallString) and ((reg.ReadInteger(FLayoutInstallString) and 1) <> 0);
+      reg.ValueExists(FLayoutInstallString);
   finally
     reg.Free;
   end;
