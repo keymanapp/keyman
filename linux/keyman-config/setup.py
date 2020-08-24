@@ -15,7 +15,7 @@ setup(
 
     install_requires=[
         'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
-        'python-magic', 'qrcode'
+        'python-magic', 'qrcode', 'sentry-sdk'
     ],
 
     # metadata to display on PyPI
