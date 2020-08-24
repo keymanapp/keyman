@@ -228,6 +228,7 @@ const
   SRegValue_LanguageProfileLangID = 'LangID';
   SRegValue_LanguageProfileLocale = 'Locale';
   SRegValue_LanguageProfileName = 'Name';
+  SRegValue_ProfileEnabled = 'Profile Enabled';
 
   { InstalledPackages }
 
@@ -260,6 +261,8 @@ const
   SRegKey_KeyboardLayout_CU = 'keyboard layout';                                       // CU
   SRegKey_KeyboardLayoutPreload_CU = 'keyboard layout\preload';                        // CU
   SRegKey_KeyboardLayoutSubstitutes_CU = 'keyboard layout\substitutes';                // CU
+
+  SRegKey_ControlPanelInternationalUserProfile = 'Control Panel\International\User Profile'; // CU
 
   { User profile keys }
 

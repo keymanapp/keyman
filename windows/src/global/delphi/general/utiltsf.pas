@@ -23,6 +23,7 @@ unit utiltsf;
 interface
 
 function TSFInstalled: Boolean;
+function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
 
 const c_clsidKMTipTextService: TGUID = '{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}';  // version 10.0
 const c_clsidKMTipTextService_90: TGUID = '{487EB753-DB93-48C5-9E6A-4398E777C61D}';   // I3663   // I4248
@@ -31,9 +32,11 @@ const c_clsidTextServicesFramework: TGUID = '{529A9E6B-6587-4F23-AB9E-9C7D683E3C
 implementation
 
 uses
-  Windows,
-  SysUtils,
-  ErrorControlledRegistry;
+  System.SysUtils,
+  Winapi.Windows,
+
+  ErrorControlledRegistry,
+  RegistryKeys;
 
 function TSFInstalled: Boolean;
 begin
@@ -43,6 +46,23 @@ begin
     Result := OpenKeyReadOnly('CLSID\'+GUIDToString(c_clsidTextServicesFramework));
   finally
     Free;
+  end;
+end;
+
+function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+var
+  FLayoutInstallString: string;
+  reg: TRegistryErrorControlled;
+begin
+  reg := TRegistryErrorControlled.Create(KEY_READ);
+  try
+    FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
+      GuidToString(guidProfile)]);
+
+    Result := reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
+      reg.ValueExists(FLayoutInstallString) and ((reg.ReadInteger(FLayoutInstallString) and 1) <> 0);
+  finally
+    reg.Free;
   end;
 end;
 

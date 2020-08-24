@@ -49,7 +49,7 @@ uses
   UfrmInstallKeyboardFromWeb in 'install\UfrmInstallKeyboardFromWeb.pas' {frmInstallKeyboardFromWeb},
   UfrmWebContainer in '..\..\global\delphi\ui\UfrmWebContainer.pas' {frmWebContainer},
   MessageIdentifierConsts in '..\..\global\delphi\cust\MessageIdentifierConsts.pas',
-  UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress},
+  Keyman.UI.UfrmProgress in '..\..\global\delphi\general\Keyman.UI.UfrmProgress.pas' {frmProgress},
   kmcomapi_errors in '..\..\global\delphi\general\kmcomapi_errors.pas',
   GenericXMLRenderer in 'render\GenericXMLRenderer.pas',
   help in 'main\help.pas',
@@ -171,7 +171,8 @@ uses
   Keyman.Configuration.UI.KeymanProtocolHandler in 'install\Keyman.Configuration.UI.KeymanProtocolHandler.pas',
   Keyman.Configuration.System.KeymanUILanguageManager in 'main\Keyman.Configuration.System.KeymanUILanguageManager.pas',
   Keyman.System.UILanguageManager in '..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
-  Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas';
+  Keyman.Configuration.System.TIPMaintenance in 'install\Keyman.Configuration.System.TIPMaintenance.pas',
+  UfrmDownloadProgress in 'util\UfrmDownloadProgress.pas' {frmDownloadProgress};
 
 {$R VERSION.RES}
 {$R manifest.res}

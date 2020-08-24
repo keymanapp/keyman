@@ -233,7 +233,7 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], nil, Force);
+    Execute(FFileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
   finally
     Free;
   end;
@@ -245,7 +245,7 @@ var
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [ikDontInstallLanguages], nil, Force);
+    Execute(FFileName, '', [], nil, Force);
   finally
     Free;
   end;

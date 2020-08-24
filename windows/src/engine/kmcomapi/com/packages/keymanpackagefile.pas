@@ -172,7 +172,7 @@ var
 begin
   with TKPInstallPackage.Create(Context) do
   try
-    o := [];
+    o := [ipLegacyRegisterAndInstallProfiles];
     if Force then
       Include(o, ipForce);
     Execute(FFileName, o);
@@ -188,7 +188,7 @@ var
 begin
   with TKPInstallPackage.Create(Context) do
   try
-    o := [ipDontInstallLanguages];
+    o := [];
     if Force then
       Include(o, ipForce);
     Execute(FFileName, o);

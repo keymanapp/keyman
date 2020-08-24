@@ -115,7 +115,7 @@ begin
   KL.MethodEnter(Self, 'Install', [Filename, Force]);
   with TKPInstallPackage.Create(Context) do
   try
-    o := [];
+    o := [ipLegacyRegisterAndInstallProfiles];
     if Force then
       Include(o, ipForce);
     Execute(Filename, o);
@@ -133,7 +133,7 @@ begin
   KL.MethodEnter(Self, 'Install2', [Filename, Force]);
   with TKPInstallPackage.Create(Context) do
   try
-    o := [ipDontInstallLanguages];
+    o := [];
     if Force then
       Include(o, ipForce);
     Execute(Filename, o);

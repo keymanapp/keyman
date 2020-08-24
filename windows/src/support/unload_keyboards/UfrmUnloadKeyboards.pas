@@ -882,7 +882,7 @@ end;
 
 procedure TForm1.cmdITfInputProcessorProfileMgrRegisterProfileClick(Sender: TObject);
 var
-  langid: UINT;
+  langid: WORD;
   guid, clsid: TGUID;
   pInputProcessorProfiles: ITfInputProcessorProfiles;
   pInputProcessorProfileMgr: ItfInputProcessorProfileMgr;

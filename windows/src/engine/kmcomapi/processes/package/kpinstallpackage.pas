@@ -46,7 +46,7 @@ interface
 uses kpbase, keymanapi_TLB;
 
 type
-  TKPInstallPackageOptions = set of (ipForce, ipDontInstallLanguages);
+  TKPInstallPackageOptions = set of (ipForce, ipLegacyRegisterAndInstallProfiles);
 
   TKPInstallPackage = class(TKPBase)
   public
@@ -120,8 +120,8 @@ var
     FLanguages: TPackageKeyboardLanguageList;
   begin
     FOptions := [ikPartOfPackage];
-    if ipDontInstallLanguages in Options then
-      Include(FOptions, ikDontInstallLanguages);
+    if ipLegacyRegisterAndInstallProfiles in Options then
+      Include(FOptions, ikLegacyRegisterAndInstallProfiles);
 
     kbd := inf.Keyboards.ItemByID(GetShortKeyboardName(FileName));
     if Assigned(kbd) and (kbd.Languages.Count > 0) then

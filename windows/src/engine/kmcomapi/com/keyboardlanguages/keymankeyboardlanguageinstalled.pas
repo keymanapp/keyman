@@ -34,10 +34,11 @@ uses
   msctf;
 
 type
-  TKeymanKeyboardLanguageInstalled = class(TKeymanKeyboardLanguage, IKeymanKeyboardLanguageInstalled, IIntKeymanKeyboardLanguage)   // I4376
+  TKeymanKeyboardLanguageInstalled = class(TKeymanKeyboardLanguage, IKeymanKeyboardLanguageInstalled, IKeymanKeyboardLanguageInstalled2, IIntKeymanKeyboardLanguage)   // I4376
   private
     FOwner: IKeymanKeyboardInstalled;
     FProfileGUID: TGUID;
+    FIsInstalled: Boolean;
   protected
     function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
       override;
@@ -50,19 +51,20 @@ type
     procedure Install; safecall;
     procedure Uninstall; safecall;
 
+    { IKeymanKeyboardLanguageInstalled2 }
     function FindInstallationLangID(out LangID: Integer;
       out TemporaryKeyboardID: WideString; out RegistrationRequired: WordBool;
       Flags: Integer): WordBool; safecall;
     procedure InstallTip(LangID: Integer;
       const TemporaryKeyboardToRemove: WideString); safecall;
     procedure RegisterTip(LangID: Integer); safecall;
-
+    function Get_IsRegistered: WordBool; safecall;
 
     { IIntKeymanKeyboardLanguageInstalled }
     procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
   public
     constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
-      ALangID: Integer; AProfileGUID: TGUID; const AName: string);
+      ALangID: Integer; AProfileGUID: TGUID; const AName: string; AIsInstalled: Boolean);
   end;
 
 implementation
@@ -75,8 +77,8 @@ uses
   glossary,
   keymanerrorcodes,
   Keyman.System.Process.KPInstallKeyboardLanguage,
+  Keyman.System.Process.KPUninstallKeyboardLanguage,
   kpinstallkeyboardlanguageprofiles,
-  kpuninstallkeyboardlanguageprofiles,
   utiltsf,
   utilxml;
 
@@ -87,6 +89,7 @@ procedure TKeymanKeyboardLanguageInstalled.ApplyEnabled(
 var
   AEnabledInt: Integer;
 begin
+  // TODO: eliminate
   if not Get_IsInstalled then
     Exit;
 
@@ -112,10 +115,11 @@ end;
 
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
   AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
-  ALangID: Integer; AProfileGUID: TGUID; const AName: string);
+  ALangID: Integer; AProfileGUID: TGUID; const AName: string; AIsInstalled: Boolean);
 begin
   FOwner := AOwner;
   FProfileGUID := AProfileGUID;
+  FIsInstalled := AIsInstalled;
   inherited Create(AContext, AOwner, AOriginalBCP47Code, ABCP47Code, ALangID, AName);
 end;
 
@@ -172,6 +176,11 @@ end;
 
 function TKeymanKeyboardLanguageInstalled.Get_IsInstalled: WordBool;
 begin
+  Result := FIsInstalled;
+end;
+
+function TKeymanKeyboardLanguageInstalled.Get_IsRegistered: WordBool;
+begin
   Result := not IsEqualGuid(FProfileGUID, GUID_NULL);
 end;
 
@@ -188,9 +197,9 @@ end;
 procedure TKeymanKeyboardLanguageInstalled.Install;
 begin
   if not Get_IsInstalled then
-    with TKPInstallKeyboardLanguageProfiles.Create(Context) do
+    with TKPInstallKeyboardLanguage.Create(Context) do
     try
-      Execute(FOwner.ID, FOwner.Name, Get_BCP47Code, FOwner.IconFilename, GetLangName);
+      InstallTip(FOwner.ID, Get_BCP47Code, Get_LangID);
     finally
       Free;
     end;
@@ -211,10 +220,9 @@ end;
 procedure TKeymanKeyboardLanguageInstalled.Uninstall;
 begin
   if Get_IsInstalled then
-    with TKPUninstallKeyboardLanguageProfiles.Create(Context) do
+    with TKPUninstallKeyboardLanguage.Create(Context) do
     try
-      Execute(FOwner.ID, Get_BCP47Code);
-      FProfileGUID := GUID_NULL;
+      UninstallTip(FOwner.ID, Get_BCP47Code);
     finally
       Free;
     end;

@@ -27,6 +27,8 @@ type
     procedure InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer);
     procedure UninstallTemporaryLayout(const LayoutString: string);
 
+    procedure RegisterTransientTips(const KeyboardID, KeyboardName: string; IconFileName: string);
+
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
   private
@@ -76,6 +78,7 @@ begin
   inherited Destroy;
 end;
 
+// TODO: change LangID to Winapi.Windows.LANGID
 function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryKeyboardID: string; Flags: DWORD): Boolean;
 var
   ml: TMitigateWin10_1803.TMitigatedLanguage;
@@ -105,42 +108,45 @@ begin
       Exit(False);
     end;
 
-    if (Flags and ilkInstallTransitoryLanguage) = ilkInstallTransitoryLanguage then
+    if (Flags and ilkInstallTransitoryLanguage) = 0 then
     begin
-      //
-      // Install user language with Powershell if it isn't present
-      //
-      LangID := 0;
-
-      if (tag = '') or not InstallBCP47Language(tag) then
-      begin
-        WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language '+BCP47Tag]));
-        Exit(False);
-      end;
-
-      //
-      // Find the new language ID
-      //
-
-      FWin8Languages.Refresh;
-      Win8Lang := FWin8Languages.FindClosestByBCP47Tag(tag);
-      if not Assigned(Win8Lang) then
-      begin
-        WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['BCP47 language was installed but could not be located']));
-        Exit(False);
-      end;
-
-      LangID := Win8Lang.LangID;
-
-      if Win8Lang.InputMethods.Count = 1 then
-      begin
-        TemporaryKeyboardID := Win8Lang.InputMethods[0];
-      end
-      else
-        // We'll continue on, but this is unexpected, so we won't try and uninstall the temporary input method. The user
-        // will have more than one input method installed.
-        WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Expecting exactly one input method; instead got '+Win8Lang.InputMethods.Text]));
+      // No warning, because this is to be expected
+      Exit(False);
     end;
+
+    //
+    // Install user language with Powershell if it isn't present
+    //
+    LangID := 0;
+
+    if (tag = '') or not InstallBCP47Language(tag) then
+    begin
+      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language '+BCP47Tag]));
+      Exit(False);
+    end;
+
+    //
+    // Find the new language ID
+    //
+
+    FWin8Languages.Refresh;
+    Win8Lang := FWin8Languages.FindClosestByBCP47Tag(tag);
+    if not Assigned(Win8Lang) then
+    begin
+      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['BCP47 language was installed but could not be located']));
+      Exit(False);
+    end;
+
+    LangID := Win8Lang.LangID;
+
+    if Win8Lang.InputMethods.Count = 1 then
+    begin
+      TemporaryKeyboardID := Win8Lang.InputMethods[0];
+    end
+    else
+      // We'll continue on, but this is unexpected, so we won't try and uninstall the temporary input method. The user
+      // will have more than one input method installed.
+      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Expecting exactly one input method; instead got '+Win8Lang.InputMethods.Text]));
   end;
 
   Result := True;
@@ -262,6 +268,73 @@ begin
   Context.Control.AutoApplyKeyman;
 end;
 
+procedure TKPInstallKeyboardLanguage.RegisterTransientTips(const KeyboardID,
+  KeyboardName: string; IconFileName: string);
+var
+  FIsAdmin: Boolean;
+  FKeyboardName: string;
+  guid: TGUID;
+  i, LangID: Integer;
+  IconIndex: Integer;
+  pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
+begin
+  if not KeyboardInstalled(KeyboardID, FIsAdmin) then
+    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
+
+  if KeyboardName = ''
+    then FKeyboardName := KeyboardID + Ext_KeymanFile
+    else FKeyboardName := KeyboardName;
+
+  for i := 0 to 3 do
+  begin
+    LangID := i * $400 + $2000;
+
+    reg := TRegistry.Create;
+    try
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+      if not reg.OpenKey(RootPath + '\$' + IntToHex(LangID, 4), True) then
+        ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardID]));
+
+      reg.WriteInteger(SRegValue_LanguageProfileLangID, LangID);
+      if not reg.ValueExists(SRegValue_KeymanProfileGUID) then
+      begin
+        CreateGuid(&guid);
+        reg.WriteString(SRegValue_KeymanProfileGUID, GuidToString(guid));
+      end
+      else
+        guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
+
+      if IconFileName = '' then   // I4555
+      begin
+        IconFileName := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
+        IconIndex := 1;
+      end
+      else
+        IconIndex := 0;
+
+      pInputProcessorProfileMgr := GetInputProcessorProfileMgr;
+      OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
+        c_clsidKMTipTextService,
+        LangID,
+        guid,
+        PWideChar(KeyboardName),
+        Length(KeyboardName),
+        PWideChar(IconFileName),
+        Length(IconFileName),
+        IconIndex,
+        0,
+        0,
+        0,
+        0));
+    finally
+      reg.Free;
+    end;
+  end;
+
+  Context.Control.AutoApplyKeyman;
+end;
+
 procedure TKPInstallKeyboardLanguage.InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer);
 var
   FIsAdmin: Boolean;
@@ -271,7 +344,7 @@ begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
     ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
-  reg := TRegistry.Create;
+  reg := TRegistry.Create(KEY_READ);
   try
     reg.RootKey := HKEY_LOCAL_MACHINE;
     RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
@@ -287,6 +360,10 @@ begin
   finally
     reg.Free;
   end;
+
+  //
+  // Install the TIP into Windows
+  //
 
   FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
     GuidToString(guid)]);

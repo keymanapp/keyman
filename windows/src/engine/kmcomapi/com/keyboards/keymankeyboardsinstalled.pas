@@ -98,7 +98,7 @@ procedure TKeymanKeyboardsInstalled.Install(const Filename: WideString; Force: W
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [], nil, Force);
+    Execute(FileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
   finally
     Free;
   end;
@@ -109,7 +109,7 @@ function TKeymanKeyboardsInstalled.Install2(const Filename: WideString;
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [ikDontInstallLanguages], nil, Force);
+    Execute(FileName, '', [], nil, Force);
   finally
     Free;
   end;
@@ -173,8 +173,9 @@ end;
 
 procedure TKeymanKeyboardsInstalled.Apply;
 var
-  i, n: Integer;
+  i, j, n: Integer;
   pInputProcessorProfiles: ITfInputProcessorProfiles;
+  kbd: IKeymanKeyboardInstalled;
 begin
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
                           IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
@@ -195,6 +196,7 @@ begin
   finally
     Free;
   end;
+
   Context.Control.AutoApplyKeyman;
 end;
 

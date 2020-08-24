@@ -19,7 +19,7 @@ object Form1: TForm1
     Top = 0
     Width = 1026
     Height = 660
-    ActivePage = tabInputMethodStatus
+    ActivePage = tabRegisterProfile
     Align = alClient
     TabOrder = 0
     OnChange = pagesChange

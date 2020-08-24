@@ -36,7 +36,7 @@ uses
 type
   TKeymanKeyboardLanguageList = TAutoObjectList;
 
-  TKeymanKeyboardLanguagesInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardLanguagesInstalled)   // I4169
+  TKeymanKeyboardLanguagesInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardLanguagesInstalled, IKeymanKeyboardLanguagesInstalled2)   // I4169
   private
     FLanguages: TKeymanKeyboardLanguageList;
     FOwner: IKeymanKeyboardInstalled;
@@ -49,6 +49,10 @@ type
     procedure Install(const BCP47Code: WideString); safecall;
     procedure InstallByLangID(LangID: Integer); safecall;
     function IndexOfBCP47Code(const BCP47Code: string): Integer;
+
+    { IKeymanKeyboardLanguagesInstalled2 }
+    function Add(const BCP47Tag: WideString): IKeymanKeyboardLanguageInstalled; safecall;
+
   public
     constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled);
     destructor Destroy; override;
@@ -68,9 +72,28 @@ uses
   KLog,
   kpinstallkeyboardlanguageprofiles,
   RegistryKeys,
-  utilkeyman;
+  utilkeyman,
+  utiltsf;
 
 { TKeymanKeyboardLanguagesInstalled }
+
+function TKeymanKeyboardLanguagesInstalled.Add(
+  const BCP47Tag: WideString): IKeymanKeyboardLanguageInstalled;
+var
+  FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
+  FCanonicalBCP47Tag: string;
+  i: Integer;
+begin
+  // This adds an in-memory item to the array so that it can be installed
+  FCanonicalBCP47Tag := TBCP47Tag.GetCanonicalTag(BCP47Tag);
+  for i := 0 to FLanguages.Count - 1 do
+    if SameText((FLanguages[i] as IKeymanKeyboardLanguageInstalled).BCP47Code, FCanonicalBCP47Tag) then
+      Exit(nil);
+
+  FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, BCP47Tag, 0, GUID_NULL, BCP47Tag, False);
+  FLanguages.Add(FKeyboardLanguage);
+  Result := FKeyboardLanguage;
+end;
 
 constructor TKeymanKeyboardLanguagesInstalled.Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled);
 begin
@@ -89,6 +112,7 @@ end;
 
 procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
 
+
   procedure RefreshProfiles;
   var
     FProfiles: TStringList;
@@ -99,40 +123,44 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
     FName, FLocale: string;
     FGUID: TGUID;
     FCanonicalBCP47Tag: string;
+    regLM: TRegistryErrorControlled;
+    FIsInstalled: Boolean;
   begin
     FProfiles := TStringList.Create;
-    with TRegistryErrorControlled.Create do
+    regLM := TRegistryErrorControlled.Create(KEY_READ);
     try
-      RootKey := HKEY_LOCAL_MACHINE;
+      regLM.RootKey := HKEY_LOCAL_MACHINE;
       RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + SRegSubKey_LanguageProfiles;
-      if OpenKeyReadOnly(RootPath) then
+      if regLM.OpenKeyReadOnly(RootPath) then
       begin
-        GetKeyNames(FProfiles);
+        regLM.GetKeyNames(FProfiles);
         for i := 0 to FProfiles.Count - 1 do
         begin
-          if OpenKeyReadOnly('\'+RootPath+'\'+FProfiles[i]) and
-            ValueExists(SRegValue_LanguageProfileLangID) and
-            ValueExists(SRegValue_LanguageProfileLocale) and
-            ValueExists(SRegValue_KeymanProfileGUID) then
+          if regLM.OpenKeyReadOnly('\'+RootPath+'\'+FProfiles[i]) and
+            regLM.ValueExists(SRegValue_LanguageProfileLangID) and
+            regLM.ValueExists(SRegValue_LanguageProfileLocale) and
+            regLM.ValueExists(SRegValue_KeymanProfileGUID) then
           begin
-            FLangID := ReadInteger(SRegValue_LanguageProfileLangID);
-            FLocale := ReadString(SRegValue_LanguageProfileLocale);
-            FGUID := StringToGUID(ReadString(SRegValue_KeymanProfileGUID));
-            if ValueExists(SRegValue_LanguageProfileName)
-              then FName := ReadString(SRegValue_LanguageProfileName)
+            FLangID := regLM.ReadInteger(SRegValue_LanguageProfileLangID);
+            FLocale := regLM.ReadString(SRegValue_LanguageProfileLocale);
+            FGUID := StringToGUID(regLM.ReadString(SRegValue_KeymanProfileGUID));
+            if regLM.ValueExists(SRegValue_LanguageProfileName)
+              then FName := regLM.ReadString(SRegValue_LanguageProfileName)
               else FName := '';
 
             FCanonicalBCP47Tag := TBCP47Tag.GetCanonicalTag(FLocale);
             if IndexOfBCP47Code(FCanonicalBCP47Tag) < 0 then
             begin
-              FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, FLocale, FLangID, FGUID, FName);
+              // TODO: move IsTIPInstalledForCurrentUser to TKeymanKeyboardLanguageInstalled.Create
+              FIsInstalled := IsTIPInstalledForCurrentUser(FCanonicalBCP47Tag, FLangID, FGUID);
+              FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, FLocale, FLangID, FGUID, FName, FIsInstalled);
               FLanguages.Add(FKeyboardLanguage);
             end;
           end;
         end;
       end;
     finally
-      Free;
+      regLM.Free;
       FProfiles.Free;
     end;
   end;
@@ -150,28 +178,29 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
     FName: string;
     FKeyboardLanguage: TKeymanKeyboardLanguageInstalled;
     FCanonicalBCP47Tag: string;
+    reg: TRegistryErrorControlled;
   begin
     FIDs := TStringList.Create;
-    with TRegistryErrorControlled.Create do
+    reg := TRegistryErrorControlled.Create(KEY_READ);
     try
-      RootKey := HKEY_LOCAL_MACHINE;
+      reg.RootKey := HKEY_LOCAL_MACHINE;
       RootPath := GetRegistryKeyboardInstallKey_LM(FOwner.ID) + '\' + SRegSubKey_SuggestedLanguages;
-      if OpenKeyReadOnly(RootPath) then
+      if reg.OpenKeyReadOnly(RootPath) then
       begin
-        GetValueNames(FIDs);
+        reg.GetValueNames(FIDs);
         for i := 0 to FIDs.Count - 1 do
         begin
           FCanonicalBCP47Tag := TBCP47Tag.GetCanonicalTag(FIDs[i]);
           if not HasLanguage(FIDs[i]) and not HasLanguage(FCanonicalBCP47Tag) then
           begin
-            FName := ReadString(FIDs[i]);
-            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, FIDs[i], 0, GUID_NULL, FName);
+            FName := reg.ReadString(FIDs[i]);
+            FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, FIDs[i], 0, GUID_NULL, FName, False);
             FLanguages.Add(FKeyboardLanguage);
           end;
         end;
       end;
     finally
-      Free;
+      reg.Free;
       FIDs.Free;
     end;
   end;
