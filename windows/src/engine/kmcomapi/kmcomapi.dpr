@@ -120,7 +120,6 @@ uses
   Unicode in '..\..\global\delphi\general\Unicode.pas',
   utilexecute in '..\..\global\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\global\delphi\general\KeymanVersion.pas',
-  kpinstallkeyboardlanguageprofiles in 'processes\keyboard\kpinstallkeyboardlanguageprofiles.pas',
   kprecompilemnemonickeyboard in 'processes\keyboard\kprecompilemnemonickeyboard.pas',
   TempFileManager in '..\..\global\delphi\general\TempFileManager.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',

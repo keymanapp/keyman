@@ -119,7 +119,7 @@ begin
   end;
 
   kmcom.Languages.Apply;
-  TWaitForTSF.WaitForLanguageProfilesToBeApplied(InstalledKeyboards);
+//  TWaitForTSF.WaitForLanguageProfilesToBeApplied(InstalledKeyboards);
   AddDefaultLanguageHotkeys(InstalledKeyboards);
 
   if InstalledPackage <> nil then

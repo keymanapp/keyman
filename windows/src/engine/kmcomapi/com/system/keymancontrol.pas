@@ -477,19 +477,6 @@ begin
 end;
 
 
-{procedure TKeymanVisualKeyboard.Print;  // I2329
-var
-  pkg: IKeymanPackageInstalled;
-  kbd: IKeymanKeyboardInstalled;
-begin
-  kbd := GetOwnerKeyboard;
-  if not Assigned(kbd) then Exit;
-  pkg := kbd.Get_OwnerPackage;
-  if Assigned(pkg) then
-    Context.Control.RunKeymanConfiguration('-kp "'+kbd.ID+'"');
-end;}
-
-
 {**
   Control of startup and shutdown of keyman32.dll -- implemented only by 32 bit;
   generally these functions are intended to be used only by keyman.exe.
@@ -501,9 +488,7 @@ begin
   Error(Cardinal(E_NOTIMPL));
 {$ELSE}
   LoadKeyman32;
-
   StartKeyman32;
-  (Context.Keyboards as IIntKeymanKeyboardsInstalled).StartKeyboards;   // I4381
 {$ENDIF}
 end;
 
@@ -511,9 +496,6 @@ procedure TKeymanControl.StopKeyman32Engine;   // I5133
 begin
 {$IFDEF WIN64}
   Error(Cardinal(E_NOTIMPL));
-{$ELSE}
-  if Context.Keyboards <> nil then
-    (Context.Keyboards as IIntKeymanKeyboardsInstalled).StopKeyboards;   // I4381
 {$ENDIF}
 end;
 

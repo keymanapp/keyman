@@ -17,8 +17,6 @@ const
 
 type
   TKPInstallKeyboardLanguage = class(TKPBase)
-    // Expects LANGIDs and LocaleNames in format 'en-US en 0409';
-
     function FindInstallationLangID(const BCP47Tag: string;
       var LangID: Integer;
       var TemporaryKeyboardID: string;
@@ -293,6 +291,9 @@ begin
     try
       reg.RootKey := HKEY_LOCAL_MACHINE;
       RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+
+      // TODO: Move these four to another key as they work differently to the other language profiles
+      //       and need special handling anyway
       if not reg.OpenKey(RootPath + '\$' + IntToHex(LangID, 4), True) then
         ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardID]));
 

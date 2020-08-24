@@ -261,7 +261,6 @@
         <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilexecute.pas"/>
         <DCCReference Include="..\..\global\delphi\general\KeymanVersion.pas"/>
-        <DCCReference Include="processes\keyboard\kpinstallkeyboardlanguageprofiles.pas"/>
         <DCCReference Include="processes\keyboard\kprecompilemnemonickeyboard.pas"/>
         <DCCReference Include="..\..\global\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\input_installlayoutortip.pas"/>

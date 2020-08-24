@@ -56,8 +56,6 @@ type
     function Install2(const Filename: WideString; Force: WordBool): IKeymanKeyboardInstalled; safecall;
 
     { IIntKeymanKeyboardsInstalled }
-    procedure StartKeyboards; deprecated;   // I4381 // TODO: eliminate
-    procedure StopKeyboards; deprecated;   // I4381  // TODO: eliminate
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
@@ -118,33 +116,6 @@ begin
   Result := Get_Items(FileName);
 end;
 
-procedure TKeymanKeyboardsInstalled.StartKeyboards;   // I4381
-var
-  i: Integer;
-  pInputProcessorProfiles: ITfInputProcessorProfiles;
-begin
-  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
-                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
-  for i := 0 to FKeyboards.Count - 1 do
-  begin
-    (FKeyboards[i] as IIntKeymanKeyboardInstalled).ApplyEnabled(
-      pInputProcessorProfiles,
-      (FKeyboards[i] as IKeymanKeyboardInstalled).Loaded);
-  end;
-end;
-
-procedure TKeymanKeyboardsInstalled.StopKeyboards;   // I4381
-begin
-{  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
-                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
-  for i := 0 to FKeyboards.Count - 1 do
-  begin
-    (FKeyboards[i] as IIntKeymanKeyboardInstalled).ApplyEnabled(
-      pInputProcessorProfiles,
-      False);
-  end;}
-end;
-
 function TKeymanKeyboardsInstalled.Get_Items(Index: OleVariant): IKeymanKeyboardInstalled;
 var
   i: Integer;
@@ -173,25 +144,14 @@ end;
 
 procedure TKeymanKeyboardsInstalled.Apply;
 var
-  i, j, n: Integer;
   pInputProcessorProfiles: ITfInputProcessorProfiles;
-  kbd: IKeymanKeyboardInstalled;
 begin
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
                           IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
   with TRegKeyboardList.Create do
   try
     Load(True);
-    for i := 0 to FKeyboards.Count - 1 do
-    begin
-      n := IndexOfName((FKeyboards[i] as IKeymanKeyboard).ID);
-      if n >= 0 then
-      begin
-        Items[n].ApplySettings((FKeyboards[i] as IIntKeymanKeyboardInstalled).RegKeyboard);
-        if Context.Control.IsKeymanRunning then
-          (FKeyboards[i] as IIntKeymanKeyboardInstalled).ApplyEnabled(pInputProcessorProfiles, Items[n].Enabled);   // I4376
-      end;
-    end;
+    // May do some cleanup
     Save;
   finally
     Free;

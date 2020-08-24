@@ -61,7 +61,6 @@ type
     function Get_IsRegistered: WordBool; safecall;
 
     { IIntKeymanKeyboardLanguageInstalled }
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
   public
     constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
       ALangID: Integer; AProfileGUID: TGUID; const AName: string; AIsInstalled: Boolean);
@@ -78,40 +77,10 @@ uses
   keymanerrorcodes,
   Keyman.System.Process.KPInstallKeyboardLanguage,
   Keyman.System.Process.KPUninstallKeyboardLanguage,
-  kpinstallkeyboardlanguageprofiles,
   utiltsf,
   utilxml;
 
 { TKeymanKeyboardLanguageInstalled }
-
-procedure TKeymanKeyboardLanguageInstalled.ApplyEnabled(
-  pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
-var
-  AEnabledInt: Integer;
-begin
-  // TODO: eliminate
-  if not Get_IsInstalled then
-    Exit;
-
-  if AEnabled then AEnabledInt := 1 else AEnabledInt := 0;
-  try   // I4494
-    OleCheck(pInputProcessorProfiles.EnableLanguageProfile(c_clsidKMTipTextService,
-      Get_LangID, FProfileGUID, AEnabledInt));
-  except
-    on E:EOleException do
-    begin
-      Context.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleException: '+E.Message+' ('+E.Source+', '+IntToHex(E.ErrorCode,8)+')']), kesWarning);
-    end;
-    on E:EOleSysError do
-    begin
-      Context.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleSysError: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']), kesWarning);
-    end;
-    on E:Exception do
-    begin
-      Context.Errors.AddFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]), kesWarning);
-    end;
-  end;
-end;
 
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
   AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
@@ -213,7 +182,8 @@ begin
     'profileguid', GUIDToString(FProfileGUID),
     'bcp47code', Get_BCP47Code,
     'langname', GetLangName,
-    'isinstalled', Get_IsInstalled
+    'isinstalled', Get_IsInstalled,
+    'isregistered', Get_IsRegistered
   ]);
 end;
 

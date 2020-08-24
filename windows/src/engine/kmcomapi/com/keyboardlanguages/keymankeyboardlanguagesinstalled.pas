@@ -67,10 +67,11 @@ uses
 
   ErrorControlledRegistry,
 
+  Keyman.System.LanguageCodeUtils,
+  Keyman.System.Process.KPInstallKeyboardLanguage,
   BCP47Tag,
   keymankeyboardlanguageinstalled,
   KLog,
-  kpinstallkeyboardlanguageprofiles,
   RegistryKeys,
   utilkeyman,
   utiltsf;
@@ -236,35 +237,36 @@ end;
 
 procedure TKeymanKeyboardLanguagesInstalled.Install(const BCP47Code: WideString);
 var
-  FIconFileName: string;
+  Tag: string;
+  lang: IKeymanKeyboardLanguageInstalled2;
+  TemporaryKeyboardID: WideString;
+  RegistrationRequired: WordBool;
+  LangID: Integer;
 begin
-  with TKPInstallKeyboardLanguageProfiles.Create(Context) do
-  try
-    FIconFileName := GetKeyboardIconFileName(FOwner.Filename);
-    if not FileExists(FIconFileName) then
-      FIconFileName := '';
-    Execute(FOwner.ID, FOwner.Name, BCP47Code, FIconFileName, '');   // I3768   // I4607
-  finally
-    Free;
+  Tag := TBCP47Tag.GetCanonicalTag(BCP47Code);
+  if IndexOfBCP47Code(Tag) >= 0 then
+    // Already installed; should we warn?
+    Exit;
+
+  lang := Add(Tag) as IKeymanKeyboardLanguageInstalled2;
+  if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, ilkInstallTransitoryLanguage) then
+  begin
+    lang.InstallTip(LangID, TemporaryKeyboardID);
   end;
 end;
 
 procedure TKeymanKeyboardLanguagesInstalled.InstallByLangID(LangID: Integer);
 var
-  FLangIDs: array of Integer;
-  FIconFileName: string;
+  Tag: string;
+  lang: IKeymanKeyboardLanguageInstalled2;
 begin
-  with TKPInstallKeyboardLanguageProfiles.Create(Context) do
-  try
-    FIconFileName := GetKeyboardIconFileName(FOwner.Filename);
-    if not FileExists(FIconFileName) then
-      FIconFileName := '';
-    SetLength(FLangIDs, 1);
-    FLangIDs[0] := LangID;
-    Execute(FOwner.ID, FOwner.Name, FLangIDs, FIconFileName, True);   // I3768   // I4607
-  finally
-    Free;
-  end;
+  Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(LangID);
+  if (Tag = '') or (IndexOfBCP47Code(Tag) >= 0) then
+    // Already installed; should we warn?
+    Exit;
+
+  lang := Add(Tag) as IKeymanKeyboardLanguageInstalled2;
+  lang.InstallTip(LangID, '');
 end;
 
 

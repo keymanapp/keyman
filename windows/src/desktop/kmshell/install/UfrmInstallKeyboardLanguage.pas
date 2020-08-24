@@ -294,7 +294,7 @@ begin
       if Assigned(FKeyboard) then
       begin
         // Because the TSF component is async we have to wait
-        TWaitForTSF.WaitForLanguageProfilesToBeApplied(FKeyboard);
+//        TWaitForTSF.WaitForLanguageProfilesToBeApplied(FKeyboard);
         FKeyboard := nil;
         kmcom.Keyboards.Refresh;  // Get updated language profile name after it is loaded
       end;

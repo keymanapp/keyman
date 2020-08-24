@@ -67,9 +67,9 @@ type
     procedure Execute(const FileName, PackageName: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
   private
     procedure RegisterLanguageProfile(Langs: array of Integer;
-      const KeyboardName, KeyboardDescription, IconFileName: string); overload;
-    function RegisterLanguageProfile(const BCP47Tag, KeyboardName,
-      KeyboardDescription, IconFileName, LanguageName: string): Boolean; overload;
+      const KeyboardID, KeyboardName, IconFileName: string); overload;
+    function RegisterLanguageProfile(const BCP47Tag, KeyboardID,
+      KeyboardName, IconFileName, LanguageName: string): Boolean; overload;
   end;
 
 implementation
@@ -82,6 +82,7 @@ uses
 
   Keyman.System.LanguageCodeUtils,
 
+  bcp47tag,
   ErrorControlledRegistry,
   kmxfile,
   keymanerror,
@@ -94,7 +95,6 @@ uses
   utilexecute,
   keymanerrorcodes,
   keymancontext,
-  kpinstallkeyboardlanguageprofiles,
   Keyman.System.Process.KPInstallKeyboardLanguage,
   OnlineConstants,
   KLog,
@@ -129,6 +129,7 @@ var
   FLanguageID: Integer;
   i: Integer;
   kpil: TKPInstallKeyboardLanguage;
+  BCP47Tag: string;
 
 type
   TWSLCallback = reference to procedure(r: TRegistryErrorControlled);
@@ -253,6 +254,34 @@ begin
         //
         if Assigned(Languages) and (Languages.Count > 0) then
         begin
+          // Save the list of preferred languages for the keyboard to the
+          // and register profiles for future installation.
+          WriteSuggestedLanguages(
+            procedure(r: TRegistryErrorControlled)
+            var
+              i: Integer;
+              LangID: Integer;
+              BCP47Tag, TemporaryKeyboardID: string;
+              kpil: TKPInstallKeyboardLanguage;
+            begin
+              for i := 0 to Languages.Count - 1 do
+              begin
+                BCP47Tag := TBCP47Tag.GetCanonicalTag(Languages[i].ID);
+                // Note: this may return a repeated tag, but FindInstallationLangID
+                // and RegisterTIP are idempotent, so it doesn't matter.
+
+                r.WriteString(BCP47Tag, Languages[i].Name);
+                kpil := TKPInstallKeyboardLanguage.Create(Context);
+                try
+                  if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, 0) then
+                    kpil.RegisterTip(kbdname, BCP47Tag, ki.KeyboardName, LangID, FIconFileName, Languages[i].Name);
+                finally
+                  kpil.Free;
+                end;
+              end;
+            end
+          );
+
           if ikLegacyRegisterAndInstallProfiles in FInstallOptions then
           begin
             // Use language data from package to install; we only install
@@ -262,7 +291,8 @@ begin
             FLanguageInstalled := False;
             for i := 0 to Languages.Count - 1 do
             begin
-              FLanguageInstalled := RegisterLanguageProfile(Languages[i].ID, kbdname, ki.KeyboardName, FIconFileName, Languages[i].Name);
+              BCP47Tag := TBCP47Tag.GetCanonicalTag(Languages[i].ID);
+              FLanguageInstalled := RegisterLanguageProfile(BCP47Tag, kbdname, ki.KeyboardName, FIconFileName, Languages[i].Name);
               if FLanguageInstalled then
                 Break;
             end;
@@ -276,29 +306,6 @@ begin
               RegisterLanguageProfile(FLanguages, kbdname, ki.KeyboardName, FIconFileName);   // I3581   // I3707
             end;
           end;
-
-          // Save the list of preferred languages for the keyboard, to the registry, for future installation.
-          WriteSuggestedLanguages(
-            procedure(r: TRegistryErrorControlled)
-            var
-              i: Integer;
-              LangID: Integer;
-              TemporaryKeyboardID: string;
-              kpil: TKPInstallKeyboardLanguage;
-            begin
-              for i := 0 to Languages.Count - 1 do
-              begin
-                r.WriteString(Languages[i].ID, Languages[i].Name);
-                kpil := TKPInstallKeyboardLanguage.Create(Context);
-                try
-                  if kpil.FindInstallationLangID(Languages[i].ID, LangID, TemporaryKeyboardID, 0) then
-                    kpil.RegisterTip(kbdname, Languages[i].ID, ki.KeyboardName, LangID, FIconFileName, Languages[i].Name);
-                finally
-                  kpil.Free;
-                end;
-              end;
-            end
-          );
         end
         else
         begin
@@ -431,21 +438,36 @@ begin
   end;
 end;
 
-procedure TKPInstallKeyboard.RegisterLanguageProfile(Langs: array of Integer; const KeyboardName, KeyboardDescription, IconFileName: string);   // I3581   // I3619   // I3707   // I3768   // I4607
+procedure TKPInstallKeyboard.RegisterLanguageProfile(Langs: array of Integer; const KeyboardID, KeyboardName, IconFileName: string);   // I3581   // I3619   // I3707   // I3768   // I4607
+var
+  kpil: TKPInstallKeyboardLanguage;
+  BCP47Tag: string;
 begin
-  with TKPInstallKeyboardLanguageProfiles.Create(Context) do
+  BCP47Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(Langs[0]);
+  kpil := TKPInstallKeyboardLanguage.Create(Context);
   try
-    Execute(KeyboardName, KeyboardDescription, Langs, IconFileName, True);   // I3707   // I3768   // I4607
+    kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardName, Langs[0], IconFileName, '');
+    kpil.InstallTip(KeyboardID, BCP47Tag, Langs[0]);
   finally
     Free;
   end;
 end;
 
-function TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardName, KeyboardDescription, IconFileName, LanguageName: string): Boolean;   // I3581   // I3619   // I3707   // I3768   // I4607
+function TKPInstallKeyboard.RegisterLanguageProfile(const BCP47Tag, KeyboardID, KeyboardName, IconFileName, LanguageName: string): Boolean;   // I3581   // I3619   // I3707   // I3768   // I4607
+var
+  kpil: TKPInstallKeyboardLanguage;
+  TemporaryKeyboardID: string;
+  LangID: Integer;
 begin
-  with TKPInstallKeyboardLanguageProfiles.Create(Context) do
+  Result := False;
+  kpil := TKPInstallKeyboardLanguage.Create(Context);
   try
-    Result := Execute(KeyboardName, KeyboardDescription, BCP47Tag, IconFileName, LanguageName);   // I3707   // I3768   // I4607
+    if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, 0) then
+    begin
+      kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardID, LangID, IconFileName, '');
+      kpil.InstallTip(KeyboardID, BCP47Tag, LangID);
+      Result := True;
+    end;
   finally
     Free;
   end;

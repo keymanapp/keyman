@@ -110,7 +110,6 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
 
   public
     constructor Create(AContext: TKeymanContext; const Name: string);
@@ -282,7 +281,8 @@ end;
 
 procedure TKeymanKeyboardInstalled.Set_Loaded(Value: WordBool);
 begin
-  FRegKeyboard.Enabled := Value;
+  // Keyman 14:0 this is now a no-op. Instead, remove Windows language
+  // associations in order to enable and disable a keyboard
 end;
 
 function TKeymanKeyboardInstalled.Get_IconFilename: WideString;   // I3581
@@ -326,14 +326,6 @@ begin
   if FRegKeyboard.MnemonicLayout
     then Result := kltMnemonic
     else Result := kltPositional;
-end;
-
-procedure TKeymanKeyboardInstalled.ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
-var
-  i: Integer;
-begin
-  for i := 0 to Get_Languages.Count - 1 do
-    (Get_Languages[i] as IIntKeymanKeyboardLanguage).ApplyEnabled(pInputProcessorProfiles, AEnabled);
 end;
 
 procedure TKeymanKeyboardInstalled.ClearVisualKeyboard;
