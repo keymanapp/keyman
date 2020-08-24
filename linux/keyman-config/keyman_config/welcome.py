@@ -16,9 +16,12 @@ from keyman_config.accelerators import bind_accelerator, init_accel
 
 class WelcomeView(Gtk.Dialog):
 
-    def __init__(self, parent, welcomeurl, keyboardname):
+    def __init__(self, parent, welcomeurl, keyboardname, newlyInstalled=False):
         self.accelerators = None
-        kbtitle = _("{name} installed").format(name=keyboardname)
+        if newlyInstalled:
+            kbtitle = _("{name} installed").format(name=keyboardname)
+        else:
+            kbtitle = keyboardname
         self.welcomeurl = welcomeurl
         Gtk.Dialog.__init__(self, kbtitle, parent)
         init_accel(self)

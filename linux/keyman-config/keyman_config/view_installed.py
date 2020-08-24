@@ -159,19 +159,19 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_top.set_layout(Gtk.ButtonBoxStyle.START)
 
         self.uninstall_button = Gtk.Button.new_with_mnemonic(_("_Uninstall"))
-        self.uninstall_button.set_tooltip_text(_("Uninstall keyboard package"))
+        self.uninstall_button.set_tooltip_text(_("Uninstall keyboard"))
         self.uninstall_button.connect("clicked", self.on_uninstall_clicked)
         self.uninstall_button.set_sensitive(False)
         bbox_top.add(self.uninstall_button)
 
         self.about_button = Gtk.Button.new_with_mnemonic(_("_About"))
-        self.about_button.set_tooltip_text(_("About keyboard package"))
+        self.about_button.set_tooltip_text(_("About keyboard"))
         self.about_button.connect("clicked", self.on_about_clicked)
         self.about_button.set_sensitive(False)
         bbox_top.add(self.about_button)
 
         self.help_button = Gtk.Button.new_with_mnemonic(_("_Help"))
-        self.help_button.set_tooltip_text(_("Help for keyboard package"))
+        self.help_button.set_tooltip_text(_("Help for keyboard"))
         self.help_button.connect("clicked", self.on_help_clicked)
         self.help_button.set_sensitive(False)
         bbox_top.add(self.help_button)
@@ -188,17 +188,17 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_bottom.set_layout(Gtk.ButtonBoxStyle.END)
 
         button = Gtk.Button.new_with_mnemonic(_("_Refresh"))
-        button.set_tooltip_text(_("Refresh keyboard package list"))
+        button.set_tooltip_text(_("Refresh keyboard list"))
         button.connect("clicked", self.on_refresh_clicked)
         bbox_bottom.add(button)
 
         button = Gtk.Button.new_with_mnemonic(_("_Download"))
-        button.set_tooltip_text(_("Download and install a keyboard package from the Keyman website"))
+        button.set_tooltip_text(_("Download and install a keyboard from the Keyman website"))
         button.connect("clicked", self.on_download_clicked)
         bbox_bottom.add(button)
 
         button = Gtk.Button.new_with_mnemonic(_("_Install"))
-        button.set_tooltip_text(_("Install a keyboard package from a file"))
+        button.set_tooltip_text(_("Install a keyboard from a file"))
         button.connect("clicked", self.on_installfile_clicked)
         bbox_bottom.add(button)
 
@@ -275,13 +275,13 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
             self.uninstall_button.set_tooltip_text(
-                _("Uninstall keyboard package {package}").format(package=model[treeiter][1]))
+                _("Uninstall keyboard {package}").format(package=model[treeiter][1]))
             self.help_button.set_tooltip_text(
-                _("Help for keyboard package {package}").format(package=model[treeiter][1]))
+                _("Help for keyboard {package}").format(package=model[treeiter][1]))
             self.about_button.set_tooltip_text(
-                _("About keyboard package {package}").format(package=model[treeiter][1]))
+                _("About keyboard {package}").format(package=model[treeiter][1]))
             self.options_button.set_tooltip_text(
-                _("Settings for keyboard package {package}").format(package=model[treeiter][1]))
+                _("Settings for keyboard {package}").format(package=model[treeiter][1]))
             logging.debug("You selected %s version %s", model[treeiter][1], model[treeiter][2])
             self.about_button.set_sensitive(True)
             if model[treeiter][4] == InstallArea.IA_USER:
@@ -301,10 +301,10 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             else:
                 self.options_button.set_sensitive(False)
         else:
-            self.uninstall_button.set_tooltip_text(_("Uninstall keyboard package"))
-            self.help_button.set_tooltip_text(_("Help for keyboard package"))
-            self.about_button.set_tooltip_text(_("About keyboard package"))
-            self.options_button.set_tooltip_text(_("Settings for keyboard package"))
+            self.uninstall_button.set_tooltip_text(_("Uninstall keyboard"))
+            self.help_button.set_tooltip_text(_("Help for keyboard"))
+            self.about_button.set_tooltip_text(_("About keyboard"))
+            self.options_button.set_tooltip_text(_("Settings for keyboard"))
             self.uninstall_button.set_sensitive(False)
             self.about_button.set_sensitive(False)
             self.help_button.set_sensitive(False)
@@ -346,9 +346,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             logging.info("Uninstall keyboard " + model[treeiter][3] + "?")
             dialog = Gtk.MessageDialog(
                 self, 0, Gtk.MessageType.QUESTION,
-                Gtk.ButtonsType.YES_NO, _("Uninstall keyboard?"))
+                Gtk.ButtonsType.YES_NO, _("Uninstall keyboard package?"))
             dialog.format_secondary_text(
-                _("Are you sure that you want to uninstall the {keyboard} keyboard?")
+                _("Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?")
                 .format(keyboard=model[treeiter][1]))
             response = dialog.run()
             dialog.destroy()

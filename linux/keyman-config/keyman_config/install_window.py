@@ -296,7 +296,7 @@ class InstallKmpWindow(Gtk.Dialog):
             if os.path.isfile(welcome_file):
                 uri_path = pathlib.Path(welcome_file).as_uri()
                 logging.debug(uri_path)
-                w = WelcomeView(self, uri_path, self.kbname)
+                w = WelcomeView(self, uri_path, self.kbname, True)
                 w.run()
                 w.destroy()
             else:
