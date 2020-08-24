@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.132 alpha 2020-08-24
+
+* feat(linux): Small UI improvements (#3495)
+
 ## 14.0.131 alpha 2020-08-21
 
 * feat(android/app): Add language picker for keyboard package installation (#3481)
