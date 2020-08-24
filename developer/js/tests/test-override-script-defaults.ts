@@ -6,7 +6,7 @@ import {decorateWithScriptOverrides} from '../dist/lexical-model-compiler/script
 
 describe('The join word breaker decorator', function () {
   it('should decorate an existing word breaker', function () {
-    let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'spaces-break-words')
+    let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces')
     assert.isFunction(breakWords);
   });
 
@@ -16,7 +16,7 @@ describe('The join word breaker decorator', function () {
   const expectedNumWords = 8;
 
   it(`should break «${[phrase]}» as ${expectedNumWords} words`, function () {
-    let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'spaces-break-words');
+    let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces');
     let defaultResult = defaultWordBreaker(phrase);
 
     assert.isAbove(defaultResult.length, expectedNumWords);

@@ -23,12 +23,46 @@ interface WordBreakerSpec {
    *    joinWordsAt: ['-'] // to keep hyphenated items together
    */
   readonly joinWordsAt?: string[];
+
+  /**
+   * Overrides word splitting behaviour for certain scripts.
+   * For example, specifing that spaces break words in scripts that do not
+   * traditionally use spaces.
+   */
+  readonly overrideScriptDefaults?: OverrideScriptDefaults;
 }
 
 /**
  * Keyman 11.0+ word breaker specification:
  */
 type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
+
+/**
+ * When configuring the default word breaker,
+ * this allows you to override the default behaviour for the script.
+ *
+ * There is currently only one option:
+ *
+ * 'break-words-at-spaces'
+ * : some scripts traditionally do not use spaces to break words, such as in
+ * Burmese, Khmer, Thai, Laos, etc. For these scripts, the default word
+ * breaker opts to break at **every** letter/syllable/ideograph.
+ * Some languages that use these scripts DO use spaces. Enable
+ * 'break-words-at-spaces' to override the unwanted, default behaviour for
+ * these scripts.
+ *
+ * @since 14.0
+ */
+type OverrideScriptDefaults = 'break-words-at-spaces';
+
+/**
+ * Chinese
+ * Japanese
+ * Thai
+ * Khmer
+ * Burmese
+ */
+
 
 interface LexicalModelSource extends LexicalModelDeclaration {
   readonly sources: Array<string>;
