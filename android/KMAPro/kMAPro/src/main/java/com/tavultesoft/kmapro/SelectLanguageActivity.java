@@ -24,6 +24,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Keyman Settings --> KeymanInstallActivity --> SelectPackageActivity --> SelectLanguageActivity
+ * Also available during keyboard package installation that involves a language choice.
+ * Displays a list of available language names for the user to add for a given installed packageID/keyboardID.
+ */
 public class SelectLanguageActivity extends AppCompatActivity implements
     StepperLayout.StepperListener, SelectLanguageFragment.OnLanguagesSelectedListener {
   private final static String TAG = "SelectLanguageActivity";

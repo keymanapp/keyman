@@ -36,8 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Keyman Settings --> KeymanInstallActivity --> SelectPackageActivity --> SelectLanguageActivity
- * Also available during keyboard package installation that involves a language choice.
  * Displays a list of available language names for the user to add for a given installed packageID/keyboardID.
  */
 public final class SelectLanguageFragment extends Fragment implements BlockingStep {

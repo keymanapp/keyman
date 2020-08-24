@@ -233,7 +233,7 @@ public class PackageActivity extends AppCompatActivity implements
    * @param preferredLanguages ArrayList<String>  The optional array of language ID's to use
    * @param anSilentInstall boolean If true, don't display readme.htm/welcome.htm content during installation
    */
-  public void installPackage(Context context, String pkgTarget, String pkgId,
+  private void installPackage(Context context, String pkgTarget, String pkgId,
                               ArrayList<String> preferredLanguages, boolean anSilentInstall) {
     try {
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
