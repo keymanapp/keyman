@@ -25,6 +25,7 @@ interface
 function TSFInstalled: Boolean;
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
 function IsTransientLanguageID(LangID: Integer): Boolean;
+function GetLayoutInstallString(LangID: Integer; guidProfile: TGUID): string;
 
 const c_clsidKMTipTextService: TGUID = '{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}';  // version 10.0
 const c_clsidKMTipTextService_90: TGUID = '{487EB753-DB93-48C5-9E6A-4398E777C61D}';   // I3663   // I4248
@@ -51,6 +52,15 @@ begin
   end;
 end;
 
+function GetLayoutInstallString(LangID: Integer; guidProfile: TGUID): string;
+begin
+  Result := Format('%04.4x:%s%s', [
+    LangID,
+    GuidToString(c_clsidKMTipTextService),   // I4244
+    GuidToString(guidProfile)
+  ]);
+end;
+
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
 var
   tag, FLayoutInstallString: string;
@@ -59,8 +69,7 @@ var
 begin
   reg := TRegistryErrorControlled.Create(KEY_READ);
   try
-    FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
-      GuidToString(guidProfile)]);
+    FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
 
     if BCP47Tag <> '' then
     begin

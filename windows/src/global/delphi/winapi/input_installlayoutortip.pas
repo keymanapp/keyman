@@ -19,7 +19,8 @@ uses
   System.SysUtils,
   System.Win.Comobj,
   Winapi.msctf,
-  keyman_msctf;
+  keyman_msctf,
+  utiltsf;
 
 function InstallLayoutOrTip(FLayoutInstallString: PChar; Flags: DWord): Boolean;
 type
@@ -101,8 +102,7 @@ begin
     if (profile.dwProfileType = TF_PROFILETYPE_INPUTPROCESSOR) and
       IsEqualGuid(profile.clsid, AClsid) then
     begin
-      FLayoutInstallString := Format('%04.4x:%s%s', [profile.langid, GuidToString(AClsid),   // I4244
-        GuidToString(profile.guidProfile)]);
+      FLayoutInstallString := GetLayoutInstallString(profile.LangID, profile.guidProfile);
       InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL);
       pInputProcessorProfileMgr.UnregisterProfile(AClsid, profile.langid, profile.guidProfile, 0);
     end;

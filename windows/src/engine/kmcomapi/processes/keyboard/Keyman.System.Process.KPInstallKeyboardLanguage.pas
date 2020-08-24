@@ -81,6 +81,9 @@ var
   Win8Lang: TWindows8Language;
   tag: string;
 begin
+  if BCP47Tag = '' then
+    ErrorFmt(KMN_E_ProfileInstall_InvalidBCP47Tag, VarArrayOf([BCP47Tag]));
+
   tag := BCP47Tag;
   TemporaryKeyboardID := '';
 
@@ -94,16 +97,6 @@ begin
   end
   else
   begin
-    //
-    // Installing a custom language only supported with Win8 and later
-    //
-
-    if not FWin8Languages.IsSupported then
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Can not install custom locales on Windows 7']));
-      Exit(False);
-    end;
-
     if not (ilkInstallTransitoryLanguage in Flags) then
     begin
       // No warning, because this is to be expected
@@ -111,13 +104,24 @@ begin
     end;
 
     //
+    // Installing a custom language only supported with Win8 and later
+    //
+
+    if not FWin8Languages.IsSupported then
+    begin
+      Warn(KMN_W_ProfileInstall_CustomLocalesNotSupported);
+      Exit(False);
+    end;
+
+    //
     // Install user language with Powershell if it isn't present
     //
+
     LangID := 0;
 
     if (tag = '') or not InstallBCP47Language(tag) then
     begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Could not install BCP47 language '+BCP47Tag]));
+      WarnFmt(KMN_W_ProfileInstall_FailedToInstallLanguage, VarArrayOf([tag]));
       Exit(False);
     end;
 
@@ -129,7 +133,7 @@ begin
     Win8Lang := FWin8Languages.FindClosestByBCP47Tag(tag);
     if not Assigned(Win8Lang) then
     begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['BCP47 language was installed but could not be located']));
+      WarnFmt(KMN_W_ProfileInstall_LanguageInstalledButNotFound, VarArrayOf([tag]));
       Exit(False);
     end;
 
@@ -142,7 +146,7 @@ begin
     else
       // We'll continue on, but this is unexpected, so we won't try and uninstall the temporary input method. The user
       // will have more than one input method installed.
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['Expecting exactly one input method; instead got '+Win8Lang.InputMethods.Text]));
+      WarnFmt(KMN_W_ProfileInstall_MoreThanOneInputMethodInstalled, VarArrayOf([Win8Lang.InputMethods.Text]));
   end;
 
   Result := True;
@@ -211,7 +215,7 @@ var
   pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
 begin
   if IsTransientLanguageID(LangID) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID, LangID])); // TODO: should not attempt to register transient profile guid (that's done by RegisterTransientTips
+    ErrorFmt(KMN_E_ProfileInstall_IsATransientLanguageCode, VarArrayOf([KeyboardID, LangID]));
 
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
     ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
@@ -248,19 +252,26 @@ begin
       IconIndex := 0;
 
     pInputProcessorProfileMgr := GetInputProcessorProfileMgr;
-    OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
-      c_clsidKMTipTextService,
-      LangID,
-      guid,
-      PWideChar(KeyboardName),
-      Length(KeyboardName),
-      PWideChar(IconFileName),
-      Length(IconFileName),
-      IconIndex,
-      0,
-      0,
-      0,
-      0));
+    try
+      OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
+        c_clsidKMTipTextService,
+        LangID,
+        guid,
+        PWideChar(KeyboardName),
+        Length(KeyboardName),
+        PWideChar(IconFileName),
+        Length(IconFileName),
+        IconIndex,
+        0,
+        0,
+        0,
+        0));
+    except
+      on E:EOleSysError do
+      begin
+        ErrorFmt(KMN_E_ProfileInstall_RegisterProfileFailed, VarArrayOf([E.Message, E.ErrorCode]));
+      end;
+    end;
   finally
     reg.Free;
   end;
@@ -286,6 +297,16 @@ begin
     then FKeyboardName := KeyboardID + Ext_KeymanFile
     else FKeyboardName := KeyboardName;
 
+  if IconFileName = '' then   // I4555
+  begin
+    IconFileName := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
+    IconIndex := 1;
+  end
+  else
+    IconIndex := 0;
+
+  pInputProcessorProfileMgr := GetInputProcessorProfileMgr;
+
   for i := 0 to 3 do
   begin
     LangID := i * $400 + $2000;
@@ -294,9 +315,6 @@ begin
     try
       reg.RootKey := HKEY_LOCAL_MACHINE;
       RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
-
-      // TODO: Move these four to another key as they work differently to the other language profiles
-      //       and need special handling anyway
       if not reg.OpenKey(RootPath + '\' + IntToHex(LangID, 4), True) then
         ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardID]));
 
@@ -309,28 +327,26 @@ begin
       else
         guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
 
-      if IconFileName = '' then   // I4555
-      begin
-        IconFileName := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_KeymanExe);
-        IconIndex := 1;
-      end
-      else
-        IconIndex := 0;
-
-      pInputProcessorProfileMgr := GetInputProcessorProfileMgr;
-      OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
-        c_clsidKMTipTextService,
-        LangID,
-        guid,
-        PWideChar(KeyboardName),
-        Length(KeyboardName),
-        PWideChar(IconFileName),
-        Length(IconFileName),
-        IconIndex,
-        0,
-        0,
-        0,
-        0));
+      try
+        OleCheck(pInputProcessorProfileMgr.RegisterProfile(   // I3743
+          c_clsidKMTipTextService,
+          LangID,
+          guid,
+          PWideChar(KeyboardName),
+          Length(KeyboardName),
+          PWideChar(IconFileName),
+          Length(IconFileName),
+          IconIndex,
+          0,
+          0,
+          0,
+          0));
+      except
+        on E:EOleSysError do
+        begin
+          ErrorFmt(KMN_E_ProfileInstall_RegisterProfileFailed, VarArrayOf([E.Message, E.ErrorCode]));
+        end;
+      end;
     finally
       reg.Free;
     end;
@@ -353,17 +369,21 @@ begin
   try
     reg.RootKey := HKEY_LOCAL_MACHINE;
 
-    if IsTransientLanguageID(LangID)
-      then RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles
-      else RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
-
-    if not reg.OpenKeyReadOnly(RootPath + '\' + BCP47Tag) then
-      // TODO: better error code
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
+    if IsTransientLanguageID(LangID) then
+    begin
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
+      if not reg.OpenKeyReadOnly(RootPath + '\' + IntToHex(LangID, 4)) then
+        ErrorFmt(KMN_E_ProfileInstall_ProfileNotFound, VarArrayOf([KeyboardID, IntToHex(LangID, 4)]));
+    end
+    else
+    begin
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+      if not reg.OpenKeyReadOnly(RootPath + '\' + BCP47Tag) then
+        ErrorFmt(KMN_E_ProfileInstall_ProfileNotFound, VarArrayOf([KeyboardID, BCP47Tag]));
+    end;
 
     if not reg.ValueExists(SRegValue_KeymanProfileGUID) then
-      // TODO: better error code
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
+      ErrorFmt(KMN_E_ProfileInstall_RegistryCorrupt, VarArrayOf([KeyboardID]));
 
     guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
   finally
@@ -374,27 +394,10 @@ begin
   // Install the TIP into Windows
   //
 
-  FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
-    GuidToString(guid)]);
+  FLayoutInstallString := GetLayoutInstallString(LangID, guid);
 
-  try   // I4494
-    if not InstallLayoutOrTip(PChar(FLayoutInstallString), 0) then   // I4302
-      // TODO: better error code
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
-  except
-    on E:EOleException do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleException: '+E.Message+' ('+E.Source+', '+IntToHex(E.ErrorCode,8)+')']));
-    end;
-    on E:EOleSysError do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleSysError: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']));
-    end;
-    on E:Exception do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]));
-    end;
-  end;
+  if not InstallLayoutOrTip(PChar(FLayoutInstallString), 0) then   // I4302
+    ErrorFmt(KMN_E_ProfileInstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 end;
 
 function TKPInstallKeyboardLanguage.InstallBCP47Language(const FLocaleName: string): Boolean;
@@ -422,8 +425,8 @@ end;
 
 procedure TKPInstallKeyboardLanguage.UninstallTemporaryLayout(const LayoutString: string);
 begin
-  // TODO: handle errors
-  InstallLayoutOrTip(PChar(LayoutString), ILOT_UNINSTALL);
+  if not InstallLayoutOrTip(PChar(LayoutString), ILOT_UNINSTALL) then
+    ErrorFmt(KMN_E_ProfileInstall_UninstallLayoutOrTipFailed, VarArrayOf([LayoutString]));
 end;
 
 end.

@@ -14,17 +14,6 @@ uses
 
 type
   TKPUninstallKeyboardLanguage = class(TKPBase)
-    /// <summary>Unregisters a TIP from the Local Machine registry</summary>
-    /// <param name="BCP47Tag">This should be a BCP47 tag
-    /// </param>
-    /// <param name="KeyboardID">The ID of the keyboard</param>
-    procedure UnregisterTip(const KeyboardID, BCP47Tag: string); overload;
-
-    /// <summary>Unregisters a transient profile tip from the Local Machine registry</summary>
-    /// <param name="KeyboardID">The ID of the keyboard</param>
-    /// <param name="LangID">The transient profile to unregister, $2000, $2400, $2800 or $2C00</param>
-    procedure UnregisterTip(const KeyboardID: string; LangID: Word); overload;
-
     /// <summary>Unregisters all TIPs from the Local Machine registry for a given keyboard, including transient profiles</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     procedure UnregisterTip(const KeyboardID: string); overload;
@@ -42,6 +31,18 @@ type
     /// <summary>Uninstalls all TIPs for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     procedure UninstallTip(const KeyboardID: string); overload;
+
+  protected
+    /// <summary>Unregisters a TIP from the Local Machine registry</summary>
+    /// <param name="BCP47Tag">This should be a BCP47 tag</param>
+    /// <param name="KeyboardID">The ID of the keyboard</param>
+    procedure UnregisterTip(const KeyboardID, BCP47Tag: string); overload;
+
+    /// <summary>Unregisters a transient profile tip from the Local Machine registry</summary>
+    /// <param name="KeyboardID">The ID of the keyboard</param>
+    /// <param name="LangID">The transient profile to unregister, $2000, $2400, $2800 or $2C00</param>
+    procedure UnregisterTip(const KeyboardID: string; LangID: Word); overload;
+
   private
     procedure DoUnregisterTip(const KeyboardID, BCP47Tag: string; pInputProcessorProfileMgr: ITfInputProcessorProfileMgr);
     procedure DoUnregisterTipTransientProfile(const KeyboardID: string; LangID: Word; pInputProcessorProfileMgr: ITfInputProcessorProfileMgr);
@@ -84,33 +85,40 @@ var
   RootPath: string;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
+    ErrorFmt(KMN_E_ProfileUninstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
   reg := TRegistry.Create;
   try
     reg.RootKey := HKEY_LOCAL_MACHINE;
     RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
-    if not reg.OpenKey(RootPath + '\' + BCP47Tag, False) then
-      ErrorFmt(KMN_E_ProfileUninstall_MustBeAllUsers, VarArrayOf([KeyboardID]));
+    if not reg.OpenKeyReadOnly(RootPath + '\' + BCP47Tag) then
+      ErrorFmt(KMN_E_ProfileUninstall_ProfileNotFound, VarArrayOf([KeyboardID]));
 
     if not reg.ValueExists(SRegValue_LanguageProfileLangID) or
         not reg.ValueExists(SRegValue_KeymanProfileGUID) then
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
+    begin
+      WarnFmt(KMN_W_ProfileUninstall_RegistryCorrupt, VarArrayOf([KeyboardID]));
+      Exit;
+    end;
 
     guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
     LangID := reg.ReadInteger(SRegValue_LanguageProfileLangID);
 
-    if not reg.OpenKey('\' + RootPath, False) then
-      // TODO: Error code
-      ErrorFmt(KMN_E_ProfileUninstall_MustBeAllUsers, VarArrayOf([KeyboardID]));
+    if not reg.DeleteKey('\' + RootPath + '\' + BCP47Tag) then
+      ErrorFmt(KMN_E_ProfileUninstall_FailedToDeleteProfile, VarArrayOf([KeyboardID, reg.LastError]));
 
-    reg.DeleteKey(BCP47Tag);
-
-    OleCheck(pInputProcessorProfileMgr.UnregisterProfile(   // I3743
-      c_clsidKMTipTextService,
-      LangID,
-      guid,
-      0));
+    try
+      OleCheck(pInputProcessorProfileMgr.UnregisterProfile(   // I3743
+        c_clsidKMTipTextService,
+        LangID,
+        guid,
+        0));
+    except
+      on E:EOleSysError do
+      begin
+        ErrorFmt(KMN_W_TSF_COMError, VarArrayOf(['UnregisterProfile: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']));
+      end;
+    end;
   finally
     reg.Free;
   end;
@@ -128,10 +136,10 @@ var
   RootPath: string;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
+    ErrorFmt(KMN_E_ProfileUninstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
   if not IsTransientLanguageID(LangID) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID, LangID]));   // TODO: error code
+    ErrorFmt(KMN_E_ProfileUninstall_NotATransientLanguageCode, VarArrayOf([KeyboardID, LangID]));
 
   reg := TRegistry.Create;
   try
@@ -147,13 +155,21 @@ begin
 
     guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
 
-    reg.DeleteKey('\' + RootPath + '\' + IntToHex(LangID, 4));
+    if not reg.DeleteKey('\' + RootPath + '\' + IntToHex(LangID, 4)) then
+      ErrorFmt(KMN_E_ProfileUninstall_FailedToDeleteProfile, VarArrayOf([KeyboardID, reg.LastError]));
 
-    OleCheck(pInputProcessorProfileMgr.UnregisterProfile(   // I3743
-      c_clsidKMTipTextService,
-      LangID,
-      guid,
-      0));
+    try
+      OleCheck(pInputProcessorProfileMgr.UnregisterProfile(   // I3743
+        c_clsidKMTipTextService,
+        LangID,
+        guid,
+        0));
+    except
+      on E:EOleSysError do
+      begin
+        WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['UnregisterProfile: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']));
+      end;
+    end;
   finally
     reg.Free;
   end;
@@ -196,13 +212,14 @@ begin
     reg.RootKey := HKEY_LOCAL_MACHINE;
     RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
     if not reg.OpenKeyReadOnly(RootPath + '\' + BCP47Tag) then
-      // TODO: better error code
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
+      ErrorFmt(KMN_E_ProfileUninstall_ProfileNotFound, VarArrayOf([KeyboardID]));
 
-    if not reg.ValueExists(SRegValue_KeymanProfileGUID) or not
-      reg.ValueExists(SRegValue_LanguageProfileLangID) then
-      // TODO: better error code
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
+    if not reg.ValueExists(SRegValue_KeymanProfileGUID) or
+      not reg.ValueExists(SRegValue_LanguageProfileLangID) then
+    begin
+      WarnFmt(KMN_W_ProfileUninstall_RegistryCorrupt, VarArrayOf([KeyboardID]));
+      Exit;
+    end;
 
     guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
     langid := reg.ReadInteger(SRegValue_LanguageProfileLangID);
@@ -217,27 +234,10 @@ begin
   // Uninstall the TIP from Windows current user
   //
 
-  FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
-    GuidToString(guid)]);
+  FLayoutInstallString := GetLayoutInstallString(LangID, guid);
 
-  try   // I4494
-    if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
-      // TODO: better error code
-      WarnFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
-  except
-    on E:EOleException do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleException: '+E.Message+' ('+E.Source+', '+IntToHex(E.ErrorCode,8)+')']));
-    end;
-    on E:EOleSysError do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleSysError: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']));
-    end;
-    on E:Exception do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]));
-    end;
-  end;
+  if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
+    WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 end;
 
 procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string;
@@ -250,22 +250,24 @@ var
   RootPath: string;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
+    ErrorFmt(KMN_E_ProfileUninstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
 
   if not IsTransientLanguageID(LangID) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID, LangID]));   // TODO: error code
+    ErrorFmt(KMN_E_ProfileUninstall_NotATransientLanguageCode, VarArrayOf([KeyboardID, LangID]));
 
   reg := TRegistry.Create(KEY_READ);
   try
     reg.RootKey := HKEY_LOCAL_MACHINE;
     RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
     if not reg.OpenKeyReadOnly(RootPath + '\' + IntToHex(LangID, 4)) then
-      // We'll assume it's already been removed
+      // We'll assume it's not installed
       Exit;
 
     if not reg.ValueExists(SRegValue_KeymanProfileGUID) then
-      // TODO: better error code
-      ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
+    begin
+      WarnFmt(KMN_W_ProfileUninstall_RegistryCorrupt, VarArrayOf([KeyboardID]));
+      Exit;
+    end;
 
     guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
   finally
@@ -275,7 +277,8 @@ begin
   //
   // We need to check if the TIP is installed before attempting to remove it,
   // because otherwise Windows will attempt to 'tidy up' and may leave a stray
-  // keyboard layout installed
+  // keyboard layout installed (the user could have removed the TIP through
+  // Windows UI/APIs after we install it).
   //
   if not IsTipInstalledForCurrentUser('', langid, guid) then
     Exit;
@@ -284,42 +287,24 @@ begin
   // Uninstall the TIP from Windows current user
   //
 
-  FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
-    GuidToString(guid)]);
+  // TODO: this probably needs to be a powershell script for full removal?
 
-  try   // I4494
-    if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
-      // TODO: better error code
-      WarnFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
-  except
-    on E:EOleException do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleException: '+E.Message+' ('+E.Source+', '+IntToHex(E.ErrorCode,8)+')']));
-    end;
-    on E:EOleSysError do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf(['EOleSysError: '+E.Message+' ('+IntToHex(E.ErrorCode,8)+')']));
-    end;
-    on E:Exception do
-    begin
-      WarnFmt(KMN_W_TSF_COMError, VarArrayOf([E.Message]));
-    end;
-  end;
+  FLayoutInstallString := GetLayoutInstallString(LangID, guid);
+
+  if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
+    WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 end;
 
 procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string);
 var
   sLocales: TStrings;
+  sLocale: string;
   FInstByAdmin: Boolean;
-  i: Integer;
   reg: TRegistry;
   RootPath: string;
 begin
   if not KeyboardInstalled(KeyboardID, FInstByAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
-
-  if FInstByAdmin and not IsAdministrator then   // I3723
-    ErrorFmt(KMN_E_ProfileUninstall_MustBeAllUsers, VarArrayOf([KeyboardID]));   // I3764
+    ErrorFmt(KMN_E_ProfileUninstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
   // We need to iterate through the Windows language profiles?
   sLocales := TStringList.Create;
@@ -336,11 +321,9 @@ begin
       reg.Free;
     end;
 
-    for i := 0 to sLocales.Count - 1 do
-    begin
+    for sLocale in sLocales do
       // Note: if TIP is not installed, this still succeeds
-      UninstallTip(KeyboardID, sLocales[i]);
-    end;
+      UninstallTip(KeyboardID, sLocale);
   finally
     sLocales.Free;
   end;
@@ -353,14 +336,12 @@ var
   sLocales: TStrings;
   sLocale: string;
   FInstByAdmin: Boolean;
-  i: Integer;
-  Path: string;
   RootPath: string;
   pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
   reg: TRegistry;
 begin
   if not KeyboardInstalled(KeyboardID, FInstByAdmin) then
-    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
+    ErrorFmt(KMN_E_ProfileUninstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
   if FInstByAdmin and not IsAdministrator then   // I3723
     ErrorFmt(KMN_E_ProfileUninstall_MustBeAllUsers, VarArrayOf([KeyboardID]));   // I3764
@@ -368,29 +349,27 @@ begin
   pInputProcessorProfileMgr := GetInputProcessorProfileMgr;
 
   sLocales := TStringList.Create;
-  reg := TRegistry.Create(KEY_READ);
   try
-    reg.RootKey := HKEY_LOCAL_MACHINE;
-    RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
-    if reg.OpenKeyReadOnly(RootPath) then
-    begin
-      reg.GetKeyNames(sLocales);
-      for i := 0 to sLocales.Count - 1 do
-      begin
-        sLocale := sLocales[i];
-        DoUnregisterTip(KeyboardID, sLocale, pInputProcessorProfileMgr);
-      end;
+    reg := TRegistry.Create(KEY_READ);
+    try
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+      if reg.OpenKeyReadOnly(RootPath) then
+        reg.GetKeyNames(sLocales);
+    finally
+      reg.Free;
     end;
 
-    DoUnregisterTipTransientProfile(KeyboardID, $2000, pInputProcessorProfileMgr);
-    DoUnregisterTipTransientProfile(KeyboardID, $2400, pInputProcessorProfileMgr);
-    DoUnregisterTipTransientProfile(KeyboardID, $2800, pInputProcessorProfileMgr);
-    DoUnregisterTipTransientProfile(KeyboardID, $2C00, pInputProcessorProfileMgr);
+    for sLocale in sLocales do
+      DoUnregisterTip(KeyboardID, sLocale, pInputProcessorProfileMgr);
   finally
-    reg.Free;
     sLocales.Free;
   end;
 
+  DoUnregisterTipTransientProfile(KeyboardID, $2000, pInputProcessorProfileMgr);
+  DoUnregisterTipTransientProfile(KeyboardID, $2400, pInputProcessorProfileMgr);
+  DoUnregisterTipTransientProfile(KeyboardID, $2800, pInputProcessorProfileMgr);
+  DoUnregisterTipTransientProfile(KeyboardID, $2C00, pInputProcessorProfileMgr);
 
   Context.Control.AutoApplyKeyman;
 end;

@@ -104,16 +104,23 @@ begin
   TemporaryKeyboardID := '';
   RegistrationRequired := False;
 
-  if LangID <> 0 then
+  if (LangID <> 0) then
     Exit(True);
 
-  RegistrationRequired := True;
   kp := TKPInstallKeyboardLanguage.Create(Context);
   try
     KPFlags := [];
     if (Flags and kifInstallTransitoryLanguage) <> 0 then
       Include(KPFlags, ilkInstallTransitoryLanguage);
     Result := kp.FindInstallationLangID(Self.Get_BCP47Code, LangID, s, KPFlags);
+
+    // We only need to register a TIP for user custom installations of languages:
+    // languages that are suggested already have a TIP registered, and the
+    // four transient language codes should have TIPs registered at install time.
+    RegistrationRequired :=
+      not IsTransientLanguageID(LangID) and
+      not Self.Get_IsRegistered;
+
     TemporaryKeyboardID := s;
   finally
     kp.Free;
