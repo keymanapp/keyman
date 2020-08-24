@@ -17,7 +17,7 @@ describe('Trie traversal abstractions', function() {
   it('root-level iteration over child nodes', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
 
-    let rootTraversal = model.getRootTraversal();
+    let rootTraversal = model.traverseFromRoot();
     assert.isDefined(rootTraversal);
 
     let rootKeys = ['t', 'o', 'a', 'i', 'w', 'h', 'f', 'b', 'n', 'y', 's', 'm',
@@ -35,7 +35,7 @@ describe('Trie traversal abstractions', function() {
   it('traversal with simple internal nodes', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
 
-    let rootTraversal = model.getRootTraversal();
+    let rootTraversal = model.traverseFromRoot();
     assert.isDefined(rootTraversal);
 
     let eKeys = ['y', 'r', 'i', 'm', 's', 'n', 'o'];
@@ -48,14 +48,16 @@ describe('Trie traversal abstractions', function() {
         tSuccess = true;
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
-        assert.isUndefined(child.entries);
+        assert.isArray(child.traversal().entries);
+        assert.isEmpty(child.traversal().entries);
 
         for(tChild of traversalInner1.children()) {
           if(tChild.char == 'h') { 
             hSuccess = true;
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
-            assert.isUndefined(tChild.entries);
+            assert.isEmpty(tChild.traversal().entries);
+            assert.isArray(tChild.traversal().entries);
 
             for(hChild of traversalInner2.children()) {
               if(hChild.char == 'e') {
@@ -88,7 +90,7 @@ describe('Trie traversal abstractions', function() {
   it('traversal over compact leaf node', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
 
-    let rootTraversal = model.getRootTraversal();
+    let rootTraversal = model.traverseFromRoot();
     assert.isDefined(rootTraversal);
 
     // 't', 'r', 'o' have siblings, but these don't.
@@ -98,13 +100,15 @@ describe('Trie traversal abstractions', function() {
       if(child.char == 't') {
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
-        assert.isUndefined(child.entries);
+        assert.isArray(child.traversal().entries);
+        assert.isEmpty(child.traversal().entries);
 
         for(tChild of traversalInner1.children()) {
           if(tChild.char == 'r') { 
             let traversalInner2 = tChild.traversal();
             assert.isDefined(traversalInner2);
-            assert.isUndefined(tChild.entries);
+            assert.isArray(tChild.traversal().entries);
+            assert.isEmpty(tChild.traversal().entries);
 
             for(rChild of traversalInner2.children()) {
               if(rChild.char == 'o') {
@@ -131,7 +135,8 @@ describe('Trie traversal abstractions', function() {
 
                   // Conditional test - if that was not the final character, entries should be undefined.
                   if(leafChildSequence.length > 0) {
-                    assert.isUndefined(curChild.traversal().entries);
+                    assert.isArray(curChild.traversal().entries);
+                    assert.isEmpty(curChild.traversal().entries);
                   } else {
                     let finalTraversal = curChild.traversal();
                     assert.isDefined(finalTraversal.entries);
@@ -155,7 +160,7 @@ describe('Trie traversal abstractions', function() {
     // One solely uses SMP characters, the other of which uses a mix of SMP and standard.
     var model = new TrieModel(jsonFixture('tries/smp-apple'));
 
-    let rootTraversal = model.getRootTraversal();
+    let rootTraversal = model.traverseFromRoot();
     assert.isDefined(rootTraversal);
 
     let smpA = smpForUnicode(0x1d5ba);
@@ -176,14 +181,16 @@ describe('Trie traversal abstractions', function() {
         aSuccess = true;
         let traversalInner1 = child.traversal();
         assert.isDefined(traversalInner1);
-        assert.isUndefined(child.entries);
+        assert.isArray(child.traversal().entries);
+        assert.isEmpty(child.traversal().entries);
 
         for(aChild of traversalInner1.children()) {
           if(aChild.char == smpP) { 
             pSuccess = true;
             let traversalInner2 = aChild.traversal();
             assert.isDefined(traversalInner2);
-            assert.isUndefined(aChild.entries);
+            assert.isArray(aChild.traversal().entries);
+            assert.isEmpty(aChild.traversal().entries);
 
             for(pChild of traversalInner2.children()) {
               let keyIndex = pKeys.indexOf(pChild.char);
@@ -193,7 +200,8 @@ describe('Trie traversal abstractions', function() {
               if(pChild.char == 'p') { // We'll test traversal with the 'mixed' entry from here.
                 let traversalInner3 = pChild.traversal();
                 assert.isDefined(traversalInner3);
-                assert.isUndefined(pChild.entries);
+                assert.isArray(pChild.traversal().entries);
+                assert.isEmpty(pChild.traversal().entries);
 
                 // Now to handle the rest, knowing it's backed by a leaf node.
                 let curChild = pChild;
@@ -219,7 +227,8 @@ describe('Trie traversal abstractions', function() {
 
                   // Conditional test - if that was not the final character, entries should be undefined.
                   if(leafChildSequence.length > 0) {
-                    assert.isUndefined(curChild.traversal().entries);
+                    assert.isArray(curChild.traversal().entries);
+                    assert.isEmpty(curChild.traversal().entries);
                   } else {
                     let finalTraversal = curChild.traversal();
                     assert.isDefined(finalTraversal.entries);
