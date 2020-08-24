@@ -162,7 +162,7 @@
       return this.getLastWord(context.left);
     }
 
-    public getRootTraversal(): LexiconTraversal {
+    public traverseFromRoot(): LexiconTraversal {
       return new TrieModel.Traversal(this._trie['root'], '');
     }
 

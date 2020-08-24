@@ -115,7 +115,7 @@ declare interface LexicalModel {
    * prediction and correction results.  The returned object represents the
    * unfiltered lexicon (with an empty prefix).
    */
-  getRootTraversal?(): LexiconTraversal;
+  traverseFromRoot?(): LexiconTraversal;
 }
 
 /**
