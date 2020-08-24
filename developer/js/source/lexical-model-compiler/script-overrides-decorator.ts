@@ -25,23 +25,15 @@ export function decorateWithScriptOverrides(breaker: WordBreakingFunction, optio
     for (let currentSpan of originalSpans) {
       let previousSpan = lastFrom(outputSpans);
 
-      if (!spansAreBackToBack(previousSpan, currentSpan)) {
+      if (spansAreBackToBack(previousSpan, currentSpan) &&
+          spanContainsOnlyLetters(previousSpan) &&
+          spanContainsOnlyLetters(currentSpan)
+      ) {
+        outputSpans.pop();
+        outputSpans.push(concatenateSpans(previousSpan, currentSpan));
+      } else {
         outputSpans.push(currentSpan);
-        continue;
       }
-
-      if (!spanContainsOnlyLetters(previousSpan)) {
-        outputSpans.push(currentSpan);
-        continue;
-      }
-
-      if (!spanContainsOnlyLetters(currentSpan)) {
-        outputSpans.push(currentSpan);
-        continue;
-      }
-
-      outputSpans.pop();
-      outputSpans.push(concatenateSpans(previousSpan, currentSpan));
     }
 
     return outputSpans;
