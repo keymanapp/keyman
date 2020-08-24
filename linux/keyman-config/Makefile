@@ -59,10 +59,10 @@ man:
 
 version:
 	cd .. && ./scripts/reconf.sh keyman-config
+	$(eval VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
 
 # i18n
 
-VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)")
 POFILES := $(shell find locale -name \*.po)
 MOFILES := $(POFILES:.po=/LC_MESSAGES/keyman-config.mo)
 
