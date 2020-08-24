@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 24/08/2020 9:24:32 AM from Type Library described below.
+// File generated on 24/08/2020 3:35:43 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -160,6 +160,12 @@ const
   kotLong = $00000002;
   kotString = $00000003;
 
+// Constants for enum tagKeymanInstallFlags
+type
+  tagKeymanInstallFlags = TOleEnum;
+const
+  kifInstallTransitoryLanguage = $00000001;
+
 type
 
 // *********************************************************************//
@@ -262,7 +268,6 @@ type
 // *********************************************************************//
 // Declaration of structures, unions and aliases.
 // *********************************************************************//
-  PWideString1 = ^WideString; {*}
 
   KeymanKeyboardEncodings = tagKeymanKeyboardEncodings;
   KeymanHotkeyModifiers = tagKeymanHotkeyModifiers;
@@ -1695,7 +1700,7 @@ type
   IKeymanKeyboardLanguageInstalled2 = interface(IKeymanKeyboardLanguageInstalled)
     ['{414C26E6-BFAC-4A70-9EA1-E525BA9BBA7E}']
     function FindInstallationLangID(out LangID: Integer; out TemporaryKeyboardID: WideString;
-                                    out RegistrationRequired: WordBool; Flags: Integer): WordBool; safecall;
+                                    out RegistrationRequired: WordBool; Flags: tagKeymanInstallFlags): WordBool; safecall;
     procedure RegisterTip(LangID: Integer); safecall;
     procedure InstallTip(LangID: Integer; const TemporaryKeyboardToRemove: WideString); safecall;
     function Get_IsRegistered: WordBool; safecall;
@@ -1710,7 +1715,7 @@ type
   IKeymanKeyboardLanguageInstalled2Disp = dispinterface
     ['{414C26E6-BFAC-4A70-9EA1-E525BA9BBA7E}']
     function FindInstallationLangID(out LangID: Integer; out TemporaryKeyboardID: WideString;
-                                    out RegistrationRequired: WordBool; Flags: Integer): WordBool; dispid 404;
+                                    out RegistrationRequired: WordBool; Flags: tagKeymanInstallFlags): WordBool; dispid 404;
     procedure RegisterTip(LangID: Integer); dispid 405;
     procedure InstallTip(LangID: Integer; const TemporaryKeyboardToRemove: WideString); dispid 406;
     property IsRegistered: WordBool readonly dispid 501;

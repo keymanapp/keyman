@@ -217,18 +217,17 @@ const
   SRegValue_Legacy_DefaultLanguageID   = 'default language id';                            // LM CU   // I4220
   SRegValue_VisualKeyboard      = 'visual keyboard';                                // LM CU
 
-  SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM CU   // I3581
-
   SRegSubKey_SuggestedLanguages = 'Suggested Languages';                            // LM
 
   { Language Profiles }
 
   {$MESSAGE HINT 'Refactor this to use SRegKeyNode naming (no prefix \); fixup references'}
-  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM CU
-  SRegValue_LanguageProfileLangID = 'LangID';
-  SRegValue_LanguageProfileLocale = 'Locale';
-  SRegValue_LanguageProfileName = 'Name';
-  SRegValue_ProfileEnabled = 'Profile Enabled';
+  SRegSubKey_LanguageProfiles      = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Language Profiles';  // LM
+  SRegSubKey_TransientLanguageProfiles = { SRegKey_InstalledKeyboards + '\<keyboard>' } '\Transient Language Profiles';  // LM
+  SRegValue_LanguageProfileLangID = 'LangID';                                       // LM SRegSubKey_LanguageProfiles
+  SRegValue_LanguageProfileLocale = 'Locale';                                       // LM SRegSubKey_LanguageProfiles
+  SRegValue_LanguageProfileName = 'Name';                                           // LM SRegSubKey_LanguageProfiles
+  SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM SRegSubKey_LanguageProfiles, SRegSubKey_TransientLanguageProfiles
 
   { InstalledPackages }
 

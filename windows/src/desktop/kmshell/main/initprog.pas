@@ -488,7 +488,7 @@ begin
         else ExitCode := 1;
 
     fmUninstallKeyboardLanguage:   // I3624
-      if UninstallKeyboardLanguage(nil, FirstKeyboardFileName, FSilent)
+      if UninstallKeyboardLanguage(FirstKeyboardFileName, FSilent)
         then ExitCode := 0
         else ExitCode := 1;
 

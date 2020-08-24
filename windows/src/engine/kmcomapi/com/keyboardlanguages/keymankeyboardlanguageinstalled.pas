@@ -54,7 +54,7 @@ type
     { IKeymanKeyboardLanguageInstalled2 }
     function FindInstallationLangID(out LangID: Integer;
       out TemporaryKeyboardID: WideString; out RegistrationRequired: WordBool;
-      Flags: Integer): WordBool; safecall;
+      Flags: tagKeymanInstallFlags): WordBool; safecall;
     procedure InstallTip(LangID: Integer;
       const TemporaryKeyboardToRemove: WideString); safecall;
     procedure RegisterTip(LangID: Integer); safecall;
@@ -63,7 +63,7 @@ type
     { IIntKeymanKeyboardLanguageInstalled }
   public
     constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
-      ALangID: Integer; AProfileGUID: TGUID; const AName: string; AIsInstalled: Boolean);
+      ALangID: Integer; AProfileGUID: TGUID; const AName: string);
   end;
 
 implementation
@@ -84,20 +84,21 @@ uses
 
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
   AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
-  ALangID: Integer; AProfileGUID: TGUID; const AName: string; AIsInstalled: Boolean);
+  ALangID: Integer; AProfileGUID: TGUID; const AName: string);
 begin
   FOwner := AOwner;
   FProfileGUID := AProfileGUID;
-  FIsInstalled := AIsInstalled;
+  FIsInstalled := IsTIPInstalledForCurrentUser(aBCP47Code, ALangID, AProfileGUID);
   inherited Create(AContext, AOwner, AOriginalBCP47Code, ABCP47Code, ALangID, AName);
 end;
 
 function TKeymanKeyboardLanguageInstalled.FindInstallationLangID(
   out LangID: Integer; out TemporaryKeyboardID: WideString;
-  out RegistrationRequired: WordBool; Flags: Integer): WordBool;
+  out RegistrationRequired: WordBool; Flags: tagKeymanInstallFlags): WordBool;
 var
   kp: TKPInstallKeyboardLanguage;
   s: string;
+  KPFlags: TKPInstallKeyboardLanguageFlags;
 begin
   LangID := Self.Get_LangID;
   TemporaryKeyboardID := '';
@@ -109,7 +110,10 @@ begin
   RegistrationRequired := True;
   kp := TKPInstallKeyboardLanguage.Create(Context);
   try
-    Result := kp.FindInstallationLangID(Self.Get_BCP47Code, LangID, s, Flags);
+    KPFlags := [];
+    if (Flags and kifInstallTransitoryLanguage) <> 0 then
+      Include(KPFlags, ilkInstallTransitoryLanguage);
+    Result := kp.FindInstallationLangID(Self.Get_BCP47Code, LangID, s, KPFlags);
     TemporaryKeyboardID := s;
   finally
     kp.Free;
@@ -192,7 +196,9 @@ begin
   if Get_IsInstalled then
     with TKPUninstallKeyboardLanguage.Create(Context) do
     try
-      UninstallTip(FOwner.ID, Get_BCP47Code);
+      if IsTransientLanguageID(Get_LangID)
+        then UninstallTip(FOwner.ID, Get_LangID)
+        else UninstallTip(FOwner.ID, Get_BCP47Code);
     finally
       Free;
     end;

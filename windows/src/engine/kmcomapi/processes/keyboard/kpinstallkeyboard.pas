@@ -273,7 +273,7 @@ begin
                 r.WriteString(BCP47Tag, Languages[i].Name);
                 kpil := TKPInstallKeyboardLanguage.Create(Context);
                 try
-                  if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, 0) then
+                  if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) then
                     kpil.RegisterTip(kbdname, BCP47Tag, ki.KeyboardName, LangID, FIconFileName, Languages[i].Name);
                 finally
                   kpil.Free;
@@ -462,7 +462,7 @@ begin
   Result := False;
   kpil := TKPInstallKeyboardLanguage.Create(Context);
   try
-    if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, 0) then
+    if kpil.FindInstallationLangID(BCP47Tag, LangID, TemporaryKeyboardID, []) then
     begin
       kpil.RegisterTip(KeyboardID, BCP47Tag, KeyboardID, LangID, IconFileName, '');
       kpil.InstallTip(KeyboardID, BCP47Tag, LangID);

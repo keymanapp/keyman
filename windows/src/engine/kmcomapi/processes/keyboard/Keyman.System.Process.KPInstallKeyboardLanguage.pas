@@ -12,15 +12,15 @@ uses
   Winapi.msctf,
   keyman_msctf;
 
-const
-  ilkInstallTransitoryLanguage= 1; // TODO move this to TLB
+type
+  TKPInstallKeyboardLanguageFlags = set of (ilkInstallTransitoryLanguage);
 
 type
   TKPInstallKeyboardLanguage = class(TKPBase)
     function FindInstallationLangID(const BCP47Tag: string;
       var LangID: Integer;
       var TemporaryKeyboardID: string;
-      Flags: DWORD): Boolean;
+      Flags: TKPInstallKeyboardLanguageFlags): Boolean;
     procedure RegisterTip(const KeyboardID, BCP47Tag, KeyboardName: string; LangID: Integer; IconFileName, LanguageName: string);
     procedure InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer);
     procedure UninstallTemporaryLayout(const LayoutString: string);
@@ -30,8 +30,6 @@ type
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
   private
-    reg: TRegistry;
-    RootPath: string;
     FWin8Languages: TWindows8LanguageList;
     function ConvertBCP47TagToLangID(Locale: string; var LangID: Integer): Boolean;
     function InstallBCP47Language(const FLocaleName: string): Boolean;
@@ -77,7 +75,7 @@ begin
 end;
 
 // TODO: change LangID to Winapi.Windows.LANGID
-function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryKeyboardID: string; Flags: DWORD): Boolean;
+function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryKeyboardID: string; Flags: TKPInstallKeyboardLanguageFlags): Boolean;
 var
   ml: TMitigateWin10_1803.TMitigatedLanguage;
   Win8Lang: TWindows8Language;
@@ -106,7 +104,7 @@ begin
       Exit(False);
     end;
 
-    if (Flags and ilkInstallTransitoryLanguage) = 0 then
+    if not (ilkInstallTransitoryLanguage in Flags) then
     begin
       // No warning, because this is to be expected
       Exit(False);
@@ -206,11 +204,15 @@ procedure TKPInstallKeyboardLanguage.RegisterTip(const KeyboardID,
   BCP47Tag, KeyboardName: string; LangID: Integer; IconFileName, LanguageName: string);
 var
   FIsAdmin: Boolean;
-  FKeyboardName: string;
+  RootPath, FKeyboardName: string;
+  reg: TRegistry;
   guid: TGUID;
   IconIndex: Integer;
   pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
 begin
+  if IsTransientLanguageID(LangID) then
+    ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID, LangID])); // TODO: should not attempt to register transient profile guid (that's done by RegisterTransientTips
+
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
     ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
 
@@ -270,10 +272,11 @@ procedure TKPInstallKeyboardLanguage.RegisterTransientTips(const KeyboardID,
   KeyboardName: string; IconFileName: string);
 var
   FIsAdmin: Boolean;
-  FKeyboardName: string;
+  RootPath, FKeyboardName: string;
   guid: TGUID;
   i, LangID: Integer;
   IconIndex: Integer;
+  reg: TRegistry;
   pInputProcessorProfileMgr: ITfInputProcessorProfileMgr;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
@@ -290,11 +293,11 @@ begin
     reg := TRegistry.Create;
     try
       reg.RootKey := HKEY_LOCAL_MACHINE;
-      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+      RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
 
       // TODO: Move these four to another key as they work differently to the other language profiles
       //       and need special handling anyway
-      if not reg.OpenKey(RootPath + '\$' + IntToHex(LangID, 4), True) then
+      if not reg.OpenKey(RootPath + '\' + IntToHex(LangID, 4), True) then
         ErrorFmt(KMN_E_ProfileInstall_MustBeAllUsers, VarArrayOf([KeyboardID]));
 
       reg.WriteInteger(SRegValue_LanguageProfileLangID, LangID);
@@ -340,7 +343,8 @@ procedure TKPInstallKeyboardLanguage.InstallTip(const KeyboardID, BCP47Tag: stri
 var
   FIsAdmin: Boolean;
   guid: TGUID;
-  FLayoutInstallString: string;
+  reg: TRegistry;
+  RootPath, FLayoutInstallString: string;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
     ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));   // I3888
@@ -348,7 +352,11 @@ begin
   reg := TRegistry.Create(KEY_READ);
   try
     reg.RootKey := HKEY_LOCAL_MACHINE;
-    RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+
+    if IsTransientLanguageID(LangID)
+      then RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles
+      else RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_LanguageProfiles;
+
     if not reg.OpenKeyReadOnly(RootPath + '\' + BCP47Tag) then
       // TODO: better error code
       ErrorFmt(KMN_E_ProfileInstall_KeyboardNotFound, VarArrayOf([KeyboardID]));

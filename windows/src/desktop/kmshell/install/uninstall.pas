@@ -29,7 +29,7 @@ uses
 
 function UninstallPackage(Owner: TWinControl; const PackageName: WideString; Silent: Boolean): Boolean;
 function UninstallKeyboard(Owner: TWinControl; const KeyboardName: WideString; Silent: Boolean): Boolean;
-function UninstallKeyboardLanguage(Owner: TWinControl; const LanguageProfileGUID: WideString; Silent: Boolean): Boolean;   // I3624
+function UninstallKeyboardLanguage(const LanguageProfileGUID: WideString; Silent: Boolean): Boolean;   // I3624
 
 implementation
 
@@ -146,9 +146,8 @@ begin
   Result := True;
 end;
 
-function UninstallKeyboardLanguage(Owner: TWinControl; const LanguageProfileGUID: WideString; Silent: Boolean): Boolean;   // I3624
+function UninstallKeyboardLanguage(const LanguageProfileGUID: WideString; Silent: Boolean): Boolean;   // I3624
 var
-  Handle: THandle;
   I: Integer;
   kbd: IKeymanKeyboardInstalled;
   J: Integer;
@@ -156,9 +155,6 @@ var
   FProfileGUID: TGUID;
 begin
   Result := False;
-  if Assigned(Owner)
-    then Handle := Owner.Handle
-    else Handle := 0;
 
   FProfileGUID := StringToGUID(LanguageProfileGUID);
   kbdlang := nil;
@@ -176,22 +172,6 @@ begin
   end;
 
   if not Assigned(kbdlang) then Exit;
-
-  {if not kmcom.SystemInfo.IsAdministrator then
-  begin
-    if not CanElevate then
-    begin
-      if not Silent then ShowMessage('Cannot uninstall this profile unless you are an administrator');
-      Exit;
-    end;
-
-    if WaitForElevatedConfiguration(Handle, '-ukl "'+LanguageProfileGUID+'" -s') = 0 then
-    begin
-      kmcom.Keyboards.Refresh;
-      Result := True;
-    end;
-    Exit;
-  end;}
 
   kbdlang.Uninstall;
   kbdlang := nil;

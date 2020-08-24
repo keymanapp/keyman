@@ -81,12 +81,11 @@ begin
   if lang.IsInstalled then
     Exit(True);
 
-  // TODO: define flags
   TemporaryKeyboardID := '';
   LangID := 0;
   RegistrationRequired := False;
 
-  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, 1) then
+  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransitoryLanguage) then
   begin
     if RegistrationRequired then
     begin
@@ -97,54 +96,6 @@ begin
 
   Result := True;
 end;
-
-(*class function TTIPMaintenance.DoUninstall(const KeyboardID: string): Boolean;
-var
-  keyboard: IKeymanKeyboardInstalled;
-  i: Integer;
-  lang: IKeymanKeyboardLanguageInstalled;
-
-  RegistrationRequired: WordBool;
-  TemporaryKeyboardID: WideString;
-  LangID: Integer;
-begin
-  keyboard := kmcom.Keyboards[KeyboardID];
-  if keyboard = nil then
-    Exit(nil);
-
-  for i := 0 to keyboard.Languages.Count - 1 do
-  begin
-    lang := keyboard.Languages[i] as IKeymanKeyboardLanguageInstalled;
-    if lang.IsInstalled then
-    begin
-      lang.Uninstall;
-    end;
-  end;
-  lang := GetKeyboardLanguage(KeyboardID, TBCP47Tag.GetCanonicalTag(BCP47Tag));
-  if lang = nil then
-    // The keyboard was not found
-    Exit(False);
-
-  // After canonicalization, we may find the language is already installed
-  if lang.IsInstalled then
-    Exit(True);
-
-  // TODO: define flags
-  TemporaryKeyboardID := '';
-  LangID := 0;
-  RegistrationRequired := False;
-
-  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, 1) then
-  begin
-    if RegistrationRequired then
-    begin
-      WaitForElevatedConfiguration(0, '-register-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'"');
-    end;
-    TUtilExecute.WaitForProcess('"'+ParamStr(0)+'" -install-tip '+IntToHex(LangID,4)+' "'+KeyboardID+'" "'+lang.BCP47Code+'" "'+TemporaryKeyboardID+'"', GetCurrentDir);
-  end;
-
-  Result := True;
-end;*)
 
 function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
 begin

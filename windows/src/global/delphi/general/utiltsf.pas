@@ -24,6 +24,7 @@ interface
 
 function TSFInstalled: Boolean;
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+function IsTransientLanguageID(LangID: Integer): Boolean;
 
 const c_clsidKMTipTextService: TGUID = '{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}';  // version 10.0
 const c_clsidKMTipTextService_90: TGUID = '{487EB753-DB93-48C5-9E6A-4398E777C61D}';   // I3663   // I4248
@@ -32,6 +33,7 @@ const c_clsidTextServicesFramework: TGUID = '{529A9E6B-6587-4F23-AB9E-9C7D683E3C
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
   Winapi.Windows,
 
@@ -51,19 +53,54 @@ end;
 
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
 var
-  FLayoutInstallString: string;
+  tag, FLayoutInstallString: string;
   reg: TRegistryErrorControlled;
+  tags: TStringList;
 begin
   reg := TRegistryErrorControlled.Create(KEY_READ);
   try
     FLayoutInstallString := Format('%04.4x:%s%s', [LangID, GuidToString(c_clsidKMTipTextService),   // I4244
       GuidToString(guidProfile)]);
 
-    Result := reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
-      reg.ValueExists(FLayoutInstallString);
+    if BCP47Tag <> '' then
+    begin
+      Result := reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
+        reg.ValueExists(FLayoutInstallString);
+    end
+    else
+    begin
+      // We'll search all the installed tags because it's probably a transient
+      // language for which we rely on the Windows language association because
+      // it can change on us
+      Result := False;
+      if reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) then
+      begin
+        tags := TStringList.Create;
+        try
+          reg.GetKeyNames(tags);
+          for tag in tags do
+          begin
+            if reg.OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\' + tag) and
+                reg.ValueExists(FLayoutInstallString) then
+              Exit(True);
+          end;
+        finally
+          tags.Free;
+        end;
+      end;
+    end;
   finally
     reg.Free;
   end;
+end;
+
+function IsTransientLanguageID(LangID: Integer): Boolean;
+begin
+  Result :=
+    (LangID = $2000) or
+    (LangID = $2400) or
+    (LangID = $2800) or
+    (LangID = $2C00);
 end;
 
 end.
