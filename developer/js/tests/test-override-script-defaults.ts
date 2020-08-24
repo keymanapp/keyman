@@ -13,14 +13,14 @@ describe('The join word breaker decorator', function () {
   // I do not read this script or language so I have NO idea what this says
   // ¯\_(ツ)_/¯
   const phrase = "ຈາກ ກ໌ນິ ສນາ ເກ໌າະ ຢັອຫ ລະ ບຣອມ ເຢາະ,";
-  const expectedNumWords = 8;
+  const expectedNumSpans = 9;
 
-  it(`should break «${[phrase]}» as ${expectedNumWords} words`, function () {
+  it(`should break «${[phrase]}» as ${expectedNumSpans} words`, function () {
     let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces');
     let defaultResult = defaultWordBreaker(phrase);
 
-    assert.isAbove(defaultResult.length, expectedNumWords);
+    assert.isAbove(defaultResult.length, expectedNumSpans);
     let actualResult = breakWords(phrase);
-    assert.lengthOf(actualResult, expectedNumWords);
+    assert.lengthOf(actualResult, expectedNumSpans);
   });
 });
