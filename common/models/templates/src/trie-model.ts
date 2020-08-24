@@ -163,12 +163,20 @@
       return this.getLastWord(context.left);
     }
 
-    public getRootTraversal(): LexiconTraversal {
+    public traverseFromRoot(): LexiconTraversal {
       return new TrieModel.Traversal(this._trie['root'], '');
     }
 
     private static Traversal = class implements LexiconTraversal {
+      /**
+       * The lexical prefix corresponding to the current traversal state.
+       */
       prefix: String;
+
+      /**
+       * The current traversal node.  Serves as the 'root' of its own sub-Trie,
+       * and we cannot navigate back to its parent.
+       */
       root: Node;
 
       constructor(root: Node, prefix: string) {
@@ -180,31 +188,29 @@
         let root = this.root;
 
         if(root.type == 'internal') {
-          for(let i = 0; i < root.values.length; i++) {
-            let entry = root.values[i];
+          for(let entry of root.values) {
             let entryNode = root.children[entry];
 
-            // SMP check
-            let charCode = entry.charCodeAt(0);
-            if(charCode >= 0xD800 && charCode <= 0xDBFF) {
-              // First part of a SMP char.
+            // UTF-16 astral plane check.
+            if(models.isHighSurrogate(entry)) {
+              // First code unit of a UTF-16 code point.
               // For now, we'll just assume the second always completes such a char.
               //
               // Note:  Things get nasty here if this is only sometimes true; in the future,
               // we should compile-time enforce that this assumption is always true if possible.
               if(entryNode.type == 'internal') {
                 let internalNode = entryNode;
-                for(let j = 0; j < entryNode.values.length; j++) {
-                  let prefix = this.prefix + entry + internalNode.values[j];
+                for(let lowSurrogate of internalNode.values) {
+                  let prefix = this.prefix + entry + lowSurrogate;
                   yield {
-                    char: entry + entryNode.values[j],
-                    traversal: function() { return new TrieModel.Traversal(internalNode.children[internalNode.values[j]], prefix) }
+                    char: entry + lowSurrogate,
+                    traversal: function() { return new TrieModel.Traversal(internalNode.children[lowSurrogate], prefix) }
                   }
                 }
               } else {
                 // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
                 let fullText = entryNode.entries[0].key;
-                entry = entry + fullText[this.prefix.length + 1]; // The other half of the SMP.
+                entry = entry + fullText[this.prefix.length + 1]; // The other half of the non-BMP char.
                 let prefix = this.prefix + entry;
 
                 yield {
@@ -212,7 +218,7 @@
                   traversal: function () {return new TrieModel.Traversal(entryNode, prefix)}
                 }
               }
-            } else if(charCode == 0xFDD0) {
+            } else if(models.isSentinel(entry)) {
               continue;
             } else {
               let prefix = this.prefix + entry;
@@ -231,13 +237,10 @@
             return entry.key != prefix && prefix.length < entry.key.length;
           })
 
-          for(let i = 0; i < children.length; i++) {
-            let entry = children[i];
-            let key = entry.key;
-            let nodeKey = entry.key[prefix.length]
-            let charCode = nodeKey.charCodeAt(0);
+          for(let {key} of children) {
+            let nodeKey = key[prefix.length];
 
-            if(charCode >= 0xD800 && charCode <= 0xDBFF) {
+            if(models.isHighSurrogate(nodeKey)) {
               // Merge the other half of an SMP char in!
               nodeKey = nodeKey + key[prefix.length+1];
             }
@@ -253,21 +256,17 @@
       get entries(): string[] {
         if(this.root.type == 'leaf') {
           let prefix = this.prefix;
-
           let matches = this.root.entries.filter(function(entry) {
             return entry.key == prefix;
-          })
-          if(matches.length > 0) {
-            return matches.map(function(value) { return value.content });
-          } else {
-            return undefined;
-          }
+          });
+
+          return matches.map(function(value) { return value.content });
         } else {
-          let matchingLeaf = this.root.children['\uFDD0'];
+          let matchingLeaf = this.root.children[models.SENTINEL_CODE_UNIT];
           if(matchingLeaf && matchingLeaf.type == 'leaf') {
             return matchingLeaf.entries.map(function(value) { return value.content });
           } else {
-            return undefined;
+            return [];
           }
         }
       }
