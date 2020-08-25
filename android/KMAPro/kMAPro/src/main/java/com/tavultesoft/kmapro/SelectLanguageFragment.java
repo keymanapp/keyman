@@ -26,6 +26,7 @@ import com.tavultesoft.kmea.KMManager;
 import com.tavultesoft.kmea.data.Keyboard;
 import com.tavultesoft.kmea.data.KeyboardController;
 import com.tavultesoft.kmea.packages.PackageProcessor;
+import com.tavultesoft.kmea.util.BCP47;
 import com.tavultesoft.kmea.util.KMLog;
 
 import org.json.JSONObject;
@@ -51,6 +52,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
   private Boolean isInstallingPackage = true;
   private static final boolean excludeInstalledLanguages = false;
   private static String packageID = null;
+  private static String languageID = null;
   private ArrayList<String> languageList = null;
   private ArrayList<Keyboard> addKeyboardsList = null;
   private File packagePath;
@@ -76,7 +78,6 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     context = getActivity();
 
     final Toolbar toolbar = v.findViewById(R.id.list_toolbar);
-    languageList = new ArrayList<String>();
     addKeyboardsList = new ArrayList<Keyboard>();
 
     final ListView listView = v.findViewById(R.id.listView);
@@ -96,6 +97,10 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     // Get the list of available Keyboards from the keyboard package kmp.json (could be temp path or installed path)
     packagePath = (File)bundle.getSerializable("packagePath");
     packageID = bundle.getString("packageID");
+    languageID = bundle.getString("languageID");
+    // Initialize the list of selected languages
+    languageList = new ArrayList<String>();
+
     JSONObject pkgInfo = kmpProcessor.loadPackageInfo(packagePath);
     Keyboard keyboard = bundle.containsKey("keyboard") ? (Keyboard)bundle.getSerializable("keyboard") :
       kmpProcessor.getKeyboard(pkgInfo, packageID, 0);
@@ -115,6 +120,20 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
 
     List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
       pkgInfo, packageID, keyboardID, isInstallingPackage, excludeInstalledLanguages);
+    int position = KeyboardController.INDEX_NOT_FOUND;
+    if (languageID != null && !languageID.isEmpty()) {
+      // Add default languageID to the list of selected languages
+      languageList.add(languageID);
+
+      //  Determine position of matching language ID (if it exists)
+      for (int i=0; i<availableKeyboardsList.size(); i++) {
+        Keyboard k = availableKeyboardsList.get(i);
+        if (BCP47.languageEquals(k.getLanguageID(), languageID)) {
+          position = i;
+          break;
+        }
+      }
+    }
 
     final String noIcon = "0";
     list = new ArrayList<HashMap<String, String>>();
@@ -144,6 +163,12 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
 
     adapter = new KMListAdapter(context, list, R.layout.list_row_layout2, from, to);
     listView.setAdapter(adapter);
+
+    // If languageID exists, pre-select adapter with the language
+    if (position != KeyboardController.INDEX_NOT_FOUND) {
+      listView.setItemChecked(position, true);
+    }
+
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
       @Override
@@ -154,11 +179,11 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
           if (languageList == null) {
             languageList = new ArrayList<String>();
           }
-          String languageID = k.getLanguageID();
-          if (languageList.contains(languageID)) {
-            languageList.remove(languageID);
+          String selectedLanguageID = k.getLanguageID();
+          if (languageList.contains(selectedLanguageID)) {
+            languageList.remove(selectedLanguageID);
           } else {
-            languageList.add(languageID);
+            languageList.add(selectedLanguageID);
           }
         } else {
           // Otherwise, add the language association

@@ -119,7 +119,7 @@ public class PackageActivity extends AppCompatActivity implements
     boolean isInstallingPackage = true;
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      isInstallingPackage, tempPackagePath, pkgTarget, pkgId, pkgName, hasWelcome, languageCount);
+      isInstallingPackage, tempPackagePath, pkgTarget, pkgId, pkgName, hasWelcome, languageID, languageCount);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
   }

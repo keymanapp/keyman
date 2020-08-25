@@ -50,8 +50,6 @@ public class SelectLanguageActivity extends AppCompatActivity implements
     packageID = bundle.getString("packageID");
     isInstallingPackage = bundle.getBoolean("isInstallingPackage");
     String pkgTarget = PackageProcessor.PP_TARGET_KEYBOARDS;
-    int languageCount = 0; // Value doesn't matter
-
 
     File resourceRoot =  new File(this.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
     PackageProcessor kmpProcessor =  new PackageProcessor(resourceRoot);
@@ -68,7 +66,7 @@ public class SelectLanguageActivity extends AppCompatActivity implements
 
     mStepperLayout = (StepperLayout) findViewById(R.id.stepperLayout);
     mStepperAdapter = new StepperAdapter(getSupportFragmentManager(), this,
-      isInstallingPackage, packagePath, pkgTarget, packageID, pkgName, hasWelcome, languageCount);
+      isInstallingPackage, packagePath, pkgTarget, packageID, pkgName, hasWelcome);
     mStepperLayout.setAdapter(mStepperAdapter);
     mStepperLayout.setListener(this);
 
