@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 14.0.133 alpha 2020-08-25
+
+* feat(common/models): lexicon traversal (#3479)
+* feat(common/models):  actual priority queue for Trie models (#3480)
+* feat(common/models): efficient batch-enqueue (#3486)
+
 ## 14.0.132 alpha 2020-08-24
 
 * feat(linux): Small UI improvements (#3495)
