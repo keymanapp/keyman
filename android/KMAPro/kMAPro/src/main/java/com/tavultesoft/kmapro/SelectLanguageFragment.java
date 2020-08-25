@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
@@ -77,8 +79,6 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     super.onCreate(savedInstanceState);
     context = getActivity();
 
-    final Toolbar toolbar = v.findViewById(R.id.list_toolbar);
-    addKeyboardsList = new ArrayList<Keyboard>();
 
     final ListView listView = v.findViewById(R.id.listView);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -112,11 +112,34 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     final String keyboardName = keyboard.getKeyboardName();
     String title_install = String.format(getString(R.string.title_select_languages_for_package), keyboardName);
     String title_no_install = getString(R.string.all_languages_installed);
+
+    final Toolbar toolbar = v.findViewById(R.id.list_toolbar);
+    ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+    ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setTitle(null);
+      actionBar.setDisplayUseLogoEnabled(false);
+      actionBar.setDisplayShowHomeEnabled(false);
+      actionBar.setDisplayShowTitleEnabled(false);
+      actionBar.setDisplayShowCustomEnabled(true);
+
+      // When installing packages, use the Keyman theme for the accent
+      if (isInstallingPackage) {
+        actionBar.setBackgroundDrawable(MainActivity.getActionBarDrawable(getContext()));
+
+        // Hide the optional accent that's used in Settings menus
+        View accent = v.findViewById(R.id.bar_accent);
+        accent.setVisibility(View.GONE);
+      }
+    }
+
     final TextView textView = v.findViewById(R.id.bar_title);
     textView.setText(title_no_install);
     if (titleFont != null) {
       textView.setTypeface(titleFont, Typeface.BOLD);
     }
+
+    addKeyboardsList = new ArrayList<Keyboard>();
 
     List<Keyboard> availableKeyboardsList = kmpProcessor.getKeyboardList(
       pkgInfo, packageID, keyboardID, isInstallingPackage, excludeInstalledLanguages);

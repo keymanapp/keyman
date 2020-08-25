@@ -13,6 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:textSize="@dimen/titlebar_label_textsize"
         android:textStyle="bold" />
 
