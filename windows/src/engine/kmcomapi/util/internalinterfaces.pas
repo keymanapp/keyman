@@ -68,18 +68,14 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
   end;
 
   IIntKeymanKeyboardLanguage = interface   // I4376
     ['{81C18942-3C81-4F50-A64A-35A4FE863177}']
-    procedure ApplyEnabled(pInputProcessorProfiles: ITfInputProcessorProfiles; AEnabled: Boolean);   // I4376
   end;
 
   IIntKeymanKeyboardsInstalled = interface(IIntKeymanCollection)   // I4381
     ['{B03FF25E-E3D8-4D0C-AC7D-68717FFD4473}']
-    procedure StartKeyboards;   // I4381
-    procedure StopKeyboards;   // I4381
   end;
 
   IIntKeymanPackageInstalled = interface(IIntKeymanInterface)

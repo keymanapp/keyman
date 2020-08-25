@@ -20,6 +20,7 @@ type
 
     { IKeymanKeyboardLanguagesFile }
     function Get_Items(Index: Integer): IKeymanKeyboardLanguage; safecall;
+    function IndexOfBCP47Code(const BCP47Code: string): Integer;
   public
     constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardFile; APackageKeyboardLanguages: TPackageKeyboardLanguageList);
     destructor Destroy; override;
@@ -34,6 +35,7 @@ uses
 
   ErrorControlledRegistry,
 
+  BCP47Tag,
   keymankeyboardlanguagefile,
   KLog,
   RegistryKeys,
@@ -44,6 +46,7 @@ uses
 constructor TKeymanKeyboardLanguagesFile.Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardFile; APackageKeyboardLanguages: TPackageKeyboardLanguageList);
 var
   i: Integer;
+  FCanonicalBCP47Tag: string;
 begin
   _SetContext(AContext);
   FOwner := AOwner;
@@ -54,7 +57,10 @@ begin
     Exit;
   for i := 0 to APackageKeyboardLanguages.Count - 1 do
   begin
-    FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, APackageKeyboardLanguages[i].ID, 0, APackageKeyboardLanguages[i].Name));
+    FCanonicalBCP47Tag := TBCP47Tag.GetCanonicalTag(APackageKeyboardLanguages[i].ID);
+    if IndexOfBCP47Code(FCanonicalBCP47Tag) < 0 then
+      FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, APackageKeyboardLanguages[i].ID, 0,
+        APackageKeyboardLanguages[i].Name));
   end;
   Refresh;
 end;
@@ -67,6 +73,17 @@ end;
 
 procedure TKeymanKeyboardLanguagesFile.DoRefresh;
 begin
+end;
+
+function TKeymanKeyboardLanguagesFile.IndexOfBCP47Code(
+  const BCP47Code: string): Integer;
+var
+  i: Integer;
+begin
+  for i := 0 to FLanguages.Count - 1 do
+    if SameText(Get_Items(i).BCP47Code, BCP47Code) then
+      Exit(i);
+  Result := -1;
 end;
 
 function TKeymanKeyboardLanguagesFile.Get_Items(Index: Integer): IKeymanKeyboardLanguage;
