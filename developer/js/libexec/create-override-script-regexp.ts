@@ -16,7 +16,7 @@ const SPACELESS_SCRIPT_BLOCKS = new Set([
 ]);
 
 let blockIter = blocks();
-let block = nextBlock()
+let block = nextBlock();
 
 let eligibleCharacters = [];
 
@@ -29,16 +29,16 @@ for (let {codePoint, generalCategory} of unicodeData()) {
   console.assert(block.contains(codePoint));
 
   if (SPACELESS_SCRIPT_BLOCKS.has(block.name) && isLetterOrMark(generalCategory)) {
-    eligibleCharacters.push(codePoint)
+    eligibleCharacters.push(codePoint);
   }
 }
 
-let ranges = groupCodePointsIntoRanges(eligibleCharacters)
+const ranges = groupCodePointsIntoRanges(eligibleCharacters);
 
-let characterClasses = ranges.map(([lower, upper]) => {
+const characterClasses = ranges.map(([lower, upper]) => {
   if (lower === upper) {
     return unicodeEscape(lower);
-  } else if (lower == upper - 1) {
+  } else if (lower === upper - 1) {
     return unicodeEscape(lower) + unicodeEscape(upper);
   } else {
     return `${unicodeEscape(lower)}-${unicodeEscape(upper)}`;
@@ -107,7 +107,7 @@ function groupCodePointsIntoRanges(characters: number[]): [number, number][] {
   let ranges = [];
 
   let previousCharacter = characters[0];
-  let candidates = characters.slice(1);
+  const candidates = characters.slice(1);
   let currentRange: [number, number] = [previousCharacter, previousCharacter];
   for (let codePoint of candidates) {
     if (codePoint === previousCharacter + 1) {
@@ -128,7 +128,6 @@ function unicodeEscape(codePoint: number) {
     throw new Error("non-BMP code points not supported");
   }
 
-  let hex = codePoint.toString(16).toUpperCase();
-  let leadingZeros = "0".repeat(4 - hex.length);
-  return `\\u${leadingZeros}${hex}`;
+  let hex = codePoint.toString(16).toUpperCase().padStart(4,'0');
+  return `\\u${hex}`;
 }
