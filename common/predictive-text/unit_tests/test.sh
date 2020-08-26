@@ -23,7 +23,7 @@ display_usage ( ) {
 
 init_dependencies ( ) {
   # Ensure all testing dependencies are in place.
-  verify_npm_setup
+  verify_npm_setup $fetch_deps
 }
 
 test-headless ( ) {
@@ -51,11 +51,13 @@ FLAGS="--require ./unit_tests/helpers"
 CI_REPORTING=0
 RUN_HEADLESS=1
 RUN_BROWSERS=1
+fetch_deps=true
+
 # Parse args
 while [[ $# -gt 0 ]] ; do
   key="$1"
   case $key in
-    -h|-help|-?)
+    -h|-help)
       display_usage
       exit
       ;;
@@ -67,6 +69,9 @@ while [[ $# -gt 0 ]] ; do
       ;;
     -integrated)
       RUN_HEADLESS=0
+      ;;
+    -skip-package-install|-S)
+      fetch_deps=false
       ;;
   esac
   shift # past argument
