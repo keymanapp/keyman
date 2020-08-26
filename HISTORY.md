@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 14.0.134 alpha 2020-08-26
+
+* [linux] Add packaging of Linux localization files (#3504)
+
 ## 14.0.133 alpha 2020-08-25
 
 * feat(common/models): lexicon traversal (#3479)
