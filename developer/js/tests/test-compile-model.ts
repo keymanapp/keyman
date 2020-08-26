@@ -11,7 +11,8 @@ describe('compileModel', function () {
     'example.qaa.trivial',
     'example.qaa.utf16le',
     'example.qaa.wordbreaker',
-    'example.qaa.joinwordbreaker'
+    'example.qaa.joinwordbreaker',
+    'example.qaa.scriptusesspaces',
   ];
 
   for (let modelID of MODELS) {
