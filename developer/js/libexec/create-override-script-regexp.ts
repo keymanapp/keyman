@@ -63,7 +63,7 @@ console.log(`/**
  * AUTOMATICALLY GENERATED FILE. DO NOT MODIFY
  * See: libexec/create-override-script-regexp.ts for details!
  */
-export const SOUTHEAST_ASIAN_LETTER = /^[${characterClasses}]$/;
+export const HAS_SOUTHEAST_ASIAN_LETTER = /[${characterClasses}]/;
 `);
 
 ////////////////////////////////// Helpers ///////////////////////////////////
