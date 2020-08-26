@@ -13,10 +13,11 @@ SCRIPT_ROOT="$(dirname "$THIS_SCRIPT")"
 
 display_usage ( ) {
   echo "test.sh [ -? | -h | -help]"
-  echo "  -CI               to perform continuous-integration friendly tests and reporting"
-  echo "  -headless         to disable the in-browser tests"
-  echo "  -integrated       to disable the 'headless' test suite"
-  echo "  -? | -h | -help   to display this help information"
+  echo "  -CI                    to perform continuous-integration friendly tests and reporting"
+  echo "  -headless              to disable the in-browser tests"
+  echo "  -integrated            to disable the 'headless' test suite"
+  echo "  -skip-package-install  (or -S) skips dependency updates"
+  echo "  -? | -h | -help        to display this help information"
   echo ""
   exit 0
 }
