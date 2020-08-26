@@ -13,6 +13,8 @@ interface LexicalModelDeclaration {
  *
  * Can support all old word breaking specification,
  * but can also be extended with options.
+ *
+ * @since 14.0
  */
 interface WordBreakerSpec {
   readonly use: SimpleWordBreakerSpec;
@@ -21,19 +23,25 @@ interface WordBreakerSpec {
    * together at the given strings. e.g.,
    *
    *    joinWordsAt: ['-'] // to keep hyphenated items together
+   *
+   * @since 14.0
    */
   readonly joinWordsAt?: string[];
 
   /**
    * Overrides word splitting behaviour for certain scripts.
-   * For example, specifing that spaces break words in scripts that do not
-   * traditionally use spaces.
+   * For example, specifing that spaces break words in certain South-East
+   * Asian scripts that otherwise do not use spaces.
+   *
+   * @since 14.0
    */
   readonly overrideScriptDefaults?: OverrideScriptDefaults;
 }
 
 /**
- * Keyman 11.0+ word breaker specification:
+ * Simplified word breaker specification.
+ *
+ * @since 11.0
  */
 type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 
@@ -44,24 +52,23 @@ type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
  * There is currently only one option:
  *
  * 'break-words-at-spaces'
- * : some scripts traditionally do not use spaces to break words, such as in
- * Burmese, Khmer, Thai, Laos, etc. For these scripts, the default word
- * breaker opts to break at **every** letter/syllable/ideograph.
- * Some languages that use these scripts DO use spaces. Enable
- * 'break-words-at-spaces' to override the unwanted, default behaviour for
- * these scripts.
+ * : some some South-East Asian scripts conventionally do not use spaces to
+ * break words. These scripts are:
+ *
+ *   * Burmese
+ *   * Khmer
+ *   * Thai
+ *   * Laos
+ *   * Katakana
+ *
+ * For these scripts, the default word breaker opts to break at **every**
+ * letter/syllable/ideograph.  Some languages that use these scripts DO use
+ * spaces. Enable 'break-words-at-spaces' to override the unwanted, default
+ * behaviour for these scripts (breaking at every grapheme cluster).
  *
  * @since 14.0
  */
 type OverrideScriptDefaults = 'break-words-at-spaces';
-
-/**
- * Chinese
- * Japanese
- * Thai
- * Khmer
- * Burmese
- */
 
 
 interface LexicalModelSource extends LexicalModelDeclaration {
