@@ -51,8 +51,8 @@ type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
  * There is currently only one option:
  *
  * 'break-words-at-spaces'
- * : some South-East Asian scripts conventionally do not use spaces to
- * break words. These scripts are:
+ * : some South-East Asian scripts conventionally do not use space or any
+ * explicit word boundary character to write word breaks. These scripts are:
  *
  *   * Burmese
  *   * Khmer
@@ -61,14 +61,11 @@ type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
  *
  * (this list may be incomplete and extended in the future)
  *
- * Additionally, some languages that use Katakana exclusively may also use
- * spaces to separate words.
- *
  * For these scripts, the default word breaker breaks at **every**
- * letter/syllable/ideograph.  Some languages that use these scripts DO use
- * spaces to separate words. Enable 'break-words-at-spaces' to override the
- * unwanted, default behaviour for these scripts (breaking at every grapheme
- * cluster).
+ * letter/syllable/ideograph. However, in languages that use these scripts BUT
+ * use spaces (or some other delimier) as word breaks, enable
+ * 'break-words-at-spaces'; enabling 'break-words-at-spaces' prevents the word
+ * breaker from making too many breaks in these scripts.
  *
  * @since 14.0
  */
