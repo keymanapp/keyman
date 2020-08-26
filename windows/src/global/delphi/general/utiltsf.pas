@@ -64,9 +64,8 @@ end;
 
 function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
 var
-  tag, FLayoutInstallString: string;
+  FLayoutInstallString: string;
   reg: TRegistryErrorControlled;
-  tags: TStringList;
 begin
   if BCP47Tag <> '' then
   begin
