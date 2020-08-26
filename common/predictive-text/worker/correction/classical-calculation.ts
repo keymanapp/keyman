@@ -197,6 +197,41 @@ namespace correction {
       return Math.min(substitutionCost, deletionCost, insertionCost, transpositionCost);
     }
 
+    getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation {
+      let trimmedInstance = new ClassicalDistanceCalculation(this);
+
+      if(inputLength > this.inputSequence.length || matchLength > this.matchSequence.length) {
+        throw "Invalid dimensions specified for trim operation";
+      }
+      // Trim our tracked input & match sequences.
+      trimmedInstance.inputSequence.splice(inputLength);
+      trimmedInstance.matchSequence.splice(matchLength);
+
+      // Major index corresponds to input length.
+      trimmedInstance.resolvedDistances.splice(inputLength);
+
+      // The real fun:  trimming off columns. (Minor index, corresponds to match length)
+      let finalTrueIndex = this.getTrueIndex(inputLength-1, matchLength-1, this.diagonalWidth);
+      // The diagonal index increases as the row index decreases.
+      for(let diagonalIndex = finalTrueIndex.col; diagonalIndex <= 2 * this.diagonalWidth; diagonalIndex++) {
+        let row = finalTrueIndex.row - (diagonalIndex - finalTrueIndex.col);
+        if(row < 0) {
+          break;
+        }
+
+        if(diagonalIndex < 0) {
+          trimmedInstance.resolvedDistances[row] = Array(2 * trimmedInstance.diagonalWidth + 1).fill(Number.MAX_VALUE);
+        } else {
+          let newCount = 2 * this.diagonalWidth - diagonalIndex;
+          let keptEntries = trimmedInstance.resolvedDistances[row].splice(0, diagonalIndex+1);
+          let newEntries = Array(newCount).fill(Number.MAX_VALUE);
+          trimmedInstance.resolvedDistances[row] = keptEntries.concat(newEntries);
+        }
+      }
+
+      return trimmedInstance;
+    }
+
     private static forDiagonalOfAxis(diagonalWidth: number, centerIndex: number, axisCap: number, closure: (axisIndex: number, diagIndex: number) => void) {
       let diagonalCap = axisCap - centerIndex < diagonalWidth ? axisCap - centerIndex + diagonalWidth : 2 * diagonalWidth;
       let startOffset = centerIndex - diagonalWidth;  // The axis's index for diagonal entry 0.  May be negative.

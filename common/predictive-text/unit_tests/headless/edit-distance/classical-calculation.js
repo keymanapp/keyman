@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+let baseNS = require('../../../build/intermediate');
 var ClassicalDistanceCalculation = require('../../../build/intermediate').correction.ClassicalDistanceCalculation;
 
 function prettyPrintMatrix(matrix) {
@@ -390,6 +391,73 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
         let buffer = compute("aadddres", "address", "InputThenMatch");
         assert.isFalse(buffer.hasFinalCostWithin(2));
       })
+    });
+  });
+
+  describe("subset operations", function() {
+    it("properly truncates tracked input & match sequences", function() {
+      let buffer = compute("tear", "there", "InputThenMatch");
+      assert.equal(buffer.getFinalCost(), 3);
+
+      let trimmedBuffer = buffer.getSubset(3, 3);
+      assert.equal(trimmedBuffer.inputSequence.length, 3);
+      assert.equal(trimmedBuffer.matchSequence.length, 3);
+
+      let expectedInput = ['t', 'e', 'a'];
+      for(let i=0; i < expectedInput.length; i++) {
+        assert.equal(trimmedBuffer.inputSequence[i].char, expectedInput[i]);
+      }
+
+      let expectedMatch = ['t', 'h', 'e'];
+      for(let i=0; i < expectedMatch.length; i++) {
+        assert.equal(trimmedBuffer.matchSequence[i].char, expectedMatch[i]);
+      }
+    });
+
+    it("['tear' => 'there'] trimmed to ['tea' => 'the']", function() {
+      let buffer = compute("tear", "there", "InputThenMatch");
+      assert.equal(buffer.getFinalCost(), 3);
+
+      let trimmedBuffer = buffer.getSubset(3, 3);
+      assert.equal(trimmedBuffer.getFinalCost(), 2);
+    });
+
+    it("['tear' => 'there'] trimmed to ['te' => 'the']", function() {
+      let buffer = compute("tear", "there", "InputThenMatch");
+      assert.equal(buffer.getFinalCost(), 3);
+
+      let trimmedBuffer = buffer.getSubset(2, 3);
+      assert.equal(trimmedBuffer.getFinalCost(), 1);
+    });
+
+    it("['tear' => 'there'] trimmed to ['tear' => '']", function() {
+      let buffer = compute("tear", "there", "InputThenMatch");
+      assert.equal(buffer.getFinalCost(), 3);
+
+      let trimmedBuffer = buffer.getSubset(4, 0);
+      assert.equal(trimmedBuffer.getFinalCost(), 4);
+    });
+
+    it("['tear' => 'there'] trimmed to ['' => 'there']", function() {
+      let buffer = compute("tear", "there", "InputThenMatch");
+      assert.equal(buffer.getFinalCost(), 3);
+
+      let trimmedBuffer = buffer.getSubset(0, 5);
+      assert.equal(trimmedBuffer.getFinalCost(), 5);
+    });
+
+    it("['jellyifhs' -> 'jellyfish'] trimmed to ['jelly' => 'jelly']", function() {
+      let buffer = compute("jellyifsh", "jellyfish");
+      
+      let trimmedBuffer = buffer.getSubset(5, 5);
+      assert.equal(trimmedBuffer.getFinalCost(), 0)
+    });
+
+    it("['jellyifhs' -> 'jellyfish'] trimmed to ['jellyifh' => 'jellyfis']", function() {
+      let buffer = compute("jellyifhs", "jellyfish");
+      
+      let trimmedBuffer = buffer.getSubset(8, 8);
+      assert.equal(trimmedBuffer.getFinalCost(), 2)
     });
   });
 });
