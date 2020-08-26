@@ -11,7 +11,9 @@ uses
   msctf in '..\..\global\delphi\winapi\msctf.pas',
   LoadIndirectStringUnit in '..\..\engine\keyman\langswitch\LoadIndirectStringUnit.pas',
   LangManager in 'LangManager.pas',
-  input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas';
+  input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
+  utiltsf in '..\..\global\delphi\general\utiltsf.pas',
+  keyman_msctf in '..\..\global\delphi\winapi\keyman_msctf.pas';
 
 {$R *.res}
 
