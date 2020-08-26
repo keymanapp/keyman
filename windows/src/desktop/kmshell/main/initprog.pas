@@ -76,7 +76,7 @@ procedure Main(Owner: TComponent = nil);
 type
     TKMShellMode = (fmUndefined, fmInstall, fmView, fmUninstall, fmAbout,
                     fmUninstallKeyboard,
-                    fmInstallKeyboardLanguage, fmUninstallKeyboardLanguage,   // I3624
+                    fmInstallKeyboardLanguage, fmRegisterTip, fmInstallTip, fmUninstallKeyboardLanguage,   // I3624
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
                     fmMigrate, fmSplash, fmStart,
@@ -109,6 +109,7 @@ uses
   help,
   HTMLHelpViewer,
   Keyman.Configuration.UI.InstallFile,
+  Keyman.Configuration.System.TIPMaintenance,
   KeymanPaths,
   KLog,
   kmint,
@@ -224,6 +225,10 @@ begin
       else if s = '-i' then   FMode := fmInstall
       else if s = '-ikl' then FMode := fmInstallKeyboardLanguage   // I3624
 
+      else if s = '-register-tip' then FMode := fmRegisterTip
+      else if s = '-install-tip' then FMode := fmInstallTip
+
+
       //else if s = '-i+' then  begin FMode := fmInstall; FNoWelcome := True; end;
       else if s = '-v' then   FMode := fmView
       else if s = '-u' then   FMode := fmUninstall
@@ -279,7 +284,7 @@ begin
     Inc(i);
   end;
 
-  if FMode in [fmInstall, fmInstallKeyboardLanguage, fmView, fmUninstallKeyboard, fmUninstallKeyboardLanguage, fmUninstallPackage] then  // I2807   // I3624
+  if FMode in [fmInstall, fmInstallKeyboardLanguage, fmInstallTip, fmRegisterTip, fmView, fmUninstallKeyboard, fmUninstallKeyboardLanguage, fmUninstallPackage] then  // I2807   // I3624
     if KeyboardFileNames.Count = 0 then Exit;
 
   Result := FMode <> fmUndefined;
@@ -344,6 +349,20 @@ var
       if KeyboardFileNames.Count < 2
         then Result := ''
         else Result := KeyboardFileNames[1];
+    end;
+
+    function ThirdKeyboardFileName: string;
+    begin
+      if KeyboardFileNames.Count < 3
+        then Result := ''
+        else Result := KeyboardFileNames[2];
+    end;
+
+    function FourthKeyboardFileName: string;
+    begin
+      if KeyboardFileNames.Count < 4
+        then Result := ''
+        else Result := KeyboardFileNames[3];
     end;
 begin
   kmcom.AutoApply := True;
@@ -469,7 +488,18 @@ begin
         else ExitCode := 1;
 
     fmUninstallKeyboardLanguage:   // I3624
-      if UninstallKeyboardLanguage(nil, FirstKeyboardFileName, FSilent)
+      if UninstallKeyboardLanguage(FirstKeyboardFileName, FSilent)
+        then ExitCode := 0
+        else ExitCode := 1;
+
+    fmRegisterTip:
+      if TTipMaintenance.RegisterTip(StrToIntDef('$'+FirstKeyboardFilename, 0), SecondKeyboardFileName, ThirdKeyboardFileName)
+        then ExitCode := 0
+        else ExitCode := 1;
+
+    fmInstallTip:
+      // TODO: handle when not enough parameters
+      if TTipMaintenance.InstallTip(StrToIntDef('$'+FirstKeyboardFilename, 0), SecondKeyboardFileName, ThirdKeyboardFileName, FourthKeyboardFileName)
         then ExitCode := 0
         else ExitCode := 1;
 
