@@ -1,3 +1,4 @@
+#!/usr/bin/env npx ts-node
 import {readFileSync} from "fs";
 import * as path from "path";
 
