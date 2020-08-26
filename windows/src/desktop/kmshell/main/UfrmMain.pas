@@ -303,7 +303,7 @@ begin
 
   sharedData.Init(
     FXMLRenderers.TempPath,
-    FXMLRenderers.RenderToString(False, s),
+    FXMLRenderers.RenderToString(FRefreshKeyman, s),
     FKeyboardXMLRenderer.FileReferences.ToStringArray
   );
 
