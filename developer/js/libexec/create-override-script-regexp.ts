@@ -18,7 +18,7 @@ const SPACELESS_SCRIPT_BLOCKS = new Set([
 let blockIter = blocks();
 let block = nextBlock()
 
-let elligibleCharacters = [];
+let eligibleCharacters = [];
 
 // @ts-ignore: TypeScript complains that it can't compile for..of over a
 // generator without --downlevelIteration, but it works anyway?
@@ -29,11 +29,11 @@ for (let {codePoint, generalCategory} of unicodeData()) {
   console.assert(block.contains(codePoint));
 
   if (SPACELESS_SCRIPT_BLOCKS.has(block.name) && isLetterOrMark(generalCategory)) {
-    elligibleCharacters.push(codePoint)
+    eligibleCharacters.push(codePoint)
   }
 }
 
-let ranges = groupCodePointsIntoRanges(elligibleCharacters)
+let ranges = groupCodePointsIntoRanges(eligibleCharacters)
 
 let characterClasses = ranges.map(([lower, upper]) => {
   if (lower === upper) {
