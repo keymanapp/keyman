@@ -36,8 +36,7 @@ uses
   Keyman.Configuration.UI.MitigationForWin10_1803,
   kmint,
   UfrmHTML,
-  UfrmInstallKeyboard,
-  UtilWaitForTSF;
+  UfrmInstallKeyboard;
 
 class function TInstallFile.Execute(KeyboardFileNames: TStrings; const FirstKeyboardFileName: string; FSilent, FNoWelcome: Boolean;
   const LogFile: string): Boolean;
@@ -119,7 +118,6 @@ begin
   end;
 
   kmcom.Languages.Apply;
-//  TWaitForTSF.WaitForLanguageProfilesToBeApplied(InstalledKeyboards);
   AddDefaultLanguageHotkeys(InstalledKeyboards);
 
   if InstalledPackage <> nil then

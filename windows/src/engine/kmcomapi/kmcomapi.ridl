@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 24/08/2020 4:33:33 PM (- $Rev: 12980 $, 240435437).
+// File generated on 26/08/2020 10:46:46 AM (- $Rev: 12980 $, 392421546).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -63,7 +63,6 @@ library keymanapi
   interface IKeymanPackagesInstalled2;
   interface IKeymanKeyboardFile2;
   interface IKeymanPackageFile2;
-  interface IKeymanInternal;
   interface IKeymanKeyboardLanguageInstalled2;
   interface IKeymanKeyboardLanguagesInstalled2;
 
@@ -154,7 +153,7 @@ library keymanapi
   ]
   enum tagKeymanInstallFlags
   {
-    kifInstallTransitoryLanguage = 1
+    kifInstallTransientLanguage = 1
   };
 
   [
@@ -970,21 +969,6 @@ library keymanapi
   {
     [id(0x00000101)]
     HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [out, retval] IKeymanPackageInstalled** PackageResult);
-  };
-
-  [
-    uuid(55AE752C-E533-46FA-96A2-19F32514365E),
-    version(14.0),
-    helpstring("https://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanInternal"),
-    dual,
-    oleautomation
-  ]
-  interface IKeymanInternal: IKeymanObject
-  {
-    [id(0x000000C9)]
-    HRESULT _stdcall RegisterTip([in] BSTR KeyboardID, [in] long LanguageID, [in] BSTR BCP47, [out, retval] BSTR* ProfileGUID);
-    [id(0x0000012D)]
-    HRESULT _stdcall GetLanguageIDFromBCP47([in] BSTR BCP47, [out, retval] long* LanguageID);
   };
 
   [

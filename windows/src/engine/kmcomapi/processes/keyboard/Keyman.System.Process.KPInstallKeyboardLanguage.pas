@@ -13,18 +13,56 @@ uses
   keyman_msctf;
 
 type
-  TKPInstallKeyboardLanguageFlags = set of (ilkInstallTransitoryLanguage);
+  TKPInstallKeyboardLanguageFlags = set of (ilkInstallTransientLanguage);
 
 type
   TKPInstallKeyboardLanguage = class(TKPBase)
+  public
+    ///  <summary>Given a BCP47 Tag, finds a corresponding LangID, including installing
+    ///  a temporary keyboard if necessary to establish a transient LangID.
+    ///  Current User.</summary>
+    ///  <returns>True if a language ID can be found</return>
+    ///  <param name="BCP47Tag">A canonical BCP47 tag to install</param>
+    ///  <param name="LangID">LangID found that corresponds to BCP47Tag</param>
+    ///  <param name="TemporaryLayoutString">If a transient LangID is installed, then
+    ///  Windows will have added a default keyboard for the language which should be
+    ///  removed after we install the Keyman TIP.</param>
+    ///  <param name="Flags">If ilkInstallTransientLanguage is included in flags,
+    ///  will not install a transient language and will return False if no standard
+    ///  Windows LangID can be found that corresponds to the BCP47 tag.</param>
     function FindInstallationLangID(const BCP47Tag: string;
       var LangID: Integer;
-      var TemporaryKeyboardID: string;
+      var TemporaryLayoutString: string;
       Flags: TKPInstallKeyboardLanguageFlags): Boolean;
+
+    ///  <summary>Registers a TIP for a given keyboard + language, and adds metadata to the
+    ///  HKLM registry about the Keyman keyboard association. Requires elevation.</summary>
+    ///  <param name="KeyboardID">Keyman keyboard to register</param>
+    ///  <param name="BCP47Tag">BCP47 tag associated with the TIP</param>
+    ///  <param name="KeyboardName">Name of keyboard to display in Windows UI</param>
+    ///  <param name="LangID">Language ID found with FindInstallationLangID</param>
+    ///  <param name="IconFileName">Icon to display in Windows UI</param>
+    ///  <param name="LanguageName">Name of language to display in Keyman UI</param>
     procedure RegisterTip(const KeyboardID, BCP47Tag, KeyboardName: string; LangID: Integer; IconFileName, LanguageName: string);
+
+    ///  <summary>Installs a TIP for a given keyboard + language, for the current user.</summary>
+    ///  <param name="KeyboardID">Keyman keyboard to associate with TIP</param>
+    ///  <param name="BCP47Tag">BCP47 tag associated with the TIP</param>
+    ///  <param name="LangID">Language ID found with FindInstallationLangID</param>
     procedure InstallTip(const KeyboardID, BCP47Tag: string; LangID: Integer);
+
+    ///  <summary>Removes a temporary keyboard layout that was installed by
+    ///  FindInstallationLangID. Current User.</summary>
+    ///  <param name="LayoutString">TemporaryLayoutString value returned from
+    ///  FindInstallationLangID</param>
     procedure UninstallTemporaryLayout(const LayoutString: string);
 
+    ///  <summary>Registers a TIP for each of the four transient language IDs,
+    ///  and adds metadata to the HKLM registry about the Keyman keyboard
+    ///  association. Requires elevation.</summary>
+    ///  <param name="KeyboardID">Keyman keyboard to register</param>
+    ///  <param name="KeyboardName">Name of keyboard to display in Windows UI</param>
+    ///  <param name="IconFileName">Icon to display in Windows UI</param>
     procedure RegisterTransientTips(const KeyboardID, KeyboardName: string; IconFileName: string);
 
     constructor Create(AContext: TKeymanContext);
@@ -75,7 +113,7 @@ begin
 end;
 
 // TODO: change LangID to Winapi.Windows.LANGID
-function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryKeyboardID: string; Flags: TKPInstallKeyboardLanguageFlags): Boolean;
+function TKPInstallKeyboardLanguage.FindInstallationLangID(const BCP47Tag: string; var LangID: Integer; var TemporaryLayoutString: string; Flags: TKPInstallKeyboardLanguageFlags): Boolean;
 var
   ml: TMitigateWin10_1803.TMitigatedLanguage;
   Win8Lang: TWindows8Language;
@@ -85,7 +123,7 @@ begin
     ErrorFmt(KMN_E_ProfileInstall_InvalidBCP47Tag, VarArrayOf([BCP47Tag]));
 
   tag := BCP47Tag;
-  TemporaryKeyboardID := '';
+  TemporaryLayoutString := '';
 
   if ConvertBCP47TagToLangID(tag, LangID) then
   begin
@@ -97,7 +135,7 @@ begin
   end
   else
   begin
-    if not (ilkInstallTransitoryLanguage in Flags) then
+    if not (ilkInstallTransientLanguage in Flags) then
     begin
       // No warning, because this is to be expected
       Exit(False);
@@ -141,7 +179,7 @@ begin
 
     if Win8Lang.InputMethods.Count = 1 then
     begin
-      TemporaryKeyboardID := Win8Lang.InputMethods[0];
+      TemporaryLayoutString := Win8Lang.InputMethods[0];
     end
     else
       // We'll continue on, but this is unexpected, so we won't try and uninstall the temporary input method. The user

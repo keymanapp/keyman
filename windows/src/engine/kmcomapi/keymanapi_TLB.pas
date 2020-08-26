@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 24/08/2020 3:35:43 PM from Type Library described below.
+// File generated on 26/08/2020 10:46:38 AM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -90,7 +90,6 @@ const
   IID_IKeymanPackagesInstalled2: TGUID = '{F23B9848-2AEF-4A2B-BC3A-292E3A00D691}';
   IID_IKeymanKeyboardFile2: TGUID = '{EDE4326B-51F4-42D5-8251-B20B71993EC8}';
   IID_IKeymanPackageFile2: TGUID = '{9B43B6BC-C622-47EF-915E-6780CF53BAAA}';
-  IID_IKeymanInternal: TGUID = '{55AE752C-E533-46FA-96A2-19F32514365E}';
   IID_IKeymanKeyboardLanguageInstalled2: TGUID = '{414C26E6-BFAC-4A70-9EA1-E525BA9BBA7E}';
   IID_IKeymanKeyboardLanguagesInstalled2: TGUID = '{628FF2E6-B490-462E-8FC7-7AE53B9D392C}';
 
@@ -164,7 +163,7 @@ const
 type
   tagKeymanInstallFlags = TOleEnum;
 const
-  kifInstallTransitoryLanguage = $00000001;
+  kifInstallTransientLanguage = $00000001;
 
 type
 
@@ -251,8 +250,6 @@ type
   IKeymanKeyboardFile2Disp = dispinterface;
   IKeymanPackageFile2 = interface;
   IKeymanPackageFile2Disp = dispinterface;
-  IKeymanInternal = interface;
-  IKeymanInternalDisp = dispinterface;
   IKeymanKeyboardLanguageInstalled2 = interface;
   IKeymanKeyboardLanguageInstalled2Disp = dispinterface;
   IKeymanKeyboardLanguagesInstalled2 = interface;
@@ -1664,30 +1661,6 @@ type
     property Version: WideString readonly dispid 15;
     property WelcomeFile: IKeymanPackageContentFile readonly dispid 16;
     property Website: WideString readonly dispid 17;
-    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
-                          out References: OleVariant): WideString; dispid 401;
-  end;
-
-// *********************************************************************//
-// Interface: IKeymanInternal
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {55AE752C-E533-46FA-96A2-19F32514365E}
-// *********************************************************************//
-  IKeymanInternal = interface(IKeymanObject)
-    ['{55AE752C-E533-46FA-96A2-19F32514365E}']
-    function RegisterTip(const KeyboardID: WideString; LanguageID: Integer; const BCP47: WideString): WideString; safecall;
-    function GetLanguageIDFromBCP47(const BCP47: WideString): Integer; safecall;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IKeymanInternalDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {55AE752C-E533-46FA-96A2-19F32514365E}
-// *********************************************************************//
-  IKeymanInternalDisp = dispinterface
-    ['{55AE752C-E533-46FA-96A2-19F32514365E}']
-    function RegisterTip(const KeyboardID: WideString; LanguageID: Integer; const BCP47: WideString): WideString; dispid 201;
-    function GetLanguageIDFromBCP47(const BCP47: WideString): Integer; dispid 301;
     function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
                           out References: OleVariant): WideString; dispid 401;
   end;

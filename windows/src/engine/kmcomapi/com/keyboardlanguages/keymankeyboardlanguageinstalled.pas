@@ -110,8 +110,8 @@ begin
   kp := TKPInstallKeyboardLanguage.Create(Context);
   try
     KPFlags := [];
-    if (Flags and kifInstallTransitoryLanguage) <> 0 then
-      Include(KPFlags, ilkInstallTransitoryLanguage);
+    if (Flags and kifInstallTransientLanguage) <> 0 then
+      Include(KPFlags, ilkInstallTransientLanguage);
     Result := kp.FindInstallationLangID(Self.Get_BCP47Code, LangID, s, KPFlags);
 
     // We only need to register a TIP for user custom installations of languages:

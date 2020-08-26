@@ -227,7 +227,7 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
         for i := 0 to FIDs.Count - 1 do
         begin
           FCanonicalBCP47Tag := TBCP47Tag.GetCanonicalTag(FIDs[i]);
-          if not HasLanguage(FIDs[i]) and not HasLanguage(FCanonicalBCP47Tag) then
+          if not HasLanguage(FCanonicalBCP47Tag) then
           begin
             FName := reg.ReadString(FIDs[i]);
             FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, FIDs[i], 0, GUID_NULL, FName);
@@ -285,7 +285,7 @@ begin
     Exit;
 
   lang := Add(Tag) as IKeymanKeyboardLanguageInstalled2;
-  if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransitoryLanguage) then
+  if lang.FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
   begin
     lang.InstallTip(LangID, TemporaryKeyboardID);
   end;

@@ -8,8 +8,6 @@ uses
 type
   TTIPMaintenance = class
   public
-//    class function DoUninstall(const KeyboardID, BCP47Tag: string): Boolean;
-
     class function DoInstall(const KeyboardID, BCP47Tag: string): Boolean;
     class function RegisterTip(LangID: Integer; const KeyboardID, BCP47Tag: string): Boolean;
     class function InstallTip(LangID: Integer; const KeyboardID, BCP47Tag, KeyboardToRemove: string): Boolean;
@@ -77,15 +75,15 @@ begin
     // The keyboard was not found
     Exit(False);
 
-  // After canonicalization, we may find the language is already installed
   if lang.IsInstalled then
+    // After canonicalization, we may find the language is already installed
     Exit(True);
 
   TemporaryKeyboardID := '';
   LangID := 0;
   RegistrationRequired := False;
 
-  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransitoryLanguage) then
+  if (lang as IKeymanKeyboardLanguageInstalled2).FindInstallationLangID(LangID, TemporaryKeyboardID, RegistrationRequired, kifInstallTransientLanguage) then
   begin
     if RegistrationRequired then
     begin
@@ -97,7 +95,7 @@ begin
   Result := True;
 end;
 
-function GetDefaultHKL: HKL;   // I3581   // I3619   // I3619
+function GetDefaultHKL: HKL;
 begin
   if not SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, @Result, 0) then
     Result := 0;
@@ -105,12 +103,9 @@ end;
 
 class function TTIPMaintenance.GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string;
 begin
-  if Keyboard.Languages.Count > 0 then
-    Result := Keyboard.Languages[0].BCP47Code
-  else
-  begin
-    Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
-  end;
+  if Keyboard.Languages.Count > 0
+    then Result := Keyboard.Languages[0].BCP47Code
+    else Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
 end;
 
 class function TTIPMaintenance.GetKeyboardLanguage(const KeyboardID,

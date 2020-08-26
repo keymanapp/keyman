@@ -14,7 +14,8 @@ uses
 
 type
   TKPUninstallKeyboardLanguage = class(TKPBase)
-    /// <summary>Unregisters all TIPs from the Local Machine registry for a given keyboard, including transient profiles</summary>
+    /// <summary>Unregisters all TIPs from the Local Machine registry for a given
+    /// keyboard, including transient profiles</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     procedure UnregisterTip(const KeyboardID: string); overload;
 

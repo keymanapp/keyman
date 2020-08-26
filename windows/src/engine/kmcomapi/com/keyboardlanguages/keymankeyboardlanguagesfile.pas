@@ -9,9 +9,7 @@ uses
   internalinterfaces;
 
 type
-  TKeymanKeyboardLanguageFileList = class(TAutoObjectList)
-
-  end;
+  TKeymanKeyboardLanguageFileList = TAutoObjectList;
 
   TKeymanKeyboardLanguagesFile = class(TKeymanAutoCollectionObject, IKeymanKeyboardLanguagesFile)   // I4169
   private

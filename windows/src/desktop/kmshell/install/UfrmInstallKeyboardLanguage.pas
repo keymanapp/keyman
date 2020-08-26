@@ -136,7 +136,6 @@ uses
   BCP47Tag,
   GetOSVersion,
   kmint,
-  UtilWaitForTSF,
   utilkmshell;
 
 {$R *.dfm}
@@ -144,18 +143,12 @@ uses
 { TfrmInstallKeyboardLanguage }
 
 function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string; Silent: Boolean): Boolean;
-//var
-//  n: Integer;
 begin
   Result := TTIPMaintenance.DoInstall(KeyboardID, ISOCode);
-{  n := kmcom.Keyboards.IndexOf(KeyboardID);
-  if n < 0 then
-    Exit(False);
+  if Result then
+    CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
-  kmcom.Keyboards[n].Languages.Install(ISOCode);
-  CheckForMitigationWarningFor_Win10_1803(Silent, '');
-
-  Result := True;}
+  Result := True;
 end;
 
 
@@ -272,14 +265,6 @@ begin
         else FCode := FLanguageVariant.Code;
 
       TTIPMaintenance.DoInstall(FKeyboard.ID, FCode);
-    //  if not kmcom.SystemInfo.IsAdministrator then
-    //  begin
-    //    WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
-    //  end
-    //  else
-    //  begin
-    //    InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
-    //  end;
 
       FKeyboardID := FKeyboard.ID;
       FKeyboard := nil;
@@ -294,7 +279,6 @@ begin
       if Assigned(FKeyboard) then
       begin
         // Because the TSF component is async we have to wait
-//        TWaitForTSF.WaitForLanguageProfilesToBeApplied(FKeyboard);
         FKeyboard := nil;
         kmcom.Keyboards.Refresh;  // Get updated language profile name after it is loaded
       end;

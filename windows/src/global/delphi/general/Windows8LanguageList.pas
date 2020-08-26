@@ -96,6 +96,7 @@ begin
   Clear;
   with TRegistry.Create do
   try
+    // TODO: move key and value names to RegistryKeys.pas
     FIsSupported := OpenKeyReadOnly('Control Panel\International\User Profile') and ValueExists('Languages');
     if FIsSupported then
     begin

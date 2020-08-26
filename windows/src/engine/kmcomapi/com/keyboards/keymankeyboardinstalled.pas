@@ -281,8 +281,10 @@ end;
 
 procedure TKeymanKeyboardInstalled.Set_Loaded(Value: WordBool);
 begin
-  // Keyman 14:0 this is now a no-op. Instead, remove Windows language
-  // associations in order to enable and disable a keyboard
+  // TODO: Keyman 14.0 this is currently a no-op. Instead, remove Windows
+  // language associations in order to enable and disable a keyboard. But we
+  // will need to re-implement this so users can still unload keyboards without
+  // uninstalling them completely.
 end;
 
 function TKeymanKeyboardInstalled.Get_IconFilename: WideString;   // I3581
