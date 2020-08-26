@@ -12,6 +12,7 @@ const SPACELESS_SCRIPT_BLOCKS = new Set([
   "Khmer",
   "Katakana",
   "Katakana Phonetic Extensions",
+  // Add more scripts here, as necessary!
 ]);
 
 let blockIter = blocks();
@@ -19,44 +20,28 @@ let block = nextBlock()
 
 let elligibleCharacters = [];
 
-// @ts-ignore
+// @ts-ignore: TypeScript complains that it can't compile for..of over a
+// generator without --downlevelIteration, but it works anyway?
 for (let {codePoint, generalCategory} of unicodeData()) {
   if (!block.contains(codePoint)) {
     block = nextBlock();
   }
   console.assert(block.contains(codePoint));
 
-  if (!SPACELESS_SCRIPT_BLOCKS.has(block.name)) {
-    continue;
+  if (SPACELESS_SCRIPT_BLOCKS.has(block.name) && isLetterOrMark(generalCategory)) {
+    elligibleCharacters.push(codePoint)
   }
-  if (!isLetterOrMark(generalCategory)) {
-    continue;
-  }
-
-  elligibleCharacters.push(codePoint)
 }
 
-let ranges = [];
-let previousCharacter = elligibleCharacters.shift()
-let currentRange = [previousCharacter, previousCharacter];
-for (let cp of elligibleCharacters) {
-  if (cp === previousCharacter + 1) {
-    currentRange[1] = cp;
-  } else {
-    ranges.push(currentRange);
-    currentRange = [cp, cp];
-  }
-
-  previousCharacter = cp;
-}
+let ranges = groupCodePointsIntoRanges(elligibleCharacters)
 
 let characterClasses = ranges.map(([lower, upper]) => {
   if (lower === upper) {
-    return uplus(lower);
+    return unicodeEscape(lower);
   } else if (lower == upper - 1) {
-    return uplus(lower) + uplus(upper);
+    return unicodeEscape(lower) + unicodeEscape(upper);
   } else {
-    return `${uplus(lower)}-${uplus(upper)}`;
+    return `${unicodeEscape(lower)}-${unicodeEscape(upper)}`;
   }
 }).join("");
 
@@ -64,8 +49,8 @@ console.log(`/**
  * AUTOMATICALLY GENERATED FILE. DO NOT MODIFY
  * See: libexec/create-override-script-regexp.ts for details!
  */
-export const HAS_SOUTHEAST_ASIAN_LETTER = /[${characterClasses}]/;
-`);
+export const HAS_SOUTHEAST_ASIAN_LETTER = /[${characterClasses}]/;`);
+
 
 ////////////////////////////////// Helpers ///////////////////////////////////
 
@@ -77,12 +62,10 @@ function* unicodeData() {
     }
 
     let parts = line.split(";")
-    let data = {
+    yield {
       codePoint: parseInt(parts[0], 16),
       generalCategory: parts[2],
     }
-
-    yield data;
   }
 }
 
@@ -120,8 +103,32 @@ function isLetterOrMark(category: string): boolean {
   return category.startsWith("L") || category.startsWith("M");
 }
 
-function uplus(cp: number) {
-  let hex = cp.toString(16).toUpperCase();
+function groupCodePointsIntoRanges(characters: number[]): [number, number][] {
+  let ranges = [];
+
+  let previousCharacter = characters[0];
+  let candidates = characters.slice(1);
+  let currentRange: [number, number] = [previousCharacter, previousCharacter];
+  for (let codePoint of candidates) {
+    if (codePoint === previousCharacter + 1) {
+      currentRange[1] = codePoint;
+    } else {
+      ranges.push(currentRange);
+      currentRange = [codePoint, codePoint];
+    }
+
+    previousCharacter = codePoint;
+  }
+
+  return ranges;
+}
+
+function unicodeEscape(codePoint: number) {
+  if (codePoint > 0xFFFF) {
+    throw new Error("non-BMP code points not supported");
+  }
+
+  let hex = codePoint.toString(16).toUpperCase();
   let leadingZeros = "0".repeat(4 - hex.length);
   return `\\u${leadingZeros}${hex}`;
 }
