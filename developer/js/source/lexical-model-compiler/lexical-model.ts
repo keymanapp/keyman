@@ -46,25 +46,29 @@ interface WordBreakerSpec {
 type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
 
 /**
- * When configuring the default word breaker,
- * this allows you to override the default behaviour for the script.
+ * Override the default word breaking behaviour for some scripts.
  *
  * There is currently only one option:
  *
  * 'break-words-at-spaces'
- * : some some South-East Asian scripts conventionally do not use spaces to
+ * : some South-East Asian scripts conventionally do not use spaces to
  * break words. These scripts are:
  *
  *   * Burmese
  *   * Khmer
  *   * Thai
  *   * Laos
- *   * Katakana
  *
- * For these scripts, the default word breaker opts to break at **every**
+ * (this list may be incomplete and extended in the future)
+ *
+ * Additionally, some languages that use Katakana exclusively may also use
+ * spaces to separate words.
+ *
+ * For these scripts, the default word breaker breaks at **every**
  * letter/syllable/ideograph.  Some languages that use these scripts DO use
- * spaces. Enable 'break-words-at-spaces' to override the unwanted, default
- * behaviour for these scripts (breaking at every grapheme cluster).
+ * spaces to separate words. Enable 'break-words-at-spaces' to override the
+ * unwanted, default behaviour for these scripts (breaking at every grapheme
+ * cluster).
  *
  * @since 14.0
  */
