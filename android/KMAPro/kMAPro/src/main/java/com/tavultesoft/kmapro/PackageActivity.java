@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -254,12 +255,13 @@ public class PackageActivity extends AppCompatActivity implements
         boolean success = installedPackageKeyboards.size() != 0;
         boolean _cleanup = true;
         if (success) {
-          if(!anSilentInstall)
+          if(!anSilentInstall) {
+            String keyboardName = installedPackageKeyboards.get(0).get(KMManager.KMKey_KeyboardName);
             Toast.makeText(context,
-              context.getString(R.string.keyboard_install_toast),
+              String.format(context.getString(R.string.keyboard_install_toast), keyboardName),
               Toast.LENGTH_SHORT).show();
-
-            _cleanup = true;
+          }
+          _cleanup = true;
           notifyPackageInstallListeners(KeyboardEventHandler.EventType.PACKAGE_INSTALLED,
             installedPackageKeyboards, 1);
           if (installedPackageKeyboards != null) {
