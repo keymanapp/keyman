@@ -17,7 +17,7 @@ def _(txt):
     return translation
 
 
-gettext.bindtextdomain('keyman-config', 'locale')
+gettext.bindtextdomain('keyman-config', '/usr/share/locale')
 gettext.textdomain('keyman-config')
 
 if __tier__ == 'alpha':
