@@ -59,7 +59,7 @@ begin
   begin
     FCanonicalBCP47Tag := TBCP47Tag.GetCanonicalTag(APackageKeyboardLanguages[i].ID);
     if IndexOfBCP47Code(FCanonicalBCP47Tag) < 0 then
-      FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, APackageKeyboardLanguages[i].ID, 0,
+      FLanguages.Add(TKeymanKeyboardLanguageFile.Create(AContext, AOwner, FCanonicalBCP47Tag, 0,
         APackageKeyboardLanguages[i].Name));
   end;
   Refresh;

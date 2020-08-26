@@ -62,7 +62,7 @@ type
 
     { IIntKeymanKeyboardLanguageInstalled }
   public
-    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
+    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
       ALangID: Integer; AProfileGUID: TGUID; const AName: string);
   end;
 
@@ -83,13 +83,13 @@ uses
 { TKeymanKeyboardLanguageInstalled }
 
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
-  AOwner: IKeymanKeyboardInstalled; const AOriginalBCP47Code, ABCP47Code: string;
+  AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
   ALangID: Integer; AProfileGUID: TGUID; const AName: string);
 begin
   FOwner := AOwner;
   FProfileGUID := AProfileGUID;
   FIsInstalled := IsTIPInstalledForCurrentUser(aBCP47Code, ALangID, AProfileGUID);
-  inherited Create(AContext, AOwner, AOriginalBCP47Code, ABCP47Code, ALangID, AName);
+  inherited Create(AContext, AOwner, ABCP47Code, ALangID, AName);
 end;
 
 function TKeymanKeyboardLanguageInstalled.FindInstallationLangID(

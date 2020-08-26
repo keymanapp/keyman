@@ -21,7 +21,6 @@ type
     FBCP47Code: string;
     FLangID: Integer;
     FName: string;
-    FOriginalBCP47Code: string;
   protected
     function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
       override;
@@ -38,7 +37,7 @@ type
     property Owner: IKeymanKeyboard read FOwner;
 
   public
-    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboard; const AOriginalBCP47Code, ABCP47Code: string; ALangID: Integer; const AName: string);
+    constructor Create(AContext: TKeymanContext; AOwner: IKeymanKeyboard; const ABCP47Code: string; ALangID: Integer; const AName: string);
   end;
 
 implementation
@@ -56,11 +55,10 @@ uses
 { TKeymanKeyboardLanguage }
 
 constructor TKeymanKeyboardLanguage.Create(AContext: TKeymanContext;
-  AOwner: IKeymanKeyboard; const AOriginalBCP47Code, ABCP47Code: string; ALangID: Integer; const AName: string);
+  AOwner: IKeymanKeyboard; const ABCP47Code: string; ALangID: Integer; const AName: string);
 begin
   FContext := AContext;
   FOwner := AOwner;
-  FOriginalBCP47Code := AOriginalBCP47Code;
   FBCP47Code := ABCP47Code;
   FLangID := ALangID;
   FName := AName;
