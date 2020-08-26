@@ -14,7 +14,7 @@ export function decorateWithScriptOverrides(breaker: WordBreakingFunction, optio
    *
    * Last updated for Unicode 13.0.0.
    */
-  const HAS_SOUTHEAST_ASIAN_LETTER = /[\u0E01-\u0E3A\u0E40-\u0E4E\u0E81\u0E82\u0E84\u0E86-\u0E8A\u0E8C-\u0EA3\u0EA5\u0EA7-\u0EBD\u0EC0-\u0EC4\u0EC6\u0EC8-\u0ECD\u0EDC-\u0EDF\u1000-\u103F\u1050-\u108F\u109A-\u109D\u1780-\u17D3\u17D7\u17DC\u17DD\u30A1-\u30FA\u30FC-\u30FF]/
+  const HAS_SOUTHEAST_ASIAN_LETTER = /[\u0E01-\u0E3A\u0E40-\u0E4E\u0E81\u0E82\u0E84\u0E86-\u0E8A\u0E8C-\u0EA3\u0EA5\u0EA7-\u0EBD\u0EC0-\u0EC4\u0EC6\u0EC8-\u0ECD\u0EDC-\u0EDF\u1000-\u103F\u1050-\u108F\u109A-\u109D\u1780-\u17D3\u17D7\u17DC\u17DD\u30A1-\u30FA\u30FC-\u30FF]/;
 
   return function enhancedBreaker(phrase: string): Span[] {
     let originalSpans = breaker(phrase);
