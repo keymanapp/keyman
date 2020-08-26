@@ -1,4 +1,16 @@
 #!/usr/bin/env npx ts-node
+
+/**
+ * Prints a JavaScript regular expression suitable for use in the
+ * **overrideScriptDefaults** word breaker decorator.
+ *
+ * This regular expression matches letters or marks in scripts that
+ * conventionally use spaces. This way, the word breaker can make sure to keep
+ * contiguous spans of these characters together!
+ *
+ * If you need to add more Unicode blocks, customize SPACELESS_SCRIPT_BLOCKS.
+ */
+
 import {readFileSync} from "fs";
 import * as path from "path";
 
@@ -6,7 +18,7 @@ import * as path from "path";
 const UCD_DIR = path.join("..", "..", "resources", "standards-data", "unicode-character-database");
 
 const SPACELESS_SCRIPT_BLOCKS = new Set([
-  "Myanmar",
+  "Myanmar",  // a.k.a., Burmese
   "Lao",
   "Thai",
   "Khmer",
