@@ -9,13 +9,36 @@ namespace correction {
 
   type RealizedInput = ProbabilityMass<Transform>[];
 
-  // Represents a potential 'search node' on the (conceptual) graph used to search for best-fitting
-  // corrections.  Stores the cost of the previous 'node' and the minimum possible cost for the
-  // 'edge' leading to the new node - that of the cost to 'sample' the new input char.
+  export const QUEUE_EDGE_COMPARATOR: models.Comparator<SearchEdge> = function(arg1, arg2) {
+    return arg1.currentCost - arg2.currentCost;
+  }
+
+  // const QUEUE_END_NODE_COMPARATOR: models.Comparator<SearchNode> = function(arg1, arg2) {
+  //   return arg1.knownCost - arg2.knownCost;
+  // }
+
+  export const QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier> = function(space1, space2) {
+    let node1 = space1.correctionQueue.peek();
+    let node2 = space2.correctionQueue.peek();
+    
+    // Guards, just in case one of the search spaces ever has an empty node.
+    if(node1 && node2) {
+      return node1.currentCost - node2.currentCost;
+    } else if(node2) {
+      return 1;
+    } else {
+      return -1;
+    }
+  }
+
+  // Represents an 'edge' to a potential 'node' on the (conceptual) graph used to search for best-fitting
+  // corrections by the correction-search algorithm.  Stores the cost leading to the new node, though it may be
+  // an overestimate when the edit distance is greater than the current search threshold.
   //
-  // So, basically a 'prior node' and the (admissibility-conforming) heuristic cost to reach a potential node
-  // in the overall A* search graph.
-  class SearchNode {
+  // For nodes with raw edit-distance cost within the current threshold for correction searches, we do have admissibility.
+  // If not enough nodes are available within that threshold, however, admissibility may be lost, leaving our search as a
+  // heuristic.
+  class SearchEdge {
     // Existing calculation from prior rounds to use as source.
     calculation: ClassicalDistanceCalculation;
 
@@ -39,30 +62,193 @@ namespace correction {
 
     get heuristicCost(): number {
       // TODO:  Optimize so that we're not frequently recomputing this?
-      return this.optimalInput.map(mass => mass.p).reduce((previous, current) => previous * current);
+      // TODO:  We might should generalize this so that the probability-to-cost function isn't directly hard-coded.
+      //        Seems like a decent first conversion function though, at least.
+      return this.optimalInput.map(mass => mass.p).reduce((previous, current) => previous + (1 - current), 0);
     }
 
     // The part used to prioritize our search.
     get currentCost(): number {
-      return this.knownCost * this.heuristicCost;
+      return this.knownCost + this.heuristicCost;
     }
 
     get mapKey(): string {
+      // TODO:  correct, as Transforms don't convert nicely to strings.
       let inputString = this.optimalInput.map((value) => value.sample).join('');
       let matchString =  this.calculation.matchSequence.map((value) => value.char).join('');
+      // TODO:  might should also track diagonalWidth.
       return inputString + models.SENTINEL_CODE_UNIT + matchString;
     }
   }
 
-  class SearchSpace {
-    correctionQueue: models.PriorityQueue<SearchNode>;
+  // Represents a processed node for the correction-search's search-space's tree-like graph.  May represent
+  // internal and 'leaf' nodes on said graph, as well as the overall root of the search.
+  //
+  // Provides functions usable to enumerate across the node's outward edges to new nodes for continued search.
+  // Most of the actual calculations occur as part of this process.
+  //
+  export class SearchNode {
+    calculation: ClassicalDistanceCalculation;
+    
+    currentTraversal: LexiconTraversal;
+    priorInput: RealizedInput;
+
+    // TODO:  Initializing from 'root' / just a traversal.
+    /**
+     * Instantiates the initial SearchNode used for corrective edit-distance based search.
+     * 
+     * @param traversal The root LexiconTraversal of a LexicalModel
+     */
+    constructor(traversal: LexiconTraversal);
+    /**
+     * Transforms an edge on the search graph into a node, utilizing its information
+     * to determine the graph edges that may come afterward.
+     * @param edge An existing SearchEdge used to to reach this SourceNode on the search algorithm's
+     * 'graph'.
+     */
+    constructor(edge: SearchEdge);
+    constructor(obj: SearchEdge|LexiconTraversal) {
+      if(obj instanceof SearchEdge) {
+        let edge = obj as SearchEdge;
+
+        this.calculation = edge.calculation;
+        this.currentTraversal = edge.calculation.matchSequence[edge.calculation.matchSequence.length-1].tag
+        this.priorInput = edge.optimalInput;
+      } else {
+        // Assume it's a LexiconTraversal instead.
+        let traversal = obj as LexiconTraversal;
+        this.calculation = new ClassicalDistanceCalculation();
+        this.currentTraversal = traversal;
+        this.priorInput = [];
+      }
+    }
+
+    buildInsertionEdges(): SearchEdge[] {
+      let edges: SearchEdge[] = [];
+
+      for(let lexicalChild of this.currentTraversal.children()) {
+        let matchToken = {
+          char: lexicalChild.char,
+          tag: lexicalChild.traversal()
+        }
+
+        // TODO:  Check against cache(s) & cache results.
+        let childCalc = this.calculation.addMatchChar(matchToken);
+
+        let searchChild = new SearchEdge();
+        searchChild.calculation = childCalc;
+        searchChild.optimalInput = this.priorInput;
+
+        edges.push(searchChild);
+      }
+
+      return edges;
+    }
+
+    buildDeletionEdges(inputDistribution: ProbabilityMass<Transform>[]): SearchEdge[] {
+      let edges: SearchEdge[] = [];
+
+      for(let probMass of inputDistribution) {
+        let edgeCalc = this.calculation;
+        let transform = probMass.sample;
+        if(transform.deleteLeft) {
+          edgeCalc = edgeCalc.getSubset(edgeCalc.inputSequence.length - transform.deleteLeft, edgeCalc.matchSequence.length);
+        }
+
+        // TODO:  transform.deleteRight currently not supported.
+
+        let inputPath = Array.from(this.priorInput);
+        inputPath.push(probMass);
+        // Tokenize and iterate over input chars, adding them into the calc.
+        for(let i=0; i < transform.insert.length; i++) {
+          let char = transform.insert[i];
+          if(models.isHighSurrogate(char)) {
+            i++;
+            char = char + transform.insert[i];
+          }
+
+          // TODO:  Drop 'matchCost' as a thing.
+          // TODO:  Check against cache, write results to that cache.
+          edgeCalc = edgeCalc.addInputChar({char: char, matchCost: 1});
+        }
+
+        let childEdge = new SearchEdge();
+        childEdge.calculation = edgeCalc;
+        childEdge.optimalInput = inputPath;
+
+        edges.push(childEdge);
+      }
+
+      return edges;
+    }
+
+    // While this may SEEM to be unnecessary, note that sometimes substitutions (which are computed
+    // via insert + delete) may be lower cost than both just-insert and just-delete.
+    buildSubstitutionEdges(inputDistribution: ProbabilityMass<Transform>[]): SearchEdge[] {
+      // Handles the 'input' component.
+      let intermediateEdges = this.buildDeletionEdges(inputDistribution);
+      let edges: SearchEdge[] = [];
+
+      for(let lexicalChild of this.currentTraversal.children()) {
+        for(let edge of intermediateEdges) {
+          let matchToken = {
+            char: lexicalChild.char,
+            tag: lexicalChild.traversal()
+          }
+  
+          // TODO:  Check against cache(s), cache results.
+          let childCalc = edge.calculation.addMatchChar(matchToken);
+  
+          let searchChild = new SearchEdge();
+          searchChild.calculation = childCalc;
+          searchChild.optimalInput = edge.optimalInput;
+  
+          edges.push(searchChild);
+        }
+      }
+
+      return edges;
+    }
+  } 
+
+  class SearchSpaceTier {
+    correctionQueue: models.PriorityQueue<SearchEdge>;
     operation: SearchOperation;
 
     processed: SearchNode[] = [];
 
     constructor(operation: SearchOperation) {
       this.operation = operation;
-      this.correctionQueue = new models.PriorityQueue<SearchNode>(DistanceModeler.QUEUE_COMPARATOR);
+      this.correctionQueue = new models.PriorityQueue<SearchEdge>(QUEUE_EDGE_COMPARATOR);
+    }
+  }
+
+  // The set of search spaces corresponding to the same 'context' for search.
+  // Whenever a wordbreak boundary is crossed, a new instance should be made.
+  export class SearchSpace {
+    private cachedSpaces: {[id: string]: SearchSpaceTier} = {};
+    private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
+
+    // TODO:  Fix; is not quite right.  We want the results corresponding to the node
+    // that will let us build the next tier's SearchNodes when new input arrives.
+    //
+    // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time 
+    // is cheaper than iteratively building a priority queue.
+    private extractedResults: SearchNode[] = [];
+
+    constructor() {
+      this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR);
+    }
+
+    processNode(node: SearchEdge): SearchNode[] {
+      let sourceCalc = node.calculation;
+
+      // TODO:  Lots of things.
+      return [];
+    }
+
+    addInput(input: Distribution<Transform>) {
+
     }
   }
 
@@ -77,14 +263,7 @@ namespace correction {
     }
 
     // Keep as a 'rotating cache'.  Includes search spaces corresponding to 'revert' commands.
-    private cachedSpaces: {[id: string]: SearchSpace} = {};
-    // Maintains the caching order so that we know which spaces ought be removed before others.
-    private cachedIDs: string[];
-
     private searchSpaces: SearchSpace[] = [];
-    static readonly QUEUE_COMPARATOR: models.Comparator<SearchNode> = function(arg1, arg2) {
-      return arg1.currentCost - arg2.currentCost;
-    }
 
     private inputs: Distribution<USVString>[] = [];
     private lexiconRoot: LexiconTraversal;
@@ -94,8 +273,7 @@ namespace correction {
       this.options = options;
     }
 
-    // TODO:  Define the type more properly.
-    addInput(input: Distribution<USVString>) {
+    addInput(input: Distribution<Transform>) {
       // TODO:  add 'addInput' operation
       //        do search space things
     }

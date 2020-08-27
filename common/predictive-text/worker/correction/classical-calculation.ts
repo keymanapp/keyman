@@ -446,10 +446,13 @@ namespace correction {
     }
 
     get mapKey(): string {
-      // TODO:  assumes TUnit == string.  Fine for us for now, though.
       let inputString = this.inputSequence.map((value) => value.key).join('');
       let matchString =  this.matchSequence.map((value) => value.key).join('');
-      return inputString + models.SENTINEL_CODE_UNIT + matchString;
+      return inputString + models.SENTINEL_CODE_UNIT + matchString + models.SENTINEL_CODE_UNIT + this.diagonalWidth;
+    }
+
+    get lastMatchEntry(): TMatch {
+      return this.matchSequence[this.matchSequence.length-1];
     }
   }
 }
