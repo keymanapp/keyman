@@ -75,7 +75,7 @@ namespace correction {
     get mapKey(): string {
       // TODO:  correct, as Transforms don't convert nicely to strings.
       let inputString = this.optimalInput.map((value) => value.sample).join('');
-      let matchString =  this.calculation.matchSequence.map((value) => value.char).join('');
+      let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
       // TODO:  might should also track diagonalWidth.
       return inputString + models.SENTINEL_CODE_UNIT + matchString;
     }
@@ -112,7 +112,7 @@ namespace correction {
         let edge = obj as SearchEdge;
 
         this.calculation = edge.calculation;
-        this.currentTraversal = edge.calculation.matchSequence[edge.calculation.matchSequence.length-1].tag
+        this.currentTraversal = edge.calculation.matchSequence[edge.calculation.matchSequence.length-1]['traversal']
         this.priorInput = edge.optimalInput;
       } else {
         // Assume it's a LexiconTraversal instead.
@@ -128,8 +128,8 @@ namespace correction {
 
       for(let lexicalChild of this.currentTraversal.children()) {
         let matchToken = {
-          char: lexicalChild.char,
-          tag: lexicalChild.traversal()
+          key: lexicalChild.char,
+          traversal: lexicalChild.traversal()
         }
 
         // TODO:  Check against cache(s) & cache results.
@@ -167,9 +167,8 @@ namespace correction {
             char = char + transform.insert[i];
           }
 
-          // TODO:  Drop 'matchCost' as a thing.
           // TODO:  Check against cache, write results to that cache.
-          edgeCalc = edgeCalc.addInputChar({char: char, matchCost: 1});
+          edgeCalc = edgeCalc.addInputChar({key: char});
         }
 
         let childEdge = new SearchEdge();
@@ -192,8 +191,8 @@ namespace correction {
       for(let lexicalChild of this.currentTraversal.children()) {
         for(let edge of intermediateEdges) {
           let matchToken = {
-            char: lexicalChild.char,
-            tag: lexicalChild.traversal()
+            key: lexicalChild.char,
+            traversal: lexicalChild.traversal()
           }
   
           // TODO:  Check against cache(s), cache results.

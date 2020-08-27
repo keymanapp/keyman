@@ -11,12 +11,12 @@ function edgeHasChars(edge, input, match) {
     return false;
   }
 
-  return edge.calculation.lastMatchEntry.char == match;
+  return edge.calculation.lastMatchEntry.key == match;
 }
 
 function findEdgeWithChars(edgeArray, input, match) {
   let results = edgeArray.filter(function(value) {
-    return value.calculation.lastMatchEntry.char == match && value.optimalInput[value.optimalInput.length - 1].sample.insert == input;
+    return value.calculation.lastMatchEntry.key == match && value.optimalInput[value.optimalInput.length - 1].sample.insert == input;
   });
 
   assert.equal(results.length, 1);
@@ -45,7 +45,7 @@ describe.only('Correction Distance Modeler', function() {
       for(let child of rootTraversal.children()) {
         expectedChildCount++;
 
-        let childEdge = edges.filter(value => value.calculation.lastMatchEntry.char == child.char)[0];
+        let childEdge = edges.filter(value => value.calculation.lastMatchEntry.key == child.char)[0];
         assert.isOk(childEdge);
         assert.isEmpty(childEdge.optimalInput);
         assert.isEmpty(childEdge.calculation.inputSequence);
@@ -111,7 +111,7 @@ describe.only('Correction Distance Modeler', function() {
           let matchingEdge = findEdgeWithChars(edges, mass.sample.insert, child.char);
 
           // Substitution - matching char
-          if(mass.sample.insert == matchingEdge.calculation.lastMatchEntry.char) {
+          if(mass.sample.insert == matchingEdge.calculation.lastMatchEntry.key) {
             assert.equal(matchingEdge.currentCost, 1 - mass.p);
           } else {
             // not matching char.
@@ -127,18 +127,18 @@ describe.only('Correction Distance Modeler', function() {
 
       let firstEdge = queue.dequeue();
       assert.equal(firstEdge.optimalInput[0].sample.insert, 't');
-      assert.equal(firstEdge.calculation.lastMatchEntry.char, 't');
+      assert.equal(firstEdge.calculation.lastMatchEntry.key, 't');
       assert.equal(firstEdge.currentCost, 0.25);
 
       let secondEdge = queue.dequeue();
       assert.equal(secondEdge.optimalInput[0].sample.insert, 'h');
-      assert.equal(secondEdge.calculation.lastMatchEntry.char, 'h');
+      assert.equal(secondEdge.calculation.lastMatchEntry.key, 'h');
       assert.equal(secondEdge.currentCost, 0.75);
 
       // After this, a 't' input without a matching char.
       let nextEdge = queue.dequeue();
       assert.equal(nextEdge.optimalInput[0].sample.insert, 't');
-      assert.notEqual(nextEdge.calculation.lastMatchEntry.char, 't');
+      assert.notEqual(nextEdge.calculation.lastMatchEntry.key, 't');
       assert.equal(nextEdge.currentCost, 1.25);
     });
 
@@ -194,7 +194,7 @@ describe.only('Correction Distance Modeler', function() {
       // Find the first result with an actual word directly represented.
       do {
         edge = layer3Queue.dequeue();
-      } while(edge.calculation.lastMatchEntry.tag.entries.length == 0);
+      } while(edge.calculation.lastMatchEntry.traversal.entries.length == 0);
 
       assertEdgeChars(edge, 'n', 'n'); // 'ten' - perfect edit distance of 0, though less-likely input sequence.
       assert(edge.currentCost, 1);
@@ -202,7 +202,7 @@ describe.only('Correction Distance Modeler', function() {
       var edge;
       do {
         edge = layer3Queue.dequeue();
-      } while(edge.calculation.lastMatchEntry.tag.entries.length == 0);
+      } while(edge.calculation.lastMatchEntry.traversal.entries.length == 0);
 
       // Both have a raw edit distance of 1 while using the same input-sequence root. ('th')
       let tenFlag = edgeHasChars(edge, 'h', 'n'); // subs out the 'h' entirely.  Could also occur with 'a', but is too unlikely.
@@ -213,7 +213,7 @@ describe.only('Correction Distance Modeler', function() {
 
       do {
         edge = layer3Queue.dequeue();
-      } while(edge.calculation.lastMatchEntry.tag.entries.length == 0);
+      } while(edge.calculation.lastMatchEntry.traversal.entries.length == 0);
 
       tenFlag = tenFlag || edgeHasChars(edge, 'h', 'n');
       theFlag = theFlag || edgeHasChars(edge, 'h', 'e');

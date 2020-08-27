@@ -451,6 +451,10 @@ namespace correction {
       return inputString + models.SENTINEL_CODE_UNIT + matchString + models.SENTINEL_CODE_UNIT + this.diagonalWidth;
     }
 
+    get lastInputEntry(): TInput {
+      return this.inputSequence[this.inputSequence.length-1];
+    }
+
     get lastMatchEntry(): TMatch {
       return this.matchSequence[this.matchSequence.length-1];
     }
