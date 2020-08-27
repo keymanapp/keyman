@@ -9,6 +9,11 @@ namespace correction {
 
   type RealizedInput = ProbabilityMass<Transform>[];
 
+  type TraversableToken<TUnit> = {
+    key: TUnit,
+    traversal: LexiconTraversal
+  }
+
   export const QUEUE_EDGE_COMPARATOR: models.Comparator<SearchEdge> = function(arg1, arg2) {
     return arg1.currentCost - arg2.currentCost;
   }
@@ -40,7 +45,7 @@ namespace correction {
   // heuristic.
   class SearchEdge {
     // Existing calculation from prior rounds to use as source.
-    calculation: ClassicalDistanceCalculation;
+    calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
 
     // The sequence of input 'samples' taken from specified input distributions.
     optimalInput: RealizedInput;
@@ -88,7 +93,7 @@ namespace correction {
   // Most of the actual calculations occur as part of this process.
   //
   export class SearchNode {
-    calculation: ClassicalDistanceCalculation;
+    calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
     
     currentTraversal: LexiconTraversal;
     priorInput: RealizedInput;
@@ -112,7 +117,7 @@ namespace correction {
         let edge = obj as SearchEdge;
 
         this.calculation = edge.calculation;
-        this.currentTraversal = edge.calculation.matchSequence[edge.calculation.matchSequence.length-1]['traversal']
+        this.currentTraversal = edge.calculation.matchSequence[edge.calculation.matchSequence.length-1].traversal;
         this.priorInput = edge.optimalInput;
       } else {
         // Assume it's a LexiconTraversal instead.
@@ -209,6 +214,10 @@ namespace correction {
       return edges;
     }
   } 
+
+  /*
+   * NOTE:  Everything after this point is EXTREMELY rough-draft. 
+   */
 
   class SearchSpaceTier {
     correctionQueue: models.PriorityQueue<SearchEdge>;
