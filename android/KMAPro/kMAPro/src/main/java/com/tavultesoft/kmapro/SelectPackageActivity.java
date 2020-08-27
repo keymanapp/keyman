@@ -103,7 +103,7 @@ public final class SelectPackageActivity extends AppCompatActivity {
         File packagePath = new File(KMManager.getPackagesDir(), pkgID);
         bundle.putSerializable("packagePath", packagePath);
         bundle.putString("packageID", pkgID);
-        bundle.putBoolean("tempPath", false);
+        bundle.putBoolean("isInstallingPackage", false);
         Intent intent = new Intent(context, SelectLanguageActivity.class);
         intent.putExtras(bundle);
         context.startActivity(intent);

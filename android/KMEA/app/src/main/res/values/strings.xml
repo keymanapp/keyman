@@ -156,6 +156,9 @@
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Would you like to delete this dictionary?</string>
 
 
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s keyboard installed</string>
+
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Enable corrections</string>
 
