@@ -97,7 +97,7 @@ type
     procedure DeleteFileReferences;
     procedure CheckLogFileForWarnings(const Filename: string; Silent: Boolean);
     function CleanupPaths(var xml: string): string;
-    procedure InstallTipForPackage(const BCP47Tag: string);
+    procedure InstallTipForKeyboard(const BCP47Tag: string);
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
@@ -296,7 +296,7 @@ begin
           if WaitForElevatedConfiguration(Handle, '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'" -nowelcome') = 0 then
           begin
             // install the keyboard tip
-            InstallTipForPackage(BCP47Tag);
+            InstallTipForKeyboard(BCP47Tag);
             ModalResult := mrOk;
           end
           else
@@ -378,9 +378,7 @@ begin
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;
         FInstalledKeyboard := (FKeyboard as IKeymanKeyboardFile2).Install2(True);
-        // TODO: let user choose language
-        // GetFirstLanguage is a temporary function until we implement TODO above
-        TTIPMaintenance.DoInstall(FKeyboard.ID, TTIPMaintenance.GetFirstLanguage(FInstalledKeyboard));
+        InstallTipForKeyboard(BCP47Tag);
         CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end
       else
@@ -440,8 +438,7 @@ begin
 
         kmcom.Refresh;
 
-        // TODO: allow user to select language
-        InstallTipForPackage(BCP47Tag);
+        InstallTipForKeyboard(BCP47Tag);
 
         CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end;
@@ -467,7 +464,7 @@ begin
   ModalResult := mrOk;
 end;
 
-procedure TfrmInstallKeyboard.InstallTipForPackage(const BCP47Tag: string);
+procedure TfrmInstallKeyboard.InstallTipForKeyboard(const BCP47Tag: string);
 var
   i: Integer;
 begin
