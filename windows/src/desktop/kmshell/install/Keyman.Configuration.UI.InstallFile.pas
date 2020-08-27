@@ -68,8 +68,8 @@ begin
   with TfrmInstallKeyboard.Create(Owner) do
   try
     Silent := ASilent;
+    DefaultBCP47Tag := BCP47;
     InstallFile := FileName;
-//TODO:    DefaultBCP47 := BCP47;
     if ModalResult = mrCancel then
       // failed to start install
       Result := False
@@ -77,7 +77,7 @@ begin
     begin
       if ASilent then
       begin
-        InstallKeyboard(LogFile);
+        InstallKeyboard(LogFile, BCP47);
         Result := True;
       end
       else

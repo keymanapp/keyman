@@ -78,18 +78,20 @@ type
 implementation
 
 uses
-  Graphics,
+  System.SysUtils,
+  System.Variants,
+  Vcl.Graphics,
+
+  internalinterfaces,
   keymanerrorcodes,
   keymanhotkey,
   kmxfileusedchars,
   kpinstallkeyboard,
   Keyman.System.LanguageCodeUtils,
-  SysUtils,
   utilkeyman,
   utilolepicture,
   utilstr,
-  utilxml,
-  Variants;
+  utilxml;
 
 { TKeymanKeyboardFile }
 
@@ -275,6 +277,8 @@ begin
     'layoutpositional', Get_LayoutType = kltPositional
   ]);
 
+  Result := Result + (FLanguages as IIntKeymanInterface).DoSerialize(Flags, ImagePath, References);
+
   if ((Flags and ksfExportImages) = ksfExportImages) and
     (Assigned(FKeyboardInfo.Icon) or
     Assigned(FKeyboardInfo.Bitmap)) then
@@ -291,7 +295,7 @@ begin
     finally
       Free;
     end;
-      Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
+    Result := Result + '<bitmap>'+ExtractFileName(FBitmap)+'</bitmap>';
   end;
 end;
 
