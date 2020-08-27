@@ -428,14 +428,14 @@ public class PackageProcessor {
   }
 
   /**
-   * Determines if installing the .kmp would result in a downgrade.  For testing only.
+   * Determines if installing the .kmp would result in a downgrade.
    * @param kmpPath The path to the .kmp to be installed.
    * @param preExtracted Indicates use of a temporary testing 'kmp' that is pre-extracted.
    * @return <code><b>true</b></code> if installing would be a downgrade, otherwise <code><b>false</b></code>.
    * @throws IOException
    * @throws JSONException
    */
-  boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
+  public boolean isDowngrade(File kmpPath, boolean preExtracted) throws IOException, JSONException {
     return internalCompareKMPVersion(kmpPath, preExtracted,-1);
   }
 

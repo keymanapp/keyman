@@ -602,27 +602,49 @@ public final class KMManager {
         }
       }
 
-      // Copy and install all KMP files (Issue for FV app?)
       File resourceRoot = new File(getResourceRoot());
       PackageProcessor kmpProcessor = new PackageProcessor(resourceRoot);
       LexicalModelPackageProcessor lmkmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
       String assetFiles[] = assetManager.list("");
       for (String assetFile : assetFiles) {
         File kmpFile, tempPackagePath;
-        boolean installAsset = FileUtils.hasKeymanPackageExtension(assetFile) ||
+        boolean isPackageFile = FileUtils.hasKeymanPackageExtension(assetFile) ||
           FileUtils.hasLexicalModelPackageExtension(assetFile);
 
-        if (installAsset) {
+        // Copy asset KMP files
+        if (isPackageFile) {
           copyAsset(context, assetFile, "", true);
           kmpFile = new File(getResourceRoot(), assetFile);
           tempPackagePath = kmpProcessor.unzipKMP(kmpFile);
 
-          if (FileUtils.hasLexicalModelPackageExtension(assetFile)) {
-            lmkmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
-          } else {
-            // Not using the list of entries returned from processKMP()
-            // because the main App will add the keyboard/lexical model info
-            kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+          // Determine package info
+          JSONObject pkgInfo = kmpProcessor.loadPackageInfo(tempPackagePath);
+          if (pkgInfo == null) {
+            KMLog.LogError(TAG, "Invalid kmp.json in default asset " + assetFile);
+          }
+          String assetPackageID = kmpProcessor.getPackageID(kmpFile);
+          String assetPackageTarget = kmpProcessor.getPackageTarget(pkgInfo);
+
+          // Only install if asset package is not a downgrade
+          try {
+            if (assetPackageTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+              if (!kmpProcessor.isDowngrade(kmpFile, true)) {
+                // Not using the list of entries returned from processKMP()
+                // because the main App will add the keyboard/lexical model info
+                kmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_KEYBOARDS_KEY);
+              }
+            } else if (assetPackageTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
+              if (!lmkmpProcessor.isDowngrade(kmpFile)) {
+                lmkmpProcessor.processKMP(kmpFile, tempPackagePath, PackageProcessor.PP_LEXICAL_MODELS_KEY);
+              }
+            }
+          } catch (JSONException e) {
+            KMLog.LogException(TAG, "Unable to determine isDowngrade for " + kmpFile.toString(), e);
+          }
+
+          // Cleanup tempPackagePath
+          if (tempPackagePath.exists()) {
+            FileUtils.deleteDirectory(tempPackagePath);
           }
         }
       }
