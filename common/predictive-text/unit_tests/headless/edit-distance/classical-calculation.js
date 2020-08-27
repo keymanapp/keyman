@@ -32,30 +32,26 @@ function compute(input, match, mode, bandSize) {
     case "InputThenMatch":
       for(let i = 0; i < input.length; i++) {
         buffer = buffer.addInputChar({
-          char: input.charAt(i),
-          cost: 0
+          key: input.charAt(i)
         });
       }
     
       for(let j = 0; j < match.length; j++) {
         buffer = buffer.addMatchChar({
-          char: match.charAt(j),
-          tag: null
+          key: match.charAt(j)
         });
       }
       break;
     case "MatchThenInput":    
       for(let j = 0; j < match.length; j++) {
         buffer = buffer.addMatchChar({
-          char: match.charAt(j),
-          tag: null
+          key: match.charAt(j)
         });
       }
 
       for(let i = 0; i < input.length; i++) {
         buffer = buffer.addInputChar({
-          char: input.charAt(i),
-          cost: 0
+          key: input.charAt(i)
         });
       }
       break;
@@ -405,12 +401,12 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
       let expectedInput = ['t', 'e', 'a'];
       for(let i=0; i < expectedInput.length; i++) {
-        assert.equal(trimmedBuffer.inputSequence[i].char, expectedInput[i]);
+        assert.equal(trimmedBuffer.inputSequence[i].key, expectedInput[i]);
       }
 
       let expectedMatch = ['t', 'h', 'e'];
       for(let i=0; i < expectedMatch.length; i++) {
-        assert.equal(trimmedBuffer.matchSequence[i].char, expectedMatch[i]);
+        assert.equal(trimmedBuffer.matchSequence[i].key, expectedMatch[i]);
       }
     });
 

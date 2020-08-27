@@ -1,16 +1,10 @@
 namespace correction {
-  export interface InputToken {
-    char: string;
-    // TODO:  integrate as part of substitution & traversal cost.
-    matchCost: number;
+  /**
+   * Represents the lowest-level unit for comparison during edit-distance calculations.
+   */
+  export interface EditToken<TUnit> {
+    key: TUnit;
   }
-
-  export interface MatchToken {
-    char: string;
-    tag: LexiconTraversal;
-  }
-
-  type CharToken = InputToken | MatchToken;
 
   // A semi-optimized 'online'/iterative Damerau-Levenshtein calculator with the following features:
   // - may add new character to the 'input' string or to the 'match' string, reusing all old calculations efficiently.
@@ -26,7 +20,7 @@ namespace correction {
   //
   // Reference: https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm#Possible_modifications
   //    - Motivating statement:  "if we are only interested in the distance if it is smaller than a threshold..."  
-  export class ClassicalDistanceCalculation {
+  export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditToken<TUnit> = EditToken<TUnit>, TMatch extends EditToken<TUnit> = EditToken<TUnit>> {
     /**
      * Stores ONLY the computed diagonal elements, nothing else.
      * 
@@ -59,12 +53,12 @@ namespace correction {
     diagonalWidth: number = 1;
 
     // The sequence of characters input so far.
-    inputSequence: InputToken[] = [];
-    matchSequence: MatchToken[] = [];
+    inputSequence: TInput[] = [];
+    matchSequence: TMatch[] = [];
 
     constructor();
-    constructor(other: ClassicalDistanceCalculation);
-    constructor(other?: ClassicalDistanceCalculation) {    
+    constructor(other: ClassicalDistanceCalculation<TUnit, TInput, TMatch>);
+    constructor(other?: ClassicalDistanceCalculation<TUnit, TInput, TMatch>) {    
       if(other) {
         // Clone class properties.
         let rowCount = other.resolvedDistances.length;
@@ -120,7 +114,7 @@ namespace correction {
      * Does not actually mutate the instance.
      */
     getFinalCost(): number {
-      let buffer = this as ClassicalDistanceCalculation;
+      let buffer = this as ClassicalDistanceCalculation<TUnit, TInput, TMatch>;
       let val = buffer.getHeuristicFinalCost();
 
       while(val > buffer.diagonalWidth) {
@@ -147,7 +141,7 @@ namespace correction {
      * @param threshold 
      */
     hasFinalCostWithin(threshold: number): boolean {
-      let buffer = this as ClassicalDistanceCalculation;
+      let buffer = this as ClassicalDistanceCalculation<TUnit, TInput, TMatch>;
       let val = buffer.getHeuristicFinalCost();
       let guaranteedBound = this.diagonalWidth;
 
@@ -167,8 +161,13 @@ namespace correction {
       return false;
     }
 
-    private static initialCostAt(buffer: ClassicalDistanceCalculation, r: number, c: number, insertCost?: number, deleteCost?: number) {
-      var baseSubstitutionCost = buffer.inputSequence[r].char == buffer.matchSequence[c].char ? 0 : 1;
+    private static initialCostAt<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
+        buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>, 
+        r: number, 
+        c: number, 
+        insertCost?: number, 
+        deleteCost?: number) {
+      var baseSubstitutionCost = buffer.inputSequence[r].key == buffer.matchSequence[c].key ? 0 : 1;
       var substitutionCost: number = buffer.getCostAt(r-1, c-1) + baseSubstitutionCost;
       var insertionCost: number = insertCost || buffer.getCostAt(r, c-1) + 1; // If set meaningfully, will never equal zero.
       var deletionCost: number = deleteCost || buffer.getCostAt(r-1, c) + 1;  // If set meaningfully, will never equal zero.
@@ -178,7 +177,7 @@ namespace correction {
         // Transposition checks
         let lastInputIndex = -1;
         for(let i = r-1; i >= 0; i--) {
-          if(buffer.inputSequence[i].char == buffer.matchSequence[c].char) {
+          if(buffer.inputSequence[i].key == buffer.matchSequence[c].key) {
             lastInputIndex = i;
             break;
           }
@@ -186,7 +185,7 @@ namespace correction {
 
         let lastMatchIndex = -1;
         for(let i = c-1; i >= 0; i--) {
-          if(buffer.matchSequence[i].char == buffer.inputSequence[r].char) {
+          if(buffer.matchSequence[i].key == buffer.inputSequence[r].key) {
             lastMatchIndex = i;
             break;
           }
@@ -197,7 +196,7 @@ namespace correction {
       return Math.min(substitutionCost, deletionCost, insertionCost, transpositionCost);
     }
 
-    getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation {
+    getSubset(inputLength: number, matchLength: number): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
       let trimmedInstance = new ClassicalDistanceCalculation(this);
 
       if(inputLength > this.inputSequence.length || matchLength > this.matchSequence.length) {
@@ -243,7 +242,7 @@ namespace correction {
     }
 
     // Inputs add an extra row / first index entry.
-    addInputChar(token: InputToken): ClassicalDistanceCalculation {
+    addInputChar(token: TInput): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
       let returnBuffer = new ClassicalDistanceCalculation(this);
       
       let r = returnBuffer.inputSequence.length;
@@ -266,7 +265,7 @@ namespace correction {
       return returnBuffer;
     }
 
-    addMatchChar(token: MatchToken): ClassicalDistanceCalculation {
+    addMatchChar(token: TMatch): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
       let returnBuffer = new ClassicalDistanceCalculation(this);
       
       let c = returnBuffer.matchSequence.length;
@@ -286,7 +285,7 @@ namespace correction {
       return returnBuffer;
     }
 
-    public increaseMaxDistance(): ClassicalDistanceCalculation {
+    public increaseMaxDistance(): ClassicalDistanceCalculation<TUnit, TInput, TMatch> {
       let returnBuffer = new ClassicalDistanceCalculation(this);
       returnBuffer.diagonalWidth++;
 
@@ -295,7 +294,7 @@ namespace correction {
       }
 
       // An abstraction of the common aspects of transposition handling during diagonal extensions.
-      function forPossibleTranspositionsInDiagonal(startPos: number, fixedChar: string, lookupString: CharToken[], closure: (axisIndex: number, diagIndex: number) => void) {
+      function forPossibleTranspositionsInDiagonal(startPos: number, fixedChar: TUnit, lookupString: EditToken<TUnit>[], closure: (axisIndex: number, diagIndex: number) => void) {
         let diagonalCap = 2 * (returnBuffer.diagonalWidth - 1);  // The maximum diagonal index permitted
         let axisCap = lookupString.length - 1;   // The maximum index supported by the axis of iteration
 
@@ -304,7 +303,7 @@ namespace correction {
 
         // Iterate within the diagonal and call our closure for any potential transpositions.
         for(let diagonalIndex = 0; diagonalIndex <= diagonalCap; diagonalIndex++) {
-          if(fixedChar == lookupString[startPos + diagonalIndex].char) {
+          if(fixedChar == lookupString[startPos + diagonalIndex].key) {
             closure(startPos + diagonalIndex, diagonalIndex);
           }
         }
@@ -332,7 +331,7 @@ namespace correction {
             // cells (r+2, * > c+2):  new transposition source
             let transposeRow = r+2;
             if(r+2 < this.inputSequence.length) { // Row to check for transposes must exist.
-              let rowChar = returnBuffer.inputSequence[r+1].char;
+              let rowChar = returnBuffer.inputSequence[r+1].key;
               // First possible match in input could be at index c + 2, which adjusts col c+2's cost.  Except that entry in r+2
               // doesn't exist yet - so we start with c+3 instead.
               forPossibleTranspositionsInDiagonal(c + 3, rowChar, returnBuffer.matchSequence, function(axisIndex, diagIndex) {
@@ -368,7 +367,7 @@ namespace correction {
             // cells(* > r+2, c+2): new transposition source
             let transposeCol = c+2;
             if(c+2 < this.matchSequence.length) { // Row to check for transposes must exist.
-              let colChar = returnBuffer.matchSequence[r+1].char;
+              let colChar = returnBuffer.matchSequence[r+1].key;
               // First possible match in input could be at index r + 2, which adjusts row r+2's cost.  Except that entry in c+2
               // doesn't exist yet - so we start with r+3 instead.
               forPossibleTranspositionsInDiagonal(r+3, colChar, returnBuffer.inputSequence, function(axisIndex, diagIndex) {
@@ -387,7 +386,12 @@ namespace correction {
       return returnBuffer;
     }
 
-    private static propagateUpdateFrom(buffer: ClassicalDistanceCalculation, r: number, c: number, value: number, diagonalIndex: number) {
+    private static propagateUpdateFrom<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
+        buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>, 
+        r: number, 
+        c: number, 
+        value: number, 
+        diagonalIndex: number) {
       // Note:  this function does not actually need the `c` parameter!
       //        That said, it's very useful when tracing stack traces & debugging.
       if(value < buffer.resolvedDistances[r][diagonalIndex]) {
@@ -414,13 +418,13 @@ namespace correction {
 
       // If both, check for propagation via substitution and possible transpositions
       if(internalRow && internalCol) {
-        let updateCost = value + (buffer.inputSequence[r+1].char == buffer.matchSequence[c+1].char ? 0 : 1);
+        let updateCost = value + (buffer.inputSequence[r+1].key == buffer.matchSequence[c+1].key ? 0 : 1);
         this.propagateUpdateFrom(buffer, r+1, c+1, updateCost, diagonalIndex);
 
         // Propagating transpositions (only possible if 'internal'.)
         let nextInputIndex = -1;
         for(let i = r+2; i < buffer.inputSequence.length; i++) {
-          if(buffer.inputSequence[i].char == buffer.matchSequence[c+1].char) {
+          if(buffer.inputSequence[i].key == buffer.matchSequence[c+1].key) {
             nextInputIndex = i;
             break;
           }
@@ -428,7 +432,7 @@ namespace correction {
 
         let nextMatchIndex = -1;
         for(let i = c+2; i < buffer.matchSequence.length; i++) {
-          if(buffer.matchSequence[i].char == buffer.inputSequence[r+1].char) {
+          if(buffer.matchSequence[i].key == buffer.inputSequence[r+1].key) {
             nextMatchIndex = i;
             break;
           }
