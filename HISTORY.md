@@ -1,5 +1,51 @@
 # Keyman Version History
 
+## 14.0.134 alpha 2020-08-26
+
+* [linux] Add packaging of Linux localization files (#3504)
+
+## 14.0.133 alpha 2020-08-25
+
+* feat(common/models): lexicon traversal (#3479)
+* feat(common/models):  actual priority queue for Trie models (#3480)
+* feat(common/models): efficient batch-enqueue (#3486)
+
+## 14.0.132 alpha 2020-08-24
+
+* feat(linux): Small UI improvements (#3495)
+
+## 14.0.131 alpha 2020-08-21
+
+* feat(android/app): Add language picker for keyboard package installation (#3481)
+
+## 14.0.130 alpha 2020-08-19
+
+* fix(android): Fix util to getting the tier on CI builds (#3491)
+
+## 14.0.129 alpha 2020-08-17
+
+* feat(windows): rework download keyboard dialog style (#3463)
+* chore: Add sample vscode settings files (#3249)
+* fix(linux): Lookup language tag from keyboard (#3408)
+
+## 14.0.128 alpha 2020-08-13
+
+* feat(linux): Hook up Sentry for km-config (#3378)
+* chore(linux): Use new staging site names and use variable for downloads.keyman.com (#3406)
+
+## 14.0.127 alpha 2020-08-12
+
+* refactor(common/models): LMLayer state management tweak, persistent ModelCompositor (#3477)
+
+## 14.0.126 alpha 2020-08-10
+
+* fix(android): Add CI script to publish to Play Store (#3469)
+* fix(android): Update sentry plugin to remove obsolete API  use (#3471)
+* feat(ios/app): universal links for keyboard installation (#3466)
+* fix(ios/engine): Proper associating-installer deinitialization, cancellation tests (#3468)
+* refactor(ios): error definitions, i18n (#3470)
+* chore: cleanup keyboardprocessor.h.in (#3473)
+
 ## 14.0.125 alpha 2020-08-07
 
 * fix(android): Update Gradle wrapper to 5.6.4 (#3467)

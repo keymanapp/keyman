@@ -17,6 +17,7 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,11 @@ public class CloudKeyboardPackageDownloadCallback implements ICloudDownloadCallb
             String pkgTarget = kbdKMPProcessor.getPackageTarget(kmpFile);
             if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
               File unzipPath = kbdKMPProcessor.unzipKMP(kmpFile);
-              installedKeyboards.addAll(kbdKMPProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_KEYBOARDS_KEY, languageID));
+              ArrayList<String> languageList = new ArrayList<String>();
+              if (languageID != null && !languageID.isEmpty()) {
+                languageList.add(languageID);
+              }
+              installedKeyboards.addAll(kbdKMPProcessor.processKMP(kmpFile, unzipPath, PackageProcessor.PP_KEYBOARDS_KEY, languageList));
             }
           }
         }

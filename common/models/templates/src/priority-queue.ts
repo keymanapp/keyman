@@ -58,35 +58,35 @@ namespace models {
     private heapify(): void;
     private heapify(start: number, end: number): void;
     private heapify(start?: number, end?: number): void {
-      if(typeof start == 'number' && typeof end == 'number') {
-        // Use of 'indices' here is a bit of a customization.
-        // At the cost of (temporary) extra storage space, we can more efficiently enqueue
-        // multiple elements simultaneously.
-        let queuedIndices: number[] = [];
-        let lastParent = -1;
-
-        for(let i = end; i >= start; i--) {
-          let parent = PriorityQueue.parentIndex(i);
-          if(this.siftDown(i) && parent < start && lastParent != parent) {
-            // We only need to queue examination for a heap node if its children have changed
-            // and it isn't already being examined.
-            queuedIndices.push(parent);
-            lastParent = parent;
-          }
-        }
-
-        lastParent = -1;
-        while(queuedIndices.length > 0) {
-          let index = queuedIndices.shift();
-          let parent = PriorityQueue.parentIndex(index);
-          if(this.siftDown(index) && parent >= 0 && lastParent != parent) {
-              // We only need to queue examination for a heap node if its children have changed.
-            queuedIndices.push(parent);
-            lastParent = parent;
-          }
-        }
-      } else {
+      if(start == undefined || end == undefined) {
         this.heapify(0, this.count - 1);
+      }
+
+      // Use of 'indices' here is a bit of a customization.
+      // At the cost of (temporary) extra storage space, we can more efficiently enqueue
+      // multiple elements simultaneously.
+      let queuedIndices: number[] = [];
+      let lastParent = -1;
+
+      for(let i = end; i >= start; i--) {
+        let parent = PriorityQueue.parentIndex(i);
+        if(this.siftDown(i) && parent < start && lastParent != parent) {
+          // We only need to queue examination for a heap node if its children have changed
+          // and it isn't already being examined.
+          queuedIndices.push(parent);
+          lastParent = parent;
+        }
+      }
+
+      lastParent = -1;
+      while(queuedIndices.length > 0) {
+        let index = queuedIndices.shift();
+        let parent = PriorityQueue.parentIndex(index);
+        if(this.siftDown(index) && parent >= 0 && lastParent != parent) {
+            // We only need to queue examination for a heap node if its children have changed.
+          queuedIndices.push(parent);
+          lastParent = parent;
+        }
       }
     }
 

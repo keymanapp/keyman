@@ -48,13 +48,49 @@ public class KMManagerTest {
 
   @Test
   public void test_getTier() {
-    String versionName = "14.0.248-alpha-local";
+    String versionName = "14.0.248-alpha";
     KMManager.Tier tier = KMManager.getTier(versionName);
     Assert.assertEquals(KMManager.Tier.ALPHA, tier);
+
+    versionName = "14.0.248-alpha-test";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.ALPHA, tier);
+
+    versionName = "14.0.248-alpha-test-1234";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.ALPHA, tier);
+
+    versionName = "14.0.248-alpha-local";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.ALPHA, tier);
+
+    versionName = "14.0.248-beta";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.BETA, tier);
+
+    versionName = "14.0.248-beta-test";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.BETA, tier);
+
+    versionName = "14.0.248-beta-test-1234";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.BETA, tier);
 
     versionName = "14.0.248-beta-local";
     tier = KMManager.getTier(versionName);
     Assert.assertEquals(KMManager.Tier.BETA, tier);
+
+    versionName = "14.0.248-stable";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
+
+    versionName = "14.0.248-stable-test";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
+
+    versionName = "14.0.248-stable-test-1234";
+    tier = KMManager.getTier(versionName);
+    Assert.assertEquals(KMManager.Tier.STABLE, tier);
 
     versionName = "14.0.248-stable-local";
     tier = KMManager.getTier(versionName);

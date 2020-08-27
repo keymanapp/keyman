@@ -10,6 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { createTrieDataStructure, defaultSearchTermToKey } from "./build-trie";
 import {decorateWithJoin} from "./join-word-breaker-decorator";
+import {decorateWithScriptOverrides} from "./script-overrides-decorator";
 
 export default class LexicalModelCompiler {
 
@@ -94,20 +95,31 @@ export class ModelSourceError extends Error {
  * breaking function.
  */
 function compileWordBreaker(spec: WordBreakerSpec): string {
-  let baseWordBreakerCode = compileInnerWordBreaker(spec.use);
+  let wordBreakerCode = compileInnerWordBreaker(spec.use);
 
-  if (spec.joinWordsAt == undefined) {
-    // No need to decorate; return it as-is
-    return baseWordBreakerCode;
+  if (spec.joinWordsAt) {
+    wordBreakerCode = compileJoinDecorator(spec, wordBreakerCode);
   }
 
+  if (spec.overrideScriptDefaults) {
+    wordBreakerCode = compileScriptOverrides(spec, wordBreakerCode);
+  }
+
+  return wordBreakerCode;
+}
+
+function compileJoinDecorator(spec: WordBreakerSpec, existingWordBreakerCode: string) {
   // Bundle the source of the join decorator, as an IIFE,
-  // like this: (function join(breaker, joiners) {/*...*/}(breaker, joiners)) 
+  // like this: (function join(breaker, joiners) {/*...*/}(breaker, joiners))
   // The decorator will run IMMEDIATELY when the model is loaded,
   // by the LMLayer returning the decorated word breaker to the
   // LMLayer model.
   let joinerExpr: string = JSON.stringify(spec.joinWordsAt)
-  return `(${decorateWithJoin.toString()}(${baseWordBreakerCode}, ${joinerExpr}))`;
+  return `(${decorateWithJoin.toString()}(${existingWordBreakerCode}, ${joinerExpr}))`;
+}
+
+function compileScriptOverrides(spec: WordBreakerSpec, existingWordBreakerCode: string) {
+  return `(${decorateWithScriptOverrides.toString()}(${existingWordBreakerCode}, '${spec.overrideScriptDefaults}'))`;
 }
 
 /**
