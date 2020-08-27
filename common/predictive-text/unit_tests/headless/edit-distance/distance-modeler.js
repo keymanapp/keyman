@@ -2,6 +2,27 @@ var assert = require('chai').assert;
 let models = require('../../../build/intermediate').models;
 let correction = require('../../../build/intermediate').correction;
 
+function assertEdgeChars(edge, input, match) {
+  assert.isTrue(edgeHasChars(edge, input, match));
+}
+
+function edgeHasChars(edge, input, match) {
+  if(edge.optimalInput[edge.optimalInput.length - 1].sample.insert != input) {
+    return false;
+  }
+
+  return edge.calculation.lastMatchEntry.char == match;
+}
+
+function findEdgeWithChars(edgeArray, input, match) {
+  let results = edgeArray.filter(function(value) {
+    return value.calculation.lastMatchEntry.char == match && value.optimalInput[value.optimalInput.length - 1].sample.insert == input;
+  });
+
+  assert.equal(results.length, 1);
+  return results[0];
+}
+
 describe.only('Correction Distance Modeler', function() {
   describe('Search Node + Search Edge', function() {
     var testModel;
@@ -87,13 +108,7 @@ describe.only('Correction Distance Modeler', function() {
         for(let mass of synthDistribution) {
           expectedChildCount++;
           
-          let matchingEdge = edges.filter(function(value) {
-            return value.calculation.lastMatchEntry.char == child.char &&
-                   value.optimalInput[0] == mass;
-          });
-
-          assert.equal(matchingEdge.length, 1); // An array is returned, but should only hold the one entry.
-          matchingEdge = matchingEdge[0]; // Array -> that one entry.
+          let matchingEdge = findEdgeWithChars(edges, mass.sample.insert, child.char);
 
           // Substitution - matching char
           if(mass.sample.insert == matchingEdge.calculation.lastMatchEntry.char) {
@@ -125,6 +140,86 @@ describe.only('Correction Distance Modeler', function() {
       assert.equal(nextEdge.optimalInput[0].sample.insert, 't');
       assert.notEqual(nextEdge.calculation.lastMatchEntry.char, 't');
       assert.equal(nextEdge.currentCost, 1.25);
+    });
+
+    it('Small integration test:  "teh" => "ten", "the"', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let rootNode = new correction.SearchNode(rootTraversal);
+      assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
+
+      // VERY artificial distributions.
+      let synthDistribution1 = [
+        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+      ];
+
+      let synthDistribution2 = [
+        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let synthDistribution3 = [
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1);
+      let layer1Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer1Edges);
+
+      let tEdge = layer1Queue.dequeue();
+      assertEdgeChars(tEdge, 't', 't');
+
+      let layer2Edges = new correction.SearchNode(tEdge).buildSubstitutionEdges(synthDistribution2);
+      let layer2Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer2Edges);
+
+      let eEdge = layer2Queue.dequeue();
+      assertEdgeChars(eEdge, 'e', 'e');
+
+      let hEdge = layer2Queue.dequeue();
+      assertEdgeChars(hEdge, 'h', 'h');
+
+      // Needed for a proper e <-> h transposition.
+      let ehEdge = findEdgeWithChars(layer2Edges, 'e', 'h');
+
+      assert.isOk(ehEdge);
+
+      // Final round:  we'll use three nodes and throw all of their results into the same priority queue.
+      let layer3eEdges  = new correction.SearchNode(eEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3hEdges  = new correction.SearchNode(hEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3ehEdges = new correction.SearchNode(ehEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+
+      // Find the first result with an actual word directly represented.
+      do {
+        edge = layer3Queue.dequeue();
+      } while(edge.calculation.lastMatchEntry.tag.entries.length == 0);
+
+      assertEdgeChars(edge, 'n', 'n'); // 'ten' - perfect edit distance of 0, though less-likely input sequence.
+      assert(edge.currentCost, 1);
+
+      var edge;
+      do {
+        edge = layer3Queue.dequeue();
+      } while(edge.calculation.lastMatchEntry.tag.entries.length == 0);
+
+      // Both have a raw edit distance of 1 while using the same input-sequence root. ('th')
+      let tenFlag = edgeHasChars(edge, 'h', 'n'); // subs out the 'h' entirely.  Could also occur with 'a', but is too unlikely.
+      let theFlag = edgeHasChars(edge, 'h', 'e'); // looks for transposed 'h' and 'e'.
+
+      assert.isTrue(tenFlag || theFlag);
+      assert.equal(edge.currentCost, 1.5);
+
+      do {
+        edge = layer3Queue.dequeue();
+      } while(edge.calculation.lastMatchEntry.tag.entries.length == 0);
+
+      tenFlag = tenFlag || edgeHasChars(edge, 'h', 'n');
+      theFlag = theFlag || edgeHasChars(edge, 'h', 'e');
+
+      assert.isTrue(tenFlag && theFlag);
+      assert.equal(edge.currentCost, 1.5);
     });
   });
 });
