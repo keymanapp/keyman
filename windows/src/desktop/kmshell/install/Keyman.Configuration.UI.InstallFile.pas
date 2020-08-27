@@ -41,7 +41,7 @@ uses
 class function TInstallFile.Execute(KeyboardFileNames: TStrings; const FirstKeyboardFileName: string; FSilent, FNoWelcome: Boolean;
   const LogFile: string): Boolean;
 begin
-  if KeyboardFileNames.Count > 1 then
+  if (KeyboardFileNames.Count > 1) or (Pos('=', FirstKeyboardFileName) > 0) then
   begin
     Result := TInstallFile.Execute(nil, KeyboardFileNames, FSilent)
   end
@@ -53,7 +53,7 @@ begin
 //  else if IsNotPackageOrKeyboardFile then
   else
   begin
-    Result := TInstallFile.Execute(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile, ''); // TODO: support BCP 47 from command line
+    Result := TInstallFile.Execute(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile, '');
   end;
 end;
 
@@ -133,10 +133,10 @@ end;
 
 /// <summary>
 /// Takes a list of filename + bcp47 pairs (in filename=bcp47 format) and
-/// installs each package / keyboard with the associated bcp47 language. If a
-/// bcp47 value is not provided, then the default language for the package is
-/// installed. If a package contains multiple keyboards, then bcp47 should not
-/// be provided, and will be ignored if it is.
+/// installs each package / keyboard and ensures the associated bcp47 language is
+/// registered. If a bcp47 value is not provided, then the default language for
+/// the package is registered. If a package contains multiple keyboards, then bcp47
+/// should not be provided, and will be ignored if it is.
 /// This is the handler for the `-i` parameter, e.g.
 ///   kmshell -i khmer_angkor.kmp c:\temp\sil_euro_latin.kmp=fr
 /// </summary>
@@ -148,6 +148,7 @@ var
   Filename: string;
   FilenameBCP47: TArray<string>;
   IsPackage: Boolean;
+  BCP47Tag: string;
 begin
   Result := False;
   FPackage := nil;
@@ -172,10 +173,11 @@ begin
       else
       begin
         FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True);
-        // TODO: the split between user and lm here is a real pain; we need to handle this cleanly
         if Length(FilenameBCP47) > 1
-          then TTIPMaintenance.DoInstall(FKeyboard.ID, FilenameBCP47[1])
-          else TTIPMaintenance.DoInstall(FKeyboard.ID, TTIPMaintenance.GetFirstLanguage(FKeyboard))
+          then BCP47Tag := FilenameBCP47[1]
+          else BCP47Tag := TTIPMaintenance.GetFirstLanguage(FKeyboard);
+        TTIPMaintenance.DoRegister(FKeyboard.ID, BCP47Tag);
+        // The keyboard will be installed for current user as a separate step
       end;
       CheckForMitigationWarningFor_Win10_1803(ASilent, '');
     except
