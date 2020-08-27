@@ -18,24 +18,6 @@ namespace correction {
     return arg1.currentCost - arg2.currentCost;
   }
 
-  // const QUEUE_END_NODE_COMPARATOR: models.Comparator<SearchNode> = function(arg1, arg2) {
-  //   return arg1.knownCost - arg2.knownCost;
-  // }
-
-  export const QUEUE_SPACE_COMPARATOR: models.Comparator<SearchSpaceTier> = function(space1, space2) {
-    let node1 = space1.correctionQueue.peek();
-    let node2 = space2.correctionQueue.peek();
-    
-    // Guards, just in case one of the search spaces ever has an empty node.
-    if(node1 && node2) {
-      return node1.currentCost - node2.currentCost;
-    } else if(node2) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-
   // Represents an 'edge' to a potential 'node' on the (conceptual) graph used to search for best-fitting
   // corrections by the correction-search algorithm.  Stores the cost leading to the new node, though it may be
   // an overestimate when the edit distance is greater than the current search threshold.
@@ -214,83 +196,4 @@ namespace correction {
       return edges;
     }
   } 
-
-  /*
-   * NOTE:  Everything after this point is EXTREMELY rough-draft. 
-   */
-
-  class SearchSpaceTier {
-    correctionQueue: models.PriorityQueue<SearchEdge>;
-    operation: SearchOperation;
-
-    processed: SearchNode[] = [];
-
-    constructor(operation: SearchOperation) {
-      this.operation = operation;
-      this.correctionQueue = new models.PriorityQueue<SearchEdge>(QUEUE_EDGE_COMPARATOR);
-    }
-  }
-
-  // The set of search spaces corresponding to the same 'context' for search.
-  // Whenever a wordbreak boundary is crossed, a new instance should be made.
-  export class SearchSpace {
-    private cachedSpaces: {[id: string]: SearchSpaceTier} = {};
-    private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
-
-    // TODO:  Fix; is not quite right.  We want the results corresponding to the node
-    // that will let us build the next tier's SearchNodes when new input arrives.
-    //
-    // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time 
-    // is cheaper than iteratively building a priority queue.
-    private extractedResults: SearchNode[] = [];
-
-    constructor() {
-      this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR);
-    }
-
-    processNode(node: SearchEdge): SearchNode[] {
-      let sourceCalc = node.calculation;
-
-      // TODO:  Lots of things.
-      return [];
-    }
-
-    addInput(input: Distribution<Transform>) {
-
-    }
-  }
-
-  export class DistanceModelerOptions {
-    minimumPredictions: number;
-  }
-
-  export class DistanceModeler {
-    private options: DistanceModelerOptions;
-    public static readonly DEFAULT_OPTIONS: DistanceModelerOptions = {
-      minimumPredictions: 3
-    }
-
-    // Keep as a 'rotating cache'.  Includes search spaces corresponding to 'revert' commands.
-    private searchSpaces: SearchSpace[] = [];
-
-    private inputs: Distribution<USVString>[] = [];
-    private lexiconRoot: LexiconTraversal;
-
-    constructor(lexiconRoot: LexiconTraversal, options: DistanceModelerOptions = DistanceModeler.DEFAULT_OPTIONS) {
-      this.lexiconRoot = lexiconRoot;
-      this.options = options;
-    }
-
-    addInput(input: Distribution<Transform>) {
-      // TODO:  add 'addInput' operation
-      //        do search space things
-    }
-
-    // Current best guesstimate of how compositor will retrieve ideal corrections.
-    getBestMatches(): Generator<[string, number][]> { // might should also include a 'base cost' parameter of sorts?
-      // Duplicates underlying Priority Queue, iterates progressively through sets of evenly-costed
-      // corrections until satisfied.
-      return null;
-    }
-  }
 }
