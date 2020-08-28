@@ -76,7 +76,7 @@ procedure Main(Owner: TComponent = nil);
 type
     TKMShellMode = (fmUndefined, fmInstall, fmView, fmUninstall, fmAbout,
                     fmUninstallKeyboard,
-                    fmInstallKeyboardLanguage, fmRegisterTip, fmInstallTip, fmUninstallKeyboardLanguage,   // I3624
+                    fmInstallTipsForPackages, fmInstallKeyboardLanguage, fmRegisterTip, fmInstallTip, fmUninstallKeyboardLanguage,   // I3624
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
                     fmMigrate, fmSplash, fmStart,
@@ -227,7 +227,7 @@ begin
 
       else if s = '-register-tip' then FMode := fmRegisterTip
       else if s = '-install-tip' then FMode := fmInstallTip
-
+      else if s = '-install-tips-for-packages' then FMode := fmInstallTipsForPackages
 
       //else if s = '-i+' then  begin FMode := fmInstall; FNoWelcome := True; end;
       else if s = '-v' then   FMode := fmView
@@ -284,7 +284,7 @@ begin
     Inc(i);
   end;
 
-  if FMode in [fmInstall, fmInstallKeyboardLanguage, fmInstallTip, fmRegisterTip, fmView, fmUninstallKeyboard, fmUninstallKeyboardLanguage, fmUninstallPackage] then  // I2807   // I3624
+  if FMode in [fmInstall, fmInstallKeyboardLanguage, fmInstallTipsForPackages, fmInstallTip, fmRegisterTip, fmView, fmUninstallKeyboard, fmUninstallKeyboardLanguage, fmUninstallPackage] then  // I2807   // I3624
     if KeyboardFileNames.Count = 0 then Exit;
 
   Result := FMode <> fmUndefined;
@@ -474,6 +474,11 @@ begin
 
     fmInstall:
       if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
+        then ExitCode := 0
+        else ExitCode := 1;
+
+    fmInstallTipsForPackages:
+      if TTipMaintenance.InstallTipsForPackages(KeyboardFileNames)
         then ExitCode := 0
         else ExitCode := 1;
 
