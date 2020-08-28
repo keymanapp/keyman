@@ -109,7 +109,6 @@ public class WebViewFragment extends Fragment implements BlockingStep {
     webView.getSettings().setLoadWithOverviewMode(true);
     webView.getSettings().setBuiltInZoomControls(true);
     webView.getSettings().setSupportZoom(true);
-    webView.getSettings().setTextZoom(200);
     webView.setVerticalScrollBarEnabled(true);
     webView.setHorizontalScrollBarEnabled(true);
     webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -135,6 +134,17 @@ public class WebViewFragment extends Fragment implements BlockingStep {
 
       @Override
       public void onPageFinished(WebView view, String url) {
+        // Inject a meta viewport tag into the head of the file if it doesn't exist
+        webView.loadUrl(
+          "javascript:(function() {" +
+            "if(!document.querySelectorAll('meta[name=viewport]').length) {"+
+            "let meta=document.createElement('meta');"+
+            "meta.name='viewport';"+
+            "meta.content='width=device-width, initial-scale=1';"+
+            "document.head.appendChild(meta);"+
+            "}"+
+            "})()"
+        );
       }
     });
 
