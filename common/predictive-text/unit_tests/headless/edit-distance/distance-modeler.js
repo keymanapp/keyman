@@ -312,7 +312,7 @@ describe.only('Correction Distance Modeler', function() {
 
       // Debugging method:  a simple loop for printing out the generated sets, in succession.
       //
-      // for(let i = 1; i < 3; i++) {
+      // for(let i = 1; i <= 8; i++) {  // After 8 tiers, we run out of entries for this particular case.
       //   console.log();
       //   console.log("Batch " + i);
 

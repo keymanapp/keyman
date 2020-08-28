@@ -210,11 +210,7 @@ namespace correction {
 
       return edges;
     }
-  } 
-
-  /*
-   * NOTE:  Everything after this point is EXTREMELY rough-draft. 
-   */
+  }
 
   class SearchSpaceTier {
     correctionQueue: models.PriorityQueue<SearchEdge>;
