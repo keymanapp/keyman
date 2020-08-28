@@ -356,7 +356,8 @@ var
   FPackage: IKeymanPackageFile;
 begin
   Result := True;
-  
+
+  // TODO: preserve user language choice with upgrade (use ForceInstall)
   for i := 0 to kmcom.Packages.Count - 1 do
   begin
     pkg := kmcom.Packages[i];

@@ -118,9 +118,11 @@ uses
   GetOSVersion,
   MessageIdentifierConsts,
   MessageIdentifiers,
+  Keyman.UI.UfrmProgress,
   Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.Configuration.System.HttpServer.App.InstallKeyboard,
   Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.Configuration.System.TIPMaintenance,
   kmcomapi_errors,
   kmint,
   OnlineConstants,
@@ -256,23 +258,41 @@ var
 begin
   if (command = 'keyboard_install') and kmcom.SystemInfo.IsAdministrator then   // I4172
   begin
-    InstallKeyboard('');
+    TfrmProgress.Execute(Self,
+      function(Manager: IProgressManager): Boolean
+      begin
+        Manager.Title := 'Installing Keyboard';
+        Manager.CanCancel := False;
+        Manager.UpdateProgress('Installing Keyboard', 0, 0);
+        InstallKeyboard('');
+        Result := True;
+      end
+    );
   end
   else if command = 'keyboard_cancel' then
     ModalResult := mrCancel
   else if (command = 'keyboard_installallusers') or (command = 'keyboard_install') then   // I4172
   begin
-    t := TTempFileManager.Get('.log');
-    try
-      if WaitForElevatedConfiguration(Handle, '-log "'+t.Name+'" -s -i "'+FInstallFile+'" -nowelcome') = 0 then
-        ModalResult := mrOk
-      else
-        ModalResult := mrCancel;
+    TfrmProgress.Execute(Self,
+      function(Manager: IProgressManager): Boolean
+      begin
+        Manager.Title := 'Installing Keyboard';
+        Manager.CanCancel := False;
+        Manager.UpdateProgress('Installing Keyboard', 0, 0);
+        t := TTempFileManager.Get('.log');
+        try
+          if WaitForElevatedConfiguration(Handle, '-log "'+t.Name+'" -s -i "'+FInstallFile+'" -nowelcome') = 0 then
+            ModalResult := mrOk
+          else
+            ModalResult := mrCancel;
 
-      CheckLogFileForWarnings(t.Name, False);
-    finally
-      t.Free;
-    end;
+          CheckLogFileForWarnings(t.Name, False);
+        finally
+          t.Free;
+        end;
+        Result := True;
+      end
+    );
   end
   else
     inherited;
@@ -306,6 +326,8 @@ var
   pkg: IKeymanPackageInstalled;
   //FKeyboardsList: WideString;
   j: Integer;
+  FInstalledPackage: IKeymanPackageInstalled;
+  FInstalledKeyboard: IKeymanKeyboardInstalled;
 begin
   kmcom.Errors.Clear;
   try
@@ -339,7 +361,10 @@ begin
         kbd := nil;
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;
-        FKeyboard.Install(True);
+        FInstalledKeyboard := (FKeyboard as IKeymanKeyboardFile2).Install2(True);
+        // TODO: let user choose language
+        // GetFirstLanguage is a temporary function until we implement TODO above
+        TTIPMaintenance.DoInstall(FKeyboard.ID, TTIPMaintenance.GetFirstLanguage(FInstalledKeyboard));
         CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end
       else
@@ -395,7 +420,15 @@ begin
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;  // I2169
 
-        FPackage.Install(True);
+        (FPackage as IKeymanPackageFile2).Install2(True);
+
+        kmcom.Refresh;
+
+        // TODO: allow user to select language
+        FInstalledPackage := kmcom.Packages[FPackage.ID];
+        for i := 0 to FInstalledPackage.Keyboards.Count - 1 do
+          TTIPMaintenance.DoInstall(FInstalledPackage.Keyboards[i].ID, TTIPMaintenance.GetFirstLanguage(FInstalledPackage.Keyboards[i] as IKeymanKeyboardInstalled));
+
         CheckForMitigationWarningFor_Win10_1803(FSilent, ALogFile);
       end;
     except

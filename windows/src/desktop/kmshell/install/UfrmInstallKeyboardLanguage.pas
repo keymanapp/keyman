@@ -93,9 +93,9 @@ type
     editSearch: TEdit;
     gridLanguages: TStringGrid;
     gridLanguageVariants: TStringGrid;
-    procedure cmdOKClick(Sender: TObject);
     procedure TntFormCreate(Sender: TObject);
     procedure TntFormDestroy(Sender: TObject);
+    procedure cmdOKClick(Sender: TObject);
     procedure gridLanguagesClick(Sender: TObject);
     procedure editSearchChange(Sender: TObject);
     procedure gridLanguagesDrawCell(Sender: TObject; ACol, ARow: Integer;
@@ -130,11 +130,12 @@ uses
   Keyman.Configuration.UI.MitigationForWin10_1803,
   Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
+  Keyman.Configuration.System.TIPMaintenance,
+  Keyman.UI.UfrmProgress,
 
   BCP47Tag,
   GetOSVersion,
   kmint,
-  UtilWaitForTSF,
   utilkmshell;
 
 {$R *.dfm}
@@ -142,15 +143,10 @@ uses
 { TfrmInstallKeyboardLanguage }
 
 function InstallKeyboardLanguage(Owner: TForm; const KeyboardID, ISOCode: string; Silent: Boolean): Boolean;
-var
-  n: Integer;
 begin
-  n := kmcom.Keyboards.IndexOf(KeyboardID);
-  if n < 0 then
-    Exit(False);
-
-  kmcom.Keyboards[n].Languages.Install(ISOCode);
-  CheckForMitigationWarningFor_Win10_1803(Silent, '');
+  Result := TTIPMaintenance.DoInstall(KeyboardID, ISOCode);
+  if Result then
+    CheckForMitigationWarningFor_Win10_1803(Silent, '');
 
   Result := True;
 end;
@@ -251,44 +247,45 @@ begin
 end;
 
 procedure TfrmInstallKeyboardLanguage.cmdOKClick(Sender: TObject);
-var
-  FLanguageVariant: TInstLanguageVariant;
-  FCode: string;
-  n: Integer;
-  FKeyboardID: string;
 begin
-  FLanguageVariant := gridLanguageVariants.Objects[0, gridLanguageVariants.Row] as TInstLanguageVariant;
-  if not Assigned(FLanguageVariant)
-    then FCode := FCustomLanguage.Tag // Using a custom code
-    else FCode := FLanguageVariant.Code;
+  if TfrmProgress.Execute(Self,
+    function(Manager: IProgressManager): Boolean
+    var
+      FLanguageVariant: TInstLanguageVariant;
+      FCode: string;
+      n: Integer;
+      FKeyboardID: string;
+    begin
+      Manager.Title := 'Installing Language';
+      Manager.CanCancel := False;
+      Manager.UpdateProgress('Installing Language', 0, 0);
+      FLanguageVariant := gridLanguageVariants.Objects[0, gridLanguageVariants.Row] as TInstLanguageVariant;
+      if not Assigned(FLanguageVariant)
+        then FCode := FCustomLanguage.Tag // Using a custom code
+        else FCode := FLanguageVariant.Code;
 
-  if not kmcom.SystemInfo.IsAdministrator then
-  begin
-    WaitForElevatedConfiguration(Handle, '-ikl "'+FKeyboard.ID+'" "'+FCode+'"');
-  end
-  else
-  begin
-    InstallKeyboardLanguage(Self, FKeyboard.ID, FCode, False);
-  end;
+      TTIPMaintenance.DoInstall(FKeyboard.ID, FCode);
 
-  FKeyboardID := FKeyboard.ID;
-  FKeyboard := nil;
+      FKeyboardID := FKeyboard.ID;
+      FKeyboard := nil;
 
-  kmcom.Languages.Refresh;
-  kmcom.Keyboards.Refresh;
-  n := kmcom.Keyboards.IndexOf(FKeyboardID);
-  if n >= 0
-    then FKeyboard := kmcom.Keyboards[n]
-    else FKeyboard := nil;
+      kmcom.Languages.Refresh;
+      kmcom.Keyboards.Refresh;
+      n := kmcom.Keyboards.IndexOf(FKeyboardID);
+      if n >= 0
+        then FKeyboard := kmcom.Keyboards[n]
+        else FKeyboard := nil;
 
-  if Assigned(FKeyboard) then
-  begin
-    // Because the TSF component is async we have to wait
-    TWaitForTSF.WaitForLanguageProfilesToBeApplied(FKeyboard);
-    FKeyboard := nil;
-    kmcom.Keyboards.Refresh;  // Get updated language profile name after it is loaded
-  end;
-  ModalResult := mrOk;
+      if Assigned(FKeyboard) then
+      begin
+        // Because the TSF component is async we have to wait
+        FKeyboard := nil;
+        kmcom.Keyboards.Refresh;  // Get updated language profile name after it is loaded
+      end;
+      Result := True;
+    end
+  ) then
+    ModalResult := mrOk;
 end;
 
 procedure TfrmInstallKeyboardLanguage.editSearchChange(Sender: TObject);

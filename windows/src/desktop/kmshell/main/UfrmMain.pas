@@ -530,7 +530,7 @@ begin
 
   if GetKeyboardLanguageFromParams(params, kbdlang) then
   begin
-    if UninstallKeyboardLanguage(Self, GUIDToString(kbdlang.ProfileGUID), False) then
+    if UninstallKeyboardLanguage(GUIDToString(kbdlang.ProfileGUID), False) then
     begin
       RefreshKeymanConfiguration;
     end;
