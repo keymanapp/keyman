@@ -257,33 +257,75 @@ describe.only('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution3);
 
       let iter = searchSpace.getBestMatches();
-      // let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      // assert.isFalse(firstSet.done);
+      let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(firstSet.done);
       
-      // firstSet = firstSet.value; // Retrieves <actual value>
-      // assert.equal(firstSet[1], 1);
-      // assert.equal(firstSet[0].length, 1); // A single sequence ("ten") should be the best match.
+      firstSet = firstSet.value; // Retrieves <actual value>
+      assert.equal(firstSet[1], 1);
+      assert.equal(firstSet[0].length, 1); // A single sequence ("ten") should be the best match.
 
-      // let chars = firstSet[0][0].map(value => value.key);
-      // assert.equal(chars.join(''), "ten");
+      let chars = firstSet[0][0].map(value => value.key);
+      assert.equal(chars.join(''), "ten");
 
-      for(let i = 1; i < 4; i++) {
-        console.log();
-        console.log("Batch " + i);
+      let secondBatch = [
+        'beh',  'te',  'tec',
+        'tech', 'tel', 'tem',
+        'ter',  'tes', 'th',
+        'the'
+      ];
 
-        let set = iter.next();
-        assert.isFalse(set.done);
+      let secondSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(secondSet.done);
+      
+      secondSet = secondSet.value; // Retrieves <actual value>
+      assert.equal(secondSet[1], 1.5);
+      assert.equal(secondSet[0].length, secondBatch.length);
 
-        set = set.value;
+      let entries = secondSet[0].map(function(sequence) {
+        return sequence.map(value => value.key).join('');
+      }).sort();
+      assert.deepEqual(entries, secondBatch);
 
-        let entries = set[0].map(function(sequence) {
-          return sequence.map(value => value.key).join('');
-        });
+      let thirdBatch = [
+        'cen', 'en',  'gen',
+        'ken', 'len', 'men',
+        'sen', 'tha', 'then',
+        'thi', 'tho', 'thr',
+        'thu', 'wen'
+      ];
 
-        console.log("Expected entry count: " + set[0].length);
-        console.log(entries);
-        console.log(set[1]);
-      }
+      let thirdSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(thirdSet.done);
+      
+      thirdSet = thirdSet.value; // Retrieves <actual value>
+      assert.equal(thirdSet[1], 2);
+      assert.equal(thirdSet[0].length, thirdBatch.length);
+
+      entries = thirdSet[0].map(function(sequence) {
+        return sequence.map(value => value.key).join('');
+      }).sort();
+      assert.deepEqual(entries, thirdBatch);
+
+      // Debugging method:  a simple loop for printing out the generated sets, in succession.
+      //
+      // for(let i = 1; i < 9; i++) {
+      //   console.log();
+      //   console.log("Batch " + i);
+
+      //   let set = iter.next();
+      //   assert.isFalse(set.done);
+
+      //   set = set.value;
+
+      //   let entries = set[0].map(function(sequence) {
+      //     return sequence.map(value => value.key).join('');
+      //   });
+
+      //   console.log("Entry count: " + set[0].length);
+      //   entries.sort();
+      //   console.log(entries);
+      //   console.log(set[1]);
+      // }
     });
   });
 });

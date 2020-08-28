@@ -73,7 +73,7 @@ namespace correction {
 
     get mapKey(): string {
       // TODO:  correct, as Transforms don't convert nicely to strings.
-      let inputString = this.optimalInput.map((value) => value.sample).join('');
+      let inputString = this.optimalInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
       let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
       // TODO:  might should also track diagonalWidth.
       return inputString + models.SENTINEL_CODE_UNIT + matchString;
@@ -248,13 +248,19 @@ namespace correction {
 
     // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time 
     // is cheaper than iteratively building a priority queue.
-    private extractedResults: SearchNode[];
+    private completedPaths: SearchNode[];
+    private returnedValues: {[mapKey: string]: SearchNode} = {};
+
+    // Lingering question - can we get away with storing a single bit instead?
+    // For now, it's best to wait for the full implementation... just in case we do
+    // find a secondary use for this.
+    private processedEdgeSet: {[mapKey: string]: SearchEdge} = {};
 
     constructor(traversalRoot: LexiconTraversal) {
       this.selectionQueue = new models.PriorityQueue<SearchSpaceTier>(QUEUE_SPACE_COMPARATOR);
       this.rootNode = new SearchNode(traversalRoot);
 
-      this.extractedResults = [this.rootNode];
+      this.completedPaths = [this.rootNode];
     }
 
     increaseMaxEditDistance() {
@@ -267,7 +273,7 @@ namespace correction {
       // With a newly-available input, we can extend new input-dependent paths from 
       // our previously-reached 'extractedResults' nodes.
       let newlyAvailableEdges: SearchEdge[] = [];
-      let batches = this.extractedResults.map(function(node) {
+      let batches = this.completedPaths.map(function(node) {
         let deletions = node.buildDeletionEdges(inputDistribution);
         let substitutions = node.buildSubstitutionEdges(inputDistribution);
 
@@ -275,7 +281,8 @@ namespace correction {
       });
 
       // Don't forget to reset the array; the contained nodes no longer reach the search's end.
-      this.extractedResults = [];
+      this.completedPaths = [];
+      this.returnedValues = {};
 
       batches.forEach(function(batch) {
         newlyAvailableEdges = newlyAvailableEdges.concat(batch);
@@ -294,15 +301,25 @@ namespace correction {
       // 2.  remove the last search tier.  Which may necessitate reconstructing the tier queue, but oh well.
     }
 
-    hasNextMatch(): boolean {
+    private hasNextMatchEntry(): boolean {
       return this.selectionQueue.peek().correctionQueue.count > 0;
     }
 
     findNextMatch(): SearchNode {
-      while(this.hasNextMatch()) {
+      while(this.hasNextMatchEntry()) {
         let bestTier = this.selectionQueue.dequeue();
 
         let incomingEdge = bestTier.correctionQueue.dequeue();
+
+        // Have we already processed a matching edge?  If so, skip it.
+        // We already know the previous edge is of lower cost.
+        if(this.processedEdgeSet[incomingEdge.mapKey]) {
+          this.selectionQueue.enqueue(bestTier);
+          continue;
+        } else {
+          this.processedEdgeSet[incomingEdge.mapKey] = incomingEdge;
+        }
+
         let currentNode = new SearchNode(this.rootNode.currentTraversal, incomingEdge);
 
         // Always possible, as this does not require any new input.
@@ -311,7 +328,7 @@ namespace correction {
 
         if(bestTier.index == this.tierOrdering.length - 1) {
           // It was the final tier - store the node for future reference.
-          this.extractedResults.push(currentNode);
+          this.completedPaths.push(currentNode);
           
           // Since we don't modify any other tier, we may simply reinsert the removed tier.
           this.selectionQueue.enqueue(bestTier);
@@ -343,6 +360,7 @@ namespace correction {
     // Current best guesstimate of how compositor will retrieve ideal corrections.
     *getBestMatches(): Generator<[TraversableToken<string>[][], number]> { 
       // might should also include a 'base cost' parameter of sorts?
+      let searchSpace = this;
 
       class BatchingAssistant {
         currentCost = Number.MIN_SAFE_INTEGER;
@@ -357,7 +375,13 @@ namespace correction {
             this.currentCost = entry.currentCost;
           }
 
-          this.entries.push(entry.calculation.matchSequence);
+          // Filter out any duplicated match sequences.  The same match sequence may be reached via
+          // different input sequences, after all.
+          let outputMapKey = entry.calculation.matchSequence.map(value => value.key).join('');
+          if(!searchSpace.returnedValues[outputMapKey]) {
+            this.entries.push(entry.calculation.matchSequence);
+            searchSpace.returnedValues[outputMapKey] = entry;
+          }
           return result;
         }
 
@@ -376,8 +400,9 @@ namespace correction {
       let batch: [TraversableToken<string>[][], number];
 
       // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
-      if(this.extractedResults.length > 0) {
-        let preprocessedQueue = new models.PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, this.extractedResults);
+      let returnedValues = Object.values(this.returnedValues);
+      if(returnedValues.length > 0) {
+        let preprocessedQueue = new models.PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
 
         // Build batches of same-cost entries.
         while(preprocessedQueue.count > 0) {
@@ -400,16 +425,26 @@ namespace correction {
       // Stage 2:  the fun part; actually searching!
       do {
         let newResult = this.findNextMatch();
+        if(!newResult) {
+          break;
+        }
         batch = batcher.checkAndAdd(newResult);
 
         if(batch) {
           yield batch;
         }
-      } while(this.hasNextMatch());
+      } while(this.hasNextMatchEntry());
+
+      batch = batcher.tryFinalize();
+      if(batch) {
+        yield batch;
+      }
 
       return null;
     }
   }
+
+  // -- Code after this point is skeletal at best. --
 
   export class DistanceModelerOptions {
     minimumPredictions: number;
