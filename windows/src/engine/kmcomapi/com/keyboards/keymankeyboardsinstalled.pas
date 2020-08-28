@@ -53,11 +53,9 @@ type
       safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     procedure Apply; safecall;
-    function Install2(const Filename: WideString; Force, InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled; safecall;
+    function Install2(const Filename: WideString; Force: WordBool): IKeymanKeyboardInstalled; safecall;
 
     { IIntKeymanKeyboardsInstalled }
-    procedure StartKeyboards;   // I4381
-    procedure StopKeyboards;   // I4381
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
@@ -98,57 +96,24 @@ procedure TKeymanKeyboardsInstalled.Install(const Filename: WideString; Force: W
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [], nil, Force);
+    Execute(FileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
   finally
     Free;
   end;
 end;
 
-function TKeymanKeyboardsInstalled.Install2(const Filename: WideString; Force,
-  InstallDefaultLanguage: WordBool): IKeymanKeyboardInstalled;
+function TKeymanKeyboardsInstalled.Install2(const Filename: WideString;
+  Force: WordBool): IKeymanKeyboardInstalled;
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    if InstallDefaultLanguage then
-      Execute(FileName, '', [ikInstallDefaultLanguage], nil, Force)
-    else
-      Execute(FileName, '', [], nil, Force);
+    Execute(FileName, '', [], nil, Force);
   finally
     Free;
   end;
 
   DoRefresh;
   Result := Get_Items(FileName);
-end;
-
-procedure TKeymanKeyboardsInstalled.StartKeyboards;   // I4381
-var
-  i: Integer;
-  pInputProcessorProfiles: ITfInputProcessorProfiles;
-begin
-  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
-                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
-  for i := 0 to FKeyboards.Count - 1 do
-  begin
-    (FKeyboards[i] as IIntKeymanKeyboardInstalled).ApplyEnabled(
-      pInputProcessorProfiles,
-      (FKeyboards[i] as IKeymanKeyboardInstalled).Loaded);
-  end;
-end;
-
-procedure TKeymanKeyboardsInstalled.StopKeyboards;   // I4381
-var
-  i: Integer;
-  pInputProcessorProfiles: ITfInputProcessorProfiles;
-begin
-  OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
-                          IID_ITfInputProcessorProfiles, pInputProcessorProfiles));
-  for i := 0 to FKeyboards.Count - 1 do
-  begin
-    (FKeyboards[i] as IIntKeymanKeyboardInstalled).ApplyEnabled(
-      pInputProcessorProfiles,
-      False);
-  end;
 end;
 
 function TKeymanKeyboardsInstalled.Get_Items(Index: OleVariant): IKeymanKeyboardInstalled;
@@ -179,7 +144,6 @@ end;
 
 procedure TKeymanKeyboardsInstalled.Apply;
 var
-  i, n: Integer;
   pInputProcessorProfiles: ITfInputProcessorProfiles;
 begin
   OleCheck(CoCreateInstance(CLASS_TF_InputProcessorProfiles, nil, CLSCTX_INPROC_SERVER,
@@ -187,20 +151,12 @@ begin
   with TRegKeyboardList.Create do
   try
     Load(True);
-    for i := 0 to FKeyboards.Count - 1 do
-    begin
-      n := IndexOfName((FKeyboards[i] as IKeymanKeyboard).ID);
-      if n >= 0 then
-      begin
-        Items[n].ApplySettings((FKeyboards[i] as IIntKeymanKeyboardInstalled).RegKeyboard);
-        if Context.Control.IsKeymanRunning then
-          (FKeyboards[i] as IIntKeymanKeyboardInstalled).ApplyEnabled(pInputProcessorProfiles, Items[n].Enabled);   // I4376
-      end;
-    end;
+    // May do some cleanup
     Save;
   finally
     Free;
   end;
+
   Context.Control.AutoApplyKeyman;
 end;
 

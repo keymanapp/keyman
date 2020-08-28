@@ -51,6 +51,8 @@ type
 
     procedure Canonicalize;
 
+    class function GetCanonicalTag(const BCP47Tag: string): string;
+
     property Language: string read FLanguage write SetLanguage;
     property ExtLang: string read FExtLang write SetExtLang;
     property Script: string read FScript write SetScript;
@@ -103,6 +105,21 @@ end;
 constructor TBCP47Tag.Create(tag: string);
 begin
   SetTag(tag);
+end;
+
+class function TBCP47Tag.GetCanonicalTag(const BCP47Tag: string): string;
+var
+  FTag: TBCP47Tag;
+begin
+  Result := BCP47Tag;
+
+  FTag := TBCP47Tag.Create(BCP47Tag);
+  try
+    FTag.Canonicalize;
+    Result := FTag.Tag;
+  finally
+    FTag.Free;
+  end;
 end;
 
 function TBCP47Tag.GetTag: string;

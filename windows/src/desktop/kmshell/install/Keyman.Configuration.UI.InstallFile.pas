@@ -167,12 +167,12 @@ begin
       begin
         if IsPackage then
         begin
-          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True, False);
+          FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True);
           InstallKeyboardPackageLanguage(FPackage, FilenameBCP47[2]);
         end
         else
         begin
-          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True, False);
+          FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True);
           FKeyboard.Languages.Install(FilenameBCP47[2]);
         end;
       end
