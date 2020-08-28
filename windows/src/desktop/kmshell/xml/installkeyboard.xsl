@@ -135,19 +135,18 @@
       <xsl:value-of select="langname" />
     </option>
   </xsl:template>
-  <xsl:template match="/Keyman/KeymanPackageFile/KeymanPackageContentKeyboardsFile/KeymanKeyboardFile">
-    <xsl:value-of select="name"/>
-    <!-- This test presents the selection for keyboard language only for packages with a single keyboard and more than one language option. In future, we could consider extending
-         it for packages with more than one keyboard, but that would take more plumbing for implementation. -->
-    <xsl:if test="count(/Keyman/KeymanPackageFile/KeymanPackageContentKeyboardsFile/KeymanKeyboardFile) = 1 and count(KeymanKeyboardLanguagesFile/KeymanKeyboardLanguage) > 1">:
-      <select class="keyboardLanguage">
-        <xsl:attribute name="id">keyboardLanguage_<xsl:value-of select="id"/></xsl:attribute>
-        <xsl:apply-templates select="KeymanKeyboardLanguagesFile/KeymanKeyboardLanguage">
-          <xsl:sort select="langname" />
-        </xsl:apply-templates>
-      </select>
-    </xsl:if>
-    <br />
+
+  <xsl:template mode="language-picker" match="/Keyman/KeymanPackageFile/KeymanPackageContentKeyboardsFile/KeymanKeyboardFile">
+    <select class="keyboardLanguage">
+      <xsl:attribute name="id">keyboardLanguage_<xsl:value-of select="id"/></xsl:attribute>
+      <xsl:apply-templates select="KeymanKeyboardLanguagesFile/KeymanKeyboardLanguage">
+        <xsl:sort select="langname" />
+      </xsl:apply-templates>
+    </select>
+  </xsl:template>
+
+  <xsl:template mode="keyboard-name" match="/Keyman/KeymanPackageFile/KeymanPackageContentKeyboardsFile/KeymanKeyboardFile">
+    <xsl:value-of select="name"/><br />
   </xsl:template>
 
   <xsl:template match="/Keyman/KeymanPackageFile/Fonts/Font/name">
@@ -186,10 +185,29 @@
   </xsl:template>
 
   <xsl:template match="/Keyman/KeymanPackageFile">
-    <tr>
-      <td class="detailheader"><xsl:value-of select="$locale/string[@name='S_Caption_Keyboards']"/></td>
-      <td class="otherdetails"><xsl:apply-templates select="KeymanPackageContentKeyboardsFile/KeymanKeyboardFile" /></td>
-    </tr>
+    <xsl:choose>
+      <xsl:when test="count(KeymanPackageContentKeyboardsFile/KeymanKeyboardFile) = 1">
+        <tr>
+          <td class="detailheader"><xsl:value-of select="$locale/string[@name='S_Caption_Keyboard']"/></td>
+          <td class="otherdetails"><xsl:apply-templates mode="keyboard-name" select="KeymanPackageContentKeyboardsFile/KeymanKeyboardFile" /></td>
+        </tr>
+        <xsl:if test="count(KeymanPackageContentKeyboardsFile/KeymanKeyboardFile/KeymanKeyboardLanguagesFile/KeymanKeyboardLanguage) > 1">
+          <!-- This test presents the selection for keyboard language only for packages with a single keyboard and 
+               more than one language option. In future, we could consider extending it for packages with more than 
+               one keyboard, but that would take more plumbing for implementation. -->
+          <tr>
+            <td class="detailheader"><xsl:value-of select="$locale/string[@name='S_Caption_KeyboardLanguage']"/></td>
+            <td class="otherdetails"><xsl:apply-templates mode="language-picker" select="KeymanPackageContentKeyboardsFile/KeymanKeyboardFile" /></td>
+          </tr>
+        </xsl:if>
+      </xsl:when>
+      <xsl:otherwise>
+        <tr>
+          <td class="detailheader"><xsl:value-of select="$locale/string[@name='S_Caption_Keyboards']"/></td>
+          <td class="otherdetails"><xsl:apply-templates mode="keyboard-name" select="KeymanPackageContentKeyboardsFile/KeymanKeyboardFile" /></td>
+        </tr>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <xsl:if test="Fonts/Font">
       <tr>

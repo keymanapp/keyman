@@ -178,6 +178,16 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">Keyboard Layouts:</string>
 
+  <!-- Context: Keyboard Install Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">Keyboard Layout:</string>
+
+  <!-- Context: Keyboard Install Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">Keyboard Language:</string>
+
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
