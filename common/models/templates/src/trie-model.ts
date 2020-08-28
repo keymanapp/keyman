@@ -220,6 +220,9 @@
               }
             } else if(models.isSentinel(entry)) {
               continue;
+            } else if(!entry) {
+              // Prevent any accidental 'null' or 'undefined' entries from having an effect.
+              continue;
             } else {
               let prefix = this.prefix + entry;
               yield {

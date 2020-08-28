@@ -171,7 +171,7 @@ describe.only('Correction Distance Modeler', function() {
       let tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
 
-      let layer2Edges = new correction.SearchNode(tEdge).buildSubstitutionEdges(synthDistribution2);
+      let layer2Edges = new correction.SearchNode(rootTraversal, tEdge).buildSubstitutionEdges(synthDistribution2);
       let layer2Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer2Edges);
 
       let eEdge = layer2Queue.dequeue();
@@ -186,9 +186,9 @@ describe.only('Correction Distance Modeler', function() {
       assert.isOk(ehEdge);
 
       // Final round:  we'll use three nodes and throw all of their results into the same priority queue.
-      let layer3eEdges  = new correction.SearchNode(eEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3hEdges  = new correction.SearchNode(hEdge).buildSubstitutionEdges(synthDistribution3);
-      let layer3ehEdges = new correction.SearchNode(ehEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3eEdges  = new correction.SearchNode(rootTraversal, eEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3hEdges  = new correction.SearchNode(rootTraversal, hEdge).buildSubstitutionEdges(synthDistribution3);
+      let layer3ehEdges = new correction.SearchNode(rootTraversal, ehEdge).buildSubstitutionEdges(synthDistribution3);
       let layer3Queue = new models.PriorityQueue(correction.QUEUE_EDGE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
@@ -220,6 +220,70 @@ describe.only('Correction Distance Modeler', function() {
 
       assert.isTrue(tenFlag && theFlag);
       assert.equal(edge.currentCost, 1.5);
+    });
+  });
+
+  describe('SearchSpaceTier + SearchSpace', function() {
+    var testModel;
+
+    before(function() {
+      testModel = new models.TrieModel(jsonFixture('tries/english-1000'));
+    });
+
+    it('Simple Search:  "teh"', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+
+      // VERY artificial distributions.
+      let synthDistribution1 = [
+        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+      ];
+
+      let synthDistribution2 = [
+        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let synthDistribution3 = [
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+      ];
+
+      searchSpace.addInput(synthDistribution1);
+      searchSpace.addInput(synthDistribution2);
+      searchSpace.addInput(synthDistribution3);
+
+      let iter = searchSpace.getBestMatches();
+      // let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      // assert.isFalse(firstSet.done);
+      
+      // firstSet = firstSet.value; // Retrieves <actual value>
+      // assert.equal(firstSet[1], 1);
+      // assert.equal(firstSet[0].length, 1); // A single sequence ("ten") should be the best match.
+
+      // let chars = firstSet[0][0].map(value => value.key);
+      // assert.equal(chars.join(''), "ten");
+
+      for(let i = 1; i < 4; i++) {
+        console.log();
+        console.log("Batch " + i);
+
+        let set = iter.next();
+        assert.isFalse(set.done);
+
+        set = set.value;
+
+        let entries = set[0].map(function(sequence) {
+          return sequence.map(value => value.key).join('');
+        });
+
+        console.log("Expected entry count: " + set[0].length);
+        console.log(entries);
+        console.log(set[1]);
+      }
     });
   });
 });

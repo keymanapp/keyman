@@ -137,6 +137,10 @@ namespace models {
      * @param elements A group of elements to enqueue simultaneously.
      */
     enqueueAll(elements: Type[]) {
+      if(elements.length == 0) {
+        return;
+      }
+      
       let firstIndex = this.count 
       this.heap = this.heap.concat(elements);
       let firstParent = PriorityQueue.parentIndex(firstIndex);
@@ -198,6 +202,18 @@ namespace models {
       } else {
         return false;
       }
+    }
+
+    /**
+     * Returns an array containing all entries of the priority queue.
+     * Altering the returned array will not affect the queue, but mutating
+     * the array's elements can cause unintended side effects.
+     * 
+     * This function makes no guarantees on the ordering of the returned elements;
+     * they will almost certainly be unsorted.
+     */
+    toArray(): Type[] {
+      return Array.from(this.heap);
     }
   }
 }
