@@ -55,6 +55,16 @@ begin
   Assert.AreEqual('arx', TLangTagsMap.AllTags['arx-BR']);
   Assert.AreEqual('bfi-x-stokoe', TLangTagsMap.AllTags['sgn-bfi-GB-x-stokoe']);
   Assert.AreEqual('bfy', TLangTagsMap.AllTags['ppa-Deva-IN']);
+
+  // und
+  Assert.AreEqual('und', TLangTagsMap.LangTags['und'].tag);
+  Assert.AreEqual('und-Zyyy-001', TLangTagsMap.LangTags['und'].full);
+  Assert.AreEqual('und', TLangTagsMap.LangTags['und'].iso639_3);
+  Assert.AreEqual('001', TLangTagsMap.LangTags['und'].region);
+  Assert.AreEqual('Undetermined', TLangTagsMap.LangTags['und'].name);
+  Assert.AreEqual('Zyyy', TLangTagsMap.LangTags['und'].script);
+  Assert.AreEqual(False, TLangTagsMap.LangTags['und'].suppress);
+  Assert.AreEqual('und-Zyyy', TLangTagsMap.LangTags['und'].windows);
 end;
 
 initialization
