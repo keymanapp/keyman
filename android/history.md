@@ -1,5 +1,9 @@
 # Keyman for Android Version History
 
+## 2020-08-31 13.0.6217 stable
+* Bug fix:
+  * Fix overflow menu for hdpi devices (#3536)
+
 ## 2020-07-17 13.0.6216 stable
 * Bug fix:
   * Make sure switch to system keyboard works on lock screen for Android P (#3358)
