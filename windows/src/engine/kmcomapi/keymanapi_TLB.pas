@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 26/08/2020 10:46:38 AM from Type Library described below.
+// File generated on 28/08/2020 3:37:13 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -1604,7 +1604,7 @@ type
 // *********************************************************************//
   IKeymanKeyboardFile2Disp = dispinterface
     ['{EDE4326B-51F4-42D5-8251-B20B71993EC8}']
-    function Install2(Force: WordBool): IKeymanKeyboardInstalled; dispid 1610809344;
+    function Install2(Force: WordBool): IKeymanKeyboardInstalled; dispid 403;
     procedure Install(Force: WordBool); dispid 256;
     property Languages: IKeymanKeyboardLanguagesFile readonly dispid 402;
     property Bitmap: IPicture readonly dispid 1;

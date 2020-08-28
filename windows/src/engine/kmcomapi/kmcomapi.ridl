@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 26/08/2020 10:46:46 AM (- $Rev: 12980 $, 392421546).
+// File generated on 28/08/2020 3:37:14 PM (- $Rev: 12980 $, 582644468).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -954,7 +954,7 @@ library keymanapi
   ]
   interface IKeymanKeyboardFile2: IKeymanKeyboardFile
   {
-    [id(0x60030000)]
+    [id(0x00000193)]
     HRESULT _stdcall Install2([in] VARIANT_BOOL Force, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
   };
 

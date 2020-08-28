@@ -35,8 +35,8 @@ type
 
   protected
     /// <summary>Unregisters a TIP from the Local Machine registry</summary>
-    /// <param name="BCP47Tag">This should be a BCP47 tag</param>
     /// <param name="KeyboardID">The ID of the keyboard</param>
+    /// <param name="BCP47Tag">This should be a BCP47 tag</param>
     procedure UnregisterTip(const KeyboardID, BCP47Tag: string); overload;
 
     /// <summary>Unregisters a transient profile tip from the Local Machine registry</summary>
