@@ -230,33 +230,7 @@ describe.only('Correction Distance Modeler', function() {
       testModel = new models.TrieModel(jsonFixture('tries/english-1000'));
     });
 
-    it('Simple Search:  "teh"', function() {
-      // The combinatorial effect here is a bit much to fully test.
-      let rootTraversal = testModel.traverseFromRoot();
-      assert.isNotEmpty(rootTraversal);
-
-      let searchSpace = new correction.SearchSpace(rootTraversal);
-
-      // VERY artificial distributions.
-      let synthDistribution1 = [
-        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
-      ];
-
-      let synthDistribution2 = [
-        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
-      ];
-
-      let synthDistribution3 = [
-        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
-        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
-      ];
-
-      searchSpace.addInput(synthDistribution1);
-      searchSpace.addInput(synthDistribution2);
-      searchSpace.addInput(synthDistribution3);
-
-      let iter = searchSpace.getBestMatches();
+    let checkResults_teh = function(iter) {
       let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(firstSet.done);
       
@@ -305,10 +279,40 @@ describe.only('Correction Distance Modeler', function() {
         return sequence.map(value => value.key).join('');
       }).sort();
       assert.deepEqual(entries, thirdBatch);
+    }
+
+    it('Simple search (paralleling "Small integration test")', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+
+      // VERY artificial distributions.
+      let synthDistribution1 = [
+        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+      ];
+
+      let synthDistribution2 = [
+        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let synthDistribution3 = [
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+      ];
+
+      searchSpace.addInput(synthDistribution1);
+      searchSpace.addInput(synthDistribution2);
+      searchSpace.addInput(synthDistribution3);
+
+      let iter = searchSpace.getBestMatches();
+      checkResults_teh(iter);
 
       // Debugging method:  a simple loop for printing out the generated sets, in succession.
       //
-      // for(let i = 1; i < 9; i++) {
+      // for(let i = 1; i < 3; i++) {
       //   console.log();
       //   console.log("Batch " + i);
 
@@ -326,6 +330,41 @@ describe.only('Correction Distance Modeler', function() {
       //   console.log(entries);
       //   console.log(set[1]);
       // }
+    });
+
+    it('Allows reiteration (sequentially)', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+
+      // VERY artificial distributions.
+      let synthDistribution1 = [
+        {sample: {insert: 't', deleteLeft: 0}, p: 1} // Transform, probability
+      ];
+
+      let synthDistribution2 = [
+        {sample: {insert: 'e', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.25}
+      ];
+
+      let synthDistribution3 = [
+        {sample: {insert: 'h', deleteLeft: 0}, p: 0.75}, // Transform, probability
+        {sample: {insert: 'n', deleteLeft: 0}, p: 0.25}
+      ];
+
+      searchSpace.addInput(synthDistribution1);
+      searchSpace.addInput(synthDistribution2);
+      searchSpace.addInput(synthDistribution3);
+
+      let iter = searchSpace.getBestMatches();
+      checkResults_teh(iter);
+
+      // The key: do we get the same results the second time?
+      // Reset the iterator first...
+      let iter2 = searchSpace.getBestMatches();
+      checkResults_teh(iter2);
     });
   });
 });

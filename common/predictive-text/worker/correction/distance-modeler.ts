@@ -361,6 +361,7 @@ namespace correction {
     *getBestMatches(): Generator<[TraversableToken<string>[][], number]> { 
       // might should also include a 'base cost' parameter of sorts?
       let searchSpace = this;
+      let currentReturns: {[mapKey: string]: SearchNode} = {};
 
       class BatchingAssistant {
         currentCost = Number.MIN_SAFE_INTEGER;
@@ -378,10 +379,19 @@ namespace correction {
           // Filter out any duplicated match sequences.  The same match sequence may be reached via
           // different input sequences, after all.
           let outputMapKey = entry.calculation.matchSequence.map(value => value.key).join('');
+
+          // First, ensure the edge has an existing 'shared' cache entry.
           if(!searchSpace.returnedValues[outputMapKey]) {
-            this.entries.push(entry.calculation.matchSequence);
             searchSpace.returnedValues[outputMapKey] = entry;
           }
+
+          // Check the generator's local returned-value cache - this determines whether or not we
+          // need to add a new 'return' to the batch.
+          if(!currentReturns[outputMapKey]) {
+            this.entries.push(entry.calculation.matchSequence);
+            currentReturns[outputMapKey] = entry;
+          }
+
           return result;
         }
 
