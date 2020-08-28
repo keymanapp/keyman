@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 14.0.136 alpha 2020-08-28
+
+* fix(android/app): Inject meta viewport tag for viewing help (#3523)
+* fix(android/app): Fix overflow menu for hdpi devices (#3532)
+* feat(windows): Rework of profile installation - Engine (#3509)
+* feat(windows): profile installation - Keyman for Windows (#3510)
+* feat(windows): profile installation - Support Tool (#3511)
+* chore(windows): remove stockeditor (#3516)
+* fix(windows): refresh configuration after changes (#3517)
+* feat(windows): split language registration on app install (#3520)
+* fix(linux): Improve robustness when installing ibus-keyman (#3535)
+
 ## 14.0.135 alpha 2020-08-27
 
 * feat(common/models): override script defaults: spaces break words (#3506)
