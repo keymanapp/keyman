@@ -24,7 +24,7 @@ function findEdgeWithChars(edgeArray, input, match) {
 }
 
 describe('Correction Distance Modeler', function() {
-  describe('Search Node + Search Edge', function() {
+  describe('SearchNode + SearchEdge', function() {
     var testModel;
 
     before(function() {
