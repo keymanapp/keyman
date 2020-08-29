@@ -23,7 +23,7 @@ function findEdgeWithChars(edgeArray, input, match) {
   return results[0];
 }
 
-describe.only('Correction Distance Modeler', function() {
+describe('Correction Distance Modeler', function() {
   describe('Search Node + Search Edge', function() {
     var testModel;
 
