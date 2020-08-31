@@ -5,4 +5,5 @@
     android:id="@+id/titlebar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:layout_alignParentTop="true" />
+    android:layout_alignParentTop="true"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
