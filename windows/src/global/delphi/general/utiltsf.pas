@@ -23,8 +23,8 @@ unit utiltsf;
 interface
 
 function TSFInstalled: Boolean;
-function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
-function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
+function IsTIPInstalledForCurrentUser(var BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+function GetBCP47ForInstalledTIP(LangID: Integer; guidProfile: TGUID): string;
 function IsTransientLanguageID(LangID: Integer): Boolean;
 function GetLayoutInstallString(LangID: Integer; guidProfile: TGUID): string;
 
@@ -62,35 +62,25 @@ begin
   ]);
 end;
 
-function IsTIPInstalledForCurrentUser(BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
+function IsTIPInstalledForCurrentUser(var BCP47Tag: string; LangID: Integer; guidProfile: TGUID): Boolean;
 var
-  FLayoutInstallString: string;
-  reg: TRegistryErrorControlled;
+  s: string;
 begin
-  if BCP47Tag <> '' then
-  begin
-    reg := TRegistryErrorControlled.Create(KEY_READ);
-    try
-      FLayoutInstallString := GetLayoutInstallString(LangID, guidProfile);
-      Result :=
-        reg.OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile + '\' + BCP47Tag) and
-        reg.ValueExists(FLayoutInstallString);
-    finally
-      reg.Free;
-    end;
-  end
-  else
-  begin
-    Result := GetBCP47ForTransientTIP(LangID, guidProfile) <> '';
-  end;
+  s := GetBCP47ForInstalledTIP(LangID, guidProfile);
+  Result := s <> '';
+  if Result then
+    BCP47Tag := s;
 end;
 
-function GetBCP47ForTransientTIP(LangID: Integer; guidProfile: TGUID): string;
+function GetBCP47ForInstalledTIP(LangID: Integer; guidProfile: TGUID): string;
 var
   tag, FLayoutInstallString: string;
   reg: TRegistryErrorControlled;
   tags: TStringList;
 begin
+  // TODO: we could cache this data so we don't have to read and compare for
+  // every installed language -- but let's get the algorithm solid before
+  // optimising.
   Result := '';
 
   reg := TRegistryErrorControlled.Create(KEY_READ);

@@ -96,25 +96,24 @@ begin
   Clear;
   with TRegistry.Create do
   try
-    // TODO: move key and value names to RegistryKeys.pas
-    FIsSupported := OpenKeyReadOnly('Control Panel\International\User Profile') and ValueExists('Languages');
+    FIsSupported := OpenKeyReadOnly(SRegKey_ControlPanelInternationalUserProfile) and ValueExists(SRegValue_CPIUP_Languages);
     if FIsSupported then
     begin
       FLanguageNames := TStringList.Create;
       FValueNames := TStringList.Create;
       try
-        ReadMultiString('Languages', FLanguageNames);
+        ReadMultiString(SRegValue_CPIUP_Languages, FLanguageNames);
 
         for i := 0 to FLanguageNames.Count - 1 do
         begin
           Language := TWindows8Language.Create(FLanguageNames[i]);
           Add(Language);
-          if OpenKeyReadOnly('\Control Panel\International\User Profile\'+FLanguageNames[i]) then
+          if OpenKeyReadOnly('\' + SRegKey_ControlPanelInternationalUserProfile + '\'+FLanguageNames[i]) then
           begin
-            if ValueExists('TransientLangId') then
-              Language.FLangId := ReadInteger('TransientLangId');
-            if ValueExists('CachedLanguageName') then
-              Language.FLocaleName := LoadIndirectString(ReadString('CachedLanguageName'));
+            if ValueExists(SRegValue_CPIUP_TransientLangId) then
+              Language.FLangId := ReadInteger(SRegValue_CPIUP_TransientLangId);
+            if ValueExists(SRegValue_CPIUP_CachedLanguageName) then
+              Language.FLocaleName := LoadIndirectString(ReadString(SRegValue_CPIUP_CachedLanguageName));
 
             FValueNames.Clear;
             GetValueNames(FValueNames);

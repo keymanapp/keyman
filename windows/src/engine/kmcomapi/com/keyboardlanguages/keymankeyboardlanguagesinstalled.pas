@@ -180,7 +180,7 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
         regLM.ValueExists(SRegValue_KeymanProfileGUID) then
       begin
         FGUID := StringToGUID(regLM.ReadString(SRegValue_KeymanProfileGUID));
-        BCP47Tag := GetBCP47ForTransientTIP(LangID, FGUID);
+        BCP47Tag := GetBCP47ForInstalledTIP(LangID, FGUID);
         if (BCP47Tag <> '') and (IndexOfBCP47Code(BCP47Tag) < 0) then
         begin
           FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, BCP47Tag, LangID, FGUID, BCP47Tag); // TODO: get language name

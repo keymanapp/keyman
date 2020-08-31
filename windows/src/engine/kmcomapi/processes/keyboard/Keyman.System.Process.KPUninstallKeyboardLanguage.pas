@@ -22,7 +22,7 @@ type
     /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     /// <param name="BCP47Tag">This should be a BCP47 tag that is currently installed</param>
-    procedure UninstallTip(const KeyboardID, BCP47Tag: string); overload;
+    procedure UninstallTip(KeyboardID, BCP47Tag: string); overload;
 
     /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
@@ -196,7 +196,7 @@ begin
   DoUnregisterTip(KeyboardID, BCP47Tag, GetInputProcessorProfileMgr);
 end;
 
-procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID, BCP47Tag: string);
+procedure TKPUninstallKeyboardLanguage.UninstallTip(KeyboardID, BCP47Tag: string);
 var
   reg: TRegistry;
   FIsAdmin: Boolean;
@@ -247,7 +247,7 @@ var
   reg: TRegistry;
   FIsAdmin: Boolean;
   guid: TGUID;
-  FLayoutInstallString: string;
+  BCP47Tag, FLayoutInstallString: string;
   RootPath: string;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
@@ -283,7 +283,9 @@ begin
   // This scenario can arise if the user has removed the TIP through Windows
   // UI/APIs after we install it.
   //
-  if not IsTipInstalledForCurrentUser('', langid, guid) then
+
+  BCP47Tag := '';
+  if not IsTipInstalledForCurrentUser(BCP47Tag, langid, guid) then
     Exit;
 
   //

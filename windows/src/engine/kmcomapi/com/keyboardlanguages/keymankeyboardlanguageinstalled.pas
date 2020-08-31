@@ -85,11 +85,16 @@ uses
 constructor TKeymanKeyboardLanguageInstalled.Create(AContext: TKeymanContext;
   AOwner: IKeymanKeyboardInstalled; const ABCP47Code: string;
   ALangID: Integer; AProfileGUID: TGUID; const AName: string);
+var
+  BCP47Code: string;
 begin
   FOwner := AOwner;
   FProfileGUID := AProfileGUID;
-  FIsInstalled := IsTIPInstalledForCurrentUser(aBCP47Code, ALangID, AProfileGUID);
-  inherited Create(AContext, AOwner, ABCP47Code, ALangID, AName);
+  BCP47Code := ABCP47Code;
+  // Note, if the TIP is installed, the BCP47Code may be modified to match the
+  // canonicalization that Windows gives it.
+  FIsInstalled := IsTIPInstalledForCurrentUser(BCP47Code, ALangID, AProfileGUID);
+  inherited Create(AContext, AOwner, BCP47Code, ALangID, AName);
 end;
 
 function TKeymanKeyboardLanguageInstalled.FindInstallationLangID(
