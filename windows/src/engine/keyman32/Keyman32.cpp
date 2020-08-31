@@ -815,12 +815,53 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
 // -                                                                                             -
 // -----------------------------------------------------------------------------------------------
 
+void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
+  RegistryReadOnly *reg2 = Reg_GetKeymanInstalledKeyboard(kp->Name);   // I3581
+  if (reg2)
+  {
+    PCSTR RootKey = isTransient ? REGSZ_TransientLanguageProfiles : REGSZ_LanguageProfiles;
+    if (reg2->OpenKeyReadOnly(RootKey))   // I3581
+    {
+      char bufProfile[LOCALE_NAME_MAX_LENGTH];
+      int nProfile = 0;
+      kp->nProfiles = 0;
+      kp->Profiles = NULL;
+      while (reg2->GetKeyNames(bufProfile, LOCALE_NAME_MAX_LENGTH, nProfile))
+      {
+        RegistryReadOnly *reg3 = Reg_GetKeymanInstalledKeyboard(kp->Name);
+        if (reg3->OpenKeyReadOnly(RootKey) &&
+          reg3->OpenKeyReadOnly(bufProfile) &&
+          reg3->ValueExists(REGSZ_LanguageProfiles_LangID) &&
+          reg3->ValueExists(REGSZ_ProfileGUID))
+        {
+          kp->nProfiles++;
+          if (kp->nProfiles == 1) kp->Profiles = new INTKEYBOARDPROFILE[1];
+          else
+          {
+            INTKEYBOARDPROFILE *pProfiles = new INTKEYBOARDPROFILE[kp->nProfiles];   // I3761
+            memcpy(pProfiles, kp->Profiles, sizeof(INTKEYBOARDPROFILE) * (kp->nProfiles - 1));   // I3761
+            delete kp->Profiles;
+            kp->Profiles = pProfiles;
+          }
+          LPINTKEYBOARDPROFILE ikp = &kp->Profiles[kp->nProfiles - 1];   // I3761
+
+          WCHAR bufW[40];
+          reg3->ReadString(REGWSZ_ProfileGUID, bufW, _countof(bufW));
+          ConvertStringToGuid(bufW, &ikp->Guid);
+          ikp->LangID = (LANGID)reg3->ReadInteger(REGSZ_LanguageProfiles_LangID);
+        }
+        delete reg3;
+        nProfile++;
+      }
+    }
+    delete reg2;
+  }
+}
 void RefreshKeyboards(BOOL Initialising)
 {
   OutputThreadDebugString("RefreshKeyboards");
 	char sz[_MAX_FNAME];
 	char oldname[_MAX_FNAME];
-	RegistryReadOnly *reg2;
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(_td->FInRefreshKeyboards) return;
@@ -893,46 +934,8 @@ void RefreshKeyboards(BOOL Initialising)
 
 			/* Read the shadow keyboard id */    // I3613
 
-      reg2 = Reg_GetKeymanInstalledKeyboard(kp->Name);   // I3581
-      if(reg2)
-      {
-        if(reg2->OpenKeyReadOnly(REGSZ_LanguageProfiles))   // I3581
-        {
-          char bufProfile[LOCALE_NAME_MAX_LENGTH];
-          int nProfile = 0;
-          kp->nProfiles = 0;
-          kp->Profiles = NULL;
-          while(reg2->GetKeyNames(bufProfile, LOCALE_NAME_MAX_LENGTH, nProfile))
-          {
-            RegistryReadOnly *reg3 = Reg_GetKeymanInstalledKeyboard(kp->Name);
-            if(reg3->OpenKeyReadOnly(REGSZ_LanguageProfiles) && reg3->OpenKeyReadOnly(bufProfile))
-            {
-              if(reg3->ValueExists(REGSZ_ProfileGUID) && reg3->ValueExists("LangID") && reg3->ValueExists("Locale")) //TODO: constnats
-              {
-                kp->nProfiles++;
-                if(kp->nProfiles == 1) kp->Profiles = new INTKEYBOARDPROFILE[1];
-                else
-                {
-                  INTKEYBOARDPROFILE *pProfiles = new INTKEYBOARDPROFILE[kp->nProfiles];   // I3761
-                  memcpy(pProfiles, kp->Profiles, sizeof(INTKEYBOARDPROFILE) * (kp->nProfiles-1));   // I3761
-                  delete kp->Profiles;
-                  kp->Profiles = pProfiles;
-                }
-                LPINTKEYBOARDPROFILE ikp = &kp->Profiles[kp->nProfiles-1];   // I3761
-
-                WCHAR bufW[40];
-                reg3->ReadString(L"profile guid", bufW, _countof(bufW)); //TODO define string constant
-                ConvertStringToGuid(bufW, &ikp->Guid);
-                reg3->ReadString(L"Locale", ikp->Locale, _countof(ikp->Locale));
-                ikp->LangID = (LANGID) reg3->ReadInteger("LangID");
-              }
-            }
-            delete reg3;
-            nProfile++;
-          }
-        }
-        delete reg2;
-			}
+      RefreshKeyboardProfiles(kp, FALSE); // Read standard profiles
+      RefreshKeyboardProfiles(kp, TRUE);  // Read transient profiles
 
 			kp->Keyboard = NULL;
 
