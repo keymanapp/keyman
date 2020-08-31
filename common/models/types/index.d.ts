@@ -115,6 +115,12 @@ declare interface LexicalModel {
   predict(transform: Transform, context: Context): Distribution<Suggestion>;
 
   /**
+   * Tokenizes the current context state, returning an array of all resulting tokens.
+   * @param context 
+   */
+  tokenize(context: Context): USVString[];
+
+  /**
    * Performs a wordbreak operation given the current context state, returning whatever word
    * or word fragment exists that starts before the caret but after the most recent whitespace
    * preceding the caret.  If no such text exists, the empty string is returned.
