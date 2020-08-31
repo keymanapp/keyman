@@ -314,7 +314,7 @@
   <xsl:template match="KeymanKeyboardLanguageInstalled">
     <div class='keyboard-language'>
       <a>
-        <xsl:attribute name="href">keyman:keyboardlanguage_uninstall?id=<xsl:value-of select='../../id'/>&amp;index=<xsl:value-of select="position()-1"/></xsl:attribute>
+        <xsl:attribute name="href">keyman:keyboardlanguage_uninstall?id=<xsl:value-of select='../../id'/>&amp;bcp47code=<xsl:value-of select="bcp47code"/></xsl:attribute>
         <img src="/app/cross.png">
           <xsl:attribute name="title"><xsl:value-of select="$locale/string[@name='S_Languages_Uninstall']"/></xsl:attribute>
         </img>

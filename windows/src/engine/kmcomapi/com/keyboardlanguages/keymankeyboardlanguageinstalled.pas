@@ -208,9 +208,7 @@ begin
   if Get_IsInstalled then
     with TKPUninstallKeyboardLanguage.Create(Context) do
     try
-      if IsTransientLanguageID(Get_LangID)
-        then UninstallTip(FOwner.ID, Get_LangID)
-        else UninstallTip(FOwner.ID, Get_BCP47Code);
+      UninstallTip(FOwner.ID, Get_LangID, Get_ProfileGUID);
     finally
       Free;
     end;
