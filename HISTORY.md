@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 14.0.137 alpha 2020-08-31
+
+* fix(android/engine): Fix package filename when downloading from cloud (#3541)
+* feat(windows): select language at keyboard install (#3524)
+* feat(windows): add langtags.json data (#3529)
+* fix(windows): add transient profile support to keyman32 (#3539)
+
 ## 14.0.136 alpha 2020-08-28
 
 * fix(android/app): Inject meta viewport tag for viewing help (#3523)
