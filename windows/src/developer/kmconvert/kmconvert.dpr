@@ -83,7 +83,7 @@ uses
   CompileErrorCodes in '..\..\global\delphi\general\CompileErrorCodes.pas',
   Keyman.Developer.System.ModelProjectTemplate in 'Keyman.Developer.System.ModelProjectTemplate.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
-  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas' {$R icons.RES},
+  Keyman.Developer.System.Project.wordlistTsvProjectFile in '..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas',
   Sentry.Client in '..\..\ext\sentry\Sentry.Client.pas',
   Sentry.Client.Console in '..\..\ext\sentry\Sentry.Client.Console.pas',
   sentry in '..\..\ext\sentry\sentry.pas',
