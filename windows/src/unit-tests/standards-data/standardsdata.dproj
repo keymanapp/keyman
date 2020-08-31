@@ -85,7 +85,18 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Keyman.Test.System.Standards.LangTagsRegistryTest.pas"/>
+        <DCCReference Include="Keyman.Test.System.CanonicalLanguageCodeUtilsTest.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\BCP47Tag.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Keyman.System.LanguageCodeUtils.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SubtagRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"/>
         <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LCIDToBCP47Registry.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.NRSIAllTagsRegistry.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\utilstr.pas"/>
+        <DCCReference Include="..\..\global\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

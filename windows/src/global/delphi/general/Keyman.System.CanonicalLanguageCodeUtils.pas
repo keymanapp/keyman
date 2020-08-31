@@ -4,9 +4,9 @@ interface
 
 type
   TCanonicalLanguageCodeUtils = class
-    class function FindBestTag(const Tag: string): string;
-    class function IsCanonical(const Tag: string): Boolean; overload;
-    class function IsCanonical(const Tag: string; var Msg: string): Boolean; overload;
+    class function FindBestTag(const Tag: string; AddRegion: Boolean): string;
+    class function IsCanonical(const Tag: string; AddRegion: Boolean): Boolean; overload;
+    class function IsCanonical(const Tag: string; var Msg: string; AddRegion: Boolean): Boolean; overload;
   end;
 
 implementation
@@ -25,7 +25,7 @@ uses
 ///  This will canonicalize known tags, then apply rules to ensure script subtag
 ///  is present if not suppressed, and add a default region if none given.
 ///</remarks>
-class function TCanonicalLanguageCodeUtils.FindBestTag(const Tag: string): string;
+class function TCanonicalLanguageCodeUtils.FindBestTag(const Tag: string; AddRegion: Boolean): string;
 var
   t: TBCP47Tag;
   LangTag: TLangTag;
@@ -63,7 +63,9 @@ begin
       t.Script := LangTag.script;
 
     // Add the region if not specified
-    if t.Region = '' then
+    // For Windows scenarios, we'll want to add a region. For cross-platform,
+    // we probably don't want to.
+    if (t.Region = '') and AddRegion then
       t.Region := LangTag.region;
 
     Exit(t.Tag);
@@ -72,17 +74,17 @@ begin
   end;
 end;
 
-class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string): Boolean;
+class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string; AddRegion: Boolean): Boolean;
 begin
-  Result := SameText(Tag, FindBestTag(Tag));
+  Result := SameText(Tag, FindBestTag(Tag, AddRegion));
 end;
 
 class function TCanonicalLanguageCodeUtils.IsCanonical(const Tag: string;
-  var Msg: string): Boolean;
+  var Msg: string; AddRegion: Boolean): Boolean;
 var
   c: string;
 begin
-  c := FindBestTag(Tag);
+  c := FindBestTag(Tag, AddRegion);
   Result := SameText(c, Tag);
   if not Result then
   begin

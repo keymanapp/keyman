@@ -87,7 +87,7 @@ var
   i: Integer;
 begin
   // This adds an in-memory item to the array so that it can be installed
-  FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Tag);
+  FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Tag, True);
   if FCanonicalBCP47Tag = '' then
     Exit(nil);
 
@@ -152,7 +152,7 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
               then FName := regLM.ReadString(SRegValue_LanguageProfileName)
               else FName := '';
 
-            FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(FLocale);
+            FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(FLocale, True);
             if (FCanonicalBCP47Tag <> '') and (IndexOfBCP47Code(FCanonicalBCP47Tag) < 0) then
             begin
               FKeyboardLanguage := TKeymanKeyboardLanguageInstalled.Create(Context, FOwner, FCanonicalBCP47Tag, FLangID, FGUID, FName);
@@ -229,7 +229,7 @@ procedure TKeymanKeyboardLanguagesInstalled.DoRefresh;
         reg.GetValueNames(FIDs);
         for i := 0 to FIDs.Count - 1 do
         begin
-          FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(FIDs[i]);
+          FCanonicalBCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(FIDs[i], True);
           if (FCanonicalBCP47Tag <> '') and not HasLanguage(FCanonicalBCP47Tag) then
           begin
             FName := reg.ReadString(FIDs[i]);
@@ -282,7 +282,7 @@ var
   RegistrationRequired: WordBool;
   LangID: Integer;
 begin
-  Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Code);
+  Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Code, True);
   if (Tag =  '') or (IndexOfBCP47Code(Tag) >= 0) then
     // Already installed, or invalid tag; should we warn?
     Exit;

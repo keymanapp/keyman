@@ -91,7 +91,7 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg) then
+        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False) then
           Result := Failed(msg);
       finally
         Free;
@@ -106,7 +106,7 @@ begin
         if not IsValid(False, msg) then
           Result := Failed(msg);
 
-        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg) then
+        if not TCanonicalLanguageCodeUtils.IsCanonical(Tag, msg, False) then
           Result := Failed(msg);
       finally
         Free;

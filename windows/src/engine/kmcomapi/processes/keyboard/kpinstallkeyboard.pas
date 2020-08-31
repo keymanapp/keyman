@@ -268,7 +268,7 @@ begin
               for i := 0 to Languages.Count - 1 do
               begin
 
-                BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(Languages[i].ID);
+                BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(Languages[i].ID, True);
                 if BCP47Tag <> '' then
                 begin
                   // Note: this may return a repeated tag, but FindInstallationLangID
@@ -296,7 +296,7 @@ begin
             FLanguageInstalled := False;
             for i := 0 to Languages.Count - 1 do
             begin
-              BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(Languages[i].ID);
+              BCP47Tag := TCanonicalLanguageCodeUtils.FindBestTag(Languages[i].ID, True);
               if BCP47Tag <> '' then
                 FLanguageInstalled := RegisterLanguageProfile(BCP47Tag, kbdname, ki.KeyboardName, FIconFileName, Languages[i].Name);
               if FLanguageInstalled then

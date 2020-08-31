@@ -475,7 +475,7 @@ begin
     Tag := StrToken(Tags, ' ');
     BCP47Tag := TBCP47Tag.Create(Tag);
     try
-      BCP47Tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Tag.Tag);
+      BCP47Tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Tag.Tag, False);
       if BCP47Tag.IsValid(False) then
       begin
         Language := TPackageKeyboardLanguage.Create(pack);
