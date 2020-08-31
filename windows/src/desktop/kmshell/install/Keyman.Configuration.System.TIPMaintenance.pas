@@ -29,7 +29,8 @@ type
     class function RegisterTip(LangID: Integer; const KeyboardID, BCP47Tag: string): Boolean;
 
     /// <summary>Helper function to get default BCP47 tag for an installed keyboard</summary>
-    class function GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string;
+    class function GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string; overload;
+    class function GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string; overload;
   private
     class function GetKeyboardLanguage(const KeyboardID,
       BCP47Tag: string): IKeymanKeyboardLanguageInstalled; static;
@@ -175,6 +176,13 @@ begin
   end
   else
     Result := False;
+end;
+
+class function TTIPMaintenance.GetFirstLanguage(Keyboard: IKeymanKeyboardFile): string;
+begin
+  if Keyboard.Languages.Count > 0
+    then Result := Keyboard.Languages[0].BCP47Code
+    else Result := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(HKLToLanguageID(GetDefaultHKL));
 end;
 
 class function TTIPMaintenance.GetFirstLanguage(Keyboard: IKeymanKeyboardInstalled): string;
