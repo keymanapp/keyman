@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 28/08/2020 3:37:13 PM from Type Library described below.
+// File generated on 1/09/2020 6:47:52 AM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -51,7 +51,7 @@ const
 
   IID_IKeymanObject: TGUID = '{4DE644EB-F254-4522-AF44-0966CD4AE9F4}';
   IID_IKeyman: TGUID = '{6B363F95-6459-404A-BB5E-F06AFB986BAA}';
-  CLASS_Keyman: TGUID = '{CF46549D-4D2D-4679-A2E1-23A815F172F8}';
+  IID_IKeymanBCP47Canonicalization: TGUID = '{CA3B3B00-EA42-4EED-9043-D1A1F1842D52}';
   IID_IKeymanCollection: TGUID = '{A2FB4733-30DE-4C7C-8ED5-F6CAFA09BB2F}';
   IID_IKeymanErrors: TGUID = '{6A05CFDD-2B7E-4CA5-BAE6-3D5DE193E9CB}';
   IID_IKeymanHotkeys: TGUID = '{5CB5DFC0-05EF-48F0-8249-7BC01AF404FF}';
@@ -92,6 +92,7 @@ const
   IID_IKeymanPackageFile2: TGUID = '{9B43B6BC-C622-47EF-915E-6780CF53BAAA}';
   IID_IKeymanKeyboardLanguageInstalled2: TGUID = '{414C26E6-BFAC-4A70-9EA1-E525BA9BBA7E}';
   IID_IKeymanKeyboardLanguagesInstalled2: TGUID = '{628FF2E6-B490-462E-8FC7-7AE53B9D392C}';
+  CLASS_Keyman: TGUID = '{CF46549D-4D2D-4679-A2E1-23A815F172F8}';
 
 // *********************************************************************//
 // Declaration of Enumerations defined in Type Library
@@ -174,6 +175,8 @@ type
   IKeymanObjectDisp = dispinterface;
   IKeyman = interface;
   IKeymanDisp = dispinterface;
+  IKeymanBCP47Canonicalization = interface;
+  IKeymanBCP47CanonicalizationDisp = dispinterface;
   IKeymanCollection = interface;
   IKeymanCollectionDisp = dispinterface;
   IKeymanErrors = interface;
@@ -343,6 +346,28 @@ type
     property Packages: IKeymanPackagesInstalled readonly dispid 9;
     procedure Refresh; dispid 10;
     property SystemInfo: IKeymanSystemInfo readonly dispid 11;
+    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
+                          out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanBCP47Canonicalization
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {CA3B3B00-EA42-4EED-9043-D1A1F1842D52}
+// *********************************************************************//
+  IKeymanBCP47Canonicalization = interface(IKeymanObject)
+    ['{CA3B3B00-EA42-4EED-9043-D1A1F1842D52}']
+    function GetCanonicalTag(const Tag: WideString): WideString; safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanBCP47CanonicalizationDisp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {CA3B3B00-EA42-4EED-9043-D1A1F1842D52}
+// *********************************************************************//
+  IKeymanBCP47CanonicalizationDisp = dispinterface
+    ['{CA3B3B00-EA42-4EED-9043-D1A1F1842D52}']
+    function GetCanonicalTag(const Tag: WideString): WideString; dispid 301;
     function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
                           out References: OleVariant): WideString; dispid 401;
   end;

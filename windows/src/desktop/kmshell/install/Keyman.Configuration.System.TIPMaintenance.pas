@@ -118,7 +118,7 @@ var
   TemporaryKeyboardID: WideString;
   LangID: Integer;
 begin
-  lang := GetKeyboardLanguage(KeyboardID, TBCP47Tag.GetCanonicalTag(BCP47Tag));
+  lang := GetKeyboardLanguage(KeyboardID, (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag));
   if lang = nil then
     // The keyboard was not found
     Exit(False);
@@ -157,7 +157,7 @@ var
   TemporaryKeyboardID: WideString;
   RegistrationRequired: WordBool;
 begin
-  lang := GetKeyboardLanguage(KeyboardID, TBCP47Tag.GetCanonicalTag(BCP47Tag));
+  lang := GetKeyboardLanguage(KeyboardID, (kmcom as IKeymanBCP47Canonicalization).GetCanonicalTag(BCP47Tag));
   if lang = nil then
     // The keyboard was not found
     Exit(False);

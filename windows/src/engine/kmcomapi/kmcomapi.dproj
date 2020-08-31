@@ -293,6 +293,7 @@
         <DCCReference Include="processes\keyboard\Keyman.System.MitigateWin10_1803LanguageInstall.pas"/>
         <DCCReference Include="processes\keyboard\Keyman.System.Process.KPInstallKeyboardLanguage.pas"/>
         <DCCReference Include="processes\keyboard\Keyman.System.Process.KPUninstallKeyboardLanguage.pas"/>
+        <DCCReference Include="..\..\global\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <RidlCompile Include="kmcomapi.ridl"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

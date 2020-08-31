@@ -105,6 +105,7 @@ function ShowNewProjectParameters(Owner: TComponent): Boolean;
 implementation
 
 uses
+  Keyman.System.CanonicalLanguageCodeUtils,
   Keyman.System.LanguageCodeUtils,
   BCP47Tag,
   utilstr,
@@ -474,7 +475,7 @@ begin
     Tag := StrToken(Tags, ' ');
     BCP47Tag := TBCP47Tag.Create(Tag);
     try
-      BCP47Tag.Canonicalize;
+      BCP47Tag.Tag := TCanonicalLanguageCodeUtils.FindBestTag(BCP47Tag.Tag);
       if BCP47Tag.IsValid(False) then
       begin
         Language := TPackageKeyboardLanguage.Create(pack);
