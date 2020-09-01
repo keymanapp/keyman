@@ -521,7 +521,15 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    // Do nothing
+    if (! openUpdates.isEmpty() && keyboardsInstalled != null) {
+      for (Map<String, String> k : keyboardsInstalled) {
+        String _langid = k.get(KMManager.KMKey_LanguageID);
+        String _kbid = k.get(KMManager.KMKey_KeyboardID);
+        removeOpenUpdate(createKeyboardId(_langid, _kbid));
+      }
+    }
+
+    tryFinalizeUpdate();
   }
 
   @Override
