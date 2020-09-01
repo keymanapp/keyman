@@ -547,5 +547,25 @@ namespace correction {
     get lastMatchEntry(): TMatch {
       return this.matchSequence[this.matchSequence.length-1];
     }
+    
+    static computeDistance<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
+        input: TInput[],
+        match: TMatch[],
+        bandSize: number = 1) {
+      // Initialize the calculation buffer, setting the diagonal width (as appropriate) in advance.
+      let buffer = new ClassicalDistanceCalculation<TUnit, TInput, TMatch>();
+      bandSize = bandSize || 1;
+      buffer.diagonalWidth = bandSize;
+    
+      for(let i = 0; i < input.length; i++) {
+        buffer = buffer.addInputChar(input[i]);
+      }
+    
+      for(let j = 0; j < match.length; j++) {
+        buffer = buffer.addMatchChar(match[j]);
+      }
+    
+      return buffer;
+    }
   }
 }
