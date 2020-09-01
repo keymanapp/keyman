@@ -443,7 +443,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
     });
 
     it("['jellyifhs' -> 'jellyfish'] trimmed to ['jelly' => 'jelly']", function() {
-      let buffer = compute("jellyifsh", "jellyfish");
+      let buffer = compute("jellyifhs", "jellyfish");
       
       let trimmedBuffer = buffer.getSubset(5, 5);
       assert.equal(trimmedBuffer.getFinalCost(), 0)
@@ -456,4 +456,78 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       assert.equal(trimmedBuffer.getFinalCost(), 2)
     });
   });
+
+  describe("edit path construction", function() {
+    let op = {
+      s: 'substitute',
+      m: 'match',
+      i: 'insert',
+      d: 'delete',
+      ts: 'transpose-start',
+      te: 'transpose-end',
+      ti: 'transpose-insert',
+      td: 'transpose-delete'
+    }
+
+    it("'accomodate' -> 'accommodate'", function() {
+      let buffer = compute("accomodate", "accommodate", "InputThenMatch");
+  
+      let editSequence = [
+      //  a     c     c     o     m
+        op.m, op.m, op.m, op.m, op.m,
+      // *m    o      d     a     t    e
+        op.i, op.m, op.m, op.m, op.m, op.m
+      ];
+
+      assert.deepEqual(buffer.editPath(), editSequence);
+    });
+
+    it("'harras' -> 'harass'", function() {
+      let buffer = compute("harras", "harass", "InputThenMatch");
+
+      let editSequence = [
+        //  h     a     r    -r     a    s     +s
+          op.m, op.m, op.m, op.d, op.m, op.m, op.i
+      ];
+
+      assert.deepEqual(buffer.editPath(), editSequence);
+    });
+
+    it("'access' -> 'assess'", function() {
+      let buffer = compute("access", "assess", "InputThenMatch");
+
+      let editSequence = [
+        //  a    c/s   c/s    e     s    s   
+          op.m, op.s, op.s, op.m, op.m, op.m
+      ];
+
+      assert.deepEqual(buffer.editPath(), editSequence);
+    });
+
+    it("'ifhs' -> 'fish'", function() {
+      let buffer = compute("ifhs", "fish");
+      
+      let editSequence = [
+          op.ts, op.te, op.ts, op.te
+      ];
+
+      assert.deepEqual(buffer.editPath(), editSequence);
+    });
+
+    // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
+    it("'abczdefig' -> 'cazefghi'", function() {
+      let buffer = compute("abczdefig", "cazefghi", "InputThenMatch", 2);
+
+      let editSequence = [
+        // --- abc -> ca ----
+        // a/c    b/_    c/a    z     -d    e     f
+          op.ts, op.td, op.te, op.m, op.d, op.m, op.m,
+        // --- ig -> ghi ----
+        // i/g    _/h    g/i
+          op.ts, op.ti, op.te
+      ];
+
+      assert.deepEqual(buffer.editPath(), editSequence);
+    });
+  })
 });
