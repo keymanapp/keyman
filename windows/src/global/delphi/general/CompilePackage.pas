@@ -466,7 +466,7 @@ begin
     for l in k.Languages do
     begin
       Tag := TBCP47Tag.Create(l.ID);
-      NewID := TCanonicalLanguageCodeUtils.FindBestTag(l.ID, True);
+      NewID := TCanonicalLanguageCodeUtils.FindBestTag(l.ID, False);
       if NewID = '' then
       begin
         // We don't have enough data to validate this tag
