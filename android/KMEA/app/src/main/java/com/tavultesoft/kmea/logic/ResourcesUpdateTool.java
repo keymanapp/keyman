@@ -147,7 +147,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       channel.setDescription(description);
       // Register the channel with the system; you can't change the importance
       // or other notification behaviors after this
-      NotificationManager notificationManager = aContext.getSystemService(NotificationManager.class);
+      NotificationManager notificationManager = (NotificationManager) aContext.getSystemService(Context.NOTIFICATION_SERVICE);
       notificationManager.createNotificationChannel(channel);
     }
   }
@@ -427,6 +427,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       .setContentTitle(currentContext.getString(R.string.keyboard_updates_available))
       .setContentText(message)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+      .setAutoCancel(true)
       .setContentIntent(startUpdateIntent)
       .setOngoing(true);
 
