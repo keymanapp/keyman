@@ -1,4 +1,6 @@
 namespace correction {
+  type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'transpose-start' | 'transpose-end' | 'transpose-insert' | 'transpose-delete';
+
   /**
    * Represents the lowest-level unit for comparison during edit-distance calculations.
    */
@@ -161,6 +163,108 @@ namespace correction {
       return false;
     }
 
+    /**
+     * Determines the edit path used to obtain the optimal cost, distinguishing between zero-cost 
+     * substitutions ('match' operations) and actual substitutions.
+     * @param row 
+     * @param col 
+     */
+    public editPath(row: number = this.inputSequence.length - 1, col: number = this.matchSequence.length - 1): EditOperation[] {
+      let currentCost = this.getCostAt(row, col);
+      let ops: EditOperation[] = null;
+      let parent: [number, number] = null;
+
+      let insertParentCost = this.getCostAt(row, col-1);
+      let deleteParentCost = this.getCostAt(row-1, col);
+      let substitutionParentCost = this.getCostAt(row-1, col-1);
+      let transposeParent = ClassicalDistanceCalculation.getTransposeParent(this, row, col);
+      if(transposeParent[0] >= 0 && transposeParent[1] >= 0) {
+        // OK, a transposition source is quite possible.  Still need to do more vetting, to be sure.
+        let expectedCost = 1;
+
+        // This transposition includes either 'transpose-insert' or 'transpose-delete' operations.
+        ops = ['transpose-start']; // always needs a 'start'.
+        if(transposeParent[0] != row-1) {
+          let count = row - transposeParent[0] - 1;
+          ops = ops.concat( Array(count).fill('transpose-delete') );
+          expectedCost += count;
+        } else {
+          let count = col - transposeParent[1] - 1;
+          ops = ops.concat( Array(count).fill('transpose-insert') );
+          expectedCost += count;
+        }
+        ops.push('transpose-end');
+
+        // Double-check our expectations.
+        if(this.getCostAt(transposeParent[0]-1, transposeParent[1]-1) != currentCost - expectedCost) {
+          ops = null;
+        }
+        parent = [transposeParent[0]-1, transposeParent[1]-1];
+      }
+
+      if(ops) {
+        // bypass the ladder.
+      } else if(substitutionParentCost == currentCost - 1) {
+          ops = ['substitute'];
+        parent = [row-1, col-1];
+      } else if(insertParentCost == currentCost - 1) {
+        ops = ['insert'];
+        parent = [row, col-1];
+      } else if(deleteParentCost == currentCost - 1) {
+        ops = ['delete'];
+        parent = [row-1, col];
+      } else { //if(substitutionParentCost == currentCost) {
+        ops = ['match'];
+        parent = [row-1, col-1];
+      }
+
+      // Recursively build the edit path.
+      if(parent[0] >= 0 && parent[1] >= 0) {
+        return this.editPath(parent[0], parent[1]).concat(ops);
+      } else {
+        if(parent[0] > -1) {
+          // There are initial deletions.
+          return Array(parent[0]+1).fill('delete').concat(ops);
+        } else if(parent[1] > -1) {
+          // There are initial insertions.
+          return Array(parent[1]+1).fill('insert').concat(ops);
+        } else {
+          return ops;
+        }        
+      }
+    }
+
+    private static getTransposeParent<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
+        buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>,
+        r: number,
+        c: number
+    ): [number, number] {
+      // Block any transpositions where the tokens are identical.
+      // Other operations will be cheaper.
+      if(buffer.inputSequence[r].key == buffer.matchSequence[c].key) {
+        return [-1, -1];
+      }
+
+      // Transposition checks
+      let lastInputIndex = -1;
+      for(let i = r-1; i >= 0; i--) {
+        if(buffer.inputSequence[i].key == buffer.matchSequence[c].key) {
+          lastInputIndex = i;
+          break;
+        }
+      }
+
+      let lastMatchIndex = -1;
+      for(let i = c-1; i >= 0; i--) {
+        if(buffer.matchSequence[i].key == buffer.inputSequence[r].key) {
+          lastMatchIndex = i;
+          break;
+        }
+      }
+
+      return [lastInputIndex, lastMatchIndex];
+    }
+
     private static initialCostAt<TUnit, TInput extends EditToken<TUnit>, TMatch extends EditToken<TUnit>>(
         buffer: ClassicalDistanceCalculation<TUnit, TInput, TMatch>, 
         r: number, 
@@ -174,22 +278,7 @@ namespace correction {
       var transpositionCost: number = Number.MAX_VALUE
 
       if(r > 0 && c > 0) { // bypass when transpositions are known to be impossible.
-        // Transposition checks
-        let lastInputIndex = -1;
-        for(let i = r-1; i >= 0; i--) {
-          if(buffer.inputSequence[i].key == buffer.matchSequence[c].key) {
-            lastInputIndex = i;
-            break;
-          }
-        }
-
-        let lastMatchIndex = -1;
-        for(let i = c-1; i >= 0; i--) {
-          if(buffer.matchSequence[i].key == buffer.inputSequence[r].key) {
-            lastMatchIndex = i;
-            break;
-          }
-        }
+        let [lastInputIndex, lastMatchIndex] = ClassicalDistanceCalculation.getTransposeParent(buffer, r, c);
         transpositionCost = buffer.getCostAt(lastInputIndex-1, lastMatchIndex-1) + (r - lastInputIndex - 1) + 1 + (c - lastMatchIndex - 1);
       }
 
