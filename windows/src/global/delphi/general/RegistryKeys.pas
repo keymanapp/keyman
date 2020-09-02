@@ -263,6 +263,10 @@ const
 
   SRegKey_ControlPanelInternationalUserProfile = 'Control Panel\International\User Profile'; // CU
 
+  SRegValue_CPIUP_Languages = 'Languages';
+  SRegValue_CPIUP_TransientLangId = 'TransientLangId';
+  SRegValue_CPIUP_CachedLanguageName = 'CachedLanguageName';
+
   { User profile keys }
 
   //SRegKey_NTProfileList = 'Software\Microsoft\Windows NT\CurrentVersion\ProfileList';
