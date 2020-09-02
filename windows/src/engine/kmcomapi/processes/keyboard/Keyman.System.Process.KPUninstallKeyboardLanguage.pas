@@ -21,19 +21,19 @@ type
 
     /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
-    /// <param name="BCP47Tag">This should be a BCP47 tag that is currently installed</param>
-    procedure UninstallTip(KeyboardID, BCP47Tag: string); overload;
-
-    /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
-    /// <param name="KeyboardID">The ID of the keyboard</param>
     /// <param name="LangID">The transient profile to uninstall, $2000, $2400, $2800, $2C00</param>
-    procedure UninstallTip(const KeyboardID: string; LangID: Word); overload;
+    procedure UninstallTip(const KeyboardID: string; LangID: Integer; ProfileGUID: TGUID); overload;
 
     /// <summary>Uninstalls all TIPs for the current user for a given keyboard</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     procedure UninstallTip(const KeyboardID: string); overload;
 
   protected
+    /// <summary>Uninstalls a TIP for the current user for a given keyboard</summary>
+    /// <param name="KeyboardID">The ID of the keyboard</param>
+    /// <param name="BCP47Tag">This should be a BCP47 tag that is currently installed</param>
+    procedure UninstallTip(KeyboardID, BCP47Tag: string); overload;
+
     /// <summary>Unregisters a TIP from the Local Machine registry</summary>
     /// <param name="KeyboardID">The ID of the keyboard</param>
     /// <param name="BCP47Tag">This should be a BCP47 tag</param>
@@ -241,39 +241,13 @@ begin
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 end;
 
-procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string;
-  LangID: Word);
+procedure TKPUninstallKeyboardLanguage.UninstallTip(const KeyboardID: string; LangID: Integer; ProfileGUID: TGUID);
 var
-  reg: TRegistry;
   FIsAdmin: Boolean;
-  guid: TGUID;
   BCP47Tag, FLayoutInstallString: string;
-  RootPath: string;
 begin
   if not KeyboardInstalled(KeyboardID, FIsAdmin) then
     ErrorFmt(KMN_E_ProfileUninstall_KeyboardNotFound, VarArrayOf([KeyboardID]));
-
-  if not IsTransientLanguageID(LangID) then
-    ErrorFmt(KMN_E_ProfileUninstall_NotATransientLanguageCode, VarArrayOf([KeyboardID, LangID]));
-
-  reg := TRegistry.Create(KEY_READ);
-  try
-    reg.RootKey := HKEY_LOCAL_MACHINE;
-    RootPath := GetRegistryKeyboardInstallKey_LM(KeyboardID) + SRegSubKey_TransientLanguageProfiles;
-    if not reg.OpenKeyReadOnly(RootPath + '\' + IntToHex(LangID, 4)) then
-      // We'll assume it's not installed
-      Exit;
-
-    if not reg.ValueExists(SRegValue_KeymanProfileGUID) then
-    begin
-      WarnFmt(KMN_W_ProfileUninstall_RegistryCorrupt, VarArrayOf([KeyboardID]));
-      Exit;
-    end;
-
-    guid := StringToGuid(reg.ReadString(SRegValue_KeymanProfileGUID));
-  finally
-    reg.Free;
-  end;
 
   //
   // We need to check if the TIP is installed before attempting to remove it,
@@ -285,13 +259,13 @@ begin
   //
 
   BCP47Tag := '';
-  if not IsTipInstalledForCurrentUser(BCP47Tag, langid, guid) then
+  if not IsTipInstalledForCurrentUser(BCP47Tag, langid, ProfileGUID) then
     Exit;
 
   //
   // Uninstall the TIP from Windows current user
   //
-  FLayoutInstallString := GetLayoutInstallString(LangID, guid);
+  FLayoutInstallString := GetLayoutInstallString(LangID, ProfileGUID);
   if not InstallLayoutOrTip(PChar(FLayoutInstallString), ILOT_UNINSTALL) then   // I4302
     WarnFmt(KMN_W_ProfileUninstall_InstallLayoutOrTipFailed, VarArrayOf([KeyboardID]));
 end;

@@ -503,7 +503,6 @@ begin
         else ExitCode := 1;
 
     fmInstallTip:
-      // TODO: handle when not enough parameters
       if TTipMaintenance.InstallTip(StrToIntDef('$'+FirstKeyboardFilename, 0), SecondKeyboardFileName, ThirdKeyboardFileName, FourthKeyboardFileName)
         then ExitCode := 0
         else ExitCode := 1;

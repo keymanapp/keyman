@@ -412,14 +412,21 @@ function TfrmMain.GetKeyboardLanguageFromParams(params: TStringList; out kbdlang
 var
   n: Integer;
   kbd: IKeymanKeyboardInstalled;
+  bcp47code: string;
 begin
   n := kmcom.Keyboards.IndexOf(params.Values['id']);
   if n < 0 then Exit(False);
   kbd := kmcom.Keyboards[n];
-  n := StrToIntDef(params.Values['index'], -1);
-  if (n < 0) or (n >= kbd.Languages.Count) then Exit(False);
-  kbdlang := kbd.Languages[n];
-  Result := True;
+  bcp47code := params.Values['bcp47code'];
+  for n := 0 to kbd.Languages.Count - 1 do
+  begin
+    if kbd.Languages[n].BCP47Code = bcp47code then
+    begin
+      kbdlang := kbd.Languages[n];
+      Exit(True);
+    end;
+  end;
+  Result := False;
 end;
 
 function TfrmMain.GetPackageFromParams(params: TStringList; out pkg: IKeymanPackageInstalled): Boolean;
