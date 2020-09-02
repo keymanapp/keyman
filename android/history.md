@@ -1,5 +1,9 @@
 # Keyman for Android Version History
 
+## 2020-09-02 13.0.6218 stable
+* Bug fix:
+  * Dismiss notifications when touched (#3548)
+
 ## 2020-08-31 13.0.6217 stable
 * Bug fix:
   * Fix overflow menu for hdpi devices (#3536)
