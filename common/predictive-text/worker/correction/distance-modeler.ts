@@ -3,7 +3,7 @@
 namespace correction {
   type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
-  type TraversableToken<TUnit> = {
+  export type TraversableToken<TUnit> = {
     key: TUnit,
     traversal: LexiconTraversal
   }
@@ -257,6 +257,11 @@ namespace correction {
       this.rootNode = new SearchNode(traversalRoot);
 
       this.completedPaths = [this.rootNode];
+
+      // Adds a base level queue to handle initial insertions.
+      let baseTier = new SearchSpaceTier(0, this.rootNode.buildInsertionEdges());
+      this.tierOrdering.push(baseTier);
+      this.selectionQueue.enqueue(baseTier);
     }
 
     increaseMaxEditDistance() {
@@ -298,7 +303,12 @@ namespace correction {
     }
 
     private hasNextMatchEntry(): boolean {
-      return this.selectionQueue.peek().correctionQueue.count > 0;
+      let topQueue = this.selectionQueue.peek();
+      if(topQueue) {
+        return topQueue.correctionQueue.count > 0;
+      } else {
+        return false;
+      }
     }
 
     findNextMatch(): SearchNode {
@@ -336,8 +346,8 @@ namespace correction {
           // TODO:  make sure we get this part right.
           let inputIndex = nextTier.index;
 
-          let deletionEdges     = currentNode.buildDeletionEdges(this.inputSequence[inputIndex]);
-          let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex]);
+          let deletionEdges     = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
+          let substitutionEdges = currentNode.buildSubstitutionEdges(this.inputSequence[inputIndex-1]);
 
           // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
           nextTier.correctionQueue.enqueueAll(deletionEdges.concat(substitutionEdges));

@@ -281,6 +281,18 @@ describe('Correction Distance Modeler', function() {
       assert.deepEqual(entries, thirdBatch);
     }
 
+    it('Simple search without input', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+
+      let iter = searchSpace.getBestMatches();
+      let firstSet = iter.next();
+      assert.isFalse(firstSet.done);
+    });
+
     it('Simple search (paralleling "Small integration test")', function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
@@ -365,6 +377,18 @@ describe('Correction Distance Modeler', function() {
       // Reset the iterator first...
       let iter2 = searchSpace.getBestMatches();
       checkResults_teh(iter2);
+    });
+
+    it('Empty search space - iteration ends immediately', function() {
+      // The combinatorial effect here is a bit much to fully test.
+      let rootTraversal = testModel.traverseFromRoot();
+      assert.isNotEmpty(rootTraversal);
+
+      let searchSpace = new correction.SearchSpace(rootTraversal);
+      let iter = searchSpace.getBestMatches();
+
+      let results = iter.next();
+      assert.isTrue(results.done);
     });
   });
 });

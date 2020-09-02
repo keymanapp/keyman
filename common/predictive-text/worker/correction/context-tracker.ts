@@ -93,15 +93,16 @@ namespace correction {
         throw "Invalid array index";
       }
 
-      let mappedIndex = (this.currentTail + index) % this.count;
+      let mappedIndex = (this.currentTail + index) % this.maxCount;
       return this.circle[mappedIndex];
     }
   }
 
   export class ContextTracker extends CircularArray<TrackedContextState> {
     static attemptMatchContext(tokenizedContext: USVString[], 
-                               matchState: TrackedContextState, 
-                               transformDistribution?: Distribution<Transform>): TrackedContextState {
+                               matchState: TrackedContextState,
+                               rootTraversal: LexiconTraversal,
+                               transformDistribution?: Distribution<Transform>,): TrackedContextState {
       // Map the previous tokenized state to an edit-distance friendly version.
       let matchContext: USVString[] = matchState.toRawTokenization();
 
@@ -165,12 +166,21 @@ namespace correction {
           //              Worth note:  when invalid, the lm-layer already has problems in other aspects too.
           whitespaceToken.transformDistributions = [transformDistribution]; // Track the Transform that resulted in the whitespace 'token'.
                                                     // Will be needed for phrase-level correction/prediction.
+          
+          // Note:  we don't bother 'correcting' whitespace tokens at this time.
+          //        They don't get any SearchSpace handling.
+
           whitespaceToken.raw = null;
           newState.tokens.push(whitespaceToken);
 
           let emptyToken = new TrackedContextToken();
           emptyToken.raw = '';
           emptyToken.transformDistributions = [];
+
+          // For now... new final token => throw out old SearchSpace, use new SearchSpace.
+          if(rootTraversal) {
+            newState.searchSpace = [new correction.SearchSpace(rootTraversal)];
+          }
           newState.tokens.push(emptyToken);
         } else {
           // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
@@ -178,10 +188,25 @@ namespace correction {
           let editedToken = newState.tokens[newState.tokens.length - 1];
           if(transformDistribution && transformDistribution.length > 0) {
             editedToken.transformDistributions.push(transformDistribution);
+            if(newState.searchSpace) {
+              newState.searchSpace.forEach(space => space.addInput(transformDistribution));
+            }
           }
           // Replace old token's raw-text with new token's raw-text.
           editedToken.raw = tokenizedContext[tokenizedContext.length - 1];
         }
+      } else {
+        // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
+        //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
+        let editedToken = newState.tokens[newState.tokens.length - 1];
+        if(transformDistribution && transformDistribution.length > 0) {
+          editedToken.transformDistributions.push(transformDistribution);
+          if(newState.searchSpace) {
+            newState.searchSpace.forEach(space => space.addInput(transformDistribution));
+          }
+        }
+        // Replace old token's raw-text with new token's raw-text.
+        editedToken.raw = tokenizedContext[tokenizedContext.length - 1];
       }
       return newState;
     }
@@ -211,7 +236,10 @@ namespace correction {
 
       // And now to add the whitespace.
       let finalTokens: TrackedContextToken[] = [];
-      finalTokens.push(baseTokens.splice(0, 1)[0]);
+
+      if(baseTokens.length > 0) {
+        finalTokens.push(baseTokens.splice(0, 1)[0]);
+      }
 
       while(baseTokens.length > 0) {
         let whitespaceToken = new TrackedContextToken();
@@ -226,7 +254,12 @@ namespace correction {
       state.poppedHead = false;
       state.pushedTail = false;
       state.tokens = finalTokens;
-      state.searchSpace = [new SearchSpace(traversalRoot)];
+      if(traversalRoot) {
+        state.searchSpace = [new SearchSpace(traversalRoot)];
+        if(finalTokens.length > 0) {
+          state.tokens[state.tokens.length - 1].transformDistributions.forEach(distrib => state.searchSpace[0].addInput(distrib));
+        }
+      }
 
       return state;
     }
@@ -254,7 +287,7 @@ namespace correction {
 
       if(tokenizedContext.length > 0) {
         for(let i = this.count - 1; i >= 0; i--) {
-          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item[i], transformDistribution);
+          let resultState = ContextTracker.attemptMatchContext(tokenizedContext, this.item(i), model.traverseFromRoot(), transformDistribution);
 
           if(resultState) {
             resultState.context = context;
@@ -266,9 +299,20 @@ namespace correction {
 
       // Else:  either empty OR we've detected a 'new context'.  Initialize from scratch; no prior input information is
       // available.  Only the results of the prior inputs are known.
+      //
+      // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
+      // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
       let state = ContextTracker.modelContextState(tokenizedContext, model.traverseFromRoot());
       state.context = context;
       this.enqueue(state);
+
+      // Initialize the search space's inputs!
+      state.searchSpace.forEach(function(space) {
+        if(state.tokens.length > 0) {
+          let finalToken = state.tokens[state.tokens.length - 1];
+          finalToken.transformDistributions.forEach(distrib => space.addInput(distrib));
+        }
+      });
       return state;
     }
   }
