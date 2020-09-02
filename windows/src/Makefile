@@ -28,10 +28,17 @@ default:
 
 # ----------------------------------------------------------------------
 
+!ifdef QUICK_BUILD_KEYMAN
+TARGETS=ext global buildtools engine desktop
+MANIFESTS=engine desktop
+!else
 TARGETS=ext global buildtools developer engine desktop support
+MANIFESTS=engine desktop developer
+!endif
+
+TARGETS=ext global buildtools engine desktop
 RELEASE_TARGETS=desktop
 CLEANS=test unit-tests cleanroot
-MANIFESTS=engine desktop developer
 
 EXCLUDEPATHDEFINES=1
 BUILDPREREQ=global-versions
@@ -186,11 +193,17 @@ build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src
     $(MAKE) dirs
     $(MAKE) build-tools
+!ifdef QUICK_BUILD_KEYMAN
+    $(MAKE) build
+    $(MAKE) build-release
+    $(MAKE) signcode
+!else
     $(MAKE) build unit-tests
     $(MAKE) build-release
     $(MAKE) signcode
     $(MAKE) -DTARGET=test test
     $(MAKE) backup
+!endif
 
     cd $(ROOT)\src\engine\inst
     $(MAKE)
@@ -198,6 +211,8 @@ build-release-wrapper: clean-output global-versions
     cd $(ROOT)\src\desktop\inst
     $(MAKE) setup
 
+!ifdef QUICK_BUILD_KEYMAN
+!else
     cd $(ROOT)\src
     $(MAKE) build-release-wrapper-oem
 
@@ -206,6 +221,7 @@ build-release-wrapper: clean-output global-versions
 
     cd $(ROOT)\src\buildtools\inst
     $(MAKE)
+!endif
 
 build-release-wrapper-oem:
 !ifdef RELEASE_OEM

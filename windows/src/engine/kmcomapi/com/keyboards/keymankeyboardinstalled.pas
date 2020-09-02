@@ -110,6 +110,7 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
+    procedure RefreshInstallation;
 
   public
     constructor Create(AContext: TKeymanContext; const Name: string);
@@ -131,12 +132,14 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   custinterfaces,
+  KPInstallKeyboard,
   KPInstallVisualKeyboard,
   KPRecompileMnemonicKeyboard,
   keymanhotkey,
   keymankeyboardlanguagesinstalled,
   keymankeyboardoptions,
   keymanerrorcodes,
+  PackageInfo,
   utilxml;
 
 procedure TKeymanKeyboardInstalled.Uninstall;
@@ -397,6 +400,31 @@ begin
       FVisualKeyboard := TKeymanVisualKeyboard.Create(Context, FRegKeyboard.VisualKeyboardFileName, Get_ID);
   finally
     Free;
+  end;
+end;
+
+/// <summary>Updates installed keyboard to Keyman 14+ registration pattern</summary>
+/// <remarks>This refreshes all the registered profiles for the keyboard and registers
+/// transient profiles. This function is idempotent. This function requires elevation '
+/// to succeed.</remarks>
+procedure TKeymanKeyboardInstalled.RefreshInstallation;
+var
+  kpik: TKPInstallKeyboard;
+  o: IKeymanPackageInstalled;
+  ll: TPackageKeyboardLanguageList;
+begin
+  kpik := TKPInstallKeyboard.Create(Context);
+  try
+    o := Get_OwnerPackage;
+    if Assigned(o) then
+    begin
+      ll := (o as IIntKeymanPackageInstalled).GetKeyboardLanguageList(Get_ID) as TPackageKeyboardLanguageList;
+      kpik.RegisterProfiles(FRegKeyboard.KeymanFile, o.ID, [ikPartOfPackage], ll);
+    end
+    else
+      kpik.RegisterProfiles(FRegKeyboard.KeymanFile, '', [], nil);
+  finally
+    kpik.Free;
   end;
 end;
 

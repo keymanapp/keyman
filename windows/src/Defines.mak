@@ -70,6 +70,10 @@ INSTALLPATH_KEYMANENGINE=%CommonProgramFiles(X86)%\Keyman\Keyman Engine
   MAKEFLAG_RELEASE_OEM=-DRELEASE_OEM
 !ENDIF
 
+!IFDEF QUICK_BUILD_KEYMAN
+  MAKEFLAG_QUICK_BUILD_KEYMAN=-DQUICK_BUILD_KEYMAN
+!ENDIF
+
 #
 # USERDEFINES allows the developer to specify overrides for various settings. We need a variable
 # because Makefiles cannot test for file existence
@@ -93,7 +97,7 @@ DCC32PATH=C:\Program Files (x86)\Embarcadero\Studio\$(DELPHI_VERSION)\bin
 # Pass local configuration through to sub-instances of MAKE
 #
 
-MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
+MAKE="$(DCC32PATH)\make" -l $(MAKEFLAG_QUICK_BUILD_KEYMAN) $(MAKEFLAG_USERDEFINES) $(MAKEFLAG_DEBUG) $(MAKEFLAG_BUILDHELP) $(MAKEFLAG_BUILDRTF) $(MAKEFLAG_SC_TIMESTAMP) $(MAKEFLAG_LINT) $(MAKEFLAG_QUIET) $(MAKEFLAG_RELEASE_OEM)
 
 #
 # Delphi build commands

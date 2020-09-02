@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 1/09/2020 6:47:52 AM from Type Library described below.
+// File generated on 2/09/2020 8:08:53 AM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -1561,6 +1561,7 @@ type
   IKeymanKeyboardsInstalled2 = interface(IKeymanKeyboardsInstalled)
     ['{EA57C94F-C140-485E-941A-3F1D5A229024}']
     function Install2(const Filename: WideString; Force: WordBool): IKeymanKeyboardInstalled; safecall;
+    procedure RefreshInstalledKeyboards; safecall;
   end;
 
 // *********************************************************************//
@@ -1571,6 +1572,7 @@ type
   IKeymanKeyboardsInstalled2Disp = dispinterface
     ['{EA57C94F-C140-485E-941A-3F1D5A229024}']
     function Install2(const Filename: WideString; Force: WordBool): IKeymanKeyboardInstalled; dispid 19;
+    procedure RefreshInstalledKeyboards; dispid 601;
     property Items[Index: OleVariant]: IKeymanKeyboardInstalled readonly dispid 0; default;
     function GetKeyboardFromFile(const Filename: WideString): IKeymanKeyboardFile; dispid 16;
     procedure Install(const Filename: WideString; Force: WordBool); dispid 17;

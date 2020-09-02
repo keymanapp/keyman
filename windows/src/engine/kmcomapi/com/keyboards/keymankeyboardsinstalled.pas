@@ -54,6 +54,7 @@ type
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     procedure Apply; safecall;
     function Install2(const Filename: WideString; Force: WordBool): IKeymanKeyboardInstalled; safecall;
+    procedure RefreshInstalledKeyboards; safecall;
 
     { IIntKeymanKeyboardsInstalled }
   public
@@ -114,6 +115,22 @@ begin
 
   DoRefresh;
   Result := Get_Items(FileName);
+end;
+
+/// <summary>Updates installed keyboards to Keyman 14+ registration pattern</summary>
+/// <remarks>This refreshes all the registered profiles for keyboards and registers
+/// transient profiles for keyboards. This function is idempotent. This function
+/// requires elevation to succeed.</remarks>
+procedure TKeymanKeyboardsInstalled.RefreshInstalledKeyboards;
+var
+  I: Integer;
+  k: IKeymanKeyboardInstalled;
+begin
+  for I := 0 to Get_Count - 1 do
+  begin
+    k := Get_Items(i);
+    (k as IIntKeymanKeyboardInstalled).RefreshInstallation;
+  end;
 end;
 
 function TKeymanKeyboardsInstalled.Get_Items(Index: OleVariant): IKeymanKeyboardInstalled;

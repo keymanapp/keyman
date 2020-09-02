@@ -229,6 +229,8 @@ const
   SRegValue_LanguageProfileName = 'Name';                                           // LM SRegSubKey_LanguageProfiles
   SRegValue_KeymanProfileGUID   = 'profile guid';                                   // LM SRegSubKey_LanguageProfiles, SRegSubKey_TransientLanguageProfiles
 
+  SRegKey_Keyman_Temp_BackupProfiles = SRegKey_KeymanEngine_CU + '\Temp Backup Profiles'; // CU
+
   { InstalledPackages }
 
   SRegKey_InstalledPackages_LM = SRegKey_KeymanEngine_LM + '\Installed Packages';               // LM
@@ -461,6 +463,7 @@ const
 
 function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
+function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
 
 implementation
 
@@ -472,6 +475,11 @@ end;
 function BuildKeyboardLanguageProfilesKey_LM(const KeyboardID: string): string;
 begin
   Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + SRegSubKey_LanguageProfiles;
+end;
+
+function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string;
+begin
+  Result := SRegKey_InstalledKeyboards_LM + '\' + KeyboardID + '\' + SRegSubKey_SuggestedLanguages;
 end;
 
 end.

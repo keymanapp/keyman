@@ -68,6 +68,7 @@ type
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
     procedure UpdateBaseLayout;   // I4169
+    procedure RefreshInstallation;
   end;
 
   IIntKeymanKeyboardLanguage = interface   // I4376
@@ -81,6 +82,7 @@ type
   IIntKeymanPackageInstalled = interface(IIntKeymanInterface)
     ['{1B0AEAAF-5638-4FF3-BC02-308D42574CAF}']
     procedure RefreshKeyboards;
+    function GetKeyboardLanguageList(const KeyboardID: string): TObject;
   end;
 
   IIntKeymanPackagesInstalled = IIntKeymanCollection;

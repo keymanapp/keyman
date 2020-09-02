@@ -1,18 +1,18 @@
 (*
   Name:             keymankeyboardlanguagesinstalled
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      11 Aug 2013
 
   Modified Date:    4 Mar 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          11 Aug 2013 - mcdurdin - I3768 - V9.0 - Remove TSF substitution code
                     16 Apr 2014 - mcdurdin - I4169 - V9.0 - Mnemonic layouts should be recompiled to positional based on user-selected base keyboard
                     04 Mar 2015 - mcdurdin - I4607 - V9.0 - Support install of keyboard against fallback locales
@@ -297,15 +297,19 @@ end;
 procedure TKeymanKeyboardLanguagesInstalled.InstallByLangID(LangID: Integer);
 var
   Tag: string;
+  n: Integer;
   lang: IKeymanKeyboardLanguageInstalled2;
 begin
   Tag := TLanguageCodeUtils.TranslateWindowsLanguagesToBCP47(LangID);
-  if (Tag = '') or (IndexOfBCP47Code(Tag) >= 0) then
-    // Already installed; should we warn?
-    Exit;
+  if (Tag = '') then Exit;
 
-  lang := Add(Tag) as IKeymanKeyboardLanguageInstalled2;
-  lang.InstallTip(LangID, '');
+  n := IndexOfBCP47Code(Tag);
+  if n < 0
+    then lang := Add(Tag) as IKeymanKeyboardLanguageInstalled2
+    else lang := Get_Items(n) as IKeymanKeyboardLanguageInstalled2;
+
+  if Assigned(lang) then
+    lang.InstallTip(LangID, '');
 end;
 
 
