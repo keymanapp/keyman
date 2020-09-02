@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 14.0.138 alpha 2020-09-02
+
+* feat(windows): map installed bcp47 (#3542)
+* fix(windows): simplify profile uninstall (#3543)
+* fix(android/app): Remove unused intent ACTION_GET_USERDATA (#3551)
+* fix(android/engine): Remove notification after installing kbd package (#3546)
+* fix(android): Re-enable monitoring of Application Not Responding (ANR) (#3550)
+
 ## 14.0.137 alpha 2020-08-31
 
 * fix(android/engine): Fix package filename when downloading from cloud (#3541)
