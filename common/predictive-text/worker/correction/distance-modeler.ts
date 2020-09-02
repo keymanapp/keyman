@@ -1,7 +1,7 @@
 /// <reference path="classical-calculation.ts" />
 
 namespace correction {
-  type RealizedInput = ProbabilityMass<Transform>[];
+  type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
   type TraversableToken<TUnit> = {
     key: TUnit,
@@ -147,7 +147,7 @@ namespace correction {
       return edges;
     }
 
-    buildDeletionEdges(inputDistribution: ProbabilityMass<Transform>[]): SearchEdge[] {
+    buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchEdge[] {
       let edges: SearchEdge[] = [];
 
       for(let probMass of inputDistribution) {
@@ -185,7 +185,7 @@ namespace correction {
 
     // While this may SEEM to be unnecessary, note that sometimes substitutions (which are computed
     // via insert + delete) may be lower cost than both just-insert and just-delete.
-    buildSubstitutionEdges(inputDistribution: ProbabilityMass<Transform>[]): SearchEdge[] {
+    buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchEdge[] {
       // Handles the 'input' component.
       let intermediateEdges = this.buildDeletionEdges(inputDistribution);
       let edges: SearchEdge[] = [];
@@ -239,7 +239,7 @@ namespace correction {
   export class SearchSpace {
     private tierOrdering: SearchSpaceTier[] = [];
     private selectionQueue: models.PriorityQueue<SearchSpaceTier>;
-    private inputSequence: ProbabilityMass<Transform>[][] = [];
+    private inputSequence: Distribution<Transform>[] = [];
     private rootNode: SearchNode;
 
     // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time 
@@ -263,7 +263,7 @@ namespace correction {
       this.tierOrdering.forEach(function(tier) { tier.increaseMaxEditDistance() });
     }
 
-    addInput(inputDistribution: ProbabilityMass<Transform>[]) {
+    addInput(inputDistribution: Distribution<Transform>) {
       this.inputSequence.push(inputDistribution);
 
       // With a newly-available input, we can extend new input-dependent paths from 
